@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Control.Icon"
         xmlns:local="clr-namespace:Root_CAMELLIA"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -17,17 +18,19 @@
         Background="{StaticResource PanelBackGround}"
         mc:Ignorable="d">
     <Window.Resources>
-        <local:TextBoxToIntConverter x:Key="TextBoxToIntConverter" />
-        <local:AxisBoolToBrushConverter x:Key="AxisBoolToBrushConverter" />
-        <local:AxisStateToEnableConverter x:Key="AxisStateToEnableConverter" />
-        <local:AxisStateToOpacityConverter x:Key="AxisStateToOpacityConverter" />
-        <local:AxisStateToLoadingOpacityConverter x:Key="AxisStateToLoadingOpacityConverter" />
+        <local:TextBoxToIntConverter x:Key="TextBoxToInt" />
+        <local:AxisBoolToBrushConverter x:Key="AxisBoolToBrush" />
+        <local:AxisStateToEnableConverter x:Key="AxisStateToEnable" />
+        <local:AxisStateToOpacityConverter x:Key="AxisStateToOpacity" />
+        <local:AxisStateToLoadingOpacityConverter x:Key="AxisStateToLoadingOpacity" />
+        <local:AxisToMotionUIConverter x:Key="AxisToMotionUI"/>
     </Window.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="690" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="260" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <!--Title Bar-->
         <Grid Grid.Row="0"
@@ -327,7 +330,7 @@
                                                                 Margin="3"
                                                                 BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdServoOnOff}">
-                                                            <Grid Background="{Binding SelectedAxis.p_bSeroOn, Converter={StaticResource AxisBoolToBrushConverter}}"
+                                                            <Grid Background="{Binding SelectedAxis.p_bSeroOn, Converter={StaticResource AxisBoolToBrush}}"
                                                                   VerticalAlignment="Center"
                                                                   HorizontalAlignment="Center"
                                                                   Width="{Binding ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
@@ -340,7 +343,7 @@
                                                         <Grid Margin="3"
                                                               Background="#FFDDDDDD"
                                                               Grid.Column="1">
-                                                            <Grid Background="{Binding SelectedAxis.p_sensorMinusLimit, Converter={StaticResource AxisBoolToBrushConverter}}">
+                                                            <Grid Background="{Binding SelectedAxis.p_sensorMinusLimit, Converter={StaticResource AxisBoolToBrush}}">
                                                                 <TextBlock Text="Fault"
                                                                            HorizontalAlignment="Center"
                                                                            VerticalAlignment="Center" />
@@ -356,7 +359,7 @@
                                                                          Margin="1">
                                                                 <Grid Margin="2,1"
                                                                       Background="#FFDDDDDD">
-                                                                    <Grid Background="{Binding SelectedAxis.p_sensorMinusLimit, Converter={StaticResource AxisBoolToBrushConverter}}">
+                                                                    <Grid Background="{Binding SelectedAxis.p_sensorMinusLimit, Converter={StaticResource AxisBoolToBrush}}">
                                                                         <TextBlock Text="-"
                                                                                    HorizontalAlignment="Center"
                                                                                    VerticalAlignment="Center" />
@@ -364,7 +367,7 @@
                                                                 </Grid>
                                                                 <Grid Margin="2,1"
                                                                       Background="#FFDDDDDD">
-                                                                    <Grid Background="{Binding SelectedAxis.p_sensorHome, Converter={StaticResource AxisBoolToBrushConverter}}">
+                                                                    <Grid Background="{Binding SelectedAxis.p_sensorHome, Converter={StaticResource AxisBoolToBrush}}">
                                                                         <TextBlock Text="H"
                                                                                    HorizontalAlignment="Center"
                                                                                    VerticalAlignment="Center" />
@@ -372,7 +375,7 @@
                                                                 </Grid>
                                                                 <Grid Margin="2,1"
                                                                       Background="#FFDDDDDD">
-                                                                    <Grid Background="{Binding SelectedAxis.p_sensorInPos, Converter={StaticResource AxisBoolToBrushConverter}}">
+                                                                    <Grid Background="{Binding SelectedAxis.p_sensorInPos, Converter={StaticResource AxisBoolToBrush}}">
                                                                         <TextBlock Text="P"
                                                                                    HorizontalAlignment="Center"
                                                                                    VerticalAlignment="Center" />
@@ -380,7 +383,7 @@
                                                                 </Grid>
                                                                 <Grid Margin="2,1"
                                                                       Background="#FFDDDDDD">
-                                                                    <Grid Background="{Binding SelectedAxis.p_sensorPlusLimit, Converter={StaticResource AxisBoolToBrushConverter}}">
+                                                                    <Grid Background="{Binding SelectedAxis.p_sensorPlusLimit, Converter={StaticResource AxisBoolToBrush}}">
                                                                         <TextBlock Text="+"
                                                                                    HorizontalAlignment="Center"
                                                                                    VerticalAlignment="Center" />
@@ -456,7 +459,7 @@
                                                                 </i:EventTrigger>
                                                             </i:Interaction.Triggers>
                                                         </Button>
-                                                        <TextBox Text="{Binding PosValue, Converter={StaticResource TextBoxToIntConverter}}"
+                                                        <TextBox Text="{Binding PosValue, Converter={StaticResource TextBoxToInt}}"
                                                                  TextAlignment="Center"
                                                                  VerticalContentAlignment="Center"
                                                                  Margin="3"
@@ -512,42 +515,74 @@
                                                     </Grid.ColumnDefinitions>
                                                     <GroupBox Header="XY"
                                                               Grid.Column="0">
-                                                        <Canvas Background="{StaticResource ControlBackGround}">
-                                                            <Border Width="80"
-                                                                    Height="80"
-                                                                    Background="Gray"
-                                                                    Margin="5">
-                                                                <Grid>
-                                                                    <Ellipse Width="70"
-                                                                             Height="70"
-                                                                             Fill="LightGray" />
-                                                                    <TextBlock Text="Stage"
-                                                                               FontSize="9"
-                                                                               VerticalAlignment="Center"
-                                                                               HorizontalAlignment="Center" />
-                                                                </Grid>
-                                                            </Border>
-                                                        </Canvas>
+                                                        <Viewbox>
+                                                            <Canvas Background="{StaticResource ControlBackGround}"
+                                                                    Width="10000" Height="10000">
+                                                                <Border Width="3000"
+                                                                        Height="3000"
+                                                                        Canvas.Left="{Binding AxisX, Converter={StaticResource AxisToMotionUI}}"
+                                                                        Canvas.Top="{Binding AxisY, Converter={StaticResource AxisToMotionUI}}"
+                                                                        Background="Gray"
+                                                                        Margin="5">
+                                                                    <Grid>
+                                                                        <Ellipse Width="2800"
+                                                                                 Height="2800"
+                                                                                 Fill="LightGray" />
+                                                                        <TextBlock Text="Stage"
+                                                                                   FontSize="300"
+                                                                                   VerticalAlignment="Center"
+                                                                                   HorizontalAlignment="Center" />
+                                                                    </Grid>
+                                                                </Border>
+                                                            </Canvas>
+                                                        </Viewbox>
                                                     </GroupBox>
                                                     <GroupBox Header="Z"
                                                               Grid.Column="1">
-                                                        <Canvas Background="LightGray">
-                                                        </Canvas>
+                                                        <Viewbox>
+                                                            <Canvas Background="LightGray"
+                                                                    Width="2000" Height="10000">
+                                                                <Border Width="2000"
+                                                                        Height="500"
+                                                                        Canvas.Top="{Binding AxisZ, Converter={StaticResource AxisToMotionUI}}"
+                                                                        Background="Gray"
+                                                                        Margin="5" />
+                                                            </Canvas>
+                                                        </Viewbox>
                                                     </GroupBox>
                                                     <GroupBox Header="Lifter"
                                                               Grid.Column="2">
-                                                        <Canvas Background="LightGray">
-                                                        </Canvas>
+                                                        <Viewbox>
+                                                            <Canvas Background="LightGray"
+                                                                    Width="2000"
+                                                                    Height="10000">
+                                                                <Border Width="2000"
+                                                                        Height="500"
+                                                                        Canvas.Top="9500"
+                                                                        Background="Gray"
+                                                                        Margin="5" />
+                                                            </Canvas>
+                                                        </Viewbox>
                                                     </GroupBox>
                                                     <GroupBox Header="Stage Z"
                                                               Grid.Column="3">
-                                                        <Canvas Background="LightGray">
-                                                        </Canvas>
+                                                        <Viewbox>
+                                                            <Canvas Background="LightGray"
+                                                                    Width="2000"
+                                                                    Height="10000">
+                                                                <Border Width="2000"
+                                                                        Height="500"
+                                                                        Canvas.Top="9500"
+                                                                        Background="Gray"
+                                                                        Margin="5" />
+                                                            </Canvas>
+                                                        </Viewbox>
                                                     </GroupBox>
 
                                                 </Grid>
-                                                <Grid Grid.ColumnSpan="2">
+                                                <Grid Grid.Column="1">
                                                     <!--<local:LoadingControl Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToLoadingOpacityConverter}}" />-->
+                                                    <local:LoadingControl Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToLoadingOpacity}}" />
                                                 </Grid>
                                             </Grid>
                                             <Grid Grid.Row="1"
@@ -576,7 +611,7 @@
                                                                                     Binding="{Binding Name}" />
                                                                 <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
-                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToIntConverter}}" />
+                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
@@ -602,7 +637,7 @@
                                                                                     Binding="{Binding Name}" />
                                                                 <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
-                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToIntConverter}}" />
+                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
@@ -628,7 +663,7 @@
                                                                                     Binding="{Binding Name}" />
                                                                 <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
-                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToIntConverter}}" />
+                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
@@ -654,7 +689,7 @@
                                                                                     Binding="{Binding Name}" />
                                                                 <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
-                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToIntConverter}}" />
+                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
@@ -680,7 +715,7 @@
                                                                                     Binding="{Binding Name}" />
                                                                 <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
-                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToIntConverter}}" />
+                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
@@ -706,7 +741,7 @@
                                                                                     Binding="{Binding Name}" />
                                                                 <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
-                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToIntConverter}}" />
+                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
@@ -732,7 +767,7 @@
                                                                                     Binding="{Binding Name}" />
                                                                 <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
-                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToIntConverter}}" />
+                                                                                    Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
@@ -790,40 +825,25 @@
             <TabItem Header="Handler"
                      Width="100">
                 <Grid>
-                    <local:Camellia_Engineer_UI x:Name="EngineerUI" />
+                    <local:Camellia_Hander_UI x:Name="HandlerUI" />
                 </Grid>
             </TabItem>
             <TabItem Header="ToolBox"
                      Width="100">
-                <Grid>
-
-                </Grid>
+                <local:Camellia_ToolBox x:Name="ToolBoxUI"/>
             </TabItem>
         </TabControl>
-        <!--<GridSplitter Grid.Row="3" 
+        <GridSplitter Grid.Row="2" 
                       Height="2"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
                       Background="{StaticResource Splitter}"
                       ShowsPreview="True" Grid.ColumnSpan="2"/>
-        <Border Grid.Row="4" Grid.ColumnSpan="2" Panel.ZIndex="99">
-            <TabControl>
-                <TabItem Header="ALL" FontSize="10">
-                    <Grid>
-                        <TextBlock Text="Log Area" Margin="5" />
-                    </Grid>
-                </TabItem>
-                <TabItem Header="System" FontSize="10"/>
-                <TabItem Header="Inspection" FontSize="10"/>
-                <TabItem Header="I/O" FontSize="10"/>
-                <TabItem Header="Network" FontSize="10"/>
-                <TabItem Header="Result" FontSize="10"/>
-                <TabItem Header="Log" Background="DarkCyan">
-                    <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
-                </TabItem>
-            </TabControl>
-
-        </Border>-->
+        <Border Grid.Row="3"
+                Grid.ColumnSpan="2"
+                Panel.ZIndex="99">
+            <tools:LogView_UI x:Name="LogUI"/>
+        </Border>
     </Grid>
 
 </Window>

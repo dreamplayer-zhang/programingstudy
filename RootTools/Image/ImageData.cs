@@ -96,7 +96,7 @@ namespace RootTools
 		}
 
 		public IntPtr m_ptrImg;
-		MemoryData m_MemData;
+		public MemoryData m_MemData;
 		public byte[] m_aBuf;
 		byte[] m_aBufFileOpen;
 
@@ -181,10 +181,11 @@ namespace RootTools
 		}
 		public unsafe void SetData(IntPtr ptr, CRect rect, int stride, int nByte = 1)
 		{
-			ReAllocate(new CPoint(rect.Width, rect.Height), nByte);
+			//ReAllocate(new CPoint(rect.Width, rect.Height), nByte);
 
 			for (int i = rect.Height - 1; i >= 0; i--)
-				Marshal.Copy((IntPtr)((long)ptr + rect.Left * nByte + ((long)i + (long)rect.Top) * stride * (long)nByte * (long)rect.Width) , m_aBuf, i * rect.Width * nByte, rect.Width * nByte);
+				Marshal.Copy((IntPtr)((long)ptr + rect.Left * nByte + ((long)i + (long)rect.Top) * stride), m_aBuf, i * rect.Width * nByte, rect.Width * nByte);
+			//Marshal.Copy((IntPtr)((long)ptr + rect.Left * nByte + ((long)i + (long)rect.Top) * stride * (long)nByte * (long)rect.Width) , m_aBuf, i * rect.Width * nByte, rect.Width * nByte);
 
 		}
 
