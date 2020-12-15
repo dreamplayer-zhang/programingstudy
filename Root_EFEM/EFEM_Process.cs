@@ -4,13 +4,14 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Root_EFEM
 {
     /// <summary> InfoWafer에 있는 Recipe를 읽어 Sequence를 만든다 </summary>
-    public class EFEM_Process
+    public class EFEM_Process : NotifyProperty
     {
-/*        #region Locate
+        #region Locate
         /// <summary> Wafer Locate 관리용 </summary>
         public class Locate
         {
@@ -58,7 +59,7 @@ namespace Root_EFEM
 
             public Locate(WTRArm arm)
             {
-                m_id = arm.m_id; 
+                m_id = arm.m_id;
                 m_arm = arm;
             }
 
@@ -127,7 +128,7 @@ namespace Root_EFEM
 
         void CalcInfoWaferProcess(InfoWafer infoWafer)
         {
-            if (infoWafer == null) return; 
+            if (infoWafer == null) return;
             Queue<ModuleRunBase> qProcess = infoWafer.m_qProcess;
             qProcess.Clear();
             qProcess.Enqueue(m_wtr.CloneRunGet(infoWafer.m_sModule, infoWafer.m_nSlot));
@@ -191,13 +192,13 @@ namespace Root_EFEM
                     InitCalc();
                     foreach (InfoWafer infoWafer in m_aCalcWafer)
                     {
-                        foreach (ModuleRunBase moduleRun in infoWafer.m_aProcess) m_qSequence.Enqueue(new Sequence(moduleRun, infoWafer));
+                        foreach (ModuleRunBase moduleRun in infoWafer.m_qProcess) m_qSequence.Enqueue(new Sequence(moduleRun, infoWafer));
                     }
                 }
                 RunTree(Tree.eMode.Init);
                 return "OK";
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 return "ReCalc Sequence Error : " + e.Message;
             }
@@ -206,13 +207,13 @@ namespace Root_EFEM
         void InitCalc()
         {
             m_qSequence.Clear();
-            m_aCalcWafer.Clear(); 
+            m_aCalcWafer.Clear();
             foreach (Locate locate in m_aLocate) locate.p_calcWafer = locate.p_infoWafer;
             foreach (InfoWafer infoWafer in m_aInfoWafer)
             {
                 InfoWafer calcWafer = new InfoWafer(infoWafer.m_sModule, infoWafer.m_nSlot, m_engineer);
                 ModuleRunBase[] aProcess = infoWafer.m_qProcess.ToArray();
-                foreach (ModuleRunBase run in aProcess) calcWafer.m_qProcess.Enqueue(run); 
+                foreach (ModuleRunBase run in aProcess) calcWafer.m_qProcess.Enqueue(run);
                 m_aCalcWafer.Add(infoWafer);
             }
         }
@@ -224,7 +225,7 @@ namespace Root_EFEM
                 if (GetLocate(arm.m_id).p_calcWafer != null)
                 {
                     CalcSequence(arm);
-                    return true; 
+                    return true;
                 }
             }
             return GetNextInfoWafer();
@@ -234,14 +235,14 @@ namespace Root_EFEM
         {
             Locate locateArmPut = GetLocate(armPut.m_id);
             InfoWafer infoWaferPut = locateArmPut.p_calcWafer;
-            ModuleRunBase runPut = infoWaferPut.m_qProcess.Dequeue();
-            string sChild = m_wtr.GetChildID(runPut, armPut); 
-            Locate locateChild = GetLocate(sChild);
+            IWTRRun runPut = (IWTRRun)infoWaferPut.m_qProcess.Dequeue();
+            runPut.SetArm(armPut); 
+            Locate locateChild = GetLocate(runPut.p_sChild);
             InfoWafer infoWaferGet = (locateChild == null) ? null : locateChild.p_calcWafer;
             if ((infoWaferGet != null) && (locateChild != null))
             {
                 ModuleRunBase runGet = infoWaferGet.m_qProcess.Dequeue();
-                string sArmGet = m_wtr.GetArmID(runGet, armPut); 
+                string sArmGet = m_wtr.GetEnableAnotherArmID(runGet, armPut, infoWaferGet);
                 Locate locateArmGet = GetLocate(sArmGet);
                 locateArmGet.p_calcWafer = locateChild.p_calcWafer;
                 locateChild.p_calcWafer = null;
@@ -249,7 +250,7 @@ namespace Root_EFEM
             }
             if (locateChild != null) locateChild.p_calcWafer = infoWaferPut;
             locateArmPut.p_calcWafer = null;
-            m_qSequence.Enqueue(new Sequence(runPut, infoWaferPut));
+            m_qSequence.Enqueue(new Sequence((ModuleRunBase)runPut, infoWaferPut));
             m_aCalcWafer.Remove(infoWaferPut);
             m_aCalcWafer.Add(infoWaferPut);
             CalcSequenceChild(infoWaferPut);
@@ -298,7 +299,7 @@ namespace Root_EFEM
 
         bool GetNextInfoWafer(int iArm, InfoWafer infoWaferGet)
         {
-            WTRArm armGet = m_wtr.p_aArm[iArm]; 
+            WTRArm armGet = m_wtr.p_aArm[iArm];
             if (armGet.IsEnableWaferSize(infoWaferGet) == false) return false;
             IWTRChild child = GetNextChild(infoWaferGet);
             if (child != null)
@@ -306,15 +307,15 @@ namespace Root_EFEM
                 InfoWafer infoWaferChild = GetLocate(child.p_id).p_calcWafer;
                 if (infoWaferChild != null)
                 {
-                    if (IsEnableWaferSizeAnotherArm(iArm, infoWaferGet) == false) return false; 
+                    if (IsEnableWaferSizeAnotherArm(iArm, infoWaferGet) == false) return false;
                 }
             }
-                    .Run_Get moduleRunGet = (.Run_Get)infoWaferGet.m_qCalcProcess.Dequeue();
-            moduleRunGet.m_eArm = armGet;
-            GetLocate(moduleRunGet.m_eArm).p_calcWafer = infoWaferGet;
-            Locate locateChild = GetLocate(moduleRunGet.m_sChild);
+            IWTRRun wtrRun = (IWTRRun)infoWaferGet.m_qProcess.Dequeue();
+            wtrRun.SetArm(armGet);
+            GetLocate(armGet.m_id).p_calcWafer = infoWaferGet;
+            Locate locateChild = GetLocate(wtrRun.p_sChild);
             if (locateChild != null) locateChild.p_calcWafer = null;
-            m_qSequence.Enqueue(new Sequence(moduleRunGet, infoWaferGet));
+            m_qSequence.Enqueue(new Sequence((ModuleRunBase)wtrRun, infoWaferGet));
             return true;
         }
 
@@ -332,9 +333,9 @@ namespace Root_EFEM
 
         IWTRChild GetNextChild(InfoWafer infoWaferGet)
         {
-            for (int n = 1; n < infoWaferGet.m_qCalcProcess.Count; n++)
+            for (int n = 1; n < infoWaferGet.m_qProcess.Count; n++)
             {
-                ModuleRunBase moduleRun = infoWaferGet.m_qCalcProcess.Peek();
+                ModuleRunBase moduleRun = infoWaferGet.m_qProcess.Peek();
                 if (moduleRun.m_moduleBase.p_id != m_wtr.p_id) return (IWTRChild)moduleRun.m_moduleBase;
             }
             return null;
@@ -347,23 +348,21 @@ namespace Root_EFEM
         {
             m_aInfoWafer.Clear();
             m_qSequence.Clear();
-            CalcRecoverArm(.eArm.Lower);
-            CalcRecoverArm(.eArm.Upper);
-            foreach (IWTRChild child in m_handler.p_wtr.m_aChild) CalcRecoverChild(child);
-            ReCalcSequence(null);
+            foreach (WTRArm arm in m_wtr.p_aArm) CalcRecoverArm(arm);
+            foreach (IWTRChild child in m_wtr.p_aChild) CalcRecoverChild(child);
+            ReCalcSequence();
             RunTree(Tree.eMode.Init);
         }
 
-        void CalcRecoverArm(.eArm arm)
+        void CalcRecoverArm(WTRArm arm)
         {
-            Locate locate = GetLocate(arm);
+            Locate locate = GetLocate(arm.m_id);
             if (locate.p_infoWafer == null) return;
             InfoWafer infoWafer = locate.p_infoWafer;
             m_aInfoWafer.Add(infoWafer);
-            infoWafer.m_aProcess.Clear();
-            int iWTRMotion = 0;
-            ModuleRunBase moduleRun = m_handler.p_wtr.GetRunMotion(ref iWTRMotion, .eMotion.Put, infoWafer.m_sModule, infoWafer.m_nSlot);
-            infoWafer.m_aProcess.Add(moduleRun);
+            infoWafer.m_qProcess.Clear();
+            ModuleRunBase moduleRun = m_wtr.CloneRunPut(infoWafer.m_sModule, infoWafer.m_nSlot);
+            infoWafer.m_qProcess.Enqueue(moduleRun);
         }
 
         void CalcRecoverChild(IWTRChild child)
@@ -372,138 +371,130 @@ namespace Root_EFEM
             if ((locate == null) || (locate.p_infoWafer == null)) return;
             InfoWafer infoWafer = locate.p_infoWafer;
             m_aInfoWafer.Add(infoWafer);
-            wtr = m_handler.p_wtr;
-            infoWafer.m_aProcess.Clear();
-            int iWTRMotion = 0;
-            string sChild = child.p_id;
-            string sChildID = "01";
-            ModuleRunBase moduleRunGet = wtr.GetRunMotion(ref iWTRMotion, .eMotion.Get, sChild, sChildID);
-            infoWafer.m_aProcess.Add(moduleRunGet);
-            ModuleRunBase moduleRunPut = wtr.GetRunMotion(ref iWTRMotion, .eMotion.Put, infoWafer.m_sModule, infoWafer.m_nSlot);
-            infoWafer.m_aProcess.Add(moduleRunPut);
+            infoWafer.m_qProcess.Clear();
+            ModuleRunBase moduleRunGet = m_wtr.CloneRunGet(child.p_id, -1);
+            infoWafer.m_qProcess.Enqueue(moduleRunGet);
+            ModuleRunBase moduleRunPut = m_wtr.CloneRunPut(infoWafer.m_sModule, infoWafer.m_nSlot);
+            infoWafer.m_qProcess.Enqueue(moduleRunPut);
         }
         #endregion
 
+        #region RunSequence
+        /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
+        public string RunNextSequence()
+        {
+            ModuleBase wtr = (ModuleBase)m_wtr;
+            if (m_qSequence.Count == 0)
+            {
+                EQ.p_eState = EQ.eState.Ready;
+                return "OK";
+            }
+            Sequence sequence = m_qSequence.Peek();
+            if (sequence.m_moduleRun.m_moduleBase == wtr)
+            {
+                sequence.m_moduleRun.StartRun();
+                while (wtr.IsBusy()) Thread.Sleep(10);
+            }
+            else sequence.m_moduleRun.StartRun();
+            m_qSequence.Dequeue();
+            InfoWafer infoWafer = sequence.m_infoWafer;
+            if (infoWafer.m_qProcess.Count > 0) infoWafer.m_qProcess.Dequeue();
+            RunTree(Tree.eMode.Init);
+            return "OK";
+        }
+        #endregion
 
+        #region UI Binding
+        string _sInfo = "OK";
+        public string p_sInfo
+        {
+            get { return _sInfo; }
+            set
+            {
+                if (_sInfo == value) return;
+                _sInfo = value;
+                OnPropertyChanged();
+            }
+        }
+        #endregion
+
+        #region Tree
         public TreeRoot m_treeWafer;
         public TreeRoot m_treeLocate;
         public TreeRoot m_treeSequence;
+        void InitTree(string id)
+        {
+            m_treeWafer = new TreeRoot(id + "Wafer", m_log, true);
+            m_treeLocate = new TreeRoot(id + "Locate", m_log);
+            m_treeSequence = new TreeRoot(id + "Sequence", m_log, true);
+            m_treeLocate.UpdateTree += M_treeLocate_UpdateTree;
+        }
 
+        private void M_treeLocate_UpdateTree()
+        {
+            RunTreeLocate(Tree.eMode.Update);
+        }
 
-        //===============================================================
+        public void RunTree(Tree.eMode mode)
+        {
+            RunTreeWafer(mode);
+            RunTreeLocate(mode);
+            RunTreeSequence(mode);
+        }
 
-         /*       
+        void RunTreeWafer(Tree.eMode mode)
+        {
+            TreeRoot tree = m_treeWafer;
+            tree.p_eMode = mode;
+            for (int n = 0; n < m_aInfoWafer.Count; n++)
+            {
+                InfoWafer infoWafer = m_aInfoWafer[n];
+                infoWafer.RunTree(tree.GetTree(infoWafer.p_id, false));
+            }
+        }
 
-                #region RunSequence
-                /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
-                public string RunNextSequence()
+        void RunTreeLocate(Tree.eMode mode)
+        {
+            TreeRoot tree = m_treeLocate;
+            tree.p_eMode = mode;
+            foreach (Locate locate in m_aLocate) locate.RunTree(tree);
+        }
+
+        void RunTreeSequence(Tree.eMode mode)
+        {
+            TreeRoot tree = m_treeSequence;
+            tree.p_eMode = mode;
+            Sequence[] aSequence = m_qSequence.ToArray();
+            for (int n = 0; n < aSequence.Length; n++)
+            {
+                ModuleRunBase moduleRun = aSequence[n].m_moduleRun;
+                ModuleBase module = moduleRun.m_moduleBase;
+                InfoWafer infoWafer = aSequence[n].m_infoWafer;
+                string sTree = "(" + infoWafer.p_id + ")." + moduleRun.p_id;
+                switch (moduleRun.m_sModuleRun)
                 {
-                    if (m_wtr.p_eState != ModuleBase.eState.Ready) return "WTR not Ready";
-                    if (m_qSequence.Count == 0)
-                    {
-                        EQ.p_eState = EQ.eState.Ready;
-                        return "OK";
-                    }
-                    Sequence sequence = m_qSequence.Peek();
-                    if (sequence.m_moduleRun.m_moduleBase == m_wtr) p_sInfo = sequence.m_moduleRun.Run();
-                    else p_sInfo = sequence.m_moduleRun.StartRun();
-                    if (p_sInfo == "OK")
-                    {
-                        m_qSequence.Dequeue();
-                        InfoWafer infoWafer = sequence.m_infoWafer;
-                        if (infoWafer.m_aProcess.Count > 0) infoWafer.m_aProcess.RemoveAt(0);
-                    }
-                    RunTree(Tree.eMode.Init);
-                    return p_sInfo;
+                    case "Get": sTree += "." + ((IWTRRun)moduleRun).p_sChild; break;
+                    case "Put": sTree += "." + ((IWTRRun)moduleRun).p_sChild; break;
                 }
-                #endregion
+                moduleRun.RunTree(tree.GetTree(n, sTree, false), true);
+            }
+        }
+        #endregion
 
-                #region UI Binding
-                string _sInfo = "OK";
-                public string p_sInfo
-                {
-                    get { return _sInfo; }
-                    set
-                    {
-                        if (_sInfo == value) return;
-                        _sInfo = value;
-                        OnPropertyChanged();
-                    }
-                }
-                #endregion
-
-                #region Tree
-                private void M_treeLocate_UpdateTree()
-                {
-                    RunTreeLocate(Tree.eMode.Update);
-                }
-
-                public void RunTree(Tree.eMode mode)
-                {
-                    RunTreeWafer(mode);
-                    RunTreeLocate(mode);
-                    RunTreeSequence(mode);
-                }
-
-                void RunTreeWafer(Tree.eMode mode)
-                {
-                    TreeRoot tree = m_treeWafer;
-                    tree.p_eMode = mode;
-                    for (int n = 0; n < m_aInfoWafer.Count; n++)
-                    {
-                        InfoWafer infoWafer = m_aInfoWafer[n];
-                        infoWafer.RunTree(tree.GetTree(infoWafer.p_id, false));
-                    }
-                }
-
-                void RunTreeLocate(Tree.eMode mode)
-                {
-                    TreeRoot tree = m_treeLocate;
-                    tree.p_eMode = mode;
-                    foreach (Locate locate in m_aLocate) locate.RunTree(tree);
-                }
-
-                void RunTreeSequence(Tree.eMode mode)
-                {
-                    TreeRoot tree = m_treeSequence;
-                    tree.p_eMode = mode;
-                    Sequence[] aSequence = m_qSequence.ToArray();
-                    for (int n = 0; n < aSequence.Length; n++)
-                    {
-                        ModuleRunBase moduleRun = aSequence[n].m_moduleRun;
-                        ModuleBase module = moduleRun.m_moduleBase;
-                        InfoWafer infoWafer = aSequence[n].m_infoWafer;
-                        string sTree = "(" + infoWafer.p_id + ")." + moduleRun.p_id;
-                        switch (moduleRun.m_sModuleRun)
-                        {
-                            case "Get": sTree += "." + ((.Run_Get)moduleRun).m_sChild; break;
-                            case "Put": sTree += "." + ((.Run_Put)moduleRun).m_sChild; break;
-                        }
-                        moduleRun.RunTree(tree.GetTree(n, sTree, false), true);
-                    }
-                }
-                #endregion
-*/
         public string m_id;
-                IEngineer m_engineer;
-                public IHandler m_handler;
-                IWTR m_wtr;
-                Log m_log;
-                public EFEM_Process(string id, IEngineer engineer, IWTR wtr)
-                {
-                    m_id = id;
-                    m_engineer = engineer;
-                    m_handler = engineer.ClassHandler();
-                    m_wtr = wtr;
-                    m_log = LogView.GetLog(id);
-
-//                    m_treeWafer = new TreeRoot(id + "Wafer", m_log, true);
-//                    m_treeLocate = new TreeRoot(id + "Locate", m_log);
-//                    m_treeSequence = new TreeRoot(id + "Sequence", m_log, true);
-
-//                    m_treeLocate.UpdateTree += M_treeLocate_UpdateTree;
-
-//                    InitLocate();
-                }
+        IEngineer m_engineer;
+        public IHandler m_handler;
+        IWTR m_wtr;
+        Log m_log;
+        public EFEM_Process(string id, IEngineer engineer, IWTR wtr)
+        {
+            m_id = id;
+            m_engineer = engineer;
+            m_handler = engineer.ClassHandler();
+            m_wtr = wtr;
+            m_log = LogView.GetLog(id);
+            InitTree(id); 
+            InitLocate();
+        }
     }
 }

@@ -21,9 +21,7 @@ namespace Root_EFEM.Module
 
         ModuleRunBase CloneRunPut(string sChild, int nSlot);
 
-        string GetArmID(ModuleRunBase runGet, WTRArm armPut);
-
-        string GetChildID(ModuleRunBase runPut, WTRArm armPut);
+        string GetEnableAnotherArmID(ModuleRunBase runGet, WTRArm armPut, InfoWafer infoWafer);
     }
 
 }
