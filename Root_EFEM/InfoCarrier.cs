@@ -116,7 +116,7 @@ namespace Root_EFEM
         {
             for (int n = 0; n < c_maxSlot; n++)
             {
-                InfoWafer newSlot = new InfoWafer(p_sModule + "." + (n + 1).ToString("00"), m_engineer);
+                InfoWafer newSlot = new InfoWafer(p_sModule, n, m_engineer);
                 newSlot.p_eState = GemSlotBase.eState.Empty;
                 newSlot.p_sCarrierID = p_sCarrierID;
                 newSlot.p_sLocID = p_sLocID;

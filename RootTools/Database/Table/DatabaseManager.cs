@@ -195,7 +195,7 @@ namespace RootTools.Database
             DataTable table;
             try
             {
-                string sSelectQuery = string.Format("SELECT * FROM wind2.{0} where sInspectionID = '{1}';", sTable, sInspectionID);
+                string sSelectQuery = string.Format("SELECT * FROM wind2.{0} where m_strInspectionID = '{1}';", sTable, sInspectionID);
                 MySqlDataAdapter ap = new MySqlDataAdapter();
                 ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
                 ap.Fill(data);

@@ -337,7 +337,7 @@ namespace Root_WIND2
                     masterImageData.m_eMode = ImageData.eMode.ImageBuffer;
                     masterImageData.SetData(Marshal.UnsafeAddrOfPinnedArrayElement(originRecipe.MasterImage.RawData, 0)
                         , new CRect(0, 0, originRecipe.MasterImage.Width, originRecipe.MasterImage.Height)
-                        , 1, originRecipe.MasterImage.ByteCnt);
+                        , originRecipe.MasterImage.Width, originRecipe.MasterImage.ByteCnt);
 
                     Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
                     {

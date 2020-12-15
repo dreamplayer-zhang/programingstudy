@@ -57,13 +57,14 @@ namespace Root_WIND2.Module
 			InitModuleRun(module);
 		}
 
-		double resolution = 1.7;	// um
+		double resolution = 1.7;    // um
 		double startDegree = 0;
 		double scanDegree = 360;
 		double scanAcc = 1;
-		int scanRate = 100;			// Camera Frame Spec 사용률 ? 1~100 %
+		int scanRate = 100;         // Camera Frame Spec 사용률 ? 1~100 %
 		int maxFrame = 100;
-		
+		//double triggerRatio = 1.5;	// 캠익에서 트리거 분주비
+
 		// recipe
 		int sobelHeight = 10;
 		int sobelThreshold = 90;
@@ -87,6 +88,7 @@ namespace Root_WIND2.Module
 			run.scanAcc = scanAcc;
 			run.scanRate = scanRate;
 			run.maxFrame = maxFrame;
+			//run.triggerRatio = triggerRatio;
 
 			run.sobelHeight = sobelHeight;
 			run.sobelThreshold = sobelThreshold;
@@ -118,7 +120,7 @@ namespace Root_WIND2.Module
 			mergeDist = tree.Set(mergeDist, mergeDist, "Merge Distance", "pixel", bVisible);
 			inspThreshhold = tree.Set(inspThreshhold, inspThreshhold, "Inspection Theshold", "", bVisible);
 			//
-			
+
 			p_sGrabModeTop = tree.Set(p_sGrabModeTop, p_sGrabModeTop, module.p_asGrabMode, "Grab Mode : Top", "Select GrabMode", bVisible);
 			if (gmTop != null) gmTop.RunTree(tree.GetTree("Grab Mode : Top", false), bVisible, true);
 			p_sGrabModeSide = tree.Set(p_sGrabModeSide, p_sGrabModeSide, module.p_asGrabMode, "Grab Mode : Side", "Select GrabMode", bVisible);
@@ -129,29 +131,16 @@ namespace Root_WIND2.Module
 
 		public override string Run()
 		{
-			string sRstCam = module.OpenCamera();
-			if (sRstCam != "OK")
-			{
-				return sRstCam;
-			}
-			module.p_bStageVac = true;
-
-			string sRst = "None";
-			sRst = GrabEdge();
-			if (sRst != "OK")
-				return sRst;
-			
-			return sRst;
-		}
-
-		private string GrabEdge()
-		{
-			Axis axisR = module.AxisRotate;
-			Axis axisEdgeX = module.AxisEdgeX;
+			if (gmTop == null || gmSide == null || gmBtm == null) return "Grab Mode == null";
 
 			try
 			{
 				gmTop.SetLight(true);
+				gmSide.SetLight(true);
+				gmBtm.SetLight(true);
+
+				Axis axisR = module.AxisRotate;
+				Axis axisEdgeX = module.AxisEdgeX;
 
 				double pulsePerDegree = module.Pulse360 / 360;
 				double curr = axisR.p_posActual - axisR.p_posActual % module.Pulse360;
@@ -173,6 +162,77 @@ namespace Root_WIND2.Module
 					return p_sInfo;
 				axisR.SetTrigger(triggerStart, triggerDest, trigger, true);
 
+				gmTop.StartGrab(gmTop.m_memoryData, new CPoint(0, 0), grabCount);
+				gmTop.Grabed += m_gmTop_Grabed;
+				gmSide.StartGrab(gmSide.m_memoryData, new CPoint(0, 0), grabCount);
+				gmBtm.StartGrab(gmBtm.m_memoryData, new CPoint(0, 0), grabCount);
+
+				if (module.Run(axisR.StartMove(moveEnd, scanSpeed, scanAcc, scanAcc)))
+					return p_sInfo;
+				if (module.Run(axisR.WaitReady()))
+					return p_sInfo;
+
+				axisR.RunTrigger(false);
+				gmTop.StopGrab();
+				gmSide.StopGrab();
+				gmBtm.StopGrab();
+				return "OK";
+			}
+			finally
+			{
+				gmTop.SetLight(false);
+				gmSide.SetLight(false);
+				gmBtm.SetLight(false);
+			}
+
+
+			/*
+			string sRstCam = module.OpenCamera();
+			if (sRstCam != "OK")
+			{
+				return sRstCam;
+			}
+			module.p_bStageVac = true;
+
+			string sRst = "None";
+			sRst = GrabEdge();
+			if (sRst != "OK")
+				return sRst;
+
+			return sRst;
+			*/
+		}
+
+		private string GrabEdge()
+		{
+			Axis axisR = module.AxisRotate;
+			Axis axisEdgeX = module.AxisEdgeX;
+
+			try
+			{
+				gmTop.SetLight(true);
+
+				double pulsePerDegree = module.Pulse360 / 360;
+				double curr = axisR.p_posActual - axisR.p_posActual % module.Pulse360;
+				double triggerStart = curr + startDegree * pulsePerDegree;
+				double triggerDest = triggerStart + scanDegree * pulsePerDegree;
+				int trigger = 1;
+
+				int scanSpeed = Convert.ToInt32((double)maxFrame * trigger * (double)scanRate / 100);
+				double moveStart = triggerStart - scanAcc * scanSpeed;   //y 축 이동 시작 지점 
+				double moveEnd = triggerDest + scanAcc * scanSpeed;  // Y 축 이동 끝 지점.
+				int grabCount = Convert.ToInt32(scanDegree * pulsePerDegree * module.TriggerRatio);
+
+				if (module.Run(axisEdgeX.StartMove(sideFocusAxis)))
+					return p_sInfo;
+				if (module.Run(axisEdgeX.WaitReady()))
+					return p_sInfo;
+				if (module.Run(axisR.StartMove(moveStart)))
+					return p_sInfo;
+				if (module.Run(axisR.WaitReady()))
+					return p_sInfo;
+
+				axisR.SetTrigger(triggerStart, triggerDest, trigger, true);
 				gmTop.StartGrab(gmTop.m_memoryData, new CPoint(0, 0), grabCount);
 				gmTop.Grabed += m_gmTop_Grabed;
 				gmSide.StartGrab(gmSide.m_memoryData, new CPoint(0, 0), grabCount);

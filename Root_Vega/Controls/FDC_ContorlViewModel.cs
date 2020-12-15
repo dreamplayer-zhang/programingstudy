@@ -203,7 +203,7 @@ namespace Root_Vega
                 m_reg.Write(Member.GetName(() => m_CVM[index].p_SlaveNumber), m_CVM[index].p_SlaveNumber);
                 m_reg.Write(Member.GetName(() => m_CVM[index].p_TmprtrName), m_CVM[index].p_TmprtrName);
 				m_FDC.m_aData[index].p_eUnit = (FDC.eUnit)(int)(m_CVM[index].p_EnumSelectedUnit);
-				m_FDC.m_aData[index].m_mmLimit.X = (int)m_CVM[index].p_LowerValue ;
+				m_FDC.m_aData[index].m_mmLimit.X = (int)m_CVM[index].p_LowerValue;
 				m_FDC.m_aData[index].m_mmLimit.Y = (int)m_CVM[index].p_UpperValue;
 			//	m_FDC.m_aData.RunTree(Tree.eMode.Update);
             }

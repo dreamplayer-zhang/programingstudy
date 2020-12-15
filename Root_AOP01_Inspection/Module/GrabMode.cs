@@ -16,10 +16,10 @@ namespace Root_AOP01_Inspection.Module
     {
         public enum eScanPos
         {
-            Bottom = 0,
-            Left,
-            Top,
-            Right,
+            SideLeft =0,
+            SideBottom,
+            SideRight,
+            SideTop,
         }
 
         #region Camera
@@ -147,7 +147,7 @@ namespace Root_AOP01_Inspection.Module
         public int m_ScanStartLine = 0;
         #endregion
 
-        public eScanPos m_eScanPos = eScanPos.Bottom;
+        public eScanPos m_eScanPos = eScanPos.SideLeft;
 
         public string p_id
         {

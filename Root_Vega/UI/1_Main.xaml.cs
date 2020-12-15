@@ -185,7 +185,12 @@ namespace Root_Vega
             ui.Init(m_handler); 
             ui.Show(); 
         }
-        #endregion
-    }
+		#endregion
+
+		private void buttonBuzzerOff_Click(object sender, RoutedEventArgs e)
+		{
+            m_engineer.BuzzerOff();
+		}
+	}
 }
 

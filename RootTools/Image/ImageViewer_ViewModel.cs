@@ -628,6 +628,7 @@ namespace RootTools
 		}
 		public unsafe void SetThumNailIamge()
 		{
+			return;
 			if (p_ImageData.p_nByte == 1)
 			{
 				Image<Gray, byte> view = new Image<Gray, byte>(p_ThumbWidth, p_ThumbHeight);
@@ -642,7 +643,7 @@ namespace RootTools
 					{
 						pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
 						pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;
-						view.Data[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                        view.Data[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * p_ImageData.p_Size.X]; 
 					}
 				}
 				if (view.Width != 0 && view.Height != 0)

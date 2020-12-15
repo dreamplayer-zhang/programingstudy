@@ -37,12 +37,14 @@ namespace Root_Vega.Module
         }
         #endregion
 
+        #region ALID
         ALID m_alidRTRWarningPos;
 
         void InitALID()
 		{
             m_alidRTRWarningPos = m_gaf.GetALID(this, "RTR WarningPos", "RTR WarningPos Error");
 		}
+        #endregion
 
         #region DIO Function
         public string RunGrip(bool bGrip)

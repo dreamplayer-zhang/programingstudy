@@ -19,7 +19,7 @@ namespace Root_AxisMapping
         {
             m_handler = handler;
             DataContext = handler;
-            moduleListUI.Init(handler.m_moduleList);
+            moduleListUI.Init(handler.p_moduleList);
             recipeUI.Init(handler.m_recipe);
             gafUI.Init(handler.m_gaf);
             InitTabControl();
@@ -27,7 +27,7 @@ namespace Root_AxisMapping
 
         void InitTabControl()
         {
-            foreach (KeyValuePair<ModuleBase, UserControl> kv in m_handler.m_moduleList.m_aModule)
+            foreach (KeyValuePair<ModuleBase, UserControl> kv in m_handler.p_moduleList.m_aModule)
             {
                 TabItem tabItem = new TabItem();
                 tabItem.Header = kv.Key.p_id;
