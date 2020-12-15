@@ -91,7 +91,7 @@ namespace Root_Vega.Module
 
             int m_nDigit = 2;
             double m_fDiv = 100;
-            public CPoint m_mmLimit = new CPoint(); 
+            public RPoint m_mmLimit = new RPoint(); 
             ALID[] m_alid = new ALID[2] { null, null };
 			public bool p_bAlarm
 			{
@@ -113,8 +113,8 @@ namespace Root_Vega.Module
                         //if ((m_svValue.p_value != null) && (m_svValue.p_value == value)) return; 
                         m_svValue.p_value = value;
                         OnPropertyChanged();
-                        m_alid[0].p_bSet = (m_svValue.p_value < m_mmLimit.X);
-                        m_alid[1].p_bSet = (m_svValue.p_value > m_mmLimit.Y);
+                        m_alid[0].Run(m_svValue.p_value < m_mmLimit.X, p_id + "'s Value is lower than Low Limit");
+                        m_alid[1].Run(m_svValue.p_value > m_mmLimit.Y, p_id + "'s Value is Higher than High Limit");
                         double dValue = Math.Abs(m_svValue.p_value - (m_mmLimit.X + m_mmLimit.Y) / 2);
                         int nRed = (int)(500 * dValue / (m_mmLimit.X - m_mmLimit.Y));
                         if (nRed > 250) nRed = 250;
@@ -142,7 +142,7 @@ namespace Root_Vega.Module
             {
                 int nValue = (int)(p_fValue * m_fDiv);
                 modbus.ReadInputRegister((byte)m_nUnitID, ref nValue);
-                p_fValue = nValue / m_fDiv; 
+                p_fValue = nValue / m_fDiv;
             }
 
             public void RunTree(Tree tree, int module_number)
@@ -156,9 +156,7 @@ namespace Root_Vega.Module
                 if (m_alid[0] == null)
                 {
                     m_alid[0] = m_module.m_gaf.GetALID(m_module, ".Low Limit", "FDC Low Limit");
-                    m_alid[0].p_sMsg = "FDC" + p_id + "value is lower then Low Limit";
                     m_alid[1] = m_module.m_gaf.GetALID(m_module, ".High Limit", "FDC High Limit");
-                    m_alid[1].p_sMsg = "FDC" + p_id + "value is higher then High Limit";
                     m_svValue = m_module.m_gaf.GetSVID(m_module, p_id); 
                 }
                 m_alid[0].p_id = "LowerLimit";
@@ -226,7 +224,6 @@ namespace Root_Vega.Module
         {
             base.RunThread();
             Thread.Sleep(m_msInterval);
-
             if (!m_modbus.m_client.Connected)
             {
                 Thread.Sleep(1000);
