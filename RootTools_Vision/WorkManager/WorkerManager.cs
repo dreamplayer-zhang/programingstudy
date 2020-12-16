@@ -23,7 +23,7 @@ namespace RootTools_Vision
         CancellationTokenSource cancellationTokenSource;
         private ManualResetEvent _waitSignal = new ManualResetEvent(false);
 
-        private bool isPause = false;
+        private bool isStop = false;
 
         WORKPLACE_STATE resultState = WORKPLACE_STATE.NONE;
         WORKPLACE_STATE excuteCondition = WORKPLACE_STATE.NONE;
@@ -147,7 +147,7 @@ namespace RootTools_Vision
             {
                 _waitSignal.WaitOne();
 
-                if (isPause == true)
+                if (isStop == true)
                 {
                     _waitSignal.Reset();
                     continue;
@@ -169,22 +169,15 @@ namespace RootTools_Vision
             // event
             this.workplaceBundle.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
 
-            this.isPause = false;
+            this.isStop = false;
             _waitSignal.Set();
-        }
-
-        public void Pause()
-        {
-            this.workplaceBundle.WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
-
-            this.isPause = true;
         }
 
         public void Stop()
         {
             this.workplaceBundle.WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
 
-            this.isPause = true;
+            this.isStop = true;
         }
     }
 }

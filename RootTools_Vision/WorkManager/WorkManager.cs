@@ -90,11 +90,6 @@ namespace RootTools_Vision
             this.workerManager.Start();
         }
 
-        public void Pause()
-        {
-            this.workerManager.Pause();
-        }
-
         public void Stop()
         {
             this.workerManager.Stop();

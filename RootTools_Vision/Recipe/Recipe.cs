@@ -140,12 +140,12 @@ namespace RootTools_Vision
         public bool Save(string recipePath)
         {
             bool rst = true;
+            this.RecipePath = recipePath;
 
             recipePath = recipePath.Replace(".rcp", "");
             string recipeName = recipePath.Substring(recipePath.LastIndexOf("\\") + 1);
             string recipeFolderPath = recipePath.Substring(0 ,recipePath.LastIndexOf("\\") + 1);
 
-            this.RecipePath = recipePath;
             this.RecipeFolderPath = recipeFolderPath;
 
             // Xml 파일을 읽은 뒤 이미지나 ROI 등을 불러오기 위해서 각 class에 대한 Save 함수를 호출한다.

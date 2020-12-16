@@ -1388,7 +1388,7 @@ namespace Root_WIND2
         BackgroundWorker Worker_ClearROI = new BackgroundWorker();
         BackgroundWorker Worker_ReadROI = new BackgroundWorker();
         BackgroundWorker Worker_ShowAll = new BackgroundWorker();
-        private void SetBackGroundWorker()
+        public void SetBackGroundWorker()
         {
             Worker_ClearROI.DoWork += Worker_ClearROI_DoWork;
             Worker_ClearROI.RunWorkerCompleted += Worker_ClearROI_RunWorkerCompleted;
@@ -1445,7 +1445,7 @@ namespace Root_WIND2
                 {
                     for (int x = data.StartPt.X; x < data.StartPt.X + data.Width; x++)
                     {
-                        fPtr[(data.StartPt.Y * p_ROILayer.p_Size.X + x)] = clr;
+                        fPtr[(data.StartPt.Y * p_ROILayer.p_Size.X + x)] += clr;
                     }
                 }
             }
@@ -1610,7 +1610,7 @@ namespace Root_WIND2
             Worker_ReadROI.RunWorkerAsync();
         }
 
-        private void _ShowAll()
+        public void _ShowAll()
         {
             if (Worker_ShowAll.IsBusy)
                 return;

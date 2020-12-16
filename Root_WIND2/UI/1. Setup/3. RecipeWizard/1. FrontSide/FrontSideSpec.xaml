@@ -34,13 +34,13 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0" DataContext="{Binding p_ROI_Viewer}">
-                        <GroupBox Header="Mask"
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition  Height="3*"/>
+                        </Grid.RowDefinitions>
+                        <GroupBox Header="ROI"
                               Background="{StaticResource GroupBoxBackground}">
                             <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="15*"/>
-                                    <RowDefinition Height="85*"/>
-                                </Grid.RowDefinitions>
                                 <ScrollViewer Grid.Row="0">
                                     <DataGrid ItemsSource="{Binding p_cInspROI}"
                                               SelectedItem="{Binding p_SelectedROI}"
@@ -99,8 +99,11 @@
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </ScrollViewer>
-                                <tools:RootViewer Grid.Row="1"/>
+                                
                             </Grid>
+                        </GroupBox>
+                        <GroupBox Header="Viewer" Grid.Row="1">
+                            <tools:RootViewer />
                         </GroupBox>
                     </Grid>
                     <!--Mask&Insepection Method-->
