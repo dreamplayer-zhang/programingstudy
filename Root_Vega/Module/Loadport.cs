@@ -29,7 +29,10 @@ namespace Root_Vega.Module
         public DIO_O m_doUnload;
         public DIO_O m_doAlarm;
         public DIO_I m_diIonizer;
-        //        public DIO_Os m_doPodCylinder;
+        DIO_O m_doPodCylinderOpen;
+        DIO_O m_doPodCylinderClose;
+        DIO_I m_diFrontCheck;
+        DIO_I m_diBackCheck;
         public OHT_Semi m_OHT;
 
         public override void GetTools(bool bInit)
@@ -50,6 +53,10 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_doAlarm, this, "Alarm");
             //            p_sInfo = m_toolBox.Get(ref m_doPodCylinder, this, "Alarm", Enum.GetNames(typeof(ePodCylinder)));
             p_sInfo = m_toolBox.Get(ref m_OHT, this, m_infoPod, "OHT");
+            p_sInfo = m_toolBox.Get(ref m_doPodCylinderOpen, this, "Pod cylinder open");
+            p_sInfo = m_toolBox.Get(ref m_doPodCylinderClose, this, "Pod cylinder close");
+            p_sInfo = m_toolBox.Get(ref m_diFrontCheck, this, "Front Pod cylinder check");
+            p_sInfo = m_toolBox.Get(ref m_diBackCheck, this, "Back Pod cylinder check");
             if (bInit)
             {
                 InitPosZ();
@@ -102,10 +109,26 @@ namespace Root_Vega.Module
 
         double m_dInposTheta = -1;
         public string MoveTheta(ePosTheta pos)
-        {
-            string sMove = m_axisTheta.StartMove(pos);
+		{
+			if (pos == ePosTheta.Open)//check
+			{
+				m_doPodCylinderClose.Write(false);
+				m_doPodCylinderOpen.Write(true);
+				Thread.Sleep(1500);
+                m_alidPodcylinderCheck.Run(m_diFrontCheck.p_bIn || m_diBackCheck.p_bIn, "Pod Cylinder State Error");
+			}
+			string sMove = m_axisTheta.StartMove(pos);
             if (sMove != "OK") return sMove;
-            return m_axisTheta.WaitReady(m_dInposTheta);
+            sMove = m_axisTheta.WaitReady(m_dInposTheta);
+            if (sMove != "OK") return sMove;
+            if (pos == ePosTheta.Close)
+			{
+                m_doPodCylinderOpen.Write(false);
+                m_doPodCylinderClose.Write(true);
+                Thread.Sleep(1500);
+                m_alidPodcylinderCheck.Run(!m_diFrontCheck.p_bIn || !m_diBackCheck.p_bIn, "Pod Cylinder State Error");
+            }
+            return "OK"; 
         }
         #endregion
 
@@ -162,9 +185,9 @@ namespace Root_Vega.Module
         {
             GemCarrierBase.ePresent present;
             if (m_dioPlaced.p_bIn != m_dioPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
-            else present = !m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;//check
+            else present = !m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
 
-            if (m_infoPod.CheckPlaced(present, m_axisZ.IsInPos(ePosZ.Load,m_dInposZ)) != "OK")//check
+            if (m_infoPod.CheckPlaced(present, m_axisZ.IsInPos(ePosZ.Load,m_dInposZ)) != "OK")
             {
                 m_alidPlaced.p_sMsg = "Placed Sensor Remain Checked while Pod State = " + m_infoPod.p_eState;
                 m_alidPlaced.p_bSet = true;
@@ -228,13 +251,13 @@ namespace Root_Vega.Module
         public bool m_bIonizerDoorlockCheck = false;
         public string BeforeGet()
 		{
-			if (m_vega.m_diDoorLock.p_bIn == true)//check
+			if (m_vega.m_diDoorLock.p_bIn == true)
 			{
 				m_bIonizerDoorlockCheck = true;
-                m_vega.m_doIonizerOnOff.Write(true);//check
+                m_vega.m_doIonizerOnOff.Write(true);
                 Thread.Sleep(2000);
                 m_vega.m_swIonizerOn.Start();
-				m_alidIonizer.Run(!m_diIonizer.p_bIn,"Ionizer is not on");//check
+				m_alidIonizer.Run(!m_diIonizer.p_bIn,"Ionizer is not on");
 			}
 			if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Get Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
@@ -251,7 +274,7 @@ namespace Root_Vega.Module
                 m_vega.m_doIonizerOnOff.Write(true);
                 Thread.Sleep(2000);
                 m_vega.m_swIonizerOn.Start();
-                m_alidIonizer.Run(!m_diIonizer.p_bIn, "Ionizer is not on");//check
+                m_alidIonizer.Run(!m_diIonizer.p_bIn, "Ionizer is not on");
             }
             if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Put Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
@@ -266,7 +289,7 @@ namespace Root_Vega.Module
             Thread.Sleep(1000);
             m_vega.m_swIonizerOn.Stop();
             m_bIonizerDoorlockCheck = false;
-            m_alidIonizer.Run(m_diIonizer.p_bIn, "Ionizer is on");//check
+            m_alidIonizer.Run(m_diIonizer.p_bIn, "Ionizer is on");
             m_alidReticleTransferFail.Run(m_diReticle.p_bIn, "Reticle Get Fail");
             return IsRunOK();
         }
@@ -277,7 +300,7 @@ namespace Root_Vega.Module
             Thread.Sleep(1000);
             m_vega.m_swIonizerOn.Stop();
             m_bIonizerDoorlockCheck = false;
-            m_alidIonizer.Run(m_diIonizer.p_bIn, "Ionizer is on");//check
+            m_alidIonizer.Run(m_diIonizer.p_bIn, "Ionizer is on");
             m_alidReticleTransferFail.Run(!m_diReticle.p_bIn, "Reticle Put Fail, Reticle Sensor not Detected");
             return IsRunOK();
         }
@@ -317,6 +340,7 @@ namespace Root_Vega.Module
         #region Load & Unload
         public string RunLoad()
         {
+
             if (m_infoPod.p_eState == InfoPod.eState.Load) return "OK"; 
             if (m_axisZ.IsInPos(ePosZ.Ready, m_dInposZ) == false) return "AxisZ Position not Ready";
             if (m_axisPodLifter.IsInPos(ePosPodLifter.Ready, m_dInposLifter) == false) return "AxisPodLifter Position not Ready";
@@ -354,7 +378,6 @@ namespace Root_Vega.Module
             if (Run(MovePodLifter(ePosPodLifter.Ready))) return p_sInfo;
             if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
             if (Run(MoveTheta(ePosTheta.Close))) return p_sInfo;
-
             // Inspection Done
             //((Vega_Engineer)m_engineer).m_InspManager.InspectionDone(App.indexFilePath);
 
@@ -416,14 +439,14 @@ namespace Root_Vega.Module
             if (Run(MoveTheta(ePosTheta.Close))) return p_sInfo;
 
             m_infoPod.AfterHome();
-            if (m_dioPlaced.p_bIn == true)
+            if (m_dioPlaced.p_bIn == false)//check jws
             {
                 m_infoPod.p_eState = InfoPod.eState.Placed; 
             }
             return "OK";
         }
 
-        public string Home_Innerpod() // JWS 200616 ADD
+        public string Home_Innerpod()
         {
             if (m_diInnerPod.p_bIn ==false) return "No InnerPod";
             if (Run(MoveZ(ePosZ.InnerPod))) return p_sInfo;
@@ -432,7 +455,7 @@ namespace Root_Vega.Module
             return MoveZ(ePosZ.Ready); 
         }
 
-        public string Home_Reticle() // JWS 200616 ADD
+        public string Home_Reticle()
         {
             if (m_axisZ.IsInPos(ePosZ.Check,m_dInposZ) == false) return "AxisZ Position Not Check Pos";
             if (m_diReticle.p_bIn)//(reticle 센서 감지)
@@ -452,7 +475,7 @@ namespace Root_Vega.Module
             return Home_Innerpod();
         }
 
-        public string HomeToMinusLimit(params Axis[] aAxis) //JWS 200625 ADD
+        public string HomeToMinusLimit(params Axis[] aAxis)
         {
             p_sInfo = StateHome(aAxis);
             if (p_sInfo != "OK") return p_sInfo;
@@ -505,6 +528,7 @@ namespace Root_Vega.Module
         ALID m_alidPlaced;
         ALID m_alidIonizer;
         ALID m_alidReticleTransferFail;
+        ALID m_alidPodcylinderCheck;
         public ALID m_alidInforeticle;
 
         void InitGAF()
@@ -518,7 +542,7 @@ namespace Root_Vega.Module
             m_alidIonizer = m_gaf.GetALID(this, "Ionizer Check", "Ionizer State");
             m_alidInforeticle = m_gaf.GetALID(this, "Info Reticle Error", "Info Reticle Error");
             m_alidReticleTransferFail = m_gaf.GetALID(this, "Reticle Transfer Fail", "Reticle Transfer Fail");
-
+            m_alidPodcylinderCheck = m_gaf.GetALID(this, "Pod cylinder Error", "Pod cylinder Error");
         }
         #endregion
 
@@ -561,7 +585,7 @@ namespace Root_Vega.Module
 
             m_axisZ.p_eState = Axis.eState.Ready;
             m_axisTheta.p_eState = Axis.eState.Ready;
-            m_vega.m_doIonizerOnOff.Write(false);//check
+            m_vega.m_doIonizerOnOff.Write(false);
 
         }
 
@@ -626,12 +650,6 @@ namespace Root_Vega.Module
                         if(m_module.m_dioPresent.p_bIn==false)
                         m_module.m_infoPod.SetInfoReticleExist();
                     }
-
-                    //else if (m_module.m_infoPod.p_infoReticle.p_sReticleID == m_module.m_infoPod.p_infoReticle.p_id)
-                    //{
-                    //    m_module.m_infoPod.p_infoReticle.p_sReticleID = sCarrierID;
-                    //    m_module.p_infoReticle.p_sSlotID = m_module.m_infoPod.p_infoReticle.p_sReticleID;
-                    //}
                 }
                 if (sResult == "OK") m_module.m_infoPod.SendCarrierID(sCarrierID); 
                 return sResult; 

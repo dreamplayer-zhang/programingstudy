@@ -540,7 +540,7 @@ namespace Root_Vega.Module
             if (bIgnoreExistSensor) bExist = (p_infoReticle != null);
             else
             {
-                bExist = m_diSideReticleExistSensor.p_bIn; //check
+                bExist = m_diSideReticleExistSensor.p_bIn;
             }
             p_brushReticleExist = bExist ? Brushes.Yellow : Brushes.Green;
             return bExist;
