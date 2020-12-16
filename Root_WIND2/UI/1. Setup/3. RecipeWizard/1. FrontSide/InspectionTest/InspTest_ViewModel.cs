@@ -180,6 +180,7 @@ namespace Root_WIND2
         private void _btnStop()
         {
             //timer.Stop();
+            m_Setup.InspectionVision.Stop();
             DatabaseManager.Instance.SelectData();
             m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
 

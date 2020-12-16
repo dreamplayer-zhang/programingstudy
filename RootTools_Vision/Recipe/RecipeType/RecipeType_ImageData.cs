@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Serialization;
 
 namespace RootTools_Vision
@@ -59,8 +61,14 @@ namespace RootTools_Vision
             return Tools.SaveRawdataToBitmap(recipeFolderPath + this.FileName , RawData, Width, Height, ByteCnt);
         }
 
-        public bool Read(string recipeFolderPath)
+        public bool Read(string recipeFolderPath)  
         {
+            if(File.Exists(recipeFolderPath + this.FileName) == false)
+            {
+                MessageBox.Show("Master Image가 없습니다.", "Error Master Image Laod",MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
             Bitmap bmp = new Bitmap(recipeFolderPath + this.FileName);
 
             this.Width = bmp.Width;

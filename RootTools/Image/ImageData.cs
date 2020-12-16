@@ -174,19 +174,12 @@ namespace RootTools
 
 		public unsafe void SetData(IntPtr ptr, CRect rect, int stride, int nByte = 1)
 		{
-            //ReAllocate(new CPoint(rect.Width, rect.Height), nByte);
-
-            //for (int i = rect.Height - 1; i >= 0; i--)
-            //    Marshal.Copy((IntPtr)((long)ptr + rect.Left * nByte + ((long)i + (long)rect.Top) * stride * nByte), m_aBuf, i * rect.Width * nByte, rect.Width * nByte);
-
             // 병렬처리
             Parallel.For(0, rect.Height - 1, (i) =>
                  {
                      Marshal.Copy((IntPtr)((long)ptr + rect.Left * nByte + ((long)i + (long)rect.Top) * stride * nByte), m_aBuf, i * rect.Width * nByte, rect.Width * nByte);
                  }
             );
-            //Marshal.Copy((IntPtr)((long)ptr + rect.Left * nByte + ((long)i + (long)rect.Top) * stride * (long)nByte * (long)rect.Width) , m_aBuf, i * rect.Width * nByte, rect.Width * nByte);
-
         }
 
 		public unsafe void SetData(ImageData imgData, CRect rect, int stride, int nByte = 1)

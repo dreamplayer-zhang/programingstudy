@@ -352,7 +352,7 @@ namespace Root_WIND2
         {
             SetMapData();
             DrawMapData();
-            LoadMasterImage();
+            //LoadMasterImage();
         }
     }
 }
