@@ -50,7 +50,7 @@ namespace Root_CAMELLIA.Data
         {
 
         }
-        public void RecipeOpen(string path = null)
+        public bool RecipeOpen(string path = null)
         {
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.DefaultExt = "aco";
@@ -87,7 +87,7 @@ namespace Root_CAMELLIA.Data
                     //  m_DM.m_LM.WriteLog(LOG.CAMELLIA, "[Open Recipe] Done");
                     // m_DM.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Open - Recipe : " + dialog.FileName);
                     //  MessageBox.Show("Open Recipe Done!");
-                   
+                    return true;
                 }
                 catch (Exception ex)
                 {
@@ -101,6 +101,7 @@ namespace Root_CAMELLIA.Data
             //    MessageBox.Show("Open Recipe Fail!");
             //    return false;
             //}
+            return false;
         }
         public void RecipeSave()
         {

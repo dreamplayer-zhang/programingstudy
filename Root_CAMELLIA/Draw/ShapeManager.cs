@@ -127,7 +127,7 @@ namespace Root_CAMELLIA.Draw
             CanvasArrowLine.Opacity = opacity;
             CanvasArrowLine.ArrowLength = 20;
         }
-        public void SetData(DrawingPoint.PointF[] pt, Brush strokeBrush, int arrowLength, double thickness, int zIndex = 0)
+        public void SetData(DrawingPoint.PointF[] pt, Brush strokeBrush, int arrowLength, double thickness, int ArrowAngle = 0, int zIndex = 0)
         {
             CanvasArrowLine.StrokeThickness = thickness;
             CanvasArrowLine.Stroke = strokeBrush;
@@ -136,6 +136,10 @@ namespace Root_CAMELLIA.Draw
             CanvasArrowLine.Y1 = pt[0].Y;
             CanvasArrowLine.X2 = pt[1].X;
             CanvasArrowLine.Y2 = pt[1].Y;
+            if(ArrowAngle != 0)
+            {
+                CanvasArrowLine.ArrowAngle = ArrowAngle;
+            }
             Panel.SetZIndex(CanvasArrowLine, zIndex);
         }
     }
