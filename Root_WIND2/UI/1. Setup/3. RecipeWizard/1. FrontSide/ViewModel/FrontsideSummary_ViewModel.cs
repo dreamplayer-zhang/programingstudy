@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -321,7 +322,8 @@ namespace Root_WIND2
         {
             SetMapData();
             DrawMapData();
-            LoadMasterImage();
+
+            //LoadMasterImage();
         }
         public void LoadMasterImage()
         {
@@ -337,7 +339,7 @@ namespace Root_WIND2
                     masterImageData.m_eMode = ImageData.eMode.ImageBuffer;
                     masterImageData.SetData(Marshal.UnsafeAddrOfPinnedArrayElement(originRecipe.MasterImage.RawData, 0)
                         , new CRect(0, 0, originRecipe.MasterImage.Width, originRecipe.MasterImage.Height)
-                        , 1, originRecipe.MasterImage.ByteCnt);
+                        , originRecipe.MasterImage.Width, originRecipe.MasterImage.ByteCnt);
 
                     Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
                     {
