@@ -2026,7 +2026,7 @@ namespace Root_Vega.Module
                 ImageData img = cam.p_ImageViewer.p_ImageData;
                 string strVRSImageDirectoryPath = "C:\\vsdb\\";
                 string strVRSImageFullPath = "";
-                string strLightName = "VRS";
+                string strLightName = "SideVRS Side";
 
                 // implement
                 try
@@ -2203,7 +2203,7 @@ namespace Root_Vega.Module
                 ImageData img = cam.p_ImageViewer.p_ImageData;
                 string strVRSImageDirectoryPath = "C:\\vsdb\\";
                 string strVRSImageFullPath = "";
-                string strLightName = "VRS";    // Bevel VRS 이름으로 바꿔라
+                string strLightName = "BevelVRS Side";    // Bevel VRS 이름으로 바꿔라
 
                 // implement
                 try
@@ -2211,7 +2211,9 @@ namespace Root_Vega.Module
                     m_module.p_bRunSideVision = true;
 
                     StopWatch sw = new StopWatch();
-                    m_module.SetLightByName(strLightName, 20);
+                    m_module.SetLightByName(strLightName, 50);
+                    strLightName = "BevelVRS Coax";
+                    m_module.SetLightByName(strLightName, 500);
                     if (cam.p_CamInfo._OpenStatus == false) cam.Connect();
                     while (cam.p_CamInfo._OpenStatus == false)
                     {
@@ -2272,11 +2274,11 @@ namespace Root_Vega.Module
                             return p_sInfo;
 
                         // Defect 위치로 이동
-                        //RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectInfo[i].cptDefectPos);    // rpDefectPos.X == Z축값, rpDefectPos.Y == Y축값
-                        //if (m_module.Run(axisXY.StartMove(dPosX, rpDefectPos.Y))) return p_sInfo;
-                        //if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                        //if (m_module.Run(axisZ.StartMove(rpDefectPos.X))) return p_sInfo;
-                        //if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+                        RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectInfo[i].cptDefectPos);    // rpDefectPos.X == Z축값, rpDefectPos.Y == Y축값
+                        if (m_module.Run(axisXY.StartMove(dPosX, rpDefectPos.Y))) return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        if (m_module.Run(axisZ.StartMove(rpDefectPos.X))) return p_sInfo;
+                        if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
 
                         // VRS 촬영 및 저장
                         string strTemp = cam.Grab();
@@ -2287,6 +2289,9 @@ namespace Root_Vega.Module
                 }
                 finally
                 {
+                    strLightName = "BevelVRS Side";
+                    m_module.SetLightByName(strLightName, 0);
+                    strLightName = "BevelVRS Coax";
                     m_module.SetLightByName(strLightName, 0);
                     m_module.p_bRunSideVision = false;
                 }
@@ -2300,10 +2305,20 @@ namespace Root_Vega.Module
                 int nCamWidth = m_module.m_CamBevel.GetRoiSize().X;
                 int nMMPerUM = 1000;
                 double dTriggerPeriod = m_dResY_um / 10 * 100;
+                int nReticleVerticalSize_px = Convert.ToInt32(m_dReticleVerticalSize_mm * nMMPerUM / m_dResY_um);
+                int nReticleHorizontalSize_px = Convert.ToInt32(m_dReticleHorizontalSize_mm * nMMPerUM / m_dResY_um);
+                int nReticleRangePulse = Convert.ToInt32(dTriggerPeriod * nReticleVerticalSize_px);
+                double dTriggerStartPosY = m_rpReticleCenterPos_pulse.Y + (nReticleRangePulse / 2);
+                int nScanLine = cpMemory.X / nCamWidth;
+                int nSpareZ = cpMemory.X % nCamWidth;
+                RPoint rpAxis = new RPoint();
+
+                rpAxis.X = m_nFocusPosZ;
+                rpAxis.Y = dTriggerStartPosY - (dTriggerPeriod * cpMemory.Y) - m_rpDistanceOfTDIToVRS_pulse.Y;
 
                 // implement
 
-                return new RPoint();
+                return rpAxis;
             }
         }
         //-------------------------------------------------------------------
