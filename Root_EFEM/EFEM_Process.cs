@@ -380,7 +380,7 @@ namespace Root_EFEM
             if (sequence.m_moduleRun.m_moduleBase == wtr)
             {
                 sequence.m_moduleRun.StartRun();
-                while (wtr.IsBusy()) Thread.Sleep(10);
+                while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             }
             else sequence.m_moduleRun.StartRun();
             m_qSequence.Dequeue();
