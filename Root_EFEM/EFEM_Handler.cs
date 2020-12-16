@@ -96,7 +96,8 @@ namespace Root_EFEM
             RND,
             Cymechs,
         }
-        List<eLoadport> m_aLoadportType = new List<eLoadport>(); 
+        List<eLoadport> m_aLoadportType = new List<eLoadport>();
+        List<InfoCarrier> m_aInfoCarrier = new List<InfoCarrier>(); 
         int m_lLoadport = 2; 
         void InitLoadport()
         {
@@ -107,9 +108,18 @@ namespace Root_EFEM
                 string sID = "Loadport" + cLP;
                 switch (m_aLoadportType[n])
                 {
-                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
-                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, true); break; 
-                    default: module = new Loadport_RND(sID, m_engineer, true, true); break;
+                    case eLoadport.RND: 
+                        module = new Loadport_RND(sID, m_engineer, true, true);
+                        m_aInfoCarrier.Add(((Loadport_RND)module).m_infoCarrier); 
+                        break;
+                    case eLoadport.Cymechs: 
+                        module = new Loadport_Cymechs(sID, m_engineer, true, true);
+                        m_aInfoCarrier.Add(((Loadport_Cymechs)module).m_infoCarrier);
+                        break; 
+                    default: 
+                        module = new Loadport_RND(sID, m_engineer, true, true);
+                        m_aInfoCarrier.Add(((Loadport_RND)module).m_infoCarrier);
+                        break;
                 }
                 InitModule(module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
@@ -315,13 +325,13 @@ namespace Root_EFEM
 
         public dynamic GetGemSlot(string sSlot)
         {
-//            foreach (Loadport loadport in m_aLoadport)
-//            {
-//                foreach (GemSlotBase slot in loadport.m_infoPod.m_aGemSlot)
-//                {
-//                    if (slot.p_id == sSlot) return slot;
-//                }
-//            }
+            foreach (InfoCarrier infoCarrier in m_aInfoCarrier)
+            {
+                foreach (GemSlotBase slot in infoCarrier.m_aGemSlot)
+                {
+                    if (slot.p_id == sSlot) return slot;
+                }
+            }
             return null;
         }
         #endregion
