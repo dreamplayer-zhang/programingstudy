@@ -763,6 +763,7 @@ namespace RootTools
                         IntPtr ptrMem = p_ROILayer.GetPtr();
 
                         if (ptrMem == IntPtr.Zero)
+
                             return;
 
                         byte* imageptr = (byte*)ptrMem.ToPointer();
