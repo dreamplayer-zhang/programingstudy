@@ -16,8 +16,11 @@ namespace Root_EFEM
         {
             foreach (ModuleBase module in modules)
             {
-                m_asModule.Add(module.p_id);
-                m_aModule.Add(module);
+                if (module.m_asRecipe.Count > 0)
+                {
+                    m_asModule.Add(module.p_id);
+                    m_aModule.Add(module);
+                }
             }
         }
         #endregion

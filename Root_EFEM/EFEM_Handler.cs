@@ -291,13 +291,13 @@ namespace Root_EFEM
         #region Calc Sequence
         public string AddSequence(dynamic infoSlot)
         {
-//            m_process.AddInfoWafer(infoSlot);
+            m_process.AddInfoWafer(infoSlot);
             return "OK";
         }
 
         public void CalcSequence()
         {
-//            m_process.ReCalcSequence(null);
+            m_process.ReCalcSequence();
         }
         #endregion
 
@@ -305,7 +305,7 @@ namespace Root_EFEM
         public void CheckFinish()
         {
             if (m_gem.p_cjRun == null) return;
-//            if (m_process.m_qSequence.Count > 0) return;
+            if (m_process.m_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
                 if (m_gem != null) m_gem.SendPJComplete(pj.m_sPJobID);
