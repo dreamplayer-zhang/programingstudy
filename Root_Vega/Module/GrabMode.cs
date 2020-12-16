@@ -141,6 +141,7 @@ namespace Root_Vega.Module
         public int m_ScanLineNum = 1;
         public int m_ScanStartLine = 0;
         public int m_nXOffset = 0;
+        public int m_nThetaOffset = 0;
         #endregion
 
         public eScanPos m_eScanPos = eScanPos.Bottom;
@@ -154,6 +155,7 @@ namespace Root_Vega.Module
         {
             m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible, bReadOnly);
             m_nXOffset = tree.Set(m_nXOffset, m_nXOffset, "X Offset", "X Offset", bVisible, bReadOnly);
+            m_nThetaOffset = tree.Set(m_nThetaOffset, m_nThetaOffset, "Theta Offset", "Theta Offset", bVisible, bReadOnly);
         }
 
         public string p_sName{get;set;}
@@ -190,6 +192,7 @@ namespace Root_Vega.Module
             dst.m_sMemoryGroup = src.m_sMemoryGroup;
 
             dst.m_nXOffset = src.m_nXOffset;
+            dst.m_nThetaOffset = src.m_nThetaOffset;
 
             return dst;
         }
@@ -198,8 +201,6 @@ namespace Root_Vega.Module
         {
             string sName = p_sName;
             p_sName = tree.Set(p_sName, p_sName, p_id, "Grab Mode Name");
-            //if (sName != p_sName)
-            //    m_sMemoryGroup = p_sName;
         }
 
         public void RunTree(Tree tree, bool bVisible, bool bReadOnly)

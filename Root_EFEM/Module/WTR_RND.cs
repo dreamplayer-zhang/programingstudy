@@ -722,8 +722,8 @@ namespace Root_EFEM.Module
         {
             AddModuleRunList(new Run_ResetCPU(this), false, "Reset WTR CPU");
             AddModuleRunList(new Run_Grip(this), false, "Run Grip WTR Arm");
-            m_runGet = AddModuleRunList(new Run_Get(this), true, "WTR Run Get Motion");
-            m_runPut = AddModuleRunList(new Run_Put(this), true, "WTR Run Put Motion");
+            m_runGet = AddModuleRunList(new Run_Get(this), false, "WTR Run Get Motion");
+            m_runPut = AddModuleRunList(new Run_Put(this), false, "WTR Run Put Motion");
         }
 
         public class Run_ResetCPU : ModuleRunBase

@@ -7,6 +7,7 @@ using System.Windows.Shapes;
 using RootTools_Vision;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Windows;
 
 namespace Root_WIND2
 {
@@ -500,7 +501,7 @@ namespace Root_WIND2
             BoxImageData.m_eMode = ImageData.eMode.ImageBuffer;
             BoxImageData.SetData(Marshal.UnsafeAddrOfPinnedArrayElement(originRecipe.MasterImage.RawData, 0)
                 , new CRect(0, 0, originRecipe.MasterImage.Width, originRecipe.MasterImage.Height)
-                , 1, originRecipe.MasterImage.ByteCnt);
+                , originRecipe.MasterImage.Width, originRecipe.MasterImage.ByteCnt);
 
             this.Offset = new CPoint(originRecipe.MasterImage.PositionX, originRecipe.MasterImage.PositionY);
             this.p_ImageData = BoxImageData;

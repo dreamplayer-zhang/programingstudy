@@ -284,7 +284,7 @@ namespace RootTools_Vision
                 if (maxScore < this.parameter.MinScoreLimit)
                 {
                     this.workplace.SetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS, false);
-                    return false;
+                    //return false;
                 }
 
                 this.workplace.SetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS, true);
