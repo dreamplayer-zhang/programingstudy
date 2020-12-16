@@ -295,6 +295,7 @@ namespace Root_EFEM
 
         public void RunTreeWafer(Tree.eMode mode)
         {
+            if ((mode == Tree.eMode.Init) && m_treeRootWafer.m_bFocus) return; 
             m_treeRootWafer.p_eMode = mode;
             for (int n = 0; n < m_aInfoWafer.Count; n++)
             {
