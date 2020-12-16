@@ -58,9 +58,18 @@ namespace RootTools_Vision
             int backsideOffset = 50;
             bool isBackside = false;
             // Recipe
-            int waferCenterX = recipeBackside.CenterX;
-            int waferCenterY = recipeBackside.CenterY;
-            int radius = recipeBackside.Radius;
+
+            // Backside
+            int waferCenterX = 0;
+            int waferCenterY = 0;
+            int radius = 0;
+
+            if (isBackside)
+            {
+                waferCenterX = recipeBackside.CenterX;
+                waferCenterY = recipeBackside.CenterY;
+                radius = recipeBackside.Radius;
+            }
 
             // 구조는 나중에 생각해봅시다...
             List<Defect> DefectList = CollectDefectData();
@@ -74,7 +83,11 @@ namespace RootTools_Vision
                 if (isBackside)
                     defect.CalcAbsToRelPos(waferCenterX, waferCenterY);
 
-                else; // Frontside
+                else
+                {
+                    OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
+                    defect.CalcAbsToRelPos(originRecipe.OriginX, originRecipe.OriginY); // Frontside
+                }
             }
 
             Workplace displayDefect = new Workplace();
@@ -245,13 +258,23 @@ namespace RootTools_Vision
                     defectArray[i] = rect;
                 }
 
-                CLR_IP.Cpp_SaveDefectListBMP(
-                   Path,
-                   (byte*)workplace.SharedBuffer.ToPointer(),
-                   workplace.SharedBufferWidth,
-                   workplace.SharedBufferHeight,
-                   defectArray
-                   );
+                //if (nByteCnt == 1)
+                    CLR_IP.Cpp_SaveDefectListBMP(
+                       Path,
+                       (byte*)workplace.SharedBuffer.ToPointer(),
+                       workplace.SharedBufferWidth,
+                       workplace.SharedBufferHeight,
+                       defectArray
+                       );
+                //else if (nByteCnt == 3)
+                //    CLR_IP.Cpp_SaveDefectListBMP_Color(
+                //        Path,
+                //       (byte*)workplaceBundle.SharedBufferR.ToPointer(),
+                //       (byte*)workplace.SharedBufferG.ToPointer(),
+                //       (byte*)workplace.SharedBufferB.ToPointer(),
+                //       workplace.SharedBufferWidth,
+                //       workplace.SharedBufferHeight,
+                //       defectArray);
             }
         }
 

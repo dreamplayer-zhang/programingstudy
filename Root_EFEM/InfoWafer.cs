@@ -268,11 +268,13 @@ namespace Root_EFEM
         }
         #endregion
 
-        public string m_sLoadport;
-        public InfoWafer(string id, IEngineer engineer)
+        public string m_sModule;
+        public int m_nSlot = 0; 
+        public InfoWafer(string sModule, int nSlot, IEngineer engineer)
         {
-            string[] asID = id.Split('.');
-            m_sLoadport = asID[0];
+            m_sModule = sModule;
+            m_nSlot = nSlot; 
+            string id = sModule + "." + ((nSlot >= 0) ? (nSlot + 1).ToString("00") : "Recover"); 
             InitBase(id, engineer);
             m_moduleRunList = new ModuleRunList(id, engineer);
             m_moduleRunList.Clear();

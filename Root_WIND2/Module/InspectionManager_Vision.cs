@@ -61,7 +61,7 @@ namespace Root_WIND2
         private int sharedBufferByteCnt;
 
         public Recipe Recipe { get => recipe; set => recipe = value; }
-        public IntPtr SharedBuffer { get => sharedBuffer; set => sharedBuffer = value; }
+         public IntPtr SharedBuffer { get => sharedBuffer; set => sharedBuffer = value; }
         public int SharedBufferWidth { get => sharedBufferWidth; set => sharedBufferWidth = value; }
         public int SharedBufferHeight { get => sharedBufferHeight; set => sharedBufferHeight = value; }
         public int SharedBufferByteCnt { get => sharedBufferByteCnt; set => sharedBufferByteCnt = value; }

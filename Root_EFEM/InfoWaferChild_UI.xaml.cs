@@ -70,7 +70,7 @@ namespace Root_EFEM
         #region Button
         private void buttonAdd_Click(object sender, RoutedEventArgs e)
         {
-            m_child.p_infoWafer = new InfoWafer(m_child.p_id + ".Recover", ((ModuleBase)m_child).m_engineer); 
+            m_child.p_infoWafer = new InfoWafer(m_child.p_id, -1, ((ModuleBase)m_child).m_engineer); 
         }
 
         private void buttonRemove_Click(object sender, RoutedEventArgs e)

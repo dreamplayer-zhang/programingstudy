@@ -50,11 +50,11 @@ namespace Root_WIND2
         public Review_ViewModel(Review review)
         {
             init();
-            ReviewWaferCanvas = review.ReviewWaferCanvas;
         }
         public void init()
         {
             p_Element.Add(m_DefectView);
+            recipe = new Recipe();
         }
 
         #region Command Btn
@@ -64,7 +64,7 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    UIManager.Instance.ChangUIMode();
+                    UIManager.Instance.ChangeUIMode();
                 });
             }
         }
@@ -80,9 +80,6 @@ namespace Root_WIND2
 
         #region GET / SET
 
-        private Canvas reviewcanvas;
-        public Canvas ReviewWaferCanvas { get => reviewcanvas; set => reviewcanvas = value; }
-
         private BitmapSource m_DefectImage;
         public BitmapSource p_DefectImage
         {
@@ -96,7 +93,6 @@ namespace Root_WIND2
             }
 
         }
-        public Recipe Recipe { get => recipe; set => recipe = value; }
 
         private Database_DataView_VM m_DataViewer_Lotinfo = new Database_DataView_VM();
         public Database_DataView_VM p_DataViewer_Lotinfo
@@ -138,8 +134,8 @@ namespace Root_WIND2
                         string sReicpePath = @"C:\Root\Recipe";
                         string sRecipeID = (string)GetDataGridItem(lotinfo_Datatable, selectedRow, "RECIPEID");
                         string sReicpeFileName = sRecipeID + ".rcp";
-                        //m_reviewRecipe.LoadRecipeInfo(Path.Combine(sReicpePath, sRecipeID, sReicpeFileName));
-                        //m_reviewRecipe.LoadRecipeData(Path.Combine(sReicpePath, sRecipeID, sReicpeFileName));
+                        recipe.Read(Path.Combine(sReicpePath, sRecipeID, sReicpeFileName));
+                        m_DefectView.SetRecipe(recipe);
 
                         DisplayDefectData(sInspectionID);
                     }
@@ -163,11 +159,25 @@ namespace Root_WIND2
                 if (selectedRow != null)
                 {
                     // BMP Open Event
-                    int nIndex = (int)GetDataGridItem(Defect_Datatable, selectedRow, "nDefectIndex");
-                    string sInspectionID = (string)GetDataGridItem(Defect_Datatable, selectedRow, "sInspectionID");
+                    int nIndex = (int)GetDataGridItem(Defect_Datatable, selectedRow, "m_nDefectIndex");
+                    string sInspectionID = (string)GetDataGridItem(Defect_Datatable, selectedRow, "m_strInspectionID");
                     string sFileName = nIndex.ToString() + ".bmp";
                     DisplayDefectImage(sInspectionID, sFileName);
-                    DisplaySelectedDefect(selectedRow); // To-do edge 전용으로만 보이니까 추후에 구조 수정필요
+
+                    // Defect Code 보고... 나중에 회의
+                    //if (defect.m_nDefectCode / 10000 == 1)  // Frontside
+                    {
+                        DisplaySelectedFrontDefect(selectedRow);
+                    }
+                    //else if (defect.m_nDefectCode / 10000 == 2)  // Backside
+                    {
+                        //DisplaySelectedBackDefect(selectedRow);
+                    }
+                    //else if (defect.m_nDefectCode / 10000 == 3) // Edge
+                    {
+                    //    DisplayEdgeSelectedDefect(selectedRow); // To-do edge 전용으로만 보이니까 추후에 구조 수정필요
+                    }
+
                 }
             }
         }
@@ -273,7 +283,6 @@ namespace Root_WIND2
                 gvSliderVal = 0;
                 GVTo = sliderScale + gvSliderVal;
                 GVFrom = 0 + gvSliderVal;
-                RaisePropertyChanged("GVHistogramAnimation");
                 RaisePropertyChanged("Slider_GV");
                 DrawDefectGVGraph();
             }
@@ -437,7 +446,6 @@ namespace Root_WIND2
                     sizeSliderVal = 0;
                     SizeTo = 50;
                     SizeFrom = 0;
-                    RaisePropertyChanged("SizeHistogramAnimation");
                     RaisePropertyChanged("Slider_Size");
                     DrawDefectSizeGraph();
                 }
@@ -458,7 +466,6 @@ namespace Root_WIND2
                     sizeSliderVal = 0;
                     SizeTo = 50 + Slider_Size;
                     SizeFrom = 0 + Slider_Size;
-                    RaisePropertyChanged("SizeHistogramAnimation");
                     RaisePropertyChanged("Slider_Size");
                     DrawDefectSizeGraph();
                 }
@@ -479,7 +486,6 @@ namespace Root_WIND2
                     sizeSliderVal = 0;
                     SizeTo = 50 + Slider_Size;
                     SizeFrom = 0 + Slider_Size;
-                    RaisePropertyChanged("SizeHistogramAnimation");
                     RaisePropertyChanged("Slider_Size");
                     DrawDefectSizeGraph();
                 }
@@ -519,36 +525,69 @@ namespace Root_WIND2
                 p_DefectImage = null;
         }
 
-        private void DisplaySelectedDefect(DataRowView selectedRow)
+        private void DisplaySelectedFrontDefect(DataRowView selectedRow)
+        {
+            if (m_ReviewDefectlist == null)
+                return;
+
+            double relX = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fRelX");
+            double relY = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fRelY");
+
+            m_DefectView.DisplaySelectedFrontDefect(m_ReviewDefectlist.Count, relX, relY);
+        }
+        private void DisplaySelectedBackDefect(DataRowView selectedRow)
+        {
+            if (m_ReviewDefectlist == null)
+                return;
+
+            double relX = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fRelX");
+            double relY = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fRelY");
+
+            m_DefectView.DisplaySelectedBackDefect(m_ReviewDefectlist.Count, relX, relY);
+        }
+        private void DisplayEdgeSelectedDefect(DataRowView selectedRow)
 		{
             if (m_ReviewDefectlist == null)
                 return;
 
-            int index = (int)GetDataGridItem(Defect_Datatable, selectedRow, "nDefectIndex");
-            double absY = (double)GetDataGridItem(Defect_Datatable, selectedRow, "fAbsY");
+            int index = (int)GetDataGridItem(Defect_Datatable, selectedRow, "m_nDefectIndex");
+            double absY = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fAbsY");
             double theta = CalculateEdgeDefectTheta(absY);
 
-            m_DefectView.DisplaySelectedDefect(m_ReviewDefectlist.Count, index, theta);
+            m_DefectView.DisplaySelectedEdgeDefect(m_ReviewDefectlist.Count, index, theta);
         }
 
         public void DisplayDefectData(string sInspectionID)
         {
             SearchDefectData(sInspectionID);            // Draw Defect Wafer Map
             m_ReviewDefectlist = GetDefectFromDataTable(Defect_Datatable);
-            DisplayEdgeDefectWaferMap();    // To-do edge 전용으로만 보이니까 추후에 구조 수정필요
+
+            m_DefectView.Clear();
+            m_DefectView.DrawWaferMap();
+            ClassifyDefect();    // To-do edge 전용으로만 보이니까 추후에 구조 수정필요
+
             DrawDefectSizeGraph();              // Draw Defect Size Distribution Histogram
             DrawDefectGVGraph();                // Draw Defect GV Distribution Histogram
-            //DisplayDefectWaferMap();            // Display Defect DataGrid
 
         }
-
-        private void DisplayEdgeDefectWaferMap()
-		{
-            m_DefectView.Clear();
+        private void ClassifyDefect()
+        {
             foreach (Defect defect in m_ReviewDefectlist)
             {
-                double theta = CalculateEdgeDefectTheta(defect.m_fAbsY);
-                m_DefectView.AddDefectFront(theta);
+                // 대충 코드는 이런식으로 분류를 하면 되지않을까...
+                //if (defect.m_nDefectCode / 10000 == 1)  // Frontside
+                {
+                    m_DefectView.AddFrontDefect(defect.m_fRelX, defect.m_fRelY);
+                }
+                //else if (defect.m_nDefectCode / 10000 == 2)  // Backside
+                {
+                    //m_DefectView.AddBackDefect(defect.m_fRelX, defect.m_fRelY);
+                }
+                //else if (defect.m_nDefectCode / 10000 == 3) // Edge
+                {
+                //    double theta = CalculateEdgeDefectTheta(defect.m_fAbsY);
+                //    m_DefectView.AddEdgeDefect(theta);
+                }
             }
         }
 
@@ -565,119 +604,10 @@ namespace Root_WIND2
             return nTheta;
         }
 
-        public void DisplayDefectWaferMap()
+        public void DisplayFrontsideDefectWaferMap()
         {
-            ReviewWaferCanvas.Children.Clear();
-            int nWaferSize = 300;
 
-            float ratio_wafer_to_canvas_x = (float)ReviewWaferCanvas.Width / nWaferSize;
-            float ratio_wafer_to_canvas_y = (float)ReviewWaferCanvas.Height / nWaferSize;
-
-            //Fill = "Gainsboro"
-            Ellipse wafer_circle = new Ellipse();
-            wafer_circle.Width = nWaferSize * ratio_wafer_to_canvas_x;
-            wafer_circle.Height = nWaferSize * ratio_wafer_to_canvas_y;
-            Canvas.SetLeft(wafer_circle, 0);
-            Canvas.SetRight(wafer_circle, nWaferSize * ratio_wafer_to_canvas_x);
-            Canvas.SetTop(wafer_circle, 0);
-            Canvas.SetBottom(wafer_circle, nWaferSize * ratio_wafer_to_canvas_y);
-
-            wafer_circle.Stroke = Brushes.Black;
-            wafer_circle.Fill = Brushes.Silver;
-            wafer_circle.StrokeThickness = 0.5;
-            ReviewWaferCanvas.Children.Add(wafer_circle);
-
-            BacksideRecipe backsideRecipe = Recipe.GetRecipe<BacksideRecipe>();
-            RecipeType_WaferMap mapdata = Recipe.WaferMap;
-            
-            double dWaferRaius = wafer_circle.Width / (double)2;
-            double dSamplingRatio = dWaferRaius / (double)backsideRecipe.Radius;
-
-            int nOriginRelx = backsideRecipe.OriginX - backsideRecipe.CenterX;
-            int nOriginRely = backsideRecipe.OriginY - backsideRecipe.CenterY;
-
-            double dPitchx = (double)backsideRecipe.DiePitchX * dSamplingRatio;
-            double dPitchy = (double)backsideRecipe.DiePitchY * dSamplingRatio;
-
-            // 
-            //double dPitchx = (double)ReviewWaferCanvas.Width / (double)LoadwaferMapInfo.MapSizeX;
-            //double dPitchy = (double)ReviewWaferCanvas.Height / (double)LoadwaferMapInfo.MapSizeY;
-
-            double dRelx = (double)nOriginRelx * dSamplingRatio;
-            double dRely = (double)nOriginRely * dSamplingRatio;
-
-            double dCanvasWaferCenterX = ReviewWaferCanvas.Width / 2;
-            double dCanvasWaferCenterY = ReviewWaferCanvas.Height / 2;
-
-
-            double Left = dCanvasWaferCenterX + dRelx;
-            double Top = (dCanvasWaferCenterY + dRely) - (dPitchy * (mapdata.MasterDieY + 1));
-            double Right = dCanvasWaferCenterX + dRelx + dPitchx;
-            double Bottom = dCanvasWaferCenterY + dRely - (dPitchy * (mapdata.MasterDieY + 1)) + dPitchy;
-
-
-            foreach (Defect defect in m_ReviewDefectlist)
-            {
-                int i = (int)defect.m_nChipIndexX;
-                int j = (int)defect.m_nCHipIndexY;
-
-
-                Rectangle ellipse = new Rectangle();
-                ellipse.Stroke = Brushes.Transparent;
-                ellipse.Fill = Brushes.Red;
-                ellipse.Width = 3;
-                ellipse.Height = 3;
-                ellipse.Opacity = 0.7;
-
-                Canvas.SetZIndex(ellipse, 99);
-
-                Canvas.SetLeft(ellipse, dCanvasWaferCenterX + defect.m_fRelX * dSamplingRatio); // 
-                Canvas.SetTop(ellipse, dCanvasWaferCenterY + defect.m_fRelY * dSamplingRatio);
-
-
-                ReviewWaferCanvas.Children.Add(ellipse);
-                ellipse.MouseLeftButtonDown += Defect_MouseLeftButtonDown;
-            }
-
-            #region Backside ChipMap 그리기
-
-            for(int y = 0; y < this.Recipe.WaferMap.MapSizeY; y++)
-            {
-                for (int x = 0; x < this.Recipe.WaferMap.MapSizeX; x++)
-                {
-                    Rectangle crect = new Rectangle();
-                    crect.Width = dPitchx;
-                    crect.Height = dPitchy;
-
-                    Canvas.SetLeft(crect, Left + (dPitchx * x));
-                    Canvas.SetTop(crect, Top + (dPitchy * y));
-                    Canvas.SetRight(crect, Right + (dPitchx * x));
-                    Canvas.SetBottom(crect, Bottom + (dPitchy * y));
-
-                    // 
-
-                    if(this.Recipe.WaferMap.GetChipType(x, y) == CHIP_TYPE.NORMAL)
-                    {
-                        crect.Stroke = Brushes.Transparent;
-                        crect.Fill = Brushes.Green;
-                        crect.Opacity = 0.5;
-                        crect.StrokeThickness = 0.2;
-                        Canvas.SetZIndex(crect, 99);
-                    }
-                    else
-                    {
-                        crect.Stroke = Brushes.Transparent;
-                        crect.Fill = Brushes.DimGray;
-                        crect.Opacity = 0.5;
-                        crect.StrokeThickness = 0.2;
-                        Canvas.SetZIndex(crect, 99);
-                    }
-                }
-            }
-
-            #endregion
         }
-
         private void Defect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Rectangle selected = (Rectangle)sender;
@@ -726,33 +656,32 @@ namespace Root_WIND2
             double fRelY = 0;
             double fAbsX = 0;
             double fAbsY = 0;
-            int fGV = 0;
+            double fGV = 0;
             int nChipIndexX = 0;
             int nCHipIndexY = 0;
 
-            int count = 0;
             foreach (DataRow dataRow in table.Rows)
             {
                 for (int i = 0; i < table.Columns.Count; i++)
                 {
-                    if (table.Columns[i].ColumnName == "nDefectIndex") nDefectIndex = (int)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "sInspectionID") sInpectionID = (string)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "nDefectCode") nDefectCode = (int)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "fSize") fSize = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "fWidth") fWidth = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "fHeight") fHeight = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "fRelX") fRelX = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "fRelY") fRelY = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "fAbsX") fAbsX = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "fAbsY") fAbsY = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "fGV") fGV = (int)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "nChipIndexX") nChipIndexX = (int)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "nCHipIndexY") nCHipIndexY = (int)dataRow.ItemArray[i];
+                    if (table.Columns[i].ColumnName == "m_nDefectIndex") nDefectIndex = (int)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_strInspectionID") sInpectionID = (string)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_nDefectCode") nDefectCode = (int)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_fSize") fSize = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_fWidth") fWidth = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_fHeight") fHeight = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_fRelX") fRelX = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_fRelY") fRelY = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_fAbsX") fAbsX = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_fAbsY") fAbsY = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_fGV") fGV = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_nChipIndexX") nChipIndexX = (int)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_nCHipIndexY") nCHipIndexY = (int)dataRow.ItemArray[i];
                 }
 
                 Defect defect = new Defect(sInpectionID
                                             , nDefectCode
-                                            , (float)fSize, fGV
+                                            , (float)fSize, (float)fGV
                                             , (float)fWidth, (float)fHeight
                                             , (float)fRelX, (float)fRelY
                                             , (float)fAbsX, (float)fAbsY
@@ -797,8 +726,8 @@ namespace Root_WIND2
                 DefectGVHistogram[0].Values.Clear();
             }
             DataRow[] foundRows;
-            string expression = "fGV >= 0";
-            string sortOrder = "fGV ASC";
+            string expression = "m_fGV >= 0";
+            string sortOrder = "m_fGV ASC";
             foundRows = pDefect_Datatable.Select(expression, sortOrder);
 
             if (foundRows.Length == 0)
@@ -814,18 +743,22 @@ namespace Root_WIND2
             if (gvHistogramMode == GVHistogramType.All)
             {
                 foreach (DataRow table in foundRows)
-                    GVHistogram[(int)table[11]]++;
+                {
+                    double gv = (double)table[11];
+                    GVHistogram[(int)gv]++;
+                }
             }
             else
             {
                 foreach (DataRow table in foundRows)
                 {
+                    double gv = (double)table[11];
                     if (gvHistogramMode == GVHistogramType.Dark)
-                        if ((int)table[11] / 2 < binSz)
-                            GVHistogram[(int)table[11] / 2]++;
+                        if ((int)gv / 2 < binSz)
+                            GVHistogram[(int)gv / 2]++;
                         else
-                        if ((int)table[11] / 2 >= binSz)
-                            GVHistogram[((int)table[11] - 128) / 2]++;
+                        if ((int)gv / 2 >= binSz)
+                            GVHistogram[((int)gv - 128) / 2]++;
                 }
             }
 
@@ -871,8 +804,8 @@ namespace Root_WIND2
                 DefectSizeHistogram[0].Values.Clear();
             }
             DataRow[] foundRows;
-            string expression = "fSize >= 0";
-            string sortOrder = "fSize ASC";
+            string expression = "m_fSize >= 0";
+            string sortOrder = "m_fSize ASC";
             foundRows = pDefect_Datatable.Select(expression, sortOrder);
 
             if (foundRows.Length == 0)

@@ -221,6 +221,15 @@ namespace Root_Vega.Module
 				}
 			}
 			public List<Fan> m_aFan = new List<Fan>();
+			public List<Fan> p_aFan
+            {
+				get { return m_aFan; }
+				set {
+					if (m_aFan == value) return;
+					m_aFan = value;
+					OnPropertyChanged();
+					}
+            }
 			List<int> m_aFanState = new List<int>();
 			List<int> m_aFanRPM = new List<int>();
 			List<int> m_aFanPressure = new List<int>();

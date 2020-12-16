@@ -22,7 +22,11 @@ namespace RootTools.Memory
                 if (value == _fGB) return;
                 if (_fGB == 0)
                 {
-                    if (m_memoryTool.m_bMaster) CreatePool(value);
+                    if (m_memoryTool.m_bMaster)
+                    {
+                        OpenPool();
+                        if (m_MMF == null) CreatePool(value);
+                    }
                 }
                 _fGB = value;
                 OnPropertyChanged(); 
@@ -34,11 +38,15 @@ namespace RootTools.Memory
         {
             StopWatch sw = new StopWatch();
             long nPool = (long)Math.Ceiling(fGB * c_fGB);
-            try { m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool); }
-            catch (Exception e) 
+            try
+            {
+                m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool);
+                GetAddress();
+            }
+            catch (Exception e)
             {
                 m_log.Error(p_id + " Memory Pool Create Error (ReStart PC) : " + e.Message);
-                return true; 
+                return true;
             }
             m_log.Info(p_id + " Memory Pool Create Done " + sw.ElapsedMilliseconds.ToString() + " ms");
             return false;
@@ -46,10 +54,28 @@ namespace RootTools.Memory
 
         public string OpenPool()
         {
-            try { m_MMF = MemoryMappedFile.OpenExisting(p_id); }
+            try
+            {
+                if (m_MMF == null)
+                {
+                    m_MMF = MemoryMappedFile.OpenExisting(p_id);
+                    GetAddress();
+                }
+            }
             catch { return "Open Error"; }
             m_log.Info(p_id + " Memory Pool Open Done");
             return (m_MMF != null) ? "OK" : "Error"; 
+        }
+
+        public long m_pAddress = 0; 
+        void GetAddress()
+        {
+            unsafe
+            {
+                byte* p = null;
+                m_MMF.CreateViewAccessor().SafeMemoryMappedViewHandle.AcquirePointer(ref p);
+                m_pAddress = (long)(IntPtr)p; 
+            }
         }
         #endregion
 
@@ -117,7 +143,8 @@ namespace RootTools.Memory
         DispatcherTimer m_timer = new DispatcherTimer(); 
         void InitTimer()
         {
-            if (m_memoryTool.m_bMaster) return; 
+            if (m_memoryTool.m_bMaster) return;
+            m_log.Info(p_id + " Start Timer"); 
             m_timer.Interval = TimeSpan.FromSeconds(0.2);
             m_timer.Tick += M_timer_Tick;
             m_timer.Start(); 

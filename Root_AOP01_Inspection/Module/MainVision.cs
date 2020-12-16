@@ -390,7 +390,8 @@ namespace Root_AOP01_Inspection.Module
             base.InitBase(id, engineer);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             InitMemorys();
-            InitPosAlign();
+            InitPosAlign(); 
+            InitInfoWaferUI();
         }
         public class Run_GrabSideScan : ModuleRunBase
         {

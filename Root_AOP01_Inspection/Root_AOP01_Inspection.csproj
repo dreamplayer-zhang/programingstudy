@@ -273,10 +273,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Engineer\AOP01_Process_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Engineer\AOP01_Recipe_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -360,10 +356,6 @@
     <Compile Include="Engineer\AOP01_Handler.cs" />
     <Compile Include="Engineer\AOP01_Handler_UI.xaml.cs">
       <DependentUpon>AOP01_Handler_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Engineer\AOP01_Process.cs" />
-    <Compile Include="Engineer\AOP01_Process_UI.xaml.cs">
-      <DependentUpon>AOP01_Process_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Engineer\AOP01_Recipe.cs" />
     <Compile Include="Engineer\AOP01_Recipe_UI.xaml.cs">
