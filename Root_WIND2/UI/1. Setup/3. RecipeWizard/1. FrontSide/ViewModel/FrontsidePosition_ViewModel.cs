@@ -23,7 +23,7 @@ using System.Runtime.InteropServices;
 
 namespace Root_WIND2
 {
-    class FrontsideAlignment_ViewModel : RootViewer_ViewModel
+    class FrontsidePosition_ViewModel : RootViewer_ViewModel
     {
         BoxProcess eBoxProcess;
         ModifyType eModifyType;
@@ -111,19 +111,43 @@ namespace Root_WIND2
             }
         }
 
-        private ObservableCollection<UIElement> m_WaferMark = new ObservableCollection<UIElement>();
-        public ObservableCollection<UIElement> p_WaferMark
+        public Visibility[] p_VisibleEmpty
         {
             get
             {
-                return m_WaferMark;
+                return m_VisibleEmpty;
             }
             set
             {
-                m_WaferMark = value;
+                SetProperty(ref m_VisibleEmpty, value);
             }
         }
-        private ObservableCollection<UIElement> m_ShotMark = new ObservableCollection<UIElement>();
+        private Visibility[] m_VisibleEmpty = new Visibility[3];
+
+        public int[] p_nMarkIndex
+        {
+            get
+            {
+                return m_nMarkIndex;
+            }
+            set
+            {
+                SetProperty(ref m_nMarkIndex, value);
+            }
+        }
+        private int[] m_nMarkIndex = new int[3];
+        public ObservableCollection<UIElement> p_MasterMark
+        {
+            get
+            {
+                return m_MasterMark;
+            }
+            set
+            {
+                m_MasterMark = value;
+            }
+        }
+        private ObservableCollection<UIElement> m_MasterMark = new ObservableCollection<UIElement>();
         public ObservableCollection<UIElement> p_ShotMark
         {
             get
@@ -135,7 +159,7 @@ namespace Root_WIND2
                 m_ShotMark = value;
             }
         }
-        private ObservableCollection<UIElement> m_ChipMark = new ObservableCollection<UIElement>();
+        private ObservableCollection<UIElement> m_ShotMark = new ObservableCollection<UIElement>();
         public ObservableCollection<UIElement> p_ChipMark
         {
             get
@@ -147,6 +171,7 @@ namespace Root_WIND2
                 m_ChipMark = value;
             }
         }
+        private ObservableCollection<UIElement> m_ChipMark = new ObservableCollection<UIElement>();
 
         private BitmapSource m_BoxImgSource;
         public BitmapSource p_BoxImgSource
@@ -638,32 +663,20 @@ namespace Root_WIND2
 
         private void CheckEmpty()
         {
-            if (p_WaferMark.Count < 1)
-                p_WaferMark.Add(TbEmpty());
+            if (p_MasterMark.Count < 1)
+                p_VisibleEmpty[0] = Visibility.Visible;
             else
-                p_WaferMark[0].Visibility = Visibility.Collapsed;
+                p_VisibleEmpty[0] = Visibility.Collapsed;
 
             if (p_ShotMark.Count < 1)
-                p_ShotMark.Add(TbEmpty());
+                p_VisibleEmpty[1] = Visibility.Visible;
             else
-                p_ShotMark[0].Visibility = Visibility.Collapsed;
+                p_VisibleEmpty[1] = Visibility.Collapsed;
 
             if (p_ChipMark.Count < 1)
-                p_ChipMark.Add(TbEmpty());
+                p_VisibleEmpty[2] = Visibility.Visible;
             else
-                p_ChipMark[0].Visibility = Visibility.Collapsed;
-        }
-
-        private TextBlock TbEmpty()
-        {
-            TextBlock tb = new TextBlock();
-            tb.Text = "Empty";
-            tb.Margin = new Thickness(20, 0, 0, 0);
-            tb.FontSize = 15;
-            tb.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
-            tb.VerticalAlignment = System.Windows.VerticalAlignment.Center;
-
-            return tb;
+                p_VisibleEmpty[2] = Visibility.Collapsed;
         }
 
         private void _saveImage()
@@ -677,10 +690,11 @@ namespace Root_WIND2
             m_PositionRecipe.AddMasterFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
-            fc.p_Offset.X = m_Offset.X;
-            fc.p_Offset.Y = m_Offset.Y;
+            fc.p_Offset = m_Offset;
+            //fc.p_Offset.X = m_Offset.X;
+            //fc.p_Offset.Y = m_Offset.Y;
             fc.p_ImageSource = p_BoxImgSource;
-            p_WaferMark.Add(fc);
+            p_MasterMark.Add(fc);
             CheckEmpty();
         }
         private void _addShotMark()
@@ -712,7 +726,7 @@ namespace Root_WIND2
 
         public void LoadPositonMark()
         {
-            p_WaferMark.Clear();
+            p_MasterMark.Clear();
             p_ChipMark.Clear();
             m_PositionRecipe = m_Recipe.GetRecipe<PositionRecipe>();
 
@@ -728,7 +742,7 @@ namespace Root_WIND2
                 fc.p_Offset = offset;
                 //fc.p_ImageSource = listMasterFeautreimage[i].GetBitMapSource();
                 fc.p_ImageSource = ImageHelper.GetBitmapSourceFromBitmap(listMasterFeature[i].GetFeatureBitmap());
-                p_WaferMark.Add((fc.Clone() as FeatureControl));
+                p_MasterMark.Add((fc.Clone() as FeatureControl));
             }
 
             //List<ImageData> listShotFeautreimage = m_PositionRecipe.ListShotImageFeatures;

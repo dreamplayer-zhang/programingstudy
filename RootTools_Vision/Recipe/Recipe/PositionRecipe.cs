@@ -67,6 +67,10 @@ namespace RootTools_Vision
             listChipFeature.Add(new RecipeType_ImageData(positionX, positionY, featureWidth, featureHeight, byteCnt, rawData));
         }
 
+        public void RemoveMasterFeature(int index)
+        {
+            
+        }
 
         public override bool Save(string recipePath)
         {

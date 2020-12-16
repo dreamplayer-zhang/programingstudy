@@ -19,7 +19,7 @@ namespace Root_WIND2
         public FrontsideSummary     Summary;
         public FrontSideMap         Map;
         public FrontSideOrigin      Origin;
-        public FrontSideAlignment   Position;
+        public FrontSidePosition   Position;
         public FrontSideROI         ROI;
         public FrontSideSpec        Spec;
 
@@ -48,16 +48,16 @@ namespace Root_WIND2
                 SetProperty(ref m_Origin_VM, value);
             }
         }
-        private FrontsideAlignment_ViewModel m_Alignment_VM;
-        public FrontsideAlignment_ViewModel p_Alignment_VM
+        private FrontsidePosition_ViewModel m_Position_VM;
+        public FrontsidePosition_ViewModel p_Position_VM
         {
             get
             {
-                return m_Alignment_VM;
+                return m_Position_VM;
             }
             set
             {
-                SetProperty(ref m_Alignment_VM, value);
+                SetProperty(ref m_Position_VM, value);
             }
         }
         private FrontsideROI_ViewModel m_ROI_VM;
@@ -113,8 +113,8 @@ namespace Root_WIND2
             p_Origin_VM.SetOrigin += P_Origin_VM_SetOrigin;
             p_Origin_VM.init(setup, m_Recipe);
 
-            p_Alignment_VM = new FrontsideAlignment_ViewModel();
-            p_Alignment_VM.init(setup, m_Recipe);
+            p_Position_VM = new FrontsidePosition_ViewModel();
+            p_Position_VM.init(setup, m_Recipe);
 
             p_ROI_VM = new FrontsideROI_ViewModel();
             p_ROI_VM.Init(setup,m_Recipe);
@@ -143,7 +143,7 @@ namespace Root_WIND2
         {
             p_Map_VM.LoadMapData(); // Map
             m_Origin_VM.LoadOriginData(); // Origin
-            p_Alignment_VM.LoadPositonMark(); // Position
+            p_Position_VM.LoadPositonMark(); // Position
             p_Spec_VM.LoadSpec();
             p_Summary_VM.LoadSummaryData();
         }
@@ -154,7 +154,7 @@ namespace Root_WIND2
             Summary = new FrontsideSummary();
             Map = new FrontSideMap();
             Origin = new FrontSideOrigin();
-            Position = new FrontSideAlignment();
+            Position = new FrontSidePosition();
             ROI = new FrontSideROI();
             Spec = new FrontSideSpec();
 
