@@ -68,10 +68,12 @@ namespace Root_Vega
             borderUnload.Background = m_loadport.m_bUnLoadCheck ? Brushes.LightGreen : null;
             if (m_loadport.m_bUnLoadCheck) { m_loadport.m_doUnload.Write(true); }
             else { m_loadport.m_doUnload.Write(false); }
-
+            
             borderAlarm.Background = (m_loadport.p_eState == ModuleBase.eState.Error) ? Brushes.Red : null;
             if (m_loadport.p_eState == ModuleBase.eState.Error) { m_loadport.m_doAlarm.Write(true); }
             else { m_loadport.m_doAlarm.Write(false); }
+
+            IonizerStatus.Background = m_loadport.m_diIonizer.p_bIn ? Brushes.Green : Brushes.DarkGray;
 
             bool bAuto = (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto); 
             borderAccessAuto.Background = bAuto ? Brushes.LightGreen : null;
@@ -83,15 +85,15 @@ namespace Root_Vega
 
             buttonLoad.IsEnabled = IsEnableLoad();
             buttonUnload.IsEnabled = IsEnableUnload();
-            if (m_loadport.m_bIonizerDoorlockCheck == false)
-            {
-                if (m_loadport.m_diIonizer.p_bIn)
-                {
-                    m_handler.m_vega.m_doIonizerOnOff.Write(false);
-                    Thread.Sleep(20);
-                    if (m_loadport.m_diIonizer.p_bIn != false) EQ.p_bStop = true;
-                }
-            }
+            //if (m_loadport.m_bIonizerDoorlockCheck == false)
+            //{
+            //    if (m_loadport.m_diIonizer.p_bIn)
+            //    {
+            //        m_handler.m_vega.m_doIonizerOnOff.Write(false);
+            //        Thread.Sleep(20);
+            //        if (m_loadport.m_diIonizer.p_bIn == true) EQ.p_bStop = true;
+            //    }
+            //}
         }
         #endregion
 
