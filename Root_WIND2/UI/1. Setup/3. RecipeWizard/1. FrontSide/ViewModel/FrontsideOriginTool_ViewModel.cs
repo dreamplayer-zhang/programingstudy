@@ -35,6 +35,7 @@ namespace Root_WIND2
             base.init();
             m_Recipe = _recipe;
             m_OriginRecipe = _recipe.GetRecipe<OriginRecipe>();
+            p_VisibleMenu = System.Windows.Visibility.Collapsed;
         }
 
 

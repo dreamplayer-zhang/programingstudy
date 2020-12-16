@@ -601,6 +601,23 @@ namespace RootTools.Inspects
 			p_qInspection.Enqueue(_property);
 		}
 
+		public void _clearInspReslut()
+		{
+			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+			if (connector.Open())
+			{
+				string dropQuery = "DROP TABLE Inspections.tempdata";
+				var result = connector.SendNonQuery(dropQuery);
+				Debug.WriteLine(string.Format("tempdata Table Drop : {0}", result));
+				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '0') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='0';");
+				Debug.WriteLine(string.Format("Status Clear : {0}", result));
+			}
+			connector.Close();
+
+			// 검사 큐 클리어
+			p_qInspection.Clear();
+		}
+
 		public void ClearInspection()
 		{
 			p_qInspection.Clear();

@@ -30,15 +30,15 @@ namespace Root_AOP01_Inspection
         #endregion 
 
         #region Module
-        public ModuleList m_moduleList;
-        public AOP01 m_aop01;
+        public ModuleList p_moduleList { get; set; }
+        public AOP01 m_aop01; 
         public AOP01_Recipe m_recipe;
         public EFEM_Process m_process;
         public MainVision m_mainVision;
 
         void InitModule()
         {
-            m_moduleList = new ModuleList(m_engineer);
+            p_moduleList = new ModuleList(m_engineer);
             m_aop01 = new AOP01("AOP01", m_engineer);
             InitModule(m_aop01); 
             InitWTR();
@@ -52,7 +52,7 @@ namespace Root_AOP01_Inspection
             iWTR.ReadInfoReticle_Registry();
 
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
-            foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
+            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
             m_process = new EFEM_Process("Process", m_engineer, iWTR);
         }
 
@@ -60,7 +60,7 @@ namespace Root_AOP01_Inspection
         {
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
-            m_moduleList.AddModule(module, ui);
+            p_moduleList.AddModule(module, ui);
         }
 
         public bool IsEnableRecovery()
@@ -105,6 +105,7 @@ namespace Root_AOP01_Inspection
             Cymechs,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
+        List<InfoCarrier> m_aInfoCarrier = new List<InfoCarrier>();
         int m_lLoadport = 2;
         void InitLoadport()
         {
@@ -115,9 +116,18 @@ namespace Root_AOP01_Inspection
                 string sID = "Loadport" + cLP;
                 switch (m_aLoadportType[n])
                 {
-                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, false, false); break;
-                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, false, false); break;
-                    default: module = new Loadport_RND(sID, m_engineer, false, false); break;
+                    case eLoadport.RND:
+                        module = new Loadport_RND(sID, m_engineer, true, true);
+                        m_aInfoCarrier.Add(((Loadport_RND)module).m_infoCarrier);
+                        break;
+                    case eLoadport.Cymechs:
+                        module = new Loadport_Cymechs(sID, m_engineer, true, true);
+                        m_aInfoCarrier.Add(((Loadport_Cymechs)module).m_infoCarrier);
+                        break;
+                    default:
+                        module = new Loadport_RND(sID, m_engineer, true, true);
+                        m_aInfoCarrier.Add(((Loadport_RND)module).m_infoCarrier);
+                        break;
                 }
                 InitModule(module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
@@ -139,7 +149,7 @@ namespace Root_AOP01_Inspection
         #region StateHome
         public string StateHome()
         {
-            string sInfo = StateHome(m_moduleList.m_aModule);
+            string sInfo = StateHome(p_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
@@ -187,7 +197,7 @@ namespace Root_AOP01_Inspection
         #region Reset
         public string Reset()
         {
-            Reset(m_gaf, m_moduleList);
+            Reset(m_gaf, p_moduleList);
             return "OK";
         }
 
@@ -228,9 +238,9 @@ namespace Root_AOP01_Inspection
 
         public dynamic GetGemSlot(string sSlot)
         {
-            foreach (Loadport loadport in m_aLoadport)
+            foreach (InfoCarrier infoCarrier in m_aInfoCarrier)
             {
-                foreach (GemSlotBase slot in loadport.m_infoPod.m_aGemSlot)
+                foreach (GemSlotBase slot in infoCarrier.m_aGemSlot)
                 {
                     if (slot.p_id == sSlot) return slot;
                 }
@@ -259,7 +269,7 @@ namespace Root_AOP01_Inspection
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run:
-                        if (m_moduleList.m_qModuleRun.Count == 0)
+                        if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
                             if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
@@ -308,8 +318,8 @@ namespace Root_AOP01_Inspection
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
-            m_moduleList.ThreadStop();
-            foreach (ModuleBase module in m_moduleList.m_aModule.Keys) module.ThreadStop();
+            p_moduleList.ThreadStop();
+            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
         }
     }
 }

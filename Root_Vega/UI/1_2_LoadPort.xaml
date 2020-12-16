@@ -116,20 +116,20 @@
                                            Grid.Row="4"
                                            Style="{StaticResource BasicTb}"
                                            Foreground="{StaticResource Black}"/>
-                        <Grid  Grid.Row="5" Grid.Column="1" Margin="0,10,0,10" Width="40" Height="25">
-                            <Border BorderThickness="3"></Border>
+                        <Grid  Grid.Row="5" Grid.Column="1" Margin="0,10,0,10" Width="40" Height="25" x:Name="IonizerStatus">
+                            <!--<Border BorderThickness="3" x:Name="IonizerStatus"></Border>
                             <Grid.Style>
                                 <Style>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding m_diIonizer.p_bIn}" Value="True">
+                                        <DataTrigger Binding="{Binding m_vega.m_doIonizerOnOff.m_bitDO.p_bOn}" Value="True">
                                             <Setter Property="Grid.Background" Value="LimeGreen"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding m_diIonizer.p_bIn}" Value="False">
+                                        <DataTrigger Binding="{Binding m_vega.m_doIonizerOnOff.m_bitDO.p_bOn}" Value="False">
                                             <Setter Property="Grid.Background" Value="Red"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </Grid.Style>
+                            </Grid.Style>-->
                         </Grid>
                     </Grid>
                 </Grid>
