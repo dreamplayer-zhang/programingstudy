@@ -189,6 +189,8 @@ namespace Root_WIND2
             {
                 displayOption = value ? DisplayOption.None : displayOption;
 
+                if (masterImageData == null) return;
+
                 if (displayOption == DisplayOption.None)
                 {
                     OriginRecipe originRecipe = this.recipe.GetRecipe<OriginRecipe>();

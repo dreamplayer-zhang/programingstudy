@@ -20,7 +20,6 @@ namespace RootTools_Vision
     {
         public ParameterBase() { }
 
-
         private readonly string name;
         private readonly  Type inspectionType;
 
