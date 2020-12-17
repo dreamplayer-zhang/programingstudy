@@ -20,11 +20,10 @@ namespace RootTools_Vision
 
     public enum WORKPLACE_SUB_STATE
     {
-        POSITION_SUCCESS    = 0b00000001,
-        LINE_FIRST_CHIP     = 0b00000010,
-        EDGE_TOP            = 0b00000100,
-        EDGE_SIDE           = 0b00001000,
-        EDGE_BOTTOM         = 0b00010000,
+        POSITION_SUCCESS            = 0b00000001,
+        LINE_FIRST_CHIP             = 0b00000010,
+        WAFER_POSITION_SUCCESS      = 0b00000100,
+        BAD_CHIP                    = 0b10000000,
     }
 
     public enum PREWORKDATA_KEY // PreworkdataList의 index로 반드시 0부터 빈틈없이 추가
@@ -41,8 +40,6 @@ namespace RootTools_Vision
 
     public class Workplace
     {
-        public event EventStateChanged StateChanged;
-
         public event EventPositionUpdated PositionUpdated;
 
         public event EventPositionIntialized PositionIntialized;
@@ -56,8 +53,7 @@ namespace RootTools_Vision
             { 
                 state = value;
 
-                if( StateChanged != null)
-                    StateChanged(this);
+                WorkEventManager.OnWorkplaceStateChanged(this, new WorkplaceStateChangedEventArgs(this));
             }
         }
 

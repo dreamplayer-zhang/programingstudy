@@ -63,9 +63,9 @@ namespace RootTools_Vision
             }
         }
 
-        private void WorkplaceStateChanged_Callback(object obj)
+        private void WorkplaceStateChanged_Callback(object obj, WorkplaceStateChangedEventArgs args)
         {
-            Workplace workplace = obj as Workplace;
+            Workplace workplace = args.workplace;
             if(workplace.STATE == this.excuteCondition)
             {
                 _waitSignal.Set();
@@ -167,7 +167,7 @@ namespace RootTools_Vision
         public void Start()
         {
             // event
-            this.workplaceBundle.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+            WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
 
             this.isStop = false;
             _waitSignal.Set();
@@ -175,7 +175,7 @@ namespace RootTools_Vision
 
         public void Stop()
         {
-            this.workplaceBundle.WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
+            WorkEventManager.WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
 
             this.isStop = true;
         }

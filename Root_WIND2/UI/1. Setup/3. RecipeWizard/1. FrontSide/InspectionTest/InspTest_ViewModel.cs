@@ -147,10 +147,10 @@ namespace Root_WIND2
             }
         }
 
-        public void DrawRectMasterFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text)
+        public void DrawRectMasterFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text , bool bSuccess)
         {
             p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, DrawTool_ViewModel.ColorType.MasterFeature);
-            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, DrawTool_ViewModel.ColorType.FeatureMatching, text);
+            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess?DrawTool_ViewModel.ColorType.FeatureMatching : DrawTool_ViewModel.ColorType.FeatureMatchingFail, text);
         }
 
         public void DrawRectShotFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text)
@@ -159,10 +159,10 @@ namespace Root_WIND2
             p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, DrawTool_ViewModel.ColorType.FeatureMatching, text);
         }
 
-        public void DrawRectChipFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text)
+        public void DrawRectChipFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text, bool bSuccess)
         {
             p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, DrawTool_ViewModel.ColorType.ChipFeature);
-            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, DrawTool_ViewModel.ColorType.FeatureMatching, text);
+            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess ? DrawTool_ViewModel.ColorType.FeatureMatching : DrawTool_ViewModel.ColorType.FeatureMatchingFail, text);
         }
         public void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
         {

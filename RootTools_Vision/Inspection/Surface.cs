@@ -79,24 +79,33 @@ namespace RootTools_Vision
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
-            for (int i = 0; i < Label.Length; i++)
-            {
-                if (Label[i].area > nDefectSz)
-                {
-                    this.workplace.AddDefect(sInspectionID,
-                        10001,
-                        Label[i].area,
-                        Label[i].value,
-                        this.workplace.PositionX + Label[i].boundLeft,
-                        this.workplace.PositionY - (chipH - Label[i].boundTop),
-                        Label[i].width,
-                        Label[i].height,
-                        this.workplace.MapPositionX,
-                        this.workplace.MapPositionY
-                        );
-                }
 
+            if (Label.Length > 0)
+            {
+                this.workplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
+
+                //Add Defect
+                for (int i = 0; i < Label.Length; i++)
+                {
+                    if (Label[i].area > nDefectSz)
+                    {
+                        this.workplace.AddDefect(sInspectionID,
+                            10001,
+                            Label[i].area,
+                            Label[i].value,
+                            this.workplace.PositionX + Label[i].boundLeft,
+                            this.workplace.PositionY - (chipH - Label[i].boundTop),
+                            Label[i].width,
+                            Label[i].height,
+                            this.workplace.MapPositionX,
+                            this.workplace.MapPositionY
+                            );
+                    }
+
+                }
             }
+
+
             WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
         }
 

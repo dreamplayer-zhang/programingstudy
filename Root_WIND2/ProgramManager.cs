@@ -220,6 +220,7 @@ namespace Root_WIND2
 
             WIND2EventManager.OnBeforeRecipeSave(recipe, new RecipeEventArgs());
 
+            if (recipePath.IndexOf(".rcp") == -1) recipePath += ".rcp";
             recipe.Save(recipePath);
 
             WIND2EventManager.OnAfterRecipeSave(recipe, new RecipeEventArgs());
