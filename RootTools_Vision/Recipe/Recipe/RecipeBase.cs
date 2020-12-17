@@ -30,17 +30,5 @@ namespace RootTools_Vision
         public abstract bool Read(string recipePath);
 
         public abstract bool Save(string recipePath);
-
-
-
-        //public bool Read(string recipePath)
-        //{
-        //    return true;
-        //}
-
-        //public bool Save(string recipePath)
-        //{
-        //    return true;
-        //}
     }
 }
