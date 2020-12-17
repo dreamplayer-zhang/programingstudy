@@ -18,9 +18,9 @@ namespace Root_WIND2
     /// <summary>
     /// GeneralMaskPage.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class FrontSideROI : UserControl
+    public partial class FrontSideMask : UserControl
     {
-        public FrontSideROI()
+        public FrontSideMask()
         {
             InitializeComponent();
         }

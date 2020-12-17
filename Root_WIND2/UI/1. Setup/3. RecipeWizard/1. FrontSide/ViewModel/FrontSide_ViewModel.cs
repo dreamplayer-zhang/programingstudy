@@ -20,7 +20,7 @@ namespace Root_WIND2
         public FrontSideMap         Map;
         public FrontSideOrigin      Origin;
         public FrontSidePosition   Position;
-        public FrontSideROI         ROI;
+        public FrontSideMask         ROI;
         public FrontSideSpec        Spec;
 
         private FrontsideSummary_ViewModel m_Summary_VM;
@@ -60,8 +60,8 @@ namespace Root_WIND2
                 SetProperty(ref m_Position_VM, value);
             }
         }
-        private FrontsideROI_ViewModel m_ROI_VM;
-        public FrontsideROI_ViewModel p_ROI_VM
+        private FrontsideMask_ViewModel m_ROI_VM;
+        public FrontsideMask_ViewModel p_ROI_VM
         {
             get
             {
@@ -116,7 +116,7 @@ namespace Root_WIND2
             p_Position_VM = new FrontsidePosition_ViewModel();
             p_Position_VM.init(setup, m_Recipe);
 
-            p_ROI_VM = new FrontsideROI_ViewModel();
+            p_ROI_VM = new FrontsideMask_ViewModel();
             p_ROI_VM.Init(setup,m_Recipe);
 
             p_Spec_VM = new FrontsideSpec_ViewModel();
@@ -155,7 +155,7 @@ namespace Root_WIND2
             Map = new FrontSideMap();
             Origin = new FrontSideOrigin();
             Position = new FrontSidePosition();
-            ROI = new FrontSideROI();
+            ROI = new FrontSideMask();
             Spec = new FrontSideSpec();
 
             SetPage(Map);

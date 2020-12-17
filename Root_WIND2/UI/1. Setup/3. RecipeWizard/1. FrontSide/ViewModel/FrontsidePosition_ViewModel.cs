@@ -700,6 +700,8 @@ namespace Root_WIND2
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
             fc.p_ImageSource = p_BoxImgSource;
+            fc.DataContext = this;
+
             p_MasterMark.Add(fc);
             CheckEmpty();
         }
@@ -713,6 +715,8 @@ namespace Root_WIND2
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
             fc.p_ImageSource = p_BoxImgSource;
+            fc.DataContext = this;
+
             p_ShotMark.Add(fc);
             CheckEmpty();
         }
@@ -726,16 +730,27 @@ namespace Root_WIND2
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
             fc.p_ImageSource = p_BoxImgSource;
+            fc.DataContext = this;
+
             p_ChipMark.Add(fc);
             CheckEmpty();
         }
-        private void _cmdContext()
-        {
-            ContextMenu context = new ContextMenu();
-            
-            
-        }
 
+        private void _deleteMasterMark()
+        {
+            m_PositionRecipe.RemoveMasterFeature(p_nMarkIndex[0]);
+            p_MasterMark.RemoveAt(p_nMarkIndex[0]);
+        }
+        private void _deleteShotMark()
+        {
+            m_PositionRecipe.RemoveShotFeature(p_nMarkIndex[1]);
+            p_ShotMark.RemoveAt(p_nMarkIndex[1]);
+        }
+        private void _deleteChipMark()
+        {
+            m_PositionRecipe.RemoveChipFeature(p_nMarkIndex[2]);
+            p_ChipMark.RemoveAt(p_nMarkIndex[2]);
+        }
         public void LoadPositonMark()
         {
             p_MasterMark.Clear();
@@ -822,10 +837,23 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(_addChipMark);
+                return new RelayCommand(_deleteMasterMark);
             }
         }
-
+        public ICommand DeleteShotMark
+        {
+            get
+            {
+                return new RelayCommand(_deleteShotMark);
+            }
+        }
+        public ICommand DeleteChipMark
+        {
+            get
+            {
+                return new RelayCommand(_deleteChipMark);
+            }
+        }
         private enum BoxProcess
         {
             None,

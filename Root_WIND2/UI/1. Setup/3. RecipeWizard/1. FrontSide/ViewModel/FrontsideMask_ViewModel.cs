@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2
 {
-    class FrontsideROI_ViewModel : RootViewer_ViewModel
+    class FrontsideMask_ViewModel : RootViewer_ViewModel
     {
         Recipe m_Recipe;
         /// <summary>

@@ -34,7 +34,7 @@ namespace Root_WIND2
 
         private void ViewerInit()
         {
-            p_ROI_Viewer = new FrontsideROI_ViewModel();
+            p_ROI_Viewer = new FrontsideMask_ViewModel();
             p_ROI_Viewer.p_VisibleMenu = Visibility.Collapsed;
             p_ROI_Viewer.SetBackGroundWorker();
             p_ROI_Viewer.p_ImageData = m_front.p_ROI_VM.p_ImageData;
@@ -45,8 +45,8 @@ namespace Root_WIND2
         }
 
         #region Property
-        private FrontsideROI_ViewModel m_ROI_Viewer;
-        public FrontsideROI_ViewModel p_ROI_Viewer
+        private FrontsideMask_ViewModel m_ROI_Viewer;
+        public FrontsideMask_ViewModel p_ROI_Viewer
         {
             get
             {

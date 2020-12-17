@@ -69,7 +69,15 @@ namespace RootTools_Vision
 
         public void RemoveMasterFeature(int index)
         {
-            
+            listMasterFeature.RemoveAt(index);
+        }
+        public void RemoveShotFeature(int index)
+        {
+            listShotFeature.RemoveAt(index);
+        }
+        public void RemoveChipFeature(int index)
+        {
+            listChipFeature.RemoveAt(index);
         }
 
         public override bool Save(string recipePath)

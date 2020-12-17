@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
              mc:Ignorable="d" 
-             Background="Transparent">
+             Background="Transparent" MouseDoubleClick="UserControl_MouseDoubleClick">
     <UserControl.Resources>
         <local:StringConverter x:Key="StringConverter"/>
     </UserControl.Resources>

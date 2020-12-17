@@ -94,7 +94,7 @@
                                                 <Setter.Value>
                                                     <ContextMenu>
                                                         <MenuItem Header="Delete"
-                                                                  Command="{Binding DeleteMasterMark}"/>
+                                                                  Command="{Binding DataContext.DeleteMasterMark}"/>
                                                     </ContextMenu>
                                                 </Setter.Value>
                                             </Setter>
@@ -105,7 +105,7 @@
                             </ScrollViewer>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="Shot Mark" Grid.Row="1" Opacity="0.3">
+                    <GroupBox Header="Shot Mark" Grid.Row="1">
                         <Grid>
                             <TextBlock Text="Empty"
                                        FontFamily="Arial"
@@ -123,6 +123,18 @@
                                             <WrapPanel Orientation="Horizontal" />
                                         </ItemsPanelTemplate>
                                     </ListBox.ItemsPanel>
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="ContextMenu">
+                                                <Setter.Value>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Delete"
+                                                                  Command="{Binding DataContext.DeleteShotMark}" />
+                                                    </ContextMenu>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
                                 </ListBox>
                             </ScrollViewer>
                         </Grid>
@@ -145,6 +157,18 @@
                                             <WrapPanel Orientation="Horizontal" />
                                         </ItemsPanelTemplate>
                                     </ListBox.ItemsPanel>
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="ContextMenu">
+                                                <Setter.Value>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Delete"
+                                                                  Command="{Binding DataContext.DeleteChipMark}" />
+                                                    </ContextMenu>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
                                 </ListBox>
                             </ScrollViewer>
                         </Grid>
