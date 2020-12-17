@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 
 namespace RootTools_Vision
 {
-    public class ROIRecipe : RecipeBase
+    public class MaskRecipe : RecipeBase
     {
         CPoint originPoint;
         CRect boundingBox;
@@ -32,7 +32,7 @@ namespace RootTools_Vision
             set => boundingBox = value; 
         }
 
-        public ROIRecipe()
+        public MaskRecipe()
         {
             this.originPoint = new CPoint();
             this.boundingBox = new CRect();
@@ -40,7 +40,7 @@ namespace RootTools_Vision
             
         }
 
-        public ROIRecipe(CPoint _originPoint)
+        public MaskRecipe(CPoint _originPoint)
         {
             this.originPoint = _originPoint;
             this.boundingBox = new CRect();
