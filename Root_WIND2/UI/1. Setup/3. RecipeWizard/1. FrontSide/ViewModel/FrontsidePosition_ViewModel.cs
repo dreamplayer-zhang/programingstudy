@@ -31,7 +31,7 @@ namespace Root_WIND2
         TShape BOX;
         ImageData BoxImage;
 
-        TRect InspArea; 
+        TRect InspArea;
 
         CPoint PointBuffer;
 
@@ -83,7 +83,7 @@ namespace Root_WIND2
                 SetRoiRect();
                 m_Origin = new CPoint(m_OriginRecipe.OriginX, m_OriginRecipe.OriginY);
 
-                if(InspArea == null)
+                if (InspArea == null)
                     InspArea = new TRect(Brushes.Yellow, 1, 1);
 
                 InspArea.MemoryRect.Left = m_Origin.X - m_OriginRecipe.InspectionBufferOffsetX;
@@ -111,7 +111,7 @@ namespace Root_WIND2
             }
         }
 
-        public Visibility[] p_VisibleEmpty
+        public ObservableCollection<Visibility> p_VisibleEmpty
         {
             get
             {
@@ -122,7 +122,7 @@ namespace Root_WIND2
                 SetProperty(ref m_VisibleEmpty, value);
             }
         }
-        private Visibility[] m_VisibleEmpty = new Visibility[3];
+        private ObservableCollection<Visibility> m_VisibleEmpty = new ObservableCollection<Visibility>();
 
         public int[] p_nMarkIndex
         {
@@ -663,6 +663,13 @@ namespace Root_WIND2
 
         private void CheckEmpty()
         {
+            if (p_VisibleEmpty.Count == 0)
+            {
+                p_VisibleEmpty.Add(new Visibility());
+                p_VisibleEmpty.Add(new Visibility());
+                p_VisibleEmpty.Add(new Visibility());
+            }
+
             if (p_MasterMark.Count < 1)
                 p_VisibleEmpty[0] = Visibility.Visible;
             else
@@ -682,8 +689,9 @@ namespace Root_WIND2
         private void _saveImage()
         {
         }
-        private void _addWaferMark()
+        private void _addMasterMark()
         {
+            var asdf = p_nMarkIndex;
             if (BoxImage == null)
                 return;
             //RecipeType_FeatureData rtf = new RecipeType_FeatureData(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.GetByteArray());
@@ -691,8 +699,6 @@ namespace Root_WIND2
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
-            //fc.p_Offset.X = m_Offset.X;
-            //fc.p_Offset.Y = m_Offset.Y;
             fc.p_ImageSource = p_BoxImgSource;
             p_MasterMark.Add(fc);
             CheckEmpty();
@@ -722,6 +728,12 @@ namespace Root_WIND2
             fc.p_ImageSource = p_BoxImgSource;
             p_ChipMark.Add(fc);
             CheckEmpty();
+        }
+        private void _cmdContext()
+        {
+            ContextMenu context = new ContextMenu();
+            
+            
         }
 
         public void LoadPositonMark()
@@ -788,7 +800,7 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(_addWaferMark);
+                return new RelayCommand(_addMasterMark);
             }
         }
         public ICommand AddShotMark
@@ -799,6 +811,14 @@ namespace Root_WIND2
             }
         }
         public ICommand AddChipMark
+        {
+            get
+            {
+                return new RelayCommand(_addChipMark);
+            }
+        }
+
+        public ICommand DeleteMasterMark
         {
             get
             {

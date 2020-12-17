@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="838" d:DesignWidth="1683" 
@@ -80,13 +81,26 @@
                             <ScrollViewer HorizontalScrollBarVisibility="Visible"
                                           VerticalScrollBarVisibility="Disabled">
                                 <ListBox ItemsSource="{Binding p_MasterMark}"
-                                         SelectedIndex="{Binding p_nMarkIndex[0], Mode=OneWayToSource}"
+                                         SelectedIndex="{Binding p_nMarkIndex[0]}"
                                          Background="Transparent">
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <WrapPanel Orientation="Horizontal" />
                                         </ItemsPanelTemplate>
                                     </ListBox.ItemsPanel>
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="ContextMenu">
+                                                <Setter.Value>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Delete"
+                                                                  Command="{Binding DeleteMasterMark}"/>
+                                                    </ContextMenu>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+
                                 </ListBox>
                             </ScrollViewer>
                         </Grid>
@@ -102,7 +116,7 @@
                             <ScrollViewer HorizontalScrollBarVisibility="Visible"
                                           VerticalScrollBarVisibility="Disabled">
                                 <ListBox ItemsSource="{Binding p_ShotMark}"
-                                         SelectedIndex="{Binding p_nMarkIndex[1], Mode=OneWayToSource}"
+                                         SelectedIndex="{Binding p_nMarkIndex[1]}"
                                          Background="Transparent">
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -124,7 +138,7 @@
                             <ScrollViewer HorizontalScrollBarVisibility="Visible"
                                           VerticalScrollBarVisibility="Disabled">
                                 <ListBox ItemsSource="{Binding p_ChipMark}"
-                                         SelectedIndex="{Binding p_nMarkIndex[2], Mode=OneWayToSource}"
+                                         SelectedIndex="{Binding p_nMarkIndex[2]}"
                                          Background="Transparent">
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>
