@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Root_WIND2
 {
     /// <summary>
-    /// AlignmentDiePosition.xaml에 대한 상호 작용 논리
+    /// GeneralMaskPage.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class FrontSideAlignment : UserControl
+    public partial class FrontSideMask : UserControl
     {
-        public FrontSideAlignment()
+        public FrontSideMask()
         {
             InitializeComponent();
         }

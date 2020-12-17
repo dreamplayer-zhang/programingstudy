@@ -254,16 +254,15 @@
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Map\FrontsideMap_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideSpecTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideSummary_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\MaskTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideSpec_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\InspectionItem.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\Mask.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideROI_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideMask_ViewModel.cs" />
     <Compile Include="Module\InspectionManager_Vision.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideOriginBox_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideOriginTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideOrigin_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideAlignment_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsidePosition_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\DrawTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\InspTestPage.xaml.cs">
       <DependentUpon>InspTestPage.xaml</DependentUpon>
@@ -360,14 +359,14 @@
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontSideOrigin.xaml.cs">
       <DependentUpon>FrontSideOrigin.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontSideAlignment.xaml.cs">
-      <DependentUpon>FrontSideAlignment.xaml</DependentUpon>
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontSidePosition.xaml.cs">
+      <DependentUpon>FrontSidePosition.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\5. GEM\GEMPanel.xaml.cs">
       <DependentUpon>GEMPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontSideROI.xaml.cs">
-      <DependentUpon>FrontSideROI.xaml</DependentUpon>
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontSideMask.xaml.cs">
+      <DependentUpon>FrontSideMask.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontSideSpec.xaml.cs">
       <DependentUpon>FrontSideSpec.xaml</DependentUpon>
@@ -541,7 +540,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontSideAlignment.xaml">
+    <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontSidePosition.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -549,7 +548,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontSideROI.xaml">
+    <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontSideMask.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
