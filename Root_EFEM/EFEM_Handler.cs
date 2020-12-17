@@ -97,7 +97,7 @@ namespace Root_EFEM
             Cymechs,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
-        List<InfoCarrier> m_aInfoCarrier = new List<InfoCarrier>(); 
+        List<ILoadport> m_aLoadport = new List<ILoadport>(); 
         int m_lLoadport = 2; 
         void InitLoadport()
         {
@@ -108,20 +108,12 @@ namespace Root_EFEM
                 string sID = "Loadport" + cLP;
                 switch (m_aLoadportType[n])
                 {
-                    case eLoadport.RND: 
-                        module = new Loadport_RND(sID, m_engineer, true, true);
-                        m_aInfoCarrier.Add(((Loadport_RND)module).m_infoCarrier); 
-                        break;
-                    case eLoadport.Cymechs: 
-                        module = new Loadport_Cymechs(sID, m_engineer, true, true);
-                        m_aInfoCarrier.Add(((Loadport_Cymechs)module).m_infoCarrier);
-                        break; 
-                    default: 
-                        module = new Loadport_RND(sID, m_engineer, true, true);
-                        m_aInfoCarrier.Add(((Loadport_RND)module).m_infoCarrier);
-                        break;
+                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
+                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, true); break; 
+                    default: module = new Loadport_RND(sID, m_engineer, true, true); break;
                 }
                 InitModule(module);
+                m_aLoadport.Add((ILoadport)module); 
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
             }
         }
@@ -299,8 +291,11 @@ namespace Root_EFEM
         #endregion
 
         #region Calc Sequence
+        public int m_nRnR = 1;
+        dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
+            m_infoRnRSlot = infoSlot;
             m_process.AddInfoWafer(infoSlot);
             return "OK";
         }
@@ -325,9 +320,9 @@ namespace Root_EFEM
 
         public dynamic GetGemSlot(string sSlot)
         {
-            foreach (InfoCarrier infoCarrier in m_aInfoCarrier)
+            foreach (ILoadport loadport in m_aLoadport)
             {
-                foreach (GemSlotBase slot in infoCarrier.m_aGemSlot)
+                foreach (GemSlotBase slot in loadport.p_infoCarrier.m_aGemSlot)
                 {
                     if (slot.p_id == sSlot) return slot;
                 }
@@ -358,9 +353,46 @@ namespace Root_EFEM
                     case EQ.eState.Run:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
-                            //m_process.p_sInfo = m_process.RunNextSequence();
+                            CheckLoad(); 
+                            m_process.p_sInfo = m_process.RunNextSequence();
+                            CheckUnload(); 
+                            if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            {
+                                m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
+                                m_process.ReCalcSequence();
+                                m_nRnR--;
+                                EQ.p_eState = EQ.eState.Run;
+                            }
                         }
                         break;
+                }
+            }
+        }
+
+        void CheckLoad()
+        {
+            EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
+            string sLoadport = sequence.m_infoWafer.m_sModule; 
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if (loadport.p_id == sLoadport) loadport.RunDocking(); 
+            }
+        }
+
+        void CheckUnload()
+        {
+            EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+                {
+                    string sLoadport = loadport.p_id;
+                    bool bUndock = true; 
+                    foreach (EFEM_Process.Sequence sequence in aSequence)
+                    {
+                        if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false; 
+                    }
+                    if (bUndock) loadport.RunUndocking(); 
                 }
             }
         }
