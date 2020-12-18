@@ -38,7 +38,7 @@ namespace Root_AOP01_Inspection
             Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
                      */
 
-                    MainVision mainVision = ((AOP01_Handler)m_eng)
+                    //MainVision mainVision = ((AOP01_Handler)m_eng)
                 });
             }
         }

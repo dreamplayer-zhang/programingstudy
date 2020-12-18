@@ -458,6 +458,8 @@ namespace RootTools.Control
             m_speedNow = GetSpeedValue(eSpeed.Move_DoorOpen);
             OverrideVelocity(m_speedNow.m_v);
         }
+
+        public bool 
         #endregion
 
         #region Shift

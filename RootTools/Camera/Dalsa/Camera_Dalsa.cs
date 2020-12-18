@@ -356,7 +356,8 @@ namespace RootTools.Camera.Dalsa
             //p_CamParam.p_eTDIMode = DalsaParameterSet.eTDIMode.Tdi;
             p_CamParam.p_eDeviceScanType = DalsaParameterSet.eDeviceScanType.Linescan;
             p_CamParam.p_eTriggerMode = DalsaParameterSet.eTriggerMode.External;
-            m_sapDevice.UpdateFeaturesToDevice();
+            if(m_sapDevice!=null)
+                m_sapDevice.UpdateFeaturesToDevice();
             m_sapXfer.Freeze();
             return "OK";
         }

@@ -500,6 +500,12 @@ namespace Root_AOP01_Inspection.Module
                         if (EQ.IsStop())
                             return "OK";
 
+                        double nRotate = m_nRotatePulse * (p_dDegree * nScanLine);
+                        if (m_module.Run(axisRotate.StartMove(nRotate)))
+                            return p_sInfo;
+                        if (m_module.Run(axisRotate.WaitReady()))
+                            return p_sInfo;
+
                         double dStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
                         double dEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
@@ -536,18 +542,7 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
-                        nScanLine++;
-
-                        if (m_module.Run(axisXY.p_axisY.StartMove(2249700)))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady()))
-                            return p_sInfo;
-                        double nRotate = m_nRotatePulse * (p_dDegree * nScanLine);
-                        if (m_module.Run(axisRotate.StartMove(nRotate)))
-                            return p_sInfo;
-                        if (m_module.Run(axisRotate.WaitReady()))
-                            return p_sInfo;
-
+                        nScanLine++;                     
                     }
                     m_grabMode.m_camera.StopGrab();
                     return "OK";
@@ -753,7 +748,10 @@ namespace Root_AOP01_Inspection.Module
                 try
                 {
                     m_grabMode.SetLight(true);
-
+                    if(m_grabMode.pUseRADS)
+                    {
+                        m_module.m_axisXY.
+                    }
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
                     CPoint cpMemoryOffset = new CPoint(m_cpMemoryOffset);
@@ -993,7 +991,7 @@ namespace Root_AOP01_Inspection.Module
                     {
                         Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1); 
                         int nScalednum = (m_Heightinfo[y,x]-110) * 255 / nCamHeight;
-                        //ColorImg.SetTo(new MCvScalar(nScalednum));
+
                         ColorImg.SetTo(new MCvScalar(nScalednum*20));
 
                         if (y == 0)
