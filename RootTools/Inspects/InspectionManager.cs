@@ -89,7 +89,6 @@ namespace RootTools.Inspects
 		StopWatch sw;
 
 		int nThreadNum = 10;
-		public int nInspectionCount = 0;
 		int ImageWidth = 320;
 		int ImageHeight = 240;
 		public ToolBox m_toolBox;
@@ -601,6 +600,23 @@ namespace RootTools.Inspects
 			p_qInspection.Enqueue(_property);
 		}
 
+		public void _clearInspReslut()
+		{
+			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+			if (connector.Open())
+			{
+				string dropQuery = "DROP TABLE Inspections.tempdata";
+				var result = connector.SendNonQuery(dropQuery);
+				Debug.WriteLine(string.Format("tempdata Table Drop : {0}", result));
+				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '0') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='0';");
+				Debug.WriteLine(string.Format("Status Clear : {0}", result));
+			}
+			connector.Close();
+
+			// 검사 큐 클리어
+			p_qInspection.Clear();
+		}
+
 		public void ClearInspection()
 		{
 			p_qInspection.Clear();
@@ -657,7 +673,6 @@ namespace RootTools.Inspects
 			{
 				//insp blockd에 대한 start xy, end xy
 				int sx, sy, ex, ey;
-				int blockcount = 1;
 
 				for (int i = wStart; i < wStop; i++)
 				{
@@ -674,7 +689,6 @@ namespace RootTools.Inspects
 						InspectionProperty ip = new InspectionProperty();
 						ip.p_InspType = GetInspectionType(dCode);
 						ip.m_nDefectCode = dCode;
-						ip.p_index = blockcount;
 						ip.MemoryPoolName = poolName;
 						ip.MemoryGroupName = groupName;
 						ip.MemoryName = memoryName;
@@ -704,7 +718,6 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
-							blockcount++;
 						}
 						else if (
 							IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Top)) &&
@@ -715,7 +728,6 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
-							blockcount++;
 						}
 						else if (
 							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
@@ -726,7 +738,6 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
-							blockcount++;
 						}
 						else if (
 							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
@@ -737,7 +748,6 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
-							blockcount++;
 						}
 						else if (
 							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Bottom)) &&
@@ -748,7 +758,6 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
-							blockcount++;
 						}
 						else if (IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
 							!IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) && 
@@ -779,8 +788,6 @@ namespace RootTools.Inspects
 							inspblocklist.Add(first);
 							inspblocklist.Add(second);
 							inspblocklist.Add(third);
-
-							blockcount += 3;
 						}
 						else if (IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) &&
 							!IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) && 
@@ -812,8 +819,6 @@ namespace RootTools.Inspects
 							inspblocklist.Add(first);
 							inspblocklist.Add(second);
 							inspblocklist.Add(third);
-
-							blockcount += 3;
 						}
 						else
 						{
@@ -821,7 +826,6 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
-							blockcount++;
 						}
 					}
 					//inspection offset, 모서리 영역 미구현

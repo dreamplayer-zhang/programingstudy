@@ -67,7 +67,6 @@ namespace RootTools_Vision
         }
         public new void Add(Workplace workplace)
         {
-            workplace.StateChanged += WorkplaceStateChanged_Callback;
             workplace.PositionUpdated += WorkplacePositionUpdated_Callback;
             workplace.PositionIntialized += WorkplacePositionInitialized_Callback;
             workplace.Index = this.Count;

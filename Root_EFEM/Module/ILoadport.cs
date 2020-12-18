@@ -1,10 +1,13 @@
-﻿using RootTools.Module;
-
-namespace Root_EFEM.Module
+﻿namespace Root_EFEM.Module
 {
     public interface ILoadport
     {
-        ModuleRunBase GetRunLoad();
-        ModuleRunBase GetRunUnload(); 
+        string p_id { get; set; }
+
+        string RunDocking();
+
+        string RunUndocking();
+
+        InfoCarrier p_infoCarrier { get; set; }
     }
 }

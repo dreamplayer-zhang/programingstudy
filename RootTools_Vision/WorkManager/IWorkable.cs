@@ -10,6 +10,5 @@ namespace RootTools_Vision
     {
         void Start();
         void Stop();
-        void Pause();
     }
 }

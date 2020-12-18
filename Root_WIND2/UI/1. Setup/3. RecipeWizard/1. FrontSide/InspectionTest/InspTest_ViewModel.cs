@@ -150,10 +150,10 @@ namespace Root_WIND2
             }
         }
 
-        public void DrawRectMasterFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text)
+        public void DrawRectMasterFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text , bool bSuccess)
         {
             p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, DrawTool_ViewModel.ColorType.MasterFeature);
-            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, DrawTool_ViewModel.ColorType.FeatureMatching, text);
+            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess?DrawTool_ViewModel.ColorType.FeatureMatching : DrawTool_ViewModel.ColorType.FeatureMatchingFail, text);
         }
 
         public void DrawRectShotFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text)
@@ -162,10 +162,10 @@ namespace Root_WIND2
             p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, DrawTool_ViewModel.ColorType.FeatureMatching, text);
         }
 
-        public void DrawRectChipFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text)
+        public void DrawRectChipFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text, bool bSuccess)
         {
             p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, DrawTool_ViewModel.ColorType.ChipFeature);
-            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, DrawTool_ViewModel.ColorType.FeatureMatching, text);
+            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess ? DrawTool_ViewModel.ColorType.FeatureMatching : DrawTool_ViewModel.ColorType.FeatureMatchingFail, text);
         }
         public void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
         {
@@ -183,23 +183,11 @@ namespace Root_WIND2
         private void _btnStop()
         {
             //timer.Stop();
-            //DatabaseManager.Instance.SelectData();
-            //m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
+            m_Setup.InspectionVision.Stop();
+            DatabaseManager.Instance.SelectData();
+            m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
 
-            //CRect rect = new CRect();
-            //rect.Left = 0;
-            //rect.Top = 0;
-            //rect.Right = p_DrawTool_VM.p_ImageData.p_Size.X;
-            //rect.Bottom = p_DrawTool_VM.p_ImageData.p_Size.Y;
-
-            //rect.Width = rect.Right - rect.Left;
-            //rect.Height = rect.Bottom - rect.Top;
-
-            
-
-            //saveWholeWaferImage(@"D:/"+m_Recipe.Name+ "Wafer.bmp", rect);
         }
-
         unsafe private void saveWholeWaferImage(string Path, CRect rect)
         {
             // Width가 4의 배수가 아닐 경우 에러남...
@@ -267,7 +255,7 @@ namespace Root_WIND2
 
                 byte[] aBuf = new byte[byteCnt * rect.Width];
 
-                for(int i = 0; i < rect.Bottom; i++)
+                for (int i = 0; i < rect.Bottom; i++)
                 {
                     ptrR += p_DrawTool_VM.p_ImageData.p_Size.X;
                     ptrG += p_DrawTool_VM.p_ImageData.p_Size.X;

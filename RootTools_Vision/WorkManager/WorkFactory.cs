@@ -55,13 +55,5 @@ namespace RootTools_Vision
                 manager.Stop();
             }
         }
-
-        public void Pause()
-        {
-            foreach (WorkManager manager in this.workManagers)
-            {
-                manager.Pause();
-            }
-        }
     }
 }

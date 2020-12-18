@@ -154,11 +154,11 @@ namespace Root_Vega.Module
             #endregion
 
             #region Interlock
-            if (m_swIonizerOn.ElapsedMilliseconds > 10000)
+            if (m_swIonizerOn.ElapsedMilliseconds > 30000)
             {
                 m_doIonizerOnOff.Write(false);
             }
-            else if (m_swIonizerOn.IsRunning)
+            else if (m_swIonizerOn.IsRunning && m_swIonizerOn.ElapsedMilliseconds > 2000)
             {
                 m_alidIonizerAlarm.Run(!m_diIonizerAlarmCheck.ReadDI(eIonizer.LP1) || !m_diIonizerAlarmCheck.ReadDI(eIonizer.LP2), "Please Check State of X-ray Ionizer");
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,12 +15,8 @@ using RootTools_Vision;
 
 namespace Root_WIND2
 {
-    public delegate void EventMapStateChanged(int x, int y, WORKPLACE_STATE state);
-
     public class InspectionManager_Vision : WorkFactory
     {
-
-        public event EventMapStateChanged MapStateChanged;
 
         SolidColorBrush brushSnap = System.Windows.Media.Brushes.LightSkyBlue;
         SolidColorBrush brushPosition = System.Windows.Media.Brushes.SkyBlue;
@@ -121,7 +118,7 @@ namespace Root_WIND2
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Inspection 생성에 실패하였습니다.\nDetail : " + ex.Message);
+                MessageBox.Show("Inspection 생성에 실패하였습니다.\n호출함수 : "+ MethodBase.GetCurrentMethod().Name + "\nDetail : " + ex.Message);
                 return false;
             }
 
@@ -197,17 +194,17 @@ namespace Root_WIND2
 
         }
 
-        object lockObj = new object();
-        private void ChangedWorkplaceState_Callback(object _obj)
-        {
-            lock (lockObj)
-            {
-                Workplace workplace = _obj as Workplace;
+        //object lockObj = new object();
+        //private void ChangedWorkplaceState_Callback(object _obj)
+        //{
+        //    lock (lockObj)
+        //    {
+        //        Workplace workplace = _obj as Workplace;
 
-                if (MapStateChanged != null && workplace.MapPositionX >= 0 && workplace.MapPositionY >= 0)
-                    MapStateChanged(workplace.MapPositionX, workplace.MapPositionY, workplace.STATE);
-            }
-        }
+        //        if (MapStateChanged != null && workplace.MapPositionX >= 0 && workplace.MapPositionY >= 0)
+        //            MapStateChanged(workplace.MapPositionX, workplace.MapPositionY, workplace.STATE);
+        //    }
+        //}
 
         private new void Start()
         {

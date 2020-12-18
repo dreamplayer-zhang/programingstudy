@@ -24,6 +24,7 @@ namespace Root_Vega.Module
 			#region Fan
 			public class Fan : NotifyProperty
 			{
+				public RPoint m_mmLimit = new RPoint();
 				public int m_nSet = 0;
 				int _nRPM = 0; 
 				public int p_nRPM
@@ -32,6 +33,17 @@ namespace Root_Vega.Module
 					set
                     {
 						if (_nRPM == value) return;
+						if (m_nSet == 0)
+						{
+							m_alidSetted_RPMLow.Run(m_mmLimit.X > _nRPM, "FFU RPM Lower than Low Limit.");
+							m_alidSetted_RPMHigh.Run(m_mmLimit.Y < _nRPM, "FFU RPM Higher than High Limit.");
+						}
+						else if(m_nSet ==1)
+                        {
+							m_alidSetted_PreLow.Run(m_mmLimit.X > _nRPM, "FFU Pressure Lower than Low Limit.");
+							m_alidSetted_PreHigh.Run(m_mmLimit.Y < _nRPM, "FFU Pressure Higher than High Limit.");
+						}
+
 						_nRPM = value;
 						OnPropertyChanged(); 
                     }
@@ -56,6 +68,11 @@ namespace Root_Vega.Module
 				ALID m_alidPressureSensor;
 				ALID m_alidPressureHigh;
 				ALID m_alidPressureLow;
+
+				ALID m_alidSetted_RPMHigh;
+				ALID m_alidSetted_RPMLow;
+				ALID m_alidSetted_PreHigh;
+				ALID m_alidSetted_PreLow;
 				public void InitALID(FFU FFU)
                 {
 					GAF GAF = FFU.m_gaf; 
@@ -65,6 +82,10 @@ namespace Root_Vega.Module
 					m_alidPressureSensor = GAF.GetALID(FFU, m_id + " : Pressure Sensor", "Pressure Check Sensor Error");
 					m_alidPressureHigh = GAF.GetALID(FFU, m_id + " : Pressure High", "Pressure too High");
 					m_alidPressureLow = GAF.GetALID(FFU, m_id + " : Pressure Low", "Pressure too Low");
+					m_alidSetted_RPMHigh = GAF.GetALID(FFU, m_id + " : RPM High", "RPM Higher than Limit");
+					m_alidSetted_RPMLow = GAF.GetALID(FFU, m_id + " : RPM Low", "RPM Lower than Limit");
+					m_alidSetted_PreHigh = GAF.GetALID(FFU, m_id + " : Pressure High", "Pressure Higher than Limit");
+					m_alidSetted_PreLow = GAF.GetALID(FFU, m_id + " : Pressure Low", "Pressure Lower than Limit");
 				}
 				#endregion
 
@@ -205,10 +226,13 @@ namespace Root_Vega.Module
 				}
 				#endregion
 
+
+
 				public void RunTree(Tree tree)
 				{
 					p_sFan = tree.Set(p_sFan, p_sFan, "Fan ID", "Fan ID");
 					m_nSet = tree.Set(m_nSet, m_nSet, "Set", "Fan Set Value (RPM) or Pressure (0.1pa)");
+					m_mmLimit = tree.Set(m_mmLimit, m_mmLimit, "Limit", "FFU Lower & Upper Limit");
 				}
 
 				public string m_id;

@@ -696,16 +696,22 @@ namespace Root_EFEM.Module
             return run;
         }
 
-        public string GetArmID(ModuleRunBase runGet, WTRArm armPut)
+        public string GetEnableAnotherArmID(ModuleRunBase runGet, WTRArm armPut, InfoWafer infoWafer)
         {
-            ((Run_Get)runGet).m_eArm = 1 - ((Arm)armPut).m_eArm;
-            return m_dicArm[((Run_Get)runGet).m_eArm].m_id;
-        }
-
-        public string GetChildID(ModuleRunBase runPut, WTRArm armPut)
-        {
-            ((Run_Put)runPut).m_eArm = ((Arm)armPut).m_eArm;
-            return ((Run_Put)runPut).p_sChild; 
+            eArm eArmPut = ((Arm)armPut).m_eArm; 
+            for (int n = 0; n < p_aArm.Count; n++)
+            {
+                Arm armGet = (Arm)p_aArm[n]; 
+                if (armGet.m_eArm != eArmPut)
+                {
+                    if (armGet.IsEnableWaferSize(infoWafer))
+                    {
+                        ((Run_Get)runGet).m_eArm = armGet.m_eArm;
+                        return armGet.m_id; 
+                    }
+                }
+            }
+            return "Not Enable";
         }
         #endregion
 
@@ -716,8 +722,8 @@ namespace Root_EFEM.Module
         {
             AddModuleRunList(new Run_ResetCPU(this), false, "Reset WTR CPU");
             AddModuleRunList(new Run_Grip(this), false, "Run Grip WTR Arm");
-            m_runGet = AddModuleRunList(new Run_Get(this), true, "WTR Run Get Motion");
-            m_runPut = AddModuleRunList(new Run_Put(this), true, "WTR Run Put Motion");
+            m_runGet = AddModuleRunList(new Run_Get(this), false, "WTR Run Get Motion");
+            m_runPut = AddModuleRunList(new Run_Put(this), false, "WTR Run Put Motion");
         }
 
         public class Run_ResetCPU : ModuleRunBase
@@ -780,7 +786,7 @@ namespace Root_EFEM.Module
             }
         }
 
-        public class Run_Get : ModuleRunBase
+        public class Run_Get : ModuleRunBase, IWTRRun
         {
             WTR_RND m_module;
             public Run_Get(WTR_RND module)
@@ -815,6 +821,11 @@ namespace Root_EFEM.Module
                     m_nChildID = m_module.GetChildSlotID(p_sChild, sChildSlot);
                 }
                 else m_nChildID = 0;
+            }
+
+            public void SetArm(WTRArm arm)
+            {
+                m_eArm = ((Arm)arm).m_eArm;
             }
 
             public override string Run()
@@ -858,7 +869,7 @@ namespace Root_EFEM.Module
             }
         }
 
-        public class Run_Put : ModuleRunBase
+        public class Run_Put : ModuleRunBase, IWTRRun
         {
             WTR_RND m_module;
             public Run_Put(WTR_RND module)
@@ -893,6 +904,11 @@ namespace Root_EFEM.Module
                     m_nChildID = m_module.GetChildSlotID(p_sChild, sChildSlot);
                 }
                 else m_nChildID = 0;
+            }
+
+            public void SetArm(WTRArm arm)
+            {
+                m_eArm = ((Arm)arm).m_eArm;
             }
 
             public override string Run()
