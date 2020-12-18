@@ -641,7 +641,7 @@ namespace Root_Vega
 				return;
 
 			//0. 개수 초기화 및 Table Drop
-			_clearInspReslut();
+			//_clearInspReslut();
 
 			ClearDrawList();
 
