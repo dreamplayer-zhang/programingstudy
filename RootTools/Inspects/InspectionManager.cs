@@ -15,6 +15,7 @@ using System.Diagnostics;
 using MySqlX.XDevAPI.Relational;
 using RootTools.ToolBoxs;
 using System.Drawing.Imaging;
+using System.Windows;
 
 namespace RootTools.Inspects
 {
@@ -230,6 +231,7 @@ namespace RootTools.Inspects
 									Console.WriteLine("Queue Item Count : " + p_qInspection.Count);
 									sw.Stop();
 									Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
+									MessageBox.Show("Inspection Complete");
 								}
 								InspectionThread[i].StartInspection(ipQueue, i);
 
@@ -403,9 +405,9 @@ namespace RootTools.Inspects
 
 				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
 
-				using (FileStream fs = new FileStream(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".vega_image"), FileMode.Create))
-				{
-					fs.Write(BitConverter.GetBytes(tempSet.Tables["tempdata"].Rows.Count), 0, sizeof(int));//defect 개수 저장
+				//using (FileStream fs = new FileStream(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".vega_image"), FileMode.Create))
+				//{
+					//fs.Write(BitConverter.GetBytes(tempSet.Tables["tempdata"].Rows.Count), 0, sizeof(int));//defect 개수 저장
 					foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
 					{
 						System.Data.DataRow dataRow = VSDataDT.NewRow();
@@ -464,16 +466,16 @@ namespace RootTools.Inspects
 						string memory = item["memMEMORY"].ToString();
 						var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
 						var img = new ImageData(tempMem);
-					var imageBytes = img.GetRectByteArray(ImageSizeBlock);
-					//img.SaveRectImage(ImageSizeBlock, System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) +"_"+Convert.ToInt32(item["idx"]).ToString("D8") + ".bmp"));
+					//var imageBytes = img.GetRectByteArray(ImageSizeBlock);
+					img.SaveRectImage(ImageSizeBlock, System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) +"_"+Convert.ToInt32(item["idx"]).ToString("D8") + ".bmp"));
 
-					fs.Write(BitConverter.GetBytes(Convert.ToInt32(item["idx"].ToString())), 0, sizeof(int));//4
-					fs.Write(BitConverter.GetBytes(ImageWidth), 0, sizeof(int));//4
-					fs.Write(BitConverter.GetBytes(ImageHeight), 0, sizeof(int));//4
-					fs.Write(BitConverter.GetBytes(imageBytes.Length), 0, sizeof(int));//4
-					fs.Write(imageBytes, 0, imageBytes.Length);//바로직전거만큼
+					//fs.Write(BitConverter.GetBytes(Convert.ToInt32(item["idx"].ToString())), 0, sizeof(int));//4
+					//fs.Write(BitConverter.GetBytes(ImageWidth), 0, sizeof(int));//4
+					//fs.Write(BitConverter.GetBytes(ImageHeight), 0, sizeof(int));//4
+					//fs.Write(BitConverter.GetBytes(imageBytes.Length), 0, sizeof(int));//4
+					//fs.Write(imageBytes, 0, imageBytes.Length);//바로직전거만큼
 				}
-				}
+				//}
 				System.Data.DataRow searchDataRow = SearchDataDT.NewRow();
 				searchDataRow["Idx"] = SearchDataDT.Rows.Count;
 				searchDataRow["InspStartTime"] = NowTime.ToString("yyyy-MM-dd HH:mm:ss");//TODO 나중에 진짜 검사 시작시간(로딩 시작 시간)으로 바꿔야 함
@@ -615,6 +617,9 @@ namespace RootTools.Inspects
 
 			// 검사 큐 클리어
 			p_qInspection.Clear();
+
+			// Defect Box 클리어
+			ClearDefectList();
 		}
 
 		public void ClearInspection()
@@ -689,6 +694,7 @@ namespace RootTools.Inspects
 						InspectionProperty ip = new InspectionProperty();
 						ip.p_InspType = GetInspectionType(dCode);
 						ip.m_nDefectCode = dCode;
+						//ip.p_index = blockcount;
 						ip.MemoryPoolName = poolName;
 						ip.MemoryGroupName = groupName;
 						ip.MemoryName = memoryName;
@@ -718,6 +724,7 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
+							//blockcount++;
 						}
 						else if (
 							IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Top)) &&
@@ -728,6 +735,7 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
+							//blockcount++;
 						}
 						else if (
 							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
@@ -738,6 +746,7 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
+							//blockcount++;
 						}
 						else if (
 							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
@@ -748,6 +757,7 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
+							//blockcount++;
 						}
 						else if (
 							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Bottom)) &&
@@ -758,6 +768,7 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
+							//blockcount++;
 						}
 						else if (IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
 							!IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) && 
@@ -788,6 +799,8 @@ namespace RootTools.Inspects
 							inspblocklist.Add(first);
 							inspblocklist.Add(second);
 							inspblocklist.Add(third);
+
+							//blockcount += 3;
 						}
 						else if (IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) &&
 							!IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) && 
@@ -819,6 +832,8 @@ namespace RootTools.Inspects
 							inspblocklist.Add(first);
 							inspblocklist.Add(second);
 							inspblocklist.Add(third);
+
+							//blockcount += 3;
 						}
 						else
 						{
@@ -826,6 +841,7 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
+							//blockcount++;
 						}
 					}
 					//inspection offset, 모서리 영역 미구현
