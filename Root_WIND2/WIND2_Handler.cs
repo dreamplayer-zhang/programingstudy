@@ -46,6 +46,8 @@ namespace Root_WIND2
             {
             }
         }
+
+        //ModuleList IHandler.p_moduleList { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
         #endregion
 
         #region Module

@@ -25,6 +25,8 @@ namespace RootTools_Vision
             private set => boundingBox = value;
         }
 
+        [XmlArray("PointLines")]
+        [XmlArrayItem("PointLine")]
         public List<RecipeType_PointLine> PointLines
         {
             get => pointLines;
@@ -115,12 +117,12 @@ namespace RootTools_Vision
         public CPoint StartPoint
         {
             get => startPoint;
-            private set => startPoint = value;
+            set => startPoint = value;
         }
         public int Length
         {
             get => length;
-            private set => length = value;
+            set => length = value;
         }
 
         public RecipeType_PointLine()

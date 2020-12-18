@@ -87,7 +87,7 @@ namespace Root_AOP01_Inspection
             switch (m_eWTR)
             {
                 case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer); break;
-                default: m_wtr = new WTR("WTR", m_engineer); break;
+                default: m_wtr = new WTRCleanUnit("WTR&CleanUnit", m_engineer); break;
             }
             InitModule(m_wtr);
         }
@@ -105,7 +105,7 @@ namespace Root_AOP01_Inspection
             Cymechs,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
-        List<ILoadport> m_aLoadport = new List<ILoadport>();
+        public List<ILoadport> m_aLoadport = new List<ILoadport>();
         int m_lLoadport = 2;
         void InitLoadport()
         {

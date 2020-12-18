@@ -144,7 +144,27 @@ namespace RootTools.Inspects
 					{
 						unsafe
 						{
-							var temp = clrInsp.StripInspection(
+							//var temp = clrInsp.StripInspection(
+							//m_InspProp.MemoryPoolName,
+							//m_InspProp.MemoryGroupName,
+							//m_InspProp.MemoryName,
+							//m_InspProp.MemoryOffset,
+							//ThreadIndex,
+							//m_InspProp.m_nDefectCode,
+							//m_InspProp.p_Rect.Left,
+							//m_InspProp.p_Rect.Top,
+							//m_InspProp.p_Rect.Right,
+							//m_InspProp.p_Rect.Bottom,
+							//m_InspProp.p_TargetMemWidth,
+							//m_InspProp.p_TargetMemHeight,
+							//m_InspProp.p_StripParam.TargetGV,
+							//m_InspProp.p_StripParam.DefectSize,
+							//m_InspProp.p_StripParam.Intensity,
+							//m_InspProp.p_StripParam.Bandwidth,
+							//m_InspProp.p_bDefectMerge,
+							//m_InspProp.p_nMergeDistance,
+							//(void*)m_InspProp.p_ptrMemory);
+							var temp = clrInsp.SurfaceInspection(
 							m_InspProp.MemoryPoolName,
 							m_InspProp.MemoryGroupName,
 							m_InspProp.MemoryName,
@@ -159,8 +179,8 @@ namespace RootTools.Inspects
 							m_InspProp.p_TargetMemHeight,
 							m_InspProp.p_StripParam.TargetGV,
 							m_InspProp.p_StripParam.DefectSize,
-							m_InspProp.p_StripParam.Intensity,
-							m_InspProp.p_StripParam.Bandwidth,
+							true,
+							true,
 							m_InspProp.p_bDefectMerge,
 							m_InspProp.p_nMergeDistance,
 							(void*)m_InspProp.p_ptrMemory);

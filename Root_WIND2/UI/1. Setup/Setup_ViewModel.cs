@@ -209,9 +209,9 @@ namespace Root_WIND2
                         test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
                     }
                     if (workplace.Index == 0)
-                        inspTestVM.DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test);
+                        inspTestVM.DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
                     else
-                        inspTestVM.DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test);
+                        inspTestVM.DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
                 }));
             }
         }
@@ -228,7 +228,7 @@ namespace Root_WIND2
                     text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
                 if (false) // Display Option : Defect Size
                     text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
-                if (true) // Display Option : GV Value
+                if (false) // Display Option : GV Value
                     text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
 
                 rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
@@ -384,7 +384,7 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(ProgramManager.Instance.NewRecipe);
+                return new RelayCommand(ProgramManager.Instance.ShowDialogSaveRecipe);
             }
 
         }

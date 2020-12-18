@@ -1852,7 +1852,7 @@ namespace Root_Vega.Module
                         int nDefectCode = Convert.ToInt32(item["ClassifyCode"]);
                         InspectionType eType = InspectionManager.GetInspectionType(nDefectCode);
                         InspectionTarget eTarget = InspectionManager.GetInspectionTarget(nDefectCode);
-                        if ((eType == InspectionType.Strip) && (eTarget == InspectionTarget.Chrome))
+                        if ((eTarget == InspectionTarget.Chrome))
                         {
                             //lstDefectPos.Add(new CPoint(posX, posY));
                             CPoint cptPos = new CPoint(posX, posY);

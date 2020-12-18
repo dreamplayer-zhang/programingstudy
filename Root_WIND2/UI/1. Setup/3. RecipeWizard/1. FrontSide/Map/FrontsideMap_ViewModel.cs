@@ -60,7 +60,8 @@ namespace Root_WIND2
             get => mapSizeX; 
             set
             {
-                SetProperty(ref mapSizeX, value);                
+                SetProperty(ref mapSizeX, value);
+                recipe.WaferMap.MapSizeX = mapSizeX;
             }
         }
         public int MapSizeY
@@ -69,10 +70,27 @@ namespace Root_WIND2
             set
             {
                 SetProperty(ref mapSizeY, value);
+                recipe.WaferMap.MapSizeY = mapSizeY;
             }
         }
-        public int OriginX { get => nOriginX; set => nOriginX = value; }
-        public int OriginY { get => nOriginY; set => nOriginY = value; }
+        public int OriginX 
+        { 
+            get => nOriginX;
+            set
+            {
+                SetProperty(ref nOriginX, value);
+                recipe.WaferMap.MasterDieX = nOriginX;
+            }
+        }
+        public int OriginY
+        {
+            get => nOriginY;
+            set
+            {
+                SetProperty(ref nOriginY, value);
+                recipe.WaferMap.MasterDieY = nOriginY;
+            }
+        }
         public int ShotX { get => nShotX; set => nShotX = value; }
         public int ShotY { get => nShotY; set => nShotY = value; }
         public int ChipsizeX
@@ -172,6 +190,8 @@ namespace Root_WIND2
 
             this.MapSizeX = this.recipe.WaferMap.MapSizeX;
             this.MapSizeY = this.recipe.WaferMap.MapSizeY;
+            this.OriginX = this.recipe.WaferMap.MasterDieX;
+            this.OriginY = this.recipe.WaferMap.MasterDieY;
             this.mapdata = new int[this.MapSizeX * this.MapSizeY];
             DrawMaps();
         }
@@ -202,6 +222,8 @@ namespace Root_WIND2
             this.MapSizeX = 14;
             this.MapSizeY = 14;
 
+            this.OriginX = 0;
+            this.OriginY = 5;
 
             int waferSize = nWaferSize;
             int r = waferSize / 2;
@@ -264,6 +286,9 @@ namespace Root_WIND2
             {
                 this.MapSizeX = waferMap.MapSizeX;
                 this.MapSizeY = waferMap.MapSizeY;
+
+                this.OriginX = waferMap.MasterDieX;
+                this.OriginY = waferMap.MasterDieY;
                 /////////
                 myCanvas.Children.Clear(); // 초기화
                 int waferSize = nWaferSize;

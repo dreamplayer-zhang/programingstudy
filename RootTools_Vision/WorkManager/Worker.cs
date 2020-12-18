@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -117,7 +118,7 @@ namespace RootTools_Vision
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("위치 : "+ ex.Source + "\nTrace :  "+ ex.StackTrace + "\nDetail : "+ ex.Message);
             }
         }
 

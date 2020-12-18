@@ -20,6 +20,7 @@ namespace RootTools_Vision
         #region [Member Variables]
         public override WORK_TYPE Type => WORK_TYPE.PREPARISON;
 
+        WorkplaceBundle workplaceBundle;
         Workplace workplace;
 
         Recipe recipe;
@@ -33,6 +34,15 @@ namespace RootTools_Vision
 
         public override bool DoPrework()
         {
+            if(this.workplace.Index != 0)
+            {
+                if (this.workplaceBundle[0].GetSubState(WORKPLACE_SUB_STATE.WAFER_POSITION_SUCCESS) == false)
+                {
+                    this.IsPreworkDone = false;
+                    return false;
+                }
+            }
+            
             return base.DoPrework();
         }
         public override void DoWork()
@@ -45,6 +55,9 @@ namespace RootTools_Vision
 
         public override void SetRecipe(Recipe _recipe)
         {
+            //if (recipe == null)
+            //    return;
+
             m_sName = this.GetType().Name;
 
             this.recipe = _recipe;
@@ -72,9 +85,15 @@ namespace RootTools_Vision
 
         public bool DoPosition()
         {
+            //if (recipe == null)
+            //    return true;
+
             if (this.workplace.MapPositionX == -1 && this.workplace.MapPositionX == -1) // Master
             {
-                return DoPosition_Wafer();
+                bool rst = DoPosition_Wafer();
+                this.workplace.SetSubState(WORKPLACE_SUB_STATE.WAFER_POSITION_SUCCESS, rst);
+
+                return rst;
             }
             else  // Position Chip
             {
@@ -128,12 +147,7 @@ namespace RootTools_Vision
                     i++;
                 }
 
-                if (maxIndex == -1) return false;
 
-                if (maxScore < this.parameter.MinScoreLimit)
-                {
-                    return false;
-                }
 
                 CPoint ptAbs = ConvertRelToAbs_Chip(new CPoint(this.positionRecipe.ListMasterFeature[maxIndex].PositionX, this.positionRecipe.ListMasterFeature[maxIndex].PositionY));
                 int tplStartX = ptAbs.X;
@@ -161,14 +175,19 @@ namespace RootTools_Vision
                 int transX = (int)(centerMatchingX - centerROIX);
                 int transY = (int)(centerMatchingY - centerROIY);
 
-                if (this.workplace.Index == 0)  // Master
+
+                if (maxScore >= this.parameter.MinScoreLimit) // Position 성공 시
                 {
                     this.workplace.SetImagePositionByTrans(transX, transY, true);
-                }
 
-                WorkEventManager.OnPositionDone(this.workplace, new PositionDoneEventArgs(new CPoint(maxStartX, maxStartY), new CPoint(maxEndX, maxEndY),
-                        new CPoint(maxStartX + transX, maxStartY + transY), new CPoint(maxEndX + transX, maxEndY + transY)));
-                        
+                    WorkEventManager.OnPositionDone(this.workplace, new PositionDoneEventArgs(new CPoint(maxStartX, maxStartY), new CPoint(maxEndX, maxEndY),
+                            new CPoint(maxStartX + transX, maxStartY + transY), new CPoint(maxEndX + transX, maxEndY + transY), true));
+                }
+                else  // Position Fail
+                {
+                    WorkEventManager.OnPositionDone(this.workplace, new PositionDoneEventArgs(new CPoint(maxStartX, maxStartY), new CPoint(maxEndX, maxEndY),
+                            new CPoint(maxStartX + transX, maxStartY + transY), new CPoint(maxEndX + transX, maxEndY + transY), false));
+                }     
             }
 
             return true;
@@ -257,16 +276,6 @@ namespace RootTools_Vision
 
                 }
 
-                if (maxIndex == -1) return false;
-
-                if (maxScore < this.parameter.MinScoreLimit)
-                {
-                    this.workplace.SetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS, false);
-                    //return false;
-                }
-
-                this.workplace.SetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS, true);
-
                 CPoint ptAbs = ConvertRelToAbs_Chip(new CPoint(this.positionRecipe.ListDieFeature[maxIndex].PositionX, this.positionRecipe.ListDieFeature[maxIndex].PositionY));
                 int tplStartX = ptAbs.X;
                 int tplStartY = ptAbs.Y;
@@ -293,17 +302,29 @@ namespace RootTools_Vision
                 int transX = (int)(centerMatchingX - tplCenterX);
                 int transY = (int)(centerMatchingY - tplCenterY);
 
-                this.workplace.MoveImagePosition(transX, transY);
 
-                maxStartX += this.parameter.SearchRangeX;
-                maxStartY -= this.parameter.SearchRangeY;
-                maxEndX += this.parameter.SearchRangeX;
-                maxEndY -= this.parameter.SearchRangeY;
+                if (maxScore >= this.parameter.MinScoreLimit) // Position 성공 시
+                {
+                    this.workplace.SetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS, true);
+                    this.workplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, false);
 
-                ExtractCurrentWorkplace();
+                    this.workplace.MoveImagePosition(transX, transY);
 
-                WorkEventManager.OnPositionDone(this.workplace, new PositionDoneEventArgs(new CPoint(tplStartX, tplStartY), new CPoint(tplStartX + tplW, tplStartY + tplH),
-                        new CPoint(tplStartX + transX, tplStartY + transY), new CPoint(tplStartX + tplW + transX, tplStartY + tplH + transY)));
+                    ExtractCurrentWorkplace();
+
+                    WorkEventManager.OnPositionDone(this.workplace, new PositionDoneEventArgs(new CPoint(tplStartX, tplStartY), new CPoint(tplStartX + tplW, tplStartY + tplH),
+                            new CPoint(tplStartX + transX, tplStartY + transY), new CPoint(tplStartX + tplW + transX, tplStartY + tplH + transY), true));
+                }
+                else  // Position 실패
+                {
+                    this.workplace.SetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS, false);
+                    this.workplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
+
+                    WorkEventManager.OnPositionDone(this.workplace, new PositionDoneEventArgs(new CPoint(tplStartX, tplStartY), new CPoint(tplStartX + tplW, tplStartY + tplH),
+                            new CPoint(tplStartX + transX, tplStartY + transY), new CPoint(tplStartX + tplW + transX, tplStartY + tplH + transY), false));
+                }
+
+
             }
             catch(Exception ex)
             {
@@ -321,6 +342,7 @@ namespace RootTools_Vision
             {
                 clone.SetRecipe(this.recipe);
                 clone.SetWorkplace(this.workplace);
+                clone.SetWorkplaceBundle(this.workplaceBundle);
             }
             catch(Exception ex)
             {
@@ -333,7 +355,7 @@ namespace RootTools_Vision
 
         public override void SetWorkplaceBundle(WorkplaceBundle workplace)
         {
-            return;
+            this.workplaceBundle = workplace;
         }
 
         private void ExtractCurrentWorkplace()
