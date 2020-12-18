@@ -500,6 +500,12 @@ namespace Root_AOP01_Inspection.Module
                         if (EQ.IsStop())
                             return "OK";
 
+                        double nRotate = m_nRotatePulse * (p_dDegree * nScanLine);
+                        if (m_module.Run(axisRotate.StartMove(nRotate)))
+                            return p_sInfo;
+                        if (m_module.Run(axisRotate.WaitReady()))
+                            return p_sInfo;
+
                         double dStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
                         double dEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
@@ -528,7 +534,7 @@ namespace Root_AOP01_Inspection.Module
                         string strMemory = curScanPos.ToString();
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
@@ -536,18 +542,7 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
-                        nScanLine++;
-
-                        if (m_module.Run(axisXY.p_axisY.StartMove(2249700)))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady()))
-                            return p_sInfo;
-                        double nRotate = m_nRotatePulse * (p_dDegree * nScanLine);
-                        if (m_module.Run(axisRotate.StartMove(nRotate)))
-                            return p_sInfo;
-                        if (m_module.Run(axisRotate.WaitReady()))
-                            return p_sInfo;
-
+                        nScanLine++;                     
                     }
                     m_grabMode.m_camera.StopGrab();
                     return "OK";
@@ -622,6 +617,7 @@ namespace Root_AOP01_Inspection.Module
                 {
                     m_grabMode.SetLight(true);
 
+                    double a = Math.Atan(55.3);
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
                     CPoint cpMemoryOffset = new CPoint(m_cpMemoryOffset);
@@ -752,7 +748,10 @@ namespace Root_AOP01_Inspection.Module
                 try
                 {
                     m_grabMode.SetLight(true);
-
+                    if(m_grabMode.pUseRADS)
+                    {
+                        m_module.m_axisXY.
+                    }
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
                     CPoint cpMemoryOffset = new CPoint(m_cpMemoryOffset);
@@ -992,7 +991,7 @@ namespace Root_AOP01_Inspection.Module
                     {
                         Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1); 
                         int nScalednum = (m_Heightinfo[y,x]-110) * 255 / nCamHeight;
-                        //ColorImg.SetTo(new MCvScalar(nScalednum));
+
                         ColorImg.SetTo(new MCvScalar(nScalednum*20));
 
                         if (y == 0)

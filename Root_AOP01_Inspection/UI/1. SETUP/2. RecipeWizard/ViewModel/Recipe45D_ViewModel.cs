@@ -25,7 +25,21 @@ namespace Root_AOP01_Inspection
         {
             get
             {
-                return new RelayCommand(() => {
+                return new RelayCommand(()=> {
+                    /*
+                      EQ.p_bStop = false;
+            PatternVision Patternvision = ((Vega_Handler)m_Engineer.ClassHandler()).m_patternVision;
+            if (Patternvision.p_eState != ModuleBase.eState.Ready)
+            {
+                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                return;
+            }
+            PatternVision.Run_Grab Grab = (PatternVision.Run_Grab)Patternvision.CloneModuleRun("Grab");
+            var viewModel = new Dialog_Scan_ViewModel(Patternvision, Grab);
+            Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+                     */
+
+                    //MainVision mainVision = ((AOP01_Handler)m_eng)
                 });
             }
         }
