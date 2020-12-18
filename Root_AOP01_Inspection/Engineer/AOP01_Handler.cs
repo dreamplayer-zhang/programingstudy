@@ -87,7 +87,7 @@ namespace Root_AOP01_Inspection
             switch (m_eWTR)
             {
                 case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer); break;
-                default: m_wtr = new WTR("WTR", m_engineer); break;
+                default: m_wtr = new WTRCleanUnit("WTR&CleanUnit", m_engineer); break;
             }
             InitModule(m_wtr);
         }

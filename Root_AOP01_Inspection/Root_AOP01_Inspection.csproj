@@ -199,7 +199,7 @@
     <Compile Include="Module\AOP01.cs" />
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Module\MainVision.cs" />
-    <Compile Include="Module\WTR.cs" />
+    <Compile Include="Module\WTRCleanUnit.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="ProgramManager.cs" />
     <Compile Include="UI\1. SETUP\3. Maintenance\ViewerTest.xaml.cs">
