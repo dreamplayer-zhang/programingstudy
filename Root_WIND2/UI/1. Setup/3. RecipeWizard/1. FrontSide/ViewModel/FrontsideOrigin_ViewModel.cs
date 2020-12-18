@@ -34,6 +34,10 @@ namespace Root_WIND2
             p_OriginTool_VM.AddOrigin += P_OriginTool_VM_AddOrigin;
             p_OriginTool_VM.AddPitch += P_OriginTool_VM_AddPitch;
             p_OriginTool_VM.DelegateInspArea += P_OriginTool_VM_DelegateInspArea;
+
+            MasterDieX = m_Recipe.WaferMap.MasterDieX;
+            MasterDieY = m_Recipe.WaferMap.MasterDieY;
+            mapControl_VM.ChangeMasterImage(m_Recipe.WaferMap.MasterDieX, masterDieY);
         }
         public void SetPage()
         {
@@ -78,7 +82,7 @@ namespace Root_WIND2
             }
         }
 
-        private int masterDieX;
+        private int masterDieX = 0;
         public int MasterDieX
         {
             get
@@ -99,7 +103,7 @@ namespace Root_WIND2
                 SetProperty(ref masterDieX, value);
             }
         }
-        private int masterDieY;
+        private int masterDieY = 5;
         public int MasterDieY
         {
             get
@@ -261,16 +265,16 @@ namespace Root_WIND2
         private void DrawMapData()
         {
             RecipeType_WaferMap mapdata = m_Recipe.WaferMap;
-            if (mapdata.Data != null)
+            if (mapdata.Data.Length > 0)
             {
                 int nMapX = mapdata.MapSizeX;
                 int nMapY = mapdata.MapSizeY;
 
-                MapControl_VM.SetMap(true, mapdata.Data, new CPoint(nMapX, nMapY));
+                MapControl_VM.SetMap(true, new CPoint(mapdata.MasterDieX, mapdata.MasterDieY), mapdata.Data, new CPoint(nMapX, nMapY));
             }
             else
             {
-                MapControl_VM.SetMap(true, setup.InspectionVision.mapdata, new CPoint(14, 14));
+                MapControl_VM.SetMap(true, new CPoint(0, 5), setup.InspectionVision.mapdata, new CPoint(14, 14));
             }
         }
         private void SetMapData()

@@ -167,11 +167,11 @@ namespace Root_WIND2
                     // Defect Code 보고... 나중에 회의
                     //if (defect.m_nDefectCode / 10000 == 1)  // Frontside
                     {
-                        DisplaySelectedFrontDefect(selectedRow);
+                        //DisplaySelectedFrontDefect(selectedRow);
                     }
                     //else if (defect.m_nDefectCode / 10000 == 2)  // Backside
                     {
-                        //DisplaySelectedBackDefect(selectedRow);
+                        DisplaySelectedBackDefect(selectedRow);
                     }
                     //else if (defect.m_nDefectCode / 10000 == 3) // Edge
                     {
@@ -577,11 +577,11 @@ namespace Root_WIND2
                 // 대충 코드는 이런식으로 분류를 하면 되지않을까...
                 //if (defect.m_nDefectCode / 10000 == 1)  // Frontside
                 {
-                    m_DefectView.AddFrontDefect(defect.m_fRelX, defect.m_fRelY);
+                    //m_DefectView.AddFrontDefect(defect.m_fRelX, defect.m_fRelY);
                 }
                 //else if (defect.m_nDefectCode / 10000 == 2)  // Backside
                 {
-                    //m_DefectView.AddBackDefect(defect.m_fRelX, defect.m_fRelY);
+                    m_DefectView.AddBackDefect(defect.m_fRelX, defect.m_fRelY);
                 }
                 //else if (defect.m_nDefectCode / 10000 == 3) // Edge
                 {
@@ -733,7 +733,7 @@ namespace Root_WIND2
             if (foundRows.Length == 0)
                 return;
 
-            int binSz = 256;
+            int binSz = 128;
             if (gvHistogramMode != GVHistogramType.All)
                 binSz = 128 / 2;
 
@@ -745,7 +745,7 @@ namespace Root_WIND2
                 foreach (DataRow table in foundRows)
                 {
                     double gv = (double)table[11];
-                    GVHistogram[(int)gv]++;
+                    GVHistogram[(int)gv/2]++;
                 }
             }
             else
@@ -754,9 +754,13 @@ namespace Root_WIND2
                 {
                     double gv = (double)table[11];
                     if (gvHistogramMode == GVHistogramType.Dark)
+                    {
                         if ((int)gv / 2 < binSz)
+                        {
                             GVHistogram[(int)gv / 2]++;
-                        else
+                        }
+                    }
+                    else
                         if ((int)gv / 2 >= binSz)
                             GVHistogram[((int)gv - 128) / 2]++;
                 }
@@ -769,18 +773,18 @@ namespace Root_WIND2
 
             GVXLabel = new string[binSz];
 
-            if (gvHistogramMode != GVHistogramType.All)
+            //if (gvHistogramMode != GVHistogramType.All)
             {
                 int yLabel = (gvHistogramMode == GVHistogramType.Bright) ? 128 : 0;
                 for (int i = yLabel; i < binSz; i++)
                     GVXLabel[i - yLabel] = (yLabel + (i - yLabel) * 2).ToString() + "~" + (yLabel + (i - yLabel) * 2 + 1).ToString();
             }
-            else
-            {
-                int yLabel = (gvHistogramMode == GVHistogramType.Bright) ? 128 : 0;
-                for (int i = yLabel; i < binSz; i++)
-                    GVXLabel[i - yLabel] = i.ToString();
-            }
+            //else
+            //{
+            //    int yLabel = (gvHistogramMode == GVHistogramType.Bright) ? 128 : 0;
+            //    for (int i = yLabel; i < binSz; i++)
+            //        GVXLabel[i - yLabel] = i.ToString();
+            //}
 
             GVYLabel = value => value.ToString("N");
         }

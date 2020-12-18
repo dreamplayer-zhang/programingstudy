@@ -18,7 +18,6 @@ namespace Root_WIND2
 {
     /// <summary>
     /// 동작 구현을 급하게 해서 불필요한 코드가 많습니다. ** 코드 최적화가 필요합니다 **
-    /// Check Box의 상태에 따라 Canvas 혹은 Grid를 Visible/Collapsed 추가 구현 필요
     /// </summary>
     public partial class DefectView : UserControl
     {
@@ -31,13 +30,65 @@ namespace Root_WIND2
         public void SetRecipe(Recipe _recipe)
         {
             this.recipe = _recipe;
+            cb_Back.IsChecked = true;
         }
-        public void Init(bool useFront, bool useBack, bool useEdge, bool useEBR)
+
+        private void DefectCheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            FrontOption.Visibility = VisibleOption(useFront);
-            BackOption.Visibility = VisibleOption(useBack);
-            EdgeOption.Visibility = VisibleOption(useEdge);
-            EBROption.Visibility = VisibleOption(useEBR);
+            CheckBox chk = (CheckBox)sender;
+
+            switch (chk.Name)
+            {
+                case "cb_Front" :
+                    if (cb_Front.IsChecked == true)
+                    {
+                        cb_Back.IsChecked = false;
+                        cb_Edge.IsChecked = false;
+                        cb_EBR.IsChecked = false;
+
+                        FrontsideCanvas.Visibility = Visibility.Visible;
+                        BacksideCanvas.Visibility = Visibility.Collapsed;
+                        gridEdge.Visibility = Visibility.Collapsed;
+                        Wafer.Visibility = Visibility.Collapsed;
+                    }
+                    break;
+                case "cb_Back":
+                    if (cb_Back.IsChecked == true)
+                    {
+                        cb_Front.IsChecked = false;
+                        cb_Edge.IsChecked = false;
+                        cb_EBR.IsChecked = false;
+
+                        FrontsideCanvas.Visibility = Visibility.Collapsed;
+                        BacksideCanvas.Visibility = Visibility.Visible;
+                        Wafer.Visibility = Visibility.Visible;
+                        gridEdge.Visibility = Visibility.Collapsed;
+                    }
+                    break;
+                case "cb_Edge":
+                    if (cb_Edge.IsChecked == true)
+                    {
+                        cb_Front.IsChecked = false;
+                        cb_Back.IsChecked = false;
+                        cb_EBR.IsChecked = false;
+
+                        FrontsideCanvas.Visibility = Visibility.Collapsed;
+                        BacksideCanvas.Visibility = Visibility.Collapsed;
+                        gridEdge.Visibility = Visibility.Visible;
+                        Wafer.Visibility = Visibility.Visible;
+                    }
+                    break;
+                case "cb_EBR":
+                    if (cb_EBR.IsChecked == true)
+                    {
+                        cb_Front.IsChecked = false;
+                        cb_Back.IsChecked = false;
+                        cb_Edge.IsChecked = false;
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         public void AddFrontDefect(double relX, double relY)
@@ -77,10 +128,6 @@ namespace Root_WIND2
 
         public void DrawWaferMap()
         {
-            DrawMap();
-        }
-        private void DrawMap()
-        {
             RecipeType_WaferMap mapdata = recipe.WaferMap;
             int[] mapData = mapdata.Data;
 
@@ -98,16 +145,14 @@ namespace Root_WIND2
                     {
                         Rectangle map = new Rectangle();
                         map.Stroke = Brushes.Black;
-                        //map.Fill = Brushes.Blue;
+                        map.Fill = Brushes.Gainsboro;
                         map.Width = mapW - margin * 2;
                         map.Height = mapH - margin * 2;
                         map.StrokeThickness = 0.5;
-                        map.Opacity = 0.6;
 
                         Canvas.SetLeft(map, x * (mapW + margin));
                         Canvas.SetTop(map, y * (mapH + margin));
-
-                        Canvas.SetZIndex(map, 99);
+ 
                         FrontsideCanvas.Children.Add(map);
                     }   
                 }        
@@ -197,7 +242,7 @@ namespace Root_WIND2
             double waferWidth = nWaferSize * ratio_wafer_to_canvas_x;
 
             double dWaferRaius = (float)BacksideCanvas.ActualWidth / (double)2;
-            double dSamplingRatio = dWaferRaius / 37410; // backside Recipe에서 radius값 가지고오기 <수정>
+            double dSamplingRatio = dWaferRaius / 30430; // backside Recipe에서 radius값 가지고오기 <수정> // 37410 meomo
 
             double dCanvasWaferCenterX = (float)BacksideCanvas.ActualWidth / 2;
             double dCanvasWaferCenterY = (float)BacksideCanvas.ActualHeight / 2;
@@ -233,34 +278,25 @@ namespace Root_WIND2
         //    }
         //}
 
-        private Visibility VisibleOption(bool use)
-        {
-            if (use)
-                return Visibility.Visible;
-            else
-                return Visibility.Collapsed;
-            
-        }
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            FrontsideCanvas.Children.Clear();
-            BacksideCanvas.Children.Clear();
-            gridEdge.Children.Clear();
-            Random random = new Random(1);
-            Random random2 = new Random(3);
-            Random random3 = new Random(7);
-            for (int i = 0; i < 150; i++)
-            {
+            //FrontsideCanvas.Children.Clear();
+            //BacksideCanvas.Children.Clear();
+            //gridEdge.Children.Clear();
+            //Random random = new Random(1);
+            //Random random2 = new Random(3);
+            //Random random3 = new Random(7);
+            //for (int i = 0; i < 150; i++)
+            //{
 
-                int r1 = random.Next(-360, 360);
-                int r2 = random2.Next(-360, 360);
-                int r3 = random3.Next(-360, 360);
-                //AddDefect(gridFront, r1);
-                //AddDefect(backsideCanvas, r2);
-                //AddDefect(gridEdge, r3);
+            //    int r1 = random.Next(-360, 360);
+            //    int r2 = random2.Next(-360, 360);
+            //    int r3 = random3.Next(-360, 360);
+            //    //AddDefect(gridFront, r1);
+            //    //AddDefect(backsideCanvas, r2);
+            //    //AddDefect(gridEdge, r3);
 
-            }
+            //}
         }
 
         public void Clear()
