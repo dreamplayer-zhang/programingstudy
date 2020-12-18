@@ -353,6 +353,7 @@
       <DependentUpon>MiniViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Image\MiniViewer_ViewModel.cs" />
+    <Compile Include="OHTNew\OHT.cs" />
     <Compile Include="Printer\SRP350.cs" />
     <Compile Include="Printer\SRP350_UI.xaml.cs">
       <DependentUpon>SRP350_UI.xaml</DependentUpon>

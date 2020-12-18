@@ -7,6 +7,7 @@ using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
 using RootTools.Control;
+using RootTools.OHT.Semi;
 
 namespace Root_EFEM.Module
 {
@@ -14,12 +15,13 @@ namespace Root_EFEM.Module
     {
         #region ToolBox
         RS232 m_rs232;
-        DIO_I m_diPlaced;
-        DIO_I m_diPresent;
+        public DIO_I m_diPlaced;
+        public DIO_I m_diPresent;
         DIO_I m_diOpen;
         DIO_I m_diClose;
         DIO_I m_diReady;
         DIO_I m_diRun;
+        public OHT_Semi m_OHT; 
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
@@ -29,6 +31,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.Get(ref m_diReady, this, "Ready");
             p_sInfo = m_toolBox.Get(ref m_diRun, this, "Run");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
