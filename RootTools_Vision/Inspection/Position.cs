@@ -45,6 +45,9 @@ namespace RootTools_Vision
 
         public override void SetRecipe(Recipe _recipe)
         {
+            //if (recipe == null)
+            //    return;
+
             m_sName = this.GetType().Name;
 
             this.recipe = _recipe;
@@ -72,6 +75,9 @@ namespace RootTools_Vision
 
         public bool DoPosition()
         {
+            //if (recipe == null)
+            //    return true;
+
             if (this.workplace.MapPositionX == -1 && this.workplace.MapPositionX == -1) // Master
             {
                 return DoPosition_Wafer();

@@ -18,7 +18,8 @@
                             HorizontalAlignment="Left"
                             Margin="10,10">
                     <Grid Margin="0,0,0,5" x:Name="FrontOption">
-                        <CheckBox Content="Front" FontSize="15" FontWeight="Bold" x:Name="cb_Front"/>
+                        <CheckBox IsChecked="False" Content="Front" FontSize="15" 
+                                  FontWeight="Bold" x:Name="cb_Front" Checked="DefectCheckBox_Checked" Unchecked="DefectCheckBox_Checked"/>
                         <Grid Width="12" Height="12" Background="Red" Margin="70,0,0,0" HorizontalAlignment="Left"/>
                         <Grid Margin="100,0,0,0" Width="120" VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
@@ -30,7 +31,8 @@
                         </Grid>
                     </Grid>
                     <Grid Margin="0,0,0,5" x:Name="BackOption">
-                        <CheckBox Content="Back" FontSize="15" FontWeight="Bold" x:Name="cb_Back"/>
+                        <CheckBox Content="Back" FontSize="15" FontWeight="Bold" x:Name="cb_Back"
+                                   Checked="DefectCheckBox_Checked" Unchecked="DefectCheckBox_Checked"/>
                         <Grid Width="12" Height="12" Background="Blue" Margin="70,0,0,0" HorizontalAlignment="Left"/>
                         <Grid Margin="100,0,0,0" Width="120" VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
@@ -42,7 +44,8 @@
                         </Grid>
                     </Grid>
                     <Grid Margin="0,0,0,5" x:Name="EdgeOption">
-                        <CheckBox Content="Edge" FontSize="15" FontWeight="Bold" x:Name="cb_EBR"/>
+                        <CheckBox Content="Edge" FontSize="15" FontWeight="Bold" x:Name="cb_Edge"
+                                   Checked="DefectCheckBox_Checked" Unchecked="DefectCheckBox_Checked"/>
                         <Grid Width="12" Height="12" Background="Green" Margin="70,0,0,0" HorizontalAlignment="Left"/>
                         <Grid Margin="100,0,0,0" Width="120" VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
@@ -54,7 +57,8 @@
                         </Grid>
                     </Grid>
                     <Grid Margin="0,0,0,5" x:Name="EBROption">
-                        <CheckBox Content="EBR" FontSize="15" FontWeight="Bold" x:Name="cb_Edge"/>
+                        <CheckBox Content="EBR" FontSize="15" FontWeight="Bold" x:Name="cb_EBR"
+                                   Checked="DefectCheckBox_Checked" Unchecked="DefectCheckBox_Checked"/>
                         <Grid Width="12" Height="12" Background="DimGray" Margin="70,0,0,0" HorizontalAlignment="Left"/>
                     </Grid>
                 </StackPanel>
@@ -91,6 +95,7 @@
                                      VerticalAlignment="Stretch"
                                      HorizontalAlignment="Stretch"
                                      Width="1000" Height="1000"
+                                    Visibility="Collapsed"
                                      Fill="Gainsboro"/>
                 </Viewbox>
                 <Viewbox VerticalAlignment="Stretch"

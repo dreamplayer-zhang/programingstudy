@@ -285,16 +285,16 @@ namespace Root_WIND2
         private void DrawMapData()
         {
             RecipeType_WaferMap mapdata = recipe.WaferMap;
-            if (mapdata.Data != null)
+            if (mapdata.Data.Length > 0)
             {
                 int nMapX = mapdata.MapSizeX;
                 int nMapY = mapdata.MapSizeY;
 
-                MapControl_VM.SetMap(false, mapdata.Data, new CPoint(nMapX, nMapY));
+                MapControl_VM.SetMap(false, new CPoint(mapdata.MasterDieX, mapdata.MasterDieY), mapdata.Data, new CPoint(nMapX, nMapY));
             }
             else
             {
-                MapControl_VM.SetMap(false, setup.InspectionVision.mapdata, new CPoint(14, 14));
+                MapControl_VM.SetMap(false, new CPoint(0, 5), setup.InspectionVision.mapdata, new CPoint(14, 14));
             }
         }
         private void SetMapData()
