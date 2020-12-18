@@ -82,6 +82,7 @@
                                           VerticalScrollBarVisibility="Disabled">
                                 <ListBox ItemsSource="{Binding p_MasterMark}"
                                          SelectedIndex="{Binding p_nMarkIndex[0]}"
+                                         BorderBrush="{x:Null}"
                                          Background="Transparent">
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -117,6 +118,7 @@
                                           VerticalScrollBarVisibility="Disabled">
                                 <ListBox ItemsSource="{Binding p_ShotMark}"
                                          SelectedIndex="{Binding p_nMarkIndex[1]}"
+                                         BorderBrush="{x:Null}"
                                          Background="Transparent">
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -151,6 +153,7 @@
                                           VerticalScrollBarVisibility="Disabled">
                                 <ListBox ItemsSource="{Binding p_ChipMark}"
                                          SelectedIndex="{Binding p_nMarkIndex[2]}"
+                                         BorderBrush="{x:Null}"
                                          Background="Transparent">
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>

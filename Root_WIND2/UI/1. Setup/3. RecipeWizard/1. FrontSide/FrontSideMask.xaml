@@ -25,7 +25,8 @@
     
     <ScrollViewer VerticalScrollBarVisibility="Visible">
         <StackPanel>
-            <Grid Height="838" DataContext="{Binding p_ROI_VM}">
+            <Grid Height="838"
+                  DataContext="{Binding p_Mask_VM}">
                 <Grid Opacity="{Binding p_PageOpacity}" IsEnabled="{Binding p_PageEnable}">
                     <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2.5*"/>
@@ -56,14 +57,14 @@
                               Background="{StaticResource GroupBoxBackground}">
                             <ScrollViewer helper:AutoScrollHelper.AutoScroll="True">
                                 <StackPanel>
-                                    <DataGrid ItemsSource="{Binding p_cInspROI}"
-                                              SelectedItem="{Binding p_SelectedROI}"
+                                    <DataGrid ItemsSource="{Binding p_cInspMask}"
+                                              SelectedItem="{Binding p_SelectedMask}"
                                               SelectionMode="Single"
                                               IsReadOnly="True"
                                               RowHeaderWidth="0"
                                               AutoGenerateColumns="False">
                                         <DataGrid.Resources>
-                                            <CollectionViewSource Source="{Binding p_cInspROI}" x:Key="items"/>
+                                            <CollectionViewSource Source="{Binding p_cInspMask}" x:Key="items"/>
                                             <Style TargetType="DataGridColumnHeader">
                                                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
                                                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -105,7 +106,7 @@
                                                     <DataTemplate>
                                                         <Button Content="Delete" Margin="1" 
                                                             Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, 
-                                                                      Path=DataContext.DeleteROI}"/>
+                                                                      Path=DataContext.DeleteMask}"/>
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
@@ -143,15 +144,15 @@
                                 </ListBox>
                                 <StackPanel Grid.Row="1">
                                     <Button Content="Clear"
-                                            Command="{Binding ClearROI}"
+                                            Command="{Binding ClearMask}"
                                             VerticalAlignment="Top"
                                             Height="40"
                                             Margin="0,2" />
                                 </StackPanel>
                             </Grid>
                         </GroupBox>
-                        <Button Content="Create ROI" Style="{StaticResource PanelBtn}" Margin="2" Grid.Row="2" Command="{Binding CreateROI}"/>
-                        <Button Content="Save ROI" Style="{StaticResource PanelBtn}" Margin="2" Grid.Row="3" Command="{Binding SaveROI}"/>
+                        <Button Content="Create Mask" Style="{StaticResource PanelBtn}" Margin="2" Grid.Row="2" Command="{Binding CreateMask}"/>
+                        <Button Content="Save Mask" Style="{StaticResource PanelBtn}" Margin="2" Grid.Row="3" Command="{Binding SaveMask}"/>
                     </Grid>
                 </Grid>
                 <local:LoadingControl Grid.ColumnSpan="3" Panel.ZIndex="100"

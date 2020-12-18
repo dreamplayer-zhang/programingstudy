@@ -60,16 +60,16 @@ namespace Root_WIND2
                 SetProperty(ref m_Position_VM, value);
             }
         }
-        private FrontsideMask_ViewModel m_ROI_VM;
-        public FrontsideMask_ViewModel p_ROI_VM
+        private FrontsideMask_ViewModel m_Mask_VM;
+        public FrontsideMask_ViewModel p_Mask_VM
         {
             get
             {
-                return m_ROI_VM;
+                return m_Mask_VM;
             }
             set
             {
-                SetProperty(ref m_ROI_VM, value);
+                SetProperty(ref m_Mask_VM, value);
             }
         }
         private FrontsideSpec_ViewModel m_Spec_VM;
@@ -116,8 +116,8 @@ namespace Root_WIND2
             p_Position_VM = new FrontsidePosition_ViewModel();
             p_Position_VM.init(setup, m_Recipe);
 
-            p_ROI_VM = new FrontsideMask_ViewModel();
-            p_ROI_VM.Init(setup,m_Recipe);
+            p_Mask_VM = new FrontsideMask_ViewModel();
+            p_Mask_VM.Init(setup,m_Recipe);
 
             p_Spec_VM = new FrontsideSpec_ViewModel();
             p_Spec_VM.init(this, m_Recipe);
@@ -133,7 +133,7 @@ namespace Root_WIND2
 
         private void P_Origin_VM_SetOrigin(object e)
         {
-            p_ROI_VM.SetOrigin(e);
+            p_Mask_VM.SetOrigin(e);
         }
         private void P_Origin_VM_SetMasterDie(object e)
         {
