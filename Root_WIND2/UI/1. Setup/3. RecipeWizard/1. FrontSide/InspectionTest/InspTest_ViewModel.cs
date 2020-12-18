@@ -186,7 +186,7 @@ namespace Root_WIND2
             m_Setup.InspectionVision.Stop();
             DatabaseManager.Instance.SelectData();
             m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
-
+        
         }
         unsafe private void saveWholeWaferImage(string Path, CRect rect)
         {
