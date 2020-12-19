@@ -7,6 +7,7 @@ using RootTools.Module;
 using Root_Vega.Module;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Threading;
+using RootTools.Inspects;
 
 namespace Root_Vega
 {
@@ -190,6 +191,43 @@ namespace Root_Vega
 
             p_PatternVision = ((Vega_Handler)m_Engineer.ClassHandler()).m_patternVision;
             p_SideVision = ((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision;
+
+            App.m_engineer.m_InspManager.AddChromeDefect += App_AddDefect;
+            App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
+            InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
+        }
+
+        ~_1_Mainview_ViewModel()
+        {
+            App.m_engineer.m_InspManager.AddChromeDefect -= App_AddDefect;
+        }
+
+        private void App_AddDefect(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void InspectionManager_RefreshDefect()
+        {
+        }
+
+        private void _ClearDefect()
+        {
+            try
+            {
+                p_MiniImageViewer.lstDefect.Clear();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -269,8 +307,8 @@ namespace Root_Vega
 
         public void UpdateMiniViewer()
         {
-            p_MiniImageViewer_Left.SetRoiRect();
-            p_MiniImageViewer.SetRoiRect();
+            //p_MiniImageViewer_Left.SetRoiRect();
+            //p_MiniImageViewer.SetRoiRect();
             p_MiniImageViewer.SetImageSource();
             p_MiniImageViewer_Btm.SetImageSource();
             p_MiniImageViewer_Top.SetImageSource();

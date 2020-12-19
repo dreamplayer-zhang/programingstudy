@@ -90,6 +90,8 @@ namespace RootTools
             }
         }
 
+        public List<CPoint> lstDefect;
+
         public bool Rotate = false;
         public bool Circle = false;
 
@@ -100,6 +102,7 @@ namespace RootTools
                 p_ImageData = image;
                 Rotate = bRotate;
                 Circle = bCircle;
+                lstDefect = new List<CPoint>();
                 //image.OnCreateNewImage += image_NewImage;
                 //image.OnUpdateImage += image_OnUpdateImage;
                 //image.UpdateOpenProgress += image_UpdateOpenProgress;
@@ -107,6 +110,26 @@ namespace RootTools
                 SetImageSource();
             }
         }
+        public CPoint GetScaledDefectPos(CPoint cptDefectPos)
+        {
+            // variable
+            CPoint cptReturn = new CPoint();
+
+            // implement
+            cptReturn.X = Scaling(cptDefectPos.X, 0, p_ImageData.p_Size.X, 0, p_CanvasWidth);
+            cptReturn.Y = Scaling(cptDefectPos.Y, 0, p_ImageData.p_Size.Y, 0, p_CanvasHeight);
+
+            return cptReturn;
+        }
+        private int Scaling(double dValue, double dMinValue, double dMaxValue, double dMinScaleValue, double dMaxScaleValue)
+        {
+            // variable
+            int nScaled = (int)(dMinScaleValue + (dValue - dMinValue) / (dMaxValue - dMinValue) * (dMaxScaleValue - dMinScaleValue));
+
+            // implement
+            return nScaled;
+        }
+
         public void SetImageData(ImageData image)
         {
             p_ImageData = null;
@@ -177,12 +200,13 @@ namespace RootTools
                 {
                     if (p_ImageData.p_nByte == 1)
                     {
-                        Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+                        Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
                         IntPtr ptrMem = m_ImageData.GetPtr();
                         if (ptrMem == IntPtr.Zero)
                             return;
                         int pix_x = 0;
                         int pix_y = 0;
+
                         if (Rotate)
                         {
                             for (int yy = 0; yy < p_CanvasHeight; yy++)
@@ -192,6 +216,8 @@ namespace RootTools
                                     pix_y = p_View_Rect.X + xx * p_View_Rect.Height / p_CanvasWidth;
                                     pix_x = p_View_Rect.Y + yy * p_View_Rect.Width / p_CanvasHeight;
                                     view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                    view.Data[yy, xx, 1] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                    view.Data[yy, xx, 2] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
                                 }
                             }
                         }
@@ -203,11 +229,11 @@ namespace RootTools
                             int nLen = 30;
                             int nRadius = p_CanvasWidth < p_CanvasHeight ? p_CanvasWidth : p_CanvasHeight;
                             int nRadius2 = nRadius - nLen;
-                            int nRadius3 = nRadius - nLen *2;
-                            
+                            int nRadius3 = nRadius - nLen * 2;
+
                             double theta = 0;
                             double max = Math.Pow(nRadius / 2, 2);
-                            double min = Math.Pow(nRadius / 2 - nLen/2, 2);
+                            double min = Math.Pow(nRadius / 2 - nLen / 2, 2);
                             double max2 = Math.Pow(nRadius2 / 2, 2);
                             double min2 = Math.Pow(nRadius2 / 2 - nLen / 2, 2);
                             double max3 = Math.Pow(nRadius3 / 2, 2);
@@ -221,7 +247,7 @@ namespace RootTools
                                     dist = Math.Pow(Math.Abs(center.X - xx), 2) + Math.Pow(Math.Abs(center.Y - yy), 2);
                                     if (dist < max && dist > min)
                                     {
-                                        theta = Math.Atan2(((double)xx - center.X), ((double)center.Y - yy)) * 180 / Math.PI +offset;
+                                        theta = Math.Atan2(((double)xx - center.X), ((double)center.Y - yy)) * 180 / Math.PI + offset;
                                         if (theta < 0)
                                         {
                                             theta = theta + 360;
@@ -231,10 +257,12 @@ namespace RootTools
                                         if (pix_y < 500)
                                             pix_y = 500;
                                         view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                        view.Data[yy, xx, 1] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                        view.Data[yy, xx, 2] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
                                     }
                                     else if (dist < max2 && dist > min2)
                                     {
-                                        theta = Math.Atan2(((double)xx - center.X), ((double)center.Y - yy)) * 180 / Math.PI +45 + offset;
+                                        theta = Math.Atan2(((double)xx - center.X), ((double)center.Y - yy)) * 180 / Math.PI + 45 + offset;
                                         if (theta < 0)
                                         {
                                             theta = theta + 360;
@@ -244,6 +272,8 @@ namespace RootTools
                                         if (pix_y < 500)
                                             pix_y = 500;
                                         view.Data[yy, xx, 0] = ((byte*)ptrMemSide)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                        view.Data[yy, xx, 1] = ((byte*)ptrMemSide)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                        view.Data[yy, xx, 2] = ((byte*)ptrMemSide)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
                                     }
                                     else if (dist < max3 && dist > min3)
                                     {
@@ -257,6 +287,8 @@ namespace RootTools
                                         if (pix_y < 500)
                                             pix_y = 500;
                                         view.Data[yy, xx, 0] = ((byte*)ptrMemBtm)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                        view.Data[yy, xx, 1] = ((byte*)ptrMemBtm)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                        view.Data[yy, xx, 2] = ((byte*)ptrMemBtm)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
                                     }
 
                                     //else if (dist < min)
@@ -268,17 +300,37 @@ namespace RootTools
                         }
                         else
                         {
-                            for (int yy = 0; yy < p_CanvasHeight; yy++)
+                            for (int yy = 1; yy < p_CanvasHeight; yy++)
                             {
+                                pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
                                 for (int xx = 0; xx < p_CanvasWidth; xx++)
                                 {
                                     pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
-                                    pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
+
+                                    view.Data[yy, xx, 2] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                    view.Data[yy, xx, 1] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
                                     view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
                                 }
                             }
-                        }
 
+                            // Defect 추가
+                            CPoint cptScaledDefectPos;
+                            for (int i = 0; i < lstDefect.Count; i++)
+                            {
+                                cptScaledDefectPos = GetScaledDefectPos(lstDefect[i]);
+                                for (int y = -1; y <= 1; y++)
+                                {
+                                    for (int x = -1; x <= 1; x++)
+                                    {
+                                        if (cptScaledDefectPos.Y - 1 < 0 || cptScaledDefectPos.Y + 1 > p_CanvasHeight) continue;
+                                        if (cptScaledDefectPos.X - 1 < 0 || cptScaledDefectPos.X + 1 > p_CanvasWidth) continue;
+                                        view.Data[cptScaledDefectPos.Y + y, cptScaledDefectPos.X + x, 0] = 255;
+                                        view.Data[cptScaledDefectPos.Y + y, cptScaledDefectPos.X + x, 1] = 0;
+                                        view.Data[cptScaledDefectPos.Y + y, cptScaledDefectPos.X + x, 2] = 0;
+                                    }
+                                }
+                            }
+                        }
                         p_ImgSource = ImageHelper.ToBitmapSource(view);
                     }
                     else if (p_ImageData.p_nByte == 3)
