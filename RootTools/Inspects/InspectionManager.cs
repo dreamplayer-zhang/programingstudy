@@ -107,6 +107,8 @@ namespace RootTools.Inspects
 		public DateTime NowTime;
 		bool m_bProgress;
 		int m_nPatternInspDoneNum = 0;
+		public bool m_bFeatureSearchFail = false;
+		public bool m_bAlignFail = false;
 		public int p_nPatternInspDoneNum
         {
             get { return m_nPatternInspDoneNum; }
