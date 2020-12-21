@@ -53,11 +53,17 @@ namespace Root_Vega
             set { _sModule = value; }
         }
 
-        public string CheckPlaced(ePresent present)
+        public string CheckPlaced(ePresent present, bool isLPLoad)
         {
             switch (p_eState)
             {
-                case eState.Empty: if (present == ePresent.Exist) p_eState = eState.Placed; break;
+                case eState.Empty: 
+                    if (present == ePresent.Exist)
+                    {
+                        if (isLPLoad) p_eState = eState.Load;
+                        else p_eState = eState.Placed;
+                    }
+                    break;
                 case eState.Placed: if (present == ePresent.Empty) p_eState = eState.Empty; break;
                 default: 
                     if (present != p_ePresentSensor)
@@ -227,7 +233,7 @@ namespace Root_Vega
             p_sCarrierID = p_sModule; 
             p_sLocID = sLocID;
             m_engineer = engineer;
-           // m_gem = m_engineer.ClassGem();
+            m_gem = m_engineer.ClassGem();
             m_log = module.m_log;
             m_treeRootReticle = new TreeRoot(p_id, m_log);
             m_treeRootReticle.UpdateTree += M_treeRootReticle_UpdateTree;

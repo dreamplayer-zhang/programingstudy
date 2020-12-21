@@ -7,6 +7,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Root_CAMELLIA.Module;
+using System.Drawing;
+using Root_CAMELLIA.Draw;
+using System.Windows.Media;
 
 namespace Root_CAMELLIA
 {
@@ -51,7 +54,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-                m_StageCenterPulse = value;
+                SetProperty(ref m_StageCenterPulse, value);
             }
         }
 
@@ -64,18 +67,129 @@ namespace Root_CAMELLIA
             DialogInit(mainwindow);
         }
 
-        public ObservableCollection<UIElement> p_MeasurePointElement
+        double m_ArrowX1 = 0.0f;
+        public double p_ArrowX1
         {
             get
             {
-                return m_MeasurePointElement;
+                return m_ArrowX1;
             }
             set
             {
-                m_MeasurePointElement = value;
+                SetProperty(ref m_ArrowX1, value);
             }
         }
-        private ObservableCollection<UIElement> m_MeasurePointElement = new ObservableCollection<UIElement>();
+
+        double m_ArrowX2 = 0.0f;
+        public double p_ArrowX2
+        {
+            get
+            {
+                return m_ArrowX2;
+            }
+            set
+            {
+                SetProperty(ref m_ArrowX2, value);
+            }
+        }
+
+        double m_ArrowY1 = 0.0f;
+        public double p_ArrowY1
+        {
+            get
+            {
+                return m_ArrowY1;
+            }
+            set
+            {
+                SetProperty(ref m_ArrowY1, value);
+            }
+        }
+
+        double m_ArrowY2 = 0.0f;
+        public double p_ArrowY2
+        {
+            get
+            {
+                return m_ArrowY2;
+            }
+            set
+            {
+                SetProperty(ref m_ArrowY2, value);
+            }
+        }
+
+        Visibility m_ArrowVisible = Visibility.Hidden;
+        public Visibility p_ArrowVisible
+        {
+            get
+            {
+                return m_ArrowVisible;
+            }
+            set
+            {
+                SetProperty(ref m_ArrowVisible, value);
+            }
+        }
+
+        private ObservableCollection<UIElement> m_DrawRouteElement = new ObservableCollection<UIElement>();
+
+        public ObservableCollection<UIElement> p_DrawRouteElement
+        {
+            get
+            {
+                return m_DrawRouteElement;
+            }
+            set
+            {
+                m_DrawRouteElement = value;
+            }
+        }
+
+        private double m_Progress = 0;
+        public double p_Progress
+        {
+            get
+            {
+                return m_Progress;
+            }
+            set
+            {
+                SetProperty(ref m_Progress, value);
+                if(value < 30)
+                {
+                    p_ProgressColor = System.Windows.Media.Brushes.Red;
+                }
+                else if (value < 65)
+                {
+                    p_ProgressColor = System.Windows.Media.Brushes.Yellow;
+                }else if(value < 90)
+                {
+                    p_ProgressColor = test;
+                }
+                else if(value == 100)
+                {
+                    p_ProgressColor = System.Windows.Media.Brushes.Blue;
+                }
+            }
+        }
+
+        public SolidColorBrush test = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 1, 211, 40));
+
+        private System.Windows.Media.Brush m_ProgressColor;
+        public System.Windows.Media.Brush p_ProgressColor
+        {
+            get
+            {
+                return m_ProgressColor;
+            }
+            set
+            {
+                SetProperty(ref m_ProgressColor, value);
+            }
+        }
+
+        public SolidColorBrush RouteBrush { get; set; } = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 0, 0, 255));
 
         private void Init()
         {
@@ -90,6 +204,9 @@ namespace Root_CAMELLIA
             ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia.mwvm = this;
 
             p_Module_Camellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
+
+            Module_Camellia.Run_Measure measure = (Module_Camellia.Run_Measure)p_Module_Camellia.CloneModuleRun("Measure");
+            this.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
         }
 
         private void ViewModelInit()
@@ -105,6 +222,29 @@ namespace Root_CAMELLIA
             dialogService.Register<Dlg_Engineer_ViewModel, Dlg_Engineer>();
             dialogService.Register<Dlg_PM_ViewModel, Dlg_PM>();
             dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_RecipeManager>();
+        }
+
+        private void DrawMeasureRoute()
+        {
+            p_DrawRouteElement.Clear();
+            int RatioX = (int)BaseDefine.CanvasWidth / BaseDefine.ViewSize;
+            int RatioY = (int)BaseDefine.CanvasHeight / BaseDefine.ViewSize;
+            for (int i = 0; i < DataManager.recipeDM.MeasurementRD.DataMeasurementRoute.Count - 1; i++)
+            {
+                ShapeManager dataRoute = new ShapeArrowLine(RouteBrush, 8);
+                ShapeArrowLine arrowLine = dataRoute as ShapeArrowLine;
+                CCircle from = DataManager.recipeDM.MeasurementRD.DataSelectedPoint[DataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]];
+                CCircle to = DataManager.recipeDM.MeasurementRD.DataSelectedPoint[DataManager.recipeDM.TeachingRD.DataMeasurementRoute[i + 1]];
+
+                from.Transform(RatioX, RatioY);
+                to.Transform(RatioX, RatioY);
+
+                PointF[] line = { new PointF((float)from.x + (float)(BaseDefine.CanvasWidth / 2), (float)-from.y + (float)(BaseDefine.CanvasHeight / 2)), new PointF((float)to.x + (float)(BaseDefine.CanvasWidth / 2), (float)-to.y + (float)(BaseDefine.CanvasHeight / 2)) };
+                arrowLine.SetData(line, RouteBrush, 15, 5, 80);
+                p_DrawRouteElement.Add(arrowLine.CanvasArrowLine);
+                //Shapes[shapeIndex] = arrowLine;
+                //shapeIndex++;
+            }
         }
 
         #region ViewModel
@@ -151,9 +291,14 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    RecipeViewModel.dataManager.recipeDM.RecipeOpen();
-                    RecipeViewModel.UpdateListView(true);
-                    RecipeViewModel.UpdateView(true);
+                    if (RecipeViewModel.dataManager.recipeDM.RecipeOpen())
+                    {
+                        RecipeViewModel.UpdateListView(true);
+                        RecipeViewModel.UpdateView(true);
+                        DrawMeasureRoute();
+                        p_Progress = 0;
+                    }
+
                 });
             }
         }
@@ -171,6 +316,9 @@ namespace Root_CAMELLIA
 
                     RecipeViewModel.UpdateListView(true);
                     RecipeViewModel.UpdateView(true);
+
+                    DrawMeasureRoute();
+
                 });
             }
         }

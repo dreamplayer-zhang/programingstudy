@@ -36,10 +36,10 @@ namespace Root_WIND2
             }
             if (cbxColors.DataContext != null)
             {
-                InspectionROI ROI = (InspectionROI)cbxColors.DataContext;
+                InspectionMask mask = (InspectionMask)cbxColors.DataContext;
                 var selected = cbxColors.SelectedItem as PropertyInfo;
                 var selectColor = selected.GetValue(selected);
-                ROI.p_Color = (Color)selectColor;
+                mask.p_Color = (Color)selectColor;
                 
             }
 
@@ -48,7 +48,7 @@ namespace Root_WIND2
         private void Picker_Loaded(object sender, RoutedEventArgs e)
         {
             var ff = cbxColors.SelectedItem;
-            InspectionROI roi = this.DataContext as InspectionROI;
+            InspectionMask roi = this.DataContext as InspectionMask;
             var select = typeof(Colors).GetProperties()
                         .Where(p => p.GetValue(null, null).ToString() == roi.p_Color.ToString())
                         .Select(p => p).FirstOrDefault();

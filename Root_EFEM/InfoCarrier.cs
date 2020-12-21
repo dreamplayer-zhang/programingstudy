@@ -116,7 +116,7 @@ namespace Root_EFEM
         {
             for (int n = 0; n < c_maxSlot; n++)
             {
-                InfoWafer newSlot = new InfoWafer(p_sModule + "." + (n + 1).ToString("00"), m_engineer);
+                InfoWafer newSlot = new InfoWafer(p_sModule, n, m_engineer);
                 newSlot.p_eState = GemSlotBase.eState.Empty;
                 newSlot.p_sCarrierID = p_sCarrierID;
                 newSlot.p_sLocID = p_sLocID;
@@ -295,6 +295,7 @@ namespace Root_EFEM
 
         public void RunTreeWafer(Tree.eMode mode)
         {
+            if ((mode == Tree.eMode.Init) && m_treeRootWafer.m_bFocus) return; 
             m_treeRootWafer.p_eMode = mode;
             for (int n = 0; n < m_aInfoWafer.Count; n++)
             {
@@ -321,7 +322,7 @@ namespace Root_EFEM
             p_sCarrierID = p_sModule;
             p_sLocID = sLocID;
             m_engineer = engineer;
-            //m_gem = m_engineer.ClassGem();
+            m_gem = m_engineer.ClassGem();
             m_log = LogView.GetLog(module.p_id, module.p_id);
             m_waferSize = new InfoWafer.WaferSize(p_sModule, bEnableWaferSize, bEnableWaferCount);
             m_treeRootWafer = new TreeRoot(p_id, m_log);

@@ -158,5 +158,13 @@ namespace Root_WIND2
 			base.Stop();
 		}
 
-    }
+        public override bool CreateInspection(Recipe _recipe)
+        {
+            throw new NotImplementedException();
+        }
+		public override bool CreateInspecion_Backside(Recipe _recipe)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

@@ -43,7 +43,7 @@ namespace Root_Vega
         #endregion 
 
         #region Module
-        public ModuleList m_moduleList;
+        public ModuleList p_moduleList { get; set; }
         public Vega_Recipe m_recipe;
         public Vega_Process m_process;
         public Vega m_vega; 
@@ -56,7 +56,7 @@ namespace Root_Vega
 
         void InitModule()
         {
-            m_moduleList = new ModuleList(m_engineer);
+            p_moduleList = new ModuleList(m_engineer);
             m_vega = new Vega("Vega", m_engineer);
             InitModule(m_vega); 
             m_robot = new Robot_RND("Robot", m_engineer);
@@ -84,7 +84,7 @@ namespace Root_Vega
         {
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
-            m_moduleList.AddModule(module, ui);
+            p_moduleList.AddModule(module, ui);
         }
 
         public bool IsEnableRecovery()
@@ -155,7 +155,7 @@ namespace Root_Vega
         #region Reset
         public string Reset()
         {
-            Reset(m_gaf, m_moduleList);
+            Reset(m_gaf, p_moduleList);
             return "OK";
         }
 
@@ -168,10 +168,10 @@ namespace Root_Vega
 
         #region Calc Sequence
         public int m_nRnR = 1;
-        dynamic m_infoSlot; 
+        dynamic m_infoRnRSlot; 
         public string AddSequence(dynamic infoSlot)
         {
-            m_infoSlot = infoSlot; 
+            m_infoRnRSlot = infoSlot; 
             m_process.p_sInfo = m_process.AddInfoReticle(infoSlot);
             return "OK";
         }
@@ -227,12 +227,12 @@ namespace Root_Vega
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run:
-                        if (m_moduleList.m_qModuleRun.Count == 0)
+                        if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
                             if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0) )
                             {
-                                m_process.p_sInfo = m_process.AddInfoReticle(m_infoSlot);
+                                m_process.p_sInfo = m_process.AddInfoReticle(m_infoRnRSlot);
                                 m_process.ReCalcSequence();
                                 m_nRnR--;
                                 EQ.p_eState = EQ.eState.Run; 
@@ -268,8 +268,8 @@ namespace Root_Vega
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
-            m_moduleList.ThreadStop();
-            foreach (ModuleBase module in m_moduleList.m_aModule.Keys) module.ThreadStop();
+            p_moduleList.ThreadStop();
+            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
         }
     }
 }

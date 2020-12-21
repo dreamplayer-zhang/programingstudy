@@ -179,7 +179,7 @@ namespace RootTools.Comm
         {
             if (OnReceive == null) return;
             SerialPort sp = (SerialPort)sender;
-            string sRead = m_sRead + sp.ReadExisting();
+            string sRead = sp.ReadExisting();
             m_commLog.Add(CommLog.eType.Receive, sRead.Trim());
             m_nDataReceive = 0; 
             DataReceive(sRead, sender); 

@@ -390,8 +390,14 @@ namespace Root_AOP01_Inspection.Module
             base.InitBase(id, engineer);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             InitMemorys();
-            InitPosAlign();
+            InitPosAlign(); 
         }
+
+        public override void ThreadStop()
+        {
+            base.ThreadStop();
+        }
+
         public class Run_GrabSideScan : ModuleRunBase
         {
             MainVision m_module;
@@ -465,7 +471,7 @@ namespace Root_AOP01_Inspection.Module
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
+                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false,bVisible), bVisible, true);
             }
             public override string Run()
             {
@@ -606,7 +612,7 @@ namespace Root_AOP01_Inspection.Module
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
+                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
             }
             public override string Run()
             {
@@ -663,7 +669,7 @@ namespace Root_AOP01_Inspection.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
@@ -737,7 +743,7 @@ namespace Root_AOP01_Inspection.Module
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
+                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
             }
             public override string Run()
             {
@@ -794,7 +800,7 @@ namespace Root_AOP01_Inspection.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
@@ -869,7 +875,7 @@ namespace Root_AOP01_Inspection.Module
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
+                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
             }
             
             public override string Run()
@@ -928,7 +934,7 @@ namespace Root_AOP01_Inspection.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
@@ -936,13 +942,14 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
-                        //CalculateHeight(nScanLine, mem,nReticleSizeY_px);
+                        CalculateHeight(nScanLine, mem, nReticleSizeY_px);
 
                         nScanLine++;
                         cpMemoryOffset.X += nCamWidth;
                     }
                     m_grabMode.m_camera.StopGrab();
                     //SaveFocusMapImage(nReticleSizeY_px/nCamWidth, nReticleSizeY_px/nCamHeight);
+                    SaveFocusMapImage(nScanLine, nReticleSizeY_px / nCamHeight);
                     return "OK";
                 }
                 finally
@@ -959,15 +966,15 @@ namespace Root_AOP01_Inspection.Module
                 byte* ptr =(byte*) mem.GetPtr().ToPointer(); //Gray
                 for(int i=0;i<nHeight;i++)
                 {
-                    int s=0, e=0,cur=0; //레이저 시작, 끝위치 정보
+                    int s=0, e=0; //레이저 시작, 끝위치 정보
                     //탐색시작y지점
                     int nY = i * nCamHeight;
                     for(int j=0;j<nCamHeight;j++)
                     {
-                        if(ptr[(int)((nY+j) *mem.W+nCamWidth*(nCurLine+0.5))]>230)
+                        if(ptr[(int)((nY+j) *mem.W+nCamWidth*(nCurLine+0.5))]>70)
                         {
-                            e = Math.Max(e, cur);
-                            s = Math.Min(s, cur);
+                            e = Math.Max(e, j);
+                            s = Math.Min(s, j);
                         }
                     }
                     m_Heightinfo[i, nCurLine] = (s + e) / 2;
@@ -978,23 +985,28 @@ namespace Root_AOP01_Inspection.Module
                 int thumsize = 30;
                 int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
                 Mat ResultMat = new Mat();
-                for(int y =0;y<nY;y++)
+                for(int x =0;x<nX;x++)
                 {
                     Mat Vmat = new Mat();
-                    for(int x=0;x<nX;x++)
+                    for(int y=0;y<nY;y++)
                     {
                         Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1); 
-                        int nScalednum = m_Heightinfo[nY,nX] * 255 / nCamHeight;
-                        ColorImg.SetTo(new MCvScalar(nScalednum));
-                        if (y == 0 && x == 0)
+                        int nScalednum = (m_Heightinfo[y,x]-110) * 255 / nCamHeight;
+                        //ColorImg.SetTo(new MCvScalar(nScalednum));
+                        ColorImg.SetTo(new MCvScalar(nScalednum*20));
+
+                        if (y == 0)
                             Vmat = ColorImg;
                         else
                             CvInvoke.VConcat(ColorImg, Vmat, Vmat);
                     }
-                    if (y == 0)
+                    if (x == 0)
                         ResultMat = Vmat;
                     else
                         CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
+
+                    CvInvoke.Imwrite(@"D:\Test\" + x+".bmp", ResultMat);
+
                 }
                 CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
             }

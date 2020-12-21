@@ -74,7 +74,17 @@ namespace RootTools
 					CustomRect mRect = rects[i];
 					mRect.Scale = scale;
 					mRect.StartPos = StartPoint;
-					dc.DrawRectangle(null, mRect.Pen, mRect.ScaledRect);
+
+					if (mRect.ScaledRect.Top > 5)
+                    {
+						Rect rtScaled = new Rect(mRect.ScaledRect.Left, mRect.ScaledRect.Top - 5, mRect.ScaledRect.Width, mRect.ScaledRect.Height);
+						dc.DrawRectangle(null, mRect.Pen, rtScaled);
+					}
+                    else
+                    {
+						dc.DrawRectangle(null, mRect.Pen, mRect.ScaledRect);
+					}
+					//dc.DrawRectangle(null, mRect.Pen, mRect.ScaledRect);
 				}
 			}
 		}

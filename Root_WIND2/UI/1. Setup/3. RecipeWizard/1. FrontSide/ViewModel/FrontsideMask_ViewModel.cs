@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2
 {
-    class FrontsideROI_ViewModel : RootViewer_ViewModel
+    class FrontsideMask_ViewModel : RootViewer_ViewModel
     {
         Recipe m_Recipe;
         /// <summary>
@@ -39,10 +39,10 @@ namespace Root_WIND2
             base.init();
             p_VisibleMenu = Visibility.Collapsed;
 
-            BufferInspROI.CollectionChanged += BufferInspROI_CollectionChanged;
+            BufferInspMask.CollectionChanged += BufferInspROI_CollectionChanged;
             SetBackGroundWorker();
 
-            p_ROILayer = ProgramManager.Instance.ROILayer;
+            p_MaskLayer = ProgramManager.Instance.ROILayer;
             m_Recipe = recipe;
         }
         public void SetOrigin(object e)
@@ -80,42 +80,42 @@ namespace Root_WIND2
         /// <summary>
         /// ROI List
         /// </summary>
-        public ObservableCollection<InspectionROI> p_cInspROI
+        public ObservableCollection<InspectionMask> p_cInspMask
         {
             get
             {
-                return m_cInspROI;
+                return m_cInspMask;
             }
             set
             {
-                m_cInspROI = value;
+                m_cInspMask = value;
             }
         }
-        private ObservableCollection<InspectionROI> m_cInspROI = new ObservableCollection<InspectionROI>();
+        private ObservableCollection<InspectionMask> m_cInspMask = new ObservableCollection<InspectionMask>();
         /// <summary>
         /// Selected ROI
         /// </summary>
-        public InspectionROI p_SelectedROI
+        public InspectionMask p_SelectedMask
         {
             get
             {
-                if (m_SelectedROI != null)
+                if (m_SelectedMask != null)
                     p_ToolEnable = true;
                 else
                 {
                     p_ToolEnable = false;
                 }
 
-                return m_SelectedROI;
+                return m_SelectedMask;
             }
             set
             {
-                SetProperty(ref m_SelectedROI, value);
+                SetProperty(ref m_SelectedMask, value);
                 if(value != null)
-                    _ReadROI();
+                    _ReadMask();
             }
         }
-        private InspectionROI m_SelectedROI;
+        private InspectionMask m_SelectedMask;
         /// <summary>
         /// Enable Draw Tool
         /// </summary>
@@ -145,14 +145,14 @@ namespace Root_WIND2
                 eToolProcess = ToolProcess.None;
                 eToolType = (ToolType)value;
                 if (eToolType == ToolType.Crop)
-                    BufferInspROI.Clear();
+                    BufferInspMask.Clear();
                 else if (eToolType != ToolType.None)
                 {
                     p_Cursor = Cursors.Cross;
                     if (CropShape != null)
-                        if (BufferInspROI.Contains(CropShape))
+                        if (BufferInspMask.Contains(CropShape))
                         {
-                            BufferInspROI.Remove(CropShape);
+                            BufferInspMask.Remove(CropShape);
                             CropShape = null;
                         }
                 }
@@ -210,7 +210,7 @@ namespace Root_WIND2
 
         #region Stack History
         private Stack<TShape[]> History = new Stack<TShape[]>();
-        public ObservableCollection<TShape> BufferInspROI = new ObservableCollection<TShape>();
+        public ObservableCollection<TShape> BufferInspMask = new ObservableCollection<TShape>();
         private void BufferInspROI_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {           
             var shapes = sender as ObservableCollection<TShape>;
@@ -247,16 +247,16 @@ namespace Root_WIND2
                     {
                         if (eToolType == ToolType.Crop)
                         {
-                            if (BufferInspROI.Contains(CropShape))
-                                BufferInspROI.Remove(CropShape);
+                            if (BufferInspMask.Contains(CropShape))
+                                BufferInspMask.Remove(CropShape);
 
                             StartDraw(eToolType, memPt, canvasPt);
-                            BufferInspROI.Add(CropShape);
+                            BufferInspMask.Add(CropShape);
                         }
                         else
                         {
                             StartDraw(eToolType, memPt, canvasPt);
-                            BufferInspROI.Add(CurrentShape);
+                            BufferInspMask.Add(CurrentShape);
                         }
 
                         eToolProcess = ToolProcess.Drawing;
@@ -269,9 +269,9 @@ namespace Root_WIND2
                     }
                     if (CropShape != null)
                     {
-                        if (BufferInspROI.Contains(CropShape))
+                        if (BufferInspMask.Contains(CropShape))
                         {
-                            BufferInspROI.Remove(CropShape);
+                            BufferInspMask.Remove(CropShape);
                             CropShape = null;
                         }
                         
@@ -629,7 +629,7 @@ namespace Root_WIND2
 
             CRect nowRect = new CRect(crop.MemoryRect.Left-BoxOffset.X, crop.MemoryRect.Top - BoxOffset.Y, crop.MemoryRect.Right - BoxOffset.X, crop.MemoryRect.Bottom- BoxOffset.Y);
             ImageData rectImageData = new ImageData(nowRect.Width, nowRect.Height, 4);
-            rectImageData.SetData(p_ROILayer.GetPtr(), nowRect, (int)p_ROILayer.p_Stride, 4);
+            rectImageData.SetData(p_MaskLayer.GetPtr(), nowRect, (int)p_MaskLayer.p_Stride, 4);
 
             for (int i = 0; i < rectImageData.m_aBuf.Length / 4; i++)
             {
@@ -660,17 +660,17 @@ namespace Root_WIND2
 
         private void MenuAdd_Click(object sender, RoutedEventArgs e)
         {
-            byte r = p_SelectedROI.p_Color.R;
-            byte g = p_SelectedROI.p_Color.G;
-            byte b = p_SelectedROI.p_Color.B;
+            byte r = p_SelectedMask.p_Color.R;
+            byte g = p_SelectedMask.p_Color.G;
+            byte b = p_SelectedMask.p_Color.B;
             DrawRectBitmap((CurrentShape as TRect).MemoryRect, r, g, b, 255, BoxOffset);
-            BufferInspROI.Clear();
+            BufferInspMask.Clear();
             SetLayerSource();
         }
         private void MenuDelete_Click(object sender, RoutedEventArgs e)
         {
             DrawRectBitmap((CurrentShape as TRect).MemoryRect, 0, 0, 0, 0, BoxOffset);
-            BufferInspROI.Clear();
+            BufferInspMask.Clear();
             SetLayerSource();
         }
         #endregion
@@ -722,7 +722,7 @@ namespace Root_WIND2
         }
         private void ModifyingShape(CPoint currentMemPt)
         {
-            foreach (TShape shape in BufferInspROI)
+            foreach (TShape shape in BufferInspMask)
             {
                 switch (shape)
                 {
@@ -746,7 +746,7 @@ namespace Root_WIND2
         }
         private void ModifyDone()
         {
-            foreach (TShape shape in BufferInspROI)
+            foreach (TShape shape in BufferInspMask)
             {
                 if (shape.isSelected)
                 {
@@ -757,10 +757,10 @@ namespace Root_WIND2
                     {
                         case TCropTool:
                             TCropTool crop = shape as TCropTool;
-                            byte r = p_SelectedROI.p_Color.R;
-                            byte g = p_SelectedROI.p_Color.G;
-                            byte b = p_SelectedROI.p_Color.B;
-                            byte a = p_SelectedROI.p_Color.A;
+                            byte r = p_SelectedMask.p_Color.R;
+                            byte g = p_SelectedMask.p_Color.G;
+                            byte b = p_SelectedMask.p_Color.B;
+                            byte a = p_SelectedMask.p_Color.A;
                             //현재 memoryRect의 시작주소를 p_roilayer에서 가져와서 cropshape의 imagedata만큼 복사?
                             CropRectSetData(crop.CropImageData, crop.MemoryRect, BoxOffset);
                             //p_UIElements.Clear();
@@ -1269,7 +1269,7 @@ namespace Root_WIND2
         #region Redraw Method
         private void Redraw()
         {
-            foreach (TShape shape in BufferInspROI)
+            foreach (TShape shape in BufferInspMask)
             {
                 switch (shape)
                 {
@@ -1388,7 +1388,7 @@ namespace Root_WIND2
         BackgroundWorker Worker_ClearROI = new BackgroundWorker();
         BackgroundWorker Worker_ReadROI = new BackgroundWorker();
         BackgroundWorker Worker_ShowAll = new BackgroundWorker();
-        private void SetBackGroundWorker()
+        public void SetBackGroundWorker()
         {
             Worker_ClearROI.DoWork += Worker_ClearROI_DoWork;
             Worker_ClearROI.RunWorkerCompleted += Worker_ClearROI_RunWorkerCompleted;
@@ -1410,14 +1410,14 @@ namespace Root_WIND2
 
         private unsafe void Worker_ShowAll_DoWork(object sender, DoWorkEventArgs e)
         {
-            IntPtr ptrMem = p_ROILayer.GetPtr();
+            IntPtr ptrMem = p_MaskLayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
-            for (int y = 0; y < p_ROILayer.p_Size.Y; y++)
+            byte[] buf = new byte[p_MaskLayer.p_Size.X * p_MaskLayer.p_nByte];
+            for (int y = 0; y < p_MaskLayer.p_Size.Y; y++)
             {
-                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * y), buf.Length);
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_MaskLayer.p_Size.X * p_MaskLayer.p_nByte * y), buf.Length);
             }
 
 
@@ -1432,7 +1432,7 @@ namespace Root_WIND2
             byte* bitmapPtr = (byte*)ptrMem.ToPointer();
             UInt32* fPtr = (UInt32*)bitmapPtr;
 
-            foreach (InspectionROI roi in p_cInspROI)
+            foreach (InspectionMask roi in p_cInspMask)
             {
                 UInt32 clr = roi.p_Color.A;
                 clr = ((UInt32)clr << 8);
@@ -1445,7 +1445,7 @@ namespace Root_WIND2
                 {
                     for (int x = data.StartPt.X; x < data.StartPt.X + data.Width; x++)
                     {
-                        fPtr[(data.StartPt.Y * p_ROILayer.p_Size.X + x)] = clr;
+                        fPtr[(data.StartPt.Y * p_MaskLayer.p_Size.X + x)] += clr;
                     }
                 }
             }
@@ -1453,33 +1453,33 @@ namespace Root_WIND2
 
         private unsafe void Worker_ReadROI_DoWork(object sender, DoWorkEventArgs e)
         {
-            IntPtr ptrMem = p_ROILayer.GetPtr();
+            IntPtr ptrMem = p_MaskLayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
-            for (int y = 0; y < p_ROILayer.p_Size.Y; y++)
+            byte[] buf = new byte[p_MaskLayer.p_Size.X * p_MaskLayer.p_nByte];
+            for (int y = 0; y < p_MaskLayer.p_Size.Y; y++)
             {
-                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * y), buf.Length);
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_MaskLayer.p_Size.X * p_MaskLayer.p_nByte * y), buf.Length);
             }
 
 
-            UInt32 clr = p_SelectedROI.p_Color.A;
+            UInt32 clr = p_SelectedMask.p_Color.A;
             clr = ((UInt32)clr << 8);
-            clr += p_SelectedROI.p_Color.R;
+            clr += p_SelectedMask.p_Color.R;
             clr = ((UInt32)clr << 8);
-            clr += p_SelectedROI.p_Color.G;
+            clr += p_SelectedMask.p_Color.G;
             clr = ((UInt32)clr << 8);
-            clr += p_SelectedROI.p_Color.B;
+            clr += p_SelectedMask.p_Color.B;
 
             byte* bitmapPtr = (byte*)ptrMem.ToPointer();
             UInt32* fPtr = (UInt32*)bitmapPtr;
 
-            foreach (PointLine data in p_SelectedROI.p_Data)
+            foreach (PointLine data in p_SelectedMask.p_Data)
             {   
                 for (int x = data.StartPt.X; x < data.StartPt.X + data.Width; x++)
                 {
-                    fPtr[(data.StartPt.Y * p_ROILayer.p_Size.X + x)] = clr;
+                    fPtr[(data.StartPt.Y * p_MaskLayer.p_Size.X + x)] = clr;
                 }
             }
         }
@@ -1492,15 +1492,15 @@ namespace Root_WIND2
         }
         private void Worker_ClearROI_DoWork(object sender, DoWorkEventArgs e)
         {
-            IntPtr ptrMem = p_ROILayer.GetPtr();
+            IntPtr ptrMem = p_MaskLayer.GetPtr();
             IntPtr ptrorigin = p_ImageData.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
-            for (int i = 0; i < p_ROILayer.p_Size.Y; i++)
+            byte[] buf = new byte[p_MaskLayer.p_Size.X * p_MaskLayer.p_nByte];
+            for (int i = 0; i < p_MaskLayer.p_Size.Y; i++)
             {
-                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * i), buf.Length);
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_MaskLayer.p_Size.X * p_MaskLayer.p_nByte * i), buf.Length);
             }
         }
         private void Worker_ClearROI_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -1515,12 +1515,12 @@ namespace Root_WIND2
         }
         private unsafe void Worker_SaveROI_DoWork(object sender, DoWorkEventArgs e)
         {
-            IntPtr ptrMem = p_ROILayer.GetPtr();
+            IntPtr ptrMem = p_MaskLayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
             byte* bitmapPtr = (byte*)ptrMem.ToPointer();
 
-            p_SelectedROI.p_Data.Clear();
+            p_SelectedMask.p_Data.Clear();
             PointLine DotLine = new PointLine();
             bool bStart = false;
             CPoint size = p_ImageData.p_Size;
@@ -1528,7 +1528,7 @@ namespace Root_WIND2
             {
                 for (int i = 0; i < size.X; i++)
                 {
-                    byte a = bitmapPtr[(j * p_ROILayer.p_Size.X + i) * 4 + 3];
+                    byte a = bitmapPtr[(j * p_MaskLayer.p_Size.X + i) * 4 + 3];
                     if (a > 0)
                     {
                         if (!bStart)
@@ -1544,11 +1544,23 @@ namespace Root_WIND2
                         {
                             DotLine.Width = i - DotLine.StartPt.X;
                             bStart = false;
-                            p_SelectedROI.p_Data.Add(DotLine);                            
+                            p_SelectedMask.p_Data.Add(DotLine);                            
                         }
                     }
 
                 }
+            }
+
+            MaskRecipe maskRecipe = m_Recipe.GetRecipe<MaskRecipe>();
+            foreach (InspectionMask inspMask in p_cInspMask)
+            {
+                RecipeType_Mask mask = new RecipeType_Mask();
+                foreach (PointLine data in inspMask.p_Data)
+                {
+                    RecipeType_PointLine pointLine = new RecipeType_PointLine(data);
+                    mask.PointLines.Add(pointLine);
+                }
+                maskRecipe.AddMask(mask);
             }
         }
         private void Worker_SaveROI_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -1561,32 +1573,32 @@ namespace Root_WIND2
         #endregion
 
         #region ICommand
-        private void _CreateROI()
+        private void _CreateMask()
         {
-            InspectionROI roi = new InspectionROI();
-            roi.p_Color = Colors.AliceBlue;
-            p_cInspROI.Add(roi);
-            p_SelectedROI = p_cInspROI.Last();
+            InspectionMask mask = new InspectionMask();
+            mask.p_Color = Colors.AliceBlue;
+            p_cInspMask.Add(mask);
+            p_SelectedMask = p_cInspMask.Last();
         }
-        private void _DeleteROI()
+        private void _DeleteMask()
         {
-            p_cInspROI.Remove(p_SelectedROI);
-            if(p_cInspROI.Count > 0)
-                p_SelectedROI = p_cInspROI.Last();
+            p_cInspMask.Remove(p_SelectedMask);
+            if(p_cInspMask.Count > 0)
+                p_SelectedMask = p_cInspMask.Last();
         }
-        private void _ClearROI()
+        private void _ClearMask()
         {
             if (p_ImageData == null)
                 return;
 
-            BufferInspROI.Clear();
+            BufferInspMask.Clear();
 
             p_PageEnable = false;
             p_PageOpacity = 0.3;
             p_LoadingOpacity = 1;
             Worker_ClearROI.RunWorkerAsync();
         }
-        private void _SaveROI()
+        private void _SaveMask()
         {
             if (p_ImageData == null)
                 return;
@@ -1597,7 +1609,7 @@ namespace Root_WIND2
 
             Worker_SaveROI.RunWorkerAsync();  
         }
-        private void _ReadROI()
+        private void _ReadMask()
         {
             if (Worker_ReadROI.IsBusy)
                 return;
@@ -1610,7 +1622,7 @@ namespace Root_WIND2
             Worker_ReadROI.RunWorkerAsync();
         }
 
-        private void _ShowAll()
+        public void _ShowAll()
         {
             if (Worker_ShowAll.IsBusy)
                 return;
@@ -1630,32 +1642,32 @@ namespace Root_WIND2
             }
         }
 
-        public ICommand DeleteROI
+        public ICommand DeleteMask
         {
             get
             {
-                return new RelayCommand(_DeleteROI);
+                return new RelayCommand(_DeleteMask);
             }
         }
-        public ICommand ClearROI
+        public ICommand ClearMask
         {
             get
             {
-                return new RelayCommand(_ClearROI);
+                return new RelayCommand(_ClearMask);
             }
         }
-        public ICommand CreateROI
+        public ICommand CreateMask
         {
             get
             {
-                return new RelayCommand(_CreateROI);
+                return new RelayCommand(_CreateMask);
             }
         }
-        public ICommand SaveROI
+        public ICommand SaveMask
         {
             get
             {
-                return new RelayCommand(_SaveROI);
+                return new RelayCommand(_SaveMask);
             }
         }
         #endregion

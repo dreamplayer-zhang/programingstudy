@@ -280,11 +280,13 @@ namespace RootTools_Vision
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
-            //Add Defect
+                //Add Defect
             for (int i = 0; i < Label.Length; i++)
             {
                 if (Label[i].area > parameter.Size)
                 {
+                    this.workplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
+
                     this.workplace.AddDefect(sInspectionID,
                         10010,
                         Label[i].area,

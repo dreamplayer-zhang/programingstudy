@@ -35,7 +35,7 @@ namespace Root_EFEM
 
         public MemoryTool ClassMemoryTool() { return m_toolBox.m_memoryTool; }
 
-        public ModuleList ClassModuleList() { return m_handler.m_moduleList; }
+        public ModuleList ClassModuleList() { return m_handler.p_moduleList; }
 
         ToolBox m_toolBox = new ToolBox();
         public ToolBox ClassToolBox() { return m_toolBox; }
@@ -123,6 +123,18 @@ namespace Root_EFEM
         }
         #endregion
 
+        #region IEngineer Function
+        public string BuzzerOff()
+        {
+            return "OK";
+        }
+
+        public string Recovery()
+        {
+            return "OK";
+        }
+        #endregion
+
         public EFEM_Handler m_handler = new EFEM_Handler();
         public void Init(string id)
         {
@@ -144,16 +156,6 @@ namespace Root_EFEM
             m_toolBox.ThreadStop();
             m_login.ThreadStop();
             LogView.ThreadStop();
-        }
-
-        public string BuzzerOff()
-        {
-            return "OK";
-        }
-
-        public string Recovery()
-        {
-            return "OK";
         }
     }
 }

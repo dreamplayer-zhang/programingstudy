@@ -36,7 +36,6 @@ namespace Root_Vega
 		MemoryTool m_MemoryModule;
 		ImageData m_Image;
 		Recipe m_Recipe;
-		int currentTotalIdx;
 
 		bool refEnabled;
 		bool alignEnabled;
@@ -531,20 +530,7 @@ namespace Root_Vega
 
 		void _clearInspReslut()
 		{
-			currentTotalIdx = 0;
-
-			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
-			if (connector.Open())
-			{
-				string dropQuery = "DROP TABLE Inspections.tempdata";
-				var result = connector.SendNonQuery(dropQuery);
-				string createQuery = "CREATE TABLE tempdata(idx INT NOT NULL AUTO_INCREMENT, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, memPOOL longtext DEFAULT NULL, memGROUP longtext DEFAULT NULL, memMEMORY longtext DEFAULT NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);";
-				connector.SendNonQuery(createQuery);
-				Debug.WriteLine(string.Format("tempdata Table Drop : {0}", result));
-				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '0') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='0';");
-				Debug.WriteLine(string.Format("Status Clear : {0}", result));
-			}
-			connector.Close();
+			m_Engineer.m_InspManager._clearInspReslut();
 		}
 
 		void ClearDrawList()

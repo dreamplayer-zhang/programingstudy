@@ -72,12 +72,15 @@ namespace RootTools_Vision
         public bool Read(string recipePath)
         {
             bool rst = true;
+           
 
             string recipeName;
             string recipeFolderPath;
 
             if (File.Exists(recipePath))
             {
+                this.RecipePath = (string)recipePath.Clone();
+
                 recipePath = recipePath.Replace(".rcp", "");
                 this.name = recipePath.Substring(recipePath.LastIndexOf("\\") + 1);
 
@@ -87,8 +90,8 @@ namespace RootTools_Vision
             else
                 return false;
 
-            this.RecipePath = recipePath;
-            this.RecipeFolderPath = recipeFolderPath;
+          
+            this.RecipeFolderPath = (string)recipeFolderPath.Clone();
 
             try
             {
@@ -131,6 +134,7 @@ namespace RootTools_Vision
             }
             catch(Exception ex)
             {
+                MessageBox.Show("Recipe Open Error\nDetail : " + ex.Message);
                 rst = false;
             }
             
@@ -140,13 +144,13 @@ namespace RootTools_Vision
         public bool Save(string recipePath)
         {
             bool rst = true;
+            this.RecipePath = (string)recipePath.Clone();
 
             recipePath = recipePath.Replace(".rcp", "");
             string recipeName = recipePath.Substring(recipePath.LastIndexOf("\\") + 1);
             string recipeFolderPath = recipePath.Substring(0 ,recipePath.LastIndexOf("\\") + 1);
 
-            this.RecipePath = recipePath;
-            this.RecipeFolderPath = recipeFolderPath;
+            this.RecipeFolderPath = (string)recipeFolderPath.Clone();
 
             // Xml 파일을 읽은 뒤 이미지나 ROI 등을 불러오기 위해서 각 class에 대한 Save 함수를 호출한다.
             foreach (ParameterBase param in this.ParameterItemList)
@@ -183,6 +187,7 @@ namespace RootTools_Vision
             catch(Exception ex)
             {
                 rst = false;
+                MessageBox.Show("Recipe Save Error!!\nDetail : " + ex.Message);
             }
 
             return rst;

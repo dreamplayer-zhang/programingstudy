@@ -15,6 +15,7 @@
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Orientation="Vertical">
+            <Button x:Name="buttonRefresh" Content="Refresh" Margin="2" Click="buttonRefresh_Click"/>
             <Button x:Name="buttonAdd" Content="Add" Margin="2,22,2,2" Click="buttonAdd_Click"/>
             <Button x:Name="buttonRemove" Content="Remove" Margin="2" Click="buttonRemove_Click"/>
             <Button x:Name="buttonStart" Content="Start" Margin="2,22,2,2" Click="buttonStart_Click"/>

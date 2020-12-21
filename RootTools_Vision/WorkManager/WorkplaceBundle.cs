@@ -58,10 +58,15 @@ namespace RootTools_Vision
                 workplace.SetSharedBuffer(sharedBuffer, width, height, byteCnt);
             }
         }
-
+        public void SetSharedRGBBuffer(IntPtr sharedBufferR, IntPtr sharedBufferG, IntPtr sharedBufferB)
+        {
+            foreach (Workplace workplace in this)
+            {
+                workplace.SetSharedRGBBuffer(sharedBufferR, sharedBufferG, sharedBufferB);
+            }
+        }
         public new void Add(Workplace workplace)
         {
-            workplace.StateChanged += WorkplaceStateChanged_Callback;
             workplace.PositionUpdated += WorkplacePositionUpdated_Callback;
             workplace.PositionIntialized += WorkplacePositionInitialized_Callback;
             workplace.Index = this.Count;

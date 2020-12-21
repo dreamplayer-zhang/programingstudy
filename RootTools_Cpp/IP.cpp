@@ -181,7 +181,7 @@ void IP::Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled
         Mat defectROI = imgMask(bounding_rect);
         Mat defectMask = imgBin(bounding_rect);
 
-        double area = countNonZero(defectMask);
+        //double area = countNonZero(defectMask);
 
         double min, max;
         minMaxIdx(defectROI, &min, &max, NULL, NULL, defectMask);
@@ -190,13 +190,14 @@ void IP::Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled
         data.bound = { bounding_rect.x, bounding_rect.y, bounding_rect.x + bounding_rect.width, bounding_rect.y + bounding_rect.height };
         data.width = bounding_rect.width;
         data.height = bounding_rect.height;
-        data.centerX = bounding_rect.x + bounding_rect.width / 2;
-        data.centerY = bounding_rect.y + bounding_rect.height / 2;
-        data.area = area;
+        data.centerX = bounding_rect.x + (double)bounding_rect.width / 2;
+        data.centerY = bounding_rect.y + (double)bounding_rect.height / 2;
+        data.area = (bounding_rect.width > bounding_rect.height)? bounding_rect.width : bounding_rect.height;
         data.value = (bDark) ? min : max;
         vtOutLabeled.push_back(data);
     }
 }
+// Surface 전용 Subpixel Inspection
 void IP::Labeling_SubPix(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nW, int nH, bool bDark, int thresh, float Scale)
 {
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
@@ -213,7 +214,7 @@ void IP::Labeling_SubPix(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOut
 
     for (int i = 0; i < contours.size(); i++) // iterate through each contour. 
     {
-        if (hierarchy[i][3] != -1) // Parent Contour가 있을 경우 Pass!
+        if (hierarchy[i][3] != -1) // Parent Contour가 있을 경우 Pass! <필요한가...?>
             continue;
 
         bounding_rect = boundingRect(contours[i]);
@@ -233,22 +234,28 @@ void IP::Labeling_SubPix(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOut
         else
             cv::threshold(Up_ScaleImg, Up_defectMask, thresh, 255, CV_THRESH_BINARY);
 
+        if (cv::sum(cv::sum(Up_defectMask))[0] == 0)
+            continue;
 
         cv::findContours(Up_defectMask, Up_contours, Up_hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-        Rect Up_bounding_rect;
+        int largest_area = 0; 
+        int largest_contour_index = 0;
+
         for (int i = 0; i < Up_contours.size(); i++) // iterate through each contour. 
         {
-            if (Up_hierarchy[i][3] != -1) // Parent Contour가 있을 경우 Pass!
-                continue;
-
-            Up_bounding_rect = boundingRect(Up_contours[i]);
+            double a = contourArea(Up_contours[i], false);  //  Find the area of contour
+            if (a > largest_area) {
+                largest_area = a;
+                largest_contour_index = i;                //Store the index of largest contour
+            }
         }
 
-        double defectX = bounding_rect.x + 1 + Up_bounding_rect.x / Scale + 1;
-        double defectY = bounding_rect.y + 1 + Up_bounding_rect.y / Scale + 1;
-        //double area = countNonZero(defectMask); // Pixel 개수 
-        double size = (Up_bounding_rect.width > Up_bounding_rect.height) ? Up_bounding_rect.width : Up_bounding_rect.height; // 타 회사들은 Defect Size를 장축의 길이로 한다고 함...
+        Rect Up_bounding_rect = boundingRect(Up_contours[largest_contour_index]);
+
+        double defectX = bounding_rect.x + 1 + (double)Up_bounding_rect.x / Scale + 1;
+        double defectY = bounding_rect.y + 1 + (double)Up_bounding_rect.y / Scale + 1;
+        double size = (Up_bounding_rect.width > Up_bounding_rect.height) ? Up_bounding_rect.width : Up_bounding_rect.height;
 
         double min, max;
         minMaxIdx(Up_ScaleImg, &min, &max, NULL, NULL, Up_defectMask);
@@ -792,6 +799,7 @@ std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float& outOr
 
     bool isOrigin = true;
     for (int c = 0; c < mapX; c++) {
+        int checkEmptyLine = 0;
         for (int r = 0; r < mapY; r++) {
             bool condition = (isIncludeMode) ? countNonZero(Mat(GridMapMask, Rect(c * nChipSzX + bounding_rect.x, r * nChipSzY + bounding_rect.y, nChipSzX, nChipSzY))) // WF 영역이 조금이라도 있으면 Map에 추가
                 : countNonZero(Mat(GridMapMask, Rect(c * nChipSzX + bounding_rect.x, r * nChipSzY + bounding_rect.y, nChipSzX, nChipSzY))) == (nChipSzX * nChipSzY);
@@ -801,12 +809,6 @@ std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float& outOr
                 if (isOrigin)
                 {
                     //circle(GridMapMask, Point(c * nChipSzX + bounding_rect.x, r * nChipSzY + nChipSzY + bounding_rect.y), 10, 125, -1); // Debug > Image Watch
-                    if (r != 0) // 좌측 첫 번재 열에는 Origin이 있어야함
-                    {
-                        pMapData.erase(pMapData.begin(), pMapData.begin() + mapY * c);
-                        outMapX -= c;
-                    }
-
                     outOriginX = (c * nChipSzX + bounding_rect.x) * downScale;
                     outOriginY = (r * nChipSzY + nChipSzY + bounding_rect.y) * downScale; // 좌'하'단
                     isOrigin = false;
@@ -816,13 +818,33 @@ std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float& outOr
                 //rectangle(GridMapMask, Rect(c * nChipSzX + bounding_rect.x, r * nChipSzY + bounding_rect.y, nChipSzX, nChipSzY), 125, 1); // Debug > Image Watch
             }
             else
+            {
                 pMapData.push_back(0);
+                checkEmptyLine++;
+            }
+        }
+        if (checkEmptyLine == mapY) // chip이 없는 빈 라인일 경우 삭제
+        {
+            pMapData.erase(pMapData.end() - mapY, pMapData.end());
+            outMapX--;
         }
     }
-
-    for (int r = 0; r < outMapY; r++) // Transpose
+    mapY = outMapY;
+    for (int r = 0; r < mapY; r++) // Transpose
+    {
+        int checkEmptyLine = 0;
         for (int c = 0; c < outMapX; c++)
-            pMapData_Trans.push_back(pMapData[c * outMapY + r]);
+        {
+            pMapData_Trans.push_back(pMapData[c * mapY + r]);
+            if (pMapData[c * mapY + r] == 0)
+                checkEmptyLine++;
+        }
+        if (checkEmptyLine == outMapX)
+        {
+            pMapData_Trans.erase(pMapData_Trans.end() - outMapX, pMapData_Trans.end());
+            outMapY--;
+        }
+    }
 
     return pMapData_Trans;
 }
@@ -964,7 +986,7 @@ void IP::SaveDefectListBMP(String sFilePath, BYTE* pSrc, int nW, int nH, std::ve
 }
 void IP::SaveDefectListBMP_Color(String sFilePath, BYTE* pR, BYTE* pG, BYTE* pB, int nW, int nH, std::vector<Rect> DefectRect)
 {
-    byte pRGB[3];
+    byte *pRGB[3] = {pR, pG, pB};
     Mat BGR[3];
 
     int saveSzW = 640;
@@ -1006,7 +1028,7 @@ void IP::SaveDefectListBMP_Color(String sFilePath, BYTE* pR, BYTE* pG, BYTE* pB,
 
         for (int ch = 2; ch >= 0; ch--)
         {
-            byte* pHeader = &pRGB[ch];
+            byte* pHeader = pRGB[ch];
             byte* defectROI = new byte[DefectRect[i].width * (long)DefectRect[i].height];
 
             for (int r = 0; r < DefectRect[i].y; r++)

@@ -20,11 +20,7 @@ namespace Root_WIND2
         {
             m_Recipe = recipe;
             m_front = front;
-            p_ROI_Viewer = m_front.p_ROI_VM;
-            p_ROI_Viewer.SetRoiRect();
-            p_ROI_Viewer.SetLayerSource();
-            //p_ROI_Viewer.p_LayerSource = m_front.p_ROI_VM.p_LayerSource;
-            //p_ROI_Viewer.SetLayerSource();
+            ViewerInit();
             m_cMask = new ObservableCollection<Mask>();
             m_cInspMethod = new ObservableCollection<ParameterBase>();
             m_cInspItem = new ObservableCollection<InspectionItem>();
@@ -36,19 +32,31 @@ namespace Root_WIND2
             WIND2EventManager.BeforeRecipeSave += BeforeRecipeSave_Callback;
         }
 
-
+        private void ViewerInit()
+        {
+            p_Mask_Viewer = new FrontsideMask_ViewModel();
+            p_Mask_Viewer.p_VisibleMenu = Visibility.Collapsed;
+            p_Mask_Viewer.SetBackGroundWorker();
+            p_Mask_Viewer.p_ImageData = m_front.p_Mask_VM.p_ImageData;
+            p_Mask_Viewer.p_MaskLayer = m_front.p_Mask_VM.p_MaskLayer;
+            p_Mask_Viewer.p_cInspMask = m_front.p_Mask_VM.p_cInspMask;
+            p_Mask_Viewer.SetRoiRect();
+            //p_ROI_Viewer.SetLayerSource();
+        }
 
         #region Property
-        private FrontsideROI_ViewModel m_ROI_Viewer;
-        public FrontsideROI_ViewModel p_ROI_Viewer
+        private FrontsideMask_ViewModel m_Mask_Viewer;
+        public FrontsideMask_ViewModel p_Mask_Viewer
         {
             get
             {
-                return m_ROI_Viewer;
+                m_Mask_Viewer.p_ImageData = m_front.p_Mask_VM.p_ImageData;
+                m_Mask_Viewer.SetImageSource();
+                return m_Mask_Viewer;
             }
             set
             {
-                SetProperty(ref m_ROI_Viewer, value);
+                SetProperty(ref m_Mask_Viewer, value);
             }
         }
 
@@ -236,8 +244,6 @@ namespace Root_WIND2
 
                     p_cInspItem.Add(item);
                     SetParameter();
-                    var asdf = m_front.p_ROI_VM;
-                    var ff = m_front.p_ROI_VM.p_cInspROI;
                 });
             }
         }

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_Vega"
+             xmlns:module="clr-namespace:Root_Vega.Module"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
              xmlns:packicon="http://metro.mahapps.com/winfx/xaml/iconpacks"
@@ -295,37 +296,27 @@
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition/>
                                                     <RowDefinition/>
-                                                    <RowDefinition/>
                                                 </Grid.RowDefinitions>
                                                 <Grid Grid.RowSpan="3"
                                               Background="{StaticResource LightGray}"/>
-                                                <TextBlock Text="Main Elapsed Time"
-                                                Style="{StaticResource BasicTb}"
-                                                FontWeight="Bold"
-                                                Foreground="{StaticResource Black}"/>
-                                                <TextBlock Text="Side Elapsed Time"
-                                                   Grid.Row="1"
+                                                <TextBlock Text="Lot Elapsed Time"
+                                                   Grid.Row="0"
                                                 Style="{StaticResource BasicTb}"
                                                 FontWeight="Bold"
                                                 Foreground="{StaticResource Black}"/>
                                                 <TextBlock Text="Defect Cnt"
-                                                   Grid.Row="2"
+                                                   Grid.Row="1"
                                                 Style="{StaticResource BasicTb}"
                                                 FontWeight="Bold"
                                                 Foreground="{StaticResource Black}"/>
-                                                <TextBlock Text="00:00:00"
+                                                <TextBlock Text="{Binding p_sLotElapsedTime}"
                                                    Grid.Column="1"
                                                    Grid.Row="0"
                                                    Style="{StaticResource BasicTb}"
                                                    Foreground="{StaticResource Black}"/>
-                                                <TextBlock Text="00:00:00"
-                                                   Grid.Column="1"
-                                                   Grid.Row="1"
-                                                   Style="{StaticResource BasicTb}"
-                                                   Foreground="{StaticResource Black}"/>
                                                 <TextBlock Text="{Binding p_nTotalDefectCount}"
                                                    Grid.Column="1"
-                                                   Grid.Row="2"
+                                                   Grid.Row="1"
                                                    Style="{StaticResource BasicTb}"
                                                    Foreground="{StaticResource Black}"/>
                                             </Grid>
@@ -483,381 +474,14 @@
                                                 <RowDefinition></RowDefinition>
                                                 <RowDefinition></RowDefinition>
                                             </Grid.RowDefinitions>
-                                            <Grid Grid.Row="0">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="3*"></RowDefinition>
-                                                    <RowDefinition Height="1*"></RowDefinition>
-                                                </Grid.RowDefinitions>
-                                                <Grid Grid.Row="0" Margin="10" RenderTransformOrigin="0.5, 0.5">
-                                                    <packicon:PackIconMaterial Kind="Fan" Grid.Row="0"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center"
-                                                                           Foreground="White"
-                                                                       Width="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}"
-                                                                       Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
-                                                    </packicon:PackIconMaterial>
-                                                    <Grid.RenderTransform>
-                                                        <RotateTransform  />
-                                                    </Grid.RenderTransform>
-                                                    <Grid.Style>
-                                                        <Style>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding p_aIsFanRun[0]}" Value="True">
-                                                                    <DataTrigger.EnterActions>
-                                                                        <BeginStoryboard x:Name="EndAnimation">
-                                                                            <Storyboard>
-                                                                                <Storyboard>
-                                                                                    <DoubleAnimation Storyboard.TargetProperty="(Rectangle.RenderTransform).(RotateTransform.Angle)"
-                                                                                    To="360" Duration="0:0:10" RepeatBehavior="Forever" />
-                                                                                </Storyboard>
-                                                                            </Storyboard>
-                                                                        </BeginStoryboard>
-                                                                    </DataTrigger.EnterActions>
-                                                                    <DataTrigger.ExitActions>
-                                                                        <StopStoryboard BeginStoryboardName="EndAnimation" />
-                                                                    </DataTrigger.ExitActions>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Grid.Style>
-                                                </Grid>
-                                                <Grid Grid.Row="1">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition/>
-                                                        <ColumnDefinition/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" ></TextBlock>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding p_aFanRPM[0]}" Foreground="White" ></TextBlock>
-                                                </Grid>
-                                            </Grid>
-                                            <Grid Grid.Row="1">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="3*"></RowDefinition>
-                                                    <RowDefinition Height="1*"></RowDefinition>
-                                                </Grid.RowDefinitions>
-                                                <Grid Grid.Row="0" Margin="10" RenderTransformOrigin="0.5, 0.5">
-                                                    <packicon:PackIconMaterial Kind="Fan" Grid.Row="0"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center"
-                                                                           Foreground="White"
-                                                                       Width="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}"
-                                                                       Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
-                                                    </packicon:PackIconMaterial>
-                                                    <Grid.RenderTransform>
-                                                        <RotateTransform/>
-                                                    </Grid.RenderTransform>
-                                                    <Grid.Style>
-                                                        <Style>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding p_aIsFanRun[1]}" Value="True">
-                                                                    <DataTrigger.EnterActions>
-                                                                        <BeginStoryboard x:Name="EndAnimation">
-                                                                            <Storyboard>
-                                                                                <Storyboard>
-                                                                                    <DoubleAnimation Storyboard.TargetProperty="(Rectangle.RenderTransform).(RotateTransform.Angle)"
-                                                                                    To="360" Duration="0:0:10" RepeatBehavior="Forever" />
-                                                                                </Storyboard>
-                                                                            </Storyboard>
-                                                                        </BeginStoryboard>
-                                                                    </DataTrigger.EnterActions>
-                                                                    <DataTrigger.ExitActions>
-                                                                        <StopStoryboard BeginStoryboardName="EndAnimation" />
-                                                                    </DataTrigger.ExitActions>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Grid.Style>
-                                                </Grid>
-                                                <Grid Grid.Row="1">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition/>
-                                                        <ColumnDefinition/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" ></TextBlock>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding p_aFanRPM[1]}" Foreground="White" ></TextBlock>
-                                                </Grid>                                            </Grid>
-                                            <Grid Grid.Row="2">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="3*"></RowDefinition>
-                                                    <RowDefinition Height="1*"></RowDefinition>
-                                                </Grid.RowDefinitions>
-                                                <Grid Grid.Row="0" Margin="10" RenderTransformOrigin="0.5, 0.5">
-                                                    <packicon:PackIconMaterial Kind="Fan" Grid.Row="0"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center"
-                                                                           Foreground="White"
-                                                                       Width="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}"
-                                                                       Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
-                                                    </packicon:PackIconMaterial>
-                                                    <Grid.RenderTransform>
-                                                        <RotateTransform />
-                                                    </Grid.RenderTransform>
-                                                    <Grid.Style>
-                                                        <Style>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding p_aIsFanRun[2]}" Value="True">
-                                                                    <DataTrigger.EnterActions>
-                                                                        <BeginStoryboard x:Name="EndAnimation">
-                                                                            <Storyboard>
-                                                                                <Storyboard>
-                                                                                    <DoubleAnimation Storyboard.TargetProperty="(Rectangle.RenderTransform).(RotateTransform.Angle)"
-                                                                                    To="360" Duration="0:0:10" RepeatBehavior="Forever" />
-                                                                                </Storyboard>
-                                                                            </Storyboard>
-                                                                        </BeginStoryboard>
-                                                                    </DataTrigger.EnterActions>
-                                                                    <DataTrigger.ExitActions>
-                                                                        <StopStoryboard BeginStoryboardName="EndAnimation" />
-                                                                    </DataTrigger.ExitActions>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Grid.Style>
-                                                </Grid>
-                                                <Grid Grid.Row="1">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition/>
-                                                        <ColumnDefinition/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" ></TextBlock>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding p_aFanRPM[2]}" Foreground="White" ></TextBlock>
-                                                </Grid>
-                                            </Grid>
-                                            <Grid Grid.Row="3">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="3*"></RowDefinition>
-                                                    <RowDefinition Height="1*"></RowDefinition>
-                                                </Grid.RowDefinitions>
-                                                <Grid Grid.Row="0" Margin="10" RenderTransformOrigin="0.5, 0.5">
-                                                    <packicon:PackIconMaterial Kind="Fan" Grid.Row="0"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center"
-                                                                           Foreground="White"
-                                                                       Width="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}"
-                                                                       Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
-                                                    </packicon:PackIconMaterial>
-                                                    <Grid.RenderTransform>
-                                                        <RotateTransform />
-                                                    </Grid.RenderTransform>
-                                                    <Grid.Style>
-                                                        <Style>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding p_aIsFanRun[3]}" Value="True">
-                                                                    <DataTrigger.EnterActions>
-                                                                        <BeginStoryboard x:Name="EndAnimation">
-                                                                            <Storyboard>
-                                                                                <Storyboard>
-                                                                                    <DoubleAnimation Storyboard.TargetProperty="(Rectangle.RenderTransform).(RotateTransform.Angle)"
-                                                                                    To="360" Duration="0:0:10" RepeatBehavior="Forever" />
-                                                                                </Storyboard>
-                                                                            </Storyboard>
-                                                                        </BeginStoryboard>
-                                                                    </DataTrigger.EnterActions>
-                                                                    <DataTrigger.ExitActions>
-                                                                        <StopStoryboard BeginStoryboardName="EndAnimation" />
-                                                                    </DataTrigger.ExitActions>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Grid.Style>
-                                                </Grid>
-                                                <Grid Grid.Row="1">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition/>
-                                                        <ColumnDefinition/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" ></TextBlock>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding p_aFanRPM[3]}" Foreground="White" ></TextBlock>
-                                                </Grid>
-                                            </Grid>
-                                            <Grid Grid.Row="4">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="3*"></RowDefinition>
-                                                    <RowDefinition Height="1*"></RowDefinition>
-                                                </Grid.RowDefinitions>
-                                                <Grid Grid.Row="0" Margin="10" RenderTransformOrigin="0.5, 0.5">
-                                                    <packicon:PackIconMaterial Kind="Fan" Grid.Row="0"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center"
-                                                                           Foreground="White"
-                                                                       Width="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}"
-                                                                       Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
-                                                    </packicon:PackIconMaterial>
-                                                    <Grid.RenderTransform>
-                                                        <RotateTransform />
-                                                    </Grid.RenderTransform>
-                                                    <Grid.Style>
-                                                        <Style>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding p_aIsFanRun[4]}" Value="True">
-                                                                    <DataTrigger.EnterActions>
-                                                                        <BeginStoryboard x:Name="EndAnimation">
-                                                                            <Storyboard>
-                                                                                <Storyboard>
-                                                                                    <DoubleAnimation Storyboard.TargetProperty="(Rectangle.RenderTransform).(RotateTransform.Angle)"
-                                                                                    To="360" Duration="0:0:10" RepeatBehavior="Forever" />
-                                                                                </Storyboard>
-                                                                            </Storyboard>
-                                                                        </BeginStoryboard>
-                                                                    </DataTrigger.EnterActions>
-                                                                    <DataTrigger.ExitActions>
-                                                                        <StopStoryboard BeginStoryboardName="EndAnimation" />
-                                                                    </DataTrigger.ExitActions>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Grid.Style>
-                                                </Grid>
-                                                <Grid Grid.Row="1">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition/>
-                                                        <ColumnDefinition/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" ></TextBlock>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding p_aFanRPM[4]}" Foreground="White" ></TextBlock>
-                                                </Grid>
-                                            </Grid>
-                                            <Grid Grid.Row="5">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="3*"></RowDefinition>
-                                                    <RowDefinition Height="1*"></RowDefinition>
-                                                </Grid.RowDefinitions>
-                                                <Grid Grid.Row="0" Margin="10" RenderTransformOrigin="0.5, 0.5">
-                                                    <packicon:PackIconMaterial Kind="Fan" Grid.Row="0"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center"
-                                                                           Foreground="White"
-                                                                       Width="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}"
-                                                                       Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
-                                                    </packicon:PackIconMaterial>
-                                                    <Grid.RenderTransform>
-                                                        <RotateTransform  />
-                                                    </Grid.RenderTransform>
-                                                    <Grid.Style>
-                                                        <Style>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding p_aIsFanRun[5]}" Value="True">
-                                                                    <DataTrigger.EnterActions>
-                                                                        <BeginStoryboard x:Name="EndAnimation">
-                                                                            <Storyboard>
-                                                                                <Storyboard>
-                                                                                    <DoubleAnimation Storyboard.TargetProperty="(Rectangle.RenderTransform).(RotateTransform.Angle)"
-                                                                                    To="360" Duration="0:0:10" RepeatBehavior="Forever" />
-                                                                                </Storyboard>
-                                                                            </Storyboard>
-                                                                        </BeginStoryboard>
-                                                                    </DataTrigger.EnterActions>
-                                                                    <DataTrigger.ExitActions>
-                                                                        <StopStoryboard BeginStoryboardName="EndAnimation" />
-                                                                    </DataTrigger.ExitActions>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Grid.Style>
-                                                </Grid>
-                                                <Grid Grid.Row="1">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition/>
-                                                        <ColumnDefinition/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" ></TextBlock>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding p_aFanRPM[5]}" Foreground="White" ></TextBlock>
-                                                </Grid>
-                                            </Grid>
-                                            <Grid Grid.Row="6">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="3*"></RowDefinition>
-                                                    <RowDefinition Height="1*"></RowDefinition>
-                                                </Grid.RowDefinitions>
-                                                <Grid Grid.Row="0" Margin="10" RenderTransformOrigin="0.5, 0.5">
-                                                    <packicon:PackIconMaterial Kind="Fan" Grid.Row="0"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center"
-                                                                           Foreground="White"
-                                                                       Width="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}"
-                                                                       Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
-                                                    </packicon:PackIconMaterial>
-                                                    <Grid.RenderTransform>
-                                                        <RotateTransform  />
-                                                    </Grid.RenderTransform>
-                                                    <Grid.Style>
-                                                        <Style>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding p_aIsFanRun[6]}" Value="True">
-                                                                    <DataTrigger.EnterActions>
-                                                                        <BeginStoryboard x:Name="EndAnimation">
-                                                                            <Storyboard>
-                                                                                <Storyboard>
-                                                                                    <DoubleAnimation Storyboard.TargetProperty="(Rectangle.RenderTransform).(RotateTransform.Angle)"
-                                                                                    To="360" Duration="0:0:10" RepeatBehavior="Forever" />
-                                                                                </Storyboard>
-                                                                            </Storyboard>
-                                                                        </BeginStoryboard>
-                                                                    </DataTrigger.EnterActions>
-                                                                    <DataTrigger.ExitActions>
-                                                                        <StopStoryboard BeginStoryboardName="EndAnimation" />
-                                                                    </DataTrigger.ExitActions>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Grid.Style>
-                                                </Grid>
-                                                <Grid Grid.Row="1">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition/>
-                                                        <ColumnDefinition/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" ></TextBlock>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding p_aFanRPM[6]}" Foreground="White" ></TextBlock>
-                                                </Grid>
-                                            </Grid>
-                                            <Grid Grid.Row="7">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="3*"></RowDefinition>
-                                                    <RowDefinition Height="1*"></RowDefinition>
-                                                </Grid.RowDefinitions>
-                                                <Grid Grid.Row="0" Margin="10" RenderTransformOrigin="0.5, 0.5">
-                                                    <packicon:PackIconMaterial Kind="Fan" Grid.Row="0"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center"
-                                                                           Foreground="White"
-                                                                       Width="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}"
-                                                                       Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
-                                                    </packicon:PackIconMaterial>
-                                                    <Grid.RenderTransform>
-                                                        <RotateTransform/>
-                                                    </Grid.RenderTransform>
-                                                    <Grid.Style>
-                                                        <Style>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding p_aIsFanRun[7]}" Value="True">
-                                                                    <DataTrigger.EnterActions>
-                                                                        <BeginStoryboard x:Name="EndAnimation">
-                                                                            <Storyboard>
-                                                                                <Storyboard>
-                                                                                    <DoubleAnimation Storyboard.TargetProperty="(Rectangle.RenderTransform).(RotateTransform.Angle)"
-                                                                                    To="360" Duration="0:0:10" RepeatBehavior="Forever" />
-                                                                                </Storyboard>
-                                                                            </Storyboard>
-                                                                        </BeginStoryboard>
-                                                                    </DataTrigger.EnterActions>
-                                                                    <DataTrigger.ExitActions>
-                                                                        <StopStoryboard BeginStoryboardName="EndAnimation" />
-                                                                    </DataTrigger.ExitActions>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Grid.Style>
-                                                </Grid>
-                                                <Grid Grid.Row="1">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition/>
-                                                        <ColumnDefinition/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" ></TextBlock>
-                                                    <TextBlock HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding p_aFanRPM[7]}" Foreground="White" ></TextBlock>
-                                                </Grid>
-                                            </Grid>
+                                            <module:FFU_Fan_UI Grid.Row="0" x:Name="FanUI0"/>
+                                            <module:FFU_Fan_UI Grid.Row="1" x:Name="FanUI1"/>
+                                            <module:FFU_Fan_UI Grid.Row="2" x:Name="FanUI2"/>
+                                            <module:FFU_Fan_UI Grid.Row="3" x:Name="FanUI3"/>
+                                            <module:FFU_Fan_UI Grid.Row="4" x:Name="FanUI4"/>
+                                            <module:FFU_Fan_UI Grid.Row="5" x:Name="FanUI5"/>
+                                            <module:FFU_Fan_UI Grid.Row="6" x:Name="FanUI6"/>
+                                            <module:FFU_Fan_UI Grid.Row="7" x:Name="FanUI7"/>
                                         </Grid>
                                     </Grid>
                                     
@@ -913,6 +537,10 @@
                         Style="{StaticResource BasicBtn}"
                         Margin="0,0,0,10"
                         Click="buttonRecovery_Click"/>
+                <Button Content="Buzzer Off" x:Name="buttonBuzzerOff"
+                        Style="{StaticResource BasicBtn}"
+                        Margin="0,0,0,10"
+                        Click="buttonBuzzerOff_Click"/>
                 <Button Content="Test" 
                         Style="{StaticResource BasicBtn}"
                         Margin="0,0,0,10"
