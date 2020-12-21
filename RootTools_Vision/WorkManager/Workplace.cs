@@ -22,9 +22,6 @@ namespace RootTools_Vision
     {
         POSITION_SUCCESS    = 0b00000001,
         LINE_FIRST_CHIP     = 0b00000010,
-        EDGE_TOP            = 0b00000100,
-        EDGE_SIDE           = 0b00001000,
-        EDGE_BOTTOM         = 0b00010000,
     }
 
     public enum PREWORKDATA_KEY // PreworkdataList의 index로 반드시 0부터 빈틈없이 추가
