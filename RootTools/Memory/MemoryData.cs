@@ -132,14 +132,7 @@ namespace RootTools.Memory
             if (p_sInfo != "OK") return;
             try
             {
-                MemoryMappedFile mmf = MemoryMappedFile.OpenExisting(m_group.m_pool.p_id);
-                long pAddress = 0; 
-                unsafe
-                {
-                    byte* p = null;
-                    mmf.CreateViewAccessor().SafeMemoryMappedViewHandle.AcquirePointer(ref p);
-                    pAddress = (long)(IntPtr)p;
-                }
+                long pAddress = m_group.m_pool.m_pAddress; 
                 pAddress += (long)Math.Ceiling(p_mbOffset * c_fMB);
                 for (int n = 0; n < p_nCount; n++)
                 {
@@ -147,7 +140,10 @@ namespace RootTools.Memory
                     pAddress += p_lSize; 
                 }
             }
-            catch (Exception e) { m_log.Error(e, "Create Buffer Memory Error"); }
+            catch (Exception e) 
+            { 
+                m_log.Error(e, "Create Buffer Memory Error"); 
+            }
             mbOffset += (int)Math.Ceiling(p_nCount * p_lSize / c_fMB);
         }
 		public ulong GetMBOffset()

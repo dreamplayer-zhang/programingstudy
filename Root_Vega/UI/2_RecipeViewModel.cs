@@ -106,7 +106,7 @@ namespace Root_Vega
 		}
 		void Init()
 		{
-			m_moduleList = m_Engineer.m_handler.m_moduleList;
+			m_moduleList = m_Engineer.m_handler.p_moduleList;
 			p_recipe = m_Engineer.m_handler.m_recipe;
 			p_moduleRunList = p_recipe.m_moduleRunList;
 		}

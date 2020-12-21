@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace RootTools_Vision
         #region [Task 관련 변수]
         private ManualResetEvent _waitSignal = new ManualResetEvent(false);
 
-        bool isPause = false;
+        bool isStop = false;
 
         Task task = null;
 
@@ -59,7 +60,7 @@ namespace RootTools_Vision
 
         ~Worker()
         {
-            this.isPause = false;
+            this.isStop = false;
             cancellationTokenSource.Cancel();
             _waitSignal.Set();
         }
@@ -75,7 +76,7 @@ namespace RootTools_Vision
                         _waitSignal.WaitOne();
                     }
 
-                    if (this.isPause == true)
+                    if (this.isStop == true)
                     {
                         _waitSignal.Reset();
                         _waitSignal.WaitOne();
@@ -117,7 +118,7 @@ namespace RootTools_Vision
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("위치 : "+ ex.Source + "\nTrace :  "+ ex.StackTrace + "\nDetail : "+ ex.Message);
             }
         }
 
@@ -140,19 +141,15 @@ namespace RootTools_Vision
 
         public void Start()
         {
-            this.isPause = false;
+            this.isStop = false;
             this.workerState = WORKER_STATE.WORKING;
             _waitSignal.Set();
         }
 
-        public void Pause()
-        {
-            this.isPause = true;
-        }
-
         public void Stop()
         {
-            this.isPause = true;
+            this.isStop = true;
+            this.workerState = WORKER_STATE.NONE;
         }
 
         public void Cancel()

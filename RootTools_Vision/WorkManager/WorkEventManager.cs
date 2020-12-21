@@ -9,45 +9,50 @@ namespace RootTools_Vision
 {
     public class WorkEventManager
     {
-        ///
-        ///     PositionChanged 
-        ///
+        #region [PositionDone]
         public static event EventHandler<PositionDoneEventArgs> PositionDone;
         
         public static void OnPositionDone(object obj, PositionDoneEventArgs args)
         {
             PositionDone?.Invoke(obj, args);
         }
+        #endregion
 
-
-        //
-        //      InspectionDone
-        //
+        #region [InspectionDone]
         public static event EventHandler<InspectionDoneEventArgs> InspectionDone;
 
         public static void OnInspectionDone(object obj, InspectionDoneEventArgs args)
         {
             InspectionDone?.Invoke(obj, args);
         }
+        #endregion
 
-
-        ///
-        ///     PositionChanged 
-        ///
+        #region [ProcessDefectDone]
         public static event EventHandler<PocessDefectDoneEventArgs> ProcessDefectDone;
 
         public static void OnProcessDefectDone(object obj, PocessDefectDoneEventArgs args)
         {
             ProcessDefectDone?.Invoke(obj, args);
         }
+        #endregion
 
 
-
+        #region [UIRedraw]
         public static event EventHandler<UIRedrawEventArgs> UIRedraw;
 
         public static void OnUIRedraw(object obj, UIRedrawEventArgs args)
         {
             UIRedraw?.Invoke(obj, args);
         }
+        #endregion
+
+        #region [WorkplaceStateChanged]
+        public static event EventHandler<WorkplaceStateChangedEventArgs> WorkplaceStateChanged;
+
+        public static void OnWorkplaceStateChanged(object obj, WorkplaceStateChangedEventArgs args)
+        {
+            WorkplaceStateChanged?.Invoke(obj, args);
+        }
+        #endregion
     }
 }

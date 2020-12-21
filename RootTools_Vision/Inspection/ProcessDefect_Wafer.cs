@@ -55,12 +55,21 @@ namespace RootTools_Vision
 
             // Option Param
             int mergeDist = 1;
-            int backsideOffset = 50;
+            int backsideOffset = 1700;
             bool isBackside = false;
             // Recipe
-            int waferCenterX = recipeBackside.CenterX;
-            int waferCenterY = recipeBackside.CenterY;
-            int radius = recipeBackside.Radius;
+
+            // Backside
+            int waferCenterX = 0;
+            int waferCenterY = 0;
+            int radius = 0;
+
+            if (isBackside)
+            {
+                waferCenterX = recipeBackside.CenterX;
+                waferCenterY = recipeBackside.CenterY;
+                radius = recipeBackside.Radius;
+            }
 
             // 구조는 나중에 생각해봅시다...
             List<Defect> DefectList = CollectDefectData();
@@ -74,7 +83,11 @@ namespace RootTools_Vision
                 if (isBackside)
                     defect.CalcAbsToRelPos(waferCenterX, waferCenterY);
 
-                else; // Frontside
+                else
+                {
+                    OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
+                    defect.CalcAbsToRelPos(originRecipe.OriginX, originRecipe.OriginY); // Frontside
+                }
             }
 
             Workplace displayDefect = new Workplace();
@@ -169,24 +182,46 @@ namespace RootTools_Vision
 
         private List<Defect> MergeDefect(List<Defect> DefectList, int mergeDist)
         {
-            string sDefectimagePath = @"D:\DefectImage";
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            sDefectimagePath = Path.Combine(sDefectimagePath, sInspectionID);
-           
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();           
             List<Defect> MergeDefectList = new List<Defect>();
             int nDefectIndex = 1;
 
             for (int i = 0; i < DefectList.Count; i++)
             {
-                if (DefectList[i].m_nDefectCode == -123)
+                if (DefectList[i].m_fSize == -123)
                     continue;
 
-                for (int j = i + 1; j < DefectList.Count; j++)
+                for (int j = 0; j < DefectList.Count; j++)
                 {
                     Rect defectRect1 = DefectList[i].p_rtDefectBox;
                     Rect defectRect2 = DefectList[j].p_rtDefectBox;
-                    defectRect1.Inflate(new Size(mergeDist, mergeDist)); // Rect 가로 1 세로 1 만큼 확장
+                    
+                    if (DefectList[j].m_fSize == -123 || (i == j))
+                        continue;
 
+                    else if (defectRect1.Contains(defectRect2))
+                    {
+                        DefectList[j].m_fSize = -123;
+                        continue;
+                    }
+                    else if(defectRect2.Contains(defectRect1))
+                    {
+                        DefectList[i].SetDefectInfo(sInspectionID, DefectList[j].m_nDefectCode, DefectList[j].m_fSize, DefectList[j].m_fGV, DefectList[j].m_fWidth, DefectList[j].m_fHeight
+                            , 0, 0, (float)DefectList[j].p_rtDefectBox.Left, (float)DefectList[j].p_rtDefectBox.Top, DefectList[j].m_nChipIndexX, DefectList[j].m_nCHipIndexY);
+                        DefectList[j].m_fSize = -123;
+                        continue;
+                    }
+                    else if(defectRect1.IntersectsWith(defectRect2))
+                    {
+                        Rect intersect = Rect.Intersect(defectRect1, defectRect2);
+                        if (intersect.Height == 0 || intersect.Width == 0)
+                        {
+                            DefectList[j].m_fSize = -123;
+                            continue;
+                        }
+                    }
+
+                    defectRect1.Inflate(new Size(mergeDist, mergeDist)); // Rect 가로/세로 mergeDist 만큼 확장
                     if (defectRect1.IntersectsWith(defectRect2) && (DefectList[i].m_nDefectCode == DefectList[j].m_nDefectCode))
                     {
                         Rect intersect = Rect.Intersect(defectRect1, defectRect2);
@@ -195,27 +230,35 @@ namespace RootTools_Vision
 
                         // Merge Defect Info
                         int nDefectCode = DefectList[j].m_nDefectCode;
-                        float fDefectSz = (DefectList[i].m_fWidth + DefectList[j].m_fWidth > DefectList[i].m_fHeight + DefectList[j].m_fHeight)
-                            ? DefectList[i].m_fWidth + DefectList[j].m_fWidth : DefectList[i].m_fHeight + DefectList[j].m_fHeight;
-                        int fDefectGV = (int)(DefectList[i].m_fGV * (DefectList[i].m_fSize / fDefectSz) + DefectList[j].m_fGV * (DefectList[j].m_fSize / fDefectSz));
+                        
+                        float fDefectGV = (float)((DefectList[i].m_fGV + DefectList[j].m_fGV) / 2.0);
                         float fDefectLeft = (defectRect2.Left < defectRect1.Left + mergeDist) ? (float)defectRect2.Left : (float)defectRect1.Left + mergeDist;
                         float fDefectTop = (defectRect2.Top < defectRect1.Top + mergeDist) ? (float)defectRect2.Top : (float)defectRect1.Top + mergeDist;
+                        float fDefectRight = (defectRect2.Right > defectRect1.Right - mergeDist) ? (float)defectRect2.Right : (float)defectRect1.Right - mergeDist;
+                        float fDefectBottom = (defectRect2.Bottom > defectRect1.Bottom - mergeDist) ? (float)defectRect2.Bottom : (float)defectRect1.Bottom - mergeDist;
+
+                        float fDefectWidth = fDefectRight - fDefectLeft;
+                        float fDefectHeight = fDefectBottom - fDefectTop;
+
+                        float fDefectSz = (fDefectWidth > fDefectHeight) ? fDefectWidth : fDefectHeight;
 
                         float fDefectRelX = 0;
                         float fDefectRelY = 0;
 
-                        float fDefectRight = (defectRect2.Right > defectRect1.Right - mergeDist) ? (float)defectRect2.Right : (float)defectRect1.Right - mergeDist;
-                        float fDefectBottom = (defectRect2.Bottom > defectRect1.Bottom - mergeDist) ? (float)defectRect2.Bottom : (float)defectRect1.Bottom - mergeDist;
-
-                        DefectList[i].SetDefectInfo(sInspectionID, nDefectCode, fDefectSz, fDefectGV, fDefectRight - fDefectLeft, fDefectBottom - fDefectTop
+                        DefectList[i].SetDefectInfo(sInspectionID, nDefectCode, fDefectSz, fDefectGV, fDefectWidth, fDefectHeight
                             , fDefectRelX, fDefectRelY, fDefectLeft, fDefectTop, DefectList[j].m_nChipIndexX, DefectList[j].m_nCHipIndexY);
 
-                        DefectList[j].m_nDefectCode = -123; // Merge된 Defect이 중복 저장되지 않도록...
+                        DefectList[j].m_fSize = -123; // Merge된 Defect이 중복 저장되지 않도록...
                     }
                 }
 
-                DefectList[i].SetDefectIndex(nDefectIndex++);
-                MergeDefectList.Add(DefectList[i]);                    
+                DefectList[i].SetDefectIndex(nDefectIndex++);              
+            }
+
+            for (int i = 0; i < DefectList.Count; i++)
+            {
+                if (DefectList[i].m_fSize != -123)
+                    MergeDefectList.Add(DefectList[i]);
             }
 
             return MergeDefectList;
@@ -245,13 +288,26 @@ namespace RootTools_Vision
                     defectArray[i] = rect;
                 }
 
-                CLR_IP.Cpp_SaveDefectListBMP(
-                   Path,
-                   (byte*)workplace.SharedBuffer.ToPointer(),
-                   workplace.SharedBufferWidth,
-                   workplace.SharedBufferHeight,
-                   defectArray
-                   );
+                if (nByteCnt == 1) { 
+                    CLR_IP.Cpp_SaveDefectListBMP(
+                       Path,
+                       (byte*)workplace.SharedBuffer.ToPointer(),
+                       workplace.SharedBufferWidth,
+                       workplace.SharedBufferHeight,
+                       defectArray
+                       );
+                }
+                
+                else if (nByteCnt == 3) { 
+                    CLR_IP.Cpp_SaveDefectListBMP_Color(
+                        Path,
+                       (byte*)workplace.SharedBufferR.ToPointer(),
+                       (byte*)workplace.SharedBufferG.ToPointer(),
+                       (byte*)workplace.SharedBufferB.ToPointer(),
+                       workplace.SharedBufferWidth,
+                       workplace.SharedBufferHeight,
+                       defectArray);
+                }
             }
         }
 

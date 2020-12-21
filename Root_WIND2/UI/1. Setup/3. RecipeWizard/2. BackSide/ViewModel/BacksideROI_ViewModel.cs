@@ -153,7 +153,7 @@ namespace Root_WIND2
             int[] mapData = null;
             unsafe
             {
-                int DownSample = 20;
+                int DownSample = 40;
 
                 fixed (byte* pImg = new byte[(long)(memW / DownSample) * (long)(memH / DownSample)]) // 원본 이미지 너무 커서 안열림
                 {
@@ -254,6 +254,12 @@ namespace Root_WIND2
             backsideRecipe.OriginY = originY;
             backsideRecipe.DiePitchX = chipSzX;
             backsideRecipe.DiePitchY = chipSzY;
+
+            OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
+            originRecipe.DiePitchX = chipSzX;
+            originRecipe.DiePitchY = chipSzY;
+            originRecipe.OriginX = originX;
+            originRecipe.OriginY = originY;
 
             mapInfo = new RecipeType_WaferMap(mapX, mapY, mapData);
 
@@ -439,6 +445,8 @@ namespace Root_WIND2
                         if (isOrigin)
                         {
                             offsetY = OriginY - (y + 1) * ChipSzY;
+                            mapInfo.MasterDieX = x;
+                            mapInfo.MasterDieY = y;
                             isOrigin = false;
                         }
 
@@ -622,7 +630,7 @@ namespace Root_WIND2
         }
         public void SaveContourMap(int CenterX, int CenterY, int radius)
         {
-            int DownSample = 1;
+            int DownSample = 60;
 
             int nMemH = p_ImageData.p_Size.Y;
             int nMemW = p_ImageData.p_Size.X;

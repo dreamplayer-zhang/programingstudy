@@ -2,9 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Serialization;
 
 namespace RootTools_Vision
@@ -58,10 +61,31 @@ namespace RootTools_Vision
             return Tools.SaveRawdataToBitmap(recipeFolderPath + this.FileName , RawData, Width, Height, ByteCnt);
         }
 
-        public bool Read(string recipeFolderPath)
+        public bool Read(string recipeFolderPath)  
         {
-            //this.rawData = new byte[this.featureWidth * this.featureHeight * this.byteCnt];
-            return Tools.LoadBitmapToRawdata(recipeFolderPath + this.FileName, ref this.rawData, ref this.width, ref this.height, ref this.byteCnt);
+            if(File.Exists(recipeFolderPath + this.FileName) == false)
+            {
+                MessageBox.Show("Master Image가 없습니다.", "Error Master Image Laod",MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            Bitmap bmp = new Bitmap(recipeFolderPath + this.FileName);
+
+            this.Width = bmp.Width;
+            this.Height = bmp.Height;
+
+            if (bmp.PixelFormat == PixelFormat.Format8bppIndexed)
+            {
+                this.ByteCnt = 1;
+            }
+            else
+            {
+                this.ByteCnt = 3;
+            }
+
+            this.RawData = new byte[this.Width * this.Height * this.byteCnt];
+
+            return Tools.LoadBitmapToRawdata(recipeFolderPath + this.FileName, this.rawData, this.Width, this.Height, this.ByteCnt);
         }
 
         public Bitmap GetFeatureBitmap()

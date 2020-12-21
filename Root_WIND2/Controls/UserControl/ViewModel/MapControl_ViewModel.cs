@@ -30,7 +30,8 @@ namespace Root_WIND2
                 m_Recipe = recipe;
 
             m_InspectionManger = inspectionManger;
-            m_InspectionManger.MapStateChanged += MapStateChanged_Callback;
+
+            WorkEventManager.WorkplaceStateChanged += MapStateChanged_Callback;
         }
 
 
@@ -41,42 +42,62 @@ namespace Root_WIND2
         SolidColorBrush brushMeasurement = System.Windows.Media.Brushes.CornflowerBlue;
         SolidColorBrush brushComplete = System.Windows.Media.Brushes.YellowGreen;
         SolidColorBrush brushCompleteWafer = System.Windows.Media.Brushes.LimeGreen;
+        SolidColorBrush brushBadChip = System.Windows.Media.Brushes.Red;
 
         object lockObj = new object();
-        private void MapStateChanged_Callback(int x, int y, RootTools_Vision.WORKPLACE_STATE state)
+        private void MapStateChanged_Callback(object obj, WorkplaceStateChangedEventArgs args)
         {
+            lock(lockObj)
+            {
+                Workplace workplace = args.workplace;
+
+                int x = workplace.MapPositionX;
+                int y = workplace.MapPositionY;
+
+                if (x < 0 || y < 0) return;
+
+                WORKPLACE_STATE state = workplace.STATE;
+
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
                 {
-                    if (p_MapItems.Count == 0) return; 
+                    if (p_MapItems.Count == 0) return;
 
                     int index = (int)(y + (x * MapSize.Y));
                     if (index > p_MapItems.Count - 1)
                         return;
 
-                    Grid chip = p_MapItems[index];
-                    switch (state)
+                    if (workplace.GetSubState(WORKPLACE_SUB_STATE.BAD_CHIP) == false)
                     {
-                        case WORKPLACE_STATE.NONE:
-                            //tb.Background = brushPosition;
-                            break;
-                        case WORKPLACE_STATE.SNAP:
-                            chip.Background = brushPreInspection;
-                            break;
-                        case WORKPLACE_STATE.READY:
-                            chip.Background = brushPosition;
-                            break;
-                        case WORKPLACE_STATE.INSPECTION:
-                            chip.Background = brushInspection;
-                            break;
-                        case WORKPLACE_STATE.DEFECTPROCESS:
-                            chip.Background = brushComplete;
-                            break;
-                        case WORKPLACE_STATE.DEFECTPROCESS_WAFER:
-                            chip.Background = brushCompleteWafer;
-                            break;
+                        Grid chip = p_MapItems[index];
+                        switch (state)
+                        {
+                            case WORKPLACE_STATE.NONE:
+                                //tb.Background = brushPosition;
+                                break;
+                            case WORKPLACE_STATE.SNAP:
+                                chip.Background = brushPreInspection;
+                                break;
+                            case WORKPLACE_STATE.READY:
+                                chip.Background = brushPosition;
+                                break;
+                            case WORKPLACE_STATE.INSPECTION:
+                                chip.Background = brushInspection;
+                                break;
+                            case WORKPLACE_STATE.DEFECTPROCESS:
+                                chip.Background = brushComplete;
+                                break;
+                            case WORKPLACE_STATE.DEFECTPROCESS_WAFER:
+                                chip.Background = brushCompleteWafer;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        Grid chip = p_MapItems[index];
+                        chip.Background = brushBadChip;
                     }
                 }));
-            
+            }
         }
 
 
@@ -114,7 +135,7 @@ namespace Root_WIND2
                     p_MapItems.Add(chip);
                 }
         }
-        public void CreateMap_OriginToolUI(bool addEvent = false, int[] map = null, CPoint mapsize = null)
+        public void CreateMap_OriginToolUI(bool addEvent, CPoint masterDie, int[] map = null, CPoint mapsize = null)
         {
             if (map == null)
             {
@@ -151,8 +172,8 @@ namespace Root_WIND2
                         chip.MouseLeftButtonDown += MAP_MouseLeftButtonDown;
                 }
 
-            if(p_MapItems.Count > 0)
-                p_MapItems[this.MapSize.Y * m_Recipe.WaferMap.MasterDieX + m_Recipe.WaferMap.MasterDieY].Background = Brushes.Purple;
+            if(masterDie.X != -1)
+                p_MapItems[this.MapSize.Y * masterDie.X + masterDie.Y].Background = Brushes.Purple;
         }
         public void SetMap(int[] map = null, CPoint mapsize = null)
         {
@@ -169,7 +190,7 @@ namespace Root_WIND2
             CreateMapUI();
             
         }
-        public void SetMap(bool addEvent, int[] map = null, CPoint mapsize = null)
+        public void SetMap(bool addEvent, CPoint masterDie, int[] map = null, CPoint mapsize = null)
         {
             if (map == null)
             {
@@ -181,7 +202,7 @@ namespace Root_WIND2
             Map = new int[mapsize.X * mapsize.Y];
             Map = map;
 
-            CreateMap_OriginToolUI(addEvent);
+            CreateMap_OriginToolUI(addEvent, masterDie);
         }
         private void MAP_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
