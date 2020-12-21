@@ -87,8 +87,7 @@ namespace Root_WIND2
         {
             get
             {
-                mapControl_VM.ChangeMasterImage(masterDieX, m_Recipe.WaferMap.MasterDieY);
-                m_Recipe.WaferMap.MasterDieX = masterDieX;
+                mapControl_VM.ChangeMasterImage(masterDieX, m_Recipe.WaferMap.MasterDieY);                
                 return masterDieX;
             }
             set
@@ -101,6 +100,7 @@ namespace Root_WIND2
                     val = m_Recipe.WaferMap.MapSizeX - 1;
 
                 SetProperty(ref masterDieX, value);
+                m_Recipe.WaferMap.MasterDieX = masterDieX;
             }
         }
         private int masterDieY = 5;
@@ -109,7 +109,6 @@ namespace Root_WIND2
             get
             {                
                 mapControl_VM.ChangeMasterImage(m_Recipe.WaferMap.MasterDieX, masterDieY);
-                m_Recipe.WaferMap.MasterDieY = masterDieY;
                 return masterDieY;
             }
             set
@@ -135,7 +134,7 @@ namespace Root_WIND2
                                     masterDieY = val - pos;
                                     break;
                                 }
-                            if (val + pos < m_Recipe.WaferMap.MapSizeY)
+                            if (val + pos < m_Recipe.WaferMap.MapSizeY)                
                                 if (map[masterDieX + ((val + pos) * m_Recipe.WaferMap.MapSizeX)] == (int)CHIP_TYPE.NORMAL)
                                 {
                                     masterDieY = val + pos;
@@ -150,10 +149,12 @@ namespace Root_WIND2
                             }
                         }
                         SetProperty(ref masterDieY, masterDieY);
+                        m_Recipe.WaferMap.MasterDieY = masterDieY;
                     }
                     else
                     {
                         SetProperty(ref masterDieY, val);
+                        m_Recipe.WaferMap.MasterDieY = masterDieY;
                     }
                 }  
             }

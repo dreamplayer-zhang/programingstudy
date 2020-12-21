@@ -109,7 +109,6 @@ namespace Root_WIND2
                 workplaceBundle = WorkplaceBundle.CreateWaferMap(_recipe);
                 workplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
                 workplaceBundle.SetSharedRGBBuffer(this.SharedBufferR, this.SharedBufferG, this.SharedBufferB);
-                //workplaceBundle.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
 
                 workBundle = WorkBundle.CreateWorkBundle(_recipe, workplaceBundle);
 
@@ -130,7 +129,6 @@ namespace Root_WIND2
         {
             try
             {
-                //RecipeType_WaferMap mapInfo = m_Recipe.GetRecipeInfo(typeof(RecipeType_WaferMap)) as RecipeType_WaferMap;
                 RecipeType_WaferMap waferMap = recipe.WaferMap;
 
                 if (waferMap == null || waferMap.MapSizeX == 0 || waferMap.MapSizeY == 0)
@@ -152,11 +150,9 @@ namespace Root_WIND2
                 ProcessDefect processDefect = new ProcessDefect();
                 workBundle.Add(processDefect);
 
-                //workplaceBundle = WorkplaceBundle.CreateWaferMap(waferMap, this.recipe.GetRecipe<OriginRecipe>());
                 workplaceBundle = WorkplaceBundle.CreateWaferMap(_recipe);
                 workplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
                 workplaceBundle.SetSharedRGBBuffer(this.SharedBufferR, this.SharedBufferG, this.SharedBufferB);
-                //workplaceBundle.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
 
                 ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
                 processDefect_Wafer.SetRecipe(recipe);
