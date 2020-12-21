@@ -19,7 +19,7 @@ namespace Root_CAMELLIA
         public DataManager DataManager;
         public Met.Nanoview NanoView;
 
-        Module_Camellia m_Module_Camellia;
+        #region Property
         public Module_Camellia p_Module_Camellia
         {
             get
@@ -31,8 +31,8 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_Module_Camellia, value);
             }
         }
+        private Module_Camellia m_Module_Camellia;
 
-        Module_Camellia.Run_Measure m_Run_Measure;
         public Module_Camellia.Run_Measure p_Run_Measure
         {
             get
@@ -44,8 +44,8 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_Run_Measure, value);
             }
         }
+        private Module_Camellia.Run_Measure m_Run_Measure;
 
-        RPoint m_StageCenterPulse = new RPoint();
         public RPoint p_StageCenterPulse
         {
             get
@@ -57,17 +57,9 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_StageCenterPulse, value);
             }
         }
+        private RPoint m_StageCenterPulse = new RPoint();
 
-        public MainWindow_ViewModel(MainWindow mainwindow)
-        {
-            m_MainWindow = mainwindow;
 
-            Init();
-            ViewModelInit();
-            DialogInit(mainwindow);
-        }
-
-        double m_ArrowX1 = 0.0f;
         public double p_ArrowX1
         {
             get
@@ -79,8 +71,8 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_ArrowX1, value);
             }
         }
+        private double m_ArrowX1 = 0.0f;
 
-        double m_ArrowX2 = 0.0f;
         public double p_ArrowX2
         {
             get
@@ -92,8 +84,8 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_ArrowX2, value);
             }
         }
+        private double m_ArrowX2 = 0.0f;
 
-        double m_ArrowY1 = 0.0f;
         public double p_ArrowY1
         {
             get
@@ -105,8 +97,8 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_ArrowY1, value);
             }
         }
+        private double m_ArrowY1 = 0.0f;
 
-        double m_ArrowY2 = 0.0f;
         public double p_ArrowY2
         {
             get
@@ -118,8 +110,8 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_ArrowY2, value);
             }
         }
+        private double m_ArrowY2 = 0.0f;
 
-        Visibility m_ArrowVisible = Visibility.Hidden;
         public Visibility p_ArrowVisible
         {
             get
@@ -131,8 +123,7 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_ArrowVisible, value);
             }
         }
-
-        private ObservableCollection<UIElement> m_DrawRouteElement = new ObservableCollection<UIElement>();
+        private Visibility m_ArrowVisible = Visibility.Hidden;
 
         public ObservableCollection<UIElement> p_DrawRouteElement
         {
@@ -145,8 +136,8 @@ namespace Root_CAMELLIA
                 m_DrawRouteElement = value;
             }
         }
+        private ObservableCollection<UIElement> m_DrawRouteElement = new ObservableCollection<UIElement>();
 
-        private double m_Progress = 0;
         public double p_Progress
         {
             get
@@ -173,10 +164,8 @@ namespace Root_CAMELLIA
                 }
             }
         }
+        private double m_Progress = 0;
 
-        public SolidColorBrush test = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 1, 211, 40));
-
-        private System.Windows.Media.Brush m_ProgressColor;
         public System.Windows.Media.Brush p_ProgressColor
         {
             get
@@ -188,8 +177,20 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_ProgressColor, value);
             }
         }
+        private System.Windows.Media.Brush m_ProgressColor;
 
         public SolidColorBrush RouteBrush { get; set; } = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 0, 0, 255));
+        public SolidColorBrush test = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 1, 211, 40));
+        #endregion
+
+        public MainWindow_ViewModel(MainWindow mainwindow)
+        {
+            m_MainWindow = mainwindow;
+
+            Init();
+            ViewModelInit();
+            DialogInit(mainwindow);
+        }
 
         private void Init()
         {
@@ -212,16 +213,18 @@ namespace Root_CAMELLIA
         private void ViewModelInit()
         {
             EngineerViewModel = new Dlg_Engineer_ViewModel(this);
+            RecipeViewModel = new Dlg_RecipeManager_ViewModel(this);   
+            SettingViewModel = new Dlg_Setting_ViewModel(this);
             PMViewModel = new Dlg_PM_ViewModel(this);
-            RecipeViewModel = new Dlg_RecipeManager_ViewModel(this);
         }
 
         private void DialogInit(MainWindow main)
         {
             dialogService = new DialogService(main);
             dialogService.Register<Dlg_Engineer_ViewModel, Dlg_Engineer>();
-            dialogService.Register<Dlg_PM_ViewModel, Dlg_PM>();
             dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_RecipeManager>();
+            dialogService.Register<Dlg_Setting_ViewModel, Dlg_Setting>();
+            dialogService.Register<Dlg_PM_ViewModel, Dlg_PM>();
         }
 
         private void DrawMeasureRoute()
@@ -249,6 +252,7 @@ namespace Root_CAMELLIA
 
         #region ViewModel
         public Dlg_PM_ViewModel PMViewModel;
+        public Dlg_Setting_ViewModel SettingViewModel;
         public Dlg_Engineer_ViewModel EngineerViewModel;
         public Dlg_RecipeManager_ViewModel RecipeViewModel
         {
@@ -345,6 +349,8 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    var viewModel = SettingViewModel;
+                    Nullable<bool> result = dialogService.ShowDialog(viewModel);
                     //m_Vision.StartRun(p_RunLADS);
                 });
             }
