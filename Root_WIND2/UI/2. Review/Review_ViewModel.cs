@@ -24,6 +24,7 @@ using Path = System.IO.Path;
 using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
 using Size = System.Windows.Size;
+using System.Collections;
 
 namespace Root_WIND2
 {
@@ -76,7 +77,6 @@ namespace Root_WIND2
             }
         }
         #endregion
-
 
         #region GET / SET
 
@@ -167,11 +167,11 @@ namespace Root_WIND2
                     // Defect Code 보고... 나중에 회의
                     //if (defect.m_nDefectCode / 10000 == 1)  // Frontside
                     {
-                        //DisplaySelectedFrontDefect(selectedRow);
+                        DisplaySelectedFrontDefect(selectedRow);
                     }
                     //else if (defect.m_nDefectCode / 10000 == 2)  // Backside
                     {
-                        DisplaySelectedBackDefect(selectedRow);
+                        //DisplaySelectedBackDefect(selectedRow);
                     }
                     //else if (defect.m_nDefectCode / 10000 == 3) // Edge
                     {
@@ -577,11 +577,11 @@ namespace Root_WIND2
                 // 대충 코드는 이런식으로 분류를 하면 되지않을까...
                 //if (defect.m_nDefectCode / 10000 == 1)  // Frontside
                 {
-                    //m_DefectView.AddFrontDefect(defect.m_fRelX, defect.m_fRelY);
+                    m_DefectView.AddFrontDefect(defect.m_fRelX, defect.m_fRelY);
                 }
                 //else if (defect.m_nDefectCode / 10000 == 2)  // Backside
                 {
-                    m_DefectView.AddBackDefect(defect.m_fRelX, defect.m_fRelY);
+                    //m_DefectView.AddBackDefect(defect.m_fRelX, defect.m_fRelY);
                 }
                 //else if (defect.m_nDefectCode / 10000 == 3) // Edge
                 {
@@ -768,23 +768,13 @@ namespace Root_WIND2
 
             GVYMaxVal = GVHistogram.Max() + GVHistogram.Max() / 10 + 1;
 
-            for (int i = 0; i < binSz; i++)
-                DefectGVHistogram[0].Values.Add(GVHistogram[i]);
+            DefectGVHistogram[0].Values.AddRange(((IEnumerable)GVHistogram).Cast<object>());
 
             GVXLabel = new string[binSz];
 
-            //if (gvHistogramMode != GVHistogramType.All)
-            {
-                int yLabel = (gvHistogramMode == GVHistogramType.Bright) ? 128 : 0;
-                for (int i = yLabel; i < binSz; i++)
-                    GVXLabel[i - yLabel] = (yLabel + (i - yLabel) * 2).ToString() + "~" + (yLabel + (i - yLabel) * 2 + 1).ToString();
-            }
-            //else
-            //{
-            //    int yLabel = (gvHistogramMode == GVHistogramType.Bright) ? 128 : 0;
-            //    for (int i = yLabel; i < binSz; i++)
-            //        GVXLabel[i - yLabel] = i.ToString();
-            //}
+            int yLabel = (gvHistogramMode == GVHistogramType.Bright) ? 128 : 0;
+            for (int i = yLabel; i < binSz; i++)
+                GVXLabel[i - yLabel] = (yLabel + (i - yLabel) * 2).ToString() + "~" + (yLabel + (i - yLabel) * 2 + 1).ToString();
 
             GVYLabel = value => value.ToString("N");
         }
@@ -853,15 +843,12 @@ namespace Root_WIND2
             }
 
             SizeYMaxVal = SzHistogram.Max() + SzHistogram.Max() / 10 + 1;
-
-            for (int i = 0; i < binCount; i++)
-                DefectSizeHistogram[0].Values.Add(SzHistogram[i]);
+            
+            DefectSizeHistogram[0].Values.AddRange(((IEnumerable)SzHistogram).Cast<object>());
 
             SizeXLabel = new string[binCount];
             for (int i = 1; i <= binCount; i++)
-            {
                 SizeXLabel[i - 1] = ((i - 1) * mergeBin + minSz).ToString() + "~" + ((i - 1) * mergeBin + minSz + mergeBin - 1).ToString();
-            }
 
             SizeYLabel = value => value.ToString("N");
         }

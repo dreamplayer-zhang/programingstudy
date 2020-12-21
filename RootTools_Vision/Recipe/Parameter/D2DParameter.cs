@@ -102,6 +102,7 @@ namespace RootTools_Vision
             }
         }
         [Category("Option")]
+        [DisplayName("Diff Filter")]
         public DiffFilterMethod DiffFilter
         {
             get => this.diffFilter;

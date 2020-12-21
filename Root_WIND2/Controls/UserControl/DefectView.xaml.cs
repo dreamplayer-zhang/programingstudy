@@ -25,12 +25,12 @@ namespace Root_WIND2
         public DefectView()
         {
             InitializeComponent();   
+            cb_Back.IsChecked = true;
         }
 
         public void SetRecipe(Recipe _recipe)
         {
             this.recipe = _recipe;
-            cb_Back.IsChecked = true;
         }
 
         private void DefectCheckBox_Checked(object sender, RoutedEventArgs e)
@@ -135,8 +135,8 @@ namespace Root_WIND2
             int mapY = mapdata.MapSizeY;
 
             int margin = 1;
-            double mapW = (FrontsideCanvas.ActualWidth - (margin * mapX)) / mapX;
-            double mapH = (FrontsideCanvas.ActualHeight - (margin * mapY)) / mapY;
+            double mapW = (FrontsideCanvas.Width - (margin * mapX)) / mapX;
+            double mapH = (FrontsideCanvas.Height - (margin * mapY)) / mapY;
 
             for (int x = 0; x < mapX; x++)
                 for(int y = 0; y < mapY; y++)
@@ -201,8 +201,8 @@ namespace Root_WIND2
             int mapY = mapdata.MapSizeY;
             int margin = 1;
             
-            double mapW = (FrontsideCanvas.ActualWidth - (margin * mapX)) / mapX;
-            double mapH = (FrontsideCanvas.ActualHeight - (margin * mapY)) / mapY;
+            double mapW = (FrontsideCanvas.Width - (margin * mapX)) / mapX;
+            double mapH = (FrontsideCanvas.Height - (margin * mapY)) / mapY;
 
             double realSizeX = originRecipe.DiePitchX;
             double realSizeY = originRecipe.DiePitchY;
@@ -238,14 +238,14 @@ namespace Root_WIND2
             defect.StrokeThickness = 0.5;
 
             int nWaferSize = 300; // 300mm 기준
-            float ratio_wafer_to_canvas_x = (float)BacksideCanvas.ActualWidth / nWaferSize;
+            float ratio_wafer_to_canvas_x = (float)BacksideCanvas.Width / nWaferSize;
             double waferWidth = nWaferSize * ratio_wafer_to_canvas_x;
 
-            double dWaferRaius = (float)BacksideCanvas.ActualWidth / (double)2;
+            double dWaferRaius = (float)BacksideCanvas.Width / (double)2;
             double dSamplingRatio = dWaferRaius / 30430; // backside Recipe에서 radius값 가지고오기 <수정> // 37410 meomo
 
-            double dCanvasWaferCenterX = (float)BacksideCanvas.ActualWidth / 2;
-            double dCanvasWaferCenterY = (float)BacksideCanvas.ActualHeight / 2;
+            double dCanvasWaferCenterX = (float)BacksideCanvas.Width / 2;
+            double dCanvasWaferCenterY = (float)BacksideCanvas.Height / 2;
 
             Canvas.SetLeft(defect, dCanvasWaferCenterX + x * dSamplingRatio);
             Canvas.SetTop(defect, dCanvasWaferCenterY + y * dSamplingRatio);
