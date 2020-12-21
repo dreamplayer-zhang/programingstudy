@@ -388,9 +388,13 @@ namespace Root_Vega
             {
                 p_MiniImageViewer.lstDefect.Clear();
                 p_MiniImageViewer_Left.lstDefect.Clear();
+                p_MiniImageViewer_BevelLeft.lstDefect.Clear();
                 p_MiniImageViewer_Right.lstDefect.Clear();
+                p_MiniImageViewer_BevelRight.lstDefect.Clear();
                 p_MiniImageViewer_Top.lstDefect.Clear();
+                p_MiniImageViewer_BevelTop.lstDefect.Clear();
                 p_MiniImageViewer_Btm.lstDefect.Clear();
+                p_MiniImageViewer_BevelBtm.lstDefect.Clear();
             }
             catch (Exception ex)
             {
