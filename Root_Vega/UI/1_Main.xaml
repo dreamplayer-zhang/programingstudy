@@ -148,56 +148,91 @@
                                         <Grid Background="{DynamicResource BtnMouseOver}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="50"/>
+                                                <ColumnDefinition Width="50"/>
                                                 <ColumnDefinition/>
+                                                <ColumnDefinition Width="50"/>
                                                 <ColumnDefinition Width="50"/>
                                             </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="50"/>
+                                                <RowDefinition Height="50"/>
                                                 <RowDefinition/>
+                                                <RowDefinition Height="50"/>
                                                 <RowDefinition Height="50"/>
                                             </Grid.RowDefinitions>
                                             <Grid Margin="10"
-                                      Grid.Column="1"
-                                      Grid.Row="1"
-                                      Background="Black">
-                                                <tools:MiniViewer DataContext="{Binding p_MiniImageViewer}"
-                                                          Width="{PriorityBinding}"
-                                                          Height="{PriorityBinding}" />
+                                                  Grid.Column="2"
+                                                  Grid.Row="2"
+                                                  Background="Black">
+                                                  <tools:MiniViewer DataContext="{Binding p_MiniImageViewer}"
+                                                                    Width="{PriorityBinding}"
+                                                                    Height="{PriorityBinding}" />
                                             </Grid>
-                                            <Grid Grid.Column="1"
-                                      Margin="10,10,10,0"
-                                      Background="Black">
-                                                <tools:MiniViewer DataContext="{Binding p_MiniImageViewer_Top}"
-                                                          Width="{PriorityBinding}"
-                                                          Height="{PriorityBinding}" />
+                                            <Grid Grid.Column="2"
+                                                  Grid.Row="1"
+                                                  Margin="10,10,10,0"
+                                                  Background="Black">
+                                                  <tools:MiniViewer DataContext="{Binding p_MiniImageViewer_Top}"
+                                                                    Width="{PriorityBinding}"
+                                                                    Height="{PriorityBinding}" />
                                             </Grid>
-                                            <Grid Grid.Column="1"
-                                      Margin="10,0,10,10"
-                                      Grid.Row="2"
-                                      Background="Black">
-                                                <tools:MiniViewer DataContext="{Binding p_MiniImageViewer_Btm}"
-                                                          Width="{PriorityBinding}"
-                                                          Height="{PriorityBinding}" />
+                                            <Grid Grid.Column="2"
+                                                  Grid.Row="0"
+                                                  Margin="10,10,10,0"
+                                                  Background="Black">
+                                                <tools:MiniViewer DataContext="{Binding p_MiniImageViewer_BevelTop}"
+                                                                    Width="{PriorityBinding}"
+                                                                    Height="{PriorityBinding}"/>
+                                            </Grid>
+                                            <Grid Grid.Column="2"
+                                                  Margin="10,0,10,10"
+                                                  Grid.Row="3"
+                                                  Background="Black">
+                                                  <tools:MiniViewer DataContext="{Binding p_MiniImageViewer_Btm}"
+                                                                    Width="{PriorityBinding}"
+                                                                    Height="{PriorityBinding}" />
+                                            </Grid>
+                                            <Grid Grid.Column="2"
+                                                  Margin="10,0,10,10"
+                                                  Grid.Row="4"
+                                                  Background="Black">
+                                                <tools:MiniViewer DataContext="{Binding p_MiniImageViewer_BevelBtm}"
+                                                                    Width="{PriorityBinding}"
+                                                                    Height="{PriorityBinding}" />
                                             </Grid>
                                             <Grid Margin="10,10,0,10"
-                                      Grid.Column="0"
-                                      Grid.Row="1"
-                                      Background="Black">
-                                                <tools:MiniViewer DataContext="{Binding p_MiniImageViewer_Left}"
-                                                          Width="{PriorityBinding}"
-                                                          Height="{PriorityBinding}" />
+                                                  Grid.Column="1"
+                                                  Grid.Row="2"
+                                                  Background="Black">
+                                                  <tools:MiniViewer DataContext="{Binding p_MiniImageViewer_Left}"
+                                                                    Width="{PriorityBinding}"
+                                                                    Height="{PriorityBinding}" />
+                                            </Grid>
+                                            <Grid Margin="10,10,0,10"
+                                                  Grid.Column="0"
+                                                  Grid.Row="2"
+                                                  Background="Black">
+                                                <tools:MiniViewer DataContext="{Binding p_MiniImageViewer_BevelLeft}"
+                                                                    Width="{PriorityBinding}"
+                                                                    Height="{PriorityBinding}" />
                                             </Grid>
                                             <Grid Margin="0,10,10,10"
-                                      Grid.Column="2"
-                                      Grid.Row="1"
-                                      Background="Black">
-                                                <tools:MiniViewer DataContext="{Binding p_MiniImageViewer_Right}"
-                                                          Width="{PriorityBinding}"
-                                                          Height="{PriorityBinding}" />
+                                                  Grid.Column="3"
+                                                  Grid.Row="2"
+                                                  Background="Black">
+                                                  <tools:MiniViewer DataContext="{Binding p_MiniImageViewer_Right}"
+                                                                    Width="{PriorityBinding}"
+                                                                    Height="{PriorityBinding}" />
+                                            </Grid>
+                                            <Grid Margin="0,10,10,10"
+                                                  Grid.Column="4"
+                                                  Grid.Row="2"
+                                                  Background="Black">
+                                                <tools:MiniViewer DataContext="{Binding p_MiniImageViewer_BevelRight}"
+                                                                    Width="{PriorityBinding}"
+                                                                    Height="{PriorityBinding}" />
                                             </Grid>
                                         </Grid>
-
-
                                     </Grid>
                                     <Grid Grid.Column="1" Margin="15,10,30,10">
                                         <Grid.RowDefinitions>
