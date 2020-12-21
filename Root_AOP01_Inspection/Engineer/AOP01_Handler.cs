@@ -45,6 +45,7 @@ namespace Root_AOP01_Inspection
             InitLoadport();
             m_mainVision = new MainVision("MainVision", m_engineer);
             InitModule(m_mainVision);
+
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_mainVision);
             m_wtr.RunTree(Tree.eMode.RegRead);

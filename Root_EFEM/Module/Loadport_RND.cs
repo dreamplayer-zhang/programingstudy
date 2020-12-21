@@ -4,6 +4,7 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHTNew;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
@@ -20,6 +21,7 @@ namespace Root_EFEM.Module
         DIO_I m_diDoorOpen;
         DIO_I m_diDocked;
         RS232 m_rs232;
+        OHT m_OHT; 
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
@@ -29,6 +31,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.Get(ref m_diDoorOpen, this, "DoorOpen");
             p_sInfo = m_toolBox.Get(ref m_diDocked, this, "Docked");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT", m_diPlaced, m_diPresent); 
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;

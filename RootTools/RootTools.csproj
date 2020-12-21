@@ -208,6 +208,7 @@
       <HintPath>..\packages\System.Drawing.Common.4.5.0\lib\net461\System.Drawing.Common.dll</HintPath>
     </Reference>
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
@@ -354,6 +355,12 @@
     </Compile>
     <Compile Include="Image\MiniViewer_ViewModel.cs" />
     <Compile Include="OHTNew\OHT.cs" />
+    <Compile Include="OHTNew\OHT_ButtonUI.xaml.cs">
+      <DependentUpon>OHT_ButtonUI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OHTNew\OHT_UI.xaml.cs">
+      <DependentUpon>OHT_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Printer\SRP350.cs" />
     <Compile Include="Printer\SRP350_UI.xaml.cs">
       <DependentUpon>SRP350_UI.xaml</DependentUpon>
@@ -917,6 +924,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="OHTNew\OHT_ButtonUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OHTNew\OHT_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="OHT\OHTHistory_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -1011,6 +1026,12 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\InPod.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OutPod.PNG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
