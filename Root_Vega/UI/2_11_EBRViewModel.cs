@@ -32,9 +32,7 @@ namespace Root_Vega
 		MemoryTool m_MemoryModule;
 		List<ImageData> m_Image = new List<ImageData>();
 		bool bUsingInspection;
-		int currentTotalIdx;
-
-
+		
 		#region Property
 
 		public DrawHistoryWorker m_DrawHistoryWorker;
@@ -209,37 +207,7 @@ namespace Root_Vega
 
 			return;
 		}
-		private void checkAddDefect(object state)
-		{
-			//_dispatcher
-			//concept
-			//db에 주기적으로 접근하여 tempTable의 최대 개수를 확인
-			//최대개수와 currentDefectIndex의 차이가 발생한다면 currentDefectIndex와 최대 개수 사이의 defect UI를 갱신하고 currentDefectIndex를 최대 개수로 변경한다
-
-			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
-			if (connector.Open())
-			{
-				string query = "SELECT COUNT(*) FROM inspections.tempdata;";
-				string temp = string.Empty;
-				var result = connector.SendQuery(query, ref temp);
-#if DEBUG
-				//Debug.WriteLine(string.Format("tempdata Row Count CODE : {0}", result));
-				//Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
-#endif
-				int count;
-				if (int.TryParse(temp, out count))
-				{
-					if (currentTotalIdx < count)
-					{
-						//current index부터 count까지 defect정보를 가져와 UI에 update하고 current index를 업데이트한다
-
-						//countQurey = string.Format("SELECT * FROM inspections.tempdata WHERE ");//우선순위를 낮춘다. SQLite파일하고 이미지 출력하는게 먼저
-
-						currentTotalIdx = count;
-					}
-				}
-			}
-		}
+		
 		/// <summary>
 		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
 		/// </summary>
@@ -272,17 +240,7 @@ namespace Root_Vega
 		}
 		void _clearInspReslut()
 		{
-			currentTotalIdx = 0;
-
-			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
-			if (connector.Open())
-			{
-				string dropQuery = "DROP TABLE Inspections.tempdata";
-				var result = connector.SendNonQuery(dropQuery);
-				Debug.WriteLine(string.Format("tempdata Table Drop : {0}", result));
-				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '0') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='0';");
-				Debug.WriteLine(string.Format("Status Clear : {0}", result));
-			}
+			m_Engineer.m_InspManager._clearInspReslut();
 		}
 
 		public void _startInsp()

@@ -256,6 +256,10 @@
     <Compile Include="Control\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\Dlg_Setting_ViewModel.cs" />
+    <Compile Include="UI_Dialog\Dlg_Setting.xaml.cs">
+      <DependentUpon>Dlg_Setting.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_Engineer\Camellia_ToolBox.xaml.cs">
       <DependentUpon>Camellia_ToolBox.xaml</DependentUpon>
     </Compile>
@@ -309,6 +313,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\LoadingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_Setting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

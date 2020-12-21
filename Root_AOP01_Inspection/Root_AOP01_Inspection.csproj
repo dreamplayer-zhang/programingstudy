@@ -199,7 +199,13 @@
     <Compile Include="Module\AOP01.cs" />
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Module\MainVision.cs" />
-    <Compile Include="Module\WTR.cs" />
+    <Compile Include="Module\OHTs_UI.xaml.cs">
+      <DependentUpon>OHTs_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\OHT_UI.xaml.cs">
+      <DependentUpon>OHT_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\WTRCleanUnit.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="ProgramManager.cs" />
     <Compile Include="UI\1. SETUP\3. Maintenance\ViewerTest.xaml.cs">
@@ -286,6 +292,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\Button\NaviBtn.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Module\OHTs_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Module\OHT_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

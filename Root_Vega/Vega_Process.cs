@@ -300,7 +300,7 @@ namespace Root_Vega
             Sequence sequence = m_qSequence.Peek();
             ModuleBase module = sequence.m_moduleRun.m_moduleBase; 
             p_sInfo = sequence.m_moduleRun.StartRun();
-            while (module.IsBusy()) Thread.Sleep(10); 
+            while (module.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10); 
             m_handler.m_bIsPossible_Recovery = false;
             m_qSequence.Dequeue();
             if (sequence.m_infoReticle.m_qProcess.Count > 0) sequence.m_infoReticle.m_qProcess.Dequeue();

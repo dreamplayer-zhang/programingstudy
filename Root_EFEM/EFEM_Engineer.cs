@@ -123,6 +123,18 @@ namespace Root_EFEM
         }
         #endregion
 
+        #region IEngineer Function
+        public string BuzzerOff()
+        {
+            return "OK";
+        }
+
+        public string Recovery()
+        {
+            return "OK";
+        }
+        #endregion
+
         public EFEM_Handler m_handler = new EFEM_Handler();
         public void Init(string id)
         {
@@ -144,16 +156,6 @@ namespace Root_EFEM
             m_toolBox.ThreadStop();
             m_login.ThreadStop();
             LogView.ThreadStop();
-        }
-
-        public string BuzzerOff()
-        {
-            return "OK";
-        }
-
-        public string Recovery()
-        {
-            return "OK";
         }
     }
 }

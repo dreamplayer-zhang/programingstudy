@@ -20,11 +20,7 @@ namespace Root_WIND2
         {
             m_Recipe = recipe;
             m_front = front;
-            p_ROI_Viewer = m_front.p_ROI_VM;
-            p_ROI_Viewer.SetRoiRect();
-            p_ROI_Viewer.SetLayerSource();
-            //p_ROI_Viewer.p_LayerSource = m_front.p_ROI_VM.p_LayerSource;
-            //p_ROI_Viewer.SetLayerSource();
+            ViewerInit();
             m_cMask = new ObservableCollection<Mask>();
             m_cInspMethod = new ObservableCollection<ParameterBase>();
             m_cInspItem = new ObservableCollection<InspectionItem>();
@@ -36,14 +32,26 @@ namespace Root_WIND2
             WIND2EventManager.BeforeRecipeSave += BeforeRecipeSave_Callback;
         }
 
-
+        private void ViewerInit()
+        {
+            p_ROI_Viewer = new FrontsideMask_ViewModel();
+            p_ROI_Viewer.p_VisibleMenu = Visibility.Collapsed;
+            p_ROI_Viewer.SetBackGroundWorker();
+            p_ROI_Viewer.p_ImageData = m_front.p_ROI_VM.p_ImageData;
+            p_ROI_Viewer.p_ROILayer = m_front.p_ROI_VM.p_ROILayer;
+            p_ROI_Viewer.p_cInspROI = m_front.p_ROI_VM.p_cInspROI;
+            p_ROI_Viewer.SetRoiRect();
+            //p_ROI_Viewer.SetLayerSource();
+        }
 
         #region Property
-        private FrontsideROI_ViewModel m_ROI_Viewer;
-        public FrontsideROI_ViewModel p_ROI_Viewer
+        private FrontsideMask_ViewModel m_ROI_Viewer;
+        public FrontsideMask_ViewModel p_ROI_Viewer
         {
             get
             {
+                m_ROI_Viewer.p_ImageData = m_front.p_ROI_VM.p_ImageData;
+                m_ROI_Viewer.SetImageSource();
                 return m_ROI_Viewer;
             }
             set
@@ -116,6 +124,7 @@ namespace Root_WIND2
             }
             set
             {
+                var asdf = p_ROI_Viewer.p_ImgSource;
                 SetProperty(ref m_selectedInspItem, value);
                 if(m_selectedInspItem != null)
                     p_selectedMethodItem = m_selectedInspItem.p_InspMethod;
@@ -236,8 +245,6 @@ namespace Root_WIND2
 
                     p_cInspItem.Add(item);
                     SetParameter();
-                    var asdf = m_front.p_ROI_VM;
-                    var ff = m_front.p_ROI_VM.p_cInspROI;
                 });
             }
         }

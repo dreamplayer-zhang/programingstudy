@@ -33,7 +33,7 @@ namespace RootTools.Control
         public void Init(ListDIO listDIO)
         {
             m_listDIO = listDIO;
-            this.DataContext = listDIO; 
+            DataContext = listDIO; 
             listView.ItemsSource = listDIO.m_aDIO;
         }
     }

@@ -20,11 +20,10 @@ namespace RootTools_Vision
 
     public enum WORKPLACE_SUB_STATE
     {
-        POSITION_SUCCESS    = 0b00000001,
-        LINE_FIRST_CHIP     = 0b00000010,
-        EDGE_TOP            = 0b00000100,
-        EDGE_SIDE           = 0b00001000,
-        EDGE_BOTTOM         = 0b00010000,
+        POSITION_SUCCESS            = 0b00000001,
+        LINE_FIRST_CHIP             = 0b00000010,
+        WAFER_POSITION_SUCCESS      = 0b00000100,
+        BAD_CHIP                    = 0b10000000,
     }
 
     public enum PREWORKDATA_KEY // PreworkdataList의 index로 반드시 0부터 빈틈없이 추가
@@ -41,8 +40,6 @@ namespace RootTools_Vision
 
     public class Workplace
     {
-        public event EventStateChanged StateChanged;
-
         public event EventPositionUpdated PositionUpdated;
 
         public event EventPositionIntialized PositionIntialized;
@@ -56,8 +53,7 @@ namespace RootTools_Vision
             { 
                 state = value;
 
-                if( StateChanged != null)
-                    StateChanged(this);
+                WorkEventManager.OnWorkplaceStateChanged(this, new WorkplaceStateChangedEventArgs(this));
             }
         }
 
@@ -76,6 +72,9 @@ namespace RootTools_Vision
         private byte[] workplaceBuffer;
 
         private IntPtr sharedBuffer;
+        private IntPtr sharedBufferR;
+        private IntPtr sharedBufferG;
+        private IntPtr sharedBufferB;
         private int sharedBufferWidth;
         private int sharedBufferHeight;
         private int sharedBufferByteCnt;
@@ -105,6 +104,21 @@ namespace RootTools_Vision
         {
             get => sharedBuffer; 
             private set => sharedBuffer = value; 
+        }
+        public IntPtr SharedBufferR
+        {
+            get => sharedBufferR;
+            private set => sharedBufferR = value;
+        }
+        public IntPtr SharedBufferG
+        {
+            get => sharedBufferG;
+            private set => sharedBufferG = value;
+        }
+        public IntPtr SharedBufferB
+        {
+            get => sharedBufferB;
+            private set => sharedBufferB = value;
         }
         public int SharedBufferWidth { get => sharedBufferWidth; private set => sharedBufferWidth = value; }
         public int SharedBufferHeight { get => sharedBufferHeight; private set => sharedBufferHeight = value; }
@@ -183,7 +197,12 @@ namespace RootTools_Vision
             this.sharedBufferHeight = height;
             this.sharedBufferByteCnt = byteCnt;
         }
-
+        public void SetSharedRGBBuffer(IntPtr _sharedBufferR, IntPtr _sharedBufferG, IntPtr _sharedBufferB)
+        {
+            this.sharedBufferR = _sharedBufferR;
+            this.sharedBufferG = _sharedBufferG;
+            this.sharedBufferB = _sharedBufferB;
+        }
         public void SetImagePosition(int posX, int posY)
         {
             this.positionX = posX;

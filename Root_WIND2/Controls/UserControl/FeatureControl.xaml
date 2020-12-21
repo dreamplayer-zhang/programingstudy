@@ -5,27 +5,29 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
              mc:Ignorable="d" 
-             Background="Transparent">
+             Background="Transparent" MouseDoubleClick="UserControl_MouseDoubleClick">
     <UserControl.Resources>
         <local:StringConverter x:Key="StringConverter"/>
     </UserControl.Resources>
-    <Grid Margin="5" Width="200" Height="220">
+    <Grid Width="180" Height="200" Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="9*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Grid Background="Black" Grid.Row="0" Margin="5">
+        <Grid Background="Black" Grid.Row="0">
             <Image x:Name="image"/>
         </Grid>
-        <Grid Grid.Row="1" Margin="5,0">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Offset" HorizontalAlignment="Left" Grid.Column="0"
-                       FontSize="13" FontFamily="Arial"/>
-            <TextBlock x:Name="offset" HorizontalAlignment="Left" Grid.Column="1"
-                       FontSize="13" FontFamily="Arial"/>
+            <TextBlock Text="Offset" HorizontalAlignment="Center" Grid.Column="0"
+                       VerticalAlignment="Center"
+                       FontSize="12" FontFamily="Arial"/>
+            <TextBlock x:Name="offset" HorizontalAlignment="Center" Grid.Column="1"
+                       VerticalAlignment="Center"
+                       FontSize="12" FontFamily="Arial"/>
         </Grid>
     </Grid>
 </UserControl>

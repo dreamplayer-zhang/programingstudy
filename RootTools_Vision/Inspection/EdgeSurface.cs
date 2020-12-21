@@ -28,12 +28,12 @@ namespace RootTools_Vision.Inspection
 			if (this.workplace.Index == 0)
 				return base.DoPrework();
 
-			if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.EDGE_TOP)
-				&& this.IsPreworkDone == false)
-			{
+			//if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.EDGE_TOP)
+			//	&& this.IsPreworkDone == false)
+			//{
 			
-			}
-			return false;
+			//}
+			return true;
 		}
 
 		public override void DoWork()

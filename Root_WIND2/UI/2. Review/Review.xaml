@@ -476,8 +476,8 @@
                                                             <ColumnDefinition Width="0.2*"/>
                                                         </Grid.ColumnDefinitions>
                                                         <Grid Grid.Column = "0">
-                                                            <Slider Maximum="155" TickPlacement="BottomRight" Value="{Binding Slider_GV, Mode=TwoWay}"
-                                                                TickFrequency="2" IsSnapToTickEnabled="True" Margin="0,10,0,0" >
+                                                            <Slider Maximum="28" TickPlacement="BottomRight" Value="{Binding Slider_GV, Mode=TwoWay}"
+                                                                TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,10,0,0" >
                                                             </Slider>
                                                         </Grid>
                                                         <Grid Grid.Column = "1">

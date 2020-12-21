@@ -258,6 +258,17 @@ namespace Root_EFEM
         }
         #endregion
 
+        #region Calc Process (Sequence)
+        /// <summary> Sequence 계산용 임시 Process </summary>
+        public Queue<ModuleRunBase> m_qCalcProcess = new Queue<ModuleRunBase>();
+        public void InitCalcProcess()
+        {
+            m_qCalcProcess.Clear(); 
+            ModuleRunBase[] aProcess = m_qProcess.ToArray();
+            foreach (ModuleRunBase run in aProcess) m_qCalcProcess.Enqueue(run); 
+        }
+        #endregion
+
         #region Tree
         public override void RunTree(Tree tree)
         {

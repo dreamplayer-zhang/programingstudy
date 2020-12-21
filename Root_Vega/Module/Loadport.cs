@@ -1,6 +1,5 @@
 ﻿using RootTools;
 using RootTools.Control;
-using RootTools.Control.Ajin;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
@@ -223,19 +222,27 @@ namespace Root_Vega.Module
             return m_infoPod.IsPutOK(ref posRobot);
         }
 		bool _eIonizerState = false;
-
-
+        
+      
         public bool m_bIonizerDoorlockCheck = false;
         public string BeforeGet()
 		{
-			if (m_vega.m_diDoorLock.p_bIn == true)//check
-			{
-				m_bIonizerDoorlockCheck = true;
+            if (m_vega.m_diDoorLock.p_bIn == true)//check
+            {
+                m_bIonizerDoorlockCheck = true;
                 m_vega.m_doIonizerOnOff.Write(true);//check
                 Thread.Sleep(2000);
                 m_vega.m_swIonizerOn.Start();
-				m_alidIonizer.Run(!m_diIonizer.p_bIn,"Ionizer is not on");//check
-			}
+                while (!m_diIonizer.p_bIn)
+                {
+                    if (m_vega.m_swIonizerOn.ElapsedMilliseconds < 3000) Thread.Sleep(10);
+                    else
+                    {
+                        m_alidIonizer.Run(!m_diIonizer.p_bIn, "Ionizer is not on");//check
+                        return "Ionizer is not on";
+                    }
+                }
+            }
 			if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Get Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
             m_alidReticleTransferFail.Run(!m_diReticle.p_bIn, " Reticle Sensor not Detected");
@@ -251,7 +258,16 @@ namespace Root_Vega.Module
                 m_vega.m_doIonizerOnOff.Write(true);
                 Thread.Sleep(2000);
                 m_vega.m_swIonizerOn.Start();
-                m_alidIonizer.Run(!m_diIonizer.p_bIn, "Ionizer is not on");//check
+                while (!m_diIonizer.p_bIn)
+                {
+                    if (m_vega.m_swIonizerOn.ElapsedMilliseconds < 3000) Thread.Sleep(10);
+                    else
+                    {
+                        m_alidIonizer.Run(!m_diIonizer.p_bIn, "Ionizer is not on");//check
+                        return "Ionizer is not on";
+                    }
+
+                }
             }
             if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Put Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
@@ -262,9 +278,10 @@ namespace Root_Vega.Module
 
         public string AfterGet()
         {
-            m_vega.m_doIonizerOnOff.Write(false);
-            Thread.Sleep(1000);
             m_vega.m_swIonizerOn.Stop();
+            Thread.Sleep(50);
+            m_vega.m_doIonizerOnOff.Write(false);
+            Thread.Sleep(500);
             m_bIonizerDoorlockCheck = false;
             m_alidIonizer.Run(m_diIonizer.p_bIn, "Ionizer is on");//check
             m_alidReticleTransferFail.Run(m_diReticle.p_bIn, "Reticle Get Fail");
@@ -273,9 +290,10 @@ namespace Root_Vega.Module
 
         public string AfterPut()
         {
-            m_vega.m_doIonizerOnOff.Write(false);
-            Thread.Sleep(1000);
             m_vega.m_swIonizerOn.Stop();
+            Thread.Sleep(50);
+            m_vega.m_doIonizerOnOff.Write(false);
+            Thread.Sleep(500);
             m_bIonizerDoorlockCheck = false;
             m_alidIonizer.Run(m_diIonizer.p_bIn, "Ionizer is on");//check
             m_alidReticleTransferFail.Run(!m_diReticle.p_bIn, "Reticle Put Fail, Reticle Sensor not Detected");
@@ -562,7 +580,6 @@ namespace Root_Vega.Module
             m_axisZ.p_eState = Axis.eState.Ready;
             m_axisTheta.p_eState = Axis.eState.Ready;
             m_vega.m_doIonizerOnOff.Write(false);//check
-
         }
 
         public override void ThreadStop()

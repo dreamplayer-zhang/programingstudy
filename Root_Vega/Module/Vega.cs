@@ -94,6 +94,9 @@ namespace Root_Vega.Module
         ALID m_alidDoorLock;
         ALID m_alidIonizerAlarm;
 
+        ALID m_alidRecipeLoadAlarm;
+        ALID m_alidFeatureSearchFailAlarm;
+        ALID m_alidAlignFailAlarm;
 
         void InitALID()
         {
@@ -108,6 +111,10 @@ namespace Root_Vega.Module
             m_alidElecPnl_2_FanAlarm = m_gaf.GetALID(this, "Elecanel 2 Fan Alarm", "Elect Panel 2 Fan Alarm");
             m_alidPCPnl_FanAlarm = m_gaf.GetALID(this, "PCPanel Fan Alarm", "PC Panel Fan Alarm");
             m_alidPC_FanAlarm = m_gaf.GetALID(this, "PC Fan Alarm", "PC Fan Alarm");
+
+            m_alidRecipeLoadAlarm = m_gaf.GetALID(this, "Recipe Not Loaded Alarm", "Recipe Not Loaded Alarm");
+            m_alidFeatureSearchFailAlarm = m_gaf.GetALID(this, "Feature Search Fail Alarm", "Feature Search Fail Alarm");
+            m_alidAlignFailAlarm = m_gaf.GetALID(this, "Align Fail Alarm", "Align Fail Alarm");
         }
         #endregion
 
@@ -154,11 +161,11 @@ namespace Root_Vega.Module
             #endregion
 
             #region Interlock
-            if (m_swIonizerOn.ElapsedMilliseconds > 10000)
+            if (m_swIonizerOn.ElapsedMilliseconds > 30000)
             {
                 m_doIonizerOnOff.Write(false);
             }
-            else if (m_swIonizerOn.IsRunning)
+            else if (m_swIonizerOn.IsRunning && m_swIonizerOn.ElapsedMilliseconds > 2000)
             {
                 m_alidIonizerAlarm.Run(!m_diIonizerAlarmCheck.ReadDI(eIonizer.LP1) || !m_diIonizerAlarmCheck.ReadDI(eIonizer.LP2), "Please Check State of X-ray Ionizer");
             }
@@ -180,6 +187,10 @@ namespace Root_Vega.Module
             m_alidElecPnl_2_FanAlarm.Run(!m_diElecPnl_2_FanAlarm.p_bIn, "Please Check Electronic Panel 1 Fan");
             m_alidPCPnl_FanAlarm.Run(!m_diPCPnl_FanAlarm.p_bIn, "Please Check PC Panel Fan");
             m_alidPC_FanAlarm.Run(!m_diPC_FanAlarm.p_bIn, "Please Check PC Fan");
+
+            m_alidRecipeLoadAlarm.Run(!App.m_engineer.m_recipe.Loaded, "Please Load Recipe");
+            m_alidFeatureSearchFailAlarm.Run(App.m_engineer.m_InspManager.m_bFeatureSearchFail, "Feature Search Failed...");
+            m_alidAlignFailAlarm.Run(App.m_engineer.m_InspManager.m_bAlignFail, "Align Failed...");
             #endregion
 
 
