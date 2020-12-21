@@ -216,12 +216,13 @@ namespace Root_CAMELLIA
             //App.m_nanoView.InitializeSR();
 
             //NanoView = new Met.Nanoview();
-            
+            //NanoView.InitializeSR(@".\Reference", 2);
 
             App.m_engineer.Init("Camellia");
             ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia.mwvm = this;
 
             p_Module_Camellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
+
 
         }
 

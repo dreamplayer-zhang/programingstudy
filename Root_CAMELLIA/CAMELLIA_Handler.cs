@@ -44,6 +44,8 @@ namespace Root_CAMELLIA
             {
             }
         }
+
+        public ModuleList p_moduleList { get; set; }
         #endregion
 
         #region Module
