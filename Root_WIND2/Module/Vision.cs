@@ -1,9 +1,6 @@
-﻿
-
-using Root_EFEM;
+﻿using Root_EFEM;
 using Root_EFEM.Module;
 using RootTools;
-using RootTools.Camera;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
 using RootTools.Light;
@@ -11,7 +8,6 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.RADS;
 using RootTools.Trees;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -334,6 +330,7 @@ namespace Root_WIND2.Module
             //            InitLineScan();
             //            InitAreaScan();
             base.InitBase(id, engineer);
+            m_waferSize = new InfoWafer.WaferSize(id, false, false);
             //            InitMemory();
         }
 
