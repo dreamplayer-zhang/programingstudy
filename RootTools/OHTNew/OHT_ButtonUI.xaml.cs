@@ -46,7 +46,7 @@ namespace RootTools.OHTNew
         {
             bool bOn = p_bOn;
             button.Foreground = bOn ? Brushes.Red : Brushes.Black;
-            if (p_bWait) bOn = bBlink ? bOn : !bOn;
+            if (p_bWait != bOn) bOn = bBlink ? bOn : !bOn;
             button.Background = bOn ? Brushes.Yellow : Brushes.DimGray;
         }
 

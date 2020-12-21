@@ -199,6 +199,7 @@ namespace RootTools.OHTNew
             Error
         }
         eState _eState = eState.All_Off;
+        public string[] m_asState = Enum.GetNames(typeof(eState)); 
         public eState p_eState
         {
             get { return _eState; }
@@ -440,6 +441,7 @@ namespace RootTools.OHTNew
                     case eState.All_Off:
                         CheckPresent(false);
                         bool bCS = IsCS(true);
+                        CheckDI(m_diValid, true);
                         if (bCS && m_diValid.p_bOn)
                         {
                             p_doLU_Req.p_bOn = true;
@@ -599,6 +601,10 @@ namespace RootTools.OHTNew
             for (int n = 0; n < m_diCS.Count; n++) m_diCS[n].p_bWait = bOn;
             bool bCSOn = false;
             for (int n = 0; n < m_diCS.Count; n++) bCSOn |= m_diCS[n].p_bOn;
+            if (bCSOn == bOn)
+            {
+                for (int n = 0; n < m_diCS.Count; n++) m_diCS[n].p_bWait = m_diCS[n].p_bOn;
+            }
             return bCSOn;
         }
 

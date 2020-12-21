@@ -135,6 +135,7 @@ namespace RootTools.Gem
                 if ((m_gem == null) || m_gem.p_bOffline) return;
                 m_log.Info("p_eTransfer " + _eReqTransfer.ToString() + " -> " + value.ToString());
                 _eReqTransfer = value;
+                if (EQ.p_bSimulate) p_eTransfer = value; 
                 switch (_eReqTransfer)
                 {
                     case eTransfer.ReadyToLoad:
