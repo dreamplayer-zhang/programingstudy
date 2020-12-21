@@ -646,6 +646,8 @@ namespace Root_Vega
 			ClearDrawList();
 
 			((Vega_Handler)m_Engineer.ClassHandler()).m_patternVision.p_nTotalBlockCount = 0;
+			App.m_engineer.m_InspManager.m_bFeatureSearchFail = false;
+			App.m_engineer.m_InspManager.m_bAlignFail = false;
 
 			//2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
 			for (int k = 0; k < p_PatternRoiList.Count; k++)
@@ -683,6 +685,7 @@ namespace Root_Vega
 						}
 						else
 						{
+							App.m_engineer.m_InspManager.m_bFeatureSearchFail = true;
 							continue;//못 찾았으면 다음 Feature값으로 이동
 						}
 					}
@@ -768,6 +771,7 @@ namespace Root_Vega
 			else
 			{
 				// align 실패
+				m_Engineer.m_InspManager.m_bAlignFail = true;
 			}
 			#endregion
 			m_Engineer.m_InspManager.InspectionDone(App.indexFilePath);
@@ -1032,7 +1036,7 @@ namespace Root_Vega
 				}
                 else
                 {
-					MessageBox.Show("Align Fail...");
+					m_Engineer.m_InspManager.m_bAlignFail = true;
 					return null;
                 }
 			}
