@@ -11,7 +11,6 @@ namespace Root_WIND2.Module
 {
     public class Run_Rotate : ModuleRunBase
     {
-        // TO-DO : 공통으로 변경 필요
         Vision m_module;
         public Run_Rotate(Vision module)
         {
