@@ -15,6 +15,11 @@ namespace Root_CAMELLIA
 {
     public class CAMELLIA_Handler : IHandler
     {
+        public ModuleList p_moduleList
+        {
+            get; set;
+        }
+
         #region List InfoWafer
         //public string AddInfoWafer(InfoWafer infoWafer)
         //{
