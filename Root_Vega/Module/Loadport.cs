@@ -1,6 +1,5 @@
 ﻿using RootTools;
 using RootTools.Control;
-using RootTools.Control.Ajin;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;

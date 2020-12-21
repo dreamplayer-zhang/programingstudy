@@ -231,7 +231,7 @@ namespace RootTools.Inspects
 									Console.WriteLine("Queue Item Count : " + p_qInspection.Count);
 									sw.Stop();
 									Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
-									MessageBox.Show("Inspection Complete");
+									//MessageBox.Show("Inspection Complete");
 								}
 								InspectionThread[i].StartInspection(ipQueue, i);
 
