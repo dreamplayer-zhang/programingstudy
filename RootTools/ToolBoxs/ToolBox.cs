@@ -449,6 +449,19 @@ namespace RootTools.ToolBoxs
             value.RunTreeToolBox(module.m_treeRootTool.GetTree(id));
             return "OK";
         }
+
+        public string Get(ref OHTNew.OHT value, ModuleBase module, GemCarrierBase carrier, string id, DIO_I diPlaced, DIO_I diPresent)
+        {
+            if (m_toolSetOHT == null) m_toolSetOHT = InitToolSet("OHT");
+            if (value == null)
+            {
+                value = new OHTNew.OHT(module.p_id + "." + id, module, carrier, m_toolDIO, diPlaced, diPresent);
+                m_toolSetOHT.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            value.RunTreeToolBox(module.m_treeRootTool.GetTree(id));
+            return "OK";
+        }
         #endregion
 
         #region ITool Laser
