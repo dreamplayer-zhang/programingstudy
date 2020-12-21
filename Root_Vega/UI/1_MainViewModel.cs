@@ -7,6 +7,7 @@ using RootTools.Module;
 using Root_Vega.Module;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Threading;
+using RootTools.Inspects;
 
 namespace Root_Vega
 {
@@ -26,7 +27,7 @@ namespace Root_Vega
             }
         }
         DispatcherTimer m_dispatcherTimer;
-        PatternVision m_PatternVision;        
+        PatternVision m_PatternVision;
         public PatternVision p_PatternVision
         {
             get { return m_PatternVision; }
@@ -41,7 +42,7 @@ namespace Root_Vega
             get { return m_SideVision; }
             set
             {
-                SetProperty(ref m_SideVision, value); 
+                SetProperty(ref m_SideVision, value);
             }
         }
         Vega_Handler m_Handler;
@@ -190,6 +191,104 @@ namespace Root_Vega
 
             p_PatternVision = ((Vega_Handler)m_Engineer.ClassHandler()).m_patternVision;
             p_SideVision = ((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision;
+
+            App.m_engineer.m_InspManager.AddChromeDefect += App_AddDefect;
+            App.m_engineer.m_InspManager.AddLeftSideDefect += App_AddDefectLeftSide;
+            App.m_engineer.m_InspManager.AddRightSideDefect += App_AddDefectRightSide;
+            App.m_engineer.m_InspManager.AddTopSideDefect += App_AddDefectTopSide;
+            App.m_engineer.m_InspManager.AddBotSideDefect += App_AddDefectBottomSide;
+
+            App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
+            InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
+        }
+
+        ~_1_Mainview_ViewModel()
+        {
+            App.m_engineer.m_InspManager.AddChromeDefect -= App_AddDefect;
+            App.m_engineer.m_InspManager.AddLeftSideDefect -= App_AddDefectLeftSide;
+            App.m_engineer.m_InspManager.AddRightSideDefect -= App_AddDefectRightSide;
+            App.m_engineer.m_InspManager.AddTopSideDefect -= App_AddDefectTopSide;
+            App.m_engineer.m_InspManager.AddBotSideDefect -= App_AddDefectBottomSide;
+        }
+
+        private void App_AddDefect(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void App_AddDefectLeftSide(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer_Left.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void App_AddDefectRightSide(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer_Right.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void App_AddDefectTopSide(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer_Top.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void App_AddDefectBottomSide(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer_Btm.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void InspectionManager_RefreshDefect()
+        {
+        }
+
+        private void _ClearDefect()
+        {
+            try
+            {
+                p_MiniImageViewer.lstDefect.Clear();
+                p_MiniImageViewer_Left.lstDefect.Clear();
+                p_MiniImageViewer_Right.lstDefect.Clear();
+                p_MiniImageViewer_Top.lstDefect.Clear();
+                p_MiniImageViewer_Btm.lstDefect.Clear();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -204,7 +303,7 @@ namespace Root_Vega
 
             for (int i = 0; i < p_Engineer.m_handler.m_aLoadport.Length; i++)
             {
-                if(p_Engineer.m_handler.m_aLoadport[i].m_swLotTime.IsRunning) p_sLotElapsedTime = p_Engineer.m_handler.m_aLoadport[i].m_swLotTime.ElapsedMilliseconds.ToString(); 
+                if (p_Engineer.m_handler.m_aLoadport[i].m_swLotTime.IsRunning) p_sLotElapsedTime = p_Engineer.m_handler.m_aLoadport[i].m_swLotTime.ElapsedMilliseconds.ToString();
             }
         }
 
@@ -269,8 +368,6 @@ namespace Root_Vega
 
         public void UpdateMiniViewer()
         {
-            p_MiniImageViewer_Left.SetRoiRect();
-            p_MiniImageViewer.SetRoiRect();
             p_MiniImageViewer.SetImageSource();
             p_MiniImageViewer_Btm.SetImageSource();
             p_MiniImageViewer_Top.SetImageSource();
