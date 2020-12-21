@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class SurfaceParameter : ParameterBase, IMaskInspection
+    public class SurfaceParameter : ParameterBase
     {
         public SurfaceParameter() : base(typeof(Surface))
         {
@@ -50,16 +50,6 @@ namespace RootTools_Vision
             {
                 SetProperty<bool>(ref this.isBright, value);
             }
-        }
-
-        // ROI
-        private int maskIndex;
-        [Category("ROI")]
-        [DisplayName("ROI Index")]
-        public int MaskIndex
-        {
-            get => maskIndex;
-            set => maskIndex = value;
         }
         #endregion
 

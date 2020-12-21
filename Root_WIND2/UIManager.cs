@@ -54,7 +54,7 @@ namespace Root_WIND2
         {
             InitModeSelect();
             InitSetupMode(program);
-            InitReviewMode(program);
+            InitReviewMode();
             InitRunMode();
 
             return true;
@@ -71,7 +71,7 @@ namespace Root_WIND2
             setupViewModel = new Setup_ViewModel(program.Recipe, program.InspectionVision, program.InspectionEFEM);
             setupWindow.DataContext = SetupViewModel;
         }
-        void InitReviewMode(ProgramManager program)
+        void InitReviewMode()
         {
             reviewWindow = new Review();
             reviewViewModel = new Review_ViewModel(reviewWindow);
@@ -81,7 +81,7 @@ namespace Root_WIND2
         {
             runWindow = new Run();
             runViewModel = new Run_ViewModel();
-            runWindow.DataContext = runViewModel;
+            reviewWindow.DataContext = runViewModel;
         }
 
         public void ChangeMainUI(UIElement window)
@@ -92,7 +92,7 @@ namespace Root_WIND2
             MainPanel.Children.Add((UIElement)window);
         }
 
-        public void ChangeUIMode()
+        public void ChangUIMode()
         {
             ChangeMainUI((UIElement)modeWindow);
         }

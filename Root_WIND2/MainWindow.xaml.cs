@@ -151,7 +151,7 @@ namespace Root_WIND2
             // WPF 파라매터 연결
             UIManager.Instance.MainPanel = this.MainPanel;
 
-            UIManager.Instance.ChangeUIMode();
+            UIManager.Instance.ChangUIMode();
 
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1);

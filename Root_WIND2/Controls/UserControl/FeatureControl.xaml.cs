@@ -48,10 +48,5 @@ namespace Root_WIND2
             fc.p_ImageSource = this.m_ImageSource;
             return fc;
         }
-
-        private void UserControl_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            var asdf = this.DataContext;
-        }
     }
 }

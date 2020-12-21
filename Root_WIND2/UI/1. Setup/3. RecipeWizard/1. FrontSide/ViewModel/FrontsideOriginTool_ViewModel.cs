@@ -7,7 +7,6 @@ using System.Windows.Shapes;
 using RootTools_Vision;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Windows;
 
 namespace Root_WIND2
 {
@@ -35,7 +34,6 @@ namespace Root_WIND2
             base.init();
             m_Recipe = _recipe;
             m_OriginRecipe = _recipe.GetRecipe<OriginRecipe>();
-            p_VisibleMenu = System.Windows.Visibility.Collapsed;
         }
 
 
@@ -498,16 +496,13 @@ namespace Root_WIND2
 
             ImageData BoxImageData = new ImageData(originRecipe.MasterImage.Width, originRecipe.MasterImage.Height, originRecipe.MasterImage.ByteCnt);
 
-
             BoxImageData.m_eMode = ImageData.eMode.ImageBuffer;
             BoxImageData.SetData(Marshal.UnsafeAddrOfPinnedArrayElement(originRecipe.MasterImage.RawData, 0)
                 , new CRect(0, 0, originRecipe.MasterImage.Width, originRecipe.MasterImage.Height)
-                , originRecipe.MasterImage.Width, originRecipe.MasterImage.ByteCnt);
-
+                , 1, originRecipe.MasterImage.ByteCnt);
 
             this.Offset = new CPoint(originRecipe.MasterImage.PositionX, originRecipe.MasterImage.PositionY);
             this.p_ImageData = BoxImageData;
-
             this.SetRoiRect();
         }
 

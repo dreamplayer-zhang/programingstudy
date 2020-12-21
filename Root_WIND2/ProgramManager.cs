@@ -34,7 +34,7 @@ namespace Root_WIND2
         #region [Setting Parameters]
 
         private bool IsInitilized = false;
-        //Memory 
+        //Memory
         //private string memoryPool = "pool";
         //private string memoryGroup = "group";
         //private string memoryNameImage = "mem";
@@ -44,6 +44,7 @@ namespace Root_WIND2
         private string memoryGroup = "Vision";
         private string memoryNameImage = "Main";
         private string memoryNameROI = "ROI";
+
 
         //Recipe
         private string recipeFolderPath = @"C:\Root\Recipe";
@@ -220,7 +221,6 @@ namespace Root_WIND2
 
             WIND2EventManager.OnBeforeRecipeSave(recipe, new RecipeEventArgs());
 
-            if (recipePath.IndexOf(".rcp") == -1) recipePath += ".rcp";
             recipe.Save(recipePath);
 
             WIND2EventManager.OnAfterRecipeSave(recipe, new RecipeEventArgs());

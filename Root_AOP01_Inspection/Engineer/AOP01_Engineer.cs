@@ -35,7 +35,7 @@ namespace Root_AOP01_Inspection
 
         public MemoryTool ClassMemoryTool() { return m_toolBox.m_memoryTool; }
 
-        public ModuleList ClassModuleList() { return m_handler.p_moduleList; }
+        public ModuleList ClassModuleList() { return m_handler.m_moduleList; }
 
         ToolBox m_toolBox = new ToolBox();
         public ToolBox ClassToolBox() { return m_toolBox; }
@@ -123,18 +123,6 @@ namespace Root_AOP01_Inspection
         }
         #endregion
 
-        #region IEngineer Function
-        public string BuzzerOff()
-        {
-            return "OK";
-        }
-
-        public string Recovery()
-        {
-            return "OK";
-        }
-        #endregion
-
         public AOP01_Handler m_handler = new AOP01_Handler();
         public void Init(string id)
         {
@@ -144,7 +132,7 @@ namespace Root_AOP01_Inspection
             m_login.Init();
             m_toolBox.Init(id, this);
             InitControl();
-            InitXGem();
+            //InitXGem();
             m_handler.Init(id, this);
             m_gaf.Init(id, this);
         }
@@ -156,6 +144,16 @@ namespace Root_AOP01_Inspection
             m_toolBox.ThreadStop();
             m_login.ThreadStop();
             LogView.ThreadStop();
+        }
+
+        public string BuzzerOff()
+        {
+            return "OK";
+        }
+
+        public string Recovery()
+        {
+            return "OK";
         }
     }
 }

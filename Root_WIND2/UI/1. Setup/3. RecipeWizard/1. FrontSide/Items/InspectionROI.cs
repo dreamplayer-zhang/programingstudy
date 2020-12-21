@@ -7,9 +7,9 @@ using System.Windows.Media;
 
 namespace Root_WIND2
 {
-    public class InspectionMask : ObservableObject
+    public class InspectionROI : ObservableObject
     {
-        public InspectionMask()
+        public InspectionROI()
         {
         }
 

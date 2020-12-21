@@ -15,15 +15,12 @@ namespace RootTools_Vision
         public readonly CPoint ptNewStart;
         public readonly CPoint ptNewEnd;
 
-        public readonly bool bSuccess;
-
-        public PositionDoneEventArgs(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, bool bSuccess)
+        public PositionDoneEventArgs(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd)
         {
             this.ptOldStart = ptOldStart;
             this.ptOldEnd = ptOldEnd;
             this.ptNewStart = ptNewStart;
             this.ptNewEnd = ptNewEnd;
-            this.bSuccess = bSuccess;
         }
     }
 
@@ -55,17 +52,5 @@ namespace RootTools_Vision
 
         }
     }
-
-
-    public class WorkplaceStateChangedEventArgs : EventArgs
-    {
-        public readonly Workplace workplace;
-
-        public WorkplaceStateChangedEventArgs(Workplace _workplace)
-        {
-            this.workplace = _workplace;
-        }
-    }
-
 
 }

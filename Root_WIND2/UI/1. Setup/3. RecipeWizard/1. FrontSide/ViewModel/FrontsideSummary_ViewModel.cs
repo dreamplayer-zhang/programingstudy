@@ -9,7 +9,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -189,8 +188,6 @@ namespace Root_WIND2
             {
                 displayOption = value ? DisplayOption.None : displayOption;
 
-                if (masterImageData == null) return;
-
                 if (displayOption == DisplayOption.None)
                 {
                     OriginRecipe originRecipe = this.recipe.GetRecipe<OriginRecipe>();
@@ -288,16 +285,16 @@ namespace Root_WIND2
         private void DrawMapData()
         {
             RecipeType_WaferMap mapdata = recipe.WaferMap;
-            if (mapdata.Data.Length > 0)
+            if (mapdata.Data != null)
             {
                 int nMapX = mapdata.MapSizeX;
                 int nMapY = mapdata.MapSizeY;
 
-                MapControl_VM.SetMap(false, new CPoint(mapdata.MasterDieX, mapdata.MasterDieY), mapdata.Data, new CPoint(nMapX, nMapY));
+                MapControl_VM.SetMap(false, mapdata.Data, new CPoint(nMapX, nMapY));
             }
             else
             {
-                MapControl_VM.SetMap(false, new CPoint(0, 5), setup.InspectionVision.mapdata, new CPoint(14, 14));
+                MapControl_VM.SetMap(false, setup.InspectionVision.mapdata, new CPoint(14, 14));
             }
         }
         private void SetMapData()
@@ -324,8 +321,7 @@ namespace Root_WIND2
         {
             SetMapData();
             DrawMapData();
-
-            //LoadMasterImage();
+            LoadMasterImage();
         }
         public void LoadMasterImage()
         {
@@ -341,7 +337,7 @@ namespace Root_WIND2
                     masterImageData.m_eMode = ImageData.eMode.ImageBuffer;
                     masterImageData.SetData(Marshal.UnsafeAddrOfPinnedArrayElement(originRecipe.MasterImage.RawData, 0)
                         , new CRect(0, 0, originRecipe.MasterImage.Width, originRecipe.MasterImage.Height)
-                        , originRecipe.MasterImage.Width, originRecipe.MasterImage.ByteCnt);
+                        , 1, originRecipe.MasterImage.ByteCnt);
 
                     Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
                     {
@@ -354,7 +350,7 @@ namespace Root_WIND2
         {
             SetMapData();
             DrawMapData();
-            //LoadMasterImage();
+            LoadMasterImage();
         }
     }
 }

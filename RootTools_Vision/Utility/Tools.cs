@@ -1,5 +1,4 @@
-﻿using RootTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -122,103 +121,34 @@ namespace RootTools_Vision
             return rst;
         }
 
-        public static bool LoadBitmapToRawdata(string filepath, byte[] rawdata, int _width, int _height, int _byteCount)
-        {
-            //StopWatch stop = new StopWatch();
-            //stop.Start();
-            bool rst = true;
-            try
-            {
-                Bitmap bmp = new Bitmap(filepath);
-
-                // Raw Copy
-                //rawdata = new byte[width * _height * _byteCount];
-                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, _width, _height), ImageLockMode.WriteOnly, bmp.PixelFormat);
-
-
-                if (_byteCount == 1)
-                {
-                    IntPtr pointer = bmpData.Scan0;
-                    //for (int i = 0; i < _height; i++)
-                    //    Marshal.Copy(pointer + bmpData.Stride * i, rawdata, i * _width, _width * _byteCount);
-
-                    Parallel.For(0, _height - 1, (i) =>
-                    {
-                        Marshal.Copy(pointer + bmpData.Stride * i, rawdata, i * _width, _width * _byteCount);
-                    });
-                }
-                else
-                {
-                    unsafe
-                    {
-                        IntPtr pointer = bmpData.Scan0;
-                        byte* pPointer = (byte*)pointer.ToPointer();
-
-                        Parallel.For(0, _height - 1, (j) =>
-                        {
-                            for (int i = 0; i < _width; i++)
-                            {
-                                rawdata[i * _width * _byteCount + j * _byteCount + 2] = pPointer[i * bmpData.Stride + j * _byteCount + 0];
-                                rawdata[i * _width * _byteCount + j * _byteCount + 1] = pPointer[i * bmpData.Stride + j * _byteCount + 1];
-                                rawdata[i * _width * _byteCount + j * _byteCount + 0] = pPointer[i * bmpData.Stride + j * _byteCount + 2];
-                            }
-                        });
-                    }
-                }
-
-            }
-            catch( Exception ex)
-            {
-                rst = false;
-            }
-            //stop.Stop();
-            //MessageBox.Show(stop.ElapsedMilliseconds.ToString());
-
-            return rst;
-        }
-
-
-        public static bool LoadBitmapToRawdata(string filepath, byte[] rawdata, ref int _width, ref int _height, ref int _byteCount)
+        public static bool LoadBitmapToRawdata(string filepath, ref byte[] rawdata, ref int _width, ref int _height, ref int _byteCount)
         {
             bool rst = true;
             try
             {
                 Bitmap bmp = new Bitmap(filepath);
 
-                
-                int width = bmp.Width;
-                int height = bmp.Height;
-                
-                _width = width;
-                _height = height;
-
-                int byteCount = 1;
+                _width = bmp.Width;
+                _height = bmp.Height;
                 if (bmp.PixelFormat == PixelFormat.Format8bppIndexed)
                 {
-                    byteCount = 1;
+                    _byteCount = 1;
                 }
                 else
                 {
-                    byteCount = 3;
+                    _byteCount = 3;
                 }
 
-                _byteCount = byteCount;
-
                 // Raw Copy
-                //rawdata = new byte[width * _height * _byteCount];
+                rawdata = new byte[_width * _height * _byteCount];
                 BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, _width, _height), ImageLockMode.WriteOnly, bmp.PixelFormat);
 
 
                 if(_byteCount == 1)
                 {
                     IntPtr pointer = bmpData.Scan0;
-                    //for (int i = 0; i < _height; i++)
-                    //    Marshal.Copy(pointer + bmpData.Stride * i, rawdata, i * _width, _width * _byteCount);
-
-                    Parallel.For(0, _height - 1, (i) =>
-                    {
-                        Marshal.Copy(pointer + bmpData.Stride * i, rawdata, i * width, width * byteCount);
-                    });
+                    for (int i = 0; i < _height; i++)
+                        Marshal.Copy(pointer + bmpData.Stride * i, rawdata, i * _width, _width * _byteCount);
                 }
                 else
                 {
@@ -229,19 +159,12 @@ namespace RootTools_Vision
 
                         for (int i = 0; i < _height; i++)
                         {
-                            //for (int j = 0; j < _width; j++)
-                            //{
-                                Parallel.For(0, _width - 1, (j) =>
-                                {
-                                    rawdata[i * width * byteCount + j * byteCount + 2] = pPointer[i * bmpData.Stride + j * byteCount + 0];
-                                    rawdata[i * width * byteCount + j * byteCount + 1] = pPointer[i * bmpData.Stride + j * byteCount + 1];
-                                    rawdata[i * width * byteCount + j * byteCount + 0] = pPointer[i * bmpData.Stride + j * byteCount + 2];
-                                });
-
-                                //rawdata[i * _width * _byteCount + j * _byteCount + 2] = pPointer[i * bmpData.Stride + j * _byteCount + 0];
-                                //rawdata[i * _width * _byteCount + j * _byteCount + 1] = pPointer[i * bmpData.Stride + j * _byteCount + 1];
-                                //rawdata[i * _width * _byteCount + j * _byteCount + 0] = pPointer[i * bmpData.Stride + j * _byteCount + 2];
-                            //}
+                            for (int j = 0; j < _width; j++)
+                            {
+                                rawdata[i * _width * _byteCount + j * _byteCount + 2] = pPointer[i * bmpData.Stride + j * _byteCount + 0];
+                                rawdata[i * _width * _byteCount + j * _byteCount + 1] = pPointer[i * bmpData.Stride + j * _byteCount + 1];
+                                rawdata[i * _width * _byteCount + j * _byteCount + 0] = pPointer[i * bmpData.Stride + j * _byteCount + 2];
+                            }
                         }
                     }
                 }

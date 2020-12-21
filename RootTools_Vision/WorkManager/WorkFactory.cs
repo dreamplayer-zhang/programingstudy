@@ -19,7 +19,7 @@ namespace RootTools_Vision
         protected abstract void InitWorkManager();
 
         public abstract bool CreateInspection(Recipe _recipe);
-        public abstract bool CreateInspecion_Backside(Recipe _recipe);
+
         public void  Init()
         {
             workManagers = new List<WorkManager>();
@@ -40,7 +40,7 @@ namespace RootTools_Vision
             return true;
         }
 
-        protected void Start()
+        public void Start()
         {
             foreach (WorkManager manager in this.workManagers)
             {
@@ -53,6 +53,14 @@ namespace RootTools_Vision
             foreach (WorkManager manager in this.workManagers)
             {
                 manager.Stop();
+            }
+        }
+
+        public void Pause()
+        {
+            foreach (WorkManager manager in this.workManagers)
+            {
+                manager.Pause();
             }
         }
     }

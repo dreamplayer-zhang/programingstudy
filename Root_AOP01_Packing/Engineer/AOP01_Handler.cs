@@ -27,7 +27,7 @@ namespace Root_AOP01_Packing
         #endregion 
 
         #region Module
-        public ModuleList p_moduleList { get; set; }
+        public ModuleList m_moduleList;
         public AOP01_Recipe m_recipe;
         public AOP01_Process m_process;
         public TapePacker m_tapePacker;
@@ -36,7 +36,7 @@ namespace Root_AOP01_Packing
 
         void InitModule()
         {
-            p_moduleList = new ModuleList(m_engineer);
+            m_moduleList = new ModuleList(m_engineer);
             m_tapePacker = new TapePacker("TapePacker", m_engineer);
             InitModule(m_tapePacker);
             m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
@@ -51,7 +51,7 @@ namespace Root_AOP01_Packing
         {
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
-            p_moduleList.AddModule(module, ui);
+            m_moduleList.AddModule(module, ui);
         }
 
         public bool IsEnableRecovery()
@@ -66,7 +66,7 @@ namespace Root_AOP01_Packing
         #region StateHome
         public string StateHome()
         {
-            string sInfo = StateHome(p_moduleList.m_aModule);
+            string sInfo = StateHome(m_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
@@ -114,7 +114,7 @@ namespace Root_AOP01_Packing
         #region Reset
         public string Reset()
         {
-            Reset(m_gaf, p_moduleList);
+            Reset(m_gaf, m_moduleList);
             return "OK";
         }
 
@@ -214,8 +214,8 @@ namespace Root_AOP01_Packing
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
-            p_moduleList.ThreadStop();
-            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
+            m_moduleList.ThreadStop();
+            foreach (ModuleBase module in m_moduleList.m_aModule.Keys) module.ThreadStop();
         }
     }
 }

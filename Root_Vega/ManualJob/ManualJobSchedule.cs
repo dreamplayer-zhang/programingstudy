@@ -3,8 +3,6 @@ using RootTools;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows;
-using RootTools.GAFs;
-
 
 namespace Root_Vega.ManualJob
 {
@@ -58,7 +56,7 @@ namespace Root_Vega.ManualJob
                 OnPropertyChanged();
             }
         }
-        
+
         public string m_sRecipe = "";
         public string SetInfoPod()
         {
@@ -67,11 +65,7 @@ namespace Root_Vega.ManualJob
             m_loadport.m_infoPod.p_sCarrierID = p_sCarrierID;
             m_loadport.m_infoPod.m_aGemSlot[0].p_sSlotID = p_sSlotID;
 
-            if (m_loadport.m_infoPod.p_infoReticle == null)
-            {
-                m_loadport.m_alidInforeticle.Run(true, "Reticle Info is null");
-                return "p_infoReticle == null";
-            }
+            if (m_loadport.m_infoPod.p_infoReticle == null) return "p_infoReticle == null";
             m_loadport.m_infoPod.p_infoReticle.m_sManualRecipe = m_sRecipe;
             m_loadport.m_infoPod.p_infoReticle.RecipeOpen(m_sRecipe);
             // Vision Recipe Open 코드 추가

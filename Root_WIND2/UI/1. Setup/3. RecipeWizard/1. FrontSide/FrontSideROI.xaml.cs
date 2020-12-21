@@ -16,24 +16,13 @@ using System.Windows.Shapes;
 namespace Root_WIND2
 {
     /// <summary>
-    /// AlignmentDiePosition.xaml에 대한 상호 작용 논리
+    /// GeneralMaskPage.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class FrontSidePosition : UserControl
+    public partial class FrontSideROI : UserControl
     {
-        public FrontSidePosition()
+        public FrontSideROI()
         {
             InitializeComponent();
-        }
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            var asdf = (sender as MenuItem).DataContext;
-        }
-
-        private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
-        {
-            var asdf = (sender as MenuItem).DataContext;
-
         }
     }
 }

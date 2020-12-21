@@ -63,9 +63,7 @@ namespace Root_WIND2
             ShotFeature,
             ChipFeature,
             FeatureMatching,
-            FeatureMatchingFail,
             Defect,
-
         }
 
         #region Property
@@ -166,9 +164,6 @@ namespace Root_WIND2
                     break;
                 case ColorType.FeatureMatching:
                     rectInfo = new TRect(Brushes.Gold, 4, 1);
-                    break;
-                case ColorType.FeatureMatchingFail:
-                    rectInfo = new TRect(Brushes.Red, 4, 1);
                     break;
                 case ColorType.Defect:
                     rectInfo = new TRect(Brushes.Red, 4, 1);

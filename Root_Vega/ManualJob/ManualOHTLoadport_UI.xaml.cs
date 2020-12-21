@@ -76,13 +76,13 @@ namespace Root_Vega.ManualJob
             imageOutPod.Visibility = bPodIn ? Visibility.Hidden : Visibility.Visible;
             if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
             {
-                m_loadport.m_bLoadCheck = true;
-                m_loadport.m_bUnLoadCheck = false;
+                m_loadport.m_dioLoad.Write(true);
+                m_loadport.m_dioUnload.Write(false);
             }
             else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
             {
-                m_loadport.m_bLoadCheck = false;
-                m_loadport.m_bUnLoadCheck = true;
+                m_loadport.m_dioLoad.Write(false);
+                m_loadport.m_dioUnload.Write(true);
             }
 
         }

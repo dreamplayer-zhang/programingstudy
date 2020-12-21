@@ -1,5 +1,4 @@
-﻿using Root_CAMELLIA.Data;
-using Root_CAMELLIA.Module;
+﻿using Root_CAMELLIA.Module;
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
@@ -222,10 +221,10 @@ namespace Root_CAMELLIA
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
             //m_AxisXY = ModuleCamellia.m_axisXY;
             //m_AxisZ = ModuleCamellia.m_axisZ;
-            AxisX = ModuleCamellia.p_axisXY.p_axisX;
-            AxisY = ModuleCamellia.p_axisXY.p_axisY;
-            AxisZ = ModuleCamellia.p_axisZ;
-            AxisLifter = ModuleCamellia.p_axisLifter;
+            AxisX = ModuleCamellia.m_axisXY.p_axisX;
+            AxisY = ModuleCamellia.m_axisXY.p_axisY;
+            AxisZ = ModuleCamellia.m_axisZ;
+            AxisLifter = ModuleCamellia.m_axisLifter;
         }
 
 
@@ -435,21 +434,6 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand CmdCopyCurrentPos
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if(SelectedAxis == null)
-                    {
-                        return;
-                    }
-                    double value = SelectedAxis.p_posActual;
-                    Clipboard.SetText(value.ToString());
-                });
-            }
-        }
         #endregion
 
         #region SR Command
@@ -512,9 +496,6 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    Module_Camellia.Run_Measure measure = (Module_Camellia.Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
-                    ModuleCamellia.mwvm.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
-
                     CloseRequested(this, new DialogCloseRequestedEventArgs(true));
                 });
             }

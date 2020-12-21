@@ -27,8 +27,8 @@ namespace RootTools_Vision.Inspection
 		{
 			if (this.workplace.Index == 0)
 				return base.DoPrework();
-				
-			return true;
+
+			return false;
 		}
 
 		public override void DoWork()

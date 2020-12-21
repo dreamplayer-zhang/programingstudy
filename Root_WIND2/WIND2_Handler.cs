@@ -12,11 +12,6 @@ namespace Root_WIND2
 {
     public class WIND2_Handler : IHandler
     {
-        public ModuleList p_moduleList
-        {
-            get;set;
-        }
-
         #region List InfoWafer
         public string AddInfoWafer(InfoWafer infoWafer)
         {
@@ -46,8 +41,6 @@ namespace Root_WIND2
             {
             }
         }
-
-        //ModuleList IHandler.p_moduleList { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
         #endregion
 
         #region Module
@@ -229,6 +222,7 @@ namespace Root_WIND2
         public WIND2_Engineer m_enginner;
         public GAF m_gaf;
         IGem m_gem;
+
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;

@@ -30,7 +30,7 @@ namespace Root_Siltron
 
         public IHandler ClassHandler() { return m_handler; }
 
-        public ModuleList ClassModuleList() { return m_handler.p_moduleList; }
+        public ModuleList ClassModuleList() { return m_handler.m_moduleList; }
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
         {

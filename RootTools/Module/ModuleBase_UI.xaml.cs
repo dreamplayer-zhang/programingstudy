@@ -1,11 +1,9 @@
 ﻿using RootTools.Control;
 using RootTools.Trees;
-using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace RootTools.Module
 {
@@ -33,24 +31,17 @@ namespace RootTools.Module
             infoListUI.Init(module.m_infoList);
             listDIUI.Init(module.m_listDI);
             listDOUI.Init(module.m_listDO);
+            treeRootUI.Init(module.m_treeRoot);
+            treeToolUI.Init(module.m_treeToolBox);
 
-            treeRootToolUI.Init(module.m_treeRootTool);
-            module.RunTreeTool(Tree.eMode.Init);
-            treeRootSetupUI.Init(module.m_treeRootSetup);
             module.RunTree(Tree.eMode.Init);
-            treeRootRunUI.Init(module.m_treeRootRun);
-            module.RunTreeRun(Tree.eMode.Init);
-            treeRootQueueUI.Init(module.m_treeRootQueue);
-            module.RunTreeQueue(Tree.eMode.Init);
+            module.RunToolTree(Tree.eMode.Init);
 
             m_minTabControl = tabControlTools.Items.Count;
             InitTabControl();
             module.OnChangeTool += Module_OnChangeTool;
-
-            InitTimer(); 
         }
 
-        #region Tool Tab
         private void Module_OnChangeTool()
         {
             InitTabControl();
@@ -91,24 +82,7 @@ namespace RootTools.Module
                 }
             }
         }
-        #endregion
 
-        #region Timer
-        DispatcherTimer m_timer = new DispatcherTimer();
-        void InitTimer()
-        {
-            m_timer.Interval = TimeSpan.FromMilliseconds(300);
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Start(); 
-        }
-
-        private void M_timer_Tick(object sender, EventArgs e)
-        {
-            m_module.RunTreeQueue(Tree.eMode.Init);
-        }
-        #endregion
-
-        #region UI Function
         private void ButtonRun_Click(object sender, RoutedEventArgs e)
         {
             m_module.ButtonRun();
@@ -117,6 +91,13 @@ namespace RootTools.Module
         private void ButtonPause_Click(object sender, RoutedEventArgs e)
         {
             EQ.p_bPause = !EQ.p_bPause;
+        }
+
+        private void CheckBoxSetup_Click(object sender, RoutedEventArgs e)
+        {
+            treeRootUI.Visibility = (checkBoxSetup.IsChecked == false) ? Visibility.Visible : Visibility.Hidden;
+            treeToolUI.Visibility = (checkBoxSetup.IsChecked == true) ? Visibility.Visible : Visibility.Hidden;
+            m_module.RunToolTree(Tree.eMode.Init);
         }
 
         private void ButtonHome_Click(object sender, RoutedEventArgs e)
@@ -129,6 +110,5 @@ namespace RootTools.Module
             if (comboAxis.SelectedIndex < 0) return;
             tabAxis.SelectedIndex = comboAxis.SelectedIndex;
         }
-        #endregion
     }
 }

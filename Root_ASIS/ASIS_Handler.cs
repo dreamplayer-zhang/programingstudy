@@ -27,7 +27,7 @@ namespace Root_ASIS
         #endregion 
 
         #region Module
-        public ModuleList p_moduleList { get; set; }
+        public ModuleList m_moduleList;
         public ASIS_Recipe m_recipe;
         public ASIS_Process m_process;
         public ASIS m_ASIS;
@@ -46,7 +46,7 @@ namespace Root_ASIS
 
         void InitModule()
         {
-            p_moduleList = new ModuleList(m_engineer);
+            m_moduleList = new ModuleList(m_engineer);
             m_ASIS = new ASIS("ASIS", m_engineer);
             InitModule(m_ASIS);
             m_loadEV = new LoadEV("LoadEV", m_engineer);
@@ -86,7 +86,7 @@ namespace Root_ASIS
         {
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
-            p_moduleList.AddModule(module, ui);
+            m_moduleList.AddModule(module, ui);
         }
 
         public bool IsEnableRecovery()
@@ -101,7 +101,7 @@ namespace Root_ASIS
         #region StateHome
         public string StateHome()
         {
-            string sInfo = StateHome(p_moduleList.m_aModule);
+            string sInfo = StateHome(m_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
@@ -149,7 +149,7 @@ namespace Root_ASIS
         #region Reset
         public string Reset()
         {
-            Reset(m_gaf, p_moduleList);
+            Reset(m_gaf, m_moduleList);
             return "OK";
         }
 
@@ -249,8 +249,8 @@ namespace Root_ASIS
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
-            p_moduleList.ThreadStop();
-            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
+            m_moduleList.ThreadStop();
+            foreach (ModuleBase module in m_moduleList.m_aModule.Keys) module.ThreadStop();
         }
     }
 }

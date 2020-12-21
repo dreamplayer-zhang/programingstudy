@@ -40,16 +40,6 @@ namespace Root_EFEM.Module
             m_dicArm.Add(eArm.Upper, new Arm(id, eArm.Upper, this, engineer, true, false));
         }
 
-        public List<WTRArm> p_aArm
-        {
-            get
-            {
-                List<WTRArm> aArm = new List<WTRArm>();
-                foreach (Arm arm in m_dicArm.Values) aArm.Add(arm);
-                return aArm;
-            }
-        }
-
         List<string> p_asArm
         {
             get
@@ -59,7 +49,7 @@ namespace Root_EFEM.Module
                 {
                     if (arm.p_bEnable) asArm.Add(arm.m_eArm.ToString());
                 }
-                return asArm;
+                return asArm; 
             }
         }
 
@@ -69,7 +59,7 @@ namespace Root_EFEM.Module
             sArm = tree.Set(sArm, sArm, p_asArm, "Arm", "Select WTR Arm", bVisible);
             foreach (Arm arm in m_dicArm.Values)
             {
-                if (arm.m_eArm.ToString() == sArm) eArm = arm.m_eArm;
+                if (arm.m_eArm.ToString() == sArm) eArm = arm.m_eArm; 
             }
         }
 
@@ -96,7 +86,7 @@ namespace Root_EFEM.Module
             public override void RunTree(Tree tree)
             {
                 base.RunTree(tree);
-                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "Wafer Check", "Wafer Check Option");
+                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "Wafer Check", "Wafer Check Option"); 
             }
 
             public DIO_I m_diCheckVac;
@@ -112,8 +102,8 @@ namespace Root_EFEM.Module
                 Vacuum,
                 InfoWafer
             };
-            eCheckWafer m_eCheckWafer = eCheckWafer.Vacuum;
-            public override bool IsWaferExist()
+            eCheckWafer m_eCheckWafer = eCheckWafer.Vacuum; 
+            public bool IsWaferExist()
             {
                 switch (m_eCheckWafer)
                 {
@@ -370,7 +360,7 @@ namespace Root_EFEM.Module
 
         string ReplyCmd(string[] sMsgs)
         {
-            string sLastCmd = m_dicCmd[m_eSendCmd];
+            string sLastCmd = m_dicCmd[m_eSendCmd];            
             try
             {
                 if (sMsgs.Length > 1) return GetErrorString(sMsgs[1]);
@@ -423,7 +413,7 @@ namespace Root_EFEM.Module
 
         eCmd m_eSendCmd = eCmd.None;
         protected string WriteCmd(eCmd cmd, params object[] objs)
-        {
+        {       
             if (EQ.IsStop()) return "EQ Stop";
             Thread.Sleep(10);
             if (m_eSendCmd != eCmd.None)
@@ -532,7 +522,7 @@ namespace Root_EFEM.Module
                     if (nReset > c_nReset) return "Reset CPU Error";
                     Thread.Sleep(100);
                 }
-                foreach (IWTRChild child in p_aChild) child.p_bLock = true;
+                foreach (IWTRChild child in m_aChild) child.p_bLock = true;
                 if (m_bNeedHome)
                 {
                     if (Run(WriteCmd(eCmd.FindHome))) return p_sInfo;
@@ -544,20 +534,19 @@ namespace Root_EFEM.Module
                 m_bNeedHome = false;
                 if (Run(WaitReply(m_secHome))) return p_sInfo;
                 p_eState = eState.Ready;
-                foreach (IWTRChild child in p_aChild) child.p_bLock = false;
+                foreach (IWTRChild child in m_aChild) child.p_bLock = false;
                 return "OK";
             }
             finally
             {
-                // if (p_sInfo != "OK") p_eState = eState.Error;
+               // if (p_sInfo != "OK") p_eState = eState.Error;
             }
         }
         #endregion
 
         #region IWTRChild
         public List<string> m_asChild = new List<string>();
-        List<IWTRChild> _aChild = new List<IWTRChild>();
-        public List<IWTRChild> p_aChild { get { return _aChild; } }
+        public List<IWTRChild> m_aChild = new List<IWTRChild>();
         public void AddChild(params IWTRChild[] childs)
         {
             foreach (IWTRChild child in childs)
@@ -565,7 +554,7 @@ namespace Root_EFEM.Module
                 if (child != null)
                 {
                     child.p_bLock = true;
-                    p_aChild.Add(child);
+                    m_aChild.Add(child);
                     m_asChild.Add(child.p_id);
                 }
             }
@@ -574,7 +563,7 @@ namespace Root_EFEM.Module
 
         protected IWTRChild GetChild(string sChild)
         {
-            foreach (IWTRChild child in p_aChild)
+            foreach (IWTRChild child in m_aChild)
             {
                 if (child.p_id == sChild) return child;
             }
@@ -599,18 +588,11 @@ namespace Root_EFEM.Module
             return 0;
         }
 
-        public bool IsEnableRecovery()
-        {
-            if (m_dicArm[eArm.Lower].p_infoWafer != null) return true;
-            if (m_dicArm[eArm.Upper].p_infoWafer != null) return true;
-            return false;
-        }
-
         public void ReadInfoReticle_Registry()
         {
             m_dicArm[eArm.Lower].ReadInfoWafer_Registry();
             m_dicArm[eArm.Upper].ReadInfoWafer_Registry();
-            foreach (IWTRChild child in p_aChild) child.ReadInfoWafer_Registry();
+            foreach (IWTRChild child in m_aChild) child.ReadInfoWafer_Registry();
         }
         #endregion
 
@@ -635,7 +617,7 @@ namespace Root_EFEM.Module
             aArm.Add(m_dicArm[eArm.Upper]);
             aArm.Add(m_dicArm[eArm.Lower]);
             m_ui.Init(p_id + ".InfoWafer", aArm, m_engineer);
-            m_aTool.Add(m_ui);
+            m_aTool.Add(m_ui); 
         }
         #endregion
 
@@ -650,7 +632,7 @@ namespace Root_EFEM.Module
         {
             m_dicArm[eArm.Upper].RunTree(tree.GetTree("Upper Arm", false));
             m_dicArm[eArm.Lower].RunTree(tree.GetTree("Lower Arm", false));
-            foreach (IWTRChild child in p_aChild) child.RunTreeTeach(tree.GetTree("Teach", false));
+            foreach (IWTRChild child in m_aChild) child.RunTreeTeach(tree.GetTree("Teach", false));
             RunTimeoutTree(tree.GetTree("Timeout", false));
         }
 
@@ -671,7 +653,7 @@ namespace Root_EFEM.Module
             InitCmd();
             InitArms(id, engineer);
             InitBase(id, engineer);
-            InitInfoWaferUI();
+            InitInfoWaferUI(); 
         }
 
         public override void ThreadStop()
@@ -679,51 +661,13 @@ namespace Root_EFEM.Module
             base.ThreadStop();
         }
 
-        #region IWTR
-        public ModuleRunBase CloneRunGet(string sChild, int nSlot)
-        {
-            Run_Get run = (Run_Get)m_runGet.Clone();
-            run.p_sChild = sChild;
-            run.m_nChildID = nSlot;
-            return run;
-        }
-
-        public ModuleRunBase CloneRunPut(string sChild, int nSlot)
-        {
-            Run_Put run = (Run_Put)m_runPut.Clone();
-            run.p_sChild = sChild;
-            run.m_nChildID = nSlot;
-            return run;
-        }
-
-        public string GetEnableAnotherArmID(ModuleRunBase runGet, WTRArm armPut, InfoWafer infoWafer)
-        {
-            eArm eArmPut = ((Arm)armPut).m_eArm; 
-            for (int n = 0; n < p_aArm.Count; n++)
-            {
-                Arm armGet = (Arm)p_aArm[n]; 
-                if (armGet.m_eArm != eArmPut)
-                {
-                    if (armGet.IsEnableWaferSize(infoWafer))
-                    {
-                        ((Run_Get)runGet).m_eArm = armGet.m_eArm;
-                        return armGet.m_id; 
-                    }
-                }
-            }
-            return "Not Enable";
-        }
-        #endregion
-
         #region ModuleRun
-        ModuleRunBase m_runGet;
-        ModuleRunBase m_runPut; 
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_ResetCPU(this), false, "Reset WTR CPU");
             AddModuleRunList(new Run_Grip(this), false, "Run Grip WTR Arm");
-            m_runGet = AddModuleRunList(new Run_Get(this), false, "WTR Run Get Motion");
-            m_runPut = AddModuleRunList(new Run_Put(this), false, "WTR Run Put Motion");
+            AddModuleRunList(new Run_Get(this), false, "WTR Run Get Motion");
+            AddModuleRunList(new Run_Put(this), false, "WTR Run Put Motion");
         }
 
         public class Run_ResetCPU : ModuleRunBase
@@ -786,24 +730,23 @@ namespace Root_EFEM.Module
             }
         }
 
-        public class Run_Get : ModuleRunBase, IWTRRun
+        public class Run_Get : ModuleRunBase
         {
             WTR_RND m_module;
             public Run_Get(WTR_RND module)
             {
-                p_sChild = ""; 
                 m_module = module;
                 InitModuleRun(module);
             }
 
-            public string p_sChild { get; set; }
             public eArm m_eArm = eArm.Upper;
+            public string m_sChild = "";
             public int m_nChildID = 0;
             public override ModuleRunBase Clone()
             {
                 Run_Get run = new Run_Get(m_module);
                 run.m_eArm = m_eArm;
-                run.p_sChild = p_sChild;
+                run.m_sChild = m_sChild;
                 run.m_nChildID = m_nChildID;
                 return run;
             }
@@ -811,27 +754,22 @@ namespace Root_EFEM.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_module.RunTreeArm(tree, ref m_eArm, bVisible && !bRecipe);
-                p_sChild = tree.Set(p_sChild, p_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
-                List<string> asChildSlot = m_module.GetChildSlotNames(p_sChild);
+                m_sChild = tree.Set(m_sChild, m_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
+                List<string> asChildSlot = m_module.GetChildSlotNames(m_sChild);
                 if ((asChildSlot != null) && (asChildSlot.Count > 0))
                 {
                     if ((m_nChildID < 0) || (m_nChildID >= asChildSlot.Count)) m_nChildID = 0;
                     string sChildSlot = asChildSlot[m_nChildID];
                     sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
-                    m_nChildID = m_module.GetChildSlotID(p_sChild, sChildSlot);
+                    m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot);
                 }
                 else m_nChildID = 0;
             }
 
-            public void SetArm(WTRArm arm)
-            {
-                m_eArm = ((Arm)arm).m_eArm;
-            }
-
             public override string Run()
             {
-                IWTRChild child = m_module.GetChild(p_sChild);
-                if (child == null) return "WTR Child not Found : " + p_sChild;
+                IWTRChild child = m_module.GetChild(m_sChild);
+                if (child == null) return "WTR Child not Found : " + m_sChild;
                 if (EQ.p_bSimulate)
                 {
                     m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
@@ -869,24 +807,24 @@ namespace Root_EFEM.Module
             }
         }
 
-        public class Run_Put : ModuleRunBase, IWTRRun
+        public class Run_Put : ModuleRunBase
         {
             WTR_RND m_module;
             public Run_Put(WTR_RND module)
             {
-                p_sChild = ""; 
                 m_module = module;
                 InitModuleRun(module);
             }
 
-            public string p_sChild { get; set; }
+            public string m_sChild = "";
+
             public eArm m_eArm = eArm.Upper;
             public int m_nChildID = 0;
             public override ModuleRunBase Clone()
             {
                 Run_Put run = new Run_Put(m_module);
                 run.m_eArm = m_eArm;
-                run.p_sChild = p_sChild;
+                run.m_sChild = m_sChild;
                 run.m_nChildID = m_nChildID;
                 return run;
             }
@@ -894,27 +832,22 @@ namespace Root_EFEM.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_module.RunTreeArm(tree, ref m_eArm, bVisible && !bRecipe);
-                p_sChild = tree.Set(p_sChild, p_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
-                List<string> asChildSlot = m_module.GetChildSlotNames(p_sChild);
+                m_sChild = tree.Set(m_sChild, m_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
+                List<string> asChildSlot = m_module.GetChildSlotNames(m_sChild);
                 if ((asChildSlot != null) && (asChildSlot.Count > 0))
                 {
                     if ((m_nChildID < 0) || (m_nChildID >= asChildSlot.Count)) m_nChildID = 0;
                     string sChildSlot = asChildSlot[m_nChildID];
                     sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
-                    m_nChildID = m_module.GetChildSlotID(p_sChild, sChildSlot);
+                    m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot);
                 }
                 else m_nChildID = 0;
             }
 
-            public void SetArm(WTRArm arm)
-            {
-                m_eArm = ((Arm)arm).m_eArm;
-            }
-
             public override string Run()
             {
-                IWTRChild child = m_module.GetChild(p_sChild);
-                if (child == null) return "WTR Child not Found : " + p_sChild;
+                IWTRChild child = m_module.GetChild(m_sChild);
+                if (child == null) return "WTR Child not Found : " + m_sChild;
                 if (EQ.p_bSimulate)
                 {
                     child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);

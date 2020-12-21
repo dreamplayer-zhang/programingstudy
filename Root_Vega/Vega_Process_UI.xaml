@@ -27,23 +27,16 @@
             <Button x:Name="buttonRunStep" Content="Run Step" Margin="2,22,2,2" Click="buttonRunStep_Click"/>
         </StackPanel>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <Grid Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Button x:Name="buttonRefresh" Content="Refresh" Margin="3" Click="buttonRefresh_Click"/>
-            <TabControl Grid.Row="2">
-                <TabItem Header="InfoReticle">
-                    <tree:TreeUI x:Name="treeReticleUI"/>
-                </TabItem>
-                <TabItem Header="Locate">
-                    <tree:TreeUI x:Name="treeLocateUI"/>
-                </TabItem>
-                <TabItem Header="Sequence">
-                    <tree:TreeUI x:Name="treeSequenceUI"/>
-                </TabItem>
-            </TabControl>
-        </Grid>
+        <TabControl Grid.Column="2">
+            <TabItem Header="InfoReticle">
+                <tree:TreeUI x:Name="treeReticleUI"/>
+            </TabItem>
+            <TabItem Header="Locate">
+                <tree:TreeUI x:Name="treeLocateUI"/>
+            </TabItem>
+            <TabItem Header="Sequence">
+                <tree:TreeUI x:Name="treeSequenceUI"/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>

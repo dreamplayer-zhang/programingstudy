@@ -15,7 +15,8 @@
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Orientation="Vertical">
             <Label Content="{Binding p_eState}" Margin="2"/>
-            <ComboBox x:Name="comboBoxIndex" Margin="2"/>
+            <Button x:Name="buttonRefresh" Content="Refresh" Margin="2" Click="buttonRefresh_Click"/>
+            <ComboBox x:Name="comboBoxIndex" Margin="2,22,2,2"/>
             <Button x:Name="buttonAdd" Content="Add" Margin="2" Click="buttonAdd_Click"/>
             <Button x:Name="buttonRemove" Content="Remove" Margin="2" Click="buttonRemove_Click"/>
             <Button x:Name="buttonRemoveAll" Content="Remove All" Margin="2" Click="buttonRemoveAll_Click"/>

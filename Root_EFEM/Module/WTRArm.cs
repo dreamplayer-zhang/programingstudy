@@ -1,5 +1,10 @@
 ﻿using RootTools;
 using RootTools.Trees;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Root_EFEM.Module
 {
@@ -45,17 +50,10 @@ namespace Root_EFEM.Module
 
         #region Wafer Size
         InfoWafer.WaferSize m_waferSize;
-        public bool IsEnableWaferSize(InfoWafer infoWafer) 
+        public bool IsEnableWaferSize(InfoWafer infoWafer) //forget
         {
             if (p_bEnable == false) return false;
             return m_waferSize.GetData(infoWafer.p_eSize).m_bEnable;
-        }
-        #endregion
-
-        #region virtual IsWaferExist
-        public virtual bool IsWaferExist()
-        {
-            return (p_infoWafer != null);
         }
         #endregion
 

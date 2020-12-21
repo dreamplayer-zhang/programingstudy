@@ -11,7 +11,6 @@ namespace RootTools
             Ready,
             Run,
             Error,
-            Null
         }
 
         public static _EQ m_EQ = new _EQ();

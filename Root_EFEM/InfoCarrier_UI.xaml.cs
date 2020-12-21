@@ -1,9 +1,7 @@
 ﻿using RootTools;
 using RootTools.Trees;
-using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 
 namespace Root_EFEM
 {
@@ -27,8 +25,6 @@ namespace Root_EFEM
             treeUI.Init(infoCarrier.m_treeRoot);
             infoCarrier.RunTree(Tree.eMode.Init);
             comboBoxIndex.ItemsSource = infoCarrier.m_asGemSlot;
-
-            InitTimer(); 
         }
 
         int GetIndex(string sWafer)
@@ -40,23 +36,6 @@ namespace Root_EFEM
             return -1;
         }
 
-        #region Timer
-        DispatcherTimer m_timer = new DispatcherTimer();
-
-        void InitTimer()
-        {
-            m_timer.Interval = TimeSpan.FromSeconds(1);
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Start();
-        }
-
-        private void M_timer_Tick(object sender, EventArgs e)
-        {
-            m_infoCarrier.RunTreeWafer(Tree.eMode.Init);
-        }
-        #endregion
-
-        #region Button Click
         private void buttonAdd_Click(object sender, RoutedEventArgs e)
         {
             if (EQ.p_bSimulate == false) return;
@@ -87,6 +66,11 @@ namespace Root_EFEM
             m_infoCarrier.RunTreeWafer(Tree.eMode.Init);
         }
 
+        private void buttonRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            m_infoCarrier.RunTreeWafer(Tree.eMode.Init);
+        }
+
         private void buttonStart_Click(object sender, RoutedEventArgs e)
         {
             if (comboBoxIndex.SelectedValue == null) return;
@@ -100,6 +84,5 @@ namespace Root_EFEM
             m_infoCarrier.StartAllProcess();
             m_infoCarrier.RunTreeWafer(Tree.eMode.Init);
         }
-        #endregion
     }
 }

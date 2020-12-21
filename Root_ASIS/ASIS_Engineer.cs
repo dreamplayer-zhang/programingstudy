@@ -35,7 +35,7 @@ namespace Root_ASIS
 
         public MemoryTool ClassMemoryTool() { return m_toolBox.m_memoryTool; }
 
-        public ModuleList ClassModuleList() { return m_handler.p_moduleList; }
+        public ModuleList ClassModuleList() { return m_handler.m_moduleList; }
 
         ToolBox m_toolBox = new ToolBox();
         public ToolBox ClassToolBox() { return m_toolBox; }

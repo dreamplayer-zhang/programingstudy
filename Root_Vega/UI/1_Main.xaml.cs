@@ -33,20 +33,8 @@ namespace Root_Vega
             moduleRobot.Init(m_handler.m_robot);
             loadportA.Init(m_handler.m_aLoadport[0], m_handler);
             loadportB.Init(m_handler.m_aLoadport[1], m_handler);
-            InitFFU(); 
-            InitTimer();
-        }
 
-        void InitFFU()
-        {
-            FanUI0.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[0];
-            FanUI1.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[1];
-            FanUI2.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[2];
-            FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
-            FanUI4.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[4];
-            FanUI5.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[5];
-            FanUI6.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[6];
-            FanUI7.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[7];
+            InitTimer();
         }
 
         #region Timer
@@ -197,12 +185,7 @@ namespace Root_Vega
             ui.Init(m_handler); 
             ui.Show(); 
         }
-		#endregion
-
-		private void buttonBuzzerOff_Click(object sender, RoutedEventArgs e)
-		{
-            m_engineer.BuzzerOff();
-		}
-	}
+        #endregion
+    }
 }
 

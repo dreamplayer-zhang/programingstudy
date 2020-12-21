@@ -1680,7 +1680,7 @@ namespace Root_CAMELLIA
                     to.ScaleOffset(ZoomScale, OffsetX, OffsetY);
 
                     PointF[] line = { new PointF((float)from.x + CenterX, (float)-from.y + CenterY), new PointF((float)to.x + CenterX, (float)-to.y + CenterY) };
-                    arrowLine.SetData(line, routeBrush, (int)to.width, RouteThick * ZoomScale, 0, 97);
+                    arrowLine.SetData(line, routeBrush, (int)to.width, RouteThick * ZoomScale, 97);
                     Shapes[shapeIndex] = arrowLine;
                     shapeIndex++;
                 }
@@ -2093,7 +2093,7 @@ namespace Root_CAMELLIA
                         to.ScaleOffset(ZoomScale, OffsetX, OffsetY);
 
                         PointF[] line = { new PointF((float)from.x + CenterX, (float)-from.y + CenterY), new PointF((float)to.x + CenterX, (float)-to.y + CenterY) };
-                        arrowLine.SetData(line, routeBrush, (int)to.width, RouteThick * ZoomScale, 0, 97);
+                        arrowLine.SetData(line, routeBrush, (int)to.width, RouteThick * ZoomScale, 97);
                         Shapes.Add(arrowLine);
                         p_DrawPointElement.Add(arrowLine.UIElement);
                     }
@@ -3648,7 +3648,6 @@ namespace Root_CAMELLIA
         {
             ColorPicker co = sender as ColorPicker;
             RouteBrush.Color = (System.Windows.Media.Color)co.SelectedColor;
-            MainViewModel.RouteBrush.Color = (System.Windows.Media.Color)co.SelectedColor;
             RedrawStage();
             //UpdateView();
         }

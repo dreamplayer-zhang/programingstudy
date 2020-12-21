@@ -237,14 +237,12 @@
     </ApplicationDefinition>
     <Compile Include="Converter\AxisBoolToBrushConverter.cs" />
     <Compile Include="BaseDefine.cs" />
-    <Compile Include="Converter\AxisToPositionConverter.cs" />
+    <Compile Include="Converter\AxisConverter.cs" />
     <Compile Include="Converter\AxisToMotionUIConverter.cs" />
     <Compile Include="Converter\AxisStateToEnableConverter.cs" />
     <Compile Include="Converter\AxisStateToLoadingOpacityConverter.cs" />
     <Compile Include="Converter\AxisStateToOpacityConverter.cs" />
-    <Compile Include="Converter\AxisToStageUIConverter.cs" />
     <Compile Include="Converter\ImageConverter.cs" />
-    <Compile Include="Converter\MeasurePointToStageUIConverter.cs" />
     <Compile Include="Converter\PathConverter.cs" />
     <Compile Include="Converter\TextBoxToIntConverter.cs" />
     <Compile Include="Data\Calibration.cs" />

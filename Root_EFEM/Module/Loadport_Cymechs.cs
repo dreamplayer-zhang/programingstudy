@@ -7,21 +7,19 @@ using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
 using RootTools.Control;
-using RootTools.OHT.Semi;
 
 namespace Root_EFEM.Module
 {
-    public class Loadport_Cymechs : ModuleBase, IWTRChild, ILoadport
+    public class Loadport_Cymechs : ModuleBase, IWTRChild
     {
         #region ToolBox
         RS232 m_rs232;
-        public DIO_I m_diPlaced;
-        public DIO_I m_diPresent;
+        DIO_I m_diPlaced;
+        DIO_I m_diPresent;
         DIO_I m_diOpen;
         DIO_I m_diClose;
         DIO_I m_diReady;
         DIO_I m_diRun;
-        public OHT_Semi m_OHT; 
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
@@ -31,7 +29,6 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.Get(ref m_diReady, this, "Ready");
             p_sInfo = m_toolBox.Get(ref m_diRun, this, "Run");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -46,8 +43,8 @@ namespace Root_EFEM.Module
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present = m_bPlaced ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-            if (p_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + p_infoCarrier.p_eState);
-            switch (p_infoCarrier.p_ePresentSensor)
+            if (m_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + m_infoCarrier.p_eState);
+            switch (m_infoCarrier.p_ePresentSensor)
             {
                 case GemCarrierBase.ePresent.Empty: m_svidPlaced.p_value = false; break;
                 case GemCarrierBase.ePresent.Exist: m_svidPlaced.p_value = true; break;
@@ -71,36 +68,36 @@ namespace Root_EFEM.Module
 
         public List<string> p_asChildSlot
         {
-            get { return p_infoCarrier.m_asGemSlot; }
+            get { return m_infoCarrier.m_asGemSlot; }
         }
 
         public InfoWafer p_infoWafer { get; set; }
 
         public InfoWafer GetInfoWafer(int nID)
         {
-            return p_infoCarrier.GetInfoWafer(nID);
+            return m_infoCarrier.GetInfoWafer(nID);
         }
 
         public void SetInfoWafer(int nID, InfoWafer infoWafer)
         {
-            p_infoCarrier.SetInfoWafer(nID, infoWafer);
+            m_infoCarrier.SetInfoWafer(nID, infoWafer);
         }
 
         public int GetTeachWTR(InfoWafer infoWafer = null)
         {
-            return p_infoCarrier.GetTeachWTR(infoWafer);
+            return m_infoCarrier.GetTeachWTR(infoWafer);
         }
 
         public string IsGetOK(int nID)
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            return p_infoCarrier.IsGetOK(nID);
+            return m_infoCarrier.IsGetOK(nID);
         }
 
         public string IsPutOK(InfoWafer infoWafer, int nID)
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            return p_infoCarrier.IsPutOK(nID);
+            return m_infoCarrier.IsPutOK(nID);
         }
 
         public string BeforeGet(int nID)
@@ -127,28 +124,28 @@ namespace Root_EFEM.Module
 
         public bool IsWaferExist(int nID = 0, bool bUseSensor = true)
         {
-            switch (p_infoCarrier.p_eState)
+            switch (m_infoCarrier.p_eState)
             {
                 case InfoCarrier.eState.Empty: return false;
                 case InfoCarrier.eState.Placed: return false;
             }
-            return (p_infoCarrier.GetInfoWafer(nID) != null);
+            return (m_infoCarrier.GetInfoWafer(nID) != null);
         }
 
         string IsRunOK()
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            return p_infoCarrier.IsRunOK();
+            return m_infoCarrier.IsRunOK();
         }
 
         public void RunTreeTeach(Tree tree)
         {
-            p_infoCarrier.m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
+            m_infoCarrier.m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
         }
 
         public void ReadInfoWafer_Registry()
         {
-            p_infoCarrier.ReadInfoWafer_Registry();
+            m_infoCarrier.ReadInfoWafer_Registry();
         }
         #endregion
 
@@ -486,7 +483,7 @@ namespace Root_EFEM.Module
             SetLoadportMapData(aSlot, asMap[0], GemSlotBase.eState.Exist);
             SetLoadportMapData(aSlot, asMap[1], GemSlotBase.eState.Cross);
             SetLoadportMapData(aSlot, asMap[2], GemSlotBase.eState.Double);
-            p_infoCarrier.SetMapData(aSlot); 
+            m_infoCarrier.SetMapData(aSlot); 
             return false;
         }
 
@@ -568,7 +565,7 @@ namespace Root_EFEM.Module
         void RunTreeSetup(Tree tree)
         {
             RunTimeoutTree(tree.GetTree("Timeout", false));
-            p_infoCarrier.m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
+            m_infoCarrier.m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
         }
 
         public override void Reset()
@@ -615,7 +612,7 @@ namespace Root_EFEM.Module
                 m_bPlaced = false;
             }
             
-            p_infoCarrier.AfterHome();
+            m_infoCarrier.AfterHome();
             return "OK";
         }
         #endregion
@@ -630,14 +627,14 @@ namespace Root_EFEM.Module
                 m_infoCarrier.m_bReqReadCarrierID = false;
                 StartRun(m_runReadPodID);
             } */
-            if (p_infoCarrier.m_bReqLoad)
+            if (m_infoCarrier.m_bReqLoad)
             {
-                p_infoCarrier.m_bReqLoad = false;
+                m_infoCarrier.m_bReqLoad = false;
                 StartRun(m_runDocking);
             }
-            if (p_infoCarrier.m_bReqUnload)
+            if (m_infoCarrier.m_bReqUnload)
             {
-                p_infoCarrier.m_bReqUnload = false;
+                m_infoCarrier.m_bReqUnload = false;
                 StartRun(m_runUndocking);
             }
             return "OK";
@@ -658,34 +655,14 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-        #region ILoadport
-        public string RunDocking()
-        {
-            if (p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
-            ModuleRunBase run = m_runDocking.Clone();
-            StartRun(run);
-            while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
-            return EQ.IsStop() ? "EQ Stop" : "OK";
-        }
-
-        public string RunUndocking()
-        {
-            if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "OK";
-            ModuleRunBase run = m_runUndocking.Clone();
-            StartRun(run);
-            while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
-            return EQ.IsStop() ? "EQ Stop" : "OK";
-        }
-        #endregion
-
-        public InfoCarrier p_infoCarrier { get; set; }
+        public InfoCarrier m_infoCarrier;
         public Loadport_Cymechs(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
             p_bLock = false;
             p_id = id;
             InitCmd();
-            p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
-            m_aTool.Add(p_infoCarrier);
+            m_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
+            m_aTool.Add(m_infoCarrier);
             InitBase(id, engineer);
             InitEvent();
             InitGAF();
@@ -724,7 +701,7 @@ namespace Root_EFEM.Module
             public Run_Docking(Loadport_Cymechs module)
             {
                 m_module = module;
-                m_infoCarrier = module.p_infoCarrier;
+                m_infoCarrier = module.m_infoCarrier;
                 InitModuleRun(module);
             }
 
@@ -758,7 +735,7 @@ namespace Root_EFEM.Module
             public Run_Undocking(Loadport_Cymechs module)
             {
                 m_module = module;
-                m_infoCarrier = module.p_infoCarrier;
+                m_infoCarrier = module.m_infoCarrier;
                 InitModuleRun(module);
             }
 

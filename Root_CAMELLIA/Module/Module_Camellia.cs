@@ -63,17 +63,6 @@ namespace Root_CAMELLIA.Module
             }
         }
         Axis m_axisLifter;
-        public Axis p_axisLifter
-        {
-            get
-            {
-                return m_axisLifter;
-            }
-            set
-            {
-                m_axisLifter = value;
-            }
-        }
         DIO_I m_axisXReady;
         DIO_I m_axisYReady;
 
@@ -595,15 +584,8 @@ namespace Root_CAMELLIA.Module
                 double centerX = m_StageCenterPos_pulse.X - (m_DataManager.m_waferCentering.m_ptCenter.X - m_StageCenterPos_pulse.X);
                 double centerY = m_StageCenterPos_pulse.Y - (m_DataManager.m_waferCentering.m_ptCenter.Y - m_StageCenterPos_pulse.Y);
 
-                double RatioX = (int)(BaseDefine.CanvasWidth / BaseDefine.ViewSize);
-                double RatioY = (int)(BaseDefine.CanvasHeight / BaseDefine.ViewSize);
-
-                m_mwvm.p_Progress = 0;
-
-
                 for (int i = 0; i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count; i++)
                 {
-
                     double x = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].x;
                     double y = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].y;
 
@@ -616,19 +598,7 @@ namespace Root_CAMELLIA.Module
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
 
-                    m_mwvm.p_ArrowX1 = x * RatioX;
-                    m_mwvm.p_ArrowY1 = -y * RatioY;
-                    if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
-                    {
-                        double x2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].x;
-                        double y2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].y;
-                        m_mwvm.p_ArrowX2 = x2 * RatioX;
-                        m_mwvm.p_ArrowY2 = -y2 * RatioY;
-                        m_mwvm.p_ArrowVisible = Visibility.Visible;
-                    }
-
                     m_NanoView.SampleMeasure(i, x, y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_Average_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, m_Average_NIR);
-
 
 
                     if (VRS.Grab() == "OK")
@@ -637,11 +607,7 @@ namespace Root_CAMELLIA.Module
                         img.SaveImageSync(strVRSImageFullPath);
                         //Grab error
                     }
-                    //Thread.Sleep(600);
-
-                    m_mwvm.p_Progress = (((double)(i + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
                 }
-                m_mwvm.p_ArrowVisible = Visibility.Hidden;
                 return "OK";
             }
         }

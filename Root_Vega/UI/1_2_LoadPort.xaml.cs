@@ -50,50 +50,30 @@ namespace Root_Vega
             m_timer.Start();
         }
 
-
         private void M_timer_Tick(object sender, EventArgs e)
         {
-			borderPlaced.Background = m_loadport.m_dioPlaced.p_bIn ? null : Brushes.LightGreen;
-            if (m_loadport.m_dioPlaced.p_bIn){m_loadport.m_dioPlaced.Write(false);}
-            else{m_loadport.m_dioPlaced.Write(true);}
-
-            borderPresent.Background = m_loadport.m_dioPresent.p_bIn ? null : Brushes.LightGreen;
-            if (m_loadport.m_dioPresent.p_bIn) { m_loadport.m_dioPresent.Write(false); }
-            else { m_loadport.m_dioPresent.Write(true); }
-            
-            borderLoad.Background = m_loadport.m_bLoadCheck ? Brushes.LightGreen : null;
-            if (m_loadport.m_bLoadCheck) { m_loadport.m_doLoad.Write(true);}
-            else { m_loadport.m_doLoad.Write(false); }
-
-            borderUnload.Background = m_loadport.m_bUnLoadCheck ? Brushes.LightGreen : null;
-            if (m_loadport.m_bUnLoadCheck) { m_loadport.m_doUnload.Write(true); }
-            else { m_loadport.m_doUnload.Write(false); }
-            
+            borderPlaced.Background = m_loadport.m_dioPlaced.p_bIn ? Brushes.LightGreen : null;
+            borderPresent.Background = m_loadport.m_dioPresent.p_bIn ? Brushes.LightGreen : null;
+            borderLoad.Background = m_loadport.m_dioLoad.p_bIn ? Brushes.LightGreen : null;
+            borderUnload.Background = m_loadport.m_dioUnload.p_bIn ? Brushes.LightGreen : null;
             borderAlarm.Background = (m_loadport.p_eState == ModuleBase.eState.Error) ? Brushes.Red : null;
-            if (m_loadport.p_eState == ModuleBase.eState.Error) { m_loadport.m_doAlarm.Write(true); }
-            else { m_loadport.m_doAlarm.Write(false); }
 
-            IonizerStatus.Background = m_loadport.m_diIonizer.p_bIn ? Brushes.Green : Brushes.DarkGray;
 
             bool bAuto = (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto); 
             borderAccessAuto.Background = bAuto ? Brushes.LightGreen : null;
-            if (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto)
-            { m_loadport.m_doAuto.Write(true); m_loadport.m_doManual.Write(false); }
             borderAccessManual.Background = bAuto ? null : Brushes.LightGreen;
-            if (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Manual)
-            { m_loadport.m_doAuto.Write(false); m_loadport.m_doManual.Write(true); }
 
             buttonLoad.IsEnabled = IsEnableLoad();
             buttonUnload.IsEnabled = IsEnableUnload();
-            //if (m_loadport.m_bIonizerDoorlockCheck == false)
-            //{
-            //    if (m_loadport.m_diIonizer.p_bIn)
-            //    {
-            //        m_handler.m_vega.m_doIonizerOnOff.Write(false);
-            //        Thread.Sleep(20);
-            //        if (m_loadport.m_diIonizer.p_bIn == true) EQ.p_bStop = true;
-            //    }
-            //}
+            if (m_loadport.m_bIonizerDoorlockCheck == false)
+            {
+                if (m_loadport.m_diIonizer.p_bIn)
+                {
+                    m_loadport.m_doIonizerOnOff.Write(false);
+                    Thread.Sleep(20);
+                    if (m_loadport.m_diIonizer.p_bIn != false) EQ.p_bStop = true;
+                }
+            }
         }
         #endregion
 
@@ -112,8 +92,6 @@ namespace Root_Vega
             bReadyToLoad = true; 
             bool bReadyState =  (m_loadport.m_qModuleRun.Count == 0);
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
-            if (m_loadport.m_infoPod.p_eState != InfoPod.eState.Placed) return false;
-
             if (m_handler.IsEnableRecovery() == true) return false;
             return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && !m_loadport.m_dioPresent.p_bIn; //forget 조건
         }

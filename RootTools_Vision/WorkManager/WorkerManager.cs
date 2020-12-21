@@ -23,7 +23,7 @@ namespace RootTools_Vision
         CancellationTokenSource cancellationTokenSource;
         private ManualResetEvent _waitSignal = new ManualResetEvent(false);
 
-        private bool isStop = false;
+        private bool isPause = false;
 
         WORKPLACE_STATE resultState = WORKPLACE_STATE.NONE;
         WORKPLACE_STATE excuteCondition = WORKPLACE_STATE.NONE;
@@ -63,9 +63,9 @@ namespace RootTools_Vision
             }
         }
 
-        private void WorkplaceStateChanged_Callback(object obj, WorkplaceStateChangedEventArgs args)
+        private void WorkplaceStateChanged_Callback(object obj)
         {
-            Workplace workplace = args.workplace;
+            Workplace workplace = obj as Workplace;
             if(workplace.STATE == this.excuteCondition)
             {
                 _waitSignal.Set();
@@ -147,7 +147,7 @@ namespace RootTools_Vision
             {
                 _waitSignal.WaitOne();
 
-                if (isStop == true)
+                if (isPause == true)
                 {
                     _waitSignal.Reset();
                     continue;
@@ -167,17 +167,24 @@ namespace RootTools_Vision
         public void Start()
         {
             // event
-            WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+            this.workplaceBundle.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
 
-            this.isStop = false;
+            this.isPause = false;
             _waitSignal.Set();
+        }
+
+        public void Pause()
+        {
+            this.workplaceBundle.WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
+
+            this.isPause = true;
         }
 
         public void Stop()
         {
-            WorkEventManager.WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
+            this.workplaceBundle.WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
 
-            this.isStop = true;
+            this.isPause = true;
         }
     }
 }

@@ -596,11 +596,11 @@ namespace Root_Vega.Module
             m_reg = new Registry(p_id + ".InfoReticle");
             m_sInfoReticle = m_reg.Read("sInfoReticle", m_sInfoReticle);
             //p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
-            p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
             if (m_axisXY.p_axisY.IsInPos(eAxisPosY.ReticleCheck) == true)
             {
                 if (m_diPatternReticleExistSensor.p_bIn == false) p_infoReticle = null;
             }
+            else p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
         }
         #endregion
 
@@ -1852,7 +1852,7 @@ namespace Root_Vega.Module
                         int nDefectCode = Convert.ToInt32(item["ClassifyCode"]);
                         InspectionType eType = InspectionManager.GetInspectionType(nDefectCode);
                         InspectionTarget eTarget = InspectionManager.GetInspectionTarget(nDefectCode);
-                        if ((eTarget == InspectionTarget.Chrome))
+                        if ((eType == InspectionType.Strip) && (eTarget == InspectionTarget.Chrome))
                         {
                             //lstDefectPos.Add(new CPoint(posX, posY));
                             CPoint cptPos = new CPoint(posX, posY);

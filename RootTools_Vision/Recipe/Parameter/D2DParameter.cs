@@ -33,7 +33,7 @@ namespace RootTools_Vision
         Line,
         BeforeInsp,
     }
-    public class D2DParameter : ParameterBase, IMaskInspection
+    public class D2DParameter : ParameterBase
     {
         public  D2DParameter() : base(typeof(D2D))
         {
@@ -127,17 +127,6 @@ namespace RootTools_Vision
             {
                 SetProperty<RefImageUpdateFreq>(ref this.refImageUpdateFreq, value);
             }
-        }
-
-
-        // ROI
-        private int maskIndex;
-        [Category("ROI")]
-        [DisplayName("ROI Index")]
-        public int MaskIndex 
-        {
-            get => maskIndex; 
-            set => maskIndex = value; 
         }
         #endregion
 

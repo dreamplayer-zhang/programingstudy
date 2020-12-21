@@ -47,10 +47,5 @@ namespace Root_Vega
         {
             m_process.p_sInfo = m_process.RunNextSequence();
         }
-
-        private void buttonRefresh_Click(object sender, RoutedEventArgs e)
-        {
-            m_process.RunTree(Tree.eMode.Init);
-        }
     }
 }

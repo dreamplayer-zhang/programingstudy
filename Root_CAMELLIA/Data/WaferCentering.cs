@@ -27,11 +27,10 @@ namespace Root_CAMELLIA.Data
         public eDir p_Dir { get; set; }
 
         public List<Point> m_ptLT = new List<Point>();
-        private List<Point> m_ptRT = new List<Point>();
-        private List<Point> m_ptRB = new List<Point>();
+        public List<Point> m_ptRT = new List<Point>();
+        public List<Point> m_ptRB = new List<Point>();
         public RPoint m_ptCenter = new RPoint();
         public RPoint m_ptStageCenter = new RPoint();
-
         //public void FindEdge(byte[] imgBuf, ePos pos)
         //{
         //    Mat matSrc = new Mat("emgutest.bmp");

@@ -21,7 +21,7 @@ namespace Root_Siltron
             m_handler = handler;
             DataContext = handler;
             if (handler.m_enginner != null) loginUI.Init(handler.m_enginner.m_login);
-            moduleListUI.Init(handler.p_moduleList);
+            moduleListUI.Init(handler.m_moduleList);
             recipeUI.Init(handler.m_recipe);
             processUI.Init(handler.m_process);
             gafUI.Init(handler.m_gaf);
@@ -31,8 +31,8 @@ namespace Root_Siltron
         void InitTabControl()
         {
             if (m_handler == null) return; 
-            if (m_handler.p_moduleList == null) return; 
-            foreach (KeyValuePair<ModuleBase, UserControl> kv in m_handler.p_moduleList.m_aModule)
+            if (m_handler.m_moduleList == null) return; 
+            foreach (KeyValuePair<ModuleBase, UserControl> kv in m_handler.m_moduleList.m_aModule)
             {
                 TabItem tabItem = new TabItem();
                 tabItem.Header = kv.Key.p_id;

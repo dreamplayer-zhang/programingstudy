@@ -34,13 +34,13 @@ namespace Root_Siltron
         #endregion
 
         #region Module
-        public ModuleList p_moduleList { get; set; }
+        public ModuleList m_moduleList;
         public Siltron_Recipe m_recipe;
         public Siltron_Process m_process;
         public Vision m_vision;
         void InitModule()
         {
-            p_moduleList = new ModuleList(m_enginner);
+            m_moduleList = new ModuleList(m_enginner);
             m_vision = new Vision("Vision", m_enginner);
             InitModule(m_vision);
             m_recipe = new Siltron_Recipe("Recipe", m_enginner);
@@ -52,7 +52,7 @@ namespace Root_Siltron
         {
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
-            p_moduleList.AddModule(module, ui);
+            m_moduleList.AddModule(module, ui);
         }
 
         public bool IsEnableRecovery()
@@ -65,7 +65,7 @@ namespace Root_Siltron
         #region StateHome
         public string StateHome()
         {
-            string sInfo = StateHome(p_moduleList.m_aModule);
+            string sInfo = StateHome(m_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
@@ -113,7 +113,7 @@ namespace Root_Siltron
         #region Reset
         public string Reset()
         {
-            Reset(m_gaf, p_moduleList);
+            Reset(m_gaf, m_moduleList);
             return "OK";
         }
 
@@ -182,7 +182,7 @@ namespace Root_Siltron
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run:
-                        if (p_moduleList.m_qModuleRun.Count == 0)
+                        if (m_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
                         }
@@ -215,10 +215,10 @@ namespace Root_Siltron
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
-            if (p_moduleList != null)
+            if (m_moduleList != null)
             {
-                p_moduleList.ThreadStop();
-                foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
+                m_moduleList.ThreadStop();
+                foreach (ModuleBase module in m_moduleList.m_aModule.Keys) module.ThreadStop();
             }
         }
     }

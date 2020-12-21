@@ -110,7 +110,7 @@ namespace RootTools
         /// <summary>
         /// ROI 4Channel BitmapLayer
         /// </summary>
-        public ImageData p_MaskLayer
+        public ImageData p_ROILayer
         {
             get
             {
@@ -704,7 +704,7 @@ namespace RootTools
                         }
                     }
                 }
-                if (p_MaskLayer != null)
+                if (p_ROILayer != null)
                     SetLayerSource();
             }
             catch (Exception ee)
@@ -717,14 +717,14 @@ namespace RootTools
         {
             try
             {
-                if (p_MaskLayer != null)
+                if (p_ROILayer != null)
                 {
                     object o = new object();
-                    if (p_MaskLayer.p_nByte == 1)
+                    if (p_ROILayer.p_nByte == 1)
                     {
                         Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
 
-                        IntPtr ptrMem = p_MaskLayer.GetPtr();
+                        IntPtr ptrMem = p_ROILayer.GetPtr();
                         if (ptrMem == IntPtr.Zero)
                             return;
 
@@ -737,7 +737,7 @@ namespace RootTools
                         rectWidth = p_View_Rect.Width;
                         rectHeight = p_View_Rect.Height;
 
-                        sizeX = p_MaskLayer.p_Size.X;
+                        sizeX = p_ROILayer.p_Size.X;
 
                         Parallel.For(0, p_CanvasHeight, (yy) =>
                         {
@@ -755,15 +755,14 @@ namespace RootTools
 
                         p_LayerSource = ImageHelper.ToBitmapSource(view);
                     }
-                    if (p_MaskLayer.p_nByte == 4)
+                    if (p_ROILayer.p_nByte == 4)
                     {
                         Image<Rgba, byte> view = new Image<Rgba, byte>(p_CanvasWidth, p_CanvasHeight);
                         byte[,,] viewPtr = view.Data;
 
-                        IntPtr ptrMem = p_MaskLayer.GetPtr();
+                        IntPtr ptrMem = p_ROILayer.GetPtr();
 
                         if (ptrMem == IntPtr.Zero)
-
                             return;
 
                         byte* imageptr = (byte*)ptrMem.ToPointer();
@@ -772,7 +771,7 @@ namespace RootTools
                         int viewrectX = p_View_Rect.X;
                         int viewrectHeight = p_View_Rect.Height;
                         int viewrectWidth = p_View_Rect.Width;
-                        int sizeX = p_MaskLayer.p_Size.X;
+                        int sizeX = p_ROILayer.p_Size.X;
 
                         Parallel.For(1, p_CanvasHeight, (yy) =>
                         {
@@ -952,16 +951,16 @@ namespace RootTools
         #region Draw Method
         public virtual unsafe void CropRectSetData(ImageData imageData, CRect nowRect, CPoint offset = null)
         {
-            IntPtr ptrMem = p_MaskLayer.GetPtr();
+            IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
 
             CPoint StartPt = new CPoint(nowRect.Left - offset.X, nowRect.Top - offset.Y);
             
-            IntPtr rectPtr = (IntPtr)((long)ptrMem + (long)StartPt.Y * p_MaskLayer.p_Size.X * p_MaskLayer.p_nByte + StartPt.X * p_MaskLayer.p_nByte);
+            IntPtr rectPtr = (IntPtr)((long)ptrMem + (long)StartPt.Y * p_ROILayer.p_Size.X * p_ROILayer.p_nByte + StartPt.X * p_ROILayer.p_nByte);
             for (int i = 0; i < nowRect.Height; i++)
             {
-                Marshal.Copy(imageData.m_aBuf, i * nowRect.Width*4, (IntPtr)((long)rectPtr + (long)p_MaskLayer.p_Size.X * p_MaskLayer.p_nByte * i), nowRect.Width * 4);
+                Marshal.Copy(imageData.m_aBuf, i * nowRect.Width*4, (IntPtr)((long)rectPtr + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * i), nowRect.Width * 4);
             }
 
         }
@@ -978,24 +977,24 @@ namespace RootTools
         }
         public virtual unsafe void DrawPixelBitmap(CPoint memPt, byte r, byte g, byte b, byte a)
         {
-            IntPtr ptrMem = p_MaskLayer.GetPtr();
+            IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
             byte* imagePtr = (byte*)ptrMem.ToPointer();
 
-            imagePtr[(memPt.Y * p_MaskLayer.p_Size.X + memPt.X) * 4 + 0] = b; // b
-            imagePtr[(memPt.Y * p_MaskLayer.p_Size.X + memPt.X) * 4 + 1] = g; // g
-            imagePtr[(memPt.Y * p_MaskLayer.p_Size.X + memPt.X) * 4 + 2] = r; // r
-            imagePtr[(memPt.Y * p_MaskLayer.p_Size.X + memPt.X) * 4 + 3] = a; // a
+            imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 0] = b; // b
+            imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 1] = g; // g
+            imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 2] = r; // r
+            imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 3] = a; // a
         }
         public virtual unsafe void DrawPixelBitmap(CPoint memPt, byte value, CPoint offset = null)
         {
-            IntPtr ptrMem = p_MaskLayer.GetPtr();
+            IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
             byte* imagePtr = (byte*)ptrMem.ToPointer();
 
-            imagePtr[memPt.Y * p_MaskLayer.p_Size.X + memPt.X] = value;
+            imagePtr[memPt.Y * p_ROILayer.p_Size.X + memPt.X] = value;
         }
         #endregion
 

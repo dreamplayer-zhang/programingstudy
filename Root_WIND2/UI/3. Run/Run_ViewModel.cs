@@ -24,7 +24,7 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    UIManager.Instance.ChangeUIMode();
+                    UIManager.Instance.ChangUIMode();
                 });
             }
         }

@@ -174,7 +174,7 @@ namespace RootTools.Gem
             set
             {
                 string[] recipe_path = value.Split('\\');
-                _sRecipe = recipe_path[recipe_path.Length - 1];
+                _sRecipe = recipe_path[3];
                 OnPropertyChanged(); 
             }
         }

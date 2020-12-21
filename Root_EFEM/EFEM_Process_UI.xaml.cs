@@ -1,9 +1,7 @@
 ﻿using RootTools;
 using RootTools.Trees;
-using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 
 namespace Root_EFEM
 {
@@ -28,46 +26,25 @@ namespace Root_EFEM
             checkBoxPause.DataContext = EQ.m_EQ;
             checkBoxSimulate.DataContext = EQ.m_EQ;
 
-            treeInfoWaferUI.Init(process.m_treeWafer);
-            treeLocateUI.Init(process.m_treeLocate);
-            treeSequenceUI.Init(process.m_treeSequence);
-            process.RunTree(Tree.eMode.Init);
-
-            InitTimer(); 
+//            treeInfoWaferUI.Init(process.m_treeReticle);
+//            treeLocateUI.Init(process.m_treeLocate);
+//            treeSequenceUI.Init(process.m_treeSequence);
+//            process.RunTree(Tree.eMode.Init);
         }
 
-        #region Button
         private void buttonClearInfoReticle_Click(object sender, RoutedEventArgs e)
         {
-            m_process.ClearInfoWafer();
+//            m_process.ClearInfoReticle();
         }
 
         private void buttonSetRecover_Click(object sender, RoutedEventArgs e)
         {
-            m_process.CalcRecover();
+//            m_process.CalcRecover();
         }
 
         private void buttonRunStep_Click(object sender, RoutedEventArgs e)
         {
-            m_process.p_sInfo = m_process.RunNextSequence();
+//            m_process.p_sInfo = m_process.RunNextSequence();
         }
-        #endregion
-
-        #region Timer
-        DispatcherTimer m_timer = new DispatcherTimer();
-
-        void InitTimer()
-        {
-            m_timer.Interval = TimeSpan.FromSeconds(1);
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Start();
-        }
-
-        private void M_timer_Tick(object sender, EventArgs e)
-        {
-            m_process.RunTree(Tree.eMode.Init);
-        }
-        #endregion
-
     }
 }

@@ -158,7 +158,7 @@
                 </Grid>
                 <Grid Grid.Row="3" >
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <Label x:Name="lableMsg" Content="{Binding p_sMsg}" ToolTip="Message" Foreground="White" FontSize="20" />
+                        <Label x:Name="lableMsg" Content="{Binding p_sMsg}" ToolTip="Message" Foreground="White" FontSize="20"/>
                     </StackPanel>
                 </Grid>
             </Grid>

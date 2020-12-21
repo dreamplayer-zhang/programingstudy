@@ -258,17 +258,6 @@ namespace Root_EFEM
         }
         #endregion
 
-        #region Calc Process (Sequence)
-        /// <summary> Sequence 계산용 임시 Process </summary>
-        public Queue<ModuleRunBase> m_qCalcProcess = new Queue<ModuleRunBase>();
-        public void InitCalcProcess()
-        {
-            m_qCalcProcess.Clear(); 
-            ModuleRunBase[] aProcess = m_qProcess.ToArray();
-            foreach (ModuleRunBase run in aProcess) m_qCalcProcess.Enqueue(run); 
-        }
-        #endregion
-
         #region Tree
         public override void RunTree(Tree tree)
         {
@@ -279,13 +268,11 @@ namespace Root_EFEM
         }
         #endregion
 
-        public string m_sModule;
-        public int m_nSlot = 0; 
-        public InfoWafer(string sModule, int nSlot, IEngineer engineer)
+        public string m_sLoadport;
+        public InfoWafer(string id, IEngineer engineer)
         {
-            m_sModule = sModule;
-            m_nSlot = nSlot; 
-            string id = sModule + "." + ((nSlot >= 0) ? (nSlot + 1).ToString("00") : "Recover"); 
+            string[] asID = id.Split('.');
+            m_sLoadport = asID[0];
             InitBase(id, engineer);
             m_moduleRunList = new ModuleRunList(id, engineer);
             m_moduleRunList.Clear();

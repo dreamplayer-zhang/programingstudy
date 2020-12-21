@@ -49,8 +49,6 @@ namespace RootTools_Vision
             if (this.workplace.Index == 0)
                 return;
 
-            bool isBackside = false;
-
             // BACKSIDE
             //if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == false)
             //{
@@ -59,8 +57,8 @@ namespace RootTools_Vision
 
             // Inspection Param
             bool bGetDarkInsp = true; // Option
-            int nGrayLevel = 15; // Option
-            int nDefectSz = 0; // Option     
+            int nGrayLevel = 30; // Option
+            int nDefectSz = 1; // Option     
 
             int chipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
             int chipW = this.workplace.BufferSizeX;
@@ -68,46 +66,37 @@ namespace RootTools_Vision
             byte[] arrBinImg = new byte[chipW * chipH]; // Threashold 결과 array
 
             // Backside Test 할 때만 추가
-            if(isBackside)
-                ExtractCurrentWorkplace();
+            ExtractCurrentWorkplace();
 
-            // Dark
-            CLR_IP.Cpp_Threshold(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp, nGrayLevel);
             // Filtering
-            CLR_IP.Cpp_Morphology(arrBinImg, arrBinImg, chipW, chipH, 3, "Close", 1);
-            // Labeling
+            //CLR_IP.Cpp_Morphology(arrBinImg, arrBinImg, nChipW, nChipH, 3, "OPEN", 1);
+
+            CLR_IP.Cpp_Threshold(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp, nGrayLevel);
+
+
             //var Label = CLR_IP.Cpp_Labeling(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp);
-            var Label = CLR_IP.Cpp_Labeling_SubPix(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp, nGrayLevel, 3);
+            var Label = CLR_IP.Cpp_Labeling_SubPix(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp, nGrayLevel, 10);
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
-
-            if (Label.Length > 0)
+            for (int i = 0; i < Label.Length; i++)
             {
-                this.workplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
-
-                //Add Defect
-                for (int i = 0; i < Label.Length; i++)
+                if (Label[i].area > nDefectSz)
                 {
-                    if (Label[i].area > nDefectSz)
-                    {
-                        this.workplace.AddDefect(sInspectionID,
-                            10001,
-                            Label[i].area,
-                            Label[i].value,
-                            this.workplace.PositionX + Label[i].boundLeft,
-                            this.workplace.PositionY - (chipH - Label[i].boundTop),
-                            Label[i].width,
-                            Label[i].height,
-                            this.workplace.MapPositionX,
-                            this.workplace.MapPositionY
-                            );
-                    }
-
+                    this.workplace.AddDefect(sInspectionID,
+                        10001,
+                        Label[i].area,
+                        Label[i].value,
+                        this.workplace.PositionX + Label[i].boundLeft,
+                        this.workplace.PositionY - (chipH - Label[i].boundTop),
+                        Label[i].width,
+                        Label[i].height,
+                        this.workplace.MapPositionX,
+                        this.workplace.MapPositionY
+                        );
                 }
+
             }
-
-
             WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
         }
 

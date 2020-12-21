@@ -68,10 +68,6 @@ namespace RootTools_Vision
 
             ProcessDefect processDefect = new ProcessDefect();
             ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-            processDefect_Wafer.SetRecipe(_recipe);
-
-            bundle.Add(processDefect);
-            bundle.Add(processDefect_Wafer);
 
             return bundle;
         }
