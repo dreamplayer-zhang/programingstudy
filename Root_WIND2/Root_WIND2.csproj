@@ -402,7 +402,6 @@
     <Compile Include="UI\1. Setup\4. Maintenance\ViewerTest_ViewModel.cs" />
     <Compile Include="WIND2_Engineer.cs" />
     <Compile Include="WIND2_Handler.cs" />
-    <Compile Include="WIND2_Process.cs" />
     <Compile Include="WIND2_Recipe.cs" />
     <Page Include="Controls\UserControl\ColorPicker.xaml">
       <SubType>Designer</SubType>

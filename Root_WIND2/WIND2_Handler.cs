@@ -51,11 +51,10 @@ namespace Root_WIND2
 
         #region Module
         public WIND2_Recipe m_recipe;
-        public WIND2_Process m_process;
+        public EFEM_Process m_process;
         public Vision m_vision;
         public EdgeSideVision m_edgesideVision;
         public BackSideVision m_backSideVision;
-
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -75,17 +74,26 @@ namespace Root_WIND2
         void InitEFEMModule()
         {
             InitWTR();
+            IWTR iWTR = (IWTR)m_wtr;
             InitLoadport();
             InitAligner();
             m_edgesideVision = new EdgeSideVision("EdgeSide Vision", m_engineer);
             InitModule(m_edgesideVision);
+            iWTR.AddChild(m_edgesideVision);
             m_backSideVision = new BackSideVision("BackSide Vision", m_engineer);
             InitModule(m_backSideVision);
+            iWTR.AddChild(m_backSideVision);
             m_vision = new Vision("Vision", m_engineer);
             InitModule(m_vision);
+            iWTR.AddChild(m_vision);
+
+            m_wtr.RunTree(Tree.eMode.RegRead);
+            m_wtr.RunTree(Tree.eMode.Init);
+            iWTR.ReadInfoReticle_Registry();
+
             m_recipe = new WIND2_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            //            m_process = new WIND2_Process("Process", m_engineer, this);
+            m_process = new EFEM_Process("Process", m_engineer, iWTR);
         }
 
         void InitModule(ModuleBase module)

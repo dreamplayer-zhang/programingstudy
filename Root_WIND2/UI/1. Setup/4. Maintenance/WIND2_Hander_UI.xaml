@@ -16,7 +16,7 @@
         </Grid.ColumnDefinitions>
         <TabControl Grid.Column="0">
             <TabItem Header="Handler" Background="{Binding p_brushHandler}">
-                <TabControl>
+                <TabControl x:Name="tabControlHandler">
                     <TabItem Header="ModuleList" Background="{Binding p_brushHandler}">
                         <module:ModuleList_UI x:Name="moduleListUI"/>
                     </TabItem>
