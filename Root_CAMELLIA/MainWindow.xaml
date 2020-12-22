@@ -617,7 +617,7 @@
                                                          Y2="{Binding p_ArrowY2, Converter={StaticResource PointToStageConverter}, ConverterParameter=Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                          Visibility="{Binding p_ArrowVisible, UpdateSourceTrigger=PropertyChanged}"  Width="1000" Height="1000" StrokeThickness="8" ArrowLength="30" ArrowAngle="80" >
                                             <arrow:ArrowLine.Stroke>
-                                                <LinearGradientBrush StartPoint="{Binding p_GradientStartPoint}" EndPoint="{Binding p_GradientEndPoint}">
+                                                <LinearGradientBrush StartPoint="{Binding p_GradientStartPoint, UpdateSourceTrigger=PropertyChanged}" EndPoint="{Binding p_GradientEndPoint, UpdateSourceTrigger=PropertyChanged}">
                                                     <GradientStop x:Name="GradientStop1" Color="Yellow" Offset="0.0" />
                                                     <GradientStop x:Name="GradientStop2" Color="Red" Offset="1.0" />
                                                 </LinearGradientBrush>

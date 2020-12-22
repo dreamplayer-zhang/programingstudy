@@ -67,7 +67,6 @@ namespace Root_CAMELLIA
 
             m_camellia = new Module_Camellia("Camellia", m_engineer);
             InitModule(m_camellia);
-
             IWTR iWTR = (IWTR)m_wtr;
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
