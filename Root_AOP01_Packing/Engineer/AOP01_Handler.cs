@@ -71,9 +71,11 @@ namespace Root_AOP01_Packing
         void InitWTR()
         {
             m_aWTR.Add(new WTR_RND("WTR_A", m_engineer));
-            m_aWTR.Add(new WTR_RND("WTR_B", m_engineer));
             InitModule(m_aWTR[0]);
+            ((WTR_RND)m_aWTR[0]).m_dicArm[WTR_RND.eArm.Lower].p_bEnable = false;
+            m_aWTR.Add(new WTR_RND("WTR_B", m_engineer));
             InitModule(m_aWTR[1]);
+            ((WTR_RND)m_aWTR[1]).m_dicArm[WTR_RND.eArm.Lower].p_bEnable = false;
         }
         #endregion
 
