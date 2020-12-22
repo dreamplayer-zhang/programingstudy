@@ -174,6 +174,7 @@ namespace Root_WIND2
         {
             EQ.m_sModel = id;
             LogView.Init();
+            m_handler.m_engineer = this;
             InitTree();
             m_login.Init();
             m_toolBox.Init(id, this);
