@@ -498,7 +498,9 @@ namespace RootTools.Module
             InitMemorys();
             InitTreeSetup(); 
             InitTreeRun();
-            InitTreeQueue(); 
+            InitTreeQueue();
+
+            RunTree(Tree.eMode.RegRead);
 
             m_thread = new Thread(new ThreadStart(ThreadRun));
             m_thread.Start();
