@@ -112,84 +112,143 @@ namespace RootTools.Inspects
 					{
 						unsafe
 						{
-							var temp = clrInsp.SurfaceInspection(
-							m_InspProp.MemoryPoolName,
-							m_InspProp.MemoryGroupName,
-							m_InspProp.MemoryName,
-							m_InspProp.MemoryOffset,
-							ThreadIndex,
-							m_InspProp.m_nDefectCode,
-							m_InspProp.p_Rect.Left,
-							m_InspProp.p_Rect.Top,
-							m_InspProp.p_Rect.Right,
-							m_InspProp.p_Rect.Bottom,
-							m_InspProp.p_TargetMemWidth,
-							m_InspProp.p_TargetMemHeight,
-							m_InspProp.p_surfaceParam.TargetGV,
-							m_InspProp.p_surfaceParam.DefectSize,
-							m_InspProp.p_surfaceParam.UseDarkInspection,
-							m_InspProp.p_surfaceParam.UseAbsoluteInspection,
-							m_InspProp.p_bDefectMerge,
-							m_InspProp.p_nMergeDistance,
-							(void*)m_InspProp.p_ptrMemory);
+                            //byte[] arrOriginImg = new byte[m_InspProp.p_Rect.Width * m_InspProp.p_Rect.Height];
+                            //byte[] arrBinImg = new byte[m_InspProp.p_Rect.Width * m_InspProp.p_Rect.Height];
+                            //for (int cnt = m_InspProp.p_Rect.Top; cnt < m_InspProp.p_Rect.Bottom; cnt++)
+                            //                     {
+                            //                         Marshal.Copy(new IntPtr(m_InspProp.p_ptrMemory.ToInt64() + (cnt * (Int64)m_InspProp.p_TargetMemWidth + m_InspProp.p_Rect.Left))
+                            //	, arrOriginImg, m_InspProp.p_Rect.Width * (cnt - m_InspProp.p_Rect.Top), m_InspProp.p_Rect.Width);
+                            //                     }
 
-							foreach (var item in temp)
-							{
-								arrDefects.Add(new DefectDataWrapper(item));
-							}
-						}
+                            //// Dark
+                            //CLR_IP.Cpp_Threshold(arrOriginImg, arrBinImg, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height, m_InspProp.p_surfaceParam.UseDarkInspection, m_InspProp.p_surfaceParam.TargetGV);
+                            //// Filtering
+                            //CLR_IP.Cpp_Morphology(arrBinImg, arrBinImg, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height, 3, "Close", 1);
+                            //// Labeling
+                            //var Label = CLR_IP.Cpp_Labeling_SubPix(arrOriginImg, arrBinImg, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height, m_InspProp.p_surfaceParam.UseDarkInspection, m_InspProp.p_surfaceParam.TargetGV, 3);
+
+                            //for (int i = 0; i<Label.Length; i++)
+                            //                     {
+                            //	if (Label[i].area > m_InspProp.p_surfaceParam.DefectSize)
+                            //                         {
+                            //		DefectData defectData = new DefectData();
+                            //		defectData.fAreaSize = Label[i].area;
+                            //		defectData.fPosX = m_InspProp.p_Rect.Left + Label[i].boundLeft + (Label[i].width / 2);
+                            //		defectData.fPosY = m_InspProp.p_Rect.Top + Label[i].boundTop + (Label[i].height / 2);
+                            //		defectData.nClassifyCode = m_InspProp.m_nDefectCode;
+                            //		defectData.nFOV = 0;
+                            //		defectData.nWidth = (int)Label[i].width;
+                            //		defectData.nHeight = (int)Label[i].height;
+                            //		defectData.nIdx = m_InspProp.p_index;
+                            //		defectData.nLength = defectData.nWidth > defectData.nHeight ? defectData.nWidth : defectData.nHeight;
+                            //		arrDefects.Add(new DefectDataWrapper(defectData));
+                            //	}
+                            //                     }
+
+                            var temp = clrInsp.SurfaceInspection(
+                                            m_InspProp.MemoryPoolName,
+                                            m_InspProp.MemoryGroupName,
+                                            m_InspProp.MemoryName,
+                                            m_InspProp.MemoryOffset,
+                                            ThreadIndex,
+                                            m_InspProp.m_nDefectCode,
+                                            m_InspProp.p_Rect.Left,
+                                            m_InspProp.p_Rect.Top,
+                                            m_InspProp.p_Rect.Right,
+                                            m_InspProp.p_Rect.Bottom,
+                                            m_InspProp.p_TargetMemWidth,
+                                            m_InspProp.p_TargetMemHeight,
+                                            m_InspProp.p_surfaceParam.TargetGV,
+                                            m_InspProp.p_surfaceParam.DefectSize,
+                                            m_InspProp.p_surfaceParam.UseDarkInspection,
+                                            m_InspProp.p_surfaceParam.UseAbsoluteInspection,
+                                            m_InspProp.p_bDefectMerge,
+                                            m_InspProp.p_nMergeDistance,
+                                            (void*)m_InspProp.p_ptrMemory);
+
+                            foreach (var item in temp)
+                            {
+                                arrDefects.Add(new DefectDataWrapper(item));
+                            }
+                        }
 
 					}
 					else if (m_InspProp.p_InspType == InspectionType.Strip)
 					{
 						unsafe
 						{
-							//var temp = clrInsp.StripInspection(
-							//m_InspProp.MemoryPoolName,
-							//m_InspProp.MemoryGroupName,
-							//m_InspProp.MemoryName,
-							//m_InspProp.MemoryOffset,
-							//ThreadIndex,
-							//m_InspProp.m_nDefectCode,
-							//m_InspProp.p_Rect.Left,
-							//m_InspProp.p_Rect.Top,
-							//m_InspProp.p_Rect.Right,
-							//m_InspProp.p_Rect.Bottom,
-							//m_InspProp.p_TargetMemWidth,
-							//m_InspProp.p_TargetMemHeight,
-							//m_InspProp.p_StripParam.TargetGV,
-							//m_InspProp.p_StripParam.DefectSize,
-							//m_InspProp.p_StripParam.Intensity,
-							//m_InspProp.p_StripParam.Bandwidth,
-							//m_InspProp.p_bDefectMerge,
-							//m_InspProp.p_nMergeDistance,
-							//(void*)m_InspProp.p_ptrMemory);
-							var temp = clrInsp.SurfaceInspection(
-							m_InspProp.MemoryPoolName,
-							m_InspProp.MemoryGroupName,
-							m_InspProp.MemoryName,
-							m_InspProp.MemoryOffset,
-							ThreadIndex,
-							m_InspProp.m_nDefectCode,
-							m_InspProp.p_Rect.Left,
-							m_InspProp.p_Rect.Top,
-							m_InspProp.p_Rect.Right,
-							m_InspProp.p_Rect.Bottom,
-							m_InspProp.p_TargetMemWidth,
-							m_InspProp.p_TargetMemHeight,
-							m_InspProp.p_StripParam.TargetGV,
-							m_InspProp.p_StripParam.DefectSize,
-							true,
-							true,
-							m_InspProp.p_bDefectMerge,
-							m_InspProp.p_nMergeDistance,
-							(void*)m_InspProp.p_ptrMemory);
+                            //byte[] arrOriginImg = new byte[m_InspProp.p_Rect.Width * m_InspProp.p_Rect.Height];
+                            //byte[] arrBinImg = new byte[m_InspProp.p_Rect.Width * m_InspProp.p_Rect.Height];
+                            //IntPtr ptrMemory = m_InspProp.p_ptrMemory;
+                            //int nMemWidth = m_InspProp.p_TargetMemWidth;
+                            //int nMemHeight = m_InspProp.p_TargetMemHeight;
+                            //int nLeft = m_InspProp.p_Rect.Left;
+                            //int nTop = m_InspProp.p_Rect.Top;
+                            //int nBottom = m_InspProp.p_Rect.Bottom;
+                            //int nRectWidth = m_InspProp.p_Rect.Width;
+                            //int nRectHeight = m_InspProp.p_Rect.Height;
+                            //int nTargetGV = m_InspProp.p_StripParam.TargetGV;
+                            //int nDefectCode = m_InspProp.m_nDefectCode;
+                            //int nDefectSize = m_InspProp.p_StripParam.DefectSize;
+                            //int iIndex = m_InspProp.p_index;
 
-							foreach (var item in temp)
-							{
-								arrDefects.Add(new DefectDataWrapper(item));
-							}
-						}
+                            //                     for (int cnt = nTop; cnt < nBottom; cnt++)
+                            //                     {
+                            //                         Marshal.Copy(new IntPtr(ptrMemory.ToInt64() + (cnt * (Int64)nMemWidth + nLeft))
+                            //                         , arrOriginImg, nRectWidth * (cnt - nTop), nRectWidth);
+                            //                     }
+
+                            //                     // Dark
+                            //                     CLR_IP.Cpp_Threshold(arrOriginImg, arrBinImg, nRectWidth, nRectHeight, true, nTargetGV);
+                            //                     // Filtering
+                            //                     CLR_IP.Cpp_Morphology(arrBinImg, arrBinImg, nRectWidth, nRectHeight, 3, "Close", 1);
+                            //                     // Labeling
+                            //                     var Label = CLR_IP.Cpp_Labeling_SubPix(arrOriginImg, arrBinImg, nRectWidth, nRectHeight, true, nTargetGV, 3);
+
+                            //                     for (int i = 0; i < Label.Length; i++)
+                            //                     {
+                            //                         if (Label[i].area > nDefectSize)
+                            //                         {
+                            //                             DefectData defectData = new DefectData();
+                            //                             defectData.fAreaSize = Label[i].area;
+                            //                             defectData.fPosX = nLeft + Label[i].boundLeft + (Label[i].width / 2);
+                            //                             defectData.fPosY = nTop + Label[i].boundTop + (Label[i].height / 2);
+                            //                             defectData.nClassifyCode = nDefectCode;
+                            //                             defectData.nFOV = 0;
+                            //                             defectData.nWidth = (int)Label[i].width;
+                            //                             defectData.nHeight = (int)Label[i].height;
+                            //                             defectData.nIdx = iIndex;
+                            //                             defectData.nLength = defectData.nWidth > defectData.nHeight ? defectData.nWidth : defectData.nHeight;
+                            //                             arrDefects.Add(new DefectDataWrapper(defectData));
+                            //                         }
+                            //                     }
+
+                            var temp = clrInsp.SurfaceInspection(
+                            m_InspProp.MemoryPoolName,
+                            m_InspProp.MemoryGroupName,
+                            m_InspProp.MemoryName,
+                            m_InspProp.MemoryOffset,
+                            ThreadIndex,
+                            m_InspProp.m_nDefectCode,
+                            m_InspProp.p_Rect.Left,
+                            m_InspProp.p_Rect.Top,
+                            m_InspProp.p_Rect.Right,
+                            m_InspProp.p_Rect.Bottom,
+                            m_InspProp.p_TargetMemWidth,
+                            m_InspProp.p_TargetMemHeight,
+                            m_InspProp.p_StripParam.TargetGV,
+                            m_InspProp.p_StripParam.DefectSize,
+                            true,
+                            true,
+                            m_InspProp.p_bDefectMerge,
+                            m_InspProp.p_nMergeDistance,
+                            (void*)m_InspProp.p_ptrMemory);
+
+                            foreach (var item in temp)
+                            {
+                                arrDefects.Add(new DefectDataWrapper(item));
+                            }
+                        }
 
 					}
 					//if (m_InspProp.p_bDefectMerge)//TODO : 기능 개선이 필요함. UI에 표시할때의 변수가 별도로 있는 것이 좋을 것으로 보임 + Defect Clustering구현
