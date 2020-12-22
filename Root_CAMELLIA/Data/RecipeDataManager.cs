@@ -69,10 +69,10 @@ namespace Root_CAMELLIA.Data
                     //Read(dialog.FileName);                        
                     dataManager.recipeDM.MeasurementRD = (RecipeData)GeneralFunction.Read(dataManager.recipeDM.MeasurementRD, dialog.FileName);
                     dataManager.recipeDM.MeasurementRD.CheckCircleSize();
-                    if (dataManager.recipeDM.MeasurementRD.ModelRecipePath != "")
-                    {
-                        LoadModel(dataManager.recipeDM.MeasurementRD.ModelRecipePath);
-                    }
+                    //if (dataManager.recipeDM.MeasurementRD.ModelRecipePath != "")
+                    //{
+                    //    LoadModel(dataManager.recipeDM.MeasurementRD.ModelRecipePath);
+                    //}
                     dataManager.recipeDM.MeasurementRD.Clone(dataManager.recipeDM.TeachingRD);
 
                     // dataManager.recipeDM.TeachingRD.CheckLayerData();
@@ -170,9 +170,10 @@ namespace Root_CAMELLIA.Data
             return sFileName;
         }
 
-        public int AddMaterial()
+        public bool AddMaterial()
         {
-            int index = 0, res = 0;
+            LibSR_Met.Nanoview.ERRORCODE_NANOVIEW res;
+              
             string name = "", ext = "";
 
             OpenFileDialog fileDlg = new OpenFileDialog();
@@ -187,61 +188,34 @@ namespace Root_CAMELLIA.Data
             {
                 foreach (string filename in fileDlg.FileNames)
                 {
-                    res = App.m_nanoView.m_Model.LoadMaterialFile(filename);
-                    if (res == 0)
+                    res = App.m_nanoView.LoadMaterial(filename);
+                    if (res == LibSR_Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                     {
                         dataManager.recipeDM.ModelData.MaterialList.Add(filename);
                     }
-                    else
-                    {
-                        if (res == 1) name = String.Format("The material({0}) is already in the list.", fileDlg.FileName);
-                        if (res == 2) name = String.Format("Error : file extension of ({0}) is incorrect.", fileDlg.FileName);
-                        if (res == 3) name = String.Format("Error : file ({0}) not found.", fileDlg.FileName);
-                        MessageBox.Show(name);
-                    }
                 }
-                return res;
+                return true;
             }
-            return -1;
+            return false;
         }
 
         public void DeleteMaterial(int nIndex)
         {
-            App.m_nanoView.m_Model.m_MaterialList.RemoveAt(nIndex);
+            App.m_nanoView.m_MaterialList.RemoveAt(nIndex);
             dataManager.recipeDM.ModelData.MaterialList.RemoveAt(nIndex);
         }
 
-        public void LoadModel(string path)
+        public bool LoadModel(string path)
         {
             App.m_nanoView.LoadModel(path);
-            //int bl;
-
-            //bl = App.m_nanoView.m_Model.FillFromFile(dataManager.recipeDM.MeasurementRD.ModelRecipePath);   
-
-            //if (bl != 0)
-            //{
-            //    foreach (Material m in App.m_nanoView.m_Model.m_MaterialList)
-            //    {
-            //        App.m_nanoView.m_Model.m_MaterialList.Remove(m);
-            //    }
-            //    return;
-            //}
 
             dataManager.recipeDM.ModelData.MaterialList.Clear();
-            //// delete and add material list control
-            ////foreach (ListViewItem item in materialList.Items)
-            ////{
-            ////    item.Remove();
-            ////}
-            //// DeleteComboStrings();
-            foreach (Material m in App.m_nanoView.m_Model.m_MaterialList)
+
+            foreach (Material m in App.m_nanoView.m_MaterialList)
             {
-                //if (m.m_Type == NanoView.Material.MaterialType.DISPERSION) index = 0;
-                //else index = 1;
-                //AddMaterialListItem(m.m_Name, index);
-                // dataManager.recipeDM.MeasurementRD.MaterialList.Add(m.m_Path);
                 dataManager.recipeDM.ModelData.MaterialList.Add(m.m_Path);
             }
+            return true;
         }
 
         public bool OpenModel()
@@ -255,29 +229,20 @@ namespace Root_CAMELLIA.Data
             fileDlg.RestoreDirectory = false;
 
 
-
+            LibSR_Met.Nanoview.ERRORCODE_NANOVIEW res;
             if (fileDlg.ShowDialog() == true)
             {
-                int bl;
-
-                bl = App.m_nanoView.m_Model.FillFromFile(fileDlg.FileName);
-
-                if (bl != 0)
+                res = App.m_nanoView.LoadModel(fileDlg.FileName);
+                if (res == LibSR_Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
-                    foreach (Material m in App.m_nanoView.m_Model.m_MaterialList)
+                    dataManager.recipeDM.ModelData.MaterialList.Clear();
+                    foreach (Material m in App.m_nanoView.m_MaterialList)
                     {
-                        App.m_nanoView.m_Model.m_MaterialList.Remove(m);
+                        dataManager.recipeDM.ModelData.MaterialList.Add(m.m_Path);
                     }
-                    return false;
+                    dataManager.recipeDM.TeachingRD.ModelRecipePath = fileDlg.FileName;
+                    return true;
                 }
-
-                dataManager.recipeDM.ModelData.MaterialList.Clear();
-                foreach (Material m in App.m_nanoView.m_Model.m_MaterialList)
-                {
-                    dataManager.recipeDM.ModelData.MaterialList.Add(m.m_Path);
-                }
-                dataManager.recipeDM.TeachingRD.ModelRecipePath = fileDlg.FileName;
-                return true;
             }
             return false;
         }
@@ -293,8 +258,8 @@ namespace Root_CAMELLIA.Data
             if (fileDlg.ShowDialog() == true)
             {
                 App.m_nanoView.SaveModel(fileDlg.FileName);
+                dataManager.recipeDM.TeachingRD.ModelRecipePath = fileDlg.FileName;
             }
-            dataManager.recipeDM.TeachingRD.ModelRecipePath = fileDlg.FileName;
             //if(dataManager.recipeDM.TeachingRD.ModelRecipePath == "")
             //{
             //    SaveAsModel();
