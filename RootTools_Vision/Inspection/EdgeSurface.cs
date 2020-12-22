@@ -28,11 +28,6 @@ namespace RootTools_Vision.Inspection
 			if (this.workplace.Index == 0)
 				return base.DoPrework();
 
-			//if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.EDGE_TOP)
-			//	&& this.IsPreworkDone == false)
-			//{
-			
-			//}
 			return true;
 		}
 

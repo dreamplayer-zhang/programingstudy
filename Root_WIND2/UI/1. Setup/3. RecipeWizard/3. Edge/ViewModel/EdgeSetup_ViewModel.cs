@@ -77,7 +77,7 @@ namespace Root_WIND2
 			setupVM.InspectionManagerEFEM.SharedBuffer = sharedBuf;
 			setupVM.InspectionManagerEFEM.InspectionMode = InspectionManager_EFEM.InsepectionMode.EDGE;
 			setupVM.InspectionManagerEFEM.SharedBufferByteCnt = DrawToolVM.p_ImageData.p_nByte;
-			setupVM.InspectionManagerEFEM.CreateInspection_Edgeside();
+			setupVM.InspectionManagerEFEM.CreateInspection();
 			setupVM.InspectionManagerEFEM.Start();
 		}
 
