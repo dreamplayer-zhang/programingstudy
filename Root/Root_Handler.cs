@@ -18,8 +18,9 @@ namespace Root
         //public BayerConvert m_bayer;
         //public ACS m_acs;
         //public TestMars m_testMars;
-        public TestRepeat m_testRepeat;
-        public ReadExcel m_readExcel; 
+        //public TestRepeat m_testRepeat;
+        //public ReadExcel m_readExcel;
+        public RemoteModule m_remote; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -35,10 +36,12 @@ namespace Root
             //InitModule(m_acs);
             //m_testMars = new TestMars("TestMars", m_enginner);
             //InitModule(m_testMars);
-            m_testRepeat = new TestRepeat("TestRepeat", m_engineer);
-            InitModule(m_testRepeat);
-            m_readExcel = new ReadExcel("ReadExcel", m_engineer);
-            InitModule(m_readExcel);
+            //m_testRepeat = new TestRepeat("TestRepeat", m_engineer);
+            //InitModule(m_testRepeat);
+            //m_readExcel = new ReadExcel("ReadExcel", m_engineer);
+            //InitModule(m_readExcel);
+            m_remote = new RemoteModule("Remote", m_engineer);
+            InitModule(m_remote);
         }
 
         void InitModule(ModuleBase module)

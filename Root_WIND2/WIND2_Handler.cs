@@ -345,6 +345,7 @@ namespace Root_WIND2
         #region Tree
         public void RunTreeModule(Tree tree)
         {
+            if (m_engineer.m_eMode == WIND2_Engineer.eMode.Vision) return; 
             RunTreeWTR(tree.GetTree("WTR"));
             RunTreeLoadport(tree.GetTree("Loadport"));
             RunTreeAligner(tree.GetTree("Aligner"));

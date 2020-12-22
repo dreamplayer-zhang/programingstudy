@@ -194,12 +194,12 @@ namespace Root_WIND2
 
         public string BuzzerOff()
         {
-            throw new System.NotImplementedException();
+            return "OK";
         }
 
         public string Recovery()
         {
-            throw new System.NotImplementedException();
+            return "OK"; 
         }
     }
 }
