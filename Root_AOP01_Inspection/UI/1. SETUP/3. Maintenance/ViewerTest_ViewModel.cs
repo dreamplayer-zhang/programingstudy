@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Root_AOP01_Inspection.UI._1._SETUP._3._Maintenance
+namespace Root_AOP01_Inspection
 {
     class ViewerTest_ViewModel : ObservableObject
     {

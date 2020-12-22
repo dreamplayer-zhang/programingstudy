@@ -45,6 +45,22 @@ namespace Root_AOP01_Inspection.Module
         Camera_Dalsa m_CamTDISide;
         Camera_Basler m_CamLADS;
 
+        class LADSInfo//한 줄에 대한 정보
+        {
+            public double[] m_Heightinfo;
+            public RPoint axisPos;//시작점의 x,y
+            public double endYPos;//끝점의 y 정보
+
+            LADSInfo() { }
+            public LADSInfo(RPoint _axisPos,double _endYPos,int arrcap/*heightinfo capacity*/)
+            {
+                axisPos = _axisPos;
+                endYPos = _endYPos;
+                m_Heightinfo = new double[arrcap];
+            }
+        }
+
+        static List<LADSInfo> ladsinfos;
 
         public override void GetTools(bool bInit)
         {
@@ -389,6 +405,7 @@ namespace Root_AOP01_Inspection.Module
         {
             base.InitBase(id, engineer);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
+            ladsinfos = new List<LADSInfo>();
             InitMemorys();
             InitPosAlign(); 
         }
@@ -747,13 +764,15 @@ namespace Root_AOP01_Inspection.Module
 
                 try
                 {
+                    AxisXY axisXY = m_module.m_axisXY;
+                    Axis axisZ = m_module.m_axisZ;
                     m_grabMode.SetLight(true);
                     if(m_grabMode.pUseRADS)
                     {
-                        m_module.m_axisXY.
+                        if(!axisZ.EnableCompensation(1))
+                            return "Axis Y Compensation disabled";
+
                     }
-                    AxisXY axisXY = m_module.m_axisXY;
-                    Axis axisZ = m_module.m_axisZ;
                     CPoint cpMemoryOffset = new CPoint(m_cpMemoryOffset);
                     int nScanLine = 0;
                     int nMMPerUM = 1000;
@@ -779,6 +798,24 @@ namespace Root_AOP01_Inspection.Module
 
 
                         double dPosX = m_rpAxisCenter.X + nReticleSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
+
+                        int idx=0;
+                        if (m_grabMode.pUseRADS)
+                        {
+                            double dist = int.MaxValue;
+                            //가장 가까운 index를 찾아
+                            for(int i=0;i<ladsinfos.Count;i++)
+                            {
+                                double curdist = ladsinfos[i].axisPos.X - dPosX;
+                                if (dist>Math.Abs(curdist))
+                                {
+                                    dist = curdist;
+                                    idx = i;
+                                }
+                                else
+                                    break;
+                            }
+                        }
 
                         if (m_module.Run(axisZ.StartMove(m_nFocusPosZ)))
                             return p_sInfo;
@@ -833,7 +870,6 @@ namespace Root_AOP01_Inspection.Module
             public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
             public GrabMode m_grabMode = null;
             string m_sGrabMode = "";
-            private int[,] m_Heightinfo;
 
             public string p_sGrabMode
             {
@@ -900,7 +936,6 @@ namespace Root_AOP01_Inspection.Module
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
                     int nScanOffset_pulse = 100000; //가속버퍼구간
 
-                    m_Heightinfo = new int[nReticleSizeY_px / nCamHeight,nReticleSizeY_px / nCamWidth];
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
                         if (EQ.IsStop())
@@ -910,7 +945,6 @@ namespace Root_AOP01_Inspection.Module
                         double dEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
-
 
                         double dPosX = m_rpAxisCenter.X + nReticleSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
 
@@ -941,13 +975,12 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
-                        CalculateHeight(nScanLine, mem, nReticleSizeY_px);
+                        CalculateHeight(nScanLine, mem, nReticleSizeY_px,new RPoint(dPosX,dStartPosY),dEndPosY);
 
                         nScanLine++;
                         cpMemoryOffset.X += nCamWidth;
                     }
                     m_grabMode.m_camera.StopGrab();
-                    //SaveFocusMapImage(nReticleSizeY_px/nCamWidth, nReticleSizeY_px/nCamHeight);
                     SaveFocusMapImage(nScanLine, nReticleSizeY_px / nCamHeight);
                     return "OK";
                 }
@@ -957,12 +990,13 @@ namespace Root_AOP01_Inspection.Module
                 }
             }
 
-            unsafe void CalculateHeight(int nCurLine, MemoryData mem,int ReticleHeight)
+            unsafe void CalculateHeight(int nCurLine, MemoryData mem,int ReticleHeight, RPoint Startpos,double endY)
             {
                 int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
                 int nHeight = ReticleHeight / nCamHeight;
                 byte* ptr =(byte*) mem.GetPtr().ToPointer(); //Gray
+                LADSInfo ladsinfo = new LADSInfo(Startpos, endY, nHeight);
                 for(int i=0;i<nHeight;i++)
                 {
                     int s=0, e=0; //레이저 시작, 끝위치 정보
@@ -976,8 +1010,10 @@ namespace Root_AOP01_Inspection.Module
                             s = Math.Min(s, j);
                         }
                     }
-                    m_Heightinfo[i, nCurLine] = (s + e) / 2;
+
+                    ladsinfo.m_Heightinfo[i] = (s + e) / 2;
                 }
+                ladsinfos.Add(ladsinfo);
             }
             private void SaveFocusMapImage(int nX, int nY)
             {
@@ -989,9 +1025,9 @@ namespace Root_AOP01_Inspection.Module
                     Mat Vmat = new Mat();
                     for(int y=0;y<nY;y++)
                     {
-                        Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1); 
-                        int nScalednum = (m_Heightinfo[y,x]-110) * 255 / nCamHeight;
-
+                        Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1);
+                        //double nScalednum = (ladsInfo.m_Heightinfo[y,x]-110) * 255 / nCamHeight;
+                        double nScalednum = (ladsinfos[nX].m_Heightinfo[y] - 110) * 255 / nCamHeight;
                         ColorImg.SetTo(new MCvScalar(nScalednum*20));
 
                         if (y == 0)
