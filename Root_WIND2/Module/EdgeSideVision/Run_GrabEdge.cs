@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Root_WIND2.Module
 {
@@ -364,15 +365,91 @@ namespace Root_WIND2.Module
 				}
 			}
 		}
+				
+		public void FindEdge()
+		{
+			int memW = Convert.ToInt32(module.MemoryEdgeTop.W);
+			int memH = module.MemoryEdgeTop.p_sz.Y;
+			int sobelSize = sobelHeight;
+
+			int memSize = memW * sobelSize;
+
+			for (int n = 1; n < memH / sobelSize; n++)
+			{
+				byte[] arrSrc = new byte[memSize];
+				byte[] arrDst = new byte[memSize];
+
+				Marshal.Copy(new IntPtr(module.MemoryEdgeTop.GetPtr().ToInt64() + (n * (Int64)memSize)),
+							arrSrc,
+							0,
+							memSize);
+
+				int nMin = 256;
+				int nMax = 0;
+				int nSearchLevel = 20;
+				int prox = nMin + (int)((nMax - nMin) * nSearchLevel * 0.01);
+				
+				if (nSearchLevel >= 100) 
+					prox = nMax;
+				else if (nSearchLevel <= 0) 
+					prox = nMin;
+
+				int x1, x2, y1, y2;
+				int nAvg, nAvgNext, nMinn;
+				x1 = 0; 
+				x2 = memW; // 3000;
+				y1 = 0;
+				y2 = sobelSize;
+
+				nMinn = x2;
+				nAvg = nAvgNext = 0;
+
+				for (int y = y1; y <= y2; y++)
+				{
+					nAvgNext += arrSrc[y * x2];
+				}
+				if (nAvgNext != 0) nAvgNext /= (y2 - y1 + 1);
+
+				for (int x = x1; x <= x2; x++)
+				{
+					nAvg = nAvgNext;
+					nAvgNext = 0;
+					for (int y = y1; y < memSize; y += memW)
+					{
+						nAvgNext += arrSrc[y + (x + 1)];
+					}
+					if (nAvgNext != 0) nAvgNext /= (y2 - y1 + 1);
+
+					if ((nAvg >= prox && prox > nAvgNext) || (nAvg <= prox && prox < nAvgNext))
+					{
+						nMinn = x;
+						x = x2 + 1;
+					}
+				}
+			}
+		}
 
 		/*
 		public void CalcAxisOffset()
 		{
-			module.EdgeXOfffset.Clear();
-			for (int n = 0; n < k_top; n++)
+			int memW = Convert.ToInt32(module.MemoryEdgeTop.W);
+			int memH = module.MemoryEdgeTop.p_sz.Y;
+			int sobelSize = sobelHeight;
+			int memSize = memW * sobelSize;
+
+			for (int n = 1; n < memH / sobelSize; n++)
 			{
-				String path = n.ToString() + ".bmp";
-				Emgu.CV.Mat matSrc = new Mat(@"D:\slot7\top\" + time + "_" + path, Emgu.CV.CvEnum.ImreadModes.Grayscale);
+				byte[] arrSrc = new byte[memSize];
+				byte[] arrDst = new byte[memSize];
+
+				Marshal.Copy(new IntPtr(module.MemoryEdgeTop.GetPtr().ToInt64() + (n * (Int64)memSize)),
+							arrSrc,
+							0,
+							memSize);
+
+				Emgu.CV.Mat matSrc = new Emgu.CV.Mat((int)sobelSize, (int)memW, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+				Marshal.Copy(arrSrc, 0, matSrc.DataPointer, arrSrc.Length);
+				
 				Emgu.CV.Mat matSobel = new Mat();
 				Emgu.CV.Mat matAbsGradX = new Mat();
 
@@ -404,7 +481,7 @@ namespace Root_WIND2.Module
 							{
 								listPixelX.Add(nStartGV);
 								listRect.Add(new Rectangle(nStartGV, j, i - nStartGV, 30));
-								//Emgu.CV.CvInvoke.Rectangle(matAbsGradX, new Rectangle(nStartGV, k, i - nStartGV, 30), color);
+								//Emgu.CV.CvInvoke.Rectangle(matAbsGradX, new Rectangle(nStartGV, j, i - nStartGV, 30), color);
 								break;
 							}
 						}
@@ -415,6 +492,8 @@ namespace Root_WIND2.Module
 				if (listPixelX.Count != 0)
 					nStartGVAvg = (int)listPixelX.Average();
 
+				String path = @"D:\SKSiltron\" + n.ToString() + ".bmp";
+
 				int nLTAvg = 0;
 				int nWidthAvg = 0;
 				if (listRect.Count != 0)
@@ -422,19 +501,15 @@ namespace Root_WIND2.Module
 					nLTAvg = (int)listRect.Average(x => x.Left);
 					nWidthAvg = (int)listRect.Average(x => x.Width);
 					Emgu.CV.CvInvoke.Rectangle(matAbsGradX, new Rectangle(nLTAvg, 0, nWidthAvg, matAbsGradX.Height), color);
-					matAbsGradX.Save(@"D:\slot7\sobel\" + time + "_" + path);
+					CvInvoke.CvtColor(matAbsGradX, matAbsGradX, Emgu.CV.CvEnum.ColorConversion.Gray2Rgb);
+					matAbsGradX.Save(path);
 				}
 
-				if (nStartGVAvg <= 0)
-					module.EdgeXOfffset.Add(0);
-				else
-					module.EdgeXOfffset.Add(nStartGVAvg);
-			}
-
-			// 앞에 이미지 없는거 처리
-			for (int i = 0; i < 4; i++)
-			{
-				module.EdgeXOfffset[i] = module.EdgeXOfffset[4];
+				//if (nStartGVAvg <= 0)
+				//	module.EdgeXOfffset.Add(0);
+				//else
+				//	module.EdgeXOfffset.Add(nStartGVAvg);
+				
 			}
 		}
 
@@ -485,4 +560,6 @@ namespace Root_WIND2.Module
 		}
 		*/
 	}
+
+
 }
