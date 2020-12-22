@@ -590,9 +590,9 @@
                                     Background="#01FFFFFF" Focusable="true">
                                 <Border BorderBrush="Black" BorderThickness="1" Panel.ZIndex="99">
                                     <Grid>
-                                        <Rectangle Width="5" Height="40" Fill="#990000FF" />
+                                        <Rectangle Width="5" Height="39" Fill="#990000FF" />
                                         <!--<TextBlock Text="Test" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" />-->
-                                        <Rectangle Width="40" Height="5" Fill="#990000FF" />
+                                        <Rectangle Width="39" Height="5" Fill="#990000FF" />
                                     </Grid>
                                     <Canvas.Left>
                                         <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="40">

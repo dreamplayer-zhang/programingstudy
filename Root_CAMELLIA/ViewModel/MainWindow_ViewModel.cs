@@ -390,6 +390,7 @@ namespace Root_CAMELLIA
                     if (RecipeViewModel.dataManager.recipeDM.RecipeOpen())
                     {
                         RecipeViewModel.UpdateListView(true);
+                        RecipeViewModel.UpdateLayerGridView();
                         RecipeViewModel.UpdateView(true);
                         DrawMeasureRoute();
                         p_Progress = 0;

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -547,8 +548,8 @@ namespace Root_CAMELLIA
 
         private string pointAddMode = "Normal";
 
-        private int _VISIntegrationTime = 20;
-        public int VISIntegrationTime
+        private string _VISIntegrationTime = "20";
+        public string VISIntegrationTime
         {
             get
             {
@@ -556,14 +557,27 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _VISIntegrationTime = value;
-                dataManager.recipeDM.TeachingRD.VISIntegrationTime = _VISIntegrationTime;
+                int val;
+                if (value == "")
+                {
+                    _VISIntegrationTime = "0";
+                    dataManager.recipeDM.TeachingRD.VISIntegrationTime = 0;
+                }
+                else if (int.TryParse(value, out val))
+                {
+                    _VISIntegrationTime = val.ToString();
+                    dataManager.recipeDM.TeachingRD.VISIntegrationTime = val;     
+                }
+                else
+                {
+                    _VISIntegrationTime = dataManager.recipeDM.TeachingRD.VISIntegrationTime.ToString();
+                }
                 RaisePropertyChanged("VISIntegrationTime");
             }
         }
 
-        private int _NIRIntegrationTime = 150;
-        public int NIRIntegrationTime
+        private string _NIRIntegrationTime = "150";
+        public string NIRIntegrationTime
         {
             get
             {
@@ -571,8 +585,23 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _NIRIntegrationTime = value;
-                dataManager.recipeDM.TeachingRD.NIRIntegrationTime = _NIRIntegrationTime;
+                int val;
+                if (value == "")
+                {
+                    _NIRIntegrationTime = "0";
+                    dataManager.recipeDM.TeachingRD.NIRIntegrationTime = 0;
+                }
+                else if(int.TryParse(value, out val))
+                {
+                    _NIRIntegrationTime = val.ToString();
+                    dataManager.recipeDM.TeachingRD.NIRIntegrationTime = val;
+                }
+                else
+                {
+                    _NIRIntegrationTime = dataManager.recipeDM.TeachingRD.NIRIntegrationTime.ToString();
+                }
+               
+              
                 RaisePropertyChanged("NIRIntegrationTime");
             }
         }
@@ -667,8 +696,8 @@ namespace Root_CAMELLIA
             }
         }
 
-        private double _WaveLengthValue = 0.0f;
-        public double WaveLengthValue
+        private string _WaveLengthValue = "0.0";
+        public string WaveLengthValue
         {
             get
             {
@@ -676,7 +705,15 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _WaveLengthValue = value;
+                double val;
+                if(double.TryParse(value, out val))
+                {
+                    _WaveLengthValue = val.ToString("N3");
+                }
+                else
+                {
+                    MessageBox.Show("Invalid Value Entered", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
                 RaisePropertyChanged("WaveLengthValue");
             }
         }
@@ -1892,7 +1929,7 @@ namespace Root_CAMELLIA
             }
             PointCount = PointListItem.Rows.Count.ToString();
 
-            WaveLengthValue = 0;
+            WaveLengthValue = "0.0";
             ReflectanceListItem.Clear();
             ReflectanceSelectedIndex = -1;
             for(int i = 0; i < dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Count; i++)
@@ -1951,8 +1988,8 @@ namespace Root_CAMELLIA
 
         private void UpdateMeasurementParameter()
         {
-            NIRIntegrationTime = dataManager.recipeDM.TeachingRD.NIRIntegrationTime;
-            VISIntegrationTime = dataManager.recipeDM.TeachingRD.VISIntegrationTime;
+            NIRIntegrationTime = dataManager.recipeDM.TeachingRD.NIRIntegrationTime.ToString();
+            VISIntegrationTime = dataManager.recipeDM.TeachingRD.VISIntegrationTime.ToString();
         }
         private void UpdateThicknessParameter()
         {
@@ -3429,13 +3466,13 @@ namespace Root_CAMELLIA
                 {
                     if (IsReflectanceCheck)
                     {
-                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Add(WaveLengthValue);
-                        ReflectanceListItem.Add(WaveLengthValue);
+                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Add(Convert.ToDouble(WaveLengthValue));
+                        ReflectanceListItem.Add(Convert.ToDouble(WaveLengthValue));
                     }
                     else if(IsTransmittanceCheck)
                     {
-                        dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Add(WaveLengthValue);
-                        TransmittanceListItem.Add(WaveLengthValue);
+                        dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Add(Convert.ToDouble(WaveLengthValue));
+                        TransmittanceListItem.Add(Convert.ToDouble(WaveLengthValue));
                     }
                 });
             }
@@ -3455,7 +3492,7 @@ namespace Root_CAMELLIA
                         }
                         dataManager.recipeDM.TeachingRD.WaveLengthReflectance.RemoveAt(ReflectanceSelectedIndex);
                         ReflectanceListItem.RemoveAt(ReflectanceSelectedIndex);
-                        ReflectanceSelectedIndex = -1;
+                        //ReflectanceSelectedIndex = ReflectanceListItem.Count - ReflectanceSelectedIndex - 1;
                     }
                     else if (IsTransmittanceCheck)
                     {
@@ -3465,7 +3502,7 @@ namespace Root_CAMELLIA
                         }
                         dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.RemoveAt(TransmittanceSelectedIndex);
                         TransmittanceListItem.RemoveAt(TransmittanceSelectedIndex);
-                        TransmittanceSelectedIndex = -1;
+                        //TransmittanceSelectedIndex = TransmittanceListItem.Count - TransmittanceSelectedIndex- 1;
                     }
                 });
             }
