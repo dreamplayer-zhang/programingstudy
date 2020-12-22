@@ -172,7 +172,7 @@ namespace Root_Vega
 			m_SlaveList = SlaveList();
         }
 
-		private void timer_Tick(object sender, EventArgs e)//check
+		private void timer_Tick(object sender, EventArgs e)
 		{
 			int CVM_Counter = m_FDC.p_lData;
 			if (m_CVM != null)

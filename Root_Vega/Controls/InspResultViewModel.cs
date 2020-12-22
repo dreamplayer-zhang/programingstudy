@@ -522,7 +522,7 @@ namespace Root_Vega.Controls
 
 
 						//imageFile.SelectActiveFrame(frameDimensions, frame);
-						using (Bitmap bmp = new Bitmap(imageWidth,imageHeight,System.Drawing.Imaging.PixelFormat.Format8bppIndexed))
+						using (Bitmap bmp = new Bitmap(imageWidth, imageHeight, System.Drawing.Imaging.PixelFormat.Format8bppIndexed))
 						{
 							bmp.Palette = mono;
 							BitmapData data = bmp.LockBits(new Rectangle(0, 0, imageWidth, imageHeight), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
@@ -715,10 +715,21 @@ namespace Root_Vega.Controls
 						//		break;
 						//}
 					}
-					catch(Exception ex)
-                    {
+					catch (Exception ex)
+					{
 
-                    }
+					}
+				}
+			}
+			else
+			{
+				string idxStr = "_" + idx.ToString("D8");
+				string imagePath = DBDataPath.Replace(".vega_result", idxStr + ".bmp");
+				if(File.Exists(imagePath))
+				{
+					Bitmap bmp = new Bitmap(imagePath);
+					SelectedTDIImage = ConvertImage(bmp);
+					bmp.Dispose();
 				}
 			}
 		}

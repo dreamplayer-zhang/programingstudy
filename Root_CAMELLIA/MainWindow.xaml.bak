@@ -588,11 +588,11 @@
                         <Viewbox Margin="3" Grid.Row="1">
                             <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"
                                     Background="#01FFFFFF" Focusable="true">
-                                <Border BorderBrush="Black" BorderThickness="1" Panel.ZIndex="99">
+                                <Border BorderBrush="Black" BorderThickness="1">
                                     <Grid>
-                                        <Rectangle Width="5" Height="39" Fill="#990000FF" />
+                                        <Rectangle Width="5" Height="40" Fill="#990000FF" />
                                         <!--<TextBlock Text="Test" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" />-->
-                                        <Rectangle Width="39" Height="5" Fill="#990000FF" />
+                                        <Rectangle Width="40" Height="5" Fill="#990000FF" />
                                     </Grid>
                                     <Canvas.Left>
                                         <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="40">
@@ -617,7 +617,7 @@
                                                          Y2="{Binding p_ArrowY2, Converter={StaticResource PointToStageConverter}, ConverterParameter=Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                          Visibility="{Binding p_ArrowVisible, UpdateSourceTrigger=PropertyChanged}"  Width="1000" Height="1000" StrokeThickness="8" ArrowLength="30" ArrowAngle="80" >
                                             <arrow:ArrowLine.Stroke>
-                                                <LinearGradientBrush StartPoint="{Binding p_GradientStartPoint}" EndPoint="{Binding p_GradientEndPoint}">
+                                                <LinearGradientBrush>
                                                     <GradientStop x:Name="GradientStop1" Color="Yellow" Offset="0.0" />
                                                     <GradientStop x:Name="GradientStop2" Color="Red" Offset="1.0" />
                                                 </LinearGradientBrush>
@@ -691,7 +691,7 @@
                                             <TextBlock Text="{Binding RecipeViewModel.PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                                         </UniformGrid>
                                         <DataGrid Grid.Row="1" ItemsSource="{Binding RecipeViewModel.PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
-                                  EnableRowVirtualization="True" Grid.ColumnSpan="2" SelectionMode="Single" CanUserDeleteRows="False">
+                                  EnableRowVirtualization="True" Grid.ColumnSpan="2" SelectionMode="Single">
                                             <DataGrid.Resources>
                                                 <Style TargetType="DataGridColumnHeader">
                                                     <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -724,11 +724,8 @@
                                                 <DataGrid Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
                                   EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding RecipeViewModel.GridLayerData}" IsReadOnly="True">
                                                     <DataGrid.Columns>
-                                                        <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True" Foreground="Blue" FontWeight="ExtraBold"/>
-                                                        <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedHost1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
-                                                            <DataGridComboBoxColumn.Header>
-                                                                <TextBlock Text="Host" Style="{StaticResource GridHeaderStyle}"/>
-                                                            </DataGridComboBoxColumn.Header>
+                                                        <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True"/>
+                                                        <DataGridComboBoxColumn Header="Host" Width="*" SelectedValueBinding="{Binding SelectedHost1, UpdateSourceTrigger=PropertyChanged}"  DisplayMemberPath="Name" SelectedValuePath="FullPath">
                                                             <DataGridComboBoxColumn.ElementStyle>
                                                                 <Style TargetType="ComboBox">
                                                                     <Setter Property="ItemsSource" Value="{Binding Host1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -741,10 +738,7 @@
                                                                 </Style>
                                                             </DataGridComboBoxColumn.EditingElementStyle>
                                                         </DataGridComboBoxColumn>
-                                                        <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
-                                                            <DataGridComboBoxColumn.Header>
-                                                                <TextBlock Text="Guest1" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridComboBoxColumn.Header>
+                                                        <DataGridComboBoxColumn Header="Guest1" Width="*"  SelectedValueBinding="{Binding SelectedGuest1, UpdateSourceTrigger=PropertyChanged}"  DisplayMemberPath="Name" SelectedValuePath="FullPath">
                                                             <DataGridComboBoxColumn.ElementStyle>
                                                                 <Style TargetType="ComboBox">
                                                                     <Setter Property="ItemsSource" Value="{Binding Guest1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -757,20 +751,9 @@
                                                                 </Style>
                                                             </DataGridComboBoxColumn.EditingElementStyle>
                                                         </DataGridComboBoxColumn>
-                                                        <DataGridTextColumn Width="50" Binding="{Binding Fv1, StringFormat=N3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                                            <DataGridTextColumn.Header>
-                                                                <TextBlock Text="fv1" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridTextColumn.Header>
-                                                        </DataGridTextColumn>
-                                                        <DataGridCheckBoxColumn Width="25" Binding="{Binding Fv1Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                                            <DataGridCheckBoxColumn.Header>
-                                                                <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridCheckBoxColumn.Header>
-                                                        </DataGridCheckBoxColumn>
-                                                        <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest2, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
-                                                            <DataGridComboBoxColumn.Header>
-                                                                <TextBlock Text="Guest2" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridComboBoxColumn.Header>
+                                                        <DataGridTextColumn Header="fv1" Width="40" Binding="{Binding Fv1, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                                        <DataGridCheckBoxColumn Header="fit" Width="25" Binding="{Binding Fv1Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                                        <DataGridComboBoxColumn Header="Guest2" Width="*"  SelectedValueBinding="{Binding SelectedGuest2, UpdateSourceTrigger=PropertyChanged}"  DisplayMemberPath="Name" SelectedValuePath="FullPath">
                                                             <DataGridComboBoxColumn.ElementStyle>
                                                                 <Style TargetType="ComboBox">
                                                                     <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -783,30 +766,9 @@
                                                                 </Style>
                                                             </DataGridComboBoxColumn.EditingElementStyle>
                                                         </DataGridComboBoxColumn>
-                                                        <DataGridTextColumn Width="50" Binding="{Binding Fv2, StringFormat=N3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                                            <DataGridTextColumn.Header>
-                                                                <TextBlock Text="fv2" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridTextColumn.Header>
-                                                        </DataGridTextColumn>
-                                                        <DataGridCheckBoxColumn Width="25" Binding="{Binding Fv2Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                                            <DataGridCheckBoxColumn.Header>
-                                                                <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridCheckBoxColumn.Header>
-                                                        </DataGridCheckBoxColumn>
-                                                        <DataGridTextColumn Width="50" Binding="{Binding Thickness, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                                            <DataGridTextColumn.Header>
-                                                                <TextBlock Text="Thick." Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridTextColumn.Header>
-                                                        </DataGridTextColumn>
-                                                        <DataGridCheckBoxColumn Width="25" Binding="{Binding ThicknessFit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                                            <DataGridCheckBoxColumn.Header>
-                                                                <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridCheckBoxColumn.Header>
-                                                        </DataGridCheckBoxColumn>
-                                                        <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
-                                                            <DataGridComboBoxColumn.Header>
-                                                                <TextBlock Text="Emm" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridComboBoxColumn.Header>
+                                                        <DataGridTextColumn Header="fv2" Width="40" Binding="{Binding Fv2, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                                        <DataGridCheckBoxColumn Header="fit" Width="25" Binding="{Binding Fv2Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                                        <DataGridComboBoxColumn Header="Emm" Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
                                                             <DataGridComboBoxColumn.ElementStyle>
                                                                 <Style TargetType="ComboBox">
                                                                     <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -926,7 +888,7 @@
                 <TabItem Header="Log" Width="80">
                 </TabItem>
                 <TabItem Header="RT Graph">
-                    <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
+                    <met:RTGraph DataContext="{Binding p_RTGraph}"/>
                 </TabItem>
             </TabControl>
         </Grid>

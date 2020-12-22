@@ -52,6 +52,8 @@ namespace Root_Vega.Module
         DIO_I m_diElecPnl_2_FanAlarm;
         DIO_I m_diPCPnl_FanAlarm;
         DIO_I m_diPC_FanAlarm;
+        DIO_I m_di12chLED1FanAlarm;
+        DIO_I m_di12chLED2FanAlarm;
         public DIO_O m_doIonizerOnOff;
 
 
@@ -73,7 +75,8 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_diPCPnl_FanAlarm, this, "PC Panel Fan Alarm");
             p_sInfo = m_toolBox.Get(ref m_diPC_FanAlarm, this, "PC Fan Alarm");
             p_sInfo = m_toolBox.Get(ref m_diInterlock_Key, this, "InterLock Key");
-            p_sInfo = m_toolBox.Get(ref m_doIonizerOnOff, this, "IonizerOnOff");
+            p_sInfo = m_toolBox.Get(ref m_di12chLED1FanAlarm, this, "12Ch LED 1 Fan Alarm");
+            p_sInfo = m_toolBox.Get(ref m_di12chLED2FanAlarm, this, "12Ch LED 2 Fan Alarm");
             p_sInfo = m_RFID.GetTools(this, bInit);
             
                 if (bInit) InitALID(); 
@@ -91,9 +94,10 @@ namespace Root_Vega.Module
         ALID m_alidElecPnl_2_FanAlarm;
         ALID m_alidPCPnl_FanAlarm;
         ALID m_alidPC_FanAlarm;
+        ALID m_alidLED1FanAlarm;
+        ALID m_alidLED2FanAlarm;
         ALID m_alidDoorLock;
         ALID m_alidIonizerAlarm;
-
         ALID m_alidRecipeLoadAlarm;
         ALID m_alidFeatureSearchFailAlarm;
         ALID m_alidAlignFailAlarm;
@@ -111,7 +115,6 @@ namespace Root_Vega.Module
             m_alidElecPnl_2_FanAlarm = m_gaf.GetALID(this, "Elecanel 2 Fan Alarm", "Elect Panel 2 Fan Alarm");
             m_alidPCPnl_FanAlarm = m_gaf.GetALID(this, "PCPanel Fan Alarm", "PC Panel Fan Alarm");
             m_alidPC_FanAlarm = m_gaf.GetALID(this, "PC Fan Alarm", "PC Fan Alarm");
-
             m_alidRecipeLoadAlarm = m_gaf.GetALID(this, "Recipe Not Loaded Alarm", "Recipe Not Loaded Alarm");
             m_alidFeatureSearchFailAlarm = m_gaf.GetALID(this, "Feature Search Fail Alarm", "Feature Search Fail Alarm");
             m_alidAlignFailAlarm = m_gaf.GetALID(this, "Align Fail Alarm", "Align Fail Alarm");
@@ -130,12 +133,12 @@ namespace Root_Vega.Module
 				switch (EQ.p_eState)
 				{
 					case EQ.eState.Error:
-                        m_doDoorLock_Use.Write(false);//check
+                        m_doDoorLock_Use.Write(false);
                         //m_doBuzzer.Write(eBuzzer.Buzzer2);
                         m_doLamp.Write(eLamp.Red);
 						break;
 					case EQ.eState.Run:
-                        m_doDoorLock_Use.Write(true);//check
+                        m_doDoorLock_Use.Write(true);
                         //m_doBuzzer.Write(eBuzzer.Buzzer4);
                         m_doLamp.Write(eLamp.Green);
                         break;
@@ -144,19 +147,19 @@ namespace Root_Vega.Module
                         m_doLamp.Write(eLamp.Green);
                         break;
 					case EQ.eState.Ready:
-                        m_doDoorLock_Use.Write(false);//check
+                        m_doDoorLock_Use.Write(false);
                         BuzzerOff();
                         m_doLamp.Write(eLamp.Yellow);
                         break;
 					case EQ.eState.Init:
-                        m_doDoorLock_Use.Write(false);//check
+                        m_doDoorLock_Use.Write(false);
                         BuzzerOff();
                         m_doLamp.Write(eLamp.Yellow);
                         break;
 				}
 				m_eStatus = EQ.p_eState;
 			}
-			if (m_dioBuzzerOffButton.p_bIn || (m_gaf.m_listALID.p_aALID.Count < 1))//check
+			if (m_dioBuzzerOffButton.p_bIn || (m_gaf.m_listALID.p_aALID.Count < 1))
                 BuzzerOff();
             #endregion
 
@@ -171,7 +174,7 @@ namespace Root_Vega.Module
             }
             if (m_bDoorlock_Use && m_diInterlock_Key.p_bIn)
             {
-                m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");//check
+                m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
             }
             m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the Emergency Buttons");
 			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar");
@@ -187,13 +190,10 @@ namespace Root_Vega.Module
             m_alidElecPnl_2_FanAlarm.Run(!m_diElecPnl_2_FanAlarm.p_bIn, "Please Check Electronic Panel 1 Fan");
             m_alidPCPnl_FanAlarm.Run(!m_diPCPnl_FanAlarm.p_bIn, "Please Check PC Panel Fan");
             m_alidPC_FanAlarm.Run(!m_diPC_FanAlarm.p_bIn, "Please Check PC Fan");
-
             m_alidRecipeLoadAlarm.Run(!App.m_engineer.m_recipe.Loaded, "Please Load Recipe");
             m_alidFeatureSearchFailAlarm.Run(App.m_engineer.m_InspManager.m_bFeatureSearchFail, "Feature Search Failed...");
             m_alidAlignFailAlarm.Run(App.m_engineer.m_InspManager.m_bAlignFail, "Align Failed...");
             #endregion
-
-
         }
         #endregion
 
@@ -294,7 +294,7 @@ namespace Root_Vega.Module
                 m_aCmd[5] = nCh;
                 CalcSend();
                 m_rs232.m_sp.Write(m_aSend, 0, 15); 
-                while (m_swRead.ElapsedMilliseconds < 10000) //CHECK
+                while (m_swRead.ElapsedMilliseconds < 10000)
                 {
                     if (m_bOnRead == false)
                     {
@@ -344,7 +344,7 @@ namespace Root_Vega.Module
             p_id = id;
             base.InitBase(id, engineer);
             m_robot = ((Vega_Handler)engineer.ClassHandler()).m_robot;
-            m_dioBuzzerOffButton.Write(true);//check
+            m_dioBuzzerOffButton.Write(true);
             m_swIonizerOn = new StopWatch();
             m_swIonizerOn.Stop();
         }
