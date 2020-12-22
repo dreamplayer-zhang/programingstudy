@@ -13,7 +13,7 @@ namespace Root_EFEM.Module
     public class WTR_RND : ModuleBase, IWTR
     {
         #region ToolBox
-        RS232 m_rs232;
+        protected RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
@@ -411,7 +411,7 @@ namespace Root_EFEM.Module
         #endregion
 
         #region RS232
-        private void M_rs232_OnReceive(string sRead)
+        protected void M_rs232_OnReceive(string sRead)
         {
             string[] sReads = sRead.Split(' ');
             if (sReads[0] == "ERR") m_log.Error(GetErrorString(sReads[1]));
