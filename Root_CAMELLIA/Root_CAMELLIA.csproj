@@ -290,7 +290,6 @@
     <Compile Include="ViewModel\MainWindow_ViewModel.cs" />
     <Compile Include="Measurement\Measurement.cs" />
     <Compile Include="Measurement\MeasurementManager.cs" />
-    <Compile Include="ModuleBase\CamelliaModuleBase.cs" />
     <Compile Include="Module\Module_Camellia.cs" />
     <Compile Include="Draw\ShapeDraw\Arc.cs" />
     <Compile Include="Draw\ShapeDraw\Circle.cs" />

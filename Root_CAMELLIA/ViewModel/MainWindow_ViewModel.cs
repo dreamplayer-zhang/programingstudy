@@ -71,7 +71,6 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_StageCenterPulse, value);
             }
         }
-        private RPoint m_StageCenterPulse = new RPoint();
 
         public MainWindow_ViewModel(MainWindow mainwindow)
         {
@@ -153,6 +152,83 @@ namespace Root_CAMELLIA
         }
         private Visibility m_ArrowVisible = Visibility.Hidden;
 
+        private System.Windows.Point m_GradienStartPoint = new System.Windows.Point();
+        public System.Windows.Point p_GradientStartPoint
+        {
+            get
+            {
+                return m_GradienStartPoint;
+            }
+            set
+            {
+                if(p_ArrowX1 < p_ArrowX2)
+                {
+                    m_GradienStartPoint.X = 0;
+                }
+                else if(p_ArrowX1 > p_ArrowX2)
+                {
+                    m_GradienStartPoint.X = 1;
+                }
+                else{
+                    m_GradienStartPoint.X = 0.5;
+                }
+
+                if(p_ArrowY1 < p_ArrowY2)
+                {
+                    m_GradienStartPoint.Y = 0;
+                }
+                else if(p_ArrowY1 > p_ArrowY2)
+                {
+                    m_GradienStartPoint.Y = 1;
+                }
+                else
+                {
+                    m_GradienStartPoint.Y = 0.5;
+                }
+
+                SetProperty(ref m_GradienStartPoint, value);
+            }
+        }
+
+        private System.Windows.Point m_GradienEndPoint = new System.Windows.Point();
+        public System.Windows.Point p_GradientEndPoint
+        {
+            get
+            {
+                return m_GradienEndPoint;
+            }
+            set
+            {
+                if (p_ArrowX1 < p_ArrowX2)
+                {
+                    m_GradienEndPoint.X = 1;
+                }
+                else if (p_ArrowX1 > p_ArrowX2)
+                {
+                    m_GradienEndPoint.X = 0;
+                }
+                else
+                {
+                    m_GradienEndPoint.X = 0.5;
+                }
+
+                if (p_ArrowY1 < p_ArrowY2)
+                {
+                    m_GradienEndPoint.Y = 1;
+                }
+                else if (p_ArrowY1 > p_ArrowY2)
+                {
+                    m_GradienEndPoint.Y = 0;
+                }
+                else
+                {
+                    m_GradienEndPoint.Y = 0.5;
+                }
+
+                SetProperty(ref m_GradienEndPoint, value);
+            }
+        }
+
         public ObservableCollection<UIElement> p_DrawRouteElement
         {
             get
@@ -210,15 +286,6 @@ namespace Root_CAMELLIA
         public SolidColorBrush RouteBrush { get; set; } = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 0, 0, 255));
         public SolidColorBrush test = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 1, 211, 40));
         #endregion
-
-        public MainWindow_ViewModel(MainWindow mainwindow)
-        {
-            m_MainWindow = mainwindow;
-
-            Init();
-            ViewModelInit();
-            DialogInit(mainwindow);
-        }
 
         private void Init()
         {
