@@ -240,19 +240,20 @@ namespace Root_CAMELLIA
                     Thread thread = new Thread(()=> 
                     {
                         EnableBtn = false;
+                        ModuleCamellia.StateHome();
                         //m_AxisXY.p_axisX.StartHome();
                         //m_AxisXY.p_axisY.StartHome();
                         //m_AxisZ.StartHome();
                         //m_AxisXY.WaitReady();
                         //m_AxisZ.WaitReady();
-                        AxisX.StartHome();
-                        AxisY.StartHome();
-                        AxisZ.StartHome();
-                        AxisLifter.StartHome();
-                        AxisX.WaitReady();
-                        AxisY.WaitReady();
-                        AxisZ.WaitReady();
-                        AxisLifter.WaitReady();
+                        //AxisX.StartHome();
+                        //AxisY.StartHome();
+                        //AxisZ.StartHome();
+                        //AxisLifter.StartHome();
+                        //AxisX.WaitReady();
+                        //AxisY.WaitReady();
+                        //AxisZ.WaitReady();
+                        //AxisLifter.WaitReady();
                         EnableBtn = true;
                     });
                     thread.Start();

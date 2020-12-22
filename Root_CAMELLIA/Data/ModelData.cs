@@ -3,6 +3,8 @@ using RootTools;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,25 +59,28 @@ namespace Root_CAMELLIA.Data
 
         public int GetLayerCount()
         {
-            return NanoView.m_Model.m_LayerList.Count;
+            return App.m_nanoView.m_LayerList.Count;
         }
 
         public void AddLayer(int index = -1)
         {
-            Layer layer = new Layer();
+            Layer layerData = new Layer();
+
             if(index == -1)
             {
-                App.m_nanoView.m_Model.m_LayerList.Add(layer);
+                //MetDataManager.m_LayerData.Add(layerData);
+                App.m_nanoView.m_LayerList.Add(layerData);
             }
             else
             {
-                App.m_nanoView.m_Model.m_LayerList.Insert(index, layer);
+               // MetDataManager.m_LayerData.Insert(index, layerData);
+                App.m_nanoView.m_LayerList.Insert(index, layerData);
             }
         }
 
         public void DeleteLayer(int index = -1)
         {
-            App.m_nanoView.m_Model.m_LayerList.RemoveAt(index);
+            App.m_nanoView.m_LayerList.RemoveAt(index);
         }
 
         public class LayerData : ObservableObject
@@ -84,17 +89,17 @@ namespace Root_CAMELLIA.Data
             public LayerData(string layerHeader)
             {
                 this.LayerHeader = layerHeader;
-                this.Host1.Add("None");
-                SelectedHost1 = Host1[0];
-                this.Guest1.Add("None");
-                SelectedGuest1 = Guest1[0];
-                this.Guest2.Add("None");
-                SelectedGuest2 = Guest2[0];
+                this.Host1.Add(new PathEntity("None", "None"));
+                SelectedHost1 = Host1[0].FullPath;
+                this.Guest1.Add(new PathEntity("None", "None"));
+                SelectedGuest1 = Guest1[0].FullPath;
+                this.Guest2.Add(new PathEntity("None", "None"));
+                SelectedGuest2 = Guest2[0].FullPath;
                 this.Fv1 = 0.0f;
                 this.Fv2 = 0.0f;
                 this.Fv1Fit = false;
                 this.Fv2Fit = false;
-                this.Emm.Add("1.Bruggeman");
+                this.Emm.Add("1. Bruggeman");
                 this.Emm.Add("2. Maxwell Ganett-LL");
                 this.Emm.Add("3. Maxwell Garnett");
                 SelectedEmm = Emm[0];
@@ -128,8 +133,8 @@ namespace Root_CAMELLIA.Data
                     RaisePropertyChanged("SelectedHost1");
                 }
             }
-            private ObservableCollection<string> _host1 = new ObservableCollection<string>();
-            public ObservableCollection<string> Host1
+            private List<PathEntity> _host1 = new List<PathEntity>();
+            public List<PathEntity> Host1
             {
                 get
                 {
@@ -155,8 +160,8 @@ namespace Root_CAMELLIA.Data
                     RaisePropertyChanged("SelectedHost2");
                 }
             }
-            private ObservableCollection<string> _host2 = new ObservableCollection<string>();
-            public ObservableCollection<string> Host2
+            private List<PathEntity> _host2 = new List<PathEntity>();
+            public List<PathEntity> Host2
             {
                 get
                 {
@@ -183,8 +188,8 @@ namespace Root_CAMELLIA.Data
                     RaisePropertyChanged("SelectedGuest1");
                 }
             }
-            private ObservableCollection<string> _guest1 = new ObservableCollection<string>();
-            public ObservableCollection<string> Guest1
+            private List<PathEntity> _guest1 = new List<PathEntity>();
+            public List<PathEntity> Guest1
             {
                 get
                 {
@@ -210,8 +215,8 @@ namespace Root_CAMELLIA.Data
                     RaisePropertyChanged("SelectedGuest2");
                 }
             }
-            private ObservableCollection<string> _guest2 = new ObservableCollection<string>();
-            public ObservableCollection<string> Guest2
+            private List<PathEntity> _guest2 = new List<PathEntity>();
+            public List<PathEntity> Guest2
             {
                 get
                 {
@@ -281,6 +286,34 @@ namespace Root_CAMELLIA.Data
                 }
             }
 
+            private double _thickness = 0.0f;
+            public double Thickness
+            {
+                get
+                {
+                    return _thickness;
+                }
+                set
+                {
+                    _thickness = value;
+                    RaisePropertyChanged("Thickness");
+                }
+            }
+
+            private bool _thicknessFit = false;
+            public bool ThicknessFit
+            {
+                get
+                {
+                    return _thicknessFit;
+                }
+                set
+                {
+                    _thicknessFit = value;
+                    RaisePropertyChanged("ThicknessFit");
+                }
+            }
+
             private string _seletedEmm;
             public string SelectedEmm
             {
@@ -294,8 +327,8 @@ namespace Root_CAMELLIA.Data
                     RaisePropertyChanged("SelectedEmm");
                 }
             }
-            private ObservableCollection<string> _Emm = new ObservableCollection<string>();
-            public ObservableCollection<string> Emm
+            private List<string> _Emm = new List<string>();
+            public List<string> Emm
             {
                 get
                 {
@@ -312,35 +345,37 @@ namespace Root_CAMELLIA.Data
             #region Function
             public void UpdateGridLayer(int currentLayer)
             {
-                Layer layer;
-                layer = App.m_nanoView.m_Model.m_LayerList.ElementAt(currentLayer);
-                if(layer.m_Host == null)
+                Layer layerData;
+                layerData = App.m_nanoView.m_LayerList.ElementAt(currentLayer);
+                if(layerData.m_Host == null)
                 {
-                    SelectedHost1 = Host1[0];
+                    SelectedHost1 = Host1[0].FullPath;
                 }
                 else
                 {
-                    SelectedHost1 = layer.m_Host.m_Name;
+                    SelectedHost1 = string.Concat(layerData.m_Host.m_Path);
                 }
-                if(layer.m_Guest1 == null)
+                if(layerData.m_Guest1 == null)
                 {
-                    SelectedGuest1 = Guest1[0];
+                    SelectedGuest1 = Guest1[0].FullPath;
                 }
                 else
                 {
-                    SelectedGuest1 = layer.m_Guest1.m_Name;
+                    SelectedGuest1 = string.Concat(layerData.m_Guest1.m_Path);
                 }
-                if(layer.m_Guest2 == null)
+                if(layerData.m_Guest2 == null)
                 {
-                    SelectedGuest2 = Guest2[0];
+                    SelectedGuest2 = Guest2[0].FullPath;
                 }
                 else
                 {
-                    SelectedGuest2 = layer.m_Guest2.m_Name;
+                    SelectedGuest2 = string.Concat(layerData.m_Guest2.m_Path);
                 }
-                this.Fv1 = layer.m_fv1After;
-                this.Fv2 = layer.m_fv2After;
-                if(layer.m_bFitfv1 == true)
+
+                this.Fv1 = layerData.m_fv1;
+                this.Fv2 = layerData.m_fv2;
+
+                if(layerData.m_bFitfv1)
                 {
                       this.Fv1Fit = true;
                 }
@@ -348,7 +383,7 @@ namespace Root_CAMELLIA.Data
                 {
                     this.Fv1Fit = false;
                 }
-                if(layer.m_bFitfv2 == true)
+                if(layerData.m_bFitfv2)
                 {
                     this.Fv2Fit = true;
                 }
@@ -356,7 +391,18 @@ namespace Root_CAMELLIA.Data
                 {
                     this.Fv2Fit = false;
                 }
-                switch (layer.m_Emm)
+
+                this.Thickness = layerData.m_Thickness;
+                if(layerData.m_bFitThickness)
+                {
+                    this.ThicknessFit = true;
+                }
+                else
+                {
+                    this.ThicknessFit = false;
+                }
+
+                switch (layerData.m_Emm)
                 {
                     case 1:
                         this.SelectedEmm = Emm[0];
@@ -370,48 +416,105 @@ namespace Root_CAMELLIA.Data
                 }
             }
 
+            public bool CheckLayerHost(int currentLayer)
+            {
+                Layer layerData;
+                layerData = App.m_nanoView.m_LayerList.ElementAt(currentLayer);
+
+                if(layerData.m_Host == null)
+                {
+                    return false;
+                }
+                return true;
+            }
+
             public void UpdateModelLayer(int currentLayer)
             {
-                Layer layer;
-                Model model = App.m_nanoView.m_Model;
-                layer = App.m_nanoView.m_Model.m_LayerList.ElementAt(currentLayer);
+                Layer layerData;
+                layerData = App.m_nanoView.m_LayerList.ElementAt(currentLayer);
 
-                layer.m_Host = model.GetMaterialFromName(SelectedHost1);
-                layer.m_Guest1 = model.GetMaterialFromName(SelectedGuest1);
-                layer.m_Guest2 = model.GetMaterialFromName(SelectedGuest2);
-                layer.m_fv1 = layer.m_fv1After = Convert.ToDouble(Fv1);
-                layer.m_fv2 = layer.m_fv2After = Convert.ToDouble(Fv2);
-                if (Convert.ToBoolean(Fv1Fit) == true)
+                layerData.m_Host = App.m_nanoView.GetMaterialFromName(Path.GetFileNameWithoutExtension(SelectedHost1));
+                layerData.m_Guest1 = App.m_nanoView.GetMaterialFromName(Path.GetFileNameWithoutExtension(SelectedGuest1));
+                layerData.m_Guest2 = App.m_nanoView.GetMaterialFromName(Path.GetFileNameWithoutExtension(SelectedGuest2));
+
+                layerData.m_fv1 = layerData.m_fv1After = Convert.ToDouble(Fv1);
+                layerData.m_fv2 = layerData.m_fv2After = Convert.ToDouble(Fv2);
+                if (Convert.ToBoolean(Fv1Fit))
                 {
-                    layer.m_bFitfv1 = true;
+                    layerData.m_bFitfv1 = true;
                 }
                 else
                 {
-                    layer.m_bFitfv1 = false;
+                    layerData.m_bFitfv1 = false;
                 }
-                if(Convert.ToBoolean(Fv2Fit) == true)
+                if(Convert.ToBoolean(Fv2Fit))
                 {
-                    layer.m_bFitfv2 = true;
+                    layerData.m_bFitfv2 = true;
                 }
                 else
                 {
-                    layer.m_bFitfv2 = false;
+                    layerData.m_bFitfv2 = false;
+                }
+
+                layerData.m_Thickness = layerData.m_ThicknessAfter = Convert.ToDouble(Thickness);
+                if (Convert.ToBoolean(ThicknessFit))
+                {
+                    layerData.m_bFitThickness = true;
+                }
+                else
+                {
+                    layerData.m_bFitThickness = false;
                 }
                 switch (SelectedEmm)
                 {
                     case "1. Bruggeman":
-                        layer.m_Emm = 1;
+                        layerData.m_Emm = 1;
                         break;
                     case "2. Maxwell Ganett-LL":
-                        layer.m_Emm = 2;
+                        layerData.m_Emm = 2;
                         break;
                     case "3. Maxwell Garnett":
-                        layer.m_Emm = 3;
+                        layerData.m_Emm = 3;
                         break;
                 }
             }
             #endregion
 
+            public class PathEntity : ObservableObject
+            {
+                public PathEntity(string fullPath, string name)
+                {
+                    FullPath = fullPath;
+                    Name = name;
+                }
+                private string _fullPath;
+                public string FullPath
+                {
+                    get
+                    {
+                        return _fullPath;
+                    }
+                    set
+                    {
+                        _fullPath = value;
+                        RaisePropertyChanged("FullPath");
+                    }
+                }
+
+                private string _name;
+                public string Name
+                {
+                    get
+                    {
+                        return _name;
+                    }
+                    set
+                    {
+                        _name = value;
+                        RaisePropertyChanged("Name");
+                    }
+                }
+            }
         }
     }
 }

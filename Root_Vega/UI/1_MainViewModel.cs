@@ -7,6 +7,7 @@ using RootTools.Module;
 using Root_Vega.Module;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Threading;
+using RootTools.Inspects;
 
 namespace Root_Vega
 {
@@ -26,7 +27,7 @@ namespace Root_Vega
             }
         }
         DispatcherTimer m_dispatcherTimer;
-        PatternVision m_PatternVision;        
+        PatternVision m_PatternVision;
         public PatternVision p_PatternVision
         {
             get { return m_PatternVision; }
@@ -41,7 +42,7 @@ namespace Root_Vega
             get { return m_SideVision; }
             set
             {
-                SetProperty(ref m_SideVision, value); 
+                SetProperty(ref m_SideVision, value);
             }
         }
         Vega_Handler m_Handler;
@@ -92,6 +93,18 @@ namespace Root_Vega
                 SetProperty(ref m_MiniImageViewer_Top, value);
             }
         }
+        private MiniViewer_ViewModel m_MiniImageViewer_BevelTop;
+        public MiniViewer_ViewModel p_MiniImageViewer_BevelTop
+        {
+            get 
+            {
+                return m_MiniImageViewer_BevelTop; 
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer_BevelTop, value);
+            }
+        }
         private MiniViewer_ViewModel m_MiniImageViewer_Btm;
         public MiniViewer_ViewModel p_MiniImageViewer_Btm
         {
@@ -102,6 +115,18 @@ namespace Root_Vega
             set
             {
                 SetProperty(ref m_MiniImageViewer_Btm, value);
+            }
+        }
+        private MiniViewer_ViewModel m_MiniImageViewer_BevelBtm;
+        public MiniViewer_ViewModel p_MiniImageViewer_BevelBtm
+        {
+            get
+            {
+                return m_MiniImageViewer_BevelBtm;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer_BevelBtm, value);
             }
         }
         private MiniViewer_ViewModel m_MiniImageViewer_Left;
@@ -116,6 +141,18 @@ namespace Root_Vega
                 SetProperty(ref m_MiniImageViewer_Left, value);
             }
         }
+        private MiniViewer_ViewModel m_MiniImageViewer_BevelLeft;
+        public MiniViewer_ViewModel p_MiniImageViewer_BevelLeft
+        {
+            get
+            {
+                return m_MiniImageViewer_BevelLeft;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer_BevelLeft, value);
+            }
+        }
         private MiniViewer_ViewModel m_MiniImageViewer_Right;
         public MiniViewer_ViewModel p_MiniImageViewer_Right
         {
@@ -128,7 +165,18 @@ namespace Root_Vega
                 SetProperty(ref m_MiniImageViewer_Right, value);
             }
         }
-
+        private MiniViewer_ViewModel m_MiniImageViewer_BevelRight;
+        public MiniViewer_ViewModel p_MiniImageViewer_BevelRight
+        {
+            get
+            {
+                return m_MiniImageViewer_BevelRight;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer_BevelRight, value);
+            }
+        }
         double m_dPatternInspProgress = 0.0;
         public double p_dPatternInspProgress
         {
@@ -184,12 +232,174 @@ namespace Root_Vega
             InitAlarmData();
             p_MiniImageViewer = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("PatternVision.Memory", "PatternVision", "Main")));
             p_MiniImageViewer_Btm = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideBottom")), true);
+            p_MiniImageViewer_BevelBtm = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "BevelBottom")), true);
             p_MiniImageViewer_Top = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideTop")), true);
+            p_MiniImageViewer_BevelTop = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "BevelTop")), true);
             p_MiniImageViewer_Left = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideLeft")));
+            p_MiniImageViewer_BevelLeft = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "BevelLeft")));
             p_MiniImageViewer_Right = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideRight")));
+            p_MiniImageViewer_BevelRight = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "BevelRight")));
 
             p_PatternVision = ((Vega_Handler)m_Engineer.ClassHandler()).m_patternVision;
             p_SideVision = ((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision;
+
+            App.m_engineer.m_InspManager.AddChromeDefect += App_AddDefectMain;
+            App.m_engineer.m_InspManager.AddLeftSideDefect += App_AddDefectSideLeft;
+            App.m_engineer.m_InspManager.AddLeftBevelDefect += App_AddDefectBevelLeft;
+            App.m_engineer.m_InspManager.AddRightSideDefect += App_AddDefectSideRight;
+            App.m_engineer.m_InspManager.AddRightBevelDefect += App_AddDefectBevelRight;
+            App.m_engineer.m_InspManager.AddTopSideDefect += App_AddDefectSideTop;
+            App.m_engineer.m_InspManager.AddTopBevelDefect += App_AddDefectBevelTop;
+            App.m_engineer.m_InspManager.AddBotSideDefect += App_AddDefectSideBottom;
+            App.m_engineer.m_InspManager.AddBotBevelDefect += App_AddDefectBevelBottom;
+
+            App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
+            InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
+        }
+
+        ~_1_Mainview_ViewModel()
+        {
+            App.m_engineer.m_InspManager.AddChromeDefect -= App_AddDefectMain;
+            App.m_engineer.m_InspManager.AddLeftSideDefect -= App_AddDefectSideLeft;
+            App.m_engineer.m_InspManager.AddLeftBevelDefect -= App_AddDefectBevelLeft;
+            App.m_engineer.m_InspManager.AddRightSideDefect -= App_AddDefectSideRight;
+            App.m_engineer.m_InspManager.AddRightBevelDefect -= App_AddDefectBevelRight;
+            App.m_engineer.m_InspManager.AddTopSideDefect -= App_AddDefectSideTop;
+            App.m_engineer.m_InspManager.AddTopBevelDefect -= App_AddDefectBevelTop;
+            App.m_engineer.m_InspManager.AddBotSideDefect -= App_AddDefectSideBottom;
+            App.m_engineer.m_InspManager.AddBotBevelDefect -= App_AddDefectBevelBottom;
+        }
+
+        private void App_AddDefectMain(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void App_AddDefectSideLeft(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer_Left.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void App_AddDefectBevelLeft(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer_BevelLeft.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void App_AddDefectSideRight(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer_Right.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void App_AddDefectBevelRight(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer_BevelRight.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void App_AddDefectSideTop(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer_Top.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void App_AddDefectBevelTop(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer_BevelTop.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void App_AddDefectSideBottom(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer_Btm.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void App_AddDefectBevelBottom(RootTools.DefectDataWrapper item)
+        {
+            try
+            {
+                p_MiniImageViewer_BevelBtm.lstDefect.Add(new CPoint((int)item.fPosX, (int)item.fPosY));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void InspectionManager_RefreshDefect()
+        {
+        }
+
+        private void _ClearDefect()
+        {
+            try
+            {
+                p_MiniImageViewer.lstDefect.Clear();
+                p_MiniImageViewer_Left.lstDefect.Clear();
+                p_MiniImageViewer_BevelLeft.lstDefect.Clear();
+                p_MiniImageViewer_Right.lstDefect.Clear();
+                p_MiniImageViewer_BevelRight.lstDefect.Clear();
+                p_MiniImageViewer_Top.lstDefect.Clear();
+                p_MiniImageViewer_BevelTop.lstDefect.Clear();
+                p_MiniImageViewer_Btm.lstDefect.Clear();
+                p_MiniImageViewer_BevelBtm.lstDefect.Clear();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -204,7 +414,7 @@ namespace Root_Vega
 
             for (int i = 0; i < p_Engineer.m_handler.m_aLoadport.Length; i++)
             {
-                if(p_Engineer.m_handler.m_aLoadport[i].m_swLotTime.IsRunning) p_sLotElapsedTime = p_Engineer.m_handler.m_aLoadport[i].m_swLotTime.ElapsedMilliseconds.ToString(); 
+                if (p_Engineer.m_handler.m_aLoadport[i].m_swLotTime.IsRunning) p_sLotElapsedTime = p_Engineer.m_handler.m_aLoadport[i].m_swLotTime.ElapsedMilliseconds.ToString();
             }
         }
 
@@ -269,13 +479,15 @@ namespace Root_Vega
 
         public void UpdateMiniViewer()
         {
-            p_MiniImageViewer_Left.SetRoiRect();
-            p_MiniImageViewer.SetRoiRect();
             p_MiniImageViewer.SetImageSource();
             p_MiniImageViewer_Btm.SetImageSource();
+            p_MiniImageViewer_BevelBtm.SetImageSource();
             p_MiniImageViewer_Top.SetImageSource();
+            p_MiniImageViewer_BevelTop.SetImageSource();
             p_MiniImageViewer_Left.SetImageSource();
+            p_MiniImageViewer_BevelLeft.SetImageSource();
             p_MiniImageViewer_Right.SetImageSource();
+            p_MiniImageViewer_BevelRight.SetImageSource();
             p_test = !p_test;
         }
 

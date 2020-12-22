@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:module="clr-namespace:RootTools.Module;assembly=RootTools"
              xmlns:gaf="clr-namespace:RootTools.GAFs;assembly=RootTools"
+             xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -15,7 +16,7 @@
         </Grid.ColumnDefinitions>
         <TabControl Grid.Column="0">
             <TabItem Header="Handler" Background="{Binding p_brushHandler}">
-                <TabControl>
+                <TabControl x:Name="tabControlHandler">
                     <TabItem Header="ModuleList" Background="{Binding p_brushHandler}">
                         <module:ModuleList_UI x:Name="moduleListUI"/>
                     </TabItem>
@@ -23,6 +24,9 @@
                         <gaf:GAF_UI x:Name="gafUI"/>
                     </TabItem>
                 </TabControl>
+            </TabItem>
+            <TabItem Header="Setup" Background="DarkBlue">
+                <tree:TreeUI x:Name="treeRootUI"/>
             </TabItem>
         </TabControl>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>

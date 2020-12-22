@@ -162,7 +162,6 @@ namespace Root_EFEM
         #region Module Vision
         enum eVision
         {
-            Vision,
             Backside,
             EBR,
             AOP
@@ -181,8 +180,7 @@ namespace Root_EFEM
                     case eVision.Backside: module = new Vision_Backside(GetVisionID(n), m_engineer); break;
                     case eVision.EBR: module = new Vision_EBR(GetVisionID(n), m_engineer); break;
                     case eVision.AOP: module = new Vision_AOP(GetVisionID(n), m_engineer); break;
-                    case eVision.Vision:
-                    default: module = new Vision(GetVisionID(n), m_engineer); break; 
+                    default: module = new Vision_AOP(GetVisionID(n), m_engineer); break; 
                 }
                 InitModule(module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
@@ -209,7 +207,7 @@ namespace Root_EFEM
         public void RunTreeVision(Tree tree)
         {
             m_lVision = tree.Set(m_lVision, m_lVision, "Count", "Vision Count");
-            while (m_aVisionType.Count < m_lVision) m_aVisionType.Add(eVision.Vision);
+            while (m_aVisionType.Count < m_lVision) m_aVisionType.Add(eVision.AOP);
             Tree treeType = tree.GetTree("Type");
             for (int n = 0; n < m_lVision; n++)
             {

@@ -103,5 +103,9 @@ namespace Root_WIND2
         {
             throw new NotImplementedException();
         }
-    }
+		public override bool CreateInspecion_Backside(Recipe _recipe)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

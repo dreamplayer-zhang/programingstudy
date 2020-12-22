@@ -1,18 +1,7 @@
 ﻿using RootTools.Module;
-using System;
+using RootTools.Trees;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Root_WIND2
 {
@@ -31,14 +20,24 @@ namespace Root_WIND2
         {
             m_handler = handler;
             DataContext = handler;
-            moduleListUI.Init(handler.m_moduleList);
+            moduleListUI.Init(handler.p_moduleList);
             gafUI.Init(handler.m_gaf);
-            InitTabControl();
+            
+            treeRootUI.Init(handler.m_engineer.m_treeRoot);
+            handler.m_engineer.RunTree(Tree.eMode.Init);
+
+            InitTabHandler(); 
+            InitTabModule();
         }
 
-        void InitTabControl()
+        void InitTabHandler()
         {
-            foreach (KeyValuePair<ModuleBase, UserControl> kv in m_handler.m_moduleList.m_aModule)
+
+        }
+
+        void InitTabModule()
+        {
+            foreach (KeyValuePair<ModuleBase, UserControl> kv in m_handler.p_moduleList.m_aModule)
             {
                 TabItem tabItem = new TabItem();
                 tabItem.Header = kv.Key.p_id;

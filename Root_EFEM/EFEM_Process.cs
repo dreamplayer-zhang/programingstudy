@@ -233,7 +233,7 @@ namespace Root_EFEM
         {
             Locate locateArmPut = GetLocate(armPut.m_id);
             InfoWafer infoWaferPut = locateArmPut.p_calcWafer;
-            IWTRRun runPut = (IWTRRun)infoWaferPut.m_qCalcProcess.Dequeue();
+            IWTRRun runPut = (IWTRRun)infoWaferPut.m_qCalcProcess.Dequeue(); //forget WTR ModuleRun
             runPut.SetArm(armPut); 
             Locate locateChild = GetLocate(runPut.p_sChild);
             InfoWafer infoWaferGet = (locateChild == null) ? null : locateChild.p_calcWafer;
@@ -301,7 +301,7 @@ namespace Root_EFEM
             wtrRun.SetArm(armGet);
             GetLocate(armGet.m_id).p_calcWafer = infoWaferGet;
             Locate locateChild = GetLocate(wtrRun.p_sChild);
-            if (locateChild != null) locateChild.p_calcWafer = null;
+            //if (locateChild != null) locateChild.p_calcWafer = null; //forget
             m_qSequence.Enqueue(new Sequence((ModuleRunBase)wtrRun, infoWaferGet));
             return true;
         }

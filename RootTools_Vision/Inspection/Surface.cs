@@ -49,6 +49,8 @@ namespace RootTools_Vision
             if (this.workplace.Index == 0)
                 return;
 
+            bool isBackside = false;
+
             // BACKSIDE
             //if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == false)
             //{
@@ -56,9 +58,9 @@ namespace RootTools_Vision
             //}
 
             // Inspection Param
-            bool bGetDarkInsp = true; // Option
-            int nGrayLevel = 30; // Option
-            int nDefectSz = 1; // Option     
+            bool isDarkInsp = !parameter.IsBright; // Option
+            int nGrayLevel = parameter.Intensity; // Option
+            int nDefectSz = parameter.Size; // Option     
 
             int chipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
             int chipW = this.workplace.BufferSizeX;
@@ -66,16 +68,34 @@ namespace RootTools_Vision
             byte[] arrBinImg = new byte[chipW * chipH]; // Threashold 결과 array
 
             // Backside Test 할 때만 추가
-            ExtractCurrentWorkplace();
+            if(isBackside)
+                ExtractCurrentWorkplace();
 
-            // Filtering
-            //CLR_IP.Cpp_Morphology(arrBinImg, arrBinImg, nChipW, nChipH, 3, "OPEN", 1);
+            // Dark
+            CLR_IP.Cpp_Threshold(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
 
-            CLR_IP.Cpp_Threshold(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp, nGrayLevel);
+            // Filter
+            switch (parameter.DiffFilter)
+            {
+                case DiffFilterMethod.Average:
+                    CLR_IP.Cpp_AverageBlur(arrBinImg, arrBinImg, chipW, chipH);
+                    break;
+                case DiffFilterMethod.Gaussian:
+                    CLR_IP.Cpp_GaussianBlur(arrBinImg, arrBinImg, chipW, chipH, 2);
+                    break;
+                case DiffFilterMethod.Median:
+                    CLR_IP.Cpp_MedianBlur(arrBinImg, arrBinImg, chipW, chipH, 3);
+                    break;
+                case DiffFilterMethod.Morphology:
+                    CLR_IP.Cpp_Morphology(arrBinImg, arrBinImg, chipW, chipH, 3, "OPEN", 1);
+                    break;
+                default:
+                    break;
+            }
 
-
+            // Labeling
             //var Label = CLR_IP.Cpp_Labeling(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp);
-            var Label = CLR_IP.Cpp_Labeling_SubPix(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp, nGrayLevel, 10);
+            var Label = CLR_IP.Cpp_Labeling_SubPix(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel, 3);
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
@@ -101,7 +121,6 @@ namespace RootTools_Vision
                             this.workplace.MapPositionY
                             );
                     }
-
                 }
             }
 

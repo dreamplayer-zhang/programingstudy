@@ -160,11 +160,14 @@
                             <RowDefinition Height="1.0*"/>
                             <RowDefinition Height="0.3*"/>
                         </Grid.RowDefinitions>
-                        <DataGrid Margin="2" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
+                        <DataGrid Margin="2" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" CanUserDeleteRows="False"
                                   EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding GridLayerData}" SelectedIndex="{Binding GridLayerIndex}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True"/>
-                                <DataGridComboBoxColumn Header="Host" Width="*" SelectedValueBinding="{Binding SelectedHost1, UpdateSourceTrigger=PropertyChanged}">
+                                <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True" Foreground="Blue" FontWeight="ExtraBold"/>
+                                <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedHost1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
+                                    <DataGridComboBoxColumn.Header>
+                                        <TextBlock Text="Host" Style="{StaticResource GridHeaderStyle}" />
+                                    </DataGridComboBoxColumn.Header>
                                     <DataGridComboBoxColumn.ElementStyle>
                                         <Style TargetType="ComboBox">
                                             <Setter Property="ItemsSource" Value="{Binding Host1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -177,7 +180,10 @@
                                         </Style>
                                     </DataGridComboBoxColumn.EditingElementStyle>
                                 </DataGridComboBoxColumn>
-                                <DataGridComboBoxColumn Header="Guest1" Width="*"  SelectedValueBinding="{Binding SelectedGuest1, UpdateSourceTrigger=PropertyChanged}">
+                                <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
+                                    <DataGridComboBoxColumn.Header>
+                                        <TextBlock Text="Guest1" Style="{StaticResource GridHeaderStyle}" />
+                                    </DataGridComboBoxColumn.Header>
                                     <DataGridComboBoxColumn.ElementStyle>
                                         <Style TargetType="ComboBox">
                                             <Setter Property="ItemsSource" Value="{Binding Guest1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -190,9 +196,20 @@
                                         </Style>
                                     </DataGridComboBoxColumn.EditingElementStyle>
                                 </DataGridComboBoxColumn>
-                                <DataGridTextColumn Header="fv1" Width="40" Binding="{Binding Fv1, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                                <DataGridCheckBoxColumn Header="fit" Width="25" Binding="{Binding Fv1Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                                <DataGridComboBoxColumn Header="Guest2" Width="*"  SelectedValueBinding="{Binding SelectedGuest2, UpdateSourceTrigger=PropertyChanged}">
+                                <DataGridTextColumn Width="50" Binding="{Binding Fv1, StringFormat=N3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="fv1" Style="{StaticResource GridHeaderStyle}" />
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridCheckBoxColumn Width="25" Binding="{Binding Fv1Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                    <DataGridCheckBoxColumn.Header>
+                                        <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
+                                    </DataGridCheckBoxColumn.Header>
+                                </DataGridCheckBoxColumn>
+                                <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest2, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
+                                    <DataGridComboBoxColumn.Header>
+                                        <TextBlock Text="Guest2" Style="{StaticResource GridHeaderStyle}" />
+                                    </DataGridComboBoxColumn.Header>
                                     <DataGridComboBoxColumn.ElementStyle>
                                         <Style TargetType="ComboBox">
                                             <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -205,9 +222,30 @@
                                         </Style>
                                     </DataGridComboBoxColumn.EditingElementStyle>
                                 </DataGridComboBoxColumn>
-                                <DataGridTextColumn Header="fv2" Width="40" Binding="{Binding Fv2, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                                <DataGridCheckBoxColumn Header="fit" Width="25" Binding="{Binding Fv2Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                                <DataGridComboBoxColumn Header="Emm" Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
+                                <DataGridTextColumn Width="50" Binding="{Binding Fv2, StringFormat=N3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="fv2" Style="{StaticResource GridHeaderStyle}" />
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridCheckBoxColumn Width="25" Binding="{Binding Fv2Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                    <DataGridCheckBoxColumn.Header>
+                                        <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
+                                    </DataGridCheckBoxColumn.Header>
+                                </DataGridCheckBoxColumn>
+                                <DataGridTextColumn Width="50" Binding="{Binding Thickness, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="Thick." Style="{StaticResource GridHeaderStyle}" />
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridCheckBoxColumn Width="25" Binding="{Binding ThicknessFit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                    <DataGridCheckBoxColumn.Header>
+                                        <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
+                                    </DataGridCheckBoxColumn.Header>
+                                </DataGridCheckBoxColumn>
+                                <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
+                                    <DataGridComboBoxColumn.Header>
+                                        <TextBlock Text="Emm" Style="{StaticResource GridHeaderStyle}" />
+                                    </DataGridComboBoxColumn.Header>
                                     <DataGridComboBoxColumn.ElementStyle>
                                         <Style TargetType="ComboBox">
                                             <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -368,7 +406,7 @@
                             <UniformGrid Rows="3" Columns="1">
                                 <RadioButton Content="Reflectance" VerticalAlignment="Center" IsChecked="{Binding IsReflectanceCheck}"/>
                                 <RadioButton Content="Transmittance" VerticalAlignment="Center" IsChecked="{Binding IsTransmittanceCheck}"/>
-                                <TextBox Text="{Binding WaveLengthValue}" TextAlignment="Center" VerticalContentAlignment="Center"/>
+                                <TextBox Text="{Binding WaveLengthValue, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"/>
                             </UniformGrid>
                             <UniformGrid Rows="1" Columns="2" Grid.Row="1">
                                 <Button Content="Add" Margin="0,5,2,5" Command="{Binding CmdAddWaveLength}"/>
@@ -386,7 +424,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Lower WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding LowerWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding LowerWaveLength, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                             </Grid>
                             <Grid Margin="5" Background="Gainsboro">
                                 <Grid.ColumnDefinitions>
@@ -394,7 +432,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Upper WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding UpperWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding UpperWaveLength, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                             </Grid>
                             <Grid Margin="5" Background="Gainsboro">
                                 <Grid.ColumnDefinitions>
@@ -460,7 +498,7 @@
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas x:Name="StageMainView" ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
-                                            <!--<i:Interaction.Triggers>
+                                            <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseMove">
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseMove" />
                                                 </i:EventTrigger>
@@ -494,7 +532,7 @@
                                                 <i:EventTrigger EventName="KeyUp" >
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView}" MethodName="OnCanvasKeyUp" />
                                                 </i:EventTrigger>
-                                            </i:Interaction.Triggers>-->
+                                            </i:Interaction.Triggers>
                                         </Canvas>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
@@ -507,7 +545,7 @@
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas x:Name="asgsgas" ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
-                                            <!--<i:Interaction.Triggers>
+                                            <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseMove">
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseMove" />
                                                 </i:EventTrigger>
@@ -541,7 +579,7 @@
                                                 <i:EventTrigger EventName="KeyUp" >
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas}" MethodName="OnCanvasKeyUp" />
                                                 </i:EventTrigger>
-                                            </i:Interaction.Triggers>-->
+                                            </i:Interaction.Triggers>
                                         </Canvas>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
@@ -616,7 +654,7 @@
                             <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                             <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                         </UniformGrid>
-                        <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True" 
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
                                   EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Index" Width="*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
@@ -744,7 +782,7 @@
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas x:Name="StagePreView" Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
-                                            <!--<i:Interaction.Triggers>
+                                            <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseMove">
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
                                                 </i:EventTrigger>
@@ -754,7 +792,7 @@
                                                 <i:EventTrigger EventName="MouseLeftButtonDown" >
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
                                                 </i:EventTrigger>
-                                            </i:Interaction.Triggers>-->
+                                            </i:Interaction.Triggers>
                                         </Canvas>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>

@@ -190,7 +190,9 @@
     <Reference Include="System.Activities.Presentation" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -296,8 +298,6 @@
     <Compile Include="UI\1. Setup\3. RecipeWizard\4. EBR\EBRSetupPage.xaml.cs">
       <DependentUpon>EBRSetupPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="InfoWafer.cs" />
-    <Compile Include="IWTRChild.cs" />
     <Compile Include="Module\Vision.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="Tune.xaml.cs">
@@ -402,7 +402,6 @@
     <Compile Include="UI\1. Setup\4. Maintenance\ViewerTest_ViewModel.cs" />
     <Compile Include="WIND2_Engineer.cs" />
     <Compile Include="WIND2_Handler.cs" />
-    <Compile Include="WIND2_Process.cs" />
     <Compile Include="WIND2_Recipe.cs" />
     <Page Include="Controls\UserControl\ColorPicker.xaml">
       <SubType>Designer</SubType>
@@ -669,6 +668,10 @@
     <ProjectReference Include="..\RootTools_Vision\RootTools_Vision.csproj">
       <Project>{b9fa8faa-0522-41f3-99ad-eb307e385f76}</Project>
       <Name>RootTools_Vision</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Root_EFEM\Root_EFEM.csproj">
+      <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
+      <Name>Root_EFEM</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

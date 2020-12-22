@@ -331,6 +331,8 @@ namespace RootTools.Control
         #region I/O Interlock
         public List<DIO_I> m_aDIO_I = new List<DIO_I>();
         public List<bool> m_bDIO_I = new List<bool>();
+        public DIO_I p_vaccumDIO_I { get; set; }
+
         public void AddIO(DIO_I io)
         {
             m_aDIO_I.Add(io);

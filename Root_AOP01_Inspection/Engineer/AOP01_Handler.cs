@@ -45,6 +45,7 @@ namespace Root_AOP01_Inspection
             InitLoadport();
             m_mainVision = new MainVision("MainVision", m_engineer);
             InitModule(m_mainVision);
+
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_mainVision);
             m_wtr.RunTree(Tree.eMode.RegRead);
@@ -105,7 +106,7 @@ namespace Root_AOP01_Inspection
             Cymechs,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
-        List<ILoadport> m_aLoadport = new List<ILoadport>();
+        public List<ILoadport> m_aLoadport = new List<ILoadport>();
         int m_lLoadport = 2;
         void InitLoadport()
         {

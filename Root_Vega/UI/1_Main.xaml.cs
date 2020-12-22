@@ -33,7 +33,7 @@ namespace Root_Vega
             moduleRobot.Init(m_handler.m_robot);
             loadportA.Init(m_handler.m_aLoadport[0], m_handler);
             loadportB.Init(m_handler.m_aLoadport[1], m_handler);
-            InitFFU(); 
+            //InitFFU(); 
             InitTimer();
         }
 

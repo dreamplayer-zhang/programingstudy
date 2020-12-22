@@ -196,6 +196,7 @@
     <Compile Include="Module\ACS.cs" />
     <Compile Include="Module\BayerConvert.cs" />
     <Compile Include="Module\ReadExcel.cs" />
+    <Compile Include="Module\RemoteModule.cs" />
     <Compile Include="Module\TestRepeat.cs" />
     <Compile Include="Module\ScareCrow.cs" />
     <Compile Include="Module\Test.cs" />

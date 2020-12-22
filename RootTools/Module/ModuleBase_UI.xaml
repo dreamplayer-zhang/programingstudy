@@ -42,9 +42,37 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Content="{Binding p_sInfo}" Margin="2" HorizontalAlignment="Left"/>
-                <CheckBox Grid.Row="0" x:Name="checkBoxSetup" Content="ToolBox" Margin="2" HorizontalAlignment="Right" VerticalAlignment="Center" Click="CheckBoxSetup_Click"/>
-                <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" Margin="5"/>
-                <tree:TreeUI Grid.Row="1" x:Name="treeToolUI" Margin="5" Visibility="Hidden"/>
+                <TabControl Grid.Row="1">
+                    <TabItem Header="Run">
+                        <Grid Margin="3">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="2*"/>
+                            </Grid.RowDefinitions>
+                            <GroupBox Grid.Row="0" BorderBrush="Black" BorderThickness="1" Margin="3">
+                                <GroupBox.Header>
+                                    <TextBlock Text="ModuleRun" Foreground="Black" FontWeight="Bold" />
+                                </GroupBox.Header>
+                                <tree:TreeUI x:Name="treeRootRunUI" Margin="3"/>
+                            </GroupBox>
+                            <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
+                            <GroupBox Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="3">
+                                <GroupBox.Header>
+                                    <TextBlock Text="Thread Queue" Foreground="Black" FontWeight="Bold" />
+                                </GroupBox.Header>
+                                <tree:TreeUI x:Name="treeRootQueueUI" Margin="3"/>
+                            </GroupBox>
+                        </Grid>
+                        
+                    </TabItem>
+                    <TabItem Header="Setup">
+                        <tree:TreeUI x:Name="treeRootSetupUI" Margin="3"/>
+                    </TabItem>
+                    <TabItem Header="Tool">
+                        <tree:TreeUI x:Name="treeRootToolUI" Margin="3"/>
+                    </TabItem>
+                </TabControl>
             </Grid>
         </Grid>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
