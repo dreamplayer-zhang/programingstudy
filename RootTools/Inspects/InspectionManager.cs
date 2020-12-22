@@ -15,6 +15,8 @@ using System.Diagnostics;
 using MySqlX.XDevAPI.Relational;
 using RootTools.ToolBoxs;
 using System.Drawing.Imaging;
+using System.Windows;
+using System.IO.Compression;
 
 namespace RootTools.Inspects
 {
@@ -89,7 +91,6 @@ namespace RootTools.Inspects
 		StopWatch sw;
 
 		int nThreadNum = 10;
-		public int nInspectionCount = 0;
 		int ImageWidth = 320;
 		int ImageHeight = 240;
 		public ToolBox m_toolBox;
@@ -107,6 +108,8 @@ namespace RootTools.Inspects
 		public DateTime NowTime;
 		bool m_bProgress;
 		int m_nPatternInspDoneNum = 0;
+		public bool m_bFeatureSearchFail = false;
+		public bool m_bAlignFail = false;
 		public int p_nPatternInspDoneNum
         {
             get { return m_nPatternInspDoneNum; }
@@ -231,6 +234,7 @@ namespace RootTools.Inspects
 									Console.WriteLine("Queue Item Count : " + p_qInspection.Count);
 									sw.Stop();
 									Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
+									//MessageBox.Show("Inspection Complete");
 								}
 								InspectionThread[i].StartInspection(ipQueue, i);
 
@@ -347,6 +351,8 @@ namespace RootTools.Inspects
 		public void InspectionDone(string inspIndexFilePath)
 		{
 			bool testFlag = false;
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
 			//여기서 DB관련동작 이하생략!
 			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
 			if (connector.Open())
@@ -403,10 +409,13 @@ namespace RootTools.Inspects
 				//encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
 
 				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-
-				using (FileStream fs = new FileStream(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".vega_image"), FileMode.Create))
+				if(!Directory.Exists(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName))))
 				{
-					fs.Write(BitConverter.GetBytes(tempSet.Tables["tempdata"].Rows.Count), 0, sizeof(int));//defect 개수 저장
+					Directory.CreateDirectory(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName)));
+				}
+				//using (FileStream fs = new FileStream(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".vega_image"), FileMode.Create))
+				//{
+					//fs.Write(BitConverter.GetBytes(tempSet.Tables["tempdata"].Rows.Count), 0, sizeof(int));//defect 개수 저장
 					foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
 					{
 						System.Data.DataRow dataRow = VSDataDT.NewRow();
@@ -465,16 +474,24 @@ namespace RootTools.Inspects
 						string memory = item["memMEMORY"].ToString();
 						var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
 						var img = new ImageData(tempMem);
-					var imageBytes = img.GetRectByteArray(ImageSizeBlock);
-					//img.SaveRectImage(ImageSizeBlock, System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) +"_"+Convert.ToInt32(item["idx"]).ToString("D8") + ".bmp"));
+					//var imageBytes = img.GetRectByteArray(ImageSizeBlock);
+					img.SaveRectImage(ImageSizeBlock, System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName), System.IO.Path.GetFileNameWithoutExtension(inspFileName) +"_"+Convert.ToInt32(item["idx"]).ToString("D8") + ".bmp"));
 
-					fs.Write(BitConverter.GetBytes(Convert.ToInt32(item["idx"].ToString())), 0, sizeof(int));//4
-					fs.Write(BitConverter.GetBytes(ImageWidth), 0, sizeof(int));//4
-					fs.Write(BitConverter.GetBytes(ImageHeight), 0, sizeof(int));//4
-					fs.Write(BitConverter.GetBytes(imageBytes.Length), 0, sizeof(int));//4
-					fs.Write(imageBytes, 0, imageBytes.Length);//바로직전거만큼
+					//fs.Write(BitConverter.GetBytes(Convert.ToInt32(item["idx"].ToString())), 0, sizeof(int));//4
+					//fs.Write(BitConverter.GetBytes(ImageWidth), 0, sizeof(int));//4
+					//fs.Write(BitConverter.GetBytes(ImageHeight), 0, sizeof(int));//4
+					//fs.Write(BitConverter.GetBytes(imageBytes.Length), 0, sizeof(int));//4
+					//fs.Write(imageBytes, 0, imageBytes.Length);//바로직전거만큼
 				}
+				//}
+				while (true)
+				{
+					if (tempSet.Tables["tempdata"].Rows.Count <= Directory.GetFiles(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName))).Count())
+						break;
 				}
+				Archive(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName)), System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".zip"),"*.*");
+				Directory.Delete(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName)));
+
 				System.Data.DataRow searchDataRow = SearchDataDT.NewRow();
 				searchDataRow["Idx"] = SearchDataDT.Rows.Count;
 				searchDataRow["InspStartTime"] = NowTime.ToString("yyyy-MM-dd HH:mm:ss");//TODO 나중에 진짜 검사 시작시간(로딩 시작 시간)으로 바꿔야 함
@@ -501,6 +518,9 @@ namespace RootTools.Inspects
 				VSDataDT.Clear();
 				VSDataInfoDT.Clear();
 				SearchDataDT.Clear();
+				sw.Stop();
+				Debug.WriteLine(string.Format("File Create Finished. : {0}", sw.ElapsedMilliseconds));
+				MessageBox.Show(string.Format("File Create Finished. : {0}", sw.ElapsedMilliseconds));
 
 
 				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '1') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='1';");
@@ -537,7 +557,58 @@ namespace RootTools.Inspects
 			}
 
 		}
-
+		public List<string> GetDirectoryFileList(string directory, string filter)
+		{
+			if (Directory.Exists(directory))
+			{
+				DirectoryInfo di = new DirectoryInfo(directory);
+				List<string> fileNames = new List<string>();
+				foreach (var file in di.GetFiles(filter))
+				{
+					fileNames.Add(file.Name);
+				}
+				return fileNames;
+			}
+			else
+			{
+				return null;
+			}
+		}
+		public void DeleteFile(string file)
+		{
+			try
+			{
+				File.Delete(file);
+			}
+			catch (FileNotFoundException)
+			{
+				return;
+			}
+		}
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="archiveFileDirectory">압축하고 싶은 파일들이 있는 경로</param>
+		/// <param name="archivedDirectoryFileName"> 압축파일경로 및 이름</param>
+		/// <param name="filter"> 압축하고 싶은 파일이름 필터 ex) *.json</param>
+		public void Archive(string archiveFileDirectory, string archivedDirectoryFileName, string filter)
+		{
+			if (GetDirectoryFileList(archiveFileDirectory, filter).Count == 0)
+			{
+				return;
+			}
+			using (FileStream zipToOpen = new FileStream($"{archivedDirectoryFileName}.zip", FileMode.CreateNew))
+			{
+				using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
+				{
+					foreach (var filePath in Directory.GetFiles(archiveFileDirectory, filter, SearchOption.AllDirectories))
+					{
+						ZipFileExtensions.CreateEntryFromFile(archive, filePath, Path.GetFileName(filePath));
+						DeleteFile(filePath);
+					}
+				}
+			}
+		}
 		public void ClearDefectList()
 		{
 			if(this.ClearDefect != null)
@@ -601,6 +672,26 @@ namespace RootTools.Inspects
 			p_qInspection.Enqueue(_property);
 		}
 
+		public void _clearInspReslut()
+		{
+			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+			if (connector.Open())
+			{
+				string dropQuery = "DROP TABLE Inspections.tempdata";
+				var result = connector.SendNonQuery(dropQuery);
+				Debug.WriteLine(string.Format("tempdata Table Drop : {0}", result));
+				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '0') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='0';");
+				Debug.WriteLine(string.Format("Status Clear : {0}", result));
+			}
+			connector.Close();
+
+			// 검사 큐 클리어
+			p_qInspection.Clear();
+
+			// Defect Box 클리어
+			ClearDefectList();
+		}
+
 		public void ClearInspection()
 		{
 			p_qInspection.Clear();
@@ -657,7 +748,6 @@ namespace RootTools.Inspects
 			{
 				//insp blockd에 대한 start xy, end xy
 				int sx, sy, ex, ey;
-				int blockcount = 1;
 
 				for (int i = wStart; i < wStop; i++)
 				{
@@ -674,7 +764,7 @@ namespace RootTools.Inspects
 						InspectionProperty ip = new InspectionProperty();
 						ip.p_InspType = GetInspectionType(dCode);
 						ip.m_nDefectCode = dCode;
-						ip.p_index = blockcount;
+						//ip.p_index = blockcount;
 						ip.MemoryPoolName = poolName;
 						ip.MemoryGroupName = groupName;
 						ip.MemoryName = memoryName;
@@ -704,7 +794,7 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
-							blockcount++;
+							//blockcount++;
 						}
 						else if (
 							IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Top)) &&
@@ -715,7 +805,7 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
-							blockcount++;
+							//blockcount++;
 						}
 						else if (
 							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
@@ -726,7 +816,7 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
-							blockcount++;
+							//blockcount++;
 						}
 						else if (
 							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
@@ -737,7 +827,7 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
-							blockcount++;
+							//blockcount++;
 						}
 						else if (
 							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Bottom)) &&
@@ -748,7 +838,7 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
-							blockcount++;
+							//blockcount++;
 						}
 						else if (IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
 							!IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) && 
@@ -780,7 +870,7 @@ namespace RootTools.Inspects
 							inspblocklist.Add(second);
 							inspblocklist.Add(third);
 
-							blockcount += 3;
+							//blockcount += 3;
 						}
 						else if (IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) &&
 							!IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) && 
@@ -813,7 +903,7 @@ namespace RootTools.Inspects
 							inspblocklist.Add(second);
 							inspblocklist.Add(third);
 
-							blockcount += 3;
+							//blockcount += 3;
 						}
 						else
 						{
@@ -821,7 +911,7 @@ namespace RootTools.Inspects
 							ip.p_Rect = inspblock;
 							AddInspection(ip, bDefectMerge, nMergeDistance);
 							inspblocklist.Add(inspblock);
-							blockcount++;
+							//blockcount++;
 						}
 					}
 					//inspection offset, 모서리 영역 미구현

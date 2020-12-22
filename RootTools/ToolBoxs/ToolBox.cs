@@ -42,7 +42,7 @@ namespace RootTools.ToolBoxs
         public string Get(ref DIO_I value, ModuleBase module, string id, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_I(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun);
-            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
+            string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
             module.m_listDI.AddBit(value.m_bitDI);
             return "OK";
@@ -51,7 +51,7 @@ namespace RootTools.ToolBoxs
         public string Get(ref DIO_O value, ModuleBase module, string id, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_O(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun);
-            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
+            string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
             module.m_listDO.AddBit(value.m_bitDO);
             return "OK";
@@ -60,7 +60,7 @@ namespace RootTools.ToolBoxs
         public string Get(ref DIO_Is value, ModuleBase module, string id, string[] asDI, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_Is(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, asDI);
-            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
+            string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
             for (int n = 0; n < asDI.Length; n++) module.m_listDO.AddBit(value.m_aBitDI[n]);
             return "OK";
@@ -69,7 +69,7 @@ namespace RootTools.ToolBoxs
         public string Get(ref DIO_Is value, ModuleBase module, string id, string sDI, int nCount, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_Is(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sDI, nCount);
-            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
+            string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
             for (int n = 0; n < nCount; n++) module.m_listDO.AddBit(value.m_aBitDI[n]);
             return "OK";
@@ -78,7 +78,7 @@ namespace RootTools.ToolBoxs
         public string Get(ref DIO_Os value, ModuleBase module, string id, string[] asDO, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_Os(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, asDO);
-            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
+            string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
             for (int n = 0; n < asDO.Length; n++) module.m_listDO.AddBit(value.m_aBitDO[n]);
             return "OK";
@@ -87,7 +87,7 @@ namespace RootTools.ToolBoxs
         public string Get(ref DIO_IO value, ModuleBase module, string id, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_IO(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun);
-            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
+            string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
             module.m_listDI.AddBit(value.m_bitDI);
             module.m_listDO.AddBit(value.m_bitDO);
@@ -97,7 +97,7 @@ namespace RootTools.ToolBoxs
         public string Get(ref DIO_I2O value, ModuleBase module, string id, string sFalse, string sTrue, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_I2O(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sFalse, sTrue);
-            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
+            string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
             module.m_listDI.AddBit(value.m_aBitDI[0]);
             module.m_listDI.AddBit(value.m_aBitDI[1]);
@@ -108,7 +108,7 @@ namespace RootTools.ToolBoxs
         public string Get(ref DIO_I2O2 value, ModuleBase module, string id, string sFalse, string sTrue, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_I2O2(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sFalse, sTrue);
-            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
+            string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
             module.m_listDI.AddBit(value.m_aBitDI[0]);
             module.m_listDI.AddBit(value.m_aBitDI[1]);
@@ -206,7 +206,7 @@ namespace RootTools.ToolBoxs
                 value = new LightSet(m_lightToolSet, module.p_id, module.m_log);
                 module.m_aTool.Add(value);
             }
-            return value.RunTree(module.m_treeToolBox.GetTree("Light"));
+            return value.RunTree(module.m_treeRootTool.GetTree("Light"));
         }
         #endregion
 
@@ -433,7 +433,7 @@ namespace RootTools.ToolBoxs
                 m_toolSetOHT.AddTool(value);
                 module.m_aTool.Add(value); 
             }
-            value.RunTreeToolBox(module.m_treeToolBox.GetTree(id)); 
+            value.RunTreeToolBox(module.m_treeRootTool.GetTree(id)); 
             return "OK";
         }
 
@@ -446,7 +446,20 @@ namespace RootTools.ToolBoxs
                 m_toolSetOHT.AddTool(value);
                 module.m_aTool.Add(value);
             }
-            value.RunTreeToolBox(module.m_treeToolBox.GetTree(id));
+            value.RunTreeToolBox(module.m_treeRootTool.GetTree(id));
+            return "OK";
+        }
+
+        public string Get(ref OHTNew.OHT value, ModuleBase module, GemCarrierBase carrier, string id, DIO_I diPlaced, DIO_I diPresent)
+        {
+            if (m_toolSetOHT == null) m_toolSetOHT = InitToolSet("OHT");
+            if (value == null)
+            {
+                value = new OHTNew.OHT(module.p_id + "." + id, module, carrier, m_toolDIO, diPlaced, diPresent);
+                m_toolSetOHT.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            value.RunTreeToolBox(module.m_treeRootTool.GetTree(id));
             return "OK";
         }
         #endregion

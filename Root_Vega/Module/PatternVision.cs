@@ -907,6 +907,8 @@ namespace Root_Vega.Module
                 {
                     m_module.p_bRunPatternVision = true;
                     m_module.p_nTotalBlockCount = 0;
+                    App.m_engineer.m_InspManager.m_bFeatureSearchFail = false;
+                    App.m_engineer.m_InspManager.m_bAlignFail = false;
 
                     if (m_grabMode == null) return "Grab Mode == null";
                     m_grabMode.SetLight(true);
@@ -1018,6 +1020,7 @@ namespace Root_Vega.Module
                                     }
                                     else
                                     {
+                                        App.m_engineer.m_InspManager.m_bFeatureSearchFail = true;
                                         continue;   // 못 찾았으면 다음 Feature값으로 이동
                                     }
                                 }
@@ -1852,7 +1855,7 @@ namespace Root_Vega.Module
                         int nDefectCode = Convert.ToInt32(item["ClassifyCode"]);
                         InspectionType eType = InspectionManager.GetInspectionType(nDefectCode);
                         InspectionTarget eTarget = InspectionManager.GetInspectionTarget(nDefectCode);
-                        if ((eType == InspectionType.Strip) && (eTarget == InspectionTarget.Chrome))
+                        if ((eTarget == InspectionTarget.Chrome))
                         {
                             //lstDefectPos.Add(new CPoint(posX, posY));
                             CPoint cptPos = new CPoint(posX, posY);

@@ -96,7 +96,8 @@ namespace Root_EFEM
             RND,
             Cymechs,
         }
-        List<eLoadport> m_aLoadportType = new List<eLoadport>(); 
+        List<eLoadport> m_aLoadportType = new List<eLoadport>();
+        List<ILoadport> m_aLoadport = new List<ILoadport>(); 
         int m_lLoadport = 2; 
         void InitLoadport()
         {
@@ -112,6 +113,7 @@ namespace Root_EFEM
                     default: module = new Loadport_RND(sID, m_engineer, true, true); break;
                 }
                 InitModule(module);
+                m_aLoadport.Add((ILoadport)module); 
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
             }
         }
@@ -160,7 +162,6 @@ namespace Root_EFEM
         #region Module Vision
         enum eVision
         {
-            Vision,
             Backside,
             EBR,
             AOP
@@ -179,8 +180,7 @@ namespace Root_EFEM
                     case eVision.Backside: module = new Vision_Backside(GetVisionID(n), m_engineer); break;
                     case eVision.EBR: module = new Vision_EBR(GetVisionID(n), m_engineer); break;
                     case eVision.AOP: module = new Vision_AOP(GetVisionID(n), m_engineer); break;
-                    case eVision.Vision:
-                    default: module = new Vision(GetVisionID(n), m_engineer); break; 
+                    default: module = new Vision_AOP(GetVisionID(n), m_engineer); break; 
                 }
                 InitModule(module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
@@ -207,22 +207,12 @@ namespace Root_EFEM
         public void RunTreeVision(Tree tree)
         {
             m_lVision = tree.Set(m_lVision, m_lVision, "Count", "Vision Count");
-            while (m_aVisionType.Count < m_lVision) m_aVisionType.Add(eVision.Vision);
+            while (m_aVisionType.Count < m_lVision) m_aVisionType.Add(eVision.AOP);
             Tree treeType = tree.GetTree("Type");
             for (int n = 0; n < m_lVision; n++)
             {
                 m_aVisionType[n] = (eVision)treeType.Set(m_aVisionType[n], m_aVisionType[n], n.ToString("00"), "Vision Type");
             }
-        }
-        #endregion
-
-        #region Tree
-        public void RunTreeModule(Tree tree)
-        {
-            RunTreeWTR(tree.GetTree("WTR"));
-            RunTreeLoadport(tree.GetTree("Loadport"));
-            RunTreeAligner(tree.GetTree("Aligner"));
-            RunTreeVision(tree.GetTree("Vision"));
         }
         #endregion
 
@@ -289,15 +279,18 @@ namespace Root_EFEM
         #endregion
 
         #region Calc Sequence
+        public int m_nRnR = 1;
+        dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
-//            m_process.AddInfoWafer(infoSlot);
+            m_infoRnRSlot = infoSlot;
+            m_process.AddInfoWafer(infoSlot);
             return "OK";
         }
 
         public void CalcSequence()
         {
-//            m_process.ReCalcSequence(null);
+            m_process.ReCalcSequence();
         }
         #endregion
 
@@ -305,7 +298,7 @@ namespace Root_EFEM
         public void CheckFinish()
         {
             if (m_gem.p_cjRun == null) return;
-//            if (m_process.m_qSequence.Count > 0) return;
+            if (m_process.m_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
                 if (m_gem != null) m_gem.SendPJComplete(pj.m_sPJobID);
@@ -315,13 +308,13 @@ namespace Root_EFEM
 
         public dynamic GetGemSlot(string sSlot)
         {
-//            foreach (Loadport loadport in m_aLoadport)
-//            {
-//                foreach (GemSlotBase slot in loadport.m_infoPod.m_aGemSlot)
-//                {
-//                    if (slot.p_id == sSlot) return slot;
-//                }
-//            }
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                foreach (GemSlotBase slot in loadport.p_infoCarrier.m_aGemSlot)
+                {
+                    if (slot.p_id == sSlot) return slot;
+                }
+            }
             return null;
         }
         #endregion
@@ -348,11 +341,58 @@ namespace Root_EFEM
                     case EQ.eState.Run:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
-                            //m_process.p_sInfo = m_process.RunNextSequence();
+                            CheckLoad(); 
+                            m_process.p_sInfo = m_process.RunNextSequence();
+                            CheckUnload(); 
+                            if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            {
+                                m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
+                                m_process.ReCalcSequence();
+                                m_nRnR--;
+                                EQ.p_eState = EQ.eState.Run;
+                            }
                         }
                         break;
                 }
             }
+        }
+
+        void CheckLoad()
+        {
+            EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
+            string sLoadport = sequence.m_infoWafer.m_sModule; 
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if (loadport.p_id == sLoadport) loadport.RunDocking(); 
+            }
+        }
+
+        void CheckUnload()
+        {
+            EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+                {
+                    string sLoadport = loadport.p_id;
+                    bool bUndock = true; 
+                    foreach (EFEM_Process.Sequence sequence in aSequence)
+                    {
+                        if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false; 
+                    }
+                    if (bUndock) loadport.RunUndocking(); 
+                }
+            }
+        }
+        #endregion
+
+        #region Tree
+        public void RunTreeModule(Tree tree)
+        {
+            RunTreeWTR(tree.GetTree("WTR"));
+            RunTreeLoadport(tree.GetTree("Loadport"));
+            RunTreeAligner(tree.GetTree("Aligner"));
+            RunTreeVision(tree.GetTree("Vision"));
         }
         #endregion
 

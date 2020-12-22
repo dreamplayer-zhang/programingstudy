@@ -72,16 +72,6 @@ namespace RootTools.Module
         /// <summary> InitModuleRuns() : ModuleBase.m_aModuleRun 에 ModuleRun을 등록한다 </summary>
         protected virtual void InitModuleRuns() { }
 
-        public virtual void RunTree(Tree tree)
-        {
-            p_sModuleRun = tree.GetTree("RunMode").Set(p_sModuleRun, "", m_asModuleRun, "ModuleRun", "Select ModuleRun");
-            foreach (ModuleRunBase moduleRun in m_aModuleRun)
-            {
-                bool bVisible = p_sModuleRun == moduleRun.m_sModuleRun; 
-                moduleRun.RunTree(tree.GetTree(moduleRun.m_sModuleRun, true, bVisible), bVisible);
-            }
-        }
-
         public virtual void GetTools(bool bInit) { }
         public virtual void InitMemorys() { }
 
@@ -137,7 +127,7 @@ namespace RootTools.Module
                 case eState.Error: Reset(); break;
                 default: break;
             }
-            RunTree(Tree.eMode.Init);
+            RunTreeRun(Tree.eMode.Init);
         }
 
         public virtual void ButtonHome()
@@ -212,6 +202,7 @@ namespace RootTools.Module
                         p_eState = eState.Error;
                         EQ.p_bStop = true;
                         m_qModuleRun.Clear();
+                        return;
                     }
                     if (m_qModuleRun.Count == 0) p_eState = eState.Ready;
                     break;
@@ -221,47 +212,6 @@ namespace RootTools.Module
                     break;
             }
         }
-        #endregion
-
-        #region Tree
-        private void M_treeRoot_UpdateTree()
-        {
-            RunTree(Tree.eMode.Update);
-            RunTree(Tree.eMode.RegWrite);
-            RunTree(Tree.eMode.Init);
-        }
-
-        public void RunTree(Tree.eMode mode)
-        {
-            m_treeRoot.p_eMode = mode;
-            RunTree(m_treeRoot);
-        }
-
-        private void M_treeToolBox_UpdateTree()
-        {
-            RunToolTree(Tree.eMode.Update);
-            RunToolTree(Tree.eMode.Init);
-            RunToolTree(Tree.eMode.RegWrite);
-        }
-
-        public void RunToolTree(Tree.eMode mode)
-        {
-            m_treeToolBox.p_eMode = mode;
-            m_listDI.m_aDIO.Clear();
-            m_listDO.m_aDIO.Clear();
-            m_listAxis.Clear();
-            GetTools(mode == Tree.eMode.RegRead);
-
-            for (int i = 0; i<m_listAxis.Count; i++)
-            {
-                m_listAxis[i].RunTreeInterlock(Tree.eMode.RegRead);
-            }
-
-            if (OnChangeTool != null) OnChangeTool();
-        }
-
-        public delegate void dgOnChangeTool();
-        public event dgOnChangeTool OnChangeTool;
         #endregion
 
         #region List Tool
@@ -406,6 +356,125 @@ namespace RootTools.Module
         }
         #endregion
 
+        #region Tree Tool
+        public TreeRoot m_treeRootTool;
+        void InitTreeTool()
+        {
+            m_treeRootTool = new TreeRoot(p_id + ".ToolBox", m_log);
+            m_treeRootTool.UpdateTree += M_treeRootTool_UpdateTree;
+            RunTreeTool(Tree.eMode.RegRead);
+        }
+
+        private void M_treeRootTool_UpdateTree()
+        {
+            RunTreeTool(Tree.eMode.Update);
+            RunTreeTool(Tree.eMode.Init);
+            RunTreeTool(Tree.eMode.RegWrite);
+        }
+
+        public delegate void dgOnChangeTool();
+        public event dgOnChangeTool OnChangeTool;
+        public void RunTreeTool(Tree.eMode mode)
+        {
+            m_treeRootTool.p_eMode = mode;
+            m_listDI.m_aDIO.Clear();
+            m_listDO.m_aDIO.Clear();
+            m_listAxis.Clear();
+            GetTools(mode == Tree.eMode.RegRead);
+            for (int i = 0; i < m_listAxis.Count; i++)
+            {
+                m_listAxis[i].RunTreeInterlock(Tree.eMode.RegRead);
+            }
+            if (OnChangeTool != null) OnChangeTool();
+        }
+        #endregion
+
+        #region Tree Setup
+        public TreeRoot m_treeRootSetup;
+        void InitTreeSetup()
+        {
+            m_treeRootSetup = new TreeRoot(p_id, m_log);
+            m_treeRootSetup.UpdateTree += M_treeRootSetup_UpdateTree;
+        }
+
+        private void M_treeRootSetup_UpdateTree()
+        {
+            RunTree(Tree.eMode.Update);
+            RunTree(Tree.eMode.RegWrite);
+            RunTree(Tree.eMode.Init);
+        }
+
+        public void RunTree(Tree.eMode mode)
+        {
+            m_treeRootSetup.p_eMode = mode;
+            RunTree(m_treeRootSetup);
+        }
+
+        public virtual void RunTree(Tree tree)
+        {
+        }
+        #endregion
+
+        #region Tree Run
+        public TreeRoot m_treeRootRun;
+        void InitTreeRun()
+        {
+            m_treeRootRun = new TreeRoot(p_id + ".Run", m_log);
+            m_treeRootRun.UpdateTree += M_treeRootRun_UpdateTree;
+            RunTreeRun(Tree.eMode.RegRead);
+        }
+
+        private void M_treeRootRun_UpdateTree()
+        {
+            RunTreeRun(Tree.eMode.Update);
+            RunTreeRun(Tree.eMode.RegWrite);
+            RunTreeRun(Tree.eMode.Init);
+        }
+
+        public void RunTreeRun(Tree.eMode mode)
+        {
+            m_treeRootRun.p_eMode = mode;
+            p_sModuleRun = m_treeRootRun.GetTree("RunMode").Set(p_sModuleRun, "", m_asModuleRun, "ModuleRun", "Select ModuleRun");
+            foreach (ModuleRunBase moduleRun in m_aModuleRun)
+            {
+                bool bVisible = p_sModuleRun == moduleRun.m_sModuleRun;
+                moduleRun.RunTree(m_treeRootRun.GetTree(moduleRun.m_sModuleRun, true, bVisible), bVisible);
+            }
+        }
+        #endregion
+
+        #region Tree Queue
+        public TreeRoot m_treeRootQueue;
+        void InitTreeQueue()
+        {
+            m_treeRootQueue = new TreeRoot(p_id, m_log);
+            m_treeRootQueue.UpdateTree += M_treeRootQueue_UpdateTree;
+        }
+
+        private void M_treeRootQueue_UpdateTree()
+        {
+            RunTreeQueue(Tree.eMode.Update);
+            RunTreeQueue(Tree.eMode.RegWrite);
+            RunTreeQueue(Tree.eMode.Init);
+        }
+
+        public void RunTreeQueue(Tree.eMode mode)
+        {
+            m_treeRootQueue.p_eMode = mode;
+            RunTreeQueue(m_treeRootQueue);
+        }
+
+        void RunTreeQueue(Tree tree)
+        {
+            ModuleRunBase[] aModuleRun = m_qModuleRun.ToArray();
+            for (int n = 0; n < aModuleRun.Length; n++)
+            {
+                ModuleRunBase run = aModuleRun[n];
+                run.RunTree(tree.GetTree(n, run.p_id), true); 
+            }
+        }
+        #endregion
+
         public string p_id { get; set; }
 
         public IEngineer m_engineer;
@@ -413,8 +482,6 @@ namespace RootTools.Module
         public IGem m_gem;
         public GAF m_gaf;
         public ToolBox m_toolBox;
-        public TreeRoot m_treeRoot;
-        public TreeRoot m_treeToolBox;
         public void InitBase(string id, IEngineer enginner)
         {
             p_id = id;
@@ -427,16 +494,11 @@ namespace RootTools.Module
 
             p_eState = eState.Init;
             InitModuleRuns();
-
-            m_treeToolBox = new TreeRoot(id + ".ToolBox", m_log);
-            m_treeToolBox.UpdateTree += M_treeToolBox_UpdateTree;
-            RunToolTree(Tree.eMode.RegRead);
-
-            InitMemorys(); 
-
-            m_treeRoot = new TreeRoot(id, m_log);
-            m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
-            RunTree(Tree.eMode.RegRead);
+            InitTreeTool(); 
+            InitMemorys();
+            InitTreeSetup(); 
+            InitTreeRun();
+            InitTreeQueue(); 
 
             m_thread = new Thread(new ThreadStart(ThreadRun));
             m_thread.Start();

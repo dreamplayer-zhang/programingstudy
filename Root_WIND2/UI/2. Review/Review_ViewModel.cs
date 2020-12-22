@@ -24,6 +24,7 @@ using Path = System.IO.Path;
 using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
 using Size = System.Windows.Size;
+using System.Collections;
 
 namespace Root_WIND2
 {
@@ -76,7 +77,6 @@ namespace Root_WIND2
             }
         }
         #endregion
-
 
         #region GET / SET
 
@@ -733,7 +733,7 @@ namespace Root_WIND2
             if (foundRows.Length == 0)
                 return;
 
-            int binSz = 256;
+            int binSz = 128;
             if (gvHistogramMode != GVHistogramType.All)
                 binSz = 128 / 2;
 
@@ -745,7 +745,7 @@ namespace Root_WIND2
                 foreach (DataRow table in foundRows)
                 {
                     double gv = (double)table[11];
-                    GVHistogram[(int)gv]++;
+                    GVHistogram[(int)gv/2]++;
                 }
             }
             else
@@ -754,9 +754,13 @@ namespace Root_WIND2
                 {
                     double gv = (double)table[11];
                     if (gvHistogramMode == GVHistogramType.Dark)
+                    {
                         if ((int)gv / 2 < binSz)
+                        {
                             GVHistogram[(int)gv / 2]++;
-                        else
+                        }
+                    }
+                    else
                         if ((int)gv / 2 >= binSz)
                             GVHistogram[((int)gv - 128) / 2]++;
                 }
@@ -764,23 +768,13 @@ namespace Root_WIND2
 
             GVYMaxVal = GVHistogram.Max() + GVHistogram.Max() / 10 + 1;
 
-            for (int i = 0; i < binSz; i++)
-                DefectGVHistogram[0].Values.Add(GVHistogram[i]);
+            DefectGVHistogram[0].Values.AddRange(((IEnumerable)GVHistogram).Cast<object>());
 
             GVXLabel = new string[binSz];
 
-            if (gvHistogramMode != GVHistogramType.All)
-            {
-                int yLabel = (gvHistogramMode == GVHistogramType.Bright) ? 128 : 0;
-                for (int i = yLabel; i < binSz; i++)
-                    GVXLabel[i - yLabel] = (yLabel + (i - yLabel) * 2).ToString() + "~" + (yLabel + (i - yLabel) * 2 + 1).ToString();
-            }
-            else
-            {
-                int yLabel = (gvHistogramMode == GVHistogramType.Bright) ? 128 : 0;
-                for (int i = yLabel; i < binSz; i++)
-                    GVXLabel[i - yLabel] = i.ToString();
-            }
+            int yLabel = (gvHistogramMode == GVHistogramType.Bright) ? 128 : 0;
+            for (int i = yLabel; i < binSz; i++)
+                GVXLabel[i - yLabel] = (yLabel + (i - yLabel) * 2).ToString() + "~" + (yLabel + (i - yLabel) * 2 + 1).ToString();
 
             GVYLabel = value => value.ToString("N");
         }
@@ -849,15 +843,12 @@ namespace Root_WIND2
             }
 
             SizeYMaxVal = SzHistogram.Max() + SzHistogram.Max() / 10 + 1;
-
-            for (int i = 0; i < binCount; i++)
-                DefectSizeHistogram[0].Values.Add(SzHistogram[i]);
+            
+            DefectSizeHistogram[0].Values.AddRange(((IEnumerable)SzHistogram).Cast<object>());
 
             SizeXLabel = new string[binCount];
             for (int i = 1; i <= binCount; i++)
-            {
                 SizeXLabel[i - 1] = ((i - 1) * mergeBin + minSz).ToString() + "~" + ((i - 1) * mergeBin + minSz + mergeBin - 1).ToString();
-            }
 
             SizeYLabel = value => value.ToString("N");
         }

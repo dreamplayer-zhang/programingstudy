@@ -722,8 +722,8 @@ namespace Root_EFEM.Module
         {
             AddModuleRunList(new Run_ResetCPU(this), false, "Reset WTR CPU");
             AddModuleRunList(new Run_Grip(this), false, "Run Grip WTR Arm");
-            m_runGet = AddModuleRunList(new Run_Get(this), true, "WTR Run Get Motion");
-            m_runPut = AddModuleRunList(new Run_Put(this), true, "WTR Run Put Motion");
+            m_runGet = AddModuleRunList(new Run_Get(this), false, "WTR Run Get Motion");
+            m_runPut = AddModuleRunList(new Run_Put(this), false, "WTR Run Put Motion");
         }
 
         public class Run_ResetCPU : ModuleRunBase
@@ -849,8 +849,8 @@ namespace Root_EFEM.Module
                     if (EQ.IsStop()) return "Stop";
                     Thread.Sleep(100);
                 }
-                if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
+                if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
                 m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
                 try
                 {
@@ -858,6 +858,7 @@ namespace Root_EFEM.Module
                     if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                     child.p_bLock = false;
+                    child.AfterGet(m_nChildID);
                 }
                 finally
                 {
@@ -928,8 +929,8 @@ namespace Root_EFEM.Module
                 }
                 int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
-                if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
+                if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
                 child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
                 try
                 {
@@ -937,6 +938,7 @@ namespace Root_EFEM.Module
                     if (m_module.Run(m_module.WriteCmd(eCmd.Put, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                     child.p_bLock = false;
+                    child.AfterPut(m_nChildID); 
                 }
                 finally
                 {

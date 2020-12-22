@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -123,6 +124,8 @@ namespace RootTools_Vision
 
         public static bool LoadBitmapToRawdata(string filepath, byte[] rawdata, int _width, int _height, int _byteCount)
         {
+            //StopWatch stop = new StopWatch();
+            //stop.Start();
             bool rst = true;
             try
             {
@@ -151,21 +154,15 @@ namespace RootTools_Vision
                         IntPtr pointer = bmpData.Scan0;
                         byte* pPointer = (byte*)pointer.ToPointer();
 
-                        for (int i = 0; i < _height; i++)
+                        Parallel.For(0, _height - 1, (j) =>
                         {
-                            //for(int j = 0; j< _width; j++)
-                            //{
-                            //    rawdata[i * _width * _byteCount + j * _byteCount + 2] = pPointer[i * bmpData.Stride + j * _byteCount + 0];
-                            //    rawdata[i * _width * _byteCount + j * _byteCount + 1] = pPointer[i * bmpData.Stride + j * _byteCount + 1];
-                            //    rawdata[i * _width * _byteCount + j * _byteCount + 0] = pPointer[i * bmpData.Stride + j * _byteCount + 2];
-                            //}
-                            Parallel.For(0, _width - 1, (j) =>
+                            for (int i = 0; i < _width; i++)
                             {
                                 rawdata[i * _width * _byteCount + j * _byteCount + 2] = pPointer[i * bmpData.Stride + j * _byteCount + 0];
                                 rawdata[i * _width * _byteCount + j * _byteCount + 1] = pPointer[i * bmpData.Stride + j * _byteCount + 1];
                                 rawdata[i * _width * _byteCount + j * _byteCount + 0] = pPointer[i * bmpData.Stride + j * _byteCount + 2];
-                            });
-                        }
+                            }
+                        });
                     }
                 }
 
@@ -174,6 +171,8 @@ namespace RootTools_Vision
             {
                 rst = false;
             }
+            //stop.Stop();
+            //MessageBox.Show(stop.ElapsedMilliseconds.ToString());
 
             return rst;
         }

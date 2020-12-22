@@ -39,6 +39,7 @@ namespace Root_CAMELLIA
             SetStage(true);
             SetViewRect();
             InitLayer();
+            UpdateLayerGridView();
             //InitLayerGrid();
         }
         public void Init()
@@ -1905,9 +1906,6 @@ namespace Root_CAMELLIA
             {
                 TransmittanceListItem.Add(dataManager.recipeDM.TeachingRD.WaveLengthTransmittance[i]);
             }
-
-            UpdateLayerGridView();
-
         }
 
         public void UpdateLayerGridView()
@@ -1924,8 +1922,10 @@ namespace Root_CAMELLIA
             else
             {
                 dataManager.recipeDM.ModelData.MaterialList.Clear();
-                App.m_nanoView.m_Model.m_MaterialList.Clear();
-                App.m_nanoView.m_Model.m_LayerList.Clear();
+                App.m_nanoView.m_MaterialList.Clear();
+                //LibSR_Met.DataManager.GetInstance().m_LayerData.Clear();
+                
+                //App.m_nanoView..Clear();
                 InitLayer();
             }
             InitLayerGrid();    
@@ -1938,6 +1938,7 @@ namespace Root_CAMELLIA
 
         public void InitLayer()
         {
+            App.m_nanoView.m_LayerList.Clear();
             dataManager.recipeDM.ModelData.AddLayer();
             dataManager.recipeDM.ModelData.AddLayer();
         }
@@ -2892,7 +2893,7 @@ namespace Root_CAMELLIA
                 Material = Path.GetFileNameWithoutExtension(str);
                 for (int i = 0; i < GridLayerData[0].Host1.Count; i++)
                 {
-                    if (GridLayerData[0].Host1[i] == Material)
+                    if (GridLayerData[0].Host1[i].Name == Material)
                     {
                         exist = true;
                     }
@@ -2903,9 +2904,9 @@ namespace Root_CAMELLIA
                     for (int i = 0; i < GridLayerData.Count; i++)
                     {
 
-                        GridLayerData[i].Host1.Add(Material);
-                        GridLayerData[i].Guest1.Add(Material);
-                        GridLayerData[i].Guest2.Add(Material);
+                        GridLayerData[i].Host1.Add(new ModelData.LayerData.PathEntity(str, Material));
+                        GridLayerData[i].Guest1.Add(new ModelData.LayerData.PathEntity(str, Material));
+                        GridLayerData[i].Guest2.Add(new ModelData.LayerData.PathEntity(str, Material));
                     }
                 }
             }
@@ -2931,7 +2932,7 @@ namespace Root_CAMELLIA
             {
                 return true;
             }
-            string material = Path.GetFileNameWithoutExtension(MaterialListItem[MaterialSelectIndex]);
+            string material = MaterialListItem[MaterialSelectIndex];
             for (int i = 0; i < GridLayerData.Count; i++)
             {
                 if (GridLayerData[i].SelectedHost1 == material || GridLayerData[i].SelectedGuest1 == material || GridLayerData[i].SelectedGuest2 == material)
@@ -2961,6 +2962,20 @@ namespace Root_CAMELLIA
                 GridLayerData[i].UpdateModelLayer(cnt);
                 cnt--;
             }
+        }
+
+        private bool CheckLayerHost()
+        {
+            int cnt = LayerCount - 1;
+            for(int i = 0; i < GridLayerData.Count; i++)
+            {
+                if (!GridLayerData[i].CheckLayerHost(cnt))
+                {
+                    return false;
+                }
+                cnt--;
+            }
+            return true;
         }
 
         private int _layerCount = 2;
@@ -3370,10 +3385,13 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    dataManager.recipeDM.RecipeOpen();
-                    UpdateListView();
-                    UpdateParameter();
-                    UpdateView();
+                    if (dataManager.recipeDM.RecipeOpen() == true)
+                    {
+                        UpdateListView(true);
+                        UpdateLayerGridView();
+                        UpdateParameter();
+                        UpdateView();
+                    }
                 });
             }
         }
@@ -3387,6 +3405,7 @@ namespace Root_CAMELLIA
                     MainViewModel.DataManager = dataManager;
                     MainViewModel.RecipeViewModel.dataManager = dataManager;
                     MainViewModel.RecipeViewModel.UpdateListView();
+                    MainViewModel.RecipeViewModel.UpdateLayerGridView();
                     MainViewModel.RecipeViewModel.UpdateView();
                 });
             }
@@ -3460,8 +3479,8 @@ namespace Root_CAMELLIA
                 {
                     //MaterialListItem.Clear();
                     //DeleteGridCombo();
-                    int res = dataManager.recipeDM.AddMaterial();
-                    if(res == 0)
+                    bool res = dataManager.recipeDM.AddMaterial();
+                    if(res)
                     {
                         MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.ModelData.MaterialList.ToArray());
                        // MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.TeachingRD.MaterialList.ToList());
@@ -3528,6 +3547,11 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     UpdateLayerModel();
+                    if (!CheckLayerHost())
+                    {
+                        MessageBox.Show("The host must exist.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
                     dataManager.recipeDM.SaveModel();
                 });
             }

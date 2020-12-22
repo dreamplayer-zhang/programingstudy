@@ -193,11 +193,11 @@
       <HintPath>..\packages\Dirkster.NumericUpDownLib.2.4.2\lib\net40\NumericUpDownLib.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
-    <Reference Include="ScottPlot, Version=4.0.45.0, Culture=neutral, PublicKeyToken=86698dc10387c39e, processorArchitecture=MSIL">
-      <HintPath>..\packages\ScottPlot.4.0.45\lib\netstandard2.0\ScottPlot.dll</HintPath>
+    <Reference Include="ScottPlot, Version=4.0.39.0, Culture=neutral, PublicKeyToken=86698dc10387c39e, processorArchitecture=MSIL">
+      <HintPath>..\packages\ScottPlot.4.0.39\lib\netstandard2.0\ScottPlot.dll</HintPath>
     </Reference>
-    <Reference Include="ScottPlot.WinForms, Version=4.0.45.0, Culture=neutral, PublicKeyToken=5df1dfa5321e734b, processorArchitecture=MSIL">
-      <HintPath>..\packages\ScottPlot.WinForms.4.0.45\lib\net472\ScottPlot.WinForms.dll</HintPath>
+    <Reference Include="ScottPlot.WPF, Version=4.0.39.0, Culture=neutral, PublicKeyToken=e53b06131e34a3aa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ScottPlot.WPF.4.0.39\lib\net472\ScottPlot.WPF.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Activities" />
@@ -256,6 +256,10 @@
     <Compile Include="Control\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\Dlg_Setting_ViewModel.cs" />
+    <Compile Include="UI_Dialog\Dlg_Setting.xaml.cs">
+      <DependentUpon>Dlg_Setting.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_Engineer\Camellia_ToolBox.xaml.cs">
       <DependentUpon>Camellia_ToolBox.xaml</DependentUpon>
     </Compile>
@@ -283,11 +287,9 @@
     </Compile>
     <Compile Include="GeneralFunction.cs" />
     <Compile Include="Draw\GeneralTools.cs" />
-    <Compile Include="InfoWafer.cs" />
     <Compile Include="ViewModel\MainWindow_ViewModel.cs" />
     <Compile Include="Measurement\Measurement.cs" />
     <Compile Include="Measurement\MeasurementManager.cs" />
-    <Compile Include="ModuleBase\CamelliaModuleBase.cs" />
     <Compile Include="Module\Module_Camellia.cs" />
     <Compile Include="Draw\ShapeDraw\Arc.cs" />
     <Compile Include="Draw\ShapeDraw\Circle.cs" />
@@ -310,6 +312,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\LoadingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_Setting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

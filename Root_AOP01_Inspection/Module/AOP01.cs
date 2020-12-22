@@ -7,6 +7,7 @@ using RootTools.Trees;
 using System;
 using System.Text;
 using System.Threading;
+using System.Windows.Threading;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -322,6 +323,9 @@ namespace Root_AOP01_Inspection.Module
         {
             p_id = id;
             base.InitBase(id, engineer);
+
+            //m_robot = ((Vega_Handler)engineer.ClassHandler()).m_robot;
+            InitTimer(); 
         }
 
         public override void ThreadStop()
@@ -329,51 +333,58 @@ namespace Root_AOP01_Inspection.Module
             base.ThreadStop();
         }
 
+        #region Show OHT -> Delete
+        public void ShowOHT()
+        {
+            m_timer.Start(); 
+        }
+
+        DispatcherTimer m_timer = new DispatcherTimer(); 
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(10);
+            m_timer.Tick += M_timer_Tick;
+        }
+
+        OHTs_UI m_uiOHT;
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            m_timer.Stop();
+            m_uiOHT = new OHTs_UI();
+            m_uiOHT.Init((AOP01_Handler)m_engineer.ClassHandler());
+            m_uiOHT.Show();
+        }
+        #endregion
+
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            //AddModuleRunList(new Run_ReadRFID(this), false, "Read RFID");
+            AddModuleRunList(new Run_ShowOHT(this), false, "Show_OHT"); //forget Delete
         }
 
-        public class Run_ReadRFID : ModuleRunBase
+        public class Run_ShowOHT : ModuleRunBase
         {
             AOP01 m_module;
-            public Run_ReadRFID(AOP01 module)
+            public Run_ShowOHT(AOP01 module)
             {
                 m_module = module;
                 InitModuleRun(module);
             }
 
-            int m_nCh = 1;
-            string m_sSimulCarrierID = "CarrierID";
             public override ModuleRunBase Clone()
             {
-                Run_ReadRFID run = new Run_ReadRFID(m_module);
-                run.m_nCh = m_nCh;
-                run.m_sSimulCarrierID = m_sSimulCarrierID;
+                Run_ShowOHT run = new Run_ShowOHT(m_module);
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_nCh = tree.Set(m_nCh, m_nCh, "Channel", "RFID Channel");
-                m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation", bVisible && EQ.p_bSimulate);
             }
 
             public override string Run()
             {
-                string sResult = "OK";
-                string sCarrierID = "";
-                if (EQ.p_bSimulate) sCarrierID = m_sSimulCarrierID;
-                else
-                {
-                    sResult = m_module.m_RFID.ReadRFID((byte)m_nCh, out sCarrierID);
-                    m_module.m_log.Info("Read RFID : " + sCarrierID);
-                    StringBuilder sHex = new StringBuilder();
-                    foreach (char ch in sCarrierID) sHex.AppendFormat("{0:x2} ", ch);
-                    m_module.m_log.Info("ReaHex RFID : " + sHex.ToString());
-                }
-                return sResult;
+                m_module.ShowOHT(); 
+                return "OK";
             }
         }
         #endregion

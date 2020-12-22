@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class SurfaceParameter : ParameterBase
+    public class SurfaceParameter : ParameterBase, IMaskInspection
     {
         public SurfaceParameter() : base(typeof(Surface))
         {
@@ -20,6 +20,7 @@ namespace RootTools_Vision
         private int intensity = 0;
         private int size = 0;
         private bool isBright = false;
+        private DiffFilterMethod diffFilter = DiffFilterMethod.Average;
         #endregion
 
         #region [Getter Setter]
@@ -50,6 +51,25 @@ namespace RootTools_Vision
             {
                 SetProperty<bool>(ref this.isBright, value);
             }
+        }
+        [Category("Option")]
+        [DisplayName("Diff Filter")]
+        public DiffFilterMethod DiffFilter
+        {
+            get => this.diffFilter;
+            set
+            {
+                SetProperty<DiffFilterMethod>(ref this.diffFilter, value);
+            }
+        }
+        // ROI
+        private int maskIndex;
+        [Category("ROI")]
+        [DisplayName("ROI Index")]
+        public int MaskIndex
+        {
+            get => maskIndex;
+            set => maskIndex = value;
         }
         #endregion
 
