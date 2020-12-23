@@ -42,7 +42,7 @@ namespace Root_EFEM.Module
 
         //forget
         #region DIO Function
-        bool m_bPlaced = false;
+        public bool m_bPlaced = false;
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present = m_bPlaced ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
