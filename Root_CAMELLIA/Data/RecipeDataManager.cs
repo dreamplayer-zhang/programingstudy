@@ -60,47 +60,24 @@ namespace Root_CAMELLIA.Data
             {
                 try
                 {
-                    //m_DM.m_LM.WriteLog(LOG.CAMELLIA, "[Open Recipe] Recipe File Path - " + dialog.FileName);
                     TeachRecipeName = Path.GetFileName(dialog.FileName);
                     TeachRecipeName = TeachRecipeName.Remove(TeachRecipeName.Length - 4);
-                    //m_DM.m_LM.WriteLog(LOG.CAMELLIA, "[Open Recipe] Recipe File Name - " + strTeachingRecipeName);
 
-                    dataManager.recipeDM.MeasurementRD.ClearPoint();
-                    //Read(dialog.FileName);                        
+                    dataManager.recipeDM.MeasurementRD.ClearPoint();                
                     dataManager.recipeDM.MeasurementRD = (RecipeData)GeneralFunction.Read(dataManager.recipeDM.MeasurementRD, dialog.FileName);
                     dataManager.recipeDM.MeasurementRD.CheckCircleSize();
-                    //if (dataManager.recipeDM.MeasurementRD.ModelRecipePath != "")
-                    //{
-                    //    LoadModel(dataManager.recipeDM.MeasurementRD.ModelRecipePath);
-                    //}
+
                     dataManager.recipeDM.MeasurementRD.Clone(dataManager.recipeDM.TeachingRD);
 
-                    // dataManager.recipeDM.TeachingRD.CheckLayerData();
-                    // dataManager.recipeDM.TeachingRD.CheckWavelengthData();
-                    //m_DM.Main.m_DlgRecipeManager.CheckWavelengthBound();
                     TeachingRecipePath = dialog.FileName;
-                    //m_DM.Main.TeachingRecipeOpenDone(dialog.FileName);
-                    //UnlockFile();
-                    //LockFile(dialog.FileName);
-                    // m_DM.Main.m_DlgRecipeManager.Text = "Recipe Manager" + "  " + m_DM.m_RDM.strTeachingRecipe;
 
-                    //  m_DM.m_LM.WriteLog(LOG.CAMELLIA, "[Open Recipe] Done");
-                    // m_DM.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Open - Recipe : " + dialog.FileName);
-                    //  MessageBox.Show("Open Recipe Done!");
                     return true;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    // m_DM.m_LM.WriteLog(LOG.CAMELLIA, "[Open Recipe] Exception Caught");
-                    // MessageBox.Show("Open Exception Caught! - " + ex.Message);
                 }
             }
-            //else
-            //{
-            //    m_DM.m_LM.WriteLog(LOG.CAMELLIA, "[Open Recipe] Fail");
-            //    MessageBox.Show("Open Recipe Fail!");
-            //    return false;
-            //}
+
             return false;
         }
         public void RecipeSave()
@@ -111,19 +88,9 @@ namespace Root_CAMELLIA.Data
             }
             else
             {
-                //SaveFileDialog dialog = new SaveFileDialog();
-                //dialog.DefaultExt = "aco";
-                //dialog.Filter = "*.aco|*.aco";
-                //dialog.InitialDirectory = BaseDefine.Dir_Recipe;
-                //if (dialog.ShowDialog() == true)
-                //{
-                //string strTeachingRecipeName = System.IO.Path.GetFileName(dialog.FileName);
-                //strTeachingRecipeName = strTeachingRecipeName.Remove(strTeachingRecipeName.Length - 4);
-
                 GeneralFunction.Save(dataManager.recipeDM.TeachingRD, TeachingRecipePath);
                 dataManager.recipeDM.TeachingRD.Clone(dataManager.recipeDM.MeasurementRD);
                 MessageBox.Show("Save Done!");
-
             }
         }
         public void RecipeSaveAs(string path = null)
@@ -136,10 +103,8 @@ namespace Root_CAMELLIA.Data
             {
                 dialog.FileName = AddFolderPath(dialog.FileName);
 
-                //da.m_LM.WriteLog(LOG.CAMELLIA, "[Save As Recipe] Recipe File Path - " + dialog.FileName);
                 TeachRecipeName = System.IO.Path.GetFileName(dialog.FileName);
                 TeachRecipeName = TeachRecipeName.Remove(TeachRecipeName.Length - 4);
-                //m_DM.m_LM.WriteLog(LOG.CAMELLIA, "[Save As Recipe] Recipe File Name - " + strTeachingRecipeName);
 
                 GeneralFunction.Save(dataManager.recipeDM.TeachingRD, dialog.FileName);
                 dataManager.recipeDM.TeachingRD.Clone(dataManager.recipeDM.MeasurementRD);
@@ -173,9 +138,6 @@ namespace Root_CAMELLIA.Data
         public bool AddMaterial()
         {
             LibSR_Met.Nanoview.ERRORCODE_NANOVIEW res;
-              
-            string name = "", ext = "";
-
             OpenFileDialog fileDlg = new OpenFileDialog();
 
             fileDlg.Multiselect = true;
@@ -260,40 +222,6 @@ namespace Root_CAMELLIA.Data
                 App.m_nanoView.SaveModel(fileDlg.FileName);
                 dataManager.recipeDM.TeachingRD.ModelRecipePath = fileDlg.FileName;
             }
-            //if(dataManager.recipeDM.TeachingRD.ModelRecipePath == "")
-            //{
-            //    SaveAsModel();
-            //}
-            ////SaveFileDialog fileDlg = new SaveFileDialog();
-
-            ////fileDlg.Filter = "Model files (*.rcp)|*.rcp|All files(*.*)|*.*";
-            ////fileDlg.RestoreDirectory = true;
-            ////fileDlg.AddExtension = true;
-
-            ////if (fileDlg.ShowDialog() == true)
-            ////{
-            //if(MessageBox.Show("Are you sure?", "Save", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
-            //{
-            //    File.WriteAllLines(dataManager.recipeDM.TeachingRD.ModelRecipePath, App.m_nanoView.m_Model.m_LayerList.ToString());
-            //}
-            ////}
         }
-
-        //public bool SaveAsModel()
-        //{
-        //    SaveFileDialog fileDlg = new SaveFileDialog();
-
-        //    fileDlg.Filter = "Model files (*.rcp)|*.rcp|All files(*.*)|*.*";
-        //    fileDlg.RestoreDirectory = true;
-        //    fileDlg.AddExtension = true;
-
-        //    if (fileDlg.ShowDialog() == true)
-        //    {
-        //        File.WriteAllLines(fileDlg.FileName, App.m_nanoView.m_Model.m_LayerList.ToString());
-        //        dataManager.recipeDM.TeachingRD.ModelRecipePath = fileDlg.FileName;
-        //        return true;
-        //    }
-        //    return false;
-        //}
     }
 }

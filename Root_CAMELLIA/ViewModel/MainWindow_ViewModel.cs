@@ -367,8 +367,6 @@ namespace Root_CAMELLIA
 
         #region Dialog
         DialogService dialogService;
-        private Dlg_RecipeManager DlgRecipeManager; 
-        private Dlg_Engineer DlgEngineer;
         #endregion
 
         #region Timer

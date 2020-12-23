@@ -586,7 +586,6 @@ namespace Root_CAMELLIA.Module
             public override string Run()
             {
                 AxisXY axisXY = m_module.m_axisXY;
-                RPoint MovePoint;
                 //if (m_InitialCal)
                 //{
                 //    MovePoint = new RPoint(m_CalWaferCenterPos_pulse);
@@ -609,7 +608,6 @@ namespace Root_CAMELLIA.Module
         public class Run_Measure : ModuleRunBase
         {
             Module_Camellia m_module;
-            Met.Nanoview m_NanoView;
             MainWindow_ViewModel m_mwvm;
             DataManager m_DataManager;
             (Met.SettingData, Met.Nanoview.ERRORCODE_NANOVIEW) m_SettingDataWithErrorCode;
@@ -671,10 +669,26 @@ namespace Root_CAMELLIA.Module
             }
             public override string Run()
             {
+
+                Axis axisLifter = m_module.p_axisLifter;
+
+                if (m_module.LifterUpVaccumCheck())
+                {
+                    if (!m_module.m_vaccum.p_bIn)
+                    {
+                        if (m_module.Run(axisLifter.StartHome()))
+                        {
+                            return p_sInfo;
+                        }
+                        if (m_module.Run(axisLifter.WaitReady()))
+                            return p_sInfo;
+                    }
+                }
+
                 //m_module.p_eState = (eState)5;
                 AxisXY axisXY = m_module.p_axisXY;
                 Axis axisZ = m_module.p_axisZ;
-                Axis axisLifter = m_module.p_axisLifter;
+                
                 // stage 48724 , wafer 47932
                 if (m_module.Run(axisZ.StartMove(m_dFocusZ_pulse)))
                 {
@@ -769,18 +783,18 @@ namespace Root_CAMELLIA.Module
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
 
-                if (m_module.LifterUpVaccumCheck())
-                {
-                    if (!m_module.m_vaccum.p_bIn)
-                    {
-                        if (m_module.Run(axisLifter.StartMove(ePosition.SWLimit_Plus)))
-                        {
-                            return p_sInfo;
-                        }
-                        if (m_module.Run(axisLifter.WaitReady()))
-                            return p_sInfo;
-                    }
-                }
+                //if (m_module.LifterUpVaccumCheck())
+                //{
+                //    if (!m_module.m_vaccum.p_bIn)
+                //    {
+                //        if (m_module.Run(axisLifter.StartMove(ePosition.SWLimit_Plus)))
+                //        {
+                //            return p_sInfo;
+                //        }
+                //        if (m_module.Run(axisLifter.WaitReady()))
+                //            return p_sInfo;
+                //    }
+                //}
 
                 return "OK";
             }
@@ -788,7 +802,6 @@ namespace Root_CAMELLIA.Module
         public class Run_VRSTEST : ModuleRunBase
         {
             Module_Camellia m_module;
-            Met.Nanoview m_NanoView;
             MainWindow_ViewModel m_mwvm;
             DataManager m_DataManager;
             RPoint m_WaferCenterPos_pulse = new RPoint(); // Pulse
@@ -824,11 +837,9 @@ namespace Root_CAMELLIA.Module
                 Camera_Basler VRS = m_module.m_CamVRS;
                 ImageData img = VRS.p_ImageViewer.p_ImageData;
                 string strVRSImageDir = "D:\\";
-                string strVRSImageFullPath = "";
-                RPoint MeasurePoint;
                 if (VRS.Grab() == "OK")
                 {
-                    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
+                    string strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
                     img.SaveImageSync(strVRSImageFullPath);
                     //Grab error
                 }
@@ -948,6 +959,7 @@ namespace Root_CAMELLIA.Module
 
         private string MoveReadyPos()
         {
+            if (p_axisLifter.IsInPos(ePosition.Position_0)) return "OK";
 
             /* XY Ready 위치 이동 */
             if (Run(p_axisXY.p_axisX.StartMove(eAxisPos.Ready)))
@@ -960,13 +972,13 @@ namespace Root_CAMELLIA.Module
                 return p_sInfo;
             if (Run(p_axisZ.WaitReady()))
                 return p_sInfo;
-
             /* Vaccum Check 후Lifter Up */
             if (LifterUpVaccumCheck())
             {
                 if (!m_vaccum.p_bIn)
                 {
-                    if (Run(p_axisLifter.StartMove(ePosition.SWLimit_Plus)))
+                    //if (Run(p_axisLifter.StartMove(ePosition.SWLimit_Plus)))
+                    if (Run(p_axisLifter.StartMove(ePosition.Position_0)))
                     {
                         return p_sInfo;
                     }
