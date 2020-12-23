@@ -28,7 +28,7 @@
         <local:AxisZToMotionUIConverter x:Key="AxisZToMotionUI"/>
         <local:AxisLifterToMotionUIConverter x:Key="AxisLifterToMotionUI"/>
     </Window.Resources>
-    <Grid Margin="5">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="690" />
@@ -80,6 +80,7 @@
         </Grid>
         <TabControl Grid.Row="1">
             <TabItem Header="Manual"
+                     Margin="-1,0,0,0"
                      Width="100">
                 <Grid>
                     <ScrollViewer Grid.Row="2"
@@ -845,6 +846,7 @@
         </TabControl>
         <GridSplitter Grid.Row="2" 
                       Height="2"
+                      Margin="0,5"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
                       Background="{StaticResource Splitter}"
