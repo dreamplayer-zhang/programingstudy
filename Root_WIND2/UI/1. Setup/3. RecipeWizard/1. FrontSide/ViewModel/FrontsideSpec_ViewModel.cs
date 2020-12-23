@@ -21,7 +21,6 @@ namespace Root_WIND2
             m_Recipe = recipe;
             m_front = front;
             ViewerInit();
-            m_cMask = new ObservableCollection<Mask>();
             m_cInspMethod = new ObservableCollection<ParameterBase>();
             m_cInspItem = new ObservableCollection<InspectionItem>();
 
@@ -41,7 +40,6 @@ namespace Root_WIND2
             p_ROI_Viewer.p_ROILayer = m_front.p_ROI_VM.p_ROILayer;
             p_ROI_Viewer.p_cInspROI = m_front.p_ROI_VM.p_cInspROI;
             p_ROI_Viewer.SetRoiRect();
-            //p_ROI_Viewer.SetLayerSource();
         }
 
         #region Property
@@ -52,24 +50,13 @@ namespace Root_WIND2
             {
                 m_ROI_Viewer.p_ImageData = m_front.p_ROI_VM.p_ImageData;
                 m_ROI_Viewer.SetImageSource();
+                if(m_ROI_Viewer.p_SelectedROI != null)
+                    m_ROI_Viewer._ReadROI();
                 return m_ROI_Viewer;
             }
             set
             {
                 SetProperty(ref m_ROI_Viewer, value);
-            }
-        }
-
-        private ObservableCollection<Mask> m_cMask;
-        public ObservableCollection<Mask> p_cMask
-        {
-            get
-            {
-                return m_cMask;
-            }
-            set
-            {
-                SetProperty(ref m_cMask, p_cMask);
             }
         }
 
@@ -96,22 +83,6 @@ namespace Root_WIND2
             set
             {
                 SetProperty(ref m_cInspItem, value);
-            }
-        }
-
-        private Mask m_selectedMask;
-        public Mask p_selectedMask
-        {
-            get
-            {
-                return m_selectedMask;
-            }
-            set
-            {
-                if (p_selectedInspItem == null)
-                    return;
-                m_selectedInspItem.p_Mask = value;
-                SetProperty(ref m_selectedMask, value);
             }
         }
 
@@ -158,7 +129,7 @@ namespace Root_WIND2
 
         public void ComboBoxItemChanged_Mask_Callback(object obj, EventArgs args)
         {
-            Mask mask = (Mask)obj;
+            InspectionROI mask = (InspectionROI)obj;
         }
 
         public void ComboBoxItemChanged_Method_Callback(object obj, EventArgs args)
@@ -173,8 +144,10 @@ namespace Root_WIND2
             InspectionItem item = obj as InspectionItem;
 
             p_cInspItem.Remove(item);
-            //p_cInspItem = p_cInspItem;
-
+            for (int i = 0; i < p_cInspItem.Count; i++)
+            {
+                p_cInspItem[i].p_Index = i;
+            }
             SetParameter();
         }
 
@@ -191,7 +164,7 @@ namespace Root_WIND2
             foreach(ParameterBase parameterBase in m_Recipe.ParameterItemList)
             {
                 InspectionItem item = new InspectionItem();
-                item.p_cMask = p_cMask;
+                item.p_cInspROI = p_ROI_Viewer.p_cInspROI;
                 item.p_cInspMethod = CloneMethod();
 
                 int selectMethod = 0;
@@ -223,6 +196,8 @@ namespace Root_WIND2
             List<ParameterBase> paramList = new List<ParameterBase>();
             foreach(InspectionItem item in p_cInspItem)
             {
+                if (item.p_InspMethod is IMaskInspection)
+                    ((IMaskInspection)item.p_InspMethod).MaskIndex = item.p_InspROI.p_Index;
                 paramList.Add(item.p_InspMethod);
             }
 
@@ -237,7 +212,8 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     InspectionItem item = new InspectionItem();
-                    item.p_cMask = p_cMask;
+                    item.p_cInspROI = p_ROI_Viewer.p_cInspROI;
+                    item.p_Index = p_cInspItem.Count();
                     item.p_cInspMethod = CloneMethod();
                     item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
                     item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
@@ -248,7 +224,6 @@ namespace Root_WIND2
                 });
             }
         }
-
         public ICommand ComboBoxSelectionChanged_MethodItem
         {
             get
