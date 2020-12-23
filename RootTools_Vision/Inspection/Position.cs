@@ -18,7 +18,7 @@ namespace RootTools_Vision
     public class Position : WorkBase
     {
         #region [Member Variables]
-        public override WORK_TYPE Type => WORK_TYPE.PREPARISON;
+        public override WORK_TYPE Type => WORK_TYPE.ALIGNMENT;
 
         WorkplaceBundle workplaceBundle;
         Workplace workplace;

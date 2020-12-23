@@ -101,6 +101,9 @@ namespace Root_WIND2.Module
 
         public override string Run()
         {
+            //레시피에 GrabMode 저장하고 있어야함
+
+
             if (m_grabMode == null) return "Grab Mode == null";
 
             if(this.inspectionVision.Recipe.Read(m_sRecipeName, true) == false)

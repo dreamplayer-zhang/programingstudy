@@ -65,11 +65,14 @@ namespace RootTools.Control.ACS
         void ReadInput()
         {
             if (EQ.p_bSimulate) return;
-            if (m_acs.p_bConnect == false) return; 
+            if (m_acs.p_bConnect == false) return;
+
             try
             {
                 for (int n = 0; n < m_lPort; n++)
                 {
+                    dynamic d = m_acs.m_channel.ReadVariable("EL1889", -1 , 0 , 11);
+
                     if (m_aPort[n] >= 0) m_aRead[n] = (uint)m_acs.m_channel.GetInputPort(n);
                     for (int m = 0, nID = 16 * n; m < 16; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aComp[m]) > 0);
                 }

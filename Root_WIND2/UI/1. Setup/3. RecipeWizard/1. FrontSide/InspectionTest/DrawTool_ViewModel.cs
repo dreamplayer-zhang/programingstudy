@@ -24,8 +24,13 @@ namespace Root_WIND2
         public Grid grid;
         public TRect pos;
     }
+
+    public delegate void EventDrawDone(CPoint leftTop, CPoint rightBottom); //임시
+
     public class DrawTool_ViewModel : RootViewer_ViewModel
     {
+        public event EventDrawDone DrawDone;
+
         public DrawTool_ViewModel()
         {
             base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
@@ -330,6 +335,34 @@ namespace Root_WIND2
         public void ChangeImageData(ImageData image = null, IDialogService dialogService = null)
         {
             base.init(image, dialogService);
+        }
+
+
+
+        public CPoint leftClickPoint = new CPoint();
+        public CPoint rightClickPoint = new CPoint();
+        //임시
+        public override void PreviewMouseDown(object sender, MouseEventArgs e)
+        {
+            base.PreviewMouseDown(sender, e);
+            if (m_KeyEvent != null)
+                if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
+                    return;
+            CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
+            CPoint MemPt = GetMemPoint(CanvasPt);
+
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                rightClickPoint = MemPt;
+            }
+            else if(e.LeftButton == MouseButtonState.Pressed)
+            {
+                leftClickPoint = MemPt;
+            }
+
+            if (this.DrawDone != null)
+                DrawDone(leftClickPoint, rightClickPoint);
+            
         }
     }
 }
