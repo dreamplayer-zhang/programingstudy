@@ -32,6 +32,8 @@ namespace Root_CAMELLIA
             m_handler = handler;
             DataContext = handler;
             moduleListUI.Init(handler.m_moduleList);
+            recipeUI.Init(handler.m_recipe);
+            processUI.Init(handler.m_process);
             gafUI.Init(handler.m_gaf);
             InitTabControl();
         }

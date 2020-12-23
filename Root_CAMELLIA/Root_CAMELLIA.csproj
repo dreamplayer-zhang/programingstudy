@@ -235,6 +235,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UI_Engineer\Camellia_Recipe_UI.xaml.cs">
+      <DependentUpon>Camellia_Recipe_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converter\AxisBoolToBrushConverter.cs" />
     <Compile Include="BaseDefine.cs" />
     <Compile Include="Converter\AxisToPositionConverter.cs" />
@@ -307,6 +310,10 @@
       <DependentUpon>Camellia_Hander_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\WpfPropertyGrid.cs" />
+    <Page Include="UI_Engineer\Camellia_Recipe_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\LoadingBlock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

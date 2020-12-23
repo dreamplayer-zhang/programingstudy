@@ -207,12 +207,12 @@ namespace Root_CAMELLIA.Module
 
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), false, "Time Delay");
-            AddModuleRunList(new Run_Calibration(this), false, "Calibration");
-            AddModuleRunList(new Run_InitCalWaferCentering(this), false, "InitCalCentering");
-            AddModuleRunList(new Run_WaferCentering(this), false, "Centering");
-            AddModuleRunList(new Run_Measure(this), false, "Measurement");
-            AddModuleRunList(new Run_VRSTEST(this), false, "VRSTEST");
+            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+            AddModuleRunList(new Run_Calibration(this), true, "Calibration");
+            AddModuleRunList(new Run_InitCalWaferCentering(this), true, "InitCalCentering");
+            AddModuleRunList(new Run_WaferCentering(this), true, "Centering");
+            AddModuleRunList(new Run_Measure(this), true, "Measurement");
+            AddModuleRunList(new Run_VRSTEST(this), true, "VRSTEST");
         }
 
         public class Run_Delay : ModuleRunBase

@@ -1,6 +1,7 @@
 ﻿using Root_CAMELLIA;
 using Root_CAMELLIA.Module;
 using Root_EFEM.Module;
+using Root_EFEM;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -55,7 +56,8 @@ namespace Root_CAMELLIA
         #region Module
         public ModuleList m_moduleList;
         public CAMELLIA_Recipe m_recipe;
-        public CAMELLIA_Process m_process;
+        //public CAMELLIA_Process m_process;
+        public EFEM_Process m_process;
         public Module_Camellia m_camellia;
         void InitModule()
         {
@@ -73,8 +75,10 @@ namespace Root_CAMELLIA
             iWTR.ReadInfoReticle_Registry();
 
             m_recipe = new CAMELLIA_Recipe("Recipe", m_engineer);
-            m_recipe.AddModule(m_camellia);
-            m_process = new CAMELLIA_Process("Process", m_engineer, this);
+            //m_recipe.AddModule(m_camellia);
+            foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
+            //m_process = new CAMELLIA_Process("Process", m_engineer, this);
+            m_process = new EFEM_Process("Process", m_engineer, iWTR);
         }
 
         void InitModule(ModuleBase module)
@@ -87,7 +91,13 @@ namespace Root_CAMELLIA
         public bool IsEnableRecovery()
         {
             //            if (m_vision.p_infoWafer != null) return true;
-            return false;
+            //return false;
+            IWTR iWTR = (IWTR)m_wtr;
+            foreach(IWTRChild child in iWTR.p_aChild)
+            {
+                if (child.p_infoWafer != null) return true;
+            }
+            return iWTR.IsEnableRecovery();
         }
         #endregion
 
@@ -122,6 +132,7 @@ namespace Root_CAMELLIA
             Cymechs,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
+        public List<ILoadport> m_aLoadport = new List<ILoadport>();
         int m_lLoadport = 2;
         void InitLoadport()
         {
@@ -137,6 +148,7 @@ namespace Root_CAMELLIA
                     default: module = new Loadport_RND(sID, m_engineer, true, true); break;
                 }
                 InitModule(module);
+                m_aLoadport.Add((ILoadport)module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
             }
         }
@@ -261,9 +273,13 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Calc Sequence
+        public int m_nRnR = 1;
+        dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
-            m_process.AddInfoWafer(infoSlot);
+            //m_process.AddInfoWafer(infoSlot);
+            m_infoRnRSlot = infoSlot;
+            m_process.p_sInfo = m_process.AddInfoWafer(infoSlot);
             return "OK";
         }
 
@@ -290,13 +306,13 @@ namespace Root_CAMELLIA
 
         public dynamic GetGemSlot(string sSlot)
         {
-            //            foreach (Loadport loadport in m_aLoadport) //forget
-            //            {
-            //                foreach (GemSlotBase slot in loadport.m_infoPod.m_aGemSlot)
-            //                {
-            //                    if (slot.p_id == sSlot) return slot;
-            //                }
-            //            }
+            foreach(ILoadport loadport in m_aLoadport)
+            {
+                foreach(GemSlotBase slot in loadport.p_infoCarrier.m_aGemSlot)
+                {
+                    if (slot.p_id == sSlot) return slot;
+                }
+            }
             return null;
         }
         #endregion
@@ -325,9 +341,46 @@ namespace Root_CAMELLIA
                     case EQ.eState.Run:
                         if (m_moduleList.m_qModuleRun.Count == 0)
                         {
+                            CheckLoad();
                             m_process.p_sInfo = m_process.RunNextSequence();
+                            CheckUnload();
+                            if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            {
+                                m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
+                                m_process.ReCalcSequence();
+                                m_nRnR--;
+                                EQ.p_eState = EQ.eState.Run;
+                            } 
                         }
                         break;
+                }
+            }
+        }
+
+        void CheckLoad()
+        {
+            EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
+            string sLoadport = sequence.m_infoWafer.m_sModule;
+            foreach(ILoadport loadport in m_aLoadport)
+            {
+                if (loadport.p_id == sLoadport) loadport.RunDocking();
+            }
+        }
+
+        void CheckUnload()
+        {
+            EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();
+            foreach(ILoadport loadport in m_aLoadport)
+            {
+                if(loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+                {
+                    string sLoadport = loadport.p_id;
+                    bool bUndock = true;
+                    foreach(EFEM_Process.Sequence sequence in aSequence)
+                    {
+                        if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
+                    }
+                    if (bUndock) loadport.RunUndocking();
                 }
             }
         }
