@@ -67,7 +67,7 @@ namespace Root_WIND2
 
         void InitVisionModule()
         {
-            m_vision = new Vision("Vision", m_engineer);
+            m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_vision);
         }
 
@@ -83,7 +83,7 @@ namespace Root_WIND2
             m_backSideVision = new BackSideVision("BackSide Vision", m_engineer);
             InitModule(m_backSideVision);
             iWTR.AddChild(m_backSideVision);
-            m_vision = new Vision("Vision", m_engineer);
+            m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Client);
             InitModule(m_vision);
             iWTR.AddChild(m_vision);
 
