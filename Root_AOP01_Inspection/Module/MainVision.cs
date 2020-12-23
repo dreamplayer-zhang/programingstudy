@@ -8,6 +8,7 @@ using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
+using RootTools.Control.Ajin;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
@@ -16,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
+using static RootTools.Control.Axis;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -155,7 +157,7 @@ namespace Root_AOP01_Inspection.Module
         public enum eAxisPos
         {
             ReadyPos,
-
+            ScanPos,
         }
 
         void InitPosAlign()
@@ -796,26 +798,7 @@ namespace Root_AOP01_Inspection.Module
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
-
                         double dPosX = m_rpAxisCenter.X + nReticleSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
-
-                        int idx=0;
-                        if (m_grabMode.pUseRADS)
-                        {
-                            double dist = int.MaxValue;
-                            //가장 가까운 index를 찾아
-                            for(int i=0;i<ladsinfos.Count;i++)
-                            {
-                                double curdist = ladsinfos[i].axisPos.X - dPosX;
-                                if (dist>Math.Abs(curdist))
-                                {
-                                    dist = curdist;
-                                    idx = i;
-                                }
-                                else
-                                    break;
-                            }
-                        }
 
                         if (m_module.Run(axisZ.StartMove(m_nFocusPosZ)))
                             return p_sInfo;
@@ -830,6 +813,18 @@ namespace Root_AOP01_Inspection.Module
                         double dTriggerEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
                         axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
+                        double dTriggerDistance = Math.Abs(dTriggerEndPosY - dTriggerStartPosY);
+                        double dSection = dTriggerDistance / ladsinfos[nScanLine].m_Heightinfo.Length;
+                        double[] darrScanAxisPos = new double[ladsinfos[nScanLine].m_Heightinfo.Length];
+                        for (int i = 0; i<darrScanAxisPos.Length; i++)
+                        {
+                            if (dTriggerStartPosY > dTriggerEndPosY)
+                                darrScanAxisPos[i] = dTriggerStartPosY - (dSection * i);
+                            else
+                                darrScanAxisPos[i] = dTriggerStartPosY + (dSection * i);
+                        }
+                        SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, darrScanAxisPos, ladsinfos[nScanLine].m_Heightinfo, ladsinfos[nScanLine].m_Heightinfo.Length, false);
+
                         string strPool = m_grabMode.m_memoryPool.p_id;
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
                         string strMemory = m_grabMode.m_memoryData.p_id;
@@ -837,7 +832,6 @@ namespace Root_AOP01_Inspection.Module
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
-
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
@@ -854,6 +848,60 @@ namespace Root_AOP01_Inspection.Module
                 {
                     m_grabMode.SetLight(false);
                 }
+            }
+
+            private void SetFocusMap(int nScanAxisNo, int nZAxisNo, double[] darrScanAxisPos, double[] darrZAxisPos, int nPointCount, bool bReverse)
+            {
+                // variable
+                int iIdxScan = 0;
+                int iIdxZ = 1;
+                int[] narrAxisNo = new int[2];
+                double[] darrPosition = new double[2];
+                double dMaxVelocity = m_module.m_axisXY.p_axisY.GetSpeedValue(eSpeed.Move).m_v;
+                double dMaxAccel = m_module.m_axisXY.p_axisY.GetSpeedValue(eSpeed.Move).m_acc;
+                double dMaxDecel = m_module.m_axisXY.p_axisY.GetSpeedValue(eSpeed.Move).m_dec;
+
+                // implement
+                if (nZAxisNo < nScanAxisNo)
+                {
+                    iIdxZ = 0;
+                    iIdxScan = 1;
+                }
+                narrAxisNo[iIdxScan] = nScanAxisNo;
+                narrAxisNo[iIdxZ] = nZAxisNo;
+
+                // Queue 초기화
+                CAXM.AxmContiWriteClear(nScanAxisNo);
+                // 보간구동 축 맵핑
+                CAXM.AxmContiSetAxisMap(nScanAxisNo, (uint)narrAxisNo.Length, narrAxisNo);
+                // 구동모드 설정 -> [0] : 절대위치구동, [1] : 상대위치구동
+                uint unAbsRelMode = 0;
+                CAXM.AxmContiSetAbsRelMode(nScanAxisNo, unAbsRelMode);
+                // Conti 작성 시작 -> AxmContiBeginNode ~ AxmContiEndNode 사이의 AXM관련 함수들이 Conti Queue에 등록된다.
+                CAXM.AxmContiBeginNode(nScanAxisNo);
+                // 축별 구동위치 등록
+                if (bReverse)
+                {
+                    for (int i = nPointCount - 1; i >= 0; i--)
+                    {
+                        darrPosition[iIdxScan] = darrScanAxisPos[i];
+                        darrPosition[iIdxZ] = darrZAxisPos[i] + m_module.m_axisZ.GetPosValue(eAxisPos.ScanPos);
+                        CAXM.AxmLineMove(nScanAxisNo, darrPosition, dMaxVelocity, dMaxAccel, dMaxDecel);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i<nPointCount; i++)
+                    {
+                        darrPosition[iIdxScan] = darrScanAxisPos[i];
+                        darrPosition[iIdxZ] = darrZAxisPos[i] + m_module.m_axisZ.GetPosValue(eAxisPos.ScanPos);
+                        CAXM.AxmLineMove(nScanAxisNo, darrPosition, dMaxVelocity, dMaxAccel, dMaxDecel);
+                    }
+                }
+                // Conti 작성 종료
+                CAXM.AxmContiEndNode(nScanAxisNo);
+
+                return;
             }
         }
         public class Run_LADS : ModuleRunBase

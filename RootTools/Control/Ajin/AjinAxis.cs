@@ -794,6 +794,7 @@ namespace RootTools.Control.Ajin
                 return false;
         }
         #endregion
+
         public AjinListAxis m_listAxis; 
         public void Init(AjinListAxis listAxis, string id, Log log)
         {
