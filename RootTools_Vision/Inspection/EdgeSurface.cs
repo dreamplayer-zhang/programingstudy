@@ -16,7 +16,7 @@ namespace RootTools_Vision.Inspection
 		WorkplaceBundle workplaceBundle;
 		Workplace workplace;
 
-		public override WORK_TYPE Type => WORK_TYPE.MAINWORK;
+		public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
 		public override WorkBase Clone()
 		{

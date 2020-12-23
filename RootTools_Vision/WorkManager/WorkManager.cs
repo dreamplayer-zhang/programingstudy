@@ -9,8 +9,8 @@ namespace RootTools_Vision
 {
     public enum WORK_TYPE
     {
-        PREPARISON,
-        MAINWORK,
+        ALIGNMENT,
+        INSPECTION,
         AFTERWORK,
         FINISHINGWORK
     }
@@ -76,7 +76,7 @@ namespace RootTools_Vision
 
             //this.workbundle = _workbundle;
             this.workplacebundle = _workplacebundle;
-            this.workplacebundle.Reset();
+            //this.workplacebundle.Reset();
 
             this.workerManager.SetBundles(this.workbundle, this.workplacebundle);
 

@@ -12,6 +12,7 @@ namespace Root_CAMELLIA
     {
         public Dlg_Setting_ViewModel(MainWindow_ViewModel main)
         {
+
         }
         public ICommand CmdClose
         {
