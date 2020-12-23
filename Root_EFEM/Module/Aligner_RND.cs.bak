@@ -594,8 +594,7 @@ namespace Root_EFEM.Module
         public string AfterGet(int nID)
         {
             string sGet = SendCmd(eCmd.ResetPos);
-            //m_bgwWaferExist.RunWorkerAsync(true);
-            m_bgwWaferExist.RunWorkerAsync(false);
+            m_bgwWaferExist.RunWorkerAsync(true);
             return sGet; 
         }
 

@@ -18,7 +18,7 @@ namespace RootTools_Vision
     {
         Workplace workplace;
 
-        public override WORK_TYPE Type => WORK_TYPE.MAINWORK;
+        public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
 
         private SurfaceParameter parameter;

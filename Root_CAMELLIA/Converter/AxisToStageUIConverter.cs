@@ -30,7 +30,7 @@ namespace Root_CAMELLIA
                 }
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
             return values;
