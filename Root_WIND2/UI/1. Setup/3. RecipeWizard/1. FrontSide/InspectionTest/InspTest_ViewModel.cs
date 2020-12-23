@@ -83,12 +83,19 @@ namespace Root_WIND2
 
             p_MapControl_VM = new MapControl_ViewModel(m_Setup.InspectionVision);
             p_DrawTool_VM = new DrawTool_ViewModel();
+            p_DrawTool_VM.DrawDone += DrawDone_Callback;
 
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromTicks(100000);
             timer.Tick += new EventHandler(timer_Tick);
             //zDatabaseManager.Instance.SetDatabase(1);
 
+        }
+
+        private void DrawDone_Callback(CPoint leftTop, CPoint rightBottom)
+        {
+            p_DrawTool_VM.Clear();
+            this.m_DrawTool_VM.DrawRect(leftTop, rightBottom, DrawTool_ViewModel.ColorType.FeatureMatchingFail);
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -182,18 +189,19 @@ namespace Root_WIND2
         }
         private void _btnStop()
         {
-            //timer.Stop();
+            timer.Stop();
             m_Setup.InspectionVision.Stop();
             DatabaseManager.Instance.SelectData();
             m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
-        
         }
-        unsafe private void saveWholeWaferImage(string Path, CRect rect)
+
+
+        unsafe private void saveWholeWaferImage(string Path, CRect rect, int byteCnt, int temp = 0)
         {
             // Width가 4의 배수가 아닐 경우 에러남...
             // 예외처리 필요 if (rect.Width % 4 != 0) >> 처리가 잘못되는듯...
 
-            int byteCnt = p_DrawTool_VM.p_ImageData.p_nByte;
+            //int byteCnt = p_DrawTool_VM.p_ImageData.p_nByte;
             int _width = p_DrawTool_VM.p_ImageData.p_Size.X;
             int _height = p_DrawTool_VM.p_ImageData.p_Size.X;
 
@@ -247,38 +255,70 @@ namespace Root_WIND2
                 rect.Right += 4 - rect.Width % 4;
             }
 
-            unsafe
+            if(byteCnt == 1)
             {
-                byte* ptrR = (byte*)p_DrawTool_VM.p_ImageData.GetPtr(0);
-                byte* ptrG = (byte*)p_DrawTool_VM.p_ImageData.GetPtr(1);
-                byte* ptrB = (byte*)p_DrawTool_VM.p_ImageData.GetPtr(2);
-
-                byte[] aBuf = new byte[byteCnt * rect.Width];
-
-                for (int i = 0; i < rect.Bottom; i++)
+                unsafe
                 {
-                    ptrR += p_DrawTool_VM.p_ImageData.p_Size.X;
-                    ptrG += p_DrawTool_VM.p_ImageData.p_Size.X;
-                    ptrB += p_DrawTool_VM.p_ImageData.p_Size.X;
-                }
+                    byte[] aBuf = new byte[byteCnt * rect.Width];
 
-                for (int i = 0; i < rect.Height; i++)
-                {
-                    for (int j = 0; j < rect.Width; j++)
+                    byte* ptr = (byte*)p_DrawTool_VM.p_ImageData.GetPtr(temp);
+
+                    for (int i = 0; i < rect.Bottom; i++)
                     {
-                        aBuf[j * byteCnt + 0] = *(ptrB + j + rect.Left);
-                        aBuf[j * byteCnt + 1] = *(ptrG + j + rect.Left);
-                        aBuf[j * byteCnt + 2] = *(ptrR + j + rect.Left);
-
+                        ptr += p_DrawTool_VM.p_ImageData.p_Size.X;
                     }
 
-                    ptrR -= p_DrawTool_VM.p_ImageData.p_Size.X;
-                    ptrG -= p_DrawTool_VM.p_ImageData.p_Size.X;
-                    ptrB -= p_DrawTool_VM.p_ImageData.p_Size.X;
+                    for (int i = 0; i < rect.Height; i++)
+                    {
+                        for (int j = 0; j < rect.Width; j++)
+                        {
+                            aBuf[j * byteCnt + 0] = *(ptr + j + rect.Left);
 
-                    bw.Write(aBuf);
+
+                        }
+
+                        ptr -= p_DrawTool_VM.p_ImageData.p_Size.X;
+
+                        bw.Write(aBuf);
+                    }
                 }
             }
+            else
+            {
+                unsafe
+                {
+                    byte* ptrR = (byte*)p_DrawTool_VM.p_ImageData.GetPtr(0);
+                    byte* ptrG = (byte*)p_DrawTool_VM.p_ImageData.GetPtr(1);
+                    byte* ptrB = (byte*)p_DrawTool_VM.p_ImageData.GetPtr(2);
+
+                    byte[] aBuf = new byte[byteCnt * rect.Width];
+
+                    for (int i = 0; i < rect.Bottom; i++)
+                    {
+                        ptrR += p_DrawTool_VM.p_ImageData.p_Size.X;
+                        ptrG += p_DrawTool_VM.p_ImageData.p_Size.X;
+                        ptrB += p_DrawTool_VM.p_ImageData.p_Size.X;
+                    }
+
+                    for (int i = 0; i < rect.Height; i++)
+                    {
+                        for (int j = 0; j < rect.Width; j++)
+                        {
+                            aBuf[j * byteCnt + 0] = *(ptrB + j + rect.Left);
+                            aBuf[j * byteCnt + 1] = *(ptrG + j + rect.Left);
+                            aBuf[j * byteCnt + 2] = *(ptrR + j + rect.Left);
+
+                        }
+
+                        ptrR -= p_DrawTool_VM.p_ImageData.p_Size.X;
+                        ptrG -= p_DrawTool_VM.p_ImageData.p_Size.X;
+                        ptrB -= p_DrawTool_VM.p_ImageData.p_Size.X;
+
+                        bw.Write(aBuf);
+                    }
+                }
+            }
+
         }
 
         public void _btnSnap()
