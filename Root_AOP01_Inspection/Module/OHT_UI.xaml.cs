@@ -33,8 +33,9 @@ namespace Root_AOP01_Inspection.Module
         #region AccessMode
         void TimerAccessMode()
         {
-            SetBrush(buttonAccessManual, m_loadport.p_infoCarrier.p_bAccessLP_Manual && p_bBlink);
-            SetBrush(buttonAccessAuto, m_loadport.p_infoCarrier.p_bAccessLP_Auto && p_bBlink);
+            bool bAuto = (m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto);
+            SetBrush(buttonAccessManual, !bAuto && p_bBlink);
+            SetBrush(buttonAccessAuto, bAuto && p_bBlink);
         }
 
         void ChangeLPState(GemCarrierBase.eAccessLP State)

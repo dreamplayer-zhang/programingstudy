@@ -199,11 +199,7 @@ namespace Root_AOP01_Inspection.Module
                 }
                 m_alidLightCurtain.Run(m_diLightCurtain.p_bIn, "Please Check LightCurtain");
             }
-            
-            //if (m_robot != null)
-            //{
-            //    if (!m_diMCReset.p_bIn) m_robot.p_bDisableHomeWhenArmOpen = true; //CHECK
-            //}
+
         }
         #endregion
 
@@ -327,6 +323,7 @@ namespace Root_AOP01_Inspection.Module
         {
             p_id = id;
             base.InitBase(id, engineer);
+
             //m_robot = ((Vega_Handler)engineer.ClassHandler()).m_robot;
             InitTimer(); 
         }

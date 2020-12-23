@@ -15,6 +15,11 @@ namespace Root_CAMELLIA
 {
     public class CAMELLIA_Handler : IHandler
     {
+        public ModuleList p_moduleList
+        {
+            get; set;
+        }
+
         #region List InfoWafer
         //public string AddInfoWafer(InfoWafer infoWafer)
         //{
@@ -44,6 +49,7 @@ namespace Root_CAMELLIA
             {
             }
         }
+
         #endregion
 
         #region Module
@@ -61,6 +67,10 @@ namespace Root_CAMELLIA
 
             m_camellia = new Module_Camellia("Camellia", m_engineer);
             InitModule(m_camellia);
+            IWTR iWTR = (IWTR)m_wtr;
+            m_wtr.RunTree(Tree.eMode.RegRead);
+            m_wtr.RunTree(Tree.eMode.Init);
+            iWTR.ReadInfoReticle_Registry();
 
             m_recipe = new CAMELLIA_Recipe("Recipe", m_engineer);
             m_recipe.AddModule(m_camellia);

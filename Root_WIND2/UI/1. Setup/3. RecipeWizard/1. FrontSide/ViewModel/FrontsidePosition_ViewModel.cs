@@ -740,19 +740,16 @@ namespace Root_WIND2
         {
             m_PositionRecipe.RemoveMasterFeature(p_nMarkIndex[0]);
             p_MasterMark.RemoveAt(p_nMarkIndex[0]);
-            CheckEmpty();
         }
         private void _deleteShotMark()
         {
             m_PositionRecipe.RemoveShotFeature(p_nMarkIndex[1]);
             p_ShotMark.RemoveAt(p_nMarkIndex[1]);
-            CheckEmpty();
         }
         private void _deleteChipMark()
         {
             m_PositionRecipe.RemoveChipFeature(p_nMarkIndex[2]);
             p_ChipMark.RemoveAt(p_nMarkIndex[2]);
-            CheckEmpty();
         }
         public void LoadPositonMark()
         {

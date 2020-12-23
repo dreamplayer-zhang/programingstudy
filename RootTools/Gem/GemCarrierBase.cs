@@ -135,6 +135,7 @@ namespace RootTools.Gem
                 if ((m_gem == null) || m_gem.p_bOffline) return;
                 m_log.Info("p_eTransfer " + _eReqTransfer.ToString() + " -> " + value.ToString());
                 _eReqTransfer = value;
+                if (EQ.p_bSimulate) p_eTransfer = value; 
                 switch (_eReqTransfer)
                 {
                     case eTransfer.ReadyToLoad:
@@ -235,13 +236,10 @@ namespace RootTools.Gem
                 if (_eReqAccessLP == value) return;
                 m_log.Info("Loadpert Req Access mode = " + value.ToString());
                 _eReqAccessLP = value;
-                m_module.p_sInfo = m_gem.SendCarrierAccessLP(this, value);
+                if (m_gem != null) m_module.p_sInfo = m_gem.SendCarrierAccessLP(this, value);
                 RunTree(Tree.eMode.Init);
             }
         }
-
-        public bool p_bAccessLP_Auto { get { return (p_eAccessLP == eAccessLP.Auto); } }
-        public bool p_bAccessLP_Manual { get { return (p_eAccessLP == eAccessLP.Manual); } }
 
         eAccessLP _eAccessLP = eAccessLP.Manual;
         public eAccessLP p_eAccessLP

@@ -34,29 +34,29 @@ namespace Root_WIND2
 
         private void ViewerInit()
         {
-            p_Mask_Viewer = new FrontsideMask_ViewModel();
-            p_Mask_Viewer.p_VisibleMenu = Visibility.Collapsed;
-            p_Mask_Viewer.SetBackGroundWorker();
-            p_Mask_Viewer.p_ImageData = m_front.p_Mask_VM.p_ImageData;
-            p_Mask_Viewer.p_MaskLayer = m_front.p_Mask_VM.p_MaskLayer;
-            p_Mask_Viewer.p_cInspMask = m_front.p_Mask_VM.p_cInspMask;
-            p_Mask_Viewer.SetRoiRect();
+            p_ROI_Viewer = new FrontsideMask_ViewModel();
+            p_ROI_Viewer.p_VisibleMenu = Visibility.Collapsed;
+            p_ROI_Viewer.SetBackGroundWorker();
+            p_ROI_Viewer.p_ImageData = m_front.p_ROI_VM.p_ImageData;
+            p_ROI_Viewer.p_ROILayer = m_front.p_ROI_VM.p_ROILayer;
+            p_ROI_Viewer.p_cInspROI = m_front.p_ROI_VM.p_cInspROI;
+            p_ROI_Viewer.SetRoiRect();
             //p_ROI_Viewer.SetLayerSource();
         }
 
         #region Property
-        private FrontsideMask_ViewModel m_Mask_Viewer;
-        public FrontsideMask_ViewModel p_Mask_Viewer
+        private FrontsideMask_ViewModel m_ROI_Viewer;
+        public FrontsideMask_ViewModel p_ROI_Viewer
         {
             get
             {
-                m_Mask_Viewer.p_ImageData = m_front.p_Mask_VM.p_ImageData;
-                m_Mask_Viewer.SetImageSource();
-                return m_Mask_Viewer;
+                m_ROI_Viewer.p_ImageData = m_front.p_ROI_VM.p_ImageData;
+                m_ROI_Viewer.SetImageSource();
+                return m_ROI_Viewer;
             }
             set
             {
-                SetProperty(ref m_Mask_Viewer, value);
+                SetProperty(ref m_ROI_Viewer, value);
             }
         }
 
@@ -124,6 +124,7 @@ namespace Root_WIND2
             }
             set
             {
+                var asdf = p_ROI_Viewer.p_ImgSource;
                 SetProperty(ref m_selectedInspItem, value);
                 if(m_selectedInspItem != null)
                     p_selectedMethodItem = m_selectedInspItem.p_InspMethod;

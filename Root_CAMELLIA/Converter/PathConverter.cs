@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Root_CAMELLIA.Data;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -17,15 +19,29 @@ namespace Root_CAMELLIA
             {
                 return null;
             }
-
-            string name = Path.GetFileNameWithoutExtension(value.ToString());
-
-            return name;
+            object res;
+            if (parameter != null && parameter.ToString() == "List")
+            {
+                List<string> list = new List<string>();
+                foreach (var str in (List<ModelData.LayerData.PathEntity>)value)
+                {
+                    string path = Path.GetFileNameWithoutExtension(str.FullPath);
+                    list.Add(path);
+                }
+                res = list;
+            }
+            else
+            {
+                string name = Path.GetFileNameWithoutExtension(value.ToString());
+                res = name;
+            }
+            return res;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            return value;
+            //throw new NotImplementedException();
         }
     }
 }

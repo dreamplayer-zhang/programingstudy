@@ -1,4 +1,5 @@
 ﻿using Root_AOP01_Packing.Module;
+using Root_EFEM.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -37,6 +38,8 @@ namespace Root_AOP01_Packing
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
+            InitWTR(); 
+            InitLoadport();
             m_tapePacker = new TapePacker("TapePacker", m_engineer);
             InitModule(m_tapePacker);
             m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
@@ -60,6 +63,35 @@ namespace Root_AOP01_Packing
             //            if (m_sideVision.p_infoReticle != null) return true;
             //            if (m_patternVision.p_infoReticle != null) return true;
             return false;
+        }
+        #endregion
+
+        #region Module WTR
+        List<ModuleBase> m_aWTR = new List<ModuleBase>(); 
+        void InitWTR()
+        {
+            m_aWTR.Add(new WTR_RND("WTR_A", m_engineer));
+            InitModule(m_aWTR[0]);
+            ((WTR_RND)m_aWTR[0]).m_dicArm[WTR_RND.eArm.Lower].p_bEnable = false;
+            m_aWTR.Add(new WTR_RND("WTR_B", m_engineer));
+            InitModule(m_aWTR[1]);
+            ((WTR_RND)m_aWTR[1]).m_dicArm[WTR_RND.eArm.Lower].p_bEnable = false;
+        }
+        #endregion
+
+        #region Module Loadport
+        public List<ILoadport> m_aLoadport = new List<ILoadport>();
+        void InitLoadport()
+        {
+            Loadport_Cymechs loadportA = new Loadport_Cymechs("LoadportA", m_engineer, true, true);
+            InitModule(loadportA);
+            m_aLoadport.Add(loadportA);
+            ((IWTR)m_aWTR[0]).AddChild((IWTRChild)loadportA);
+
+            //Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, true, true);
+            //InitModule(loadportAOP);
+            //m_aLoadport.Add(loadportAOP);
+            //((IWTR)m_wtr).AddChild((IWTRChild)module);
         }
         #endregion
 

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -39,6 +40,7 @@ namespace Root_CAMELLIA
             SetStage(true);
             SetViewRect();
             InitLayer();
+            UpdateLayerGridView();
             //InitLayerGrid();
         }
         public void Init()
@@ -546,8 +548,8 @@ namespace Root_CAMELLIA
 
         private string pointAddMode = "Normal";
 
-        private int _VISIntegrationTime = 20;
-        public int VISIntegrationTime
+        private string _VISIntegrationTime = "20";
+        public string VISIntegrationTime
         {
             get
             {
@@ -555,14 +557,27 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _VISIntegrationTime = value;
-                dataManager.recipeDM.TeachingRD.VISIntegrationTime = _VISIntegrationTime;
+                int val;
+                if (value == "")
+                {
+                    _VISIntegrationTime = "0";
+                    dataManager.recipeDM.TeachingRD.VISIntegrationTime = 0;
+                }
+                else if (int.TryParse(value, out val))
+                {
+                    _VISIntegrationTime = val.ToString();
+                    dataManager.recipeDM.TeachingRD.VISIntegrationTime = val;     
+                }
+                else
+                {
+                    _VISIntegrationTime = dataManager.recipeDM.TeachingRD.VISIntegrationTime.ToString();
+                }
                 RaisePropertyChanged("VISIntegrationTime");
             }
         }
 
-        private int _NIRIntegrationTime = 150;
-        public int NIRIntegrationTime
+        private string _NIRIntegrationTime = "150";
+        public string NIRIntegrationTime
         {
             get
             {
@@ -570,8 +585,23 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _NIRIntegrationTime = value;
-                dataManager.recipeDM.TeachingRD.NIRIntegrationTime = _NIRIntegrationTime;
+                int val;
+                if (value == "")
+                {
+                    _NIRIntegrationTime = "0";
+                    dataManager.recipeDM.TeachingRD.NIRIntegrationTime = 0;
+                }
+                else if(int.TryParse(value, out val))
+                {
+                    _NIRIntegrationTime = val.ToString();
+                    dataManager.recipeDM.TeachingRD.NIRIntegrationTime = val;
+                }
+                else
+                {
+                    _NIRIntegrationTime = dataManager.recipeDM.TeachingRD.NIRIntegrationTime.ToString();
+                }
+               
+              
                 RaisePropertyChanged("NIRIntegrationTime");
             }
         }
@@ -666,8 +696,8 @@ namespace Root_CAMELLIA
             }
         }
 
-        private double _WaveLengthValue = 0.0f;
-        public double WaveLengthValue
+        private string _WaveLengthValue = "0.0";
+        public string WaveLengthValue
         {
             get
             {
@@ -675,7 +705,15 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _WaveLengthValue = value;
+                double val;
+                if(double.TryParse(value, out val))
+                {
+                    _WaveLengthValue = val.ToString("N3");
+                }
+                else
+                {
+                    MessageBox.Show("Invalid Value Entered", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
                 RaisePropertyChanged("WaveLengthValue");
             }
         }
@@ -1891,7 +1929,7 @@ namespace Root_CAMELLIA
             }
             PointCount = PointListItem.Rows.Count.ToString();
 
-            WaveLengthValue = 0;
+            WaveLengthValue = "0.0";
             ReflectanceListItem.Clear();
             ReflectanceSelectedIndex = -1;
             for(int i = 0; i < dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Count; i++)
@@ -1905,9 +1943,6 @@ namespace Root_CAMELLIA
             {
                 TransmittanceListItem.Add(dataManager.recipeDM.TeachingRD.WaveLengthTransmittance[i]);
             }
-
-            UpdateLayerGridView();
-
         }
 
         public void UpdateLayerGridView()
@@ -1924,8 +1959,10 @@ namespace Root_CAMELLIA
             else
             {
                 dataManager.recipeDM.ModelData.MaterialList.Clear();
-                App.m_nanoView.m_Model.m_MaterialList.Clear();
-                App.m_nanoView.m_Model.m_LayerList.Clear();
+                App.m_nanoView.m_MaterialList.Clear();
+                //LibSR_Met.DataManager.GetInstance().m_LayerData.Clear();
+                
+                //App.m_nanoView..Clear();
                 InitLayer();
             }
             InitLayerGrid();    
@@ -1938,6 +1975,7 @@ namespace Root_CAMELLIA
 
         public void InitLayer()
         {
+            App.m_nanoView.m_LayerList.Clear();
             dataManager.recipeDM.ModelData.AddLayer();
             dataManager.recipeDM.ModelData.AddLayer();
         }
@@ -1950,8 +1988,8 @@ namespace Root_CAMELLIA
 
         private void UpdateMeasurementParameter()
         {
-            NIRIntegrationTime = dataManager.recipeDM.TeachingRD.NIRIntegrationTime;
-            VISIntegrationTime = dataManager.recipeDM.TeachingRD.VISIntegrationTime;
+            NIRIntegrationTime = dataManager.recipeDM.TeachingRD.NIRIntegrationTime.ToString();
+            VISIntegrationTime = dataManager.recipeDM.TeachingRD.VISIntegrationTime.ToString();
         }
         private void UpdateThicknessParameter()
         {
@@ -2892,7 +2930,7 @@ namespace Root_CAMELLIA
                 Material = Path.GetFileNameWithoutExtension(str);
                 for (int i = 0; i < GridLayerData[0].Host1.Count; i++)
                 {
-                    if (GridLayerData[0].Host1[i] == Material)
+                    if (GridLayerData[0].Host1[i].Name == Material)
                     {
                         exist = true;
                     }
@@ -2903,9 +2941,9 @@ namespace Root_CAMELLIA
                     for (int i = 0; i < GridLayerData.Count; i++)
                     {
 
-                        GridLayerData[i].Host1.Add(Material);
-                        GridLayerData[i].Guest1.Add(Material);
-                        GridLayerData[i].Guest2.Add(Material);
+                        GridLayerData[i].Host1.Add(new ModelData.LayerData.PathEntity(str, Material));
+                        GridLayerData[i].Guest1.Add(new ModelData.LayerData.PathEntity(str, Material));
+                        GridLayerData[i].Guest2.Add(new ModelData.LayerData.PathEntity(str, Material));
                     }
                 }
             }
@@ -2931,7 +2969,7 @@ namespace Root_CAMELLIA
             {
                 return true;
             }
-            string material = Path.GetFileNameWithoutExtension(MaterialListItem[MaterialSelectIndex]);
+            string material = MaterialListItem[MaterialSelectIndex];
             for (int i = 0; i < GridLayerData.Count; i++)
             {
                 if (GridLayerData[i].SelectedHost1 == material || GridLayerData[i].SelectedGuest1 == material || GridLayerData[i].SelectedGuest2 == material)
@@ -2961,6 +2999,20 @@ namespace Root_CAMELLIA
                 GridLayerData[i].UpdateModelLayer(cnt);
                 cnt--;
             }
+        }
+
+        private bool CheckLayerHost()
+        {
+            int cnt = LayerCount - 1;
+            for(int i = 0; i < GridLayerData.Count; i++)
+            {
+                if (!GridLayerData[i].CheckLayerHost(cnt))
+                {
+                    return false;
+                }
+                cnt--;
+            }
+            return true;
         }
 
         private int _layerCount = 2;
@@ -3370,10 +3422,13 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    dataManager.recipeDM.RecipeOpen();
-                    UpdateListView();
-                    UpdateParameter();
-                    UpdateView();
+                    if (dataManager.recipeDM.RecipeOpen() == true)
+                    {
+                        UpdateListView(true);
+                        UpdateLayerGridView();
+                        UpdateParameter();
+                        UpdateView();
+                    }
                 });
             }
         }
@@ -3387,6 +3442,7 @@ namespace Root_CAMELLIA
                     MainViewModel.DataManager = dataManager;
                     MainViewModel.RecipeViewModel.dataManager = dataManager;
                     MainViewModel.RecipeViewModel.UpdateListView();
+                    MainViewModel.RecipeViewModel.UpdateLayerGridView();
                     MainViewModel.RecipeViewModel.UpdateView();
                 });
             }
@@ -3410,13 +3466,13 @@ namespace Root_CAMELLIA
                 {
                     if (IsReflectanceCheck)
                     {
-                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Add(WaveLengthValue);
-                        ReflectanceListItem.Add(WaveLengthValue);
+                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Add(Convert.ToDouble(WaveLengthValue));
+                        ReflectanceListItem.Add(Convert.ToDouble(WaveLengthValue));
                     }
                     else if(IsTransmittanceCheck)
                     {
-                        dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Add(WaveLengthValue);
-                        TransmittanceListItem.Add(WaveLengthValue);
+                        dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Add(Convert.ToDouble(WaveLengthValue));
+                        TransmittanceListItem.Add(Convert.ToDouble(WaveLengthValue));
                     }
                 });
             }
@@ -3436,7 +3492,7 @@ namespace Root_CAMELLIA
                         }
                         dataManager.recipeDM.TeachingRD.WaveLengthReflectance.RemoveAt(ReflectanceSelectedIndex);
                         ReflectanceListItem.RemoveAt(ReflectanceSelectedIndex);
-                        ReflectanceSelectedIndex = -1;
+                        //ReflectanceSelectedIndex = ReflectanceListItem.Count - ReflectanceSelectedIndex - 1;
                     }
                     else if (IsTransmittanceCheck)
                     {
@@ -3446,7 +3502,7 @@ namespace Root_CAMELLIA
                         }
                         dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.RemoveAt(TransmittanceSelectedIndex);
                         TransmittanceListItem.RemoveAt(TransmittanceSelectedIndex);
-                        TransmittanceSelectedIndex = -1;
+                        //TransmittanceSelectedIndex = TransmittanceListItem.Count - TransmittanceSelectedIndex- 1;
                     }
                 });
             }
@@ -3460,8 +3516,8 @@ namespace Root_CAMELLIA
                 {
                     //MaterialListItem.Clear();
                     //DeleteGridCombo();
-                    int res = dataManager.recipeDM.AddMaterial();
-                    if(res == 0)
+                    bool res = dataManager.recipeDM.AddMaterial();
+                    if(res)
                     {
                         MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.ModelData.MaterialList.ToArray());
                        // MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.TeachingRD.MaterialList.ToList());
@@ -3528,6 +3584,11 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     UpdateLayerModel();
+                    if (!CheckLayerHost())
+                    {
+                        MessageBox.Show("The host must exist.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
                     dataManager.recipeDM.SaveModel();
                 });
             }
