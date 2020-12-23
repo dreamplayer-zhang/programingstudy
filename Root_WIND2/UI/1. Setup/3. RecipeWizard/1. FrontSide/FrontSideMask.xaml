@@ -84,10 +84,14 @@
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
-                                            <DataGridTextColumn Header="Index" Width="50"
+                                            <!--<DataGridTextColumn Header="Index" Width="50"
                                                                 ElementStyle="{StaticResource TextInCellCenter}"
                                                                 Binding="{Binding Converter={StaticResource IndexConverter},  
-                                                                ConverterParameter={StaticResource ResourceKey=items}}"/>
+                                                                ConverterParameter={StaticResource ResourceKey=items}}"/>-->
+                                            <DataGridTextColumn Header="Index"
+                                                                Width="50"
+                                                                Binding="{Binding p_Index}" 
+                                                                ElementStyle="{StaticResource TextInCellCenter}"/>
 
                                             <DataGridTextColumn Header="Size(byte)" Width="*" Binding="{Binding p_Size}"
                                                             ElementStyle="{StaticResource TextInCellCenter}"/>
