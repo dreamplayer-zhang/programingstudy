@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace Root_AOP01_Packing.Module
 {
-    public class IndividualElevator : ModuleBase, IWTRChild
+    public class Unloadport_AOP : ModuleBase, IWTRChild
     {
         #region ToolBox
         //DIO_I m_diPlaced;
@@ -198,7 +198,7 @@ namespace Root_AOP01_Packing.Module
         }
         #endregion
 
-        public IndividualElevator(string id, IEngineer engineer)
+        public Unloadport_AOP(string id, IEngineer engineer)
         {
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             base.InitBase(id, engineer);
@@ -217,8 +217,8 @@ namespace Root_AOP01_Packing.Module
 
         public class Run_Delay : ModuleRunBase
         {
-            IndividualElevator m_module;
-            public Run_Delay(IndividualElevator module)
+            Unloadport_AOP m_module;
+            public Run_Delay(Unloadport_AOP module)
             {
                 m_module = module;
                 InitModuleRun(module);

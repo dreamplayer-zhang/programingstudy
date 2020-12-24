@@ -33,25 +33,41 @@ namespace Root_AOP01_Packing
         public AOP01_Recipe m_recipe;
         public AOP01_Process m_process;
         public TapePacker m_tapePacker;
-        public VacuumPacker m_vacuumPacker; 
+        public VacuumPacker m_vacuumPacker;
+        public IndividualElevator m_elevator;
+        public Unloadport_AOP m_unloadport;
+        public WrappingContainer m_wrapping; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             InitWTR(); 
             InitLoadport();
+
             m_tapePacker = new TapePacker("TapePacker", m_engineer);
             InitModule(m_tapePacker);
             ((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);
             ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_tapePacker);
+
             m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
             InitModule(m_vacuumPacker);
             ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_vacuumPacker);
+
+            m_elevator = new IndividualElevator("IndividualElevator", m_engineer);
+            InitModule(m_elevator);
+            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_elevator);
+
+            m_unloadport = new Unloadport_AOP("Unloadport", m_engineer);
+            InitModule(m_unloadport);
+            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_unloadport);
+
+            m_wrapping = new WrappingContainer("WrappingContainer", m_engineer);
+            InitModule(m_wrapping);
 
             m_aWTR[0].RunTree(Tree.eMode.RegRead);
             m_aWTR[0].RunTree(Tree.eMode.Init);
             m_aWTR[1].RunTree(Tree.eMode.RegRead);
             m_aWTR[1].RunTree(Tree.eMode.Init);
-            //((IWTR)m_wtr).ReadInfoReticle_Registry();
+            //((IWTR)m_wtr).ReadInfoReticle_Registry(); //forget
 
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();

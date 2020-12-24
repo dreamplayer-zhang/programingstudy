@@ -194,6 +194,8 @@
     <Compile Include="Dummy.cs" />
     <Compile Include="Module\IndividualElevator.cs" />
     <Compile Include="Module\Loadport_AOP.cs" />
+    <Compile Include="Module\Unloadport_AOP.cs" />
+    <Compile Include="Module\WrappingContainer.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="UI\2. REVIEW\Review_Panel.xaml.cs">
       <DependentUpon>Review_Panel.xaml</DependentUpon>
