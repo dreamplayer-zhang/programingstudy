@@ -65,6 +65,14 @@ namespace Root_EFEM.Module
 
         void RunTreeArm(Tree tree, ref eArm eArm, bool bVisible)
         {
+            if (p_asArm.Count < 2)
+            {
+                foreach (Arm arm in m_dicArm.Values)
+                {
+                    if (arm.p_bEnable) eArm = arm.m_eArm; 
+                }
+                return; 
+            }
             string sArm = eArm.ToString();
             sArm = tree.Set(sArm, sArm, p_asArm, "Arm", "Select WTR Arm", bVisible);
             foreach (Arm arm in m_dicArm.Values)
