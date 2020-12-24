@@ -196,7 +196,7 @@
                                         </Style>
                                     </DataGridComboBoxColumn.EditingElementStyle>
                                 </DataGridComboBoxColumn>
-                                <DataGridTextColumn Width="50" Binding="{Binding Fv1, StringFormat=N3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                <DataGridTextColumn Width="50" Binding="{Binding Fv1, StringFormat=N3, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="fv1" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridTextColumn.Header>
@@ -222,7 +222,7 @@
                                         </Style>
                                     </DataGridComboBoxColumn.EditingElementStyle>
                                 </DataGridComboBoxColumn>
-                                <DataGridTextColumn Width="50" Binding="{Binding Fv2, StringFormat=N3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                <DataGridTextColumn Width="50" Binding="{Binding Fv2, StringFormat=N3, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="fv2" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridTextColumn.Header>
@@ -232,7 +232,7 @@
                                         <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridCheckBoxColumn.Header>
                                 </DataGridCheckBoxColumn>
-                                <DataGridTextColumn Width="50" Binding="{Binding Thickness, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                <DataGridTextColumn Width="50" Binding="{Binding Thickness, StringFormat=N2, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="Thick." Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridTextColumn.Header>
@@ -440,7 +440,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Thickness LM Iteration" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding ThicknessLMIteration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding ThicknessLMIteration, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                             </Grid>
                             <Grid Margin="5" Background="Gainsboro">
                                 <Grid.ColumnDefinitions>
@@ -448,7 +448,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Damping Factor" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding DampingFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding DampingFactor, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N1}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                             </Grid>
                         </UniformGrid>
                     </Grid>
@@ -497,43 +497,7 @@
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <Canvas x:Name="StageMainView" ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="MouseMove">
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseMove" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseWheel" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseWheel" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseLeftButtonDown" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeftButtonDown" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseLeftButtonUp" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeftButtonUp" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseRightButtonDown" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseRightButtonDown" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseRightButtonUp" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseRightButtonUp" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseEnter" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseEnter" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseLeave" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeave" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseLeave" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeave" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="KeyDown" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView}" MethodName="OnCanvasKeyDown" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="KeyUp" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView}" MethodName="OnCanvasKeyUp" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </Canvas>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"/>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
@@ -544,43 +508,7 @@
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <Canvas x:Name="asgsgas" ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="MouseMove">
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseMove" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseWheel" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseWheel" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseLeftButtonDown" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseLeftButtonDown" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseLeftButtonUp" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseLeftButtonUp" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseRightButtonDown" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseRightButtonDown" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseRightButtonUp" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseRightButtonUp" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseEnter" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseEnter" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseLeave" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseLeave" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseLeave" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseLeave" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="KeyDown" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas}" MethodName="OnCanvasKeyDown" />
-                                                </i:EventTrigger>
-                                                <i:EventTrigger EventName="KeyUp" >
-                                                    <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas}" MethodName="OnCanvasKeyUp" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
-                                        </Canvas>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"/>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
@@ -591,11 +519,46 @@
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
-                                        </Canvas>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"/>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
+                        </Viewbox>
+                        <Viewbox Margin="10" Width="auto" Grid.Row="0" Panel.ZIndex="99">
+                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFfFFF" Focusable="True">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseMove">
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseMove" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseWheel" >
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseWheel" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown" >
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonDown" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeftButtonUp" >
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonUp" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseRightButtonDown" >
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseRightButtonDown" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseRightButtonUp" >
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseRightButtonUp" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseEnter" >
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseEnter" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeave" >
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeave" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="KeyDown" >
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnCanvasKeyDown" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="KeyUp" >
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnCanvasKeyUp" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Canvas>
                         </Viewbox>
                     </Grid>
                     <Grid Grid.Row="2">

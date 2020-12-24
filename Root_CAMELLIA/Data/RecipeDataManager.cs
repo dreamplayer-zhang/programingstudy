@@ -209,7 +209,7 @@ namespace Root_CAMELLIA.Data
             return false;
         }
 
-        public void SaveModel()
+        public bool SaveModel()
         {
             SaveFileDialog fileDlg = new SaveFileDialog();
 
@@ -221,7 +221,9 @@ namespace Root_CAMELLIA.Data
             {
                 App.m_nanoView.SaveModel(fileDlg.FileName);
                 dataManager.recipeDM.TeachingRD.ModelRecipePath = fileDlg.FileName;
+                return true;
             }
+            return false;
         }
     }
 }
