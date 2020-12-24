@@ -146,7 +146,7 @@ namespace RootTools.Control.ACS
         void InitThread()
         {
             m_thread = new Thread(new ThreadStart(RunThread));
-//            m_thread.Start(); 
+            m_thread.Start(); 
         }
 
         void RunThread()
