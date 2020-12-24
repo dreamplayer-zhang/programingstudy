@@ -440,38 +440,6 @@ namespace Root_WIND2
 
 
         }
-        public void _saveMasterImage()
-        {
-            int posX = this.Offset.X;
-            int posY = this.Offset.Y;
-            int width = this.p_ImageData.p_Size.X;
-            int height = this.p_ImageData.p_Size.Y;
-            int byteCount = this.p_ImageData.p_nByte;
-            byte[] rawdata = this.p_ImageData.GetByteArray();
-
-            this.m_Recipe.SaveMasterImage(posX, posY, width, height, byteCount, rawdata);
-        }
-        public void _loadMasterImage()
-        {
-            this.m_Recipe.LoadMasterImage();
-
-            OriginRecipe originRecipe = this.m_Recipe.GetRecipe<OriginRecipe>();
-
-            ImageData BoxImageData = new ImageData(originRecipe.MasterImage.Width, originRecipe.MasterImage.Height, originRecipe.MasterImage.ByteCnt);
-
-
-            BoxImageData.m_eMode = ImageData.eMode.ImageBuffer;
-            BoxImageData.SetData(Marshal.UnsafeAddrOfPinnedArrayElement(originRecipe.MasterImage.RawData, 0)
-                , new CRect(0, 0, originRecipe.MasterImage.Width, originRecipe.MasterImage.Height)
-                , originRecipe.MasterImage.Width, originRecipe.MasterImage.ByteCnt);
-
-
-            this.Offset = new CPoint(originRecipe.MasterImage.PositionX, originRecipe.MasterImage.PositionY);
-            this.p_ImageData = BoxImageData;
-
-            this.SetRoiRect();
-        }
-
         public ICommand SetOriginPoint
         {
             get
@@ -493,6 +461,7 @@ namespace Root_WIND2
                 return new RelayCommand(_clearOrigin);
             }
         }
+
         public ICommand SaveMasterImage
         {
             get
@@ -500,6 +469,7 @@ namespace Root_WIND2
                 return new RelayCommand(_saveMasterImage);
             }
         }
+
         public ICommand LoadMasterImage
         {
             get
@@ -508,6 +478,38 @@ namespace Root_WIND2
             }
         }
 
+        public void _saveMasterImage()
+        {
+            int posX = this.Offset.X;
+            int posY = this.Offset.Y;
+            int width = this.p_ImageData.p_Size.X;
+            int height = this.p_ImageData.p_Size.Y;
+            int byteCount = this.p_ImageData.p_nByte;
+            byte[] rawdata = this.p_ImageData.GetByteArray();
+
+            this.m_Recipe.SaveMasterImage(posX, posY, width, height, byteCount, rawdata);
+        }
+
+        public void _loadMasterImage()
+        {
+            this.m_Recipe.LoadMasterImage();
+
+            OriginRecipe originRecipe = this.m_Recipe.GetRecipe<OriginRecipe>();
+
+            ImageData BoxImageData = new ImageData(originRecipe.MasterImage.Width, originRecipe.MasterImage.Height, originRecipe.MasterImage.ByteCnt);
+
+
+            BoxImageData.m_eMode = ImageData.eMode.ImageBuffer;
+            BoxImageData.SetData(Marshal.UnsafeAddrOfPinnedArrayElement(originRecipe.MasterImage.RawData, 0)
+                , new CRect(0, 0, originRecipe.MasterImage.Width, originRecipe.MasterImage.Height)
+                , originRecipe.MasterImage.Width, originRecipe.MasterImage.ByteCnt);
+
+
+            this.Offset = new CPoint(originRecipe.MasterImage.PositionX, originRecipe.MasterImage.PositionY);
+            this.p_ImageData = BoxImageData;
+
+            this.SetRoiRect();
+        }
 
         private enum OriginProcess
         {

@@ -47,6 +47,20 @@ namespace Root_WIND2
         }
         #endregion
 
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+        }
+        #endregion
+
         #region Title Bar
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -109,6 +123,7 @@ namespace Root_WIND2
         private Run_ViewModel m_RunViewModel;
         #endregion
 
+
         public IDialogService dialogService;
 
         void Init()
@@ -141,6 +156,8 @@ namespace Root_WIND2
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1);
             //////
+
+            InitTimer();
         }
 
         void ThreadStop()
