@@ -81,11 +81,28 @@ namespace Root_EFEM.Module
                 Init(id + "." + arm.ToString(), engineer, bEnableWaferSize, bEnableWaferCount); 
             }
 
+            enum eCheckWafer
+            {
+                InfoWafer,
+                Sensor
+            }
+            eCheckWafer m_eCheckWafer = eCheckWafer.Sensor;
             public override bool IsWaferExist()
             {
-                bool bExist = false; 
-                m_module.p_sInfo = m_module.RequestWafer(m_eArm, ref bExist);
-                return bExist;
+                switch (m_eCheckWafer)
+                {
+                    case eCheckWafer.Sensor:
+                        bool bExist = false;
+                        m_module.p_sInfo = m_module.RequestWafer(m_eArm, ref bExist);
+                        return bExist;
+                    default: return (p_infoWafer != null);
+                }
+            }
+
+            public override void RunTree(Tree tree)
+            {
+                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer");
+                base.RunTree(tree);
             }
         }
         #endregion

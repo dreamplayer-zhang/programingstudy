@@ -1,29 +1,38 @@
-﻿using RootTools;
-using RootTools.Memory;
+﻿using Root_EFEM;
+using Root_EFEM.Module;
+using RootTools;
 using RootTools.Module;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Root_EFEM.Module
+namespace Root_AOP01_Packing.Module
 {
-    public class Vision_Backside : ModuleBase, IWTRChild
+    public class IndividualElevator : ModuleBase, IWTRChild
     {
         #region ToolBox
-        MemoryPool m_memoryPool;
+        //DIO_I m_diPlaced;
+        //DIO_I m_diPresent;
+        //DIO_I m_diLoad;
+        //DIO_I m_diUnload;
+        //DIO_I m_diDoorOpen;
+        //DIO_I m_diDocked;
+        //OHT m_OHT;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
+            //p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
+            //p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
+            //p_sInfo = m_toolBox.Get(ref m_diLoad, this, "Load");
+            //p_sInfo = m_toolBox.Get(ref m_diUnload, this, "Unload");
+            //p_sInfo = m_toolBox.Get(ref m_diDoorOpen, this, "DoorOpen");
+            //p_sInfo = m_toolBox.Get(ref m_diDocked, this, "Docked");
+            //p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            //p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT", m_diPlaced, m_diPresent);
             if (bInit)
             {
-                InitMemory();
+                //m_rs232.OnReceive += M_rs232_OnReceive;
+                //m_rs232.p_bConnect = true;
             }
-        }
-        #endregion
-
-        #region Memory
-        void InitMemory()
-        {
         }
         #endregion
 
@@ -48,16 +57,6 @@ namespace Root_EFEM.Module
             m_reg = new Registry(p_id + ".InfoWafer");
             m_sInfoWafer = m_reg.Read("sInfoWafer", m_sInfoWafer);
             p_infoWafer = m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
-        }
-        #endregion
-
-        #region InfoWafer UI
-        InfoWaferChild_UI m_ui;
-        void InitInfoWaferUI()
-        {
-            m_ui = new InfoWaferChild_UI();
-            m_ui.Init(this);
-            m_aTool.Add(m_ui);
         }
         #endregion
 
@@ -118,22 +117,29 @@ namespace Root_EFEM.Module
 
         public string BeforeGet(int nID)
         {
-            return "OK";
+            //if (p_infoWafer == null) return m_id + " BeforeGet : InfoWafer = null";
+            return CheckGetPut();
         }
 
         public string BeforePut(int nID)
         {
             if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
-            return "OK";
+            return CheckGetPut();
         }
 
         public string AfterGet(int nID)
         {
-            return "OK";
+            return CheckGetPut();
         }
 
         public string AfterPut(int nID)
         {
+            return "OK";
+        }
+
+        string CheckGetPut()
+        {
+            if (p_eState != eState.Ready) return p_id + " eState not Ready";
             return "OK";
         }
 
@@ -178,11 +184,24 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-        public Vision_Backside(string id, IEngineer engineer)
+        #region State Home
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            p_sInfo = base.StateHome();
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            return p_sInfo;
+        }
+        #endregion
+
+        public IndividualElevator(string id, IEngineer engineer)
         {
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             base.InitBase(id, engineer);
-            InitInfoWaferUI(); 
         }
 
         public override void ThreadStop()
@@ -198,8 +217,8 @@ namespace Root_EFEM.Module
 
         public class Run_Delay : ModuleRunBase
         {
-            Vision_Backside m_module;
-            public Run_Delay(Vision_Backside module)
+            IndividualElevator m_module;
+            public Run_Delay(IndividualElevator module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -225,5 +244,6 @@ namespace Root_EFEM.Module
             }
         }
         #endregion
+
     }
 }

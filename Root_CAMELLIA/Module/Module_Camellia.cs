@@ -1012,18 +1012,38 @@ namespace Root_CAMELLIA.Module
             return "OK";
         }
 
-        public bool IsWaferExist(int nID, bool bUseSensor = true)
+        enum eCheckWafer
         {
-            if (bUseSensor)
-                return (p_infoWafer != null);
-            //            return m_diWaferExist.p_bIn;
-            return false;
+            InfoWafer,
+            Sensor
+        }
+        eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
+        public bool IsWaferExist(int nID)
+        {
+            switch (m_eCheckWafer)
+            {
+                case eCheckWafer.Sensor: return false; //m_diWaferExist.p_bIn;
+                default: return (p_infoWafer != null);
+            }
         }
 
         public void RunTreeTeach(Tree tree)
         {
             m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
         }
+
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            RunTreeSetup(tree.GetTree("Setup", false));
+        }
+
+        void RunTreeSetup(Tree tree)
+        {
+            m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer");
+            m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
+        }
+
     }
 
 
