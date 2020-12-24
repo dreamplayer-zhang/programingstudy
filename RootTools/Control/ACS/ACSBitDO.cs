@@ -21,7 +21,7 @@ namespace RootTools.Control.ACS
             try
             {
                 dynamic d = m_acs.m_channel.ReadVariable(m_listDIO.m_sName, -1, m_nByte, m_nByte);
-                uint nDO = d;
+                uint nDO = (uint)(int)d;
                 if (bOn) nDO |= m_listDIO.m_aBitComp[m_nBit];
                 else nDO &= (m_listDIO.m_aBitComp[m_nBit] ^ 0xff); 
                 m_acs.m_channel.WriteVariable(nDO, m_listDIO.m_sName, -1, m_nByte, m_nByte); 
