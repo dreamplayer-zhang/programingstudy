@@ -84,10 +84,8 @@ namespace Root_CAMELLIA
             this.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
 
 
+            InitNanoView();
             //m_reg.Write(,);
-
-			//테스트하였는데 뭔가 문제있음. 바로 Initialize하면 컨버터에 오류발생
-            //App.m_nanoView.InitializeSR(@"C:\Users\ATI\Desktop\ATI_LIB_v18_6(backup20201208)\Init_ATI_NIR.cfg", 2);
         }
 
         public double p_ArrowX1
@@ -289,11 +287,42 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_ProgressColor, value);
             }
         }
+
+        private bool m_InitNanoview = false;
+        public bool p_InitNanoview
+        {
+            get
+            {
+                return m_InitNanoview;
+            }
+            set
+            {
+                SetProperty(ref m_InitNanoview, value);
+            }
+        }
+
         private System.Windows.Media.Brush m_ProgressColor;
 
         public SolidColorBrush RouteBrush { get; set; } = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 0, 0, 255));
         public SolidColorBrush test = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 1, 211, 40));
         #endregion
+
+        private void InitNanoView()
+        {
+            string config = "";
+            config = SettingViewModel.m_reg.Read(BaseDefine.RegNanoViewConfig, config);
+            int port = -1;
+            port = SettingViewModel.m_reg.Read(BaseDefine.RegNanoViewPort, port);
+            if (config != "" && port != -1)
+            {
+                if(App.m_nanoView.InitializeSR(config, port) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                {
+                    p_InitNanoview = true;
+                    SettingViewModel.LoadParameter();
+                }
+            }
+           
+        }
 
         private void Init()
         {
@@ -448,6 +477,11 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     var viewModel = SettingViewModel;
+                    if (m_InitNanoview)
+                    {
+                        viewModel.LoadParameter();
+                    }
+                    viewModel.LoadConfig();
                     Nullable<bool> result = dialogService.ShowDialog(viewModel);
                 });
             }
@@ -463,6 +497,22 @@ namespace Root_CAMELLIA
                     App.m_engineer.ThreadStop();
                 });
             }
+        }
+        #endregion
+
+        #region Event
+        public void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+            
+            //UIElement el = (UIElement)sender;
+            if(e.ChangedButton == MouseButton.Left && e.ClickCount == 2)
+            {
+                System.Windows.Point pt = e.GetPosition((UIElement)sender);
+
+            }
+
+
         }
         #endregion
     }
