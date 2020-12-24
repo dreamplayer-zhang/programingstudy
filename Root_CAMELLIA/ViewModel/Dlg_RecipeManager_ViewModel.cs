@@ -552,11 +552,11 @@ namespace Root_CAMELLIA
             }
             set
             {
-                int val;
+                int val = 0;
                 if (value == "")
                 {
-                    _VISIntegrationTime = "0";
-                    dataManager.recipeDM.TeachingRD.VISIntegrationTime = 0;
+                    _VISIntegrationTime = val.ToString();
+                    dataManager.recipeDM.TeachingRD.VISIntegrationTime = val;
                 }
                 else if (int.TryParse(value, out val))
                 {
@@ -646,8 +646,9 @@ namespace Root_CAMELLIA
             }
         }
 
-        private float _DampingFactor = 0.0f;
-        public float DampingFactor
+        //private float _DampingFactor = 0.0f;
+        private string _DampingFactor = "0.00";
+        public string DampingFactor
         {
             get
             {
@@ -655,9 +656,34 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _DampingFactor = value;
-                dataManager.recipeDM.TeachingRD.DampingFactor = _DampingFactor;
+                float val = 0.0f;
+                if (float.TryParse(value, out val))
+                {
+                    _DampingFactor = val.ToString("N2");
+                }
+                else
+                {
+                    _DampingFactor = dataManager.recipeDM.TeachingRD.DampingFactor.ToString("N2");
+                    val = dataManager.recipeDM.TeachingRD.DampingFactor;
+                }
+                dataManager.recipeDM.TeachingRD.DampingFactor = val;
                 RaisePropertyChanged("DampingFactor");
+                //if (value == "")
+                //{
+                //    _DampingFactor = dataManager.recipeDM.TeachingRD.DampingFactor.ToString("N2");
+                //    val = dataManager.recipeDM.TeachingRD.DampingFactor;
+                //}
+                //else if (float.TryParse(value, out val))
+                //{
+                //    _DampingFactor = val.ToString("N2");
+                //}
+                //else
+                //{
+                //    _DampingFactor = dataManager.recipeDM.TeachingRD.DampingFactor.ToString("N2");
+                //    val = dataManager.recipeDM.TeachingRD.DampingFactor;
+                //}
+                //dataManager.recipeDM.TeachingRD.DampingFactor = val;
+
             }
         }
 
@@ -1095,7 +1121,7 @@ namespace Root_CAMELLIA
         public void OnMouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
             UIElement el = sender as UIElement;
-            el.Focus();
+            //el.Focus();
             StageMouseHover = true;
             StageMouseHoverUpdate = false;
         }
@@ -1109,7 +1135,7 @@ namespace Root_CAMELLIA
 
             UIElement el = (UIElement)sender;
 
-            el.Focus();
+            //el.Focus();
             System.Windows.Point pt = e.GetPosition((UIElement)sender);
             MousePoint = new System.Windows.Point(pt.X, pt.Y);
             PrintMousePosition(MousePoint);
@@ -1248,6 +1274,7 @@ namespace Root_CAMELLIA
         public void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             UIElement el = (UIElement)sender;
+            el.Focus();
             Drag = false;
             System.Windows.Point pt = e.GetPosition((UIElement)sender);
             el.ReleaseMouseCapture();
@@ -1926,7 +1953,7 @@ namespace Root_CAMELLIA
             LowerWaveLength = dataManager.recipeDM.TeachingRD.LowerWaveLength;
             UpperWaveLength = dataManager.recipeDM.TeachingRD.UpperWaveLength;
             ThicknessLMIteration = dataManager.recipeDM.TeachingRD.LMIteration;
-            DampingFactor = dataManager.recipeDM.TeachingRD.DampingFactor;
+            DampingFactor = dataManager.recipeDM.TeachingRD.DampingFactor.ToString();
         }
 
         private void SetViewRect()
@@ -3423,7 +3450,10 @@ namespace Root_CAMELLIA
                         MessageBox.Show("The host must exist.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
-                    dataManager.recipeDM.SaveModel();
+                    if (dataManager.recipeDM.SaveModel())
+                    {
+                        ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+                    }
                 });
             }
         }

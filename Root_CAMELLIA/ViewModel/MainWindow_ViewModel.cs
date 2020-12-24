@@ -83,8 +83,11 @@ namespace Root_CAMELLIA
             Module_Camellia.Run_Measure measure = (Module_Camellia.Run_Measure)p_Module_Camellia.CloneModuleRun("Measure");
             this.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
 
+
+            //m_reg.Write(,);
+
 			//테스트하였는데 뭔가 문제있음. 바로 Initialize하면 컨버터에 오류발생
-            App.m_nanoView.InitializeSR(@"C:\Users\ATI\Desktop\ATI_LIB_v18_6(backup20201208)\Init_ATI_NIR.cfg", 2);
+            //App.m_nanoView.InitializeSR(@"C:\Users\ATI\Desktop\ATI_LIB_v18_6(backup20201208)\Init_ATI_NIR.cfg", 2);
         }
 
         public double p_ArrowX1
@@ -435,8 +438,6 @@ namespace Root_CAMELLIA
                     dialog.LogUI.Init(LogView.m_logView);
                     dialog.ToolBoxUI.Init(App.m_engineer);
                     Nullable<bool> result = dialog.ShowDialog();
-                    ////dialog.ShowDialog();
-                    ////Nullable<bool> result = dialogService.ShowDialog(viewModel);
                 });
             }
         }
@@ -448,7 +449,6 @@ namespace Root_CAMELLIA
                 {
                     var viewModel = SettingViewModel;
                     Nullable<bool> result = dialogService.ShowDialog(viewModel);
-                    //m_Vision.StartRun(p_RunLADS);
                 });
             }
         }
@@ -465,86 +465,5 @@ namespace Root_CAMELLIA
             }
         }
         #endregion
-
-        #region 이전코드
-        //public MainWindow_ViewModel(MainWindow main)
-        //{
-        //    DataManager = main.DataManager;
-        //    Init();
-        //}
-
-        //public void Init()
-        //{
-        //    PointListItem.Columns.Add(new DataColumn("ListIndex"));
-        //    PointListItem.Columns.Add(new DataColumn("ListX"));
-        //    PointListItem.Columns.Add(new DataColumn("ListY"));
-        //    PointListItem.Columns.Add(new DataColumn("ListRoute"));
-        //}
-
-        //public void UpdateListView()
-        //{
-        //    PointListItem.Clear();
-        //    int nCount = 0;
-        //    int nSelCnt = DataManager.recipeDM.TeachingRD.DataSelectedPoint.Count;
-        //    int[] MeasurementOrder = new int[nSelCnt];
-
-        //    for (int i = 0; i < nSelCnt; i++)
-        //    {
-        //        MeasurementOrder[DataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]] = i;
-        //    }
-
-        //    DataRow row;
-        //    for (int i = 0; i < nSelCnt; i++, nCount++)
-        //    {
-
-        //        CCircle c = DataManager.recipeDM.TeachingRD.DataSelectedPoint[i];
-        //        int nRoute = MeasurementOrder[i];
-        //        row = PointListItem.NewRow();
-        //        row["ListIndex"] = (nCount + 1).ToString();
-        //        row["ListX"] = Math.Round(c.x, 3).ToString();
-        //        row["ListY"] = Math.Round(c.y, 3).ToString();
-        //        row["ListRoute"] = (nRoute + 1).ToString();
-        //        PointListItem.Rows.Add(row);
-
-        //    }
-        //    PointCount = PointListItem.Rows.Count.ToString();
-        //}
-
-        //public DataManager DataManager { get; set; }
-
-        //private ObservableCollection<UIElement> m_MainDrawElement = new ObservableCollection<UIElement>();
-        //public ObservableCollection<UIElement> p_MainDrawElement
-        //{
-        //    get
-        //    {
-        //        return m_MainDrawElement;
-        //    }
-        //    set
-        //    {
-        //        m_MainDrawElement = value;
-        //    }
-        //}
-
-        //public string PointCount { get; set; } = "0";
-
-        //public ObservableCollection<ShapeManager> Shapes = new ObservableCollection<ShapeManager>();
-        //public ObservableCollection<GeometryManager> Geometry = new ObservableCollection<GeometryManager>();
-
-        //DataTable pointListItem = new DataTable();
-        //public DataTable PointListItem
-        //{
-        //    get
-        //    {
-        //        return pointListItem;
-        //    }
-        //    set
-        //    {
-        //        pointListItem = value;
-        //        RaisePropertyChanged("PointListItem");
-        //    }
-        //}
-        #endregion
-
-
     }
 }
