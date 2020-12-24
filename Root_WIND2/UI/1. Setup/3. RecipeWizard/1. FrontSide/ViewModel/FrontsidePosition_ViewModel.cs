@@ -51,7 +51,6 @@ namespace Root_WIND2
             CheckEmpty();
         }
 
-        private CPoint m_PointXY = new CPoint();
         public CPoint p_PointXY
         {
             get
@@ -63,7 +62,7 @@ namespace Root_WIND2
                 SetProperty(ref m_PointXY, value);
             }
         }
-        private CPoint m_SizeWH = new CPoint();
+        private CPoint m_PointXY = new CPoint();
         public CPoint p_SizeWH
         {
             get
@@ -75,7 +74,7 @@ namespace Root_WIND2
                 SetProperty(ref m_SizeWH, value);
             }
         }
-        private CPoint m_Origin = new CPoint();
+        private CPoint m_SizeWH = new CPoint();
         public CPoint p_Origin
         {
             get
@@ -98,7 +97,7 @@ namespace Root_WIND2
                 SetProperty(ref m_Origin, value);
             }
         }
-        private CPoint m_Offset = new CPoint();
+        private CPoint m_Origin = new CPoint();
         public CPoint p_Offset
         {
             get
@@ -110,6 +109,7 @@ namespace Root_WIND2
                 SetProperty(ref m_Offset, value);
             }
         }
+        private CPoint m_Offset = new CPoint();
 
         public ObservableCollection<Visibility> p_VisibleEmpty
         {
@@ -173,7 +173,6 @@ namespace Root_WIND2
         }
         private ObservableCollection<UIElement> m_ChipMark = new ObservableCollection<UIElement>();
 
-        private BitmapSource m_BoxImgSource;
         public BitmapSource p_BoxImgSource
         {
             get
@@ -185,6 +184,7 @@ namespace Root_WIND2
                 SetProperty(ref m_BoxImgSource, value);
             }
         }
+        private BitmapSource m_BoxImgSource;
 
         public override void PreviewMouseDown(object sender, MouseEventArgs e)
         {
@@ -751,6 +751,7 @@ namespace Root_WIND2
             m_PositionRecipe.RemoveChipFeature(p_nMarkIndex[2]);
             p_ChipMark.RemoveAt(p_nMarkIndex[2]);
         }
+
         public void LoadPositonMark()
         {
             p_MasterMark.Clear();
