@@ -61,7 +61,7 @@ namespace Root_WIND2.Module
 		double resolution = 1.7;    // um
 		double startDegree = 0;
 		double scanDegree = 360;
-		double scanAcc = 1;
+		double scanAcc = 1;			// sec
 		int scanRate = 100;         // Camera Frame Spec 사용률 ? 1~100 %
 		int maxFrame = 100;
 		//double triggerRatio = 1.5;	// 캠익에서 트리거 분주비
@@ -83,12 +83,12 @@ namespace Root_WIND2.Module
 			run.p_sGrabModeSide = p_sGrabModeSide;
 			run.p_sGrabModeBtm = p_sGrabModeBtm;
 
-			run.resolution = resolution;
 			run.startDegree = startDegree;
 			run.scanDegree = scanDegree;
-			run.scanAcc = scanAcc;
-			run.scanRate = scanRate;
 			run.maxFrame = maxFrame;
+			run.scanRate = scanRate;
+			run.scanAcc = scanAcc;
+			run.resolution = resolution;
 			//run.triggerRatio = triggerRatio;
 
 			run.sobelHeight = sobelHeight;
@@ -106,9 +106,11 @@ namespace Root_WIND2.Module
 		{
 			startDegree = tree.Set(startDegree, startDegree, "Start Angle", "Degree", bVisible);
 			scanDegree = tree.Set(scanDegree, scanDegree, "Scan Angle", "Degree", bVisible);
-			scanRate = tree.Set(scanRate, scanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100%", bVisible);
-			maxFrame = tree.Set(maxFrame, maxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
-			scanAcc = tree.Set(scanAcc, scanAcc, "Scan Acc", "스캔 축 가속도 (sec)", bVisible);
+			maxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(maxFrame, maxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
+			scanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(scanRate, scanRate, "Scan Rate", "카메라 Frame 사용률 (1~ 100 %)", bVisible);
+			scanAcc = (tree.GetTree("Scan Velocity", false, bVisible)).Set(scanAcc, scanAcc, "Scan Acc", "Scan 축 가속도 (sec)", bVisible);
+			resolution = tree.Set(resolution, resolution, "Resolution", "um / pixel", bVisible);
+			//triggerRatio = tree.Set(triggerRatio, triggerRatio, "분주비", "Camera 분주비", bVisible);
 
 			// recipe
 			sobelHeight = (tree.GetTree("Side Focus", false, bVisible)).Set(sobelHeight, sobelHeight, "Sobel Start Height", "", bVisible);
@@ -116,47 +118,62 @@ namespace Root_WIND2.Module
 			sobelCnt = (tree.GetTree("Side Focus", false, bVisible)).Set(sobelCnt, sobelCnt, "Edge Detect Count", "Sobel Edge 검출 시 Threshold 이상의 Count. Count 이상 발견 시 Edge", bVisible);
 			sideFocusAxis = (tree.GetTree("Side Focus", false, bVisible)).Set(sideFocusAxis, sideFocusAxis, "Side Focus Axis", "Side 카메라 Focus 축 값", bVisible);
 
-			inspHeight = tree.Set(inspHeight, inspHeight, "Inspection ROI Height", "", bVisible);
-			defectSize = tree.Set(defectSize, defectSize, "Defect Size", "pixel", bVisible);
-			mergeDist = tree.Set(mergeDist, mergeDist, "Merge Distance", "pixel", bVisible);
-			inspThreshhold = tree.Set(inspThreshhold, inspThreshhold, "Inspection Theshold", "", bVisible);
+			inspHeight = (tree.GetTree("Recipe", false, bVisible)).Set(inspHeight, inspHeight, "Inspection ROI Height", "", bVisible);
+			defectSize = (tree.GetTree("Recipe", false, bVisible)).Set(defectSize, defectSize, "Defect Size", "pixel", bVisible);
+			mergeDist = (tree.GetTree("Recipe", false, bVisible)).Set(mergeDist, mergeDist, "Merge Distance", "pixel", bVisible);
+			inspThreshhold = (tree.GetTree("Recipe", false, bVisible)).Set(inspThreshhold, inspThreshhold, "Inspection Theshold", "", bVisible);
 			//
 
 			p_sGrabModeTop = tree.Set(p_sGrabModeTop, p_sGrabModeTop, module.p_asGrabMode, "Grab Mode : Top", "Select GrabMode", bVisible);
-			if (gmTop != null) gmTop.RunTree(tree.GetTree("Grab Mode : Top", false), bVisible, true);
+			if (gmTop != null) 
+				gmTop.RunTree(tree.GetTree("Grab Mode : Top", false), bVisible, true);
 			p_sGrabModeSide = tree.Set(p_sGrabModeSide, p_sGrabModeSide, module.p_asGrabMode, "Grab Mode : Side", "Select GrabMode", bVisible);
-			if (gmSide != null) gmSide.RunTree(tree.GetTree("Grab Mode : Side", false), bVisible, true);
+			if (gmSide != null) 
+				gmSide.RunTree(tree.GetTree("Grab Mode : Side", false), bVisible, true);
 			p_sGrabModeBtm = tree.Set(p_sGrabModeBtm, p_sGrabModeBtm, module.p_asGrabMode, "Grab Mode : Bottom", "Select GrabMode", bVisible);
-			if (gmBtm != null) gmBtm.RunTree(tree.GetTree("Grab Mode : Bottom", false), bVisible, true);
+			if (gmBtm != null) 
+				gmBtm.RunTree(tree.GetTree("Grab Mode : Bottom", false), bVisible, true);
 		}
 
 		public override string Run()
 		{
+			/*
+			string sRstCam = module.OpenCamera();
+			if (sRstCam != "OK")
+			{
+				return sRstCam;
+			}
+			module.p_bStageVac = true;
+			*/
+
 			if (gmTop == null || gmSide == null || gmBtm == null) return "Grab Mode == null";
 
 			try
 			{
 				gmTop.SetLight(true);
-				gmSide.SetLight(true);
-				gmBtm.SetLight(true);
+				//gmSide.SetLight(true);
+				//gmBtm.SetLight(true);
 
 				Axis axisR = module.AxisRotate;
 				Axis axisEdgeX = module.AxisEdgeX;
 
 				double pulsePerDegree = module.Pulse360 / 360;
-				double curr = axisR.p_posActual - axisR.p_posActual % module.Pulse360;
-				double triggerStart = curr + startDegree * pulsePerDegree;
-				double triggerDest = triggerStart + scanDegree * pulsePerDegree;
+				int camHeight = module.CamEdgeTop.GetRoiSize().Y;
 				int trigger = 1;
-				int scanSpeed = Convert.ToInt32((double)maxFrame * trigger * (double)scanRate / 100);
+				int scanSpeed = Convert.ToInt32((double)maxFrame * trigger * camHeight * (double)maxFrame / 100);
+
+				//double curr = axisR.p_posActual - axisR.p_posActual % module.Pulse360;
+				//double triggerStart = curr + startDegree * pulsePerDegree;
+				double triggerStart = startDegree * pulsePerDegree;
+				double triggerDest = triggerStart + scanDegree * pulsePerDegree;
 				double moveStart = triggerStart - scanAcc * scanSpeed;   //y 축 이동 시작 지점 
 				double moveEnd = triggerDest + scanAcc * scanSpeed;  // Y 축 이동 끝 지점.
-				int grabCount = Convert.ToInt32(scanDegree * pulsePerDegree * module.TriggerRatio);
+				int grabCount = Convert.ToInt32(scanDegree * pulsePerDegree * module.EdgeCamTriggerRatio);
 
-				axisEdgeX.StartMove(sideFocusAxis);
+				if (module.Run(axisEdgeX.StartMove(sideFocusAxis)))
+					return p_sInfo;
 				if (module.Run(axisEdgeX.WaitReady()))
 					return p_sInfo;
-
 				if (module.Run(axisR.StartMove(moveStart)))
 					return p_sInfo;
 				if (module.Run(axisR.WaitReady()))
@@ -182,26 +199,9 @@ namespace Root_WIND2.Module
 			finally
 			{
 				gmTop.SetLight(false);
-				gmSide.SetLight(false);
-				gmBtm.SetLight(false);
+				//gmSide.SetLight(false);
+				//gmBtm.SetLight(false);
 			}
-
-
-			/*
-			string sRstCam = module.OpenCamera();
-			if (sRstCam != "OK")
-			{
-				return sRstCam;
-			}
-			module.p_bStageVac = true;
-
-			string sRst = "None";
-			sRst = GrabEdge();
-			if (sRst != "OK")
-				return sRst;
-
-			return sRst;
-			*/
 		}
 
 		private string GrabEdge()
@@ -222,7 +222,7 @@ namespace Root_WIND2.Module
 				int scanSpeed = Convert.ToInt32((double)maxFrame * trigger * (double)scanRate / 100);
 				double moveStart = triggerStart - scanAcc * scanSpeed;   //y 축 이동 시작 지점 
 				double moveEnd = triggerDest + scanAcc * scanSpeed;  // Y 축 이동 끝 지점.
-				int grabCount = Convert.ToInt32(scanDegree * pulsePerDegree * module.TriggerRatio);
+				int grabCount = Convert.ToInt32(scanDegree * pulsePerDegree * module.EdgeCamTriggerRatio);
 
 				if (module.Run(axisEdgeX.StartMove(sideFocusAxis)))
 					return p_sInfo;
