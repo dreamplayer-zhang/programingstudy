@@ -67,11 +67,11 @@ namespace RootTools.Control.ACS
             if (m_acs.p_bConnect == false) return;
             try
             {
-                dynamic d = m_acs.m_channel.ReadVariable(m_sName, -1, 0, m_lByte);
+                dynamic d = m_acs.m_channel.ReadVariable(m_sName, -1, 0, m_lByte - 1);
                 object[] aRead = d; 
                 for (int n = 0; n < m_lByte; n++)
                 {
-                    m_aRead[n] = (uint)aRead[n];
+                    m_aRead[n] = (uint)(int)aRead[n];
                     for (int m = 0, nID = 8 * n; m < 8; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aBitComp[m]) > 0); 
                 }
             }
@@ -84,11 +84,11 @@ namespace RootTools.Control.ACS
             if (m_acs.p_bConnect == false) return;
             try
             {
-                dynamic d = m_acs.m_channel.ReadVariable(m_sName, -1, 0, m_lByte);
+                dynamic d = m_acs.m_channel.ReadVariable(m_sName, -1, 0, m_lByte - 1);
                 object[] aRead = d;
                 for (int n = 0; n < m_lByte; n++)
                 {
-                    m_aRead[n] = (uint)aRead[n];
+                    m_aRead[n] = (uint)(int)aRead[n];
                     for (int m = 0, nID = 8 * n; m < 8; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aBitComp[m]) > 0);
                 }
             }
@@ -119,6 +119,7 @@ namespace RootTools.Control.ACS
 
         public void RunTree(Tree tree)
         {
+            m_sName = tree.Set(m_sName, m_sName, "Name", "DIO Name"); 
             m_lByte = tree.Set(m_lByte, 1, "Count", "DIO Port Count (Byte)");
             InitModule();
             SetModuleOffset();

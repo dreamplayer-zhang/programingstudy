@@ -20,6 +20,7 @@ namespace RootTools.Control.ACS
         {
             int nAxis = m_nAxis;
             m_nAxis = tree.Set(m_nAxis, m_nAxis, "Axis Number", "ACS Axis Number");
+            m_nHomeBuffer = tree.Set(m_nHomeBuffer, m_nAxis, "Axis Home Buffer", "ACS Axis Home Buffer Number");
             m_sUnit = tree.Set(m_sUnit, m_sUnit, "Unit", "AXS Axis Unit"); 
             m_bAbsoluteEncoder = tree.Set(m_bAbsoluteEncoder, m_bAbsoluteEncoder, "Absolute Encoder", "Absolute Encoder");
         }
@@ -229,6 +230,7 @@ namespace RootTools.Control.ACS
         #endregion
 
         #region Home
+        int m_nHomeBuffer = 0; 
         public override string StartHome()
         {
             if (m_bAbsoluteEncoder)
@@ -238,7 +240,7 @@ namespace RootTools.Control.ACS
             }
             p_sInfo = base.StartHome();
             if (p_sInfo != "OK") return p_sInfo;
-            p_sInfo = m_acs.m_aBuffer[m_nAxis].Run();
+            p_sInfo = m_acs.m_aBuffer[m_nHomeBuffer].Run();
             if (p_sInfo != "OK") return p_sInfo;
             p_eState = eState.Home;
             Thread.Sleep(10);
