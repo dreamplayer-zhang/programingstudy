@@ -123,7 +123,7 @@ namespace Root_AOP01_Packing.Module
             return IsRunOK();
         }
 
-        public bool IsWaferExist(int nID = 0, bool bUseSensor = true)
+        public bool IsWaferExist(int nID = 0)
         {
             switch (p_infoCarrier.p_eState)
             {

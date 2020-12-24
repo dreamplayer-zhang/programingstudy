@@ -4,6 +4,7 @@ using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
@@ -33,8 +34,6 @@ namespace Root_AOP01_Packing
         public AOP01_Process m_process;
         public TapePacker m_tapePacker;
         public VacuumPacker m_vacuumPacker; 
-        //        public Robot_RND m_robot;
-
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -42,9 +41,18 @@ namespace Root_AOP01_Packing
             InitLoadport();
             m_tapePacker = new TapePacker("TapePacker", m_engineer);
             InitModule(m_tapePacker);
+            ((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);
+            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_tapePacker);
             m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
-            InitModule(m_vacuumPacker); 
+            InitModule(m_vacuumPacker);
+            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_vacuumPacker);
+
+            m_aWTR[0].RunTree(Tree.eMode.RegRead);
+            m_aWTR[0].RunTree(Tree.eMode.Init);
+            m_aWTR[1].RunTree(Tree.eMode.RegRead);
+            m_aWTR[1].RunTree(Tree.eMode.Init);
             //((IWTR)m_wtr).ReadInfoReticle_Registry();
+
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();
             m_process = new AOP01_Process("Process", m_engineer, this);
@@ -88,10 +96,10 @@ namespace Root_AOP01_Packing
             m_aLoadport.Add(loadportA);
             ((IWTR)m_aWTR[0]).AddChild((IWTRChild)loadportA);
 
-            //Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, true, true);
-            //InitModule(loadportAOP);
-            //m_aLoadport.Add(loadportAOP);
-            //((IWTR)m_wtr).AddChild((IWTRChild)module);
+            Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, true, true);
+            InitModule(loadportAOP);
+            m_aLoadport.Add(loadportAOP);
+            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)loadportAOP);
         }
         #endregion
 
