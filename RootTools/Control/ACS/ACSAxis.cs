@@ -344,7 +344,7 @@ namespace RootTools.Control.ACS
                         }
                         else
                         {
-                            if (m_acs.m_aBuffer[m_nAxis].m_bRun == false)
+                            if (m_acs.m_aBuffer[m_nHomeBuffer].m_bRun == false)
                             {
                                 p_sInfo = p_id + " -> Home Finished " + (m_swMove.ElapsedMilliseconds / 1000).ToString("0.0 sec");
                                 p_eState = eState.Ready;
