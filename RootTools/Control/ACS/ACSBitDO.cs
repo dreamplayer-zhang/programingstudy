@@ -5,8 +5,9 @@ namespace RootTools.Control.ACS
 {
     public class ACSBitDO : BitDO
     {
-        public int m_nPort = -1;
+        public int m_nByte = 0; 
         public int m_nBit = -1;
+        
         public override void Write(bool bOn)
         {
             if (EQ.p_bSimulate)
@@ -15,12 +16,15 @@ namespace RootTools.Control.ACS
                 return;
             }
             if (p_bOn == bOn) return;
-            if (m_nPort < 0) return;
             if (m_nBit < 0) return;
             if (m_acs.p_bConnect == false) return; 
             try
             {
-                m_acs.m_channel.SetOutput(m_nPort, m_nBit, (bOn ? (int)1 : (int)0));
+                dynamic d = m_acs.m_channel.ReadVariable(m_listDIO.m_sName, -1, m_nByte, m_nByte);
+                uint nDO = (uint)(int)d;
+                if (bOn) nDO |= m_listDIO.m_aBitComp[m_nBit];
+                else nDO &= (m_listDIO.m_aBitComp[m_nBit] ^ 0xff); 
+                m_acs.m_channel.WriteVariable(nDO, m_listDIO.m_sName, -1, m_nByte, m_nByte); 
                 Log(p_sLongID + ", Write Output : " + bOn.ToString());
             }
             catch (Exception e) { Log("SetOutput Error : " + e.Message); }
@@ -34,10 +38,12 @@ namespace RootTools.Control.ACS
             m_sLog = sLog;
         }
 
-        ACS m_acs; 
-        public ACSBitDO(ACS acs)
+        ACS m_acs;
+        ACSListDIO m_listDIO; 
+        public ACSBitDO(ACS acs, ACSListDIO listDIO)
         {
-            m_acs = acs; 
+            m_acs = acs;
+            m_listDIO = listDIO; 
         }
     }
 }

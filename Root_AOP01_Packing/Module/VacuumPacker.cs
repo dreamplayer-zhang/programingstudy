@@ -1,13 +1,16 @@
-﻿using RootTools;
+﻿using Root_EFEM;
+using Root_EFEM.Module;
+using RootTools;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Root_AOP01_Packing.Module
 {
-    public class VacuumPacker : ModuleBase
+    public class VacuumPacker : ModuleBase, IWTRChild
     {
         int TestNum = 1;
         #region ToolBox
@@ -29,11 +32,6 @@ namespace Root_AOP01_Packing.Module
         DIO_I2O m_dioBtmHeaterUpdown; // LJM 201020 Add
         DIO_I2O m_dioTopTotalHeaterUpdown; // LJM 201020 Add
         DIO_O m_doHeater; // LJM 201020 Add
-
-
-
-
-
 
         public override void GetTools(bool bInit)
         {
@@ -133,6 +131,135 @@ namespace Root_AOP01_Packing.Module
                 if (dio.m_swWrite.ElapsedMilliseconds > msWait) return dio.m_id + " Sol Valve Move Timeout";
             }
             return "OK";
+        }
+        #endregion
+
+        #region InfoWafer
+        string m_sInfoWafer = "";
+        InfoWafer _infoWafer = null;
+        public InfoWafer p_infoWafer
+        {
+            get { return _infoWafer; }
+            set
+            {
+                m_sInfoWafer = (value == null) ? "" : value.p_id;
+                _infoWafer = value;
+                if (m_reg != null) m_reg.Write("sInfoWafer", m_sInfoWafer);
+                OnPropertyChanged();
+            }
+        }
+
+        Registry m_reg = null;
+        public void ReadInfoWafer_Registry()
+        {
+            m_reg = new Registry(p_id + ".InfoWafer");
+            m_sInfoWafer = m_reg.Read("sInfoWafer", m_sInfoWafer);
+            p_infoWafer = m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
+        }
+        #endregion
+
+        #region IWTRChild
+        bool _bLock = false;
+        public bool p_bLock
+        {
+            get { return _bLock; }
+            set
+            {
+                if (_bLock == value) return;
+                _bLock = value;
+            }
+        }
+
+        bool IsLock()
+        {
+            for (int n = 0; n < 10; n++)
+            {
+                if (p_bLock == false) return false;
+                Thread.Sleep(100);
+            }
+            return true;
+        }
+
+        public List<string> p_asChildSlot { get { return null; } }
+
+        public InfoWafer GetInfoWafer(int nID)
+        {
+            return p_infoWafer;
+        }
+
+        public void SetInfoWafer(int nID, InfoWafer infoWafer)
+        {
+            p_infoWafer = infoWafer;
+        }
+
+        public string IsGetOK(int nID)
+        {
+            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            if (p_infoWafer == null) return p_id + " IsGetOK - InfoWafer not Exist";
+            return "OK";
+        }
+
+        public string IsPutOK(InfoWafer infoWafer, int nID)
+        {
+            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            if (p_infoWafer != null) return p_id + " IsPutOK - InfoWafer Exist";
+            if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false) return p_id + " not Enable Wafer Size";
+            return "OK";
+        }
+
+        public int GetTeachWTR(InfoWafer infoWafer = null)
+        {
+            if (infoWafer == null) infoWafer = p_infoWafer;
+            return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
+        }
+
+        public string BeforeGet(int nID)
+        {
+            //if (p_infoWafer == null) return m_id + " BeforeGet : InfoWafer = null";
+            return CheckGetPut();
+        }
+
+        public string BeforePut(int nID)
+        {
+            if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
+            return CheckGetPut();
+        }
+
+        public string AfterGet(int nID)
+        {
+            return CheckGetPut();
+        }
+
+        public string AfterPut(int nID)
+        {
+            return "OK";
+        }
+
+        string CheckGetPut()
+        {
+            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            return "OK";
+        }
+
+        enum eCheckWafer
+        {
+            InfoWafer,
+            Sensor
+        }
+        eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
+        public bool IsWaferExist(int nID)
+        {
+            switch (m_eCheckWafer)
+            {
+                case eCheckWafer.Sensor: return false; // m_diWaferExist.p_bIn;
+                default: return (p_infoWafer != null);
+            }
+        }
+
+        InfoWafer.WaferSize m_waferSize;
+        public void RunTreeTeach(Tree tree)
+        {
+            m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
         }
         #endregion
 
@@ -298,6 +425,7 @@ namespace Root_AOP01_Packing.Module
 
         public VacuumPacker(string id, IEngineer engineer)
         {
+            m_waferSize = new InfoWafer.WaferSize(id, false, false);
             base.InitBase(id, engineer);
         }
 

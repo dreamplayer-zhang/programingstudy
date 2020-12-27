@@ -22,9 +22,8 @@ namespace Root_CAMELLIA
                 res /= 10000;
                 return res.ToString("0.###") + "mm";
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                
             }
             return values;
          

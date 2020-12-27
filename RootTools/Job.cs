@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace RootTools
 {
@@ -178,10 +179,16 @@ namespace RootTools
         #endregion
 
         #region File Stream
+        public string m_sMemory = ""; 
         void Save(Stream stream)
         {
             StreamWriter sw = new StreamWriter(stream);
             foreach (Group group in m_group.m_aGroup) group.Save(sw, "");
+            if (m_memoryStream != null)
+            {
+                sw.Flush();
+                m_sMemory = Encoding.Default.GetString(m_memoryStream.ToArray()); 
+            }
             sw.Close();
         }
 

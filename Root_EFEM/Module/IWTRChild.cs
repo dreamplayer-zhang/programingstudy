@@ -34,7 +34,7 @@ namespace Root_EFEM.Module
 
         string AfterPut(int nID);
 
-        bool IsWaferExist(int nID, bool bUseSensor = true);
+        bool IsWaferExist(int nID);
 
         void RunTreeTeach(Tree tree);
 

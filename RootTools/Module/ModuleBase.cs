@@ -1,4 +1,5 @@
 ﻿using RootTools.Camera;
+using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -6,6 +7,9 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 
 namespace RootTools.Module
@@ -340,12 +344,19 @@ namespace RootTools.Module
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
             m_swRun.Restart();
             m_log.Info("ModuleRun : " + moduleRun.p_id + " Start");
-            try { p_sInfo = moduleRun.Run(); }
+            try 
+            { 
+                switch (p_eRemote)
+                {
+                    case eRemote.Client: p_sInfo = m_remote.RemoteRun(moduleRun); break;
+                    default: p_sInfo = moduleRun.Run();break; 
+                }
+            }
             catch (Exception e) { p_sInfo = "StateRun Exception = " + e.Message; }
 
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
             m_log.Info("ModuleRun : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
-            m_qModuleRun.Dequeue();
+            if (m_qModuleRun.Count > 0) m_qModuleRun.Dequeue();
             if (p_sInfo != "OK")
             {
                 EQ.p_bStop = true;
@@ -354,6 +365,127 @@ namespace RootTools.Module
             }
             return p_sInfo;
         }
+        #endregion
+
+        #region RemoteRun
+        public enum eRemote
+        {
+            Local,
+            Client,
+            Server
+        }
+        eRemote _eRemote = eRemote.Local; 
+        public eRemote p_eRemote
+        {
+            get { return _eRemote; }
+            set
+            {
+                if (_eRemote == value) return;
+                _eRemote = value;
+                OnPropertyChanged(); 
+                m_remote = new Remote(this); 
+            }
+        }
+
+        public class Remote
+        {
+            MemoryStream m_memoryStream = new MemoryStream();
+
+            #region Client
+            TCPIPClient m_client;
+            void InitClient(bool bInit)
+            {
+                m_module.p_sInfo = m_module.m_toolBox.Get(ref m_client, m_module, "TCPIP");
+                if (bInit) m_client.EventReciveData += M_client_EventReciveData;
+            }
+
+            private void M_client_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+            {
+                m_bWaitRemote = false;
+                m_module.p_sInfo = Encoding.Default.GetString(aBuf, 0, nSize);
+                if (m_module.p_sInfo != "OK") m_module.p_eState = eState.Error; 
+            }
+
+            public string RemoteRun(ModuleRunBase run)
+            {
+                m_memoryStream = new MemoryStream();
+                m_treeRoot.m_job = new Job(m_memoryStream, true, m_log);
+                m_treeRoot.p_eMode = Tree.eMode.JobSave;
+                run.RunTree(m_treeRoot, true);
+                m_treeRoot.m_job.Close();
+                string sRun = m_treeRoot.m_job.m_sMemory;
+                m_bWaitRemote = true; 
+                m_client.Send(run.m_sModuleRun + "," + sRun);
+                m_memoryStream.Close();
+                WaitDone();
+                return m_module.p_sInfo; 
+            }
+
+            bool m_bWaitRemote = false; 
+            void WaitDone()
+            {
+                while (m_bWaitRemote)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return; 
+                }
+            }
+            #endregion
+
+            #region Server
+            TCPIPServer m_server;
+            void InitServer(bool bInit)
+            {
+                m_module.p_sInfo = m_module.m_toolBox.Get(ref m_server, m_module, "TCPIP");
+                if (bInit) m_server.EventReciveData += M_server_EventReciveData;
+            }
+
+            private void M_server_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+            {
+                string sCmd = Encoding.Default.GetString(aBuf, 0, nSize);
+                string[] asCmd = sCmd.Split(',');
+                ModuleRunBase run = m_module.CloneModuleRun(asCmd[0]);
+                if (run == null) m_server.Send("Unknown Cmd");
+                sCmd = sCmd.Substring(asCmd[0].Length + 1, sCmd.Length - asCmd[0].Length - 1);
+                ServerRun(run, sCmd);
+            }
+
+            void ServerRun(ModuleRunBase run, string sCmd)
+            {
+                m_memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(sCmd));
+                m_treeRoot.m_job = new Job(m_memoryStream, false, m_log);
+                m_treeRoot.p_eMode = Tree.eMode.JobOpen;
+                run.RunTree(m_treeRoot, true);
+                m_treeRoot.m_job.Close();
+                m_module.StartRun(run);
+                while (m_module.IsBusy()) Thread.Sleep(10);
+                m_server.Send(m_module.p_sInfo);
+                m_memoryStream.Close();
+            }
+            #endregion
+
+            #region ToolBox
+            public void GetTools(bool bInit)
+            {
+                switch (m_module.p_eRemote)
+                {
+                    case eRemote.Client: InitClient(bInit); break;
+                    case eRemote.Server: InitServer(bInit); break;
+                }
+            }
+            #endregion
+
+            ModuleBase m_module;
+            Log m_log; 
+            TreeRoot m_treeRoot; 
+            public Remote(ModuleBase module)
+            {
+                m_module = module;
+                m_log = module.m_log; 
+                m_treeRoot = new TreeRoot(module.p_id, module.m_log); 
+            }
+        }
+        public Remote m_remote; 
         #endregion
 
         #region Tree Tool
@@ -482,10 +614,11 @@ namespace RootTools.Module
         public IGem m_gem;
         public GAF m_gaf;
         public ToolBox m_toolBox;
-        public void InitBase(string id, IEngineer enginner)
+        public void InitBase(string id, IEngineer enginner, eRemote eRemote = eRemote.Local)
         {
             p_id = id;
             m_engineer = enginner;
+            p_eRemote = eRemote; 
             m_log = LogView.GetLog(id, id);
             m_gem = enginner.ClassGem();
             m_gaf = enginner.ClassGAF();
@@ -498,7 +631,9 @@ namespace RootTools.Module
             InitMemorys();
             InitTreeSetup(); 
             InitTreeRun();
-            InitTreeQueue(); 
+            InitTreeQueue();
+
+            RunTree(Tree.eMode.RegRead);
 
             m_thread = new Thread(new ThreadStart(ThreadRun));
             m_thread.Start();

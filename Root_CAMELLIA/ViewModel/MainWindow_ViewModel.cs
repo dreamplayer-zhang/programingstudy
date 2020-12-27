@@ -83,8 +83,9 @@ namespace Root_CAMELLIA
             Module_Camellia.Run_Measure measure = (Module_Camellia.Run_Measure)p_Module_Camellia.CloneModuleRun("Measure");
             this.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
 
-			//테스트하였는데 뭔가 문제있음. 바로 Initialize하면 컨버터에 오류발생
-            App.m_nanoView.InitializeSR(@"C:\Users\ATI\Desktop\ATI_LIB_v18_6(backup20201208)\Init_ATI_NIR.cfg", 2);
+
+            InitNanoView();
+            //m_reg.Write(,);
         }
 
         public double p_ArrowX1
@@ -109,6 +110,31 @@ namespace Root_CAMELLIA
             set
             {
                 SetProperty(ref m_ArrowX2, value);
+                if (p_ArrowX1 < p_ArrowX2)
+                {
+                    m_GradientStartTempPoint.X = 0;
+                }
+                else if (p_ArrowX1 > p_ArrowX2)
+                {
+                    m_GradientStartTempPoint.X = 1;
+                }
+                else
+                {
+                    m_GradientStartTempPoint.X = 0.5;
+                }
+
+                if (p_ArrowX1 < p_ArrowX2)
+                {
+                    m_GradientEndTempPoint.X = 1;
+                }
+                else if (p_ArrowX1 > p_ArrowX2)
+                {
+                    m_GradientEndTempPoint.X = 0;
+                }
+                else
+                {
+                    m_GradientEndTempPoint.X = 0.5;
+                }
             }
         }
         private double m_ArrowX2 = 0.0f;
@@ -135,6 +161,34 @@ namespace Root_CAMELLIA
             set
             {
                 SetProperty(ref m_ArrowY2, value);
+                if (p_ArrowY1 < p_ArrowY2)
+                {
+                    m_GradientStartTempPoint.Y = 0;
+                }
+                else if (p_ArrowY1 > p_ArrowY2)
+                {
+                    m_GradientStartTempPoint.Y = 1;
+                }
+                else
+                {
+                    m_GradientStartTempPoint.Y = 0.5;
+                }
+
+                if (p_ArrowY1 < p_ArrowY2)
+                {
+                    m_GradientEndTempPoint.Y = 1;
+                }
+                else if (p_ArrowY1 > p_ArrowY2)
+                {
+                    m_GradientEndTempPoint.Y = 0;
+                }
+                else
+                {
+                    m_GradientEndTempPoint.Y = 0.5;
+                }
+
+                p_GradientStartPoint = m_GradientStartTempPoint;
+                p_GradientEndPoint = m_GradientEndTempPoint;
             }
         }
         private double m_ArrowY2 = 0.0f;
@@ -152,80 +206,32 @@ namespace Root_CAMELLIA
         }
         private Visibility m_ArrowVisible = Visibility.Hidden;
 
-        private System.Windows.Point m_GradienStartPoint = new System.Windows.Point();
+        private System.Windows.Point m_GradientStartTempPoint = new System.Windows.Point();
+        private System.Windows.Point m_GradientEndTempPoint = new System.Windows.Point();
+
+        private System.Windows.Point m_GradientStartPoint = new System.Windows.Point();
         public System.Windows.Point p_GradientStartPoint
         {
             get
             {
-                return m_GradienStartPoint;
+                return m_GradientStartPoint;
             }
             set
             {
-                if(p_ArrowX1 < p_ArrowX2)
-                {
-                    m_GradienStartPoint.X = 0;
-                }
-                else if(p_ArrowX1 > p_ArrowX2)
-                {
-                    m_GradienStartPoint.X = 1;
-                }
-                else{
-                    m_GradienStartPoint.X = 0.5;
-                }
-
-                if(p_ArrowY1 < p_ArrowY2)
-                {
-                    m_GradienStartPoint.Y = 0;
-                }
-                else if(p_ArrowY1 > p_ArrowY2)
-                {
-                    m_GradienStartPoint.Y = 1;
-                }
-                else
-                {
-                    m_GradienStartPoint.Y = 0.5;
-                }
-
-                SetProperty(ref m_GradienStartPoint, value);
+                SetProperty(ref m_GradientStartPoint, value);
             }
         }
 
-        private System.Windows.Point m_GradienEndPoint = new System.Windows.Point();
+        private System.Windows.Point m_GradientEndPoint = new System.Windows.Point();
         public System.Windows.Point p_GradientEndPoint
         {
             get
             {
-                return m_GradienEndPoint;
+                return m_GradientEndPoint;
             }
             set
             {
-                if (p_ArrowX1 < p_ArrowX2)
-                {
-                    m_GradienEndPoint.X = 1;
-                }
-                else if (p_ArrowX1 > p_ArrowX2)
-                {
-                    m_GradienEndPoint.X = 0;
-                }
-                else
-                {
-                    m_GradienEndPoint.X = 0.5;
-                }
-
-                if (p_ArrowY1 < p_ArrowY2)
-                {
-                    m_GradienEndPoint.Y = 1;
-                }
-                else if (p_ArrowY1 > p_ArrowY2)
-                {
-                    m_GradienEndPoint.Y = 0;
-                }
-                else
-                {
-                    m_GradienEndPoint.Y = 0.5;
-                }
-
-                SetProperty(ref m_GradienEndPoint, value);
+                SetProperty(ref m_GradientEndPoint, value);
             }
         }
 
@@ -281,11 +287,42 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_ProgressColor, value);
             }
         }
+
+        private bool m_InitNanoview = false;
+        public bool p_InitNanoview
+        {
+            get
+            {
+                return m_InitNanoview;
+            }
+            set
+            {
+                SetProperty(ref m_InitNanoview, value);
+            }
+        }
+
         private System.Windows.Media.Brush m_ProgressColor;
 
         public SolidColorBrush RouteBrush { get; set; } = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 0, 0, 255));
         public SolidColorBrush test = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 1, 211, 40));
         #endregion
+
+        private void InitNanoView()
+        {
+            string config = "";
+            config = SettingViewModel.m_reg.Read(BaseDefine.RegNanoViewConfig, config);
+            int port = -1;
+            port = SettingViewModel.m_reg.Read(BaseDefine.RegNanoViewPort, port);
+            if (config != "" && port != -1)
+            {
+                if(App.m_nanoView.InitializeSR(config, port) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                {
+                    p_InitNanoview = true;
+                    SettingViewModel.LoadParameter();
+                }
+            }
+           
+        }
 
         private void Init()
         {
@@ -362,8 +399,6 @@ namespace Root_CAMELLIA
 
         #region Dialog
         DialogService dialogService;
-        private Dlg_RecipeManager DlgRecipeManager; 
-        private Dlg_Engineer DlgEngineer;
         #endregion
 
         #region Timer
@@ -432,8 +467,6 @@ namespace Root_CAMELLIA
                     dialog.LogUI.Init(LogView.m_logView);
                     dialog.ToolBoxUI.Init(App.m_engineer);
                     Nullable<bool> result = dialog.ShowDialog();
-                    ////dialog.ShowDialog();
-                    ////Nullable<bool> result = dialogService.ShowDialog(viewModel);
                 });
             }
         }
@@ -444,8 +477,12 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     var viewModel = SettingViewModel;
+                    if (m_InitNanoview)
+                    {
+                        viewModel.LoadParameter();
+                    }
+                    viewModel.LoadConfig();
                     Nullable<bool> result = dialogService.ShowDialog(viewModel);
-                    //m_Vision.StartRun(p_RunLADS);
                 });
             }
         }
@@ -463,85 +500,20 @@ namespace Root_CAMELLIA
         }
         #endregion
 
-        #region 이전코드
-        //public MainWindow_ViewModel(MainWindow main)
-        //{
-        //    DataManager = main.DataManager;
-        //    Init();
-        //}
+        #region Event
+        public void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
 
-        //public void Init()
-        //{
-        //    PointListItem.Columns.Add(new DataColumn("ListIndex"));
-        //    PointListItem.Columns.Add(new DataColumn("ListX"));
-        //    PointListItem.Columns.Add(new DataColumn("ListY"));
-        //    PointListItem.Columns.Add(new DataColumn("ListRoute"));
-        //}
+            
+            //UIElement el = (UIElement)sender;
+            if(e.ChangedButton == MouseButton.Left && e.ClickCount == 2)
+            {
+                System.Windows.Point pt = e.GetPosition((UIElement)sender);
 
-        //public void UpdateListView()
-        //{
-        //    PointListItem.Clear();
-        //    int nCount = 0;
-        //    int nSelCnt = DataManager.recipeDM.TeachingRD.DataSelectedPoint.Count;
-        //    int[] MeasurementOrder = new int[nSelCnt];
+            }
 
-        //    for (int i = 0; i < nSelCnt; i++)
-        //    {
-        //        MeasurementOrder[DataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]] = i;
-        //    }
 
-        //    DataRow row;
-        //    for (int i = 0; i < nSelCnt; i++, nCount++)
-        //    {
-
-        //        CCircle c = DataManager.recipeDM.TeachingRD.DataSelectedPoint[i];
-        //        int nRoute = MeasurementOrder[i];
-        //        row = PointListItem.NewRow();
-        //        row["ListIndex"] = (nCount + 1).ToString();
-        //        row["ListX"] = Math.Round(c.x, 3).ToString();
-        //        row["ListY"] = Math.Round(c.y, 3).ToString();
-        //        row["ListRoute"] = (nRoute + 1).ToString();
-        //        PointListItem.Rows.Add(row);
-
-        //    }
-        //    PointCount = PointListItem.Rows.Count.ToString();
-        //}
-
-        //public DataManager DataManager { get; set; }
-
-        //private ObservableCollection<UIElement> m_MainDrawElement = new ObservableCollection<UIElement>();
-        //public ObservableCollection<UIElement> p_MainDrawElement
-        //{
-        //    get
-        //    {
-        //        return m_MainDrawElement;
-        //    }
-        //    set
-        //    {
-        //        m_MainDrawElement = value;
-        //    }
-        //}
-
-        //public string PointCount { get; set; } = "0";
-
-        //public ObservableCollection<ShapeManager> Shapes = new ObservableCollection<ShapeManager>();
-        //public ObservableCollection<GeometryManager> Geometry = new ObservableCollection<GeometryManager>();
-
-        //DataTable pointListItem = new DataTable();
-        //public DataTable PointListItem
-        //{
-        //    get
-        //    {
-        //        return pointListItem;
-        //    }
-        //    set
-        //    {
-        //        pointListItem = value;
-        //        RaisePropertyChanged("PointListItem");
-        //    }
-        //}
+        }
         #endregion
-
-
     }
 }

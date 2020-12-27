@@ -18,30 +18,33 @@ namespace Root
         //public BayerConvert m_bayer;
         //public ACS m_acs;
         //public TestMars m_testMars;
-        //public TestRepeat m_testRepeat;
+        public TestRepeat m_testRepeat;
         //public ReadExcel m_readExcel;
-        public RemoteModule m_remote; 
+        //public RemoteModule m_remote;
+        //public RemoteModule m_server;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            //m_test = new Test("Test", m_enginner);
+            //m_test = new Test("Test", m_engineer);
             //InitModule(m_test);
-            //m_scarecrow =new ScareCrow("ScareCrow", m_enginner);
+            //m_scarecrow =new ScareCrow("ScareCrow", m_engineer);
             //InitModule(m_scarecrow);
-            //m_siltron = new Siltron("Siltrion", m_enginner);
+            //m_siltron = new Siltron("Siltrion", m_engineer);
             //InitModule(m_siltron);
-            //m_bayer = new BayerConvert("BayerConvert", m_enginner);
+            //m_bayer = new BayerConvert("BayerConvert", m_engineer);
             //InitModule(m_bayer);
-            //m_acs = new ACS("ACS", m_enginner);
+            //m_acs = new ACS("ACS", m_engineer);
             //InitModule(m_acs);
-            //m_testMars = new TestMars("TestMars", m_enginner);
+            //m_testMars = new TestMars("TestMars", m_engineer);
             //InitModule(m_testMars);
-            //m_testRepeat = new TestRepeat("TestRepeat", m_engineer);
-            //InitModule(m_testRepeat);
+            m_testRepeat = new TestRepeat("TestRepeat", m_engineer);
+            InitModule(m_testRepeat);
             //m_readExcel = new ReadExcel("ReadExcel", m_engineer);
             //InitModule(m_readExcel);
-            m_remote = new RemoteModule("Remote", m_engineer);
-            InitModule(m_remote);
+            //m_server = new RemoteModule("Server", m_engineer, ModuleBase.eRemote.Server);
+            //InitModule(m_server);
+            //m_remote = new RemoteModule("Remote", m_engineer, ModuleBase.eRemote.Client);
+            //InitModule(m_remote);
         }
 
         void InitModule(ModuleBase module)

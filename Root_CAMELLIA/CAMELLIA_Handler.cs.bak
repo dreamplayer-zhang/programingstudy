@@ -1,6 +1,6 @@
-﻿using Root_EFEM;
+﻿using Root_CAMELLIA;
+using Root_CAMELLIA.Module;
 using Root_EFEM.Module;
-using Root_WIND2.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -11,17 +11,20 @@ using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Root_WIND2
+namespace Root_CAMELLIA
 {
-    public class WIND2_Handler : IHandler
+    public class CAMELLIA_Handler : IHandler
     {
-        public ModuleList p_moduleList { get; set; }
+        public ModuleList p_moduleList
+        {
+            get; set;
+        }
 
         #region List InfoWafer
-        public string AddInfoWafer(InfoWafer infoWafer)
-        {
-            return "OK";
-        }
+        //public string AddInfoWafer(InfoWafer infoWafer)
+        //{
+        //    return "OK";
+        //}
         #endregion
 
         #region UI Binding
@@ -50,57 +53,35 @@ namespace Root_WIND2
         #endregion
 
         #region Module
-        public WIND2_Recipe m_recipe;
-        public EFEM_Process m_process;
-        public Vision m_vision;
-        public EdgeSideVision m_edgesideVision;
-        public BackSideVision m_backSideVision;
+        public ModuleList m_moduleList;
+        public CAMELLIA_Recipe m_recipe;
+        public CAMELLIA_Process m_process;
+        public Module_Camellia m_camellia;
         void InitModule()
         {
-            p_moduleList = new ModuleList(m_engineer);
-            switch (m_engineer.m_eMode)
-            {
-                case WIND2_Engineer.eMode.Vision: InitVisionModule(); break; 
-                case WIND2_Engineer.eMode.EFEM: InitEFEMModule(); break;
-            }
-        }
+            m_moduleList = new ModuleList(m_engineer);
 
-        void InitVisionModule()
-        {
-            m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Server);
-            InitModule(m_vision);
-        }
-
-        void InitEFEMModule()
-        {
             InitWTR();
-            IWTR iWTR = (IWTR)m_wtr;
             InitLoadport();
             InitAligner();
-            m_edgesideVision = new EdgeSideVision("EdgeSide Vision", m_engineer);
-            InitModule(m_edgesideVision);
-            iWTR.AddChild(m_edgesideVision);
-            m_backSideVision = new BackSideVision("BackSide Vision", m_engineer);
-            InitModule(m_backSideVision);
-            iWTR.AddChild(m_backSideVision);
-            m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Client);
-            InitModule(m_vision);
-            iWTR.AddChild(m_vision);
 
+            m_camellia = new Module_Camellia("Camellia", m_engineer);
+            InitModule(m_camellia);
+            IWTR iWTR = (IWTR)m_wtr;
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
             iWTR.ReadInfoReticle_Registry();
 
-            m_recipe = new WIND2_Recipe("Recipe", m_engineer);
-            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR);
+            m_recipe = new CAMELLIA_Recipe("Recipe", m_engineer);
+            m_recipe.AddModule(m_camellia);
+            m_process = new CAMELLIA_Process("Process", m_engineer, this);
         }
 
         void InitModule(ModuleBase module)
         {
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
-            p_moduleList.AddModule(module, ui);
+            m_moduleList.AddModule(module, ui);
         }
 
         public bool IsEnableRecovery()
@@ -141,7 +122,6 @@ namespace Root_WIND2
             Cymechs,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
-        public List<ILoadport> m_aLoadport = new List<ILoadport>();
         int m_lLoadport = 2;
         void InitLoadport()
         {
@@ -157,7 +137,6 @@ namespace Root_WIND2
                     default: module = new Loadport_RND(sID, m_engineer, true, true); break;
                 }
                 InitModule(module);
-                m_aLoadport.Add((ILoadport)module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
             }
         }
@@ -203,10 +182,19 @@ namespace Root_WIND2
         }
         #endregion
 
+        #region Tree
+        public void RunTreeModule(Tree tree)
+        {
+            RunTreeWTR(tree.GetTree("WTR"));
+            RunTreeLoadport(tree.GetTree("Loadport"));
+            RunTreeAligner(tree.GetTree("Aligner"));
+        }
+        #endregion
+
         #region StateHome
         public string StateHome()
         {
-            string sInfo = StateHome(p_moduleList.m_aModule);
+            string sInfo = StateHome(m_moduleList.m_aModule);
             if (sInfo == "OK")
                 EQ.p_eState = EQ.eState.Ready;
             return sInfo;
@@ -259,7 +247,7 @@ namespace Root_WIND2
         #region Reset
         public string Reset()
         {
-            Reset(m_gaf, p_moduleList);
+            Reset(m_gaf, m_moduleList);
             return "OK";
         }
 
@@ -335,36 +323,29 @@ namespace Root_WIND2
                         StateHome();
                         break;
                     case EQ.eState.Run:
-                        m_process.p_sInfo = m_process.RunNextSequence();
+                        if (m_moduleList.m_qModuleRun.Count == 0)
+                        {
+                            m_process.p_sInfo = m_process.RunNextSequence();
+                        }
                         break;
                 }
             }
         }
         #endregion
 
-        #region Tree
-        public void RunTreeModule(Tree tree)
-        {
-            if (m_engineer.m_eMode == WIND2_Engineer.eMode.Vision) return; 
-            RunTreeWTR(tree.GetTree("WTR"));
-            RunTreeLoadport(tree.GetTree("Loadport"));
-            RunTreeAligner(tree.GetTree("Aligner"));
-        }
-        #endregion
-
         string m_id;
-        public WIND2_Engineer m_engineer;
+        public CAMELLIA_Engineer m_engineer;
         public GAF m_gaf;
         IGem m_gem;
+
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_engineer = (WIND2_Engineer)engineer;
+            m_engineer = (CAMELLIA_Engineer)engineer;
             m_gaf = engineer.ClassGAF();
             m_gem = engineer.ClassGem();
             InitModule();
             InitThread();
-            engineer.ClassMemoryTool().InitThreadProcess();
         }
 
         public void ThreadStop()
@@ -375,10 +356,10 @@ namespace Root_WIND2
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
-            if (p_moduleList != null)
+            if (m_moduleList != null)
             {
-                p_moduleList.ThreadStop();
-                foreach (ModuleBase module in p_moduleList.m_aModule.Keys)
+                m_moduleList.ThreadStop();
+                foreach (ModuleBase module in m_moduleList.m_aModule.Keys)
                     module.ThreadStop();
             }
         }

@@ -172,7 +172,7 @@ namespace Root_CAMELLIA.Module
             m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisLifter.AddIO(m_axisXReady);
             m_axisLifter.AddIO(m_axisYReady);
-            m_axisLifter.AddIO(m_vaccum);
+            //m_axisLifter.AddIO(m_vaccum);
             m_axisLifter.p_vaccumDIO_I = m_vaccum;
         }
         #endregion
@@ -207,12 +207,12 @@ namespace Root_CAMELLIA.Module
 
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), false, "Time Delay");
-            AddModuleRunList(new Run_Calibration(this), false, "Calibration");
-            AddModuleRunList(new Run_InitCalWaferCentering(this), false, "InitCalCentering");
-            AddModuleRunList(new Run_WaferCentering(this), false, "Centering");
-            AddModuleRunList(new Run_Measure(this), false, "Measurement");
-            AddModuleRunList(new Run_VRSTEST(this), false, "VRSTEST");
+            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+            AddModuleRunList(new Run_Calibration(this), true, "Calibration");
+            AddModuleRunList(new Run_InitCalWaferCentering(this), true, "InitCalCentering");
+            AddModuleRunList(new Run_WaferCentering(this), true, "Centering");
+            AddModuleRunList(new Run_Measure(this), true, "Measurement");
+            AddModuleRunList(new Run_VRSTEST(this), true, "VRSTEST");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -586,7 +586,6 @@ namespace Root_CAMELLIA.Module
             public override string Run()
             {
                 AxisXY axisXY = m_module.m_axisXY;
-                RPoint MovePoint;
                 //if (m_InitialCal)
                 //{
                 //    MovePoint = new RPoint(m_CalWaferCenterPos_pulse);
@@ -609,7 +608,6 @@ namespace Root_CAMELLIA.Module
         public class Run_Measure : ModuleRunBase
         {
             Module_Camellia m_module;
-            Met.Nanoview m_NanoView;
             MainWindow_ViewModel m_mwvm;
             DataManager m_DataManager;
             (Met.SettingData, Met.Nanoview.ERRORCODE_NANOVIEW) m_SettingDataWithErrorCode;
@@ -671,10 +669,26 @@ namespace Root_CAMELLIA.Module
             }
             public override string Run()
             {
+
+                Axis axisLifter = m_module.p_axisLifter;
+
+                if (m_module.LifterUpVaccumCheck())
+                {
+                    if (!m_module.m_vaccum.p_bIn)
+                    {
+                        if (m_module.Run(axisLifter.StartHome()))
+                        {
+                            return p_sInfo;
+                        }
+                        if (m_module.Run(axisLifter.WaitReady()))
+                            return p_sInfo;
+                    }
+                }
+
                 //m_module.p_eState = (eState)5;
                 AxisXY axisXY = m_module.p_axisXY;
                 Axis axisZ = m_module.p_axisZ;
-                Axis axisLifter = m_module.p_axisLifter;
+                
                 // stage 48724 , wafer 47932
                 if (m_module.Run(axisZ.StartMove(m_dFocusZ_pulse)))
                 {
@@ -734,9 +748,12 @@ namespace Root_CAMELLIA.Module
                         m_mwvm.p_ArrowVisible = Visibility.Visible;
                     }
 
-                    m_NanoView.SampleMeasure(i, x, y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_Average_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, m_Average_NIR);
-                    //m_mwvm.p_RTGraph.DrawReflectanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
-                    //m_mwvm.p_RTGraph.DrawTransmittanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
+                    App.m_nanoView.SampleMeasure(i, x, y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_Average_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, m_Average_NIR)
+;
+                        Met.DataManager dm = Met.DataManager.GetInstance();
+                    dm.SaveRawData(@"C:\Users\ATI\Desktop\Root_201221수정\MeasureData\", i);
+                    m_mwvm.p_RTGraph.DrawReflectanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
+                    m_mwvm.p_RTGraph.DrawTransmittanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
 
 
                     if (VRS.Grab() == "OK")
@@ -766,18 +783,18 @@ namespace Root_CAMELLIA.Module
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
 
-                if (m_module.LifterUpVaccumCheck())
-                {
-                    if (!m_module.m_vaccum.p_bIn)
-                    {
-                        if (m_module.Run(axisLifter.StartMove(ePosition.SWLimit_Plus)))
-                        {
-                            return p_sInfo;
-                        }
-                        if (m_module.Run(axisLifter.WaitReady()))
-                            return p_sInfo;
-                    }
-                }
+                //if (m_module.LifterUpVaccumCheck())
+                //{
+                //    if (!m_module.m_vaccum.p_bIn)
+                //    {
+                //        if (m_module.Run(axisLifter.StartMove(ePosition.SWLimit_Plus)))
+                //        {
+                //            return p_sInfo;
+                //        }
+                //        if (m_module.Run(axisLifter.WaitReady()))
+                //            return p_sInfo;
+                //    }
+                //}
 
                 return "OK";
             }
@@ -785,7 +802,6 @@ namespace Root_CAMELLIA.Module
         public class Run_VRSTEST : ModuleRunBase
         {
             Module_Camellia m_module;
-            Met.Nanoview m_NanoView;
             MainWindow_ViewModel m_mwvm;
             DataManager m_DataManager;
             RPoint m_WaferCenterPos_pulse = new RPoint(); // Pulse
@@ -821,11 +837,9 @@ namespace Root_CAMELLIA.Module
                 Camera_Basler VRS = m_module.m_CamVRS;
                 ImageData img = VRS.p_ImageViewer.p_ImageData;
                 string strVRSImageDir = "D:\\";
-                string strVRSImageFullPath = "";
-                RPoint MeasurePoint;
                 if (VRS.Grab() == "OK")
                 {
-                    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
+                    string strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
                     img.SaveImageSync(strVRSImageFullPath);
                     //Grab error
                 }
@@ -945,6 +959,7 @@ namespace Root_CAMELLIA.Module
 
         private string MoveReadyPos()
         {
+            if (p_axisLifter.IsInPos(ePosition.Position_0)) return "OK";
 
             /* XY Ready 위치 이동 */
             if (Run(p_axisXY.p_axisX.StartMove(eAxisPos.Ready)))
@@ -957,13 +972,13 @@ namespace Root_CAMELLIA.Module
                 return p_sInfo;
             if (Run(p_axisZ.WaitReady()))
                 return p_sInfo;
-
             /* Vaccum Check 후Lifter Up */
             if (LifterUpVaccumCheck())
             {
                 if (!m_vaccum.p_bIn)
                 {
-                    if (Run(p_axisLifter.StartMove(ePosition.SWLimit_Plus)))
+                    //if (Run(p_axisLifter.StartMove(ePosition.SWLimit_Plus)))
+                    if (Run(p_axisLifter.StartMove(ePosition.Position_0)))
                     {
                         return p_sInfo;
                     }

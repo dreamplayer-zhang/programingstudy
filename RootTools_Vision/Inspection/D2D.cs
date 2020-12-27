@@ -25,7 +25,7 @@ namespace RootTools_Vision
         float[] histWeightMap = null;
         List<byte[]> GoldenImages = new List<byte[]>();
 
-        public override WORK_TYPE Type => WORK_TYPE.MAINWORK;
+        public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
         // D2D Recipe & Parameter
         private D2DParameter parameter;
