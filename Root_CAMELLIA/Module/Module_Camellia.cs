@@ -259,6 +259,7 @@ namespace Root_CAMELLIA.Module
             int m_EdgeSearchRange = 20;
             int m_EdgeSearchLength = 500;
 
+            (Met.SettingData, Met.Nanoview.ERRORCODE_NANOVIEW) m_SettingDataWithErrorCode;
             public Run_InitCalWaferCentering(Module_Camellia module)
             {
                 m_module = module;
@@ -303,79 +304,89 @@ namespace Root_CAMELLIA.Module
             public override string Run()
             {
 
+
+
+                m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
+                if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                {
+                    Met.SettingData setting = m_SettingDataWithErrorCode.Item1;
+                    //App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal);
+                    m_DataManager.m_calibration.Run(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal);
+                }
+
                 //m_NanoView.Calibration(m_BGIntTime_VIS, m_BGIntTime_NIR, m_Average_VIS, m_Average_NIR, m_InitialCal);
-                m_DataManager.m_calibration.Run(m_BGIntTime_VIS, m_BGIntTime_NIR, m_Average_VIS, m_Average_NIR, m_InitialCal);
-                AxisXY axisXY = m_module.m_axisXY;
-                Axis axisZ = m_module.m_axisZ;
-                string strVRSImageDir = "D:\\";
-                string strVRSImageFullPath = "";
-
+                //m_DataManager.m_calibration.Run(m_BGIntTime_VIS, m_BGIntTime_NIR, m_Average_VIS, m_Average_NIR, m_InitialCal);
                 //AxisXY axisXY = m_module.m_axisXY;
+                //Axis axisZ = m_module.m_axisZ;
+                //string strVRSImageDir = "D:\\";
+                //string strVRSImageFullPath = "";
 
-                Camera_Basler VRS = m_module.m_CamVRS;
-                ImageData img = VRS.p_ImageViewer.p_ImageData;
+                ////AxisXY axisXY = m_module.m_axisXY;
 
-
-                if (m_module.Run(axisZ.StartMove(47932)))
-                {
-                    return p_sInfo;
-                }
-                if (m_module.Run(axisZ.WaitReady()))
-                    return p_sInfo;
+                //Camera_Basler VRS = m_module.m_CamVRS;
+                //ImageData img = VRS.p_ImageViewer.p_ImageData;
 
 
-                if (m_module.Run(axisXY.StartMove(m_WaferLT_pulse)))
-                    return p_sInfo;
-                if (m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
+                //if (m_module.Run(axisZ.StartMove(47932)))
+                //{
+                //    return p_sInfo;
+                //}
+                //if (m_module.Run(axisZ.WaitReady()))
+                //    return p_sInfo;
+
+
+                //if (m_module.Run(axisXY.StartMove(m_WaferLT_pulse)))
+                //    return p_sInfo;
+                //if (m_module.Run(axisXY.WaitReady()))
+                //    return p_sInfo;
 
 
 
 
-                if (VRS.Grab() == "OK")
-                {
-                    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 0);
-                    img.SaveImageSync(strVRSImageFullPath);
-                    //Grab error
-                }
-                m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.LT);
+                //if (VRS.Grab() == "OK")
+                //{
+                //    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 0);
+                //    img.SaveImageSync(strVRSImageFullPath);
+                //    //Grab error
+                //}
+                //m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.LT);
 
 
-                if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
-                    return p_sInfo;
-                if (m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
+                //if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
+                //    return p_sInfo;
+                //if (m_module.Run(axisXY.WaitReady()))
+                //    return p_sInfo;
 
-                if (VRS.Grab() == "OK")
-                {
-                    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
-                    img.SaveImageSync(strVRSImageFullPath);
-                    //Grab error
-                }
-                m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.RT);
-
-
-                if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
-                    return p_sInfo;
-                if (m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
-
-                if (VRS.Grab() == "OK")
-                {
-                    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);
-                    img.SaveImageSync(strVRSImageFullPath);
-                    //Grab error
-                }
-                m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.RB);
+                //if (VRS.Grab() == "OK")
+                //{
+                //    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
+                //    img.SaveImageSync(strVRSImageFullPath);
+                //    //Grab error
+                //}
+                //m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.RT);
 
 
-                m_DataManager.m_waferCentering.CalCenterPoint(VRS.GetRoiSize(), m_dResX_um, m_dResY_um, m_WaferLT_pulse, m_WaferRT_pulse, m_WaferRB_pulse);
+                //if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
+                //    return p_sInfo;
+                //if (m_module.Run(axisXY.WaitReady()))
+                //    return p_sInfo;
+
+                //if (VRS.Grab() == "OK")
+                //{
+                //    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);
+                //    img.SaveImageSync(strVRSImageFullPath);
+                //    //Grab error
+                //}
+                //m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.RB);
 
 
-                if (m_module.Run(axisXY.StartMove(m_DataManager.m_waferCentering.m_ptCenter)))
-                    return p_sInfo;
-                if (m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
+                //m_DataManager.m_waferCentering.CalCenterPoint(VRS.GetRoiSize(), m_dResX_um, m_dResY_um, m_WaferLT_pulse, m_WaferRT_pulse, m_WaferRB_pulse);
+
+
+                //if (m_module.Run(axisXY.StartMove(m_DataManager.m_waferCentering.m_ptCenter)))
+                //    return p_sInfo;
+                //if (m_module.Run(axisXY.WaitReady()))
+                //    return p_sInfo;
 
                 return "OK";
             }
@@ -532,10 +543,6 @@ namespace Root_CAMELLIA.Module
         {
             Module_Camellia m_module;
             Met.Nanoview m_NanoView;
-            int m_BGIntTime_VIS = 50;
-            int m_BGIntTime_NIR = 150;
-            int m_Average_VIS = 5;
-            int m_Average_NIR = 3;
             bool m_InitialCal = false;
             (Met.SettingData, Met.Nanoview.ERRORCODE_NANOVIEW) m_SettingDataWithErrorCode;
             public RPoint m_CalWaferCenterPos_pulse = new RPoint(); // Pulse
@@ -543,15 +550,6 @@ namespace Root_CAMELLIA.Module
             public Run_Calibration(Module_Camellia module)
             {
                 m_module = module;
-                m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
-                if (m_SettingDataWithErrorCode.Item1 != null)
-                {
-                    m_Average_VIS = m_SettingDataWithErrorCode.Item1.nAverage_VIS;
-                    m_Average_NIR = m_SettingDataWithErrorCode.Item1.nAverage_NIR;
-                    m_BGIntTime_VIS = m_SettingDataWithErrorCode.Item1.nBGIntTime_VIS;
-                    m_BGIntTime_NIR = m_SettingDataWithErrorCode.Item1.nBGIntTime_NIR;
-                }
-
                 InitModuleRun(module);
             }
 
@@ -563,21 +561,6 @@ namespace Root_CAMELLIA.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_BGIntTime_VIS = tree.Set(m_BGIntTime_VIS, m_BGIntTime_VIS, "VIS Background cal integration time", "VIS Background cal integration(exposure) time", bVisible);
-                m_BGIntTime_NIR = tree.Set(m_BGIntTime_NIR, m_BGIntTime_NIR, "NIR Background cal integration time", "NIR Background cal integration(exposure) time", bVisible);
-                m_Average_VIS = tree.Set(m_Average_VIS, m_Average_VIS, "VIS Spectrum Count", "VIS Spectrum Count", bVisible);
-                m_Average_NIR = tree.Set(m_Average_NIR, m_Average_NIR, "NIR Spectrum Count", "NIR Spectrum Count", bVisible);
-
-                if (m_SettingDataWithErrorCode.Item1 != null)
-                {
-                    m_SettingDataWithErrorCode.Item1.nAverage_VIS = m_Average_VIS;
-                    m_SettingDataWithErrorCode.Item1.nAverage_NIR = m_Average_NIR;
-                    m_SettingDataWithErrorCode.Item1.nBGIntTime_VIS = m_BGIntTime_VIS;
-                    m_SettingDataWithErrorCode.Item1.nBGIntTime_NIR = m_BGIntTime_NIR;
-                    App.m_nanoView.SaveSettingParameters(m_SettingDataWithErrorCode.Item1);
-                }
-
-               
                 m_InitialCal = tree.Set(m_InitialCal, m_InitialCal, "Initial Calibration", "Initial Calibration", bVisible);
                 m_CalWaferCenterPos_pulse = tree.Set(m_CalWaferCenterPos_pulse, m_CalWaferCenterPos_pulse, "Calibration Wafer Center Axis Position", "Calibration Wafer Center Axis Position(Pulse)", bVisible);
                 m_RefWaferCenterPos_pulse = tree.Set(m_RefWaferCenterPos_pulse, m_RefWaferCenterPos_pulse, "Reference Wafer Center Axis Position", "Reference Wafer Center Axis Position(Pulse)", bVisible);
@@ -601,7 +584,16 @@ namespace Root_CAMELLIA.Module
                 //m_InitalCal은 지금은 무조건 false로 쓰니깐 하드코딩해놓고 보류...
                 //centring 하면서 Cal은 동시에 진행해도 됨
                 //calibration : 지금 위치에서 그냥 바로 cal 시작
-                m_NanoView.Calibration(m_BGIntTime_VIS, m_BGIntTime_NIR, m_Average_VIS, m_Average_NIR, m_InitialCal); //m_InitialCal);
+
+
+                m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
+                if(m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                {
+                    Met.SettingData setting = m_SettingDataWithErrorCode.Item1;
+                    App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal);
+                }
+
+               
                 return "OK";
             }
         }
@@ -616,8 +608,6 @@ namespace Root_CAMELLIA.Module
             double m_dResY_um = 1;
             double m_dFocusZ_pulse = 1; // Pulse
 
-            int m_Average_VIS = 5;
-            int m_Average_NIR = 3;
             bool m_LoadSettingData = false;
 
             public Run_Measure(Module_Camellia module)
@@ -626,13 +616,13 @@ namespace Root_CAMELLIA.Module
                 m_mwvm = module.mwvm;
                 m_DataManager = module.m_DataManager;
 
-                m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
-                if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
-                {
-                    m_Average_VIS = m_SettingDataWithErrorCode.Item1.nAverage_VIS;
-                    m_Average_NIR = m_SettingDataWithErrorCode.Item1.nAverage_NIR;
-                    m_LoadSettingData = true;
-                }
+                //m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
+                //if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                //{
+                //    m_Average_VIS = m_SettingDataWithErrorCode.Item1.nAverage_VIS;
+                //    m_Average_NIR = m_SettingDataWithErrorCode.Item1.nAverage_NIR;
+                //    m_LoadSettingData = true;
+                //}
                 InitModuleRun(module);
             }
             public override ModuleRunBase Clone()
@@ -643,8 +633,6 @@ namespace Root_CAMELLIA.Module
                 run.m_dResX_um = m_dResX_um;
                 run.m_dResY_um = m_dResY_um;
                 run.m_dFocusZ_pulse = m_dFocusZ_pulse;
-                run.m_Average_NIR = m_Average_NIR;
-                run.m_Average_VIS = m_Average_VIS;
                 return run;
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
@@ -653,19 +641,6 @@ namespace Root_CAMELLIA.Module
                 m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)", bVisible);
                 m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)", bVisible);
                 m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)", bVisible);
-                if(m_LoadSettingData == true)
-                {
-
-                }
-                m_Average_VIS = tree.Set(m_Average_VIS, m_Average_VIS, "VIS Spectrum Count", "VIS Spectrum Count", bVisible);
-                m_Average_NIR = tree.Set(m_Average_NIR, m_Average_NIR, "NIR Spectrum Count", "NIR Spectrum Count", bVisible);
-
-                if(m_SettingDataWithErrorCode.Item1 != null)
-                {
-                    m_SettingDataWithErrorCode.Item1.nAverage_VIS = m_Average_VIS;
-                    m_SettingDataWithErrorCode.Item1.nAverage_NIR = m_Average_NIR;
-                    App.m_nanoView.SaveSettingParameters(m_SettingDataWithErrorCode.Item1);
-                }
             }
             public override string Run()
             {
@@ -685,8 +660,20 @@ namespace Root_CAMELLIA.Module
                     }
                 }
 
-                //m_module.p_eState = (eState)5;
-                AxisXY axisXY = m_module.p_axisXY;
+
+                m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
+                Met.SettingData setting = null;
+                if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                {
+                     setting = m_SettingDataWithErrorCode.Item1;
+                }
+                else
+                {
+                    return "SettingDataLoad Error";
+                }
+
+                    //m_module.p_eState = (eState)5;
+                    AxisXY axisXY = m_module.p_axisXY;
                 Axis axisZ = m_module.p_axisZ;
                 
                 // stage 48724 , wafer 47932
@@ -721,6 +708,10 @@ namespace Root_CAMELLIA.Module
 
                 m_mwvm.p_Progress = 0;
 
+                Met.DataManager dm = Met.DataManager.GetInstance();
+
+                dm.ClearRawData();
+
 
                 for (int i = 0; i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count; i++)
                 {
@@ -748,10 +739,11 @@ namespace Root_CAMELLIA.Module
                         m_mwvm.p_ArrowVisible = Visibility.Visible;
                     }
 
-                    App.m_nanoView.SampleMeasure(i, x, y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_Average_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, m_Average_NIR)
+                    App.m_nanoView.SampleMeasure(i, x, y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, setting.nAverage_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, setting.nAverage_NIR);
 ;
-                        Met.DataManager dm = Met.DataManager.GetInstance();
+                       
                     dm.SaveRawData(@"C:\Users\ATI\Desktop\Root_201221수정\MeasureData\", i);
+                    App.m_nanoView.GetThickness(i);
                     m_mwvm.p_RTGraph.DrawReflectanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
                     m_mwvm.p_RTGraph.DrawTransmittanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
 
