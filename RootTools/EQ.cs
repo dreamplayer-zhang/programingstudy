@@ -65,6 +65,19 @@ namespace RootTools
 
     public class _EQ : NotifyProperty
     {
+        #region Deligate
+        public enum eEQ
+        {
+            State,
+            Stop,
+            Pause,
+            Simulate,
+            DoorOpen
+        }
+        public delegate void dgOnChanged(eEQ eEQ, dynamic value);
+        public event dgOnChanged OnChanged;
+        #endregion
+
         EQ.eState _eState = EQ.eState.Init;
         public EQ.eState p_eState
         {
@@ -74,6 +87,7 @@ namespace RootTools
                 if (_eState == value) return;
                 _eState = value;
                 OnPropertyChanged();
+                if (OnChanged != null) OnChanged(eEQ.State, value); 
             }
         }
 
@@ -97,6 +111,7 @@ namespace RootTools
                 if (_bStop == value) return;
                 _bStop = value;
                 OnPropertyChanged();
+                if (OnChanged != null) OnChanged(eEQ.Stop, value);
             }
         }
 
@@ -109,6 +124,7 @@ namespace RootTools
                 if (_bPause == value) return;
                 _bPause = value;
                 OnPropertyChanged();
+                if (OnChanged != null) OnChanged(eEQ.Pause, value);
             }
         }
 
@@ -121,11 +137,9 @@ namespace RootTools
                 if (_bSimulate == value) return;
                 _bSimulate = value;
                 OnPropertyChanged();
+                if (OnChanged != null) OnChanged(eEQ.Simulate, value);
             }
         }
-
-        public delegate void dgOnDoorOpen();
-        public event dgOnDoorOpen OnDoorOpen;
 
         bool _bDoorOpen = false;
         public bool p_bDoorOpen
@@ -136,7 +150,7 @@ namespace RootTools
                 if (_bDoorOpen == value) return;
                 _bDoorOpen = value;
                 OnPropertyChanged();
-                if (OnDoorOpen != null) OnDoorOpen(); 
+                if (OnChanged != null) OnChanged(eEQ.DoorOpen, value);
             }
         }
     }
