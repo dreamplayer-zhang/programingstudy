@@ -16,6 +16,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 using System.Threading;
 using static RootTools.Control.Axis;
 
@@ -413,6 +414,7 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_Grab45(this), false, "Run Grab 45");
             AddModuleRunList(new Run_GrabSideScan(this), false, "Run Side Scan");
             AddModuleRunList(new Run_LADS(this), false, "Run LADS");
+            AddModuleRunList(new Run_BarcodeInspection(this), false, "Run Barcode Inspection");
         }
         #endregion
 
@@ -1103,5 +1105,62 @@ namespace Root_AOP01_Inspection.Module
                 CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
             }
         }
+
+        #region Barcode Inspection
+        public class Run_BarcodeInspection : ModuleRunBase
+        {
+            MainVision m_module;
+
+            public Run_BarcodeInspection(MainVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_BarcodeInspection run = new Run_BarcodeInspection(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                
+            }
+
+            public override string Run()
+            {
+                string strPool = "MainVision.Vision Memory";
+                string strGroup = "MainVision";
+                string strMemory = "Main";
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                CPoint cptStartROIPoint = new CPoint(2447, 4667);
+                CPoint cptEndROIPoint = new CPoint(4687, 10652);
+                CRect crtROI = new CRect(cptStartROIPoint, cptEndROIPoint);
+                Mat matSrc = GetBarcodeMat(mem, crtROI);
+                Mat matBinary = new Mat();
+                CvBlobs blobs;
+                CvBlobDetector blobDetector;
+
+                // Binarization
+                CvInvoke.Threshold(matSrc, matBinary, 50, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
+
+                return "OK";
+            }
+
+            unsafe Mat GetBarcodeMat(MemoryData mem, CRect crtROI)
+            {
+                ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+                IntPtr p = mem.GetPtr();
+                img.SetData(p, crtROI, (int)mem.W);
+                img.SaveImageSync("D:\\TEST.bmp");
+                Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
+
+                return matReturn;
+            }
+
+
+        }
+        #endregion
     }
 }
