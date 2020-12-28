@@ -1,4 +1,5 @@
 ﻿using Emgu.CV;
+using Emgu.CV.Cvb;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Root_EFEM;
@@ -1110,6 +1111,13 @@ namespace Root_AOP01_Inspection.Module
         public class Run_BarcodeInspection : ModuleRunBase
         {
             MainVision m_module;
+            public int m_nGaussianBlurKernalSize = 3;
+            public double m_dGaussianBlurSigma = 1.5;
+            public AdaptiveThresholdType m_eAdabtiveThresholdType = AdaptiveThresholdType.GaussianC;
+            public ThresholdType m_eThresholdType = ThresholdType.Binary;
+            public int m_nThresholdBlockSize = 3;
+            public double m_dThresholdParam = 3;
+            public int m_nErodeSize = 3;
 
             public Run_BarcodeInspection(MainVision module)
             {
@@ -1120,12 +1128,25 @@ namespace Root_AOP01_Inspection.Module
             public override ModuleRunBase Clone()
             {
                 Run_BarcodeInspection run = new Run_BarcodeInspection(m_module);
+                run.m_nGaussianBlurKernalSize = m_nGaussianBlurKernalSize;
+                run.m_dGaussianBlurSigma = m_dGaussianBlurSigma;
+                run.m_eAdabtiveThresholdType = m_eAdabtiveThresholdType;
+                run.m_eThresholdType = m_eThresholdType;
+                run.m_nThresholdBlockSize = m_nThresholdBlockSize;
+                run.m_dThresholdParam = m_dThresholdParam;
+                run.m_nErodeSize = m_nErodeSize;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                
+                m_nGaussianBlurKernalSize = tree.Set(m_nGaussianBlurKernalSize, m_nGaussianBlurKernalSize, "GaussianBlur Kernal Size", "GaussianBlur Kernal Size", bVisible);
+                m_dGaussianBlurSigma = tree.Set(m_dGaussianBlurSigma, m_dGaussianBlurSigma, "GaussianBlur Sigma", "GaussianBlur Sigma", bVisible);
+                m_eAdabtiveThresholdType = (AdaptiveThresholdType)tree.Set(m_eAdabtiveThresholdType, m_eAdabtiveThresholdType, "Adaptive Threshold Type", "Adaptive Threshold Type", bVisible);
+                m_eThresholdType = (ThresholdType)tree.Set(m_eThresholdType, m_eThresholdType, "Threshold Type", "Threshold Type", bVisible);
+                m_nThresholdBlockSize = tree.Set(m_nThresholdBlockSize, m_nThresholdBlockSize, "Threshold Block Size", "Threshold Block Size", bVisible);
+                m_dThresholdParam = tree.Set(m_dThresholdParam, m_dThresholdParam, "Threshold Param", "Threshold Param", bVisible);
+                m_nErodeSize = tree.Set(m_nErodeSize, m_nErodeSize, "Erode Size", "Erode Size", bVisible);
             }
 
             public override string Run()
@@ -1134,16 +1155,23 @@ namespace Root_AOP01_Inspection.Module
                 string strGroup = "MainVision";
                 string strMemory = "Main";
                 MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
-                CPoint cptStartROIPoint = new CPoint(2447, 4667);
-                CPoint cptEndROIPoint = new CPoint(4687, 10652);
+                CPoint cptStartROIPoint = new CPoint(2500, 4667);
+                CPoint cptEndROIPoint = new CPoint(4600, 10652);
                 CRect crtROI = new CRect(cptStartROIPoint, cptEndROIPoint);
                 Mat matSrc = GetBarcodeMat(mem, crtROI);
                 Mat matBinary = new Mat();
-                CvBlobs blobs;
-                CvBlobDetector blobDetector;
+                Image<Gray, Byte> imgSrc;
+                CvBlobs blobs = new CvBlobs();
+                CvBlobDetector blobDetector = new CvBlobDetector();
 
-                // Binarization
-                CvInvoke.Threshold(matSrc, matBinary, 50, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
+                CvInvoke.GaussianBlur(matSrc, matBinary, new System.Drawing.Size(m_nGaussianBlurKernalSize, m_nGaussianBlurKernalSize), m_dGaussianBlurSigma);
+                CvInvoke.AdaptiveThreshold(matBinary, matBinary, 255.0, m_eAdabtiveThresholdType, m_eThresholdType, m_nThresholdBlockSize, m_dThresholdParam);
+                var element = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new System.Drawing.Size(m_nErodeSize, m_nErodeSize), new System.Drawing.Point(-1, -1));
+                CvInvoke.Dilate(matBinary, matBinary, element, new System.Drawing.Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
+                matBinary.Save("D:\\TEST.BMP");
+
+                imgSrc = matBinary.ToImage<Gray, Byte>();
+                blobDetector.Detect(imgSrc, blobs);
 
                 return "OK";
             }
