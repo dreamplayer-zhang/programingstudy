@@ -60,10 +60,10 @@ namespace Root_WIND2.Module
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
                 p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
-                p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1); 
-                p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
+                
             }
-            m_axisRotate.StartMove(1000);
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
+            p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
             m_remote.GetTools(bInit);
         }
         #endregion
