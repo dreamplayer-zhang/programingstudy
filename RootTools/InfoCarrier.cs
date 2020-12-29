@@ -1,5 +1,4 @@
-﻿using RootTools;
-using RootTools.Gem;
+﻿using RootTools.Gem;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -7,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
 
-namespace Root_EFEM
+namespace RootTools
 {
     public class InfoCarrier : GemCarrierBase, ITool
     {

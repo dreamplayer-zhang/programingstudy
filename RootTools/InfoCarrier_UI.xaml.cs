@@ -1,11 +1,12 @@
-﻿using RootTools;
-using RootTools.Trees;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using RootTools;
+using RootTools.Trees;
 
-namespace Root_EFEM
+
+namespace RootTools
 {
     /// <summary>
     /// InfoCarrier_UI.xaml에 대한 상호 작용 논리
@@ -16,7 +17,6 @@ namespace Root_EFEM
         {
             InitializeComponent();
         }
-
         InfoCarrier m_infoCarrier;
         public void Init(InfoCarrier infoCarrier)
         {
@@ -28,9 +28,8 @@ namespace Root_EFEM
             infoCarrier.RunTree(Tree.eMode.Init);
             comboBoxIndex.ItemsSource = infoCarrier.m_asGemSlot;
 
-            InitTimer(); 
+            InitTimer();
         }
-
         int GetIndex(string sWafer)
         {
             for (int n = 0; n < m_infoCarrier.m_asGemSlot.Count; n++)

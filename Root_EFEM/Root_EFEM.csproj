@@ -187,10 +187,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="InfoCarrier_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="InfoWaferChild_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -223,11 +219,6 @@
     <Compile Include="EFEM_Recipe_UI.xaml.cs">
       <DependentUpon>EFEM_Recipe_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="InfoCarrier.cs" />
-    <Compile Include="InfoCarrier_UI.xaml.cs">
-      <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="InfoWafer.cs" />
     <Compile Include="InfoWaferChild_UI.xaml.cs">
       <DependentUpon>InfoWaferChild_UI.xaml</DependentUpon>
     </Compile>
