@@ -1110,7 +1110,17 @@ namespace Root_AOP01_Inspection.Module
         #region Barcode Inspection
         public class Run_BarcodeInspection : ModuleRunBase
         {
+            public enum eSearchDirection
+            {
+                TopToBottom = 0,
+                LeftToRight,
+                RightToLeft,
+                BottomToTop,
+            }
+
             MainVision m_module;
+            public CPoint m_cptBarcodeLTPoint = new CPoint(0, 0);
+            public CPoint m_cptBarcodeRBPoint = new CPoint(0, 0);
             public int m_nGaussianBlurKernalSize = 3;
             public double m_dGaussianBlurSigma = 1.5;
             public AdaptiveThresholdType m_eAdabtiveThresholdType = AdaptiveThresholdType.GaussianC;
@@ -1128,6 +1138,8 @@ namespace Root_AOP01_Inspection.Module
             public override ModuleRunBase Clone()
             {
                 Run_BarcodeInspection run = new Run_BarcodeInspection(m_module);
+                run.m_cptBarcodeLTPoint = m_cptBarcodeLTPoint;
+                run.m_cptBarcodeRBPoint = m_cptBarcodeRBPoint;
                 run.m_nGaussianBlurKernalSize = m_nGaussianBlurKernalSize;
                 run.m_dGaussianBlurSigma = m_dGaussianBlurSigma;
                 run.m_eAdabtiveThresholdType = m_eAdabtiveThresholdType;
@@ -1140,13 +1152,18 @@ namespace Root_AOP01_Inspection.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_nGaussianBlurKernalSize = tree.Set(m_nGaussianBlurKernalSize, m_nGaussianBlurKernalSize, "GaussianBlur Kernal Size", "GaussianBlur Kernal Size", bVisible);
-                m_dGaussianBlurSigma = tree.Set(m_dGaussianBlurSigma, m_dGaussianBlurSigma, "GaussianBlur Sigma", "GaussianBlur Sigma", bVisible);
-                m_eAdabtiveThresholdType = (AdaptiveThresholdType)tree.Set(m_eAdabtiveThresholdType, m_eAdabtiveThresholdType, "Adaptive Threshold Type", "Adaptive Threshold Type", bVisible);
-                m_eThresholdType = (ThresholdType)tree.Set(m_eThresholdType, m_eThresholdType, "Threshold Type", "Threshold Type", bVisible);
-                m_nThresholdBlockSize = tree.Set(m_nThresholdBlockSize, m_nThresholdBlockSize, "Threshold Block Size", "Threshold Block Size", bVisible);
-                m_dThresholdParam = tree.Set(m_dThresholdParam, m_dThresholdParam, "Threshold Param", "Threshold Param", bVisible);
-                m_nErodeSize = tree.Set(m_nErodeSize, m_nErodeSize, "Erode Size", "Erode Size", bVisible);
+                m_cptBarcodeLTPoint = (tree.GetTree("Barcode ROI", false, bVisible)).Set(m_cptBarcodeLTPoint, m_cptBarcodeLTPoint, "Left Top Point", "Left Top Point", bVisible);
+                m_cptBarcodeRBPoint = (tree.GetTree("Barcode ROI", false, bVisible)).Set(m_cptBarcodeRBPoint, m_cptBarcodeRBPoint, "Right Bottom Point", "Right Bottom Point", bVisible);
+
+                m_nGaussianBlurKernalSize = (tree.GetTree("GaussianBlur Parameter", false, bVisible)).Set(m_nGaussianBlurKernalSize, m_nGaussianBlurKernalSize, "GaussianBlur Kernal Size", "GaussianBlur Kernal Size", bVisible);
+                m_dGaussianBlurSigma = (tree.GetTree("GaussianBlur Parameter", false, bVisible)).Set(m_dGaussianBlurSigma, m_dGaussianBlurSigma, "GaussianBlur Sigma", "GaussianBlur Sigma", bVisible);
+
+                m_eAdabtiveThresholdType = (AdaptiveThresholdType)(tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_eAdabtiveThresholdType, m_eAdabtiveThresholdType, "Adaptive Threshold Type", "Adaptive Threshold Type", bVisible);
+                m_eThresholdType = (ThresholdType)(tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_eThresholdType, m_eThresholdType, "Threshold Type", "Threshold Type", bVisible);
+                m_nThresholdBlockSize = (tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_nThresholdBlockSize, m_nThresholdBlockSize, "Threshold Block Size", "Threshold Block Size", bVisible);
+                m_dThresholdParam = (tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_dThresholdParam, m_dThresholdParam, "Threshold Param", "Threshold Param", bVisible);
+
+                m_nErodeSize = (tree.GetTree("Erode Parameter", false, bVisible)).Set(m_nErodeSize, m_nErodeSize, "Erode Size", "Erode Size", bVisible);
             }
 
             public override string Run()
@@ -1155,23 +1172,60 @@ namespace Root_AOP01_Inspection.Module
                 string strGroup = "MainVision";
                 string strMemory = "Main";
                 MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
-                CPoint cptStartROIPoint = new CPoint(2500, 4667);
-                CPoint cptEndROIPoint = new CPoint(4600, 10652);
+                CPoint cptStartROIPoint = m_cptBarcodeLTPoint;
+                CPoint cptEndROIPoint = m_cptBarcodeRBPoint;
                 CRect crtROI = new CRect(cptStartROIPoint, cptEndROIPoint);
-                Mat matSrc = GetBarcodeMat(mem, crtROI);
-                Mat matBinary = new Mat();
-                Image<Gray, Byte> imgSrc;
-                CvBlobs blobs = new CvBlobs();
-                CvBlobDetector blobDetector = new CvBlobDetector();
+                CRect crtHalfLeft = new CRect(cptStartROIPoint, new CPoint(crtROI.Center().X, cptEndROIPoint.Y));
+                CRect crtHalfRight = new CRect(new CPoint(crtROI.Center().X, cptStartROIPoint.Y), cptEndROIPoint);
 
-                CvInvoke.GaussianBlur(matSrc, matBinary, new System.Drawing.Size(m_nGaussianBlurKernalSize, m_nGaussianBlurKernalSize), m_dGaussianBlurSigma);
-                CvInvoke.AdaptiveThreshold(matBinary, matBinary, 255.0, m_eAdabtiveThresholdType, m_eThresholdType, m_nThresholdBlockSize, m_dThresholdParam);
-                var element = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new System.Drawing.Size(m_nErodeSize, m_nErodeSize), new System.Drawing.Point(-1, -1));
-                CvInvoke.Dilate(matBinary, matBinary, element, new System.Drawing.Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
-                matBinary.Save("D:\\TEST.BMP");
+                // ROI따기
+                int nTop = GetEdge(mem, crtROI, 50, eSearchDirection.TopToBottom, 70);
+                int nBottom = GetEdge(mem, crtROI, 50, eSearchDirection.BottomToTop, 70);
+                CRect crtTopBox = new CRect(new CPoint(cptStartROIPoint.X, cptStartROIPoint.Y + nTop), new CPoint(cptEndROIPoint.X, cptStartROIPoint.Y + nTop + 100));
+                int nLeft = GetEdge(mem, crtTopBox, 10, eSearchDirection.LeftToRight, 70);
+                int nRight = GetEdge(mem, crtTopBox, 10, eSearchDirection.RightToLeft, 70);
+                CRect crtBarcode = new CRect(m_cptBarcodeLTPoint.X + nLeft, m_cptBarcodeLTPoint.Y + nTop, m_cptBarcodeLTPoint.X + nRight, m_cptBarcodeLTPoint.Y + nBottom);
+                Mat matBarcode = GetBarcodeMat(mem, crtBarcode);
 
-                imgSrc = matBinary.ToImage<Gray, Byte>();
-                blobDetector.Detect(imgSrc, blobs);
+                // 회전각도 알아내기
+                int nLeftTop = GetEdge(mem, crtHalfLeft, 10, eSearchDirection.TopToBottom, 70);
+                CPoint cptLeftTop = new CPoint(crtHalfLeft.Center().X, nLeftTop);
+                int nRightTop = GetEdge(mem, crtHalfRight, 10, eSearchDirection.TopToBottom, 70);
+                CPoint cptRightTop = new CPoint(crtHalfRight.Center().X, nRightTop);
+                double dThetaRadian = Math.Atan2((double)(cptRightTop.Y - cptLeftTop.Y), (double)(cptRightTop.X - cptLeftTop.X));
+                double dThetaDegree = dThetaRadian * (180 / Math.PI);
+
+                // Barcode 회전
+                Mat matAffine = new Mat();
+                Mat matRotation = new Mat();
+                CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
+                CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
+                matRotation.Save("D:\\Rotation.bmp");
+                int y1 = 100;
+                int y2 = matRotation.Rows - 100;
+                int x1 = 100;
+                int x2 = matRotation.Cols - 100;
+                Mat matCutting = new Mat(matRotation, new Range(y1, y2), new Range(x1, x2));
+                matCutting.Save("D:\\Cutting.bmp");
+
+                // Profile 구하기
+                //byte[] barrRowProfile = GetRowProfile(matCutting);
+                Mat matSub = GetRowProfile(matCutting);
+                Mat matResult = matCutting - matSub;
+                matResult.Save("D:\\Result.bmp");
+                //// 이진화
+                //Mat matBinary = new Mat();
+                //// Gaussian Blur
+                //CvInvoke.GaussianBlur(matCutting, matBinary, new System.Drawing.Size(m_nGaussianBlurKernalSize, m_nGaussianBlurKernalSize), m_dGaussianBlurSigma);
+                //// AdaptiveThreshold
+                //CvInvoke.AdaptiveThreshold(matBinary, matBinary, 255.0, m_eAdabtiveThresholdType, m_eThresholdType, m_nThresholdBlockSize, m_dThresholdParam);
+                //// 반전
+                //CvInvoke.BitwiseNot(matBinary, matBinary);
+                //// 침식
+                //var element = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new System.Drawing.Size(m_nErodeSize, m_nErodeSize), new System.Drawing.Point(-1, -1));
+                //CvInvoke.Erode(matBinary, matBinary, element, new System.Drawing.Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
+
+                //matBinary.Save("D:\\Binary.bmp");
 
                 return "OK";
             }
@@ -1181,13 +1235,153 @@ namespace Root_AOP01_Inspection.Module
                 ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
                 IntPtr p = mem.GetPtr();
                 img.SetData(p, crtROI, (int)mem.W);
-                img.SaveImageSync("D:\\TEST.bmp");
                 Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
 
                 return matReturn;
             }
 
+            unsafe int GetEdge(MemoryData mem, CRect crtROI, int nProfileSize, eSearchDirection eDirection, int nThreshold)
+            {
+                if (nProfileSize > crtROI.Width) return 0;
 
+                // variable
+                ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+                IntPtr p = mem.GetPtr();
+                byte* bp;
+
+                // implement
+                img.SetData(p, crtROI, (int)mem.W);
+                int nCount = 0;
+                switch (eDirection)
+                {
+                    case eSearchDirection.TopToBottom:
+                        for (int y = 0; y<img.p_Size.Y; y++)
+                        {
+                            nCount = 0;
+                            bp = (byte*)img.GetPtr() + y * img.p_Stride + (img.p_Size.X / 2);
+                            for (int x = -(nProfileSize / 2); x < (nProfileSize / 2); x++)
+                            {
+                                byte* bpCurrent = bp + x;
+                                if (*bpCurrent < nThreshold) nCount++;
+                            }
+                            if (nCount == nProfileSize) return y;
+                        }
+                        break;
+                    case eSearchDirection.LeftToRight:
+                        for (int x = 0; x<img.p_Size.X; x++)
+                        {
+                            nCount = 0;
+                            bp = (byte*)img.GetPtr() + x + (img.p_Size.Y / 2) * img.p_Stride;
+                            for (int y = -(nProfileSize / 2); y < (nProfileSize / 2); y++)
+                            {
+                                byte* bpCurrent = bp + y * img.p_Stride;
+                                if (*bpCurrent < nThreshold) nCount++;
+                            }
+                            if (nCount == nProfileSize) return x;
+                        }
+                        break;
+                    case eSearchDirection.RightToLeft:
+                        for (int x = img.p_Size.X - 1; x >= 0; x--)
+                        {
+                            nCount = 0;
+                            bp = (byte*)img.GetPtr() + x + (img.p_Size.Y / 2) * img.p_Stride;
+                            for (int y = -(nProfileSize / 2); y < (nProfileSize / 2); y++)
+                            {
+                                byte* bpCurrent = bp + y * img.p_Stride;
+                                if (*bpCurrent < nThreshold) return x;
+                            }
+                        }
+                        break;
+                    case eSearchDirection.BottomToTop:
+                        for (int y = img.p_Size.Y - 2; y >= 0; y--) // img의 마지막줄은 0으로 채워질 수 있기 때문에 마지막의 전줄부터 탐색
+                        {
+                            nCount = 0;
+                            bp = (byte*)img.GetPtr() + y * img.p_Stride + (img.p_Size.X / 2);
+                            for (int x = -(nProfileSize / 2); x < (nProfileSize / 2); x++)
+                            {
+                                byte* bpCurrent = bp + x;
+                                if (*bpCurrent < nThreshold) nCount++;
+                            }
+                            if (nCount == nProfileSize) return y;
+                        }
+                        break;
+                }
+
+                return 0;
+            }
+
+            unsafe Mat GetRowProfile(Mat matSrc)
+            {
+                // variable
+                byte[] barrProfile = new byte[matSrc.Rows];
+                long lSum = 0;
+                byte* bp = null;
+                Mat matReturn = new Mat(matSrc.Size, matSrc.Depth, matSrc.NumberOfChannels);
+
+                // implement
+                for (int y = 0; y<matSrc.Rows; y++)
+                {
+                    lSum = 0;
+                    for (int x = 0; x<matSrc.Cols; x++)
+                    {
+                        bp = (byte*)matSrc.DataPointer + y * matSrc.Step + x;
+                        lSum += *bp;
+                    }
+                    barrProfile[y] = (byte)(lSum / matSrc.Cols);
+                    for (int x = 0; x<matReturn.Cols; x++)
+                    {
+                        SetValue(matReturn, y, x, barrProfile[y]);
+                    }
+                }
+                
+                return matReturn;
+            }
+
+            public void SetValue(Mat mat, int row, int col, dynamic value)
+            {
+                var target = CreateElement(mat.Depth, value);
+                Marshal.Copy(target, 0, mat.DataPointer + (row * mat.Cols + col) * mat.ElementSize, 1);
+            }
+
+            private dynamic CreateElement(DepthType depthType, dynamic value)
+            {
+                var element = CreateElement(depthType);
+                element[0] = value;
+                return element;
+            }
+
+            private dynamic CreateElement(DepthType depthType)
+            {
+                if (depthType == DepthType.Cv8S)
+                {
+                    return new sbyte[1];
+                }
+                if (depthType == DepthType.Cv8U)
+                {
+                    return new byte[1];
+                }
+                if (depthType == DepthType.Cv16S)
+                {
+                    return new short[1];
+                }
+                if (depthType == DepthType.Cv16U)
+                {
+                    return new ushort[1];
+                }
+                if (depthType == DepthType.Cv32S)
+                {
+                    return new int[1];
+                }
+                if (depthType == DepthType.Cv32F)
+                {
+                    return new float[1];
+                }
+                if (depthType == DepthType.Cv64F)
+                {
+                    return new double[1];
+                }
+                return new float[1];
+            }
         }
         #endregion
     }
