@@ -1200,7 +1200,9 @@ namespace Root_AOP01_Inspection.Module
                 Mat matRotation = new Mat();
                 CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
                 CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
-                matRotation.Save("D:\\Rotation.bmp");
+                //matRotation.Save("D:\\Rotation.bmp");
+
+                // 회전 후 외곽영역 Cutting
                 int y1 = 100;
                 int y2 = matRotation.Rows - 100;
                 int x1 = 100;
@@ -1209,23 +1211,25 @@ namespace Root_AOP01_Inspection.Module
                 matCutting.Save("D:\\Cutting.bmp");
 
                 // Profile 구하기
-                //byte[] barrRowProfile = GetRowProfile(matCutting);
-                Mat matSub = GetRowProfile(matCutting);
+                Mat matSub = GetRowProfileMat(matCutting);
+
+                // 차영상 구하기
                 Mat matResult = matCutting - matSub;
                 matResult.Save("D:\\Result.bmp");
-                //// 이진화
-                //Mat matBinary = new Mat();
-                //// Gaussian Blur
-                //CvInvoke.GaussianBlur(matCutting, matBinary, new System.Drawing.Size(m_nGaussianBlurKernalSize, m_nGaussianBlurKernalSize), m_dGaussianBlurSigma);
-                //// AdaptiveThreshold
-                //CvInvoke.AdaptiveThreshold(matBinary, matBinary, 255.0, m_eAdabtiveThresholdType, m_eThresholdType, m_nThresholdBlockSize, m_dThresholdParam);
-                //// 반전
-                //CvInvoke.BitwiseNot(matBinary, matBinary);
-                //// 침식
-                //var element = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new System.Drawing.Size(m_nErodeSize, m_nErodeSize), new System.Drawing.Point(-1, -1));
-                //CvInvoke.Erode(matBinary, matBinary, element, new System.Drawing.Point(-1, -1), 1, BorderType.Reflect, default(MCvScalar));
 
-                //matBinary.Save("D:\\Binary.bmp");
+                // 차영상에서 Blob Labeling
+                Mat matBinary = new Mat();
+                CvInvoke.Threshold(matResult, matBinary, 70, 255, ThresholdType.Binary);
+                matBinary.Save("D:\\BinaryResult.bmp");
+                CvBlobs blobs = new CvBlobs();
+                CvBlobDetector blobDetector = new CvBlobDetector();
+                Image<Gray, byte> img = matBinary.ToImage<Gray, byte>();
+                blobDetector.Detect(img, blobs);
+
+                foreach (CvBlob blob in blobs.Values)
+                {
+                    Console.WriteLine("Width:" + blob.BoundingBox.Width + ", Height:" + blob.BoundingBox.Height);
+                }
 
                 return "OK";
             }
@@ -1310,14 +1314,13 @@ namespace Root_AOP01_Inspection.Module
                 return 0;
             }
 
-            unsafe Mat GetRowProfile(Mat matSrc)
+            unsafe Mat GetRowProfileMat(Mat matSrc)
             {
                 // variable
-                byte[] barrProfile = new byte[matSrc.Rows];
                 long lSum = 0;
                 byte* bp = null;
                 Mat matReturn = new Mat(matSrc.Size, matSrc.Depth, matSrc.NumberOfChannels);
-
+                Image<Gray, byte> img = matReturn.ToImage<Gray, byte>();
                 // implement
                 for (int y = 0; y<matSrc.Rows; y++)
                 {
@@ -1327,60 +1330,14 @@ namespace Root_AOP01_Inspection.Module
                         bp = (byte*)matSrc.DataPointer + y * matSrc.Step + x;
                         lSum += *bp;
                     }
-                    barrProfile[y] = (byte)(lSum / matSrc.Cols);
                     for (int x = 0; x<matReturn.Cols; x++)
                     {
-                        SetValue(matReturn, y, x, barrProfile[y]);
+                        img.Data[y, x, 0] = (byte)(lSum / matSrc.Cols);
                     }
                 }
+                matReturn = img.Mat;
                 
                 return matReturn;
-            }
-
-            public void SetValue(Mat mat, int row, int col, dynamic value)
-            {
-                var target = CreateElement(mat.Depth, value);
-                Marshal.Copy(target, 0, mat.DataPointer + (row * mat.Cols + col) * mat.ElementSize, 1);
-            }
-
-            private dynamic CreateElement(DepthType depthType, dynamic value)
-            {
-                var element = CreateElement(depthType);
-                element[0] = value;
-                return element;
-            }
-
-            private dynamic CreateElement(DepthType depthType)
-            {
-                if (depthType == DepthType.Cv8S)
-                {
-                    return new sbyte[1];
-                }
-                if (depthType == DepthType.Cv8U)
-                {
-                    return new byte[1];
-                }
-                if (depthType == DepthType.Cv16S)
-                {
-                    return new short[1];
-                }
-                if (depthType == DepthType.Cv16U)
-                {
-                    return new ushort[1];
-                }
-                if (depthType == DepthType.Cv32S)
-                {
-                    return new int[1];
-                }
-                if (depthType == DepthType.Cv32F)
-                {
-                    return new float[1];
-                }
-                if (depthType == DepthType.Cv64F)
-                {
-                    return new double[1];
-                }
-                return new float[1];
             }
         }
         #endregion
