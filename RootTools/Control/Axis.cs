@@ -452,8 +452,10 @@ namespace RootTools.Control
             }
         }
 
-        private void M_EQ_OnDoorOpen()
+        private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
+            if (eEQ != _EQ.eEQ.DoorOpen) return;
+            if (value == false) return;
             if (p_eState != eState.Move) return;
             if (m_speedNow == null) return;
             if (m_speedNow.m_id != eSpeed.Move.ToString()) return;
@@ -838,7 +840,7 @@ namespace RootTools.Control
             InitTree(); 
             InitSetting();
             InitInterlock();
-            EQ.m_EQ.OnDoorOpen += M_EQ_OnDoorOpen;
+            EQ.m_EQ.OnChanged += M_EQ_OnChanged;
         }
     }
 }

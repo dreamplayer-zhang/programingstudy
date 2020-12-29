@@ -348,7 +348,7 @@ namespace RootTools.Module
             { 
                 switch (p_eRemote)
                 {
-                    case eRemote.Client: p_sInfo = m_remote.RemoteRun(moduleRun); break;
+                    case eRemote.Client: p_sInfo = m_remote.RemoteSend(moduleRun); break;
                     default: p_sInfo = moduleRun.Run();break; 
                 }
             }
@@ -391,22 +391,149 @@ namespace RootTools.Module
         {
             MemoryStream m_memoryStream = new MemoryStream();
 
+            #region eCmd
+            public enum eProtocol
+            {
+                EQ,
+                ModuleRun,
+            }
+
+            public class Protocol
+            {
+                public eRemote m_eRemote = eRemote.Local; 
+                public eProtocol m_eProtocol = eProtocol.EQ;
+                public string m_sCmd = "";
+                
+                string _sRun = ""; 
+                public string p_sRun
+                {
+                    get { return _sRun; }
+                    set
+                    {
+                        _sRun = value;
+                        _sSend = m_eRemote.ToString() +',' + m_eProtocol.ToString() + ',' + m_sCmd + ',' + _sRun;
+                    }
+                }
+
+                string _sSend = ""; 
+                public string p_sSend
+                {
+                    get { return _sSend; }
+                    set
+                    {
+                        _sSend = value;
+                        string[] asSend = _sSend.Split(',');
+                        try
+                        {
+                            m_eRemote = GetRemote(asSend[0]);
+                            m_eProtocol = GetProtocol(asSend[1]);
+                            m_sCmd = asSend[2];
+                            int l = asSend[0].Length + asSend[1].Length + asSend[2].Length + 3;
+                            _sRun = _sSend.Substring(l, _sSend.Length - l);
+                        }
+                        catch (Exception) { }
+                    }
+                }
+
+                public bool IsSame(Protocol protocol)
+                {
+                    if (m_eRemote != protocol.m_eRemote) return false;
+                    if (m_eProtocol != protocol.m_eProtocol) return false;
+                    if (m_sCmd != protocol.m_sCmd) return false;
+                    return true; 
+                }
+
+                public bool m_bDone = false;
+                public string WaitDone()
+                {
+                    while (m_bDone == false)
+                    {
+                        Thread.Sleep(10);
+                        if (EQ.IsStop()) return "EQ Stop";
+                    }
+                    return p_sRun; 
+                }
+
+                public Protocol(eRemote eRemote, eProtocol eProtocol, string sCmd, string sRun)
+                {
+                    m_eRemote = eRemote; 
+                    m_eProtocol = eProtocol;
+                    m_sCmd = sCmd;
+                    p_sRun = sRun;
+                }
+
+                public Protocol(string sSend) 
+                {
+                    p_sSend = sSend;
+                }
+
+                eRemote GetRemote(string sRemote)
+                {
+                    foreach (eRemote remote in Enum.GetValues(typeof(eRemote)))
+                    {
+                        if (remote.ToString() == sRemote) return remote;
+                    }
+                    return eRemote.Local;
+                }
+
+                eProtocol GetProtocol(string sProtocol)
+                {
+                    foreach (eProtocol protocol in Enum.GetValues(typeof(eProtocol)))
+                    {
+                        if (protocol.ToString() == sProtocol) return protocol; 
+                    }
+                    return eProtocol.EQ; 
+                }
+            }
+            #endregion
+
+            #region Remote EQ
+            private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
+            {
+                //RemoteSend(eProtocol.EQ, eEQ.ToString(), value.ToString());
+            }
+            #endregion
+
+            #region List Send
+            List<Protocol> m_aProtocol = new List<Protocol>(); 
+            void Send(Protocol protocol)
+            {
+                m_aProtocol.Add(protocol); 
+                switch (m_module.p_eRemote)
+                {
+                    case eRemote.Client: m_client.Send(protocol.p_sSend); break;
+                    case eRemote.Server: m_server.Send(protocol.p_sSend); break; 
+                }
+            }
+
+            void Recieve(Protocol protocol)
+            {
+                for (int n = 0; n < m_aProtocol.Count; n++)
+                {
+                    if (m_aProtocol[n].IsSame(protocol))
+                    {
+                        m_aProtocol[n].p_sRun = protocol.p_sRun; 
+                        m_aProtocol[n].m_bDone = true;
+                        m_aProtocol.RemoveAt(n);
+                        return; 
+                    }
+                }
+            }
+            #endregion
+
             #region Client
             TCPIPClient m_client;
             void InitClient(bool bInit)
             {
                 m_module.p_sInfo = m_module.m_toolBox.Get(ref m_client, m_module, "TCPIP");
-                if (bInit) m_client.EventReciveData += M_client_EventReciveData;
+                if (bInit)
+                {
+                    m_client.EventReciveData += M_client_EventReciveData;
+                    EQ.m_EQ.OnChanged += M_EQ_OnChanged;
+                }
             }
 
-            private void M_client_EventReciveData(byte[] aBuf, int nSize, Socket socket)
-            {
-                m_bWaitRemote = false;
-                m_module.p_sInfo = Encoding.Default.GetString(aBuf, 0, nSize);
-                if (m_module.p_sInfo != "OK") m_module.p_eState = eState.Error; 
-            }
-
-            public string RemoteRun(ModuleRunBase run)
+            public string RemoteSend(ModuleRunBase run)
             {
                 m_memoryStream = new MemoryStream();
                 m_treeRoot.m_job = new Job(m_memoryStream, true, m_log);
@@ -414,20 +541,29 @@ namespace RootTools.Module
                 run.RunTree(m_treeRoot, true);
                 m_treeRoot.m_job.Close();
                 string sRun = m_treeRoot.m_job.m_sMemory;
-                m_bWaitRemote = true; 
-                m_client.Send(run.m_sModuleRun + "," + sRun);
+                Protocol protocol = new Protocol(m_module.p_eRemote, eProtocol.ModuleRun, run.m_sModuleRun, sRun); 
+                Send(protocol);
                 m_memoryStream.Close();
-                WaitDone();
+                m_module.p_sInfo = protocol.WaitDone();
                 return m_module.p_sInfo; 
             }
 
-            bool m_bWaitRemote = false; 
-            void WaitDone()
+            public string RemoteSend(eProtocol eProtocol, string sCmd, string sRun)
             {
-                while (m_bWaitRemote)
+                Protocol protocol = new Protocol(m_module.p_eRemote, eProtocol, sCmd, sRun);
+                Send(protocol);
+                m_module.p_sInfo = protocol.WaitDone();
+                return m_module.p_sInfo;
+            }
+
+            private void M_client_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+            {
+                string sSend = Encoding.Default.GetString(aBuf, 0, nSize);
+                if (sSend.Length <= 0) return;
+                Protocol protocol = new Protocol(sSend);
+                if (protocol.m_eRemote == m_module.p_eRemote) Recieve(protocol);
+                else
                 {
-                    Thread.Sleep(10);
-                    if (EQ.IsStop()) return; 
                 }
             }
             #endregion
@@ -437,29 +573,48 @@ namespace RootTools.Module
             void InitServer(bool bInit)
             {
                 m_module.p_sInfo = m_module.m_toolBox.Get(ref m_server, m_module, "TCPIP");
-                if (bInit) m_server.EventReciveData += M_server_EventReciveData;
+                if (bInit)
+                {
+                    m_server.EventReciveData += M_server_EventReciveData;
+                    EQ.m_EQ.OnChanged += M_EQ_OnChanged;
+                }
             }
 
             private void M_server_EventReciveData(byte[] aBuf, int nSize, Socket socket)
             {
-                string sCmd = Encoding.Default.GetString(aBuf, 0, nSize);
-                string[] asCmd = sCmd.Split(',');
-                ModuleRunBase run = m_module.CloneModuleRun(asCmd[0]);
-                if (run == null) m_server.Send("Unknown Cmd");
-                sCmd = sCmd.Substring(asCmd[0].Length + 1, sCmd.Length - asCmd[0].Length - 1);
-                ServerRun(run, sCmd);
+                string sSend = Encoding.Default.GetString(aBuf, 0, nSize);
+                if (sSend.Length <= 0) return;
+                Protocol protocol = new Protocol(sSend);
+                if (protocol.m_eRemote == m_module.p_eRemote) Recieve(protocol);
+                else
+                {
+                    switch (protocol.m_eProtocol)
+                    {
+                        case eProtocol.ModuleRun: ServerModuleRun(protocol); break;
+                        default:
+                            break;
+                    }
+                }
             }
 
-            void ServerRun(ModuleRunBase run, string sCmd)
+            void ServerModuleRun(Protocol protocol)
             {
-                m_memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(sCmd));
+                ModuleRunBase run = m_module.CloneModuleRun(protocol.m_sCmd);
+                if (run == null)
+                {
+                    protocol.p_sRun = "Unknown Cmd";
+                    Send(protocol);
+                    return; 
+                }
+                m_memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(protocol.p_sRun));
                 m_treeRoot.m_job = new Job(m_memoryStream, false, m_log);
                 m_treeRoot.p_eMode = Tree.eMode.JobOpen;
                 run.RunTree(m_treeRoot, true);
                 m_treeRoot.m_job.Close();
                 m_module.StartRun(run);
                 while (m_module.IsBusy()) Thread.Sleep(10);
-                m_server.Send(m_module.p_sInfo);
+                protocol.p_sRun = m_module.p_sInfo; 
+                Send(protocol);
                 m_memoryStream.Close();
             }
             #endregion
