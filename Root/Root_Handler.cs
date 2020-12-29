@@ -20,8 +20,8 @@ namespace Root
         //public TestMars m_testMars;
         public TestRepeat m_testRepeat;
         //public ReadExcel m_readExcel;
-        //public RemoteModule m_remote;
-        //public RemoteModule m_server;
+        public RemoteModule m_remote;
+        public RemoteModule m_server;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -41,10 +41,10 @@ namespace Root
             InitModule(m_testRepeat);
             //m_readExcel = new ReadExcel("ReadExcel", m_engineer);
             //InitModule(m_readExcel);
-            //m_server = new RemoteModule("Server", m_engineer, ModuleBase.eRemote.Server);
-            //InitModule(m_server);
-            //m_remote = new RemoteModule("Remote", m_engineer, ModuleBase.eRemote.Client);
-            //InitModule(m_remote);
+            m_server = new RemoteModule("Server", m_engineer, ModuleBase.eRemote.Server);
+            InitModule(m_server);
+            m_remote = new RemoteModule("Remote", m_engineer, ModuleBase.eRemote.Client);
+            InitModule(m_remote);
         }
 
         void InitModule(ModuleBase module)

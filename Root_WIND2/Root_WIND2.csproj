@@ -237,6 +237,7 @@
     <Compile Include="EdgeResult.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />
+    <Compile Include="Module\Vision\Run_VisionAlign.cs" />
     <Compile Include="WIND2EventArgs.cs" />
     <Compile Include="WIND2EventManager.cs" />
     <Compile Include="Module\BackSideVision.cs" />

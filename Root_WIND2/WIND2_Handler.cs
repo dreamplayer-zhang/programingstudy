@@ -63,12 +63,17 @@ namespace Root_WIND2
                 case WIND2_Engineer.eMode.Vision: InitVisionModule(); break; 
                 case WIND2_Engineer.eMode.EFEM: InitEFEMModule(); break;
             }
+
+            
         }
 
         void InitVisionModule()
         {
             m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_vision);
+
+            m_edgesideVision = new EdgeSideVision("EdgeSide Vision", m_engineer);
+            InitModule(m_edgesideVision);
         }
 
         void InitEFEMModule()
@@ -77,8 +82,7 @@ namespace Root_WIND2
             IWTR iWTR = (IWTR)m_wtr;
             InitLoadport();
             InitAligner();
-            m_edgesideVision = new EdgeSideVision("EdgeSide Vision", m_engineer);
-            InitModule(m_edgesideVision);
+            
             iWTR.AddChild(m_edgesideVision);
             m_backSideVision = new BackSideVision("BackSide Vision", m_engineer);
             InitModule(m_backSideVision);
