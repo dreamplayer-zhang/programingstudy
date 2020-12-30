@@ -11,9 +11,9 @@ using RootTools_Vision.Inspection;
 
 namespace Root_WIND2
 {
-	public class InspectionManager_EFEM : WorkFactory
+	public class InspectionManagerEdge : WorkFactory
 	{
-		public InspectionManager_EFEM(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt)
+		public InspectionManagerEdge(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt)
 		{
 			this.sharedBuffer = _sharedBuffer;
 			this.sharedBufferWidth = _width;
@@ -155,10 +155,6 @@ namespace Root_WIND2
 			*/
 		}
 
-		public override bool CreateInspecion_Backside(Recipe _recipe)
-		{
-			throw new NotImplementedException();
-		}
 
 		public new void Start()
 		{

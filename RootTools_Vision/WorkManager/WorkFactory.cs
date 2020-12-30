@@ -19,7 +19,7 @@ namespace RootTools_Vision
         protected abstract void InitWorkManager();
 
         public abstract bool CreateInspection(Recipe _recipe);
-        public abstract bool CreateInspecion_Backside(Recipe _recipe);
+
         public void  Init()
         {
             workManagers = new List<WorkManager>();

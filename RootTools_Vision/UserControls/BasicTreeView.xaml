@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="RootTools_Vision.UserControls.BasicTreeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RootTools_Vision.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="111" d:DesignWidth="233">
+    <UserControl.Resources>
+
+    </UserControl.Resources>
+    
+
+    <Grid>
+        <TreeView>
+            <TreeViewItem Header="AAAA" IsExpanded="True">
+                <TreeViewItem Header="BBBB"/>
+            </TreeViewItem>
+            <TreeViewItem Header="CCCC">
+                <TreeViewItem Header="DDDD"/>
+            </TreeViewItem>
+            <TreeViewItem Header="EEEE">
+                <TreeViewItem Header="FFFF"/>
+            </TreeViewItem>
+        </TreeView>
+    </Grid>
+</UserControl>

@@ -156,7 +156,9 @@ namespace RootTools_Vision
 
         public object GetPreworkData(PREWORKDATA_KEY key)
         {
-            return this.preworkdataDicitonary[key];
+            if (preworkdataDicitonary.Count == 0) return null;
+
+            return this.preworkdataDicitonary[key];   
         }
 
 

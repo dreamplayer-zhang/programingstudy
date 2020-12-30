@@ -32,6 +32,9 @@ namespace Root_WIND2
         public Setup_ViewModel SetupViewModel { get => setupViewModel; set => setupViewModel = value; }
         internal Review_ViewModel ReviewViewModel { get => reviewViewModel; set => reviewViewModel = value; }
         internal Run_ViewModel RunViewModel { get => runViewModel; set => runViewModel = value; }
+        public SettingDialog SettingDialog { get => settingDialog; set => settingDialog = value; }
+
+
 
         #region WPF member
         private Grid mainPanel;
@@ -42,20 +45,28 @@ namespace Root_WIND2
         private Setup setupWindow;
         private Review reviewWindow;
         private Run runWindow;
+
+        private SettingDialog settingDialog;
         #endregion
 
         #region ViewModel
         private Setup_ViewModel setupViewModel;
         private Review_ViewModel reviewViewModel;
         private Run_ViewModel runViewModel;
+
+        private SettingDialog_ViewModel settingDialogViewModel;
         #endregion
 
         public bool Initialize(ProgramManager program)
         {
+            // Main UI
             InitModeSelect();
             InitSetupMode(program);
             InitReviewMode(program);
             InitRunMode();
+
+            // 기타 UI
+            InitSettingDialog();
 
             return true;
         }
@@ -68,7 +79,7 @@ namespace Root_WIND2
         void InitSetupMode(ProgramManager program)
         {
             setupWindow = new Setup();
-            setupViewModel = new Setup_ViewModel(program.Recipe, program.InspectionVision, program.InspectionEFEM);
+            setupViewModel = new Setup_ViewModel(program.Recipe, program.InspectionFront, program.InspectionEdge);
             setupWindow.DataContext = SetupViewModel;
         }
         void InitReviewMode(ProgramManager program)
@@ -82,6 +93,14 @@ namespace Root_WIND2
             runWindow = new Run();
             runViewModel = new Run_ViewModel();
             runWindow.DataContext = runViewModel;
+        }
+
+        void InitSettingDialog()
+        {
+            settingDialog = new SettingDialog();
+            settingDialogViewModel = new SettingDialog_ViewModel();
+            settingDialog.DataContext = settingDialogViewModel;
+            settingDialogViewModel.Init();
         }
 
         public void ChangeMainUI(UIElement window)

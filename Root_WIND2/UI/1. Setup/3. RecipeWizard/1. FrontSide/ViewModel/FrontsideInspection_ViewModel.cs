@@ -22,11 +22,10 @@ using System.IO;
 
 namespace Root_WIND2
 {
-    class InspTest_ViewModel : ObservableObject
+    class FronsideInspection_ViewModel : ObservableObject
     {
         Setup_ViewModel m_Setup;
         Recipe m_Recipe;
-        private readonly IDialogService m_DialogService;
 
         private MapControl_ViewModel m_MapControl_VM;
         public MapControl_ViewModel p_MapControl_VM
@@ -41,20 +40,18 @@ namespace Root_WIND2
             }
         }
 
-        private DrawTool_ViewModel m_DrawTool_VM;
-        public DrawTool_ViewModel p_DrawTool_VM
+        private FronsideInspection_ImageViewer_ViewModel m_ImageViewer_VM;
+        public FronsideInspection_ImageViewer_ViewModel p_ImageViewer_VM
         {
             get
             {
-                return m_DrawTool_VM;
+                return m_ImageViewer_VM;
             }
             set
             {
-                SetProperty(ref m_DrawTool_VM, value);
+                SetProperty(ref m_ImageViewer_VM, value);
             }
         }
-        public InspTestPanel Main;
-        public InspTestPage InspTest;
 
         private Database_DataView_VM m_DataViewer_VM = new Database_DataView_VM();
         public DispatcherTimer timer;
@@ -66,36 +63,85 @@ namespace Root_WIND2
         }
 
 
-        public InspTest_ViewModel(Setup_ViewModel setup)
+        public void init(Setup_ViewModel setup)
         {
             m_Setup = setup;
             m_Recipe = setup.Recipe;
 
-            init(setup);
-            m_DialogService = ProgramManager.Instance.DialogService;
-             
-        }
-
-        public void init(Setup_ViewModel setup)
-        { 
-            Main = new InspTestPanel();
-            InspTest = new InspTestPage();
-
             p_MapControl_VM = new MapControl_ViewModel(m_Setup.InspectionVision);
-            p_DrawTool_VM = new DrawTool_ViewModel();
-            p_DrawTool_VM.DrawDone += DrawDone_Callback;
+            p_ImageViewer_VM = new FronsideInspection_ImageViewer_ViewModel();
+            p_ImageViewer_VM.DrawDone += DrawDone_Callback;
 
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromTicks(100000);
             timer.Tick += new EventHandler(timer_Tick);
-            //zDatabaseManager.Instance.SetDatabase(1);
+            //DatabaseManager.Instance.SetDatabase(1);
 
+            WorkEventManager.PositionDone += PositionDone_Callback;
+            WorkEventManager.InspectionDone += SurfaceInspDone_Callback;
+            WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
+        }
+
+        object lockObj = new object();
+        private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
+        {
+            Workplace workplace = obj as Workplace;
+            lock (this.lockObj)
+            {
+                Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+                {
+                    String test = "";
+                    if (true) // Display Option : Position Trans
+                    {
+                        test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
+                    }
+                    if (workplace.Index == 0)
+                        DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
+                    else
+                        DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
+                }));
+            }
+        }
+        private void SurfaceInspDone_Callback(object obj, InspectionDoneEventArgs args)
+        {
+            Workplace workplace = obj as Workplace;
+            List<String> textList = new List<String>();
+            List<CRect> rectList = new List<CRect>();
+            foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+            {
+                String text = "";
+
+                if (false) // Display Option : Rel Position
+                    text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
+                if (false) // Display Option : Defect Size
+                    text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
+                if (false) // Display Option : GV Value
+                    text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
+
+                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+                textList.Add(text);
+            }
+
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            {
+                    DrawRectDefect(rectList, textList, args.reDraw);
+            }));
+        }
+
+        private void ProcessDefectDone_Callback(object obj, PocessDefectDoneEventArgs args)
+        {
+            Workplace workplace = obj as Workplace;
+
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            {
+                    UpdateDataGrid();
+            }));
         }
 
         private void DrawDone_Callback(CPoint leftTop, CPoint rightBottom)
         {
-            p_DrawTool_VM.Clear();
-            this.m_DrawTool_VM.DrawRect(leftTop, rightBottom, DrawTool_ViewModel.ColorType.FeatureMatchingFail);
+            p_ImageViewer_VM.Clear();
+            this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, FronsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatchingFail);
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -121,12 +167,12 @@ namespace Root_WIND2
             }
 
 
-            Main.SubPanel.Children.Clear();
-            Main.SubPanel.Children.Add(page);
+            //Main.SubPanel.Children.Clear();
+            //Main.SubPanel.Children.Add(page);
 
-            p_DrawTool_VM.Clear();
+            p_ImageViewer_VM.Clear();
         }
-        
+
 
         public ICommand btnInspTestStart
         {
@@ -157,29 +203,29 @@ namespace Root_WIND2
             }
         }
 
-        public void DrawRectMasterFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text , bool bSuccess)
+        public void DrawRectMasterFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text, bool bSuccess)
         {
-            p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, DrawTool_ViewModel.ColorType.MasterFeature);
-            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess?DrawTool_ViewModel.ColorType.FeatureMatching : DrawTool_ViewModel.ColorType.FeatureMatchingFail, text);
+            p_ImageViewer_VM.DrawRect(ptOldStart, ptOldEnd, FronsideInspection_ImageViewer_ViewModel.ColorType.MasterFeature);
+            p_ImageViewer_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess ? FronsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatching : FronsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatchingFail, text);
         }
 
         public void DrawRectShotFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text)
         {
-            p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, DrawTool_ViewModel.ColorType.ShotFeature);
-            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, DrawTool_ViewModel.ColorType.FeatureMatching, text);
+            p_ImageViewer_VM.DrawRect(ptOldStart, ptOldEnd, FronsideInspection_ImageViewer_ViewModel.ColorType.ShotFeature);
+            p_ImageViewer_VM.DrawRect(ptNewStart, ptNewEnd, FronsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatching, text);
         }
 
         public void DrawRectChipFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text, bool bSuccess)
         {
-            p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, DrawTool_ViewModel.ColorType.ChipFeature);
-            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess ? DrawTool_ViewModel.ColorType.FeatureMatching : DrawTool_ViewModel.ColorType.FeatureMatchingFail, text);
+            p_ImageViewer_VM.DrawRect(ptOldStart, ptOldEnd, FronsideInspection_ImageViewer_ViewModel.ColorType.ChipFeature);
+            p_ImageViewer_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess ? FronsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatching : FronsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatchingFail, text);
         }
         public void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
         {
-            if(reDraw)
-                p_DrawTool_VM.Clear();
+            if (reDraw)
+                p_ImageViewer_VM.Clear();
 
-            p_DrawTool_VM.DrawRect(rectList, DrawTool_ViewModel.ColorType.Defect, text);
+            p_ImageViewer_VM.DrawRect(rectList, FronsideInspection_ImageViewer_ViewModel.ColorType.Defect, text);
         }
 
         public void UpdateDataGrid()
@@ -202,8 +248,8 @@ namespace Root_WIND2
             // 예외처리 필요 if (rect.Width % 4 != 0) >> 처리가 잘못되는듯...
 
             //int byteCnt = p_DrawTool_VM.p_ImageData.p_nByte;
-            int _width = p_DrawTool_VM.p_ImageData.p_Size.X;
-            int _height = p_DrawTool_VM.p_ImageData.p_Size.X;
+            int _width = p_ImageViewer_VM.p_ImageData.p_Size.X;
+            int _height = p_ImageViewer_VM.p_ImageData.p_Size.X;
 
             FileStream fs = new FileStream(Path, FileMode.Create, FileAccess.Write);
             BinaryWriter bw = new BinaryWriter(fs);
@@ -255,17 +301,17 @@ namespace Root_WIND2
                 rect.Right += 4 - rect.Width % 4;
             }
 
-            if(byteCnt == 1)
+            if (byteCnt == 1)
             {
                 unsafe
                 {
                     byte[] aBuf = new byte[byteCnt * rect.Width];
 
-                    byte* ptr = (byte*)p_DrawTool_VM.p_ImageData.GetPtr(temp);
+                    byte* ptr = (byte*)p_ImageViewer_VM.p_ImageData.GetPtr(temp);
 
                     for (int i = 0; i < rect.Bottom; i++)
                     {
-                        ptr += p_DrawTool_VM.p_ImageData.p_Size.X;
+                        ptr += p_ImageViewer_VM.p_ImageData.p_Size.X;
                     }
 
                     for (int i = 0; i < rect.Height; i++)
@@ -277,7 +323,7 @@ namespace Root_WIND2
 
                         }
 
-                        ptr -= p_DrawTool_VM.p_ImageData.p_Size.X;
+                        ptr -= p_ImageViewer_VM.p_ImageData.p_Size.X;
 
                         bw.Write(aBuf);
                     }
@@ -287,17 +333,17 @@ namespace Root_WIND2
             {
                 unsafe
                 {
-                    byte* ptrR = (byte*)p_DrawTool_VM.p_ImageData.GetPtr(0);
-                    byte* ptrG = (byte*)p_DrawTool_VM.p_ImageData.GetPtr(1);
-                    byte* ptrB = (byte*)p_DrawTool_VM.p_ImageData.GetPtr(2);
+                    byte* ptrR = (byte*)p_ImageViewer_VM.p_ImageData.GetPtr(0);
+                    byte* ptrG = (byte*)p_ImageViewer_VM.p_ImageData.GetPtr(1);
+                    byte* ptrB = (byte*)p_ImageViewer_VM.p_ImageData.GetPtr(2);
 
                     byte[] aBuf = new byte[byteCnt * rect.Width];
 
                     for (int i = 0; i < rect.Bottom; i++)
                     {
-                        ptrR += p_DrawTool_VM.p_ImageData.p_Size.X;
-                        ptrG += p_DrawTool_VM.p_ImageData.p_Size.X;
-                        ptrB += p_DrawTool_VM.p_ImageData.p_Size.X;
+                        ptrR += p_ImageViewer_VM.p_ImageData.p_Size.X;
+                        ptrG += p_ImageViewer_VM.p_ImageData.p_Size.X;
+                        ptrB += p_ImageViewer_VM.p_ImageData.p_Size.X;
                     }
 
                     for (int i = 0; i < rect.Height; i++)
@@ -310,9 +356,9 @@ namespace Root_WIND2
 
                         }
 
-                        ptrR -= p_DrawTool_VM.p_ImageData.p_Size.X;
-                        ptrG -= p_DrawTool_VM.p_ImageData.p_Size.X;
-                        ptrB -= p_DrawTool_VM.p_ImageData.p_Size.X;
+                        ptrR -= p_ImageViewer_VM.p_ImageData.p_Size.X;
+                        ptrG -= p_ImageViewer_VM.p_ImageData.p_Size.X;
+                        ptrB -= p_ImageViewer_VM.p_ImageData.p_Size.X;
 
                         bw.Write(aBuf);
                     }
@@ -332,7 +378,7 @@ namespace Root_WIND2
             }
             Run_GrabLineScan Grab = (Run_GrabLineScan)vision.CloneModuleRun("GrabLineScan");
             var viewModel = new Dialog_Scan_ViewModel(vision, Grab);
-            Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+            Nullable<bool> result = ProgramManager.Instance.DialogService.ShowDialog(viewModel);
             if (result.HasValue)
             {
                 if (result.Value)
@@ -359,32 +405,46 @@ namespace Root_WIND2
 
             //m_Setup.InspectionManager.Recipe.GetParameter().Save();
 
-            p_DrawTool_VM.Clear();
-            
-            IntPtr SharedBuf = new IntPtr();
-            if (p_DrawTool_VM.p_ImageData.p_nByte == 3)
-            {
-                if (p_DrawTool_VM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
-                    SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr((int)p_DrawTool_VM.p_eColorViewMode - 1);
-                else // All 일때는 R채널로...
-                    SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr(0);
+            p_ImageViewer_VM.Clear();
 
-                m_Setup.InspectionVision.SetWorkplaceBuffer(SharedBuf, p_DrawTool_VM.p_ImageData.GetPtr(0), p_DrawTool_VM.p_ImageData.GetPtr(1), p_DrawTool_VM.p_ImageData.GetPtr(2));
+            IntPtr SharedBuf = new IntPtr();
+            if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
+            {
+                if (p_ImageViewer_VM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
+                    SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr((int)p_ImageViewer_VM.p_eColorViewMode - 1);
+                else // All 일때는 R채널로...
+                    SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr(0);
+
+                m_Setup.InspectionVision.SetWorkplaceBuffer(SharedBuf, p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
             }
             else
-            { 
-                SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr();
+            {
+                SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr();
                 m_Setup.InspectionVision.SharedBuffer = SharedBuf;
             }
-            
-            m_Setup.InspectionVision.SharedBufferByteCnt = p_DrawTool_VM.p_ImageData.p_nByte;
-            
-            if(m_Setup.InspectionVision.CreateInspection() == false)
+
+            m_Setup.InspectionVision.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
+
+            if (m_Setup.InspectionVision.CreateInspection() == false)
             {
                 return;
             }
             m_Setup.InspectionVision.Start(false);
 
+        }
+
+
+        public void LoadInspTestData()
+        {
+            RecipeType_WaferMap mapdata = m_Recipe.WaferMap;
+            if (mapdata.Data != null)
+            {
+                int nMapX = mapdata.MapSizeX;
+                int nMapY = mapdata.MapSizeY;
+
+                p_MapControl_VM.SetMap(mapdata.Data, new CPoint(nMapX, nMapY));
+                p_MapControl_VM.CreateMapUI();
+            }
         }
     }
 }
