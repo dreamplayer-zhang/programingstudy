@@ -749,7 +749,7 @@ namespace Root_AOP01_Inspection.Module
             }
             public override ModuleRunBase Clone()
             {
-                Run_Grab run = new Run_Grab(m_module);
+                Run_Grab45 run = new Run_Grab45(m_module);
                 run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
                 run.m_cpMemoryOffset = new CPoint(m_cpMemoryOffset);
                 run.m_dResX_um = m_dResX_um;
@@ -799,7 +799,7 @@ namespace Root_AOP01_Inspection.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                     int nReticleSizeY_px = Convert.ToInt32(m_nReticleSize_mm * nMMPerUM / m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
-                    int nScanOffset_pulse = 100000; //가속버퍼구간
+                    int nScanOffset_pulse = 500000; //가속버퍼구간
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
@@ -829,7 +829,7 @@ namespace Root_AOP01_Inspection.Module
                         double dTriggerDistance = Math.Abs(dTriggerEndPosY - dTriggerStartPosY);
                         double dSection = dTriggerDistance / ladsinfos[nScanLine].m_Heightinfo.Length;
                         double[] darrScanAxisPos = new double[ladsinfos[nScanLine].m_Heightinfo.Length];
-                        for (int i = 0; i<darrScanAxisPos.Length; i++)
+                        for (int i = 0; i < darrScanAxisPos.Length; i++)
                         {
                             if (dTriggerStartPosY > dTriggerEndPosY)
                                 darrScanAxisPos[i] = dTriggerStartPosY - (dSection * i);
@@ -837,7 +837,7 @@ namespace Root_AOP01_Inspection.Module
                                 darrScanAxisPos[i] = dTriggerStartPosY + (dSection * i);
                         }
                         SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, darrScanAxisPos, ladsinfos[nScanLine].m_Heightinfo, ladsinfos[nScanLine].m_Heightinfo.Length, false);
-
+                        
                         string strPool = m_grabMode.m_memoryPool.p_id;
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
                         string strMemory = m_grabMode.m_memoryData.p_id;
@@ -845,10 +845,21 @@ namespace Root_AOP01_Inspection.Module
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
-                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady()))
-                            return p_sInfo;
+
+                        CAXM.AxmContiStart(((AjinAxis)axisXY.p_axisY).m_nAxis, 0, 0);
+                        Thread.Sleep(10);
+                        uint unRunning = 0;
+                        while (true)
+                        {
+                            CAXM.AxmContiIsMotion(((AjinAxis)axisXY.p_axisY).m_nAxis, ref unRunning);
+                            if (unRunning == 0) break;
+                            Thread.Sleep(100);
+                        }
+
+                        //if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
+                        //    return p_sInfo;
+                        //if (m_module.Run(axisXY.WaitReady()))
+                        //    return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
                         nScanLine++;
@@ -980,6 +991,7 @@ namespace Root_AOP01_Inspection.Module
                 try
                 {
                     m_grabMode.SetLight(true);
+                    ladsinfos.Clear();
 
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
@@ -1087,7 +1099,7 @@ namespace Root_AOP01_Inspection.Module
                     {
                         Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1);
                         //double nScalednum = (ladsInfo.m_Heightinfo[y,x]-110) * 255 / nCamHeight;
-                        double nScalednum = (ladsinfos[nX].m_Heightinfo[y] - 110) * 255 / nCamHeight;
+                        double nScalednum = (ladsinfos[x].m_Heightinfo[y] - 110) * 255 / nCamHeight;
                         ColorImg.SetTo(new MCvScalar(nScalednum*20));
 
                         if (y == 0)
