@@ -251,11 +251,19 @@
                                         <DataGridTemplateColumn Header="Mask" Width="*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <ComboBox     ItemsSource="{Binding p_cMask}"
+                                                    
+                                                    <!--<ComboBox     ItemsSource="{Binding p_cMask}"
                                                                   SelectedItem="{Binding p_Mask, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                   IsSynchronizedWithCurrentItem="False"
                                                                   DisplayMemberPath="p_sName"
                                                                   BorderThickness="1"
+                                                                  VerticalContentAlignment="Center">-->
+                                                    <ComboBox     ItemsSource="{Binding p_cInspROI}"
+                                                                  SelectedItem="{Binding p_InspROI, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  IsSynchronizedWithCurrentItem="False"
+                                                                  BorderThickness="1"
+                                                                  DisplayMemberPath="p_Index"
+                                                                  HorizontalContentAlignment="Center"
                                                                   VerticalContentAlignment="Center">
                                                         <i:Interaction.Triggers>
                                                             <i:EventTrigger EventName="SelectionChanged">
@@ -269,8 +277,8 @@
                                         <DataGridTemplateColumn Header="Color" Width="*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Grid Margin="2" Opacity="0.5" 
-                                                              Background="{Binding p_Mask.p_Color, 
+                                                    <Grid Margin="2"
+                                                          Background="{Binding p_InspROI.p_Color, 
                                                               Converter={StaticResource ColorConverter}}"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>

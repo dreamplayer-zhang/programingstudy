@@ -1,6 +1,7 @@
 ﻿using Root_ASIS.AOI;
 using RootTools;
 using RootTools.Camera.BaslerPylon;
+using RootTools.Control;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
@@ -11,10 +12,18 @@ namespace Root.Module
     public class TestRepeat : ModuleBase
     {
         #region ToolBox
+        Axis m_axis0;
+        Axis m_axis1;
+        Axis m_axis2;
+        Axis m_axis3;
         public MemoryPool m_memoryPool;
         CameraBasler m_cam;
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_axis0, this, "Axis0");
+            p_sInfo = m_toolBox.Get(ref m_axis1, this, "Axis1");
+            p_sInfo = m_toolBox.Get(ref m_axis2, this, "Axis2");
+            p_sInfo = m_toolBox.Get(ref m_axis3, this, "Axis3");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_cam, this, "Camera");
             if (bInit)

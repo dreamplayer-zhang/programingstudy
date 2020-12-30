@@ -50,17 +50,21 @@ namespace Root_WIND2.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
-            p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory",1);
+            if (p_eRemote != eRemote.Client)
+            {
+                p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
+                p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
+                p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
+                p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
+                p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
+                p_sInfo = m_toolBox.Get(ref m_lightSet, this);
+                p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
+                p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
+                
+            }
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
-            p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
-            p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
-            m_axisRotate.StartMove(1000);
+            m_remote.GetTools(bInit);
         }
         #endregion
 
@@ -258,12 +262,19 @@ namespace Root_WIND2.Module
             return "OK";
         }
 
-        public bool IsWaferExist(int nID, bool bIgnoreExistSensor = false)
+        enum eCheckWafer
         {
-            if (bIgnoreExistSensor)
-                return (p_infoWafer != null);
-            //            return m_diWaferExist.p_bIn;
-            return false;
+            InfoWafer,
+            Sensor
+        }
+        eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
+        public bool IsWaferExist(int nID)
+        {
+            switch (m_eCheckWafer)
+            {
+                case eCheckWafer.Sensor: return false; // m_diWaferExist.p_bIn;
+                default: return (p_infoWafer != null);
+            }
         }
 
         InfoWafer.WaferSize m_waferSize;
@@ -325,11 +336,11 @@ namespace Root_WIND2.Module
         }
         #endregion
 
-        public Vision(string id, IEngineer engineer)
+        public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
             //            InitLineScan();
             //            InitAreaScan();
-            base.InitBase(id, engineer);
+            base.InitBase(id, engineer, eRemote);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             //            InitMemory();
         }

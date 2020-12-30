@@ -41,7 +41,6 @@ namespace Root_CAMELLIA
             SetViewRect();
             InitLayer();
             UpdateLayerGridView();
-            //InitLayerGrid();
         }
         public void Init()
         {
@@ -60,10 +59,6 @@ namespace Root_CAMELLIA
             PointCount = "0";
             Percentage = "0";
             ZoomScale = 1;
-
-            //StageMainView
-            //VerticalScroll.Value = VerticalScroll.Minimum;
-            //HorizontalScroll.Value = HorizontalScroll.Minimum;
 
             CenterX = (int)(1000 * 0.5f);
             CenterY = (int)(1000 * 0.5f);
@@ -557,11 +552,11 @@ namespace Root_CAMELLIA
             }
             set
             {
-                int val;
+                int val = 0;
                 if (value == "")
                 {
-                    _VISIntegrationTime = "0";
-                    dataManager.recipeDM.TeachingRD.VISIntegrationTime = 0;
+                    _VISIntegrationTime = val.ToString();
+                    dataManager.recipeDM.TeachingRD.VISIntegrationTime = val;
                 }
                 else if (int.TryParse(value, out val))
                 {
@@ -651,8 +646,9 @@ namespace Root_CAMELLIA
             }
         }
 
-        private float _DampingFactor = 0.0f;
-        public float DampingFactor
+        //private float _DampingFactor = 0.0f;
+        private string _DampingFactor = "0.00";
+        public string DampingFactor
         {
             get
             {
@@ -660,9 +656,34 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _DampingFactor = value;
-                dataManager.recipeDM.TeachingRD.DampingFactor = _DampingFactor;
+                float val = 0.0f;
+                if (float.TryParse(value, out val))
+                {
+                    _DampingFactor = val.ToString("N2");
+                }
+                else
+                {
+                    _DampingFactor = dataManager.recipeDM.TeachingRD.DampingFactor.ToString("N2");
+                    val = dataManager.recipeDM.TeachingRD.DampingFactor;
+                }
+                dataManager.recipeDM.TeachingRD.DampingFactor = val;
                 RaisePropertyChanged("DampingFactor");
+                //if (value == "")
+                //{
+                //    _DampingFactor = dataManager.recipeDM.TeachingRD.DampingFactor.ToString("N2");
+                //    val = dataManager.recipeDM.TeachingRD.DampingFactor;
+                //}
+                //else if (float.TryParse(value, out val))
+                //{
+                //    _DampingFactor = val.ToString("N2");
+                //}
+                //else
+                //{
+                //    _DampingFactor = dataManager.recipeDM.TeachingRD.DampingFactor.ToString("N2");
+                //    val = dataManager.recipeDM.TeachingRD.DampingFactor;
+                //}
+                //dataManager.recipeDM.TeachingRD.DampingFactor = val;
+
             }
         }
 
@@ -1100,7 +1121,7 @@ namespace Root_CAMELLIA
         public void OnMouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
             UIElement el = sender as UIElement;
-            el.Focus();
+            //el.Focus();
             StageMouseHover = true;
             StageMouseHoverUpdate = false;
         }
@@ -1114,7 +1135,7 @@ namespace Root_CAMELLIA
 
             UIElement el = (UIElement)sender;
 
-            el.Focus();
+            //el.Focus();
             System.Windows.Point pt = e.GetPosition((UIElement)sender);
             MousePoint = new System.Windows.Point(pt.X, pt.Y);
             PrintMousePosition(MousePoint);
@@ -1253,6 +1274,7 @@ namespace Root_CAMELLIA
         public void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             UIElement el = (UIElement)sender;
+            el.Focus();
             Drag = false;
             System.Windows.Point pt = e.GetPosition((UIElement)sender);
             el.ReleaseMouseCapture();
@@ -1432,75 +1454,10 @@ namespace Root_CAMELLIA
         #region Method
         private void InitStage()
         {
-            //ArcPointNum = 63;
-            //EdgeNum = 4;
-            //DoubleHoleNum = 4;
-            //GuideLineNum = 4;
-
-            //DataStageField.Set(0, 0, BaseDefine.ViewSize, BaseDefine.ViewSize);
-            //DataStageLineHole.Set(0, 0, BaseDefine.ViewSize, 7);
             OpenStageCircleHole();
-
-
-            //double dRadiusIn = 130;
-            //double dRadiusOut = 155;
-            //DataStageEdgeHolePoint[0] = new PointF((float)15, (float)Math.Sqrt(16675));
-            //DataStageEdgeHolePoint[1] = new PointF((float)Math.Sqrt(16347.75), (float)23.5);
-            //DataStageEdgeHolePoint[2] = new PointF((float)Math.Sqrt(23472.75), (float)23.5);
-            //DataStageEdgeHolePoint[3] = new PointF((float)15, (float)Math.Sqrt(23800));
-            //DataStageEdgeHolePoint[4] = new PointF((float)Math.Sqrt(16347.75), (float)-23.5);
-            //DataStageEdgeHolePoint[5] = new PointF((float)15, (float)-Math.Sqrt(16675));
-            //DataStageEdgeHolePoint[6] = new PointF((float)15, (float)-Math.Sqrt(23800));
-            //DataStageEdgeHolePoint[7] = new PointF((float)Math.Sqrt(23472.75), (float)-23.5);
-            //DataStageEdgeHolePoint[8] = new PointF((float)-15, (float)-Math.Sqrt(16675));
-            //DataStageEdgeHolePoint[9] = new PointF((float)-Math.Sqrt(16347.75), (float)-23.5);
-            //DataStageEdgeHolePoint[10] = new PointF((float)-Math.Sqrt(23472.75), (float)-23.5);
-            //DataStageEdgeHolePoint[11] = new PointF((float)-15, (float)-Math.Sqrt(23800));
-            //DataStageEdgeHolePoint[12] = new PointF((float)-Math.Sqrt(16347.75), (float)23.5);
-            //DataStageEdgeHolePoint[13] = new PointF((float)-15, (float)Math.Sqrt(16675));
-            //DataStageEdgeHolePoint[14] = new PointF((float)-15, (float)Math.Sqrt(23800));
-            //DataStageEdgeHolePoint[15] = new PointF((float)-Math.Sqrt(23472.75), (float)23.5);
-
-            //for (int i = 0; i < EdgeNum; i++)
-            //{
-            //    DataStageEdgeHoleArc[2 * i + 0] = new Arc(0, 0, dRadiusIn, Math.Atan2(DataStageEdgeHolePoint[4 * i + 0].Y, DataStageEdgeHolePoint[4 * i + 0].X), Math.Atan2(DataStageEdgeHolePoint[4 * i + 1].Y, DataStageEdgeHolePoint[4 * i + 1].X), ArcPointNum, false);
-            //    DataStageEdgeHoleArc[2 * i + 1] = new Arc(0, 0, dRadiusOut, Math.Atan2(DataStageEdgeHolePoint[4 * i + 2].Y, DataStageEdgeHolePoint[4 * i + 2].X), Math.Atan2(DataStageEdgeHolePoint[4 * i + 3].Y, DataStageEdgeHolePoint[4 * i + 3].X), ArcPointNum, false);
-            //}
-
-            //double dRadiusHole = 6;
-            //double dInLength = 69.3;
-            //double dOutLength = 77.85;
-            //for (int i = 0; i < 2 * DoubleHoleNum; i++)
-            //{
-            //    DataStageDoubleHoleArc[i] = new Arc();
-            //}
-            //DataStageDoubleHoleArc[0].InitArc(dInLength, dInLength, dRadiusHole, (3 / (float)4) * Math.PI, (7 / (float)4) * Math.PI, ArcPointNum, true);
-            //DataStageDoubleHoleArc[1].InitArc(dOutLength, dOutLength, dRadiusHole, (7 / (float)4) * Math.PI, (3 / (float)4) * Math.PI, ArcPointNum, true);
-            //DataStageDoubleHoleArc[2].InitArc(dInLength, -dInLength, dRadiusHole, (1 / (float)4) * Math.PI, (5 / (float)4) * Math.PI, ArcPointNum, true);
-            //DataStageDoubleHoleArc[3].InitArc(dOutLength, -dOutLength, dRadiusHole, (5 / (float)4) * Math.PI, (1 / (float)4) * Math.PI, ArcPointNum, true);
-            //DataStageDoubleHoleArc[4].InitArc(-dInLength, -dInLength, dRadiusHole, (7 / (float)4) * Math.PI, (3 / (float)4) * Math.PI, ArcPointNum, true);
-            //DataStageDoubleHoleArc[5].InitArc(-dOutLength, -dOutLength, dRadiusHole, (3 / (float)4) * Math.PI, (7 / (float)4) * Math.PI, ArcPointNum, true);
-            //DataStageDoubleHoleArc[6].InitArc(-dInLength, dInLength, dRadiusHole, (5 / (float)4) * Math.PI, (1 / (float)4) * Math.PI, ArcPointNum, true);
-            //DataStageDoubleHoleArc[7].InitArc(-dOutLength, dOutLength, dRadiusHole, (1 / (float)4) * Math.PI, (5 / (float)4) * Math.PI, ArcPointNum, true);
-
-            //DataStageTopHoleArc[0] = new Arc(0, 145, dRadiusHole, Math.PI, 0, ArcPointNum, true);
-            //DataStageTopHoleArc[1] = new Arc(0, 0, dRadiusOut, Math.Atan2(Math.Sqrt(23989), 6), Math.Atan2(Math.Sqrt(23989), -6), ArcPointNum, true);
-            //DataStageBotHoleArc[0] = new Arc(0, -145, dRadiusHole, 0, Math.PI, ArcPointNum, true);
-            //DataStageBotHoleArc[1] = new Arc(0, 0, dRadiusOut, Math.Atan2(-Math.Sqrt(23989), -6), Math.Atan2(-Math.Sqrt(23989), 6), ArcPointNum, true);
-
-
-            //for (int i = 0; i < GuideLineNum; i++)
-            //{
-            //    DataStageGuideLine[i] = new Circle();
-
-            //}
-            //DataStageGuideLine[0].Set(0, 0, 49, 49);         
-            //DataStageGuideLine[1].Set(0, 0, 98, 98);
-            //DataStageGuideLine[2].Set(0, 0, 150, 150);
-            //DataStageGuideLine[3].Set(0, 0, 196, 196);
         }
 
-        public void OpenStageCircleHole()
+        private void OpenStageCircleHole()
         {
             if (dataStageCircleHole.Count != 0)
             {
@@ -1996,7 +1953,7 @@ namespace Root_CAMELLIA
             LowerWaveLength = dataManager.recipeDM.TeachingRD.LowerWaveLength;
             UpperWaveLength = dataManager.recipeDM.TeachingRD.UpperWaveLength;
             ThicknessLMIteration = dataManager.recipeDM.TeachingRD.LMIteration;
-            DampingFactor = dataManager.recipeDM.TeachingRD.DampingFactor;
+            DampingFactor = dataManager.recipeDM.TeachingRD.DampingFactor.ToString();
         }
 
         private void SetViewRect()
@@ -2470,16 +2427,12 @@ namespace Root_CAMELLIA
                 return;
             }
             double[,] distance = new double[nTotalPoint, nTotalPoint];
-            //double[,] distTable = new double[nTotalPoint, nTotalPoint];
             List<int> listPoint = new List<int>();
             List<int> listWentPoint = new List<int>();
             List<double[,]> listDoublePoint = new List<double[,]>();
 
             int nCurrentIdx = 0;
-            //SortedTupleBag<Data, int> keyValues = new SortedTupleBag<Data, int>();
             List<Data> data = new List<Data>();
-
-            double dMaxValue = 0;
             for (int i = 0; i < nTotalPoint; i++)
             {
                 for (int j = 0; j < nTotalPoint; j++)
@@ -2599,7 +2552,6 @@ namespace Root_CAMELLIA
             int nCount = 0;
             foreach (var item in list)
             {
-                //if (Math.Round(item.x, 3) == Math.Round(circle.x, 3) && Math.Round(item.y, 3) == Math.Round(circle.y, 3))
                 if (Math.Round(item.x, 3) == Math.Round(circle.x, 3) && Math.Round(item.y, 3) == Math.Round(circle.y, 3)
                     && Math.Round(item.width, 3) == Math.Round(circle.width, 3) && Math.Round(item.height, 3) == Math.Round(circle.height, 3))
                 {
@@ -2638,16 +2590,7 @@ namespace Root_CAMELLIA
 
         private double GetDistance(ShapeEllipse eg, System.Windows.Point pt)
         {
-            double dResult = 0f;
-            float x = 0, y = 0, maxX = -1, maxY = -1, minX = 9999, minY = 9999;
-
-
-            dResult = Math.Sqrt(Math.Pow(eg.CenterX - pt.X, 2) + Math.Pow(eg.CenterY - pt.Y, 2));
-
-            //x = (maxX + minX) * 0.5f;
-            //y = (maxY + minY) * 0.5f;
-
-            // dResult = Math.Sqrt(Math.Pow(x - (double)pt.X, 2) + Math.Pow(y - (double)pt.Y, 2));
+            double dResult = Math.Sqrt(Math.Pow(eg.CenterX - pt.X, 2) + Math.Pow(eg.CenterY - pt.Y, 2));
 
             return Math.Round(dResult, 3);
         }
@@ -2683,18 +2626,6 @@ namespace Root_CAMELLIA
 
                 if (ContainsData(dataManager.recipeDM.TeachingRD.DataSelectedPoint, circle, out index) && !ContainsData(ListReorderPoint, circle, out nReorderIdx))
                 {
-                    //if (index == 0)
-                    //{
-                    //    return;
-                    //}
-                    //foreach (int i in dataManager.recipeDM.TeachingRD.DataMeasurementRoute)
-                    //{
-                    //    if (i == 0)
-                    //    {
-                    //        start = startIdx;
-                    //    }
-                    //    startIdx++;
-                    //}
                     DeletePoint(index, 1);
                     dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count);
                     dataManager.recipeDM.TeachingRD.DataSelectedPoint.Insert(ReorderCnt, circle);
@@ -2709,27 +2640,7 @@ namespace Root_CAMELLIA
                         ReorderCnt = 0;
                         ReorderBrush = normalBrush;
                     }
-                    //RouteOptimizaionFunc();
                 }
-
-
-                //else
-                //{
-                //    foreach (int i in dataManager.recipeDM.TeachingRD.DataMeasurementRoute)
-                //    {
-                //        if (i == dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Count - 1)
-                //        {
-                //            end = endIdx;
-                //            //before = dataMA
-                //        }
-                //        endIdx++;
-                //    }
-                //    int t = dataManager.recipeDM.TeachingRD.DataMeasurementRoute[CurrentSelectPoint];
-                //    dataManager.recipeDM.TeachingRD.DataMeasurementRoute[CurrentSelectPoint] = dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Count - 1;
-                //    dataManager.recipeDM.TeachingRD.DataMeasurementRoute[end] = t;
-                //}
-
-
             }
         }
 
@@ -2739,9 +2650,6 @@ namespace Root_CAMELLIA
             double dOffsetY = 0;
             if (CurrentCandidatePoint != -1)
             {
-
-                //if (double.TryParse(tbOffsetX.Text, out dOffsetX) && double.TryParse(tbOffsetY.Text, out dOffsetY))
-                //{
                 CCircle circle = dataManager.recipeDM.TeachingRD.DataCandidatePoint[CurrentCandidatePoint];
                 circle.MeasurementOffsetX = dOffsetX;
                 circle.MeasurementOffsetY = dOffsetY;
@@ -2750,8 +2658,6 @@ namespace Root_CAMELLIA
                 if (ContainsSelectedData(dataManager.recipeDM.TeachingRD.DataSelectedPoint, circle, out _index) && ((ShiftKeyDown && CtrlKeyDown) || !CtrlKeyDown))
                 {
                     DeletePoint(_index, 1);
-                    //m_DM.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Point Editor - Delete - Index : " + (_index + 1).ToString()
-                    //                + ", X : " + Math.Round(circle.x, 3).ToString() + ", Y : " + Math.Round(circle.y, 3).ToString());
                 }
                 else
                 {
@@ -2764,28 +2670,16 @@ namespace Root_CAMELLIA
                             RouteOrder.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count - 1);
                         }
                     }
-                    //dataManager.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Point Editor - Add - Index : " + m_DM.m_RDM.TeachingRD.DataSelectedPoint.Count.ToString()
-                    //                + ", X : " + Math.Round(circle.x, 3).ToString() + ", Y : " + Math.Round(circle.y, 3).ToString());
-
-                    //UpdateView();
-                    //UpdateListView();
                 }
             }
             if (CurrentSelectPoint != -1)
             {
-                dOffsetX = 0;
-                dOffsetY = 0;
-
-                //if (double.TryParse(tbOffsetX.Text, out dOffsetX) && double.TryParse(tbOffsetY.Text, out dOffsetY))
-                //{
                 CCircle circle = dataManager.recipeDM.TeachingRD.DataSelectedPoint[CurrentSelectPoint];
 
                 int _index = -1;
                 if (ContainsSelectedData(dataManager.recipeDM.TeachingRD.DataSelectedPoint, circle, out _index) && ((ShiftKeyDown && CtrlKeyDown) || !CtrlKeyDown))
                 {
                     DeletePoint(_index, 1);
-                    //dataManager.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Point Editor - Delete - Index : " + (_index + 1).ToString()
-                    //                + ", X : " + Math.Round(circle.x, 3).ToString() + ", Y : " + Math.Round(circle.y, 3).ToString());
                 }
                 else
                 {
@@ -2798,13 +2692,6 @@ namespace Root_CAMELLIA
                             RouteOrder.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count - 1);
                         }
                     }
-                    //dataManager.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Point Editor - Add - Index : " + m_DM.m_RDM.TeachingRD.DataSelectedPoint.Count.ToString()
-                    //                + ", X : " + Math.Round(circle.x, 3).ToString() + ", Y : " + Math.Round(circle.y, 3).ToString());
-
-                    //SetListViewTab(0);
-                    //InvalidateView();
-                    //UpdateView();
-                    //UpdateListView();
                 }
             }
         }
@@ -2814,8 +2701,6 @@ namespace Root_CAMELLIA
             double dOffsetX = 0;
             double dOffsetY = 0;
 
-            //if (double.TryParse(tbOffsetX.Text, out dOffsetX) && double.TryParse(tbOffsetY.Text, out dOffsetY))
-            //{
             CCircle circle = dataManager.recipeDM.TeachingRD.DataCandidatePoint[nIndex];
             circle.MeasurementOffsetX = dOffsetX;
             circle.MeasurementOffsetY = dOffsetY;
@@ -2832,11 +2717,6 @@ namespace Root_CAMELLIA
                         RouteOrder.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count - 1);
                     }
                 }
-
-                //m_DM.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Point Editor - Add - Index : " + m_DM.m_RDM.TeachingRD.DataSelectedPoint.Count.ToString()
-                //                    + ", X : " + Math.Round(circle.x, 3).ToString() + ", Y : " + Math.Round(circle.y, 3).ToString());
-
-                //InvalidateView();
             }
             else
             {
@@ -2845,11 +2725,6 @@ namespace Root_CAMELLIA
                     DeletePoint(_index, 1);
                 }
             }
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Input is Not Valid");
-            //}
         }
 
         public void DeletePoint(int nIndex, int nRange)
@@ -2884,7 +2759,6 @@ namespace Root_CAMELLIA
             int nCount = 0;
             foreach (var item in list)
             {
-                //if (Math.Round(item.x, 3) == Math.Round(circle.x, 3) && Math.Round(item.y, 3) == Math.Round(circle.y, 3))
                 if (Math.Round(item.x, 3) == Math.Round(circle.x, 3) && Math.Round(item.y, 3) == Math.Round(circle.y, 3)
                     && Math.Round(item.width, 3) == Math.Round(circle.width, 3) && Math.Round(item.height, 3) == Math.Round(circle.height, 3)
                     && Math.Round(item.MeasurementOffsetX, 3) == Math.Round(circle.MeasurementOffsetX, 3) && Math.Round(item.MeasurementOffsetY, 3) == Math.Round(circle.MeasurementOffsetY, 3))
@@ -3111,7 +2985,6 @@ namespace Root_CAMELLIA
                         ReorderBrush = normalBrush;
                         PointAddMode = "Normal";
                     }
-                    //RedrawStage();
                     UpdateView();
                 });
             }
@@ -3157,11 +3030,9 @@ namespace Root_CAMELLIA
                         IsLockUI = true;
 
                         ZoomScale = 1;
-                        //RedrawStage();
                     }
                     InitKeyButton();
                     RedrawStage();
-                    //UpdateView();
                 });
             }
         }
@@ -3347,7 +3218,6 @@ namespace Root_CAMELLIA
                         return;
                     }
                     dataManager.recipeDM.TeachingRD.ClearPoint();
-                    //dataSelectedPoint.Clear();
 
                     UpdateListView();
                     UpdateView();
@@ -3492,7 +3362,6 @@ namespace Root_CAMELLIA
                         }
                         dataManager.recipeDM.TeachingRD.WaveLengthReflectance.RemoveAt(ReflectanceSelectedIndex);
                         ReflectanceListItem.RemoveAt(ReflectanceSelectedIndex);
-                        //ReflectanceSelectedIndex = ReflectanceListItem.Count - ReflectanceSelectedIndex - 1;
                     }
                     else if (IsTransmittanceCheck)
                     {
@@ -3502,7 +3371,6 @@ namespace Root_CAMELLIA
                         }
                         dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.RemoveAt(TransmittanceSelectedIndex);
                         TransmittanceListItem.RemoveAt(TransmittanceSelectedIndex);
-                        //TransmittanceSelectedIndex = TransmittanceListItem.Count - TransmittanceSelectedIndex- 1;
                     }
                 });
             }
@@ -3514,20 +3382,13 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    //MaterialListItem.Clear();
-                    //DeleteGridCombo();
                     bool res = dataManager.recipeDM.AddMaterial();
                     if(res)
                     {
                         MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.ModelData.MaterialList.ToArray());
-                       // MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.TeachingRD.MaterialList.ToList());
                     }
 
                     UpdateGridCombo();
-                    //for(int i = 0; i < dataManager.recipeDM.TeachingRD.MaterialList.Count; i++)
-                    //{
-                    //    MaterialListItem.Add(dataManager.recipeDM.TeachingRD.MaterialList[i]);
-                    //}
                 });
             }
         }
@@ -3589,7 +3450,10 @@ namespace Root_CAMELLIA
                         MessageBox.Show("The host must exist.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
-                    dataManager.recipeDM.SaveModel();
+                    if (dataManager.recipeDM.SaveModel())
+                    {
+                        ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+                    }
                 });
             }
         }
@@ -3711,7 +3575,6 @@ namespace Root_CAMELLIA
             RouteBrush.Color = (System.Windows.Media.Color)co.SelectedColor;
             MainViewModel.RouteBrush.Color = (System.Windows.Media.Color)co.SelectedColor;
             RedrawStage();
-            //UpdateView();
         }
         public void colorPicker_Opened(object sender, RoutedEventArgs e)
         {
@@ -3798,7 +3661,6 @@ namespace Root_CAMELLIA
                 else if (IsKeyboardShowIndex)
                 {
                     IsKeyboardShowIndex = false;
-                    //UpdateView();
                     RedrawStage();
                     if (ShiftKeyDown)
                     {

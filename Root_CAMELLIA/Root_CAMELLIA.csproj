@@ -208,6 +208,7 @@
     <Reference Include="System.Drawing.Common, Version=4.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Drawing.Common.4.7.0\lib\net461\System.Drawing.Common.dll</HintPath>
     </Reference>
+    <Reference Include="System.ValueTuple" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -235,6 +236,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converter\BoolConverter.cs" />
+    <Compile Include="UI_Engineer\Camellia_Recipe_UI.xaml.cs">
+      <DependentUpon>Camellia_Recipe_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converter\AxisBoolToBrushConverter.cs" />
     <Compile Include="BaseDefine.cs" />
     <Compile Include="Converter\AxisToPositionConverter.cs" />
@@ -307,6 +312,10 @@
       <DependentUpon>Camellia_Hander_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\WpfPropertyGrid.cs" />
+    <Page Include="UI_Engineer\Camellia_Recipe_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\LoadingBlock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -461,11 +470,9 @@ copy /Y "$(SolutionDir)Lib\MetLib\Reference\configc.dat" $(SolutionDir)$(Project
 copy /Y "$(SolutionDir)Lib\MetLib\Reference\configc_org.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configc_org.dat"
 copy /Y "$(SolutionDir)Lib\MetLib\Reference\configd.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configd.dat"
 copy /Y "$(SolutionDir)Lib\MetLib\Reference\configd_0.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configd_0.dat"
-copy /Y "$(SolutionDir)Lib\MetLib\Reference\c-Si_Set_(0.76-9.03).ref" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\c-Si_Set_(0.76-9.03).ref"
 copy /Y "$(SolutionDir)Lib\MetLib\Reference\Init_ATI_NIR.cfg" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\Init_ATI_NIR.cfg"
 copy /Y "$(SolutionDir)Lib\MetLib\Reference\Init_ATI_NIR.ini" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\Init_ATI_NIR.ini"
 copy /Y "$(SolutionDir)Lib\MetLib\Reference\ZedGraph.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\ZedGraph.dll"
-copy /Y "$(SolutionDir)Lib\MetLib\c-Si_Set_(0.76-9.03).ref" $(SolutionDir)$(ProjectName)\$(OutDir)\c-Si_Set_(0.76-9.03).ref"
 copy /Y "$(SolutionDir)Lib\MetLib\NanoView.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NanoView.dll"
 copy /Y "$(SolutionDir)Lib\MetLib\NETOmniDriver-NET40.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NETOmniDriver-NET40.dll"
 copy /Y "$(SolutionDir)Lib\MetLib\OmniDriver64.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\OmniDriver64.dll"

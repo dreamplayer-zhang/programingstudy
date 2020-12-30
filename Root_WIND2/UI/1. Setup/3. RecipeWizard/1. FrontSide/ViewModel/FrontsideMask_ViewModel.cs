@@ -1524,6 +1524,7 @@ namespace Root_WIND2
             PointLine DotLine = new PointLine();
             bool bStart = false;
             CPoint size = p_ImageData.p_Size;
+            int selectIndex = p_cInspROI.IndexOf(p_SelectedROI);
             for (int j = 0; j < size.Y; j++)
             {
                 for (int i = 0; i < size.X; i++)
@@ -1544,10 +1545,11 @@ namespace Root_WIND2
                         {
                             DotLine.Width = i - DotLine.StartPt.X;
                             bStart = false;
-                            p_SelectedROI.p_Data.Add(DotLine);                            
+                            p_SelectedROI.p_Data.Add(DotLine);
+                            m_Recipe.GetRecipe<MaskRecipe>().MaskList[selectIndex].PointLines.Add(new RecipeType_PointLine(DotLine));
+                            // MaskRecipe의 SelectedROI의 PointLine Type Add
                         }
                     }
-
                 }
             }
         }
@@ -1565,14 +1567,20 @@ namespace Root_WIND2
         {
             InspectionROI roi = new InspectionROI();
             roi.p_Color = Colors.AliceBlue;
+            roi.p_Index = p_cInspROI.Count();
             p_cInspROI.Add(roi);
             p_SelectedROI = p_cInspROI.Last();
+            m_Recipe.GetRecipe<MaskRecipe>().MaskList.Add(new RecipeType_Mask());
         }
         private void _DeleteROI()
         {
             p_cInspROI.Remove(p_SelectedROI);
             if(p_cInspROI.Count > 0)
                 p_SelectedROI = p_cInspROI.Last();
+            for (int i = 0; i < p_cInspROI.Count; i++)
+            {
+                p_cInspROI[i].p_Index = i;
+            }
         }
         private void _ClearROI()
         {
@@ -1597,7 +1605,7 @@ namespace Root_WIND2
 
             Worker_SaveROI.RunWorkerAsync();  
         }
-        private void _ReadROI()
+        public void _ReadROI()
         {
             if (Worker_ReadROI.IsBusy)
                 return;

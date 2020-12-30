@@ -23,7 +23,6 @@ namespace RootTools.Camera.Matrox
         private MIL_ID m_MilSystem;                          // 프레임그래버
         private MIL_ID m_MilDigitizer;                       // 카메라
         private MIL_ID m_MilDisplay;                         // 디스플레이
-        //private MIL_ID m_MilImage = MIL.M_NULL;              // MIL Image buffer identifier.
         private MIL_ID[] m_MilBuffers = new MIL_ID[c_nBuf];  // 버퍼
         
         int m_nWidth = 0;
@@ -118,8 +117,8 @@ namespace RootTools.Camera.Matrox
                 SetProperty(ref m_CamInfo, value);
             }
         }
-        const int c_nBuf = 100;
-        int _nBuf = 100;
+        const int c_nBuf = 300;
+        int _nBuf = 300;
         public int p_nBuf
         {
             get
@@ -132,7 +131,6 @@ namespace RootTools.Camera.Matrox
                 _nBuf = (value > c_nBuf) ? c_nBuf : value;
             }
         }
-        //int m_nGrabTrigger = 0;
 
         public CPoint p_sz
         {
@@ -198,7 +196,6 @@ namespace RootTools.Camera.Matrox
         }
         #endregion
 
-        // 생성자
         public Camera_Matrox(string id, Log log)
         {
             p_id = id;
@@ -206,7 +203,6 @@ namespace RootTools.Camera.Matrox
             p_treeRoot = new TreeRoot(id, m_log);
             bgw_Connect.DoWork += bgw_Connect_Dowork;
             bgw_Connect.RunWorkerCompleted += bgw_Connect_RunWorkerCompleted;
-            //m_ImageLive = new ImageData(1920, 1080, 1);
             m_ImageLive = new ImageData(6560, 1080, 1);
             p_ImageViewer = new ImageViewer_ViewModel(m_ImageLive, null, _dispatcher);
             p_CamInfo = new MatroxCamInfo(m_log);
@@ -265,8 +261,6 @@ namespace RootTools.Camera.Matrox
                     }
                 }
             }
-            //MIL.MbufAllocColor(m_MilSystem, p_nImgBand, p_nWidth, p_nHeight, 8 + MIL.M_UNSIGNED, lImgAttributes, ref m_MilImage);
-            //MIL.MbufClear(m_MilImage, 0);
 
             // Allocate the grab buffers and clear them.
             for (int i = 0; i < p_nBuf; i++)
@@ -287,15 +281,11 @@ namespace RootTools.Camera.Matrox
                 MIL.MbufFree(m_MilBuffers[p_nBuf]);
             }
 
-            //m_ImageLive.ReAllocate(new CPoint(p_nWidth, p_nHeight), 1);
             return;
         }
 
         void DisconnectCamera()
         {
-            // variable
-
-            // implement
             for (int i = 0; i<p_nBuf; i++)
             {
                 if (m_MilBuffers[i] != MIL.M_NULL)
@@ -395,7 +385,7 @@ namespace RootTools.Camera.Matrox
 
         public CPoint GetRoiSize()
         {
-            return new CPoint();
+            return new CPoint(p_nWidth, p_nHeight);
         }
 
         int m_nGrabCount = 0;
@@ -405,26 +395,18 @@ namespace RootTools.Camera.Matrox
         IntPtr m_MemPtr = IntPtr.Zero;
         CPoint m_cpScanOffset = new CPoint();
         GCHandle userObjectHandle;
-        MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(LineScanArchiveFunction);
-        //private const int BUFFERING_SIZE_MAX = 20;
 
+        private const int BUFFERING_SIZE_MAX = 20;
+        MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(LineScanArchiveFunction);
+        UserDataObject userObject = new UserDataObject();
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0)
         {
-            UserDataObject userObject = new UserDataObject();
-
             m_nGrabCount = (int)Math.Truncate(1.0 * nLine / p_nHeight);
             m_nGrabTrigger = 0;
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
             m_cpScanOffset = cpScanOffset;
             p_CamInfo.p_eState = eCamState.GrabMem;
-            //int nbFrames = 0;
-            //int n = 0;
-            //int nbFramesReplayed = 0;
-            //double frameRate = 0;
-            //double timeWait = 0;
-            //double totalReplay = 0;
-            //double grabScale = 1.0;
 
             MIL_INT licenseModules = 0;
             MIL_INT frameCount = 0;
@@ -447,38 +429,29 @@ namespace RootTools.Camera.Matrox
             }
 
             /*
-			// Sets the maximum time to wait for a frame before generating an error.
-			// MIL.M_DEFAULT is same as MIL.M_INFINITE (msec)
-			MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TIMEOUT, 1000);
-			// Sets the maximum amount of time to wait for MdigProcess() to complete the current grab (M_STOP) or all the queued grabs (M_STOP + M_WAIT), before generating an error.
-			// MIL.M_DEFAULT is same as MIL.M_INFINITE (msec)
-			MIL.MdigControl(m_MilDigitizer, MIL.M_PROCESS_TIMEOUT, MIL.M_DEFAULT);
-			// Create an internal grab monitoring thread. The internal grab monitoring thread will produce an error if there is no longer any grab activity.
-			MIL.MdigControl(m_MilDigitizer, MIL.M_PROCESS_GRAB_MONITOR, MIL.M_ENABLE);
+            // Sets the maximum time to wait for a frame before generating an error.
+            // MIL.M_DEFAULT is same as MIL.M_INFINITE (msec)
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TIMEOUT, 1000);
+            // Sets the maximum amount of time to wait for MdigProcess() to complete the current grab (M_STOP) or all the queued grabs (M_STOP + M_WAIT), before generating an error.
+            // MIL.M_DEFAULT is same as MIL.M_INFINITE (msec)
+            MIL.MdigControl(m_MilDigitizer, MIL.M_PROCESS_TIMEOUT, MIL.M_DEFAULT);
+            // Create an internal grab monitoring thread. The internal grab monitoring thread will produce an error if there is no longer any grab activity.
+            MIL.MdigControl(m_MilDigitizer, MIL.M_PROCESS_GRAB_MONITOR, MIL.M_ENABLE);
 
-			// Sets the signal transition upon which to generate a grab trigger.
-		    MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TRIGGER_ACTIVATION, MIL.M_DEFAULT);
-			// Sets the signal source of the grab trigger when there are multiple sources available.
-			MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TRIGGER_SOURCE, MIL.M_DEFAULT);
-			// Sets whether, when a grab command is issued (for example, MdigGrab()) to wait for a trigger before grabbing.
-			MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TRIGGER_STATE, MIL.M_DEFAULT);
+            Sets the signal transition upon which to generate a grab trigger.
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TRIGGER_ACTIVATION, MIL.M_DEFAULT);
+            // Sets the signal source of the grab trigger when there are multiple sources available.
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TRIGGER_SOURCE, MIL.M_DEFAULT);
+            // Sets whether, when a grab command is issued (for example, MdigGrab()) to wait for a trigger before grabbing.
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TRIGGER_STATE, MIL.M_ENABLE);
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TRIGGER_STATE, MIL.M_DEFAULT);
             */
 
-            //userObject.NbGrabStart = 0;
-            //userObject.MilDigitizer = m_MilDigitizer;
-            //userObject.MilImageDisp = m_MilImage;
-			userObjectHandle = GCHandle.Alloc(this);
-           
-            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TIMEOUT, MIL.M_INFINITE);
+            userObjectHandle = GCHandle.Alloc(this);
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TIMEOUT, MIL.M_INFINITE); // Grab 대기 시간
             MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS);
-
-            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, 90, MIL.M_SEQUENCE + MIL.M_COUNT(90), MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
-
-            //MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(LineScanArchiveFunction);
-            ////MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_START, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
-            ////MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_END, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
-            ////MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_START + MIL.M_UNHOOK, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
-            //MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_FRAME_START, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_SEQUENCE + MIL.M_COUNT(m_nGrabCount), MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+            //MdigProcess(MilDigitizer, MilGrabBuf, GRAB_NUM, M_SEQUENCE + M_COUNT(TOTAL_FRAME_NUM), M_ASYNCHRONOUS + M_TRIGGER_FOR_FIRST_GRAB, ProcessingFunction, &UserHookData);
 
             m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));
             m_GrabThread.Start();
@@ -493,11 +466,10 @@ namespace RootTools.Camera.Matrox
 
             int lY = m_nGrabCount * Convert.ToInt32(p_nHeight);
             int iBlock = 0;
-            while (iBlock < 90/*m_nGrabCount*/)
+            while (iBlock < m_nGrabCount)
             {
                 if (iBlock < m_nGrabTrigger)
                 {   
-                    Debug.WriteLine("block " + iBlock);
                     MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarray);
                     Parallel.For(0, p_nHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
                     {
@@ -510,7 +482,6 @@ namespace RootTools.Camera.Matrox
                         }
                     });
                     iBlock++;
-                    Debug.WriteLine("block" + iBlock);
                     if (m_nGrabCount != 0)
                         p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
@@ -525,9 +496,9 @@ namespace RootTools.Camera.Matrox
             {
                 GCHandle handle = (GCHandle)(UserDataPtr);
                 Camera_Matrox cam = handle.Target as Camera_Matrox;
-
-                cam.m_nGrabTrigger++;
-                Debug.WriteLine(cam.m_nGrabTrigger);
+                
+                if (cam != null)
+                    cam.m_nGrabTrigger++;
             }
             return 0;
         }
@@ -545,6 +516,7 @@ namespace RootTools.Camera.Matrox
             if (m_MilDigitizer == MIL.M_NULL)
                 return "Digitizer is NULL";
             MIL.MdigHalt(m_MilDigitizer);
+            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_STOP, MIL.M_DEFAULT, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
             return "OK";
         }
 

@@ -1,11 +1,10 @@
-﻿using RootTools;
-using RootTools.Gem;
+﻿using RootTools.Gem;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 
-namespace Root_EFEM
+namespace RootTools
 {
     public class InfoWafer : GemSlotBase
     {
