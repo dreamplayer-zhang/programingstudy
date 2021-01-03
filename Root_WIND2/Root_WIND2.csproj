@@ -244,10 +244,15 @@
       <DependentUpon>BacksideInspection.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideInspection_ViewModel.cs" />
-    <Compile Include="UI\SettingDialog.xaml.cs">
+    <Compile Include="UI\SettingDialog\ISettingData.cs" />
+    <Compile Include="UI\SettingDialog\SettingData.cs" />
+    <Compile Include="UI\SettingDialog\SettingData_Setup.cs" />
+    <Compile Include="UI\SettingDialog\SettingData_SetupBackside.cs" />
+    <Compile Include="UI\SettingDialog\SettingData_SetupFrontside.cs" />
+    <Compile Include="UI\SettingDialog\SettingDialog.xaml.cs">
       <DependentUpon>SettingDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\SettingDialog_ViewModel.cs" />
+    <Compile Include="UI\SettingDialog\SettingDialog_ViewModel.cs" />
     <Compile Include="WIND2EventArgs.cs" />
     <Compile Include="WIND2EventManager.cs" />
     <Compile Include="Module\BackSideVision.cs" />
@@ -271,7 +276,7 @@
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideOriginTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideOrigin_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsidePosition_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FronsideInspection_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideInspection_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontsideInspection.xaml.cs">
       <DependentUpon>FrontsideInspection.xaml</DependentUpon>
     </Compile>
@@ -582,7 +587,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\SettingDialog.xaml">
+    <Page Include="UI\SettingDialog\SettingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

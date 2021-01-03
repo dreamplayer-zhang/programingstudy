@@ -35,7 +35,7 @@
                                           Background="{StaticResource GroupBoxBackground}"
                                           Header="Image View">
                                 <Grid Background="Black">
-                                    <tools:RootViewer DataContext="{Binding p_DrawTool_VM}"/>
+                                <tools:RootViewer DataContext="{Binding p_ImageViewer_VM}"/>
                                 </Grid>
                             </GroupBox>
                         </Grid>
@@ -49,7 +49,7 @@
                                           Background="{StaticResource GroupBoxBackground}"
                                           Header="Result" Grid.ColumnSpan="2">
 
-                            <tools:Database_DataView DataContext="{Binding p_ImageViewer_VM}">
+                            <tools:Database_DataView DataContext="{Binding p_DataViewer_VM}">
                                 </tools:Database_DataView>
                             </GroupBox>
                             <Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">

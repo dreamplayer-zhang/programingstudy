@@ -36,8 +36,8 @@ namespace Root_WIND2
             }
         }
 
-        private FronsideInspection_ImageViewer_ViewModel m_DrawTool_VM;
-        public FronsideInspection_ImageViewer_ViewModel p_DrawTool_VM
+        private FrontsideInspection_ImageViewer_ViewModel m_DrawTool_VM;
+        public FrontsideInspection_ImageViewer_ViewModel p_DrawTool_VM
         {
             get
             {
@@ -65,7 +65,7 @@ namespace Root_WIND2
             m_Recipe = setup.Recipe;
 
             p_MapControl_VM = new MapControl_ViewModel(ProgramManager.Instance.InspectionBack);
-            p_DrawTool_VM = new FronsideInspection_ImageViewer_ViewModel();
+            p_DrawTool_VM = new FrontsideInspection_ImageViewer_ViewModel();
 
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromTicks(100000);
@@ -136,7 +136,7 @@ namespace Root_WIND2
         private void DrawDone_Callback(CPoint leftTop, CPoint rightBottom)
         {
             p_DrawTool_VM.Clear();
-            this.m_DrawTool_VM.DrawRect(leftTop, rightBottom, FronsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatchingFail);
+            this.m_DrawTool_VM.DrawRect(leftTop, rightBottom, FrontsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatchingFail);
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -196,27 +196,27 @@ namespace Root_WIND2
 
         public void DrawRectMasterFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text, bool bSuccess)
         {
-            p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, FronsideInspection_ImageViewer_ViewModel.ColorType.MasterFeature);
-            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess ? FronsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatching : FronsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatchingFail, text);
+            p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, FrontsideInspection_ImageViewer_ViewModel.ColorType.MasterFeature);
+            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess ? FrontsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatching : FrontsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatchingFail, text);
         }
 
         public void DrawRectShotFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text)
         {
-            p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, FronsideInspection_ImageViewer_ViewModel.ColorType.ShotFeature);
-            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, FronsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatching, text);
+            p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, FrontsideInspection_ImageViewer_ViewModel.ColorType.ShotFeature);
+            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, FrontsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatching, text);
         }
 
         public void DrawRectChipFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text, bool bSuccess)
         {
-            p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, FronsideInspection_ImageViewer_ViewModel.ColorType.ChipFeature);
-            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess ? FronsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatching : FronsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatchingFail, text);
+            p_DrawTool_VM.DrawRect(ptOldStart, ptOldEnd, FrontsideInspection_ImageViewer_ViewModel.ColorType.ChipFeature);
+            p_DrawTool_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess ? FrontsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatching : FrontsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatchingFail, text);
         }
         public void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
         {
             if (reDraw)
                 p_DrawTool_VM.Clear();
 
-            p_DrawTool_VM.DrawRect(rectList, FronsideInspection_ImageViewer_ViewModel.ColorType.Defect, text);
+            p_DrawTool_VM.DrawRect(rectList, FrontsideInspection_ImageViewer_ViewModel.ColorType.Defect, text);
         }
 
         public void UpdateDataGrid()
