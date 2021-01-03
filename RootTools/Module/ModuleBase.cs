@@ -675,6 +675,7 @@ namespace RootTools.Module
 
         public void UpdateModule(Remote.Protocol protocol)
         {
+            if (p_eRemote == protocol.m_eRemote) return; 
             for (int n = 0; n < m_asChanged.Length; n++)
             {
                 if (protocol.m_sCmd == m_asChanged[n])
