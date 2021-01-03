@@ -115,6 +115,7 @@ namespace RootTools.Camera.Dalsa
         }
         #endregion
 
+        bool Scandir;
         Log m_log;
         public SapAcquisition m_sapAcq = null;
         public SapBuffer m_sapBuf = null;
@@ -355,7 +356,8 @@ namespace RootTools.Camera.Dalsa
             //p_CamParam.p_eTDIMode = DalsaParameterSet.eTDIMode.Tdi;
             p_CamParam.p_eDeviceScanType = DalsaParameterSet.eDeviceScanType.Linescan;
             p_CamParam.p_eTriggerMode = DalsaParameterSet.eTriggerMode.External;
-            m_sapDevice.UpdateFeaturesToDevice();
+            if(m_sapDevice!=null)
+                m_sapDevice.UpdateFeaturesToDevice();
             m_sapXfer.Freeze();
             return "OK";
         }
@@ -383,9 +385,10 @@ namespace RootTools.Camera.Dalsa
             //    return;
             //}
 
-            p_CamParam.p_eDir = bInvY ? DalsaParameterSet.eDir.Reverse : DalsaParameterSet.eDir.Forward;
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
+
+            Scandir = bInvY;
 
             if (m_sapBuf.BytesPerPixel > 1)
             {
@@ -427,6 +430,7 @@ namespace RootTools.Camera.Dalsa
                 return;
             }
 
+            Scandir = bInvY;
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
             m_RedMemPtr = m_Memory.GetPtr(0);
@@ -462,7 +466,6 @@ namespace RootTools.Camera.Dalsa
             int nByteCnt = m_sapBuf.BytesPerPixel;
             int nCamHeight = p_CamParam.p_Height;
             int nCamWidth = p_CamParam.p_Width;
-            DalsaParameterSet.eDir eDir = p_CamParam.p_eDir;
             long lMemoryWidth = (long)m_Memory.W;
             int nMemoryOffsetX = m_cpScanOffset.X;
             int nMemoryOffsetY = m_cpScanOffset.Y;
@@ -474,10 +477,11 @@ namespace RootTools.Camera.Dalsa
                     Parallel.For(0, nCamHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
                     {
                         int yp;
-                        if (eDir == DalsaParameterSet.eDir.Reverse)
+                        if (Scandir)
                             yp = lY - (y + (iBlock) * nCamHeight) + m_nInverseYOffset;
                         else
                             yp = y + (iBlock) * nCamHeight;
+
                         IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt;
                         IntPtr dstPtr = (IntPtr)((long)m_MemPtr + nMemoryOffsetX + (yp + nMemoryOffsetY) * lMemoryWidth);
                         Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, nCamWidth, nCamWidth);
@@ -521,7 +525,12 @@ namespace RootTools.Camera.Dalsa
                     IntPtr ipSrc = m_pSapBuf[iBlock % p_nBuf];
                     Parallel.For(0, nCamHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
                     {
-                        int yp = y + iBlock * nCamHeight + nScanOffsetY;
+                        int yp;
+                        if (Scandir)
+                            yp = m_nGrabCount * nCamHeight - (y + (iBlock) * nCamHeight) + m_nInverseYOffset;
+                        else
+                            yp = y + iBlock * nCamHeight + nScanOffsetY;
+
                         long n = nScanOffsetX + yp * nMemWidth;
                         IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt;
                         IntPtr RedPtr = (IntPtr)((long)m_RedMemPtr + n);
