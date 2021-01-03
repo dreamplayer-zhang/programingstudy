@@ -15,7 +15,7 @@ using RootTools_Vision;
 
 namespace Root_WIND2
 {
-    public class InspectionManager_Vision : WorkFactory
+    public class InspectionManagerFrontside : WorkFactory
     {
 
         SolidColorBrush brushSnap = System.Windows.Media.Brushes.LightSkyBlue;
@@ -32,7 +32,7 @@ namespace Root_WIND2
 
         #endregion
 
-        public InspectionManager_Vision(IntPtr _sharedBuffer, int _width, int _height)
+        public InspectionManagerFrontside(IntPtr _sharedBuffer, int _width, int _height)
         {
             this.sharedBuffer = _sharedBuffer;
             this.sharedBufferWidth = _width;
@@ -90,10 +90,7 @@ namespace Root_WIND2
         {
             return CreateInspection(this.recipe);
         }
-        public bool CreateInspecion_Backside()
-        {
-            return CreateInspecion_Backside(this.recipe);
-        }
+
         public override bool CreateInspection(Recipe _recipe)
         {
             try
@@ -121,54 +118,6 @@ namespace Root_WIND2
                 return false;
             }
 
-            return true;
-        }
-
-
-        public override bool CreateInspecion_Backside(Recipe _recipe)
-        {
-            try
-            {
-                RecipeType_WaferMap waferMap = recipe.WaferMap;
-
-                if (waferMap == null || waferMap.MapSizeX == 0 || waferMap.MapSizeY == 0)
-                {
-                    MessageBox.Show("Map 정보가 없습니다.");
-                    return false;
-                }
-
-                workBundle = new WorkBundle();
-
-                Position position = new Position();
-                workBundle.Add(position);
-
-                Surface surface = new Surface();
-                surface.SetRecipe(recipe);
-
-                workBundle.Add(surface);
-
-                ProcessDefect processDefect = new ProcessDefect();
-                workBundle.Add(processDefect);
-
-                workplaceBundle = WorkplaceBundle.CreateWaferMap(_recipe);
-                workplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
-                workplaceBundle.SetSharedRGBBuffer(this.SharedBufferR, this.SharedBufferG, this.SharedBufferB);
-
-                ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-                processDefect_Wafer.SetRecipe(recipe);
-                processDefect_Wafer.SetWorkplaceBundle(workplaceBundle);
-                workBundle.Add(processDefect_Wafer);
-
-                workplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
-
-                if (this.SetBundles(workBundle, workplaceBundle) == false)
-                    return false;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Inspection 생성에 실패하였습니다.\nDetail : " + ex.Message);
-                return false;
-            }
             return true;
         }
 

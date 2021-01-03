@@ -341,9 +341,9 @@ namespace Root_CAMELLIA
                     case EQ.eState.Run:
                         if (m_moduleList.m_qModuleRun.Count == 0)
                         {
-                            CheckLoad();
+                            //CheckLoad();
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            CheckUnload();
+                            //CheckUnload();
                             if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);

@@ -63,6 +63,11 @@ namespace System.Windows.Controls
                 Designer.PropertyInspectorFontAndColorData = value; 
             }
         }
+        public bool TitleVisible
+        {
+            get { return (bool)GetValue(TitleVisibleProperty); }
+            set { SetValue(TitleVisibleProperty, value); }
+        }
         /// <summary>Shows the description area on the top of the control</summary>
         public bool HelpVisible
         {
@@ -100,6 +105,9 @@ namespace System.Windows.Controls
         public static readonly DependencyProperty PropertySortProperty =
             DependencyProperty.Register("PropertySort", typeof(PropertySort), typeof(WpfPropertyGrid),
             new FrameworkPropertyMetadata(PropertySort.CategorizedAlphabetical, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, PropertySortPropertyChanged));
+        public static readonly DependencyProperty TitleVisibleProperty =
+            DependencyProperty.Register("TitleVisible", typeof(bool), typeof(WpfPropertyGrid),
+            new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, TitleVisiblePropertyChanged));
         #endregion
 
         #region Dependency properties events
@@ -187,10 +195,10 @@ namespace System.Windows.Controls
 
             pg.ChangeHelpText(string.Empty, string.Empty);
         }
-        private static void HelpVisiblePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        private static void TitleVisiblePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
             WpfPropertyGrid pg = source as WpfPropertyGrid;
-
+            
             if (e.NewValue != e.OldValue)
             {
                 if (e.NewValue.Equals(true))
@@ -203,6 +211,22 @@ namespace System.Windows.Controls
                     pg.HelpTextHeight = pg.RowDefinitions[2].Height.Value;
                     pg.RowDefinitions[1].Height = new GridLength(0);
                     pg.RowDefinitions[2].Height = new GridLength(0);
+                }
+            }
+        }
+        private static void HelpVisiblePropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        {
+            WpfPropertyGrid pg = source as WpfPropertyGrid;
+
+            if (e.NewValue != e.OldValue)
+            {
+                if (e.NewValue.Equals(true))
+                {
+                    pg.RowDefinitions[0].Height = new GridLength(1, GridUnitType.Star);
+                }
+                else
+                {
+                    pg.RowDefinitions[0].Height = new GridLength(0);
                 }
             }        
         }
@@ -293,6 +317,8 @@ namespace System.Windows.Controls
 
             var methods = inspectorType.GetMethods(Reflection.BindingFlags.Public | Reflection.BindingFlags.NonPublic | Reflection.BindingFlags.Instance |
                 Reflection.BindingFlags.DeclaredOnly);
+
+
 
             this.RefreshMethod = inspectorType.GetMethod("RefreshPropertyList",
                 Reflection.BindingFlags.NonPublic | Reflection.BindingFlags.Instance | Reflection.BindingFlags.DeclaredOnly);

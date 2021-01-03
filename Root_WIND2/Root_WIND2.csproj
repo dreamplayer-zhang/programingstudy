@@ -237,11 +237,26 @@
     <Compile Include="EdgeResult.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />
+    <Compile Include="Module\InspectionManagerBackside.cs" />
+    <Compile Include="Module\InspectionManagerEdge.cs" />
+    <Compile Include="Module\InspectionManagerFrontside.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\BacksideInspection.xaml.cs">
+      <DependentUpon>BacksideInspection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideInspection_ViewModel.cs" />
+    <Compile Include="UI\SettingDialog\ISettingData.cs" />
+    <Compile Include="UI\SettingDialog\SettingData.cs" />
+    <Compile Include="UI\SettingDialog\SettingData_Setup.cs" />
+    <Compile Include="UI\SettingDialog\SettingData_SetupBackside.cs" />
+    <Compile Include="UI\SettingDialog\SettingData_SetupFrontside.cs" />
+    <Compile Include="UI\SettingDialog\SettingDialog.xaml.cs">
+      <DependentUpon>SettingDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SettingDialog\SettingDialog_ViewModel.cs" />
     <Compile Include="WIND2EventArgs.cs" />
     <Compile Include="WIND2EventManager.cs" />
     <Compile Include="Module\BackSideVision.cs" />
     <Compile Include="Module\GrabMode.cs" />
-    <Compile Include="Module\InspectionManager_EFEM.cs" />
     <Compile Include="Module\Common\Run_Delay.cs" />
     <Compile Include="Module\Vision\Run_GrabLineScan.cs" />
     <Compile Include="Module\Vision\Run_Inspect.cs" />
@@ -250,32 +265,22 @@
     <Compile Include="UIManager.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\InspectionROI.cs" />
     <Compile Include="Module\EdgeSideVision.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Map\Control_Chip.xaml.cs">
-      <DependentUpon>Control_Chip.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Map\FrontsideMap_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideMap_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideSpecTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideSummary_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideSpec_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\InspectionItem.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\Mask.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideMask_ViewModel.cs" />
-    <Compile Include="Module\InspectionManager_Vision.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideOriginBox_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideOriginTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideOrigin_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsidePosition_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\DrawTool_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\InspTestPage.xaml.cs">
-      <DependentUpon>InspTestPage.xaml</DependentUpon>
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideInspection_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontsideInspection.xaml.cs">
+      <DependentUpon>FrontsideInspection.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\InspTestPanel.xaml.cs">
-      <DependentUpon>InspTestPanel.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\InspTest_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\BacksideInspTest_Panel.xaml.cs">
-      <DependentUpon>BacksideInspTest_Panel.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideInspection_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\BacksideSetup.xaml.cs">
       <DependentUpon>BacksideSetup.xaml</DependentUpon>
     </Compile>
@@ -288,7 +293,6 @@
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\BacksideROI.xaml.cs">
       <DependentUpon>BacksideROI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideInspTest_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideROI_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideSetup_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\3. Edge\EdgeSetupPage.xaml.cs">
@@ -339,7 +343,7 @@
       <DependentUpon>FrontSide_Panel.xaml</DependentUpon>
     </Compile>
     <Compile Include="MVVM\Converter.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Map\FrontSideMap.xaml.cs">
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontSideMap.xaml.cs">
       <DependentUpon>FrontSideMap.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Button\NaviBtn.xaml.cs">
@@ -431,19 +435,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\InspTestPage.xaml">
+    <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontsideInspection.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\InspTestPanel.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Map\Control_Chip.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\1. Setup\3. RecipeWizard\2. BackSide\BacksideInspTest_Panel.xaml">
+    <Page Include="UI\1. Setup\3. RecipeWizard\2. BackSide\BacksideInspection.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -507,7 +503,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Map\FrontSideMap.xaml">
+    <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontSideMap.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -588,6 +584,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\4. Maintenance\ViewerTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SettingDialog\SettingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

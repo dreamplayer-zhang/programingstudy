@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,18 +11,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-
 
 namespace Root_WIND2
 {
     /// <summary>
-    /// InspTestPanel.xaml에 대한 상호 작용 논리
+    /// SettingDialog.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class InspTestPanel : UserControl
+    public partial class SettingDialog : Window
     {
-        public InspTestPanel()
+        public SettingDialog()
         {
             InitializeComponent();
         }

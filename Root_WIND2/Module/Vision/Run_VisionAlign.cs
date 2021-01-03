@@ -4,7 +4,6 @@ using RootTools.Control;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
-using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +12,9 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2.Module
 {
-    public class Run_Inspect : ModuleRunBase
+    public class Run_VisionAlign : ModuleRunBase
     {
         Vision m_module;
-
-        string m_sRecipeName = string.Empty;
-
-        // Grab 관련 파라매터 (이거 나중에 구조 변경 필요할듯)
         public RPoint m_rpAxisCenter = new RPoint();    // Wafer Center Position
         public CPoint m_cpMemoryOffset = new CPoint();  // Memory Offset
         public double m_dResX_um = 1;                   // Camera Resolution X
@@ -31,16 +26,6 @@ namespace Root_WIND2.Module
         bool m_bInvDir = false;
         public GrabMode m_grabMode = null;
         string m_sGrabMode = "";
-
-        InspectionManagerFrontside inspectionFront;
-
-        #region [Getter Setter]
-        public string RecipeName 
-        { 
-            get => m_sRecipeName;
-            set => m_sRecipeName = value;
-        }
-
         public string p_sGrabMode
         {
             get { return m_sGrabMode; }
@@ -51,45 +36,20 @@ namespace Root_WIND2.Module
             }
         }
 
-        public InspectionManagerFrontside InspectionVision 
-        {  
-            get => inspectionFront;
-            set => inspectionFront = value;
-        }
-        #endregion
-
-        public Run_Inspect(Vision module)
+        public Run_VisionAlign(Vision module)
         {
             m_module = module;
-            inspectionFront = ((WIND2_Engineer)module.m_engineer).InspectionFront;
             InitModuleRun(module);
         }
 
         public override ModuleRunBase Clone()
         {
-            Run_Inspect run = new Run_Inspect(m_module);
-            run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
-            run.m_cpMemoryOffset = new CPoint(m_cpMemoryOffset);
-            run.m_dResX_um = m_dResX_um;
-            run.m_dResY_um = m_dResY_um;
-            run.m_nFocusPosZ = m_nFocusPosZ;
-            run.m_nWaferSize_mm = m_nWaferSize_mm;
-            run.m_nMaxFrame = m_nMaxFrame;
-            run.m_nScanRate = m_nScanRate;
-            run.p_sGrabMode = p_sGrabMode;
-
-            run.InspectionVision = ProgramManager.Instance.InspectionFront;
-
-            run.RecipeName = this.RecipeName;
+            Run_VisionAlign run = new Run_VisionAlign(m_module);
             return run;
         }
 
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
-            m_sRecipeName = tree.SetFile(m_sRecipeName, m_sRecipeName, "rcp", "Recipe", "Recipe Name", bVisible);
-
-
-            // 이거 다 셋팅 되어 있는거 가져와야함
             m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
             m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
             m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam X Resolution", "X Resolution (um)", bVisible);
@@ -103,20 +63,8 @@ namespace Root_WIND2.Module
 
         public override string Run()
         {
-            //레시피에 GrabMode 저장하고 있어야함
-
-
             if (m_grabMode == null) return "Grab Mode == null";
 
-            if(this.inspectionFront.Recipe.Read(m_sRecipeName, true) == false)
-                return "Recipe Open Fail";
-
-            if (this.inspectionFront.CreateInspection() == false)
-                return "Create Inspection Fail";
-
-            this.inspectionFront.Start(true);
-
-            /// Snap Start (이거 나중에 구조 변경 필요할듯...)
             try
             {
                 m_grabMode.SetLight(true);
@@ -189,21 +137,27 @@ namespace Root_WIND2.Module
                         return p_sInfo;
                     axisXY.p_axisY.RunTrigger(false);
 
-                    WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_camera.GetRoiSize().X, nWaferSizeY_px)));
+                    //WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_camera.GetRoiSize().X, nWaferSizeY_px)));
 
                     nScanLine++;
                     cpMemoryOffset.X += m_grabMode.m_camera.GetRoiSize().X;
                 }
                 m_grabMode.m_camera.StopGrab();
+
+                // Align
+
+                IntPtr memImg = m_grabMode.m_memoryData.GetPtr();
+
+                
+                
+                //
+
                 return "OK";
             }
             finally
             {
                 m_grabMode.SetLight(false);
             }
-
-
-            return "OK";
         }
     }
 }

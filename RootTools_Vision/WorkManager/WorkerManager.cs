@@ -95,6 +95,7 @@ namespace RootTools_Vision
                     worker.eWorkerState == WORKER_STATE.WORKING)
                     continue;
 
+                worker.eWorkerState = WORKER_STATE.WORK_ASSIGNED;
                 return worker;
             }
 
@@ -110,7 +111,13 @@ namespace RootTools_Vision
                 Worker worker = GetAvailableWorker();
                 while (worker != null)
                 {
-                    if(eStateCheckType == STATE_CHECK_TYPE.WAFER)
+                    if (this.workplaceBundle.CheckStateAll(WORKPLACE_STATE.DEFECTPROCESS_WAFER) == true)
+                    {
+                        worker.eWorkerState = WORKER_STATE.NONE;
+                        break;
+                    }
+
+                    if (eStateCheckType == STATE_CHECK_TYPE.WAFER)
                     {
                         if(this.workplaceBundle.CheckStateAll(this.excuteCondition) == true)
                         {
@@ -120,17 +127,24 @@ namespace RootTools_Vision
                             this.workBundle.WorkplaceBundle = this.workplaceBundle;
                             worker.SetWorkBundle(this.workBundle.Clone());
                             worker.Start();
-                            break;
+
+                            worker = GetAvailableWorker();
+                        }
+                        else
+                        {
+                            worker.eWorkerState = WORKER_STATE.NONE;
                         }
                     }
                     else
                     {
                         Workplace workplace = this.workplaceBundle.GetWorkplaceByState(this.excuteCondition);
-                        if (workplace == null) return;
+                        if (workplace == null)
+                        {
+                            worker.eWorkerState = WORKER_STATE.NONE;
+                            return;
+                        }
 
                         workplace.IsOccupied = true;
-
-                        worker.eWorkerState = WORKER_STATE.WORK_ASSIGNED;
 
                         worker.SetWorkBundle(this.workBundleList[workplace.Index]);
                         worker.Start();

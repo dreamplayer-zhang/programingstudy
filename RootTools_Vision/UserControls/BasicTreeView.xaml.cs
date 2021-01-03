@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_WIND2
+namespace RootTools_Vision.UserControls
 {
     /// <summary>
-    /// Control_Chip.xaml에 대한 상호 작용 논리
+    /// BasicTreeView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Control_Chip : UserControl
+    public partial class BasicTreeView : UserControl
     {
-        public Control_Chip()
+        public BasicTreeView()
         {
             InitializeComponent();
         }
