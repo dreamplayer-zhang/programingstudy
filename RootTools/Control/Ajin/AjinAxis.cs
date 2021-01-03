@@ -774,6 +774,27 @@ namespace RootTools.Control.Ajin
         }
         #endregion
 
+        #region Compensation
+        
+        public override bool CompensationSet(double dstartpos, double[] dpPosition, double[] dpCorrection)
+        {
+            uint res = AXM("AxmCompensationSet", CAXM.AxmCompensationSet(m_nAxis, dpPosition.Length, dstartpos, dpPosition, dpCorrection, 0));
+            if (res == 0)
+                return true;
+            else
+                return false;        
+        }
+
+        public override bool EnableCompensation(int isenable)
+        {
+            uint res = AXM("AxmCompensationEnable", CAXM.AxmCompensationEnable(m_nAxis, (uint)isenable));
+            if (res == 0)
+                return true;
+            else
+                return false;
+        }
+        #endregion
+
         public AjinListAxis m_listAxis; 
         public void Init(AjinListAxis listAxis, string id, Log log)
         {

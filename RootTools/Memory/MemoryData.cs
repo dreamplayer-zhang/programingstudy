@@ -360,7 +360,7 @@ namespace RootTools.Memory
                 bw.Write(i);
                 bw.Write((byte)255);
             }
-            byte[] aBuf = new byte[p_nByte * p_sz.X]; 
+            byte[] aBuf = new byte[p_nByte * p_sz.X];
             for (int y = 0; y < p_sz.Y; y++)
             {
                 Marshal.Copy(GetPtr(nIndex, 0, p_sz.Y - y - 1), aBuf, 0, p_nByte * p_sz.X);
