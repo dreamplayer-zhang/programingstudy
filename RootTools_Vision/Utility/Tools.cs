@@ -154,9 +154,9 @@ namespace RootTools_Vision
                         IntPtr pointer = bmpData.Scan0;
                         byte* pPointer = (byte*)pointer.ToPointer();
 
-                        Parallel.For(0, _height - 1, (j) =>
+                        Parallel.For(0, _height - 1, (i) =>
                         {
-                            for (int i = 0; i < _width; i++)
+                            for (int j = 0; j < _width; j++)
                             {
                                 rawdata[i * _width * _byteCount + j * _byteCount + 2] = pPointer[i * bmpData.Stride + j * _byteCount + 0];
                                 rawdata[i * _width * _byteCount + j * _byteCount + 1] = pPointer[i * bmpData.Stride + j * _byteCount + 1];

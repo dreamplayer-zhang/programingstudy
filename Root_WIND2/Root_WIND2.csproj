@@ -253,6 +253,9 @@
       <DependentUpon>SettingDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SettingDialog\SettingDialog_ViewModel.cs" />
+    <Compile Include="UI\2. Review\Tuning.xaml.cs">
+      <DependentUpon>Tuning.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WIND2EventArgs.cs" />
     <Compile Include="WIND2EventManager.cs" />
     <Compile Include="Module\BackSideVision.cs" />
@@ -474,6 +477,10 @@
     <Page Include="UI\1. Setup\4. Maintenance\WIND2_Hander_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\2. Review\Tuning.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\3. Run\Run.xaml">
       <SubType>Designer</SubType>
