@@ -1,9 +1,9 @@
-﻿using Root_Rinse_Loader.Engineer;
+﻿using Root_Rinse_Unloader.Engineer;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
 
-namespace Root_Rinse_Loader
+namespace Root_Rinse_Unloader
 {
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리
@@ -16,12 +16,12 @@ namespace Root_Rinse_Loader
         }
 
         #region Loaded
-        RinseL_Engineer m_engineer = new RinseL_Engineer();
+        RinseU_Engineer m_engineer = new RinseU_Engineer();
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(@"C:\Recipe\Rinse_Loader")) Directory.CreateDirectory(@"C:\Recipe\Rinse_Loader");
-            m_engineer.Init("Rinse_Loader");
-            engineerUI.Init(m_engineer); 
+            if (!Directory.Exists(@"C:\Recipe\Rinse_Unloader")) Directory.CreateDirectory(@"C:\Recipe\Rinse_Unloader");
+            m_engineer.Init("Rinse_Unloader");
+            engineerUI.Init(m_engineer);
         }
         #endregion
 
@@ -31,6 +31,5 @@ namespace Root_Rinse_Loader
             m_engineer.ThreadStop();
         }
         #endregion
-
     }
 }

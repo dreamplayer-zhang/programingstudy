@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{171D186A-EB04-4032-A114-8064B3465FCD}</ProjectGuid>
+    <ProjectGuid>{5FC85C77-783D-4A56-B3A4-898AACBB8D0C}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Root_Rinse_Loader</RootNamespace>
-    <AssemblyName>Root_Rinse_Loader</AssemblyName>
+    <RootNamespace>Root_Rinse_Unloader</RootNamespace>
+    <AssemblyName>Root_Rinse_Unloader</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -38,7 +38,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SqlXml" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -57,11 +56,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Engineer\RinseL_Engineer_UI.xaml">
+    <Page Include="Engineer\RinseU_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Engineer\RinseL_Handler_UI.xaml">
+    <Page Include="Engineer\RinseU_Handler_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -73,13 +72,13 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Engineer\RinseL_Engineer_UI.xaml.cs">
-      <DependentUpon>RinseL_Engineer_UI.xaml</DependentUpon>
+    <Compile Include="Engineer\RinseU_Engineer.cs" />
+    <Compile Include="Engineer\RinseU_Engineer_UI.xaml.cs">
+      <DependentUpon>RinseU_Engineer_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Engineer\RinseL_Engineer.cs" />
-    <Compile Include="Engineer\RinseL_Handler.cs" />
-    <Compile Include="Engineer\RinseL_Handler_UI.xaml.cs">
-      <DependentUpon>RinseL_Handler_UI.xaml</DependentUpon>
+    <Compile Include="Engineer\RinseU_Handler.cs" />
+    <Compile Include="Engineer\RinseU_Handler_UI.xaml.cs">
+      <DependentUpon>RinseU_Handler_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

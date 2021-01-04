@@ -2,20 +2,20 @@
 using RootTools.Trees;
 using System.Windows.Controls;
 
-namespace Root_Rinse_Loader.Engineer
+namespace Root_Rinse_Unloader.Engineer
 {
     /// <summary>
-    /// RinseL_Engineer_UI.xaml에 대한 상호 작용 논리
+    /// RinseU_Engineer_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class RinseL_Engineer_UI : UserControl
+    public partial class RinseU_Engineer_UI : UserControl
     {
-        public RinseL_Engineer_UI()
+        public RinseU_Engineer_UI()
         {
             InitializeComponent();
         }
 
-        RinseL_Engineer m_engineer = null;
-        public void Init(RinseL_Engineer engineer)
+        RinseU_Engineer m_engineer = null;
+        public void Init(RinseU_Engineer engineer)
         {
             m_engineer = engineer;
             logViewUI.Init(LogView.m_logView);

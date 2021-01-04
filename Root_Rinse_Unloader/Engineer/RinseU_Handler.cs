@@ -8,9 +8,9 @@ using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Root_Rinse_Loader.Engineer
+namespace Root_Rinse_Unloader.Engineer
 {
-    public class RinseL_Handler : IHandler
+    public class RinseU_Handler : IHandler
     {
         #region UI Binding
         public Brush p_brushHandler
@@ -159,14 +159,14 @@ namespace Root_Rinse_Loader.Engineer
         #endregion
 
         string m_id;
-        public RinseL_Engineer m_engineer;
+        public RinseU_Engineer m_engineer;
         public GAF m_gaf;
         IGem m_gem;
 
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_engineer = (RinseL_Engineer)engineer;
+            m_engineer = (RinseU_Engineer)engineer;
             m_gaf = engineer.ClassGAF();
             m_gem = engineer.ClassGem();
             InitModule();
