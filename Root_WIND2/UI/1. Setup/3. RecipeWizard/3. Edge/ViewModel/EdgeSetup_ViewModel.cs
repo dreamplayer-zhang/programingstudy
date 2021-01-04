@@ -16,8 +16,8 @@ namespace Root_WIND2
 		private WIND2_Engineer engineer;
 		private Setup_ViewModel setupVM;
 
-		private DrawTool_ViewModel drawToolVM;
-		public DrawTool_ViewModel DrawToolVM
+		private FrontsideInspection_ImageViewer_ViewModel drawToolVM;
+		public FrontsideInspection_ImageViewer_ViewModel DrawToolVM
 		{
 			get { return drawToolVM; }
 			set { SetProperty(ref drawToolVM, value); }
@@ -40,7 +40,7 @@ namespace Root_WIND2
 
 		public void Init()
 		{
-			DrawToolVM = new DrawTool_ViewModel();
+			DrawToolVM = new FrontsideInspection_ImageViewer_ViewModel();
 		}
 
 		public void Scan()
@@ -75,7 +75,7 @@ namespace Root_WIND2
 			}
 
 			setupVM.InspectionManagerEFEM.SharedBuffer = sharedBuf;
-			setupVM.InspectionManagerEFEM.InspectionMode = InspectionManager_EFEM.InsepectionMode.EDGE;
+			setupVM.InspectionManagerEFEM.InspectionMode = InspectionManagerEdge.InsepectionMode.EDGE;
 			setupVM.InspectionManagerEFEM.SharedBufferByteCnt = DrawToolVM.p_ImageData.p_nByte;
 			setupVM.InspectionManagerEFEM.CreateInspection();
 			setupVM.InspectionManagerEFEM.Start();

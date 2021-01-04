@@ -1,4 +1,6 @@
-﻿namespace Root_EFEM.Module
+﻿using RootTools;
+
+namespace Root_EFEM.Module
 {
     public interface ILoadport
     {

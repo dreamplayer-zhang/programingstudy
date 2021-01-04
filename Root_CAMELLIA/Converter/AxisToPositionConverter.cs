@@ -17,7 +17,7 @@ namespace Root_CAMELLIA
             {
                 double pulse = (double)values[1];
                 double center = (double)values[2];
-                double res = pulse - center;
+                double res =  center - pulse;
 
                 res /= 10000;
                 return res.ToString("0.###") + "mm";

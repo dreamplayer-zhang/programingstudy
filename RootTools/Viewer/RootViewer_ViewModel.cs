@@ -574,7 +574,7 @@ namespace RootTools
                         }
                         else if (p_ImageData.p_nByte == 3)
                         {
-                            if (p_eColorViewMode == eColorViewMode.All)
+                             if (p_eColorViewMode == eColorViewMode.All)
                             {
                                 if(p_ImageData.m_eMode == ImageData.eMode.MemoryRead)
                                 {
