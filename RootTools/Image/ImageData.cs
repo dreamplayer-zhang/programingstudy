@@ -644,7 +644,7 @@ namespace RootTools
 		void Worker_MemoryCopy_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
 		{
 			p_nProgress = 100;
-			OnCreateNewImage();
+			//OnCreateNewImage();
 		}
 
 
@@ -679,7 +679,7 @@ namespace RootTools
 		void Worker_MemoryClear_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
 		{
 			p_nProgress = 100;
-			OnCreateNewImage();
+			//OnCreateNewImage();
 		}
 
 		int nLine = 0;
