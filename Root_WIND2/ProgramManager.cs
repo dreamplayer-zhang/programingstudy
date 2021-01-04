@@ -61,8 +61,9 @@ namespace Root_WIND2
 
         private ImageData imageEdge;
 
-        InspectionManager_Vision inspectionVision;
-        InspectionManager_EFEM inspectionEFEM;
+        InspectionManagerFrontside inspectionFront;
+        InspectionManagerBackside inspectionBack;
+        InspectionManagerEdge inspectionEdge;
         #endregion
 
         #region [Getter Setter]
@@ -71,8 +72,10 @@ namespace Root_WIND2
         public Recipe Recipe { get => recipe; private set => recipe = value; }
         public ImageData Image { get => image; private set => image = value; }
         public ImageData ROILayer { get => roiLayer; private set => roiLayer = value; }
-        public InspectionManager_Vision InspectionVision { get => inspectionVision; private set => inspectionVision = value; }
-        public InspectionManager_EFEM InspectionEFEM { get => inspectionEFEM; private set => inspectionEFEM = value; }
+        public InspectionManagerFrontside InspectionFront { get => inspectionFront; private set => inspectionFront = value; }
+        public InspectionManagerBackside InspectionBack { get => inspectionBack; private set => inspectionBack = value; }
+        public InspectionManagerEdge InspectionEdge { get => inspectionEdge; private set => inspectionEdge = value; }
+        
         public IDialogService DialogService { get => dialogService; set => dialogService = value; }
         public ImageData ImageEdge { get => imageEdge; private set => imageEdge = value; }
         #endregion
@@ -119,6 +122,7 @@ namespace Root_WIND2
             ImageEdge = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
             //ImageEdge.p_nByte = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop).p_nByte;
 
+
             return true;
         }
 
@@ -134,19 +138,23 @@ namespace Root_WIND2
             if (!Directory.Exists(recipeFolderPath))
                 Directory.CreateDirectory(recipeFolderPath);
 
-            // Vision
-            this.InspectionVision = new InspectionManager_Vision(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
+            // Front
+            this.InspectionFront = new InspectionManagerFrontside(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
             
-            this.Engineer.InspectionVision = this.InspectionVision;
-            this.Engineer.InspectionVision.Recipe = this.recipe;
+            this.Engineer.InspectionFront = this.InspectionFront;
+            this.Engineer.InspectionFront.Recipe = this.recipe;
 
-            // EFEM
-            this.InspectionEFEM = new InspectionManager_EFEM(ImageEdge.GetPtr(), ImageEdge.p_Size.X, ImageEdge.p_Size.Y, 3);
+            // Back
+            this.InspectionBack = new InspectionManagerBackside(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
 
-            this.Engineer.InspectionEFEM = this.InspectionEFEM;
+            this.Engineer.InspectionBack = this.InspectionBack;
+            this.Engineer.InspectionBack.Recipe = this.recipe;
+
+            // Edge
+            this.InspectionEdge = new InspectionManagerEdge(ImageEdge.GetPtr(), ImageEdge.p_Size.X, ImageEdge.p_Size.Y, 3);
+
+            this.Engineer.InspectionEFEM = this.InspectionEdge;
             this.Engineer.InspectionEFEM.Recipe = this.recipe;
-
-         
 
             return true;
         }

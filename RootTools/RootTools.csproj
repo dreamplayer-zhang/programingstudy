@@ -360,6 +360,11 @@
       <DependentUpon>MiniViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Image\MiniViewer_ViewModel.cs" />
+    <Compile Include="InfoCarrier.cs" />
+    <Compile Include="InfoCarrier_UI.xaml.cs">
+      <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="InfoWafer.cs" />
     <Compile Include="OHTNew\OHT.cs" />
     <Compile Include="OHTNew\OHT_ButtonUI.xaml.cs">
       <DependentUpon>OHT_ButtonUI.xaml</DependentUpon>
@@ -634,7 +639,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Comm\RFID_Brooks.cs" />
     <Compile Include="Image\RPoint.cs" />
     <Compile Include="Comm\RS232.cs" />
     <Compile Include="Comm\RS232_UI.xaml.cs">
@@ -824,6 +828,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Image\MiniViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InfoCarrier_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

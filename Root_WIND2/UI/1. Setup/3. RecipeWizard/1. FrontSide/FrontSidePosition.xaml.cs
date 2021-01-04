@@ -24,16 +24,5 @@ namespace Root_WIND2
         {
             InitializeComponent();
         }
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            var asdf = (sender as MenuItem).DataContext;
-        }
-
-        private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
-        {
-            var asdf = (sender as MenuItem).DataContext;
-
-        }
     }
 }

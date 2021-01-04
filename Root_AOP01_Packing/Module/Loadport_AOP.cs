@@ -69,7 +69,7 @@ namespace Root_AOP01_Packing.Module
 
         public List<string> p_asChildSlot
         {
-            get { return p_infoCarrier.m_asGemSlot; }
+            get { return p_infoCarrier.p_asGemSlot; }
         }
 
         public InfoWafer p_infoWafer { get; set; }
@@ -354,3 +354,4 @@ namespace Root_AOP01_Packing.Module
         #endregion
     }
 }
+
