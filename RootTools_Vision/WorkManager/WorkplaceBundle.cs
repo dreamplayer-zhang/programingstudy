@@ -152,12 +152,6 @@ namespace RootTools_Vision
             }
         }
 
-        public void WorkplaceStateChanged_Callback(object obj)
-        {
-            if (WorkplaceStateChanged != null)
-                WorkplaceStateChanged(obj);
-        }
-
         public void WorkplacePositionInitialized_Callback(object obj, int transX, int transY)
         {
             Workplace workplace = obj as Workplace;

@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_AOP01_Inspection.UI._1._SETUP._3._Maintenance
+namespace Root_AOP01_Inspection
 {
     /// <summary>
     /// ViewerTest.xaml에 대한 상호 작용 논리

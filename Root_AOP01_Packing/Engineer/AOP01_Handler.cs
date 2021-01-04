@@ -107,12 +107,12 @@ namespace Root_AOP01_Packing
         public List<ILoadport> m_aLoadport = new List<ILoadport>();
         void InitLoadport()
         {
-            Loadport_Cymechs loadportA = new Loadport_Cymechs("LoadportA", m_engineer, true, true);
+            Loadport_Cymechs loadportA = new Loadport_Cymechs("LoadportA", m_engineer, false, false);
             InitModule(loadportA);
             m_aLoadport.Add(loadportA);
             ((IWTR)m_aWTR[0]).AddChild((IWTRChild)loadportA);
 
-            Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, true, true);
+            Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, false, false);
             InitModule(loadportAOP);
             m_aLoadport.Add(loadportAOP);
             ((IWTR)m_aWTR[1]).AddChild((IWTRChild)loadportAOP);

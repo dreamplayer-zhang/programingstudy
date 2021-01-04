@@ -139,10 +139,15 @@ namespace Root_WIND2
 
         public WIND2_Handler m_handler = new WIND2_Handler();
 
-        private InspectionManager_Vision inspectionVision;
-        public InspectionManager_Vision InspectionVision { get => inspectionVision; set => inspectionVision = value; }
-        private InspectionManager_EFEM inspectionEFEM;
-        public InspectionManager_EFEM InspectionEFEM { get => inspectionEFEM; set => inspectionEFEM = value; }
+        private InspectionManagerFrontside inspectionFront;
+        public InspectionManagerFrontside InspectionFront { get => inspectionFront; set => inspectionFront = value; }
+
+        private InspectionManagerBackside inspectionBack;
+        public InspectionManagerBackside InspectionBack { get => inspectionBack; set => inspectionBack = value; }
+
+
+        private InspectionManagerEdge inspectionEFEM;
+        public InspectionManagerEdge InspectionEFEM { get => inspectionEFEM; set => inspectionEFEM = value; }
 
         #region Tree Setup
         public TreeRoot m_treeRoot;

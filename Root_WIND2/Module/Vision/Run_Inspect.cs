@@ -32,7 +32,7 @@ namespace Root_WIND2.Module
         public GrabMode m_grabMode = null;
         string m_sGrabMode = "";
 
-        InspectionManager_Vision inspectionVision;
+        InspectionManagerFrontside inspectionFront;
 
         #region [Getter Setter]
         public string RecipeName 
@@ -51,17 +51,17 @@ namespace Root_WIND2.Module
             }
         }
 
-        public InspectionManager_Vision InspectionVision 
+        public InspectionManagerFrontside InspectionVision 
         {  
-            get => inspectionVision;
-            set => inspectionVision = value;
+            get => inspectionFront;
+            set => inspectionFront = value;
         }
         #endregion
 
         public Run_Inspect(Vision module)
         {
             m_module = module;
-            inspectionVision = ((WIND2_Engineer)module.m_engineer).InspectionVision;
+            inspectionFront = ((WIND2_Engineer)module.m_engineer).InspectionFront;
             InitModuleRun(module);
         }
 
@@ -78,7 +78,7 @@ namespace Root_WIND2.Module
             run.m_nScanRate = m_nScanRate;
             run.p_sGrabMode = p_sGrabMode;
 
-            run.InspectionVision = ProgramManager.Instance.InspectionVision;
+            run.InspectionVision = ProgramManager.Instance.InspectionFront;
 
             run.RecipeName = this.RecipeName;
             return run;
@@ -88,6 +88,8 @@ namespace Root_WIND2.Module
         {
             m_sRecipeName = tree.SetFile(m_sRecipeName, m_sRecipeName, "rcp", "Recipe", "Recipe Name", bVisible);
 
+
+            // 이거 다 셋팅 되어 있는거 가져와야함
             m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
             m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
             m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam X Resolution", "X Resolution (um)", bVisible);
@@ -106,13 +108,13 @@ namespace Root_WIND2.Module
 
             if (m_grabMode == null) return "Grab Mode == null";
 
-            if(this.inspectionVision.Recipe.Read(m_sRecipeName, true) == false)
+            if(this.inspectionFront.Recipe.Read(m_sRecipeName, true) == false)
                 return "Recipe Open Fail";
 
-            if (this.inspectionVision.CreateInspection() == false)
+            if (this.inspectionFront.CreateInspection() == false)
                 return "Create Inspection Fail";
 
-            this.inspectionVision.Start(true);
+            this.inspectionFront.Start(true);
 
             /// Snap Start (이거 나중에 구조 변경 필요할듯...)
             try

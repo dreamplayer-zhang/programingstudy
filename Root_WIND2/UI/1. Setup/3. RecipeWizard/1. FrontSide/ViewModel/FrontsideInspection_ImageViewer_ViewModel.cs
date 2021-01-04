@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Root_WIND2
 {
@@ -27,11 +28,11 @@ namespace Root_WIND2
 
     public delegate void EventDrawDone(CPoint leftTop, CPoint rightBottom); //임시
 
-    public class DrawTool_ViewModel : RootViewer_ViewModel
+    public class FrontsideInspection_ImageViewer_ViewModel : RootViewer_ViewModel
     {
         public event EventDrawDone DrawDone;
 
-        public DrawTool_ViewModel()
+        public FrontsideInspection_ImageViewer_ViewModel()
         {
             base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
             p_VisibleMenu = Visibility.Visible;
@@ -273,16 +274,52 @@ namespace Root_WIND2
             return grid;
         }
 
+        static long time = 0;
+        static StopWatch watch = new StopWatch();
         private void RedrawShapes()
         {
+            // 개선중..
+            watch.p_secTimeout = 1;
+            if (watch.IsRunning == true)
+            {
+                time += watch.ElapsedMilliseconds;
+                watch.Restart();
+            }
+            else
+            {
+                watch.Start();
+            }
+
+            if (time < 1000 / 20)
+            {
+                return;
+            }
+            else
+            {
+                time = 0;
+            }
+
             foreach (TShape shape in Shapes)
             {
                 TRect rect = shape as TRect;
+                if (!this.p_View_Rect.Contains(rect.MemoryRect.Left, rect.MemoryRect.Top) || !this.p_View_Rect.Contains(rect.MemoryRect.Right, rect.MemoryRect.Bottom))
+                {
+                    rect.CanvasRect.Visibility = Visibility.Hidden;
+                    continue;
+                }
+                else
+                {
+                    rect.CanvasRect.Visibility = Visibility.Visible;
+                }
+
                 CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
                 CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
 
                 CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
                 CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+
+                    
+
                 int width = Math.Abs(canvasRB.X - canvasLT.X);
                 int height = Math.Abs(canvasRB.Y - canvasLT.Y);
                 rect.CanvasRect.Width = width;
@@ -293,11 +330,47 @@ namespace Root_WIND2
                 Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
             }
         }
+
+        static long time1 = 0;
+        static StopWatch watch1 = new StopWatch();
         private void ReWriteText()
         {
+
+            watch1.p_secTimeout = 1;
+            if (watch1.IsRunning == true)
+            {
+
+
+                time1 += watch1.ElapsedMilliseconds;
+                watch1.Restart();
+            }
+            else
+            {
+                watch1.Start();
+            }
+            if (time1 < 1000 / 20) 
+            {
+                return;
+            }
+            else
+            {
+                time1 = 0;
+            }
+
+
             foreach (InfoTextBolck info in InfoTextBolcks)
             {
                 TRect rect = info.pos;
+                if (!this.p_View_Rect.Contains(rect.MemoryRect.Left, rect.MemoryRect.Top) || !this.p_View_Rect.Contains(rect.MemoryRect.Right, rect.MemoryRect.Bottom))
+                {
+
+                    info.grid.Visibility = Visibility.Hidden;
+                    continue;
+                }
+                else
+                {
+                    info.grid.Visibility = Visibility.Visible;
+                }
                 CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
                 CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
 
@@ -310,7 +383,6 @@ namespace Root_WIND2
                 Canvas.SetLeft(info.grid, canvasLT.X);
                 Canvas.SetTop(info.grid, canvasRB.Y);                
             }
-            
         }
         
         public void Clear()

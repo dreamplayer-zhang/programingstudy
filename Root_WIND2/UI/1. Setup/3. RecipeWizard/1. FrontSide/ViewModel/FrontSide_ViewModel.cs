@@ -22,6 +22,7 @@ namespace Root_WIND2
         public FrontSidePosition   Position;
         public FrontSideMask         ROI;
         public FrontSideSpec        Spec;
+        public FrontsideInspection        InspTestPage;
 
         private FrontsideSummary_ViewModel m_Summary_VM;
         public FrontsideSummary_ViewModel p_Summary_VM
@@ -97,6 +98,19 @@ namespace Root_WIND2
             }
         }
 
+        private FronsideInspection_ViewModel m_InspTest_VM;
+        public FronsideInspection_ViewModel p_InspTest_VM
+        {
+            get
+            {
+                return m_InspTest_VM;
+            }
+            set
+            {
+                SetProperty(ref m_InspTest_VM, value);
+            }
+        }
+
 
 
         Setup_ViewModel m_Setup;
@@ -122,13 +136,21 @@ namespace Root_WIND2
             p_Spec_VM = new FrontsideSpec_ViewModel();
             p_Spec_VM.init(this, m_Recipe);
 
-            Init();
             p_Origin_VM.MapControl_VM.SetMasterDie += P_Origin_VM_SetMasterDie;
-            
+
+            p_InspTest_VM = new FronsideInspection_ViewModel();
+            p_InspTest_VM.init(setup);
+
+            Init();
+
+            // 구조가 ...
+
             m_Map_VM = new FrontsideMap_ViewModel();
             m_Map_VM.Init(setup, Map, m_Recipe);
 
             p_Summary_VM.ConnectInspItemDataGrid(p_Spec_VM);
+
+
         }
 
         private void P_Origin_VM_SetOrigin(object e)
@@ -146,6 +168,7 @@ namespace Root_WIND2
             p_Position_VM.LoadPositonMark(); // Position
             p_Spec_VM.LoadSpec();
             p_Summary_VM.LoadSummaryData();
+            p_InspTest_VM.LoadInspTestData();
         }
 
         public void Init()
@@ -157,6 +180,7 @@ namespace Root_WIND2
             Position = new FrontSidePosition();
             ROI = new FrontSideMask();
             Spec = new FrontSideSpec();
+            InspTestPage = new FrontsideInspection();
 
             SetPage(Map);
             SetPage(Origin);
@@ -164,6 +188,7 @@ namespace Root_WIND2
             SetPage(ROI);
             SetPage(Spec);
             SetPage(Summary);
+            SetPage(InspTestPage);
 
         }
         public void SetPage(UserControl page)
@@ -240,7 +265,8 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    m_Setup.SetFrontInspTest();
+                    SetPage(InspTestPage);
+                    m_InspTest_VM.SetPage(InspTestPage);
                 });
             }
         }
