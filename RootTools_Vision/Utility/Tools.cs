@@ -122,74 +122,6 @@ namespace RootTools_Vision
             return rst;
         }
 
-        
-        public unsafe static byte[] LoadBitmapToRawdata(string filepath, int* _width, int* _height)
-        {
-            byte[] resData = null;
-            bool res = false;
-            try
-            {
-                int byteCount = 1;
-                Bitmap bmp = new Bitmap(filepath);
-
-                *_width = bmp.Width;
-                *_height = bmp.Height;
-
-                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, *_width, *_height), ImageLockMode.WriteOnly, bmp.PixelFormat);
-
-                
-
-                if (bmp.PixelFormat == PixelFormat.Format8bppIndexed)
-                {
-                    byteCount = 1;
-                }
-                else
-                {
-                    byteCount = 3;
-                }
-
-                resData = new byte[bmp.Width * bmp.Height * byteCount];
-                if (byteCount == 1)
-                {
-                    //IntPtr[] ptr = new IntPtr[bmp.Width * bmp.Height * byteCount];
-                    IntPtr pointer = bmpData.Scan0;
-                    Parallel.For(0, *_height - 1, (i) =>
-                    {
-                        Marshal.Copy(pointer + bmpData.Stride * i, resData, i * *_width, *_width * byteCount);
-                        //rawdata. (byte*)ptr[i].ToPointer();
-                    });
-                   
-                    
-                }
-                else
-                {
-                    unsafe
-                    {
-                        IntPtr pointer = bmpData.Scan0;
-                        byte* pPointer = (byte*)pointer.ToPointer();
-
-                        Parallel.For(0, *_height - 1, (i) =>
-                        {
-                            for (int j = 0; j < *_width; j++)
-                            {
-                                resData[i * *_width * byteCount + j * byteCount + 2] = pPointer[i * bmpData.Stride + j * byteCount + 0];
-                                resData[i * *_width * byteCount + j * byteCount + 1] = pPointer[i * bmpData.Stride + j * byteCount + 1];
-                                resData[i * *_width * byteCount + j * byteCount + 0] = pPointer[i * bmpData.Stride + j * byteCount + 2];
-                            }
-                        });
-                    }
-                }
-
-                
-            }
-            catch (Exception)
-            {
-                resData = null;
-               // res = false;
-            }
-            return resData;
-        }
-
         public static bool LoadBitmapToRawdata(string filepath, byte[] rawdata, int _width, int _height, int _byteCount)
         {
             //StopWatch stop = new StopWatch();
@@ -222,9 +154,9 @@ namespace RootTools_Vision
                         IntPtr pointer = bmpData.Scan0;
                         byte* pPointer = (byte*)pointer.ToPointer();
 
-                        Parallel.For(0, _height - 1, (i) =>
+                        Parallel.For(0, _height - 1, (j) =>
                         {
-                            for (int j = 0; j < _width; j++)
+                            for (int i = 0; i < _width; i++)
                             {
                                 rawdata[i * _width * _byteCount + j * _byteCount + 2] = pPointer[i * bmpData.Stride + j * _byteCount + 0];
                                 rawdata[i * _width * _byteCount + j * _byteCount + 1] = pPointer[i * bmpData.Stride + j * _byteCount + 1];

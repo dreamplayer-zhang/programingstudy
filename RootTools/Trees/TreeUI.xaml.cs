@@ -59,12 +59,5 @@ namespace RootTools.Trees
             if (m_treeRoot != null)
                 m_treeRoot.m_bFocus = false;
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Button asdf = ((Button)sender);
-            var ffff =asdf.DataContext;
-
-        }
     }
 }
