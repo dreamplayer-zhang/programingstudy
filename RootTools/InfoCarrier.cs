@@ -110,7 +110,6 @@ namespace RootTools
         #region GemSlot
         const int c_maxSlot = 25;
         /// <summary> m_GemSlot.p_id List </summary>
-        public List<string> m_asGemSlot = new List<string>();  
         void InitSlot()
         {
             for (int n = 0; n < c_maxSlot; n++)
@@ -120,7 +119,6 @@ namespace RootTools
                 newSlot.p_sCarrierID = p_sCarrierID;
                 newSlot.p_sLocID = p_sLocID;
                 m_aGemSlot.Add(newSlot);
-                m_asGemSlot.Add(newSlot.p_id); 
                 m_aInfoWafer.Add(null);
             }
         }
@@ -135,6 +133,16 @@ namespace RootTools
                 if (value > c_maxSlot) return;
                 m_log.Info(p_id + " lWafer : " + _lWafer.ToString() + " -> " + value.ToString());
                 _lWafer = value;
+            }
+        }
+
+        public List<string> p_asGemSlot
+        {
+            get
+            {
+                List<string> asGemSlot = new List<string>();
+                for (int n = 0; n < p_lWafer; n++) asGemSlot.Add(m_aGemSlot[n].p_id);
+                return asGemSlot; 
             }
         }
 
@@ -299,7 +307,7 @@ namespace RootTools
             for (int n = 0; n < m_aInfoWafer.Count; n++)
             {
                 InfoWafer infoWafer = m_aInfoWafer[n];
-                if (infoWafer != null) infoWafer.RunTree(m_treeRootWafer.GetTree(m_asGemSlot[n], false));
+                if (infoWafer != null) infoWafer.RunTree(m_treeRootWafer.GetTree(m_aGemSlot[n].p_id, false));
                 if (mode == Tree.eMode.RegWrite) SaveInfoWafer(n);
             }
         }
