@@ -632,7 +632,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Comm\RFID_Brooks.cs" />
     <Compile Include="Image\RPoint.cs" />
     <Compile Include="Comm\RS232.cs" />
     <Compile Include="Comm\RS232_UI.xaml.cs">
