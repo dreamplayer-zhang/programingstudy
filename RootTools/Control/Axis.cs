@@ -452,14 +452,17 @@ namespace RootTools.Control
             }
         }
 
-        private void M_EQ_OnDoorOpen()
+        private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
+            if (eEQ != _EQ.eEQ.DoorOpen) return;
+            if (value == false) return;
             if (p_eState != eState.Move) return;
             if (m_speedNow == null) return;
             if (m_speedNow.m_id != eSpeed.Move.ToString()) return;
             m_speedNow = GetSpeedValue(eSpeed.Move_DoorOpen);
             OverrideVelocity(m_speedNow.m_v);
         }
+
         #endregion
 
         #region Shift
@@ -831,6 +834,32 @@ namespace RootTools.Control
         }
         #endregion
 
+        #region Compensation
+        /*Compensation Table 사용 순서 : Compensation Set -> Compensation Enable IsEnable*/
+        /* 축 설정하는거 enable이 안되면 축설정 할라고 일단 놔둠
+            a = CAXM.AxmStatusSetActPos(2, 0);
+            b = CAXM.AxmStatusSetCmdPos(2, 0);
+            a = CAXM.AxmStatusSetCmdPos(0, 0);
+            b = CAXM.AxmStatusSetActPos(0, 0);
+            uint r = CAXM.AxmStatusSetPosType(2, 1, 7044215, 0);
+            r = CAXM.AxmStatusSetPosType(0, 1, 5015422, 0);
+            r= CAXM.AxmStatusGetPosType(2, ref aa,ref a,ref b);
+            m_BST.m_LM.WriteLog(LOG.DATAPROCESS, "    ");
+         */
+
+        public virtual void SetAxis()
+        {
+
+        }
+        public virtual bool CompensationSet(double startpos, double[] Position, double[] dpCorrection)
+        {
+            return false;
+        }
+        public virtual bool EnableCompensation(int isenable)
+        {
+            return false;
+        }
+        #endregion
         protected void InitBase(string id, Log log)
         {
             p_id = id;
@@ -838,7 +867,7 @@ namespace RootTools.Control
             InitTree(); 
             InitSetting();
             InitInterlock();
-            EQ.m_EQ.OnDoorOpen += M_EQ_OnDoorOpen;
+            EQ.m_EQ.OnChanged += M_EQ_OnChanged;
         }
     }
 }

@@ -71,7 +71,7 @@ namespace Root_EFEM.Module
 
         public List<string> p_asChildSlot
         {
-            get { return p_infoCarrier.m_asGemSlot; }
+            get { return p_infoCarrier.p_asGemSlot; }
         }
 
         public InfoWafer p_infoWafer { get; set; }
@@ -125,7 +125,7 @@ namespace Root_EFEM.Module
             return IsRunOK();
         }
 
-        public bool IsWaferExist(int nID = 0, bool bUseSensor = true)
+        public bool IsWaferExist(int nID = 0)
         {
             switch (p_infoCarrier.p_eState)
             {
@@ -381,34 +381,22 @@ namespace Root_EFEM.Module
         {
             Run(CmdResetCPU());
             p_eState = eState.Init;
-            m_bNeedHome = true;
             base.Reset();
         }
 
         public override void ButtonHome()
         {
-            m_bNeedHome = true;
             base.ButtonHome();
         }
         #endregion
 
         #region StateHome
-        bool m_bNeedHome = true;
         public override string StateHome()
         {
             if (EQ.p_bSimulate == false)
             {
                 if (Run(CmdResetCPU())) return p_sInfo;
-                if (m_bNeedHome)
-                {
-                    if (Run(CmdHome())) return p_sInfo;
-                    m_bNeedHome = false;
-                }
-                else
-                {
-                    if (m_diDoorOpen.p_bIn) return p_id + " Door Opened";
-                    if (Run(CmdUnload())) return p_sInfo;
-                }
+                if (Run(CmdHome())) return p_sInfo;
             }
             p_eState = eState.Ready;
             p_infoCarrier.p_eState = InfoCarrier.eState.Empty;

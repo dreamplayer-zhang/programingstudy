@@ -1,6 +1,7 @@
 ﻿using Root_EFEM;
 using Root_EFEM.Module;
 using RootTools;
+using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
 using RootTools.Light;
@@ -31,6 +32,7 @@ namespace Root_WIND2.Module
         RADSControl m_RADSControl;
 
         Camera_Dalsa m_CamMain;
+        Camera_Basler m_CamAlign;
 
         #region [Getter Setter]
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
@@ -46,21 +48,26 @@ namespace Root_WIND2.Module
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
         public RADSControl RADSControl { get => m_RADSControl; private set => m_RADSControl = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
+        public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         #endregion
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
-            p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory",1);
-            p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
-            p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
-            p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
-            m_axisRotate.StartMove(1000);
+            if (p_eRemote != eRemote.Client)
+            {
+                p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
+                p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
+                p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
+                p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
+                p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
+                p_sInfo = m_toolBox.Get(ref m_lightSet, this);
+                p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
+                p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
+                p_sInfo = m_toolBox.Get(ref m_CamAlign, this, "AlignCam");
+                p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
+                p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
+            }
+            m_remote.GetTools(bInit);
         }
         #endregion
 
@@ -258,12 +265,19 @@ namespace Root_WIND2.Module
             return "OK";
         }
 
-        public bool IsWaferExist(int nID, bool bIgnoreExistSensor = false)
+        enum eCheckWafer
         {
-            if (bIgnoreExistSensor)
-                return (p_infoWafer != null);
-            //            return m_diWaferExist.p_bIn;
-            return false;
+            InfoWafer,
+            Sensor
+        }
+        eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
+        public bool IsWaferExist(int nID)
+        {
+            switch (m_eCheckWafer)
+            {
+                case eCheckWafer.Sensor: return false; // m_diWaferExist.p_bIn;
+                default: return (p_infoWafer != null);
+            }
         }
 
         InfoWafer.WaferSize m_waferSize;
@@ -309,6 +323,8 @@ namespace Root_WIND2.Module
             Thread.Sleep(200);
             if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
                 m_CamMain.Connect();
+            if (m_CamAlign != null)
+                m_CamAlign.Connect();
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             //p_bStageVac = false;
@@ -325,11 +341,11 @@ namespace Root_WIND2.Module
         }
         #endregion
 
-        public Vision(string id, IEngineer engineer)
+        public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
             //            InitLineScan();
             //            InitAreaScan();
-            base.InitBase(id, engineer);
+            base.InitBase(id, engineer, eRemote);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             //            InitMemory();
         }
@@ -347,7 +363,7 @@ namespace Root_WIND2.Module
             AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
             AddModuleRunList(new Run_GrabLineScan(this), false, "Run Grab LineScan Camera");
             AddModuleRunList(new Run_Inspect(this), false, "Run Inspect");
-            
+            AddModuleRunList(new Run_VisionAlign(this), false, "Vision Align");
         }
         #endregion
     }

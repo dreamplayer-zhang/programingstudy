@@ -17,6 +17,9 @@ namespace Root_CAMELLIA
         StopWatch StopWatch { get; set; }
         bool m_bProgress { get; set; }
         public bool IsInitialized { get; private set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public void StartMeasurement()
         {
             if (m_bProgress)
@@ -26,15 +29,5 @@ namespace Root_CAMELLIA
             m_bProgress = false;
 
         }
-        //public int GetWaitQueue()
-        //{
-        //    return p_qInspection.Count;
-        //}
-
-
-
-
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

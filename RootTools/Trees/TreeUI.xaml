@@ -646,8 +646,36 @@
                                                 IsEnabled="{Binding p_bEnable}">
                                         <Button.Template>
                                             <ControlTemplate>
-                                                <Border BorderThickness="1" BorderBrush="Black">
+                                                <Border BorderThickness="1" BorderBrush="Black"  Background="Transparent">
                                                     <PackIcon:PackIconBoxIcons Kind="RegularFileFind"
+                                                                Width="{PriorityBinding}"
+                                                                Height="{PriorityBinding}"
+                                                                VerticalAlignment="Center"
+                                                                HorizontalAlignment="Center"
+                                                                Foreground="Black" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                    <TextBox Text="{Binding p_value}" Grid.Column="1"
+                                             IsEnabled="{Binding p_bEnable}"
+                                             Style="{StaticResource BorderChangeTextBox}"
+                                             GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
+                                             PreviewKeyDown="ToggleButton_PreviewKeyDown" />
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeItem_FolderName}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30"></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Command="{Binding OpenFolderCommand}" 
+                                            IsEnabled="{Binding p_bEnable}">
+                                        <Button.Template>
+                                            <ControlTemplate>
+                                                <Border BorderThickness="1" BorderBrush="Black" Background="Transparent">
+                                                    <PackIcon:PackIconBoxIcons Kind="RegularFolderOpen"
                                                                 Width="{PriorityBinding}"
                                                                 Height="{PriorityBinding}"
                                                                 VerticalAlignment="Center"

@@ -106,24 +106,6 @@ namespace Root_WIND2
         }
         #endregion
 
-        #region UI
-        public SelectMode m_ModeUI;
-        public Setup m_Setup;
-        public Review m_Review;
-        public Run m_Run;
-        public SelectMode ModeUI;
-        public Setup Setup;
-        public Review Review;
-        public Run Run;
-        #endregion
-
-        #region ViewModel
-        private Setup_ViewModel m_SetupViewModel;
-        private Review_ViewModel m_ReviewViewModel;
-        private Run_ViewModel m_RunViewModel;
-        #endregion
-
-
         public IDialogService dialogService;
 
         void Init()

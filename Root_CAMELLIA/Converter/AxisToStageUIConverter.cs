@@ -22,15 +22,15 @@ namespace Root_CAMELLIA
                 double ratio = (int)(BaseDefine.CanvasWidth / BaseDefine.ViewSize);
                 if (axis.p_id == "Camellia.StageXYX")
                 {
-                    res = (BaseDefine.CanvasWidth / 2) - ((center - current) / (10000 / ratio)) - (double.Parse((string)parameter) / 2);
+                    res = (BaseDefine.CanvasWidth / 2) + ((center - current) / (10000 / ratio)) - (double.Parse((string)parameter) / 2);
                 }
                 else
                 {
-                    res = (BaseDefine.CanvasHeight / 2) + ((center - current) / (10000 / ratio)) - (double.Parse((string)parameter) / 2);
+                    res = (BaseDefine.CanvasHeight / 2) - ((center - current) / (10000 / ratio)) - (double.Parse((string)parameter) / 2);
                 }
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
             return values;

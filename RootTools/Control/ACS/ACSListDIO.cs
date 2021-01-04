@@ -6,17 +6,16 @@ namespace RootTools.Control.ACS
 {
     public class ACSListDIO : ListDIO
     {
-        #region Port
-        public int m_lPort = 1;
-        public List<int> m_aPort = new List<int>();
+        #region Byte
+        public string m_sName = ""; 
+        public int m_lByte = 1;
         List<uint> m_aRead = new List<uint>();
-        uint[] m_aComp = new uint[16];
+        public uint[] m_aBitComp = new uint[8];
         void InitModule()
         {
-            while (m_aPort.Count < m_lPort)
+            while (m_aRead.Count < m_lByte)
             {
-                for (int n = 0, nID = 16 * m_aPort.Count; n < 16; n++, nID++) AddBit(NewBit(nID));
-                m_aPort.Add(-1);
+                for (int n = 0, nID = 8 * m_aRead.Count; n < 8; n++, nID++) AddBit(NewBit(nID));
                 m_aRead.Add(0);
             }
         }
@@ -30,7 +29,7 @@ namespace RootTools.Control.ACS
                     bitDI.Init(nID, m_log);
                     return bitDI;
                 case eDIO.Output:
-                    ACSBitDO bitDO = new ACSBitDO(m_acs);
+                    ACSBitDO bitDO = new ACSBitDO(m_acs, this);
                     bitDO.Init(nID, m_log);
                     return bitDO;
             }
@@ -41,11 +40,11 @@ namespace RootTools.Control.ACS
         {
             if (m_eDIO != eDIO.Output) return;
             int nID = 0;
-            for (int nPort = 0; nPort < m_lPort; nPort++)
+            for (int nByte = 0; nByte < m_lByte; nByte++)
             {
-                for (int nBit = 0; nBit < 16; nBit++, nID++)
+                for (int nBit = 0; nBit < 8; nBit++, nID++) 
                 {
-                    ((ACSBitDO)m_aDIO[nID]).m_nPort = m_aPort[nPort];
+                    ((ACSBitDO)m_aDIO[nID]).m_nByte = nByte;
                     ((ACSBitDO)m_aDIO[nID]).m_nBit = nBit;
                 }
             }
@@ -65,13 +64,15 @@ namespace RootTools.Control.ACS
         void ReadInput()
         {
             if (EQ.p_bSimulate) return;
-            if (m_acs.p_bConnect == false) return; 
+            if (m_acs.p_bConnect == false) return;
             try
             {
-                for (int n = 0; n < m_lPort; n++)
+                dynamic d = m_acs.m_channel.ReadVariable(m_sName, -1, 0, m_lByte - 1);
+                object[] aRead = d; 
+                for (int n = 0; n < m_lByte; n++)
                 {
-                    if (m_aPort[n] >= 0) m_aRead[n] = (uint)m_acs.m_channel.GetInputPort(n);
-                    for (int m = 0, nID = 16 * n; m < 16; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aComp[m]) > 0);
+                    m_aRead[n] = (uint)(int)aRead[n];
+                    for (int m = 0, nID = 8 * n; m < 8; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aBitComp[m]) > 0); 
                 }
             }
             catch (Exception e) { LogError("GetInputPort Error : " + e.Message); }
@@ -83,10 +84,12 @@ namespace RootTools.Control.ACS
             if (m_acs.p_bConnect == false) return;
             try
             {
-                for (int n = 0; n < m_lPort; n++)
+                dynamic d = m_acs.m_channel.ReadVariable(m_sName, -1, 0, m_lByte - 1);
+                object[] aRead = d;
+                for (int n = 0; n < m_lByte; n++)
                 {
-                    if (m_aPort[n] >= 0) m_aRead[n] = (uint)m_acs.m_channel.GetOutputPort(n);
-                    for (int m = 0, nID = 16 * n; m < 16; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aComp[m]) > 0);
+                    m_aRead[n] = (uint)(int)aRead[n];
+                    for (int m = 0, nID = 8 * n; m < 8; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aBitComp[m]) > 0);
                 }
             }
             catch (Exception e) { LogError("GetOutputPort Error : " + e.Message); }
@@ -110,24 +113,16 @@ namespace RootTools.Control.ACS
             m_eDIO = dio;
             m_acs = acs; 
             m_log = acs.m_log;
-            m_aComp[0] = 1;
-            for (int n = 1; n < 16; n++) m_aComp[n] = 2 * m_aComp[n - 1];
+            m_aBitComp[0] = 1;
+            for (int n = 1; n < 8; n++) m_aBitComp[n] = 2 * m_aBitComp[n - 1];
         }
 
         public void RunTree(Tree tree)
         {
-            m_lPort = tree.Set(m_lPort, 1, "Count", "DIO Port Count");
+            m_sName = tree.Set(m_sName, m_sName, "Name", "DIO Name"); 
+            m_lByte = tree.Set(m_lByte, 1, "Count", "DIO Port Count (Byte)");
             InitModule();
-            RunTreePort(tree.GetTree(m_id)); 
             SetModuleOffset();
-        }
-
-        void RunTreePort(Tree tree)
-        {
-            for (int n = 0; n < m_lPort; n++)
-            {
-                m_aPort[n] = tree.Set(m_aPort[n], -1, n.ToString("00"), "DIO Port Number"); 
-            }
         }
 
     }

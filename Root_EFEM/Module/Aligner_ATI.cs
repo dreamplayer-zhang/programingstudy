@@ -291,10 +291,19 @@ namespace Root_EFEM.Module
             return "OK";
         }
 
-        public bool IsWaferExist(int nID, bool bIgnoreExistSensor = false)
+        enum eCheckWafer
         {
-            if (bIgnoreExistSensor) return (p_infoWafer != null);
-            return m_diWaferExist.p_bIn;
+            InfoWafer,
+            Sensor
+        }
+        eCheckWafer m_eCheckWafer = eCheckWafer.Sensor; 
+        public bool IsWaferExist(int nID)
+        {
+            switch (m_eCheckWafer)
+            {
+                case eCheckWafer.Sensor: return m_diWaferExist.p_bIn;
+                default: return (p_infoWafer != null);
+            }
         }
 
         InfoWafer.WaferSize m_waferSize;
@@ -313,6 +322,7 @@ namespace Root_EFEM.Module
 
         void RunTreeSetup(Tree tree)
         {
+            m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer"); 
             m_szAlignROI = tree.Set(m_szAlignROI, m_szAlignROI, "Cameara AOI", "Camera AOI (pixel)");
             RunTreeWafer(tree.GetTree("Default Wafer", false));
             RunTreeRotate(tree.GetTree("Rotate", false));

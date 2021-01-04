@@ -65,6 +65,14 @@ namespace Root_EFEM.Module
 
         void RunTreeArm(Tree tree, ref eArm eArm, bool bVisible)
         {
+            if (p_asArm.Count < 2)
+            {
+                foreach (Arm arm in m_dicArm.Values)
+                {
+                    if (arm.p_bEnable) eArm = arm.m_eArm; 
+                }
+                return; 
+            }
             string sArm = eArm.ToString();
             sArm = tree.Set(sArm, sArm, p_asArm, "Arm", "Select WTR Arm", bVisible);
             foreach (Arm arm in m_dicArm.Values)
@@ -93,12 +101,6 @@ namespace Root_EFEM.Module
                 return "OK";
             }
 
-            public override void RunTree(Tree tree)
-            {
-                base.RunTree(tree);
-                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "Wafer Check", "Wafer Check Option");
-            }
-
             public DIO_I m_diCheckVac;
             public DIO_I m_diArmClose;
             public void GetTools(ToolBox toolBox)
@@ -109,17 +111,23 @@ namespace Root_EFEM.Module
 
             enum eCheckWafer
             {
-                Vacuum,
-                InfoWafer
+                InfoWafer,
+                Sensor,
             };
-            eCheckWafer m_eCheckWafer = eCheckWafer.Vacuum;
+            eCheckWafer m_eCheckWafer = eCheckWafer.Sensor;
             public override bool IsWaferExist()
             {
                 switch (m_eCheckWafer)
                 {
-                    case eCheckWafer.Vacuum: return m_diCheckVac.p_bIn;
+                    case eCheckWafer.Sensor: return m_diCheckVac.p_bIn;
                     default: return (p_infoWafer != null);
                 }
+            }
+
+            public override void RunTree(Tree tree)
+            {
+                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "Wafer Check", "Wafer Check Option");
+                base.RunTree(tree);
             }
         }
         #endregion
@@ -942,8 +950,9 @@ namespace Root_EFEM.Module
                 }
                 finally
                 {
-                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
-                    else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    //if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                    //else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
                 if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";
                 return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;

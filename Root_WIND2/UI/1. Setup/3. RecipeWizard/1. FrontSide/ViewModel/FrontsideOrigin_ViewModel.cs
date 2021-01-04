@@ -243,13 +243,14 @@ namespace Root_WIND2
 
         private void P_OriginTool_VM_DelegateInspArea(object e)
         {
-            //여기머야
             TRect InspAreaBuf = e as TRect;
             p_OriginBoxTool_VM.AddInspArea(InspAreaBuf);
-            OriginImageData = new ImageData(InspAreaBuf.MemoryRect.Width, InspAreaBuf.MemoryRect.Height);
-            OriginImageData.m_eMode = ImageData.eMode.ImageBuffer;
-            OriginImageData.SetData(p_OriginBoxTool_VM.p_ImageData.GetPtr(), InspAreaBuf.MemoryRect, (int)p_OriginBoxTool_VM.p_ImageData.p_Stride);
 
+            CRect rect = new CRect(InspAreaBuf.MemoryRect.Left, InspAreaBuf.MemoryRect.Top, InspAreaBuf.MemoryRect.Right, InspAreaBuf.MemoryRect.Bottom);
+            OriginImageData = new ImageData(rect.Width, rect.Height, p_OriginBoxTool_VM.p_ImageData.p_nByte);
+            OriginImageData.m_eMode = ImageData.eMode.ImageBuffer;
+            //OriginImageData.SetData(p_OriginBoxTool_VM.p_ImageData.GetPtr(), InspAreaBuf.MemoryRect, (int)p_OriginBoxTool_VM.p_ImageData.p_Stride, p_OriginBoxTool_VM.p_ImageData.p_nByte);
+            OriginImageData.SetData(p_OriginBoxTool_VM.p_ImageData, rect, (int)p_OriginBoxTool_VM.p_ImageData.p_Stride, p_OriginBoxTool_VM.p_ImageData.p_nByte);
             InspAreaBuf.Tag = OriginImageData;
 
             SetOrigin(InspAreaBuf);
