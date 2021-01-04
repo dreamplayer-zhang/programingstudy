@@ -247,6 +247,7 @@
     <Compile Include="Module\InspectionManagerBackside.cs" />
     <Compile Include="Module\InspectionManagerEdge.cs" />
     <Compile Include="Module\InspectionManagerFrontside.cs" />
+    <Compile Include="Module\Vision\Run_VisionAlign.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\BacksideInspection.xaml.cs">
       <DependentUpon>BacksideInspection.xaml</DependentUpon>
     </Compile>
