@@ -17,8 +17,10 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows;
 using static RootTools.Control.Axis;
 
 namespace Root_AOP01_Inspection.Module
@@ -416,6 +418,8 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_GrabSideScan(this), false, "Run Side Scan");
             AddModuleRunList(new Run_LADS(this), false, "Run LADS");
             AddModuleRunList(new Run_BarcodeInspection(this), false, "Run Barcode Inspection");
+            AddModuleRunList(new Run_MakeAlignTemplateImage(this), false, "Run MakeAlignTemplateImage");
+            AddModuleRunList(new Run_PatternAlign(this), false, "Run PatternAlign");
         }
         #endregion
 
@@ -1350,6 +1354,223 @@ namespace Root_AOP01_Inspection.Module
                 matReturn = img.Mat;
                 
                 return matReturn;
+            }
+        }
+        #endregion
+
+        #region Make Align Template Image
+        public class Run_MakeAlignTemplateImage : ModuleRunBase
+        {
+            MainVision m_module;
+            public CPoint m_cptTopAlignMarkStartPos = new CPoint();
+            public CPoint m_cptTopAlignMarkEndPos = new CPoint();
+            public CPoint m_cptBottomAlignMarkStartPos = new CPoint();
+            public CPoint m_cptBottomAlignMarkEndPos = new CPoint();
+            //public string m_strTopTemplateImageFilePath = "D:\\TemplateImage\\TopTemplateImage.bmp";
+            //public string m_strBottomTemplateImageFilePath = "D:\\TemplateImage\\BottomTemplateImage.bmp";
+
+            public Run_MakeAlignTemplateImage(MainVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_MakeAlignTemplateImage run = new Run_MakeAlignTemplateImage(m_module);
+                run.m_cptTopAlignMarkStartPos = m_cptTopAlignMarkStartPos;
+                run.m_cptTopAlignMarkEndPos = m_cptTopAlignMarkEndPos;
+                run.m_cptBottomAlignMarkStartPos = m_cptBottomAlignMarkStartPos;
+                run.m_cptBottomAlignMarkEndPos = m_cptBottomAlignMarkEndPos;
+
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_cptTopAlignMarkStartPos = (tree.GetTree("Align Mark ROI", false, bVisible)).Set(m_cptTopAlignMarkStartPos, m_cptTopAlignMarkStartPos, "Align Mark Start Point of Top", "Align Mark Start Point of Top", bVisible);
+                m_cptTopAlignMarkEndPos = (tree.GetTree("Align Mark ROI", false, bVisible)).Set(m_cptTopAlignMarkEndPos, m_cptTopAlignMarkEndPos, "Align Mark End Point of Top", "Align Mark End Point of Top", bVisible);
+                m_cptBottomAlignMarkStartPos = (tree.GetTree("Align Mark ROI", false, bVisible)).Set(m_cptBottomAlignMarkStartPos, m_cptBottomAlignMarkStartPos, "Align Mark Start Point of Bottom", "Align Mark Start Point of Bottom", bVisible);
+                m_cptBottomAlignMarkEndPos = (tree.GetTree("Align Mark ROI", false, bVisible)).Set(m_cptBottomAlignMarkEndPos, m_cptBottomAlignMarkEndPos, "Align Mark End Point of Bottom", "Align Mark End Point of Bottom", bVisible);
+
+                //m_strTopTemplateImageFilePath = (tree.GetTree("Template Image Save Path", false, bVisible)).SetFile(m_strTopTemplateImageFilePath, m_strTopTemplateImageFilePath, "bmp", "Top Template Image Path", "Top Template Image Path", bVisible);
+                //m_strBottomTemplateImageFilePath = (tree.GetTree("Template Image Save Path", false, bVisible)).SetFile(m_strBottomTemplateImageFilePath, m_strBottomTemplateImageFilePath, "bmp", "Bottom Template Image Path", "Bottom Template Image Path", bVisible);
+            }
+
+            public override string Run()
+            {
+                // variable
+                Mat matTopTemplateImage = new Mat();
+                Mat matBottomTemplateImage = new Mat();
+                string strPool = "MainVision.Vision Memory";
+                string strGroup = "MainVision";
+                string strMemory = "Main";
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                CRect crtTopROI = new CRect(m_cptTopAlignMarkStartPos.X, m_cptTopAlignMarkStartPos.Y, m_cptTopAlignMarkEndPos.X, m_cptTopAlignMarkEndPos.Y);
+                CRect crtBottomROI = new CRect(m_cptBottomAlignMarkStartPos.X, m_cptBottomAlignMarkStartPos.Y, m_cptBottomAlignMarkEndPos.X, m_cptBottomAlignMarkEndPos.Y);
+                string strTopTemplateImageFilePath = "D:\\TemplateImage\\";
+                string strBottomTemplateImageFilePath = "D:\\TemplateImage\\";
+
+
+                // implement
+                if (!Directory.Exists(strTopTemplateImageFilePath))
+                    Directory.CreateDirectory(strTopTemplateImageFilePath);
+                if (!Directory.Exists(strBottomTemplateImageFilePath))
+                    Directory.CreateDirectory(strBottomTemplateImageFilePath);
+                matTopTemplateImage = GetMatImage(mem, crtTopROI);
+                matTopTemplateImage.Save(Path.Combine(strTopTemplateImageFilePath, "TopTemplateImage.bmp"));
+                matBottomTemplateImage = GetMatImage(mem, crtBottomROI);
+                matBottomTemplateImage.Save(Path.Combine(strBottomTemplateImageFilePath, "BottomTemplateImage.bmp"));
+
+                return "OK";
+            }
+
+            Mat GetMatImage(MemoryData mem, CRect crtROI)
+            {
+                ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+                IntPtr p = mem.GetPtr();
+                img.SetData(p, crtROI, (int)mem.W);
+                Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
+
+                return matReturn;
+            }
+        }
+        #endregion
+
+        #region PatternAlign
+        public class Run_PatternAlign : ModuleRunBase
+        {
+            MainVision m_module;
+            public int m_nSearchAreaSize;
+            public double m_dMatchScore = 0.4;
+            public string m_strTopTemplateImageFilePath = "D:\\TemplateImage\\TopTemplateImage.bmp";
+            public string m_strBottomTemplateImageFilePath = "D:\\TemplateImage\\BottomTemplateImage.bmp";
+
+            public Run_PatternAlign(MainVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_PatternAlign run = new Run_PatternAlign(m_module);
+                run.m_nSearchAreaSize = m_nSearchAreaSize;
+                run.m_dMatchScore = m_dMatchScore;
+                run.m_strTopTemplateImageFilePath = m_strTopTemplateImageFilePath;
+                run.m_strBottomTemplateImageFilePath = m_strBottomTemplateImageFilePath;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_nSearchAreaSize = tree.Set(m_nSearchAreaSize, m_nSearchAreaSize, "Template Matching Search Area Size", "Template Matching Search Area Size", bVisible);
+                m_dMatchScore = tree.Set(m_dMatchScore, m_dMatchScore, "Template Matching Pass Score", "Template Matching Pass Score", bVisible);
+                m_strTopTemplateImageFilePath = (tree.GetTree("Template Image Path", false, bVisible)).SetFile(m_strTopTemplateImageFilePath, m_strTopTemplateImageFilePath, "bmp", "Top Template Image Path", "Top Template Image Path", bVisible);
+                m_strBottomTemplateImageFilePath = (tree.GetTree("Template Image Path", false, bVisible)).SetFile(m_strBottomTemplateImageFilePath, m_strBottomTemplateImageFilePath, "bmp", "Bottom Template Image Path", "Bottom Template Image Path", bVisible);
+            }
+
+            public override string Run()
+            {
+                // variable
+                Image<Gray, byte> imgTop = new Image<Gray, byte>(m_strTopTemplateImageFilePath);
+                Image<Gray, byte> imgBottom = new Image<Gray, byte>(m_strBottomTemplateImageFilePath);
+                CPoint cptTopCenter = new CPoint();
+                CPoint cptBottomCenter = new CPoint();
+                string strPool = "MainVision.Vision Memory";
+                string strGroup = "MainVision";
+                string strMemory = "Main";
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                bool bFoundTop = false;
+                bool bFoundBottom = false;
+                CPoint cptTopResultCenter;
+                CPoint cptBottomResultCenter;
+
+                // implement
+                Run_MakeAlignTemplateImage moduleRun = (Run_MakeAlignTemplateImage)m_module.CloneModuleRun("MakeAlignTemplateImage");
+                cptTopCenter.X = moduleRun.m_cptTopAlignMarkStartPos.X + (moduleRun.m_cptTopAlignMarkEndPos.X - moduleRun.m_cptTopAlignMarkStartPos.X) / 2;
+                cptTopCenter.Y = moduleRun.m_cptTopAlignMarkStartPos.Y + (moduleRun.m_cptTopAlignMarkEndPos.Y - moduleRun.m_cptTopAlignMarkStartPos.Y) / 2;
+                cptBottomCenter.X = moduleRun.m_cptBottomAlignMarkStartPos.X + (moduleRun.m_cptBottomAlignMarkEndPos.X - moduleRun.m_cptBottomAlignMarkStartPos.X) / 2;
+                cptBottomCenter.Y = moduleRun.m_cptBottomAlignMarkStartPos.Y + (moduleRun.m_cptBottomAlignMarkEndPos.Y - moduleRun.m_cptBottomAlignMarkStartPos.Y) / 2;
+
+                // Top Template Image Processing
+                Point ptStart = new Point(cptTopCenter.X - (m_nSearchAreaSize / 2), cptTopCenter.Y - (m_nSearchAreaSize / 2));
+                Point ptEnd = new Point(cptTopCenter.X + (m_nSearchAreaSize / 2), cptTopCenter.Y + (m_nSearchAreaSize / 2));
+                CRect crtSearchArea = new CRect(ptStart, ptEnd);
+                Mat matSearchArea = GetMatImage(mem, crtSearchArea);
+                Image<Gray, byte> imgSrc = matSearchArea.ToImage<Gray, byte>();
+                bFoundTop = TemplateMatching(mem, crtSearchArea, imgSrc, imgTop, out cptTopResultCenter);
+
+                // Bottom Template Image Processing
+                ptStart = new Point(cptBottomCenter.X - (m_nSearchAreaSize / 2), cptBottomCenter.Y - (m_nSearchAreaSize / 2));
+                ptEnd = new Point(cptBottomCenter.X + (m_nSearchAreaSize / 2), cptBottomCenter.Y + (m_nSearchAreaSize / 2));
+                crtSearchArea = new CRect(ptStart, ptEnd);
+                matSearchArea = GetMatImage(mem, crtSearchArea);
+                imgSrc = matSearchArea.ToImage<Gray, byte>();
+                bFoundBottom = TemplateMatching(mem, crtSearchArea, imgSrc, imgTop, out cptBottomResultCenter);
+
+                // Calculate Theta
+                if (bFoundTop && bFoundBottom)  // Top & Bottom 모두 Template Matching 성공했을 경우
+                {
+                    double dThetaRadian = Math.Atan2((double)(cptBottomResultCenter.Y - cptTopResultCenter.Y), (double)(cptBottomResultCenter.X - cptTopResultCenter.X));
+                    double dThetaDegree = dThetaRadian * (180 / Math.PI);
+                    dThetaDegree -= 90;
+                    // 1000 Pulse = 1 Degree
+                    double dThetaPulse = dThetaDegree * 1000;
+
+                    // Theta축 회전
+                    Axis axisRotate = m_module.m_axisRotate;
+                    double dActualPos = axisRotate.p_posActual;
+                    axisRotate.StartMove(dActualPos + dThetaPulse);
+                    return "OK";
+                }
+                else
+                    return "Fail";
+            }
+
+            Mat GetMatImage(MemoryData mem, CRect crtROI)
+            {
+                ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+                IntPtr p = mem.GetPtr();
+                img.SetData(p, crtROI, (int)mem.W);
+                Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
+
+                return matReturn;
+            }
+
+            bool TemplateMatching(MemoryData mem, CRect crtSearchArea, Image<Gray, byte> imgSrc, Image<Gray, byte> imgTemplate, out CPoint cptCenter)
+            {
+                // variable
+                int nWidthDiff = 0;
+                int nHeightDiff = 0;
+                Point ptMaxRelative = new Point();
+                float fMaxScore = float.MinValue;
+                bool bFoundTemplate = false;
+
+                // implement
+                Image<Gray, float> imgResult = imgSrc.MatchTemplate(imgTemplate, TemplateMatchingType.CcorrNormed);
+                nWidthDiff = imgSrc.Width - imgResult.Width;
+                nHeightDiff = imgSrc.Height - imgResult.Height;
+                float[,,] matches = imgResult.Data;
+                
+                for (int x = 0; x<matches.GetLength(1); x++)
+                {
+                    for (int y = 0; y<matches.GetLength(0); y++)
+                    {
+                        if (fMaxScore < matches[y, x, 0] && m_dMatchScore <= matches[y, x, 0])
+                        {
+                            fMaxScore = matches[y, x, 0];
+                            ptMaxRelative.X = x;
+                            ptMaxRelative.Y = y;
+                            bFoundTemplate = true;
+                        }
+                    }
+                }
+                cptCenter = new CPoint();
+                cptCenter.X = (int)(crtSearchArea.Left + ptMaxRelative.X) + (int)(nWidthDiff / 2);
+                cptCenter.Y = (int)(crtSearchArea.Top + ptMaxRelative.Y) + (int)(nHeightDiff / 2);
+
+                return bFoundTemplate;
             }
         }
         #endregion
