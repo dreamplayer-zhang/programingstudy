@@ -1521,7 +1521,7 @@ namespace Root_AOP01_Inspection.Module
                     // Theta축 회전
                     Axis axisRotate = m_module.m_axisRotate;
                     double dActualPos = axisRotate.p_posActual;
-                    axisRotate.StartMove(dActualPos + dThetaPulse);
+                    axisRotate.StartMove(dActualPos - dThetaPulse);
                     return "OK";
                 }
                 else
