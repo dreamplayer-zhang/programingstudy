@@ -65,6 +65,7 @@ namespace Root_CAMELLIA
 
             InitWTR();
             InitLoadport();
+            InitRFID();
             InitAligner();
             m_camellia = new Module_Camellia("Camellia", m_engineer);
             InitModule(m_camellia);
@@ -151,6 +152,19 @@ namespace Root_CAMELLIA
                 m_aLoadport.Add((ILoadport)module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
             }
+        }
+
+        void InitRFID()
+        {
+            ModuleBase module;
+            char cID = 'A';
+            for(int n=0; n<m_lLoadport; n++, cID++)
+            {
+                string sID = "Rfid" + cID;
+                module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]);
+                InitModule(module);
+            }
+            
         }
 
         public void RunTreeLoadport(Tree tree)
