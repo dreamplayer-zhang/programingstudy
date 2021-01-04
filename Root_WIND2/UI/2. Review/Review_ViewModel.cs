@@ -492,10 +492,12 @@ namespace Root_WIND2
             }
         }
 
-        #endregion
+        ObservableCollection<string> CollectionOfFilePaths { get; set; }
 
-        #region DataTypeEnum
-        private GVHistogramType gvHistogramMode = GVHistogramType.Dark;
+    #endregion
+
+    #region DataTypeEnum
+    private GVHistogramType gvHistogramMode = GVHistogramType.Dark;
         private enum GVHistogramType
         {
             All,
@@ -569,6 +571,7 @@ namespace Root_WIND2
             DrawDefectSizeGraph();              // Draw Defect Size Distribution Histogram
             DrawDefectGVGraph();                // Draw Defect GV Distribution Histogram
 
+            CollectionOfFilePaths = new ObservableCollection<string> { @"D:\Images\lena512.bmp", @"D:\Images\lena512.bmp" };
         }
         private void ClassifyDefect()
         {
