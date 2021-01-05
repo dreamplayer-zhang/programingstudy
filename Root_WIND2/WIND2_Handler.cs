@@ -60,20 +60,24 @@ namespace Root_WIND2
             p_moduleList = new ModuleList(m_engineer);
             switch (m_engineer.m_eMode)
             {
-                case WIND2_Engineer.eMode.Vision: InitVisionModule(); break; 
-                case WIND2_Engineer.eMode.EFEM: InitEFEMModule(); break;
+                case WIND2_Engineer.eMode.Vision: 
+                    InitVisionModule(); break;
+                case WIND2_Engineer.eMode.EFEM:
+                    InitEFEMModule();
+                    break;
             }
-
-            
         }
 
         void InitVisionModule()
         {
+            IWTR iWTR = (IWTR)m_wtr;
+
             m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_vision);
 
-            m_edgesideVision = new EdgeSideVision("EdgeSide Vision", m_engineer);
-            InitModule(m_edgesideVision);
+            m_recipe = new WIND2_Recipe("Recipe", m_engineer);
+            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
+            m_process = new EFEM_Process("Process", m_engineer, iWTR);
         }
 
         void InitEFEMModule()
@@ -87,6 +91,9 @@ namespace Root_WIND2
             m_backSideVision = new BackSideVision("BackSide Vision", m_engineer);
             InitModule(m_backSideVision);
             iWTR.AddChild(m_backSideVision);
+            m_edgesideVision = new EdgeSideVision("EdgeSide Vision", m_engineer);
+            InitModule(m_edgesideVision);
+            iWTR.AddChild(m_edgesideVision);
             m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Client);
             InitModule(m_vision);
             iWTR.AddChild(m_vision);
@@ -320,6 +327,8 @@ namespace Root_WIND2
         #region Thread
         bool m_bThread = false;
         Thread m_thread = null;
+        public int m_nRnR = 1;
+        dynamic m_infoRnRSlot;
         void InitThread()
         {
             m_thread = new Thread(new ThreadStart(RunThread));
@@ -339,7 +348,19 @@ namespace Root_WIND2
                         StateHome();
                         break;
                     case EQ.eState.Run:
-                        m_process.p_sInfo = m_process.RunNextSequence();
+                        if (p_moduleList.m_qModuleRun.Count == 0)
+                        {
+                            //CheckLoad();
+                            m_process.p_sInfo = m_process.RunNextSequence();
+                            //CheckUnload();
+                            if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            {
+                                m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
+                                m_process.ReCalcSequence();
+                                m_nRnR--;
+                                EQ.p_eState = EQ.eState.Run;
+                            }
+                        }
                         break;
                 }
             }

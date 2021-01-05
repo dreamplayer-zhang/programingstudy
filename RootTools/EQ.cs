@@ -34,7 +34,8 @@ namespace RootTools
         public static bool p_bStop
         {
             get { return m_EQ.p_bStop; }
-            set { m_EQ.p_bStop = value; }
+            set { 
+                m_EQ.p_bStop = value; }
         }
 
         public static bool p_bPause
