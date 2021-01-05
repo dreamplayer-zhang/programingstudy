@@ -4,21 +4,60 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 
 namespace Root_EFEM.Module
 {
     public class WTR_Cymechs : ModuleBase, IWTR
     {
+        #region Comm
+        enum eComm
+        {
+            TCPIP,
+            RS232,
+        }
+        eComm _eComm = eComm.TCPIP; 
+        eComm p_eComm
+        {
+            get { return _eComm; }
+            set
+            {
+                _eComm = value;
+                m_reg.Write("Comm", (int)p_eComm); 
+            }
+        }
+
+        Registry m_reg; 
+        void InitCommType(string id)
+        {
+            m_reg = new Registry(id);
+            p_eComm = (eComm)m_reg.Read("Comm", (int)p_eComm); 
+        }
+        #endregion
+
         #region ToolBox
+        TCPIPClient m_tcpip; 
         RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            if (bInit)
+            switch (p_eComm)
             {
-                m_rs232.OnReceive += M_rs232_OnReceive;
-                m_rs232.p_bConnect = true;
+                case eComm.TCPIP:
+                    p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP"); 
+                    if (bInit)
+                    {
+                        m_tcpip.EventReciveData += M_tcpip_EventReciveData;
+                    }
+                    break; 
+                case eComm.RS232:
+                    p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+                    if (bInit)
+                    {
+                        m_rs232.OnReceive += M_rs232_OnReceive;
+                        m_rs232.p_bConnect = true;
+                    }
+                    break; 
             }
         }
         #endregion
@@ -412,7 +451,7 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-        #region RS232
+        #region Comm
         Queue<Protocol> m_qProtocol = new Queue<Protocol>();
         bool m_bRunSend = false;
         Thread m_threadSend;
@@ -452,11 +491,27 @@ namespace Root_EFEM.Module
             }
         }
 
+        private void M_tcpip_EventReciveData(byte[] aBuf, int nSize, System.Net.Sockets.Socket socket)
+        {
+            string sRead = Encoding.Default.GetString(aBuf, 0, nSize);
+            m_log.Info(" <-- Recv] " + sRead);
+            if (m_protocolSend != null)
+            {
+                bool bDone = m_protocolSend.OnReceive(sRead);
+                if (bDone) m_protocolSend = null;
+            }
+        }
+
         string SendCmd(string sCmd)
         {
             if (EQ.IsStop()) return "EQ Stop";
             m_log.Info(" [ Send --> " + sCmd);
-            return m_rs232.Send(sCmd);
+            switch (p_eComm)
+            {
+                case eComm.TCPIP: return m_tcpip.Send(sCmd); 
+                case eComm.RS232: return m_rs232.Send(sCmd);
+            }
+            return "SendCmd Comm Type Error : " + p_eComm.ToString(); 
         }
         #endregion
 
@@ -718,6 +773,7 @@ namespace Root_EFEM.Module
 
         void RunTreeSetup(Tree tree)
         {
+            p_eComm = (eComm)tree.Set(p_eComm, p_eComm, "Type", "Communication Type"); 
             m_dicArm[eArm.A].RunTree(tree.GetTree("Arm A", false));
             m_dicArm[eArm.B].RunTree(tree.GetTree("Arm B", false));
             foreach (IWTRChild child in p_aChild) child.RunTreeTeach(tree.GetTree("Teach", false));
@@ -739,6 +795,7 @@ namespace Root_EFEM.Module
 
         public WTR_Cymechs(string id, IEngineer engineer)
         {
+            InitCommType(id); 
             InitErrorString(); 
             InitArms(id, engineer);
             InitBase(id, engineer);

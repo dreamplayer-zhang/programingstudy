@@ -181,6 +181,12 @@
     <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.3\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
@@ -190,6 +196,7 @@
     <Reference Include="System.Activities.Presentation" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -240,6 +247,7 @@
     <Compile Include="Module\InspectionManagerBackside.cs" />
     <Compile Include="Module\InspectionManagerEdge.cs" />
     <Compile Include="Module\InspectionManagerFrontside.cs" />
+    <Compile Include="Module\Vision\Run_VisionAlign.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\BacksideInspection.xaml.cs">
       <DependentUpon>BacksideInspection.xaml</DependentUpon>
     </Compile>
@@ -254,6 +262,9 @@
       <DependentUpon>SettingDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SettingDialog\SettingDialog_ViewModel.cs" />
+    <Compile Include="UI\2. Review\Tuning.xaml.cs">
+      <DependentUpon>Tuning.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WIND2EventArgs.cs" />
     <Compile Include="WIND2EventManager.cs" />
     <Compile Include="Module\BackSideVision.cs" />
@@ -407,7 +418,11 @@
     <Compile Include="UI\1. Setup\4. Maintenance\ViewerTest_ViewModel.cs" />
     <Compile Include="WIND2_Engineer.cs" />
     <Compile Include="WIND2_Handler.cs" />
+    <Compile Include="WIND2_Process.cs" />
     <Compile Include="WIND2_Recipe.cs" />
+    <Compile Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml.cs">
+      <DependentUpon>WIND2_Recipe_UI.xaml</DependentUpon>
+    </Compile>
     <Page Include="Controls\UserControl\ColorPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -475,6 +490,10 @@
     <Page Include="UI\1. Setup\4. Maintenance\WIND2_Hander_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\2. Review\Tuning.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\3. Run\Run.xaml">
       <SubType>Designer</SubType>
@@ -591,6 +610,10 @@
     <Page Include="UI\SettingDialog\SettingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

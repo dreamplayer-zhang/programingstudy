@@ -178,8 +178,8 @@ namespace Root_WIND2.Module
         {
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
-            if (p_infoWafer == null)
-                return p_id + " IsGetOK - InfoWafer not Exist";
+            //if (p_infoWafer == null)
+            //    return p_id + " IsGetOK - InfoWafer not Exist";
             return "OK";
         }
 
@@ -187,10 +187,10 @@ namespace Root_WIND2.Module
         {
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
-            if (p_infoWafer != null)
-                return p_id + " IsPutOK - InfoWafer Exist";
-            if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false)
-                return p_id + " not Enable Wafer Size";
+            //if (p_infoWafer != null)
+            //    return p_id + " IsPutOK - InfoWafer Exist";
+            //if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false)
+            //    return p_id + " not Enable Wafer Size";
             return "OK";
         }
 
@@ -283,8 +283,8 @@ namespace Root_WIND2.Module
             Thread.Sleep(200);
             if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == eCamState.Init)
                 m_CamMain.Connect();
-            if (m_CamLADS != null)
-                m_CamLADS.Connect();
+            //if (m_CamLADS != null)
+            //    m_CamLADS.Connect();
 
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
@@ -305,8 +305,8 @@ namespace Root_WIND2.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Grab(this), false, "Run Grab");
-            AddModuleRunList(new Run_LADS(this), false, "Run LADS");
+            AddModuleRunList(new Run_Grab(this), true, "Run Grab");
+            AddModuleRunList(new Run_LADS(this), true, "Run LADS");
         }
         #endregion
 

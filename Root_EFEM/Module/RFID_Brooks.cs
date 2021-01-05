@@ -2,69 +2,70 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.IO.Ports;
-using System.Collections;
-using System.Runtime;
-using System.Diagnostics;
+using RootTools.Comm;
+using RootTools.Module;
+using RootTools;
+using RootTools.Trees;
+using System.Threading;
 
-namespace RootTools
+namespace Root_EFEM.Module
 {
-    public class RFID_Brooks : IRFID
+    public class RFID_Brooks : ModuleBase
     {
-        string m_sID;
         const int m_nReaderID = 0; // Default Value
         const char m_cEndCharacter = (char)0x0D;
-        SerialPort m_serial = new SerialPort();
-        char[] m_byteBuffer = new char[4096];
-        string m_sSerialPort = "COM0";
-        int m_nBaudrate = 9600;
-        Parity m_eParity = Parity.None;
-        StopBits m_eStopBit = StopBits.Two;
+        RS232 m_rs232;
+        public IHandler m_handle;
 
-        int m_nTryConnect = 3;
-        int m_nWaitRecive = 3000;
-        bool m_bBusy = false;
-
-//        string m_sReadData = "";
-
-        public RFID_Brooks()
+        public RFID_Brooks(string sID, IEngineer engineer, ILoadport loadport)
         {
-
+            p_id = sID;
+            this.InitBase(sID, engineer);
+            m_handle = engineer.ClassHandler();
         }
 
-        public void Init(string sID)
+        public override void GetTools(bool bInit)
         {
-            m_sID = sID;
-
-            //RunTree
-
-            m_serial.PortName = m_sSerialPort;
-            m_serial.BaudRate = m_nBaudrate;
-            m_serial.Parity = m_eParity;
-            m_serial.StopBits = m_eStopBit;
-            m_serial.DataReceived += m_serial_DataReceived;
-            try
+            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            if (bInit)
             {
-                for (int n = 0; n < m_nTryConnect; n++)
-                {
-                    m_serial.Open();
-                    if (m_serial.IsOpen)
-                    {
-                        break;
-                    }
-                    Thread.Sleep(100);
-                }
-            }
-            catch (Exception)
-            {
-                // 로그
+                m_rs232.OnReceive += M_rs232_OnReceive;
+                m_rs232.p_bConnect = true;
             }
         }
 
-        public bool ReadID(ref string sID)
+        private void M_rs232_OnReceive(string sRead)
         {
+            m_sRFID = ConvertMessage(sRead);
+            m_bOnRead = false;
+        }
+
+        int m_secRS232 = 2;
+        void RunTimeoutTree(Tree tree)
+        {
+            m_secRS232 = tree.Set(m_secRS232, m_secRS232, "RS232", "Timeout (sec)");
+        }
+
+        void RunTreeSetup(Tree tree)
+        {
+            RunTimeoutTree(tree.GetTree("Timeout", false));
+        }
+
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            RunTreeSetup(tree.GetTree("Setup", false));
+        }
+
+        StopWatch m_swRead = new StopWatch();
+        string m_sRFID = "";
+        bool m_bOnRead = false;
+
+        public string ReadRFID(out string sRFID)
+        {
+            m_bOnRead = true;
+            m_swRead.Restart();
             string sCmd = "";
             //Package Header (Start + Length1 + Length2)
             sCmd += "S"; // Start
@@ -95,61 +96,42 @@ namespace RootTools
             sCmd += (char)(nAdd >> 8); // CheckSum3
             sCmd += (char)(nAdd); // CheckSum4
 
-            m_serial.Write(sCmd);
-            m_bBusy = true;
-
-            return true;
-        }
-
-        void m_serial_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            int nRead = m_serial.BytesToRead;
-            if (nRead > m_byteBuffer.Length)
+            //m_serial.Write(sCmd);
+            m_rs232.Send(sCmd);
+            while (m_swRead.ElapsedMilliseconds < m_secRS232 * 1000)
             {
-                m_byteBuffer = new char[nRead];
+                if (m_bOnRead == false)
+                {
+                    sRFID = m_sRFID;
+                    return "OK";
+                }
+                Thread.Sleep(20);
             }
-            m_serial.Read(m_byteBuffer, 0, nRead);
-            string sBuffer = new string(m_byteBuffer);
-
-            // Log sBuffer
-
-            ConvertMessage(ref sBuffer);
-            m_bBusy = false;
+            sRFID = "";
+            return "RFID Read Fail : Timeout";
         }
 
-        bool WaitRecive()
+        string ConvertMessage(string sBuffer)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            while (m_bBusy && sw.ElapsedMilliseconds < m_nWaitRecive)
-            {
-                Thread.Sleep(100);
-            }
-            return !m_bBusy;
-        }
-
-        bool ConvertMessage(ref string sBuffer)
-        {
-            bool bError = false;
             int nLength, nLengthHigh, nLengthLow, nReaderID, nPage;
             string sData = "";
-            if (sBuffer.Length <= 3|| sBuffer[0] != 'S')
+            if (sBuffer.Length <= 3 || sBuffer[0] != 'S')
             {
-                return false;
+                return "NG";
             }
             nLengthHigh = Convert16To10(sBuffer[1]);
             nLengthLow = Convert16To10(sBuffer[2]);
             nLength = nLengthHigh * 16 + nLengthLow;
-            if (sBuffer.Length < nLength) 
+            if (sBuffer.Length < nLength)
             {
-                return false;
+                return "NG";
             }
             switch (sBuffer[3])
             {
                 case 'x':
                     nReaderID = Convert.ToInt32(sBuffer[4]);
                     nPage = Convert.ToInt32(sBuffer[5]) * 10 + Convert.ToInt32(sBuffer[6]);
-                    for (int n = 7; n < 23; n +=2)
+                    for (int n = 7; n < 23; n += 2)
                     {
                         int nHigh = Convert16To10(sBuffer[n]);
                         int nLow = Convert16To10(sBuffer[n + 1]);
@@ -160,7 +142,6 @@ namespace RootTools
                     }
                     break;
                 case 'e':
-                    bError = true;
                     nReaderID = Convert.ToInt32(sBuffer[4]);
                     string sErrorMessage = ConvertErrorMessage(sBuffer[5]);
                     //Log Error
@@ -169,7 +150,7 @@ namespace RootTools
                 default:
                     break;
             }
-            return bError;
+            return sData;
         }
 
         int Convert16To10(char ch)
@@ -243,5 +224,48 @@ namespace RootTools
             }
             return sErrorMessage;
         }
+
+
+        #region ModuleRun
+        protected override void InitModuleRuns()
+        {
+            AddModuleRunList(new Run_ReadRFID(this), true, "RFID Read");
+        }
+
+        public class Run_ReadRFID : ModuleRunBase
+        {
+            RFID_Brooks m_module;
+            public Run_ReadRFID(RFID_Brooks module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+            bool m_bRFID = false;
+            public override ModuleRunBase Clone()
+            {
+                Run_ReadRFID run = new Run_ReadRFID(m_module);
+                run.m_bRFID = m_bRFID;
+                return run;
+            }
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bRFID = tree.Set(m_bRFID, m_bRFID, "Use", "Run ReadRFID", bVisible);
+            }
+
+            public override string Run()
+            {
+                string sResult = "OK";
+                string sCarrierID = "";
+                //if(EQ.p_bSimulate) m_handle.
+                //if (EQ.p_bSimulate) m_loadport.p_infoCarrier.p_sCarrierID = "CarrierID";
+                if (m_bRFID)
+                {
+                    sResult = m_module.ReadRFID(out sCarrierID);
+                    //m_loadport.p_infoCarrier.p_sCarrierID = (sResult == "OK") ? sCarrierID : "";
+                }
+                return sResult;
+            }
+        }
+        #endregion
     }
 }

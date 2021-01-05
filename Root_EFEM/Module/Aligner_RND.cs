@@ -427,7 +427,8 @@ namespace Root_EFEM.Module
                 {
                     Thread.Sleep(10);
                     if (m_bDone) return "OK";
-                    if (m_bSend && (m_swWait.ElapsedMilliseconds > msWait)) return "Wait Receive Timeout : " + m_eCmd.ToString();
+                    if (m_bSend && (m_swWait.ElapsedMilliseconds > msWait)) 
+                        return "Wait Receive Timeout : " + m_eCmd.ToString();
                     if (EQ.IsStop()) return "EQ Stop"; 
                 }
             }
