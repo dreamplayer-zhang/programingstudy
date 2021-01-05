@@ -18,6 +18,16 @@ namespace RootTools.Control
             }
         }
 
+        public string WaitDone(double secWait)
+        {
+            int msWait = (int)(1000 * secWait);
+            while (m_swWrite.ElapsedMilliseconds < msWait)
+            {
+                if (p_bDone) return "OK";
+            }
+            return "DIO Timeout : " + m_id;
+        }
+
         public bool p_bOut
         {
             get { return m_aBitDO[1].p_bOn && (m_aBitDO[0].p_bOn == false); }
@@ -106,10 +116,12 @@ namespace RootTools.Control
             return (m_listDO.m_aDIO[nDO].p_sID != "Output");
         }
 
+        public StopWatch m_swWrite = new StopWatch();
         public void Write(bool bOn)
         {
             m_aBitDO[0].Write(!bOn);
-            m_aBitDO[1].Write(bOn); 
+            m_aBitDO[1].Write(bOn);
+            m_swWrite.Start();
         }
 
         public bool p_bEnableRun { get; set; }

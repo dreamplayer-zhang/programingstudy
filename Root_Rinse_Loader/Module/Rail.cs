@@ -11,11 +11,9 @@ namespace Root_Rinse_Loader.Module
     public class Rail : ModuleBase
     {
         #region ToolBox
-        Axis m_axisRail;
-
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRail, this, "Rail");
+            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Rotate");
             p_sInfo = m_toolBox.Get(ref m_axisWidth, this, "Width");
             foreach (Line line in m_aLine) line.GetTools(m_toolBox); 
             if (bInit) 
@@ -75,11 +73,12 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region Rotate
-        double m_fJogScale = 1; 
+        double m_fJogScale = 1;
+        Axis m_axisRotate;
 
         public string RunRotate(bool bRotate)
         {
-            m_axisRail.Jog(m_fJogScale);
+            m_axisRotate.Jog(m_fJogScale);
             return "OK"; 
         }
 
@@ -97,7 +96,8 @@ namespace Root_Rinse_Loader.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
-            p_sInfo = base.StateHome();
+            m_axisRotate.ServoOn(true); 
+            p_sInfo = base.StateHome(m_axisWidth);
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             return p_sInfo;
         }
