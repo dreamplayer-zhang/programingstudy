@@ -385,11 +385,19 @@ namespace Root_WIND2
 
         public void ShowSettingDialog()
         {
-            
-            if(UIManager.Instance.SettingDialog.ShowDialog() == true)
+            Nullable<bool> result = ProgramManager.Instance.DialogService.ShowDialog(UIManager.Instance.SettingDialogViewModel);
+            if (result.HasValue)
             {
+                if (result.Value)
+                {
+                    
+                }
+                else
+                {
 
+                }
             }
+
         }
 
         #endregion

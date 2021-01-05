@@ -1,4 +1,5 @@
-﻿using RootTools.Trees;
+﻿using RootTools;
+using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +11,7 @@ using System.Windows.Input;
 
 namespace Root_WIND2
 {
-    class SettingDialog_ViewModel : ObservableObject
+    public class SettingDialog_ViewModel : ObservableObject, IDialogRequestClose
     {
         #region [Parameters]
         TreeItemCollection menuItems;
@@ -48,6 +49,9 @@ namespace Root_WIND2
 
         #region [Commands]
         private ICommand selectedItemCommand;
+
+        public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
+
         public ICommand SelectedItemCommand
         {
             get
@@ -76,14 +80,15 @@ namespace Root_WIND2
         #region [Commnads Callback]
 
 
+
         public void OnButtonClickedOK()
         {
-
+            CloseRequested(this, new DialogCloseRequestedEventArgs(true));
         }
 
         public void OnButtonClickedCancel()
         {
-
+            CloseRequested(this, new DialogCloseRequestedEventArgs(false));
         }
 
         public void OnSelectedItemChanged_Callback()

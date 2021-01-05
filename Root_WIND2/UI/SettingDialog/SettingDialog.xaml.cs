@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace Root_WIND2
     /// <summary>
     /// SettingDialog.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class SettingDialog : Window
+    public partial class SettingDialog : Window, IDialog
     {
         public SettingDialog()
         {

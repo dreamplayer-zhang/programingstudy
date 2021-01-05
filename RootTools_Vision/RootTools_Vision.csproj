@@ -104,6 +104,8 @@
     <Compile Include="Inspection\ProcessDefect_Wafer.cs" />
     <Compile Include="Recipe\IRecipe.cs" />
     <Compile Include="Recipe\Parameter\D2DParameter.cs" />
+    <Compile Include="Recipe\Parameter\IColorInspection.cs" />
+    <Compile Include="Recipe\Parameter\IDisplaySpecSummary.cs" />
     <Compile Include="Recipe\Parameter\IMaskInspection.cs" />
     <Compile Include="Recipe\Parameter\ParameterBase.cs" />
     <Compile Include="Recipe\Parameter\PositionParameter.cs" />

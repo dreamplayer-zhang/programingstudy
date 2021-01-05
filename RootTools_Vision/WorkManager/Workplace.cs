@@ -99,7 +99,11 @@ namespace RootTools_Vision
         public int BufferSizeX { get => sizeX; private set => sizeX = value; }
         public int BufferSizeY { get => sizeY; private set => sizeY = value; }
         
-        public byte[] WorkplaceBuffer { get => workplaceBuffer; private set => workplaceBuffer = value; }
+        public byte[] WorkplaceBuffer 
+        { 
+            get => workplaceBuffer; 
+            private set => workplaceBuffer = value; 
+        }
         public IntPtr SharedBuffer
         {
             get => sharedBuffer; 
