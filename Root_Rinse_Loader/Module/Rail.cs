@@ -128,6 +128,22 @@ namespace Root_Rinse_Loader.Module
             base.ThreadStop();
         }
 
+        #region StartRun
+        public void StartRun()
+        {
+            switch (Rinse.p_eMode)
+            {
+                case Rinse.eMode.Magazine:
+                    RunMoveWidth(Rinse.p_widthStrip);
+                    RunRotate(true); 
+                    break;
+                case Rinse.eMode.Stack:
+                    RunRotate(false); 
+                    break; 
+            }
+        }
+        #endregion
+
         #region ModuleRun
         protected override void InitModuleRuns()
         {
