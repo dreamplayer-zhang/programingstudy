@@ -199,6 +199,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\Rail.cs" />
+    <Compile Include="Module\Roller.cs" />
     <Compile Include="Module\Storage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

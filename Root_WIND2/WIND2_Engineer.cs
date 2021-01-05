@@ -78,7 +78,7 @@ namespace Root_WIND2
             Vision,
             EFEM
         }
-        public eMode m_eMode = eMode.Vision; 
+        public eMode m_eMode = eMode.EFEM; 
 
         void RunTreeMode(Tree tree)
         {

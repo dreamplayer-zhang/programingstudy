@@ -64,9 +64,9 @@ namespace Root_WIND2.Module
                 p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
                 p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.Get(ref m_CamAlign, this, "AlignCam");
-                p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-                p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
             }
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
+            p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
             m_remote.GetTools(bInit);
         }
         #endregion
@@ -154,7 +154,7 @@ namespace Root_WIND2.Module
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
             m_memoryGroup2 = m_memoryPool2.GetGroup("group");
-            m_memoryGroup2.CreateMemory("ROI", 1, 4, 30000,30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+            m_memoryGroup2.CreateMemory("ROI", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
         }
 
         #endregion
@@ -216,6 +216,10 @@ namespace Root_WIND2.Module
 
         public string IsGetOK(int nID)
         {
+            if (p_eRemote == eRemote.Client)
+            {   
+                return "OK";
+            }
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
             if (p_infoWafer == null)
@@ -225,6 +229,10 @@ namespace Root_WIND2.Module
 
         public string IsPutOK(InfoWafer infoWafer, int nID)
         {
+            if (p_eRemote == eRemote.Client)
+            {
+                return "OK";
+            }
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
             if (p_infoWafer != null)
@@ -243,16 +251,53 @@ namespace Root_WIND2.Module
 
         public string BeforeGet(int nID)
         {
-//            string info = MoveReadyPos();
-//            if (info != "OK") return info;
+            //            string info = MoveReadyPos();
+            //            if (info != "OK") return info;
+            if (p_eRemote == eRemote.Client)
+            {
+                return m_remote.RemoteSend(Remote.eProtocol.BeforeGet, "Get", "Get");
+            }
+            else if (p_eRemote == eRemote.Server)
+            {
+                m_axisXY.StartMove("Position_0");
+                m_axisRotate.StartMove("Position_0");
+                m_axisZ.StartMove("Position_0");
+
+                m_axisXY.WaitReady();
+                m_axisRotate.WaitReady();
+                m_axisZ.WaitReady();
+            }
             return "OK";
+        }
+
+        public override string ServerBeforeGet()
+        {
+            return BeforeGet(0);
         }
 
         public string BeforePut(int nID)
         {
-//            string info = MoveReadyPos();
-//            if (info != "OK") return info;
+            //            string info = MoveReadyPos();
+            //            if (info != "OK") return info;
+            if (p_eRemote == eRemote.Client)
+            {
+                return m_remote.RemoteSend(Remote.eProtocol.BeforePut, "Put", "Put");
+            }
+            else if(p_eRemote == eRemote.Server)
+            {
+                m_axisXY.StartMove("Position_0");
+                m_axisRotate.StartMove("Position_0");
+                m_axisZ.StartMove("Position_0");
+
+                m_axisXY.WaitReady();
+                m_axisRotate.WaitReady();
+                m_axisZ.WaitReady();
+            }
             return "OK";
+        }
+        public override string ServerBeforePut()
+        {
+            return BeforePut(0);
         }
 
         public string AfterGet(int nID)
@@ -318,17 +363,24 @@ namespace Root_WIND2.Module
         {
             if (EQ.p_bSimulate)
                 return "OK";
-            //            p_bStageBlow = false;
-            //            p_bStageVac = true;
-            Thread.Sleep(200);
-            if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
-                m_CamMain.Connect();
-            if (m_CamAlign != null)
-                m_CamAlign.Connect();
-            p_sInfo = base.StateHome();
-            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
-            //p_bStageVac = false;
-            return "OK";
+
+            if (p_eRemote == eRemote.Client)
+            {
+                m_remote.RemoteSend(Remote.eProtocol.Initial, "INIT", "INIT");
+                return "OK";
+            }
+            else
+            {
+                //            p_bStageBlow = false;
+                //            p_bStageVac = true;
+                Thread.Sleep(200);
+                if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
+                    m_CamMain.Connect();
+                p_sInfo = base.StateHome();
+                p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+                //p_bStageVac = false;
+                return "OK";
+            }
         }
         #endregion
 
@@ -343,7 +395,7 @@ namespace Root_WIND2.Module
 
         public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
-            //            InitLineScan();
+            //            InitLineScan();+
             //            InitAreaScan();
             base.InitBase(id, engineer, eRemote);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
@@ -359,11 +411,11 @@ namespace Root_WIND2.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), false, "Time Delay");
+            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
             AddModuleRunList(new Run_GrabLineScan(this), false, "Run Grab LineScan Camera");
             AddModuleRunList(new Run_Inspect(this), false, "Run Inspect");
-            AddModuleRunList(new Run_VisionAlign(this), false, "Vision Align");
+            
         }
         #endregion
     }

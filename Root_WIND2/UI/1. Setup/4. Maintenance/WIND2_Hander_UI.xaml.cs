@@ -21,6 +21,8 @@ namespace Root_WIND2
             m_handler = handler;
             DataContext = handler;
             moduleListUI.Init(handler.p_moduleList);
+            processUI.Init(handler.m_process);
+            recipeUI.Init(handler.m_recipe);
             gafUI.Init(handler.m_gaf);
             
             treeRootUI.Init(handler.m_engineer.m_treeRoot);

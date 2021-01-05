@@ -118,8 +118,10 @@ namespace Root_WIND2
 
             roiLayer = new ImageData(memoryTool.GetMemory("pool", "group", memoryNameROI));
             //roiLayer.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameROI).p_nCount;
-
-            ImageEdge = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
+            if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+            {
+                ImageEdge = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
+            }
             //ImageEdge.p_nByte = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop).p_nByte;
 
 
@@ -151,10 +153,13 @@ namespace Root_WIND2
             this.Engineer.InspectionBack.Recipe = this.recipe;
 
             // Edge
-            this.InspectionEdge = new InspectionManagerEdge(ImageEdge.GetPtr(), ImageEdge.p_Size.X, ImageEdge.p_Size.Y, 3);
+            if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+            {
+                this.InspectionEdge = new InspectionManagerEdge(ImageEdge.GetPtr(), ImageEdge.p_Size.X, ImageEdge.p_Size.Y, 3);
 
-            this.Engineer.InspectionEFEM = this.InspectionEdge;
-            this.Engineer.InspectionEFEM.Recipe = this.recipe;
+                this.Engineer.InspectionEFEM = this.InspectionEdge;
+                this.Engineer.InspectionEFEM.Recipe = this.recipe;
+            }
 
             return true;
         }

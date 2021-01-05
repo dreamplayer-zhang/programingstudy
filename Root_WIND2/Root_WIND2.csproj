@@ -417,7 +417,11 @@
     <Compile Include="UI\1. Setup\4. Maintenance\ViewerTest_ViewModel.cs" />
     <Compile Include="WIND2_Engineer.cs" />
     <Compile Include="WIND2_Handler.cs" />
+    <Compile Include="WIND2_Process.cs" />
     <Compile Include="WIND2_Recipe.cs" />
+    <Compile Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml.cs">
+      <DependentUpon>WIND2_Recipe_UI.xaml</DependentUpon>
+    </Compile>
     <Page Include="Controls\UserControl\ColorPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -605,6 +609,10 @@
     <Page Include="UI\SettingDialog\SettingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
