@@ -1,8 +1,10 @@
 ﻿using Root_EFEM;
 using Root_EFEM.Module;
 using RootTools;
+using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -11,52 +13,143 @@ namespace Root_AOP01_Packing.Module
     public class IndividualElevator : ModuleBase, IWTRChild
     {
         #region ToolBox
-        //DIO_I m_diPlaced;
-        //DIO_I m_diPresent;
-        //DIO_I m_diLoad;
-        //DIO_I m_diUnload;
-        //DIO_I m_diDoorOpen;
-        //DIO_I m_diDocked;
-        //OHT m_OHT;
+        Axis m_axis;
+        DIO_I[] m_diCheck = new DIO_I[3];
+        DIO_I[] m_diProtection = new DIO_I[2];
         public override void GetTools(bool bInit)
         {
-            //p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
-            //p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
-            //p_sInfo = m_toolBox.Get(ref m_diLoad, this, "Load");
-            //p_sInfo = m_toolBox.Get(ref m_diUnload, this, "Unload");
-            //p_sInfo = m_toolBox.Get(ref m_diDoorOpen, this, "DoorOpen");
-            //p_sInfo = m_toolBox.Get(ref m_diDocked, this, "Docked");
-            //p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            //p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT", m_diPlaced, m_diPresent);
+            p_sInfo = m_toolBox.Get(ref m_axis, this, "Elevator"); 
+            p_sInfo = m_toolBox.Get(ref m_diCheck[0], this, "Check 0");
+            p_sInfo = m_toolBox.Get(ref m_diCheck[1], this, "Check 1");
+            p_sInfo = m_toolBox.Get(ref m_diCheck[2], this, "Check 2");
+            p_sInfo = m_toolBox.Get(ref m_diProtection[0], this, "Protection 0");
+            p_sInfo = m_toolBox.Get(ref m_diProtection[1], this, "Protection 1");
             if (bInit)
             {
-                //m_rs232.OnReceive += M_rs232_OnReceive;
-                //m_rs232.p_bConnect = true;
+                InitPosElevator();
             }
         }
         #endregion
 
+        #region Sensor
+        bool _bCheck = false; 
+        public bool p_bCheck
+        {
+            get { return _bCheck; }
+            set
+            {
+                if (_bCheck == value) return;
+                _bCheck = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        bool _bProtection = false; 
+        public bool p_bProtection
+        {
+            get { return _bProtection; }
+            set
+            {
+                if (_bProtection == value) return;
+                _bProtection = value;
+                m_axis.StopAxis(); 
+                OnPropertyChanged(); 
+            }
+        }
+
+        bool m_bThreadCheck = false;
+        Thread m_threadCheck; 
+        void InitThreadCheck()
+        {
+            m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
+            m_threadCheck.Start(); 
+        }
+
+        void RunThreadCheck()
+        {
+            m_bThreadCheck = true;
+            Thread.Sleep(1000);
+            while (m_bThreadCheck)
+            {
+                Thread.Sleep(10);
+                p_bCheck = (m_diCheck[0].p_bIn && m_diCheck[1].p_bIn && m_diCheck[2].p_bIn);
+                p_bProtection = (m_diProtection[0].p_bIn || m_diProtection[1].p_bIn); 
+            }
+        }
+        #endregion
+
+        #region Elevator
+        public enum ePos
+        {
+            Top,
+            Bottom
+        }
+        void InitPosElevator()
+        {
+            m_axis.AddPos(Enum.GetNames(typeof(ePos)));
+        }
+
+        public string MoveElevator(int nLevel)
+        {
+            m_axis.StartMove(GetPos(nLevel));
+            return m_axis.WaitReady(); 
+        }
+
+        double GetPos(int nLevel)
+        {
+            if (nLevel < 0) nLevel = 0;
+            if (nLevel > 7) nLevel = 7;
+            double pos0 = m_axis.GetPosValue(ePos.Bottom);
+            double pos7 = m_axis.GetPosValue(ePos.Top);
+            return nLevel * (pos7 - pos0) / 7 + pos0;
+        }
+        #endregion
+
+        #region Mapping
+        public string RunMapping()
+        {
+            p_infoWafer = null;
+            if (Run(m_axis.StartMove(ePos.Bottom))) return p_sInfo;
+            if (Run(m_axis.WaitReady())) return p_sInfo;
+            if (Run(m_axis.StartMove(ePos.Bottom))) return p_sInfo;
+            for (int n = 0; n < 8; n++)
+            {
+                double pos = GetPos(n);
+                while (m_axis.p_posCommand < pos)
+                {
+                    Thread.Sleep(10);
+                    if (p_bProtection)
+                    {
+                        m_axis.StopAxis();
+                        return "Protection Detected"; 
+                    }
+                }
+                if (p_bCheck)
+                {
+                    m_axis.StopAxis();
+                    if (Run(MoveElevator(n))) return p_sInfo;
+                    p_infoWafer = new InfoWafer(p_id, n, m_engineer);
+                    return "OK"; 
+                }
+            }
+            return "No Case"; 
+        }
+        #endregion
+
         #region InfoWafer
-        string m_sInfoWafer = "";
         InfoWafer _infoWafer = null;
         public InfoWafer p_infoWafer
         {
             get { return _infoWafer; }
             set
             {
-                m_sInfoWafer = (value == null) ? "" : value.p_id;
                 _infoWafer = value;
-                if (m_reg != null) m_reg.Write("sInfoWafer", m_sInfoWafer);
                 OnPropertyChanged();
             }
         }
 
-        Registry m_reg = null;
         public void ReadInfoWafer_Registry()
         {
-            m_reg = new Registry(p_id + ".InfoWafer");
-            m_sInfoWafer = m_reg.Read("sInfoWafer", m_sInfoWafer);
-            p_infoWafer = m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
         }
         #endregion
 
@@ -143,19 +236,9 @@ namespace Root_AOP01_Packing.Module
             return "OK";
         }
 
-        enum eCheckWafer
-        {
-            InfoWafer,
-            Sensor
-        }
-        eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
         public bool IsWaferExist(int nID)
         {
-            switch (m_eCheckWafer)
-            {
-                case eCheckWafer.Sensor: return false; // m_diWaferExist.p_bIn;
-                default: return (p_infoWafer != null);
-            }
+            return (p_infoWafer != null);
         }
 
         InfoWafer.WaferSize m_waferSize;
@@ -174,7 +257,6 @@ namespace Root_AOP01_Packing.Module
 
         void RunTreeSetup(Tree tree)
         {
-            m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer");
             m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
         }
 
@@ -202,10 +284,16 @@ namespace Root_AOP01_Packing.Module
         {
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             base.InitBase(id, engineer);
+            InitThreadCheck(); 
         }
 
         public override void ThreadStop()
         {
+            if (m_bThreadCheck)
+            {
+                m_bThreadCheck = false;
+                m_threadCheck.Join(); 
+            }
             base.ThreadStop();
         }
 
