@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Rinse_Loader.Module;
+using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
@@ -28,16 +29,18 @@ namespace Root_Rinse_Loader.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
+        public Storage m_storage;
+        public Rail m_rail; 
         //public AOP01 m_aop01;
         //public MainVision m_mainVision;
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            //m_aop01 = new AOP01("AOP01", m_engineer);
-            //InitModule(m_aop01);
-            //m_mainVision = new MainVision("MainVision", m_engineer);
-            //InitModule(m_mainVision);
+            m_storage = new Storage("Storage", m_engineer);
+            InitModule(m_storage);
+            m_rail = new Rail("Rail", m_engineer);
+            InitModule(m_rail);
         }
 
         void InitModule(ModuleBase module)
