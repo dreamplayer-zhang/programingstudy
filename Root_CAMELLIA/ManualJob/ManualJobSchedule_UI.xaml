@@ -1,18 +1,24 @@
-﻿<Window x:Class="Root_Vega.ManualJob.ManualJobSchedule_UI"
+﻿<Window x:Class="Root_CAMELLIA.ManualJob.ManualJobSchedule_UI"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Root_CAMELLIA.ManualJob"
+        mc:Ignorable="d"
         WindowStyle="SingleBorderWindow"
         Closing="Window_Closing"
-        Title="ManualJobSchedule" Height="610.795" Width="705.966" Background="#FF2D2D30" Topmost="True">
+        Title="ManualJobSchedule" Height="600" Width="930.5" Background="#FF406859" Topmost="True">
+    <!--Title="ManualJobSchedule_UI" Height="600" Width="700" Background="#FF2D2D30" Topmost="True">-->
     <Window.Resources>
         <LinearGradientBrush x:Key="BtnGradientBrush" StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="#FF3E3E40" Offset="0"/>
-            <!--<GradientStop Color="#CCFFFA" Offset="0.5"/>-->
             <GradientStop Color="#FF3E3E40" Offset="0.5"/>
             <GradientStop Color="#FF3E3E40" Offset="1"/>
         </LinearGradientBrush>
+        <Style x:Key="{x:Type GroupBox}" TargetType="{x:Type GroupBox}">
+        </Style>
         <Style TargetType="Button">
-            <Setter Property="Background" Value="Black"/>
+            <Setter Property="Background" Value="DarkSlateGray"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="FontWeight" Value="Bold"/>
@@ -73,78 +79,83 @@
             </Setter>
         </Style>
     </Window.Resources>
-
-    <Grid x:Name="gridMain">
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="7*"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="3.7*"/>
-                    <RowDefinition Height="1.8*"/>
-                    <RowDefinition Height="3.7*"/>
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0" Height="auto">
-                    <GroupBox FontSize="20" Header="Infomation" Height="auto" Foreground="White">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                <TextBlock Text=" Location ID = " VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding p_sLocID}" VerticalAlignment="Center" TextAlignment="Left" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="1" Orientation="Horizontal">
-                                <TextBlock Text=" Lot ID = " VerticalAlignment="Center"/>
-                                <TextBox x:Name="textBoxLotID" Text="{Binding p_sLotID}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="2" Orientation="Horizontal">
-                                <TextBlock Text=" Pod ID = " VerticalAlignment="Center"/>
-                                <TextBox Text="{Binding p_sCarrierID}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left"/>
-                            </StackPanel>
-                            <StackPanel Grid.Row="3" Orientation="Horizontal">
-                                <TextBlock Text=" Reticle ID = " VerticalAlignment="Center"/>
-                                <TextBox x:Name="textBoxSlotID" Text="{Binding p_sSlotID}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left" />
-                            </StackPanel>
-                        </Grid>
-                    </GroupBox>
-                </Grid>
-                <Grid Grid.Row="1" Height="auto">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="318*"/>
-                        <ColumnDefinition Width="43*"/>
-                        <ColumnDefinition Width="128*"/>
-                    </Grid.ColumnDefinitions>
-                    <GroupBox FontSize="20" Header="Recipe Select" Height="100" Foreground="White" Grid.ColumnSpan="3" Margin="0,7">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text=" Recipe ID = " VerticalAlignment="Center"/>
-                            <ComboBox x:Name="comboRecipeID" MinWidth="50" VerticalAlignment="Center" SelectionChanged="comboRecipeID_SelectionChanged"/>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="6*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="4*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Height="auto">
+                <GroupBox FontSize="20" Header="Infomation" Height="auto" Foreground="White">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Text="Location ID = " VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding p_sLocID}" VerticalAlignment="Center" TextAlignment="Left" MinWidth="100"/>
                         </StackPanel>
-                    </GroupBox>
-                </Grid>
-                <Grid Grid.Row="2" Height="auto">
-                    <GroupBox FontSize="20" Header="Option" Height="auto" Foreground="White">
-                        <StackPanel Orientation="Vertical">
-                            <CheckBox Content="RNR Mode" IsChecked="{Binding p_bRnR}" Foreground="White" VerticalAlignment="Center" Margin="10"/>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text=" RnR Count = " VerticalAlignment="Center"/>
-                                <TextBox Text="{Binding p_nRnR}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left" />
-                            </StackPanel>
-
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                            <TextBlock Text="Lot ID = " VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding p_sLotID}" VerticalAlignment="Center" TextAlignment="Left" MinWidth="100"/>
                         </StackPanel>
-                    </GroupBox>
-                </Grid>
+                        <StackPanel Grid.Row="2" Orientation="Horizontal">
+                            <TextBlock Text="Carrier ID = " VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding p_sCarrierID}" VerticalAlignment="Center" TextAlignment="Left" MinWidth="100"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
             </Grid>
-            <StackPanel Grid.Column="1" Margin="10">
-                <Button x:Name="buttonRun" Height="100" Margin="5" Content="Run" IsDefault="True" Visibility="Hidden" Click="ButtonRun_Click"/>
-                <Button Height="100" Margin="5" Content="Cancel" IsCancel="True"/>
-            </StackPanel>
-        </Grid>
+            <Grid Grid.Row="1" Height="auto">
+                <GroupBox FontSize="20" Header="Recipe Select" Height="auto" Foreground="White">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Recipe ID = " VerticalAlignment="Center"/>
+                        <ComboBox x:Name="comboRecipeID" MinWidth="150" VerticalAlignment="Center" SelectionChanged="comboRecipeID_SelectionChanged"/>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+            <Grid Grid.Row="2" Height="auto">
+                <GroupBox FontSize="20" Header="Option" Height="auto" Foreground="White">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Vertical">
+                            <CheckBox Content="RNR Mode" IsChecked="{Binding p_bRnR}" Foreground="White" VerticalAlignment="Center" Margin="10"/>
+                        </StackPanel>
+                    </Grid>
 
+                </GroupBox>
+            </Grid>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="8*"/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <local:ManualJobSlot_UI Width="auto" Height="auto"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="Run" IsDefault="True" Click="Button_Click" Margin="12"/>
+                <Button Grid.Column="1" Content="Cancel" IsCancel="True" Click="Button_Click_1" Margin="12"/>
+                
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
+
+    
