@@ -64,9 +64,9 @@ namespace Root_WIND2.Module
                 p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
                 p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.Get(ref m_CamAlign, this, "AlignCam");
-                p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-                p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
             }
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
+            p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
             m_remote.GetTools(bInit);
         }
         #endregion
@@ -154,7 +154,7 @@ namespace Root_WIND2.Module
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
             m_memoryGroup2 = m_memoryPool2.GetGroup("group");
-            m_memoryGroup2.CreateMemory("ROI", 1, 4, 30000,30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+            m_memoryGroup2.CreateMemory("ROI", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
         }
 
         #endregion
@@ -395,7 +395,7 @@ namespace Root_WIND2.Module
 
         public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
-            //            InitLineScan();
+            //            InitLineScan();+
             //            InitAreaScan();
             base.InitBase(id, engineer, eRemote);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
