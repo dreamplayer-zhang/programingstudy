@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
+             xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              xmlns:helper="clr-namespace:Helper"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:wpg="clr-namespace:System.Windows.Controls"
@@ -28,7 +29,7 @@
                             MethodName="GetValues"
                             ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:IMAGE_CHANNEL"/>
+                <x:Type TypeName="vision:IMAGE_CHANNEL"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </UserControl.Resources>
