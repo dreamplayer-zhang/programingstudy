@@ -4,6 +4,7 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHTNew;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
@@ -13,20 +14,29 @@ namespace Root_AOP01_Packing.Module
     public class Loadport_AOP : ModuleBase, IWTRChild, ILoadport
     {
         #region ToolBox
-        DIO_Is m_diPodCheck; 
+        DIO_I[] m_diPodCheck = new DIO_I[3]; 
         DIO_I2O2 m_dioGuide;
         Axis m_axisDoor;
         DIO_I m_diDoorOpen;
-        DIO_I m_diDoorClose; 
-        //OHT m_OHT;
+        DIO_I m_diDoorClose;
+        DIO_O m_doManual;
+        DIO_O m_doAuto;
+        DIO_O m_doPresent;
+        DIO_O m_doPlaced;
+        DIO_O m_doLoad;
+        DIO_O m_doUnload;
+        DIO_O m_doAlarm;
+        OHT m_OHT;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diPodCheck, this, "POD Check", "POD Check", 3);
+            p_sInfo = m_toolBox.Get(ref m_diPodCheck[0], this, "POD Check0");
+            p_sInfo = m_toolBox.Get(ref m_diPodCheck[1], this, "POD Check1");
+            p_sInfo = m_toolBox.Get(ref m_diPodCheck[2], this, "POD Check2");
             p_sInfo = m_toolBox.Get(ref m_dioGuide, this, "Guide", "Up", "Down");
             p_sInfo = m_toolBox.Get(ref m_axisDoor, this, "Door");
             p_sInfo = m_toolBox.Get(ref m_diDoorOpen, this, "Door Open");
             p_sInfo = m_toolBox.Get(ref m_diDoorClose, this, "Door Close");
-            //p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT", m_diPlaced, m_diPresent);
+            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT", m_diPodCheck[0], m_diPodCheck[1]);
             if (bInit) { }
         }
         #endregion
