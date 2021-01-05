@@ -130,7 +130,7 @@ namespace RootTools_Vision
             try
             {
                 Bitmap bmp = new Bitmap(filepath);
-
+                
                 // Raw Copy
                 //rawdata = new byte[width * _height * _byteCount];
                 BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, _width, _height), ImageLockMode.WriteOnly, bmp.PixelFormat);
@@ -154,9 +154,9 @@ namespace RootTools_Vision
                         IntPtr pointer = bmpData.Scan0;
                         byte* pPointer = (byte*)pointer.ToPointer();
 
-                        Parallel.For(0, _height - 1, (j) =>
+                        Parallel.For(0, _height - 1, (i) =>
                         {
-                            for (int i = 0; i < _width; i++)
+                            for (int j = 0; j < _width; j++)
                             {
                                 rawdata[i * _width * _byteCount + j * _byteCount + 2] = pPointer[i * bmpData.Stride + j * _byteCount + 0];
                                 rawdata[i * _width * _byteCount + j * _byteCount + 1] = pPointer[i * bmpData.Stride + j * _byteCount + 1];

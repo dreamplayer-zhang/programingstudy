@@ -244,6 +244,7 @@
       <DependentUpon>BacksideInspection.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideInspection_ViewModel.cs" />
+    <Compile Include="UI\Enums.cs" />
     <Compile Include="UI\SettingDialog\ISettingData.cs" />
     <Compile Include="UI\SettingDialog\SettingData.cs" />
     <Compile Include="UI\SettingDialog\SettingData_Setup.cs" />

@@ -196,7 +196,7 @@ namespace RootTools_Vision
             if (this.workplace.Index == 0)
                 return;
 
-            if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == false)
+            if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == false || this.workplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) == null)
             {
                 return;
             }

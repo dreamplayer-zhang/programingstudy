@@ -8,6 +8,7 @@
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:wpg="clr-namespace:System.Windows.Controls"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="838" d:DesignWidth="1683" Background="{StaticResource PanelBackGround}">
     <UserControl.Resources>
@@ -22,6 +23,14 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <ObjectDataProvider x:Key="DataFromEnum"
+                            MethodName="GetValues"
+                            ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:IMAGE_CHANNEL"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </UserControl.Resources>
     <Grid DataContext="{Binding p_Spec_VM}">
         <ScrollViewer>
@@ -99,7 +108,6 @@
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </ScrollViewer>
-                                
                             </Grid>
                         </GroupBox>
                         <GroupBox Header="Viewer" Grid.Row="1">
@@ -304,16 +312,36 @@
 
                                         <DataGridTextColumn Header="Value" Width="*"
                                                                     ElementStyle="{StaticResource TextInCellCenter}"
-                                                                    Binding="{Binding p_InspMethod.Name, 
+                                                                    Binding="{Binding p_InspMethod.Value,
                                                                     Converter={StaticResource StringConverter}}"/>
                                         <DataGridTextColumn Header="Size(Pxl)" Width="*" 
                                                                     ElementStyle="{StaticResource TextInCellCenter}"
-                                                                    Binding="{Binding p_InspMethod.p_nSize, 
+                                                                    Binding="{Binding p_InspMethod.Size, 
                                                                     Converter={StaticResource StringConverter}}"/>
-                                        <DataGridTextColumn Header="Mode" Width="*" 
+
+                                        <DataGridTemplateColumn Header="Channel" Width="*">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ComboBox     ItemsSource="{Binding Source={StaticResource DataFromEnum}}"
+                                                                  SelectedItem="{Binding p_InspChannel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  IsSynchronizedWithCurrentItem="False"
+                                                                  BorderThickness="1"
+                                                                  HorizontalContentAlignment="Center"
+                                                                  VerticalContentAlignment="Center">
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="SelectionChanged">
+                                                                <i:InvokeCommandAction Command="{Binding ComboBoxSelectionChanged_InspChannel}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </ComboBox>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        
+                                        <!--<DataGridTextColumn Header="Channel" Width="*" 
                                                                     ElementStyle="{StaticResource TextInCellCenter}"
                                                                     Binding="{Binding p_InspMethod.p_inspMode, 
-                                                                    Converter={StaticResource StringConverter}}"/>
+                                                                    Converter={StaticResource StringConverter}}"/>-->
                                         <DataGridTemplateColumn Width="60" Header="-">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>

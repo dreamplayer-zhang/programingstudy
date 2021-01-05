@@ -12,8 +12,6 @@ namespace Root_WIND2
 {
     class FrontsideSpec_ViewModel : ObservableObject
     {
-
-
         public Frontside_ViewModel m_front;
         public Recipe m_Recipe;
         public void init(Frontside_ViewModel front, Recipe recipe)
@@ -21,10 +19,8 @@ namespace Root_WIND2
             m_Recipe = recipe;
             m_front = front;
             ViewerInit();
-            m_cInspMethod = new ObservableCollection<ParameterBase>();
+           
             m_cInspItem = new ObservableCollection<InspectionItem>();
-
-            p_cInspMethod = ParameterBase.GetChildClass();
 
             p_selectedMethodItem = null;
 
@@ -114,6 +110,7 @@ namespace Root_WIND2
                 SetProperty(ref m_selectedMethodItem, value);
             }
         }
+
         #endregion
 
 
@@ -193,11 +190,17 @@ namespace Root_WIND2
 
         public void SetParameter()
         {
+            
             List<ParameterBase> paramList = new List<ParameterBase>();
             foreach(InspectionItem item in p_cInspItem)
             {
                 if (item.p_InspMethod is IMaskInspection)
-                    ((IMaskInspection)item.p_InspMethod).MaskIndex = item.p_InspROI.p_Index;
+                {
+                    if (item.p_InspROI != null)
+                    {
+                        ((IMaskInspection)item.p_InspMethod).MaskIndex = item.p_InspROI.p_Index;
+                    }
+                }
                 paramList.Add(item.p_InspMethod);
             }
 
@@ -214,7 +217,6 @@ namespace Root_WIND2
                     InspectionItem item = new InspectionItem();
                     item.p_cInspROI = p_ROI_Viewer.p_cInspROI;
                     item.p_Index = p_cInspItem.Count();
-                    item.p_cInspMethod = CloneMethod();
                     item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
                     item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
                     item.ButtonClicked_Delete += ButtonClicked_Delete_Callback;
@@ -236,5 +238,6 @@ namespace Root_WIND2
             }
         }
         #endregion
+
     }
 }
