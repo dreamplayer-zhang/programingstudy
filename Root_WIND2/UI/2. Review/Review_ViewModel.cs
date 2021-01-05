@@ -136,8 +136,12 @@ namespace Root_WIND2
                         string sReicpeFileName = sRecipeID + ".rcp";
                         recipe.Read(Path.Combine(sReicpePath, sRecipeID, sReicpeFileName));
                         m_DefectView.SetRecipe(recipe);
-
                         DisplayDefectData(sInspectionID);
+
+                        m_DefectView.tbRcpName.Text = sRecipeID.ToString();
+                        m_DefectView.tbWaferID.Text = (string)GetDataGridItem(lotinfo_Datatable, selectedRow, "WAFERID");
+                        m_DefectView.tbTotalCnt.Text = m_ReviewDefectlist.Count.ToString() + " (EA)";
+                        m_DefectView.tb_EdgeCnt.Text = m_ReviewDefectlist.Count.ToString() + " (EA)";
                     }
                     catch (Exception ex)
                     {
@@ -167,7 +171,7 @@ namespace Root_WIND2
                     // Defect Code 보고... 나중에 회의
                     //if (defect.m_nDefectCode / 10000 == 1)  // Frontside
                     {
-                        DisplaySelectedFrontDefect(selectedRow);
+                        //DisplaySelectedFrontDefect(selectedRow);
                     }
                     //else if (defect.m_nDefectCode / 10000 == 2)  // Backside
                     {
@@ -175,7 +179,7 @@ namespace Root_WIND2
                     }
                     //else if (defect.m_nDefectCode / 10000 == 3) // Edge
                     {
-                    //    DisplayEdgeSelectedDefect(selectedRow); // To-do edge 전용으로만 보이니까 추후에 구조 수정필요
+                        DisplayEdgeSelectedDefect(selectedRow); // To-do edge 전용으로만 보이니까 추후에 구조 수정필요
                     }
 
                 }
@@ -524,7 +528,6 @@ namespace Root_WIND2
             else
                 p_DefectImage = null;
         }
-
         private void DisplaySelectedFrontDefect(DataRowView selectedRow)
         {
             if (m_ReviewDefectlist == null)
@@ -568,10 +571,10 @@ namespace Root_WIND2
 
             DrawDefectSizeGraph();              // Draw Defect Size Distribution Histogram
             DrawDefectGVGraph();                // Draw Defect GV Distribution Histogram
-
         }
         private void ClassifyDefect()
         {
+            //m_DefectView.tbRcpName.Text = 
             foreach (Defect defect in m_ReviewDefectlist)
             {
                 // 대충 코드는 이런식으로 분류를 하면 되지않을까...
@@ -585,8 +588,8 @@ namespace Root_WIND2
                 }
                 //else if (defect.m_nDefectCode / 10000 == 3) // Edge
                 {
-                //    double theta = CalculateEdgeDefectTheta(defect.m_fAbsY);
-                //    m_DefectView.AddEdgeDefect(theta);
+                    //double theta = CalculateEdgeDefectTheta(defect.m_fAbsY);
+                    //m_DefectView.AddEdgeDefect(theta);
                 }
             }
         }
