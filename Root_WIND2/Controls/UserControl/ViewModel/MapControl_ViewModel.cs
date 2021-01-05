@@ -18,14 +18,14 @@ namespace Root_WIND2
 {
     class MapControl_ViewModel : ObservableObject
     {
-        InspectionManager_Vision m_InspectionManger;
+        WorkFactory m_InspectionManger;
         Recipe m_Recipe;
 
         public delegate void setMasterDie(object e);
         public event setMasterDie SetMasterDie;
         public int[] Map;
         CPoint MapSize;
-        public MapControl_ViewModel(InspectionManager_Vision inspectionManger, Recipe recipe = null)
+        public MapControl_ViewModel(WorkFactory inspectionManger, Recipe recipe = null)
         {
             if(recipe != null)
                 m_Recipe = recipe;
@@ -72,7 +72,7 @@ namespace Root_WIND2
                     {
 
                         Grid chip = p_MapItems[index];
-                        //lock (lockObj) //여기다가 lock걸면 화면 최대/최소화 시 맵이 회색으로 변함
+                        lock (lockObj) //여기다가 lock걸면 화면 최대/최소화 시 맵이 회색으로 변함
                         {
                             switch (state)
                             { 
@@ -101,7 +101,7 @@ namespace Root_WIND2
                     {
                         Grid chip = p_MapItems[index];
 
-                        chip.Background = brushBadChip;
+                        lock(this.lockObj) chip.Background = brushBadChip;
                     }
                 }));
             }
@@ -115,8 +115,11 @@ namespace Root_WIND2
 
         public void CreateMapUI(int[] map = null, CPoint mapsize = null)
         {
+            // 여기 예외처리 이상함
             if (map == null)
             {
+                if (Map == null) return;
+
                 map = Map;
                 mapsize = MapSize;
             }

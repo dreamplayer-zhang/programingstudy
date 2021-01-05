@@ -1,4 +1,5 @@
 ﻿using Emgu.CV;
+using Emgu.CV.Cvb;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Root_EFEM;
@@ -8,6 +9,7 @@ using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
+using RootTools.Control.Ajin;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
@@ -15,7 +17,11 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows;
+using static RootTools.Control.Axis;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -45,6 +51,22 @@ namespace Root_AOP01_Inspection.Module
         Camera_Dalsa m_CamTDISide;
         Camera_Basler m_CamLADS;
 
+        class LADSInfo//한 줄에 대한 정보
+        {
+            public double[] m_Heightinfo;
+            public RPoint axisPos;//시작점의 x,y
+            public double endYPos;//끝점의 y 정보
+
+            LADSInfo() { }
+            public LADSInfo(RPoint _axisPos,double _endYPos,int arrcap/*heightinfo capacity*/)
+            {
+                axisPos = _axisPos;
+                endYPos = _endYPos;
+                m_Heightinfo = new double[arrcap];
+            }
+        }
+
+        static List<LADSInfo> ladsinfos;
 
         public override void GetTools(bool bInit)
         {
@@ -139,7 +161,7 @@ namespace Root_AOP01_Inspection.Module
         public enum eAxisPos
         {
             ReadyPos,
-
+            ScanPos,
         }
 
         void InitPosAlign()
@@ -395,6 +417,9 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_Grab45(this), false, "Run Grab 45");
             AddModuleRunList(new Run_GrabSideScan(this), false, "Run Side Scan");
             AddModuleRunList(new Run_LADS(this), false, "Run LADS");
+            AddModuleRunList(new Run_BarcodeInspection(this), false, "Run Barcode Inspection");
+            AddModuleRunList(new Run_MakeAlignTemplateImage(this), false, "Run MakeAlignTemplateImage");
+            AddModuleRunList(new Run_PatternAlign(this), false, "Run PatternAlign");
         }
         #endregion
 
@@ -402,6 +427,7 @@ namespace Root_AOP01_Inspection.Module
         {
             base.InitBase(id, engineer);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
+            ladsinfos = new List<LADSInfo>();
             InitMemorys();
             InitPosAlign(); 
         }
@@ -484,7 +510,6 @@ namespace Root_AOP01_Inspection.Module
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false,bVisible), bVisible, true);
             }
             public override string Run()
             {
@@ -512,6 +537,12 @@ namespace Root_AOP01_Inspection.Module
                     {
                         if (EQ.IsStop())
                             return "OK";
+
+                        double nRotate = m_nRotatePulse * (p_dDegree * nScanLine);
+                        if (m_module.Run(axisRotate.StartMove(nRotate)))
+                            return p_sInfo;
+                        if (m_module.Run(axisRotate.WaitReady()))
+                            return p_sInfo;
 
                         double dStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
                         double dEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
@@ -541,7 +572,7 @@ namespace Root_AOP01_Inspection.Module
                         string strMemory = curScanPos.ToString();
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
@@ -549,18 +580,7 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
-                        nScanLine++;
-
-                        if (m_module.Run(axisXY.p_axisY.StartMove(2249700)))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady()))
-                            return p_sInfo;
-                        double nRotate = m_nRotatePulse * (p_dDegree * nScanLine);
-                        if (m_module.Run(axisRotate.StartMove(nRotate)))
-                            return p_sInfo;
-                        if (m_module.Run(axisRotate.WaitReady()))
-                            return p_sInfo;
-
+                        nScanLine++;                     
                     }
                     m_grabMode.m_camera.StopGrab();
                     return "OK";
@@ -625,7 +645,6 @@ namespace Root_AOP01_Inspection.Module
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
             }
             public override string Run()
             {
@@ -635,6 +654,7 @@ namespace Root_AOP01_Inspection.Module
                 {
                     m_grabMode.SetLight(true);
 
+                    double a = Math.Atan(55.3);
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
                     CPoint cpMemoryOffset = new CPoint(m_cpMemoryOffset);
@@ -733,7 +753,7 @@ namespace Root_AOP01_Inspection.Module
             }
             public override ModuleRunBase Clone()
             {
-                Run_Grab run = new Run_Grab(m_module);
+                Run_Grab45 run = new Run_Grab45(m_module);
                 run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
                 run.m_cpMemoryOffset = new CPoint(m_cpMemoryOffset);
                 run.m_dResX_um = m_dResX_um;
@@ -756,7 +776,6 @@ namespace Root_AOP01_Inspection.Module
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
             }
             public override string Run()
             {
@@ -764,10 +783,15 @@ namespace Root_AOP01_Inspection.Module
 
                 try
                 {
-                    m_grabMode.SetLight(true);
-
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
+                    m_grabMode.SetLight(true);
+                    if(m_grabMode.pUseRADS)
+                    {
+                        if(!axisZ.EnableCompensation(1))
+                            return "Axis Y Compensation disabled";
+
+                    }
                     CPoint cpMemoryOffset = new CPoint(m_cpMemoryOffset);
                     int nScanLine = 0;
                     int nMMPerUM = 1000;
@@ -779,7 +803,7 @@ namespace Root_AOP01_Inspection.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                     int nReticleSizeY_px = Convert.ToInt32(m_nReticleSize_mm * nMMPerUM / m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
-                    int nScanOffset_pulse = 100000; //가속버퍼구간
+                    int nScanOffset_pulse = 500000; //가속버퍼구간
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
@@ -790,7 +814,6 @@ namespace Root_AOP01_Inspection.Module
                         double dEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
-
 
                         double dPosX = m_rpAxisCenter.X + nReticleSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
 
@@ -807,6 +830,18 @@ namespace Root_AOP01_Inspection.Module
                         double dTriggerEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
                         axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
+                        double dTriggerDistance = Math.Abs(dTriggerEndPosY - dTriggerStartPosY);
+                        double dSection = dTriggerDistance / ladsinfos[nScanLine].m_Heightinfo.Length;
+                        double[] darrScanAxisPos = new double[ladsinfos[nScanLine].m_Heightinfo.Length];
+                        for (int i = 0; i < darrScanAxisPos.Length; i++)
+                        {
+                            if (dTriggerStartPosY > dTriggerEndPosY)
+                                darrScanAxisPos[i] = dTriggerStartPosY - (dSection * i);
+                            else
+                                darrScanAxisPos[i] = dTriggerStartPosY + (dSection * i);
+                        }
+                        SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, darrScanAxisPos, ladsinfos[nScanLine].m_Heightinfo, ladsinfos[nScanLine].m_Heightinfo.Length, false);
+                        
                         string strPool = m_grabMode.m_memoryPool.p_id;
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
                         string strMemory = m_grabMode.m_memoryData.p_id;
@@ -815,10 +850,20 @@ namespace Root_AOP01_Inspection.Module
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
 
-                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady()))
-                            return p_sInfo;
+                        CAXM.AxmContiStart(((AjinAxis)axisXY.p_axisY).m_nAxis, 0, 0);
+                        Thread.Sleep(10);
+                        uint unRunning = 0;
+                        while (true)
+                        {
+                            CAXM.AxmContiIsMotion(((AjinAxis)axisXY.p_axisY).m_nAxis, ref unRunning);
+                            if (unRunning == 0) break;
+                            Thread.Sleep(100);
+                        }
+
+                        //if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
+                        //    return p_sInfo;
+                        //if (m_module.Run(axisXY.WaitReady()))
+                        //    return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
                         nScanLine++;
@@ -831,6 +876,60 @@ namespace Root_AOP01_Inspection.Module
                 {
                     m_grabMode.SetLight(false);
                 }
+            }
+
+            private void SetFocusMap(int nScanAxisNo, int nZAxisNo, double[] darrScanAxisPos, double[] darrZAxisPos, int nPointCount, bool bReverse)
+            {
+                // variable
+                int iIdxScan = 0;
+                int iIdxZ = 1;
+                int[] narrAxisNo = new int[2];
+                double[] darrPosition = new double[2];
+                double dMaxVelocity = m_module.m_axisXY.p_axisY.GetSpeedValue(eSpeed.Move).m_v;
+                double dMaxAccel = m_module.m_axisXY.p_axisY.GetSpeedValue(eSpeed.Move).m_acc;
+                double dMaxDecel = m_module.m_axisXY.p_axisY.GetSpeedValue(eSpeed.Move).m_dec;
+
+                // implement
+                if (nZAxisNo < nScanAxisNo)
+                {
+                    iIdxZ = 0;
+                    iIdxScan = 1;
+                }
+                narrAxisNo[iIdxScan] = nScanAxisNo;
+                narrAxisNo[iIdxZ] = nZAxisNo;
+
+                // Queue 초기화
+                CAXM.AxmContiWriteClear(nScanAxisNo);
+                // 보간구동 축 맵핑
+                CAXM.AxmContiSetAxisMap(nScanAxisNo, (uint)narrAxisNo.Length, narrAxisNo);
+                // 구동모드 설정 -> [0] : 절대위치구동, [1] : 상대위치구동
+                uint unAbsRelMode = 0;
+                CAXM.AxmContiSetAbsRelMode(nScanAxisNo, unAbsRelMode);
+                // Conti 작성 시작 -> AxmContiBeginNode ~ AxmContiEndNode 사이의 AXM관련 함수들이 Conti Queue에 등록된다.
+                CAXM.AxmContiBeginNode(nScanAxisNo);
+                // 축별 구동위치 등록
+                if (bReverse)
+                {
+                    for (int i = nPointCount - 1; i >= 0; i--)
+                    {
+                        darrPosition[iIdxScan] = darrScanAxisPos[i];
+                        darrPosition[iIdxZ] = darrZAxisPos[i] + m_module.m_axisZ.GetPosValue(eAxisPos.ScanPos);
+                        CAXM.AxmLineMove(nScanAxisNo, darrPosition, dMaxVelocity, dMaxAccel, dMaxDecel);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i<nPointCount; i++)
+                    {
+                        darrPosition[iIdxScan] = darrScanAxisPos[i];
+                        darrPosition[iIdxZ] = darrZAxisPos[i] + m_module.m_axisZ.GetPosValue(eAxisPos.ScanPos);
+                        CAXM.AxmLineMove(nScanAxisNo, darrPosition, dMaxVelocity, dMaxAccel, dMaxDecel);
+                    }
+                }
+                // Conti 작성 종료
+                CAXM.AxmContiEndNode(nScanAxisNo);
+
+                return;
             }
         }
         public class Run_LADS : ModuleRunBase
@@ -847,7 +946,6 @@ namespace Root_AOP01_Inspection.Module
             public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
             public GrabMode m_grabMode = null;
             string m_sGrabMode = "";
-            private int[,] m_Heightinfo;
 
             public string p_sGrabMode
             {
@@ -888,7 +986,6 @@ namespace Root_AOP01_Inspection.Module
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
             }
             
             public override string Run()
@@ -898,6 +995,7 @@ namespace Root_AOP01_Inspection.Module
                 try
                 {
                     m_grabMode.SetLight(true);
+                    ladsinfos.Clear();
 
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
@@ -914,7 +1012,6 @@ namespace Root_AOP01_Inspection.Module
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
                     int nScanOffset_pulse = 100000; //가속버퍼구간
 
-                    m_Heightinfo = new int[nReticleSizeY_px / nCamHeight,nReticleSizeY_px / nCamWidth];
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
                         if (EQ.IsStop())
@@ -924,7 +1021,6 @@ namespace Root_AOP01_Inspection.Module
                         double dEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
-
 
                         double dPosX = m_rpAxisCenter.X + nReticleSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
 
@@ -955,13 +1051,12 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
-                        CalculateHeight(nScanLine, mem, nReticleSizeY_px);
+                        CalculateHeight(nScanLine, mem, nReticleSizeY_px,new RPoint(dPosX,dStartPosY),dEndPosY);
 
                         nScanLine++;
                         cpMemoryOffset.X += nCamWidth;
                     }
                     m_grabMode.m_camera.StopGrab();
-                    //SaveFocusMapImage(nReticleSizeY_px/nCamWidth, nReticleSizeY_px/nCamHeight);
                     SaveFocusMapImage(nScanLine, nReticleSizeY_px / nCamHeight);
                     return "OK";
                 }
@@ -971,12 +1066,13 @@ namespace Root_AOP01_Inspection.Module
                 }
             }
 
-            unsafe void CalculateHeight(int nCurLine, MemoryData mem,int ReticleHeight)
+            unsafe void CalculateHeight(int nCurLine, MemoryData mem,int ReticleHeight, RPoint Startpos,double endY)
             {
                 int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
                 int nHeight = ReticleHeight / nCamHeight;
                 byte* ptr =(byte*) mem.GetPtr().ToPointer(); //Gray
+                LADSInfo ladsinfo = new LADSInfo(Startpos, endY, nHeight);
                 for(int i=0;i<nHeight;i++)
                 {
                     int s=0, e=0; //레이저 시작, 끝위치 정보
@@ -990,8 +1086,10 @@ namespace Root_AOP01_Inspection.Module
                             s = Math.Min(s, j);
                         }
                     }
-                    m_Heightinfo[i, nCurLine] = (s + e) / 2;
+
+                    ladsinfo.m_Heightinfo[i] = (s + e) / 2;
                 }
+                ladsinfos.Add(ladsinfo);
             }
             private void SaveFocusMapImage(int nX, int nY)
             {
@@ -1003,9 +1101,9 @@ namespace Root_AOP01_Inspection.Module
                     Mat Vmat = new Mat();
                     for(int y=0;y<nY;y++)
                     {
-                        Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1); 
-                        int nScalednum = (m_Heightinfo[y,x]-110) * 255 / nCamHeight;
-                        //ColorImg.SetTo(new MCvScalar(nScalednum));
+                        Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1);
+                        //double nScalednum = (ladsInfo.m_Heightinfo[y,x]-110) * 255 / nCamHeight;
+                        double nScalednum = (ladsinfos[x].m_Heightinfo[y] - 110) * 255 / nCamHeight;
                         ColorImg.SetTo(new MCvScalar(nScalednum*20));
 
                         if (y == 0)
@@ -1024,5 +1122,457 @@ namespace Root_AOP01_Inspection.Module
                 CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
             }
         }
+
+        #region Barcode Inspection
+        public class Run_BarcodeInspection : ModuleRunBase
+        {
+            public enum eSearchDirection
+            {
+                TopToBottom = 0,
+                LeftToRight,
+                RightToLeft,
+                BottomToTop,
+            }
+
+            MainVision m_module;
+            public CPoint m_cptBarcodeLTPoint = new CPoint(0, 0);
+            public CPoint m_cptBarcodeRBPoint = new CPoint(0, 0);
+            public int m_nGaussianBlurKernalSize = 3;
+            public double m_dGaussianBlurSigma = 1.5;
+            public AdaptiveThresholdType m_eAdabtiveThresholdType = AdaptiveThresholdType.GaussianC;
+            public ThresholdType m_eThresholdType = ThresholdType.Binary;
+            public int m_nThresholdBlockSize = 3;
+            public double m_dThresholdParam = 3;
+            public int m_nErodeSize = 3;
+
+            public Run_BarcodeInspection(MainVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_BarcodeInspection run = new Run_BarcodeInspection(m_module);
+                run.m_cptBarcodeLTPoint = m_cptBarcodeLTPoint;
+                run.m_cptBarcodeRBPoint = m_cptBarcodeRBPoint;
+                run.m_nGaussianBlurKernalSize = m_nGaussianBlurKernalSize;
+                run.m_dGaussianBlurSigma = m_dGaussianBlurSigma;
+                run.m_eAdabtiveThresholdType = m_eAdabtiveThresholdType;
+                run.m_eThresholdType = m_eThresholdType;
+                run.m_nThresholdBlockSize = m_nThresholdBlockSize;
+                run.m_dThresholdParam = m_dThresholdParam;
+                run.m_nErodeSize = m_nErodeSize;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_cptBarcodeLTPoint = (tree.GetTree("Barcode ROI", false, bVisible)).Set(m_cptBarcodeLTPoint, m_cptBarcodeLTPoint, "Left Top Point", "Left Top Point", bVisible);
+                m_cptBarcodeRBPoint = (tree.GetTree("Barcode ROI", false, bVisible)).Set(m_cptBarcodeRBPoint, m_cptBarcodeRBPoint, "Right Bottom Point", "Right Bottom Point", bVisible);
+
+                m_nGaussianBlurKernalSize = (tree.GetTree("GaussianBlur Parameter", false, bVisible)).Set(m_nGaussianBlurKernalSize, m_nGaussianBlurKernalSize, "GaussianBlur Kernal Size", "GaussianBlur Kernal Size", bVisible);
+                m_dGaussianBlurSigma = (tree.GetTree("GaussianBlur Parameter", false, bVisible)).Set(m_dGaussianBlurSigma, m_dGaussianBlurSigma, "GaussianBlur Sigma", "GaussianBlur Sigma", bVisible);
+
+                m_eAdabtiveThresholdType = (AdaptiveThresholdType)(tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_eAdabtiveThresholdType, m_eAdabtiveThresholdType, "Adaptive Threshold Type", "Adaptive Threshold Type", bVisible);
+                m_eThresholdType = (ThresholdType)(tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_eThresholdType, m_eThresholdType, "Threshold Type", "Threshold Type", bVisible);
+                m_nThresholdBlockSize = (tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_nThresholdBlockSize, m_nThresholdBlockSize, "Threshold Block Size", "Threshold Block Size", bVisible);
+                m_dThresholdParam = (tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_dThresholdParam, m_dThresholdParam, "Threshold Param", "Threshold Param", bVisible);
+
+                m_nErodeSize = (tree.GetTree("Erode Parameter", false, bVisible)).Set(m_nErodeSize, m_nErodeSize, "Erode Size", "Erode Size", bVisible);
+            }
+
+            public override string Run()
+            {
+                string strPool = "MainVision.Vision Memory";
+                string strGroup = "MainVision";
+                string strMemory = "Main";
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                CPoint cptStartROIPoint = m_cptBarcodeLTPoint;
+                CPoint cptEndROIPoint = m_cptBarcodeRBPoint;
+                CRect crtROI = new CRect(cptStartROIPoint, cptEndROIPoint);
+                CRect crtHalfLeft = new CRect(cptStartROIPoint, new CPoint(crtROI.Center().X, cptEndROIPoint.Y));
+                CRect crtHalfRight = new CRect(new CPoint(crtROI.Center().X, cptStartROIPoint.Y), cptEndROIPoint);
+
+                // ROI따기
+                int nTop = GetEdge(mem, crtROI, 50, eSearchDirection.TopToBottom, 70);
+                int nBottom = GetEdge(mem, crtROI, 50, eSearchDirection.BottomToTop, 70);
+                CRect crtTopBox = new CRect(new CPoint(cptStartROIPoint.X, cptStartROIPoint.Y + nTop), new CPoint(cptEndROIPoint.X, cptStartROIPoint.Y + nTop + 100));
+                int nLeft = GetEdge(mem, crtTopBox, 10, eSearchDirection.LeftToRight, 70);
+                int nRight = GetEdge(mem, crtTopBox, 10, eSearchDirection.RightToLeft, 70);
+                CRect crtBarcode = new CRect(m_cptBarcodeLTPoint.X + nLeft, m_cptBarcodeLTPoint.Y + nTop, m_cptBarcodeLTPoint.X + nRight, m_cptBarcodeLTPoint.Y + nBottom);
+                Mat matBarcode = GetBarcodeMat(mem, crtBarcode);
+
+                // 회전각도 알아내기
+                int nLeftTop = GetEdge(mem, crtHalfLeft, 10, eSearchDirection.TopToBottom, 70);
+                CPoint cptLeftTop = new CPoint(crtHalfLeft.Center().X, nLeftTop);
+                int nRightTop = GetEdge(mem, crtHalfRight, 10, eSearchDirection.TopToBottom, 70);
+                CPoint cptRightTop = new CPoint(crtHalfRight.Center().X, nRightTop);
+                double dThetaRadian = Math.Atan2((double)(cptRightTop.Y - cptLeftTop.Y), (double)(cptRightTop.X - cptLeftTop.X));
+                double dThetaDegree = dThetaRadian * (180 / Math.PI);
+
+                // Barcode 회전
+                Mat matAffine = new Mat();
+                Mat matRotation = new Mat();
+                CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
+                CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
+                //matRotation.Save("D:\\Rotation.bmp");
+
+                // 회전 후 외곽영역 Cutting
+                int y1 = 100;
+                int y2 = matRotation.Rows - 100;
+                int x1 = 100;
+                int x2 = matRotation.Cols - 100;
+                Mat matCutting = new Mat(matRotation, new Range(y1, y2), new Range(x1, x2));
+                matCutting.Save("D:\\Cutting.bmp");
+
+                // Profile 구하기
+                Mat matSub = GetRowProfileMat(matCutting);
+
+                // 차영상 구하기
+                Mat matResult = matCutting - matSub;
+                matResult.Save("D:\\Result.bmp");
+
+                // 차영상에서 Blob Labeling
+                Mat matBinary = new Mat();
+                CvInvoke.Threshold(matResult, matBinary, 70, 255, ThresholdType.Binary);
+                matBinary.Save("D:\\BinaryResult.bmp");
+                CvBlobs blobs = new CvBlobs();
+                CvBlobDetector blobDetector = new CvBlobDetector();
+                Image<Gray, byte> img = matBinary.ToImage<Gray, byte>();
+                blobDetector.Detect(img, blobs);
+
+                foreach (CvBlob blob in blobs.Values)
+                {
+                    Console.WriteLine("Width:" + blob.BoundingBox.Width + ", Height:" + blob.BoundingBox.Height);
+                }
+
+                return "OK";
+            }
+
+            unsafe Mat GetBarcodeMat(MemoryData mem, CRect crtROI)
+            {
+                ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+                IntPtr p = mem.GetPtr();
+                img.SetData(p, crtROI, (int)mem.W);
+                Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
+
+                return matReturn;
+            }
+
+            unsafe int GetEdge(MemoryData mem, CRect crtROI, int nProfileSize, eSearchDirection eDirection, int nThreshold)
+            {
+                if (nProfileSize > crtROI.Width) return 0;
+
+                // variable
+                ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+                IntPtr p = mem.GetPtr();
+                byte* bp;
+
+                // implement
+                img.SetData(p, crtROI, (int)mem.W);
+                int nCount = 0;
+                switch (eDirection)
+                {
+                    case eSearchDirection.TopToBottom:
+                        for (int y = 0; y<img.p_Size.Y; y++)
+                        {
+                            nCount = 0;
+                            bp = (byte*)img.GetPtr() + y * img.p_Stride + (img.p_Size.X / 2);
+                            for (int x = -(nProfileSize / 2); x < (nProfileSize / 2); x++)
+                            {
+                                byte* bpCurrent = bp + x;
+                                if (*bpCurrent < nThreshold) nCount++;
+                            }
+                            if (nCount == nProfileSize) return y;
+                        }
+                        break;
+                    case eSearchDirection.LeftToRight:
+                        for (int x = 0; x<img.p_Size.X; x++)
+                        {
+                            nCount = 0;
+                            bp = (byte*)img.GetPtr() + x + (img.p_Size.Y / 2) * img.p_Stride;
+                            for (int y = -(nProfileSize / 2); y < (nProfileSize / 2); y++)
+                            {
+                                byte* bpCurrent = bp + y * img.p_Stride;
+                                if (*bpCurrent < nThreshold) nCount++;
+                            }
+                            if (nCount == nProfileSize) return x;
+                        }
+                        break;
+                    case eSearchDirection.RightToLeft:
+                        for (int x = img.p_Size.X - 1; x >= 0; x--)
+                        {
+                            nCount = 0;
+                            bp = (byte*)img.GetPtr() + x + (img.p_Size.Y / 2) * img.p_Stride;
+                            for (int y = -(nProfileSize / 2); y < (nProfileSize / 2); y++)
+                            {
+                                byte* bpCurrent = bp + y * img.p_Stride;
+                                if (*bpCurrent < nThreshold) return x;
+                            }
+                        }
+                        break;
+                    case eSearchDirection.BottomToTop:
+                        for (int y = img.p_Size.Y - 2; y >= 0; y--) // img의 마지막줄은 0으로 채워질 수 있기 때문에 마지막의 전줄부터 탐색
+                        {
+                            nCount = 0;
+                            bp = (byte*)img.GetPtr() + y * img.p_Stride + (img.p_Size.X / 2);
+                            for (int x = -(nProfileSize / 2); x < (nProfileSize / 2); x++)
+                            {
+                                byte* bpCurrent = bp + x;
+                                if (*bpCurrent < nThreshold) nCount++;
+                            }
+                            if (nCount == nProfileSize) return y;
+                        }
+                        break;
+                }
+
+                return 0;
+            }
+
+            unsafe Mat GetRowProfileMat(Mat matSrc)
+            {
+                // variable
+                long lSum = 0;
+                byte* bp = null;
+                Mat matReturn = new Mat(matSrc.Size, matSrc.Depth, matSrc.NumberOfChannels);
+                Image<Gray, byte> img = matReturn.ToImage<Gray, byte>();
+                // implement
+                for (int y = 0; y<matSrc.Rows; y++)
+                {
+                    lSum = 0;
+                    for (int x = 0; x<matSrc.Cols; x++)
+                    {
+                        bp = (byte*)matSrc.DataPointer + y * matSrc.Step + x;
+                        lSum += *bp;
+                    }
+                    for (int x = 0; x<matReturn.Cols; x++)
+                    {
+                        img.Data[y, x, 0] = (byte)(lSum / matSrc.Cols);
+                    }
+                }
+                matReturn = img.Mat;
+                
+                return matReturn;
+            }
+        }
+        #endregion
+
+        #region Make Align Template Image
+        public class Run_MakeAlignTemplateImage : ModuleRunBase
+        {
+            MainVision m_module;
+            public CPoint m_cptTopAlignMarkStartPos = new CPoint();
+            public CPoint m_cptTopAlignMarkEndPos = new CPoint();
+            public CPoint m_cptBottomAlignMarkStartPos = new CPoint();
+            public CPoint m_cptBottomAlignMarkEndPos = new CPoint();
+            //public string m_strTopTemplateImageFilePath = "D:\\TemplateImage\\TopTemplateImage.bmp";
+            //public string m_strBottomTemplateImageFilePath = "D:\\TemplateImage\\BottomTemplateImage.bmp";
+
+            public Run_MakeAlignTemplateImage(MainVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_MakeAlignTemplateImage run = new Run_MakeAlignTemplateImage(m_module);
+                run.m_cptTopAlignMarkStartPos = m_cptTopAlignMarkStartPos;
+                run.m_cptTopAlignMarkEndPos = m_cptTopAlignMarkEndPos;
+                run.m_cptBottomAlignMarkStartPos = m_cptBottomAlignMarkStartPos;
+                run.m_cptBottomAlignMarkEndPos = m_cptBottomAlignMarkEndPos;
+
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_cptTopAlignMarkStartPos = (tree.GetTree("Align Mark ROI", false, bVisible)).Set(m_cptTopAlignMarkStartPos, m_cptTopAlignMarkStartPos, "Align Mark Start Point of Top", "Align Mark Start Point of Top", bVisible);
+                m_cptTopAlignMarkEndPos = (tree.GetTree("Align Mark ROI", false, bVisible)).Set(m_cptTopAlignMarkEndPos, m_cptTopAlignMarkEndPos, "Align Mark End Point of Top", "Align Mark End Point of Top", bVisible);
+                m_cptBottomAlignMarkStartPos = (tree.GetTree("Align Mark ROI", false, bVisible)).Set(m_cptBottomAlignMarkStartPos, m_cptBottomAlignMarkStartPos, "Align Mark Start Point of Bottom", "Align Mark Start Point of Bottom", bVisible);
+                m_cptBottomAlignMarkEndPos = (tree.GetTree("Align Mark ROI", false, bVisible)).Set(m_cptBottomAlignMarkEndPos, m_cptBottomAlignMarkEndPos, "Align Mark End Point of Bottom", "Align Mark End Point of Bottom", bVisible);
+
+                //m_strTopTemplateImageFilePath = (tree.GetTree("Template Image Save Path", false, bVisible)).SetFile(m_strTopTemplateImageFilePath, m_strTopTemplateImageFilePath, "bmp", "Top Template Image Path", "Top Template Image Path", bVisible);
+                //m_strBottomTemplateImageFilePath = (tree.GetTree("Template Image Save Path", false, bVisible)).SetFile(m_strBottomTemplateImageFilePath, m_strBottomTemplateImageFilePath, "bmp", "Bottom Template Image Path", "Bottom Template Image Path", bVisible);
+            }
+
+            public override string Run()
+            {
+                // variable
+                Mat matTopTemplateImage = new Mat();
+                Mat matBottomTemplateImage = new Mat();
+                string strPool = "MainVision.Vision Memory";
+                string strGroup = "MainVision";
+                string strMemory = "Main";
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                CRect crtTopROI = new CRect(m_cptTopAlignMarkStartPos.X, m_cptTopAlignMarkStartPos.Y, m_cptTopAlignMarkEndPos.X, m_cptTopAlignMarkEndPos.Y);
+                CRect crtBottomROI = new CRect(m_cptBottomAlignMarkStartPos.X, m_cptBottomAlignMarkStartPos.Y, m_cptBottomAlignMarkEndPos.X, m_cptBottomAlignMarkEndPos.Y);
+                string strTopTemplateImageFilePath = "D:\\TemplateImage\\";
+                string strBottomTemplateImageFilePath = "D:\\TemplateImage\\";
+
+
+                // implement
+                if (!Directory.Exists(strTopTemplateImageFilePath))
+                    Directory.CreateDirectory(strTopTemplateImageFilePath);
+                if (!Directory.Exists(strBottomTemplateImageFilePath))
+                    Directory.CreateDirectory(strBottomTemplateImageFilePath);
+                matTopTemplateImage = GetMatImage(mem, crtTopROI);
+                matTopTemplateImage.Save(Path.Combine(strTopTemplateImageFilePath, "TopTemplateImage.bmp"));
+                matBottomTemplateImage = GetMatImage(mem, crtBottomROI);
+                matBottomTemplateImage.Save(Path.Combine(strBottomTemplateImageFilePath, "BottomTemplateImage.bmp"));
+
+                return "OK";
+            }
+
+            Mat GetMatImage(MemoryData mem, CRect crtROI)
+            {
+                ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+                IntPtr p = mem.GetPtr();
+                img.SetData(p, crtROI, (int)mem.W);
+                Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
+
+                return matReturn;
+            }
+        }
+        #endregion
+
+        #region PatternAlign
+        public class Run_PatternAlign : ModuleRunBase
+        {
+            MainVision m_module;
+            public int m_nSearchAreaSize;
+            public double m_dMatchScore = 0.4;
+            public string m_strTopTemplateImageFilePath = "D:\\TemplateImage\\TopTemplateImage.bmp";
+            public string m_strBottomTemplateImageFilePath = "D:\\TemplateImage\\BottomTemplateImage.bmp";
+
+            public Run_PatternAlign(MainVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_PatternAlign run = new Run_PatternAlign(m_module);
+                run.m_nSearchAreaSize = m_nSearchAreaSize;
+                run.m_dMatchScore = m_dMatchScore;
+                run.m_strTopTemplateImageFilePath = m_strTopTemplateImageFilePath;
+                run.m_strBottomTemplateImageFilePath = m_strBottomTemplateImageFilePath;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_nSearchAreaSize = tree.Set(m_nSearchAreaSize, m_nSearchAreaSize, "Template Matching Search Area Size", "Template Matching Search Area Size", bVisible);
+                m_dMatchScore = tree.Set(m_dMatchScore, m_dMatchScore, "Template Matching Pass Score", "Template Matching Pass Score", bVisible);
+                m_strTopTemplateImageFilePath = (tree.GetTree("Template Image Path", false, bVisible)).SetFile(m_strTopTemplateImageFilePath, m_strTopTemplateImageFilePath, "bmp", "Top Template Image Path", "Top Template Image Path", bVisible);
+                m_strBottomTemplateImageFilePath = (tree.GetTree("Template Image Path", false, bVisible)).SetFile(m_strBottomTemplateImageFilePath, m_strBottomTemplateImageFilePath, "bmp", "Bottom Template Image Path", "Bottom Template Image Path", bVisible);
+            }
+
+            public override string Run()
+            {
+                // variable
+                Image<Gray, byte> imgTop = new Image<Gray, byte>(m_strTopTemplateImageFilePath);
+                Image<Gray, byte> imgBottom = new Image<Gray, byte>(m_strBottomTemplateImageFilePath);
+                CPoint cptTopCenter = new CPoint();
+                CPoint cptBottomCenter = new CPoint();
+                string strPool = "MainVision.Vision Memory";
+                string strGroup = "MainVision";
+                string strMemory = "Main";
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                bool bFoundTop = false;
+                bool bFoundBottom = false;
+                CPoint cptTopResultCenter;
+                CPoint cptBottomResultCenter;
+
+                // implement
+                Run_MakeAlignTemplateImage moduleRun = (Run_MakeAlignTemplateImage)m_module.CloneModuleRun("MakeAlignTemplateImage");
+                cptTopCenter.X = moduleRun.m_cptTopAlignMarkStartPos.X + (moduleRun.m_cptTopAlignMarkEndPos.X - moduleRun.m_cptTopAlignMarkStartPos.X) / 2;
+                cptTopCenter.Y = moduleRun.m_cptTopAlignMarkStartPos.Y + (moduleRun.m_cptTopAlignMarkEndPos.Y - moduleRun.m_cptTopAlignMarkStartPos.Y) / 2;
+                cptBottomCenter.X = moduleRun.m_cptBottomAlignMarkStartPos.X + (moduleRun.m_cptBottomAlignMarkEndPos.X - moduleRun.m_cptBottomAlignMarkStartPos.X) / 2;
+                cptBottomCenter.Y = moduleRun.m_cptBottomAlignMarkStartPos.Y + (moduleRun.m_cptBottomAlignMarkEndPos.Y - moduleRun.m_cptBottomAlignMarkStartPos.Y) / 2;
+
+                // Top Template Image Processing
+                Point ptStart = new Point(cptTopCenter.X - (m_nSearchAreaSize / 2), cptTopCenter.Y - (m_nSearchAreaSize / 2));
+                Point ptEnd = new Point(cptTopCenter.X + (m_nSearchAreaSize / 2), cptTopCenter.Y + (m_nSearchAreaSize / 2));
+                CRect crtSearchArea = new CRect(ptStart, ptEnd);
+                Mat matSearchArea = GetMatImage(mem, crtSearchArea);
+                Image<Gray, byte> imgSrc = matSearchArea.ToImage<Gray, byte>();
+                bFoundTop = TemplateMatching(mem, crtSearchArea, imgSrc, imgTop, out cptTopResultCenter);
+
+                // Bottom Template Image Processing
+                ptStart = new Point(cptBottomCenter.X - (m_nSearchAreaSize / 2), cptBottomCenter.Y - (m_nSearchAreaSize / 2));
+                ptEnd = new Point(cptBottomCenter.X + (m_nSearchAreaSize / 2), cptBottomCenter.Y + (m_nSearchAreaSize / 2));
+                crtSearchArea = new CRect(ptStart, ptEnd);
+                matSearchArea = GetMatImage(mem, crtSearchArea);
+                imgSrc = matSearchArea.ToImage<Gray, byte>();
+                bFoundBottom = TemplateMatching(mem, crtSearchArea, imgSrc, imgTop, out cptBottomResultCenter);
+
+                // Calculate Theta
+                if (bFoundTop && bFoundBottom)  // Top & Bottom 모두 Template Matching 성공했을 경우
+                {
+                    double dThetaRadian = Math.Atan2((double)(cptBottomResultCenter.Y - cptTopResultCenter.Y), (double)(cptBottomResultCenter.X - cptTopResultCenter.X));
+                    double dThetaDegree = dThetaRadian * (180 / Math.PI);
+                    dThetaDegree -= 90;
+                    // 1000 Pulse = 1 Degree
+                    double dThetaPulse = dThetaDegree * 1000;
+
+                    // Theta축 회전
+                    Axis axisRotate = m_module.m_axisRotate;
+                    double dActualPos = axisRotate.p_posActual;
+                    axisRotate.StartMove(dActualPos - dThetaPulse);
+                    return "OK";
+                }
+                else
+                    return "Fail";
+            }
+
+            Mat GetMatImage(MemoryData mem, CRect crtROI)
+            {
+                ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+                IntPtr p = mem.GetPtr();
+                img.SetData(p, crtROI, (int)mem.W);
+                Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
+
+                return matReturn;
+            }
+
+            bool TemplateMatching(MemoryData mem, CRect crtSearchArea, Image<Gray, byte> imgSrc, Image<Gray, byte> imgTemplate, out CPoint cptCenter)
+            {
+                // variable
+                int nWidthDiff = 0;
+                int nHeightDiff = 0;
+                Point ptMaxRelative = new Point();
+                float fMaxScore = float.MinValue;
+                bool bFoundTemplate = false;
+
+                // implement
+                Image<Gray, float> imgResult = imgSrc.MatchTemplate(imgTemplate, TemplateMatchingType.CcorrNormed);
+                nWidthDiff = imgSrc.Width - imgResult.Width;
+                nHeightDiff = imgSrc.Height - imgResult.Height;
+                float[,,] matches = imgResult.Data;
+                
+                for (int x = 0; x<matches.GetLength(1); x++)
+                {
+                    for (int y = 0; y<matches.GetLength(0); y++)
+                    {
+                        if (fMaxScore < matches[y, x, 0] && m_dMatchScore <= matches[y, x, 0])
+                        {
+                            fMaxScore = matches[y, x, 0];
+                            ptMaxRelative.X = x;
+                            ptMaxRelative.Y = y;
+                            bFoundTemplate = true;
+                        }
+                    }
+                }
+                cptCenter = new CPoint();
+                cptCenter.X = (int)(crtSearchArea.Left + ptMaxRelative.X) + (int)(nWidthDiff / 2);
+                cptCenter.Y = (int)(crtSearchArea.Top + ptMaxRelative.Y) + (int)(nHeightDiff / 2);
+
+                return bFoundTemplate;
+            }
+        }
+        #endregion
     }
 }

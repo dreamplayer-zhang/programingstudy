@@ -47,6 +47,20 @@ namespace Root_WIND2
         }
         #endregion
 
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+        }
+        #endregion
+
         #region Title Bar
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -92,23 +106,6 @@ namespace Root_WIND2
         }
         #endregion
 
-        #region UI
-        public SelectMode m_ModeUI;
-        public Setup m_Setup;
-        public Review m_Review;
-        public Run m_Run;
-        public SelectMode ModeUI;
-        public Setup Setup;
-        public Review Review;
-        public Run Run;
-        #endregion
-
-        #region ViewModel
-        private Setup_ViewModel m_SetupViewModel;
-        private Review_ViewModel m_ReviewViewModel;
-        private Run_ViewModel m_RunViewModel;
-        #endregion
-
         public IDialogService dialogService;
 
         void Init()
@@ -141,6 +138,8 @@ namespace Root_WIND2
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1);
             //////
+
+            InitTimer();
         }
 
         void ThreadStop()

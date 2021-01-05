@@ -119,6 +119,10 @@
     <Compile Include="Recipe\Recipe\RecipeBase.cs" />
     <Compile Include="Recipe\Recipe\MaskRecipe.cs" />
     <Compile Include="Recipe\Recipe\SurfaceRecipe.cs" />
+    <Compile Include="UserControls\BasicTreeView.xaml.cs">
+      <DependentUpon>BasicTreeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\BasicTreeView_ViewModel.cs" />
     <Compile Include="Utility\KlarfData.cs" />
     <Compile Include="Utility\KlarfData_Lot.cs" />
     <Compile Include="WorkManager\WorkEventManager.cs" />
@@ -148,6 +152,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UserControls\BasicTreeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

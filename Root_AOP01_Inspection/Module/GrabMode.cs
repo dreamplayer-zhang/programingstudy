@@ -111,15 +111,22 @@ namespace Root_AOP01_Inspection.Module
         #region RADS
         public RADSControl m_RADSControl;
         bool m_bUseRADS = false;
+        public bool pUseRADS
+        {
+            get
+            {
+                return m_bUseRADS;
+            }
+            set
+            {
+                m_bUseRADS = value;
+            }
+        }
         void RunTreeRADS(Tree tree, bool bVisible, bool bReadOnly)
         {
-            m_bUseRADS = tree.Set(m_bUseRADS, m_bUseRADS, "Use", "Using RADS", bVisible, false);
+            m_bUseRADS = tree.Set(pUseRADS, pUseRADS, "Use", "Using RADS", bVisible, false);
         }
 
-        public bool GetUseRADS()
-        {
-            return m_bUseRADS;
-        }
         #endregion
 
         #region Memory

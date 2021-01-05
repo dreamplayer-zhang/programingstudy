@@ -173,6 +173,14 @@
                         </MenuItem.Header>
                     </MenuItem>
                 </Menu>
+                <Button Width="100" BorderThickness="0" Background="{StaticResource ControlBackGround}"
+                        Command="{Binding btnPopUpSetting}">
+                    <TextBlock Text="Setting" 
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                </Button>
                 <!--<Button Width="100" Content="Test"  Command="{Binding btnTest}"/>-->
 
 

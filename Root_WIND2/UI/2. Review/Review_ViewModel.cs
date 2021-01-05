@@ -496,10 +496,12 @@ namespace Root_WIND2
             }
         }
 
-        #endregion
+        ObservableCollection<string> CollectionOfFilePaths { get; set; }
 
-        #region DataTypeEnum
-        private GVHistogramType gvHistogramMode = GVHistogramType.Dark;
+    #endregion
+
+    #region DataTypeEnum
+    private GVHistogramType gvHistogramMode = GVHistogramType.Dark;
         private enum GVHistogramType
         {
             All,

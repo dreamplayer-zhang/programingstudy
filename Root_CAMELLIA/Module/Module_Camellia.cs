@@ -51,6 +51,7 @@ namespace Root_CAMELLIA.Module
                 m_axisXY = value;
             }
         }
+
         Axis m_axisZ;
         public Axis p_axisZ
         {
@@ -131,8 +132,8 @@ namespace Root_CAMELLIA.Module
 
         DIO_I m_axisXReady;
         DIO_I m_axisYReady;
-        DIO_I m_vaccum;
-        DIO_O m_vaccumOnOff;
+        DIO_I m_vacuum;
+        DIO_O m_vacuumOnOff;
         Camera_Basler m_CamVRS;
 
         #region Light
@@ -173,7 +174,7 @@ namespace Root_CAMELLIA.Module
             m_axisLifter.AddIO(m_axisXReady);
             m_axisLifter.AddIO(m_axisYReady);
             //m_axisLifter.AddIO(m_vaccum);
-            m_axisLifter.p_vaccumDIO_I = m_vaccum;
+            m_axisLifter.p_vaccumDIO_I = m_vacuum;
         }
         #endregion
 
@@ -187,15 +188,15 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_axisXReady, this, "Stage X Ready");
             p_sInfo = m_toolBox.Get(ref m_axisYReady, this, "Stage Y Ready");
-            p_sInfo = m_toolBox.Get(ref m_vaccum, this, "Vaccum On");
-            p_sInfo = m_toolBox.Get(ref m_vaccumOnOff, this, "Vaccum OnOff");
+            p_sInfo = m_toolBox.Get(ref m_vacuum, this, "Vaccum On");
+            p_sInfo = m_toolBox.Get(ref m_vacuumOnOff, this, "Vaccum OnOff");
         }
         #endregion
 
         public Module_Camellia(string id, IEngineer engineer)
         {
-            base.InitBase(id, engineer);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
+            base.InitBase(id, engineer);
             InitWorkPoint();
             m_DataManager = DataManager.Instance;
         }
@@ -304,6 +305,11 @@ namespace Root_CAMELLIA.Module
             public override string Run()
             {
 
+                if (m_module.LifterDown() != "OK")
+                {
+                    return p_sInfo;
+                }
+                m_module.VaccumOnOff(true);
 
 
                 m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
@@ -447,6 +453,14 @@ namespace Root_CAMELLIA.Module
                 ImageData img = VRS.p_ImageViewer.p_ImageData;
 
 
+                if (m_module.LifterDown() != "OK")
+                {
+                    return p_sInfo;
+                }
+                m_module.VaccumOnOff(true);
+
+
+
                 if (m_module.Run(axisZ.StartMove(47932)))
                 {
                     return p_sInfo;
@@ -569,6 +583,13 @@ namespace Root_CAMELLIA.Module
             public override string Run()
             {
                 AxisXY axisXY = m_module.m_axisXY;
+
+                if (m_module.LifterDown() != "OK")
+                {
+                    return p_sInfo;
+                }
+                m_module.VaccumOnOff(true);
+
                 //if (m_InitialCal)
                 //{
                 //    MovePoint = new RPoint(m_CalWaferCenterPos_pulse);
@@ -647,35 +668,39 @@ namespace Root_CAMELLIA.Module
 
                 Axis axisLifter = m_module.p_axisLifter;
 
-                if (m_module.LifterUpVaccumCheck())
+                //if (m_module.LifterUpVaccumCheck())
+                //{
+                //    if (!m_module.m_vaccum.p_bIn)
+                //    {
+                //        if (m_module.Run(axisLifter.StartMove(eAxisPos.Ready)))
+                //        {
+                //            return p_sInfo;
+                //        }
+                //        if (m_module.Run(axisLifter.WaitReady()))
+                //            return p_sInfo;
+                //    }
+                //}
+                if(m_module.LifterDown() != "OK")
                 {
-                    if (!m_module.m_vaccum.p_bIn)
-                    {
-                        if (m_module.Run(axisLifter.StartHome()))
-                        {
-                            return p_sInfo;
-                        }
-                        if (m_module.Run(axisLifter.WaitReady()))
-                            return p_sInfo;
-                    }
+                    return p_sInfo;
                 }
-
+                m_module.VaccumOnOff(true);
 
                 m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
                 Met.SettingData setting = null;
                 if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
-                     setting = m_SettingDataWithErrorCode.Item1;
+                    setting = m_SettingDataWithErrorCode.Item1;
                 }
                 else
                 {
                     return "SettingDataLoad Error";
                 }
 
-                    //m_module.p_eState = (eState)5;
-                    AxisXY axisXY = m_module.p_axisXY;
+                //m_module.p_eState = (eState)5;
+                AxisXY axisXY = m_module.p_axisXY;
                 Axis axisZ = m_module.p_axisZ;
-                
+
                 // stage 48724 , wafer 47932
                 if (m_module.Run(axisZ.StartMove(m_dFocusZ_pulse)))
                 {
@@ -719,8 +744,8 @@ namespace Root_CAMELLIA.Module
                     double x = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].x;
                     double y = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].y;
 
-                    double dX = centerX + x * 10000;
-                    double dY = centerY + y * 10000;
+                    double dX = centerX - x * 10000;
+                    double dY = centerY - y * 10000;
                     MeasurePoint = new RPoint(dX, dY);
 
                     if (m_module.Run(axisXY.StartMove(MeasurePoint)))
@@ -739,10 +764,12 @@ namespace Root_CAMELLIA.Module
                         m_mwvm.p_ArrowVisible = Visibility.Visible;
                     }
 
-                    App.m_nanoView.SampleMeasure(i, x, y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, setting.nAverage_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, setting.nAverage_NIR);
-;
-                       
-                    dm.SaveRawData(@"C:\Users\ATI\Desktop\Root_201221수정\MeasureData\", i);
+                    if(App.m_nanoView.SampleMeasure(i, x, y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, setting.nAverage_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, setting.nAverage_NIR) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                    {
+                        return "Layer Model Not Ready";
+                    }
+
+                    dm.SaveRawData(@"C:\Users\ATI\Desktop\MeasureData\test" + i, i);
                     App.m_nanoView.GetThickness(i);
                     m_mwvm.p_RTGraph.DrawReflectanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
                     m_mwvm.p_RTGraph.DrawTransmittanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
@@ -861,7 +888,12 @@ namespace Root_CAMELLIA.Module
             {
                 p_axisLifter.m_bDIO_I[i] = false;
             }
-
+            if (!LifterMoveVacuumCheck())
+            {
+                p_eState = eState.Error;
+                p_sInfo = "Vacuum is not turn off";
+                return p_sInfo;
+            }
             p_axisLifter.StartHome();
             if (p_axisLifter.WaitReady() != "OK")
             {
@@ -902,14 +934,90 @@ namespace Root_CAMELLIA.Module
             return p_sInfo;
         }
 
-        public bool LifterUpVaccumCheck()
+        public string LifterDown()
         {
-            if (m_vaccum.p_bIn)
+            if (LifterMoveVacuumCheck())
             {
-                m_vaccumOnOff.Write(false);
-                Thread.Sleep(1000);
+                if (!m_vacuum.p_bIn)
+                {
+                    if (p_axisLifter.IsInPos(eAxisPos.Ready))
+                    {
+                        return "OK";
+                    }
+
+                    if (Run(p_axisLifter.StartMove(eAxisPos.Ready)))
+                    {
+                        return p_sInfo;
+                    }
+                    if (Run(p_axisLifter.WaitReady()))
+                        return p_sInfo;
+                }
+                else
+                {
+                    p_sInfo = p_id + " Vacuum is not turn off";
+                    return p_sInfo;
+                }
             }
+            else
+            {
+                p_sInfo = p_id + " Vacuum is not turn off";
+                return p_sInfo;
+            }
+            return "OK";
+        }
+
+        public string LifterUp()
+        {
+
+            if (LifterMoveVacuumCheck())
+            {
+                if (!m_vacuum.p_bIn)
+                {
+                    if (p_axisLifter.IsInPos(ePosition.Position_0))
+                    {
+                        return "OK";
+                    }
+
+                    if (Run(p_axisLifter.StartMove(ePosition.Position_0)))
+                    {
+                        return p_sInfo;
+                    }
+                    if (Run(p_axisLifter.WaitReady()))
+                        return p_sInfo;
+                }
+                else
+                {
+                    p_sInfo = p_id + " Vacuum is not turn off";
+                    return p_sInfo;
+                }
+            }
+            else
+            {
+                p_sInfo = p_id + " Vacuum is not turn off";
+                return p_sInfo;
+            }
+            return "OK";
+        }
+
+        public bool LifterMoveVacuumCheck()
+        {
+            if (m_vacuum.p_bIn)
+            {
+                VaccumOnOff(false);
+            }
+
+            if (m_vacuum.p_bIn)
+            {
+                return false;
+            }
+
             return true;
+        }
+
+        public void VaccumOnOff(bool onOff)
+        {
+            m_vacuumOnOff.Write(onOff);
+            Thread.Sleep(1000);
         }
 
         public InfoWafer GetInfoWafer(int nID)
@@ -965,23 +1073,25 @@ namespace Root_CAMELLIA.Module
             if (Run(p_axisZ.WaitReady()))
                 return p_sInfo;
             /* Vaccum Check 후Lifter Up */
-            if (LifterUpVaccumCheck())
-            {
-                if (!m_vaccum.p_bIn)
-                {
-                    //if (Run(p_axisLifter.StartMove(ePosition.SWLimit_Plus)))
-                    if (Run(p_axisLifter.StartMove(ePosition.Position_0)))
-                    {
-                        return p_sInfo;
-                    }
-                    if (Run(p_axisLifter.WaitReady()))
-                        return p_sInfo;
-                }
-                else
-                {
-                    return p_id + "Vaccum Error";
-                }
-            }
+            if (LifterUp() != "OK")
+                return p_sInfo;
+            //if (LifterUpVaccumCheck())
+            //{
+            //    if (!m_vaccum.p_bIn)
+            //    {
+            //        //if (Run(p_axisLifter.StartMove(ePosition.SWLimit_Plus)))
+            //        if (Run(p_axisLifter.StartMove(ePosition.Position_0)))
+            //        {
+            //            return p_sInfo;
+            //        }
+            //        if (Run(p_axisLifter.WaitReady()))
+            //            return p_sInfo;
+            //    }
+            //    else
+            //    {
+            //        return p_id + "Vaccum Error";
+            //    }
+            //}
 
             return "OK";
         }

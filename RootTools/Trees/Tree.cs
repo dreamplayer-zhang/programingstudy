@@ -254,6 +254,15 @@ namespace RootTools.Trees
             return newitem;
         }
 
+        Tree GetItemFolder(string sName, string value, string sDesc)
+        {
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item;
+            Tree newitem = new TreeItem_FolderName(sName, this, value, sDesc, m_log);
+            AddTreeItem(newitem);
+            return newitem;
+        }
+
         Tree GetItemPassword(string sName, string value, string sDesc)
         {
             Tree item = FindTreeItem(sName);
@@ -357,6 +366,34 @@ namespace RootTools.Trees
                     break;
                 case eMode.Update:
                     dynamic oValue = ((ITreeItem)item).GetValue(); 
+                    item.m_bUpdated = true;
+                    return (oValue == null) ? "" : oValue.ToString();
+                case eMode.RegWrite:
+                    p_treeRoot.m_reg.Write(p_id + "." + p_sName + "." + item.p_sName, value);
+                    break;
+                case eMode.RegRead:
+                    return (string)p_treeRoot.m_reg.Read(p_id + "." + p_sName + "." + item.p_sName, valueDef);
+                case eMode.JobOpen:
+                case eMode.JobSave:
+                    if (p_treeRoot.m_job == null) return valueDef;
+                    return p_treeRoot.m_job.Set(GetJobID(p_id), item.p_sName, value, valueDef);
+            }
+            return value;
+        }
+
+        public string SetFolder(string value, string valueDef, string id, string sDesc, bool bVisible = true, bool bReadOnly = false)
+        {
+            Tree item = GetItemFolder(id, value, sDesc);
+            if (item == null) return value;
+            item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
+            item.p_bVisible = bVisible;
+            switch (p_treeRoot.p_eMode)
+            {
+                case eMode.Init:
+                    ((ITreeItem)item).SetValue(value);
+                    break;
+                case eMode.Update:
+                    dynamic oValue = ((ITreeItem)item).GetValue();
                     item.m_bUpdated = true;
                     return (oValue == null) ? "" : oValue.ToString();
                 case eMode.RegWrite:

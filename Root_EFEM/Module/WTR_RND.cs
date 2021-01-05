@@ -950,8 +950,9 @@ namespace Root_EFEM.Module
                 }
                 finally
                 {
-                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
-                    else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    //if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                    //else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
                 if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";
                 return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;
