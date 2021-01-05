@@ -70,7 +70,7 @@
             </StackPanel>
         </Border>
         <!--End Menu-->
-        
+
         <!--Toolbar-->
         <Border Grid.Row="1"
                 Background="{StaticResource ControlBackGround}"
@@ -78,7 +78,7 @@
                 BorderThickness="0,0,0,0">
         </Border>
         <!--End Toolbar-->
-        
+
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Disabled">
             <StackPanel>
                 <Grid Height="838">
@@ -86,7 +86,7 @@
                         <ColumnDefinition Width="2*"/>
                         <ColumnDefinition Width="8*"/>
                     </Grid.ColumnDefinitions>
-                    
+
                     <Grid Grid.Column="0" Visibility="Hidden" x:Name="RunPanel">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="2.5*"/>
@@ -110,7 +110,7 @@
                                 </StackPanel>
                                 <StackPanel Grid.Row="1" Margin="10,2" VerticalAlignment="Center">
                                     <TextBlock Text="Sub Progress" FontSize="13" FontWeight="Bold"/>
-                                        <Grid>
+                                    <Grid>
                                         <ProgressBar Height="25" Value="80"/>
                                         <TextBlock Text="Sub Process Name" 
                                                    VerticalAlignment="Center" 
@@ -323,7 +323,7 @@
                                         </StackPanel>
                                     </Grid>
                                 </GroupBox>
-                                                               
+
                                 <!--<tools:Database_DataView 
                                     DataContext="{Binding p_DataViewer_Lotinfo}" 
                                     Margin="0,5,0,0" 
@@ -360,7 +360,7 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
 
-                            
+
                             <!--End Defect View-->
                             <Grid Grid.Column="0">
                                 <ItemsControl ItemsSource="{Binding p_Element}"/>
@@ -392,8 +392,8 @@
                                                     <GroupBox.Header>
                                                         <TextBlock Text="Result"/>
                                                     </GroupBox.Header>
-                                                    
-                                     
+
+
                                                     <DataGrid 
                                                         Name="Defect_Viewer" 
                                                         ItemsSource="{Binding pDefect_Datatable}"
@@ -420,8 +420,8 @@
                                                     <GroupBox.Header>
                                                         <TextBlock Text="Defect Image"/>
                                                     </GroupBox.Header>
-                                                    
-                                                    
+
+
                                                     <Grid Background="Black">
                                                         <Image 
                                                             x:Name="DefectImage"
@@ -432,8 +432,8 @@
                                                          VerticalAlignment="Center"
                                                          HorizontalAlignment="Center"/>-->
                                                     </Grid>
-                                                    
-                                                    
+
+
                                                 </GroupBox>
 
                                             </Grid>
@@ -564,6 +564,52 @@
                                                 </Grid>
                                             </Grid>
                                         </TabItem>
+                                        <TabItem Header="Golden Image Trend" IsEnabled="true">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="3*"/>
+                                                    <RowDefinition Height="40"/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <Grid Grid.Row="0" Margin="10" Background="Black">
+                                                    <Image Source="{Binding GoldenImg}"/>
+                                                </Grid>
+                                                <Grid Grid.Row="1">
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                        <Button Grid.Row="1" Width="100" Margin="0,0,5,5" 
+                                                                Content="Image Load" HorizontalAlignment="Right" 
+                                                                Command="{Binding LoadImage}"></Button>
+                                                        <Button Grid.Row="1" Width="100" Margin="0,0,5,5" 
+                                                                Content="Check All" HorizontalAlignment="Right"
+                                                                Command="{Binding btnCheckAll}"></Button>
+                                                        <Button Grid.Row="1" Width="100" Margin="0,0,5,5" 
+                                                                Content="Uncheck All" HorizontalAlignment="Right"
+                                                                Command="{Binding btnUncheckAll}"></Button>
+                                                        <Button Grid.Row="1" Width="100" Margin="0,0,5,5" 
+                                                                Content="Show Trend" HorizontalAlignment="Right"
+                                                                Command="{Binding btnShowTrend}"></Button>
+                                                        <Button Grid.Row="1" Width="100" Margin="0,0,5,5" 
+                                                                Content="Save Image" HorizontalAlignment="Right"
+                                                                Command="{Binding btnSearch}"></Button>
+                                                    </StackPanel>
+                                                </Grid>
+
+
+                                                <ListBox ItemsSource="{Binding CollectionOfFilePaths}" Grid.Row="2">
+                                                    <ListBox.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <StackPanel Orientation="Horizontal"/>
+                                                        </ItemsPanelTemplate>
+                                                    </ListBox.ItemsPanel>
+
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Image Source="{Binding}"/>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                            </Grid>
+                                        </TabItem>
                                         <TabItem Header="Metrology">
                                             <Grid>
                                                 <Grid.RowDefinitions>
@@ -577,7 +623,7 @@
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
                                                 <Button Content="Tuning" Grid.Column="1"
-                                    Margin="3" FontWeight="Bold"/>
+                                                    Margin="3" FontWeight="Bold"/>
                                                 <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
                                                     <GroupBox.Header>
                                                         <TextBlock Text="Result"/>
@@ -702,6 +748,6 @@
                 </Grid>
             </StackPanel>
         </ScrollViewer>
-        
+
     </Grid>
 </UserControl>

@@ -28,11 +28,11 @@ namespace Root_WIND2
 
     public delegate void EventDrawDone(CPoint leftTop, CPoint rightBottom); //임시
 
-    public class FronsideInspection_ImageViewer_ViewModel : RootViewer_ViewModel
+    public class FrontsideInspection_ImageViewer_ViewModel : RootViewer_ViewModel
     {
         public event EventDrawDone DrawDone;
 
-        public FronsideInspection_ImageViewer_ViewModel()
+        public FrontsideInspection_ImageViewer_ViewModel()
         {
             base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
             p_VisibleMenu = Visibility.Visible;

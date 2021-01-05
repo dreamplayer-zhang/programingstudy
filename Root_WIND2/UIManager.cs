@@ -100,7 +100,6 @@ namespace Root_WIND2
             settingDialog = new SettingDialog();
             settingDialogViewModel = new SettingDialog_ViewModel();
             settingDialog.DataContext = settingDialogViewModel;
-            settingDialogViewModel.Init();
         }
 
         public void ChangeMainUI(UIElement window)

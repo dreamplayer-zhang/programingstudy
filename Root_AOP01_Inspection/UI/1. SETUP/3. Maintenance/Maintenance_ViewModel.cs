@@ -1,5 +1,4 @@
-﻿using Root_AOP01_Inspection.UI._1._SETUP._3._Maintenance;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Root_AOP01_Inspection
@@ -12,6 +11,7 @@ namespace Root_AOP01_Inspection
         AOP01_Engineer_UI Engineer_UI;
         ViewerTest ToolViewerTest;
         ViewerTest_ViewModel ToolViewerTest_VM;
+
         public Maintenance_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
@@ -22,6 +22,13 @@ namespace Root_AOP01_Inspection
             ToolViewerTest = new ViewerTest();
             ToolViewerTest.DataContext = ToolViewerTest_VM;
         }
+        
+        public void SetPage(UserControl page)
+        {
+            Maintenance.SubPanel.Children.Clear();
+            Maintenance.SubPanel.Children.Add(page);
+        }
+        #region RelayCommand
         public ICommand btnSummary
         {
             get
@@ -65,10 +72,6 @@ namespace Root_AOP01_Inspection
 
             }
         }
-        public void SetPage(UserControl page)
-        {
-            Maintenance.SubPanel.Children.Clear();
-            Maintenance.SubPanel.Children.Add(page);
-        }
+        #endregion
     }
 }

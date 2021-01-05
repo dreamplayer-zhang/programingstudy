@@ -178,6 +178,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -233,7 +234,7 @@
       <DependentUpon>NaviBtn.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\Recipe45D_ViewModel.cs" />
-    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeBackside_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeFrontside_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeEdge_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeLADS_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\RecipeWizard_ViewModel.cs" />

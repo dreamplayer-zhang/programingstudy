@@ -238,6 +238,8 @@
     <Compile Include="Module\ILoadport.cs" />
     <Compile Include="Module\IWTRRun.cs" />
     <Compile Include="Module\Loadport_Cymechs.cs" />
+    <Compile Include="Module\RFID_Brooks.cs" />
+    <Compile Include="Module\RFID_Ceyon.cs" />
     <Compile Include="Module\Vision_AOP.cs" />
     <Compile Include="Module\Vision_Backside.cs" />
     <Compile Include="Module\Vision_EBR.cs" />

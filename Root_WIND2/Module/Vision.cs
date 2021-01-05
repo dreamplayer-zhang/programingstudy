@@ -1,6 +1,7 @@
 ﻿using Root_EFEM;
 using Root_EFEM.Module;
 using RootTools;
+using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
 using RootTools.Light;
@@ -31,6 +32,7 @@ namespace Root_WIND2.Module
         RADSControl m_RADSControl;
 
         Camera_Dalsa m_CamMain;
+        Camera_Basler m_CamAlign;
 
         #region [Getter Setter]
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
@@ -46,6 +48,7 @@ namespace Root_WIND2.Module
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
         public RADSControl RADSControl { get => m_RADSControl; private set => m_RADSControl = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
+        public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         #endregion
 
         public override void GetTools(bool bInit)
@@ -60,10 +63,10 @@ namespace Root_WIND2.Module
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
                 p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
-                
+                p_sInfo = m_toolBox.Get(ref m_CamAlign, this, "AlignCam");
+                p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
+                p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
             }
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-            p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
             m_remote.GetTools(bInit);
         }
         #endregion
@@ -410,8 +413,8 @@ namespace Root_WIND2.Module
         {
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
-            AddModuleRunList(new Run_GrabLineScan(this), true, "Run Grab LineScan Camera");
-            AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
+            AddModuleRunList(new Run_GrabLineScan(this), false, "Run Grab LineScan Camera");
+            AddModuleRunList(new Run_Inspect(this), false, "Run Inspect");
             
         }
         #endregion

@@ -16,8 +16,8 @@ namespace Root_WIND2
 		private WIND2_Engineer engineer;
 		private Setup_ViewModel setupVM;
 
-		private FronsideInspection_ImageViewer_ViewModel drawToolVM;
-		public FronsideInspection_ImageViewer_ViewModel DrawToolVM
+		private FrontsideInspection_ImageViewer_ViewModel drawToolVM;
+		public FrontsideInspection_ImageViewer_ViewModel DrawToolVM
 		{
 			get { return drawToolVM; }
 			set { SetProperty(ref drawToolVM, value); }
@@ -40,7 +40,7 @@ namespace Root_WIND2
 
 		public void Init()
 		{
-			DrawToolVM = new FronsideInspection_ImageViewer_ViewModel();
+			DrawToolVM = new FrontsideInspection_ImageViewer_ViewModel();
 		}
 
 		public void Scan()
