@@ -198,7 +198,7 @@ namespace RootTools_Vision
             try
             {
                 Bitmap bmp = new Bitmap(filepath);
-
+                
                 // Raw Copy
                 //rawdata = new byte[width * _height * _byteCount];
                 BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, _width, _height), ImageLockMode.WriteOnly, bmp.PixelFormat);

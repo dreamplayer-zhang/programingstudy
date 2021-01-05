@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    public interface ISettingData
+    public enum IMAGE_CHANNEL
     {
+        R_GRAY = 0,
+        G = 1,
+        B = 2
     }
 }

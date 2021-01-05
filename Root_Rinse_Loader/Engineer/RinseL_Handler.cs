@@ -30,9 +30,9 @@ namespace Root_Rinse_Loader.Engineer
         #region Module
         public ModuleList p_moduleList { get; set; }
         public Storage m_storage;
-        public Rail m_rail; 
-        //public AOP01 m_aop01;
-        //public MainVision m_mainVision;
+        public Rail m_rail;
+        public Roller m_roller;
+        public Loader m_loader; 
 
         void InitModule()
         {
@@ -41,6 +41,10 @@ namespace Root_Rinse_Loader.Engineer
             InitModule(m_storage);
             m_rail = new Rail("Rail", m_engineer);
             InitModule(m_rail);
+            m_roller = new Roller("Roller", m_engineer);
+            InitModule(m_roller);
+            m_loader = new Loader("Loader", m_engineer, m_storage, m_roller);
+            InitModule(m_loader);
         }
 
         void InitModule(ModuleBase module)
