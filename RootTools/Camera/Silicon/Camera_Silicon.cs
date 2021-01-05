@@ -49,7 +49,7 @@ namespace RootTools.Camera.Silicon
                 SetProperty(ref m_nDeviceIndex, value);
             }
         }
-        string m_sMCF;
+        string m_sMCF = "";
         public string p_sMCF
         {
             get { return m_sMCF; }

@@ -259,7 +259,8 @@ namespace Root_EFEM.Module
                     if (EQ.IsStop()) return "EQ Stop";
                     Thread.Sleep(10);
                     ms10 += 10;
-                    if (ms10 > msDelay) return m_sLastCmd + " Has no Answer !!";
+                    if (ms10 > msDelay) 
+                        return m_sLastCmd + " Has no Answer !!";
                 }
                 return "OK";
             }

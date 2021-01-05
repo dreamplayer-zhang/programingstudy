@@ -95,6 +95,16 @@ namespace RootTools.Module
             return StateHome(m_listAxis);
         }
 
+        public virtual string ServerBeforePut()
+        {
+            return "FALSE";
+        }
+
+        public virtual string ServerBeforeGet()
+        {
+            return "FALSE";
+        }
+
         protected virtual void StopHome()
         {
             EQ.p_bStop = true;
@@ -396,6 +406,9 @@ namespace RootTools.Module
             {
                 EQ,
                 ModuleRun,
+                Initial,
+                BeforeGet,
+                BeforePut,
             }
 
             public class Protocol
@@ -591,10 +604,34 @@ namespace RootTools.Module
                     switch (protocol.m_eProtocol)
                     {
                         case eProtocol.ModuleRun: ServerModuleRun(protocol); break;
+                        case eProtocol.Initial: InitialModule(protocol); break;
+                        case eProtocol.BeforeGet: BeforeGet(protocol); break;
+                        case eProtocol.BeforePut: BeforePut(protocol); break;
                         default:
                             break;
                     }
                 }
+            }
+            void BeforeGet(Protocol protocol)
+            {
+                protocol.p_sRun = m_module.ServerBeforeGet();
+                Send(protocol);
+            }
+            void BeforePut(Protocol protocol)
+            {
+                protocol.p_sRun = m_module.ServerBeforePut();
+                Send(protocol);
+            }
+
+            void InitialModule(Protocol protocol)
+            {
+                
+                m_module.p_eState = eState.Home;
+                while (m_module.IsBusy())
+                    Thread.Sleep(10);
+                EQ.p_eState = EQ.eState.Ready;
+                protocol.p_sRun = m_module.p_sInfo;
+                Send(protocol);
             }
 
             void ServerModuleRun(Protocol protocol)
@@ -608,7 +645,7 @@ namespace RootTools.Module
                 }
                 m_memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(protocol.p_sRun));
                 m_treeRoot.m_job = new Job(m_memoryStream, false, m_log);
-                m_treeRoot.p_eMode = Tree.eMode.JobOpen;
+                m_treeRoot.p_eMode = Tree.eMode.RegRead;
                 run.RunTree(m_treeRoot, true);
                 m_treeRoot.m_job.Close();
                 m_module.StartRun(run);

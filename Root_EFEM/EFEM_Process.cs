@@ -73,6 +73,8 @@ namespace Root_EFEM
         /// <summary> 프로그램 시작시 Registry 에서 Wafer 정보 읽기 </summary>
         void InitLocate()
         {
+            if (m_wtr == null)
+                return;
             m_aLocate.Clear();
             foreach (WTRArm arm in m_wtr.p_aArm) InitLocateArm(arm);
             foreach (IWTRChild child in m_wtr.p_aChild) InitLocateChild(child);
