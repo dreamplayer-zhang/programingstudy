@@ -936,6 +936,7 @@ namespace Root_AOP01_Inspection.Module
         {
             MainVision m_module;
 
+            public int m_nLaserThreshold = 70;              // Laser Threshold
             public RPoint m_rpAxisCenter = new RPoint();    // Reticle Center Position
             public CPoint m_cpMemoryOffset = new CPoint();  // Memory Offset
             public double m_dResX_um = 1;                   // Camera Resolution X
@@ -964,6 +965,7 @@ namespace Root_AOP01_Inspection.Module
             public override ModuleRunBase Clone()
             {
                 Run_LADS run = new Run_LADS(m_module);
+                run.m_nLaserThreshold = m_nLaserThreshold;
                 run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
                 run.m_cpMemoryOffset = new CPoint(m_cpMemoryOffset);
                 run.m_dResX_um = m_dResX_um;
@@ -977,6 +979,7 @@ namespace Root_AOP01_Inspection.Module
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_nLaserThreshold = tree.Set(m_nLaserThreshold, m_nLaserThreshold, "Laser Threshold", "Laser Threshold", bVisible);
                 m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
                 m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
                 m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam X Resolution", "X Resolution (um)", bVisible);
@@ -1051,13 +1054,15 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
-                        CalculateHeight(nScanLine, mem, nReticleSizeY_px,new RPoint(dPosX,dStartPosY),dEndPosY);
+                        //CalculateHeight(nScanLine, mem, nReticleSizeY_px, new RPoint(dPosX, dStartPosY), dEndPosY);
+                        CalculateHeight_ESCHO(mem, nScanLine, nReticleSizeY_px);
 
                         nScanLine++;
                         cpMemoryOffset.X += nCamWidth;
                     }
                     m_grabMode.m_camera.StopGrab();
-                    SaveFocusMapImage(nScanLine, nReticleSizeY_px / nCamHeight);
+                    SaveFocusMap(nReticleSizeY_px / nCamHeight);
+                    //SaveFocusMapImage(nScanLine, nReticleSizeY_px / nCamHeight);
                     return "OK";
                 }
                 finally
@@ -1066,61 +1071,141 @@ namespace Root_AOP01_Inspection.Module
                 }
             }
 
-            unsafe void CalculateHeight(int nCurLine, MemoryData mem,int ReticleHeight, RPoint Startpos,double endY)
+            unsafe void CalculateHeight_ESCHO(MemoryData mem, int nCurrentLine, int nReticleHeight_px)
             {
+                IntPtr p = mem.GetPtr();
                 int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
-                int nHeight = ReticleHeight / nCamHeight;
-                byte* ptr =(byte*) mem.GetPtr().ToPointer(); //Gray
-                LADSInfo ladsinfo = new LADSInfo(Startpos, endY, nHeight);
-                for(int i=0;i<nHeight;i++)
-                {
-                    int s=0, e=0; //레이저 시작, 끝위치 정보
-                    //탐색시작y지점
-                    int nY = i * nCamHeight;
-                    for(int j=0;j<nCamHeight;j++)
-                    {
-                        if(ptr[(int)((nY+j) *mem.W+nCamWidth*(nCurLine+0.5))]>70)
-                        {
-                            e = Math.Max(e, j);
-                            s = Math.Min(s, j);
-                        }
-                    }
+                int nCount = nReticleHeight_px / nCamHeight;
+                LADSInfo ladsinfo = new LADSInfo(new RPoint(), 0, nCount);
 
-                    ladsinfo.m_Heightinfo[i] = (s + e) / 2;
+                for (int i = 0; i<nCount; i++)
+                {
+                    int nLeft = nCurrentLine * nCamWidth;
+                    int nTop = i * nCamHeight;
+                    int nRight = nLeft + nCamWidth;
+                    int nBottom = nTop + nCamHeight;
+                    CRect crtROI = new CRect(nLeft, nTop, nRight, nBottom);
+                    ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+                    img.SetData(p, crtROI, (int)mem.W);
+                    ladsinfo.m_Heightinfo[i] = CalculatingHeight(img);
                 }
-                ladsinfos.Add(ladsinfo);
             }
-            private void SaveFocusMapImage(int nX, int nY)
+
+            void SaveFocusMap(int nHeight)
             {
-                int thumsize = 30;
-                int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
-                Mat ResultMat = new Mat();
-                for(int x =0;x<nX;x++)
-                {
-                    Mat Vmat = new Mat();
-                    for(int y=0;y<nY;y++)
-                    {
-                        Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1);
-                        //double nScalednum = (ladsInfo.m_Heightinfo[y,x]-110) * 255 / nCamHeight;
-                        double nScalednum = (ladsinfos[x].m_Heightinfo[y] - 110) * 255 / nCamHeight;
-                        ColorImg.SetTo(new MCvScalar(nScalednum*20));
+                // variable
+                int nX = ladsinfos.Count;
+                int nY = nHeight;
 
-                        if (y == 0)
-                            Vmat = ColorImg;
-                        else
-                            CvInvoke.VConcat(ColorImg, Vmat, Vmat);
-                    }
-                    if (x == 0)
-                        ResultMat = Vmat;
-                    else
-                        CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
+                // implement
 
-                    CvInvoke.Imwrite(@"D:\Test\" + x+".bmp", ResultMat);
 
-                }
-                CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
+                return;
             }
+
+            #region VEGA LADS
+            unsafe double CalculatingHeight(ImageData img)
+            {
+                // variable
+                int nImgWidth = m_grabMode.m_camera.GetRoiSize().X;
+                int nImgHeight = m_grabMode.m_camera.GetRoiSize().Y;
+                double[] daHeight = new double[nImgWidth];
+
+                // implement
+                byte* pSrc = (byte*)img.GetPtr().ToPointer();
+                for (int x = 0; x < nImgWidth; x++, pSrc++)
+                {
+                    byte* pSrcY = pSrc;
+                    int nSum = 0;
+                    int nYSum = 0;
+                    for (int y = 0; y < nImgHeight; y++, pSrcY += nImgWidth)
+                    {
+                        if (*pSrcY < m_nLaserThreshold) continue;
+                        nSum += *pSrcY;
+                        nYSum += *pSrcY * y;
+                    }
+                    int iIndex = x;
+                    daHeight[iIndex] = (nSum != 0) ? ((double)nYSum / (double)nSum) : 0.0;
+                }
+
+                return GetHeightAverage(daHeight);
+            }
+
+            double GetHeightAverage(double[] daHeight)
+            {
+                // variable
+                double dSum = 0.0;
+                int nHitCount = 0;
+
+                // implement
+                for (int i = 0; i < daHeight.Length; i++)
+                {
+                    if (daHeight[i] < double.Epsilon) continue;
+                    nHitCount++;
+                    dSum += daHeight[i];
+                }
+                if (nHitCount == 0) return -1;
+                return dSum / nHitCount;
+            }
+            #endregion
+            #region 이지혜 LADS
+            //unsafe void CalculateHeight(int nCurLine, MemoryData mem,int ReticleHeight, RPoint Startpos,double endY)
+            //{
+            //    int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
+            //    int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
+            //    int nHeight = ReticleHeight / nCamHeight;
+            //    byte* ptr =(byte*) mem.GetPtr().ToPointer(); //Gray
+            //    LADSInfo ladsinfo = new LADSInfo(Startpos, endY, nHeight);
+            //    for(int i=0;i<nHeight;i++)
+            //    {
+            //        int s=0, e=0; //레이저 시작, 끝위치 정보
+            //        //탐색시작y지점
+            //        int nY = i * nCamHeight;
+            //        for(int j=0;j<nCamHeight;j++)
+            //        {
+            //            if(ptr[(int)((nY+j) *mem.W+nCamWidth*(nCurLine+0.5))]>70)
+            //            {
+            //                e = Math.Max(e, j);
+            //                s = Math.Min(s, j);
+            //            }
+            //        }
+
+            //        ladsinfo.m_Heightinfo[i] = (s + e) / 2;
+            //    }
+            //    ladsinfos.Add(ladsinfo);
+            //}
+            //private void SaveFocusMapImage(int nX, int nY)
+            //{
+            //    int thumsize = 30;
+            //    int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
+            //    Mat ResultMat = new Mat();
+            //    for(int x =0;x<nX;x++)
+            //    { 
+            //        Mat Vmat = new Mat();
+            //        for(int y=0;y<nY;y++)
+            //        {
+            //            Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1);
+            //            //double nScalednum = (ladsInfo.m_Heightinfo[y,x]-110) * 255 / nCamHeight;
+            //            double nScalednum = (ladsinfos[x].m_Heightinfo[y] - 110) * 255 / nCamHeight;
+            //            ColorImg.SetTo(new MCvScalar(nScalednum*20));
+
+            //            if (y == 0)
+            //                Vmat = ColorImg;
+            //            else
+            //                CvInvoke.VConcat(ColorImg, Vmat, Vmat);
+            //        }
+            //        if (x == 0)
+            //            ResultMat = Vmat;
+            //        else
+            //            CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
+
+            //        CvInvoke.Imwrite(@"D:\Test\" + x+".bmp", ResultMat);
+
+            //    }
+            //    CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
+            //}
+            #endregion
         }
 
         #region Barcode Inspection
@@ -1171,15 +1256,15 @@ namespace Root_AOP01_Inspection.Module
                 m_cptBarcodeLTPoint = (tree.GetTree("Barcode ROI", false, bVisible)).Set(m_cptBarcodeLTPoint, m_cptBarcodeLTPoint, "Left Top Point", "Left Top Point", bVisible);
                 m_cptBarcodeRBPoint = (tree.GetTree("Barcode ROI", false, bVisible)).Set(m_cptBarcodeRBPoint, m_cptBarcodeRBPoint, "Right Bottom Point", "Right Bottom Point", bVisible);
 
-                m_nGaussianBlurKernalSize = (tree.GetTree("GaussianBlur Parameter", false, bVisible)).Set(m_nGaussianBlurKernalSize, m_nGaussianBlurKernalSize, "GaussianBlur Kernal Size", "GaussianBlur Kernal Size", bVisible);
-                m_dGaussianBlurSigma = (tree.GetTree("GaussianBlur Parameter", false, bVisible)).Set(m_dGaussianBlurSigma, m_dGaussianBlurSigma, "GaussianBlur Sigma", "GaussianBlur Sigma", bVisible);
+                //m_nGaussianBlurKernalSize = (tree.GetTree("GaussianBlur Parameter", false, bVisible)).Set(m_nGaussianBlurKernalSize, m_nGaussianBlurKernalSize, "GaussianBlur Kernal Size", "GaussianBlur Kernal Size", bVisible);
+                //m_dGaussianBlurSigma = (tree.GetTree("GaussianBlur Parameter", false, bVisible)).Set(m_dGaussianBlurSigma, m_dGaussianBlurSigma, "GaussianBlur Sigma", "GaussianBlur Sigma", bVisible);
 
-                m_eAdabtiveThresholdType = (AdaptiveThresholdType)(tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_eAdabtiveThresholdType, m_eAdabtiveThresholdType, "Adaptive Threshold Type", "Adaptive Threshold Type", bVisible);
-                m_eThresholdType = (ThresholdType)(tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_eThresholdType, m_eThresholdType, "Threshold Type", "Threshold Type", bVisible);
-                m_nThresholdBlockSize = (tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_nThresholdBlockSize, m_nThresholdBlockSize, "Threshold Block Size", "Threshold Block Size", bVisible);
-                m_dThresholdParam = (tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_dThresholdParam, m_dThresholdParam, "Threshold Param", "Threshold Param", bVisible);
+                //m_eAdabtiveThresholdType = (AdaptiveThresholdType)(tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_eAdabtiveThresholdType, m_eAdabtiveThresholdType, "Adaptive Threshold Type", "Adaptive Threshold Type", bVisible);
+                //m_eThresholdType = (ThresholdType)(tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_eThresholdType, m_eThresholdType, "Threshold Type", "Threshold Type", bVisible);
+                //m_nThresholdBlockSize = (tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_nThresholdBlockSize, m_nThresholdBlockSize, "Threshold Block Size", "Threshold Block Size", bVisible);
+                //m_dThresholdParam = (tree.GetTree("Threshold Parameter", false, bVisible)).Set(m_dThresholdParam, m_dThresholdParam, "Threshold Param", "Threshold Param", bVisible);
 
-                m_nErodeSize = (tree.GetTree("Erode Parameter", false, bVisible)).Set(m_nErodeSize, m_nErodeSize, "Erode Size", "Erode Size", bVisible);
+                //m_nErodeSize = (tree.GetTree("Erode Parameter", false, bVisible)).Set(m_nErodeSize, m_nErodeSize, "Erode Size", "Erode Size", bVisible);
             }
 
             public override string Run()
@@ -1202,6 +1287,7 @@ namespace Root_AOP01_Inspection.Module
                 int nRight = GetEdge(mem, crtTopBox, 10, eSearchDirection.RightToLeft, 70);
                 CRect crtBarcode = new CRect(m_cptBarcodeLTPoint.X + nLeft, m_cptBarcodeLTPoint.Y + nTop, m_cptBarcodeLTPoint.X + nRight, m_cptBarcodeLTPoint.Y + nBottom);
                 Mat matBarcode = GetBarcodeMat(mem, crtBarcode);
+                matBarcode.Save("D:\\BeforeRotation.bmp");
 
                 // 회전각도 알아내기
                 int nLeftTop = GetEdge(mem, crtHalfLeft, 10, eSearchDirection.TopToBottom, 70);
@@ -1216,7 +1302,7 @@ namespace Root_AOP01_Inspection.Module
                 Mat matRotation = new Mat();
                 CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
                 CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
-                //matRotation.Save("D:\\Rotation.bmp");
+                matRotation.Save("D:\\AfterRotation.bmp");
 
                 // 회전 후 외곽영역 Cutting
                 int y1 = 100;
