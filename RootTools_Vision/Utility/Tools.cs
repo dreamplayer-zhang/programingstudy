@@ -399,21 +399,5 @@ namespace RootTools_Vision
         {
             return Activator.CreateInstance(type);
         }
-
-        public static void ParallelImageCopy(IntPtr ptrSrc, int srcStride, int srcHeight, CRect roi, byte[] byteDst)
-        {
-            int top = roi.Top;
-            int bottom = roi.Bottom;
-            int left = roi.Left;
-            int right = roi.Right;
-            int width = roi.Width;
-            int height = roi.Height;
-
-            Parallel.For(top, bottom, (i) =>
-              {
-                  Marshal.Copy(new IntPtr(ptrSrc.ToInt64() + (i * (Int64)srcStride + left)), byteDst, width * (i - top), width);
-
-              });
-        }
     }
 }

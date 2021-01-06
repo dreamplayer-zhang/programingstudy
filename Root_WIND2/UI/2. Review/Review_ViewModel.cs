@@ -76,65 +76,6 @@ namespace Root_WIND2
                 return new RelayCommand(SearchLotinfoData);
             }
         }
-        public ICommand btnLoadImage
-        {
-            get
-            {
-                return new RelayCommand(LoadGoldenImage);
-            }
-        }
-        public ICommand btnCheckAll
-        {
-            get
-            {
-                return new RelayCommand(SearchLotinfoData);
-            }
-        }
-        public ICommand btnUncheckAll
-        {
-            get
-            {
-                return new RelayCommand(SearchLotinfoData);
-            }
-        }
-        public ICommand btnShowTrend
-        {
-            get
-            {
-                return new RelayCommand(SearchLotinfoData);
-            }
-        }
-        public ICommand btnSaveTrend
-        {
-            get
-            {
-                return new RelayCommand(SearchLotinfoData);
-            }
-        }
-        public void GoldenImagelist_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            int a = 0;
-        }
-        private void OnMouseEnter(object sender, MouseEventArgs e)
-        {
-            int a = 0;
-        }
-
-        public void GoldenImagelist_SelectionChanged(object sender, EventArgs e)
-        {
-            int a = 0;
-        }
-
-        public void OnMouseDown(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        public void OnListViewMouseButtonDown(object sender, MouseButtonEventArgs e)
-        {
-           // MaterialSelectIndex = -1;
-        }
-
         #endregion
 
         #region GET / SET
@@ -555,50 +496,12 @@ namespace Root_WIND2
             }
         }
 
-        // Golden Image Trend Tab
-        private ObservableCollection<ListViewItemTemplate> goldenImageList = new ObservableCollection<ListViewItemTemplate>();
-        public ObservableCollection<ListViewItemTemplate> GoldenImageList
-        {
-            get
-            {
-                return goldenImageList;
-            }
-            set
-            {
-                SetProperty(ref goldenImageList, value);
-                RaisePropertyChanged("GoldenImageList");
-            }
-        }
+        ObservableCollection<string> CollectionOfFilePaths { get; set; }
 
-        private int listViewIdx;
-        public int ListViewIdx
-        {
-            get
-            {
-                return listViewIdx;
-            }
-            set
-            {
-                SetProperty(ref listViewIdx, value);
-                GoldenImage = GoldenImageList[listViewIdx].GoldenImgData;
-            }
-        }
-        private BitmapSource goldenImage;
-        public BitmapSource GoldenImage
-        {
-            get
-            {
-                return goldenImage;
-            }
-            set
-            {
-                SetProperty(ref goldenImage, value);
-            }
-        }
-        #endregion
+    #endregion
 
-        #region DataTypeEnum
-        private GVHistogramType gvHistogramMode = GVHistogramType.Dark;
+    #region DataTypeEnum
+    private GVHistogramType gvHistogramMode = GVHistogramType.Dark;
         private enum GVHistogramType
         {
             All,
@@ -670,8 +573,6 @@ namespace Root_WIND2
 
             DrawDefectSizeGraph();              // Draw Defect Size Distribution Histogram
             DrawDefectGVGraph();                // Draw Defect GV Distribution Histogram
-
-            GoldenImageList.Clear();
         }
         private void ClassifyDefect()
         {
@@ -731,26 +632,7 @@ namespace Root_WIND2
             string sLotInfo = "lotinfo";
             pLotinfo_Datatable = DatabaseManager.Instance.SelectTable(sLotInfo);
         }
-        public void LoadGoldenImage()
-        {
-            GoldenImageList.Clear();
 
-            if (recipe.RecipeFolderPath.Length == 0)
-                return;
-
-            string imgPath = recipe.RecipeFolderPath + @"RefImageHistory\";
-            List<string> imgNames =  Directory.GetFiles(imgPath, "*.bmp", SearchOption.AllDirectories).ToList();
-
-            foreach (string path in imgNames)
-            {
-                
-                ListViewItemTemplate temp = new ListViewItemTemplate();
-                temp.GoldenImgData = new BitmapImage(new (path));
-                temp.Title = path.Substring(imgPath.Length, path.Length - imgPath.Length - 4); // 끝에 .bmp 제거
-
-                GoldenImageList.Add(temp);
-            }
-        }
         public object GetDataGridItem(DataTable table, DataRow datarow, string sColumnName)
         {
             object result;
@@ -975,22 +857,5 @@ namespace Root_WIND2
 
             SizeYLabel = value => value.ToString("N");
         }
-    }
-}
-
-public class ListViewItemTemplate
-{
-    private string _Title;
-    public string Title
-    {
-        get { return this._Title; }
-        set { this._Title = value; }
-    }
-
-    private BitmapImage _GoldenImgData;
-    public BitmapImage GoldenImgData
-    {
-        get { return this._GoldenImgData; }
-        set { this._GoldenImgData = value; }
     }
 }

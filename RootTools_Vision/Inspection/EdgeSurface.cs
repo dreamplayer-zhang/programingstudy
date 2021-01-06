@@ -73,7 +73,7 @@ namespace RootTools_Vision.Inspection
 			byte[] arrSrc = new byte[memSize];
 			for (int cnt = top; cnt < bottom; cnt++)
 			{
-				Marshal.Copy(new IntPtr(this.workplace.SharedBufferR_GRAY.ToInt64() + (cnt * (Int64)memW))
+				Marshal.Copy(new IntPtr(this.workplace.SharedBuffer.ToInt64() + (cnt * (Int64)memW))
 							, arrSrc
 							, memW * (cnt - top)
 							, memW);

@@ -116,21 +116,11 @@ namespace Root_Rinse_Loader.Module
         {
             if (Rinse.p_eMode != Rinse.eMode.Stack) return "Run mode is not Stack"; 
             if (Run(RunPickerDown(false))) return p_sInfo; 
-            if (m_storage.p_bIsEnablePick == false)
-            {
-                if (Run(m_storage.StartMoveStackReady())) return p_sInfo;
-                while (m_storage.IsBusy())
-                {
-                    Thread.Sleep(10);
-                    if (EQ.IsStop()) return "EQ Stop";
-                }
-            }
             if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
+            //forget Check Storage
             if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(RunPickerDown(false))) return p_sInfo;
-            if (Run(m_storage.StartMoveStackReady())) return p_sInfo;
-            if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             return "OK";
         }
 
@@ -147,16 +137,6 @@ namespace Root_Rinse_Loader.Module
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(m_roller.RunRotate(true))) return p_sInfo;
             return "OK";
-        }
-
-        public bool IsLoad()
-        {
-            if (m_aPicker[0].m_dioVacuum.p_bOut == false) return false; 
-            foreach (Picker picker in m_aPicker)
-            {
-                if (picker.m_dioVacuum.p_bIn) return true; 
-            }
-            return false; 
         }
         #endregion
 
@@ -198,29 +178,12 @@ namespace Root_Rinse_Loader.Module
             InitBase(id, engineer); 
         }
 
-        #region StartRun
-        public void StartRun()
-        {
-            switch (Rinse.p_eMode)
-            {
-                case Rinse.eMode.Magazine:
-                    RunPickerDown(false);
-                    MoveLoader(ePos.Roller);
-                    break;
-                case Rinse.eMode.Stack:
-                    StartRun(m_runRun.Clone()); 
-                    break;
-            }
-        }
-        #endregion
-
         #region ModuleRun
-        ModuleRunBase m_runRun; 
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Load(this), false, "Load Strip");
             AddModuleRunList(new Run_Unload(this), false, "Unload Strip");
-            m_runRun = AddModuleRunList(new Run_Run(this), false, "Move Strip");
+            AddModuleRunList(new Run_Run(this), false, "Move Strip");
         }
 
         public class Run_Load : ModuleRunBase
@@ -294,16 +257,9 @@ namespace Root_Rinse_Loader.Module
 
             public override string Run()
             {
-                if (m_module.IsLoad())
-                {
-                    if (m_module.Run(m_module.RunUnload())) return p_sInfo; 
-                }
-                while (EQ.p_eState == EQ.eState.Run) //forget me not
-                {
-                    if (m_module.Run(m_module.RunLoad())) return p_sInfo;
-                    if (m_module.Run(m_module.RunUnload())) return p_sInfo;
-                }
-                return "OK"; 
+                string sRun = m_module.RunLoad();
+                if (sRun != "OK") return sRun; 
+                return m_module.RunUnload();
             }
         }
         #endregion

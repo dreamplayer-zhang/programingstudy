@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision
+namespace Root_WIND2
 {
-    public interface IFrontsideInspection
+    public enum IMAGE_CHANNEL
     {
+        R_GRAY = 0,
+        G = 1,
+        B = 2
     }
 }

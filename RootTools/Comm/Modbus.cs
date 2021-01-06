@@ -295,7 +295,7 @@ namespace RootTools.Comm
             catch { }
             return "OK";
         }
-        public string ReadInputRegister(byte nUnit, int nAddress, ref int nValue)
+        public string ReadInputRegister(byte nUnit, ref int nValue)
         {
             if (m_client.Connected == false) return "Not Connect";
             if (nUnit == 0) return "Invalid Unit ID";
@@ -304,7 +304,7 @@ namespace RootTools.Comm
             {
                 lock (m_csLock)
                 {
-                    int[] anRead = m_client.ReadInputRegisters(nAddress, 1);
+                    int[] anRead = m_client.ReadInputRegisters(1000, 1);
                     if (anRead.Length > 0) nValue = anRead[0];
                 }
             }

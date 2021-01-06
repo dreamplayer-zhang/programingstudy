@@ -23,12 +23,6 @@ namespace Root_Rinse_Loader.Module
             get { return m_rinse.p_widthStrip; }
             set { m_rinse.p_widthStrip = value; }
         }
-
-        public static int p_iMagazine
-        {
-            get { return m_rinse.p_iMagazine; }
-            set { m_rinse.p_iMagazine = value; }
-        }
     }
 
     public class _Rinse : NotifyProperty
@@ -53,18 +47,6 @@ namespace Root_Rinse_Loader.Module
             {
                 if (_widthStrip == value) return;
                 _widthStrip = value;
-                OnPropertyChanged(); 
-            }
-        }
-
-        int _iMagazin = 0;
-        public int p_iMagazine
-        {
-            get { return _iMagazin; }
-            set
-            {
-                if (_iMagazin == value) return;
-                _iMagazin = value;
                 OnPropertyChanged(); 
             }
         }

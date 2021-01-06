@@ -291,7 +291,7 @@ namespace RootTools_Vision
                 if (nByteCnt == 1) { 
                     CLR_IP.Cpp_SaveDefectListBMP(
                        Path,
-                       (byte*)workplace.SharedBufferR_GRAY.ToPointer(),
+                       (byte*)workplace.SharedBuffer.ToPointer(),
                        workplace.SharedBufferWidth,
                        workplace.SharedBufferHeight,
                        defectArray
@@ -301,7 +301,7 @@ namespace RootTools_Vision
                 else if (nByteCnt == 3) { 
                     CLR_IP.Cpp_SaveDefectListBMP_Color(
                         Path,
-                       (byte*)workplace.SharedBufferR_GRAY.ToPointer(),
+                       (byte*)workplace.SharedBufferR.ToPointer(),
                        (byte*)workplace.SharedBufferG.ToPointer(),
                        (byte*)workplace.SharedBufferB.ToPointer(),
                        workplace.SharedBufferWidth,

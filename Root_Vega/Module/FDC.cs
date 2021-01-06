@@ -141,7 +141,7 @@ namespace Root_Vega.Module
             public void ReadInputRegister(Modbus modbus)
             {
                 int nValue = (int)(p_fValue * m_fDiv);
-                modbus.ReadInputRegister((byte)m_nUnitID, 1000, ref nValue);
+                modbus.ReadInputRegister((byte)m_nUnitID, ref nValue);
                 p_fValue = nValue / m_fDiv;
             }
 

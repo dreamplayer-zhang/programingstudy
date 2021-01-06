@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class SurfaceParameter : ParameterBase, IMaskInspection, IColorInspection
+    public class SurfaceParameter : ParameterBase, IMaskInspection
     {
         public SurfaceParameter() : base(typeof(Surface))
         {
@@ -63,18 +63,13 @@ namespace RootTools_Vision
             }
         }
         // ROI
-        [Browsable(false)]
+        private int maskIndex;
+        [Category("ROI")]
+        [DisplayName("ROI Index")]
         public int MaskIndex
         {
-            get;
-            set;
-        }
-
-        [Browsable(false)]
-        public IMAGE_CHANNEL IndexChannel 
-        {
-            get; 
-            set; 
+            get => maskIndex;
+            set => maskIndex = value;
         }
         #endregion
 

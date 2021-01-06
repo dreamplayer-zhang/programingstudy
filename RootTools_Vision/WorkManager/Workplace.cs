@@ -69,11 +69,10 @@ namespace RootTools_Vision
         private int transY;
         private int sizeX;
         private int sizeY;
-        private byte[] workplaceBufferR_GRAY;
-        private byte[] workplaceBufferG;
-        private byte[] workplaceBufferB;
+        private byte[] workplaceBuffer;
 
-        private IntPtr sharedBufferR_GRAY;
+        private IntPtr sharedBuffer;
+        private IntPtr sharedBufferR;
         private IntPtr sharedBufferG;
         private IntPtr sharedBufferB;
         private int sharedBufferWidth;
@@ -100,28 +99,20 @@ namespace RootTools_Vision
         public int BufferSizeX { get => sizeX; private set => sizeX = value; }
         public int BufferSizeY { get => sizeY; private set => sizeY = value; }
         
-        public byte[] WorkplaceBufferR_GRAY
+        public byte[] WorkplaceBuffer 
         { 
-            get => workplaceBufferR_GRAY; 
-            private set => workplaceBufferR_GRAY = value; 
+            get => workplaceBuffer; 
+            private set => workplaceBuffer = value; 
         }
-
-        public byte[] WorkplaceBufferG
+        public IntPtr SharedBuffer
         {
-            get => workplaceBufferG;
-            private set => workplaceBufferG = value;
+            get => sharedBuffer; 
+            private set => sharedBuffer = value; 
         }
-        public byte[] WorkplaceBufferB
+        public IntPtr SharedBufferR
         {
-            get => workplaceBufferB;
-            private set => workplaceBufferB = value;
-        }
-
-
-        public IntPtr SharedBufferR_GRAY
-        {
-            get => sharedBufferR_GRAY;
-            private set => sharedBufferR_GRAY = value;
+            get => sharedBufferR;
+            private set => sharedBufferR = value;
         }
         public IntPtr SharedBufferG
         {
@@ -185,9 +176,7 @@ namespace RootTools_Vision
             this.sizeX = szX;
             this.sizeY = szY;
             this.index = idx;
-            this.workplaceBufferR_GRAY = new byte[szX * szY];
-            this.workplaceBufferG = new byte[szX * szY];
-            this.workplaceBufferB = new byte[szX * szY];
+            this.workplaceBuffer = new byte[szX * szY];
         }
 
 
@@ -206,46 +195,17 @@ namespace RootTools_Vision
             else subState = tempState;
         }
 
-        public IntPtr GetSharedBuffer(IMAGE_CHANNEL channel)
-        {
-            switch (channel)
-            {
-                case IMAGE_CHANNEL.R_GRAY:
-                    return SharedBufferR_GRAY;
-                case IMAGE_CHANNEL.G:
-                    return SharedBufferG;                    
-                case IMAGE_CHANNEL.B:
-                    return SharedBufferB;
-            }
-
-            return SharedBufferR_GRAY;
-        }
-
-        public byte[] GetWorkplaceBuffer(IMAGE_CHANNEL channel)
-        {
-            switch (channel)
-            {
-                case IMAGE_CHANNEL.R_GRAY:
-                    return workplaceBufferR_GRAY;
-                case IMAGE_CHANNEL.G:
-                    return workplaceBufferG;
-                case IMAGE_CHANNEL.B:
-                    return workplaceBufferB;
-            }
-
-            return workplaceBufferR_GRAY;
-        }
 
         public void SetSharedBuffer(IntPtr _sharedBuffer, int width, int height, int byteCnt)
         {
-            this.sharedBufferR_GRAY = _sharedBuffer;
+            this.sharedBuffer = _sharedBuffer;
             this.sharedBufferWidth = width;
             this.sharedBufferHeight = height;
             this.sharedBufferByteCnt = byteCnt;
         }
         public void SetSharedRGBBuffer(IntPtr _sharedBufferR, IntPtr _sharedBufferG, IntPtr _sharedBufferB)
         {
-            this.sharedBufferR_GRAY = _sharedBufferR;
+            this.sharedBufferR = _sharedBufferR;
             this.sharedBufferG = _sharedBufferG;
             this.sharedBufferB = _sharedBufferB;
         }

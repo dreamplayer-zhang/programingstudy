@@ -408,23 +408,20 @@ namespace Root_WIND2
             p_ImageViewer_VM.Clear();
 
             IntPtr SharedBuf = new IntPtr();
-            //if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
-            //{
-            //    if (p_ImageViewer_VM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
-            //        SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr((int)p_ImageViewer_VM.p_eColorViewMode - 1);
-            //    else // All 일때는 R채널로...
-            //        SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr(0);
+            if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
+            {
+                if (p_ImageViewer_VM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
+                    SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr((int)p_ImageViewer_VM.p_eColorViewMode - 1);
+                else // All 일때는 R채널로...
+                    SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr(0);
 
-            //    m_Setup.InspectionVision.SetWorkplaceBuffer(p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
-            //}
-            //else
-            //{
-            //    SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr();
-            //    m_Setup.InspectionVision.SetWorkplaceBuffer(p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
-            //}
-
-            SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr();
-            m_Setup.InspectionVision.SetWorkplaceBuffer(p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
+                m_Setup.InspectionVision.SetWorkplaceBuffer(SharedBuf, p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
+            }
+            else
+            {
+                SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr();
+                m_Setup.InspectionVision.SharedBuffer = SharedBuf;
+            }
 
             m_Setup.InspectionVision.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
 

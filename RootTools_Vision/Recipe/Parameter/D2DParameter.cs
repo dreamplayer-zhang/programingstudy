@@ -141,7 +141,7 @@ namespace RootTools_Vision
         }
 
         [Browsable(false)]
-        public IMAGE_CHANNEL IndexChannel
+        public INSPECTION_IMAGE_CHANNEL IndexChannel
         { 
             get; 
             set; 
