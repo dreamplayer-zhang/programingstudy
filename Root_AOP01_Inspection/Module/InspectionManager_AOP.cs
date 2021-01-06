@@ -1,118 +1,201 @@
-﻿using RootTools_Vision;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Threading;
+using RootTools;
+using RootTools.Database;
+using RootTools_Vision;
 
 namespace Root_AOP01_Inspection.Module
 {
 	public class InspectionManager_AOP : WorkFactory
 	{
-		#region Field
+		SolidColorBrush brushSnap = System.Windows.Media.Brushes.LightSkyBlue;
+		SolidColorBrush brushPosition = System.Windows.Media.Brushes.SkyBlue;
+		SolidColorBrush brushPreInspection = System.Windows.Media.Brushes.Cornsilk;
+		SolidColorBrush brushInspection = System.Windows.Media.Brushes.Gold;
+		SolidColorBrush brushMeasurement = System.Windows.Media.Brushes.CornflowerBlue;
+		SolidColorBrush brushComplete = System.Windows.Media.Brushes.YellowGreen;
 
+
+		#region [Member Variables]
+		WorkBundle workBundle;
+		WorkplaceBundle workplaceBundle;
+
+		#endregion
+
+		public InspectionManager_AOP(IntPtr _sharedBuffer, int _width, int _height)
+		{
+			this.sharedBuffer = _sharedBuffer;
+			this.sharedBufferWidth = _width;
+			this.sharedBufferHeight = _height;
+			sharedBufferByteCnt = 1;
+		}
+
+		protected override void InitWorkManager()
+		{
+			this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORKPLACE_STATE.READY, WORKPLACE_STATE.SNAP, STATE_CHECK_TYPE.CHIP));
+			this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY, STATE_CHECK_TYPE.CHIP, 4));
+			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION, STATE_CHECK_TYPE.CHIP));
+			this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS_WAFER, WORKPLACE_STATE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
+
+			AOPEventManager.SnapDone += SnapDone_Callback;
+		}
+
+		private Recipe recipe;
 		private IntPtr sharedBuffer;
+
+		private IntPtr sharedBufferR;
+		private IntPtr sharedBufferG;
+		private IntPtr sharedBufferB;
+
 		private int sharedBufferWidth;
 		private int sharedBufferHeight;
 		private int sharedBufferByteCnt;
 
-		#endregion
-
-		#region Property
-
-		private InspectionMode inspectionMode;
-		public InspectionMode InspectionMode { get => inspectionMode; set => inspectionMode = value; }
-
-		//private Recipe recipe;
-		//public Recipe Recipe { get => recipe; set => recipe = value; }
+		public Recipe Recipe { get => recipe; set => recipe = value; }
+		public IntPtr SharedBufferR { get => sharedBufferR; set => sharedBufferR = value; }
+		public IntPtr SharedBufferG { get => sharedBufferG; set => sharedBufferG = value; }
+		public IntPtr SharedBufferB { get => sharedBufferB; set => sharedBufferB = value; }
 
 		public IntPtr SharedBuffer { get => sharedBuffer; set => sharedBuffer = value; }
 		public int SharedBufferWidth { get => sharedBufferWidth; set => sharedBufferWidth = value; }
 		public int SharedBufferHeight { get => sharedBufferHeight; set => sharedBufferHeight = value; }
 		public int SharedBufferByteCnt { get => sharedBufferByteCnt; set => sharedBufferByteCnt = value; }
 
-		#endregion
+		public enum InspectionMode
+		{
+			FRONT,
+			BACK,
+			//EBR,
+			//EDGE,
+		}
 
-		public InspectionManager_AOP(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt)
-		{
-			this.sharedBuffer = _sharedBuffer;
-			this.sharedBufferWidth = _width;
-			this.sharedBufferHeight = _height;
-			this.sharedBufferByteCnt = _byteCnt;
-		}
-		public override bool CreateInspecion_Backside(Recipe _recipe)
-		{
-			return false;//사용하지 않음? 할수도있음 ㅇㅇ
-		}
-		public bool CreateInspection()
-		{
-			//검사영역생성. 레시피 없을때?
+		private InspectionMode inspectionMode = InspectionMode.FRONT;
+		public InspectionMode p_InspectionMode { get => inspectionMode; set => inspectionMode = value; }
 
-			return true;
+		public int[] mapdata = new int[14 * 14];
+
+
+		public bool CreateInspecion()
+		{
+			return CreateInspection(this.recipe);
 		}
+
+
 		public override bool CreateInspection(Recipe _recipe)
 		{
-			//검사영역생성. 레시피 있을때?
-
-			int partitionNum = 10;  // recipe?
-			WorkplaceBundle workplaces = new WorkplaceBundle();
-
-			// top
-			int memoryHeightTop = this.SharedBufferHeight;
-			int memoryWidthTop = this.SharedBufferWidth;
-
-			for (int i = 0; i < memoryHeightTop / partitionNum; i++)
+			try
 			{
-				Workplace workplace = new Workplace(0, i, 0, memoryHeightTop / partitionNum * i, memoryWidthTop, memoryHeightTop / partitionNum);
-				workplace.SetSharedBuffer(this.SharedBuffer, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
-				workplaces.Add(workplace);
-			}
+				RecipeType_WaferMap waferMap = recipe.WaferMap;
 
-			// side
-			RootTools.ImageData imageDataSide = ProgramManager.Instance.GetMemory();
-			int memoryHeightSide = imageDataSide.p_Size.Y;
-			int memoryWidhtSide = imageDataSide.p_Size.X;
-			for (int i = 0; i < memoryHeightSide / partitionNum; i++)
+				if (waferMap == null || waferMap.MapSizeX == 0 || waferMap.MapSizeY == 0)
+				{
+					//MessageBox.Show("Map 정보가 없습니다.");
+					throw new Exception("Map 정보가 없습니다", null);
+				}
+
+				workBundle = new WorkBundle();
+
+				Position position = new Position();
+				position.SetRecipe(recipe);
+				workBundle.Add(position);
+
+				Surface surface = new Surface();
+				surface.SetRecipe(recipe);
+
+				workBundle.Add(surface);
+
+				ProcessDefect processDefect = new ProcessDefect();
+				processDefect.SetRecipe(recipe);
+				workBundle.Add(processDefect);
+
+				workplaceBundle = WorkplaceBundle.CreateWaferMap(_recipe);//칩별로 스레드 할당
+				workplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
+				workplaceBundle.SetSharedRGBBuffer(this.SharedBufferR, this.SharedBufferG, this.SharedBufferB);
+
+				ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
+				processDefect_Wafer.SetRecipe(recipe);
+				processDefect_Wafer.SetWorkplaceBundle(workplaceBundle);
+				workBundle.Add(processDefect_Wafer);
+
+				workplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
+
+				if (this.SetBundles(workBundle, workplaceBundle) == false)
+					return false;
+			}
+			catch (Exception ex)
 			{
-				Workplace workplace = new Workplace(0, i, 0, memoryHeightSide / partitionNum * i, memoryWidhtSide, memoryHeightSide / partitionNum);
-				workplace.SetSharedBuffer(imageDataSide.GetPtr(), memoryWidhtSide, memoryHeightSide, imageDataSide.p_nByte);
-				workplaces.Add(workplace);
+				throw new Exception(string.Format("Inspection 생성에 실패하였습니다.\nDetail : " + ex.Message), ex);
 			}
-
-			// bottom
-			RootTools.ImageData imageDataBtm = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeSide);
-			int memoryHeightBtm = imageDataBtm.p_Size.Y;
-			int memoryWidhtBtm = imageDataBtm.p_Size.X;
-			for (int i = 0; i < memoryHeightBtm / partitionNum; i++)
-			{
-				Workplace workplace = new Workplace(0, i, 0, memoryHeightBtm / partitionNum * i, memoryWidhtBtm, memoryHeightBtm / partitionNum);
-				workplace.SetSharedBuffer(imageDataBtm.GetPtr(), memoryWidhtBtm, memoryHeightBtm, imageDataBtm.p_nByte);
-				workplaces.Add(workplace);
-			}
-
-			EdgeSurface edgeSurface = new EdgeSurface();
-			edgeSurface.SetRecipe(this.recipe);
-			edgeSurface.SetWorkplaceBundle(workplaces);
-
-			ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-			processDefect_Wafer.SetRecipe(this.recipe);
-			processDefect_Wafer.SetWorkplaceBundle(workplaces);
-
-			WorkBundle works = new WorkBundle();
-			works.Add(edgeSurface);
-			works.Add(processDefect_Wafer);
-
-			SetBundles(works, workplaces);
-			return true;
 			return true;
 		}
 
-		protected override void InitWorkManager()
+		public void SnapDone_Callback(object obj, SnapDoneArgs args)
 		{
-			//초기화
-			this.Add(new WorkManager("Snap", WORK_TYPE.ALIGNMENT, WORKPLACE_STATE.SNAP, WORKPLACE_STATE.NONE, STATE_CHECK_TYPE.CHIP, 5));
-			//this.Add(new WorkManager("EdgeSurface", WORK_TYPE.INSPECTION, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.NONE, STATE_CHECK_TYPE.CHIP, 5));//검사부에 맞춰서 넣어야하는것으로 보이는데...
-			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION, STATE_CHECK_TYPE.WAFER));
+			if (this.workplaceBundle == null) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
+
+			Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
+
+			foreach (Workplace wp in this.workplaceBundle)
+			{
+				Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.BufferSizeY), new Point(wp.PositionX + wp.BufferSizeX, wp.PositionY));
+
+				if (snapArea.Contains(checkArea) == true)
+				{
+					wp.STATE = WORKPLACE_STATE.SNAP;
+				}
+			}
+
+		}
+
+		private new void Start()
+		{
+			string lotId = "Lotid";
+			string partId = "Partid";
+			string setupId = "SetupID";
+			string cstId = "CSTid";
+			string waferId = "WaferID";
+			//string sRecipe = "RecipeID";
+			string recipeName = recipe.Name;
+
+			DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
+
+			base.Start();
+		}
+
+		public void SetWorkplaceBuffer(IntPtr inspPtr, IntPtr ptrR, IntPtr ptrG, IntPtr ptrB)
+		{
+			this.SharedBuffer = inspPtr;
+			this.SharedBufferR = ptrR;
+			this.SharedBufferG = ptrG;
+			this.SharedBufferB = ptrB;
+		}
+		public void Start(bool Snap)
+		{
+			if (this.Recipe == null && this.Recipe.WaferMap == null)
+				return;
+
+			if (Snap == false)
+			{
+				foreach (Workplace wp in this.workplaceBundle)
+				{
+					wp.STATE = WORKPLACE_STATE.SNAP;
+				}
+			}
+
+			Start();
+		}
+
+		public new void Stop()
+		{
+			base.Stop();
 		}
 	}
 }

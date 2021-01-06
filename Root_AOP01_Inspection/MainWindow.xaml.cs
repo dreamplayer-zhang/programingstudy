@@ -128,7 +128,6 @@ namespace Root_AOP01_Inspection
         #endregion
 
         public AOP01_Engineer m_engineer = new AOP01_Engineer();
-        private ProgramManager program;
         public IDialogService dialogService;
 
         public MainWindow()

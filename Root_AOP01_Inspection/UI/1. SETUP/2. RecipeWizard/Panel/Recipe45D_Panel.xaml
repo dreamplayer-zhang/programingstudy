@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_AOP01_Inspection"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="836" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
     <Grid>
@@ -40,7 +41,8 @@
 
                         <Grid Grid.Column="0">
                             <GroupBox Header="45D Image">
-                                <Image Source="/Root_AOP01_Inspection;component/Resource/ReticleMap2.PNG"/>
+								<tools:RootViewer DataContext="{Binding p_ImageViewer_VM}"/>
+								<!--<Image Source="/Root_AOP01_Inspection;component/Resource/ReticleMap2.PNG"/>-->
                             </GroupBox>
                         </Grid>
                         <GridSplitter Grid.Column="1" 
@@ -212,12 +214,15 @@
                             </Grid>
 
                             <Grid Grid.Column="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="1*"/>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="auto"/>
+									<RowDefinition Height="1*"/>
                                     <RowDefinition Height="5*"/>
                                     <RowDefinition Height="6*"/>
                                 </Grid.RowDefinitions>
-                                <GroupBox Header="Pellicle Haze" Grid.Row="0">
+								<Button Content="Inspection Test"
+										Command="{Binding commandInspTest}"/>
+								<GroupBox Header="Pellicle Haze" Grid.Row="1">
                                     <Grid Margin="5">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="2*"/>
@@ -228,13 +233,13 @@
                                                    FontWeight="Bold"/>
                                     </Grid>
                                 </GroupBox>
-                                <GroupBox Grid.Row="1" Header="Defect Image"
+                                <GroupBox Grid.Row="2" Header="Defect Image"
                                   Background="{StaticResource GroupBoxBackground}">
                                     <Grid Background="Black">
                                         <Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG"/>
                                     </Grid>
                                 </GroupBox>
-                                <GroupBox Grid.Row="2" Header="Insepction Info"
+                                <GroupBox Grid.Row="3" Header="Insepction Info"
                                   Background="{StaticResource GroupBoxBackground}">
                                     <DataGrid IsReadOnly="True" Grid.Row="1">
                                         <DataGrid.Resources>
