@@ -28,8 +28,10 @@ namespace RootTools_Vision
         public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
         // D2D Recipe & Parameter
+        private Recipe recipe;
         private D2DParameter parameter;
-        private D2DRecipe recipe;
+        private D2DRecipe recipeD2D;
+
 
         private IntPtr inspectionSharedBuffer;
         private byte[] inspectionWorkBuffer;
@@ -42,8 +44,9 @@ namespace RootTools_Vision
 
         public override void SetRecipe(Recipe _recipe)
         {
+            this.recipe = _recipe;
             this.parameter = _recipe.GetRecipe<D2DParameter>();
-            this.recipe = _recipe.GetRecipe<D2DRecipe>();
+            this.recipeD2D = _recipe.GetRecipe<D2DRecipe>();
         }
 
         public override bool DoPrework()
@@ -283,6 +286,12 @@ namespace RootTools_Vision
 
             // Threshold 값으로 Defect 탐색
             CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, parameter.Intensity);
+
+
+            // Mask
+            MaskRecipe mask = this.recipe.GetRecipe<MaskRecipe>(); //요기다 추가해줘용
+
+
             // Labeling
             var Label = CLR_IP.Cpp_Labeling(inspectionWorkBuffer, binImg, chipW, chipH);
 
