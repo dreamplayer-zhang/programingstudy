@@ -56,7 +56,7 @@ namespace RootTools.Gem
                 if (_ePresentSensor == value) return;
                 m_log.Info("p_ePresentSensor " + _ePresentSensor.ToString() + " -> " + value.ToString());
                 _ePresentSensor = value;
-                if (m_gem != null)
+                if (m_gem != null && !m_gem.p_bOffline)
                 {
                     switch (value)
                     {

@@ -52,7 +52,7 @@ namespace Root_WIND2.Module
 		public Camera_Dalsa CamEdgeTop { get => camEdgeTop; private set => camEdgeTop = value; }
 		public Camera_Dalsa CamEdgeSide { get => camEdgeSide; private set => camEdgeSide = value; }
 		public Camera_Dalsa CamEdgeBtm { get => camEdgeBtm; private set => camEdgeBtm = value; }
-		public Camera_Matrox CamEBR { get => CamEBR; private set => CamEBR = value; }
+		public Camera_Matrox CamEBR { get => camEBR; private set => camEBR = value; }
 		#endregion
 
 		public override void GetTools(bool bInit)
@@ -230,8 +230,8 @@ namespace Root_WIND2.Module
 		{
 			if (p_eState != eState.Ready)
 				return p_id + " eState not Ready";
-			if (p_infoWafer == null)
-				return p_id + " IsGetOK - InfoWafer not Exist";
+			//if (p_infoWafer == null)
+			//	return p_id + " IsGetOK - InfoWafer not Exist";
 			return "OK";
 		}
 
@@ -239,10 +239,10 @@ namespace Root_WIND2.Module
 		{
 			if (p_eState != eState.Ready)
 				return p_id + " eState not Ready";
-			if (p_infoWafer != null)
-				return p_id + " IsPutOK - InfoWafer Exist";
-			if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false)
-				return p_id + " not Enable Wafer Size";
+			//if (p_infoWafer != null)
+			//	return p_id + " IsPutOK - InfoWafer Exist";
+			//if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false)
+			//	return p_id + " not Enable Wafer Size";
 			return "OK";
 		}
 
@@ -257,6 +257,14 @@ namespace Root_WIND2.Module
 		{
 			//            string info = MoveReadyPos();
 			//            if (info != "OK") return info;
+			axisRotate.StartHome();
+			if (axisRotate.WaitReady() != "OK")
+			{
+				p_bStageVac = false;
+				p_eState = eState.Error;
+				return "OK";
+			}
+			p_bStageVac = false;
 			return "OK";
 		}
 
@@ -264,6 +272,14 @@ namespace Root_WIND2.Module
 		{
 			//            string info = MoveReadyPos();
 			//            if (info != "OK") return info;
+			axisRotate.StartHome();
+			if (axisRotate.WaitReady() != "OK")
+			{
+				p_bStageVac = false;
+				p_eState = eState.Error;
+				return "OK";
+			}
+			p_bStageVac = false;
 			return "OK";
 		}
 
@@ -355,23 +371,23 @@ namespace Root_WIND2.Module
 				return "OK";
 			}
 
-			Thread.Sleep(200);
-			axisEbrXZ.p_axisX.StartHome();
-			if (axisEbrXZ.p_axisX.WaitReady() != "OK")
-			{
-				p_bStageVac = false;
-				p_eState = eState.Error;
-				return "OK";
-			}
+			//Thread.Sleep(200);
+			//axisEbrXZ.p_axisX.StartHome();
+			//if (axisEbrXZ.p_axisX.WaitReady() != "OK")
+			//{
+			//	p_bStageVac = false;
+			//	p_eState = eState.Error;
+			//	return "OK";
+			//}
 
-			Thread.Sleep(200);
-			axisEbrXZ.p_axisY.StartHome();
-			if (axisEbrXZ.p_axisY.WaitReady() != "OK")
-			{
-				p_bStageVac = false;
-				p_eState = eState.Error;
-				return "OK";
-			}
+			//Thread.Sleep(200);
+			//axisEbrXZ.p_axisY.StartHome();
+			//if (axisEbrXZ.p_axisY.WaitReady() != "OK")
+			//{
+			//	p_bStageVac = false;
+			//	p_eState = eState.Error;
+			//	return "OK";
+			//}
 
 			Thread.Sleep(200);
 			axisRotate.StartHome();
@@ -421,8 +437,8 @@ namespace Root_WIND2.Module
 		#region ModuleRun
 		protected override void InitModuleRuns()
 		{
-			AddModuleRunList(new Run_GrabEdge(this), false, "Run Grab Edge");
-			AddModuleRunList(new Run_GrabEBR(this), false, "Run Grab EBR");
+			AddModuleRunList(new Run_GrabEdge(this), true, "Run Grab Edge");
+			AddModuleRunList(new Run_GrabEBR(this), true, "Run Grab EBR");
 		}
 
 		public ImageData GetMemoryData(EDGE_TYPE data)

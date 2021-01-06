@@ -33,7 +33,7 @@ namespace RootTools_Vision
         Line,
         BeforeInsp,
     }
-    public class D2DParameter : ParameterBase, IMaskInspection
+    public class D2DParameter : ParameterBase, IMaskInspection, IColorInspection, IDisplaySpecSummary
     {
         public  D2DParameter() : base(typeof(D2D))
         {
@@ -62,6 +62,7 @@ namespace RootTools_Vision
             set
             {
                 SetProperty<int>(ref this.intensity, value);
+                Value = this.intensity;
             }
         }
         [Category("Parameter")]
@@ -132,13 +133,28 @@ namespace RootTools_Vision
 
 
         // ROI
-        private int maskIndex;
-        [Category("ROI")]
-        [DisplayName("ROI Index")]
+        [Browsable(false)]
         public int MaskIndex 
         {
-            get => maskIndex; 
-            set => maskIndex = value; 
+            get;
+            set;
+        }
+
+        [Browsable(false)]
+        public IMAGE_CHANNEL IndexChannel
+        { 
+            get; 
+            set; 
+        }
+
+        [Browsable(false)]
+        public int Value 
+        {
+            get { return this.intensity; }
+            set
+            {
+                RaisePropertyChanged("Value");
+            }
         }
         #endregion
 

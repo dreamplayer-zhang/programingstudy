@@ -33,6 +33,7 @@ namespace Root_WIND2
         internal Review_ViewModel ReviewViewModel { get => reviewViewModel; set => reviewViewModel = value; }
         internal Run_ViewModel RunViewModel { get => runViewModel; set => runViewModel = value; }
         public SettingDialog SettingDialog { get => settingDialog; set => settingDialog = value; }
+        public SettingDialog_ViewModel SettingDialogViewModel { get => settingDialogViewModel; set => settingDialogViewModel = value; }
 
 
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    interface ISettingData
+    public interface ISettingData
     {
     }
 }

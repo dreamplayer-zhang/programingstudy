@@ -62,7 +62,7 @@ namespace RootTools.ToolBoxs
             if (value == null) value = new DIO_Is(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, asDI);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
-            for (int n = 0; n < asDI.Length; n++) module.m_listDO.AddBit(value.m_aBitDI[n]);
+            for (int n = 0; n < asDI.Length; n++) module.m_listDI.AddBit(value.m_aBitDI[n]);
             return "OK";
         }
 
@@ -71,7 +71,7 @@ namespace RootTools.ToolBoxs
             if (value == null) value = new DIO_Is(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sDI, nCount);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
-            for (int n = 0; n < nCount; n++) module.m_listDO.AddBit(value.m_aBitDI[n]);
+            for (int n = 0; n < nCount; n++) module.m_listDI.AddBit(value.m_aBitDI[n]);
             return "OK";
         }
 

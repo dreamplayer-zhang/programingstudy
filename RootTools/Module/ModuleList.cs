@@ -144,7 +144,8 @@ namespace RootTools.Module
                     EQ.p_eState = EQ.eState.Init;
                     break;
                 case EQ.eState.Ready:
-                    if (m_qModuleRun.Count == 0) StartModuleRuns();
+                    if (m_qModuleRun.Count == 0) 
+                        StartModuleRuns();
                     else
                     {
                         m_qModuleRun.Clear();

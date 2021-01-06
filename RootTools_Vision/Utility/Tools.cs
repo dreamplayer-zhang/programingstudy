@@ -122,6 +122,74 @@ namespace RootTools_Vision
             return rst;
         }
 
+        
+        public unsafe static byte[] LoadBitmapToRawdata(string filepath, int* _width, int* _height)
+        {
+            byte[] resData = null;
+            bool res = false;
+            try
+            {
+                int byteCount = 1;
+                Bitmap bmp = new Bitmap(filepath);
+
+                *_width = bmp.Width;
+                *_height = bmp.Height;
+
+                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, *_width, *_height), ImageLockMode.WriteOnly, bmp.PixelFormat);
+
+                
+
+                if (bmp.PixelFormat == PixelFormat.Format8bppIndexed)
+                {
+                    byteCount = 1;
+                }
+                else
+                {
+                    byteCount = 3;
+                }
+
+                resData = new byte[bmp.Width * bmp.Height * byteCount];
+                if (byteCount == 1)
+                {
+                    //IntPtr[] ptr = new IntPtr[bmp.Width * bmp.Height * byteCount];
+                    IntPtr pointer = bmpData.Scan0;
+                    Parallel.For(0, *_height - 1, (i) =>
+                    {
+                        Marshal.Copy(pointer + bmpData.Stride * i, resData, i * *_width, *_width * byteCount);
+                        //rawdata. (byte*)ptr[i].ToPointer();
+                    });
+                   
+                    
+                }
+                else
+                {
+                    unsafe
+                    {
+                        IntPtr pointer = bmpData.Scan0;
+                        byte* pPointer = (byte*)pointer.ToPointer();
+
+                        Parallel.For(0, *_height - 1, (i) =>
+                        {
+                            for (int j = 0; j < *_width; j++)
+                            {
+                                resData[i * *_width * byteCount + j * byteCount + 2] = pPointer[i * bmpData.Stride + j * byteCount + 0];
+                                resData[i * *_width * byteCount + j * byteCount + 1] = pPointer[i * bmpData.Stride + j * byteCount + 1];
+                                resData[i * *_width * byteCount + j * byteCount + 0] = pPointer[i * bmpData.Stride + j * byteCount + 2];
+                            }
+                        });
+                    }
+                }
+
+                
+            }
+            catch (Exception)
+            {
+                resData = null;
+               // res = false;
+            }
+            return resData;
+        }
+
         public static bool LoadBitmapToRawdata(string filepath, byte[] rawdata, int _width, int _height, int _byteCount)
         {
             //StopWatch stop = new StopWatch();
@@ -130,7 +198,7 @@ namespace RootTools_Vision
             try
             {
                 Bitmap bmp = new Bitmap(filepath);
-
+                
                 // Raw Copy
                 //rawdata = new byte[width * _height * _byteCount];
                 BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, _width, _height), ImageLockMode.WriteOnly, bmp.PixelFormat);
@@ -330,6 +398,22 @@ namespace RootTools_Vision
         public static object CreateInstance(Type type)
         {
             return Activator.CreateInstance(type);
+        }
+
+        public static void ParallelImageCopy(IntPtr ptrSrc, int srcStride, int srcHeight, CRect roi, byte[] byteDst)
+        {
+            int top = roi.Top;
+            int bottom = roi.Bottom;
+            int left = roi.Left;
+            int right = roi.Right;
+            int width = roi.Width;
+            int height = roi.Height;
+
+            Parallel.For(top, bottom, (i) =>
+              {
+                  Marshal.Copy(new IntPtr(ptrSrc.ToInt64() + (i * (Int64)srcStride + left)), byteDst, width * (i - top), width);
+
+              });
         }
     }
 }
