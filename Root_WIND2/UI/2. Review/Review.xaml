@@ -182,7 +182,7 @@
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="65*" />
-                                <ColumnDefinition Width="35*"/>
+                                <ColumnDefinition Width="35*" />
                             </Grid.ColumnDefinitions>
                             <ItemsControl ItemsSource="{Binding p_Element}" Grid.Column="0"/>
                             <Grid Grid.Column="1">
@@ -387,458 +387,534 @@
                             </GroupBox>
                         </Grid>
                     </Grid>
-                    <Grid Grid.Column="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="1*" />
-                            <RowDefinition Height="1*" />
-                            <RowDefinition Height="1*" />
-                        </Grid.RowDefinitions>
-                        <GroupBox Grid.Row="0"
-                                  Header="Bevel Map">
-                            <Grid Margin="5" Background="Black">
-                                <Image Source="/Root_WIND2;component/Resources/bevelmap2.bmp" Margin="15"/>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox Grid.Row="1"
-                                  Header="Bevel Panorama">
-                            <Grid Margin="5,10">
-                                <Image Source="/Root_WIND2;component/Resources/bevelmap.bmp" 
-                                       Stretch="Fill"/>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox Grid.Row="2"
-                                  Header="Bevel Graph">
-                            <Grid Margin="5,10">
-                                <Image Source="/Root_WIND2;component/Resources/EBR.PNG"
-                                       Stretch="Fill"/>
-                            </Grid>
-                        </GroupBox>
-                    </Grid>
+                    <GroupBox Header="Application" Grid.Column="2">
+                        <TabControl Background="{StaticResource PanelBackGround}"
+                                    BorderThickness="1">
+                            <TabItem Header="Bevel">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="1*" />
+                                        <RowDefinition Height="1*" />
+                                        <RowDefinition Height="1*" />
+                                    </Grid.RowDefinitions>
+                                    <GroupBox Grid.Row="0"
+                                              Header="Bevel Map">
+                                        <Grid Margin="5"
+                                              Background="Black">
+                                            <Image Source="/Root_WIND2;component/Resources/bevelmap2.bmp"
+                                                   Margin="15" />
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Grid.Row="1"
+                                              Header="Bevel Panorama">
+                                        <Grid Margin="5,10">
+                                            <Image Source="/Root_WIND2;component/Resources/bevelmap.bmp"
+                                                   Stretch="Fill" />
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Grid.Row="2"
+                                              Header="Bevel Graph">
+                                        <Grid Margin="5,10">
+                                            <Image Source="/Root_WIND2;component/Resources/EBR.PNG"
+                                                   Stretch="Fill" />
+                                        </Grid>
+                                    </GroupBox>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Golden Image Trend"
+                                     IsEnabled="true">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="3*" />
+                                        <RowDefinition Height="40" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0"
+                                          Margin="10"
+                                          Background="Black">
+                                        <Image Source="{Binding GoldenImage}" />
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Right">
+                                            <Button Grid.Row="1"
+                                                    Width="100"
+                                                    Margin="0,0,5,5"
+                                                    Content="Image Load"
+                                                    HorizontalAlignment="Right"
+                                                    Command="{Binding btnLoadImage}"></Button>
+                                            <Button Grid.Row="1"
+                                                    Width="100"
+                                                    Margin="0,0,5,5"
+                                                    Content="Check All"
+                                                    HorizontalAlignment="Right"
+                                                    Command="{Binding btnCheckAll}"></Button>
+                                            <Button Grid.Row="1"
+                                                    Width="100"
+                                                    Margin="0,0,5,5"
+                                                    Content="Uncheck All"
+                                                    HorizontalAlignment="Right"
+                                                    Command="{Binding btnUncheckAll}"></Button>
+                                            <Button Grid.Row="1"
+                                                    Width="100"
+                                                    Margin="0,0,5,5"
+                                                    Content="Show Trend"
+                                                    HorizontalAlignment="Right"
+                                                    Command="{Binding btnShowTrend}"></Button>
+                                            <Button Grid.Row="1"
+                                                    Width="100"
+                                                    Margin="0,0,5,5"
+                                                    Content="Save Image"
+                                                    HorizontalAlignment="Right"
+                                                    Command="{Binding btnSaveTrend}"></Button>
+                                        </StackPanel>
+                                    </Grid>
 
-                    <!--<Grid Grid.Column="2">
-                        <GroupBox Header="Detail">
-                            <TabControl Background="{StaticResource PanelBackGround}"
-                                        BorderThickness="1">
-                                <TabItem Header="asdf">
-                                    
+                                    <ListView x:Name="GoldenImagelist"
+                                              Margin="10"
+                                              Grid.Row="2"
+                                              ItemsSource="{Binding GoldenImageList, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                              SelectedIndex="{Binding ListViewIdx}"
+                                              SelectionMode="Multiple">
+                                        <ListView.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ListView.ItemsPanel>
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Vertical"
+                                                            VerticalAlignment="Stretch">
+                                                    <Image Source="{Binding GoldenImgData, UpdateSourceTrigger=PropertyChanged}"
+                                                           Width="100"
+                                                           Height="100"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Top" />
+                                                    <TextBlock Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Bottom" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectionChanged">
+                                                <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=GoldenImagelist, Mode=OneWay}"
+                                                                    MethodName="GoldenImagelist_SelectionChanged" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ListView>
 
-                                </TabItem>
-                                <TabItem Header="Inspection">
-                                </TabItem>
-                                <TabItem Header="Defect">
-                                </TabItem>
-                                <TabItem Header="Metrology">
-                                    <Grid>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Metrology">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="2*"/>
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1.2*" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <GroupBox Grid.Column="0">
+                                        <GroupBox.Header>
+                                            <TextBlock Text="Data" />
+                                        </GroupBox.Header>
+                                        <DataGrid IsReadOnly="True"
+                                                  Grid.Row="1">
+                                            <DataGrid.Resources>
+                                                <Style TargetType="DataGridColumnHeader">
+                                                    <Setter Property="HorizontalAlignment"
+                                                            Value="Stretch" />
+                                                    <Setter Property="HorizontalContentAlignment"
+                                                            Value="Center" />
+                                                </Style>
+                                            </DataGrid.Resources>
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="No."
+                                                                    Binding="{Binding Path=no}"
+                                                                    Width="0.5*" />
+                                                <DataGridTextColumn Header="Insp"
+                                                                    Binding="{Binding Path=mode}"
+                                                                    Width="0.7*" />
+                                                <DataGridTextColumn Header="Chip"
+                                                                    Binding="{Binding Path=chip}"
+                                                                    Width="0.8*" />
+                                                <DataGridTextColumn Header="Location"
+                                                                    Binding="{Binding Path=xy}"
+                                                                    Width="1.5*" />
+                                                <DataGridTextColumn Header="Gv"
+                                                                    Binding="{Binding Path=gv}"
+                                                                    Width="0.5*" />
+                                                <DataGridTextColumn Header="Size"
+                                                                    Binding="{Binding Path=size}"
+                                                                    Width="*" />
+                                                <DataGridTextColumn Header="Code"
+                                                                    Binding="{Binding Path=dc}"
+                                                                    Width="*" />
+                                            </DataGrid.Columns>
+
+                                            <local:DummyResult no="0"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="1"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="2"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="3"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="4"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="5"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="6"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="7"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="8"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="9"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="0"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="1"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="2"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="3"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="4"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="5"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="6"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="7"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="8"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="9"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="0"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="1"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="2"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="3"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="4"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="5"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="6"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="7"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="8"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="9"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="0"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="1"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="2"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="3"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="4"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="5"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="6"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="7"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="8"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="9"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="0"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="1"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="2"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="3"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="4"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="5"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="6"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="7"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="8"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                            <local:DummyResult no="9"
+                                                               mode="Front"
+                                                               chip="3,13"
+                                                               xy="25854,72838"
+                                                               gv="65"
+                                                               size="15x15"
+                                                               dc="00001" />
+                                        </DataGrid>
+                                    </GroupBox>
+                                    <Grid Grid.Column="1">
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="40" />
                                             <RowDefinition />
                                             <RowDefinition />
                                             <RowDefinition />
                                         </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="1.2*" />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <Button Content="Tuning"
-                                                Grid.Column="1"
-                                                Margin="3"
-                                                FontWeight="Bold" />
-                                        <GroupBox Grid.Column="0"
-                                                  Grid.Row="1"
-                                                  Grid.RowSpan="2">
+                                        <GroupBox Grid.Row="0">
                                             <GroupBox.Header>
-                                                <TextBlock Text="Result" />
-                                            </GroupBox.Header>
-                                            <DataGrid IsReadOnly="True"
-                                                      Grid.Row="1">
-                                                <DataGrid.Resources>
-                                                    <Style TargetType="DataGridColumnHeader">
-                                                        <Setter Property="HorizontalAlignment"
-                                                                Value="Stretch" />
-                                                        <Setter Property="HorizontalContentAlignment"
-                                                                Value="Center" />
-                                                    </Style>
-                                                </DataGrid.Resources>
-                                                <DataGrid.Columns>
-                                                    <DataGridTextColumn Header="No."
-                                                                        Binding="{Binding Path=no}"
-                                                                        Width="0.5*" />
-                                                    <DataGridTextColumn Header="Insp"
-                                                                        Binding="{Binding Path=mode}"
-                                                                        Width="0.7*" />
-                                                    <DataGridTextColumn Header="Chip"
-                                                                        Binding="{Binding Path=chip}"
-                                                                        Width="0.8*" />
-                                                    <DataGridTextColumn Header="Location"
-                                                                        Binding="{Binding Path=xy}"
-                                                                        Width="1.5*" />
-                                                    <DataGridTextColumn Header="Gv"
-                                                                        Binding="{Binding Path=gv}"
-                                                                        Width="0.5*" />
-                                                    <DataGridTextColumn Header="Size"
-                                                                        Binding="{Binding Path=size}"
-                                                                        Width="*" />
-                                                    <DataGridTextColumn Header="Code"
-                                                                        Binding="{Binding Path=dc}"
-                                                                        Width="*" />
-                                                </DataGrid.Columns>
-
-                                                <local:DummyResult no="0"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="1"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="2"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="3"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="4"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="5"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="6"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="7"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="8"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="9"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="0"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="1"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="2"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="3"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="4"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="5"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="6"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="7"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="8"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="9"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="0"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="1"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="2"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="3"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="4"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="5"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="6"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="7"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="8"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="9"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="0"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="1"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="2"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="3"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="4"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="5"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="6"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="7"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="8"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="9"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="0"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="1"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="2"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="3"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="4"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="5"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="6"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="7"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="8"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                                <local:DummyResult no="9"
-                                                                   mode="Front"
-                                                                   chip="3,13"
-                                                                   xy="25854,72838"
-                                                                   gv="65"
-                                                                   size="15x15"
-                                                                   dc="00001" />
-                                            </DataGrid>
-                                        </GroupBox>
-                                        <GroupBox Grid.Column="1"
-                                                  Grid.Row="1">
-                                            <GroupBox.Header>
-                                                <TextBlock Text="Defect Image" />
+                                                <TextBlock Text="Image" />
                                             </GroupBox.Header>
                                             <Grid Background="Black">
                                                 <TextBlock Text="Defect Image"
@@ -847,8 +923,7 @@
                                                            HorizontalAlignment="Center" />
                                             </Grid>
                                         </GroupBox>
-                                        <GroupBox Grid.Column="1"
-                                                  Grid.Row="2">
+                                        <GroupBox Grid.Row="1">
                                             <GroupBox.Header>
                                                 <TextBlock Text="Map" />
                                             </GroupBox.Header>
@@ -871,21 +946,22 @@
                                                 </Viewbox>
                                             </Grid>
                                         </GroupBox>
-                                        <GroupBox Grid.Column="0"
-                                                  Grid.Row="3"
-                                                  Grid.ColumnSpan="2">
-                                            <GroupBox.Header>
-                                                <TextBlock Text="Measurement Data" />
-                                            </GroupBox.Header>
-
-                                            <Image Source="/Root_WIND2;component/Resources/ChartEBR.PNG"
-                                                   Stretch="Fill" />
-                                        </GroupBox>
                                     </Grid>
-                                </TabItem>
-                            </TabControl>
-                        </GroupBox>
-                    </Grid>-->
+                                    <GroupBox Grid.Row="1"
+                                              Grid.ColumnSpan="2">
+                                        <GroupBox.Header>
+                                            <TextBlock Text="Measurement Data" />
+                                        </GroupBox.Header>
+
+                                        <Image Source="/Root_WIND2;component/Resources/ChartEBR.PNG"
+                                               Stretch="Fill" />
+                                    </GroupBox>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+                    </GroupBox>
+
+
 
                 </Grid>
             </StackPanel>
