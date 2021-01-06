@@ -1,5 +1,4 @@
-﻿using Root_EFEM;
-using Root_EFEM.Module;
+﻿using Root_EFEM.Module;
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
@@ -52,7 +51,8 @@ namespace Root_AOP01_Packing.Module
             {
                 if (_bProtection == value) return;
                 _bProtection = value;
-                m_axis.StopAxis(); 
+                m_axis.StopAxis();
+                p_infoWafer = null;
                 OnPropertyChanged(); 
             }
         }
@@ -91,6 +91,7 @@ namespace Root_AOP01_Packing.Module
 
         public string MoveElevator(int nLevel)
         {
+            p_infoWafer = null;
             m_axis.StartMove(GetPos(nLevel));
             return m_axis.WaitReady(); 
         }
@@ -111,7 +112,7 @@ namespace Root_AOP01_Packing.Module
             p_infoWafer = null;
             if (Run(m_axis.StartMove(ePos.Bottom))) return p_sInfo;
             if (Run(m_axis.WaitReady())) return p_sInfo;
-            if (Run(m_axis.StartMove(ePos.Bottom))) return p_sInfo;
+            if (Run(m_axis.StartMove(ePos.Top))) return p_sInfo;
             for (int n = 0; n < 8; n++)
             {
                 double pos = GetPos(n);
@@ -128,8 +129,12 @@ namespace Root_AOP01_Packing.Module
                 {
                     m_axis.StopAxis();
                     if (Run(MoveElevator(n))) return p_sInfo;
-                    p_infoWafer = new InfoWafer(p_id, n, m_engineer);
-                    return "OK"; 
+                    if (p_bCheck)
+                    {
+                        p_infoWafer = new InfoWafer(p_id, 0, m_engineer);
+                        return "OK";
+                    }
+                    else return "Check Case";
                 }
             }
             return "No Case"; 
@@ -210,7 +215,7 @@ namespace Root_AOP01_Packing.Module
 
         public string BeforeGet(int nID)
         {
-            //if (p_infoWafer == null) return m_id + " BeforeGet : InfoWafer = null";
+            if (p_infoWafer == null) return p_id + " BeforeGet : InfoWafer = null";
             return CheckGetPut();
         }
 
@@ -275,6 +280,7 @@ namespace Root_AOP01_Packing.Module
                 return "OK";
             }
             p_sInfo = base.StateHome();
+            p_infoWafer = null; 
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             return p_sInfo;
         }
@@ -301,6 +307,7 @@ namespace Root_AOP01_Packing.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
+            AddModuleRunList(new Run_Mapping(this), true, "Mapping");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -329,6 +336,31 @@ namespace Root_AOP01_Packing.Module
             {
                 Thread.Sleep((int)(1000 * m_secDelay));
                 return "OK";
+            }
+        }
+
+        public class Run_Mapping : ModuleRunBase
+        {
+            IndividualElevator m_module;
+            public Run_Mapping(IndividualElevator module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Mapping run = new Run_Mapping(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunMapping(); 
             }
         }
         #endregion
