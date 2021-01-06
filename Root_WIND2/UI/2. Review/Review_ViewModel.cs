@@ -76,6 +76,65 @@ namespace Root_WIND2
                 return new RelayCommand(SearchLotinfoData);
             }
         }
+        public ICommand btnLoadImage
+        {
+            get
+            {
+                return new RelayCommand(LoadGoldenImage);
+            }
+        }
+        public ICommand btnCheckAll
+        {
+            get
+            {
+                return new RelayCommand(SearchLotinfoData);
+            }
+        }
+        public ICommand btnUncheckAll
+        {
+            get
+            {
+                return new RelayCommand(SearchLotinfoData);
+            }
+        }
+        public ICommand btnShowTrend
+        {
+            get
+            {
+                return new RelayCommand(SearchLotinfoData);
+            }
+        }
+        public ICommand btnSaveTrend
+        {
+            get
+            {
+                return new RelayCommand(SearchLotinfoData);
+            }
+        }
+        public void GoldenImagelist_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int a = 0;
+        }
+        private void OnMouseEnter(object sender, MouseEventArgs e)
+        {
+            int a = 0;
+        }
+
+        public void GoldenImagelist_SelectionChanged(object sender, EventArgs e)
+        {
+            int a = 0;
+        }
+
+        public void OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        public void OnListViewMouseButtonDown(object sender, MouseButtonEventArgs e)
+        {
+           // MaterialSelectIndex = -1;
+        }
+
         #endregion
 
         #region GET / SET
@@ -136,8 +195,12 @@ namespace Root_WIND2
                         string sReicpeFileName = sRecipeID + ".rcp";
                         recipe.Read(Path.Combine(sReicpePath, sRecipeID, sReicpeFileName));
                         m_DefectView.SetRecipe(recipe);
-
                         DisplayDefectData(sInspectionID);
+
+                        m_DefectView.tbRcpName.Text = sRecipeID.ToString();
+                        m_DefectView.tbWaferID.Text = (string)GetDataGridItem(lotinfo_Datatable, selectedRow, "WAFERID");
+                        m_DefectView.tbTotalCnt.Text = m_ReviewDefectlist.Count.ToString() + " (EA)";
+                        m_DefectView.tb_EdgeCnt.Text = m_ReviewDefectlist.Count.ToString() + " (EA)";
                     }
                     catch (Exception ex)
                     {
@@ -167,7 +230,7 @@ namespace Root_WIND2
                     // Defect Code 보고... 나중에 회의
                     //if (defect.m_nDefectCode / 10000 == 1)  // Frontside
                     {
-                        DisplaySelectedFrontDefect(selectedRow);
+                        //DisplaySelectedFrontDefect(selectedRow);
                     }
                     //else if (defect.m_nDefectCode / 10000 == 2)  // Backside
                     {
@@ -175,7 +238,7 @@ namespace Root_WIND2
                     }
                     //else if (defect.m_nDefectCode / 10000 == 3) // Edge
                     {
-                    //    DisplayEdgeSelectedDefect(selectedRow); // To-do edge 전용으로만 보이니까 추후에 구조 수정필요
+                        DisplayEdgeSelectedDefect(selectedRow); // To-do edge 전용으로만 보이니까 추후에 구조 수정필요
                     }
 
                 }
@@ -492,12 +555,50 @@ namespace Root_WIND2
             }
         }
 
-        ObservableCollection<string> CollectionOfFilePaths { get; set; }
+        // Golden Image Trend Tab
+        private ObservableCollection<ListViewItemTemplate> goldenImageList = new ObservableCollection<ListViewItemTemplate>();
+        public ObservableCollection<ListViewItemTemplate> GoldenImageList
+        {
+            get
+            {
+                return goldenImageList;
+            }
+            set
+            {
+                SetProperty(ref goldenImageList, value);
+                RaisePropertyChanged("GoldenImageList");
+            }
+        }
 
-    #endregion
+        private int listViewIdx;
+        public int ListViewIdx
+        {
+            get
+            {
+                return listViewIdx;
+            }
+            set
+            {
+                SetProperty(ref listViewIdx, value);
+                GoldenImage = GoldenImageList[listViewIdx].GoldenImgData;
+            }
+        }
+        private BitmapSource goldenImage;
+        public BitmapSource GoldenImage
+        {
+            get
+            {
+                return goldenImage;
+            }
+            set
+            {
+                SetProperty(ref goldenImage, value);
+            }
+        }
+        #endregion
 
-    #region DataTypeEnum
-    private GVHistogramType gvHistogramMode = GVHistogramType.Dark;
+        #region DataTypeEnum
+        private GVHistogramType gvHistogramMode = GVHistogramType.Dark;
         private enum GVHistogramType
         {
             All,
@@ -526,7 +627,6 @@ namespace Root_WIND2
             else
                 p_DefectImage = null;
         }
-
         private void DisplaySelectedFrontDefect(DataRowView selectedRow)
         {
             if (m_ReviewDefectlist == null)
@@ -571,10 +671,11 @@ namespace Root_WIND2
             DrawDefectSizeGraph();              // Draw Defect Size Distribution Histogram
             DrawDefectGVGraph();                // Draw Defect GV Distribution Histogram
 
-            CollectionOfFilePaths = new ObservableCollection<string> { @"D:\Images\lena512.bmp", @"D:\Images\lena512.bmp" };
+            GoldenImageList.Clear();
         }
         private void ClassifyDefect()
         {
+            //m_DefectView.tbRcpName.Text = 
             foreach (Defect defect in m_ReviewDefectlist)
             {
                 // 대충 코드는 이런식으로 분류를 하면 되지않을까...
@@ -588,8 +689,8 @@ namespace Root_WIND2
                 }
                 //else if (defect.m_nDefectCode / 10000 == 3) // Edge
                 {
-                //    double theta = CalculateEdgeDefectTheta(defect.m_fAbsY);
-                //    m_DefectView.AddEdgeDefect(theta);
+                    //double theta = CalculateEdgeDefectTheta(defect.m_fAbsY);
+                    //m_DefectView.AddEdgeDefect(theta);
                 }
             }
         }
@@ -630,7 +731,26 @@ namespace Root_WIND2
             string sLotInfo = "lotinfo";
             pLotinfo_Datatable = DatabaseManager.Instance.SelectTable(sLotInfo);
         }
+        public void LoadGoldenImage()
+        {
+            GoldenImageList.Clear();
 
+            if (recipe.RecipeFolderPath.Length == 0)
+                return;
+
+            string imgPath = recipe.RecipeFolderPath + @"RefImageHistory\";
+            List<string> imgNames =  Directory.GetFiles(imgPath, "*.bmp", SearchOption.AllDirectories).ToList();
+
+            foreach (string path in imgNames)
+            {
+                
+                ListViewItemTemplate temp = new ListViewItemTemplate();
+                temp.GoldenImgData = new BitmapImage(new (path));
+                temp.Title = path.Substring(imgPath.Length, path.Length - imgPath.Length - 4); // 끝에 .bmp 제거
+
+                GoldenImageList.Add(temp);
+            }
+        }
         public object GetDataGridItem(DataTable table, DataRow datarow, string sColumnName)
         {
             object result;
@@ -855,5 +975,22 @@ namespace Root_WIND2
 
             SizeYLabel = value => value.ToString("N");
         }
+    }
+}
+
+public class ListViewItemTemplate
+{
+    private string _Title;
+    public string Title
+    {
+        get { return this._Title; }
+        set { this._Title = value; }
+    }
+
+    private BitmapImage _GoldenImgData;
+    public BitmapImage GoldenImgData
+    {
+        get { return this._GoldenImgData; }
+        set { this._GoldenImgData = value; }
     }
 }
