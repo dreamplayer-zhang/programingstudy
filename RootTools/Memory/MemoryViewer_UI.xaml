@@ -19,6 +19,7 @@
                 <MenuItem Header="File">
                     <MenuItem x:Name="menuOpen" Header="Open" Click="menuOpen_Click"/>
                     <MenuItem x:Name="memuSave" Header="Save" Click="memuSave_Click"/>
+                    <MenuItem x:Name="memuClear" Header="Clear" Click="memuClear_Click"/>
                 </MenuItem>
             </Menu>
             <Label Content="{Binding p_sZoom}" ToolTip="Zoom" VerticalAlignment="Center"/>

@@ -803,7 +803,7 @@ namespace Root_AOP01_Inspection.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                     int nReticleSizeY_px = Convert.ToInt32(m_nReticleSize_mm * nMMPerUM / m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
-                    int nScanOffset_pulse = 500000; //가속버퍼구간
+                    int nScanOffset_pulse = 200000; //가속버퍼구간
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
@@ -816,6 +816,7 @@ namespace Root_AOP01_Inspection.Module
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
                         double dPosX = m_rpAxisCenter.X + nReticleSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
+                        dPosX = m_rpAxisCenter.X + (170 * nMMPerUM / 0.1 / 2) - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
 
                         if (m_module.Run(axisZ.StartMove(m_nFocusPosZ)))
                             return p_sInfo;
@@ -937,6 +938,7 @@ namespace Root_AOP01_Inspection.Module
             MainVision m_module;
 
             public int m_nLaserThreshold = 70;              // Laser Threshold
+            public int m_nUptime = 40;                      // Trigger Uptime
             public RPoint m_rpAxisCenter = new RPoint();    // Reticle Center Position
             public CPoint m_cpMemoryOffset = new CPoint();  // Memory Offset
             public double m_dResX_um = 1;                   // Camera Resolution X
@@ -966,6 +968,7 @@ namespace Root_AOP01_Inspection.Module
             {
                 Run_LADS run = new Run_LADS(m_module);
                 run.m_nLaserThreshold = m_nLaserThreshold;
+                run.m_nUptime = m_nUptime;
                 run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
                 run.m_cpMemoryOffset = new CPoint(m_cpMemoryOffset);
                 run.m_dResX_um = m_dResX_um;
@@ -980,6 +983,7 @@ namespace Root_AOP01_Inspection.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_nLaserThreshold = tree.Set(m_nLaserThreshold, m_nLaserThreshold, "Laser Threshold", "Laser Threshold", bVisible);
+                m_nUptime = tree.Set(m_nUptime, m_nUptime, "Trigger Uptime", "Trigger Uptime", bVisible);
                 m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
                 m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
                 m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam X Resolution", "X Resolution (um)", bVisible);
@@ -997,6 +1001,7 @@ namespace Root_AOP01_Inspection.Module
 
                 try
                 {
+                    Camera_Basler.s_nCount = 0;
                     m_grabMode.SetLight(true);
                     ladsinfos.Clear();
 
@@ -1037,8 +1042,8 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
 
                         double dTriggerStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2;
-                        double dTriggerEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
-                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, 40, true);
+                        double dTriggerEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2;
+                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger * nCamHeight, m_nUptime, true);
 
                         string strPool = m_grabMode.m_memoryPool.p_id;
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
@@ -1053,16 +1058,17 @@ namespace Root_AOP01_Inspection.Module
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
-
+                        m_grabMode.m_camera.StopGrab();
                         //CalculateHeight(nScanLine, mem, nReticleSizeY_px, new RPoint(dPosX, dStartPosY), dEndPosY);
-                        CalculateHeight_ESCHO(mem, nScanLine, nReticleSizeY_px);
+                        CalculateHeight_ESCHO(mem, m_grabMode.m_ScanStartLine + nScanLine, nReticleSizeY_px);
 
                         nScanLine++;
                         cpMemoryOffset.X += nCamWidth;
+                        Console.WriteLine(Camera_Basler.s_nCount);
                     }
                     m_grabMode.m_camera.StopGrab();
-                    SaveFocusMap(nReticleSizeY_px / nCamHeight);
-                    //SaveFocusMapImage(nScanLine, nReticleSizeY_px / nCamHeight);
+                    //SaveFocusMap(nReticleSizeY_px / nCamHeight);
+                    SaveFocusMapImage(nScanLine, nReticleSizeY_px / nCamHeight);
                     return "OK";
                 }
                 finally
@@ -1088,8 +1094,10 @@ namespace Root_AOP01_Inspection.Module
                     CRect crtROI = new CRect(nLeft, nTop, nRight, nBottom);
                     ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
                     img.SetData(p, crtROI, (int)mem.W);
+                    //img.SaveImageSync("D:\\img_" + i + ".bmp");
                     ladsinfo.m_Heightinfo[i] = CalculatingHeight(img);
                 }
+                ladsinfos.Add(ladsinfo);
             }
 
             void SaveFocusMap(int nHeight)
@@ -1175,36 +1183,36 @@ namespace Root_AOP01_Inspection.Module
             //    }
             //    ladsinfos.Add(ladsinfo);
             //}
-            //private void SaveFocusMapImage(int nX, int nY)
-            //{
-            //    int thumsize = 30;
-            //    int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
-            //    Mat ResultMat = new Mat();
-            //    for(int x =0;x<nX;x++)
-            //    { 
-            //        Mat Vmat = new Mat();
-            //        for(int y=0;y<nY;y++)
-            //        {
-            //            Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1);
-            //            //double nScalednum = (ladsInfo.m_Heightinfo[y,x]-110) * 255 / nCamHeight;
-            //            double nScalednum = (ladsinfos[x].m_Heightinfo[y] - 110) * 255 / nCamHeight;
-            //            ColorImg.SetTo(new MCvScalar(nScalednum*20));
+            private void SaveFocusMapImage(int nX, int nY)
+            {
+                int thumsize = 30;
+                int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
+                Mat ResultMat = new Mat();
+                for (int x = 0; x < nX; x++)
+                {
+                    Mat Vmat = new Mat();
+                    for (int y = 0; y < nY; y++)
+                    {
+                        Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1);
+                        //double nScalednum = (ladsInfo.m_Heightinfo[y,x]-110) * 255 / nCamHeight;
+                        double nScalednum = (ladsinfos[x].m_Heightinfo[y] - 215) * 255 / nCamHeight;
+                        ColorImg.SetTo(new MCvScalar(nScalednum * 20));
 
-            //            if (y == 0)
-            //                Vmat = ColorImg;
-            //            else
-            //                CvInvoke.VConcat(ColorImg, Vmat, Vmat);
-            //        }
-            //        if (x == 0)
-            //            ResultMat = Vmat;
-            //        else
-            //            CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
+                        if (y == 0)
+                            Vmat = ColorImg;
+                        else
+                            CvInvoke.VConcat(ColorImg, Vmat, Vmat);
+                    }
+                    if (x == 0)
+                        ResultMat = Vmat;
+                    else
+                        CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
 
-            //        CvInvoke.Imwrite(@"D:\Test\" + x+".bmp", ResultMat);
+                    CvInvoke.Imwrite(@"D:\Test\" + x + ".bmp", ResultMat);
 
-            //    }
-            //    CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
-            //}
+                }
+                CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
+            }
             #endregion
         }
 
