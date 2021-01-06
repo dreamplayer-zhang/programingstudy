@@ -24,8 +24,10 @@ namespace Root_WIND2
         Recipe recipe;
         public DefectView()
         {
-            InitializeComponent();   
-            cb_Back.IsChecked = true;
+            InitializeComponent();
+            //cb_Edge.IsChecked = true;
+            //cb_Back.IsChecked = true;
+            cb_Front.IsChecked = true;
         }
 
         public void SetRecipe(Recipe _recipe)
@@ -108,8 +110,8 @@ namespace Root_WIND2
         {
             if (gridEdge.Children.Count > listCnt)
                 gridEdge.Children.RemoveAt(gridEdge.Children.Count - 1);
+            AddEdgeDefect(gridEdge, theta, Brushes.Yellow, true);
 
-            AddEdgeDefect(gridEdge, theta, Brushes.Yellow);
         }
         public void DisplaySelectedFrontDefect(int listCnt, double relX, double relY)
         {
@@ -128,7 +130,26 @@ namespace Root_WIND2
 
         public void DrawWaferMap()
         {
-            RecipeType_WaferMap mapdata = recipe.WaferMap;
+            //RecipeType_WaferMap mapdata = recipe.WaferMap; // 원래코드
+
+            // 임시
+            int[] data = new int[9*9];
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (i == 0 || i == 1 || i == 2
+                    || i == 6 || i == 7 || i == 8
+                    || i == 9 || i == 10 || i == 16
+                    || i == 17 || i == 18 || i == 26
+                    || i == 54 || i == 62 || i == 63
+                    || i == 64 || i == 70 || i == 71
+                    || i == 72 || i == 73 || i == 74
+                    || i == 78 || i == 79 || i == 80)
+                    data[i] = 0;
+                else
+                    data[i] = 1;
+            }
+            RecipeType_WaferMap mapdata = new RecipeType_WaferMap(9, 9, data);
+            // UI자료용
             int[] mapData = mapdata.Data;
 
             int mapX = mapdata.MapSizeX;
@@ -137,7 +158,7 @@ namespace Root_WIND2
             int margin = 1;
             double mapW = (FrontsideCanvas.Width - (margin * mapX)) / mapX;
             double mapH = (FrontsideCanvas.Height - (margin * mapY)) / mapY;
-
+            MapCanvas.Children.Clear();
             for (int x = 0; x < mapX; x++)
                 for(int y = 0; y < mapY; y++)
                 {
@@ -152,31 +173,52 @@ namespace Root_WIND2
 
                         Canvas.SetLeft(map, x * (mapW + margin));
                         Canvas.SetTop(map, y * (mapH + margin));
- 
-                        FrontsideCanvas.Children.Add(map);
+                        MapCanvas.Children.Add(map);
                     }   
                 }        
         }
 
-        private void AddEdgeDefect(Grid gridArea, double theta, Brush brush = null)
+        private void AddEdgeDefect(Grid gridArea, double theta, Brush brush = null, bool select = false)
         {
             Rectangle defect = new Rectangle();
-            defect.Width = 10;
-            defect.Height = 10;
+            defect.VerticalAlignment = VerticalAlignment.Bottom;
+
+            
+            RotateTransform rotate = new RotateTransform(theta);
+            TransformGroup transformGroup = new TransformGroup();
+            transformGroup.Children.Add(rotate);
+            defect.RenderTransform = transformGroup;
 
             if (brush != null)
                 defect.Fill = brush;
             else
                 defect.Fill = Brushes.Green;
 
-            defect.Stroke = Brushes.Black;
-            defect.StrokeThickness = 0.5;
-            defect.VerticalAlignment = VerticalAlignment.Bottom;
-            defect.RenderTransformOrigin = new Point(0.5, -49);
-            RotateTransform rotate = new RotateTransform(theta);
-            TransformGroup transformGroup = new TransformGroup();
-            transformGroup.Children.Add(rotate);
-            defect.RenderTransform = transformGroup;
+            if (select)
+            {
+                //defect.Stroke = Brushes.Black;
+                //defect.StrokeThickness = 0.5;
+                //defect.Width = 6;
+                //defect.Height = 6;
+                //defect.RenderTransformOrigin = new Point(0.5, -82.333);
+                defect.Stroke = Brushes.Black;
+                defect.StrokeThickness = 1;
+                defect.Width = 10;
+                defect.Height = 10;
+                defect.RenderTransformOrigin = new Point(0.5, -49);
+            }
+            else
+            {
+                defect.Width = 6;
+                defect.Height = 6;
+                defect.RenderTransformOrigin = new Point(0.5, -82.333);
+                //defect.Stroke = Brushes.Black;
+                //defect.StrokeThickness = 0.0;
+                //defect.Width = 2;
+                //defect.Height = 2;
+                //defect.RenderTransformOrigin = new Point(0.5, -249);
+
+            }
 
             gridArea.Children.Add(defect);             
         }
@@ -212,9 +254,9 @@ namespace Root_WIND2
             double samplingRatioX = canvasSizeX / realSizeX;
             double samplingRatioY = canvasSizeY / realSizeY;
 
-            double canvasOriginPosX = mapdata.MasterDieX * (mapW + margin);
-            double canvasOriginPosY = mapdata.MasterDieY * (mapH + margin) + mapH;
-           
+            double canvasOriginPosX = mapdata.MasterDieX * (mapW + margin); //*
+            double canvasOriginPosY = mapdata.MasterDieY * (mapH + margin) + mapH;//
+
             Canvas.SetLeft(defect, canvasOriginPosX + x * samplingRatioX);
             Canvas.SetTop(defect, canvasOriginPosY + y * samplingRatioY);
 
@@ -277,27 +319,6 @@ namespace Root_WIND2
         //        }
         //    }
         //}
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            //FrontsideCanvas.Children.Clear();
-            //BacksideCanvas.Children.Clear();
-            //gridEdge.Children.Clear();
-            //Random random = new Random(1);
-            //Random random2 = new Random(3);
-            //Random random3 = new Random(7);
-            //for (int i = 0; i < 150; i++)
-            //{
-
-            //    int r1 = random.Next(-360, 360);
-            //    int r2 = random2.Next(-360, 360);
-            //    int r3 = random3.Next(-360, 360);
-            //    //AddDefect(gridFront, r1);
-            //    //AddDefect(backsideCanvas, r2);
-            //    //AddDefect(gridEdge, r3);
-
-            //}
-        }
 
         public void Clear()
 		{

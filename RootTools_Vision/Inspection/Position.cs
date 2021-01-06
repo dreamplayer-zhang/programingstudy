@@ -383,6 +383,7 @@ namespace RootTools_Vision
 
 
             // 지금은 세개 다하는데 추후에 하나만 해야할 수 도....
+
             Tools.ParallelImageCopy(
                 this.workplace.SharedBufferR_GRAY,
                 this.workplace.SharedBufferWidth,
@@ -395,30 +396,33 @@ namespace RootTools_Vision
                     this.workplace.PositionY),
                 this.workplace.WorkplaceBufferR_GRAY);
 
-            Tools.ParallelImageCopy(
-                this.workplace.SharedBufferG,
-                this.workplace.SharedBufferWidth,
-                this.workplace.SharedBufferHeight,
-                new CRect
-                (
-                    this.workplace.PositionX, 
-                    this.workplace.PositionY - this.workplace.BufferSizeY, 
-                    this.workplace.PositionX + this.workplace.BufferSizeX, 
-                    this.workplace.PositionY),
-                this.workplace.WorkplaceBufferG);
 
-            Tools.ParallelImageCopy(
-                this.workplace.SharedBufferB,
-                this.workplace.SharedBufferWidth,
-                this.workplace.SharedBufferHeight,
-                new CRect
-                (
-                    this.workplace.PositionX,
-                    this.workplace.PositionY - this.workplace.BufferSizeY,
-                    this.workplace.PositionX + this.workplace.BufferSizeX,
-                    this.workplace.PositionY),
-                this.workplace.WorkplaceBufferB);
+            if(this.workplace.SharedBufferByteCnt == 3)
+            {
+                Tools.ParallelImageCopy(
+                    this.workplace.SharedBufferG,
+                    this.workplace.SharedBufferWidth,
+                    this.workplace.SharedBufferHeight,
+                    new CRect
+                    (
+                        this.workplace.PositionX,
+                        this.workplace.PositionY - this.workplace.BufferSizeY,
+                        this.workplace.PositionX + this.workplace.BufferSizeX,
+                        this.workplace.PositionY),
+                    this.workplace.WorkplaceBufferG);
 
+                Tools.ParallelImageCopy(
+                    this.workplace.SharedBufferB,
+                    this.workplace.SharedBufferWidth,
+                    this.workplace.SharedBufferHeight,
+                    new CRect
+                    (
+                        this.workplace.PositionX,
+                        this.workplace.PositionY - this.workplace.BufferSizeY,
+                        this.workplace.PositionX + this.workplace.BufferSizeX,
+                        this.workplace.PositionY),
+                    this.workplace.WorkplaceBufferB);
+            }
         }
     }
 }
