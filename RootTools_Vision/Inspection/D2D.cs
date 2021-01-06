@@ -28,8 +28,13 @@ namespace RootTools_Vision
         public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
         // D2D Recipe & Parameter
+        private Recipe recipe;
         private D2DParameter parameter;
-        private D2DRecipe recipe;
+        private D2DRecipe recipeD2D;
+
+
+        private IntPtr inspectionSharedBuffer;
+        private byte[] inspectionWorkBuffer;
         #endregion
 
         public D2D() : base()
@@ -39,8 +44,9 @@ namespace RootTools_Vision
 
         public override void SetRecipe(Recipe _recipe)
         {
+            this.recipe = _recipe;
             this.parameter = _recipe.GetRecipe<D2DParameter>();
-            this.recipe = _recipe.GetRecipe<D2DRecipe>();
+            this.recipeD2D = _recipe.GetRecipe<D2DRecipe>();
         }
 
         public override bool DoPrework()
@@ -49,6 +55,8 @@ namespace RootTools_Vision
             {
                 return base.DoPrework();
             }
+
+            this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
 
             if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP) == true &&
                 this.workplaceBundle.CheckStateLine(this.workplace.MapPositionX, WORKPLACE_STATE.READY) &&
@@ -129,7 +137,7 @@ namespace RootTools_Vision
                 if (wp.MapPositionX == this.workplace.MapPositionX)
                     if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
                         if ((wp.MapPositionY >= startY) && (wp.MapPositionY <= endY) && wp.MapPositionY != this.workplace.MapPositionY)
-                            wpDatas.Add(wp.WorkplaceBuffer);
+                            wpDatas.Add(wp.GetWorkplaceBuffer(this.parameter.IndexChannel));
 
             switch(parameter.CreateRefImage)
             {
@@ -184,7 +192,7 @@ namespace RootTools_Vision
                 if (wp.MapPositionX == this.workplace.MapPositionX)
                     if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
                         if ((wp.MapPositionY == startY) || (wp.MapPositionY == middleY) || (wp.MapPositionY == endY))
-                            GoldenImages.Add(wp.WorkplaceBuffer);
+                            GoldenImages.Add(wp.GetWorkplaceBuffer(this.parameter.IndexChannel));
         }
         public override void SetWorkplace(Workplace _workplace)
         {
@@ -201,6 +209,9 @@ namespace RootTools_Vision
                 return;
             }
 
+            this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
+            this.inspectionWorkBuffer = this.workplace.GetWorkplaceBuffer(this.parameter.IndexChannel);
+
             int memH = this.workplace.SharedBufferHeight;
             int memW = this.workplace.SharedBufferWidth;
 
@@ -215,14 +226,14 @@ namespace RootTools_Vision
             {
                 SetMultipleGoldenImages();
                 // Diff Image 계산
-                CLR_IP.Cpp_SelectMinDiffinArea(workplace.WorkplaceBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
+                CLR_IP.Cpp_SelectMinDiffinArea(inspectionWorkBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
             }
             else
             {
                 if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
                     SetGoldenImage();
                 // Diff Image 계산
-                CLR_IP.Cpp_SubtractAbs(GoldenImage, workplace.WorkplaceBuffer, diffImg, chipW, chipH);
+                CLR_IP.Cpp_SubtractAbs(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
 
                 if (parameter.ScaleMap) // ScaleMap Option
                 {
@@ -248,7 +259,7 @@ namespace RootTools_Vision
                 if (parameter.HistWeightMap) // Histogram WeightMap
                 {
                     histWeightMap = new float[chipW * chipH];
-                    CLR_IP.Cpp_CreateHistogramWeightMap(workplace.WorkplaceBuffer, GoldenImage, histWeightMap, chipW, chipH, 5);        // -> 뭔가 결과가 이상함... 수정 필요
+                    CLR_IP.Cpp_CreateHistogramWeightMap(inspectionWorkBuffer, GoldenImage, histWeightMap, chipW, chipH, 5);        // -> 뭔가 결과가 이상함... 수정 필요
                     CLR_IP.Cpp_Multiply(diffImg, histWeightMap, diffImg, chipW, chipH);
                 }
             }
@@ -275,8 +286,14 @@ namespace RootTools_Vision
 
             // Threshold 값으로 Defect 탐색
             CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, parameter.Intensity);
+
+
+            // Mask
+            MaskRecipe mask = this.recipe.GetRecipe<MaskRecipe>(); //요기다 추가해줘용
+
+
             // Labeling
-            var Label = CLR_IP.Cpp_Labeling(workplace.WorkplaceBuffer, binImg, chipW, chipH);
+            var Label = CLR_IP.Cpp_Labeling(inspectionWorkBuffer, binImg, chipW, chipH);
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
@@ -340,7 +357,7 @@ namespace RootTools_Vision
                     if (wp.MapPositionX == this.workplace.MapPositionX)
                         if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
                             if ((wp.MapPositionY >= startY) && (wp.MapPositionY <= endY) && wp.MapPositionY != this.workplace.MapPositionY)
-                                wpDatas.Add(wp.WorkplaceBuffer);
+                                wpDatas.Add(wp.GetWorkplaceBuffer(this.parameter.IndexChannel));
 
                 switch (parameter.CreateRefImage)
                 {

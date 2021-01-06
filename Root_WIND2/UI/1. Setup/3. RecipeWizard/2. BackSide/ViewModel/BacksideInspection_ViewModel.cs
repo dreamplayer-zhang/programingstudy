@@ -260,12 +260,12 @@ namespace Root_WIND2
                 else // All 일때는 R채널로...
                     SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr(0);
 
-                m_Setup.InspectionVision.SetWorkplaceBuffer(SharedBuf, p_DrawTool_VM.p_ImageData.GetPtr(0), p_DrawTool_VM.p_ImageData.GetPtr(1), p_DrawTool_VM.p_ImageData.GetPtr(2));
+                m_Setup.InspectionVision.SetWorkplaceBuffer(p_DrawTool_VM.p_ImageData.GetPtr(0), p_DrawTool_VM.p_ImageData.GetPtr(1), p_DrawTool_VM.p_ImageData.GetPtr(2));
             }
             else
             {
                 SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr();
-                m_Setup.InspectionVision.SharedBuffer = SharedBuf;
+                m_Setup.InspectionVision.SharedBufferR_Gray = SharedBuf;
             }
 
             m_Setup.InspectionVision.SharedBufferByteCnt = p_DrawTool_VM.p_ImageData.p_nByte;

@@ -13,31 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_WIND2
+namespace Root_CAMELLIA.ManualJob
 {
     /// <summary>
-    /// Review.xaml에 대한 상호 작용 논리
+    /// ManualJobSlot_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Review : UserControl
+    public partial class ManualJobSlot_UI : UserControl
     {
-        public Review()
+        public ManualJobSlot_UI()
         {
             InitializeComponent();
-        }
-
-        private void GoldenImagelist_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-        private void GoldenImagelist_MouseEnter(object sender, MouseEventArgs e)
-        {
-
-        }
-
-        private void GoldenImagelist_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-
         }
     }
 }
