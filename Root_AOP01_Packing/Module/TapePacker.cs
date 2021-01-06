@@ -1,5 +1,4 @@
-﻿using Root_EFEM;
-using Root_EFEM.Module;
+﻿using Root_EFEM.Module;
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
@@ -80,6 +79,31 @@ namespace Root_AOP01_Packing.Module
         }
         #endregion
 
+        #region Process State
+        public enum eProcess
+        {
+            Empty,
+            Case,
+            Opening,
+            Opened,
+            Reticle,
+            Packing,
+            Done
+        }
+        eProcess _eProcess = eProcess.Empty; 
+        public eProcess p_eProcess
+        {
+            get { return _eProcess; }
+            set
+            {
+                if (_eProcess == value) return;
+                _eProcess = value;
+                if (m_reg != null) m_reg.Write("Process", (int)value);
+                OnPropertyChanged(); 
+            }
+        }
+        #endregion
+
         #region InfoWafer
         string m_sInfoWafer = "";
         InfoWafer _infoWafer = null;
@@ -100,6 +124,7 @@ namespace Root_AOP01_Packing.Module
         {
             m_reg = new Registry(p_id + ".InfoWafer");
             m_sInfoWafer = m_reg.Read("sInfoWafer", m_sInfoWafer);
+            p_eProcess = (eProcess)m_reg.Read("Process", (int)p_eProcess); 
             p_infoWafer = m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
         }
         #endregion

@@ -1546,13 +1546,23 @@ namespace Root_WIND2
                             DotLine.Width = i - DotLine.StartPt.X;
                             bStart = false;
                             p_SelectedROI.p_Data.Add(DotLine);
-                            m_Recipe.GetRecipe<MaskRecipe>().MaskList[selectIndex].PointLines.Add(new RecipeType_PointLine(DotLine));
+                            //m_Recipe.GetRecipe<MaskRecipe>().MaskList[selectIndex].PointLines.Add(new RecipeType_PointLine(DotLine));
                             // MaskRecipe의 SelectedROI의 PointLine Type Add
                         }
                     }
                 }
             }
+            SetRecipeData();
         }
+
+        public void SetRecipeData()
+        {
+            for(int i = 0; i < p_cInspROI.Count; i++)
+            {
+                m_Recipe.GetRecipe<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data);
+            }
+        }
+
         private void Worker_SaveROI_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             p_PageEnable = true;

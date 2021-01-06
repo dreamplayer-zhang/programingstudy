@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using RootTools;
+﻿using RootTools;
 using RootTools.Database;
 using RootTools_CLR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class Surface : WorkBase
+    public class BacksideSurface : WorkBase
     {
         Workplace workplace;
 
@@ -22,18 +18,18 @@ namespace RootTools_Vision
 
         private IntPtr inspectionSharedBuffer;
         private byte[] inspectionWorkplaceBuffer;
-        private SurfaceParameter parameter;
-        private SurfaceRecipe recipe;
+        private BacksideSurfaceParameter parameter;
+        private BacksideRecipe recipe;
 
-        public Surface() : base()
+        public BacksideSurface() : base()
         {
             m_sName = this.GetType().Name;
         }
 
         public override void SetRecipe(Recipe _recipe)
         {
-            this.parameter = _recipe.GetRecipe<SurfaceParameter>();
-            this.recipe = _recipe.GetRecipe<SurfaceRecipe>();
+            this.parameter = _recipe.GetRecipe<BacksideSurfaceParameter>();
+            this.recipe = _recipe.GetRecipe<BacksideRecipe>();
         }
 
         public override void DoWork()
@@ -53,6 +49,14 @@ namespace RootTools_Vision
             this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
             this.inspectionWorkplaceBuffer = this.workplace.GetWorkplaceBuffer(this.parameter.IndexChannel);
 
+            bool isBackside = false;
+
+            // BACKSIDE
+            //if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == false)
+            //{
+            //    return;
+            //}
+
             // Inspection Param
             bool isDarkInsp = !parameter.IsBright; // Option
             int nGrayLevel = parameter.Intensity; // Option
@@ -62,6 +66,9 @@ namespace RootTools_Vision
             int chipW = this.workplace.BufferSizeX;
 
             byte[] arrBinImg = new byte[chipW * chipH]; // Threashold 결과 array
+            
+            //Position 안해서...?
+            ExtractCurrentWorkplace();
 
             // Dark
             CLR_IP.Cpp_Threshold(workplace.WorkplaceBufferR_GRAY, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
@@ -148,6 +155,5 @@ namespace RootTools_Vision
                 Marshal.Copy(new IntPtr(this.workplace.SharedBufferR_GRAY.ToInt64() + (cnt * (Int64)memW + Left))
                     , this.workplace.WorkplaceBufferR_GRAY, chipW * (cnt - Top), chipW);
         }
-
     }
 }
