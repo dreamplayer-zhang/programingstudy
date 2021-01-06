@@ -1,5 +1,4 @@
-﻿using RootTools_Vision;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -8,14 +7,12 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class SurfaceParameter : ParameterBase, IMaskInspection, IColorInspection
+    class BacksideSurfaceParameter : ParameterBase, IMaskInspection, IColorInspection, IBacksideInspection
     {
-        public SurfaceParameter() : base(typeof(Surface))
+        public BacksideSurfaceParameter() : base(typeof(BacksideSurface))
         {
 
         }
-
-
         #region [Parameter]
         private int intensity = 0;
         private int size = 0;
@@ -71,10 +68,10 @@ namespace RootTools_Vision
         }
 
         [Browsable(false)]
-        public IMAGE_CHANNEL IndexChannel 
+        public IMAGE_CHANNEL IndexChannel
         {
-            get; 
-            set; 
+            get;
+            set;
         }
         #endregion
 
@@ -94,6 +91,5 @@ namespace RootTools_Vision
             // 현재 타입의 클래스를 생성해서 새로 값(객체)을 할당해주어야합니다.
             return this.MemberwiseClone(); ;
         }
-
     }
 }
