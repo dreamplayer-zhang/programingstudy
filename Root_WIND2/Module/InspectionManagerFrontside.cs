@@ -34,7 +34,7 @@ namespace Root_WIND2
 
         public InspectionManagerFrontside(IntPtr _sharedBuffer, int _width, int _height)
         {
-            this.sharedBuffer = _sharedBuffer;
+            this.sharedBufferR_Gray = _sharedBuffer;
             this.sharedBufferWidth = _width;
             this.sharedBufferHeight = _height;
             sharedBufferByteCnt = 1;
@@ -52,9 +52,8 @@ namespace Root_WIND2
         }
 
         private Recipe recipe;
-        private IntPtr sharedBuffer;
 
-        private IntPtr sharedBufferR;
+        private IntPtr sharedBufferR_Gray;
         private IntPtr sharedBufferG;
         private IntPtr sharedBufferB;
 
@@ -63,11 +62,10 @@ namespace Root_WIND2
         private int sharedBufferByteCnt;
 
         public Recipe Recipe { get => recipe; set => recipe = value; }
-        public IntPtr SharedBufferR { get => sharedBufferR; set => sharedBufferR = value; }
+        public IntPtr SharedBufferR_Gray { get => sharedBufferR_Gray; set => sharedBufferR_Gray = value; }
         public IntPtr SharedBufferG { get => sharedBufferG; set => sharedBufferG = value; }
         public IntPtr SharedBufferB { get => sharedBufferB; set => sharedBufferB = value; }
 
-        public IntPtr SharedBuffer { get => sharedBuffer; set => sharedBuffer = value; }
         public int SharedBufferWidth { get => sharedBufferWidth; set => sharedBufferWidth = value; }
         public int SharedBufferHeight { get => sharedBufferHeight; set => sharedBufferHeight = value; }
         public int SharedBufferByteCnt { get => sharedBufferByteCnt; set => sharedBufferByteCnt = value; }
@@ -104,8 +102,8 @@ namespace Root_WIND2
                 }
 
                 workplaceBundle = WorkplaceBundle.CreateWaferMap(_recipe);
-                workplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
-                workplaceBundle.SetSharedRGBBuffer(this.SharedBufferR, this.SharedBufferG, this.SharedBufferB);
+                workplaceBundle.SetSharedBuffer(this.SharedBufferR_Gray, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
+                workplaceBundle.SetSharedRGBBuffer(this.SharedBufferR_Gray, this.SharedBufferG, this.SharedBufferB);
 
                 workBundle = WorkBundle.CreateWorkBundle(_recipe, workplaceBundle);
 
@@ -166,10 +164,9 @@ namespace Root_WIND2
             base.Start();
         }
 
-        public void SetWorkplaceBuffer(IntPtr inspPtr, IntPtr ptrR, IntPtr ptrG, IntPtr ptrB)
+        public void SetWorkplaceBuffer(IntPtr ptrR, IntPtr ptrG, IntPtr ptrB)
         {
-            this.SharedBuffer = inspPtr;
-            this.SharedBufferR = ptrR;
+            this.SharedBufferR_Gray = ptrR;
             this.SharedBufferG = ptrG;
             this.SharedBufferB = ptrB;
         }
