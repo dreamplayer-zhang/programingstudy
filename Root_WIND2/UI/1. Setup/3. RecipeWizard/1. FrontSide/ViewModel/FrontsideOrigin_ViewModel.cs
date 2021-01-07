@@ -9,7 +9,7 @@ using System.Windows.Media;
 
 namespace Root_WIND2
 {
-    class FrontsideOrigin_ViewModel : ObservableObject
+    class FrontsideOrigin_ViewModel : ObservableObject, IRecipeUILoadable
     {
         ImageData OriginImageData;
         TRect InspAreaBuf;
@@ -286,6 +286,11 @@ namespace Root_WIND2
 
             MasterDieX = m_Recipe.WaferMap.MasterDieX;
             MasterDieY = m_Recipe.WaferMap.MasterDieY;
+        }
+
+        public void Load()
+        {
+            LoadOriginData();
         }
     }
 }

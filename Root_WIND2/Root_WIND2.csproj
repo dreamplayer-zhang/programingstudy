@@ -252,18 +252,19 @@
       <DependentUpon>BacksideInspection.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideInspection_ViewModel.cs" />
-    <Compile Include="UI\SettingDialog\ISettingData.cs" />
-    <Compile Include="UI\SettingDialog\SettingData.cs" />
-    <Compile Include="UI\SettingDialog\SettingData_Setup.cs" />
-    <Compile Include="UI\SettingDialog\SettingData_SetupBackside.cs" />
-    <Compile Include="UI\SettingDialog\SettingData_SetupFrontside.cs" />
-    <Compile Include="UI\SettingDialog\SettingDialog.xaml.cs">
+    <Compile Include="Dialog\SettingDialog\ISettingData.cs" />
+    <Compile Include="Dialog\SettingDialog\SettingData.cs" />
+    <Compile Include="Dialog\SettingDialog\SettingData_Setup.cs" />
+    <Compile Include="Dialog\SettingDialog\SettingData_SetupBackside.cs" />
+    <Compile Include="Dialog\SettingDialog\SettingData_SetupFrontside.cs" />
+    <Compile Include="Dialog\SettingDialog\SettingDialog.xaml.cs">
       <DependentUpon>SettingDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\SettingDialog\SettingDialog_ViewModel.cs" />
+    <Compile Include="Dialog\SettingDialog\SettingDialog_ViewModel.cs" />
     <Compile Include="UI\2. Review\Tuning.xaml.cs">
       <DependentUpon>Tuning.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Interfaces\IRecipeUILoadable.cs" />
     <Compile Include="WIND2EventArgs.cs" />
     <Compile Include="WIND2EventManager.cs" />
     <Compile Include="Module\BackSideVision.cs" />
@@ -606,7 +607,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\SettingDialog\SettingDialog.xaml">
+    <Page Include="Dialog\SettingDialog\SettingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

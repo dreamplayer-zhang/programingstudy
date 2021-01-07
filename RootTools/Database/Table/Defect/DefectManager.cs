@@ -15,10 +15,9 @@ namespace RootTools.Database
         /// <summary>
         /// DEFECT 관련 처리.
         /// </summary>
-
-
         public DefectManager()
         {         
+
         }
 
         public static void AddDefect(int _nThreadID, Defect _DefectData)
