@@ -2,12 +2,17 @@
 using RootTools.Memory;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Threading;
 
 namespace RootTools.Camera.Matrox
@@ -23,6 +28,7 @@ namespace RootTools.Camera.Matrox
         private MIL_ID m_MilSystem;                          // 프레임그래버
         private MIL_ID m_MilDigitizer;                       // 카메라
         private MIL_ID m_MilDisplay;                         // 디스플레이
+        private MIL_ID m_MilImage = MIL.M_NULL;              // MIL Image buffer identifier.
         private MIL_ID[] m_MilBuffers = new MIL_ID[c_nBuf];  // 버퍼
         
         int m_nWidth = 0;
@@ -131,6 +137,7 @@ namespace RootTools.Camera.Matrox
                 _nBuf = (value > c_nBuf) ? c_nBuf : value;
             }
         }
+        //int m_nGrabTrigger = 0;
 
         public CPoint p_sz
         {
@@ -196,6 +203,7 @@ namespace RootTools.Camera.Matrox
         }
         #endregion
 
+        // 생성자
         public Camera_Matrox(string id, Log log)
         {
             p_id = id;
@@ -203,6 +211,7 @@ namespace RootTools.Camera.Matrox
             p_treeRoot = new TreeRoot(id, m_log);
             bgw_Connect.DoWork += bgw_Connect_Dowork;
             bgw_Connect.RunWorkerCompleted += bgw_Connect_RunWorkerCompleted;
+            //m_ImageLive = new ImageData(1920, 1080, 1);
             m_ImageLive = new ImageData(6560, 1080, 1);
             p_ImageViewer = new ImageViewer_ViewModel(m_ImageLive, null, _dispatcher);
             p_CamInfo = new MatroxCamInfo(m_log);
@@ -251,6 +260,7 @@ namespace RootTools.Camera.Matrox
                     if (m_MilDigitizer == MIL.M_NULL)
                     {
                         MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_DEFAULT, ref m_MilDigitizer);
+                        //MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_EMULATED, ref m_MilDigitizer);
 
                         p_nImgBand = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_BAND, MIL.M_NULL);
                         p_nWidth = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_X, MIL.M_NULL);
@@ -261,7 +271,10 @@ namespace RootTools.Camera.Matrox
                     }
                 }
             }
+            MIL.MbufAllocColor(m_MilSystem, p_nImgBand, p_nWidth, p_nHeight, 8 + MIL.M_UNSIGNED, lImgAttributes, ref m_MilImage);
+            MIL.MbufClear(m_MilImage, 0);
 
+            //MIL.MappControl(MIL.M_DEFAULT, MIL.M_ERROR, MIL.M_PRINT_DISABLE);
             // Allocate the grab buffers and clear them.
             for (int i = 0; i < p_nBuf; i++)
             {
@@ -281,11 +294,15 @@ namespace RootTools.Camera.Matrox
                 MIL.MbufFree(m_MilBuffers[p_nBuf]);
             }
 
+            //m_ImageLive.ReAllocate(new CPoint(p_nWidth, p_nHeight), 1);
             return;
         }
 
         void DisconnectCamera()
         {
+            // variable
+
+            // implement
             for (int i = 0; i<p_nBuf; i++)
             {
                 if (m_MilBuffers[i] != MIL.M_NULL)

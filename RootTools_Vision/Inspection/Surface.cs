@@ -20,7 +20,8 @@ namespace RootTools_Vision
 
         public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
-
+        private IntPtr inspectionSharedBuffer;
+        private byte[] inspectionWorkplaceBuffer;
         private SurfaceParameter parameter;
         private SurfaceRecipe recipe;
 
@@ -49,13 +50,8 @@ namespace RootTools_Vision
             if (this.workplace.Index == 0)
                 return;
 
-            bool isBackside = false;
-
-            // BACKSIDE
-            //if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == false)
-            //{
-            //    return;
-            //}
+            this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
+            this.inspectionWorkplaceBuffer = this.workplace.GetWorkplaceBuffer(this.parameter.IndexChannel);
 
             // Inspection Param
             bool isDarkInsp = !parameter.IsBright; // Option
@@ -67,12 +63,8 @@ namespace RootTools_Vision
 
             byte[] arrBinImg = new byte[chipW * chipH]; // Threashold 결과 array
 
-            // Backside Test 할 때만 추가
-            if(isBackside)
-                ExtractCurrentWorkplace();
-
             // Dark
-            CLR_IP.Cpp_Threshold(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
+            CLR_IP.Cpp_Threshold(workplace.WorkplaceBufferR_GRAY, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
 
             // Filter
             switch (parameter.DiffFilter)
@@ -95,7 +87,7 @@ namespace RootTools_Vision
 
             // Labeling
             //var Label = CLR_IP.Cpp_Labeling(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp);
-            var Label = CLR_IP.Cpp_Labeling_SubPix(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel, 3);
+            var Label = CLR_IP.Cpp_Labeling_SubPix(workplace.WorkplaceBufferR_GRAY, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel, 3);
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
@@ -153,8 +145,8 @@ namespace RootTools_Vision
             int memW = this.workplace.SharedBufferWidth;
 
             for (int cnt = Top; cnt < Bottom; cnt++)
-                Marshal.Copy(new IntPtr(this.workplace.SharedBuffer.ToInt64() + (cnt * (Int64)memW + Left))
-                    , this.workplace.WorkplaceBuffer, chipW * (cnt - Top), chipW);
+                Marshal.Copy(new IntPtr(this.workplace.SharedBufferR_GRAY.ToInt64() + (cnt * (Int64)memW + Left))
+                    , this.workplace.WorkplaceBufferR_GRAY, chipW * (cnt - Top), chipW);
         }
 
     }

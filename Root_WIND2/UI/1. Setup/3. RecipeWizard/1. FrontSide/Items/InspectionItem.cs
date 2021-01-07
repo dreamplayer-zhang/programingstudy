@@ -20,6 +20,17 @@ namespace Root_WIND2
         public event ComboboxItemChanged ComboBoxItemChanged_Method;
         public event ButtonClicked ButtonClicked_Delete;
 
+        public InspectionItem()
+        {
+            if(this.m_cInspROI != null) this.m_InspROI = this.m_cInspROI[0];
+            
+            m_cInspMethod = new ObservableCollection<ParameterBase>();
+            p_cInspMethod = ParameterBase.GetChildClass();
+
+            this.p_InspMethod = this.m_cInspMethod[1]; // Position
+            this.p_InspChannel = IMAGE_CHANNEL.R_GRAY;
+        }
+
         public int p_Index
         {
             get
@@ -34,6 +45,7 @@ namespace Root_WIND2
         }
         private int m_Index = 0;
 
+        private ObservableCollection<InspectionROI> m_cInspROI;
         public ObservableCollection<InspectionROI> p_cInspROI
         {
             get
@@ -45,8 +57,9 @@ namespace Root_WIND2
                 SetProperty(ref m_cInspROI, value);
             }
         }
-        private ObservableCollection<InspectionROI> m_cInspROI;
 
+
+        private InspectionROI m_InspROI;
         public InspectionROI p_InspROI
         {
             get
@@ -58,7 +71,21 @@ namespace Root_WIND2
                 SetProperty(ref m_InspROI, value);
             }
         }
-        private InspectionROI m_InspROI;
+
+
+
+
+
+        private IMAGE_CHANNEL m_inspChannel;
+        public IMAGE_CHANNEL p_InspChannel
+        {
+            get => this.m_inspChannel;
+            set
+            {
+                SetProperty(ref this.m_inspChannel, value);
+            }
+        }
+
 
         public ObservableCollection<ParameterBase> p_cInspMethod
         {

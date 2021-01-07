@@ -1,13 +1,14 @@
 ﻿using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class PositionParameter : ParameterBase
+    public class PositionParameter : ParameterBase, IMaskInspection, IColorInspection
     {
         public PositionParameter() : base(typeof(Position))
         {
@@ -45,6 +46,20 @@ namespace RootTools_Vision
             {
                 SetProperty<int>(ref minScoreLimit, value);
             }
+        }
+
+        [Browsable(false)]
+        public IMAGE_CHANNEL IndexChannel
+        {
+            get;
+            set;
+        }
+
+        [Browsable(false)]
+        public int MaskIndex 
+        {
+            get; 
+            set; 
         }
         #endregion
 

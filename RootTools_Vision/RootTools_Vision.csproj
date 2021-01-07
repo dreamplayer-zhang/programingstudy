@@ -99,12 +99,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Inspection\BacksideSurface.cs" />
     <Compile Include="Inspection\D2D.cs" />
     <Compile Include="Inspection\EdgeSurface.cs" />
     <Compile Include="Inspection\ProcessDefect_Wafer.cs" />
-    <Compile Include="Recipe\IRecipe.cs" />
+    <Compile Include="Recipe\Interfaces\IRecipe.cs" />
+    <Compile Include="Recipe\Parameter\BacksideSurfaceParameter.cs" />
     <Compile Include="Recipe\Parameter\D2DParameter.cs" />
-    <Compile Include="Recipe\Parameter\IMaskInspection.cs" />
+    <Compile Include="Recipe\Interfaces\IBacksideInspection.cs" />
+    <Compile Include="Recipe\Interfaces\IColorInspection.cs" />
+    <Compile Include="Recipe\Interfaces\IDisplaySpecSummary.cs" />
+    <Compile Include="Recipe\Interfaces\IFrontsideInspection.cs" />
+    <Compile Include="Recipe\Interfaces\IMaskInspection.cs" />
     <Compile Include="Recipe\Parameter\ParameterBase.cs" />
     <Compile Include="Recipe\Parameter\PositionParameter.cs" />
     <Compile Include="Recipe\Parameter\SurfaceParameter.cs" />
@@ -123,6 +129,7 @@
       <DependentUpon>BasicTreeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\BasicTreeView_ViewModel.cs" />
+    <Compile Include="Utility\Enums.cs" />
     <Compile Include="Utility\KlarfData.cs" />
     <Compile Include="Utility\KlarfData_Lot.cs" />
     <Compile Include="WorkManager\WorkEventManager.cs" />

@@ -24,5 +24,20 @@ namespace Root_WIND2
         {
             InitializeComponent();
         }
+
+        private void GoldenImagelist_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void GoldenImagelist_MouseEnter(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void GoldenImagelist_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
     }
 }

@@ -417,7 +417,11 @@
     <Compile Include="UI\1. Setup\4. Maintenance\ViewerTest_ViewModel.cs" />
     <Compile Include="WIND2_Engineer.cs" />
     <Compile Include="WIND2_Handler.cs" />
+    <Compile Include="WIND2_Process.cs" />
     <Compile Include="WIND2_Recipe.cs" />
+    <Compile Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml.cs">
+      <DependentUpon>WIND2_Recipe_UI.xaml</DependentUpon>
+    </Compile>
     <Page Include="Controls\UserControl\ColorPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -606,6 +610,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -688,6 +696,12 @@
       <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
       <Name>Root_EFEM</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\bevelmap.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\bevelmap2.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
