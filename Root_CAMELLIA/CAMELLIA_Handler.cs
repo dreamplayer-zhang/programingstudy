@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Root_CAMELLIA.ManualJob;
 
 namespace Root_CAMELLIA
 {
@@ -339,7 +340,7 @@ namespace Root_CAMELLIA
             m_thread = new Thread(new ThreadStart(RunThread));
             m_thread.Start();
         }
-
+        
         void RunThread()
         {
             m_bThread = true;
@@ -355,7 +356,7 @@ namespace Root_CAMELLIA
                     case EQ.eState.Run:
                         if (m_moduleList.m_qModuleRun.Count == 0)
                         {
-                            //CheckLoad();
+                            CheckLoad();
                             m_process.p_sInfo = m_process.RunNextSequence();
                             //CheckUnload();
                             if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
@@ -373,30 +374,51 @@ namespace Root_CAMELLIA
 
         void CheckLoad()
         {
-            EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
-            string sLoadport = sequence.m_infoWafer.m_sModule;
-            foreach(ILoadport loadport in m_aLoadport)
-            {
-                if (loadport.p_id == sLoadport) loadport.RunDocking();
-            }
+            //EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
+            //string sLoadport = sequence.m_infoWafer.m_sModule;
+            //foreach(ILoadport loadport in m_aLoadport)
+            //{
+            //    if (loadport.p_id == sLoadport) loadport.RunDocking();
+            //}
+
+
+            //InfoCarrier infoCarrier = m_aLoadport[0].p_infoCarrier;
+            //List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
+            //string sMap = "1100110011111100000011010";
+            //foreach (char ch in sMap)
+            //{
+            //    switch (ch)
+            //    {
+            //        case '0': aSlot.Add(GemSlotBase.eState.Empty); break;
+            //        case '1': aSlot.Add(GemSlotBase.eState.Exist); break;
+            //        case 'D': aSlot.Add(GemSlotBase.eState.Double); break;
+            //        case 'C': aSlot.Add(GemSlotBase.eState.Cross); break;
+            //        default:
+            //            aSlot.Add(GemSlotBase.eState.Undefined);
+            //            break;
+            //    }
+            //}
+            //infoCarrier.SetMapData(aSlot);
+            //ManualJobSchedule jobSchedule = new ManualJobSchedule(infoCarrier);
+            //jobSchedule.ShowPopup();
         }
 
         void CheckUnload()
         {
-            EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();
-            foreach(ILoadport loadport in m_aLoadport)
-            {
-                if(loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
-                {
-                    string sLoadport = loadport.p_id;
-                    bool bUndock = true;
-                    foreach(EFEM_Process.Sequence sequence in aSequence)
-                    {
-                        if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
-                    }
-                    if (bUndock) loadport.RunUndocking();
-                }
-            }
+            //EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();
+            //foreach(ILoadport loadport in m_aLoadport)
+            //{
+            //    if(loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+            //    {
+            //        string sLoadport = loadport.p_id;
+            //        bool bUndock = true;
+            //        foreach(EFEM_Process.Sequence sequence in aSequence)
+            //        {
+            //            if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
+            //        }
+            //        if (bUndock) loadport.RunUndocking();
+            //    }
+            //}
         }
         #endregion
 

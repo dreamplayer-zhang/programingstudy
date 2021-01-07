@@ -18,6 +18,8 @@ namespace RootTools.Gem
             Exist,
             Double,
             Cross,
+            Select,
+            Run,
         }
         eState _eState = eState.Empty;
         public eState p_eState
