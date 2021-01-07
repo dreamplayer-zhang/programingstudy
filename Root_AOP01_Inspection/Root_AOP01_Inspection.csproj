@@ -197,6 +197,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UI\3. RUN\Dlg_Start.xaml.cs">
+      <DependentUpon>Dlg_Start.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\AOP01.cs" />
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Module\MainVision.cs" />
@@ -272,6 +275,10 @@
     <Compile Include="UI\1. SETUP\Setup_Panel.xaml.cs">
       <DependentUpon>Setup_Panel.xaml</DependentUpon>
     </Compile>
+    <Page Include="UI\3. RUN\Dlg_Start.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Engineer\AOP01_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

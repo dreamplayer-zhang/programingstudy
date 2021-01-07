@@ -22,7 +22,7 @@ using System.IO;
 
 namespace Root_WIND2
 {
-    class FronsideInspection_ViewModel : ObservableObject
+    class FronsideInspection_ViewModel : ObservableObject, IRecipeUILoadable
     {
         Setup_ViewModel m_Setup;
         Recipe m_Recipe;
@@ -448,6 +448,11 @@ namespace Root_WIND2
                 p_MapControl_VM.SetMap(mapdata.Data, new CPoint(nMapX, nMapY));
                 p_MapControl_VM.CreateMapUI();
             }
+        }
+
+        public void Load()
+        {
+            LoadInspTestData();
         }
     }
 }

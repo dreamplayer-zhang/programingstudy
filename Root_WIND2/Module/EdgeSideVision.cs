@@ -439,6 +439,7 @@ namespace Root_WIND2.Module
 		{
 			AddModuleRunList(new Run_GrabEdge(this), true, "Run Grab Edge");
 			AddModuleRunList(new Run_GrabEBR(this), true, "Run Grab EBR");
+			AddModuleRunList(new Run_InspectEdge(this), true, "Run Inspect Edge");
 		}
 
 		public ImageData GetMemoryData(EDGE_TYPE data)

@@ -155,10 +155,10 @@ namespace Root_WIND2
             // Edge
             if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
             {
-                this.InspectionEdge = new InspectionManagerEdge(ImageEdge.GetPtr(), ImageEdge.p_Size.X, ImageEdge.p_Size.Y, 3);
+                this.InspectionEdge = new InspectionManagerEdge(imageEdge.GetPtr(), imageEdge.p_Size.X, imageEdge.p_Size.Y, 3);
 
-                this.Engineer.InspectionEFEM = this.InspectionEdge;
-                this.Engineer.InspectionEFEM.Recipe = this.recipe;
+                this.Engineer.InspectionEdge = this.InspectionEdge;
+                this.Engineer.InspectionEdge.Recipe = this.recipe;
             }
 
             return true;
