@@ -84,17 +84,25 @@ namespace Root_AOP01_Packing.Module
         public string RunDoor(ePos ePos)
         {
             m_axis.StartMove(ePos);
-            return m_axis.WaitReady();  
+            string sRun = m_axis.WaitReady();
+            if (sRun != "OK") return sRun;
+            Thread.Sleep(100); 
+            switch (ePos)
+            {
+                case ePos.Close: if (p_eDoor != eDoor.Close) return "Door Close Sensor Error"; break;
+                case ePos.Open: if (p_eDoor != eDoor.Open) return "Door Open Sensor Error"; break;
+            }
+            return "OK"; 
         }
         #endregion
 
         #region Thread Check
         bool m_bThreadCheck = false;
-        Thread m_thread;
-        void Initthread()
+        Thread m_threadCheck;
+        void InitThread()
         {
-            m_thread = new Thread(new ThreadStart(RunThreadCheck));
-            m_thread.Start(); 
+            m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
+            m_threadCheck.Start(); 
         }
 
         void RunThreadCheck()
@@ -186,7 +194,7 @@ namespace Root_AOP01_Packing.Module
 
         public string BeforePut(int nID)
         {
-            return CheckGetPut();
+            return RunDoor(ePos.Open); 
         }
 
         public string AfterGet(int nID)
@@ -196,7 +204,7 @@ namespace Root_AOP01_Packing.Module
 
         public string AfterPut(int nID)
         {
-            return "OK";
+            return RunDoor(ePos.Close); 
         }
 
         string CheckGetPut()
@@ -253,18 +261,25 @@ namespace Root_AOP01_Packing.Module
         {
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             base.InitBase(id, engineer);
+            InitThread();
         }
 
         public override void ThreadStop()
         {
+            if (m_bThreadCheck)
+            {
+                m_bThreadCheck = false;
+                m_threadCheck.Join(); 
+            }
             base.ThreadStop();
         }
 
         #region ModuleRun
+        ModuleRunBase m_runDoor; 
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
-            AddModuleRunList(new Run_Door(this), true, "Door Open Close");
+            m_runDoor = AddModuleRunList(new Run_Door(this), true, "Door Open Close");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -305,22 +320,22 @@ namespace Root_AOP01_Packing.Module
                 InitModuleRun(module);
             }
 
-            bool m_bOpen = false; 
+            public ePos m_ePos = ePos.Close; 
             public override ModuleRunBase Clone()
             {
                 Run_Door run = new Run_Door(m_module);
-                run.m_bOpen = m_bOpen;
+                run.m_ePos = m_ePos;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_bOpen = tree.Set(m_bOpen, m_bOpen, "Open", "Door Open", bVisible);
+                m_ePos = (ePos)tree.Set(m_ePos, m_ePos, "Door", "Door Open", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunDoor(m_bOpen ? ePos.Open : ePos.Close); 
+                return m_module.RunDoor(m_ePos); 
             }
         }
         #endregion
