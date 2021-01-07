@@ -545,6 +545,7 @@ namespace RootTools.Camera.BaslerPylon
         private Stopwatch stopWatch = new Stopwatch();
         private bool m_bLive = true;
         private CRect m_LastROI = new CRect(0, 0, 0, 0);
+        public static int s_nCount = 0;
         private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
         {
             try
@@ -591,6 +592,7 @@ namespace RootTools.Camera.BaslerPylon
                         }
                         else
                         {
+                            s_nCount++;
                             int nFrameOffsetCntY = m_cpScanOffset.Y + m_nFrameCnt;
                             if (m_nFrameCnt < m_nFrameTotal)
                             {
@@ -683,7 +685,7 @@ namespace RootTools.Camera.BaslerPylon
         {
             try
             {
-                if (m_cam.IsOpen)
+                if (m_cam != null && m_cam.IsOpen)
                 {
                     m_cpScanOffset = cpScanOffset;
                     m_nFrameCnt = 0;
