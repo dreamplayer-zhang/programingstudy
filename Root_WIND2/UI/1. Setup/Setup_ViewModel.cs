@@ -333,7 +333,7 @@ namespace Root_WIND2
         internal RecipeWizard_ViewModel Wizard { get => wizardVM; set => wizardVM = value; }
         public Recipe Recipe { get => recipe; set => recipe = value; }
         public InspectionManagerFrontside InspectionVision { get => inspectionMgrVision; set => inspectionMgrVision = value; }
-        public InspectionManagerEdge InspectionManagerEFEM { get => inspectionMgrEdge; set => inspectionMgrEdge = value; }
+        public InspectionManagerEdge InspectionManagerEdge { get => inspectionMgrEdge; set => inspectionMgrEdge = value; }
 
         #endregion
 

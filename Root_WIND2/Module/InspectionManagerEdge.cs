@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using RootTools.Database;
 using RootTools.OHT;
 using RootTools_Vision;
-using RootTools_Vision.Inspection;
 
 namespace Root_WIND2
 {
