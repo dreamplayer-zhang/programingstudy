@@ -264,6 +264,7 @@ namespace Root_AOP01_Packing.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
+            AddModuleRunList(new Run_Door(this), true, "Door Open Close");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -292,6 +293,34 @@ namespace Root_AOP01_Packing.Module
             {
                 Thread.Sleep((int)(1000 * m_secDelay));
                 return "OK";
+            }
+        }
+
+        public class Run_Door : ModuleRunBase
+        {
+            Unloadport_AOP m_module;
+            public Run_Door(Unloadport_AOP module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            bool m_bOpen = false; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Door run = new Run_Door(m_module);
+                run.m_bOpen = m_bOpen;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bOpen = tree.Set(m_bOpen, m_bOpen, "Open", "Door Open", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.RunDoor(m_bOpen ? ePos.Open : ePos.Close); 
             }
         }
         #endregion
