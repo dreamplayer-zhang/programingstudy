@@ -274,6 +274,18 @@ void IP::Labeling_SubPix(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOut
     }
 }
 
+void IP::Masking(BYTE* pSrc, BYTE* pDst, std::vector<Point> vtStartPoint, std::vector<int> vtLength, int nW, int nH)
+{
+    Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+    Mat imgMask = Mat::zeros(nH, nW, CV_8UC1);
+
+    for (int i = 0; i < vtLength.size(); i++)
+        cv::line(imgMask, vtStartPoint[i], Point(vtStartPoint[i].x + vtLength[i], vtStartPoint[i].y), Scalar(255), 1);
+
+    cv::bitwise_and(imgSrc, imgMask, imgDst);
+}
+
 // Position
 float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nMemW, int nMemH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt)
 {

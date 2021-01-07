@@ -5,144 +5,311 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
              mc:Ignorable="d" 
-             d:DesignHeight="1000" d:DesignWidth="1000" Background="{StaticResource PanelBackGround}">
-    <GroupBox Grid.Row="1" Header="Defect View">
+             d:DesignHeight="575" d:DesignWidth="621" Background="{StaticResource PanelBackGround}"
+             Height="575">
+    <GroupBox Grid.Row="1" Header="Defect Map">
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="15*"/>
-                <RowDefinition Height="85*"/>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <Button Content=" " Click="Button_Click"/>
-                <StackPanel VerticalAlignment="Top" 
-                            HorizontalAlignment="Left"
-                            Margin="10,10">
-                    <Grid Margin="0,0,0,5" x:Name="FrontOption">
-                        <CheckBox IsChecked="False" Content="Front" FontSize="15" 
-                                  FontWeight="Bold" x:Name="cb_Front" Checked="DefectCheckBox_Checked" Unchecked="DefectCheckBox_Checked"/>
-                        <Grid Width="12" Height="12" Background="Red" Margin="70,0,0,0" HorizontalAlignment="Left"/>
-                        <Grid Margin="100,0,0,0" Width="120" VerticalAlignment="Center">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="0" x:Name="tb_FrontCnt"/>
-                            <TextBlock Text="EA" Grid.Column="1"/>
-                        </Grid>
+            <StackPanel VerticalAlignment="Bottom"
+                        HorizontalAlignment="Left">
+                <Grid Margin="0,0,0,5"
+                      x:Name="FrontOption">
+                    <CheckBox IsChecked="False"
+                              Content="Front"
+                              FontSize="10"
+                              FontWeight="Bold"
+                              x:Name="cb_Front"
+                              Checked="DefectCheckBox_Checked"
+                              Unchecked="DefectCheckBox_Checked" />
+                    <Grid Width="12"
+                          Height="12"
+                          Background="Red"
+                          Margin="60,0,0,0"
+                          HorizontalAlignment="Left" />
+                    <Grid Margin="80,0,0,0"
+                          Width="120"
+                          VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="0"
+                                   x:Name="tb_FrontCnt" />
+                        <TextBlock Text="EA"
+                                   Grid.Column="1" />
                     </Grid>
-                    <Grid Margin="0,0,0,5" x:Name="BackOption">
-                        <CheckBox Content="Back" FontSize="15" FontWeight="Bold" x:Name="cb_Back"
-                                   Checked="DefectCheckBox_Checked" Unchecked="DefectCheckBox_Checked"/>
-                        <Grid Width="12" Height="12" Background="Blue" Margin="70,0,0,0" HorizontalAlignment="Left"/>
-                        <Grid Margin="100,0,0,0" Width="120" VerticalAlignment="Center">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="0" x:Name="tb_BackCnt"/>
-                            <TextBlock Text="EA" Grid.Column="1"/>
-                        </Grid>
-                    </Grid>
-                    <Grid Margin="0,0,0,5" x:Name="EdgeOption">
-                        <CheckBox Content="Edge" FontSize="15" FontWeight="Bold" x:Name="cb_Edge"
-                                   Checked="DefectCheckBox_Checked" Unchecked="DefectCheckBox_Checked"/>
-                        <Grid Width="12" Height="12" Background="Green" Margin="70,0,0,0" HorizontalAlignment="Left"/>
-                        <Grid Margin="100,0,0,0" Width="120" VerticalAlignment="Center">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="0" x:Name="tb_EdgeCnt"/>
-                            <TextBlock Text="EA" Grid.Column="1"/>
-                        </Grid>
-                    </Grid>
-                    <Grid Margin="0,0,0,5" x:Name="EBROption">
-                        <CheckBox Content="EBR" FontSize="15" FontWeight="Bold" x:Name="cb_EBR"
-                                   Checked="DefectCheckBox_Checked" Unchecked="DefectCheckBox_Checked"/>
-                        <Grid Width="12" Height="12" Background="DimGray" Margin="70,0,0,0" HorizontalAlignment="Left"/>
-                    </Grid>
-                </StackPanel>
-                <Grid VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Text="Wafer ID" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="0" Margin="0,5,0,5"  VerticalAlignment="Center"/>
-                    <TextBlock Text="Recipe"   FontSize="15" FontWeight="Bold"  Grid.Row="1" Grid.Column="0" Margin="0,5,0,5" VerticalAlignment="Center"/>
-                    <TextBlock Text="Total Defect"   FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="0" Margin="0,5,0,5"  VerticalAlignment="Center"/>
-                    <TextBlock Text="   :    " FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
-                    <TextBlock Text="   :    " FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
-                    <TextBlock Text="   :    " FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
-                    <TextBlock Text="DummyWafer001" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"
-                               x:Name="tbWaferID"/>
-                    <TextBlock Text="test200804.rcp"    FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"
-                               x:Name="tbRcpName"/>
-                    <TextBlock Text="68423 (EA)"    FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"
-                               x:Name="tbTotalCnt"/>
                 </Grid>
-            </Grid>
-
-
-            <Grid Grid.Row="1" Margin="50">
-                <Viewbox>
-                    <Ellipse x:Name="Wafer"
-                                     VerticalAlignment="Stretch"
-                                     HorizontalAlignment="Stretch"
-                                     Width="1000" Height="1000"
-                                    Visibility="Collapsed"
-                                     Fill="Gainsboro"/>
-                </Viewbox>
-                <Viewbox VerticalAlignment="Stretch"
-                                 HorizontalAlignment="Stretch">
-                    <Canvas x:Name="FrontsideCanvas" Width="1000" Height="1000" 
-                                 SnapsToDevicePixels="True"
-                                 Margin="30"
-                                 VerticalAlignment="Center"
-                                 HorizontalAlignment="Center">
-                    </Canvas>
-                </Viewbox>
-                <Viewbox VerticalAlignment="Stretch"
-                                 HorizontalAlignment="Stretch"
-                                 Margin="5">
-                    <Canvas x:Name="BacksideCanvas" Width="1000" Height="1000" 
-                                 SnapsToDevicePixels="True"
-                                 Margin="0"
-                                 VerticalAlignment="Center"
-                                 HorizontalAlignment="Center">
-                    </Canvas>
-                </Viewbox>
-                <Viewbox VerticalAlignment="Stretch"
-                                 HorizontalAlignment="Stretch"
-                                 Margin="10">
-                    <Grid Width="1000" Height="1000" x:Name="gridEdge">
+                <Grid Margin="0,0,0,5"
+                      x:Name="BackOption">
+                    <CheckBox Content="Back"
+                              FontSize="10"
+                              FontWeight="Bold"
+                              x:Name="cb_Back"
+                              Checked="DefectCheckBox_Checked"
+                              Unchecked="DefectCheckBox_Checked" />
+                    <Grid Width="12"
+                          Height="12"
+                          Background="Blue"
+                          Margin="60,0,0,0"
+                          HorizontalAlignment="Left" />
+                    <Grid Margin="80,0,0,0"
+                          Width="120"
+                          VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="0"
+                                   x:Name="tb_BackCnt" />
+                        <TextBlock Text="EA"
+                                   Grid.Column="1" />
                     </Grid>
-                </Viewbox>
-                <Viewbox VerticalAlignment="Stretch"
+                </Grid>
+                <Grid Margin="0,0,0,5"
+                      x:Name="EdgeOption">
+                    <CheckBox Content="Edge"
+                              FontSize="10"
+                              FontWeight="Bold"
+                              x:Name="cb_Edge"
+                              Checked="DefectCheckBox_Checked"
+                              Unchecked="DefectCheckBox_Checked" />
+                    <Grid Width="12"
+                          Height="12"
+                          Background="Green"
+                          Margin="60,0,0,0"
+                          HorizontalAlignment="Left" />
+                    <Grid Margin="80,0,0,0"
+                          Width="120"
+                          VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="0"
+                                   x:Name="tb_EdgeCnt" />
+                        <TextBlock Text="EA"
+                                   Grid.Column="1" />
+                    </Grid>
+                </Grid>
+                <Grid Margin="0,0,0,5"
+                      x:Name="EBROption">
+                    <CheckBox Content="EBR"
+                              FontSize="10"
+                              FontWeight="Bold"
+                              x:Name="cb_EBR"
+                              Checked="DefectCheckBox_Checked"
+                              Unchecked="DefectCheckBox_Checked" />
+                    <Grid Width="12"
+                          Height="12"
+                          Background="DimGray"
+                          Margin="60,0,0,0"
+                          HorizontalAlignment="Left" />
+                </Grid>
+            </StackPanel>
+            <Grid VerticalAlignment="Top"
+                  HorizontalAlignment="Right"
+                  Margin="5,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Wafer ID"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Grid.Row="0"
+                           Grid.Column="0"
+                           Margin="0,5,0,5"
+                           VerticalAlignment="Center" />
+                <TextBlock Text="Recipe"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Grid.Row="1"
+                           Grid.Column="0"
+                           Margin="0,5,0,5"
+                           VerticalAlignment="Center" />
+                <TextBlock Text="Total Defect"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Grid.Row="2"
+                           Grid.Column="0"
+                           Margin="0,5,0,5"
+                           VerticalAlignment="Center" />
+                <TextBlock Text="   :    "
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Grid.Row="0"
+                           Grid.Column="1"
+                           Margin="0,5,0,5"
+                           VerticalAlignment="Center" />
+                <TextBlock Text="   :    "
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Grid.Row="1"
+                           Grid.Column="1"
+                           Margin="0,5,0,5"
+                           VerticalAlignment="Center" />
+                <TextBlock Text="   :    "
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Grid.Row="2"
+                           Grid.Column="1"
+                           Margin="0,5,0,5"
+                           VerticalAlignment="Center" />
+                <TextBlock Text="DummyWafer001"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Grid.Row="0"
+                           Grid.Column="2"
+                           Margin="0,5,0,5"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"
+                           x:Name="tbWaferID" />
+                <TextBlock Text="test200804.rcp"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Grid.Row="1"
+                           Grid.Column="2"
+                           Margin="0,5,0,5"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"
+                           x:Name="tbRcpName" />
+                <TextBlock Text="68423 (EA)"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Grid.Row="2"
+                           Grid.Column="2"
+                           Margin="0,5,0,5"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"
+                           x:Name="tbTotalCnt" />
+            </Grid>
+            <Viewbox Grid.Row="1"
+                     Width="480" Height="480">
+                <Grid Grid.Row="1">
+                    <Viewbox>
+                        <Ellipse x:Name="Wafer"
+                                 VerticalAlignment="Stretch"
                                  HorizontalAlignment="Stretch"
-                                 Margin="15">
-                    <Grid Width="1000" Height="1000" x:Name="gridEBR">
-                        <!--<Rectangle Width="5" Height="5" 
-                                   Fill="DimGray" Stroke="Black" StrokeThickness="0.5"
-                                   VerticalAlignment="Bottom" RenderTransformOrigin="0.5,-50">
+                                 Width="1000"
+                                 Height="1000"
+                                 Opacity="0.5"
+                                 Visibility="Visible"
+                                 Fill="Gainsboro" />
+                    </Viewbox>
+                    <Viewbox Margin="50">
+                        <Canvas x:Name="MapCanvas"
+                                Width="1000"
+                                Height="1000"
+                                SnapsToDevicePixels="True"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center" />
+                    </Viewbox>
+                    <Viewbox>
+                        <Canvas x:Name="FrontsideCanvas"
+                                Width="1000"
+                                Height="1000"
+                                SnapsToDevicePixels="True"
+                                Margin="30"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+                        </Canvas>
+                    </Viewbox>
+                    <Viewbox>
+                        <Canvas x:Name="BacksideCanvas"
+                                Width="1000"
+                                Height="1000"
+                                SnapsToDevicePixels="True"
+                                Margin="0"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+                        </Canvas>
+                    </Viewbox>
+                    <Viewbox>
+                        <Grid>
+                            <Grid Width="1000"
+                                  Height="1000"
+                                  x:Name="gridEdge" />
+                        </Grid>
+                    </Viewbox>
+                    <Viewbox>
+                        <Grid Width="1000"
+                              Height="1000"
+                              x:Name="gridEBR">
+                            <!--<Ellipse x:Name="test"
+                                 VerticalAlignment="Stretch"
+                                 HorizontalAlignment="Stretch"
+                                 Width="1000"
+                                 Height="1000"
+                                 Visibility="Visible"
+                                 Fill="Beige" />-->
+                        <!--<Rectangle Width="5"
+                                   Height="5"
+                                   Fill="Green"
+                                   Panel.ZIndex="1111"
+                                   RenderTransformOrigin="0.5,0.5" />-->
+                        <!--<Rectangle Width="6"
+                                   Height="6"
+                                   Fill="Red"
+                                   Stroke="Black"
+                                   VerticalAlignment="Bottom"
+                                   StrokeThickness="0.5"
+                                   RenderTransformOrigin="0.5,-82.333">
                             <Rectangle.RenderTransform>
                                 <TransformGroup>
-                                    <ScaleTransform/>
-                                    <SkewTransform/>
-                                    <RotateTransform Angle="0"/>
-                                    <TranslateTransform/>
+                                    <ScaleTransform />
+                                    <SkewTransform />
+                                    <RotateTransform Angle="0" />
+                                    <TranslateTransform />
                                 </TransformGroup>
                             </Rectangle.RenderTransform>
                         </Rectangle>-->
-                    </Grid>
-                </Viewbox>
+                        </Grid>
+                    </Viewbox>
+                    <Ellipse Width="600"
+                             Height="600"
+                             Stroke="Red"
+                             StrokeThickness="1" />
+                    <Ellipse Width="1300"
+                             Height="1300"
+                             Stroke="Red"
+                             StrokeThickness="1" />
+                    <Ellipse Width="1400"
+                             Height="1400"
+                             Stroke="Red"
+                             StrokeThickness="1" />
+                    <Line X2="1"
+                          Margin="0"
+                          Stretch="Fill"
+                          VerticalAlignment="Center"
+                          Stroke="Blue"
+                          StrokeThickness="1" />
+                    <Line Y2="1"
+                          Margin="0"
+                          Stretch="Fill"
+                          Stroke="Blue"
+                          StrokeThickness="1" />
+                    <Line X2="1"
+                          Y2="1"
+                          Margin="205"
+                          Stretch="Fill"
+                          Stroke="Blue"
+                          StrokeThickness="1" />
+                    <Line X2="1"
+                          X1="0"
+                          Y1="1"
+                          Y2="0"
+                          Margin="205"
+                          Stretch="Fill"
+                          Stroke="Blue"
+                          StrokeThickness="1" />
 
-            </Grid>
+                </Grid>
+            </Viewbox>
 
         </Grid>
     </GroupBox>

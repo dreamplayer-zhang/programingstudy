@@ -67,7 +67,7 @@ namespace Root_AOP01_Packing
             m_aWTR[0].RunTree(Tree.eMode.Init);
             m_aWTR[1].RunTree(Tree.eMode.RegRead);
             m_aWTR[1].RunTree(Tree.eMode.Init);
-            //((IWTR)m_wtr).ReadInfoReticle_Registry(); //forget
+            ((IWTR)m_aWTR[1]).ReadInfoReticle_Registry(); 
 
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();

@@ -42,7 +42,7 @@
                                 <ContentPresenter ContentSource="Header" RecognizesAccessKey="true" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                                   TextElement.FontFamily="Arial"
                                                   TextElement.FontWeight="Bold"
-                                                  TextElement.FontSize="15"/>
+                                                  TextElement.FontSize="12"/>
 
                             </Border>
                             <ContentPresenter Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />

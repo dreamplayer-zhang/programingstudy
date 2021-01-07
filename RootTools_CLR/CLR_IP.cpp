@@ -168,6 +168,25 @@ namespace RootTools_CLR
 		return local;
 	}
 
+	void CLR_IP::Cpp_Masking(array<byte>^ pSrcImg, array<byte>^ pDstImg, array<Cpp_Point^>^ startPoint, array<int>^ length, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0]; // pin : 주소값 고정
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		std::vector<Point> vtStartPoint;
+		std::vector<int> vtLength;
+
+		for (int i = 0; i < startPoint->Length; i++)
+		{
+			vtStartPoint.push_back(Point(startPoint[i]->x, startPoint[i]->y));
+			vtLength.push_back((int)length[i]);
+		}
+		IP::Masking(pSrc, pDst, vtStartPoint, vtLength, nMemW, nMemH);
+
+		pSrc = nullptr;
+		pDst = nullptr;
+	}
+
 	float CLR_IP::Cpp_TemplateMatching(byte* pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
