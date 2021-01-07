@@ -1025,7 +1025,6 @@ namespace Root_AOP01_Inspection.Module
 
                 try
                 {
-                    Camera_Basler.s_nCount = 0;
                     m_grabMode.SetLight(true);
                     ladsinfos.Clear();
 
@@ -1088,7 +1087,6 @@ namespace Root_AOP01_Inspection.Module
 
                         nScanLine++;
                         cpMemoryOffset.X += nCamWidth;
-                        Console.WriteLine(Camera_Basler.s_nCount);
                     }
                     m_grabMode.m_camera.StopGrab();
                     SaveFocusMapImage(nScanLine, nReticleSizeY_px / nCamHeight);
