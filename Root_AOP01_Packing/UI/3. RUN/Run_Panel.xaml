@@ -92,7 +92,7 @@
                             <TextBlock Text="Lot ID" VerticalAlignment="Center"/>
                             <TextBlock Text="lot00001" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                             <TextBlock Text="Reticle ID" VerticalAlignment="Center"/>
-                            <TextBlock Text="dummyW001" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            <TextBlock Text="dummy001" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                             <TextBlock Text="Recipe" VerticalAlignment="Center"/>
                             <TextBlock Text="test00001.rcp" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                         </UniformGrid>
