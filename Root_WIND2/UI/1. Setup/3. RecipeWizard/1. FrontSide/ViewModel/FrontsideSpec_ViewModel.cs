@@ -162,6 +162,8 @@ namespace Root_WIND2
 
             if(p_cInspItem.Count > 0)
                 p_selectedInspItem = p_cInspItem[0];
+
+            SetParameter();
         }
 
         public void SetParameter()

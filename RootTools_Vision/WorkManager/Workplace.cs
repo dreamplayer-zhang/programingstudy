@@ -146,7 +146,7 @@ namespace RootTools_Vision
 
         public Workplace()
         {
-
+            //Reset();
         }
 
         public void Reset()
@@ -163,6 +163,15 @@ namespace RootTools_Vision
 
         public void SetPreworkData(PREWORKDATA_KEY key, object dataObj)
         {
+            if(this.preworkdataDicitonary.Count != Enum.GetValues(typeof(PREWORKDATA_KEY)).Length)
+            {
+                foreach (PREWORKDATA_KEY tempkey in Enum.GetValues(typeof(PREWORKDATA_KEY)))
+                {
+                    if(this.preworkdataDicitonary.ContainsKey(tempkey) == false)
+                        this.preworkdataDicitonary.Add(tempkey, null);
+                }
+            }
+
             this.preworkdataDicitonary[key] = dataObj;
             //this.preworkDataList.Add(dataObj);
         }
