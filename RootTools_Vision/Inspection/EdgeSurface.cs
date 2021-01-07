@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace RootTools_Vision.Inspection
+namespace RootTools_Vision
 {
 	public class EdgeSurface : WorkBase
 	{
@@ -18,9 +18,33 @@ namespace RootTools_Vision.Inspection
 
 		public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
+		private EdgeSurfaceParameter parameter;
+		private EdgeSurfaceRecipe recipe;
+
+		public EdgeSurface() : base()
+		{
+			m_sName = this.GetType().Name;
+		}
+
 		public override WorkBase Clone()
 		{
 			return (WorkBase)this.MemberwiseClone();
+		}
+
+		public override void SetRecipe(Recipe _recipe)
+		{
+			this.parameter = _recipe.GetRecipe<EdgeSurfaceParameter>();
+			this.recipe = _recipe.GetRecipe<EdgeSurfaceRecipe>();
+		}
+
+		public override void SetWorkplace(Workplace _workplace)
+		{
+			this.workplace = _workplace;
+		}
+
+		public override void SetWorkplaceBundle(WorkplaceBundle _workplace)
+		{
+			this.workplaceBundle = _workplace;
 		}
 
 		public override bool DoPrework()
@@ -37,59 +61,39 @@ namespace RootTools_Vision.Inspection
 			base.DoWork();
 		}
 
-		public override void SetRecipe(Recipe _recipe)
-		{
-			
-		}
-
-		public override void SetWorkplace(Workplace _workplace)
-		{
-			this.workplace = _workplace;
-		}
-
-		public override void SetWorkplaceBundle(WorkplaceBundle _workplace)
-		{
-			this.workplaceBundle = _workplace;
-		}
-
 		public void DoInspection()
 		{
 			//if (this.workplace.Index == 0)
 			//	return;
 						
-			int roiHeight = 1000; // recipe
-			int threshold = 12; // recipe
-			int defectSize = 5; // recipe
+			int roiHeight = parameter.RoiHeight;
+			int roiWidth = parameter.RoiWidth; //this.workplace.SharedBufferWidth;
+			int threshold = parameter.Theshold; // 12;
+			int defectSize = parameter.Size; // 5;
 
-			//int memH = this.workplace.SharedBufferHeight;
-			int memW = this.workplace.SharedBufferWidth;
-			int memSize = memW * roiHeight;
+			int roiSize = roiWidth * roiHeight;
 
 			int left = this.workplace.PositionX;
 			int top = this.workplace.PositionY;
 			int right = this.workplace.PositionX + this.workplace.SharedBufferWidth; 
 			int bottom = this.workplace.PositionY + roiHeight;
 
-			byte[] arrSrc = new byte[memSize];
+			byte[] arrSrc = new byte[roiSize];
 			for (int cnt = top; cnt < bottom; cnt++)
 			{
-				Marshal.Copy(new IntPtr(this.workplace.SharedBufferR_GRAY.ToInt64() + (cnt * (Int64)memW))
+				Marshal.Copy(new IntPtr(this.workplace.SharedBufferR_GRAY.ToInt64() + (cnt * (Int64)roiWidth))
 							, arrSrc
-							, memW * (cnt - top)
-							, memW);
+							, roiWidth * (cnt - top)
+							, roiWidth);
 			}
-
-			//Emgu.CV.Mat mat = new Emgu.CV.Mat((int)roiHeight, (int)memW, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
-			//Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
-			//mat.Save(@"D:\mat_" + this.workplace.Index.ToString() + ".bmp");
 
 			// profile 생성
 			List<int> temp = new List<int>();
 			List<int> profile = new List<int>();
-			for (long j = 0; j < memW; j++)
+			for (long j = 0; j < roiWidth; j++)
 			{
 				temp.Clear();
-				for (long i = 0; i < memSize; i += memW)
+				for (long i = 0; i < roiSize; i += roiWidth)
 				{
 					temp.Add(arrSrc[j + i]);
 				}
@@ -98,19 +102,19 @@ namespace RootTools_Vision.Inspection
 			}
 
 			// Calculate diff image (original - profile)
-			byte[] diff = new byte[memSize];
+			byte[] diff = new byte[roiSize];
 			for (int j = 0; j < roiHeight; j++)
 			{
-				for (int i = 0; i < memW; i++)
+				for (int i = 0; i < roiWidth; i++)
 				{
-					diff[(j * memW) + i] = (byte)(Math.Abs(arrSrc[(j * memW) + i] - profile[i]));
+					diff[(j * roiWidth) + i] = (byte)(Math.Abs(arrSrc[(j * roiWidth) + i] - profile[i]));
 				}
 			}
 
 			// Threshold
-			byte[] thresh = new byte[memSize];
-			CLR_IP.Cpp_Threshold(diff, thresh, memW, roiHeight, false, threshold);
-			var label = CLR_IP.Cpp_Labeling(diff, thresh, memW, roiHeight, true);
+			byte[] thresh = new byte[roiSize];
+			CLR_IP.Cpp_Threshold(diff, thresh, roiWidth, roiHeight, false, threshold);
+			var label = CLR_IP.Cpp_Labeling(diff, thresh, roiWidth, roiHeight, true);
 
 			// Add defect
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();

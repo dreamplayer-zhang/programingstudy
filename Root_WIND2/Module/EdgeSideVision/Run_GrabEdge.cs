@@ -22,6 +22,10 @@ namespace Root_WIND2.Module
 		GrabMode gmBtm = null;
 
 		string m_sGrabModeTop = "";
+		string m_sGrabModeSide = "";
+		string m_sGrabModeBtm = "";
+
+		#region [Getter/Setter]
 		public string p_sGrabModeTop
 		{
 			get { return m_sGrabModeTop; }
@@ -31,7 +35,6 @@ namespace Root_WIND2.Module
 				gmTop = module.GetGrabMode(value);
 			}
 		}
-		string m_sGrabModeSide = "";
 		public string p_sGrabModeSide
 		{
 			get { return m_sGrabModeSide; }
@@ -41,7 +44,6 @@ namespace Root_WIND2.Module
 				gmSide = module.GetGrabMode(value);
 			}
 		}
-		string m_sGrabModeBtm = "";
 		public string p_sGrabModeBtm
 		{
 			get { return m_sGrabModeBtm; }
@@ -51,6 +53,7 @@ namespace Root_WIND2.Module
 				gmBtm = module.GetGrabMode(value);
 			}
 		}
+		#endregion
 
 		public Run_GrabEdge(EdgeSideVision module)
 		{
@@ -66,15 +69,10 @@ namespace Root_WIND2.Module
 		int scanRate = 100;         // Camera Frame Spec 사용률 ? 1~100 %
 		int maxFrame = 100;
 
-		// recipe
-		int sobelHeight = 10;
+		int sideFocusAxis = 26809;
+		int sobelHeight = 200;
 		int sobelThreshold = 90;
 		int sobelCnt = 10;
-		int sideFocusAxis = 26809;
-		int inspHeight = 200;
-		int defectSize = 5;
-		int mergeDist = 5;
-		int inspThreshhold = 12;
 
 		public override ModuleRunBase Clone()
 		{
@@ -91,14 +89,10 @@ namespace Root_WIND2.Module
 			run.resolution = resolution;
 			//run.triggerRatio = triggerRatio;
 
+			run.sideFocusAxis = sideFocusAxis;
 			run.sobelHeight = sobelHeight;
 			run.sobelThreshold = sobelThreshold;
 			run.sobelCnt = sobelCnt;
-			run.sideFocusAxis = sideFocusAxis;
-			run.inspHeight = inspHeight;
-			run.defectSize = defectSize;
-			run.mergeDist = mergeDist;
-			run.inspThreshhold = inspThreshhold;
 			return run;
 		}
 
@@ -112,17 +106,10 @@ namespace Root_WIND2.Module
 			scanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(scanRate, scanRate, "Scan Rate", "카메라 Frame 사용률 (1~ 100 %)", bVisible);
 			scanAcc = (tree.GetTree("Scan Velocity", false, bVisible)).Set(scanAcc, scanAcc, "Scan Acc", "Scan 축 가속도 (sec)", bVisible);
 
-			// recipe
-			sobelHeight = (tree.GetTree("Side Focus", false, bVisible)).Set(sobelHeight, sobelHeight, "Sobel Start Height", "", bVisible);
-			sobelThreshold = (tree.GetTree("Side Focus", false, bVisible)).Set(sobelThreshold, sobelThreshold, "Edge Detect GV Threshold", "Sobel Edge 검출 시 GV Threshold", bVisible);
-			sobelCnt = (tree.GetTree("Side Focus", false, bVisible)).Set(sobelCnt, sobelCnt, "Edge Detect Count", "Sobel Edge 검출 시 Threshold 이상의 Count. Count 이상 발견 시 Edge", bVisible);
 			sideFocusAxis = (tree.GetTree("Side Focus", false, bVisible)).Set(sideFocusAxis, sideFocusAxis, "Side Focus Axis", "Side 카메라 Focus 축 값", bVisible);
-
-			inspHeight = (tree.GetTree("Recipe", false, bVisible)).Set(inspHeight, inspHeight, "Inspection ROI Height", "", bVisible);
-			defectSize = (tree.GetTree("Recipe", false, bVisible)).Set(defectSize, defectSize, "Defect Size", "pixel", bVisible);
-			mergeDist = (tree.GetTree("Recipe", false, bVisible)).Set(mergeDist, mergeDist, "Merge Distance", "pixel", bVisible);
-			inspThreshhold = (tree.GetTree("Recipe", false, bVisible)).Set(inspThreshhold, inspThreshhold, "Inspection Theshold", "", bVisible);
-			//
+			//sobelHeight = tree.Set(sobelHeight, sobelHeight, "Sobel Start Height", "", bVisible);
+			//sobelThreshold = tree.Set(sobelThreshold, sobelThreshold, "Edge Detect GV Threshold", "Sobel Edge 검출 시 GV Threshold", bVisible);
+			//sobelCnt = tree.Set(sobelCnt, sobelCnt, "Edge Detect Count", "Sobel Edge 검출 시 Threshold 이상의 Count. Count 이상 발견 시 Edge", bVisible);
 
 			p_sGrabModeTop = tree.Set(p_sGrabModeTop, p_sGrabModeTop, module.p_asGrabMode, "Grab Mode : Top", "Select GrabMode", bVisible);
 			//if (gmTop != null) 
