@@ -182,7 +182,7 @@ namespace Root_WIND2
                 }
                 
                 this.Recipe.Clear();
-                ShowDialogSaveRecipe();
+                ShowDialogSaveRecipe(true);
 
                 WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
             }
@@ -192,12 +192,14 @@ namespace Root_WIND2
             }
         }
 
-        public void ShowDialogSaveRecipe()
+        public void ShowDialogSaveRecipe(bool bNew = false)
         {
             try
             {
                 SaveFileDialog dlg = new SaveFileDialog();
                 dlg.InitialDirectory = recipeFolderPath;
+
+                if (bNew == true) dlg.Title = "새로 만들기";
 
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == true)
