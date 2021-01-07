@@ -72,17 +72,14 @@ namespace Root_CAMELLIA.ManualJob
 
         void OnChanged()
         {
-            if (m_manualSlot == null) return;
-            m_manualSlot.SetRecipe(_sRecipe);
+            
         }
 
-        InfoCarrier m_infoCarrier = null;
-        ManualSlot m_manualSlot = null;
+        public InfoCarrier m_infoCarrier = null;
         public ManualJobSchedule(InfoCarrier infoCarrier)
         {
             m_infoCarrier = infoCarrier;
             if (m_infoCarrier == null) return;
-            m_manualSlot = new ManualSlot(m_infoCarrier);
         }
 
         public bool ShowPopup()
@@ -90,8 +87,8 @@ namespace Root_CAMELLIA.ManualJob
             if (ManualJobSchedule_UI.m_bShow) return false;
             Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                ManualJobSchedule_UI jobschedulePopup = new ManualJobSchedule_UI();
-                jobschedulePopup.Init(this);
+                ManualJobSchedule_UI jobschedulePopup = new ManualJobSchedule_UI(m_infoCarrier);
+                jobschedulePopup.Init(this, m_infoCarrier);
                 //m_handler.m_nRnR = p_bRnR ? p_nRnR : 1;   //working
                 p_bRnR = false;
                 jobschedulePopup.ShowDialog();

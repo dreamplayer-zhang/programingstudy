@@ -14,7 +14,7 @@ namespace Root_AOP01_Packing.Module
     public class VacuumPacker : ModuleBase, IWTRChild
     {
         int TestNum = 1;
-        #region ToolBox
+        #region ToolBox //forget
         DIO_IO[] m_dioVacuum = new DIO_IO[2] { null, null };
         DIO_O[] m_doBlow = new DIO_O[2];
         Axis m_axisLoad;
@@ -209,10 +209,61 @@ namespace Root_AOP01_Packing.Module
             }
             void InitPos()
             {
+                m_dioVacuum[0].Write(false);
+                m_dioVacuum[1].Write(false);
                 m_axisMove.AddPos(Enum.GetNames(typeof(ePosMove)));
                 m_axisPicker.AddPos(Enum.GetNames(typeof(ePosPicker)));
             }
-            //forget
+
+            public string RunMove(ePosMove ePos)
+            {
+                m_axisMove.StartMove(ePos);
+                return m_axisMove.WaitReady();
+            }
+
+            public string RunMove(ePosPicker ePos)
+            {
+                m_axisPicker.StartMove(ePos);
+                return m_axisPicker.WaitReady();
+            }
+
+            double m_secVac = 0.5;
+            double m_secBlow = 0.5;
+            string RunVacOn()
+            {
+                m_dioVacuum[0].Write(true);
+                m_dioVacuum[1].Write(true);
+                int msVac = (int)(1000 * m_secVac);
+                while (m_dioVacuum[0].m_swWrite.ElapsedMilliseconds < msVac)
+                {
+                    Thread.Sleep(10);
+                    if (m_dioVacuum[0].p_bIn && m_dioVacuum[1].p_bIn) return "OK";
+                    if (EQ.IsStop()) return m_id + " EQ Stop";
+                }
+                return "Vacuum Sensor On Timeout";
+            }
+
+            string RunVacOff(bool bCenter)
+            {
+                int nID = bCenter ? 0 : 1;
+                m_dioVacuum[nID].Write(false);
+                if (m_dioVacuum[nID].p_bIn)
+                {
+                    m_doBlow[nID].Write(true);
+                    Thread.Sleep((int)(1000 * m_secBlow));
+                    m_doBlow[nID].Write(false);
+                }
+                return "OK";
+            }
+
+
+
+            public void RunTree(Tree tree)
+            {
+                m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Wait (sec)");
+                m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Vacuum Off Blow Time (sec)");
+                foreach (Solvalue sol in m_aSolvalve) sol.RunTree(tree);
+            }
 
             string m_id;
             VacuumPacker m_packer;
@@ -220,7 +271,7 @@ namespace Root_AOP01_Packing.Module
             {
                 m_id = id;
                 m_packer = packer;
-                //InitSolvalve();
+                InitSolvalve();
             }
         }
         #endregion
