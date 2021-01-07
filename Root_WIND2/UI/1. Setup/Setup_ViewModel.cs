@@ -290,7 +290,7 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(ProgramManager.Instance.ShowDialogSaveRecipe);
+                return new RelayCommand(ProgramManager.Instance.NewRecipe);
             }
 
         }

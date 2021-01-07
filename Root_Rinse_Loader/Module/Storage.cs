@@ -160,10 +160,11 @@ namespace Root_Rinse_Loader.Module
 
         #region Pusher
         DIO_I2O m_dioPusher;
-        DIO_I m_diOverload; 
-        public string RunPusher(double secWait)
+        DIO_I m_diOverload;
+        double m_secPusher = 10;
+        public string RunPusher()
         {
-            int msWait = (int)(1000 * secWait); 
+            int msWait = (int)(1000 * m_secPusher); 
             StopWatch sw = new StopWatch(); 
             m_dioPusher.Write(true);
             while (m_dioPusher.p_bDone == false)
@@ -183,7 +184,12 @@ namespace Root_Rinse_Loader.Module
                 }
             }
             m_dioPusher.Write(false);
-            return m_dioPusher.WaitDone(secWait); 
+            return m_dioPusher.WaitDone(m_secPusher); 
+        }
+
+        void RunTreePusher(Tree tree)
+        {
+            m_secPusher = tree.Set(m_secPusher, m_secPusher, "Timeout", "Pusher Timeout (sec)"); 
         }
         #endregion
 
@@ -216,30 +222,48 @@ namespace Root_Rinse_Loader.Module
             return m_axis.WaitReady();
         }
 
-        double m_secStackReady = 5;
-        int m_msStackReady = 5000;
+        double m_posStackReady = 0; 
         double m_fJogScale = 1; 
-        StopWatch m_swStack = new StopWatch(); 
         public string MoveStackReady()
         {
-            if (m_swStack.ElapsedMilliseconds > m_msStackReady) MoveStack();
-            m_swStack.Start();
+            if (m_posStackReady != m_axis.p_posCommand) MoveStack();
             if (m_stack.p_bLevel)
             {
                 m_axis.Jog(-m_fJogScale); 
                 while (m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
             }
             m_axis.Jog(m_fJogScale);
-            while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10); 
+            while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
+            m_posStackReady = m_axis.p_posCommand; 
             return "OK"; 
+        }
+
+        public bool p_bIsEnablePick
+        {
+            get { return Math.Abs(m_posStackReady - m_axis.p_posCommand) < 10; }
         }
 
         void RunTreeElevator(Tree tree)
         {
             m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Magazine Slot Pitch (pulse)");
             m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Jog Scale", "Jog Move Scale (0 ~ 1)"); 
-            m_secStackReady = tree.Set(m_secStackReady, m_secStackReady, "StackReady", "Stack Ready (sec)");
-            m_msStackReady = (int)(1000 * m_secStackReady); 
+        }
+        #endregion
+
+        #region RunMagazine
+        double m_secRunDelay = 0; 
+        public string RunMagazine()
+        {
+            for (int n = Rinse.p_iMagazine; n < 80; n++)
+            {
+                ePos eMGZ = (ePos)(n / 20);
+                int iMGZ = n % 20;
+                if (Run(MoveMagazine(eMGZ, iMGZ))) return p_sInfo; 
+                if (Run(RunPusher())) return p_sInfo;
+                Rinse.p_iMagazine++; 
+                Thread.Sleep((int)(1000 * m_secRunDelay)); 
+            }
+            return "OK";
         }
         #endregion
 
@@ -287,7 +311,9 @@ namespace Root_Rinse_Loader.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeElevator(tree.GetTree("Elevator", false));
+            RunTreeElevator(tree.GetTree("Elevator"));
+            RunTreePusher(tree.GetTree("Pusher"));
+            m_secRunDelay = tree.Set(m_secRunDelay, m_secRunDelay, "Run Delay", "Run Delay (sec)"); 
         }
         #endregion
 
@@ -310,12 +336,37 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
+        #region StartRun
+        public void StartRun()
+        {
+            switch (Rinse.p_eMode)
+            {
+                case Rinse.eMode.Magazine:
+                    StartRun(m_runMagazine.Clone()); 
+                    break;
+                case Rinse.eMode.Stack:
+                    MoveStack(); 
+                    break;
+            }
+        }
+        #endregion
+
         #region ModuleRun
+        public string StartMoveStackReady()
+        {
+            StartRun(m_runReady.Clone()); 
+            return "OK";
+        }
+
+        ModuleRunBase m_runReady;
+        ModuleRunBase m_runMagazine;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_MovePos(this), false, "Move Elevator Position");
             AddModuleRunList(new Run_Pusher(this), false, "Move Elevator & Run Pusher");
             AddModuleRunList(new Run_Clamp(this), false, "Run Clamp");
+            m_runReady = AddModuleRunList(new Run_StackReady(this), false, "Run Stack Move Ready Position");
+            m_runMagazine = AddModuleRunList(new Run_RunMagazine(this), false, "Run Magazine");
         }
 
         public class Run_MovePos : ModuleRunBase
@@ -361,7 +412,6 @@ namespace Root_Rinse_Loader.Module
 
             ePos m_ePos = ePos.Stack;
             int m_iIndex = 0;
-            double m_secWait = 10; 
             public override ModuleRunBase Clone()
             {
                 Run_Pusher run = new Run_Pusher(m_module);
@@ -374,14 +424,13 @@ namespace Root_Rinse_Loader.Module
             {
                 m_ePos = (ePos)tree.Set(m_ePos, m_ePos, "Pos", "Elevator Position", bVisible);
                 m_iIndex = tree.Set(m_iIndex, m_iIndex, "Index", "Magazine Index", bVisible && (m_ePos != ePos.Stack));
-                m_secWait = tree.Set(m_secWait, m_secWait, "Pusher Timeout", "Pusher Timeout (sec)", bVisible);
             }
 
             public override string Run()
             {
                 if (m_ePos == ePos.Stack) return m_module.MoveStack();
                 if (m_module.Run(m_module.MoveMagazine(m_ePos, m_iIndex))) return p_sInfo;
-                return m_module.RunPusher(m_secWait); 
+                return m_module.RunPusher(); 
             }
         }
 
@@ -413,6 +462,56 @@ namespace Root_Rinse_Loader.Module
             public override string Run()
             {
                 return m_module.RunClamp(m_bClamp, m_secDelay); 
+            }
+        }
+
+        public class Run_StackReady : ModuleRunBase
+        {
+            Storage m_module;
+            public Run_StackReady(Storage module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_StackReady run = new Run_StackReady(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.MoveStackReady(); 
+            }
+        }
+
+        public class Run_RunMagazine : ModuleRunBase
+        {
+            Storage m_module;
+            public Run_RunMagazine(Storage module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_RunMagazine run = new Run_RunMagazine(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunMagazine();
             }
         }
         #endregion

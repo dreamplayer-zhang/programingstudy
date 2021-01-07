@@ -56,19 +56,6 @@ namespace Root_WIND2
             }
         }
 
-        private ObservableCollection<ParameterBase> m_cInspMethod;
-        public ObservableCollection<ParameterBase> p_cInspMethod
-        {
-            get
-            {
-                return m_cInspMethod;
-            }
-            set
-            {
-                SetProperty(ref m_cInspMethod, value);
-            }
-        }
-
         private ObservableCollection<InspectionItem> m_cInspItem;
         public ObservableCollection<InspectionItem> p_cInspItem
         {
@@ -114,16 +101,6 @@ namespace Root_WIND2
         #endregion
 
 
-        public ObservableCollection<ParameterBase> CloneMethod()
-        {
-            ObservableCollection<ParameterBase> method = new ObservableCollection<ParameterBase>();
-            foreach(ParameterBase param in p_cInspMethod)
-            {
-                method.Add((ParameterBase)param.Clone());
-            }
-            return method;
-        }
-
         public void ComboBoxItemChanged_Mask_Callback(object obj, EventArgs args)
         {
             InspectionROI mask = (InspectionROI)obj;
@@ -162,7 +139,6 @@ namespace Root_WIND2
             {
                 InspectionItem item = new InspectionItem();
                 item.p_cInspROI = p_ROI_Viewer.p_cInspROI;
-                item.p_cInspMethod = CloneMethod();
 
                 int selectMethod = 0;
                 for (int i = 0; i < item.p_cInspMethod.Count; i++)
@@ -186,6 +162,8 @@ namespace Root_WIND2
 
             if(p_cInspItem.Count > 0)
                 p_selectedInspItem = p_cInspItem[0];
+
+            SetParameter();
         }
 
         public void SetParameter()
@@ -201,6 +179,12 @@ namespace Root_WIND2
                         ((IMaskInspection)item.p_InspMethod).MaskIndex = item.p_InspROI.p_Index;
                     }
                 }
+
+                if(item.p_InspMethod is IColorInspection)
+                {
+                    ((IColorInspection)item.p_InspMethod).IndexChannel = item.p_InspChannel;
+                }
+
                 paramList.Add(item.p_InspMethod);
             }
 
@@ -232,7 +216,7 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    m_selectedInspItem.p_InspMethod = p_cInspMethod[0];
+                    m_selectedInspItem.p_InspMethod = p_selectedInspItem.p_InspMethod;
                     SetParameter();
                 });
             }

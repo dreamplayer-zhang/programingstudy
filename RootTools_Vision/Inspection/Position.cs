@@ -30,6 +30,8 @@ namespace RootTools_Vision
 
         OriginRecipe recipeOrigin;
 
+        IntPtr InspectionSharedBuffer;
+
         #endregion
 
         public override bool DoPrework()
@@ -103,6 +105,8 @@ namespace RootTools_Vision
 
         public bool DoPosition_Wafer()
         {
+            this.InspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
+
             //if (this.positionRecipe.IndexMaxScoreMasterFeature == -1) // Feature가 셋팅이 안되어 있는 경우 전체 Feature 사용
             {
                 int outX = 0, outY = 0;
@@ -125,7 +129,7 @@ namespace RootTools_Vision
                     unsafe
                     {
                         score =  CLR_IP.Cpp_TemplateMatching(
-                            (byte*)this.workplace.SharedBuffer.ToPointer(), feature.RawData, &outX, &outY, 
+                            (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY, 
                             this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                             feature.Width, feature.Height,
                             startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt);
@@ -195,6 +199,8 @@ namespace RootTools_Vision
 
         public bool DoPosition_Chip()
         {
+            this.InspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
+
             int outX = 0, outY = 0;
             int maxX = 0, maxY = 0;
             int maxStartX = 0, maxStartY = 0;
@@ -221,7 +227,7 @@ namespace RootTools_Vision
                         unsafe
                         {
                             score = CLR_IP.Cpp_TemplateMatching(
-                                (byte*)this.workplace.SharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
+                                (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
                                 this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                                 feature.Width, feature.Height,
                                 startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt);
@@ -260,7 +266,7 @@ namespace RootTools_Vision
                     unsafe
                     {
                         score = CLR_IP.Cpp_TemplateMatching(
-                            (byte*)this.workplace.SharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
+                            (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
                             this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                             feature.Width, feature.Height,
                             startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt);
@@ -359,20 +365,64 @@ namespace RootTools_Vision
         private void ExtractCurrentWorkplace()
         {
             // Copy 
-            int chipH = this.workplace.BufferSizeY;
-            int chipW = this.workplace.BufferSizeX;
+            //int chipH = this.workplace.BufferSizeY;
+            //int chipW = this.workplace.BufferSizeX;
 
-            int Left = this.workplace.PositionX;
-            int Top = this.workplace.PositionY - chipH;
-            int Right = this.workplace.PositionX + chipW;
-            int Bottom = this.workplace.PositionY;
+            //int Left = this.workplace.PositionX;
+            //int Top = this.workplace.PositionY - chipH;
+            //int Right = this.workplace.PositionX + chipW;
+            //int Bottom = this.workplace.PositionY;
 
-            int memH = this.workplace.SharedBufferHeight;
-            int memW = this.workplace.SharedBufferWidth;
+            //int memH = this.workplace.SharedBufferHeight;
+            //int memW = this.workplace.SharedBufferWidth;
 
-            for (int cnt = Top; cnt < Bottom; cnt++)
-                Marshal.Copy(new IntPtr(this.workplace.SharedBuffer.ToInt64() + (cnt * (Int64)memW + Left))
-                    , this.workplace.WorkplaceBuffer, chipW * (cnt - Top), chipW);
+            //for (int cnt = Top; cnt < Bottom; cnt++)
+            //    Marshal.Copy(new IntPtr(
+            //        this.InspectionSharedBuffer.ToInt64() + (cnt * (Int64)memW + Left))
+            //        , this.workplace.WorkplaceBuffer, chipW * (cnt - Top), chipW);
+
+
+            // 지금은 세개 다하는데 추후에 하나만 해야할 수 도....
+
+            Tools.ParallelImageCopy(
+                this.workplace.SharedBufferR_GRAY,
+                this.workplace.SharedBufferWidth,
+                this.workplace.SharedBufferHeight,
+                new CRect
+                (
+                    this.workplace.PositionX, 
+                    this.workplace.PositionY - this.workplace.BufferSizeY, 
+                    this.workplace.PositionX + this.workplace.BufferSizeX, 
+                    this.workplace.PositionY),
+                this.workplace.WorkplaceBufferR_GRAY);
+
+
+            if(this.workplace.SharedBufferByteCnt == 3)
+            {
+                Tools.ParallelImageCopy(
+                    this.workplace.SharedBufferG,
+                    this.workplace.SharedBufferWidth,
+                    this.workplace.SharedBufferHeight,
+                    new CRect
+                    (
+                        this.workplace.PositionX,
+                        this.workplace.PositionY - this.workplace.BufferSizeY,
+                        this.workplace.PositionX + this.workplace.BufferSizeX,
+                        this.workplace.PositionY),
+                    this.workplace.WorkplaceBufferG);
+
+                Tools.ParallelImageCopy(
+                    this.workplace.SharedBufferB,
+                    this.workplace.SharedBufferWidth,
+                    this.workplace.SharedBufferHeight,
+                    new CRect
+                    (
+                        this.workplace.PositionX,
+                        this.workplace.PositionY - this.workplace.BufferSizeY,
+                        this.workplace.PositionX + this.workplace.BufferSizeX,
+                        this.workplace.PositionY),
+                    this.workplace.WorkplaceBufferB);
+            }
         }
     }
 }

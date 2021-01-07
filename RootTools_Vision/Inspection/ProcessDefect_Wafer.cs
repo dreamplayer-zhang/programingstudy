@@ -90,9 +90,10 @@ namespace RootTools_Vision
                 }
             }
 
-            Workplace displayDefect = new Workplace();
+           
+            //Workplace displayDefect = new Workplace();
             foreach (Defect defect in MergeDefectList)
-                displayDefect.DefectList.Add(defect);
+                this.workplace.DefectList.Add(defect);
 
             string sDefectimagePath = @"D:\DefectImage";
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();    
@@ -116,7 +117,7 @@ namespace RootTools_Vision
                 //}
             }
 
-            WorkEventManager.OnInspectionDone(displayDefect, new InspectionDoneEventArgs(new List<CRect>(), true));
+            WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>(), true));
         }
 
         public override WorkBase Clone()
@@ -291,7 +292,7 @@ namespace RootTools_Vision
                 if (nByteCnt == 1) { 
                     CLR_IP.Cpp_SaveDefectListBMP(
                        Path,
-                       (byte*)workplace.SharedBuffer.ToPointer(),
+                       (byte*)workplace.SharedBufferR_GRAY.ToPointer(),
                        workplace.SharedBufferWidth,
                        workplace.SharedBufferHeight,
                        defectArray
@@ -301,7 +302,7 @@ namespace RootTools_Vision
                 else if (nByteCnt == 3) { 
                     CLR_IP.Cpp_SaveDefectListBMP_Color(
                         Path,
-                       (byte*)workplace.SharedBufferR.ToPointer(),
+                       (byte*)workplace.SharedBufferR_GRAY.ToPointer(),
                        (byte*)workplace.SharedBufferG.ToPointer(),
                        (byte*)workplace.SharedBufferB.ToPointer(),
                        workplace.SharedBufferWidth,

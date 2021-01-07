@@ -164,7 +164,8 @@ namespace RootTools
         void RunTreeSlot(Tree tree)
         {
             p_eWaferSize = (InfoWafer.eWaferSize)tree.Set(p_eWaferSize, p_eWaferSize, "Size", "Wafer Size");
-            p_lWafer = tree.Set(p_lWafer, p_lWafer, "Count", "Slot Count", true, true);
+            if (m_waferSize.m_bUseCount == false) p_lWafer = 1; 
+            else p_lWafer = tree.Set(p_lWafer, p_lWafer, "Count", "Slot Count", true, true);
         }
         #endregion
 

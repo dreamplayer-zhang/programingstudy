@@ -73,7 +73,7 @@
             </Setter>
         </Style>
     </Window.Resources>
-    
+
     <Grid x:Name="gridMain">
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
@@ -115,7 +115,12 @@
                     </GroupBox>
                 </Grid>
                 <Grid Grid.Row="1" Height="auto">
-                    <GroupBox FontSize="20" Header="Recipe Select" Height="100" Foreground="White">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="318*"/>
+                        <ColumnDefinition Width="43*"/>
+                        <ColumnDefinition Width="128*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox FontSize="20" Header="Recipe Select" Height="100" Foreground="White" Grid.ColumnSpan="3" Margin="0,7">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text=" Recipe ID = " VerticalAlignment="Center"/>
                             <ComboBox x:Name="comboRecipeID" MinWidth="50" VerticalAlignment="Center" SelectionChanged="comboRecipeID_SelectionChanged"/>
@@ -140,6 +145,6 @@
                 <Button Height="100" Margin="5" Content="Cancel" IsCancel="True"/>
             </StackPanel>
         </Grid>
-        
+
     </Grid>
 </Window>

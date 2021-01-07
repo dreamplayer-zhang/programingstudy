@@ -253,7 +253,6 @@
       <DependentUpon>BacksideInspection.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideInspection_ViewModel.cs" />
-    <Compile Include="UI\Enums.cs" />
     <Compile Include="UI\SettingDialog\ISettingData.cs" />
     <Compile Include="UI\SettingDialog\SettingData.cs" />
     <Compile Include="UI\SettingDialog\SettingData_Setup.cs" />
@@ -698,6 +697,12 @@
       <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
       <Name>Root_EFEM</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\bevelmap.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\bevelmap2.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

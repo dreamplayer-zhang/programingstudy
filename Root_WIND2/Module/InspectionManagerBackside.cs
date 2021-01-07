@@ -108,7 +108,7 @@ namespace Root_WIND2
                 Position position = new Position();
                 workBundle.Add(position);
 
-                Surface surface = new Surface();
+                BacksideSurface surface = new BacksideSurface();
                 surface.SetRecipe(recipe);
 
                 workBundle.Add(surface);

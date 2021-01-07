@@ -23,6 +23,7 @@ namespace RootTools.Control
             int msWait = (int)(1000 * secWait);
             while (m_swWrite.ElapsedMilliseconds < msWait)
             {
+                if (EQ.IsStop()) return m_id + " EQ Stop";
                 if (p_bDone) return "OK";
             }
             return "DIO Timeout : " + m_id;
@@ -35,7 +36,7 @@ namespace RootTools.Control
 
         ListDIO m_listDI;
         ListDIO m_listDO;
-        string m_id;
+        public string m_id;
         Log m_log;
         public DIO_I2O2(IToolDIO tool, string id, Log log, bool bEnableRun, string sFalse, string sTrue)
         {

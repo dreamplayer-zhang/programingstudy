@@ -4,7 +4,9 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHTNew;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -13,30 +15,52 @@ namespace Root_AOP01_Packing.Module
     public class Loadport_AOP : ModuleBase, IWTRChild, ILoadport
     {
         #region ToolBox
-        DIO_Is m_diPodCheck; 
+        DIO_I[] m_diPodCheck = new DIO_I[3]; 
         DIO_I2O2 m_dioGuide;
         Axis m_axisDoor;
-        DIO_I m_diDoorOpen;
-        DIO_I m_diDoorClose; 
-        //OHT m_OHT;
+        DIO_I[] m_diDoor = new DIO_I[2];
+        DIO_O m_doManual;
+        DIO_O m_doAuto;
+        DIO_O m_doPresent;
+        DIO_O m_doPlaced;
+        DIO_O m_doLoad;
+        DIO_O m_doUnload;
+        DIO_O m_doAlarm;
+        OHT m_OHT;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diPodCheck, this, "POD Check", "POD Check", 3);
+            p_sInfo = m_toolBox.Get(ref m_diPodCheck[0], this, "POD Check0");
+            p_sInfo = m_toolBox.Get(ref m_diPodCheck[1], this, "POD Check1");
+            p_sInfo = m_toolBox.Get(ref m_diPodCheck[2], this, "POD Check2");
             p_sInfo = m_toolBox.Get(ref m_dioGuide, this, "Guide", "Up", "Down");
             p_sInfo = m_toolBox.Get(ref m_axisDoor, this, "Door");
-            p_sInfo = m_toolBox.Get(ref m_diDoorOpen, this, "Door Open");
-            p_sInfo = m_toolBox.Get(ref m_diDoorClose, this, "Door Close");
-            //p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT", m_diPlaced, m_diPresent);
-            if (bInit) { }
+            p_sInfo = m_toolBox.Get(ref m_diDoor[0], this, "Door Close");
+            p_sInfo = m_toolBox.Get(ref m_diDoor[1], this, "Door Open");
+            p_sInfo = m_toolBox.Get(ref m_doManual, this, "Manual");
+            p_sInfo = m_toolBox.Get(ref m_doAuto, this, "Auto");
+            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT", m_diPodCheck[0], m_diPodCheck[1]);
+            if (bInit) 
+            {
+                InitPos(); 
+            }
         }
         #endregion
 
-        #region DIO Function
+        #region Check
         public bool CheckPlaced()
         {
-            GemCarrierBase.ePresent present = GemCarrierBase.ePresent.Unknown; 
-            //if (m_diPlaced.p_bIn != m_diPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
-            //else present = m_diPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            GemCarrierBase.ePresent present = GemCarrierBase.ePresent.Unknown;
+            int nCheck = 0; 
+            for (int n = 0; n < 3; n++)
+            {
+                if (m_diPodCheck[n].p_bIn) nCheck++; 
+            }
+            switch (nCheck)
+            {
+                case 0: present = GemCarrierBase.ePresent.Empty; break;
+                case 3: present = GemCarrierBase.ePresent.Exist; break;
+                default: present = GemCarrierBase.ePresent.Unknown; break; 
+            }
             if (p_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + p_infoCarrier.p_eState);
             switch (p_infoCarrier.p_ePresentSensor)
             {
@@ -44,6 +68,76 @@ namespace Root_AOP01_Packing.Module
                 case GemCarrierBase.ePresent.Exist: m_svidPlaced.p_value = true; break;
             }
             return m_svidPlaced.p_value;
+        }
+        #endregion
+
+        #region Guide
+        double m_secGuide = 5; 
+        public string RunGuide(bool bDown)
+        {
+            m_dioGuide.Write(bDown);
+            return m_dioGuide.WaitDone(m_secGuide); 
+        }
+        #endregion
+
+        #region Door
+        public enum eDoor
+        {
+            Running,
+            Close,
+            Open,
+            Error
+        }
+        eDoor _eDoor = eDoor.Running;
+        public eDoor p_eDoor
+        {
+            get { return _eDoor; }
+            set
+            {
+                if (_eDoor == value) return;
+                _eDoor = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public enum ePos
+        {
+            Close,
+            Open
+        }
+        void InitPos()
+        {
+            m_axisDoor.AddPos(Enum.GetNames(typeof(ePos)));
+        }
+
+        public string RunDoorMove(ePos ePos)
+        {
+            m_axisDoor.StartMove(ePos);
+            return m_axisDoor.WaitReady();
+        }
+        #endregion
+
+        #region Thread Check
+        bool m_bThreadCheck = false;
+        Thread m_threadCheck;
+        void InitThread()
+        {
+            m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
+            m_threadCheck.Start();
+        }
+
+        void RunThreadCheck()
+        {
+            m_bThreadCheck = true;
+            Thread.Sleep(3000);
+            while (m_bThreadCheck)
+            {
+                Thread.Sleep(10);
+                CheckPlaced();
+                int nDoor = m_diDoor[1].p_bIn ? 2 : 0;
+                if (m_diDoor[0].p_bIn) nDoor++;
+                p_eDoor = (eDoor)nDoor;
+            }
         }
         #endregion
 
@@ -150,6 +244,7 @@ namespace Root_AOP01_Packing.Module
         {
             m_secHome = tree.Set(m_secHome, m_secHome, "Home", "Timeout (sec)");
             m_secMotion = tree.Set(m_secMotion, m_secMotion, "Motion", "Timeout (sec)");
+            m_secGuide = tree.Set(m_secGuide, m_secGuide, "Guide", "Guide Move Timeout (sec)");
         }
         #endregion
 
@@ -197,7 +292,6 @@ namespace Root_AOP01_Packing.Module
         #region StateReady
         public override string StateReady()
         {
-            CheckPlaced();
             if (p_infoCarrier.m_bReqLoad)
             {
                 p_infoCarrier.m_bReqLoad = false;
@@ -256,10 +350,16 @@ namespace Root_AOP01_Packing.Module
             InitBase(id, engineer);
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
+            InitThread(); 
         }
 
         public override void ThreadStop()
         {
+            if (m_bThreadCheck)
+            {
+                m_bThreadCheck = false;
+                m_threadCheck.Join();
+            }
             base.ThreadStop();
         }
 

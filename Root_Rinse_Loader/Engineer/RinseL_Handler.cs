@@ -147,6 +147,33 @@ namespace Root_Rinse_Loader.Engineer
             m_thread.Start();
         }
 
+        bool _bRun = false; 
+        public bool p_bRun
+        {
+            get { return _bRun; }
+            set
+            {
+                if (_bRun == value) return;
+                _bRun = value;
+                StartRun(value); 
+            }
+        }
+
+        void StartRun(bool bRun)
+        {
+            if (bRun)
+            {
+                m_rail.StartRun();
+                m_roller.StartRun();
+                m_storage.StartRun(); 
+                m_loader.StartRun(); 
+            }
+            else
+            {
+
+            }
+        }
+
         void RunThread()
         {
             m_bThread = true;
@@ -157,10 +184,9 @@ namespace Root_Rinse_Loader.Engineer
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
-                    case EQ.eState.Run:
-                        //forget
-                        break;
+                    case EQ.eState.Run:break;
                 }
+                p_bRun = (EQ.p_eState == EQ.eState.Run); 
             }
         }
         #endregion
