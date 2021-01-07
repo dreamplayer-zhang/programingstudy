@@ -10,7 +10,7 @@ using System.Windows.Input;
 
 namespace Root_WIND2
 {
-    class FrontsideSpec_ViewModel : ObservableObject
+    class FrontsideSpec_ViewModel : ObservableObject, IRecipeUILoadable
     {
         public Frontside_ViewModel m_front;
         public Recipe m_Recipe;
@@ -32,9 +32,9 @@ namespace Root_WIND2
             p_ROI_Viewer = new FrontsideMask_ViewModel();
             p_ROI_Viewer.p_VisibleMenu = Visibility.Collapsed;
             p_ROI_Viewer.SetBackGroundWorker();
-            p_ROI_Viewer.p_ImageData = m_front.p_ROI_VM.p_ImageData;
-            p_ROI_Viewer.p_ROILayer = m_front.p_ROI_VM.p_ROILayer;
-            p_ROI_Viewer.p_cInspROI = m_front.p_ROI_VM.p_cInspROI;
+            p_ROI_Viewer.p_ImageData = m_front.p_Mask_VM.p_ImageData;
+            p_ROI_Viewer.p_ROILayer = m_front.p_Mask_VM.p_ROILayer;
+            p_ROI_Viewer.p_cInspROI = m_front.p_Mask_VM.p_cInspROI;
             p_ROI_Viewer.SetRoiRect();
         }
 
@@ -44,7 +44,7 @@ namespace Root_WIND2
         {
             get
             {
-                m_ROI_Viewer.p_ImageData = m_front.p_ROI_VM.p_ImageData;
+                m_ROI_Viewer.p_ImageData = m_front.p_Mask_VM.p_ImageData;
                 m_ROI_Viewer.SetImageSource();
                 if(m_ROI_Viewer.p_SelectedROI != null)
                     m_ROI_Viewer._ReadROI();
@@ -162,6 +162,8 @@ namespace Root_WIND2
 
             if(p_cInspItem.Count > 0)
                 p_selectedInspItem = p_cInspItem[0];
+
+            SetParameter();
         }
 
         public void SetParameter()
@@ -187,6 +189,11 @@ namespace Root_WIND2
             }
 
             this.m_Recipe.ParameterItemList = paramList;
+        }
+
+        public void Load()
+        {
+            LoadSpec();
         }
 
         #region ICommand

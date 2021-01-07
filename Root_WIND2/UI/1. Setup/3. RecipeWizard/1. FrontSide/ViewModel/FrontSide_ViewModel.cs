@@ -20,7 +20,7 @@ namespace Root_WIND2
         public FrontSideMap         Map;
         public FrontSideOrigin      Origin;
         public FrontSidePosition   Position;
-        public FrontSideMask         ROI;
+        public FrontSideMask         Mask;
         public FrontSideSpec        Spec;
         public FrontsideInspection        InspTestPage;
 
@@ -61,16 +61,16 @@ namespace Root_WIND2
                 SetProperty(ref m_Position_VM, value);
             }
         }
-        private FrontsideMask_ViewModel m_ROI_VM;
-        public FrontsideMask_ViewModel p_ROI_VM
+        private FrontsideMask_ViewModel m_Mask_VM;
+        public FrontsideMask_ViewModel p_Mask_VM
         {
             get
             {
-                return m_ROI_VM;
+                return m_Mask_VM;
             }
             set
             {
-                SetProperty(ref m_ROI_VM, value);
+                SetProperty(ref m_Mask_VM, value);
             }
         }
         private FrontsideSpec_ViewModel m_Spec_VM;
@@ -130,8 +130,8 @@ namespace Root_WIND2
             p_Position_VM = new FrontsidePosition_ViewModel();
             p_Position_VM.init(setup, m_Recipe);
 
-            p_ROI_VM = new FrontsideMask_ViewModel();
-            p_ROI_VM.Init(setup,m_Recipe);
+            p_Mask_VM = new FrontsideMask_ViewModel();
+            p_Mask_VM.Init(setup,m_Recipe);
 
             p_Spec_VM = new FrontsideSpec_ViewModel();
             p_Spec_VM.init(this, m_Recipe);
@@ -155,7 +155,7 @@ namespace Root_WIND2
 
         private void P_Origin_VM_SetOrigin(object e)
         {
-            p_ROI_VM.SetOrigin(e);
+            p_Mask_VM.SetOrigin(e);
         }
         private void P_Origin_VM_SetMasterDie(object e)
         {
@@ -163,12 +163,14 @@ namespace Root_WIND2
         }
         public void UI_Redraw()
         {
-            p_Map_VM.LoadMapData(); // Map
-            m_Origin_VM.LoadOriginData(); // Origin
-            p_Position_VM.LoadPositonMark(); // Position
-            p_Spec_VM.LoadSpec();
-            p_Summary_VM.LoadSummaryData();
-            p_InspTest_VM.LoadInspTestData();
+            // 추후에 관리 통합할 수 있도록 변경
+            p_Map_VM.Load(); // Map
+            m_Origin_VM.Load(); // Origin
+            p_Position_VM.Load(); // Position
+            p_Spec_VM.Load();
+            p_Summary_VM.Load();
+            p_InspTest_VM.Load();
+            p_Mask_VM.Load();
         }
 
         public void Init()
@@ -178,14 +180,14 @@ namespace Root_WIND2
             Map = new FrontSideMap();
             Origin = new FrontSideOrigin();
             Position = new FrontSidePosition();
-            ROI = new FrontSideMask();
+            Mask = new FrontSideMask();
             Spec = new FrontSideSpec();
             InspTestPage = new FrontsideInspection();
 
             SetPage(Map);
             SetPage(Origin);
             SetPage(Position);
-            SetPage(ROI);
+            SetPage(Mask);
             SetPage(Spec);
             SetPage(Summary);
             SetPage(InspTestPage);
@@ -195,6 +197,11 @@ namespace Root_WIND2
         {
             Main.SubPanel.Children.Clear();
             Main.SubPanel.Children.Add(page);
+        }
+
+        public void Load()
+        {
+            throw new NotImplementedException();
         }
 
         public ICommand btnFrontSummary
@@ -245,7 +252,7 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    SetPage(ROI);
+                    SetPage(Mask);
                 });
             }
         }

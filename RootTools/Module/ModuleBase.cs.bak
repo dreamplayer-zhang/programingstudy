@@ -707,7 +707,7 @@ namespace RootTools.Module
         void OnChanged(eChanged eChanged, dynamic value)
         {
             if (m_remote == null) return;
-            //m_remote.RemoteSend(Remote.eProtocol.Module, eChanged.ToString(), value.ToString()); 
+            m_remote.RemoteSend(Remote.eProtocol.Module, eChanged.ToString(), value.ToString()); 
         }
 
         public void UpdateModule(Remote.Protocol protocol)

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using RootTools.Database;
 using RootTools.OHT;
 using RootTools_Vision;
-using RootTools_Vision.Inspection;
 
 namespace Root_WIND2
 {
@@ -15,7 +14,7 @@ namespace Root_WIND2
 	{
 		public InspectionManagerEdge(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt)
 		{
-			this.sharedBuffer = _sharedBuffer;
+			this.sharedBufferR_Gray = _sharedBuffer;
 			this.sharedBufferWidth = _width;
 			this.sharedBufferHeight = _height;
 			this.sharedBufferByteCnt = _byteCnt;
@@ -23,10 +22,11 @@ namespace Root_WIND2
 
 		protected override void InitWorkManager()
 		{
-			//base.InitWorkManager();
 			this.Add(new WorkManager("Snap", WORK_TYPE.ALIGNMENT, WORKPLACE_STATE.SNAP, WORKPLACE_STATE.NONE, STATE_CHECK_TYPE.CHIP, 5));
 			this.Add(new WorkManager("EdgeSurface", WORK_TYPE.INSPECTION, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.NONE, STATE_CHECK_TYPE.CHIP, 5));
 			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION, STATE_CHECK_TYPE.WAFER));
+
+			WIND2EventManager.SnapDone += SnapDone_Callback;
 		}
 
 		public enum InsepectionMode
@@ -40,13 +40,19 @@ namespace Root_WIND2
 		public InsepectionMode InspectionMode { get => inspectionMode; set => inspectionMode = value; }
 
 		private Recipe recipe;
-		private IntPtr sharedBuffer;
+		private IntPtr sharedBufferR_Gray;
+		private IntPtr sharedBufferG;
+		private IntPtr sharedBufferB;
+
 		private int sharedBufferWidth;
 		private int sharedBufferHeight;
 		private int sharedBufferByteCnt;
 
 		public Recipe Recipe { get => recipe; set => recipe = value; }
-		public IntPtr SharedBuffer { get => sharedBuffer; set => sharedBuffer = value; }
+		public IntPtr SharedBufferR_Gray { get => sharedBufferR_Gray; set => sharedBufferR_Gray = value; }
+		public IntPtr SharedBufferG { get => sharedBufferG; set => sharedBufferG = value; }
+		public IntPtr SharedBufferB { get => sharedBufferB; set => sharedBufferB = value; }
+
 		public int SharedBufferWidth { get => sharedBufferWidth; set => sharedBufferWidth = value; }
 		public int SharedBufferHeight { get => sharedBufferHeight; set => sharedBufferHeight = value; }
 		public int SharedBufferByteCnt { get => sharedBufferByteCnt; set => sharedBufferByteCnt = value; }
@@ -68,7 +74,8 @@ namespace Root_WIND2
 			for (int i = 0; i < memoryHeightTop / partitionNum; i++)
 			{
 				Workplace workplace = new Workplace(0, i, 0, memoryHeightTop / partitionNum * i, memoryWidthTop, memoryHeightTop / partitionNum);
-				workplace.SetSharedBuffer(this.SharedBuffer, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
+				workplace.SetSharedBuffer(this.SharedBufferR_Gray, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
+				workplace.SetSharedRGBBuffer(this.SharedBufferR_Gray, this.sharedBufferG, this.sharedBufferB);
 				workplaces.Add(workplace);
 			}
 
@@ -79,7 +86,8 @@ namespace Root_WIND2
 			for (int i = 0; i < memoryHeightSide / partitionNum; i++)
 			{
 				Workplace workplace = new Workplace(0, i, 0, memoryHeightSide / partitionNum * i, memoryWidhtSide, memoryHeightSide / partitionNum);
-				workplace.SetSharedBuffer(imageDataSide.GetPtr(), memoryWidhtSide, memoryHeightSide, imageDataSide.p_nByte);
+				workplace.SetSharedBuffer(imageDataSide.GetPtr(0), memoryWidhtSide, memoryHeightSide, imageDataSide.p_nByte);
+				workplace.SetSharedRGBBuffer(imageDataSide.GetPtr(0), imageDataSide.GetPtr(1), imageDataSide.GetPtr(2));
 				workplaces.Add(workplace);
 			}
 
@@ -90,7 +98,9 @@ namespace Root_WIND2
 			for (int i = 0; i<memoryHeightBtm / partitionNum; i++)
 			{
 				Workplace workplace = new Workplace(0, i, 0, memoryHeightBtm / partitionNum * i, memoryWidhtBtm, memoryHeightBtm / partitionNum);
-				workplace.SetSharedBuffer(imageDataBtm.GetPtr(), memoryWidhtBtm, memoryHeightBtm, imageDataBtm.p_nByte);
+				workplace.SetSharedBuffer(imageDataBtm.GetPtr(0), memoryWidhtBtm, memoryHeightBtm, imageDataBtm.p_nByte);
+				workplace.SetSharedRGBBuffer(imageDataBtm.GetPtr(0), imageDataBtm.GetPtr(1), imageDataBtm.GetPtr(2));
+
 				workplaces.Add(workplace);
 			}
 
@@ -108,51 +118,6 @@ namespace Root_WIND2
 
 			SetBundles(works, workplaces);
 			return true;
-
-			/*
-			// Top : 0
-			WorkplaceBundle workplaces = WorkplaceBundle.CreateWorkplaceBundle(sharedBufferWidth, sharedBufferHeight);
-			Workplace edgeTopWorkplace = new Workplace();
-			edgeTopWorkplace.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
-			workplaces.Add(edgeTopWorkplace);
-
-			// Side : 1
-			Workplace edgeSideWorkplace = new Workplace();
-			edgeTopWorkplace.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
-			workplaces.Add(edgeSideWorkplace);
-
-			// Bottom : 2
-			Workplace edgeBottomWorkplace = new Workplace();
-			edgeTopWorkplace.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
-			workplaces.Add(edgeBottomWorkplace);
-
-			// EBR : 3
-			Workplace ebrWorkplace = new Workplace();
-			edgeTopWorkplace.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
-			workplaces.Add(ebrWorkplace);
-			*/
-
-			/*
-			WorkplaceBundle workplaces = WorkplaceBundle.CreateWorkplaceBundle(sharedBufferWidth, sharedBufferHeight);
-			workplaces.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
-
-			EdgeSurface edgeSurface = new EdgeSurface();
-			edgeSurface.SetRecipe(this.recipe);
-			edgeSurface.SetWorkplaceBundle(workplaces);
-
-			ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-			processDefect_Wafer.SetRecipe(this.recipe);
-			processDefect_Wafer.SetWorkplaceBundle(workplaces);
-			//ProcessDefect processDefect = new ProcessDefect();
-			//processDefect.SetData(recipe.GetRecipeData(), recipe.GetParameter());
-			//works.Add(processDefect);
-			
-			WorkBundle works = new WorkBundle();
-			works.Add(edgeSurface);
-			works.Add(processDefect_Wafer);
-
-			SetBundles(works, workplaces);
-			*/
 		}
 
 
@@ -177,6 +142,11 @@ namespace Root_WIND2
 		public new void Stop()
 		{
 			base.Stop();
+		}
+
+		private void SnapDone_Callback(object sender, SnapDoneArgs e)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

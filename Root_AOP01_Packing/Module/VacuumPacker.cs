@@ -3,6 +3,7 @@ using Root_EFEM.Module;
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Root_AOP01_Packing.Module
     public class VacuumPacker : ModuleBase, IWTRChild
     {
         int TestNum = 1;
-        #region ToolBox
+        #region ToolBox //forget
         DIO_IO[] m_dioVacuum = new DIO_IO[2] { null, null };
         DIO_O[] m_doBlow = new DIO_O[2];
         Axis m_axisLoad;
@@ -67,8 +68,6 @@ namespace Root_AOP01_Packing.Module
 
                 p_sInfo = m_toolBox.Get(ref m_doHeater, this, "Heater Heating");
             }
-
-            
             if (bInit) InitTools();
         }
 
@@ -97,9 +96,183 @@ namespace Root_AOP01_Packing.Module
                 InitAxisPosLoad();
                 InitAxisPosGuide();
             }
-            
+        }
+        #endregion
 
-            
+        #region Solvalue
+        public class Solvalue
+        {
+            public DIO_I2O2 m_dio;
+            public double m_secTimeout = 5;
+
+            public void GetTools(ToolBox toolBox, string sOff, string sOn, bool bInit)
+            {
+                m_packer.p_sInfo = toolBox.Get(ref m_dio, m_packer, m_id, sOff, sOn);
+                if (bInit) m_dio.Write(false);
+            }
+
+            public string RunSol(bool bOn, double secSleep = 0)
+            {
+                m_dio.Write(bOn);
+                Thread.Sleep(500);
+                string sWait = m_dio.WaitDone(m_secTimeout);
+                if (sWait != "OK") return sWait;
+                Thread.Sleep((int)(1000 * secSleep));
+                return "OK";
+            }
+
+            public void RunTree(Tree tree)
+            {
+                m_secTimeout = tree.Set(m_secTimeout, m_secTimeout, m_id, "Solvalue Move Timeout (sec)");
+            }
+
+            VacuumPacker m_packer;
+            public string m_id;
+            public Solvalue(string id, VacuumPacker packer, double secTimeout)
+            {
+                m_id = id;
+                m_packer = packer;
+                m_secTimeout = secTimeout;
+            }
+        }
+
+        public List<Solvalue> m_aSolvalve = new List<Solvalue>();
+        Solvalue GetNewSolvalve(string id, double secTimeout)
+        {
+            Solvalue sol = new Solvalue(id, this, secTimeout);
+            m_aSolvalve.Add(sol);
+            return sol;
+        }
+
+        public List<string> p_asSol
+        {
+            get
+            {
+                List<string> asSol = new List<string>();
+                foreach (Solvalue sol in m_aSolvalve) asSol.Add(sol.m_id);
+                return asSol;
+            }
+        }
+
+        public Solvalue GetSolvalve(string sSol)
+        {
+            foreach (Solvalue sol in m_aSolvalve)
+            {
+                if (sol.m_id == sSol) return sol;
+            }
+            return null;
+        }
+        #endregion
+
+        #region Wrapper
+        public class Wrapper
+        {
+            Axis m_axisMove;
+            Axis m_axisPicker;
+            DIO_IO[] m_dioVacuum = new DIO_IO[2];
+            DIO_O[] m_doBlow = new DIO_O[2];
+            Solvalue m_solPush;
+            DIO_I m_diCheck;
+            DIO_I m_diLevel;
+            public void GetTools(ToolBox toolBox, bool bInit)
+            {
+                m_packer.p_sInfo = toolBox.Get(ref m_axisMove, m_packer, "Move");
+                m_packer.p_sInfo = toolBox.Get(ref m_axisPicker, m_packer, "Picker");
+                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum[0], m_packer, "Vacuum Center");
+                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum[1], m_packer, "Vacuum Side");
+                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[0], m_packer, "Blow Center");
+                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[1], m_packer, "Blow Side");
+                m_solPush.GetTools(toolBox, "Back", "Push", bInit);
+                m_packer.p_sInfo = toolBox.Get(ref m_diCheck, m_packer, "Wrapper Check");
+                m_packer.p_sInfo = toolBox.Get(ref m_diLevel, m_packer, "Wrapper Level");
+                if (bInit) InitPos(); 
+            }
+
+            List<Solvalue> m_aSolvalve = new List<Solvalue>();
+            void InitSolvalve()
+            {
+                m_solPush = m_packer.GetNewSolvalve(m_id + ".Push", 5);
+                m_aSolvalve.Add(m_solPush);
+            }
+
+            public enum ePosMove
+            {
+                Pick,
+                Place,
+                Push
+            }
+            public enum ePosPicker
+            {
+                Up,
+                Down,
+                Open
+            }
+            void InitPos()
+            {
+                m_dioVacuum[0].Write(false);
+                m_dioVacuum[1].Write(false);
+                m_axisMove.AddPos(Enum.GetNames(typeof(ePosMove)));
+                m_axisPicker.AddPos(Enum.GetNames(typeof(ePosPicker)));
+            }
+
+            public string RunMove(ePosMove ePos)
+            {
+                m_axisMove.StartMove(ePos);
+                return m_axisMove.WaitReady();
+            }
+
+            public string RunMove(ePosPicker ePos)
+            {
+                m_axisPicker.StartMove(ePos);
+                return m_axisPicker.WaitReady();
+            }
+
+            double m_secVac = 0.5;
+            double m_secBlow = 0.5;
+            string RunVacOn()
+            {
+                m_dioVacuum[0].Write(true);
+                m_dioVacuum[1].Write(true);
+                int msVac = (int)(1000 * m_secVac);
+                while (m_dioVacuum[0].m_swWrite.ElapsedMilliseconds < msVac)
+                {
+                    Thread.Sleep(10);
+                    if (m_dioVacuum[0].p_bIn && m_dioVacuum[1].p_bIn) return "OK";
+                    if (EQ.IsStop()) return m_id + " EQ Stop";
+                }
+                return "Vacuum Sensor On Timeout";
+            }
+
+            string RunVacOff(bool bCenter)
+            {
+                int nID = bCenter ? 0 : 1;
+                m_dioVacuum[nID].Write(false);
+                if (m_dioVacuum[nID].p_bIn)
+                {
+                    m_doBlow[nID].Write(true);
+                    Thread.Sleep((int)(1000 * m_secBlow));
+                    m_doBlow[nID].Write(false);
+                }
+                return "OK";
+            }
+
+
+
+            public void RunTree(Tree tree)
+            {
+                m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Wait (sec)");
+                m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Vacuum Off Blow Time (sec)");
+                foreach (Solvalue sol in m_aSolvalve) sol.RunTree(tree);
+            }
+
+            string m_id;
+            VacuumPacker m_packer;
+            public Wrapper(string id, VacuumPacker packer)
+            {
+                m_id = id;
+                m_packer = packer;
+                InitSolvalve();
+            }
         }
         #endregion
 

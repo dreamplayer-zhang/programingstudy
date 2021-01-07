@@ -33,6 +33,7 @@ namespace Root_WIND2.Module
 
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
+        Camera_Basler m_CamAutoFocus;
 
         #region [Getter Setter]
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
@@ -49,6 +50,7 @@ namespace Root_WIND2.Module
         public RADSControl RADSControl { get => m_RADSControl; private set => m_RADSControl = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
+        public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
         #endregion
 
         public override void GetTools(bool bInit)
@@ -64,6 +66,7 @@ namespace Root_WIND2.Module
                 p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
                 p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.Get(ref m_CamAlign, this, "AlignCam");
+                p_sInfo = m_toolBox.Get(ref m_CamAutoFocus, this, "AutoFocusCam");
             }
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
@@ -415,6 +418,8 @@ namespace Root_WIND2.Module
             AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
             AddModuleRunList(new Run_GrabLineScan(this), false, "Run Grab LineScan Camera");
             AddModuleRunList(new Run_Inspect(this), false, "Run Inspect");
+            AddModuleRunList(new Run_VisionAlign(this), false, "Run VisionAlign");
+            AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
             
         }
         #endregion

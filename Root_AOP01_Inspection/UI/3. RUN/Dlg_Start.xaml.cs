@@ -10,24 +10,26 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Root_AOP01_Inspection
 {
     /// <summary>
-    /// Run_Panel.xaml에 대한 상호 작용 논리
+    /// Dlg_Start.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Run_Panel : UserControl
+    public partial class Dlg_Start : Window
     {
-        public Run_Panel()
+        public Dlg_Start()
         {
             InitializeComponent();
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var asdf = this.DataContext;
+            this.DragMove();
+        }
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

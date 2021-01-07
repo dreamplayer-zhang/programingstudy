@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2
 {
-    class FrontsideMask_ViewModel : RootViewer_ViewModel
+    class FrontsideMask_ViewModel : RootViewer_ViewModel, IRecipeUILoadable
     {
         Recipe m_Recipe;
         /// <summary>
@@ -1640,6 +1640,12 @@ namespace Root_WIND2
             p_LoadingOpacity = 1;
             Worker_ShowAll.RunWorkerAsync();
         }
+
+        public void Load()
+        {
+            throw new NotImplementedException();
+        }
+
         public ICommand ShowAll
         {
             get

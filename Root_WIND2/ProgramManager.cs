@@ -155,10 +155,10 @@ namespace Root_WIND2
             // Edge
             if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
             {
-                this.InspectionEdge = new InspectionManagerEdge(ImageEdge.GetPtr(), ImageEdge.p_Size.X, ImageEdge.p_Size.Y, 3);
+                this.InspectionEdge = new InspectionManagerEdge(imageEdge.GetPtr(), imageEdge.p_Size.X, imageEdge.p_Size.Y, 3);
 
-                this.Engineer.InspectionEFEM = this.InspectionEdge;
-                this.Engineer.InspectionEFEM.Recipe = this.recipe;
+                this.Engineer.InspectionEdge = this.InspectionEdge;
+                this.Engineer.InspectionEdge.Recipe = this.recipe;
             }
 
             return true;
@@ -182,7 +182,7 @@ namespace Root_WIND2
                 }
                 
                 this.Recipe.Clear();
-                ShowDialogSaveRecipe();
+                ShowDialogSaveRecipe(true);
 
                 WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
             }
@@ -192,12 +192,14 @@ namespace Root_WIND2
             }
         }
 
-        public void ShowDialogSaveRecipe()
+        public void ShowDialogSaveRecipe(bool bNew = false)
         {
             try
             {
                 SaveFileDialog dlg = new SaveFileDialog();
                 dlg.InitialDirectory = recipeFolderPath;
+
+                if (bNew == true) dlg.Title = "새로 만들기";
 
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == true)

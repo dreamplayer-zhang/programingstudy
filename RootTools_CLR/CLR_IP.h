@@ -27,7 +27,7 @@ namespace RootTools_CLR
 		static array<Cpp_LabelParam^>^ Cpp_Labeling(array<byte>^ pSrcImg, array<byte>^ pBinImg, int  nMemW, int  nMemH, bool bDark);
 		static array<Cpp_LabelParam^>^ Cpp_Labeling(array<byte>^ pSrcImg, array<byte>^ pBinImg, int  nMemW, int  nMemH);
 		static array<Cpp_LabelParam^>^ Cpp_Labeling_SubPix(array<byte>^ pSrcImg, array<byte>^ pBinImg, int  nMemW, int  nMemH, bool bDark, int thresh, float Scale);
-
+		static void Cpp_Masking(array<byte>^ pSrcImg, array<byte>^ pDstImg, array<Cpp_Point^>^ startPoint, array<int>^ length, int  nMemW, int  nMemH);
 		// Method는 3, 5 권장 (다른 Method들은 정규화 되지 않아 Score가 100 이상 나올 수 있음) - 정확성 3 < 5, 속도 3 > 5
 		// OutPosX, OutPosY는 Matching Box의 좌상단. {CenterX, CenterY} = {OutPosX + nTempW / 2, OutPosY + nTempH / 2}
 		static float Cpp_TemplateMatching(byte* pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt);
