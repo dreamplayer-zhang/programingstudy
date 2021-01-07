@@ -437,32 +437,17 @@
                                     <Grid Grid.Row="1">
                                         <StackPanel Orientation="Horizontal"
                                                     HorizontalAlignment="Right">
-                                            <Button Grid.Row="1"
-                                                    Width="100"
+                                            <Button Width="100"
                                                     Margin="0,0,5,5"
                                                     Content="Image Load"
                                                     HorizontalAlignment="Right"
                                                     Command="{Binding btnLoadImage}"></Button>
-                                            <Button Grid.Row="1"
-                                                    Width="100"
-                                                    Margin="0,0,5,5"
-                                                    Content="Check All"
-                                                    HorizontalAlignment="Right"
-                                                    Command="{Binding btnCheckAll}"></Button>
-                                            <Button Grid.Row="1"
-                                                    Width="100"
-                                                    Margin="0,0,5,5"
-                                                    Content="Uncheck All"
-                                                    HorizontalAlignment="Right"
-                                                    Command="{Binding btnUncheckAll}"></Button>
-                                            <Button Grid.Row="1"
-                                                    Width="100"
+                                            <Button Width="100"
                                                     Margin="0,0,5,5"
                                                     Content="Show Trend"
                                                     HorizontalAlignment="Right"
                                                     Command="{Binding btnShowTrend}"></Button>
-                                            <Button Grid.Row="1"
-                                                    Width="100"
+                                            <Button Width="100"
                                                     Margin="0,0,5,5"
                                                     Content="Save Image"
                                                     HorizontalAlignment="Right"
@@ -475,7 +460,7 @@
                                               Grid.Row="2"
                                               ItemsSource="{Binding GoldenImageList, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                               SelectedIndex="{Binding ListViewIdx}"
-                                              SelectionMode="Multiple">
+                                              ScrollViewer.HorizontalScrollBarVisibility="Visible">
                                         <ListView.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <StackPanel Orientation="Horizontal" />

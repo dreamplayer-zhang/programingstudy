@@ -113,26 +113,7 @@ namespace Root_WIND2
         }
         public void GoldenImagelist_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            int a = 0;
-        }
-        private void OnMouseEnter(object sender, MouseEventArgs e)
-        {
-            int a = 0;
-        }
-
-        public void GoldenImagelist_SelectionChanged(object sender, EventArgs e)
-        {
-            int a = 0;
-        }
-
-        public void OnMouseDown(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        public void OnListViewMouseButtonDown(object sender, MouseButtonEventArgs e)
-        {
-           // MaterialSelectIndex = -1;
+            if (e.AddedItems.Count > 0) ;
         }
 
         #endregion
@@ -739,6 +720,10 @@ namespace Root_WIND2
                 return;
 
             string imgPath = recipe.RecipeFolderPath + @"RefImageHistory\";
+            DirectoryInfo di = new DirectoryInfo(recipe.RecipeFolderPath + @"RefImageHistory");
+            if (di.Exists == false)
+                return;
+           
             List<string> imgNames =  Directory.GetFiles(imgPath, "*.bmp", SearchOption.AllDirectories).ToList();
 
             foreach (string path in imgNames)
@@ -748,6 +733,7 @@ namespace Root_WIND2
                 temp.GoldenImgData = new BitmapImage(new (path));
                 temp.Title = path.Substring(imgPath.Length, path.Length - imgPath.Length - 4); // 끝에 .bmp 제거
 
+                for(int i = 0; i < 3; i++)
                 GoldenImageList.Add(temp);
             }
         }

@@ -55,8 +55,14 @@ namespace RootTools_Vision
 
             waferMap = new RecipeType_WaferMap();
 
-            RecipeItemList = Tools.GetEnumerableOfType<RecipeBase>().ToList<RecipeBase>();
-            ParameterItemList = new List<ParameterBase>();
+            RecipeItemList.Clear();
+            foreach(RecipeBase recipe in Tools.GetEnumerableOfType<RecipeBase>().ToList<RecipeBase>())
+            {
+                RecipeItemList.Add(recipe);
+            }
+            ParameterItemList.Clear();
+
+            WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
         }
 
         public bool Read(string recipePath, bool bUpdateUI)
