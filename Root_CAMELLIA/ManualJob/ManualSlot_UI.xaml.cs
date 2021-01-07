@@ -27,10 +27,12 @@ namespace Root_CAMELLIA.ManualJob
         TextBlock[] m_tblockState = new TextBlock[nSlot];
         ComboBox[] m_cbRecipe = new ComboBox[nSlot];
         TextBox[] m_tboxWaferID = new TextBox[nSlot];
-        Grid grid = new Grid();
+        Grid grid;
         InfoCarrier m_infoCarrier = null;
-        public ManualSlot_UI()
+        ManualSlot m_manualSlot = null;
+        public ManualSlot_UI(ManualSlot manualSlot)
         {
+            m_manualSlot = manualSlot;
             InitializeComponent();
             for (int i = 0; i < nSlot; i++)
             {
@@ -39,7 +41,7 @@ namespace Root_CAMELLIA.ManualJob
                 m_cbRecipe[i] = new ComboBox();
                 m_tboxWaferID[i] = new TextBox();
             }
-
+            grid = new Grid();
             Content = grid;
             //grid.ShowGridLines = true;
             InitSlotDisplay();
@@ -119,28 +121,15 @@ namespace Root_CAMELLIA.ManualJob
             }
         }
 
-        public void Init(InfoCarrier infoCarrier)
+        public void Init()
         {
-            m_infoCarrier = infoCarrier;
-            for (int i = 0; i < nSlot; i++)
-            {
-                if (m_infoCarrier.GetInfoWafer(i) == null)
-                {
-                    m_btnSelect[i].IsEnabled = false;
-                    m_tblockState[i].IsEnabled = false;
-                    m_tblockState[i].Text = "Empty";
-                    m_cbRecipe[i].IsEnabled = false;
-                    m_tboxWaferID[i].IsEnabled = false;
-                }
-                else
-                {
-                    m_btnSelect[i].IsEnabled = true;
-                    m_tblockState[i].IsEnabled = true;
-                    m_tblockState[i].Text = m_infoCarrier.GetInfoWafer(i).p_eState.ToString();
-                    m_cbRecipe[i].IsEnabled = true;
-                    m_tboxWaferID[i].IsEnabled = true;
-                }
-            }
+            //for (int i = 0; i < nSlot; i++)
+            //{
+            //    if (m_infoCarrier.GetInfoWafer(i) == null)
+            //    {
+
+            //    }
+            //}
         }
 
 
@@ -151,6 +140,11 @@ namespace Root_CAMELLIA.ManualJob
             {
                 m_cbRecipe[i].SelectedItem = sRecipe;
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var asdf = m_infoCarrier;
         }
     }
 }

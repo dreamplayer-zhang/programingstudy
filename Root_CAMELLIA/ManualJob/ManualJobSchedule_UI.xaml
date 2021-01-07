@@ -172,8 +172,7 @@
                         <TextBlock Text="Wafer ID" Margin="4" FontSize="20" VerticalAlignment="Center" TextAlignment="Center" Foreground="Black" Background="White"/>
                     </Grid>
                 </Grid>
-                <Grid Grid.Row="1">
-                    <local:ManualSlot_UI/>
+                <Grid Grid.Row="1" x:Name="gridSlot">
                 </Grid>
             </Grid>
             <Grid Grid.Row="1">
