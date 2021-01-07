@@ -841,7 +841,7 @@ namespace Root_AOP01_Inspection.Module
                                 darrScanAxisPos[i] = dTriggerStartPosY + (dSection * i);
                         }
                         SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, darrScanAxisPos, ladsinfos[nScanLine].m_Heightinfo, ladsinfos[nScanLine].m_Heightinfo.Length, false);
-                        
+
                         string strPool = m_grabMode.m_memoryPool.p_id;
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
                         string strMemory = m_grabMode.m_memoryData.p_id;
@@ -898,6 +898,18 @@ namespace Root_AOP01_Inspection.Module
                 narrAxisNo[iIdxScan] = nScanAxisNo;
                 narrAxisNo[iIdxZ] = nZAxisNo;
 
+                // Min-Max 구하기
+                double dMin = 480;
+                double dMax = 0;
+                double dCenter = 240;
+                double dPixelPerPulse = 500;
+                for (int i = 0; i < darrZAxisPos.Length; i++)
+                {
+                    if (darrZAxisPos[i] < dMin) dMin = darrZAxisPos[i];
+                    if (darrZAxisPos[i] > dMax) dMax = darrZAxisPos[i];
+                }
+                dCenter = ((dMax - dMin) / 2) + dMin;
+
                 // Queue 초기화
                 CAXM.AxmContiWriteClear(nScanAxisNo);
                 // 보간구동 축 맵핑
@@ -913,7 +925,7 @@ namespace Root_AOP01_Inspection.Module
                     for (int i = nPointCount - 1; i >= 0; i--)
                     {
                         darrPosition[iIdxScan] = darrScanAxisPos[i];
-                        darrPosition[iIdxZ] = darrZAxisPos[i] + m_module.m_axisZ.GetPosValue(eAxisPos.ScanPos);
+                        darrPosition[iIdxZ] = ((darrZAxisPos[i] - dCenter) * dPixelPerPulse) + m_nFocusPosZ;//m_module.m_axisZ.GetPosValue(eAxisPos.ScanPos);
                         CAXM.AxmLineMove(nScanAxisNo, darrPosition, dMaxVelocity, dMaxAccel, dMaxDecel);
                     }
                 }
@@ -922,7 +934,7 @@ namespace Root_AOP01_Inspection.Module
                     for (int i = 0; i<nPointCount; i++)
                     {
                         darrPosition[iIdxScan] = darrScanAxisPos[i];
-                        darrPosition[iIdxZ] = darrZAxisPos[i] + m_module.m_axisZ.GetPosValue(eAxisPos.ScanPos);
+                        darrPosition[iIdxZ] = ((darrZAxisPos[i] - dCenter) * dPixelPerPulse) + m_nFocusPosZ;//m_module.m_axisZ.GetPosValue(eAxisPos.ScanPos);
                         CAXM.AxmLineMove(nScanAxisNo, darrPosition, dMaxVelocity, dMaxAccel, dMaxDecel);
                     }
                 }
@@ -1162,6 +1174,19 @@ namespace Root_AOP01_Inspection.Module
                 int thumsize = 30;
                 int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
                 Mat ResultMat = new Mat();
+
+                // Min-Max 값 알아내기
+                int nMin = 480;
+                int nMax = 0;
+                for (int x = 0; x < nX; x++)
+                {
+                    for (int y = 0; y<nY; y++)
+                    {
+                        if (ladsinfos[x].m_Heightinfo[y] < nMin && ladsinfos[x].m_Heightinfo[y] > -1) nMin = (int)ladsinfos[x].m_Heightinfo[y];
+                        if (ladsinfos[x].m_Heightinfo[y] > nMax) nMax = (int)ladsinfos[x].m_Heightinfo[y];
+                    }
+                }
+
                 for (int x = 0; x < nX; x++)
                 {
                     Mat Vmat = new Mat();
@@ -1170,7 +1195,7 @@ namespace Root_AOP01_Inspection.Module
                         Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 3);
                         //double nScalednum = (ladsInfo.m_Heightinfo[y,x]-110) * 255 / nCamHeight;
                         //double nScalednum = (ladsinfos[x].m_Heightinfo[y] - 215) * 255 / nCamHeight;
-                        MCvScalar color = HeatColor(ladsinfos[x].m_Heightinfo[y], 0, 480);
+                        MCvScalar color = HeatColor(ladsinfos[x].m_Heightinfo[y], nMin, nMax);
                         ColorImg.SetTo(color);
 
                         if (y == 0)
