@@ -3,6 +3,7 @@ using Root_EFEM.Module;
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -67,8 +68,6 @@ namespace Root_AOP01_Packing.Module
 
                 p_sInfo = m_toolBox.Get(ref m_doHeater, this, "Heater Heating");
             }
-
-            
             if (bInit) InitTools();
         }
 
@@ -97,9 +96,132 @@ namespace Root_AOP01_Packing.Module
                 InitAxisPosLoad();
                 InitAxisPosGuide();
             }
-            
+        }
+        #endregion
 
-            
+        #region Solvalue
+        public class Solvalue
+        {
+            public DIO_I2O2 m_dio;
+            public double m_secTimeout = 5;
+
+            public void GetTools(ToolBox toolBox, string sOff, string sOn, bool bInit)
+            {
+                m_packer.p_sInfo = toolBox.Get(ref m_dio, m_packer, m_id, sOff, sOn);
+                if (bInit) m_dio.Write(false);
+            }
+
+            public string RunSol(bool bOn, double secSleep = 0)
+            {
+                m_dio.Write(bOn);
+                Thread.Sleep(500);
+                string sWait = m_dio.WaitDone(m_secTimeout);
+                if (sWait != "OK") return sWait;
+                Thread.Sleep((int)(1000 * secSleep));
+                return "OK";
+            }
+
+            public void RunTree(Tree tree)
+            {
+                m_secTimeout = tree.Set(m_secTimeout, m_secTimeout, m_id, "Solvalue Move Timeout (sec)");
+            }
+
+            VacuumPacker m_packer;
+            public string m_id;
+            public Solvalue(string id, VacuumPacker packer, double secTimeout)
+            {
+                m_id = id;
+                m_packer = packer;
+                m_secTimeout = secTimeout;
+            }
+        }
+
+        public List<Solvalue> m_aSolvalve = new List<Solvalue>();
+        Solvalue GetNewSolvalve(string id, double secTimeout)
+        {
+            Solvalue sol = new Solvalue(id, this, secTimeout);
+            m_aSolvalve.Add(sol);
+            return sol;
+        }
+
+        public List<string> p_asSol
+        {
+            get
+            {
+                List<string> asSol = new List<string>();
+                foreach (Solvalue sol in m_aSolvalve) asSol.Add(sol.m_id);
+                return asSol;
+            }
+        }
+
+        public Solvalue GetSolvalve(string sSol)
+        {
+            foreach (Solvalue sol in m_aSolvalve)
+            {
+                if (sol.m_id == sSol) return sol;
+            }
+            return null;
+        }
+        #endregion
+
+        #region Wrapper
+        public class Wrapper
+        {
+            Axis m_axisMove;
+            Axis m_axisPicker;
+            DIO_IO[] m_dioVacuum = new DIO_IO[2];
+            DIO_O[] m_doBlow = new DIO_O[2];
+            Solvalue m_solPush;
+            DIO_I m_diCheck;
+            DIO_I m_diLevel;
+            public void GetTools(ToolBox toolBox, bool bInit)
+            {
+                m_packer.p_sInfo = toolBox.Get(ref m_axisMove, m_packer, "Move");
+                m_packer.p_sInfo = toolBox.Get(ref m_axisPicker, m_packer, "Picker");
+                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum[0], m_packer, "Vacuum Center");
+                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum[1], m_packer, "Vacuum Side");
+                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[0], m_packer, "Blow Center");
+                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[1], m_packer, "Blow Side");
+                m_solPush.GetTools(toolBox, "Back", "Push", bInit);
+                m_packer.p_sInfo = toolBox.Get(ref m_diCheck, m_packer, "Wrapper Check");
+                m_packer.p_sInfo = toolBox.Get(ref m_diLevel, m_packer, "Wrapper Level");
+                if (bInit) InitPos(); 
+            }
+
+            List<Solvalue> m_aSolvalve = new List<Solvalue>();
+            void InitSolvalve()
+            {
+                m_solPush = m_packer.GetNewSolvalve(m_id + ".Push", 5);
+                m_aSolvalve.Add(m_solPush);
+            }
+
+            public enum ePosMove
+            {
+                Pick,
+                Place,
+                Push
+            }
+            public enum ePosPicker
+            {
+                Up,
+                Down,
+                Open
+            }
+            void InitPos()
+            {
+                m_axisMove.AddPos(Enum.GetNames(typeof(ePosMove)));
+                m_axisPicker.AddPos(Enum.GetNames(typeof(ePosPicker)));
+            }
+            //forget
+
+            string m_id;
+            VacuumPacker m_packer;
+            public Wrapper(string id, VacuumPacker packer)
+            {
+                m_id = id;
+                m_packer = packer;
+                //InitSolvalve();
+            }
         }
         #endregion
 

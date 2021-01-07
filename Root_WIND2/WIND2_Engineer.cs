@@ -146,8 +146,8 @@ namespace Root_WIND2
         public InspectionManagerBackside InspectionBack { get => inspectionBack; set => inspectionBack = value; }
 
 
-        private InspectionManagerEdge inspectionEFEM;
-        public InspectionManagerEdge InspectionEFEM { get => inspectionEFEM; set => inspectionEFEM = value; }
+        private InspectionManagerEdge inspectionEdge;
+        public InspectionManagerEdge InspectionEdge { get => inspectionEdge; set => inspectionEdge = value; }
 
         #region Tree Setup
         public TreeRoot m_treeRoot;
