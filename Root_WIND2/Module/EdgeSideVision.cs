@@ -19,9 +19,11 @@ namespace Root_WIND2.Module
 		#region ToolBox
 		Axis axisRotate;
 		Axis axisEdgeX;
-		AxisXY axisEbrXZ;
+		Axis axisEbrX;
+		Axis axisEbrZ;
 		DIO_O doVac;
 		DIO_O doBlow;
+		DIO_I diWaferExist;
 
 		MemoryPool memoryPool;
 		MemoryGroup memoryGroup;
@@ -39,7 +41,8 @@ namespace Root_WIND2.Module
 		#region Getter/Setter
 		public Axis AxisRotate { get => axisRotate; private set => axisRotate = value; }
 		public Axis AxisEdgeX { get => axisEdgeX; private set => axisEdgeX = value; }
-		public AxisXY AxisXZ { get => axisEbrXZ; private set => axisEbrXZ = value; }
+		public Axis AxisEbrX { get => axisEbrX; private set => axisEbrX = value; }
+		public Axis AxisEbrZ { get => axisEbrZ; private set => axisEbrZ = value; }
 		public DIO_O DoVac { get => doVac; private set => doVac = value; }
 		public DIO_O DoBlow { get => doBlow; private set => doBlow = value; }
 		public MemoryPool MemoryPool { get => memoryPool; private set => memoryPool = value; }
@@ -58,10 +61,12 @@ namespace Root_WIND2.Module
 		public override void GetTools(bool bInit)
 		{
 			p_sInfo = m_toolBox.Get(ref axisRotate, this, "Axis Rotate");
-			p_sInfo = m_toolBox.Get(ref axisEdgeX, this, "Axis Edge SideX");
-			p_sInfo = m_toolBox.Get(ref axisEbrXZ, this, "Axis EBR XZ");
+			p_sInfo = m_toolBox.Get(ref axisEdgeX, this, "Axis Edge X");
+			p_sInfo = m_toolBox.Get(ref axisEbrX, this, "Axis EBR X");
+			p_sInfo = m_toolBox.Get(ref axisEbrZ, this, "Axis EBR Z");
 			p_sInfo = m_toolBox.Get(ref doVac, this, "Stage Vacuum");
 			p_sInfo = m_toolBox.Get(ref doBlow, this, "Stage Blow");
+			p_sInfo = m_toolBox.Get(ref diWaferExist, this, "Wafer Exist");
 			p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
 			p_sInfo = m_toolBox.Get(ref camEdgeTop, this, "Cam EdgeTop");
 			p_sInfo = m_toolBox.Get(ref camEdgeSide, this, "Cam EdgeSide");
@@ -363,31 +368,28 @@ namespace Root_WIND2.Module
 
 			OpenCamera();
 			p_bStageVac = true;
+			
 			axisEdgeX.StartHome();
+			axisEbrX.StartHome();
+			axisEbrZ.StartHome();
 			if (axisEdgeX.WaitReady() != "OK")
 			{
 				p_bStageVac = false;
 				p_eState = eState.Error;
 				return "OK";
 			}
-
-			//Thread.Sleep(200);
-			//axisEbrXZ.p_axisX.StartHome();
-			//if (axisEbrXZ.p_axisX.WaitReady() != "OK")
-			//{
-			//	p_bStageVac = false;
-			//	p_eState = eState.Error;
-			//	return "OK";
-			//}
-
-			//Thread.Sleep(200);
-			//axisEbrXZ.p_axisY.StartHome();
-			//if (axisEbrXZ.p_axisY.WaitReady() != "OK")
-			//{
-			//	p_bStageVac = false;
-			//	p_eState = eState.Error;
-			//	return "OK";
-			//}
+			if (axisEbrX.WaitReady() != "OK")
+			{
+				p_bStageVac = false;
+				p_eState = eState.Error;
+				return "OK";
+			}
+			if (axisEbrZ.WaitReady() != "OK")
+			{
+				p_bStageVac = false;
+				p_eState = eState.Error;
+				return "OK";
+			}
 
 			Thread.Sleep(200);
 			axisRotate.StartHome();
@@ -397,11 +399,12 @@ namespace Root_WIND2.Module
 				return "OK";
 			}
 
-			//p_sInfo = base.StateHome();
-			p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error; 
-			//p_eState = eState.Error;
-			p_bStageVac = false;
-			return "Home Error";
+			p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+			
+			if (diWaferExist.p_bIn == false)
+				p_bStageVac = false;
+
+			return p_sInfo;
 		}
 		#endregion
 
