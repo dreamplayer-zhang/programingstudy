@@ -43,6 +43,16 @@ namespace RootTools
     {
         public CPoint StartPt;
         public int Width;
+
+        public PointLine() { }
+
+        public PointLine(CPoint startPt, int width)
+        {
+            StartPt.X = startPt.X;
+            startPt.Y = StartPt.Y;
+            Width = width;
+        }
+
     }
     public class TPoint : TShape
     {

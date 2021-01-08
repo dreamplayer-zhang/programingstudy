@@ -23,48 +23,12 @@ namespace Root_AOP01_Packing.Module
         #endregion
 
         #region Solvalue
-        public class Solvalue
+        public List<DIO_I2O2> m_aSolvalve = new List<DIO_I2O2>();
+        public void InitSolvalve(DIO_I2O2 sol)
         {
-            public DIO_I2O2 m_dio;
-            public double m_secTimeout = 5;
-
-            public void GetTools(ToolBox toolBox, string sOff, string sOn, bool bInit)
-            {
-                m_packer.p_sInfo = toolBox.Get(ref m_dio, m_packer, m_id, sOff, sOn);
-                if (bInit) m_dio.Write(false); 
-            }
-
-            public string RunSol(bool bOn, double secSleep = 0)
-            {
-                m_dio.Write(bOn);
-                Thread.Sleep(500);
-                string sWait = m_dio.WaitDone(m_secTimeout);
-                if (sWait != "OK") return sWait; 
-                Thread.Sleep((int)(1000 * secSleep));
-                return "OK"; 
-            }
-
-            public void RunTree(Tree tree)
-            {
-                m_secTimeout = tree.Set(m_secTimeout, m_secTimeout, m_id, "Solvalue Move Timeout (sec)"); 
-            }
-
-            TapePacker m_packer;
-            public string m_id;
-            public Solvalue(string id, TapePacker packer, double secTimeout)
-            {
-                m_id = id; 
-                m_packer = packer;
-                m_secTimeout = secTimeout; 
-            }
-        }
-
-        public List<Solvalue> m_aSolvalve = new List<Solvalue>(); 
-        Solvalue GetNewSolvalve(string id, double secTimeout)
-        {
-            Solvalue sol = new Solvalue(id, this, secTimeout);
+            if (sol == null) return;
             m_aSolvalve.Add(sol);
-            return sol; 
+            sol.Write(false); 
         }
 
         public List<string> p_asSol
@@ -72,14 +36,14 @@ namespace Root_AOP01_Packing.Module
             get
             {
                 List<string> asSol = new List<string>();
-                foreach (Solvalue sol in m_aSolvalve) asSol.Add(sol.m_id);
+                foreach (DIO_I2O2 sol in m_aSolvalve) asSol.Add(sol.m_id);
                 return asSol; 
             }
         }
 
-        public Solvalue GetSolvalve(string sSol)
+        public DIO_I2O2 GetSolvalve(string sSol)
         {
-            foreach (Solvalue sol in m_aSolvalve)
+            foreach (DIO_I2O2 sol in m_aSolvalve)
             {
                 if (sol.m_id == sSol) return sol; 
             }
@@ -91,34 +55,25 @@ namespace Root_AOP01_Packing.Module
         public class Cartridge
         {
             Axis m_axis;
-            Solvalue m_solCutter;
+            DIO_I2O2 m_solCutter;
             DIO_I[] m_diCheck = new DIO_I[2];
-            Solvalue m_solLock;
-            Solvalue m_solStop;
+            DIO_I2O2 m_solLock;
+            DIO_I2O2 m_solStop;
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_axis, m_packer, m_id);
-                m_solCutter.GetTools(toolBox, "Backward", "Forward", bInit);
-                m_packer.p_sInfo = toolBox.Get(ref m_diCheck[0], m_packer, "Check0");
-                m_packer.p_sInfo = toolBox.Get(ref m_diCheck[1], m_packer, "Check1");
-                m_solLock.GetTools(toolBox, "Unlock", "Lock", bInit);
-                m_solStop.GetTools(toolBox, "Rotate", "Stop", bInit);
+                m_packer.p_sInfo = toolBox.Get(ref m_solCutter, m_packer, m_id + ".Cutter", "Backward", "Forward");
+                m_packer.p_sInfo = toolBox.Get(ref m_diCheck[0], m_packer, m_id + ".Check0");
+                m_packer.p_sInfo = toolBox.Get(ref m_diCheck[1], m_packer, m_id + ".Check1");
+                m_packer.p_sInfo = toolBox.Get(ref m_solLock, m_packer, m_id + ".Lock", "Unlock", "Lock");
+                m_packer.p_sInfo = toolBox.Get(ref m_solStop, m_packer, m_id + ".Stop", "Rotate", "Stop");
                 if (bInit)
                 {
-                    foreach (Solvalue sol in m_aSolvalve) sol.m_dio.Write(false); 
+                    m_packer.InitSolvalve(m_solCutter);
+                    m_packer.InitSolvalve(m_solLock);
+                    m_packer.InitSolvalve(m_solLock);
                     InitPos(); 
                 }
-            }
-
-            List<Solvalue> m_aSolvalve = new List<Solvalue>(); 
-            void InitSolvalve()
-            {
-                m_solCutter = m_packer.GetNewSolvalve(m_id + ".Cutter", 5);
-                m_aSolvalve.Add(m_solCutter);
-                m_solLock = m_packer.GetNewSolvalve(m_id + ".Lock", 5);
-                m_aSolvalve.Add(m_solLock);
-                m_solStop = m_packer.GetNewSolvalve(m_id + ".Stop", 5);
-                m_aSolvalve.Add(m_solStop);
             }
 
             public enum ePos
@@ -161,18 +116,12 @@ namespace Root_AOP01_Packing.Module
                 return m_diCheck[0].p_bIn && m_diCheck[1].p_bIn; 
             }
 
-            public void RunTree(Tree tree)
-            {
-                foreach (Solvalue sol in m_aSolvalve) sol.RunTree(tree); 
-            }
-
             string m_id;
             TapePacker m_packer; 
             public Cartridge(string id, TapePacker packer)
             {
                 m_id = id;
                 m_packer = packer;
-                InitSolvalve(); 
             }
         }
 
@@ -182,25 +131,17 @@ namespace Root_AOP01_Packing.Module
         #region Roller
         public class Roller
         {
-            Solvalue m_solUp;
-            Solvalue m_solPush;
+            DIO_I2O2 m_solUp;
+            DIO_I2O2 m_solPush;
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_solUp.GetTools(toolBox, "Down", "Up", bInit);
-                m_solPush.GetTools(toolBox, "Back", "Push", bInit);
+                m_packer.p_sInfo = toolBox.Get(ref m_solUp, m_packer, m_id + ".UpDown", "Down", "Up");
+                m_packer.p_sInfo = toolBox.Get(ref m_solPush, m_packer, m_id + ".Push", "Back", "Push");
                 if (bInit)
                 {
-                    RunPush(false); 
+                    m_packer.InitSolvalve(m_solPush);
+                    m_packer.InitSolvalve(m_solUp);
                 }
-            }
-
-            List<Solvalue> m_aSolvalve = new List<Solvalue>();
-            void InitSolvalve()
-            {
-                m_solUp = m_packer.GetNewSolvalve(m_id + ".Down", 5);
-                m_aSolvalve.Add(m_solUp);
-                m_solPush = m_packer.GetNewSolvalve(m_id + ".Push", 5);
-                m_aSolvalve.Add(m_solPush);
             }
 
             public string RunPush(bool bPush)
@@ -209,17 +150,12 @@ namespace Root_AOP01_Packing.Module
                 if (bPush)
                 {
                     if (m_packer.Run(m_solUp.RunSol(true))) return m_packer.p_sInfo;
-                    return m_solPush.RunSol(true, 1);
+                    return m_solPush.RunSol(true);
                 }
                 else
                 {
                     return m_solUp.RunSol(false); 
                 }
-            }
-
-            public void RunTree(Tree tree)
-            {
-                foreach (Solvalue sol in m_aSolvalve) sol.RunTree(tree);
             }
 
             string m_id;
@@ -228,7 +164,6 @@ namespace Root_AOP01_Packing.Module
             {
                 m_id = id;
                 m_packer = packer;
-                InitSolvalve(); 
             }
         }
         public Roller m_roller; 
@@ -237,65 +172,56 @@ namespace Root_AOP01_Packing.Module
         #region Head
         public class Head
         {
-            Solvalue m_solHead;
-            Solvalue m_solPicker;
+            DIO_I2O2 m_solHead;
+            DIO_I2O2 m_solPicker;
             DIO_I m_diOverload;
             DIO_I m_diCheckCover;
             DIO_IO m_dioVacuum;
             DIO_O m_doBlow; 
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_solHead.GetTools(toolBox, "Up", "Down", bInit);
-                m_solPicker.GetTools(toolBox, "Up", "Down", bInit);
-                m_packer.p_sInfo = toolBox.Get(ref m_diOverload, m_packer, "Overload");
-                m_packer.p_sInfo = toolBox.Get(ref m_diCheckCover, m_packer, "Check Cover");
-                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum, m_packer, "Vacuum");
-                m_packer.p_sInfo = toolBox.Get(ref m_doBlow, m_packer, "Blow");
+                m_packer.p_sInfo = toolBox.Get(ref m_solHead, m_packer, m_id + ".Head", "Up", "Down");
+                m_packer.p_sInfo = toolBox.Get(ref m_solPicker, m_packer, m_id + ".Picker", "Up", "Down");
+                m_packer.p_sInfo = toolBox.Get(ref m_diOverload, m_packer, m_id + ".Overload");
+                m_packer.p_sInfo = toolBox.Get(ref m_diCheckCover, m_packer, m_id + ".Check Cover");
+                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum, m_packer, m_id + ".Vacuum");
+                m_packer.p_sInfo = toolBox.Get(ref m_doBlow, m_packer, m_id + ".Blow");
                 if (bInit)
                 {
-                    foreach (Solvalue sol in m_aSolvalve) sol.m_dio.Write(false);
+                    m_packer.InitSolvalve(m_solHead);
+                    m_packer.InitSolvalve(m_solPicker);
                 }
-            }
-
-            List<Solvalue> m_aSolvalve = new List<Solvalue>();
-            void InitSolvalve()
-            {
-                m_solHead = m_packer.GetNewSolvalve(m_id + ".Head", 5);
-                m_aSolvalve.Add(m_solHead);
-                m_solPicker = m_packer.GetNewSolvalve(m_id + ".Picker", 5);
-                m_aSolvalve.Add(m_solPicker);
             }
 
             public string Run(bool bHeadDown, bool bPickerDown)
             {
-                m_solPicker.m_dio.Write(bPickerDown);
+                m_solPicker.Write(bPickerDown);
                 string sRun = RunHead(bHeadDown);
                 if (sRun != "OK")
                 {
-                    m_solPicker.m_dio.Write(false);
+                    m_solPicker.Write(false);
                     RunHead(false); 
                     return sRun;
                 }
-                return m_solPicker.m_dio.WaitDone(m_solPicker.m_secTimeout); 
+                return m_solPicker.WaitDone(); 
             }
 
             string RunHead(bool bDown)
             {
                 if (bDown == false) return m_solHead.RunSol(bDown);
-                DIO_I2O2 dio = m_solHead.m_dio; 
-                dio.Write(bDown);
+                m_solHead.Write(bDown);
                 Thread.Sleep(100);
                 int msWait = (int)(1000 * m_solHead.m_secTimeout);
-                while (dio.p_bDone != true)
+                while (m_solHead.p_bDone != true)
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return m_id + " EQ Stop";
                     if (m_diOverload.p_bIn)
                     {
-                        dio.Write(false);
+                        m_solHead.Write(false);
                         return "Overload Sensor Checked"; 
                     }
-                    if (dio.m_swWrite.ElapsedMilliseconds > msWait) return dio.m_id + " Solvalve Move Timeout";
+                    if (m_solHead.m_swWrite.ElapsedMilliseconds > msWait) return m_solHead.m_id + " Solvalve Move Timeout";
                 }
                 return "OK";
             }
@@ -326,7 +252,6 @@ namespace Root_AOP01_Packing.Module
             {
                 m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Wait (sec)");
                 m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Vacuum Off Blow Time (sec)");
-                foreach (Solvalue sol in m_aSolvalve) sol.RunTree(tree);
             }
 
             string m_id;
@@ -335,7 +260,6 @@ namespace Root_AOP01_Packing.Module
             {
                 m_id = id;
                 m_packer = packer;
-                InitSolvalve(); 
             }
         }
 
@@ -349,8 +273,8 @@ namespace Root_AOP01_Packing.Module
             DIO_I m_diCheck;
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_axis, m_packer, "Rotate");
-                m_packer.p_sInfo = toolBox.Get(ref m_diCheck, m_packer, "Check");
+                m_packer.p_sInfo = toolBox.Get(ref m_axis, m_packer, m_id + ".Rotate");
+                m_packer.p_sInfo = toolBox.Get(ref m_diCheck, m_packer, m_id + ".Check");
                 if (bInit) { }
             }
 
@@ -456,6 +380,56 @@ namespace Root_AOP01_Packing.Module
                 if (m_reg != null) m_reg.Write("Process", (int)value);
                 OnPropertyChanged(); 
             }
+        }
+        #endregion
+
+        #region Functions
+        public string RunCoverOpen()
+        {
+            if (p_eProcess != eProcess.Case) return "Process not Case : " + p_eProcess.ToString();
+            p_eProcess = eProcess.Opening;
+            if (Run(m_head.RunVacuum(false))) return p_sInfo;
+            if (Run(m_head.Run(false, false))) return p_sInfo;
+            if (Run(m_head.Run(true, true))) return p_sInfo;
+            if (Run(m_head.RunVacuum(true))) return p_sInfo;
+            if (Run(m_head.Run(false, true))) return p_sInfo;
+            p_eProcess = eProcess.Opened;
+            return "OK";
+        }
+
+        public string RunCoverClose()
+        {
+            if (Run(m_head.Run(true, true))) return p_sInfo;
+            if (Run(m_head.RunVacuum(false))) return p_sInfo;
+            if (Run(m_head.Run(true, false))) return p_sInfo;
+            return "OK";
+        }
+
+        public string RunHeadUp()
+        {
+            if (Run(m_head.RunVacuum(false))) return p_sInfo;
+            if (Run(m_head.Run(false, false))) return p_sInfo;
+            return "OK";
+        }
+
+        public string RunTaping()
+        {
+            if (p_eProcess != eProcess.Reticle) return "Process not Reticle : " + p_eProcess.ToString();
+            p_eProcess = eProcess.Packing;
+            if (Run(RunCoverClose())) return p_sInfo;
+            if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo;
+            if (Run(m_cartridge.RunMove(Cartridge.ePos.Run))) return p_sInfo;
+            if (Run(m_stage.RunRotate(m_stage.m_degAttach))) return p_sInfo;
+            if (Run(m_roller.RunPush(true))) return p_sInfo;
+            Thread.Sleep(1000);
+            if (Run(m_cartridge.RunMove(Cartridge.ePos.Ready))) return p_sInfo;
+            if (Run(m_stage.RunTaping())) return p_sInfo;
+            if (Run(m_cartridge.RunCutter())) return p_sInfo;
+            if (Run(m_stage.RunRotate(180))) return p_sInfo;
+            if (Run(RunHeadUp())) return p_sInfo;
+            if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo;
+            p_eProcess = eProcess.Done;
+            return "OK";
         }
         #endregion
 
@@ -606,55 +580,6 @@ namespace Root_AOP01_Packing.Module
         }
         #endregion
 
-        #region Functions
-        public string RunCoverOpen()
-        {
-            if (p_eProcess != eProcess.Case) return "Process not Case : " + p_eProcess.ToString();
-            p_eProcess = eProcess.Opening;
-            if (Run(m_head.RunVacuum(false))) return p_sInfo;
-            if (Run(m_head.Run(false, false))) return p_sInfo;
-            if (Run(m_head.Run(true, true))) return p_sInfo;
-            if (Run(m_head.RunVacuum(true))) return p_sInfo;
-            if (Run(m_head.Run(false, true))) return p_sInfo;
-            p_eProcess = eProcess.Opened; 
-            return "OK";
-        }
-
-        public string RunCoverClose()
-        {
-            if (Run(m_head.Run(true, true))) return p_sInfo;
-            if (Run(m_head.RunVacuum(false))) return p_sInfo;
-            if (Run(m_head.Run(true, false))) return p_sInfo;
-            return "OK"; 
-        }
-
-        public string RunHeadUp()
-        {
-            if (Run(m_head.RunVacuum(false))) return p_sInfo;
-            if (Run(m_head.Run(false, false))) return p_sInfo;
-            return "OK"; 
-        }
-
-        public string RunTaping()
-        {
-            if (p_eProcess != eProcess.Reticle) return "Process not Reticle : " + p_eProcess.ToString();
-            p_eProcess = eProcess.Packing;
-            if (Run(RunCoverClose())) return p_sInfo;
-            if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo;
-            if (Run(m_cartridge.RunMove(Cartridge.ePos.Run))) return p_sInfo;
-            if (Run(m_stage.RunRotate(m_stage.m_degAttach))) return p_sInfo;
-            if (Run(m_roller.RunPush(true))) return p_sInfo;
-            if (Run(m_cartridge.RunMove(Cartridge.ePos.Ready))) return p_sInfo;
-            if (Run(m_stage.RunTaping())) return p_sInfo; 
-            if (Run(m_cartridge.RunCutter())) return p_sInfo;
-            if (Run(m_stage.RunRotate(180))) return p_sInfo;
-            if (Run(RunHeadUp())) return p_sInfo;
-            if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo;
-            p_eProcess = eProcess.Done;
-            return "OK";
-        }
-        #endregion
-
         #region Override
         public override void RunTree(Tree tree)
         {
@@ -664,8 +589,6 @@ namespace Root_AOP01_Packing.Module
 
         void RunTreeSetup(Tree tree)
         {
-            m_cartridge.RunTree(tree.GetTree("Cartridge")); 
-            m_roller.RunTree(tree.GetTree("Roller"));
             m_head.RunTree(tree.GetTree("Head"));
             m_stage.RunTree(tree.GetTree("Stage"));
         }
@@ -774,10 +697,10 @@ namespace Root_AOP01_Packing.Module
 
             public override string Run()
             {
-                Solvalue sol = m_module.GetSolvalve(m_sSol);
+                DIO_I2O2 sol = m_module.GetSolvalve(m_sSol);
                 if (sol == null) return "Invalid Solvalve Name";
-                sol.m_dio.Write(m_bOn); 
-                return "OK";
+                sol.Write(m_bOn); 
+                return sol.WaitDone();
             }
         }
 

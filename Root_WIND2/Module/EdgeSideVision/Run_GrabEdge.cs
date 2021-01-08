@@ -55,24 +55,21 @@ namespace Root_WIND2.Module
 		}
 		#endregion
 
+		double startDegree = 0;
+		double scanDegree = 360;
+		double resolution = 1.67;    // um
+		double scanAcc = 1;         // sec
+		int scanRate = 100;         // Camera Frame Spec 사용률 ? 1~100 %
+		int maxFrame = 100;
+
+		int sideFocusAxis = 26809;
+		int edgeDetectHeight = 200;
+
 		public Run_GrabEdge(EdgeSideVision module)
 		{
 			this.module = module;
 			InitModuleRun(module);
 		}
-
-		double startDegree = 0;
-		double scanDegree = 360;
-		double resolution = 1.67;    // um
-		//double triggerRatio = 1.5;	// 캠익에서 트리거 분주비
-		double scanAcc = 1;			// sec
-		int scanRate = 100;         // Camera Frame Spec 사용률 ? 1~100 %
-		int maxFrame = 100;
-
-		int sideFocusAxis = 26809;
-		int sobelHeight = 200;
-		int sobelThreshold = 90;
-		int sobelCnt = 10;
 
 		public override ModuleRunBase Clone()
 		{
@@ -87,12 +84,9 @@ namespace Root_WIND2.Module
 			run.scanRate = scanRate;
 			run.scanAcc = scanAcc;
 			run.resolution = resolution;
-			//run.triggerRatio = triggerRatio;
 
 			run.sideFocusAxis = sideFocusAxis;
-			run.sobelHeight = sobelHeight;
-			run.sobelThreshold = sobelThreshold;
-			run.sobelCnt = sobelCnt;
+			run.edgeDetectHeight = edgeDetectHeight;
 			return run;
 		}
 
@@ -101,15 +95,12 @@ namespace Root_WIND2.Module
 			startDegree = tree.Set(startDegree, startDegree, "Start Angle", "Degree", bVisible);
 			scanDegree = tree.Set(scanDegree, scanDegree, "Scan Angle", "Degree", bVisible);
 			resolution = tree.Set(resolution, resolution, "Resolution", "um / pixel", bVisible);
-			//triggerRatio = tree.Set(triggerRatio, triggerRatio, "분주비", "Camera 분주비", bVisible);
 			maxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(maxFrame, maxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
 			scanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(scanRate, scanRate, "Scan Rate", "카메라 Frame 사용률 (1~ 100 %)", bVisible);
 			scanAcc = (tree.GetTree("Scan Velocity", false, bVisible)).Set(scanAcc, scanAcc, "Scan Acc", "Scan 축 가속도 (sec)", bVisible);
 
 			sideFocusAxis = (tree.GetTree("Side Focus", false, bVisible)).Set(sideFocusAxis, sideFocusAxis, "Side Focus Axis", "Side 카메라 Focus 축 값", bVisible);
-			//sobelHeight = tree.Set(sobelHeight, sobelHeight, "Sobel Start Height", "", bVisible);
-			//sobelThreshold = tree.Set(sobelThreshold, sobelThreshold, "Edge Detect GV Threshold", "Sobel Edge 검출 시 GV Threshold", bVisible);
-			//sobelCnt = tree.Set(sobelCnt, sobelCnt, "Edge Detect Count", "Sobel Edge 검출 시 Threshold 이상의 Count. Count 이상 발견 시 Edge", bVisible);
+			edgeDetectHeight = (tree.GetTree("Side Focus", false, bVisible)).Set(edgeDetectHeight, edgeDetectHeight, "Edge Detect Height", "Top Edge 검출영역 Height", bVisible);
 
 			p_sGrabModeTop = tree.Set(p_sGrabModeTop, p_sGrabModeTop, module.p_asGrabMode, "Grab Mode : Top", "Select GrabMode", bVisible);
 			//if (gmTop != null) 
@@ -227,6 +218,9 @@ namespace Root_WIND2.Module
 			*/
 		}
 
+
+		int sobelThreshold = 90;
+		int sobelCnt = 10;
 		public void CalcSobelEdge(byte[] arrSobel, int nWidth, int nHeight, List<int> edgeDetect)
 		{
 			for (int i = 0; i < nWidth; i++)
@@ -256,7 +250,7 @@ namespace Root_WIND2.Module
 
 			int memW = Convert.ToInt32(module.MemoryEdgeTop.W);
 			int memH = module.MemoryEdgeTop.p_sz.Y;
-			int sobelSize = sobelHeight;
+			int sobelSize = edgeDetectHeight;
 
 			int memSize = memW * sobelSize;
 

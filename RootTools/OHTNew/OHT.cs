@@ -34,7 +34,7 @@ namespace RootTools.OHTNew
 
         bool p_bPresent
         {
-            get { return m_diPlaced.p_bIn && m_diPresent.p_bIn; }
+            get { return m_loadport.p_bPlaced && m_loadport.p_bPresent; }
         }
 
         bool _bAuto = false; 
@@ -677,21 +677,19 @@ namespace RootTools.OHTNew
         #endregion
 
         public ModuleBase m_module;
+        public ILoadport m_loadport; 
         public Log m_log;
         public GemCarrierBase m_carrier = null;
         IToolDIO m_toolDIO;
-        public DIO_I m_diPlaced;
-        public DIO_I m_diPresent;
 
-        public OHT(string id, ModuleBase module, GemCarrierBase carrier, IToolDIO toolDIO, DIO_I diPlaced, DIO_I diPresent)
+        public OHT(string id, ModuleBase module, ILoadport loadport, GemCarrierBase carrier, IToolDIO toolDIO)
         {
             p_id = id;
             m_module = module;
+            m_loadport = loadport; 
             m_carrier = carrier;
             m_log = module.m_log;
             m_toolDIO = toolDIO;
-            m_diPlaced = diPlaced;
-            m_diPresent = diPresent;
 
             InitTP(); 
             InitDI();
