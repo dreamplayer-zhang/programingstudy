@@ -1797,7 +1797,8 @@ namespace Root_AOP01_Inspection.Module
             MainVision m_module;
             public int m_nSearchArea = 2000;
             public double m_dMatchScore = 0.95;
-            public double m_dNGSpec_um = 100.0;
+            public double m_dNGSpecDistance_um = 100.0;
+            public double m_dNGSpecDegree = 0.5;
 
             public Run_ShiftAndRotation(MainVision module)
             {
@@ -1810,6 +1811,8 @@ namespace Root_AOP01_Inspection.Module
                 Run_ShiftAndRotation run = new Run_ShiftAndRotation(m_module);
                 run.m_nSearchArea = m_nSearchArea;
                 run.m_dMatchScore = m_dMatchScore;
+                run.m_dNGSpecDistance_um = m_dNGSpecDistance_um;
+                run.m_dNGSpecDegree = m_dNGSpecDegree;
                 return run;
             }
 
@@ -1817,6 +1820,8 @@ namespace Root_AOP01_Inspection.Module
             {
                 m_nSearchArea = tree.Set(m_nSearchArea, m_nSearchArea, "Search Area Size [px]", "Search Area Size [px]", bVisible);
                 m_dMatchScore = tree.Set(m_dMatchScore, m_dMatchScore, "Template Matching Score [0.0~1.0]", "Template Matching Score [0.0~1.0]", bVisible);
+                m_dNGSpecDistance_um = tree.GetTree("NG Spec", false, bVisible).Set(m_dNGSpecDistance_um, m_dNGSpecDistance_um, "Distance NG Spec [um]", "Distance NG Spec [um]", bVisible);
+                m_dNGSpecDegree = tree.GetTree("NG Spec", false, bVisible).Set(m_dNGSpecDegree, m_dNGSpecDegree, "Degree NG Spec", "Degree NG Spec", bVisible);
             }
 
             public enum eSearchPoint
@@ -1926,10 +1931,17 @@ namespace Root_AOP01_Inspection.Module
                 // Get distance From InFeatureCentroid & OutFeatureCentroid
                 double dResultDistance = GetDistanceOfTwoPoint(cptInFeatureCentroid, cptOutFeatureCentroid);
 
+                // Get Degree From OutLT & OutRT
+                double dThetaRadian = Math.Atan2((double)(cptarrOutResultCenterPositions[(int)eSearchPoint.RT].Y - cptarrOutResultCenterPositions[(int)eSearchPoint.LT].Y),
+                                                          cptarrOutResultCenterPositions[(int)eSearchPoint.RT].X - cptarrOutResultCenterPositions[(int)eSearchPoint.LT].X);
+                double dThetaDegree = dThetaRadian * (180 / Math.PI);
+
                 // Judgement
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
-                if (m_dNGSpec_um < (dResultDistance * moduleRunGrab.m_dResY_um)) return "Fail";
-                else return "OK";
+                if (m_dNGSpecDistance_um < (dResultDistance * moduleRunGrab.m_dResY_um)) return "Fail";
+                if (m_dNGSpecDegree < Math.Abs(dThetaDegree)) return "Fail";
+                
+                return "OK";
             }
 
             // 다각형의 면적과 무게중심을 구하는 알고리즘 * 출처 https://lsit81.tistory.com/entry/%EB%8B%A4%EA%B0%81%ED%98%95-%EB%A9%B4%EC%A0%81%EA%B3%BC-%EB%AC%B4%EA%B2%8C-%EC%A4%91%EC%8B%AC-%EA%B5%AC%ED%95%98%EA%B8%B0
