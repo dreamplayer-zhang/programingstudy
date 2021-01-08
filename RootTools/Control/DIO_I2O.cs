@@ -1,5 +1,6 @@
 ﻿using RootTools.Trees;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace RootTools.Control
 {
@@ -18,14 +19,23 @@ namespace RootTools.Control
             }
         }
 
-        public string WaitDone(double secWait)
+        public int m_secTimeout = 7;
+        public string WaitDone()
         {
-            int msWait = (int)(1000 * secWait); 
+            int msWait = (int)(1000 * m_secTimeout); 
             while (m_swWrite.ElapsedMilliseconds < msWait)
             {
+                if (EQ.IsStop()) return m_id + " EQ Stop";
                 if (p_bDone) return "OK"; 
             }
             return "DIO Timeout : " + m_id; 
+        }
+
+        public string RunSol(bool bOn)
+        {
+            Write(bOn);
+            Thread.Sleep(200);
+            return WaitDone();
         }
 
         public bool p_bOut
@@ -60,6 +70,7 @@ namespace RootTools.Control
             if (sDI1 != "OK") return sDI1;
             if (sDO != "OK") return sDO;
             m_bReverse = tree.Set(m_bReverse, m_bReverse, "Reverse", "Reverse DO Output");
+            m_secTimeout = tree.Set(m_secTimeout, m_secTimeout, "Timeout", "DIO WaitDone Timeout (sec)");
             m_eRun = (eRun)tree.Set(m_eRun, eRun.Nothing, "Run", "DIO Run Mode", p_bEnableRun);
             m_msRepeat = tree.Set(m_msRepeat, 1000, "Repeat", "Repeat Toggle Period (ms)", m_eRun == eRun.Repeat);
             return "OK";

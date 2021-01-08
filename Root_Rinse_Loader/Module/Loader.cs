@@ -77,17 +77,15 @@ namespace Root_Rinse_Loader.Module
         {
             m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum Sensor Wait (sec)");
             m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
-            m_secUpDown = tree.Set(m_secUpDown, m_secUpDown, "Timeout", "Picker Up & Down Timeout (sec)"); 
         }
         #endregion
 
         #region Picker Up & Down
         DIO_I2O2 m_dioPickerDown;
-        double m_secUpDown = 5; 
         public string RunPickerDown(bool bDown)
         {
             m_dioPickerDown.Write(bDown);
-            return m_dioPickerDown.WaitDone(m_secUpDown); 
+            return m_dioPickerDown.WaitDone(); 
         }
         #endregion
 

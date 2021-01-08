@@ -80,9 +80,9 @@ namespace RootTools.OHTNew
         {
             SetBrushLoadport(buttonStateLoading, m_OHT.m_doLoadReq.p_bOn && p_bBlink);
             SetBrushLoadport(buttonStateUnloading, m_OHT.m_doUnloadReq.p_bOn && p_bBlink);
-            textBlockPlaced.Foreground = !m_OHT.m_diPlaced.p_bIn ? Brushes.White : Brushes.Gray;
-            textBlockPresent.Foreground = !m_OHT.m_diPresent.p_bIn ? Brushes.White : Brushes.Gray;
-            bool bPodIn = p_bBlink ? m_OHT.m_diPlaced.p_bIn : m_OHT.m_diPresent.p_bIn;
+            textBlockPlaced.Foreground = !m_OHT.m_loadport.p_bPlaced ? Brushes.White : Brushes.Gray;
+            textBlockPresent.Foreground = !m_OHT.m_loadport.p_bPresent ? Brushes.White : Brushes.Gray;
+            bool bPodIn = p_bBlink ? m_OHT.m_loadport.p_bPlaced : m_OHT.m_loadport.p_bPresent;
             imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
             imageOutPod.Visibility = bPodIn ? Visibility.Hidden : Visibility.Visible;
             int nState = (int)m_OHT.p_eState; 

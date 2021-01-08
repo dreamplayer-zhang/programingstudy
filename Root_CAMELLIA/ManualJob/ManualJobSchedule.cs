@@ -66,13 +66,7 @@ namespace Root_CAMELLIA.ManualJob
                 if (_sRecipe == value) return;
                 _sRecipe = value;
                 OnPropertyChanged();
-                OnChanged();
             }
-        }
-
-        void OnChanged()
-        {
-            
         }
 
         public InfoCarrier m_infoCarrier = null;
