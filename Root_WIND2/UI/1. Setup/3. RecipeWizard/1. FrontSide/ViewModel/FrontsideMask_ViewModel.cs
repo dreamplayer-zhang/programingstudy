@@ -1643,7 +1643,7 @@ namespace Root_WIND2
 
         public void Load()
         {
-            throw new NotImplementedException();
+            //
         }
 
         public ICommand ShowAll
