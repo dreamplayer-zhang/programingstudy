@@ -1655,6 +1655,22 @@ namespace Root_WIND2
         public void Load()
         {
             //
+            p_cInspROI.Clear();
+
+            foreach (RecipeType_Mask mask in m_Recipe.GetRecipe<MaskRecipe>().MaskList)
+            {
+                InspectionROI roi = new InspectionROI();
+                roi.p_Color = Colors.AliceBlue;
+                roi.p_Index = p_cInspROI.Count();
+
+                List<PointLine> pointLines = new List<PointLine>();
+                mask.CopyPointLinesTo(ref pointLines);
+                roi.p_Data = pointLines;
+                
+                p_cInspROI.Add(roi);
+            }
+
+            p_SelectedROI = p_cInspROI.First();
         }
 
         public ICommand ShowAll
