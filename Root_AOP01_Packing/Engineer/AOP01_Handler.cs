@@ -36,7 +36,6 @@ namespace Root_AOP01_Packing
         public VacuumPacker m_vacuumPacker;
         public IndividualElevator m_elevator;
         public Unloadport_AOP m_unloadport;
-        public WrappingContainer m_wrapping; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -59,9 +58,6 @@ namespace Root_AOP01_Packing
             m_unloadport = new Unloadport_AOP("Unloadport", m_engineer);
             InitModule(m_unloadport);
             ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_unloadport);
-
-            m_wrapping = new WrappingContainer("WrappingContainer", m_engineer);
-            InitModule(m_wrapping);
 
             m_aWTR[0].RunTree(Tree.eMode.RegRead);
             m_aWTR[0].RunTree(Tree.eMode.Init);

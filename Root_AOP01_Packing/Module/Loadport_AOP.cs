@@ -72,11 +72,10 @@ namespace Root_AOP01_Packing.Module
         #endregion
 
         #region Guide
-        double m_secGuide = 5; 
         public string RunGuide(bool bDown)
         {
             m_dioGuide.Write(bDown);
-            return m_dioGuide.WaitDone(m_secGuide); 
+            return m_dioGuide.WaitDone(); 
         }
         #endregion
 
@@ -244,7 +243,6 @@ namespace Root_AOP01_Packing.Module
         {
             m_secHome = tree.Set(m_secHome, m_secHome, "Home", "Timeout (sec)");
             m_secMotion = tree.Set(m_secMotion, m_secMotion, "Motion", "Timeout (sec)");
-            m_secGuide = tree.Set(m_secGuide, m_secGuide, "Guide", "Guide Move Timeout (sec)");
         }
         #endregion
 

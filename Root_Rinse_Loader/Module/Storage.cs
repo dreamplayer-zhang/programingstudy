@@ -161,10 +161,9 @@ namespace Root_Rinse_Loader.Module
         #region Pusher
         DIO_I2O m_dioPusher;
         DIO_I m_diOverload;
-        double m_secPusher = 10;
         public string RunPusher()
         {
-            int msWait = (int)(1000 * m_secPusher); 
+            int msWait = (int)(1000 * m_dioPusher.m_secTimeout); 
             StopWatch sw = new StopWatch(); 
             m_dioPusher.Write(true);
             while (m_dioPusher.p_bDone == false)
@@ -184,12 +183,7 @@ namespace Root_Rinse_Loader.Module
                 }
             }
             m_dioPusher.Write(false);
-            return m_dioPusher.WaitDone(m_secPusher); 
-        }
-
-        void RunTreePusher(Tree tree)
-        {
-            m_secPusher = tree.Set(m_secPusher, m_secPusher, "Timeout", "Pusher Timeout (sec)"); 
+            return m_dioPusher.WaitDone(); 
         }
         #endregion
 
@@ -312,7 +306,6 @@ namespace Root_Rinse_Loader.Module
         {
             base.RunTree(tree);
             RunTreeElevator(tree.GetTree("Elevator"));
-            RunTreePusher(tree.GetTree("Pusher"));
             m_secRunDelay = tree.Set(m_secRunDelay, m_secRunDelay, "Run Delay", "Run Delay (sec)"); 
         }
         #endregion
