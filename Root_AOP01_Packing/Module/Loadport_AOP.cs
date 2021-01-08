@@ -38,7 +38,7 @@ namespace Root_AOP01_Packing.Module
             p_sInfo = m_toolBox.Get(ref m_diDoor[1], this, "Door Open");
             p_sInfo = m_toolBox.Get(ref m_doManual, this, "Manual");
             p_sInfo = m_toolBox.Get(ref m_doAuto, this, "Auto");
-            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT", m_diPodCheck[0], m_diPodCheck[1]);
+            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
             if (bInit) 
             {
                 InitPos(); 
@@ -336,6 +336,10 @@ namespace Root_AOP01_Packing.Module
             while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
+
+        public bool p_bPlaced { get { return m_diPodCheck[0].p_bIn; } }
+        public bool p_bPresent { get { return (m_diPodCheck[1].p_bIn && m_diPodCheck[2].p_bIn); } }
+
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }

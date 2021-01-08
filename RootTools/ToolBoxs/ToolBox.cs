@@ -13,6 +13,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.OHT.Semi;
 using RootTools.OHT.SSEM;
+using RootTools.OHTNew;
 using RootTools.Printer;
 using RootTools.RADS;
 using RootTools.RTC5s.LaserBright;
@@ -450,12 +451,12 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref OHTNew.OHT value, ModuleBase module, GemCarrierBase carrier, string id, DIO_I diPlaced, DIO_I diPresent)
+        public string Get(ref OHTNew.OHT value, ModuleBase module, GemCarrierBase carrier, string id)
         {
             if (m_toolSetOHT == null) m_toolSetOHT = InitToolSet("OHT");
             if (value == null)
             {
-                value = new OHTNew.OHT(module.p_id + "." + id, module, carrier, m_toolDIO, diPlaced, diPresent);
+                value = new OHTNew.OHT(module.p_id + "." + id, module, (ILoadport)module, carrier, m_toolDIO);
                 m_toolSetOHT.AddTool(value);
                 module.m_aTool.Add(value);
             }
