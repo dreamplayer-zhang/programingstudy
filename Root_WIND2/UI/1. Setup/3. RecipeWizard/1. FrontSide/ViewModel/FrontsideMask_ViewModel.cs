@@ -1594,7 +1594,7 @@ namespace Root_WIND2
             }
             if (p_cInspROI.Count == 0)
             {
-                SetLayerSource();
+                _ClearROI();
             }
             else
             {
