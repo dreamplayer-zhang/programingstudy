@@ -65,7 +65,7 @@ namespace Root_WIND2
 
 		public override bool CreateInspection(Recipe _recipe)
 		{
-			int partitionNum = 10;  // recipe?
+			int partitionNum = 1000;  // recipe
 			WorkplaceBundle workplaces = new WorkplaceBundle();
 
 			// top
