@@ -15,7 +15,7 @@ namespace Root_WIND2.Module
 		InspectionManagerEdge inspectionEdge;
 		string recipeName = string.Empty;
 
-		int roiHeight = 200;
+		int roiHeight = 1000;
 		int roiWidth = 3000;
 		int threshhold = 12;
 		int size = 5;
@@ -68,6 +68,12 @@ namespace Root_WIND2.Module
 		{
 			try
 			{
+				//if (this.inspectionEdge.Recipe.Read(m_sRecipeName, true) == false)
+				//	return "Recipe Open Fail";
+
+				if (this.inspectionEdge.CreateInspection() == false)
+					return "Create Inspection Fail";
+
 				inspectionEdge.Start();
 				return "OK";
 			}
