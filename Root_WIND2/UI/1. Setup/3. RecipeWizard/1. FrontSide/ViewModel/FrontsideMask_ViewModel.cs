@@ -1519,7 +1519,8 @@ namespace Root_WIND2
             if (ptrMem == IntPtr.Zero)
                 return;
             byte* bitmapPtr = (byte*)ptrMem.ToPointer();
-
+            if (p_SelectedROI == null)
+                return;
             p_SelectedROI.p_Data.Clear();
             PointLine DotLine = new PointLine();
             bool bStart = false;
@@ -1591,6 +1592,16 @@ namespace Root_WIND2
             {
                 p_cInspROI[i].p_Index = i;
             }
+            if (p_cInspROI.Count == 0)
+            {
+                SetLayerSource();
+            }
+            else
+            {
+                p_SelectedROI = p_cInspROI.Last();
+            }
+            
+            
         }
         private void _ClearROI()
         {
