@@ -213,7 +213,17 @@
                                 <GroupBox.Resources>
                                     <local:PropertyConverter x:Key="PropertyConverter"/>
                                 </GroupBox.Resources>
-                                <wpg:WpfPropertyGrid 
+                                <ComboBox VerticalAlignment="Top">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Background="Blue">
+                                                <TextBlock Text="{Binding}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                    
+                                </ComboBox>
+                                <!--<wpg:WpfPropertyGrid 
                                                     SelectedObject="{Binding p_selectedMethodItem, FallbackValue=null,
                                                     Converter={StaticResource ResourceKey=PropertyConverter}}"
                                                     
@@ -221,7 +231,7 @@
                                                      VerticalAlignment="Stretch"
                                                      HelpVisible="True"
                                                      ToolbarVisible="False"
-                                                     PropertySort="Categorized"/>
+                                                     PropertySort="Categorized"/>-->
                             </GroupBox>
 
                         </Grid>
@@ -269,11 +279,22 @@
                                                                   VerticalContentAlignment="Center">-->
                                                     <ComboBox     ItemsSource="{Binding p_cInspROI}"
                                                                   SelectedItem="{Binding p_InspROI, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  Background="AliceBlue"
                                                                   IsSynchronizedWithCurrentItem="False"
                                                                   BorderThickness="1"
                                                                   DisplayMemberPath="p_Index"
                                                                   HorizontalContentAlignment="Center"
                                                                   VerticalContentAlignment="Center">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <Rectangle Fill="{Binding p_Color, Converter={StaticResource ColorConverter}}"
+                                                                               Width="15"
+                                                                               Height="15" Margin="5,0,10,0"/>
+                                                                    <TextBlock Text="{Binding p_Index}"  VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
                                                         <i:Interaction.Triggers>
                                                             <i:EventTrigger EventName="SelectionChanged">
                                                                 <i:InvokeCommandAction Command="{Binding ComboBoxSelectionChanged_MaskItem}" />
