@@ -208,7 +208,7 @@
                             
                             
                             
-                            <GroupBox Header="Method Spec" Grid.Row="0" Grid.RowSpan="3"
+                            <!--<GroupBox Header="Method Spec" Grid.Row="0" Grid.RowSpan="3"
                                   Background="{StaticResource GroupBoxBackground}">
                                 <GroupBox.Resources>
                                     <local:PropertyConverter x:Key="PropertyConverter"/>
@@ -223,7 +223,7 @@
                                     </ComboBox.ItemTemplate>
                                     
                                 </ComboBox>
-                                <!--<wpg:WpfPropertyGrid 
+                                --><!--<wpg:WpfPropertyGrid 
                                                     SelectedObject="{Binding p_selectedMethodItem, FallbackValue=null,
                                                     Converter={StaticResource ResourceKey=PropertyConverter}}"
                                                     
@@ -231,8 +231,8 @@
                                                      VerticalAlignment="Stretch"
                                                      HelpVisible="True"
                                                      ToolbarVisible="False"
-                                                     PropertySort="Categorized"/>-->
-                            </GroupBox>
+                                                     PropertySort="Categorized"/>--><!--
+                            </GroupBox>-->
 
                         </Grid>
                     </Grid>
@@ -304,7 +304,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Color" Width="*">
+                                        <!--<DataGridTemplateColumn Header="Color" Width="*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <Grid Margin="2"
@@ -312,7 +312,7 @@
                                                               Converter={StaticResource ColorConverter}}"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
+                                        </DataGridTemplateColumn>-->
                                         <DataGridTemplateColumn Header="Inspection Method" Width="1.5*">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
