@@ -73,6 +73,8 @@ namespace Root_WIND2.Module
 
 		public override string Run()
 		{
+			module.p_bStageVac = true;
+
 			if (gmEBR == null) return "Grab Mode == null";
 
 			try
