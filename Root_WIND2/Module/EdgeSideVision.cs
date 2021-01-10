@@ -155,7 +155,7 @@ namespace Root_WIND2.Module
 
 		double pulse360 = 360000;
 		public double Pulse360 { get => pulse360; set => pulse360 = value; }
-		double edgeCamTriggerRatio = 1.5; //캠익에서 트리거 분주비
+		double edgeCamTriggerRatio = 1; //캠익에서 트리거 분주비
 		public double EdgeCamTriggerRatio { get => edgeCamTriggerRatio; set => edgeCamTriggerRatio = value; }
 		double ebrCamTriggerRatio = 2/3;
 		public double EbrCamTriggerRatio { get => ebrCamTriggerRatio; set => ebrCamTriggerRatio = value; }

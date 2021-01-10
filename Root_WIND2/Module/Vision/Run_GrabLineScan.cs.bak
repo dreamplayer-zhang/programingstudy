@@ -119,7 +119,7 @@ namespace Root_WIND2.Module
 
                     if (m_module.Run(axisZ.StartMove(m_nFocusPosZ)))
                         return p_sInfo;
-                    if (m_module.Run(axisXY.StartMove(new RPoint(dPosX + m_module.AlignData.X, dStartPosY + m_module.AlignData.Y))))
+                    if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
@@ -141,7 +141,7 @@ namespace Root_WIND2.Module
                     m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
                     //m_grabMode.StartGrabColor(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
 
-                    if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY + m_module.AlignData.Y, nScanSpeed)))
+                    if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;

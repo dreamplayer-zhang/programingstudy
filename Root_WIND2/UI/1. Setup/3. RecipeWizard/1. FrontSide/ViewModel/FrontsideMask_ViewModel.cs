@@ -1670,6 +1670,8 @@ namespace Root_WIND2
                 p_cInspROI.Add(roi);
             }
 
+            if (p_cInspROI.Count == 0) return;
+
             p_SelectedROI = p_cInspROI.First();
         }
 

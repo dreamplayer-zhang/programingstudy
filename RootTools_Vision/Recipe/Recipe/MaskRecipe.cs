@@ -26,7 +26,7 @@ namespace RootTools_Vision
         }
 
         [XmlIgnore]
-        public CRect BoudingBox 
+        public CRect BoundingBox 
         { 
             get => boundingBox; 
             set => boundingBox = value; 
@@ -89,6 +89,13 @@ namespace RootTools_Vision
         public override bool Save(string recipePath)
         {
             return true;
+        }
+
+        public override void Clear()
+        {
+            OriginPoint = new CPoint();
+            BoundingBox = new CRect();
+            MaskList.Clear();
         }
     }
 }

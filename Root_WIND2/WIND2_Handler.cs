@@ -62,7 +62,8 @@ namespace Root_WIND2
             switch (m_engineer.m_eMode)
             {
                 case WIND2_Engineer.eMode.Vision: 
-                    InitVisionModule(); break;
+                    InitVisionModule(); 
+                    break;
                 case WIND2_Engineer.eMode.EFEM:
                     InitEFEMModule();
                     break;
