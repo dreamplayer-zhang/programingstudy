@@ -208,22 +208,12 @@
                             
                             
                             
-                            <!--<GroupBox Header="Method Spec" Grid.Row="0" Grid.RowSpan="3"
+                            <GroupBox Header="Method Spec" Grid.Row="0" Grid.RowSpan="3"
                                   Background="{StaticResource GroupBoxBackground}">
                                 <GroupBox.Resources>
                                     <local:PropertyConverter x:Key="PropertyConverter"/>
                                 </GroupBox.Resources>
-                                <ComboBox VerticalAlignment="Top">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Background="Blue">
-                                                <TextBlock Text="{Binding}" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                    
-                                </ComboBox>
-                                --><!--<wpg:WpfPropertyGrid 
+                                <wpg:WpfPropertyGrid 
                                                     SelectedObject="{Binding p_selectedMethodItem, FallbackValue=null,
                                                     Converter={StaticResource ResourceKey=PropertyConverter}}"
                                                     
@@ -231,8 +221,8 @@
                                                      VerticalAlignment="Stretch"
                                                      HelpVisible="True"
                                                      ToolbarVisible="False"
-                                                     PropertySort="Categorized"/>--><!--
-                            </GroupBox>-->
+                                                     PropertySort="Categorized"/>
+                            </GroupBox>
 
                         </Grid>
                     </Grid>
