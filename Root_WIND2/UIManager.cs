@@ -92,7 +92,7 @@ namespace Root_WIND2
         void InitRunMode()
         {
             runWindow = new Run();
-            runViewModel = new Run_ViewModel();
+            runViewModel = new Run_ViewModel(setupViewModel);
             runWindow.DataContext = runViewModel;
         }
 

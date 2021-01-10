@@ -179,7 +179,6 @@ namespace Root_WIND2.Module
 		private void m_gmTop_Grabed(object sender, EventArgs e)
 		{
 			GrabedArgs ga = (GrabedArgs)e;
-			module.p_nProgress = ga.nProgress;
 			int memW = Convert.ToInt32(ga.mdMemoryData.W);
 			int memH = ga.mdMemoryData.p_sz.Y;
 

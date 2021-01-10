@@ -65,22 +65,20 @@ namespace Root_WIND2
 
 		public override bool CreateInspection(Recipe _recipe)
 		{
-			int partitionNum = 2000;  // recipe
+			int partitionNum = 1000;  // recipe
 			WorkplaceBundle workplaces = new WorkplaceBundle();
 
 			// top
-			int memoryHeightTop = 10000;// this.SharedBufferHeight;
+			int memoryHeightTop = this.SharedBufferHeight;
 			int memoryWidthTop = this.SharedBufferWidth;
 			for (int i = 0; i < memoryHeightTop / partitionNum; i++)
 			{
-				Workplace workplace = new Workplace(0, i, 0, memoryHeightTop / partitionNum * i, memoryWidthTop, partitionNum);
+				Workplace workplace = new Workplace(0, i, 0, memoryHeightTop / partitionNum * i, memoryWidthTop, memoryHeightTop / partitionNum);
 				workplace.SetSharedBuffer(this.SharedBufferR_Gray, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
 				workplace.SetSharedRGBBuffer(this.SharedBufferR_Gray, this.sharedBufferG, this.sharedBufferB);
 				workplaces.Add(workplace);
 			}
-			workplaces[0].SetSharedBuffer(this.SharedBufferR_Gray, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
-			workplaces[0].SetSharedRGBBuffer(this.SharedBufferR_Gray, this.sharedBufferG, this.sharedBufferB);
-			/*
+
 			// side
 			RootTools.ImageData imageDataSide = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeSide);
 			int memoryHeightSide = imageDataSide.p_Size.Y;
@@ -105,7 +103,7 @@ namespace Root_WIND2
 
 				workplaces.Add(workplace);
 			}
-			*/
+
 			EdgeSurface edgeSurface = new EdgeSurface();
 			edgeSurface.SetRecipe(this.recipe);
 			edgeSurface.SetWorkplaceBundle(workplaces);

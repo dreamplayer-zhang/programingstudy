@@ -370,7 +370,7 @@ namespace Root_WIND2
         public void _btnSnap()
         {
             EQ.p_bStop = false;
-            Vision vision = ((WIND2_Handler)ProgramManager.Instance.Engineer.ClassHandler()).m_vision;
+            Vision vision = ((WIND2_Handler)ProgramManager.Instance.Engineer.ClassHandler()).p_Vision;
             if (vision.p_eState != ModuleBase.eState.Ready)
             {
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
