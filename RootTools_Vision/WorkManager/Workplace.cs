@@ -194,9 +194,9 @@ namespace RootTools_Vision
             this.sizeX = szX;
             this.sizeY = szY;
             this.index = idx;
-            this.workplaceBufferR_GRAY = new byte[szX * szY];
-            this.workplaceBufferG = new byte[szX * szY];
-            this.workplaceBufferB = new byte[szX * szY];
+            //this.workplaceBufferR_GRAY = new byte[szX * szY];
+            //this.workplaceBufferG = new byte[szX * szY];
+            //this.workplaceBufferB = new byte[szX * szY];
         }
 
 
