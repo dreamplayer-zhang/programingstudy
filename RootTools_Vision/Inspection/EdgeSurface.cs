@@ -49,43 +49,52 @@ namespace RootTools_Vision
 
 		public override bool DoPrework()
 		{
-			if (this.workplace.Index == 0)
-				return base.DoPrework();
-
-			return true;
+			return base.DoPrework();
 		}
 
 		public override void DoWork()
 		{
 			DoInspection();
-			base.DoWork();
+			//base.DoWork();
 		}
 
 		public void DoInspection()
 		{
-			//if (this.workplace.Index == 0)
-			//	return;
-						
-			int roiHeight = parameter.RoiHeight;
-			int roiWidth = parameter.RoiWidth; //this.workplace.SharedBufferWidth;
-			int threshold = parameter.Theshold; // 12;
-			int defectSize = parameter.Size; // 5;
+			if (this.workplace.Index == 0)
+				return;
+
+			DoColorInspection(this.workplace.SharedBufferR_GRAY, parameter);
+			DoColorInspection(this.workplace.SharedBufferG, parameter);
+			DoColorInspection(this.workplace.SharedBufferB, parameter);
+
+			WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+		}
+
+		private void DoColorInspection(IntPtr sharedBuffer, EdgeSurfaceParameter param)
+		{
+			int roiHeight = 2000; //parameter.RoiHeight;
+			int roiWidth = this.workplace.SharedBufferWidth; //parameter.RoiWidth;
+			int threshold = 40; //parameter.Theshold;
+			int defectSize = 10; //parameter.Size;
 
 			int roiSize = roiWidth * roiHeight;
 
 			int left = this.workplace.PositionX;
 			int top = this.workplace.PositionY;
-			int right = this.workplace.PositionX + this.workplace.SharedBufferWidth; 
+			int right = this.workplace.PositionX + this.workplace.SharedBufferWidth;
 			int bottom = this.workplace.PositionY + roiHeight;
 
 			byte[] arrSrc = new byte[roiSize];
 			for (int cnt = top; cnt < bottom; cnt++)
 			{
-				Marshal.Copy(new IntPtr(this.workplace.SharedBufferR_GRAY.ToInt64() + (cnt * (Int64)roiWidth))
+				Marshal.Copy(new IntPtr(sharedBuffer.ToInt64() + (cnt * (Int64)roiWidth))
 							, arrSrc
 							, roiWidth * (cnt - top)
 							, roiWidth);
 			}
+			//Emgu.CV.Mat mat = new Emgu.CV.Mat((int)roiHeight, (int)roiWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+			//Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
+			//mat.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_" + this.workplace.Index.ToString() + ".bmp");
 
 			// profile 생성
 			List<int> temp = new List<int>();
@@ -115,6 +124,9 @@ namespace RootTools_Vision
 			byte[] thresh = new byte[roiSize];
 			CLR_IP.Cpp_Threshold(diff, thresh, roiWidth, roiHeight, false, threshold);
 			var label = CLR_IP.Cpp_Labeling(diff, thresh, roiWidth, roiHeight, true);
+			//Emgu.CV.Mat mat2 = new Emgu.CV.Mat((int)roiHeight, (int)roiWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+			//Marshal.Copy(thresh, 0, mat2.DataPointer, arrSrc.Length);
+			//mat2.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_thresh_" + this.workplace.Index.ToString() + ".bmp");
 
 			// Add defect
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
@@ -127,7 +139,7 @@ namespace RootTools_Vision
 						label[i].area,
 						label[i].value,
 						this.workplace.PositionX + label[i].boundLeft,
-						this.workplace.PositionY - label[i].boundTop,
+						this.workplace.PositionY + label[i].boundTop,
 						Math.Abs(label[i].boundRight - label[i].boundLeft),
 						Math.Abs(label[i].boundBottom - label[i].boundTop),
 						this.workplace.MapPositionX,
@@ -135,8 +147,6 @@ namespace RootTools_Vision
 						);
 				}
 			}
-
-			WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 		}
 	}
 }

@@ -88,8 +88,9 @@ namespace Root_WIND2
             p_moduleList = new ModuleList(m_engineer);
             switch (m_engineer.m_eMode)
             {
-                case WIND2_Engineer.eMode.Vision:
-                    InitVisionModule(); break;
+                case WIND2_Engineer.eMode.Vision: 
+                    InitVisionModule(); 
+                    break;
                 case WIND2_Engineer.eMode.EFEM:
                     InitEFEMModule();
                     break;
