@@ -1557,7 +1557,8 @@ namespace Root_WIND2
 
         public void SetRecipeData()
         {
-            for(int i = 0; i < p_cInspROI.Count; i++)
+            m_Recipe.GetRecipe<MaskRecipe>().OriginPoint = this.BoxOffset;
+            for (int i = 0; i < p_cInspROI.Count; i++)
             {
                 m_Recipe.GetRecipe<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data);
             }

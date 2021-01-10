@@ -54,7 +54,7 @@ namespace RootTools
             this.StartPt = new CPoint();
             
             StartPt.X = startPt.X;
-            startPt.Y = StartPt.Y;
+            StartPt.Y = startPt.Y;
             Width = width;
         }
 

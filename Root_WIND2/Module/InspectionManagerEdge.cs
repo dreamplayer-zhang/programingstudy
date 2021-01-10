@@ -22,9 +22,9 @@ namespace Root_WIND2
 
 		protected override void InitWorkManager()
 		{
-			this.Add(new WorkManager("Snap", WORK_TYPE.ALIGNMENT, WORKPLACE_STATE.SNAP, WORKPLACE_STATE.NONE, STATE_CHECK_TYPE.CHIP, 5));
-			this.Add(new WorkManager("EdgeSurface", WORK_TYPE.INSPECTION, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.NONE, STATE_CHECK_TYPE.CHIP, 5));
-			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION, STATE_CHECK_TYPE.WAFER));
+			this.Add(new WorkManager("Snap", WORK_TYPE.SNAP, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
+			this.Add(new WorkManager("EdgeSurface", WORK_TYPE.INSPECTION, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
+			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.WAFER));
 
 			WIND2EventManager.SnapDone += SnapDone_Callback;
 		}

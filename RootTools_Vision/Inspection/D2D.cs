@@ -59,7 +59,7 @@ namespace RootTools_Vision
             this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
 
             if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP) == true &&
-                this.workplaceBundle.CheckStateLine(this.workplace.MapPositionX, WORKPLACE_STATE.READY) &&
+                this.workplaceBundle.CheckStateLine(this.workplace.MapPositionX, WORK_TYPE.ALIGNMENT) &&
                 this.IsPreworkDone == false)
             {
                 CreateGoldenImage();

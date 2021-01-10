@@ -142,7 +142,9 @@ namespace Root_WIND2
 
             // Front
             this.InspectionFront = new InspectionManagerFrontside(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
-            
+            this.InspectionFront.SetColorSharedBuffer(image.GetPtr(0), image.GetPtr(1), image.GetPtr(2));
+
+
             this.Engineer.InspectionFront = this.InspectionFront;
             this.Engineer.InspectionFront.Recipe = this.recipe;
 
