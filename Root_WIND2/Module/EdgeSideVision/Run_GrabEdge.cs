@@ -115,6 +115,8 @@ namespace Root_WIND2.Module
 
 		public override string Run()
 		{
+			module.p_bStageVac = true;
+
 			if (gmTop == null || gmSide == null || gmBtm == null) return "Grab Mode == null";
 
 			try
@@ -129,7 +131,8 @@ namespace Root_WIND2.Module
 				double pulsePerDegree = module.Pulse360 / 360;
 				int camHeight = module.CamEdgeTop.GetRoiSize().Y;
 				int trigger = 1;
-				int scanSpeed = Convert.ToInt32((double)maxFrame * trigger * camHeight * (double)maxFrame / 100);
+				//int scanSpeed = Convert.ToInt32((double)maxFrame * trigger * camHeight * (double)scanRate / 100);
+				int scanSpeed = 56000;
 
 				//double curr = axisR.p_posActual - axisR.p_posActual % module.Pulse360;
 				//double triggerStart = curr + startDegree * pulsePerDegree;
@@ -176,6 +179,7 @@ namespace Root_WIND2.Module
 		private void m_gmTop_Grabed(object sender, EventArgs e)
 		{
 			GrabedArgs ga = (GrabedArgs)e;
+			module.p_nProgress = ga.nProgress;
 			int memW = Convert.ToInt32(ga.mdMemoryData.W);
 			int memH = ga.mdMemoryData.p_sz.Y;
 

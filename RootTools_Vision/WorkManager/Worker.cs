@@ -150,6 +150,8 @@ namespace RootTools_Vision
         {
             this.isStop = true;
             this.workerState = WORKER_STATE.NONE;
+
+            this.works = null;
         }
 
         public void Cancel()

@@ -286,6 +286,7 @@ namespace Root_WIND2.Module
                 m_CamMain.Connect();
             //if (m_CamLADS != null)
             //    m_CamLADS.Connect();
+            base.StateHome();
 
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
 
@@ -437,6 +438,7 @@ namespace Root_WIND2.Module
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.Grabed += M_grabMode_Grabed;
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY+90000, nScanSpeed)))
                             return p_sInfo;
@@ -454,6 +456,12 @@ namespace Root_WIND2.Module
                 {
                     m_grabMode.SetLight(false);
                 }
+            }
+
+            private void M_grabMode_Grabed(object sender, EventArgs e)
+            {
+                GrabedArgs ga = (GrabedArgs)e;
+                m_module.p_nProgress = ga.nProgress;
             }
         }
 

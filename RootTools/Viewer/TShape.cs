@@ -44,12 +44,17 @@ namespace RootTools
         public CPoint StartPt;
         public int Width;
 
-        public PointLine() { }
+        public PointLine() 
+        {
+            this.StartPt = new CPoint();
+        }
 
         public PointLine(CPoint startPt, int width)
         {
+            this.StartPt = new CPoint();
+            
             StartPt.X = startPt.X;
-            startPt.Y = StartPt.Y;
+            StartPt.Y = startPt.Y;
             Width = width;
         }
 

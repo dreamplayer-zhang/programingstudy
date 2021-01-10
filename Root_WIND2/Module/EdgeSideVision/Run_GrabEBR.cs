@@ -1,5 +1,6 @@
 ﻿
 using RootTools;
+using RootTools.Camera;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
@@ -73,6 +74,8 @@ namespace Root_WIND2.Module
 
 		public override string Run()
 		{
+			module.p_bStageVac = true;
+
 			if (gmEBR == null) return "Grab Mode == null";
 
 			try
@@ -102,6 +105,7 @@ namespace Root_WIND2.Module
 
 				axisR.SetTrigger(triggerStart, triggerDest, trigger, true);
 				gmEBR.StartGrab(gmEBR.m_memoryData, new CPoint(0, 0), grabCount);
+                gmEBR.Grabed += GmEBR_Grabed; ;
 
 				if (module.Run(axisR.StartMove(moveEnd, scanSpeed, scanAcc, scanAcc)))
 					return p_sInfo;
@@ -117,5 +121,11 @@ namespace Root_WIND2.Module
 				gmEBR.SetLight(false);
 			}
 		}
-	}
+
+        private void GmEBR_Grabed(object sender, EventArgs e)
+        {
+			GrabedArgs ga = (GrabedArgs)e;
+			module.p_nProgress = ga.nProgress;
+		}
+    }
 }

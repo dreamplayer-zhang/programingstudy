@@ -16,35 +16,73 @@ namespace RootTools_Vision
         }
 
         #region [Parameter]
-        private int searchRangeX = 100;
-        private int searchRangeY = 100;
-        private int minScoreLimit = 60;
+        private int chipSearchRangeX = 100;
+        private int chipSearchRangeY = 100;
+        private int chipMinScoreLimit = 60;
+        private int waferSearchRangeX = 1000;
+        private int waferSearchRangeY = 1000;
+        private int waferMinScoreLimit = 60;
         #endregion
 
 
         #region [Getter Setter]
-        public int SearchRangeX
+
+        [DisplayName("Chip Search Range X")]
+        public int ChipSearchRangeX
         {
-            get => searchRangeX;
+            get => chipSearchRangeX;
             set
             {
-                SetProperty<int>(ref searchRangeX, value);
+                SetProperty<int>(ref chipSearchRangeX, value);
             }
         }
-        public int SearchRangeY
+        [DisplayName("Chip Search Range Y")]
+        public int ChipSearchRangeY
         {
-            get => searchRangeY;
+            get => chipSearchRangeY;
             set
             {
-                SetProperty<int>(ref searchRangeY, value);
+                SetProperty<int>(ref chipSearchRangeY, value);
             }
         }
-        public int MinScoreLimit
+
+        [DisplayName("Chip Score Limit")]
+        public int ChipMinScoreLimit
         {
-            get => minScoreLimit;
+            get => chipMinScoreLimit;
             set
             {
-                SetProperty<int>(ref minScoreLimit, value);
+                SetProperty<int>(ref chipMinScoreLimit, value);
+            }
+        }
+
+        [DisplayName("Wafer Search Range X")]
+        public int WaferSearchRangeX
+        {
+            get => waferSearchRangeX;
+            set
+            {
+                SetProperty<int>(ref waferSearchRangeX, value);
+            }
+        }
+
+        [DisplayName("Wafer Search Range Y")]
+        public int WaferSearchRangeY
+        {
+            get => waferSearchRangeY;
+            set
+            {
+                SetProperty<int>(ref waferSearchRangeY, value);
+            }
+        }
+
+        [DisplayName("Wafer Score Limit")]
+        public int WaferMinScoreLimit
+        {
+            get => waferMinScoreLimit;
+            set
+            {
+                SetProperty<int>(ref waferMinScoreLimit, value);
             }
         }
 

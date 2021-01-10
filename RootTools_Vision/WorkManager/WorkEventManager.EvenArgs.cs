@@ -48,6 +48,14 @@ namespace RootTools_Vision
         }
     }
 
+    public class PocessDefectWaferDoneEventArgs : EventArgs
+    {
+        public PocessDefectWaferDoneEventArgs()
+        {
+
+        }
+    }
+
     public class UIRedrawEventArgs : EventArgs
     { 
         public UIRedrawEventArgs()

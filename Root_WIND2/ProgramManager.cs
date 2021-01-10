@@ -120,17 +120,16 @@ namespace Root_WIND2
             //roiLayer.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameROI).p_nCount;
             if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
             {
-                ImageEdge = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
-            }
-            //ImageEdge.p_nByte = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop).p_nByte;
-
+                imageEdge = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
+                imageEdge.p_nByte = memoryTool.GetMemory("EdgeSide Vision.Memory", "EdgeSide Vision", "EdgeTop").p_nCount;                    
+			}
 
             return true;
         }
 
         public ImageData GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE type)
         {
-            return engineer.m_handler.m_edgesideVision.GetMemoryData(type);
+            return engineer.m_handler.p_EdgeSideVision.GetMemoryData(type);
         }
 
         private bool InitMember()
@@ -142,7 +141,9 @@ namespace Root_WIND2
 
             // Front
             this.InspectionFront = new InspectionManagerFrontside(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
-            
+            this.InspectionFront.SetColorSharedBuffer(image.GetPtr(0), image.GetPtr(1), image.GetPtr(2));
+
+
             this.Engineer.InspectionFront = this.InspectionFront;
             this.Engineer.InspectionFront.Recipe = this.recipe;
 
@@ -155,12 +156,18 @@ namespace Root_WIND2
             // Edge
             if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
             {
-                this.InspectionEdge = new InspectionManagerEdge(imageEdge.GetPtr(), imageEdge.p_Size.X, imageEdge.p_Size.Y, 3);
+                if (imageEdge.p_nByte == 1)
+                    this.InspectionEdge = new InspectionManagerEdge(imageEdge.GetPtr(), imageEdge.p_Size.X, imageEdge.p_Size.Y, 3);
+
+                if (imageEdge.p_nByte == 3)
+                {
+                    this.InspectionEdge = new InspectionManagerEdge(imageEdge.GetPtr(), imageEdge.p_Size.X, imageEdge.p_Size.Y, 3);
+                    this.InspectionEdge.SetWorkplaceBuffer(imageEdge.GetPtr(0), imageEdge.GetPtr(1), imageEdge.GetPtr(2));
+                }
 
                 this.Engineer.InspectionEdge = this.InspectionEdge;
                 this.Engineer.InspectionEdge.Recipe = this.recipe;
             }
-
             return true;
         }
 

@@ -59,6 +59,7 @@ namespace Root_WIND2.Module
             run.m_searchRangeY = m_searchRangeY;
             run.m_score = m_score;
             run.m_saveAlignFailImage = m_saveAlignFailImage;
+            run.m_saveAlignFailImagePath = m_saveAlignFailImagePath;
             run.m_AlignCamResolution = m_AlignCamResolution;
             return run;
         }
@@ -77,24 +78,25 @@ namespace Root_WIND2.Module
             m_AlignCamResolution = tree.Set(m_AlignCamResolution, m_AlignCamResolution, "Align Cam Resolution", "Align Cam Resolution", bVisible);
         }
 
+        int i = 1;
         public override string Run()
         {
-            //AxisXY axisXY = m_module.AxisXY;
-            //Axis axisZ = m_module.AxisZ;
+            AxisXY axisXY = m_module.AxisXY;
+            Axis axisZ = m_module.AxisZ;
 
-            //if (m_module.Run(axisZ.StartMove(m_focusPosZ)))
-            //    return p_sInfo;  
-            //if (m_module.Run(axisXY.StartMove(m_firstPointPulse)))
-            //    return p_sInfo;
+            if (m_module.Run(axisZ.StartMove(m_focusPosZ)))
+                return p_sInfo;
+            if (m_module.Run(axisXY.StartMove(m_firstPointPulse)))
+                return p_sInfo;
 
-            //if (m_module.Run(axisZ.WaitReady()))
-            //    return p_sInfo;
-            //if (m_module.Run(axisXY.WaitReady()))
-            //    return p_sInfo;
+            if (m_module.Run(axisZ.WaitReady()))
+                return p_sInfo;
+            if (m_module.Run(axisXY.WaitReady()))
+                return p_sInfo;
 
 
-            //string strVRSImageDir = "D:\\"; 
-
+            string strVRSImageDir = @"C:\Users\ATI\Desktop\image\";
+            string strVRSImageFullPath = "";
             //ImageData img = m_CamAlign.p_ImageViewer.p_ImageData;
             //if (m_CamAlign.Grab() == "OK")
             //{
@@ -102,17 +104,23 @@ namespace Root_WIND2.Module
             //    //img.SaveImageSync(strVRSImageFullPath);
             //    //Grab error
             //}
-
+            //return "OK";
 
             int camWidth = m_CamAlign.GetRoiSize().X;
             int camHeight = m_CamAlign.GetRoiSize().Y;
             
-            ImageData img = new ImageData(2600, 2625, 1);
+            //ImageData img = new ImageData(2600, 2625, 1);
+            ImageData img = m_CamAlign.p_ImageViewer.p_ImageData;
+            if (m_CamAlign.Grab() == "OK")
+            {
+                strVRSImageFullPath = string.Format(strVRSImageDir + "test_{0}.bmp", i++);
+                img.SaveImageSync(strVRSImageFullPath);
+            }
             //m_CamAlign.GetRoiSize().X
-            img.SetBackGroundWorker();
-            img.OpenFile(@"C:\Users\cgkim\Desktop\image\src.bmp", new CPoint(0, 0));
+            //img.SetBackGroundWorker();
+            //img.OpenFile(@"C:\Users\cgkim\Desktop\image\src.bmp", new CPoint(0, 0));
 
-            for (int i = 0; i < int.MaxValue; i++) ;
+            //for (int i = 0; i < int.MaxValue; i++) ;
             IntPtr src = img.GetPtr();
 
             //Mat matSrc = new Mat(new Size(2600, 2625), DepthType.Cv8U, 3, img.GetPtr(), (int)img.p_Stride);
@@ -129,7 +137,7 @@ namespace Root_WIND2.Module
 
             //? 카메라 5.5um / 11um 
 
-            DirectoryInfo di = new DirectoryInfo(@"C:\Users\cgkim\Desktop\image\template");
+            DirectoryInfo di = new DirectoryInfo(m_saveAlignFailImagePath);
 
             int resPosX = 0;
             int resPosY = 0;
@@ -149,10 +157,10 @@ namespace Root_WIND2.Module
                     //int* pWidth = &width;
                     //int* pHeight = &height;
                     byte[] rawdata = Tools.LoadBitmapToRawdata(fullname, &width, &height);
-                    
+
                     result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), rawdata, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
                 }
-                if(maxScore < result)
+                if (maxScore < result)
                 {
                     maxScore = result;
                     resPosX = posX;
@@ -167,29 +175,132 @@ namespace Root_WIND2.Module
             if (maxScore < m_score)
                 return "First Point Align Fail [Score : " + maxScore.ToString() + "]";
 
-         
-           
-          
-            camWidth = 2200;
-            camHeight = 2200;
-            //resPosX = 0;
-            //resPosY = 2200;
-            m_firstPointPulse = new RPoint(100000, 100000);
-            double cx = m_firstPointPulse.X / PULSE_TO_UM - (resPosX - (camWidth / 2)) * 5.5;
-            double cy = m_firstPointPulse.Y / PULSE_TO_UM - (resPosY - (camHeight / 2)) * 5.5; 
 
 
-            int posX2 = 0, posY2 = 0;
+            if (m_module.Run(axisXY.StartMove(m_secondPointPulse)))
+                return p_sInfo;
+            if (m_module.Run(axisXY.WaitReady()))
+                return p_sInfo;
 
-            m_secondPointPulse = new RPoint(150000, 100000);
-            double cx2 = m_secondPointPulse.X / PULSE_TO_UM - ((camWidth / 2) + posX2) * 5.5;
-            double cy2 = m_secondPointPulse.Y / PULSE_TO_UM - ((camHeight / 2) + posY2) * 5.5;
 
-            //cx2 - cx  cy2 - cy1
-            double v = Math.Atan2(cy2 - cy, cx2 - cx);
-            
+            if (m_CamAlign.Grab() == "OK")
+            {
+                strVRSImageFullPath = string.Format(strVRSImageDir + "test_{0}.bmp", i++);
+                img.SaveImageSync(strVRSImageFullPath);
+            }
+            //m_CamAlign.GetRoiSize().X
+            //img.SetBackGroundWorker();
+            //img.OpenFile(@"C:\Users\cgkim\Desktop\image\src.bmp", new CPoint(0, 0));
 
-            int t = 10;
+            //for (int i = 0; i < int.MaxValue; i++) ;
+            IntPtr src2 = img.GetPtr();
+
+            int resPosX2 = 0;
+            int resPosY2 = 0;
+            float result2 = 0.0f;
+            float maxScore2 = 0;
+
+            foreach (FileInfo file in di.GetFiles())
+            {
+                string filename = file.Name.Substring(0, file.Name.Length - 4);
+                string fullname = file.FullName;
+
+
+                int posX = 0, posY = 0;
+                unsafe
+                {
+                    //byte* rawdata = null;
+                    int width = 0, height = 0;
+                    //int* pWidth = &width;
+                    //int* pHeight = &height;
+                    byte[] rawdata = Tools.LoadBitmapToRawdata(fullname, &width, &height);
+
+                    result2 = CLR_IP.Cpp_TemplateMatching((byte*)(src2.ToPointer()), rawdata, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
+                }
+                if (maxScore2 < result2)
+                {
+                    maxScore2 = result2;
+                    resPosX2 = posX;
+                    resPosY2 = posY;
+                }
+
+                //String FileNameOnly = File.Name.Substring(0, File.Name.Length - 4);
+                //String FullFileName = File.FullName;
+
+                //MessageBox.Show(FullFileName + " " + FileNameOnly);
+            }
+            if (maxScore2 < m_score)
+                return "Second Point Align Fail [Score : " + maxScore2.ToString() + "]";
+
+            //double cx = m_firstPointPulse.X / PULSE_TO_UM - ((camWidth / 2) + resPosX) * m_AlignCamResolution;
+            //double cy = m_firstPointPulse.Y / PULSE_TO_UM + ((camHeight / 2) - resPosY) * m_AlignCamResolution;
+
+            //double cx2 = m_secondPointPulse.X / PULSE_TO_UM - ((camWidth / 2) + resPosX2) * m_AlignCamResolution;
+            //double cy2 = m_secondPointPulse.Y / PULSE_TO_UM + ((camHeight / 2) - resPosY2) * m_AlignCamResolution;
+            //double realX = Math.Abs(m_firstPointPulse.X - m_secondPointPulse.X) / 10;
+            //double cx = ((camWidth / 2) + resPosX) * m_AlignCamResolution;
+            //double cy = m_firstPointPulse.Y / PULSE_TO_UM - ((camHeight / 2) + resPosY) * m_AlignCamResolution;
+
+            //double cx2 = ((camWidth / 2) + resPosX2) * m_AlignCamResolution;
+            //double cy2 = m_secondPointPulse.Y / PULSE_TO_UM - ((camHeight / 2) + resPosY2) * m_AlignCamResolution;
+            double cx = m_firstPointPulse.X / PULSE_TO_UM - ((camWidth / 2) + resPosX) * m_AlignCamResolution;
+            double cy = m_firstPointPulse.Y / PULSE_TO_UM - ((camHeight / 2) + resPosY) * m_AlignCamResolution;
+
+            double cx2 = m_secondPointPulse.X / PULSE_TO_UM - ((camWidth / 2) + resPosX2) * m_AlignCamResolution;
+            double cy2 = m_secondPointPulse.Y / PULSE_TO_UM - ((camHeight / 2) + resPosY2) * m_AlignCamResolution;
+
+
+            //double radian = Math.Atan2(cy2 - cy, cx2 - cx);
+            double radian = Math.Atan2(cy2 - cy, cx2 - cx);
+            double angle = radian * (180 / Math.PI);
+            double resAngle = 0;
+            if (cy2 - cy < 0)
+            {
+                 resAngle = angle + 180;
+
+            }
+            else
+            {
+                resAngle = angle - 180;
+            }
+
+            Axis axisRotate = m_module.AxisRotate;
+            axisRotate.StartMove((axisRotate.p_posActual - resAngle * 1000));
+
+            //if (m_module.Run(axisXY.StartMove(m_firstPointPulse)))
+            //    return p_sInfo;
+            //if (m_module.Run(axisXY.WaitReady()))
+            //    return p_sInfo;
+
+            //if (m_module.Run(axisXY.p_axisX.StartMove(m_firstPointPulse.X - (resPosX - camWidth / 2) * m_AlignCamResolution * 10)))
+            //    return p_sInfo;
+            //if (m_module.Run(axisXY.p_axisX.WaitReady()))
+            //    return p_sInfo;
+            //if (m_module.Run(axisXY.p_axisY.StartMove(m_firstPointPulse.Y + (resPosY - camHeight / 2) * m_AlignCamResolution * 10)))
+            //    return p_sInfo;
+            //if (m_module.Run(axisXY.p_axisY.WaitReady()))
+            //    return p_sInfo;
+            //Axis axisRotate = m_module.AxisRotate;
+            //axisRotate.StartMove((angle * 1000));
+            //camWidth = 2200;
+            //camHeight = 2200;
+            ////resPosX = 0;
+            ////resPosY = 2200;
+            //m_firstPointPulse = new RPoint(100000, 100000);
+            //double cx = m_firstPointPulse.X / PULSE_TO_UM - ((camWidth / 2) + resPosX) * 5.5;
+            //double cy = m_firstPointPulse.Y / PULSE_TO_UM - ((camHeight / 2) + resPosY) * 5.5; 
+
+
+
+
+            //m_secondPointPulse = new RPoint(150000, 100000);
+            //double cx2 = m_secondPointPulse.X / PULSE_TO_UM - ((camWidth / 2) + posX2) * 5.5;
+            //double cy2 = m_secondPointPulse.Y / PULSE_TO_UM - ((camHeight / 2) + posY2) * 5.5;
+
+            ////cx2 - cx  cy2 - cy1
+            //double v = Math.Atan2(cy2 - cy, cx2 - cx);
+
+            //int t = 10;
             //double x = (m_secondPointPulse.X - m_firstPointPulse.X) * 10 / 5.5;
 
             //int dX = posX - posX2;

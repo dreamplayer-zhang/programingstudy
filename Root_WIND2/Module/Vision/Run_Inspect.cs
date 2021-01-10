@@ -105,16 +105,25 @@ namespace Root_WIND2.Module
         {
             //레시피에 GrabMode 저장하고 있어야함
 
+            this.inspectionFront.Stop();
 
             if (m_grabMode == null) return "Grab Mode == null";
 
-            if(this.inspectionFront.Recipe.Read(m_sRecipeName, true) == false)
-                return "Recipe Open Fail";
+            if (EQ.IsStop() == false)
+            {
+                if (this.inspectionFront.Recipe.Read(m_sRecipeName, true) == false)
+                    return "Recipe Open Fail";
 
-            if (this.inspectionFront.CreateInspection() == false)
-                return "Create Inspection Fail";
+                if (this.inspectionFront.CreateInspection() == false)
+                    return "Create Inspection Fail";
 
-            this.inspectionFront.Start(true);
+                this.inspectionFront.Start(true);
+
+            }
+            else
+            {
+                this.inspectionFront.Stop();
+            }
 
             /// Snap Start (이거 나중에 구조 변경 필요할듯...)
             try
@@ -141,7 +150,11 @@ namespace Root_WIND2.Module
                 while (m_grabMode.m_ScanLineNum > nScanLine)
                 {
                     if (EQ.IsStop())
+                    {
+                        this.inspectionFront.Stop();
                         return "OK";
+                    }
+                        
 
                     // 위에서 아래로 찍는것을 정방향으로 함, 즉 Y축 값이 큰쪽에서 작은쪽으로 찍는것이 정방향
                     // Grab하기 위해 이동할 Y축의 시작 끝 점
@@ -195,6 +208,7 @@ namespace Root_WIND2.Module
                     cpMemoryOffset.X += m_grabMode.m_camera.GetRoiSize().X;
                 }
                 m_grabMode.m_camera.StopGrab();
+                //this.inspectionFront.Stop();
                 return "OK";
             }
             finally

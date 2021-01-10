@@ -78,11 +78,14 @@ namespace Root_WIND2
             Vision,
             EFEM
         }
-        public eMode m_eMode = eMode.Vision; 
+        public eMode m_eMode = eMode.Vision;
+
+        public bool m_bVisionEnable = false;
 
         void RunTreeMode(Tree tree)
         {
-            m_eMode = (eMode)tree.Set(m_eMode, m_eMode, "Mode", "Run Mode"); 
+            m_eMode = (eMode)tree.Set(m_eMode, m_eMode, "Mode", "Run Mode");
+            m_bVisionEnable = tree.Set(m_bVisionEnable, m_bVisionEnable, "VisionEnable", "VisionEnable");
         }
         #endregion
 
