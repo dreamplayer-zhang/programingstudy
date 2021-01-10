@@ -12,14 +12,15 @@ using RootTools.ToolBoxs;
 
 namespace Root_WIND2
 {
-    public class Maintenance_ViewModel : ObservableObject
+    class Maintenance_ViewModel : ObservableObject
     {
         public MaintenancePanel Main;
         Setup_ViewModel m_Setup;
-        public WIND2_Hander_UI HandlerUI;
+        WIND2_Hander_UI HandlerUI;
         ToolBox_UI ToolBoxUI;
         ViewerTest ToolViewerTest;
         ViewerTest_ViewModel ToolViewerTest_VM;
+
 
         public Maintenance_ViewModel(Setup_ViewModel setup)
         {

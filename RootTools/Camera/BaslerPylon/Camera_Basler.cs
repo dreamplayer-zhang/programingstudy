@@ -629,7 +629,7 @@ namespace RootTools.Camera.BaslerPylon
         void GrabEvent()
         {
             if (Grabed != null)
-                OnGrabed(new GrabedArgs(m_Memory, m_nFrameCnt, m_LastROI));
+                OnGrabed(new GrabedArgs(m_Memory, m_nFrameCnt, m_LastROI, p_nGrabProgress));
         }
         protected virtual void OnGrabed(GrabedArgs e)
         {

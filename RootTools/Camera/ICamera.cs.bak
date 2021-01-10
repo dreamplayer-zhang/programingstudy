@@ -41,13 +41,11 @@ namespace RootTools.Camera
         public MemoryData mdMemoryData;
         public int nFrameCnt;
         public CRect rtRoi;
-        public int nProgress;
-        public GrabedArgs(MemoryData md, int FrameCnt, CRect Roi, int progress)
+        public GrabedArgs(MemoryData md, int FrameCnt, CRect Roi)
         {
             mdMemoryData = md;
             nFrameCnt = FrameCnt;
             rtRoi = Roi;
-            nProgress = progress;
         }
     }
 }
