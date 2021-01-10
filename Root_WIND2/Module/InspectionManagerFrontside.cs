@@ -170,6 +170,7 @@ namespace Root_WIND2
             this.SharedBufferG = ptrG;
             this.SharedBufferB = ptrB;
         }
+
         public void Start(bool Snap)
         {
             if (this.Recipe == null && this.Recipe.WaferMap == null)
