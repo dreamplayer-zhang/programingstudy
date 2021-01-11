@@ -40,7 +40,7 @@ namespace RootTools
         }
 
         #region Timer
-        DispatcherTimer m_timer = new DispatcherTimer();
+        public DispatcherTimer m_timer = new DispatcherTimer();
 
         void InitTimer()
         {

@@ -684,6 +684,7 @@ namespace Root_EFEM.Module
 
         public override void ThreadStop()
         {
+            m_ui.ThreadStop(); 
             base.ThreadStop();
         }
 
