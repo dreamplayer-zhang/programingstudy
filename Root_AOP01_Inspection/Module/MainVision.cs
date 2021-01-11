@@ -2175,32 +2175,33 @@ namespace Root_AOP01_Inspection.Module
                         CRect crtFoundRect = new CRect(ptStart, ptEnd);
                         Mat matFound = m_module.GetMatImage(mem, crtFoundRect);
                         Mat matBinary = new Mat();
-                        CvInvoke.Threshold(matFound, matBinary, m_nThreshold, 255, ThresholdType.Binary);
-                        //Image<Gray, byte> imgBinary = matBinary.ToImage<Gray, byte>();
-                        Mat imgBinary = matBinary;
+                        CvInvoke.Threshold(matFound, matBinary, m_nThreshold, 128, ThresholdType.Binary);
+                        Image<Gray, byte> imgBinary = matBinary.ToImage<Gray, byte>();
                         CvBlobs blobs = new CvBlobs();
                         CvBlobDetector blobDetector = new CvBlobDetector();
-                        //blobDetector.Detect(imgBinary, blobs);
-
+                        blobDetector.Detect(imgBinary, blobs);
                         int nMaxArea = 0;
-                        System.Drawing.Point[] ptContour = new System.Drawing.Point[1];
+                        System.Drawing.Point[] ptsContour = new System.Drawing.Point[1];
                         foreach (CvBlob blob in blobs.Values)
                         {
-                            if (nMaxArea < blob.Area)
+                            if (blob.Area > nMaxArea)
                             {
                                 nMaxArea = blob.Area;
-                                ptContour = blob.GetContour();
+                                ptsContour = blob.GetContour();
                             }
                         }
-                        Mat matMask = Mat.Zeros(matBinary.Width + 2, matBinary.Height + 2, DepthType.Cv8U, 1);
-                        System.Drawing.Rectangle rtDummy;
-                        imgBinary.Save("D:\\BIN_" + i + ".bmp");
-                        imgBinary = new Image<Gray, byte>("D:\\BIN_" + i + ".bmp");
-                        CvInvoke.FloodFill(imgBinary, matMask, new System.Drawing.Point(270,230)/*ptContour[0]*/, new MCvScalar(256), out rtDummy, new MCvScalar(0), new MCvScalar(100), Connectivity.EightConnected, FloodFillType.MaskOnly);
-                        matMask.Save("D:\\MASK_" + i + ".bmp");
+                        Mat matMask = new Mat(matBinary.Width + 2, matBinary.Height + 2, matBinary.Depth, matBinary.NumberOfChannels);
+                        System.Drawing.Rectangle rtDummy = new System.Drawing.Rectangle();
+                        Mat matBinaryOrigin = new Mat();
+                        matBinary.CopyTo(matBinaryOrigin);
+                        CvInvoke.FloodFill(matBinary, matMask, ptsContour[0], new MCvScalar(255), out rtDummy, new MCvScalar(0), new MCvScalar(0), Connectivity.EightConnected, FloodFillType.FixedRange);
+                        matBinary.Save("D:\\BIN_" + i + ".bmp");
+                        //Mat matResult = matBinary - matBinaryOrigin;
+                        //matResult.Save("D:\\RESULT_" + i + ".bmp");
+                        
                     }
                 }
-
+                GC.Collect();
 
                 return "OK";
             }
