@@ -33,6 +33,7 @@ namespace Root_AOP01_Inspection.Module
         Axis m_axisZ;
         Axis m_axisSideZ;
         AxisXY m_axisXY;
+        public DIO_I m_diExistVision;
         DIO_O m_doVac;
         DIO_O m_doBlow;
         MemoryPool m_memoryPool;
@@ -70,6 +71,7 @@ namespace Root_AOP01_Inspection.Module
 
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_diExistVision, this, "Reticle Exist on Vision");
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
             p_sInfo = m_toolBox.Get(ref m_axisSideZ, this, "Axis Side Z");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
@@ -413,13 +415,13 @@ namespace Root_AOP01_Inspection.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Grab(this), false, "Run Grab");
-            AddModuleRunList(new Run_Grab45(this), false, "Run Grab 45");
-            AddModuleRunList(new Run_GrabSideScan(this), false, "Run Side Scan");
-            AddModuleRunList(new Run_LADS(this), false, "Run LADS");
-            AddModuleRunList(new Run_BarcodeInspection(this), false, "Run Barcode Inspection");
-            AddModuleRunList(new Run_MakeAlignTemplateImage(this), false, "Run MakeAlignTemplateImage");
-            AddModuleRunList(new Run_PatternAlign(this), false, "Run PatternAlign");
+            AddModuleRunList(new Run_Grab(this), true, "Run Grab");
+            AddModuleRunList(new Run_Grab45(this), true, "Run Grab 45");
+            AddModuleRunList(new Run_GrabSideScan(this), true, "Run Side Scan");
+            AddModuleRunList(new Run_LADS(this), true, "Run LADS");
+            AddModuleRunList(new Run_BarcodeInspection(this), true, "Run Barcode Inspection");
+            AddModuleRunList(new Run_MakeAlignTemplateImage(this), true, "Run MakeAlignTemplateImage");
+            AddModuleRunList(new Run_PatternAlign(this), true, "Run PatternAlign");
         }
         #endregion
 

@@ -12,6 +12,7 @@ namespace Root_AOP01_Inspection.Module
     public class WTRCleanUnit : WTR_RND
     {
         #region ToolBox
+        public DIO_I m_diExistRTR;
         DIO_O m_doTopBlow;
         DIO_O m_doBottomBlow;
         Axis m_axisZ;
@@ -20,6 +21,7 @@ namespace Root_AOP01_Inspection.Module
             p_sInfo = m_toolBox.Get(ref m_doTopBlow, this, "Top Blow");
             p_sInfo = m_toolBox.Get(ref m_doBottomBlow, this, "Bottom Blow");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Clean Unit Z Axis");
+            p_sInfo = m_toolBox.Get(ref m_diExistRTR, this, "Reticle Exist on RTR");
             base.GetTools(bInit);
         }
         #endregion
@@ -62,7 +64,7 @@ namespace Root_AOP01_Inspection.Module
         protected override void InitModuleRuns()
         {
             base.InitModuleRuns();
-            AddModuleRunList(new Run_Clean(this), false, "RTR Run Clean");
+            AddModuleRunList(new Run_Clean(this), true, "RTR Run Clean");
         }
 
         public class Run_Clean : ModuleRunBase

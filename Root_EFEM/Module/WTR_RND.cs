@@ -636,10 +636,12 @@ namespace Root_EFEM.Module
 
         #region InfoWafer UI
         InfoWaferWTR_UI m_ui;
+        public List<WTRArm> aArm;
+
         void InitInfoWaferUI()
         {
             m_ui = new InfoWaferWTR_UI();
-            List<WTRArm> aArm = new List<WTRArm>();
+            aArm = new List<WTRArm>();
             aArm.Add(m_dicArm[eArm.Upper]);
             aArm.Add(m_dicArm[eArm.Lower]);
             m_ui.Init(p_id + ".InfoWafer", aArm, m_engineer);

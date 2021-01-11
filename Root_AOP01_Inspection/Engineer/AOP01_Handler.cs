@@ -82,7 +82,7 @@ namespace Root_AOP01_Inspection
             Cymechs
         }
         eWTR m_eWTR = eWTR.RND;
-        ModuleBase m_wtr;
+        public ModuleBase m_wtr;
         void InitWTR()
         {
             switch (m_eWTR)
@@ -140,10 +140,19 @@ namespace Root_AOP01_Inspection
         #endregion
 
         #region StateHome
+        public bool m_bIsPossible_Recovery = false;
         public string StateHome()
         {
-            string sInfo = StateHome(p_moduleList.m_aModule);
+            //string sInfo = StateHome(p_moduleList.m_aModule); lyj temp
+            string sInfo = StateHome(m_wtr);
+            if (sInfo != "OK")
+            {
+                EQ.p_eState = EQ.eState.Init;
+                return sInfo;
+            }
+            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
+            if (sInfo == "OK") m_bIsPossible_Recovery = true;
             return sInfo;
         }
 
