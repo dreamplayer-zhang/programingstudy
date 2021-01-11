@@ -1,5 +1,4 @@
-﻿using Root_AOP01_Inspection.Module;
-using Root_EFEM;
+﻿using Root_EFEM;
 using Root_EFEM.Module;
 using RootTools;
 using RootTools.GAFs;
@@ -12,9 +11,9 @@ using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Root_AOP01_Inspection
+namespace Root_VEGA_P.Engineer
 {
-    public class AOP01_Handler : IHandler
+    public class VEGA_P_Handler : IHandler
     {
         #region UI Binding
         public Brush p_brushHandler
@@ -28,32 +27,25 @@ namespace Root_AOP01_Inspection
             get { return Brushes.BurlyWood; }
             set { }
         }
-        #endregion 
+        #endregion
 
         #region Module
         public ModuleList p_moduleList { get; set; }
-        public AOP01 m_aop01; 
-        public AOP01_Recipe m_recipe;
+        public VEGA_P_Recipe m_recipe;
         public EFEM_Process m_process;
-        public MainVision m_mainVision;
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            m_aop01 = new AOP01("AOP01", m_engineer);
-            InitModule(m_aop01); 
             InitWTR();
             InitLoadport();
-            m_mainVision = new MainVision("MainVision", m_engineer);
-            InitModule(m_mainVision);
 
             IWTR iWTR = (IWTR)m_wtr;
-            iWTR.AddChild(m_mainVision);
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
             iWTR.ReadInfoReticle_Registry();
 
-            m_recipe = new AOP01_Recipe("Recipe", m_engineer);
+            m_recipe = new VEGA_P_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
             m_process = new EFEM_Process("Process", m_engineer, iWTR);
         }
@@ -67,12 +59,12 @@ namespace Root_AOP01_Inspection
 
         public bool IsEnableRecovery()
         {
-            IWTR iWTR = (IWTR)m_wtr; 
+            IWTR iWTR = (IWTR)m_wtr;
             foreach (IWTRChild child in iWTR.p_aChild)
             {
-                if (child.p_infoWafer != null) return true; 
+                if (child.p_infoWafer != null) return true;
             }
-            return iWTR.IsEnableRecovery(); 
+            return iWTR.IsEnableRecovery();
         }
         #endregion
 
@@ -89,7 +81,7 @@ namespace Root_AOP01_Inspection
             switch (m_eWTR)
             {
                 case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer); break;
-                default: m_wtr = new WTRCleanUnit("WTR&CleanUnit", m_engineer); break;
+                default: m_wtr = new WTR_RND("WTR", m_engineer); break;
             }
             InitModule(m_wtr);
         }
@@ -151,7 +143,7 @@ namespace Root_AOP01_Inspection
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
-            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision);
+            sInfo = StateHome((ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1]);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             if (sInfo == "OK") m_bIsPossible_Recovery = true;
             return sInfo;
@@ -217,7 +209,7 @@ namespace Root_AOP01_Inspection
         public string AddSequence(dynamic infoSlot)
         {
             m_infoRnRSlot = infoSlot;
-            m_process.p_sInfo = m_process.AddInfoWafer(infoSlot); 
+            m_process.p_sInfo = m_process.AddInfoWafer(infoSlot);
             return "OK";
         }
 
@@ -328,14 +320,14 @@ namespace Root_AOP01_Inspection
         #endregion
 
         string m_id;
-        public AOP01_Engineer m_engineer;
+        public VEGA_P_Engineer m_engineer;
         public GAF m_gaf;
         IGem m_gem;
 
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_engineer = (AOP01_Engineer)engineer;
+            m_engineer = (VEGA_P_Engineer)engineer;
             m_gaf = engineer.ClassGAF();
             m_gem = engineer.ClassGem();
             InitModule();
@@ -354,5 +346,6 @@ namespace Root_AOP01_Inspection
             p_moduleList.ThreadStop();
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
         }
+
     }
 }

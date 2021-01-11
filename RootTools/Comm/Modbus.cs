@@ -312,7 +312,7 @@ namespace RootTools.Comm
             return "OK";
         }
 
-        public string ReadInputRegister(byte nUnit, int nAddress, ref List<int> anValue)
+        public string ReadInputRegister(byte nUnit, int nAddress, List<int> anValue)
         {
             if (m_client.Connected == false) return "Not Connect";
             if (nUnit == 0) return "Invalid Unit ID";

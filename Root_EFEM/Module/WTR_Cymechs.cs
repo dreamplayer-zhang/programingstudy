@@ -805,6 +805,7 @@ namespace Root_EFEM.Module
 
         public override void ThreadStop()
         {
+            m_ui.ThreadStop(); 
             if (m_bRunSend)
             {
                 m_bRunSend = false;

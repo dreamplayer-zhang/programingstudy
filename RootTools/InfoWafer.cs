@@ -227,6 +227,7 @@ namespace RootTools
 
         public void RecipeOpen(string sRecipe)
         {
+            m_sManualRecipe = sRecipe; 
             p_sRecipe = sRecipe;
             m_moduleRunList.OpenJob(sRecipe, true);
             m_qProcess.Clear();
