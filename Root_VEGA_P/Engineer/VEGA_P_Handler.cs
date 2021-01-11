@@ -1,5 +1,6 @@
 ﻿using Root_EFEM;
 using Root_EFEM.Module;
+using Root_VEGA_P.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -39,6 +40,7 @@ namespace Root_VEGA_P.Engineer
             p_moduleList = new ModuleList(m_engineer);
             InitWTR();
             InitLoadport();
+            InitParticleCounter();
 
             IWTR iWTR = (IWTR)m_wtr;
             m_wtr.RunTree(Tree.eMode.RegRead);
@@ -118,6 +120,13 @@ namespace Root_VEGA_P.Engineer
                 m_aLoadport.Add((ILoadport)module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
             }
+        }
+
+        void InitParticleCounter()
+        {
+            ModuleBase module;
+            module = new ParticleCounter(m_id, m_engineer);
+            InitModule(module);
         }
 
         public void RunTreeLoadport(Tree tree)
