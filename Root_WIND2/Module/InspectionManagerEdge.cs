@@ -34,7 +34,7 @@ namespace Root_WIND2
 			this.Add(new WorkManager("EdgeSurface", WORK_TYPE.INSPECTION, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
 			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.WAFER));
 
-			WIND2EventManager.SnapDone += SnapDone_Callback;
+			//WIND2EventManager.SnapDone += SnapDone_Callback;
 		}
 
 		public enum InsepectionMode

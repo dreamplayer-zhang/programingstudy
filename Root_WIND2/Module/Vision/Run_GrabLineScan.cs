@@ -91,7 +91,7 @@ namespace Root_WIND2.Module
                 m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                 int nWaferSizeY_px = Convert.ToInt32(m_nWaferSize_mm * nMMPerUM / m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
-                int nScanOffset_pulse = 30000;
+                int nScanOffset_pulse = 40000;
 
                 int startOffsetX = cpMemoryOffset.X;
                 int startOffsetY = 0;
@@ -103,7 +103,7 @@ namespace Root_WIND2.Module
 
                     // 위에서 아래로 찍는것을 정방향으로 함, 즉 Y축 값이 큰쪽에서 작은쪽으로 찍는것이 정방향
                     // Grab하기 위해 이동할 Y축의 시작 끝 점
-                    double dStartPosY = m_rpAxisCenter.Y + m_module.AlignData.X - nTotalTriggerCount / 2 - nScanOffset_pulse;
+                    double dStartPosY = m_rpAxisCenter.Y + m_module.AlignData.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
                     double dEndPosY = m_rpAxisCenter.Y + m_module.AlignData.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
                     m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
@@ -127,7 +127,7 @@ namespace Root_WIND2.Module
                         return p_sInfo;
 
                     double dTriggerStartPosY = m_rpAxisCenter.Y + m_module.AlignData.Y - nTotalTriggerCount / 2;
-                    double dTriggerEndPosY = m_rpAxisCenter.Y + m_module.AlignData.Y + nTotalTriggerCount / 2;
+                    double dTriggerEndPosY = m_rpAxisCenter.Y + m_module.AlignData.Y + nTotalTriggerCount / 2 + 40000;
                     axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
                     string strPool = m_grabMode.m_memoryPool.p_id;
@@ -141,7 +141,7 @@ namespace Root_WIND2.Module
                     m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
                     //m_grabMode.StartGrabColor(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
 
-                    if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY + m_module.AlignData.Y, nScanSpeed)))
+                    if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
