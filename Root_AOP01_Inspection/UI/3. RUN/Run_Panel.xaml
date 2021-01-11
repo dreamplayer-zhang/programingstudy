@@ -100,6 +100,7 @@
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
                             <Grid Margin="10,5"
                                   Grid.Row="0">
@@ -107,7 +108,7 @@
                                     <RowDefinition Height="20" />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="LoadPort"
+                                <TextBlock Text="LoadPort A"
                                            VerticalAlignment="Bottom"
                                            FontSize="13"
                                            FontWeight="Bold" />
@@ -117,7 +118,7 @@
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
                                         Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="Ready"
+                                    <TextBlock Text="{Binding p_eState}" Name ="LoadportA_State"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Border>
@@ -125,6 +126,28 @@
                             </Grid>
                             <Grid Margin="10,5"
                                   Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="LoadPort B"
+                                           VerticalAlignment="Bottom"
+                                           FontSize="13"
+                                           FontWeight="Bold" />
+                                <Border Grid.Row="1"
+                                        CornerRadius="2"
+                                        Margin="0,0,0,0"
+                                        BorderBrush="DimGray"
+                                        BorderThickness="1"
+                                        Background="{StaticResource PanelBackGround}">
+                                    <TextBlock Text="{Binding p_eState}" Name ="LoadportB_State"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Border>
+
+                            </Grid>
+                            <Grid Margin="10,5"
+                                  Grid.Row="2">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="20" />
                                     <RowDefinition />
@@ -138,13 +161,13 @@
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
                                         Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="Ready"
+                                    <TextBlock Text="{Binding p_eState}" Name ="RTR_State"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Border>
                             </Grid>
                             <Grid Margin="10,5"
-                                  Grid.Row="2">
+                                  Grid.Row="3">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="20" />
                                     <RowDefinition />
@@ -164,7 +187,7 @@
                                 </Border>
                             </Grid>
                             <Grid Margin="10,5"
-                                  Grid.Row="3">
+                                  Grid.Row="4">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="20" />
                                     <RowDefinition />
@@ -184,7 +207,7 @@
                                 </Border>
                             </Grid>
                             <Grid Margin="10,5"
-                                  Grid.Row="4">
+                                  Grid.Row="5">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="20" />
                                     <RowDefinition />
@@ -204,7 +227,7 @@
                                 </Border>
                             </Grid>
                             <Grid Margin="10,5"
-                                  Grid.Row="5">
+                                  Grid.Row="6">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="20" />
                                     <RowDefinition />
@@ -243,21 +266,21 @@
                             <Grid Grid.Column="0"
                                   Margin="5"
                                   Background="LightGray">
-                                <TextBlock Text="Loadport"
+                                <TextBlock Text="Loadport" Name="ExistLoadport"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
                             <Grid Grid.Column="1"
                                   Margin="5"
                                   Background="LightGray">
-                                <TextBlock Text="RTR"
+                                <TextBlock Text="RTR" Name="ExistRTR"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
                             <Grid Grid.Column="2"
                                   Margin="5"
-                                  Background="SteelBlue">
-                                <TextBlock Text="Vision"
+                                  Background="LightGray">
+                                <TextBlock Text="Vision" Name="ExistVision"
                                            FontWeight="Bold"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
@@ -799,20 +822,36 @@
                 </Grid>
                 <Grid Grid.Column="4">
                     <StackPanel Grid.Row="1"
-                                Margin="0,20">
-                        <Button Content="Start / Stop"
+                                Margin="0,10">
+                        <Button Content="Start"
                                 Style="{StaticResource SetupPanelBtn}"
-                                Command="{Binding cmdStart}"
-                                Click="Button_Click"/>
-                        <Button Content="Pause / Resume"
-                                Style="{StaticResource SetupPanelBtn}" />
+                                Margin="0,0,0,10"
+                                Command="{Binding cmdStart}"/>
+                        <Button Content="Pause" 
+                                Style="{StaticResource SetupPanelBtn}"
+                                Margin="0,0,0,10"
+                                Name="PauseResume"
+                                Click="ButtonPause_Click" />
                         <Button Content="Initialize"
-                                Style="{StaticResource SetupPanelBtn}" />
+                                Style="{StaticResource SetupPanelBtn}"
+                                Margin="0,0,0,10"
+                                Click="ButtonInitialize_Click" />
                         <Button Content="Recovery"
-                                Style="{StaticResource SetupPanelBtn}" />
-                        <Button Content="Unload Request"
-                                Style="{StaticResource SetupPanelBtn}" />
+                                Style="{StaticResource SetupPanelBtn}"
+                                Margin="0,0,0,10"
+                                Click="ButtonRecovery_Click" />
+                        <Button Content="Buzzer Off"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Margin="0,0,0,10"
+                                Click="ButtonBuzzerOff_Click"/>
                     </StackPanel>
+                    <StackPanel VerticalAlignment="Bottom">
+                        <Button x:Name="buttonOHT" Content="OHT" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
+                    Margin="0,0,0,10" Click="ButtonOHT_Click"/>
+                        <Button x:Name="buttonAlarmList" Content="AlarmList" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
+                    Margin="0,0,0,10" Click="ButtonAlarmList_Click"/>
+                    </StackPanel>
+
                 </Grid>
             </Grid>
         </StackPanel>
