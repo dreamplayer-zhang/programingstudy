@@ -12,6 +12,7 @@ using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Root_CAMELLIA.ManualJob;
+using RootTools.OHTNew;
 
 namespace Root_CAMELLIA
 {

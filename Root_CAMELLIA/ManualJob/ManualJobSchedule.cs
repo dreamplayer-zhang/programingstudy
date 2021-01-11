@@ -66,13 +66,7 @@ namespace Root_CAMELLIA.ManualJob
                 if (_sRecipe == value) return;
                 _sRecipe = value;
                 OnPropertyChanged();
-                OnChanged();
             }
-        }
-
-        void OnChanged()
-        {
-            
         }
 
         public InfoCarrier m_infoCarrier = null;
@@ -85,16 +79,22 @@ namespace Root_CAMELLIA.ManualJob
         public bool ShowPopup()
         {
             if (ManualJobSchedule_UI.m_bShow) return false;
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                ManualJobSchedule_UI jobschedulePopup = new ManualJobSchedule_UI(m_infoCarrier);
-                jobschedulePopup.Init(this, m_infoCarrier);
-                //m_handler.m_nRnR = p_bRnR ? p_nRnR : 1;   //working
-                p_bRnR = false;
-                jobschedulePopup.ShowDialog();
-                //return jobschedulePopup.DialogResult == true;
-            });
-            return false;
+            ManualJobSchedule_UI jobschedulePopup = new ManualJobSchedule_UI(m_infoCarrier);
+            jobschedulePopup.Init(this, m_infoCarrier);
+            //m_handler.m_nRnR = p_bRnR ? p_nRnR : 1;   //working
+            p_bRnR = false;
+            jobschedulePopup.ShowDialog();
+            return jobschedulePopup.DialogResult == true;
+        }
+
+        public void SetInfoCarrier(InfoCarrier infoCarrier)
+        {
+            m_infoCarrier = infoCarrier;
+        }
+
+        public InfoCarrier GetInfoCarrier()
+        {
+            return m_infoCarrier;
         }
     }
 }

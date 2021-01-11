@@ -13,6 +13,11 @@ namespace RootTools_Vision
 
         }
 
+        public override void Clear()
+        {
+           
+        }
+
         public override bool Read(string recipePath)
         {
             return true;

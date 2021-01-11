@@ -278,6 +278,20 @@ namespace RootTools
             }
             return "OK";
         }
+
+        public string SetSelectMapData(InfoCarrier infoCarrier)
+        {
+            //if (p_lWafer > aSlotState.Count) return "SetMapData Lendth Error";
+            for (int n = 0; n < p_lWafer; n++)
+            {
+                //if (aSlotState[n] == GemSlotBase.eState.Select) SetInfoWafer(n);
+                if (GetInfoWafer(n) != null)
+                {
+                    if (GetInfoWafer(n).p_eState != GemSlotBase.eState.Select) SetInfoWafer(n, null);
+                }
+            }
+            return "OK";
+        }
         #endregion
 
         #region UI

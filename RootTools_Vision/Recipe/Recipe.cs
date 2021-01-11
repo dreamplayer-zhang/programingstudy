@@ -55,10 +55,9 @@ namespace RootTools_Vision
 
             waferMap = new RecipeType_WaferMap();
 
-            RecipeItemList.Clear();
-            foreach(RecipeBase recipe in Tools.GetEnumerableOfType<RecipeBase>().ToList<RecipeBase>())
+            foreach(RecipeBase recipe in RecipeItemList)
             {
-                RecipeItemList.Add(recipe);
+                recipe.Clear();
             }
             ParameterItemList.Clear();
 

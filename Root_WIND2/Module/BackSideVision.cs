@@ -22,11 +22,11 @@ namespace Root_WIND2.Module
     public class BackSideVision : ModuleBase, IWTRChild
     {
         #region ToolBox
-        Axis m_axisRotate;
         Axis m_axisZ;
         AxisXY m_axisXY;
         DIO_O m_doVac;
         DIO_O m_doBlow;
+        DIO_I diWaferExist;
         MemoryPool m_memoryPool;
         MemoryGroup m_memoryGroup;
         MemoryData m_memoryMain;
@@ -41,6 +41,7 @@ namespace Root_WIND2.Module
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
             p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
             p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
+            p_sInfo = m_toolBox.Get(ref diWaferExist, this, "Wafer Exist");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "BackSide Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
@@ -285,11 +286,14 @@ namespace Root_WIND2.Module
                 m_CamMain.Connect();
             //if (m_CamLADS != null)
             //    m_CamLADS.Connect();
+            base.StateHome();
 
-            p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
-            //p_bStageVac = false;
-            return "OK";
+
+            if (diWaferExist.p_bIn == false)
+                p_bStageVac = false;
+
+            return p_sInfo;
         }
         #endregion
 
@@ -434,6 +438,7 @@ namespace Root_WIND2.Module
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.Grabed += M_grabMode_Grabed;
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY+90000, nScanSpeed)))
                             return p_sInfo;
@@ -451,6 +456,12 @@ namespace Root_WIND2.Module
                 {
                     m_grabMode.SetLight(false);
                 }
+            }
+
+            private void M_grabMode_Grabed(object sender, EventArgs e)
+            {
+                GrabedArgs ga = (GrabedArgs)e;
+                m_module.p_nProgress = ga.nProgress;
             }
         }
 

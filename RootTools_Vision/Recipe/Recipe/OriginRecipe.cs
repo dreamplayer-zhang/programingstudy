@@ -103,5 +103,16 @@ namespace RootTools_Vision
             //masterImage.FileName = "MasterImage.bmp";
             //return masterImage.Save(recipePath);
         }
+
+        public override void Clear()
+        {
+            this.OriginX = 0;
+            this.OriginY = 0;
+            this.DiePitchX = 0;
+            this.DiePitchY = 0;
+            this.InspectionBufferOffsetX = 0;
+            this.InspectionBufferOffsetY = 0;
+
+        }
     }
 }

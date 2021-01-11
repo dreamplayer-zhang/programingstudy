@@ -334,6 +334,8 @@ namespace RootTools.Gem
 
         #region Property
         public string p_sLocID { get; set; }
+
+        public string p_sLotID { get; set; }
         #endregion
 
         #region Tree Gem

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -42,10 +43,10 @@ namespace Root_WIND2
 
         protected override void InitWorkManager()
         {
-            this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORKPLACE_STATE.READY, WORKPLACE_STATE.SNAP, STATE_CHECK_TYPE.CHIP));
-            this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY, STATE_CHECK_TYPE.CHIP, 4));
-            this.Add(new WorkManager("ProcessDefect", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION, STATE_CHECK_TYPE.CHIP));
-            this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS_WAFER, WORKPLACE_STATE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
+            this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP));
+            this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORK_TYPE.ALIGNMENT, STATE_CHECK_TYPE.CHIP, 4));
+            this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.CHIP, 4));
+            this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
 
 
             WIND2EventManager.SnapDone += SnapDone_Callback;
@@ -102,6 +103,8 @@ namespace Root_WIND2
                 }
 
                 workplaceBundle = WorkplaceBundle.CreateWaferMap(_recipe);
+
+                this.SharedBufferByteCnt = 3; // 이거 수정해야함
                 workplaceBundle.SetSharedBuffer(this.SharedBufferR_Gray, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
                 workplaceBundle.SetSharedRGBBuffer(this.SharedBufferR_Gray, this.SharedBufferG, this.SharedBufferB);
 
@@ -121,17 +124,19 @@ namespace Root_WIND2
 
         public void SnapDone_Callback(object obj, SnapDoneArgs args)
         {
-            if (this.workplaceBundle == null) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
+            if (this.workplaceBundle == null || this.IsStop == true) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
 
             Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
 
             foreach (Workplace wp in this.workplaceBundle)
             {
+                if (wp.STATE >= WORK_TYPE.SNAP) continue;
+
                 Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.BufferSizeY), new Point(wp.PositionX + wp.BufferSizeX, wp.PositionY));
 
                 if (snapArea.Contains(checkArea) == true)
                 {
-                    wp.STATE = WORKPLACE_STATE.SNAP;
+                    wp.STATE = WORK_TYPE.SNAP;
                 }
             }
 
@@ -164,12 +169,14 @@ namespace Root_WIND2
             base.Start();
         }
 
-        public void SetWorkplaceBuffer(IntPtr ptrR, IntPtr ptrG, IntPtr ptrB)
+        public void SetColorSharedBuffer(IntPtr ptrR, IntPtr ptrG, IntPtr ptrB)
         {
             this.SharedBufferR_Gray = ptrR;
             this.SharedBufferG = ptrG;
             this.SharedBufferB = ptrB;
+            this.SharedBufferByteCnt = 3;
         }
+
         public void Start(bool Snap)
         {
             if (this.Recipe == null && this.Recipe.WaferMap == null)
@@ -179,16 +186,23 @@ namespace Root_WIND2
             {
                 foreach (Workplace wp in this.workplaceBundle)
                 {
-                    wp.STATE = WORKPLACE_STATE.SNAP;
+                    wp.STATE = WORK_TYPE.SNAP;
                 }
             }
 
             Start();
         }
 
-        public new void Stop()
+        public void Stop()
         {
-            base.Stop();
+            if(this.workplaceBundle != null)
+            {
+                this.workplaceBundle.Reset();
+                workBundle = null;
+                workplaceBundle = null;
+
+                base.Stop();
+            }
         }
     }
 }

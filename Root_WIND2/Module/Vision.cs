@@ -51,6 +51,8 @@ namespace Root_WIND2.Module
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
+
+        public RPoint AlignData = new RPoint(0, 0);
         #endregion
 
         public override void GetTools(bool bInit)

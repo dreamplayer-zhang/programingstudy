@@ -1,6 +1,6 @@
-﻿using RootTools;
+﻿using System;
 
-namespace Root_EFEM.Module
+namespace RootTools.OHTNew
 {
     public interface ILoadport
     {
@@ -11,5 +11,9 @@ namespace Root_EFEM.Module
         string RunUndocking();
 
         InfoCarrier p_infoCarrier { get; set; }
+
+        bool p_bPlaced { get; }
+
+        bool p_bPresent { get; }
     }
 }

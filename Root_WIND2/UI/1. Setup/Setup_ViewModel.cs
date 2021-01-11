@@ -57,7 +57,7 @@ namespace Root_WIND2
         private Edge_ViewModel edgeVM;
         //private InspTest_ViewModel inspTestVM;  //삭제
         private BacksideInspection_ViewModel backsideInspTestVM;
-        private Maintenance_ViewModel maintVM;
+        public Maintenance_ViewModel maintVM;
         private GEM_ViewModel gemVM;
 
         private InspectionManagerFrontside inspectionMgrVision;

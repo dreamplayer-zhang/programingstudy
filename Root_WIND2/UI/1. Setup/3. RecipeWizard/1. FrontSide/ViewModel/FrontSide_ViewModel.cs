@@ -20,7 +20,7 @@ namespace Root_WIND2
         public FrontSideMap         Map;
         public FrontSideOrigin      Origin;
         public FrontSidePosition   Position;
-        public FrontSideMask         Mask;
+        public FrontSideMask         ROI;
         public FrontSideSpec        Spec;
         public FrontsideInspection        InspTestPage;
 
@@ -61,16 +61,16 @@ namespace Root_WIND2
                 SetProperty(ref m_Position_VM, value);
             }
         }
-        private FrontsideMask_ViewModel m_Mask_VM;
-        public FrontsideMask_ViewModel p_Mask_VM
+        private FrontsideMask_ViewModel m_ROI_VM;
+        public FrontsideMask_ViewModel p_ROI_VM
         {
             get
             {
-                return m_Mask_VM;
+                return m_ROI_VM;
             }
             set
             {
-                SetProperty(ref m_Mask_VM, value);
+                SetProperty(ref m_ROI_VM, value);
             }
         }
         private FrontsideSpec_ViewModel m_Spec_VM;
@@ -130,8 +130,8 @@ namespace Root_WIND2
             p_Position_VM = new FrontsidePosition_ViewModel();
             p_Position_VM.init(setup, m_Recipe);
 
-            p_Mask_VM = new FrontsideMask_ViewModel();
-            p_Mask_VM.Init(setup,m_Recipe);
+            p_ROI_VM = new FrontsideMask_ViewModel();
+            p_ROI_VM.Init(setup,m_Recipe);
 
             p_Spec_VM = new FrontsideSpec_ViewModel();
             p_Spec_VM.init(this, m_Recipe);
@@ -155,7 +155,7 @@ namespace Root_WIND2
 
         private void P_Origin_VM_SetOrigin(object e)
         {
-            p_Mask_VM.SetOrigin(e);
+            p_ROI_VM.SetOrigin(e);
         }
         private void P_Origin_VM_SetMasterDie(object e)
         {
@@ -170,7 +170,7 @@ namespace Root_WIND2
             p_Spec_VM.Load();
             p_Summary_VM.Load();
             p_InspTest_VM.Load();
-            p_Mask_VM.Load();
+            p_ROI_VM.Load();
         }
 
         public void Init()
@@ -180,14 +180,14 @@ namespace Root_WIND2
             Map = new FrontSideMap();
             Origin = new FrontSideOrigin();
             Position = new FrontSidePosition();
-            Mask = new FrontSideMask();
+            ROI = new FrontSideMask();
             Spec = new FrontSideSpec();
             InspTestPage = new FrontsideInspection();
 
             SetPage(Map);
             SetPage(Origin);
             SetPage(Position);
-            SetPage(Mask);
+            SetPage(ROI);
             SetPage(Spec);
             SetPage(Summary);
             SetPage(InspTestPage);
@@ -252,7 +252,7 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    SetPage(Mask);
+                    SetPage(ROI);
                 });
             }
         }

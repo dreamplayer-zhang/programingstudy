@@ -65,7 +65,6 @@ namespace Root_ASIS.Module
             }
         }
 
-        double m_secUp = 2;
         bool _bUp = false; 
         public bool p_bUp
         {
@@ -83,7 +82,6 @@ namespace Root_ASIS.Module
         {
             m_secBlow0 = tree.Set(m_secBlow0, m_secBlow0, "Blow 0", "Blow Time (sec)");
             m_secBlow1 = tree.Set(m_secBlow1, m_secBlow1, "Blow 1", "Blow Time (sec)");
-            m_secUp = tree.Set(m_secUp, m_secUp, "UpDown", "Up Down Timeour (sec)");
             m_msBlow0 = (int)(1000 * m_secBlow0);
             m_msBlow1 = (int)(1000 * m_secBlow1);
         }
@@ -117,7 +115,7 @@ namespace Root_ASIS.Module
                 p_bUp = false;
                 if (Run(AxisTurn(ePos.Turn))) return p_sInfo;
                 p_bUp = true;
-                if (Run(m_dioUp.WaitDone(m_secUp))) return p_sInfo;
+                if (Run(m_dioUp.WaitDone())) return p_sInfo;
                 p_bVacuum0 = false;
                 p_bVacuum1 = true; 
                 return "OK";

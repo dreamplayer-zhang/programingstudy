@@ -16,6 +16,7 @@ namespace RootTools_Vision
     [XmlInclude(typeof(D2DRecipe))]
     [XmlInclude(typeof(BacksideRecipe))]
     [XmlInclude(typeof(MaskRecipe))]
+    [XmlInclude(typeof(EdgeSurfaceRecipe))]
     public abstract class RecipeBase : ObservableObject, IComparable<RecipeBase>, IRecipe
     {
         public int CompareTo(RecipeBase other)
@@ -31,5 +32,7 @@ namespace RootTools_Vision
         public abstract bool Read(string recipePath);
 
         public abstract bool Save(string recipePath);
+
+        public abstract void Clear();
     }
 }
