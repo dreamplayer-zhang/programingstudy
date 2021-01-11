@@ -12,10 +12,40 @@ namespace Root_VEGA_P.Module
     public class ParticleCounter : ModuleBase
     {
         #region ToolBox
-        Modbus m_modbus; 
+        RS232 m_rs232;
+        Modbus m_modbus;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_modbus, this, "Modbus");
+            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            if (bInit)
+            {
+                m_rs232.OnReceive += M_rs232_OnReceive;
+                m_rs232.p_bConnect = true;
+                ConnectModbus(); 
+            }
+        }
+        #endregion
+
+        #region RS232
+        string ConnectRS232()
+        {
+            m_rs232.p_bConnect = true;
+            return m_rs232.p_bConnect ? "OK" : "RS232 Connect Error"; 
+        }
+
+        private void M_rs232_OnReceive(string sRead)
+        {
+            //forget
+        }
+        #endregion
+
+        #region Vacuum Pump
+        public string RunPump(bool bOn)
+        {
+            if (Run(ConnectRS232())) return p_sInfo;
+            //RunPump
+            return "OK"; 
         }
         #endregion
 
@@ -24,7 +54,7 @@ namespace Root_VEGA_P.Module
         {
             if (m_modbus.m_client.Connected) return "OK"; 
             p_sInfo = m_modbus.Connect();
-            return m_modbus.m_client.Connected ? "OK" : "Connect Error";
+            return m_modbus.m_client.Connected ? "OK" : "Modbus Connect Error";
         }
         #endregion
 
@@ -72,16 +102,21 @@ namespace Root_VEGA_P.Module
 
         string ReadParticle()
         {
-            if (Run(ConnectModbus())) return p_sInfo; 
-            if (Run(SetSample())) return p_sInfo;
-            p_bDone = false;
-            Thread.Sleep(10);
-            if (Run(m_modbus.WriteCoils(m_nUnit, 1, true))) return p_sInfo;
-            m_sw.Start(); 
-            Thread.Sleep(200);
-            if (Run(WaitDone())) return p_sInfo; 
-            if (Run(m_modbus.ReadInputRegister(m_nUnit, 30229, m_aRead))) return p_sInfo;
-            return "OK"; 
+            try
+            {
+                if (Run(RunPump(true))) return p_sInfo;
+                if (Run(ConnectModbus())) return p_sInfo;
+                if (Run(SetSample())) return p_sInfo;
+                p_bDone = false;
+                Thread.Sleep(10);
+                if (Run(m_modbus.WriteCoils(m_nUnit, 1, true))) return p_sInfo;
+                m_sw.Start();
+                Thread.Sleep(200);
+                if (Run(WaitDone())) return p_sInfo;
+                if (Run(m_modbus.ReadInputRegister(m_nUnit, 30229, m_aRead))) return p_sInfo;
+                return "OK";
+            }
+            finally { RunPump(false); }
         }
 
         public bool p_bDone
@@ -172,8 +207,9 @@ namespace Root_VEGA_P.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), false, "time Selay");
-            AddModuleRunList(new Run_Run(this), false, "time Selay");
+            AddModuleRunList(new Run_Delay(this), false, "Time Delay");
+            AddModuleRunList(new Run_Pump(this), false, "Run Vacuum Pump");
+            AddModuleRunList(new Run_Run(this), false, "Run Particle Counter");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -200,7 +236,38 @@ namespace Root_VEGA_P.Module
 
             public override string Run()
             {
-                Thread.Sleep((int)(1000 * m_secDelay)); 
+                Thread.Sleep(1000 * m_secDelay); 
+                return "OK";
+            }
+        }
+
+        public class Run_Pump : ModuleRunBase
+        {
+            ParticleCounter m_module;
+            public Run_Pump(ParticleCounter module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            int m_secDelay = 1;
+            public override ModuleRunBase Clone()
+            {
+                Run_Pump run = new Run_Pump(m_module);
+                run.m_secDelay = m_secDelay;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Delay Time (sec)");
+            }
+
+            public override string Run()
+            {
+                if (m_module.Run(m_module.RunPump(true))) return p_sInfo; 
+                Thread.Sleep(1000 * m_secDelay);
+                if (m_module.Run(m_module.RunPump(false))) return p_sInfo;
                 return "OK";
             }
         }
