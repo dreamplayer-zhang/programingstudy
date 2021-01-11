@@ -43,9 +43,9 @@ namespace Root_WIND2
 
         protected override void InitWorkManager()
         {
-            this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP));
-            this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORK_TYPE.ALIGNMENT, STATE_CHECK_TYPE.CHIP, 4));
-            this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.CHIP, 4));
+            this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP, 8));
+            this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORK_TYPE.ALIGNMENT, STATE_CHECK_TYPE.CHIP, 8));
+            this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.CHIP, 8));
             this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
 
 

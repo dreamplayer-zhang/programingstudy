@@ -182,7 +182,7 @@ namespace Root_WIND2.Module
                         return p_sInfo;
 
                     double dTriggerStartPosY = m_rpAxisCenter.Y + m_module.AlignData.Y - nTotalTriggerCount / 2;
-                    double dTriggerEndPosY = m_rpAxisCenter.Y + m_module.AlignData.Y + nTotalTriggerCount / 2;
+                    double dTriggerEndPosY = m_rpAxisCenter.Y + m_module.AlignData.Y + nTotalTriggerCount / 2 + 40000;
                     axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
                     string strPool = m_grabMode.m_memoryPool.p_id;

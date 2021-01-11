@@ -404,12 +404,6 @@ namespace Root_WIND2
             p_DrawElement.Clear();
         }
 
-        public void ChangeImageData(ImageData image = null, IDialogService dialogService = null)
-        {
-            base.init(image, dialogService);
-        }
-
-
 
         public CPoint leftClickPoint = new CPoint();
         public CPoint rightClickPoint = new CPoint();
