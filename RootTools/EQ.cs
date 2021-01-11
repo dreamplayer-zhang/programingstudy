@@ -1,9 +1,11 @@
-﻿using System.Threading;
+﻿using System.ComponentModel;
+using System.Threading;
 
 namespace RootTools
 {
     public static class EQ 
     {
+
         public enum eState
         {
             Init,
@@ -22,7 +24,8 @@ namespace RootTools
         public static eState p_eState
         {
             get { return m_EQ.p_eState; }
-            set { m_EQ.p_eState = value; }
+            set { m_EQ.p_eState = value;
+            }
         }
 
         public static string p_sInfo

@@ -57,8 +57,7 @@ namespace Root_CAMELLIA
         {
             InfoCarrier infoCarrier = m_handler.m_aLoadport[0].p_infoCarrier;
             List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
-            //string sMap = "1100110011111100000011010";
-            string sMap = "1111001100111";
+            string sMap = "1100110011111100000011010";
             foreach (char ch in sMap)
             {
                 switch (ch)

@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         WindowStyle="SingleBorderWindow"
         Closing="Window_Closing"
-        Title="ManualJobSchedule" Height="700" Width="930.5" Background="#FF406859" Topmost="True">
+        Title="ManualJobSchedule" Height="740" Width="930.5" Background="#FF406859" Topmost="True" WindowStartupLocation="CenterScreen">
     <!--Title="ManualJobSchedule_UI" Height="600" Width="700" Background="#FF2D2D30" Topmost="True">-->
     <Window.Resources>
         <LinearGradientBrush x:Key="BtnGradientBrush" StartPoint="0,0" EndPoint="1,1">
@@ -231,15 +231,15 @@
                         </Grid.RowDefinitions>
                         <StackPanel Grid.Row="0" Orientation="Horizontal">
                             <TextBlock Text="Location ID = " VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding p_sLocID}" VerticalAlignment="Center" TextAlignment="Left" MinWidth="100"/>
+                            <TextBox x:Name="textboxLocID" VerticalAlignment="Center" TextAlignment="Left" MinWidth="100"/>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Orientation="Horizontal">
                             <TextBlock Text="Lot ID = " VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding p_sLotID}" VerticalAlignment="Center" TextAlignment="Left" MinWidth="100"/>
+                            <TextBox x:Name="textboxLotID" VerticalAlignment="Center" TextAlignment="Left" MinWidth="100"/>
                         </StackPanel>
                         <StackPanel Grid.Row="2" Orientation="Horizontal">
                             <TextBlock Text="Carrier ID = " VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding p_sCarrierID}" VerticalAlignment="Center" TextAlignment="Left" MinWidth="100"/>
+                            <TextBox x:Name="textboxCstID" VerticalAlignment="Center" TextAlignment="Left" MinWidth="100"/>
                         </StackPanel>
                     </Grid>
                 </GroupBox>

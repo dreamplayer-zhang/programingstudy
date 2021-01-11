@@ -8,13 +8,15 @@ using RootTools.Module;
 using RootTools.OHTNew;
 using RootTools.Trees;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Root_WIND2
 {
-    public class WIND2_Handler : IHandler
+    public class WIND2_Handler : ObservableObject, IHandler
     {
         public ModuleList p_moduleList { get; set; }
 
@@ -53,16 +55,42 @@ namespace Root_WIND2
         #region Module
         public WIND2_Recipe m_recipe;
         public EFEM_Process m_process;
-        public Vision m_vision;
-        public EdgeSideVision m_edgesideVision;
+        Vision m_vision;
+        public Vision p_Vision
+        {
+            get { return m_vision; }
+            set
+            {
+                SetProperty(ref m_vision, value);
+            }
+        }
+        EdgeSideVision m_edgesideVision;
+        public EdgeSideVision p_EdgeSideVision
+        {
+            get { return m_edgesideVision; }
+            set
+            {
+                SetProperty(ref m_edgesideVision, value);
+            }
+        }
         public BackSideVision m_backSideVision;
+        public BackSideVision p_BackSideVision
+        {
+            get { return m_backSideVision; }
+            set
+            {
+                SetProperty(ref m_backSideVision, value);
+            }
+        }
+
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             switch (m_engineer.m_eMode)
             {
                 case WIND2_Engineer.eMode.Vision: 
-                    InitVisionModule(); break;
+                    InitVisionModule(); 
+                    break;
                 case WIND2_Engineer.eMode.EFEM:
                     InitEFEMModule();
                     break;
@@ -87,7 +115,7 @@ namespace Root_WIND2
             IWTR iWTR = (IWTR)m_wtr;
             InitLoadport();
             InitAligner();
-            
+
             iWTR.AddChild(m_edgesideVision);
             m_backSideVision = new BackSideVision("BackSide Vision", m_engineer);
             InitModule(m_backSideVision);
@@ -96,8 +124,11 @@ namespace Root_WIND2
             InitModule(m_edgesideVision);
             iWTR.AddChild(m_edgesideVision);
             m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Client);
-            InitModule(m_vision);
-            iWTR.AddChild(m_vision);
+            if (ProgramManager.Instance.Engineer.m_bVisionEnable)
+            {
+                InitModule(m_vision);
+                iWTR.AddChild(m_vision);
+            }
 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
@@ -130,6 +161,17 @@ namespace Root_WIND2
         }
         eWTR m_eWTR = eWTR.RND;
         ModuleBase m_wtr;
+        public ModuleBase p_WTR
+        {
+            get
+            {
+                return m_wtr;
+            }
+            set
+            {
+                SetProperty(ref m_wtr, value);
+            }
+        }
         void InitWTR()
         {
             switch (m_eWTR)
@@ -153,7 +195,18 @@ namespace Root_WIND2
             Cymechs,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
-        public List<ILoadport> m_aLoadport = new List<ILoadport>();
+        public ObservableCollection<ILoadport> m_aLoadport = new ObservableCollection<ILoadport>();
+        public ObservableCollection<ILoadport> p_aLoadport
+        {
+            get
+            {
+                return m_aLoadport;
+            }
+            set
+            {
+                SetProperty(ref m_aLoadport, value);
+            }
+        }
         int m_lLoadport = 2;
         void InitLoadport()
         {
@@ -194,18 +247,32 @@ namespace Root_WIND2
             RND
         }
         eAligner m_eAligner = eAligner.ATI;
+
+        ModuleBase m_Aligner;
+        public ModuleBase p_Aligner
+        {
+            get
+            {
+                return m_Aligner;
+            }
+            set
+            {
+                SetProperty(ref m_Aligner, value);
+            }
+        }
+
         void InitAligner()
         {
             ModuleBase module = null;
             switch (m_eAligner)
             {
-                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break;
-                case eAligner.RND: module = new Aligner_RND("Aligner", m_engineer); break;
+                case eAligner.ATI: p_Aligner = new Aligner_ATI("Aligner", m_engineer); break;
+                case eAligner.RND: p_Aligner = new Aligner_RND("Aligner", m_engineer); break;
             }
-            if (module != null)
+            if (p_Aligner != null)
             {
-                InitModule(module);
-                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+                InitModule(p_Aligner);
+                ((IWTR)m_wtr).AddChild((IWTRChild)p_Aligner);
             }
         }
 
@@ -371,7 +438,7 @@ namespace Root_WIND2
         #region Tree
         public void RunTreeModule(Tree tree)
         {
-            if (m_engineer.m_eMode == WIND2_Engineer.eMode.Vision) return; 
+            if (m_engineer.m_eMode == WIND2_Engineer.eMode.Vision) return;
             RunTreeWTR(tree.GetTree("WTR"));
             RunTreeLoadport(tree.GetTree("Loadport"));
             RunTreeAligner(tree.GetTree("Aligner"));

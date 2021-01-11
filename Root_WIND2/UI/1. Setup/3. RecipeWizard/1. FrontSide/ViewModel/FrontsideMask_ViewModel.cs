@@ -1519,7 +1519,8 @@ namespace Root_WIND2
             if (ptrMem == IntPtr.Zero)
                 return;
             byte* bitmapPtr = (byte*)ptrMem.ToPointer();
-
+            if (p_SelectedROI == null)
+                return;
             p_SelectedROI.p_Data.Clear();
             PointLine DotLine = new PointLine();
             bool bStart = false;
@@ -1557,7 +1558,8 @@ namespace Root_WIND2
 
         public void SetRecipeData()
         {
-            for(int i = 0; i < p_cInspROI.Count; i++)
+            m_Recipe.GetRecipe<MaskRecipe>().OriginPoint = this.BoxOffset;
+            for (int i = 0; i < p_cInspROI.Count; i++)
             {
                 m_Recipe.GetRecipe<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data);
             }
@@ -1591,6 +1593,16 @@ namespace Root_WIND2
             {
                 p_cInspROI[i].p_Index = i;
             }
+            if (p_cInspROI.Count == 0)
+            {
+                _ClearROI();
+            }
+            else
+            {
+                p_SelectedROI = p_cInspROI.Last();
+            }
+            
+            
         }
         private void _ClearROI()
         {

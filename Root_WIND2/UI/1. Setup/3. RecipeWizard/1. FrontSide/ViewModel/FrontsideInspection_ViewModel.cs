@@ -78,7 +78,7 @@ namespace Root_WIND2
             //DatabaseManager.Instance.SetDatabase(1);
 
             WorkEventManager.PositionDone += PositionDone_Callback;
-            WorkEventManager.InspectionDone += SurfaceInspDone_Callback;
+            WorkEventManager.InspectionDone += InspectionDone_Callback;
             WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
         }
 
@@ -102,7 +102,7 @@ namespace Root_WIND2
                 }));
             }
         }
-        private void SurfaceInspDone_Callback(object obj, InspectionDoneEventArgs args)
+        private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
         {
             Workplace workplace = obj as Workplace;
             List<String> textList = new List<String>();
@@ -140,7 +140,7 @@ namespace Root_WIND2
 
         private void DrawDone_Callback(CPoint leftTop, CPoint rightBottom)
         {
-            p_ImageViewer_VM.Clear();
+            //p_ImageViewer_VM.Clear();
             this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, FrontsideInspection_ImageViewer_ViewModel.ColorType.FeatureMatchingFail);
         }
 
@@ -370,7 +370,7 @@ namespace Root_WIND2
         public void _btnSnap()
         {
             EQ.p_bStop = false;
-            Vision vision = ((WIND2_Handler)ProgramManager.Instance.Engineer.ClassHandler()).m_vision;
+            Vision vision = ((WIND2_Handler)ProgramManager.Instance.Engineer.ClassHandler()).p_Vision;
             if (vision.p_eState != ModuleBase.eState.Ready)
             {
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
@@ -424,7 +424,7 @@ namespace Root_WIND2
             //}
 
             SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr();
-            m_Setup.InspectionVision.SetWorkplaceBuffer(p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
+            m_Setup.InspectionVision.SetColorSharedBuffer(p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
 
             m_Setup.InspectionVision.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
 

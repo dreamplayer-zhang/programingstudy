@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Gem;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -177,9 +178,17 @@ namespace Root_CAMELLIA.ManualJob
             m_JobSchedule = manualJobSchedule;
             this.DataContext = manualJobSchedule;
             m_infoCarrier = infoCarrier;
+            InitInfo();
             InitRecipeList();
             InitSlotDisplay();
             InitSlotRecipeList();
+        }
+
+        void InitInfo()
+        {
+            textboxLocID.Text = m_infoCarrier.p_sLocID;
+            textboxLotID.Text = m_infoCarrier.p_sLotID;
+            textboxCstID.Text = m_infoCarrier.p_sCarrierID;
         }
 
         void InitRecipeList()
@@ -222,12 +231,27 @@ namespace Root_CAMELLIA.ManualJob
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-         
+            if (m_infoCarrier == null) return;
+            m_infoCarrier.p_sLocID = textboxLocID.Text;
+            m_infoCarrier.p_sLotID = textboxLotID.Text;
+            m_infoCarrier.p_sCarrierID = textboxCstID.Text;
+            for(int i=0; i<nSlot; i++)
+            {
+                if (m_infoCarrier.GetInfoWafer(i) != null)
+                {
+                    m_infoCarrier.GetInfoWafer(i).p_sRecipe = m_cbRecipe[i].Text;
+                    m_infoCarrier.GetInfoWafer(i).p_sWaferID = m_tboxWaferID[i].Text;
+                    m_infoCarrier.GetInfoWafer(i).p_eState = m_tblockState[i].Text == "Select" ? GemSlotBase.eState.Select : GemSlotBase.eState.Exist;
+                }
+            }
+            //m_JobSchedule.SetInfoCarrier(m_infoCarrier);
+            m_infoCarrier.SetSelectMapData(m_infoCarrier);
+            this.DialogResult = true;
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-
+            this.Close();
         }
     }
 }

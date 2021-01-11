@@ -58,7 +58,7 @@ namespace Root_WIND2.Module
 		public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
 		{
 			roiHeight = tree.Set(roiHeight, roiHeight, "ROI Height", "", bVisible);
-			roiWidth = tree.Set(roiHeight, roiHeight, "ROI Width", "", bVisible);
+			roiWidth = tree.Set(roiWidth, roiWidth, "ROI Width", "", bVisible);
 			threshhold = tree.Set(threshhold, threshhold, "Theshold", "", bVisible);
 			size = tree.Set(size, size, "Defect Size", "pixel", bVisible);
 			mergeDist = tree.Set(mergeDist, mergeDist, "Merge Distance", "pixel", bVisible);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,29 @@ namespace Root_WIND2
         public Run()
         {
             InitializeComponent();
+        }
+       
+    }
+    public class ModuleStateToColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            RootTools.Module.ModuleBase.eState eState = (RootTools.Module.ModuleBase.eState)value;
+            switch (eState)
+            {
+                case RootTools.Module.ModuleBase.eState.Init: return Brushes.DimGray;
+                case RootTools.Module.ModuleBase.eState.Home: return Brushes.DimGray;
+                case RootTools.Module.ModuleBase.eState.Ready: return Brushes.LightYellow;
+                case RootTools.Module.ModuleBase.eState.Run:
+                    return Brushes.PaleGreen;
+                case RootTools.Module.ModuleBase.eState.Error: return Brushes.Red;
+                default: return Brushes.DimGray;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
         }
     }
 }

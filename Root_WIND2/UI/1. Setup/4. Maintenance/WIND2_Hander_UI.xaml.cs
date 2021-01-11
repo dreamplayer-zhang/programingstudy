@@ -32,6 +32,11 @@ namespace Root_WIND2
             InitTabModule();
         }
 
+        public ModuleList_UI GetModuleList_UI()
+        {
+            return moduleListUI;
+        }
+
         void InitTabHandler()
         {
 

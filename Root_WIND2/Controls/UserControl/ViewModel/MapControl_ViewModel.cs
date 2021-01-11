@@ -58,7 +58,7 @@ namespace Root_WIND2
 
                 if (x < 0 || y < 0) return;
 
-                WORKPLACE_STATE state = workplace.STATE;
+                WORK_TYPE state = workplace.STATE;
 
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
                 {
@@ -76,22 +76,22 @@ namespace Root_WIND2
                         {
                             switch (state)
                             { 
-                                case WORKPLACE_STATE.NONE:
+                                case WORK_TYPE.NONE:
                                     //tb.Background = brushPosition;
                                     break;
-                                case WORKPLACE_STATE.SNAP:
+                                case WORK_TYPE.SNAP:
                                     chip.Background = brushPreInspection;
                                 break;
-                                case WORKPLACE_STATE.READY:
+                                case WORK_TYPE.ALIGNMENT:
                                     chip.Background = brushPosition;
                                 break;
-                                case WORKPLACE_STATE.INSPECTION:
+                                case WORK_TYPE.INSPECTION:
                                     chip.Background = brushInspection;
                                 break;
-                                case WORKPLACE_STATE.DEFECTPROCESS:
+                                case WORK_TYPE.DEFECTPROCESS:
                                     chip.Background = brushComplete;
                                 break;
-                                case WORKPLACE_STATE.DEFECTPROCESS_WAFER:
+                                case WORK_TYPE.DEFECTPROCESS_WAFER:
                                     chip.Background = brushCompleteWafer;
                                 break;
                             }
