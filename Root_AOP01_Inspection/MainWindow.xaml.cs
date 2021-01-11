@@ -159,7 +159,7 @@ namespace Root_AOP01_Inspection
             
             Init_ViewModel();
             Init_UI();
-            Run.Init(m_engineer.m_handler.m_aop01, m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], (ALIDList)m_engineer.m_gaf.m_listALID, m_engineer);
+            Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1],  m_engineer);
             //m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
         }
         void Init_ViewModel()
