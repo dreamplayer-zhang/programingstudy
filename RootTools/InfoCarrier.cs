@@ -295,12 +295,14 @@ namespace RootTools
         #endregion
 
         #region UI
+        List<InfoCarrier_UI> m_aCarrierUI = new List<InfoCarrier_UI>(); 
         public UserControl p_ui
         {
             get
             {
                 InfoCarrier_UI ui = new InfoCarrier_UI();
                 ui.Init(this);
+                m_aCarrierUI.Add(ui); 
                 return ui;
             }
         }
@@ -356,6 +358,7 @@ namespace RootTools
 
         public void ThreadStop()
         {
+            foreach (InfoCarrier_UI ui in m_aCarrierUI) ui.m_timer.Stop(); 
         }
     }
 }
