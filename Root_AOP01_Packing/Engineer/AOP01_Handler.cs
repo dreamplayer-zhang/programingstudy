@@ -88,7 +88,7 @@ namespace Root_AOP01_Packing
         #endregion
 
         #region Module WTR
-        List<ModuleBase> m_aWTR = new List<ModuleBase>(); 
+        public List<ModuleBase> m_aWTR = new List<ModuleBase>(); 
         void InitWTR()
         {
             m_aWTR.Add(new WTR_RND("WTR_A", m_engineer));

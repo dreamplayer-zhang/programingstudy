@@ -32,9 +32,7 @@ namespace Root_WIND2
 		{
 			//this.Add(new WorkManager("Snap", WORK_TYPE.SNAP, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
 			this.Add(new WorkManager("EdgeSurface", WORK_TYPE.INSPECTION, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
-			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.WAFER));
-
-			WIND2EventManager.SnapDone += SnapDone_Callback;
+			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.WAFER));
 		}
 
 		public enum InsepectionMode
@@ -155,57 +153,6 @@ namespace Root_WIND2
 			}
 
 			return true;
-
-			//// top
-			//int memoryHeightTop = this.SharedBufferHeight;
-			//int memoryWidthTop = this.SharedBufferWidth;
-			//for (int i = 0; i < memoryHeightTop / partitionNum; i++)
-			//{
-			//	Workplace workplace = new Workplace(0, i, 0, memoryHeightTop / partitionNum * i, memoryWidthTop, memoryHeightTop / partitionNum);
-			//	workplace.SetSharedBuffer(this.SharedBufferR_Gray, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
-			//	workplace.SetSharedRGBBuffer(this.SharedBufferR_Gray, this.sharedBufferG, this.sharedBufferB);
-			//	workplaces.Add(workplace);
-			//}
-
-			//// side
-			//RootTools.ImageData imageDataSide = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeSide);
-			//int memoryHeightSide = imageDataSide.p_Size.Y;
-			//int memoryWidhtSide = imageDataSide.p_Size.X;
-			//for (int i = 0; i < memoryHeightSide / partitionNum; i++)
-			//{
-			//	Workplace workplace = new Workplace(0, i, 0, memoryHeightSide / partitionNum * i, memoryWidhtSide, memoryHeightSide / partitionNum);
-			//	workplace.SetSharedBuffer(imageDataSide.GetPtr(0), memoryWidhtSide, memoryHeightSide, imageDataSide.p_nByte);
-			//	workplace.SetSharedRGBBuffer(imageDataSide.GetPtr(0), imageDataSide.GetPtr(1), imageDataSide.GetPtr(2));
-			//	workplaces.Add(workplace);
-			//}
-
-			//// bottom
-			//RootTools.ImageData imageDataBtm = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeSide);
-			//int memoryHeightBtm = imageDataBtm.p_Size.Y;
-			//int memoryWidhtBtm = imageDataBtm.p_Size.X;
-			//for (int i = 0; i<memoryHeightBtm / partitionNum; i++)
-			//{
-			//	Workplace workplace = new Workplace(0, i, 0, memoryHeightBtm / partitionNum * i, memoryWidhtBtm, memoryHeightBtm / partitionNum);
-			//	workplace.SetSharedBuffer(imageDataBtm.GetPtr(0), memoryWidhtBtm, memoryHeightBtm, imageDataBtm.p_nByte);
-			//	workplace.SetSharedRGBBuffer(imageDataBtm.GetPtr(0), imageDataBtm.GetPtr(1), imageDataBtm.GetPtr(2));
-
-			//	workplaces.Add(workplace);
-			//}
-
-			//EdgeSurface edgeSurface = new EdgeSurface();
-			//edgeSurface.SetRecipe(this.recipe);
-			//edgeSurface.SetWorkplaceBundle(workplaces);
-
-			//ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-			//processDefect_Wafer.SetRecipe(this.recipe);
-			//processDefect_Wafer.SetWorkplaceBundle(workplaces);
-
-			//WorkBundle works = new WorkBundle();
-			//works.Add(edgeSurface);
-			//works.Add(processDefect_Wafer);
-
-			//SetBundles(works, workplaces);
-			//return true;
 		}
 
 		public new void Start()
