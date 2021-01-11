@@ -135,6 +135,15 @@ namespace RootTools_Vision
             boundingBox.Right = maxX;
             boundingBox.Bottom = maxY;
         }
+
+        public void CopyPointLinesTo(ref List<PointLine> _pointLines)
+        {
+            _pointLines.Clear();
+            foreach(RecipeType_PointLine pl in this.pointLines)
+            {
+                _pointLines.Add(new PointLine(pl.StartPoint, pl.Length));
+            }
+        }
     }
 
     public class RecipeType_PointLine

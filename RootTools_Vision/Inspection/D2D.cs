@@ -59,7 +59,7 @@ namespace RootTools_Vision
             this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
 
             if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP) == true &&
-                this.workplaceBundle.CheckStateLine(this.workplace.MapPositionX, WORKPLACE_STATE.READY) &&
+                this.workplaceBundle.CheckStateLine(this.workplace.MapPositionX, WORK_TYPE.ALIGNMENT) &&
                 this.IsPreworkDone == false)
             {
                 CreateGoldenImage();
@@ -291,6 +291,18 @@ namespace RootTools_Vision
             // Mask
             MaskRecipe mask = this.recipe.GetRecipe<MaskRecipe>(); //요기다 추가해줘용
 
+            Cpp_Point[] maskStartPoint = new Cpp_Point[mask.MaskList[this.parameter.MaskIndex].PointLines.Count];
+            int[] maskLength = new int[mask.MaskList[this.parameter.MaskIndex].PointLines.Count];
+
+            Cpp_Point tempPt = new Cpp_Point();
+            for(int i = 0; i < mask.MaskList[this.parameter.MaskIndex].PointLines.Count; i++)
+            {
+                maskStartPoint[i] = new Cpp_Point();
+                maskStartPoint[i].x = mask.MaskList[this.parameter.MaskIndex].PointLines[i].StartPoint.X;
+                maskStartPoint[i].y = mask.MaskList[this.parameter.MaskIndex].PointLines[i].StartPoint.Y;
+                maskLength[i] = mask.MaskList[this.parameter.MaskIndex].PointLines[i].Length;
+            }
+            CLR_IP.Cpp_Masking(binImg, binImg, maskStartPoint.ToArray(), maskLength.ToArray(), chipW, chipH);
 
             // Labeling
             var Label = CLR_IP.Cpp_Labeling(inspectionWorkBuffer, binImg, chipW, chipH);

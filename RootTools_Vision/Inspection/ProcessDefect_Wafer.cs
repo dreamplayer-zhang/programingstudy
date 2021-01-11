@@ -25,7 +25,7 @@ namespace RootTools_Vision
         {
         }
 
-        public override WORK_TYPE Type => WORK_TYPE.FINISHINGWORK;
+        public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_WAFER;
 
         public override void DoWork()
         {
@@ -90,9 +90,10 @@ namespace RootTools_Vision
                 }
             }
 
-            Workplace displayDefect = new Workplace();
+           
+            //Workplace displayDefect = new Workplace();
             foreach (Defect defect in MergeDefectList)
-                displayDefect.DefectList.Add(defect);
+                this.workplace.DefectList.Add(defect);
 
             string sDefectimagePath = @"D:\DefectImage";
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();    
@@ -116,7 +117,8 @@ namespace RootTools_Vision
                 //}
             }
 
-            WorkEventManager.OnInspectionDone(displayDefect, new InspectionDoneEventArgs(new List<CRect>(), true));
+            WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>(), true));
+            WorkEventManager.OnProcessDefectWaferDone(this.workplace, new PocessDefectWaferDoneEventArgs());
         }
 
         public override WorkBase Clone()

@@ -44,5 +44,16 @@ namespace RootTools_Vision
         {
             return true;
         }
+
+        public override void Clear()
+        {
+            this.OriginX = 0;
+            this.OriginY = 0;
+            this.DiePitchX = 0;
+            this.DiePitchY = 0;
+            this.CenterX = 0;
+            this.CenterY = 0;
+            this.Radius = 0;
+        }
     }
 }

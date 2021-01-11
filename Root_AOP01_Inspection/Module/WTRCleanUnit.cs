@@ -62,7 +62,7 @@ namespace Root_AOP01_Inspection.Module
         protected override void InitModuleRuns()
         {
             base.InitModuleRuns();
-            AddModuleRunList(new Run_Clean(this), false, "RTR Run Clean");
+            AddModuleRunList(new Run_Clean(this), true, "RTR Run Clean");
         }
 
         public class Run_Clean : ModuleRunBase

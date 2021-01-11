@@ -24,5 +24,10 @@ namespace Root_AOP01_Inspection
         {
             InitializeComponent();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var asdf = this.DataContext;
+        }
     }
 }

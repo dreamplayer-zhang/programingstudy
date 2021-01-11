@@ -171,7 +171,7 @@ namespace Root_AOP01_Inspection
             //Review.DataContext =;;
 
             Run = new Run_Panel();
-            Run.DataContext = this;
+            Run.DataContext = m_Run;
 
             MainPanel.Children.Clear();
             MainPanel.Children.Add(ModeSelect);

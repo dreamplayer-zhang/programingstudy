@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Authentication.ExtendedProtection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,6 +10,13 @@ namespace RootTools_Vision
     public abstract class WorkFactory
     {
         private List<WorkManager> workManagers;
+
+        private bool isStop = true;
+
+        public bool IsStop
+        {
+            get => this.isStop;
+        }
 
         public WorkFactory()
         {
@@ -42,18 +50,29 @@ namespace RootTools_Vision
 
         protected void Start()
         {
+            this.isStop = false;
             foreach (WorkManager manager in this.workManagers)
             {
                 manager.Start();
             }
+
+            WorkEventManager.ProcessDefectWaferDone += OnProcessDefectWaferDone_Callback;
         }
 
         public void Stop()
         {
+            this.isStop = true;
             foreach (WorkManager manager in this.workManagers)
             {
                 manager.Stop();
             }
+
+            WorkEventManager.ProcessDefectWaferDone -= OnProcessDefectWaferDone_Callback;
+        }
+
+        public void OnProcessDefectWaferDone_Callback(object obj, PocessDefectWaferDoneEventArgs args)
+        {
+            Stop();
         }
     }
 }

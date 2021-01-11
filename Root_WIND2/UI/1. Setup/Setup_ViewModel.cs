@@ -57,22 +57,22 @@ namespace Root_WIND2
         private Edge_ViewModel edgeVM;
         //private InspTest_ViewModel inspTestVM;  //삭제
         private BacksideInspection_ViewModel backsideInspTestVM;
-        private Maintenance_ViewModel maintVM;
+        public Maintenance_ViewModel maintVM;
         private GEM_ViewModel gemVM;
 
         private InspectionManagerFrontside inspectionMgrVision;
-        private InspectionManagerEdge inspectionMgrEFEM;
+        private InspectionManagerEdge inspectionMgrEdge;
 
         public Setup_ViewModel()
         {
             init();
         }
 
-        public Setup_ViewModel(Recipe _recipe = null , InspectionManagerFrontside _inspectionMgrVision = null, InspectionManagerEdge _inspectionMgrEFEM = null)
+        public Setup_ViewModel(Recipe _recipe = null , InspectionManagerFrontside _inspectionMgrVision = null, InspectionManagerEdge _inspectionMgrEdge = null)
         {        
             this.recipe = _recipe;
             inspectionMgrVision = _inspectionMgrVision;
-            inspectionMgrEFEM = _inspectionMgrEFEM;
+            inspectionMgrEdge = _inspectionMgrEdge;
             init();
             
             
@@ -290,7 +290,7 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(ProgramManager.Instance.ShowDialogSaveRecipe);
+                return new RelayCommand(ProgramManager.Instance.NewRecipe);
             }
 
         }
@@ -333,7 +333,7 @@ namespace Root_WIND2
         internal RecipeWizard_ViewModel Wizard { get => wizardVM; set => wizardVM = value; }
         public Recipe Recipe { get => recipe; set => recipe = value; }
         public InspectionManagerFrontside InspectionVision { get => inspectionMgrVision; set => inspectionMgrVision = value; }
-        public InspectionManagerEdge InspectionManagerEFEM { get => inspectionMgrEFEM; set => inspectionMgrEFEM = value; }
+        public InspectionManagerEdge InspectionManagerEdge { get => inspectionMgrEdge; set => inspectionMgrEdge = value; }
 
         #endregion
 

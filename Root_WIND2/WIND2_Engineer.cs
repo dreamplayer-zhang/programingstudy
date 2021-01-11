@@ -78,11 +78,14 @@ namespace Root_WIND2
             Vision,
             EFEM
         }
-        public eMode m_eMode = eMode.Vision; 
+        public eMode m_eMode = eMode.Vision;
+
+        public bool m_bVisionEnable = false;
 
         void RunTreeMode(Tree tree)
         {
-            m_eMode = (eMode)tree.Set(m_eMode, m_eMode, "Mode", "Run Mode"); 
+            m_eMode = (eMode)tree.Set(m_eMode, m_eMode, "Mode", "Run Mode");
+            m_bVisionEnable = tree.Set(m_bVisionEnable, m_bVisionEnable, "VisionEnable", "VisionEnable");
         }
         #endregion
 
@@ -146,8 +149,8 @@ namespace Root_WIND2
         public InspectionManagerBackside InspectionBack { get => inspectionBack; set => inspectionBack = value; }
 
 
-        private InspectionManagerEdge inspectionEFEM;
-        public InspectionManagerEdge InspectionEFEM { get => inspectionEFEM; set => inspectionEFEM = value; }
+        private InspectionManagerEdge inspectionEdge;
+        public InspectionManagerEdge InspectionEdge { get => inspectionEdge; set => inspectionEdge = value; }
 
         #region Tree Setup
         public TreeRoot m_treeRoot;

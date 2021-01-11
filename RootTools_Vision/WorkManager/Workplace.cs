@@ -7,12 +7,12 @@ using RootTools.Database;
 
 namespace RootTools_Vision
 {
-    public enum WORKPLACE_STATE
+    public enum WORK_TYPE
     {
         //32개 가능?
         NONE                = 0b0000000,
         SNAP                = 0b0000010,
-        READY               = 0b0000100,
+        ALIGNMENT           = 0b0000100,
         INSPECTION          = 0b0001000,
         DEFECTPROCESS       = 0b0010000,
         DEFECTPROCESS_WAFER = 0b0100000,
@@ -20,9 +20,9 @@ namespace RootTools_Vision
 
     public enum WORKPLACE_SUB_STATE
     {
-        POSITION_SUCCESS            = 0b00000001,
-        LINE_FIRST_CHIP             = 0b00000010,
-        WAFER_POSITION_SUCCESS      = 0b00000100,
+        WAFER_POSITION_SUCCESS      = 0b00000001,
+        POSITION_SUCCESS            = 0b00000010,
+        LINE_FIRST_CHIP             = 0b00000100,
         BAD_CHIP                    = 0b10000000,
     }
 
@@ -44,9 +44,9 @@ namespace RootTools_Vision
 
         public event EventPositionIntialized PositionIntialized;
 
-        private WORKPLACE_STATE state;
+        private WORK_TYPE state;
 
-        public WORKPLACE_STATE STATE
+        public WORK_TYPE STATE
         {
             get { return state; }
             set 
@@ -146,23 +146,36 @@ namespace RootTools_Vision
 
         public Workplace()
         {
-
+            //Reset();
         }
 
         public void Reset()
         {
-            this.STATE = WORKPLACE_STATE.NONE;
+            this.STATE = WORK_TYPE.NONE;
 
             this.PreworkDataDictionary.Clear();
 
             foreach(PREWORKDATA_KEY key in Enum.GetValues(typeof(PREWORKDATA_KEY)))
             {
                 this.preworkdataDicitonary.Add(key, null);
-            }            
+            }
+
+            workplaceBufferR_GRAY = null;
+            workplaceBufferG = null;
+            workplaceBufferB = null;
         }
 
         public void SetPreworkData(PREWORKDATA_KEY key, object dataObj)
         {
+            if(this.preworkdataDicitonary.Count != Enum.GetValues(typeof(PREWORKDATA_KEY)).Length)
+            {
+                foreach (PREWORKDATA_KEY tempkey in Enum.GetValues(typeof(PREWORKDATA_KEY)))
+                {
+                    if(this.preworkdataDicitonary.ContainsKey(tempkey) == false)
+                        this.preworkdataDicitonary.Add(tempkey, null);
+                }
+            }
+
             this.preworkdataDicitonary[key] = dataObj;
             //this.preworkDataList.Add(dataObj);
         }
@@ -185,6 +198,10 @@ namespace RootTools_Vision
             this.sizeX = szX;
             this.sizeY = szY;
             this.index = idx;
+            this.workplaceBufferR_GRAY = null;
+            this.workplaceBufferG = null;
+            this.workplaceBufferB = null;
+
             this.workplaceBufferR_GRAY = new byte[szX * szY];
             this.workplaceBufferG = new byte[szX * szY];
             this.workplaceBufferB = new byte[szX * szY];
@@ -262,9 +279,6 @@ namespace RootTools_Vision
 
             this.transX = transX;
             this.transY = transY;
-
-            if (this.PositionIntialized != null && bApplyAll == true)
-                this.PositionIntialized(this, transX, transY);
         }
 
         public void MoveImagePosition(int transX, int transY, bool bUpdate = false)
@@ -276,9 +290,6 @@ namespace RootTools_Vision
 
             this.transX = transX;
             this.transY = transY;
-
-            if (this.PositionUpdated != null && bUpdate == true)
-                this.PositionUpdated(this);
         }
         public void AddDefect(string sInspectionID, int defectCode, float defectSz, float defectVal, float defectAbsLeft, float defectAbsTop, float defectW, float defectH, int chipIdxX, int chipIdxY) // SurfaceDefectParam
         {

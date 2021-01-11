@@ -46,7 +46,7 @@ namespace Root_WIND2
 		public void Scan()
 		{
 			EQ.p_bStop = false;
-			EdgeSideVision edgeSideVision = ((WIND2_Handler)engineer.ClassHandler()).m_edgesideVision;
+			EdgeSideVision edgeSideVision = ((WIND2_Handler)engineer.ClassHandler()).p_EdgeSideVision;
 			if (edgeSideVision.p_eState != ModuleBase.eState.Ready)
 			{
 				MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
@@ -74,11 +74,11 @@ namespace Root_WIND2
 				sharedBuf = DrawToolVM.p_ImageData.GetPtr();
 			}
 
-			setupVM.InspectionManagerEFEM.SharedBuffer = sharedBuf;
-			setupVM.InspectionManagerEFEM.InspectionMode = InspectionManagerEdge.InsepectionMode.EDGE;
-			setupVM.InspectionManagerEFEM.SharedBufferByteCnt = DrawToolVM.p_ImageData.p_nByte;
-			setupVM.InspectionManagerEFEM.CreateInspection();
-			setupVM.InspectionManagerEFEM.Start();
+			setupVM.InspectionManagerEdge.SharedBufferR_Gray = sharedBuf;
+			setupVM.InspectionManagerEdge.InspectionMode = InspectionManagerEdge.InsepectionMode.EDGE;
+			setupVM.InspectionManagerEdge.SharedBufferByteCnt = DrawToolVM.p_ImageData.p_nByte;
+			setupVM.InspectionManagerEdge.CreateInspection();
+			setupVM.InspectionManagerEdge.Start();
 		}
 
 		private void ChangeViewer(string dataName)

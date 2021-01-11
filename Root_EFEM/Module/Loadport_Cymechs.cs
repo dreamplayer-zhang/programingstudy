@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Threading;
 using RootTools.Control;
 using RootTools.OHT.Semi;
+using RootTools.OHTNew;
 
 namespace Root_EFEM.Module
 {
@@ -676,6 +677,9 @@ namespace Root_EFEM.Module
             while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
+
+        public bool p_bPlaced { get { return m_diPlaced.p_bIn; } }
+        public bool p_bPresent { get { return m_diPresent.p_bIn; } }
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }

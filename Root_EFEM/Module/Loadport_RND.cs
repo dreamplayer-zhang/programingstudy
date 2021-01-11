@@ -31,7 +31,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.Get(ref m_diDoorOpen, this, "DoorOpen");
             p_sInfo = m_toolBox.Get(ref m_diDocked, this, "Docked");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT", m_diPlaced, m_diPresent); 
+            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT"); 
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -461,6 +461,10 @@ namespace Root_EFEM.Module
             while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
+
+        public bool p_bPlaced { get { return m_diPlaced.p_bIn; } }
+        public bool p_bPresent { get { return m_diPresent.p_bIn; } }
+
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }

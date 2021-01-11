@@ -365,6 +365,7 @@
       <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="InfoWafer.cs" />
+    <Compile Include="OHTNew\ILoadport.cs" />
     <Compile Include="OHTNew\OHT.cs" />
     <Compile Include="OHTNew\OHT_ButtonUI.xaml.cs">
       <DependentUpon>OHT_ButtonUI.xaml</DependentUpon>

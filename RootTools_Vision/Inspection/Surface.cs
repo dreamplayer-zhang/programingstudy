@@ -64,7 +64,7 @@ namespace RootTools_Vision
             byte[] arrBinImg = new byte[chipW * chipH]; // Threashold 결과 array
 
             // Dark
-            CLR_IP.Cpp_Threshold(workplace.WorkplaceBufferR_GRAY, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
+            CLR_IP.Cpp_Threshold(inspectionWorkplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
 
             // Filter
             switch (parameter.DiffFilter)

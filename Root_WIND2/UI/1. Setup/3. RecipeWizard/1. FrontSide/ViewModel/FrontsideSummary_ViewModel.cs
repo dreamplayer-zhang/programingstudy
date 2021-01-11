@@ -17,7 +17,7 @@ using System.Windows.Threading;
 
 namespace Root_WIND2
 {
-    class FrontsideSummary_ViewModel : RootViewer_ViewModel
+    class FrontsideSummary_ViewModel : RootViewer_ViewModel, IRecipeUILoadable
     {
         public void init(Setup_ViewModel _setup, Recipe _recipe)
         {
@@ -355,6 +355,11 @@ namespace Root_WIND2
             SetMapData();
             DrawMapData();
             //LoadMasterImage();
+        }
+
+        public void Load()
+        {
+            LoadSummaryData();
         }
     }
 }

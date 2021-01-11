@@ -16,7 +16,7 @@ namespace RootTools_Vision
         {
         }
 
-        public override WORK_TYPE Type => WORK_TYPE.FINISHINGWORK;
+        public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS;
 
         public override void SetRecipe(Recipe _recipe)
         {
