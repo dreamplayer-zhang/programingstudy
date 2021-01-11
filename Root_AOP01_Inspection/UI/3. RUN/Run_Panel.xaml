@@ -843,7 +843,15 @@
                         <Button Content="Buzzer Off"
                                 Style="{StaticResource SetupPanelBtn}"
                                 Margin="0,0,0,10"
-                                Click="ButtonBuzzerOff_Click"/>
+                                Click="ButtonBuzzerOff_Click" />
+                        <Button Content="Buzzer Off"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Margin="0,0,0,10"
+                                Click="ButtonBuzzerOff_Click" />
+                        <Button Content="Buzzer Off"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Margin="0,0,0,10"
+                                Click="ButtonBuzzerOff_Click" />
                     </StackPanel>
                     <StackPanel VerticalAlignment="Bottom">
                         <Button x:Name="buttonOHT" Content="OHT" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
