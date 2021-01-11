@@ -57,6 +57,8 @@ namespace Root_WIND2.Module
 
 		public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
 		{
+			recipeName = tree.SetFile(recipeName, recipeName, "rcp", "Recipe", "Recipe Name", bVisible);
+
 			roiHeight = tree.Set(roiHeight, roiHeight, "ROI Height", "", bVisible);
 			roiWidth = tree.Set(roiWidth, roiWidth, "ROI Width", "", bVisible);
 			threshhold = tree.Set(threshhold, threshhold, "Theshold", "", bVisible);
@@ -68,8 +70,8 @@ namespace Root_WIND2.Module
 		{
 			try
 			{
-				//if (this.inspectionEdge.Recipe.Read(m_sRecipeName, true) == false)
-				//	return "Recipe Open Fail";
+				if (this.inspectionEdge.Recipe.Read(recipeName, true) == false)
+					return "Recipe Open Fail";
 
 				if (this.inspectionEdge.CreateInspection() == false)
 					return "Create Inspection Fail";

@@ -100,7 +100,7 @@
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
 
-                                <TextBlock FontSize="12" Text="Enable Backside Insp." Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                <TextBlock FontSize="12" Text="Enable EdgeSide Insp." Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                 <TextBlock FontSize="12" Text="Upload Image Size" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                 <TextBlock FontSize="12" Text="Upload Image Res." Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                 <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
@@ -164,17 +164,13 @@
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
                                 <TextBlock FontSize="12" Text="Inspection ROI Height" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                <TextBlock FontSize="12" Text="Defect Size Min (um)" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                <TextBlock FontSize="12" Text="GV USL" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                <TextBlock FontSize="12" Text="GV LSL" Style="{StaticResource BasicTb}" Grid.Row="3"/>
-                                <TextBlock FontSize="12" Text="Size USL" Style="{StaticResource BasicTb}" Grid.Row="4"/>
-                                <TextBlock FontSize="12" Text="Size LSL" Style="{StaticResource BasicTb}" Grid.Row="5"/>
+                                <TextBlock FontSize="12" Text="Inspection ROI Width" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+                                <TextBlock FontSize="12" Text="Threshold" Style="{StaticResource BasicTb}" Grid.Row="2"/>
+                                <TextBlock FontSize="12" Text="Size Minimum (um)" Style="{StaticResource BasicTb}" Grid.Row="3"/>
                                 <TextBox Text="{Binding ROIHeight}" Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Text="{Binding DefectSizeMin}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Grid.Column="2" Grid.Row="5" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding ROIWidth}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding Threshold}" Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding DefectSizeMin}" Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                             </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="6" Header="Defect Code">
