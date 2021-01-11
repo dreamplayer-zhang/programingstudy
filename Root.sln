@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_Rinse_Loader", "Root_R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_Rinse_Unloader", "Root_Rinse_Unloader\Root_Rinse_Unloader.csproj", "{5FC85C77-783D-4A56-B3A4-898AACBB8D0C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_VEGA_P", "Root_VEGA_P\Root_VEGA_P.csproj", "{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -305,6 +307,18 @@ Global
 		{5FC85C77-783D-4A56-B3A4-898AACBB8D0C}.Release|x64.Build.0 = Release|x64
 		{5FC85C77-783D-4A56-B3A4-898AACBB8D0C}.Release|x86.ActiveCfg = Release|Any CPU
 		{5FC85C77-783D-4A56-B3A4-898AACBB8D0C}.Release|x86.Build.0 = Release|Any CPU
+		{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}.Debug|x64.Build.0 = Debug|Any CPU
+		{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}.Debug|x86.Build.0 = Debug|Any CPU
+		{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}.Release|x64.ActiveCfg = Release|Any CPU
+		{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}.Release|x64.Build.0 = Release|Any CPU
+		{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}.Release|x86.ActiveCfg = Release|Any CPU
+		{013A1C5B-1A49-4D14-ADBE-60B90410F9EB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
