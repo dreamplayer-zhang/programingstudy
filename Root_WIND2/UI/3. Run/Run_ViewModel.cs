@@ -131,20 +131,23 @@ namespace Root_WIND2
         }
         public void init()
         {
-            p_LoadPort1 = (Loadport_RND)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_aLoadport[0];
-            p_LoadPort2 = (Loadport_RND)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_aLoadport[1];
-            p_Aligner = (Aligner_RND)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_Aligner;
-            p_WTR = (WTR_RND)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_WTR;
-            p_EdgeVision = (EdgeSideVision)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_EdgeSideVision;
-            p_BackSideVision  = (BackSideVision)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_BackSideVision;
-            p_Vision = (Vision)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_Vision;
-            
-            m_Viewer.init(null, ProgramManager.Instance.DialogService);
-            m_ToolMemory = ProgramManager.Instance.Engineer.ClassMemoryTool();
+            if (ProgramManager.Instance.Engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+            {
+                p_LoadPort1 = (Loadport_RND)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_aLoadport[0];
+                p_LoadPort2 = (Loadport_RND)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_aLoadport[1];
+                p_Aligner = (Aligner_RND)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_Aligner;
+                p_WTR = (WTR_RND)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_WTR;
+                p_EdgeVision = (EdgeSideVision)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_EdgeSideVision;
+                p_BackSideVision = (BackSideVision)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_BackSideVision;
+                p_Vision = (Vision)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_Vision;
 
-            m_imagedata = new ImageData(m_ToolMemory.GetMemory("BackSide Vision.BackSide Memory", "BackSide Vision", "Main"));
-            m_imagedata.p_nByte = 3;
-            p_Viewer.SetImageData(m_imagedata);
+                m_Viewer.init(null, ProgramManager.Instance.DialogService);
+                m_ToolMemory = ProgramManager.Instance.Engineer.ClassMemoryTool();
+
+                m_imagedata = new ImageData(m_ToolMemory.GetMemory("BackSide Vision.BackSide Memory", "BackSide Vision", "Main"));
+                m_imagedata.p_nByte = 3;
+                p_Viewer.SetImageData(m_imagedata);
+            }
         }
 
         public void EQHome()

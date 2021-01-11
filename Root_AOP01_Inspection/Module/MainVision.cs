@@ -32,6 +32,7 @@ namespace Root_AOP01_Inspection.Module
         Axis m_axisZ;
         Axis m_axisSideZ;
         AxisXY m_axisXY;
+        public DIO_I m_diExistVision;
         DIO_O m_doVac;
         DIO_O m_doBlow;
         MemoryPool m_memoryPool;
@@ -69,6 +70,7 @@ namespace Root_AOP01_Inspection.Module
 
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_diExistVision, this, "Reticle Exist on Vision");
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
             p_sInfo = m_toolBox.Get(ref m_axisSideZ, this, "Axis Side Z");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");

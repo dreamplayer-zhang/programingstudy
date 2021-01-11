@@ -230,7 +230,7 @@ namespace RootTools
 			m_ptrImg = data.GetPtr();
 			m_MemData = data;
 			p_Size = data.p_sz;
-			p_nByte = data.p_nByte;
+			p_nByte = data.p_nCount;
 			SetBackGroundWorker();
 		}
 

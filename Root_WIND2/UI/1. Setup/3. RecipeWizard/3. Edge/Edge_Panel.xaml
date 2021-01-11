@@ -18,6 +18,7 @@
                             Style="{StaticResource PanelBtn}"
                             Command="{Binding btnEdgeSetup}"/>
                     <Button Content="Snap"
+                            Visibility="Collapsed"
                             Style="{StaticResource PanelBtn}"
                             Command="{Binding btnEdgeSnap}"/>
                     <Button Content="Inspection"

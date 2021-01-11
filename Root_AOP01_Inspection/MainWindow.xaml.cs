@@ -4,6 +4,11 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Root_EFEM.Module;
+using Root_AOP01_Inspection.Module;
+using RootTools.GAFs;
+
+
 
 namespace Root_AOP01_Inspection
 {
@@ -135,6 +140,7 @@ namespace Root_AOP01_Inspection
             InitializeComponent();
         }
 
+       // Run_Panel _Panel = new Run_Panel();
         void Init()
         {
             dialogService = new DialogService(this);
@@ -152,6 +158,7 @@ namespace Root_AOP01_Inspection
             
             Init_ViewModel();
             Init_UI();
+            Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1],  m_engineer);
             //m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
         }
         void Init_ViewModel()
