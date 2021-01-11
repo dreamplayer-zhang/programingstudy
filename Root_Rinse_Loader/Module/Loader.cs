@@ -112,7 +112,7 @@ namespace Root_Rinse_Loader.Module
         #region Load
         public string RunLoad()
         {
-            if (Rinse.p_eMode != Rinse.eMode.Stack) return "Run mode is not Stack"; 
+            if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack"; 
             if (Run(RunPickerDown(false))) return p_sInfo; 
             if (m_storage.p_bIsEnablePick == false)
             {
@@ -134,7 +134,7 @@ namespace Root_Rinse_Loader.Module
 
         public string RunUnload()
         {
-            if (Rinse.p_eMode != Rinse.eMode.Stack) return "Run mode is not Stack";
+            if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack";
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             //forget Check Stip Exist -> Error ??
@@ -185,11 +185,13 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
+        RinseL m_rinse;
         Storage m_storage;
         Roller m_roller; 
-        public Loader(string id, IEngineer engineer, Storage storage, Roller roller)
+        public Loader(string id, IEngineer engineer, RinseL rinse, Storage storage, Roller roller)
         {
             p_id = id;
+            m_rinse = rinse;
             m_storage = storage;
             m_roller = roller;
             InitPickers(); 
@@ -199,13 +201,13 @@ namespace Root_Rinse_Loader.Module
         #region StartRun
         public void StartRun()
         {
-            switch (Rinse.p_eMode)
+            switch (m_rinse.p_eMode)
             {
-                case Rinse.eMode.Magazine:
+                case RinseL.eRunMode.Magazine:
                     RunPickerDown(false);
                     MoveLoader(ePos.Roller);
                     break;
-                case Rinse.eMode.Stack:
+                case RinseL.eRunMode.Stack:
                     StartRun(m_runRun.Clone()); 
                     break;
             }

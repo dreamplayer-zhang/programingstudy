@@ -607,9 +607,9 @@ namespace Root_EFEM.Module
                 }
             }
             p_eState = eState.Ready;
-            if(m_diPlaced.p_bIn && m_diPresent.p_bIn)
+            if (m_diPlaced.p_bIn && m_diPresent.p_bIn)
             {
-                m_bPlaced= true;
+                m_bPlaced = true;
             }
             else
             {
