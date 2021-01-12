@@ -101,7 +101,7 @@ namespace Root_AOP01_Inspection
         #endregion
 
         #region Module Loadport
-        enum eLoadport
+        public enum eLoadport
         {
             RND,
             Cymechs,
