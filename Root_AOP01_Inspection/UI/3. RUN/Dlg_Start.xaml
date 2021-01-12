@@ -66,7 +66,8 @@
                 <GroupBox Header="Loadport 1">
                     <Grid Background="AliceBlue">
                         <Grid.RowDefinitions>
-                            <RowDefinition />
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
                             <RowDefinition />
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
@@ -148,12 +149,26 @@
 
                             </UniformGrid>
                         </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Button Content="Load"
+                                    Margin="3,0"
+                                    Style="{StaticResource SetupPanelBtn}" />
+                            <Button Content="Unload"
+                                    Margin="3,0"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SetupPanelBtn}" />
+                        </Grid>
                     </Grid>
                 </GroupBox>
                 <GroupBox Header="Loadport 2" Grid.Row="1">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition />
+                            <RowDefinition Height="2*" />
+                            <RowDefinition Height="2*"/>
                             <RowDefinition />
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
@@ -235,6 +250,19 @@
                                 </Grid>
 
                             </UniformGrid>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Button Content="Load"
+                                    Margin="3,0"
+                                    Style="{StaticResource SetupPanelBtn}" />
+                            <Button Content="Unload"
+                                    Margin="3,0"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SetupPanelBtn}" />
                         </Grid>
                     </Grid>
                 </GroupBox>

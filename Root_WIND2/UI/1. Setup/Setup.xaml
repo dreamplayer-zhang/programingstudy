@@ -213,9 +213,7 @@
                                     Command="{Binding p_CurrentPanel.DataContext.btnBack}"
                                     Background="{StaticResource ControlBackGround}">
                             <StackPanel Orientation="Horizontal">
-                                <!--<TextBlock Text="Back"/>-->
-                                <!--<material:PackIcon Kind="ArrowLeftBold"/>-->
-                                <PackIcon:PackIconMaterialDesign Kind="KeyboardArrowLeft" Foreground="Black"></PackIcon:PackIconMaterialDesign>
+                                <PackIcon:PackIconMaterial Kind="ArrowLeftBold"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -227,7 +225,7 @@
                                     Background="{StaticResource ControlBackGround}">
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Home"/>-->
-                                <PackIcon:PackIconMaterialDesign Kind="Home" Foreground="Black"></PackIcon:PackIconMaterialDesign>
+                                <PackIcon:PackIconMaterial Kind="Home" />
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -239,9 +237,7 @@
                                     Command="{Binding btnNewRecipe}">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
-                                    <!--<TextBlock Text="Save"/>-->
-                                    <!--material:PackIcon Kind="FilePlusOutline"/>-->
-                                        <PackIcon:PackIconMaterialDesign Kind="AttachFile" Foreground="Black"></PackIcon:PackIconMaterialDesign>
+                                    <PackIcon:PackIconMaterial Kind="FolderPlus"/>
                                 </StackPanel>
                             </Button.Content>
                         </Button>
@@ -255,7 +251,7 @@
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Load"/>-->
                                 <!--<material:PackIcon Kind="FolderOpen"/>-->
-                                <PackIcon:PackIconMaterialDesign Kind="FolderOpen" Foreground="Black"></PackIcon:PackIconMaterialDesign>
+                                <PackIcon:PackIconMaterial Kind="FolderOpen" />
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -267,9 +263,7 @@
                                     Command="{Binding btnSaveRecipe}">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
-                                    <!--<TextBlock Text="Save"/>-->
-                                    <!--<material:PackIcon Kind="ContentSave"/>-->
-                                    <PackIcon:PackIconMaterialDesign Kind="Save" Foreground="Black"></PackIcon:PackIconMaterialDesign>
+                                    <PackIcon:PackIconMaterial Kind="ContentSave" />
                                 </StackPanel>
                             </Button.Content>
                         </Button>

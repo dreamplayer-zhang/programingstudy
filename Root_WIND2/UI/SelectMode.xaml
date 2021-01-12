@@ -3,23 +3,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="883" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
     <ScrollViewer>
         <StackPanel>
             <Grid Height="883">
                 <!--<material:MaterialDateDisplay Margin="20,20" FontFamily="Arial"/>-->
-                <TextBlock Text="," Margin="190,37"
+                <TextBlock Text="2021-01-11 09:15:46" Margin="30"
                        VerticalAlignment="Top"
-                       HorizontalAlignment="Left"
+                       HorizontalAlignment="Right"
                        FontSize="30"
-                       FontWeight="Normal"/>
-                <TextBlock Text="00:00:00" Margin="203,37"
+                       FontWeight="Bold"/>
+                <!--<TextBlock Text="00:00:00" Margin="203,37"
                        VerticalAlignment="Top"
                        HorizontalAlignment="Left"
                        FontSize="30"
                        FontWeight="Normal"
-                       x:Name="tbDate"/>
+                       x:Name="tbDate"/>-->
                 <Grid Margin="20,30">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -49,12 +50,15 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid>
-                                <!--<material:PackIcon Kind="Wrench"
-                                           Width=" 150" 
-                                           Height="150"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center"
-                                           Panel.ZIndex="2"/>-->
+                                <icon:PackIconMaterial Kind="Monitor" VerticalAlignment="Center"
+                                                     HorizontalAlignment="Center"
+                                                     Width="150" Height="150"/>
+                                <icon:PackIconMaterial Kind="Cog"
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       Width="60"
+                                                       Height="60"
+                                                       Margin="0,0,0,25" />
                             </Grid>
                             <Grid Grid.Row="1">
                                 <Grid.RowDefinitions>
@@ -139,11 +143,11 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <!--<material:PackIcon Kind="MonitorDashboard" 
-                                           Width=" 150" 
-                                           Height="150"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center"/>-->
+                            <icon:PackIconMaterial Kind="MonitorDashboard"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   Width="150"
+                                                   Height="150" />
                             <Grid Grid.Row="1">
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
@@ -216,7 +220,7 @@
                               Cursor="Hand">
                         <GroupBox.Header>
                             <Grid>
-                                <TextBlock Text="Run" FontSize="35"
+                                <TextBlock Text="Operation" FontSize="35"
                                    FontWeight="Bold"/>
                             </Grid>
                         </GroupBox.Header>
@@ -225,24 +229,25 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <!--<material:PackIcon Kind="Play"
-                                           Width="100"
-                                           Height="70"
-                                           VerticalAlignment="Center"
-                                           Margin="0,0,4,50"
-                                           HorizontalAlignment="Center"/>
-                            <material:PackIcon Kind="ComputerClassic" 
-                                           Width=" 150" 
-                                           Height="150"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center"/>-->
+                            <icon:PackIconMaterial Kind="Monitor"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   Width="150"
+                                                   Height="150" />
+                            <icon:PackIconMaterial Kind="Play"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   Width="60"
+                                                   Height="60"
+                                                   Margin="7,0,0,28" />
                             <Grid Grid.Row="1">
-                                <TextBlock Text="Stop"
-                                       Style="{StaticResource BasicTb}"
-                                       Margin="0"
-                                       FontSize="45"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
+                                <TextBlock Text="Operation Mode"
+                                           Style="{StaticResource BasicTb}"
+                                           Margin="0"
+                                           FontSize="45"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
                             </Grid>
                         </Grid>
                     </GroupBox>

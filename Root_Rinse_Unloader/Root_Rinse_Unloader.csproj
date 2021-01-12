@@ -198,6 +198,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\RinseU.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

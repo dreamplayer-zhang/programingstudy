@@ -116,9 +116,11 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
-        public Rail(string id, IEngineer engineer)
+        RinseL m_rinse; 
+        public Rail(string id, IEngineer engineer, RinseL rinse)
         {
             p_id = id;
+            m_rinse = rinse; 
             initILines(); 
             InitBase(id, engineer);
         }
@@ -131,13 +133,13 @@ namespace Root_Rinse_Loader.Module
         #region StartRun
         public void StartRun()
         {
-            switch (Rinse.p_eMode)
+            switch (m_rinse.p_eMode)
             {
-                case Rinse.eMode.Magazine:
-                    RunMoveWidth(Rinse.p_widthStrip);
+                case RinseL.eRunMode.Magazine:
+                    RunMoveWidth(m_rinse.p_widthStrip);
                     RunRotate(true); 
                     break;
-                case Rinse.eMode.Stack:
+                case RinseL.eRunMode.Stack:
                     RunRotate(false); 
                     break; 
             }

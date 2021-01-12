@@ -54,11 +54,11 @@ namespace Root_AOP01_Packing.Module
         #region Cartridge
         public class Cartridge
         {
-            Axis m_axis;
-            DIO_I2O2 m_solCutter;
-            DIO_I[] m_diCheck = new DIO_I[2];
-            DIO_I2O2 m_solLock;
-            DIO_I2O2 m_solStop;
+            Axis m_axis; // 3번축이던가..?
+            DIO_I2O2 m_solCutter; // Y17,18
+            DIO_I[] m_diCheck = new DIO_I[2]; //카트리지 유무, X26,X27
+            DIO_I2O2 m_solLock; // Y19,Y20
+            DIO_I2O2 m_solStop; // Y21,Y22
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_axis, m_packer, m_id);
@@ -131,8 +131,8 @@ namespace Root_AOP01_Packing.Module
         #region Roller
         public class Roller
         {
-            DIO_I2O2 m_solUp;
-            DIO_I2O2 m_solPush;
+            DIO_I2O2 m_solUp; // Y23,24
+            DIO_I2O2 m_solPush; // Y25,26
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_solUp, m_packer, m_id + ".UpDown", "Down", "Up");
@@ -172,12 +172,12 @@ namespace Root_AOP01_Packing.Module
         #region Head
         public class Head
         {
-            DIO_I2O2 m_solHead;
-            DIO_I2O2 m_solPicker;
-            DIO_I m_diOverload;
-            DIO_I m_diCheckCover;
-            DIO_IO m_dioVacuum;
-            DIO_O m_doBlow; 
+            DIO_I2O2 m_solHead; // Y13,14 전체(누르는 부분,피커 포함) Z
+            DIO_I2O2 m_solPicker; // Y15,16 피커 Z
+            DIO_I m_diOverload; // Y13,14에 대한 Overload
+            DIO_I m_diCheckCover; // Case 유무확인 X18
+            DIO_IO m_dioVacuum; // Y66, X96 피커Vac
+            DIO_O m_doBlow; // Y67
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_solHead, m_packer, m_id + ".Head", "Up", "Down");
@@ -193,7 +193,7 @@ namespace Root_AOP01_Packing.Module
                 }
             }
 
-            public string Run(bool bHeadDown, bool bPickerDown)
+            public string RunSol(bool bHeadDown, bool bPickerDown)
             {
                 m_solPicker.Write(bPickerDown);
                 string sRun = RunHead(bHeadDown);
@@ -269,8 +269,8 @@ namespace Root_AOP01_Packing.Module
         #region Stage
         public class Stage
         {
-            public Axis m_axis;
-            DIO_I m_diCheck;
+            public Axis m_axis; //1번 축 Rotate
+            DIO_I m_diCheck; // X19 Case 체크
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_axis, m_packer, m_id + ".Rotate");
@@ -389,26 +389,19 @@ namespace Root_AOP01_Packing.Module
             if (p_eProcess != eProcess.Case) return "Process not Case : " + p_eProcess.ToString();
             p_eProcess = eProcess.Opening;
             if (Run(m_head.RunVacuum(false))) return p_sInfo;
-            if (Run(m_head.Run(false, false))) return p_sInfo;
-            if (Run(m_head.Run(true, true))) return p_sInfo;
+            if (Run(m_head.RunSol(false, false))) return p_sInfo;
+            if (Run(m_head.RunSol(true, true))) return p_sInfo;
             if (Run(m_head.RunVacuum(true))) return p_sInfo;
-            if (Run(m_head.Run(false, true))) return p_sInfo;
+            if (Run(m_head.RunSol(false, true))) return p_sInfo;
             p_eProcess = eProcess.Opened;
             return "OK";
         }
 
         public string RunCoverClose()
         {
-            if (Run(m_head.Run(true, true))) return p_sInfo;
+            if (Run(m_head.RunSol(true, true))) return p_sInfo;
             if (Run(m_head.RunVacuum(false))) return p_sInfo;
-            if (Run(m_head.Run(true, false))) return p_sInfo;
-            return "OK";
-        }
-
-        public string RunHeadUp()
-        {
-            if (Run(m_head.RunVacuum(false))) return p_sInfo;
-            if (Run(m_head.Run(false, false))) return p_sInfo;
+            if (Run(m_head.RunSol(true, false))) return p_sInfo;
             return "OK";
         }
 
@@ -421,6 +414,7 @@ namespace Root_AOP01_Packing.Module
             if (Run(m_cartridge.RunMove(Cartridge.ePos.Run))) return p_sInfo;
             if (Run(m_stage.RunRotate(m_stage.m_degAttach))) return p_sInfo;
             if (Run(m_roller.RunPush(true))) return p_sInfo;
+            // Cartridge Attach가 필요
             Thread.Sleep(1000);
             if (Run(m_cartridge.RunMove(Cartridge.ePos.Ready))) return p_sInfo;
             if (Run(m_stage.RunTaping())) return p_sInfo;
@@ -429,6 +423,15 @@ namespace Root_AOP01_Packing.Module
             if (Run(RunHeadUp())) return p_sInfo;
             if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo;
             p_eProcess = eProcess.Done;
+            return "OK";
+        }
+
+        public string RunHeadUp()
+        {
+            if (Run(m_head.RunVacuum(false)))
+                return p_sInfo;
+            if (Run(m_head.RunSol(false, false)))
+                return p_sInfo;
             return "OK";
         }
         #endregion
