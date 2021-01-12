@@ -263,24 +263,24 @@
                                 <ColumnDefinition />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0"
+                            <Grid Grid.Column="0" x:Name ="ExistLoadport"
                                   Margin="5"
                                   Background="LightGray">
-                                <TextBlock Text="Loadport" Name="ExistLoadport"
+                                <TextBlock Text="Loadport"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
-                            <Grid Grid.Column="1"
+                            <Grid Grid.Column="1" x:Name ="ExistRTR"
                                   Margin="5"
                                   Background="LightGray">
-                                <TextBlock Text="RTR" Name="ExistRTR"
+                                <TextBlock Text="RTR" 
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
-                            <Grid Grid.Column="2"
+                            <Grid Grid.Column="2" x:Name = "ExistVision"
                                   Margin="5"
                                   Background="LightGray">
-                                <TextBlock Text="Vision" Name="ExistVision"
+                                <TextBlock Text="Vision" 
                                            FontWeight="Bold"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
@@ -840,14 +840,6 @@
                                 Style="{StaticResource SetupPanelBtn}"
                                 Margin="0,0,0,10"
                                 Click="ButtonRecovery_Click" />
-                        <Button Content="Buzzer Off"
-                                Style="{StaticResource SetupPanelBtn}"
-                                Margin="0,0,0,10"
-                                Click="ButtonBuzzerOff_Click" />
-                        <Button Content="Buzzer Off"
-                                Style="{StaticResource SetupPanelBtn}"
-                                Margin="0,0,0,10"
-                                Click="ButtonBuzzerOff_Click" />
                         <Button Content="Buzzer Off"
                                 Style="{StaticResource SetupPanelBtn}"
                                 Margin="0,0,0,10"

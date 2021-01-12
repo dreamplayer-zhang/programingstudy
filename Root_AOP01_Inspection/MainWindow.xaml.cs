@@ -130,6 +130,7 @@ namespace Root_AOP01_Inspection
         #region ViewModel
         private Setup_ViewModel m_Setup;
         private Run_ViewModel m_Run;
+        private Dlg_ViewModel m_Dlg;
         #endregion
 
         public AOP01_Engineer m_engineer = new AOP01_Engineer();
