@@ -1405,7 +1405,7 @@ namespace RootTools
             double nY = p_View_Rect.Y + canvasPt.Y * p_View_Rect.Height / p_CanvasHeight;
             return new CPoint((int)nX, (int)nY);
         }
-        protected CPoint GetCanvasPoint(CPoint memPt)
+        public CPoint GetCanvasPoint(CPoint memPt)
         {
             if (p_View_Rect.Width > 0 && p_View_Rect.Height > 0)
             {

@@ -7,7 +7,7 @@ using RootTools;
 using RootTools.Module;
 using Root_AOP01_Inspection.Module;
 using Root_EFEM.Module;
-using RootTools.GAFs;
+using static Root_EFEM.Module.WTR_RND;
 
 namespace Root_AOP01_Inspection
 {
@@ -21,6 +21,8 @@ namespace Root_AOP01_Inspection
         MainVision m_mainvision;
         WTRCleanUnit m_wtrcleanunit;
         WTRArm m_wtr;
+
+        Arm m_arm;
         Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
         Loadport_RND[] m_rndLoadport = new Loadport_RND[2];
         AOP01_Handler.eLoadport LoadportType;
@@ -33,6 +35,7 @@ namespace Root_AOP01_Inspection
         {
             m_engineer = engineer;
             m_handler = engineer.m_handler;
+            m_arm = wtrcleanunit.m_dicArm[0];
             m_wtrcleanunit = wtrcleanunit;
             m_wtr = m_wtrcleanunit.p_aArm[0];
             m_mainvision = mainvision;
@@ -47,6 +50,7 @@ namespace Root_AOP01_Inspection
         public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_RND loadport1,
             Loadport_RND loadport2, AOP01_Engineer engineer)
         {
+            m_arm = wtrcleanunit.m_dicArm[0];
             m_engineer = engineer;
             m_handler = engineer.m_handler;
             m_wtrcleanunit = wtrcleanunit;
@@ -72,7 +76,7 @@ namespace Root_AOP01_Inspection
        
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            ExistRTR.Background = m_wtrcleanunit.m_diExistRTR.p_bIn == true && m_wtr.p_infoWafer != null? Brushes.SteelBlue : Brushes.LightGray;
+            ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true == true && m_wtr.p_infoWafer != null? Brushes.SteelBlue : Brushes.LightGray;
             ExistVision.Background = m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null? Brushes.SteelBlue : Brushes.LightGray;
 			switch (LoadportType)
 			{

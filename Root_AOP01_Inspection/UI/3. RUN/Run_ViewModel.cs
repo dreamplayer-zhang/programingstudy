@@ -1,9 +1,14 @@
-﻿using System;
+﻿using Root_AOP01_Inspection.Module;
+using Root_EFEM.Module;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using RootTools.Trees;
+using RootTools.GAFs;
+
 
 namespace Root_AOP01_Inspection
 {
@@ -21,8 +26,13 @@ namespace Root_AOP01_Inspection
             {
                 return new RelayCommand(() =>
                 {
-                    Dlg_Start dlg_Start = new Dlg_Start();
-                    dlg_Start.ShowDialog();
+                    if(!ALIDList_PopupUI.m_bShow)
+                    {
+                        Dlg_Start dlg_Start = new Dlg_Start();
+                        AOP01_Handler handler = m_Mainwindow.m_engineer.m_handler;
+                        dlg_Start.Init(handler.m_mainVision, (WTRCleanUnit)handler.m_wtr, (Loadport_Cymechs)handler.m_aLoadport[0], (Loadport_Cymechs)handler.m_aLoadport[1], m_Mainwindow.m_engineer);
+                        dlg_Start.ShowDialog();
+                    }
                 });
             }
         }
