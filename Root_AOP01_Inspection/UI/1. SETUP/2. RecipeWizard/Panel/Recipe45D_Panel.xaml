@@ -18,10 +18,16 @@
                     <Button Content="Snap"
                             Command="{Binding btnSnap}"
                             Style="{StaticResource SetupPanelBtn}"/>
-                    <Button Content="Inspection"
-                            Command="{Binding btnInspection}"
+					<Button Content="Set Center"
+                            Command="{Binding commandSetCenter}"
                             Style="{StaticResource SetupPanelBtn}"/>
-                </StackPanel>
+					<Button Content="Start Recipe Teaching"
+                            Command="{Binding commandStartTeaching}"
+                            Style="{StaticResource SetupPanelBtn}"/>
+					<Button Content="Inspection"
+                            Command="{Binding commandInspTest}"
+                            Style="{StaticResource SetupPanelBtn}"/>
+				</StackPanel>
                 <Button Content="Back"
                         Command="{Binding btnBack}"
                         Style="{StaticResource SetupPanelBtn}"
@@ -112,9 +118,10 @@
                                 <GroupBox Grid.Row="3" Header="Pellicle Frontside">
                                     <Grid Margin="3">
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="4*"/>
-                                            <RowDefinition Height="5*"/>
-                                        </Grid.RowDefinitions>
+                                            <RowDefinition Height="3*"/>
+											<RowDefinition Height="4*"/>
+											<RowDefinition Height="3*"/>
+										</Grid.RowDefinitions>
                                         <GroupBox Header="Spec">
                                             <Grid Margin="5">
                                                 <Grid.ColumnDefinitions>
@@ -209,7 +216,32 @@
                                                 </ComboBox>
                                             </Grid>
                                         </GroupBox>
-                                    </Grid>
+										<GroupBox Header="Teaching" Grid.Row="2">
+											<StackPanel>
+												<Grid Margin="5">
+													<Grid.ColumnDefinitions>
+														<ColumnDefinition Width="0.5*"/>
+														<ColumnDefinition Width="1*"/>
+														<ColumnDefinition Width="1*"/>
+													</Grid.ColumnDefinitions>
+													<Grid.RowDefinitions>
+														<RowDefinition/>
+													</Grid.RowDefinitions>
+													
+													<TextBlock FontSize="12"
+															   Text="Map Center" 
+															   Style="{StaticResource BasicTb}" 
+															   Grid.Row="0"/>
+													<TextBox Text="{Binding CenterPoint.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+															 Style="{StaticResource BasicTbox}" 
+															 Grid.Column="1" Width="150" Height="25"/>
+													<TextBox Text="{Binding CenterPoint.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+															 Style="{StaticResource BasicTbox}" 
+															 Grid.Column="2" Width="150" Height="25"/>
+												</Grid>
+											</StackPanel>
+										</GroupBox>
+									</Grid>
                                 </GroupBox>
                             </Grid>
 
@@ -217,11 +249,9 @@
 								<Grid.RowDefinitions>
 									<RowDefinition Height="auto"/>
 									<RowDefinition Height="1*"/>
-                                    <RowDefinition Height="5*"/>
-                                    <RowDefinition Height="6*"/>
-                                </Grid.RowDefinitions>
-								<Button Content="Inspection Test"
-										Command="{Binding commandInspTest}"/>
+									<RowDefinition Height="5*"/>
+									<RowDefinition Height="6*"/>
+								</Grid.RowDefinitions>
 								<GroupBox Header="Pellicle Haze" Grid.Row="1">
                                     <Grid Margin="5">
                                         <Grid.ColumnDefinitions>

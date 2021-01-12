@@ -28,7 +28,7 @@ namespace Root_AOP01_Inspection
 
     public delegate void EventDrawDone(CPoint leftTop, CPoint rightBottom); //임시
 
-    class Recipe45D_ImageViewer_ViewModel : RootViewer_ViewModel
+    public class Recipe45D_ImageViewer_ViewModel : RootViewer_ViewModel
     {
         public event EventDrawDone DrawDone;
 

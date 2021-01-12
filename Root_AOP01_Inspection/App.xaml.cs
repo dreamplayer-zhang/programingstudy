@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools.Database;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -20,5 +21,10 @@ namespace Root_AOP01_Inspection
 		public static string mSideRightMem = "SideRight";
 		public static string mSideTopMem = "SideTop";
 		public static string mSideBotMem = "SideBot";
+		protected override void OnStartup(StartupEventArgs e)
+		{
+			base.OnStartup(e);
+			var input = DatabaseManager.Instance.SetDatabase(1, "localhost", "Inspections", "root", "`ati5344");
+		}
 	}
 }

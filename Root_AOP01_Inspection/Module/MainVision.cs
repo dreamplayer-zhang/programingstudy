@@ -1618,10 +1618,6 @@ namespace Root_AOP01_Inspection.Module
                 Mat matTopTemplateImage = new Mat();
                 Mat matBottomTemplateImage = new Mat();
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
-                CRect crtTopROI = new CRect(m_cptTopAlignMarkStartPos.X, m_cptTopAlignMarkStartPos.Y, m_cptTopAlignMarkEndPos.X, m_cptTopAlignMarkEndPos.Y);
-                CRect crtBottomROI = new CRect(m_cptBottomAlignMarkStartPos.X, m_cptBottomAlignMarkStartPos.Y, m_cptBottomAlignMarkEndPos.X, m_cptBottomAlignMarkEndPos.Y);
-                string strTopTemplateImageFilePath = "D:\\TemplateImage\\";
-                string strBottomTemplateImageFilePath = "D:\\TemplateImage\\";
                 string strAlignMarkPath = "D:\\AlignMarkTemplateImage\\";
                 string strInOutFeaturePath = "D:\\FeatureTemplateImage\\";
 

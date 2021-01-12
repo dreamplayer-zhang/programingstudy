@@ -40,10 +40,10 @@ namespace Root_AOP01_Inspection.Module
 
 		protected override void InitWorkManager()
 		{
-			this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORKPLACE_STATE.READY, WORKPLACE_STATE.SNAP, STATE_CHECK_TYPE.CHIP));
-			this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY, STATE_CHECK_TYPE.CHIP, 4));
-			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION, STATE_CHECK_TYPE.CHIP));
-			this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS_WAFER, WORKPLACE_STATE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
+			//this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP));
+			this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP, 10));
+			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.CHIP));
+			this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
 
 			AOPEventManager.SnapDone += SnapDone_Callback;
 		}
@@ -51,6 +51,7 @@ namespace Root_AOP01_Inspection.Module
 		private Recipe recipe;
 		private IntPtr sharedBuffer;
 
+		private IntPtr sharedBufferR_Gray;
 		private IntPtr sharedBufferR;
 		private IntPtr sharedBufferG;
 		private IntPtr sharedBufferB;
@@ -60,6 +61,7 @@ namespace Root_AOP01_Inspection.Module
 		private int sharedBufferByteCnt;
 
 		public Recipe Recipe { get => recipe; set => recipe = value; }
+		public IntPtr SharedBufferR_Gray { get => sharedBufferR_Gray; set => sharedBufferR_Gray = value; }
 		public IntPtr SharedBufferR { get => sharedBufferR; set => sharedBufferR = value; }
 		public IntPtr SharedBufferG { get => sharedBufferG; set => sharedBufferG = value; }
 		public IntPtr SharedBufferB { get => sharedBufferB; set => sharedBufferB = value; }
@@ -83,9 +85,16 @@ namespace Root_AOP01_Inspection.Module
 		public int[] mapdata = new int[14 * 14];
 
 
-		public bool CreateInspecion()
+		public bool CreateInspection()
 		{
 			return CreateInspection(this.recipe);
+		}
+
+		public void SetWorkplaceBuffer(IntPtr ptrR, IntPtr ptrG, IntPtr ptrB)
+		{
+			this.SharedBufferR_Gray = ptrR;
+			this.SharedBufferG = ptrG;
+			this.SharedBufferB = ptrB;
 		}
 
 
@@ -97,26 +106,33 @@ namespace Root_AOP01_Inspection.Module
 
 				if (waferMap == null || waferMap.MapSizeX == 0 || waferMap.MapSizeY == 0)
 				{
-					//MessageBox.Show("Map 정보가 없습니다.");
-					throw new Exception("Map 정보가 없습니다", null);
+					MessageBox.Show("Map 정보가 없습니다.");
+					return false;
 				}
 
 				workBundle = new WorkBundle();
 
-				Position position = new Position();
-				position.SetRecipe(recipe);
-				workBundle.Add(position);
+				//Position position = new Position();
+				//PositionParameter posParam = new PositionParameter();
+				//_recipe.ParameterItemList.Add(posParam);
+				//position.SetRecipe(_recipe);
+				//workBundle.Add(position);
 
-				Surface surface = new Surface();
+				BacksideSurface surface = new BacksideSurface();
+				BacksideSurfaceParameter surParam = new BacksideSurfaceParameter();
+				surParam.IsBright = false;
+				surParam.Intensity = 80;
+				surParam.Size = 1;
+				recipe.ParameterItemList.Add(surParam);
 				surface.SetRecipe(recipe);
 
 				workBundle.Add(surface);
 
 				ProcessDefect processDefect = new ProcessDefect();
-				processDefect.SetRecipe(recipe);
+				processDefect.SetRecipe(_recipe);
 				workBundle.Add(processDefect);
 
-				workplaceBundle = WorkplaceBundle.CreateWaferMap(_recipe);//칩별로 스레드 할당
+				workplaceBundle = WorkplaceBundle.CreateWaferMap(_recipe);
 				workplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
 				workplaceBundle.SetSharedRGBBuffer(this.SharedBufferR, this.SharedBufferG, this.SharedBufferB);
 
@@ -132,7 +148,8 @@ namespace Root_AOP01_Inspection.Module
 			}
 			catch (Exception ex)
 			{
-				throw new Exception(string.Format("Inspection 생성에 실패하였습니다.\nDetail : " + ex.Message), ex);
+				MessageBox.Show("Inspection 생성에 실패하였습니다.\nDetail : " + ex.Message);
+				return false;
 			}
 			return true;
 		}
@@ -149,7 +166,7 @@ namespace Root_AOP01_Inspection.Module
 
 				if (snapArea.Contains(checkArea) == true)
 				{
-					wp.STATE = WORKPLACE_STATE.SNAP;
+					wp.STATE = WORK_TYPE.SNAP;
 				}
 			}
 
@@ -164,7 +181,7 @@ namespace Root_AOP01_Inspection.Module
 			string waferId = "WaferID";
 			//string sRecipe = "RecipeID";
 			string recipeName = recipe.Name;
-
+			var temp = DatabaseManager.Instance.GetConnectionStatus();
 			DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
 
 			base.Start();
@@ -186,7 +203,7 @@ namespace Root_AOP01_Inspection.Module
 			{
 				foreach (Workplace wp in this.workplaceBundle)
 				{
-					wp.STATE = WORKPLACE_STATE.SNAP;
+					wp.STATE = WORK_TYPE.SNAP;
 				}
 			}
 
@@ -196,6 +213,14 @@ namespace Root_AOP01_Inspection.Module
 		public new void Stop()
 		{
 			base.Stop();
+		}
+
+		public void SetColorSharedBuffer(IntPtr ptrR, IntPtr ptrG, IntPtr ptrB)
+		{
+			this.SharedBufferR_Gray = ptrR;
+			this.SharedBufferG = ptrG;
+			this.SharedBufferB = ptrB;
+			this.SharedBufferByteCnt = 3;
 		}
 	}
 }

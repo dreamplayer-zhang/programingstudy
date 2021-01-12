@@ -43,7 +43,7 @@ namespace RootTools_Vision
         }
         public void DoInspection()
         {
-            if (this.workplace.Index == 0)
+           if (this.workplace.Index == 0)
                 return;
 
             this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
