@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_AOP01_Inspection.Module;
+using RootTools;
 using RootTools.Control;
 using RootTools.Control.Ajin;
 using RootTools.GAFs;
@@ -136,6 +137,9 @@ namespace Root_AOP01_Inspection
         #endregion
 
         public AOP01_Handler m_handler = new AOP01_Handler();
+
+        private InspectionManager_AOP inspectionManager;
+        public InspectionManager_AOP InspectionManager { get => inspectionManager; set => inspectionManager = value; }
         public void Init(string id)
         {
             EQ.m_sModel = id;
@@ -155,6 +159,7 @@ namespace Root_AOP01_Inspection
             m_handler.ThreadStop();
             m_toolBox.ThreadStop();
             m_login.ThreadStop();
+            m_ajin.ThreadStop();
             LogView.ThreadStop();
         }
     }

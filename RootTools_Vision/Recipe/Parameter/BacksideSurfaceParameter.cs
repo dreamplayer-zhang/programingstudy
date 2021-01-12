@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    class BacksideSurfaceParameter : ParameterBase, IMaskInspection, IColorInspection, IBacksideInspection
+    public class BacksideSurfaceParameter : ParameterBase, IMaskInspection, IColorInspection, IBacksideInspection
     {
         public BacksideSurfaceParameter() : base(typeof(BacksideSurface))
         {
