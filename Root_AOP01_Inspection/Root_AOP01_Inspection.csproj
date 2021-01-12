@@ -226,6 +226,7 @@
     <Compile Include="UI\1. SETUP\2. RecipeWizard\Page\RecipeSummary_Page.xaml.cs">
       <DependentUpon>RecipeSummary_Page.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\3. RUN\Dlg_ViewModel.cs" />
     <Compile Include="UI\3. RUN\Run_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\4. GEM\GEM_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\3. Maintenance\Maintenance_ViewModel.cs" />

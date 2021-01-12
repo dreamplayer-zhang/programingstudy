@@ -8,6 +8,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System.Collections.ObjectModel;
 
 namespace Root_AOP01_Inspection
 {
