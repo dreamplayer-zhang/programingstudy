@@ -35,9 +35,9 @@ namespace Root_AOP01_Inspection
         {
             m_engineer = engineer;
             m_handler = engineer.m_handler;
-            m_arm = wtrcleanunit.m_dicArm[0];
             m_wtrcleanunit = wtrcleanunit;
             m_wtr = m_wtrcleanunit.p_aArm[0];
+            m_arm = m_wtrcleanunit.m_dicArm[0];
             m_mainvision = mainvision;
             m_loadport[0] = loadport1;
             m_loadport[1] = loadport2;
@@ -50,11 +50,11 @@ namespace Root_AOP01_Inspection
         public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_RND loadport1,
             Loadport_RND loadport2, AOP01_Engineer engineer)
         {
-            m_arm = wtrcleanunit.m_dicArm[0];
             m_engineer = engineer;
             m_handler = engineer.m_handler;
             m_wtrcleanunit = wtrcleanunit;
             m_wtr = m_wtrcleanunit.p_aArm[0];
+            m_arm = m_wtrcleanunit.m_dicArm[0];
             m_mainvision = mainvision;
             m_rndLoadport[0] = loadport1;
             m_rndLoadport[1] = loadport2;
