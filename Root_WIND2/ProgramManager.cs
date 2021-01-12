@@ -120,7 +120,7 @@ namespace Root_WIND2
             //roiLayer.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameROI).p_nCount;
             if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
             {
-                imageEdge = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
+                imageEdge = engineer.m_handler.p_EdgeSideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
                 imageEdge.p_nByte = memoryTool.GetMemory("EdgeSide Vision.Memory", "EdgeSide Vision", "EdgeTop").p_nCount;                    
 			}
 
