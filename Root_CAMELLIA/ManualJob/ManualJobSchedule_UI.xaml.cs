@@ -237,11 +237,16 @@ namespace Root_CAMELLIA.ManualJob
             m_infoCarrier.p_sCarrierID = textboxCstID.Text;
             for(int i=0; i<nSlot; i++)
             {
-                if (m_infoCarrier.GetInfoWafer(i) != null)
+                InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(i); 
+                if (infoWafer != null)
                 {
-                    m_infoCarrier.GetInfoWafer(i).p_sRecipe = m_cbRecipe[i].Text;
-                    m_infoCarrier.GetInfoWafer(i).p_sWaferID = m_tboxWaferID[i].Text;
-                    m_infoCarrier.GetInfoWafer(i).p_eState = m_tblockState[i].Text == "Select" ? GemSlotBase.eState.Select : GemSlotBase.eState.Exist;
+                    infoWafer.p_eState = (m_tblockState[i].Text == "Select") ? GemSlotBase.eState.Select : GemSlotBase.eState.Empty;
+                    infoWafer.p_sWaferID = m_tboxWaferID[i].Text;
+                    if (infoWafer.p_eState == GemSlotBase.eState.Select)
+                    {
+                        infoWafer.RecipeOpen("C:\\Recipe\\Camellia\\" + m_cbRecipe[i].Text);
+                        m_infoCarrier.StartProcess(infoWafer.p_id); 
+                    }
                 }
             }
             //m_JobSchedule.SetInfoCarrier(m_infoCarrier);

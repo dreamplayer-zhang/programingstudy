@@ -74,7 +74,6 @@ namespace Root_WIND2.Module
             m_AlignCount = tree.Set(m_AlignCount, m_AlignCount, "Align count", "Align Count", bVisible);
         }
 
-        int i = 1;
         public override string Run()
         {
             AxisXY axisXY = m_module.AxisXY;
@@ -92,23 +91,18 @@ namespace Root_WIND2.Module
 
 
             string strVRSImageDir = @"C:\Users\ATI\Desktop\image\";
-            string strVRSImageFullPath = "";
-
-
             int camWidth = m_CamAlign.GetRoiSize().X;
             int camHeight = m_CamAlign.GetRoiSize().Y;
             
             // 이미지 회득
             ImageData img = m_CamAlign.p_ImageViewer.p_ImageData;
+            string strVRSImageFullPath;
             if (m_CamAlign.Grab() == "OK")
             {
-                strVRSImageFullPath = string.Format(strVRSImageDir + "test_{0}.bmp", i++);
+                strVRSImageFullPath = string.Format(strVRSImageDir + "test_{0}.bmp", 0);
                 img.SaveImageSync(strVRSImageFullPath);
             }
             IntPtr src = img.GetPtr();
-
-
-            bool IsFirst = true;
             byte[] rawdata;
 
             int firstPosX = 0, firstPosY = 0, secondPosX = 0, secondPosY = 0;
@@ -120,19 +114,17 @@ namespace Root_WIND2.Module
 
             int resPosX = 0;
             int resPosY = 0;
-            float result = 0.0f;
             float maxScore = 0;
             string matchingFeaturePath = "";
-            byte[] firstRawData = null;
-            int firstWidth = 0, firstHeight = 0;
+            byte[] findRawData = null;
+            int findWidth = 0, findHeight = 0;
+            float result;
             foreach (FileInfo file in di.GetFiles())
             {
                 string fullname = file.FullName;
-                //byte[] rawdata;
-                //int width = 0, height = 0;
                 unsafe
                 {
-                  
+
                     rawdata = Tools.LoadBitmapToRawdata(fullname, &width, &height);
 
                     result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), rawdata, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
@@ -142,9 +134,9 @@ namespace Root_WIND2.Module
                     maxScore = result;
                     resPosX = posX;
                     resPosY = posY;
-                    firstRawData = rawdata;
-                    firstWidth = width;
-                    firstHeight = height;
+                    findRawData = rawdata;
+                    findWidth = width;
+                    findHeight = height;
                     matchingFeaturePath = fullname;
                 }
             }
@@ -161,7 +153,7 @@ namespace Root_WIND2.Module
 
             if (m_CamAlign.Grab() == "OK")
             {
-                strVRSImageFullPath = string.Format(strVRSImageDir + "test_{0}.bmp", i++);
+                strVRSImageFullPath = string.Format(strVRSImageDir + "test_{0}.bmp", 1);
                 img.SaveImageSync(strVRSImageFullPath);
             }
 
@@ -169,36 +161,14 @@ namespace Root_WIND2.Module
 
             int resPosX2 = 0;
             int resPosY2 = 0;
-            float result2 = 0.0f;
-            float maxScore2 = 0;
-            string matchingFeaturePath2 = "";
-            byte[] secondRawData = null;
-            int secondWidth = 0, secondHeight = 0;
-            foreach (FileInfo file in di.GetFiles())
-            {
-                string fullname = file.FullName;
-                //byte[] rawdata;
-                //int width = 0, height = 0;
-                unsafe
-                {
-                   
-                    rawdata = Tools.LoadBitmapToRawdata(fullname, &width, &height);
 
-                    result2 = CLR_IP.Cpp_TemplateMatching((byte*)(src2.ToPointer()), rawdata, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
-                }
-                if (maxScore2 < result2)
-                {
-                    maxScore2 = result2;
-                    resPosX2 = posX;
-                    resPosY2 = posY;
-                    secondRawData = rawdata;
-                    secondWidth = width;
-                    secondHeight = height;
-                    matchingFeaturePath2 = fullname;
-                }
+            unsafe
+            {
+                result = CLR_IP.Cpp_TemplateMatching((byte*)(src2.ToPointer()), findRawData, &resPosX2, &resPosY2, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
             }
-            if (maxScore2 < m_score)
-                return "Second Point Align Fail [Score : " + maxScore2.ToString() + "]";
+
+            if (result < m_score)
+                return "Second Point Align Fail [Score : " + result.ToString() + "]";
 
             double resAngle = CalcAngle(resPosX, resPosY, resPosX2, resPosY2);
 
@@ -212,39 +182,31 @@ namespace Root_WIND2.Module
             {
                 for (int cnt = 1; cnt < m_AlignCount; cnt++)
                 {
-                    //bool IsFirst = true;
-                    //byte[] rawdata;
 
-                    //int firstPosX = 0, firstPosY = 0, secondPosX = 0, secondPosY = 0;
-                    //int width = 0, height = 0;
                     for (int i = 0; i < 2; i++)
                     {
+
+
+                        bool IsFirst;
                         if (Math.Abs(axisXY.p_posActual.X - m_firstPointPulse.X) < 10)
                         {
                             IsFirst = true;
-                            rawdata = firstRawData;
-                            width = firstWidth;
-                            height = firstHeight;
                         }
                         else
                         {
                             IsFirst = false;
-                            rawdata = secondRawData;
-                            width = secondWidth;
-                            height = secondHeight;
                         }
 
-                        //if (m_CamAlign.Grab() != "OK") return "Grab Error";d
                         if (m_CamAlign.Grab() == "OK")
                         {
-                            strVRSImageFullPath = string.Format(strVRSImageDir + "왜안돼{0}.bmp", i);
+                            strVRSImageFullPath = string.Format(strVRSImageDir + "Repeat Img{0}.bmp", cnt + (i + 1));
                             img.SaveImageSync(strVRSImageFullPath);
                         }
                         src = img.GetPtr();
                         int PosX = 0, PosY = 0;
                         unsafe
                         {
-                            result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), rawdata, &PosX, &PosY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
+                            result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), findRawData, &PosX, &PosY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
                         }
                         if (IsFirst)
                         {
@@ -259,8 +221,6 @@ namespace Root_WIND2.Module
                                     return p_sInfo;
                                 if (m_module.Run(axisXY.WaitReady()))
                                     return p_sInfo;
-
-                                IsFirst = false;
                             }
 
                         }
@@ -278,8 +238,6 @@ namespace Root_WIND2.Module
                                     return p_sInfo;
                                 if (m_module.Run(axisXY.WaitReady()))
                                     return p_sInfo;
-
-                                IsFirst = true;
                             }
                         }
 
@@ -288,55 +246,24 @@ namespace Root_WIND2.Module
 
                     axisRotate.StartMove((axisRotate.p_posActual - resAngle * 1000));
                     axisRotate.WaitReady();
-
-                    //if (m_CamAlign.Grab() != "OK") return "Grab Error";
-                    //src2 = img.GetPtr();
-                    //int secondPosX = 0, secondPosY = 0;
-                    //unsafe
-                    //{
-
-                    //    int width = 0, height = 0;
-                    //    byte[] rawdata = Tools.LoadBitmapToRawdata(matchingFeaturePath2, &width, &height);
-
-                    //    result = CLR_IP.Cpp_TemplateMatching((byte*)(src2.ToPointer()), rawdata, &secondPosX, &secondPosY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
-                    //}
-                    //if (result < m_score)
-                    //    return "Align Count :" + cnt.ToString() + "Second Point Align Fail [Score : " + result.ToString() + "]";
-
-
                 }
 
             }
 
-
-            //if (m_CamAlign.Grab() != "OK") return "Grab Error";
-            if (m_CamAlign.Grab() == "OK")
-            {
-                strVRSImageFullPath = string.Format(strVRSImageDir + "asanwawnrnar{0}.bmp", i);
-                img.SaveImageSync(strVRSImageFullPath);
-            }
-
-            RPoint pulse = new RPoint();
+            if (m_CamAlign.Grab() != "OK") return "Grab Error";
+            RPoint pulse;
             if (Math.Abs(axisXY.p_posActual.X - m_firstPointPulse.X) < 10)
             {
-                IsFirst = true;
-                rawdata = firstRawData;
-                width = firstWidth;
-                height = firstHeight;
                 pulse = m_firstPointPulse;
             }
             else
             {
-                IsFirst = false;
-                rawdata = secondRawData;
-                width = secondWidth;
-                height = secondHeight;
                 pulse = m_secondPointPulse;
             }
             src = img.GetPtr();
             unsafe
             {
-                CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), rawdata, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
+                CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), findRawData, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
             }
            
             if (m_module.Run(axisXY.p_axisX.StartMove(pulse.X - (posX + (width / 2) - camWidth / 2) * m_AlignCamResolution * 10)))
@@ -365,7 +292,7 @@ namespace Root_WIND2.Module
 
             double radian = Math.Atan2(cy2 - cy, cx2 - cx);
             double angle = radian * (180 / Math.PI);
-            double resAngle = 0;
+            double resAngle;
             if (cy2 - cy < 0)
             {
                 resAngle = angle + 180;

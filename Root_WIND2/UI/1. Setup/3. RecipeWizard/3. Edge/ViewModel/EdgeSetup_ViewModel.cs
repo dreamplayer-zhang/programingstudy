@@ -16,8 +16,8 @@ namespace Root_WIND2
 		private WIND2_Engineer engineer;
 		private Setup_ViewModel setupVM;
 
-		private FrontsideInspection_ImageViewer_ViewModel drawToolVM;
-		public FrontsideInspection_ImageViewer_ViewModel DrawToolVM
+		private RootViewer_ViewModel drawToolVM;
+		public RootViewer_ViewModel DrawToolVM
 		{
 			get { return drawToolVM; }
 			set { SetProperty(ref drawToolVM, value); }
@@ -28,7 +28,11 @@ namespace Root_WIND2
 		public ICommand btnBottom { get { return new RelayCommand(() => ChangeViewer("Bottom")); }}
 
 		private int roiHeight;
-		public int RoiHeight { get => roiHeight; set => roiHeight = value; }
+		public int ROIHeight { get => roiHeight; set => roiHeight = value; }
+		private int roiWidth;
+		public int ROIWidth { get => roiWidth; set => roiWidth = value; }
+		private int threshold;
+		public int Threshold { get => threshold; set => threshold = value; }
 		private int defectSizeMin;
 		public int DefectSizeMin { get => defectSizeMin; set => defectSizeMin = value; }
 
@@ -40,7 +44,9 @@ namespace Root_WIND2
 
 		public void Init()
 		{
-			DrawToolVM = new FrontsideInspection_ImageViewer_ViewModel();
+			DrawToolVM = new RootViewer_ViewModel();
+			DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeTop));
+			//DrawToolVM.SetImageData(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeTop));
 		}
 
 		public void Scan()
@@ -59,8 +65,6 @@ namespace Root_WIND2
 
 		public void Inspect()
 		{
-			DrawToolVM.Clear();
-
 			IntPtr sharedBuf = new IntPtr();
 			if (DrawToolVM.p_ImageData.p_nByte == 3)
 			{
@@ -84,11 +88,11 @@ namespace Root_WIND2
 		private void ChangeViewer(string dataName)
 		{
 			if (dataName == "Top")
-				DrawToolVM.ChangeImageData(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeTop), ProgramManager.Instance.DialogService);
+				DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeTop), ProgramManager.Instance.DialogService);
 			else if (dataName == "Side")
-				DrawToolVM.ChangeImageData(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeSide), ProgramManager.Instance.DialogService);
+				DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeSide), ProgramManager.Instance.DialogService);
 			else if (dataName == "Bottom")
-				DrawToolVM.ChangeImageData(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeBottom), ProgramManager.Instance.DialogService);
+				DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeBottom), ProgramManager.Instance.DialogService);
 		}
 
 		private void ClearDefectData()
