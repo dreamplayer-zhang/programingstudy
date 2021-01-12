@@ -227,6 +227,7 @@
     <Compile Include="UI\1. SETUP\Setup_Panel.xaml.cs">
       <DependentUpon>Setup_Panel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\Vision_AOP.cs" />
     <Page Include="Engineer\AOP01_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
