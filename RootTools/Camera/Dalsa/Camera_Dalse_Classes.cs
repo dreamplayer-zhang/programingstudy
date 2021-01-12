@@ -169,7 +169,7 @@ namespace RootTools.Camera.Dalsa
             }
             set
             {
-                SetFeatureValue(ref m_eDir, value, "SensorScanDirection", typeof(string));
+                SetFeatureValue(ref m_eDir, value, "sensorScanDirection", typeof(string));
             }
         }
 

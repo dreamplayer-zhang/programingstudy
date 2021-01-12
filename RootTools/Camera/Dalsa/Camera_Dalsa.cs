@@ -86,8 +86,8 @@ namespace RootTools.Camera.Dalsa
                 SetProperty(ref m_CamParam, value);
             }
         }
-        const int c_nBuf = 200;
-        int _nBuf = 200;
+        const int c_nBuf = 1000;
+        int _nBuf = 1000;
         public int p_nBuf
         {
             get
@@ -389,6 +389,10 @@ namespace RootTools.Camera.Dalsa
             m_MemPtr = memory.GetPtr();
 
             Scandir = bInvY;
+            if (Scandir)
+                m_CamParam.p_eDir = DalsaParameterSet.eDir.Reverse;
+            else
+                m_CamParam.p_eDir = DalsaParameterSet.eDir.Forward;
 
             if (m_sapBuf.BytesPerPixel > 1)
             {
@@ -449,6 +453,7 @@ namespace RootTools.Camera.Dalsa
             m_nGrabTrigger = 0;
             m_sapXfer.Snap(m_nGrabCount);
             p_CamInfo.p_eState = eCamState.GrabMem;
+            
             m_GrabThread = new Thread(new ThreadStart(RunGrabLineColorScanThread));
             m_GrabThread.Start();
         }
@@ -521,9 +526,9 @@ namespace RootTools.Camera.Dalsa
             while (iBlock < m_nGrabCount)
             {
                 if (iBlock < m_nGrabTrigger)
-                {
+                {   
                     IntPtr ipSrc = m_pSapBuf[iBlock % p_nBuf];
-                    Parallel.For(0, nCamHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
+                    Parallel.For(0, nCamHeight, new ParallelOptions { MaxDegreeOfParallelism = 18 }, (y) =>
                     {
                         int yp;
                         if (Scandir)
