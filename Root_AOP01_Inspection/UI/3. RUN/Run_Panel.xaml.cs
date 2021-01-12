@@ -24,6 +24,8 @@ namespace Root_AOP01_Inspection
 
         Arm m_arm;
         Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
+        Loadport_RND[] m_rndLoadport = new Loadport_RND[2];
+        AOP01_Handler.eLoadport LoadportType;
         public Run_Panel()
         {
             InitializeComponent();
@@ -42,6 +44,24 @@ namespace Root_AOP01_Inspection
             LoadportA_State.DataContext = loadport1;
             LoadportB_State.DataContext = loadport2;
             RTR_State.DataContext = wtrcleanunit;
+            LoadportType = AOP01_Handler.eLoadport.Cymechs;
+            InitTimer();
+        }
+        public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_RND loadport1,
+            Loadport_RND loadport2, AOP01_Engineer engineer)
+        {
+            m_arm = wtrcleanunit.m_dicArm[0];
+            m_engineer = engineer;
+            m_handler = engineer.m_handler;
+            m_wtrcleanunit = wtrcleanunit;
+            m_wtr = m_wtrcleanunit.p_aArm[0];
+            m_mainvision = mainvision;
+            m_rndLoadport[0] = loadport1;
+            m_rndLoadport[1] = loadport2;
+            LoadportA_State.DataContext = loadport1;
+            LoadportB_State.DataContext = loadport2;
+            RTR_State.DataContext = wtrcleanunit;
+            LoadportType = AOP01_Handler.eLoadport.RND;
             InitTimer();
         }
 
@@ -54,13 +74,22 @@ namespace Root_AOP01_Inspection
             m_timer.Start();
         }
        
-            private void M_timer_Tick(object sender, EventArgs e)
-            {
-                ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_wtr.p_infoWafer != null? Brushes.SteelBlue : Brushes.LightGray;
-                ExistVision.Background = m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null? Brushes.SteelBlue : Brushes.LightGray;
-                ExistLoadport.Background =(m_loadport[0].p_infoWafer != null)||(m_loadport[1].p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
-            }
-            #endregion
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true == true && m_wtr.p_infoWafer != null? Brushes.SteelBlue : Brushes.LightGray;
+            ExistVision.Background = m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null? Brushes.SteelBlue : Brushes.LightGray;
+			switch (LoadportType)
+			{
+				case AOP01_Handler.eLoadport.Cymechs:
+                    ExistLoadport.Background = (m_loadport[0].p_infoWafer != null) || (m_loadport[1].p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
+                    break;
+				case AOP01_Handler.eLoadport.RND:
+                default:
+                    ExistLoadport.Background = (m_rndLoadport[0].p_infoWafer != null) || (m_rndLoadport[1].p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
+					break;
+			}
+        }
+        #endregion
 
             #region Button Recovery
             bool IsEnableRecovery()
@@ -99,8 +128,18 @@ namespace Root_AOP01_Inspection
 
             bool IsRunModule()
             {
-                if (IsRunModule(m_loadport[0])) return true;
-                if (IsRunModule(m_loadport[1])) return true;
+			    switch (LoadportType)
+			    {
+				    case AOP01_Handler.eLoadport.Cymechs:
+                    if (IsRunModule(m_loadport[0])) return true;
+                    if (IsRunModule(m_loadport[1])) return true;
+                    break;
+                case AOP01_Handler.eLoadport.RND:
+                    default:
+                    if (IsRunModule(m_rndLoadport[0])) return true;
+                    if (IsRunModule(m_rndLoadport[1])) return true;
+                    break;
+			    }
                 if (IsRunModule(m_wtrcleanunit)) return true;
                 if (IsRunModule(m_handler.m_mainVision)) return true;
                 return false;

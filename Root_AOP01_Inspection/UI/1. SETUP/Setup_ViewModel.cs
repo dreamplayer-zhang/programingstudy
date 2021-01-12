@@ -1,4 +1,5 @@
 ﻿
+using Root_AOP01_Inspection.Module;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -47,6 +48,9 @@ namespace Root_AOP01_Inspection
         private RecipeEdge_ViewModel m_RecipeEdge;
         private RecipeLADS_ViewModel m_RecipeLADS;
 
+        InspectionManager_AOP inspectionManager;
+        public InspectionManager_AOP InspectionManager { get => inspectionManager; private set => inspectionManager = value; }
+
         public Setup_ViewModel(MainWindow mainwindow)
         {
             m_MainWindow = mainwindow;
@@ -55,6 +59,7 @@ namespace Root_AOP01_Inspection
             Init_NaviBtn();
 
             Set_HomePanel();
+            inspectionManager = ProgramManager.Instance.InspectionManager;
         }
 
         void Init_ViewModel()

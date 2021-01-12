@@ -80,14 +80,14 @@ namespace RootTools.Database
         }
 
 
-        public bool SetDatabase(int _nThreadCount)
+        public bool SetDatabase(int _nThreadCount, string sServerName = "localhost", string sDBName = "wind2", string sUid = "root", string sPw = "root")
         {
             bool bConnect = false;
 
             m_sInspectionID = "";
 
 
-            m_MainConnectSession = new Database_ConnectSession((int)ID.MainQuery);
+            m_MainConnectSession = new Database_ConnectSession((int)ID.MainQuery, sServerName, sDBName, sUid, sPw);
             bConnect = m_MainConnectSession.Connect(); // 메인세션
 
             m_mySqlCommand = new MySqlCommand();
@@ -98,7 +98,7 @@ namespace RootTools.Database
                 m_ThreadConnectSession = new Database_ConnectSession[_nThreadCount];
                 for (int i = 0; i < _nThreadCount; i++)
                 {
-                    m_ThreadConnectSession[i] = new Database_ConnectSession(i);
+                    m_ThreadConnectSession[i] = new Database_ConnectSession(i, sServerName, sDBName, sUid, sPw);
                     bConnect = m_ThreadConnectSession[i].Connect(); // 스레드 세션
                 }
             }

@@ -356,14 +356,14 @@ namespace Root_AOP01_Inspection.Module
         #region override
         public override void InitMemorys()
         {
+            //MainVision.Main.
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
-
-            m_memoryMain = m_memoryGroup.CreateMemory("Main", 1, 1, 1000, 1000);
-
-            m_memorySideLeft = m_memoryGroup.CreateMemory("SideLeft", 1, 1, 1000, 1000);
-            m_memorySideBottom = m_memoryGroup.CreateMemory("SideBottom", 1, 1, 1000, 1000);
-            m_memorySideRight = m_memoryGroup.CreateMemory("SideRight", 1, 1, 1000, 1000);
-            m_memorySideTop = m_memoryGroup.CreateMemory("SideTop", 1, 1, 1000, 1000);
+            m_memoryMain = m_memoryGroup.CreateMemory(App.mMainMem, 1, 1, 1000, 1000);
+           
+            m_memorySideLeft = m_memoryGroup.CreateMemory(App.mSideLeftMem, 1, 1, 1000, 1000);
+            m_memorySideBottom = m_memoryGroup.CreateMemory(App.mSideBotMem, 1, 1, 1000, 1000);
+            m_memorySideRight = m_memoryGroup.CreateMemory(App.mSideRightMem, 1, 1, 1000, 1000);
+            m_memorySideTop = m_memoryGroup.CreateMemory(App.mSideTopMem, 1, 1, 1000, 1000);
 
             m_memoryTDI45 = m_memoryGroup.CreateMemory("TDI45", 1, 1, 1000, 1000);
             m_memoryLADS = m_memoryGroup.CreateMemory("LADS", 1, 1, 1000, 1000);
@@ -1318,10 +1318,7 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                string strPool = "MainVision.Vision Memory";
-                string strGroup = "MainVision";
-                string strMemory = "Main";
-                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 CPoint cptStartROIPoint = m_cptBarcodeLTPoint;
                 CPoint cptEndROIPoint = new CPoint(cptStartROIPoint.X + m_nROIWidth, cptStartROIPoint.Y + m_nROIHeight);
                 CRect crtROI = new CRect(cptStartROIPoint, cptEndROIPoint);
@@ -1618,10 +1615,9 @@ namespace Root_AOP01_Inspection.Module
             public override string Run()
             {
                 // variable
-                string strPool = "MainVision.Vision Memory";
-                string strGroup = "MainVision";
-                string strMemory = "Main";
-                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                Mat matTopTemplateImage = new Mat();
+                Mat matBottomTemplateImage = new Mat();
+                MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 string strAlignMarkPath = "D:\\AlignMarkTemplateImage\\";
                 string strInOutFeaturePath = "D:\\FeatureTemplateImage\\";
 
@@ -1731,10 +1727,7 @@ namespace Root_AOP01_Inspection.Module
                 Image<Gray, byte> imgBottom = new Image<Gray, byte>(m_strBottomTemplateImageFilePath);
                 CPoint cptTopCenter = new CPoint();
                 CPoint cptBottomCenter = new CPoint();
-                string strPool = "MainVision.Vision Memory";
-                string strGroup = "MainVision";
-                string strMemory = "Main";
-                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 bool bFoundTop = false;
                 bool bFoundBottom = false;
                 CPoint cptTopResultCenter;

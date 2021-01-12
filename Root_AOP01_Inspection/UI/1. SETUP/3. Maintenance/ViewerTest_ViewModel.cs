@@ -35,7 +35,7 @@ namespace Root_AOP01_Inspection
         {
             m_ToolMemory = tool;
             p_Viewer.init(null, ProgramManager.Instance.DialogService);
-            m_imagedata = new ImageData(m_ToolMemory.GetMemory("MainVision.Vision Memory", "MainVision", "Main"));
+            m_imagedata = new ImageData(m_ToolMemory.GetMemory(App.mPool, App.mGroup, App.mMainMem));
             m_imagedata.p_nByte = 3;
             p_Viewer.SetImageData(m_imagedata);
         }
