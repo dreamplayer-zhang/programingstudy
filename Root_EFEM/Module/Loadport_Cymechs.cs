@@ -607,12 +607,14 @@ namespace Root_EFEM.Module
                 }
             }
             p_eState = eState.Ready;
-            if (m_diPlaced.p_bIn && m_diPresent.p_bIn)
+            if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
             {
-                m_bPlaced = true;
+                p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                m_bPlaced= true;
             }
             else
             {
+                p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
                 m_bPlaced = false;
             }
             
