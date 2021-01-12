@@ -111,7 +111,7 @@ namespace Root_CAMELLIA
             Cymechs
         }
         eWTR m_eWTR = eWTR.RND;
-        ModuleBase m_wtr;
+        public ModuleBase m_wtr;
         void InitWTR()
         {
             switch (m_eWTR)
@@ -375,30 +375,37 @@ namespace Root_CAMELLIA
 
         void CheckLoad()
         {
-            //EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
-            //string sLoadport = sequence.m_infoWafer.m_sModule;
-            //foreach(ILoadport loadport in m_aLoadport)
-            //{
-            //    if (loadport.p_id == sLoadport) loadport.RunDocking();
-            //}
+            EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
+            string sLoadport = sequence.m_infoWafer.m_sModule;
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if (loadport.p_id == sLoadport)
+                {
+                    //loadport.RunDocking();
+                    if (loadport.RunDocking() != "OK") return;
+                    InfoCarrier infoCarrier = loadport.p_infoCarrier;
+                    ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
+                    manualJobSchedule.ShowPopup(); //p_moduleList.ClickRun();
+                }
+            }
         }
 
         void CheckUnload()
         {
-            //EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();
-            //foreach(ILoadport loadport in m_aLoadport)
-            //{
-            //    if(loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
-            //    {
-            //        string sLoadport = loadport.p_id;
-            //        bool bUndock = true;
-            //        foreach(EFEM_Process.Sequence sequence in aSequence)
-            //        {
-            //            if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
-            //        }
-            //        if (bUndock) loadport.RunUndocking();
-            //    }
-            //}
+            EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+                {
+                    string sLoadport = loadport.p_id;
+                    bool bUndock = true;
+                    foreach (EFEM_Process.Sequence sequence in aSequence)
+                    {
+                        if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
+                    }
+                    if (bUndock) loadport.RunUndocking();
+                }
+            }
         }
         #endregion
 

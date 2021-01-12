@@ -249,13 +249,16 @@ namespace Root_CAMELLIA.ManualJob
                     }
                 }
             }
-            //m_JobSchedule.SetInfoCarrier(m_infoCarrier);
             m_infoCarrier.SetSelectMapData(m_infoCarrier);
             this.DialogResult = true;
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            for (int n = 0; n < m_infoCarrier.p_lWafer; n++)
+            {
+                if (m_infoCarrier.GetInfoWafer(n) != null) m_infoCarrier.SetInfoWafer(n, null);
+            }
             this.Close();
         }
     }

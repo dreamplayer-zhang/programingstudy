@@ -528,7 +528,7 @@ namespace Root_EFEM.Module
                 if (m_module.Run(m_module.CmdLoad(m_bMapping))) return p_sInfo;
                 if (m_module.Run(m_module.CmdGetMapData())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
-                m_module.m_ceidDocking.Send(); 
+                m_module.m_ceidDocking.Send();
                 return "OK";
             }
         }
