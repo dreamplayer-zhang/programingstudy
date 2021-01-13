@@ -131,11 +131,21 @@
                            FontSize="32" FontWeight="Bold"/>
             </Border>
             <Grid Grid.Column="3">
-                <TextBlock Text="State : Now Process" 
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"  Text="State :  " 
                            FontSize="15"
                            FontWeight="Bold"
                            VerticalAlignment="Center"
-                           HorizontalAlignment="Center"/>
+                           HorizontalAlignment="Right"/>
+                <TextBlock Grid.Column="1" Text=" " 
+                           x:Name="textState"
+                           FontSize="15"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"/>
             </Grid>
             <StackPanel Grid.Column="4"
                         Orientation="Horizontal"

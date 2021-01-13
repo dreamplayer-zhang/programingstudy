@@ -10,42 +10,6 @@ namespace Root_CAMELLIA.ManualJob
 {
     public class ManualJobSchedule : NotifyProperty
     {
-        string _sLocID = "";
-        public string p_sLocID
-        {
-            get { return _sLocID; }
-            set
-            {
-                if (_sLocID == value) return;
-                _sLocID = value;
-                OnPropertyChanged();
-            }
-        }
-
-        string _sLotID = "";
-        public string p_sLotID 
-        {
-            get { return _sLotID; }
-            set
-            {
-                if (_sLotID == value) return;
-                _sLotID = value;
-                OnPropertyChanged();
-            }
-        }
-
-        string _sCarrierID = "";
-        public string p_sCarrierID
-        { 
-            get { return _sCarrierID; }
-            set
-            {
-                if (_sCarrierID == value) return;
-                _sCarrierID = value;
-                OnPropertyChanged();
-            }
-        }
-
         bool _bRnR = false;
         public bool p_bRnR
         {
