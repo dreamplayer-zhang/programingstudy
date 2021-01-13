@@ -433,12 +433,14 @@ namespace Root_EFEM.Module
         SVID m_svidPlaced;
         CEID m_ceidDocking;
         CEID m_ceidUnDocking;
+        public CEID m_ceidUnloadReq;
         ALID m_alidPlaced;
         void InitGAF() 
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
             m_ceidDocking = m_gaf.GetCEID(this, "Docking");
             m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
+            m_ceidUnloadReq = m_gaf.GetCEID(this, "Unload Request");
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
         }
         #endregion
