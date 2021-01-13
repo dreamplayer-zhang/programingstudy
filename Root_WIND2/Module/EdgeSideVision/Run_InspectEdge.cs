@@ -15,6 +15,11 @@ namespace Root_WIND2.Module
 		InspectionManagerEdge inspectionEdge;
 		string recipeName = string.Empty;
 
+		// degree, 카메라 위치 각도 offset
+		int topOffset = 0;
+		int sideOffset = 45;
+		int btmOffset = 90;
+
 		int roiHeight = 1000;
 		int roiWidth = 3000;
 		int threshhold = 12;
@@ -52,6 +57,10 @@ namespace Root_WIND2.Module
 			run.size = size;
 			run.mergeDist = mergeDist;
 			run.threshhold = threshhold;
+
+			run.topOffset = topOffset;
+			run.sideOffset = sideOffset;
+			run.btmOffset = btmOffset;
 			return run;
 		}
 
@@ -59,11 +68,15 @@ namespace Root_WIND2.Module
 		{
 			recipeName = tree.SetFile(recipeName, recipeName, "rcp", "Recipe", "Recipe Name", bVisible);
 
-			roiHeight = tree.Set(roiHeight, roiHeight, "ROI Height", "", bVisible);
-			roiWidth = tree.Set(roiWidth, roiWidth, "ROI Width", "", bVisible);
-			threshhold = tree.Set(threshhold, threshhold, "Theshold", "", bVisible);
-			size = tree.Set(size, size, "Defect Size", "pixel", bVisible);
-			mergeDist = tree.Set(mergeDist, mergeDist, "Merge Distance", "pixel", bVisible);
+			topOffset = (tree.GetTree("Camera Offset", false, bVisible)).Set(topOffset, topOffset, "Top Camera", "카메라 위치 offset (Degree)", bVisible);
+			sideOffset = (tree.GetTree("Camera Offset", false, bVisible)).Set(sideOffset, sideOffset, "Side Camera", "카메라 위치 offset (Degree)", bVisible);
+			btmOffset = (tree.GetTree("Camera Offset", false, bVisible)).Set(btmOffset, btmOffset, "Bottom Camera", "카메라 위치 offset (Degree)", bVisible);
+
+			//roiHeight = tree.Set(roiHeight, roiHeight, "ROI Height", "", bVisible);
+			//roiWidth = tree.Set(roiWidth, roiWidth, "ROI Width", "", bVisible);
+			//threshhold = tree.Set(threshhold, threshhold, "Theshold", "", bVisible);
+			//size = tree.Set(size, size, "Defect Size", "pixel", bVisible);
+			//mergeDist = tree.Set(mergeDist, mergeDist, "Merge Distance", "pixel", bVisible);
 		}
 
 		public override string Run()
@@ -72,6 +85,9 @@ namespace Root_WIND2.Module
 			{
 				if (this.inspectionEdge.Recipe.Read(recipeName, true) == false)
 					return "Recipe Open Fail";
+
+				if (this.inspectionEdge.SetCameraInfo() == false)
+					return "Set Camera Info Fail";
 
 				if (this.inspectionEdge.CreateInspection() == false)
 					return "Create Inspection Fail";

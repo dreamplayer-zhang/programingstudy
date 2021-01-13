@@ -75,5 +75,10 @@ namespace Root_WIND2
 			Main.SubPanel.Children.Add(page);
 		}
 
+		public void UI_Redraw()
+		{
+			PanelVM.LoadParameter();
+		}
+
 	}
 }
