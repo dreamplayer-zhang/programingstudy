@@ -18,6 +18,7 @@
                             Command="{Binding btnSnap}"
                             Style="{StaticResource SetupPanelBtn}"/>
                     <Button Content="Inspection"
+                            Command="{Binding btnInspection}"
                             Style="{StaticResource SetupPanelBtn}"/>
                 </StackPanel>
                 <Button Content="Back"
@@ -87,16 +88,19 @@
                                               HorizontalAlignment="Center" Width="85"/>
                                         <ToggleButton Content="True" Grid.Row="1" Grid.Column="1" 
                                               VerticalAlignment="Center"
-                                              HorizontalAlignment="Center" Width="85"/>
+                                              HorizontalAlignment="Center" Width="85"
+                                                      IsChecked="{Binding p_bEnableAlignKeyInsp}"/>
                                         <ToggleButton Content="True" Grid.Row="2" Grid.Column="1" 
                                               VerticalAlignment="Center"
-                                              HorizontalAlignment="Center" Width="85"/>
+                                              HorizontalAlignment="Center" Width="85"
+                                                      IsChecked="{Binding p_bEnablePatternShift}"/>
                                         <ToggleButton Content="True" Grid.Row="3" Grid.Column="1" 
                                               VerticalAlignment="Center"
                                               HorizontalAlignment="Center" Width="85"/>
                                         <ToggleButton Content="True" Grid.Row="4" Grid.Column="1" 
                                               VerticalAlignment="Center"
-                                              HorizontalAlignment="Center" Width="85"/>
+                                              HorizontalAlignment="Center" Width="85"
+                                                      IsChecked="{Binding p_bEnableBarcodeInsp}"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="1" Header="Illumination">

@@ -13,6 +13,27 @@ namespace Root_AOP01_Inspection
             m_Engineer = setup.m_MainWindow.m_engineer;
         }
 
+        #region Property
+        bool m_bEnableAlignKeyInsp = false;
+        public bool p_bEnableAlignKeyInsp
+        {
+            get { return m_bEnableAlignKeyInsp; }
+            set { SetProperty(ref m_bEnableAlignKeyInsp, value); }
+        }
+        bool m_bEnableBarcodeInsp = false;
+        public bool p_bEnableBarcodeInsp
+        {
+            get { return m_bEnableBarcodeInsp; }
+            set { SetProperty(ref m_bEnableBarcodeInsp, value); }
+        }
+        bool m_bEnablePatternShift = false;
+        public bool p_bEnablePatternShift
+        {
+            get { return m_bEnablePatternShift; }
+            set { SetProperty(ref m_bEnablePatternShift, value); }
+        }
+        #endregion
+
         #region RelayCommand
         public ICommand btnBack
         {
@@ -32,6 +53,34 @@ namespace Root_AOP01_Inspection
                     MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
                     MainVision.Run_Grab grab = (MainVision.Run_Grab)mainVision.CloneModuleRun("Run Grab");
                     mainVision.StartRun(grab);
+                });
+            }
+        }
+
+        public ICommand btnInspection
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
+                    if (p_bEnableAlignKeyInsp)
+                    {
+                        MainVision.Run_AlignKeyInspection alignKeyInspection = (MainVision.Run_AlignKeyInspection)mainVision.CloneModuleRun("AlignKeyInspection");
+                        mainVision.StartRun(alignKeyInspection);
+                    }
+
+                    if (p_bEnablePatternShift)
+                    {
+                        MainVision.Run_ShiftAndRotation shiftAndRotation = (MainVision.Run_ShiftAndRotation)mainVision.CloneModuleRun("ShiftAndRotation");
+                        mainVision.StartRun(shiftAndRotation);
+                    }
+
+                    if (p_bEnableBarcodeInsp)
+                    {
+                        MainVision.Run_BarcodeInspection barcodeInspection = (MainVision.Run_BarcodeInspection)mainVision.CloneModuleRun("BarcodeInspection");
+                        mainVision.StartRun(barcodeInspection);
+                    }
                 });
             }
         }
