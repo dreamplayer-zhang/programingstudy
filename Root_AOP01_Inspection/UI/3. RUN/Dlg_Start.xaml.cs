@@ -67,7 +67,6 @@ namespace Root_AOP01_Inspection
             //RNRMode.DataContext = m_aRnR;
             Test.DataContext = m_aRnR;
             InitButtonLoad();
-            InitTimer();
         }
         public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_RND loadport1,
             Loadport_RND loadport2, AOP01_Engineer engineer)
@@ -88,58 +87,8 @@ namespace Root_AOP01_Inspection
             //RNRCount.DataContext = m_aRnR;
             //RNRMode.DataContext = m_aRnR;
             InitButtonLoad();
-            InitTimer();
         }
 
-        #region Timer
-        DispatcherTimer m_timer = new DispatcherTimer();
-        void InitTimer()
-        {
-            m_timer.Interval = TimeSpan.FromMilliseconds(20);
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Start();
-        }
-
-
-        private void M_timer_Tick(object sender, EventArgs e)
-        {
-            switch(LoadportType)
-            {
-                case AOP01_Handler.eLoadport.Cymechs:
-                    Placed1.Background = m_loadport[0].m_diPlaced.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
-                    Present1.Background = m_loadport[0].m_diPresent.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
-                    //Load1.Background = m_loadport[0].m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
-                    //UnLoad1.Background = m_loadport[0].m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
-                    Alarm1.Background = m_loadport[0].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
-                    Placed2.Background = m_loadport[1].m_diPlaced.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
-                    Present2.Background = m_loadport[1].m_diPresent.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
-                    //Load2.Background = m_loadport[1].m_bLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
-                    //UnLoad2.Background = m_loadport[1].m_bUnLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
-                    Alarm2.Background = m_loadport[1].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
-                    break;
-                case AOP01_Handler.eLoadport.RND:
-                    Placed1.Background = m_rndloadport[0].m_diPlaced.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
-                    Present1.Background = m_rndloadport[0].m_diPresent.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
-                    //Load1.Background = m_rndloadport[0].m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
-                    //UnLoad1.Background = m_rndloadport[0].m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
-                    Alarm1.Background = m_rndloadport[0].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
-                    Placed2.Background = m_rndloadport[1].m_diPlaced.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
-                    Present2.Background = m_rndloadport[1].m_diPresent.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
-                    //Load2.Background = m_rndloadport[1].m_bLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
-                    //UnLoad2.Background = m_rndloadport[1].m_bUnLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
-                    Alarm2.Background = m_rndloadport[1].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
-                    break;
-            }
-
-
-            Loadport1.Background = Loadport1_Check.IsChecked==true ? Brushes.AliceBlue : null;
-            Loadport2.Background = Loadport2_Check.IsChecked == true ? Brushes.AliceBlue : null;
-            //ButtonLoad1.IsEnabled = IsEnableLoad(0);
-            ButtonUnLoadReq1.IsEnabled = IsEnableUnload(0);
-            ButtonLoad2.IsEnabled = IsEnableLoad(1);
-            ButtonUnLoadReq2.IsEnabled = IsEnableUnload(1);
-        }
-        #endregion
         #region Button Load UnLoad
         BackgroundWorker m_bgwLoad = new BackgroundWorker();
         void InitButtonLoad()
@@ -222,19 +171,6 @@ namespace Root_AOP01_Inspection
             //        EQ.p_eState = EQ.eState.Run;
             //        break;
             //}
-        }
-        #endregion
-        #region Loadport Check Box
-        private void LP1CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            if(Loadport2_Check.IsChecked==true)
-                Loadport2_Check.IsChecked = false;
-        }
-
-        private void LP2CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            if(Loadport1_Check.IsChecked==true)
-                Loadport1_Check.IsChecked = false;
         }
         #endregion
         #region Recipe List
