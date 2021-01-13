@@ -15,6 +15,7 @@ namespace RootTools_Vision
     [XmlInclude(typeof(D2DParameter))]
     [XmlInclude(typeof(SurfaceParameter))]
     [XmlInclude(typeof(PositionParameter))]
+    [XmlInclude(typeof(EdgeSurfaceParameter))]
     //[XmlType(TypeName = "Parameter")]
     public abstract class ParameterBase : ObservableObject, IComparable<ParameterBase>, IRecipe
     {
