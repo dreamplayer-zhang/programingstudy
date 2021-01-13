@@ -23,8 +23,8 @@ namespace Root_EFEM.Module
         public DIO_I m_diReady;
         public DIO_I m_diRun;
         public OHT_Semi m_OHT;
-        public bool m_bLoadCheck = false;
-        public bool m_bUnLoadCheck = false;
+        //public bool m_bLoadCheck = false;
+        //public bool m_bUnLoadCheck = false;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");

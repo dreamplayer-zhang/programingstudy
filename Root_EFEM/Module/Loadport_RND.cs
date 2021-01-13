@@ -14,12 +14,12 @@ namespace Root_EFEM.Module
     public class Loadport_RND : ModuleBase, IWTRChild, ILoadport
     {
         #region ToolBox
-        DIO_I m_diPlaced;
-        DIO_I m_diPresent;
-        DIO_I m_diLoad;
-        DIO_I m_diUnload;
-        DIO_I m_diDoorOpen;
-        DIO_I m_diDocked;
+        public DIO_I m_diPlaced;
+        public DIO_I m_diPresent;
+        public DIO_I m_diLoad;
+        public DIO_I m_diUnload;
+        public DIO_I m_diDoorOpen;
+        public DIO_I m_diDocked;
         RS232 m_rs232;
         OHT m_OHT; 
         public override void GetTools(bool bInit)

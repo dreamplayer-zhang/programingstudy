@@ -15,6 +15,7 @@
         Background="Gray">
     <Window.Resources>
         <converter:BoolToRunColorConverter x:Key="BoolToRunColorConverters" />
+
     </Window.Resources>
     <Grid Background="{StaticResource PanelBackGround}"
           Margin="1">
@@ -172,10 +173,10 @@
                             <Button Content="Load" Name="ButtonLoad1"
                                     Margin="3,0"
                                     Style="{StaticResource SetupPanelBtn}" Click="ButtonLoad1_Click" />
-                            <Button Content="Unload" Name="ButtonUnLoad1"
+                            <Button Content="UnloadRequest" Name="ButtonUnLoadReq1"
                                     Margin="3,0"
                                     Grid.Column="1"
-                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoad1_Click" />
+                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoadReq1_Click" />
                         </Grid>
                     </Grid>
                 </GroupBox>
@@ -274,10 +275,10 @@
                             <Button Content="Load" Name="ButtonLoad2"
                                     Margin="3,0"
                                     Style="{StaticResource SetupPanelBtn}" Click="ButtonLoad2_Click" />
-                            <Button Content="Unload" Name="ButtonUnLoad2"
+                            <Button Content="UnloadRequest" Name="ButtonUnLoadReq2"
                                     Margin="3,0"
                                     Grid.Column="1"
-                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoad2_Click" />
+                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoadReq2_Click" />
                         </Grid>
                     </Grid>
                 </GroupBox>
@@ -329,8 +330,14 @@
                                         Style="{StaticResource SetupPanelBtn}" Click="ButtonSearch_Click" VerticalAlignment="Top" />
                             </Grid>
                         </GroupBox>
+
                         <ListView
                             Grid.Row="1" x:Name="listviewRCP">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+                                </Style>
+                            </ListView.ItemContainerStyle>
                             <ListView.View>
                                 <GridView ColumnHeaderContainerStyle="{StaticResource ResourceKey=BasicGridViewColumn}">
                                     <GridViewColumn Width="40" Header="No.">
@@ -747,18 +754,18 @@
                             </Border>
 
                         </Grid>
-                        <GroupBox Margin="10,0,10,5" Grid.Row="1">
+                        <GroupBox Margin="10,0,10,5" Grid.Row="2">
                             <GroupBox.Header>
                                 <TextBlock Text="Option" />
                             </GroupBox.Header>
-                            <UniformGrid Margin="10,5" Columns="2">
-                                <CheckBox Content="Option1" />
-                                <CheckBox Content="Option2" />
-                                <CheckBox Content="Option3" />
-                                <CheckBox Content="Option4" />
-                                <CheckBox Content="Option5" />
-                                <CheckBox Content="Option6" />
-                                <CheckBox Content="Option7" />
+                            <UniformGrid Margin="10,5">
+                                <StackPanel x:Name="Test" Orientation="Vertical">
+                                    <CheckBox Name="RNRMode" Margin="10" Content="RNR Mode" IsChecked="{Binding p_bRnR}"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Name="RNRCount" Text=" RnR Count = " VerticalAlignment="Center"/>
+                                        <TextBox Text="{Binding p_nRnR}" IsEnabled="{Binding ElementName=RNRMode, Path=IsChecked}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left" />
+                                    </StackPanel>
+                                </StackPanel>
                             </UniformGrid>
                         </GroupBox>
                     </Grid>
