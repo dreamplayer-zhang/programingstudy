@@ -112,18 +112,7 @@ namespace Root_AOP01_Inspection.Module
 
 				workBundle = new WorkBundle();
 
-				//Position position = new Position();
-				//PositionParameter posParam = new PositionParameter();
-				//_recipe.ParameterItemList.Add(posParam);
-				//position.SetRecipe(_recipe);
-				//workBundle.Add(position);
-
 				BacksideSurface surface = new BacksideSurface();
-				BacksideSurfaceParameter surParam = new BacksideSurfaceParameter();
-				surParam.IsBright = false;
-				surParam.Intensity = 80;
-				surParam.Size = 1;
-				recipe.ParameterItemList.Add(surParam);
 				surface.SetRecipe(recipe);
 
 				workBundle.Add(surface);

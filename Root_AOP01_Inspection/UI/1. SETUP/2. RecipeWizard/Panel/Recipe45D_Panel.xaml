@@ -21,9 +21,6 @@
 					<Button Content="Set Center"
                             Command="{Binding commandSetCenter}"
                             Style="{StaticResource SetupPanelBtn}"/>
-					<Button Content="Start Recipe Teaching"
-                            Command="{Binding commandStartTeaching}"
-                            Style="{StaticResource SetupPanelBtn}"/>
 					<Button Content="Inspection"
                             Command="{Binding commandInspTest}"
                             Style="{StaticResource SetupPanelBtn}"/>
@@ -134,16 +131,21 @@
                                                     <RowDefinition/>
                                                     <RowDefinition/>
                                                 </Grid.RowDefinitions>
-                                                <TextBlock FontSize="12" Text="Use Absolute GV" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                                <TextBlock FontSize="12" Text="Pit Level" Style="{StaticResource BasicTb}" Grid.Row="3"/>
+                                                <TextBlock FontSize="12" Text="Birght Inspection" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                                <!--<TextBlock FontSize="12" Text="Pit Level" Style="{StaticResource BasicTb}" Grid.Row="3"/>-->
                                                 <TextBlock FontSize="12" Text="GV" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                                 <TextBlock FontSize="12" Text="Size" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                                <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
-                                                      VerticalAlignment="Center"
-                                                      HorizontalAlignment="Center" Width="85"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="1" Text="80"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="2" Text="10"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="3" Text="1"/>
+                                                <ToggleButton Content="{Binding BrightGV}" Grid.Row="0" Grid.Column="1" 
+                                                      VerticalAlignment="Stretch"
+                                                      HorizontalAlignment="Center" Width="85"
+															  Margin="0,5"
+															  IsChecked="{Binding AbsoluteGV}"/>
+                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="1" 
+														 Text="{Binding SurfaceGV}"/>
+                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="2" 
+														 Text="{Binding SurfaceSize}"/>
+                                                <!--<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="3" 
+														 Text="{Binding PitLevel}"/>-->
                                             </Grid>
                                         </GroupBox>
                                         <GroupBox Header="Defect Code" Grid.Row="1">
