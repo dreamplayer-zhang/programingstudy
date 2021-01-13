@@ -208,12 +208,12 @@ namespace RootTools.Module
                 case eState.Home:
                     p_bEnableHome = false;
                     p_sRun = "Stop";
-                    if (p_eRemote != eRemote.Client)
-                    {
+                    //if (p_eRemote != eRemote.Client)
+                    //{
                         string sStateHome = StateHome();
                         if (sStateHome == "OK") p_eState = eState.Ready;
                         else StopHome();
-                    }
+                    //}
                     break;
                 case eState.Ready:
                     p_bEnableHome = true;

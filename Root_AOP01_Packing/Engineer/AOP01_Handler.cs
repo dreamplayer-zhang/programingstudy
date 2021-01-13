@@ -37,12 +37,16 @@ namespace Root_AOP01_Packing
         public VacuumPacker m_vacuumPacker;
         public IndividualElevator m_elevator;
         public Unloadport_AOP m_unloadport;
+        public Vision_AOP m_visionAOP;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             InitWTR(); 
             InitLoadport();
 
+            m_visionAOP = new Vision_AOP("Vision", m_engineer);
+            InitModule(m_visionAOP);
+            
             m_tapePacker = new TapePacker("TapePacker", m_engineer);
             InitModule(m_tapePacker);
             ((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);

@@ -18,11 +18,13 @@ namespace Root_EFEM.Module
         RS232 m_rs232;
         public DIO_I m_diPlaced;
         public DIO_I m_diPresent;
-        DIO_I m_diOpen;
-        DIO_I m_diClose;
-        DIO_I m_diReady;
-        DIO_I m_diRun;
-        public OHT_Semi m_OHT; 
+        public DIO_I m_diOpen;
+        public DIO_I m_diClose;
+        public DIO_I m_diReady;
+        public DIO_I m_diRun;
+        public OHT_Semi m_OHT;
+        public bool m_bLoadCheck = false;
+        public bool m_bUnLoadCheck = false;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");

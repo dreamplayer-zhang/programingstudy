@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_AOP01_Inspection"
         xmlns:icon="clr-namespace:Root_AOP01_Inspection.Icon"
+        xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
         mc:Ignorable="d"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -12,6 +13,9 @@
         Height="800"
         Width="1200"
         Background="Gray">
+    <Window.Resources>
+        <converter:BoolToRunColorConverter x:Key="BoolToRunColorConverters" />
+    </Window.Resources>
     <Grid Background="{StaticResource PanelBackGround}"
           Margin="1">
         <Grid.RowDefinitions>
@@ -64,7 +68,7 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <GroupBox Header="Loadport 1">
-                    <Grid Background="AliceBlue">
+                    <Grid Name="Loadport1">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="2*"/>
                             <RowDefinition Height="2*"/>
@@ -93,79 +97,90 @@
                                  VerticalAlignment="Top"
                                  HorizontalAlignment="Right"
                                  Width="15" Height="15">
-                            <CheckBox IsChecked="True"/>
+                            <CheckBox Name="Loadport1_Check" IsChecked="false" Checked="LP1CheckBox_Checked"/>
                         </Viewbox>
                         <Grid Grid.Row="1">
-                            <UniformGrid Columns="4"
-                                         Rows="2">
-                                <Grid Margin="3"
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <!--<UniformGrid Columns="4"
+                                         Rows="2">-->
+                            <Grid Margin="3" x:Name="AccessManual1" Grid.Column="0" Grid.Row="0" 
                                       Background="LightGray">
-                                    <TextBlock Text="Manual"
+                                <TextBlock Text="Manual"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
+                            </Grid>
+                            <Grid Margin="3" x:Name="AccessAuto1" Grid.Column="1" Grid.Row="0"
                                       Background="LightGray">
-                                    <TextBlock Text="Auto"
+                                <TextBlock Text="Auto"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
+                            </Grid>
+                            <Grid Margin="3" x:Name="Present1" Grid.Column="2" Grid.Row="0"
                                       Background="LightGray">
-                                    <TextBlock Text="Present"
+                                <TextBlock Text="Present"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
+                            </Grid>
+                            <Grid Margin="3" x:Name="Placed1" Grid.Column="3" Grid.Row="0" 
                                       Background="LightGray">
-                                    <TextBlock Text="Placed"
+                                <TextBlock Text="Placed" 
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center">
+                                </TextBlock>
+                            </Grid>
+                            <Grid Margin="3" x:Name="Load1" Grid.Column="0" Grid.Row="1"
+                                      Background="LightGray">
+                                <TextBlock Text="Load"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
+                            </Grid>
+                            <Grid Margin="3" x:Name="UnLoad1" Grid.Column="1" Grid.Row="1"
                                       Background="LightGray">
-                                    <TextBlock Text="Load"
+                                <TextBlock Text="Unload"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
+                            </Grid>
+                            <Grid Margin="3"  Grid.Column="2" Grid.Row="1"
                                       Background="LightGray">
-                                    <TextBlock Text="Unload"
+                                <TextBlock Text="Reserve"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
+                            </Grid>
+                            <Grid Margin="3" x:Name="Alarm1" Grid.Column="3" Grid.Row="1"
                                       Background="LightGray">
-                                    <TextBlock Text="Reserve"
+                                <TextBlock Text="Alarm"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
-                                      Background="LightGray">
-                                    <TextBlock Text="Alarm"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
+                            </Grid>
 
-                            </UniformGrid>
+                            <!--</UniformGrid>-->
                         </Grid>
                         <Grid Grid.Row="2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <Button Content="Load"
+                            <Button Content="Load" Name="ButtonLoad1"
                                     Margin="3,0"
-                                    Style="{StaticResource SetupPanelBtn}" />
-                            <Button Content="Unload"
+                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonLoad1_Click" />
+                            <Button Content="Unload" Name="ButtonUnLoad1"
                                     Margin="3,0"
                                     Grid.Column="1"
-                                    Style="{StaticResource SetupPanelBtn}" />
+                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoad1_Click" />
                         </Grid>
                     </Grid>
                 </GroupBox>
                 <GroupBox Header="Loadport 2" Grid.Row="1">
-                    <Grid>
+                    <Grid Name="Loadport2">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="2*" />
                             <RowDefinition Height="2*"/>
@@ -195,42 +210,42 @@
                                  HorizontalAlignment="Right"
                                  Width="15"
                                  Height="15">
-                            <CheckBox IsChecked="False" />
+                            <CheckBox Name="Loadport2_Check" IsChecked="False" Checked="LP2CheckBox_Checked" />
                         </Viewbox>
                         <Grid Grid.Row="1">
                             <UniformGrid Columns="4"
                                          Rows="2">
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="AccessManual2"
                                       Background="LightGray">
                                     <TextBlock Text="Manual"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="AccessAuto2"
                                       Background="LightGray">
                                     <TextBlock Text="Auto"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="Present2"
                                       Background="LightGray">
                                     <TextBlock Text="Present"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="Placed2"
                                       Background="LightGray">
                                     <TextBlock Text="Placed"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="Load2"
                                       Background="LightGray">
                                     <TextBlock Text="Load"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="UnLoad2"
                                       Background="LightGray">
                                     <TextBlock Text="Unload"
                                                VerticalAlignment="Center"
@@ -242,7 +257,7 @@
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="Alarm2"
                                       Background="LightGray">
                                     <TextBlock Text="Alarm"
                                                VerticalAlignment="Center"
@@ -256,13 +271,13 @@
                                 <ColumnDefinition />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <Button Content="Load"
+                            <Button Content="Load" Name="ButtonLoad2"
                                     Margin="3,0"
-                                    Style="{StaticResource SetupPanelBtn}" />
-                            <Button Content="Unload"
+                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonLoad2_Click" />
+                            <Button Content="Unload" Name="ButtonUnLoad2"
                                     Margin="3,0"
                                     Grid.Column="1"
-                                    Style="{StaticResource SetupPanelBtn}" />
+                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoad2_Click" />
                         </Grid>
                     </Grid>
                 </GroupBox>
@@ -308,13 +323,42 @@
                                     <TextBox Grid.Column="1"
                                              IsEnabled="{Binding ElementName=cbRecipe, Path=IsChecked}" />
                                 </Grid>
-                                <Button Content="Search" Grid.Row="2"
+                                <Button Content="Search" Grid.Row="2" Name="ButtonSearch"
                                         Height="30" Margin="3,0"
                                         Command="{Binding btnSearch}"
-                                        Style="{StaticResource SetupPanelBtn}" />
+                                        Style="{StaticResource SetupPanelBtn}" Click="ButtonSearch_Click" VerticalAlignment="Top" />
                             </Grid>
                         </GroupBox>
-                        <DataGrid IsReadOnly="True"
+                        <ListView
+                            Grid.Row="1" x:Name="listviewRCP">
+                            <ListView.View>
+                                <GridView ColumnHeaderContainerStyle="{StaticResource ResourceKey=BasicGridViewColumn}">
+                                    <GridViewColumn Width="40" Header="No.">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding p_nNumber}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="150" Header="Recipe">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding p_sRecipeName}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="300" Header="Date">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding p_sDate}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                    <!--<DataGrid IsReadOnly="True"
                                   Grid.Row="1">
                             <DataGrid.Resources>
                                 <Style TargetType="DataGridColumnHeader">
@@ -324,7 +368,7 @@
                                             Value="Center" />
                                 </Style>
                             </DataGrid.Resources>
-                            <DataGrid.Columns>
+                            --><!--<DataGrid.Columns>
                                 <DataGridTextColumn  Header="No."
                                                      Binding="{Binding Path=a}"
                                                      Width="0.4*" />
@@ -334,8 +378,8 @@
                                 <DataGridTextColumn  Header="Date"
                                                      Binding="{Binding Path=b}"
                                                      Width="1.2*" />
-                            </DataGrid.Columns>
-                            <local:Dummy a="0"
+                            </DataGrid.Columns>-->
+                            <!--<local:Dummy a="0"
                                          b="2020-11-27-05:55"
                                          c="Reticle001"
                                          d="Recipe001.rcp" />
@@ -358,9 +402,8 @@
                             <local:Dummy a="5"
                                          b="2020-11-27-11:34"
                                          c="Reticle004"
-                                         d="Recipe004.rcp" />
-                        </DataGrid>
-                    </Grid>
+                                         d="Recipe004.rcp" />--><!--
+                        </DataGrid>-->
                 </GroupBox>
             </Grid>
             <Grid Grid.Column="2">
@@ -373,337 +416,337 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="2*"/>
                             <RowDefinition />
-                        </Grid.RowDefinitions>    
-                        <Grid Margin="10,5" Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1.5*" />
-                            <ColumnDefinition Width="4.5*" />
-                            <ColumnDefinition Width="4*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Border BorderBrush="Gray"
+                        <Grid Margin="10,5" Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*" />
+                                <ColumnDefinition Width="4.5*" />
+                                <ColumnDefinition Width="4*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="1"
                                 Grid.Column="0">
-                            <TextBlock Text="Enable"
+                                <TextBlock Text="Enable"
                                        Margin="3"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="0,1,1,1"
                                 Grid.Column="1">
-                            <TextBlock Text="Inspection Item"
+                                <TextBlock Text="Inspection Item"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="0,1,1,1"
                                 Grid.Column="2">
-                            <TextBlock Text="Value"
+                                <TextBlock Text="Value"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="1,0,1,1"
                                 Grid.Row="1">
-                            <CheckBox VerticalAlignment="Center"
+                                <CheckBox VerticalAlignment="Center"
                                       HorizontalAlignment="Center"
                                       IsEnabled="False"
                                       IsChecked="True"
                                       Margin="3"/>
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="1,0,1,1"
                                 Grid.Row="2">
-                            <CheckBox VerticalAlignment="Center"
+                                <CheckBox VerticalAlignment="Center"
                                       HorizontalAlignment="Center"
                                       Margin="3"/>
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="1,0,1,1"
                                 Grid.Row="3">
-                            <CheckBox VerticalAlignment="Center"
+                                <CheckBox VerticalAlignment="Center"
                                       HorizontalAlignment="Center"
                                       Margin="3"/>
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="1,0,1,1"
                                 Grid.Row="4">
-                            <CheckBox VerticalAlignment="Center"
+                                <CheckBox VerticalAlignment="Center"
                                       HorizontalAlignment="Center"
                                       Margin="3" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="1,0,1,1"
                                 Grid.Row="5">
-                            <CheckBox VerticalAlignment="Center"
+                                <CheckBox VerticalAlignment="Center"
                                       HorizontalAlignment="Center"
                                       Margin="3" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="1,0,1,1"
                                 Grid.Row="6">
-                            <CheckBox VerticalAlignment="Center"
+                                <CheckBox VerticalAlignment="Center"
                                       HorizontalAlignment="Center"
                                       Margin="3" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="1,0,1,1"
                                 Grid.Row="7">
-                            <CheckBox VerticalAlignment="Center"
+                                <CheckBox VerticalAlignment="Center"
                                       HorizontalAlignment="Center"
                                       Margin="3" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="1,0,1,1"
                                 Grid.Row="8">
-                            <CheckBox VerticalAlignment="Center"
+                                <CheckBox VerticalAlignment="Center"
                                       HorizontalAlignment="Center"
                                       Margin="3"/>
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="1,0,1,1"
                                 Grid.Row="9">
-                            <CheckBox VerticalAlignment="Center"
+                                <CheckBox VerticalAlignment="Center"
                                       HorizontalAlignment="Center"
                                       Margin="3"/>
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="0,0,1,1"
                                 Grid.Column="1"
                                 Grid.Row="1">
-                            <TextBlock Style="{StaticResource BasicTb}"
+                                <TextBlock Style="{StaticResource BasicTb}"
                                        Text="Edge Broken" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="0,0,1,1"
                                 Grid.Column="1"
                                 Grid.Row="2">
-                            <TextBlock Style="{StaticResource BasicTb}"
+                                <TextBlock Style="{StaticResource BasicTb}"
                                        Text="Pattern Array Shift" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="0,0,1,1"
                                 Grid.Column="1"
                                 Grid.Row="3">
-                            <TextBlock Style="{StaticResource BasicTb}"
+                                <TextBlock Style="{StaticResource BasicTb}"
                                        Text="Pateern Discolor" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="0,0,1,1"
                                 Grid.Column="1"
                                 Grid.Row="4">
-                            <TextBlock Style="{StaticResource BasicTb}"
+                                <TextBlock Style="{StaticResource BasicTb}"
                                        Text="Barcode Scratch" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="0,0,1,1"
                                 Grid.Column="1"
                                 Grid.Row="5">
-                            <TextBlock Style="{StaticResource BasicTb}"
+                                <TextBlock Style="{StaticResource BasicTb}"
                                        Text="Align Key Exist" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="0,0,1,1"
                                 Grid.Column="1"
                                 Grid.Row="6">
-                            <TextBlock Style="{StaticResource BasicTb}"
+                                <TextBlock Style="{StaticResource BasicTb}"
                                        Text="Pellicle Shift" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="0,0,1,1"
                                 Grid.Column="1"
                                 Grid.Row="7">
-                            <TextBlock Style="{StaticResource BasicTb}"
+                                <TextBlock Style="{StaticResource BasicTb}"
                                        Text="Pellicle Haze" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="0,0,1,1"
                                 Grid.Column="1"
                                 Grid.Row="8">
-                            <TextBlock Style="{StaticResource BasicTb}"
+                                <TextBlock Style="{StaticResource BasicTb}"
                                        Text="Pellicle Expanding" />
-                        </Border>
-                        <Border BorderBrush="Gray"
+                            </Border>
+                            <Border BorderBrush="Gray"
                                 BorderThickness="0,0,1,1"
                                 Grid.Column="1"
                                 Grid.Row="9">
-                            <TextBlock Style="{StaticResource BasicTb}"
+                                <TextBlock Style="{StaticResource BasicTb}"
                                        Text="Pellicle Frontside" />
-                        </Border>
-                        <Border Grid.Column="2"
+                            </Border>
+                            <Border Grid.Column="2"
                                 Grid.Row="1"
 
                                 BorderBrush="Gray"
                                 BorderThickness="0,0,1,1">
-                            <Grid>
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text=">"
                                            Margin="45,0" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="0"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="mm"
                                            Margin="40,0"
                                            HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
-                        <Border Grid.Column="2"
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2"
                                 Grid.Row="2"
                                 BorderBrush="Gray"
                                 BorderThickness="0,0,1,1">
-                            <Grid>
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text=">"
                                            Margin="45,0" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="0"
                                            HorizontalAlignment="Center" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="mm"
                                            Margin="40,0"
                                            HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
-                        <Border Grid.Column="2"
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2"
                                 Grid.Row="3"
                                 BorderBrush="Gray"
                                 BorderThickness="0,0,1,1">
-                            <Grid>
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text=">"
                                            Margin="45,0" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="0"
                                            HorizontalAlignment="Center" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="mm"
                                            Margin="40,0"
                                            HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
-                        <Border Grid.Column="2"
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2"
                                 Grid.Row="4"
                                 
                                 BorderBrush="Gray"
                                 BorderThickness="0,0,1,1">
-                            <Grid>
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text=">"
                                            Margin="45,0" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="0"
                                            HorizontalAlignment="Center" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="mm"
                                            Margin="40,0"
                                            HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
-                        <Border Grid.Column="2"
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2"
                                 Grid.Row="5"
                                 
                                 BorderBrush="Gray"
                                 BorderThickness="0,0,1,1">
-                            <Grid>
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text=">"
                                            Margin="45,0" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="0"
                                            HorizontalAlignment="Center" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="um"
                                            Margin="40,0"
                                            HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
-                        <Border Grid.Column="2"
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2"
                                 Grid.Row="6"
                                 
                                 BorderBrush="Gray"
                                 BorderThickness="0,0,1,1">
-                            <Grid>
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text=">"
                                            Margin="45,0" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="0"
                                            HorizontalAlignment="Center" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="mm"
                                            Margin="40,0"
                                            HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
-                        <Border Grid.Column="2"
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2"
                                 Grid.Row="7"
                                 
                                 BorderBrush="Gray"
                                 BorderThickness="0,0,1,1">
-                            <Grid>
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text=">"
                                            Margin="45,0" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="0"
                                            HorizontalAlignment="Center" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="mm"
                                            Margin="40,0"
                                            HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
-                        <Border Grid.Column="2"
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2"
                                 Grid.Row="8"
                                 
                                 BorderBrush="Gray"
                                 BorderThickness="0,0,1,1">
-                            <Grid>
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text=">"
                                            Margin="45,0" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="0"
                                            HorizontalAlignment="Center" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="um"
                                            Margin="40,0"
                                            HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
-                        <Border Grid.Column="2"
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2"
                                 Grid.Row="9"
                                 
                                 BorderBrush="Gray"
                                 BorderThickness="0,0,1,1">
-                            <Grid>
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text=">"
                                            Margin="45,0" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="0"
                                            HorizontalAlignment="Center" />
-                                <TextBlock Style="{StaticResource BasicTb}"
+                                    <TextBlock Style="{StaticResource BasicTb}"
                                            Text="um"
                                            Margin="40,0"
                                            HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
+                                </Grid>
+                            </Border>
 
-                    </Grid>
+                        </Grid>
                         <GroupBox Margin="10,0,10,5" Grid.Row="1">
                             <GroupBox.Header>
                                 <TextBlock Text="Option" />
