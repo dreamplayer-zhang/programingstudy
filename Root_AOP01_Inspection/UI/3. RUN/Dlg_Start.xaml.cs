@@ -14,6 +14,8 @@ using RootTools.Gem;
 using System.Threading;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Text;
+using RootTools.Trees;
 
 namespace Root_AOP01_Inspection
 {
@@ -29,7 +31,10 @@ namespace Root_AOP01_Inspection
         WTRCleanUnit m_wtrcleanunit;
         WTRArm m_wtr;
         Arm m_arm;
+        RNR m_aRnR;
         Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
+        Loadport_RND[] m_rndloadport = new Loadport_RND[2];
+        AOP01_Handler.eLoadport LoadportType;
         public Dlg_Start()
         {
             InitializeComponent();
@@ -45,6 +50,7 @@ namespace Root_AOP01_Inspection
         public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
             Loadport_Cymechs loadport2, AOP01_Engineer engineer)
         {
+            m_aRnR = new RNR();
             m_aRecipe = new ObservableCollection<Recipe>();
             m_engineer = engineer;
             m_handler = engineer.m_handler;
@@ -56,7 +62,31 @@ namespace Root_AOP01_Inspection
             m_loadport[0] = loadport1;
             m_loadport[1] = loadport2;
             listviewRCP.ItemsSource = m_aRecipe;
-
+            LoadportType = AOP01_Handler.eLoadport.Cymechs;
+            //RNRCount.DataContext = m_aRnR;
+            //RNRMode.DataContext = m_aRnR;
+            Test.DataContext = m_aRnR;
+            InitButtonLoad();
+            InitTimer();
+        }
+        public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_RND loadport1,
+            Loadport_RND loadport2, AOP01_Engineer engineer)
+        {
+            RNR m_aRnR = new RNR();
+            m_aRecipe = new ObservableCollection<Recipe>();
+            m_engineer = engineer;
+            m_handler = engineer.m_handler;
+            m_recipe = engineer.m_handler.m_recipe;
+            m_arm = wtrcleanunit.m_dicArm[0];
+            m_wtrcleanunit = wtrcleanunit;
+            m_wtr = m_wtrcleanunit.p_aArm[0];
+            m_mainvision = mainvision;
+            m_rndloadport[0] = loadport1;
+            m_rndloadport[1] = loadport2;
+            listviewRCP.ItemsSource = m_aRecipe;
+            LoadportType = AOP01_Handler.eLoadport.RND;
+            //RNRCount.DataContext = m_aRnR;
+            //RNRMode.DataContext = m_aRnR;
             InitButtonLoad();
             InitTimer();
         }
@@ -73,22 +103,41 @@ namespace Root_AOP01_Inspection
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            Placed1.Background = m_loadport[0].m_diPlaced.p_bIn == true? Brushes.SteelBlue : Brushes.LightGray;
-            Present1.Background = m_loadport[0].m_diPresent.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
-            Load1.Background = m_loadport[0].m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
-            UnLoad1.Background = m_loadport[0].m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
-            Alarm1.Background = m_loadport[0].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
-            Placed2.Background = m_loadport[1].m_diPlaced.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
-            Present2.Background = m_loadport[1].m_diPresent.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
-            Load2.Background = m_loadport[1].m_bLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
-            UnLoad2.Background = m_loadport[1].m_bUnLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
-            Alarm2.Background = m_loadport[1].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
+            switch(LoadportType)
+            {
+                case AOP01_Handler.eLoadport.Cymechs:
+                    Placed1.Background = m_loadport[0].m_diPlaced.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
+                    Present1.Background = m_loadport[0].m_diPresent.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
+                    //Load1.Background = m_loadport[0].m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
+                    //UnLoad1.Background = m_loadport[0].m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
+                    Alarm1.Background = m_loadport[0].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
+                    Placed2.Background = m_loadport[1].m_diPlaced.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
+                    Present2.Background = m_loadport[1].m_diPresent.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
+                    //Load2.Background = m_loadport[1].m_bLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
+                    //UnLoad2.Background = m_loadport[1].m_bUnLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
+                    Alarm2.Background = m_loadport[1].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
+                    break;
+                case AOP01_Handler.eLoadport.RND:
+                    Placed1.Background = m_rndloadport[0].m_diPlaced.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
+                    Present1.Background = m_rndloadport[0].m_diPresent.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
+                    //Load1.Background = m_rndloadport[0].m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
+                    //UnLoad1.Background = m_rndloadport[0].m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
+                    Alarm1.Background = m_rndloadport[0].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
+                    Placed2.Background = m_rndloadport[1].m_diPlaced.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
+                    Present2.Background = m_rndloadport[1].m_diPresent.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
+                    //Load2.Background = m_rndloadport[1].m_bLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
+                    //UnLoad2.Background = m_rndloadport[1].m_bUnLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
+                    Alarm2.Background = m_rndloadport[1].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
+                    break;
+            }
+
+
             Loadport1.Background = Loadport1_Check.IsChecked==true ? Brushes.AliceBlue : null;
             Loadport2.Background = Loadport2_Check.IsChecked == true ? Brushes.AliceBlue : null;
-            ButtonLoad1.IsEnabled = IsEnableLoad(0);
-            ButtonUnLoad1.IsEnabled = IsEnableUnload(0);
+            //ButtonLoad1.IsEnabled = IsEnableLoad(0);
+            ButtonUnLoadReq1.IsEnabled = IsEnableUnload(0);
             ButtonLoad2.IsEnabled = IsEnableLoad(1);
-            ButtonUnLoad2.IsEnabled = IsEnableUnload(1);
+            ButtonUnLoadReq2.IsEnabled = IsEnableUnload(1);
         }
         #endregion
         #region Button Load UnLoad
@@ -121,12 +170,13 @@ namespace Root_AOP01_Inspection
 
         private void ButtonLoad1_Click(object sender, RoutedEventArgs e)
         {
+            m_handler.m_nRnR = m_aRnR.p_bRnR ? m_aRnR.p_nRnR : 1;
             if (IsEnableLoad(0) == false) return;
             //if (m_manualjob.ShowPopup() == false) return;
             m_bgwLoad.RunWorkerAsync();
         }
 
-        private void ButtonUnLoad1_Click(object sender, RoutedEventArgs e)
+        private void ButtonUnLoadReq1_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableUnload(0) == false) return;
             //m_loadport[0].m_ceidUnload.Send();
@@ -139,7 +189,7 @@ namespace Root_AOP01_Inspection
             m_bgwLoad.RunWorkerAsync();
         }
 
-        private void ButtonUnLoad2_Click(object sender, RoutedEventArgs e)
+        private void ButtonUnLoadReq2_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableUnload(1) == false) return;
             //m_loadport.m_ceidUnload.Send();
@@ -148,16 +198,16 @@ namespace Root_AOP01_Inspection
        
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            //ModuleRunBase moduleRun = m_loadport[0].m_runReadPodID.Clone();
-            //m_loadport[0].StartRun(moduleRun);
-            //Thread.Sleep(100);
-            //while ((EQ.IsStop() != true) && m_loadport[0].m_qModuleRun.Count > 0) Thread.Sleep(10);
-            //while ((EQ.IsStop() != true) && m_loadport[0].p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
-            //moduleRun = m_loadport[0].m_runLoad.Clone();
-            //m_loadport.StartRun(moduleRun);
-            //Thread.Sleep(100);
-            //while ((EQ.IsStop() != true) && m_loadport.m_qModuleRun.Count > 0) Thread.Sleep(10);
-            //while ((EQ.IsStop() != true) && m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+        //    ModuleRunBase moduleRun = m_loadport[0].m_runReadPodID.Clone();
+        //    m_loadport[0].StartRun(moduleRun);
+        //    Thread.Sleep(100);
+        //    while ((EQ.IsStop() != true) && m_loadport[0].m_qModuleRun.Count > 0) Thread.Sleep(10);
+        //    while ((EQ.IsStop() != true) && m_loadport[0].p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+        //    moduleRun = m_loadport[0].m_runLoad.Clone();
+        //    m_loadport[0].StartRun(moduleRun);
+        //    Thread.Sleep(100);
+        //    while ((EQ.IsStop() != true) && m_loadport.m_qModuleRun.Count > 0) Thread.Sleep(10);
+        //    while ((EQ.IsStop() != true) && m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
         }
 
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -190,7 +240,7 @@ namespace Root_AOP01_Inspection
         #region Recipe List
         public class Recipe : NotifyProperty
         {
-            int _nNumber = 0;
+            int _nNumber = 1;
             public int p_nNumber
             {
                 get { return _nNumber; }
@@ -230,13 +280,44 @@ namespace Root_AOP01_Inspection
             {
                 FileInfo file = new FileInfo(files);
                 string rcpname = file.Name;
-                AddRecipe(rcpname, file.CreationTime.ToString());
+                AddRecipe(rcpname, file.LastWriteTime.ToString());
             }
         }
-        
-        public void FindRecipe()
+        void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {  
+            Recipe typeItem = (Recipe)listviewRCP.SelectedItem;
+            string sRecipeName = typeItem.p_sRecipeName.ToString();
+            string sRecipe = m_recipe.m_sPath + sRecipeName;
+            m_recipe.m_moduleRunList.OpenJob(sRecipe);
+            m_recipe.m_moduleRunList.RunTree(Tree.eMode.Init);
+        }
+        #endregion
+
+        #region RnR Property
+        public class RNR : NotifyProperty
         {
-           
+
+            bool _bRnR = false;
+            public bool p_bRnR
+            {
+                get { return _bRnR; }
+                set
+                {
+                    _bRnR = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            int _nRnR = 1;
+            public int p_nRnR
+            {
+                get { return _nRnR; }
+                set
+                {
+                    _nRnR = value;
+                    OnPropertyChanged();
+                }
+            }
         }
         #endregion
     }
