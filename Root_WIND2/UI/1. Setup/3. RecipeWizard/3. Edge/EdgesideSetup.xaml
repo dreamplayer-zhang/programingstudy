@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Root_WIND2.EdgeSetupPage"
+﻿<UserControl x:Class="Root_WIND2.EdgesideSetup"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -132,21 +132,13 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
                                     <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock FontSize="12" Text="R" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                <TextBlock FontSize="12" Text="G" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                <TextBlock FontSize="12" Text="B" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                <TextBlock FontSize="12" Text="White" Style="{StaticResource BasicTb}" Grid.Row="3"/>
+                                <TextBlock FontSize="12" Text="White" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                <TextBlock FontSize="12" Text="Side" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                 <Slider Grid.Column="1" Grid.Row="0" VerticalAlignment="Center"/>
                                 <Slider Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"/>
-                                <Slider Grid.Column="1" Grid.Row="2" VerticalAlignment="Center"/>
-                                <Slider Grid.Column="1" Grid.Row="3" VerticalAlignment="Center"/>
                                 <TextBox Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                                 <TextBox Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                             </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="5" Header="Spec">
@@ -156,8 +148,6 @@
                                     <ColumnDefinition Width="1*"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
                                     <RowDefinition/>
                                     <RowDefinition/>
                                     <RowDefinition/>
@@ -183,14 +173,10 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                     <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock FontSize="12" Text="Intensity" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                <TextBlock FontSize="12" Text="Over GV USL" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                <TextBlock FontSize="12" Text="Under GV LSL" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                <TextBlock FontSize="12" Text="Over Size USL" Style="{StaticResource BasicTb}" Grid.Row="3"/>
-                                <TextBlock FontSize="12" Text="Under Size LSL" Style="{StaticResource BasicTb}" Grid.Row="4"/>
+                                <TextBlock FontSize="12" Text="Top" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                <TextBlock FontSize="12" Text="Side" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+                                <TextBlock FontSize="12" Text="Bottom" Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                 <ComboBox Grid.Row="0" Grid.Column="1" SelectedIndex="0" 
                                           VerticalAlignment="Center"
                                           HorizontalAlignment="Center">
@@ -214,28 +200,6 @@
                                     <ComboBoxItem Content="0x000060"/>
                                 </ComboBox>
                                 <ComboBox Grid.Row="2" Grid.Column="1" SelectedIndex="0" 
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center">
-                                    <ComboBoxItem Content="0x000000"/>
-                                    <ComboBoxItem Content="0x000010"/>
-                                    <ComboBoxItem Content="0x000020"/>
-                                    <ComboBoxItem Content="0x000030"/>
-                                    <ComboBoxItem Content="0x000040"/>
-                                    <ComboBoxItem Content="0x000050"/>
-                                    <ComboBoxItem Content="0x000060"/>
-                                </ComboBox>
-                                <ComboBox Grid.Row="3" Grid.Column="1" SelectedIndex="0" 
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center">
-                                    <ComboBoxItem Content="0x000000"/>
-                                    <ComboBoxItem Content="0x000010"/>
-                                    <ComboBoxItem Content="0x000020"/>
-                                    <ComboBoxItem Content="0x000030"/>
-                                    <ComboBoxItem Content="0x000040"/>
-                                    <ComboBoxItem Content="0x000050"/>
-                                    <ComboBoxItem Content="0x000060"/>
-                                </ComboBox>
-                                <ComboBox Grid.Row="4" Grid.Column="1" SelectedIndex="0" 
                                           VerticalAlignment="Center"
                                           HorizontalAlignment="Center">
                                     <ComboBoxItem Content="0x000000"/>

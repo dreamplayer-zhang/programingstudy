@@ -1280,13 +1280,8 @@ namespace Root_AOP01_Inspection.Module
             public CPoint m_cptBarcodeLTPoint = new CPoint(0, 0);
             public int m_nROIWidth = 1000;
             public int m_nROIHeight = 5000;
-            public int m_nGaussianBlurKernalSize = 3;
-            public double m_dGaussianBlurSigma = 1.5;
-            public AdaptiveThresholdType m_eAdabtiveThresholdType = AdaptiveThresholdType.GaussianC;
-            public ThresholdType m_eThresholdType = ThresholdType.Binary;
-            public int m_nThresholdBlockSize = 3;
-            public double m_dThresholdParam = 3;
-            public int m_nErodeSize = 3;
+            public bool m_bDarkBackground = true;
+            public int m_nThreshold = 70;
 
             public Run_BarcodeInspection(MainVision module)
             {
@@ -1300,13 +1295,8 @@ namespace Root_AOP01_Inspection.Module
                 run.m_cptBarcodeLTPoint = m_cptBarcodeLTPoint;
                 run.m_nROIWidth = m_nROIWidth;
                 run.m_nROIHeight = m_nROIHeight;
-                run.m_nGaussianBlurKernalSize = m_nGaussianBlurKernalSize;
-                run.m_dGaussianBlurSigma = m_dGaussianBlurSigma;
-                run.m_eAdabtiveThresholdType = m_eAdabtiveThresholdType;
-                run.m_eThresholdType = m_eThresholdType;
-                run.m_nThresholdBlockSize = m_nThresholdBlockSize;
-                run.m_dThresholdParam = m_dThresholdParam;
-                run.m_nErodeSize = m_nErodeSize;
+                run.m_bDarkBackground = m_bDarkBackground;
+                run.m_nThreshold = m_nThreshold;
                 return run;
             }
 
@@ -1315,6 +1305,8 @@ namespace Root_AOP01_Inspection.Module
                 m_cptBarcodeLTPoint = (tree.GetTree("Barcode ROI", false, bVisible)).Set(m_cptBarcodeLTPoint, m_cptBarcodeLTPoint, "Left Top Point", "Left Top Point", bVisible);
                 m_nROIWidth = (tree.GetTree("Barcode ROI", false, bVisible)).Set(m_nROIWidth, m_nROIWidth, "Barcode ROI Width", "Barcode ROI Width", bVisible);
                 m_nROIHeight = (tree.GetTree("Barcode ROI", false, bVisible)).Set(m_nROIHeight, m_nROIHeight, "Barcode ROI Height", "Barcode ROI Height", bVisible);
+                m_bDarkBackground = tree.Set(m_bDarkBackground, m_bDarkBackground, "Dark Background", "Dark Background", bVisible);
+                m_nThreshold = tree.Set(m_nThreshold, m_nThreshold, "Find Edge Threshold", "Find Edge Threshold", bVisible);
             }
 
             public override string Run()
@@ -1327,19 +1319,21 @@ namespace Root_AOP01_Inspection.Module
                 CRect crtHalfRight = new CRect(new CPoint(crtROI.Center().X, cptStartROIPoint.Y), cptEndROIPoint);
 
                 // ROI따기
-                int nTop = GetEdge(mem, crtROI, 50, eSearchDirection.TopToBottom, 70);
-                int nBottom = GetEdge(mem, crtROI, 50, eSearchDirection.BottomToTop, 70);
-                CRect crtTopBox = new CRect(new CPoint(cptStartROIPoint.X, cptStartROIPoint.Y + nTop), new CPoint(cptEndROIPoint.X, cptStartROIPoint.Y + nTop + 100));
-                int nLeft = GetEdge(mem, crtTopBox, 10, eSearchDirection.LeftToRight, 70);
-                int nRight = GetEdge(mem, crtTopBox, 10, eSearchDirection.RightToLeft, 70);
+                int nTop = GetEdge(mem, crtROI, 50, eSearchDirection.TopToBottom, m_nThreshold, m_bDarkBackground);
+                int nBottom = GetEdge(mem, crtROI, 50, eSearchDirection.BottomToTop, m_nThreshold, m_bDarkBackground);
+                //CRect crtTopBox = new CRect(new CPoint(cptStartROIPoint.X, cptStartROIPoint.Y + nTop), new CPoint(cptEndROIPoint.X, cptStartROIPoint.Y + nTop + 100));
+                //int nLeft = GetEdge(mem, crtTopBox, 10, eSearchDirection.LeftToRight, m_nThreshold, m_bDarkBackground);
+                //int nRight = GetEdge(mem, crtTopBox, 10, eSearchDirection.RightToLeft, m_nThreshold, m_bDarkBackground);
+                int nLeft = GetBarcodeSideEdge(mem, crtROI, 10, eSearchDirection.LeftToRight, m_nThreshold, m_bDarkBackground);
+                int nRight = GetBarcodeSideEdge(mem, crtROI, 10, eSearchDirection.RightToLeft, m_nThreshold, m_bDarkBackground);
                 CRect crtBarcode = new CRect(m_cptBarcodeLTPoint.X + nLeft, m_cptBarcodeLTPoint.Y + nTop, m_cptBarcodeLTPoint.X + nRight, m_cptBarcodeLTPoint.Y + nBottom);
                 Mat matBarcode = m_module.GetMatImage(mem, crtBarcode);
                 matBarcode.Save("D:\\BeforeRotation.bmp");
 
                 // 회전각도 알아내기
-                int nLeftTop = GetEdge(mem, crtHalfLeft, 10, eSearchDirection.TopToBottom, 70);
+                int nLeftTop = GetEdge(mem, crtHalfLeft, 10, eSearchDirection.TopToBottom, m_nThreshold, m_bDarkBackground);
                 CPoint cptLeftTop = new CPoint(crtHalfLeft.Center().X, nLeftTop);
-                int nRightTop = GetEdge(mem, crtHalfRight, 10, eSearchDirection.TopToBottom, 70);
+                int nRightTop = GetEdge(mem, crtHalfRight, 10, eSearchDirection.TopToBottom, m_nThreshold, m_bDarkBackground);
                 CPoint cptRightTop = new CPoint(crtHalfRight.Center().X, nRightTop);
                 double dThetaRadian = Math.Atan2((double)(cptRightTop.Y - cptLeftTop.Y), (double)(cptRightTop.X - cptLeftTop.X));
                 double dThetaDegree = dThetaRadian * (180 / Math.PI);
@@ -1363,7 +1357,10 @@ namespace Root_AOP01_Inspection.Module
                 Mat matSub = GetRowProfileMat(matCutting);
 
                 // 차영상 구하기
-                Mat matResult = matCutting - matSub;
+                Mat matResult;
+                if (m_bDarkBackground) matResult = matSub - matCutting;
+                else matResult = matCutting - matSub;
+                //Mat matResult = matCutting - matSub;
                 matResult.Save("D:\\Result.bmp");
 
                 // 차영상에서 Blob Labeling
@@ -1383,9 +1380,10 @@ namespace Root_AOP01_Inspection.Module
                 return "OK";
             }
 
-            unsafe int GetEdge(MemoryData mem, CRect crtROI, int nProfileSize, eSearchDirection eDirection, int nThreshold)
+            unsafe int GetEdge(MemoryData mem, CRect crtROI, int nProfileSize, eSearchDirection eDirection, int nThreshold, bool bDarkBackground)
             {
                 if (nProfileSize > crtROI.Width) return 0;
+                if (nProfileSize > crtROI.Height) return 0;
 
                 // variable
                 ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
@@ -1405,7 +1403,14 @@ namespace Root_AOP01_Inspection.Module
                             for (int x = -(nProfileSize / 2); x < (nProfileSize / 2); x++)
                             {
                                 byte* bpCurrent = bp + x;
-                                if (*bpCurrent < nThreshold) nCount++;
+                                if (bDarkBackground)
+                                {
+                                    if (*bpCurrent > nThreshold) nCount++;
+                                }
+                                else
+                                {
+                                    if (*bpCurrent < nThreshold) nCount++;
+                                }
                             }
                             if (nCount == nProfileSize) return y;
                         }
@@ -1418,7 +1423,14 @@ namespace Root_AOP01_Inspection.Module
                             for (int y = -(nProfileSize / 2); y < (nProfileSize / 2); y++)
                             {
                                 byte* bpCurrent = bp + y * img.p_Stride;
-                                if (*bpCurrent < nThreshold) nCount++;
+                                if (bDarkBackground)
+                                {
+                                    if (*bpCurrent > nThreshold) nCount++;
+                                }
+                                else
+                                {
+                                    if (*bpCurrent < nThreshold) nCount++;
+                                }
                             }
                             if (nCount == nProfileSize) return x;
                         }
@@ -1431,8 +1443,16 @@ namespace Root_AOP01_Inspection.Module
                             for (int y = -(nProfileSize / 2); y < (nProfileSize / 2); y++)
                             {
                                 byte* bpCurrent = bp + y * img.p_Stride;
-                                if (*bpCurrent < nThreshold) return x;
+                                if (bDarkBackground)
+                                {
+                                    if (*bpCurrent > nThreshold) nCount++;
+                                }
+                                else
+                                {
+                                    if (*bpCurrent < nThreshold) nCount++;
+                                }
                             }
+                            if (nCount == nProfileSize) return x;
                         }
                         break;
                     case eSearchDirection.BottomToTop:
@@ -1443,10 +1463,103 @@ namespace Root_AOP01_Inspection.Module
                             for (int x = -(nProfileSize / 2); x < (nProfileSize / 2); x++)
                             {
                                 byte* bpCurrent = bp + x;
-                                if (*bpCurrent < nThreshold) nCount++;
+                                if (bDarkBackground)
+                                {
+                                    if (*bpCurrent > nThreshold) nCount++;
+                                }
+                                else
+                                {
+                                    if (*bpCurrent < nThreshold) nCount++;
+                                }
                             }
                             if (nCount == nProfileSize) return y;
                         }
+                        break;
+                }
+
+                return 0;
+            }
+
+            unsafe int GetBarcodeSideEdge(MemoryData mem, CRect crtROI, int nProfileSize, eSearchDirection eDirection, int nThreshold, bool bDarkBackground)
+            {
+                if (nProfileSize > crtROI.Width) return 0;
+                if (nProfileSize > crtROI.Height) return 0;
+
+                // variable
+                ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+                IntPtr p = mem.GetPtr();
+                byte* bp;
+
+                // implement
+                img.SetData(p, crtROI, (int)mem.W);
+                int nFlipCount = 0;
+                bool bCurrentDark = false;
+                if (bDarkBackground) bCurrentDark = true;
+                
+                switch (eDirection)
+                {
+                    case eSearchDirection.LeftToRight:
+
+                        for (int x = 0; x < img.p_Size.X; x++)
+                        {
+                            nFlipCount = 0;
+                            for (int y = 0; y < img.p_Size.Y; y++)
+                            {
+                                bp = (byte*)img.GetPtr() + y * img.p_Stride + x;
+                                if (bDarkBackground)
+                                {
+                                    if (*bp > nThreshold)
+                                    {
+                                        bCurrentDark = !bCurrentDark;
+                                        nFlipCount++;
+                                    }
+                                }
+                                else
+                                {
+                                    if (*bp < nThreshold)
+                                    {
+                                        bCurrentDark = !bCurrentDark;
+                                        nFlipCount++;
+                                    }
+                                }
+                            }
+                            if (nFlipCount > 10) return x;
+                        }
+                        return 0;
+
+                        break;
+                    case eSearchDirection.RightToLeft:
+
+                        for (int x = img.p_Size.X - 1; x >= 0; x--)
+                        {
+                            nFlipCount = 0;
+                            for (int y = 0; y < img.p_Size.Y; y++)
+                            {
+                                bp = (byte*)img.GetPtr() + y * img.p_Stride + x;
+                                if (bDarkBackground)
+                                {
+                                    if (*bp > nThreshold)
+                                    {
+                                        bCurrentDark = !bCurrentDark;
+                                        nFlipCount++;
+                                    }
+                                }
+                                else
+                                {
+                                    if (*bp < nThreshold)
+                                    {
+                                        bCurrentDark = !bCurrentDark;
+                                        nFlipCount++;
+                                    }
+                                }
+                            }
+                            if (nFlipCount > 10) return x;
+                        }
+                        return 0;
+
+                        break;
+                    default:
+                        return 0;
                         break;
                 }
 

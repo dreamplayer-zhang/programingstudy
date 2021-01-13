@@ -18,9 +18,9 @@ namespace Root_WIND2
     /// <summary>
     /// EdgeSetupPage.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class EdgeSetupPage : UserControl
+    public partial class EdgesideSetup : UserControl
     {
-        public EdgeSetupPage()
+        public EdgesideSetup()
         {
             InitializeComponent();
         }
