@@ -80,7 +80,7 @@ namespace Root_WIND2
 			workBundle = new WorkBundle();
 			workplaceBundle = new WorkplaceBundle();
 
-			int partitionNum = 2000;  // recipe
+			int partitionNum = _recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightTop;  // 2000
 			try 
 			{
 				// top
@@ -89,7 +89,7 @@ namespace Root_WIND2
 				
 				for (int i = 0; i < memoryHeightTop / partitionNum; i++)
 				{
-					Workplace workplace = new Workplace(0, i, 0, partitionNum * i, memoryWidthTop, partitionNum);
+					Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Top, i, 0, partitionNum * i, memoryWidthTop, partitionNum);
 					workplace.SetSharedBuffer(this.SharedBufferR_Gray, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
 					workplace.SetSharedRGBBuffer(this.SharedBufferR_Gray, this.sharedBufferG, this.sharedBufferB);
 
@@ -98,14 +98,13 @@ namespace Root_WIND2
 				workplaceBundle[0].SetSharedBuffer(this.SharedBufferR_Gray, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
 				workplaceBundle[0].SetSharedRGBBuffer(this.SharedBufferR_Gray, this.sharedBufferG, this.sharedBufferB);
 
-				/*
 				// side
 				RootTools.ImageData imageDataSide = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeSide);
 				int memoryHeightSide = imageDataSide.p_Size.Y;
 				int memoryWidhtSide = imageDataSide.p_Size.X;
 				for (int i = 0; i < memoryHeightSide / partitionNum; i++)
 				{
-					Workplace workplace = new Workplace(0, i, 0, memoryHeightSide / partitionNum * i, memoryWidhtSide, partitionNum);
+					Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Side, i, 0, memoryHeightSide / partitionNum * i, memoryWidhtSide, partitionNum);
 					workplace.SetSharedBuffer(imageDataSide.GetPtr(0), memoryWidhtSide, memoryHeightSide, imageDataSide.p_nByte);
 					workplace.SetSharedRGBBuffer(imageDataSide.GetPtr(0), imageDataSide.GetPtr(1), imageDataSide.GetPtr(2));
 
@@ -118,13 +117,12 @@ namespace Root_WIND2
 				int memoryWidhtBtm = imageDataBtm.p_Size.X;
 				for (int i = 0; i < memoryHeightBtm / partitionNum; i++)
 				{
-					Workplace workplace = new Workplace(0, i, 0, memoryHeightBtm / partitionNum * i, memoryWidhtBtm, partitionNum);
+					Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Btm, i, 0, memoryHeightBtm / partitionNum * i, memoryWidhtBtm, partitionNum);
 					workplace.SetSharedBuffer(imageDataBtm.GetPtr(0), memoryWidhtBtm, memoryHeightBtm, imageDataBtm.p_nByte);
 					workplace.SetSharedRGBBuffer(imageDataBtm.GetPtr(0), imageDataBtm.GetPtr(1), imageDataBtm.GetPtr(2));
 
 					workplaceBundle.Add(workplace);
 				}
-				*/
 
 				EdgeSurface edgeSurface = new EdgeSurface();
 				edgeSurface.SetRecipe(this.recipe);
