@@ -393,7 +393,7 @@ namespace Root_CAMELLIA
                 if (loadport.p_id == sLoadport)
                 {
                     //loadport.RunDocking();
-                    if (loadport.RunDocking() != "OK") return;
+                    if (loadport.StartRunDocking() != "OK") return;
                     InfoCarrier infoCarrier = loadport.p_infoCarrier;
                     ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
                     manualJobSchedule.ShowPopup(); //p_moduleList.ClickRun();
@@ -414,7 +414,7 @@ namespace Root_CAMELLIA
                     {
                         if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
                     }
-                    if (bUndock) loadport.RunUndocking();
+                    if (bUndock) loadport.StartRunUndocking();
                 }
             }
         }

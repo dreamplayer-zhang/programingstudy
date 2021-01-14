@@ -24,24 +24,27 @@ namespace Root_WIND2
 		private int threshold_Top;
 		private int defectSizeMin_Top;
 		private int mergeDist_Top;
-		private int whiteIllum_Top;
-		private int sideIllum_Top;
 		
 		private int roiHeight_Side;
 		private int roiWidth_Side;
 		private int threshold_Side;
 		private int defectSizeMin_Side;
 		private int mergeDist_Side;
-		private int whiteIllum_Side;
-		private int sideIllum_Side;
 
 		private int roiHeight_Btm;
 		private int roiWidth_Btm;
 		private int threshold_Btm;
 		private int defectSizeMin_Btm;
 		private int mergeDist_Btm;
-		private int whiteIllum_Btm;
-		private int sideIllum_Btm;
+
+		private int _ROIHeight = 0;
+		private int _ROIWidth = 0;
+		private int _Threshold = 0;
+		private int _DefectSizeMin = 0;
+		private int _MergeDist = 0;
+		private bool _IsTopChecked = true;
+		private bool _IsSideChecked = false;
+		private bool _IsBtmChecked = false;
 
 		#region [Getter / Setter]
 		public RootViewer_ViewModel DrawToolVM
@@ -49,37 +52,199 @@ namespace Root_WIND2
 			get { return drawToolVM; }
 			set { SetProperty(ref drawToolVM, value); }
 		}
+		public int ROIHeight
+		{
+			get
+			{
+				return _ROIHeight;
+			}
+			set
+			{
+				SetProperty(ref _ROIHeight, value);
+				if (IsTopChecked)
+					roiHeight_Top = value;
+				if (IsSideChecked)
+					roiHeight_Side = value;
+				if (IsBtmChecked)
+					roiHeight_Btm = value;
+				
+				SetParameter();
+			}
+		}
+		public int ROIWidth 
+		{
+			get
+			{
+				return _ROIWidth;
+			}
+			set
+			{
+				SetProperty(ref _ROIWidth, value);
+				if (IsTopChecked)
+					roiWidth_Top = value;
+				if (IsSideChecked)
+					roiWidth_Side = value;
+				if (IsBtmChecked)
+					roiWidth_Btm = value;
 
-		public int ROIHeight_Top { get => roiHeight_Top; set => roiHeight_Top = value; }
-		public int ROIWidth_Top { get => roiWidth_Top; set => roiWidth_Top = value; }
-		public int Threshold_Top { get => threshold_Top; set => threshold_Top = value; }
-		public int DefectSizeMin_Top { get => defectSizeMin_Top; set => defectSizeMin_Top = value; }
-		public int MergeDist_Top { get => mergeDist_Top; set => mergeDist_Top = value; }
-		public int WhiteIllum_Top { get => whiteIllum_Top; set => whiteIllum_Top = value; }
-		public int SideIllum_Top { get => sideIllum_Top; set => sideIllum_Top = value; }
+				SetParameter();
+			}
+		}
+		public int Threshold
+		{
+			get
+			{
+				return _Threshold;
+			}
+			set
+			{
+				SetProperty(ref _Threshold, value);
+				if (IsTopChecked)
+					threshold_Top = value;
+				if (IsSideChecked)
+					threshold_Side = value;
+				if (IsBtmChecked)
+					threshold_Btm = value;
 
-		public int ROIHeight_Side { get => roiHeight_Side; set => roiHeight_Side = value; }
-		public int ROIWidth_Side { get => roiWidth_Side; set => roiWidth_Side = value; }
-		public int Threshold_Side { get => threshold_Side; set => threshold_Side = value; }
-		public int DefectSizeMin_Side { get => defectSizeMin_Side; set => defectSizeMin_Side = value; }
-		public int MergeDist_Side { get => mergeDist_Side; set => mergeDist_Side = value; }
+				SetParameter();
+			}
+		}
+		public int DefectSizeMin
+		{
+			get
+			{
+				return _DefectSizeMin;
+			}
+			set
+			{
+				SetProperty(ref _DefectSizeMin, value);
+				if (IsTopChecked)
+					defectSizeMin_Top = value;
+				if (IsSideChecked)
+					defectSizeMin_Side = value;
+				if (IsBtmChecked)
+					defectSizeMin_Btm = value;
 
-		public int WhiteIllum_Side { get => whiteIllum_Side; set => whiteIllum_Side = value; }
-		public int SideIllum_Side { get => sideIllum_Side; set => sideIllum_Side = value; }
+				SetParameter();
+			}
+		}
+		public int MergeDist
+		{
+			get
+			{
+				return _MergeDist;
+			}
+			set
+			{
+				SetProperty(ref _MergeDist, value);
+				if (IsTopChecked)
+					mergeDist_Top = value;
+				if (IsSideChecked)
+					mergeDist_Side = value;
+				if (IsBtmChecked)
+					mergeDist_Btm = value;
 
-		public int ROIHeight_Btm { get => roiHeight_Btm; set => roiHeight_Btm = value; }
-		public int ROIWidth_Btm { get => roiWidth_Btm; set => roiWidth_Btm = value; }
-		public int Threshold_Btm { get => threshold_Btm; set => threshold_Btm = value; }
-		public int DefectSizeMin_Btm { get => defectSizeMin_Btm; set => defectSizeMin_Btm = value; }
-		public int MergeDist_Btm { get => mergeDist_Btm; set => mergeDist_Btm = value; }
+				SetParameter();
+			}
+		}
 
-		public int WhiteIllum_Btm { get => whiteIllum_Btm; set => whiteIllum_Btm = value; }
-		public int SideIllum_Btm { get => sideIllum_Btm; set => sideIllum_Btm = value; }
+		public bool IsTopChecked
+		{
+			get
+			{
+				return _IsTopChecked;
+			}
+			set
+			{
+				SetProperty(ref _IsTopChecked, value);
+				if (_IsTopChecked)
+				{
+					IsSideChecked = false;
+					IsBtmChecked = false;
+				}
+			}
+		}
+		public bool IsSideChecked
+		{
+			get
+			{
+				return _IsSideChecked;
+			}
+			set
+			{
+				SetProperty(ref _IsSideChecked, value);
+				if (_IsSideChecked)
+				{
+					IsTopChecked = false;
+					IsBtmChecked = false;
+				}
+			}
+		}
+		public bool IsBtmChecked
+		{
+			get
+			{
+				return _IsBtmChecked;
+			}
+			set
+			{
+				SetProperty(ref _IsBtmChecked, value);
+				if (_IsBtmChecked)
+				{
+					IsTopChecked = false;
+					IsSideChecked = false;
+				}
+			}
+		}
 		#endregion
 
-		public ICommand btnTop { get { return new RelayCommand(() => ChangeViewer("Top")); }}
-		public ICommand btnSide { get { return new RelayCommand(() => ChangeViewer("Side")); }}
-		public ICommand btnBottom { get { return new RelayCommand(() => ChangeViewer("Bottom")); }}
+		public ICommand btnTop
+		{
+			get
+			{
+				return new RelayCommand(() => 
+				{ 
+					ChangeViewer("Top");
+					ROIHeight = roiHeight_Top;
+					ROIWidth = roiWidth_Top;
+					Threshold = threshold_Top;
+					DefectSizeMin = defectSizeMin_Top;
+					MergeDist = mergeDist_Top;
+				});  
+			}
+		}
+
+		public ICommand btnSide
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					ChangeViewer("Side");
+					ROIHeight = roiHeight_Side;
+					ROIWidth = roiWidth_Side;
+					Threshold = threshold_Side;
+					DefectSizeMin = defectSizeMin_Side;
+					MergeDist = mergeDist_Side;
+				});
+			}
+		}
+
+		public ICommand btnBottom
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					ChangeViewer("Bottom");
+					ROIHeight = roiHeight_Btm;
+					ROIWidth = roiWidth_Btm;
+					Threshold = threshold_Btm;
+					DefectSizeMin = defectSizeMin_Btm;
+					MergeDist = mergeDist_Btm;
+				});
+			}
+		}
 
 		public EdgesideSetup_ViewModel()
 		{
@@ -148,53 +313,75 @@ namespace Root_WIND2
 			SetParameter();
 		}
 
-		private void ClearDefectData()
+		public void LoadParameter()
 		{
+			if (recipe.GetRecipe<EdgeSurfaceParameter>() == null)
+				return;
 
+			roiHeight_Top = recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightTop;
+			roiWidth_Top = recipe.GetRecipe<EdgeSurfaceParameter>().RoiWidthTop;
+			threshold_Top = recipe.GetRecipe<EdgeSurfaceParameter>().ThesholdTop;
+			defectSizeMin_Top = recipe.GetRecipe<EdgeSurfaceParameter>().SizeMinTop;
+			mergeDist_Top = recipe.GetRecipe<EdgeSurfaceParameter>().MergeDistTop;
 
+			roiHeight_Side = recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightSide;
+			roiWidth_Side = recipe.GetRecipe<EdgeSurfaceParameter>().RoiWidthSide;
+			threshold_Side = recipe.GetRecipe<EdgeSurfaceParameter>().ThesholdSide;
+			defectSizeMin_Side = recipe.GetRecipe<EdgeSurfaceParameter>().SizeMinSide;
+			mergeDist_Side = recipe.GetRecipe<EdgeSurfaceParameter>().MergeDistSide;
+
+			roiHeight_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightBtm;
+			roiWidth_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().RoiWidthBtm;
+			threshold_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().ThesholdBtm;
+			defectSizeMin_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().SizeMinBtm;
+			mergeDist_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().MergeDistBtm;
+
+			if (IsTopChecked)
+			{
+				ROIHeight = roiHeight_Top;
+				ROIWidth = roiWidth_Top;
+				Threshold = threshold_Top;
+				DefectSizeMin = defectSizeMin_Top;
+				MergeDist = mergeDist_Top;
+			}
+			else if (IsSideChecked)
+			{
+				ROIHeight = roiHeight_Side;
+				ROIWidth = roiWidth_Side;
+				Threshold = threshold_Side;
+				DefectSizeMin = defectSizeMin_Side;
+				MergeDist = mergeDist_Side;
+			}
+			else if (IsBtmChecked)
+			{
+				ROIHeight = roiHeight_Btm;
+				ROIWidth = roiWidth_Btm;
+				Threshold = threshold_Btm;
+				DefectSizeMin = defectSizeMin_Btm;
+				MergeDist = mergeDist_Btm;
+			}
 		}
 
-		private void LoadParameter()
-		{
-			ROIHeight_Top = recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightTop;
-			ROIWidth_Top = recipe.GetRecipe<EdgeSurfaceParameter>().RoiWidthTop;
-			Threshold_Top = recipe.GetRecipe<EdgeSurfaceParameter>().ThesholdTop;
-			DefectSizeMin_Top = recipe.GetRecipe<EdgeSurfaceParameter>().SizeMinTop;
-			MergeDist_Top = recipe.GetRecipe<EdgeSurfaceParameter>().MergeDistTop;
-
-			ROIHeight_Side = recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightSide;
-			ROIWidth_Side = recipe.GetRecipe<EdgeSurfaceParameter>().RoiWidthSide;
-			Threshold_Side = recipe.GetRecipe<EdgeSurfaceParameter>().ThesholdSide;
-			DefectSizeMin_Side = recipe.GetRecipe<EdgeSurfaceParameter>().SizeMinSide;
-			MergeDist_Side = recipe.GetRecipe<EdgeSurfaceParameter>().MergeDistSide;
-
-			ROIHeight_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightBtm;
-			ROIWidth_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().RoiWidthBtm;
-			Threshold_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().ThesholdBtm;
-			DefectSizeMin_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().SizeMinBtm;
-			MergeDist_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().MergeDistBtm;
-		}
-
-		private void SetParameter()
+		public void SetParameter()
 		{
 			EdgeSurfaceParameter param = new EdgeSurfaceParameter();
-			param.RoiHeightTop = ROIHeight_Top;
-			param.RoiWidthTop = ROIWidth_Top;
-			param.ThesholdTop = Threshold_Top;
-			param.SizeMinTop = DefectSizeMin_Top;
-			param.MergeDistTop = MergeDist_Top;
+			param.RoiHeightTop = roiHeight_Top;
+			param.RoiWidthTop = roiWidth_Top;
+			param.ThesholdTop = threshold_Top;
+			param.SizeMinTop = defectSizeMin_Top;
+			param.MergeDistTop = mergeDist_Top;
 
-			param.RoiHeightSide = ROIHeight_Side;
-			param.RoiWidthSide = ROIWidth_Side;
-			param.ThesholdSide = Threshold_Side;
-			param.SizeMinSide = DefectSizeMin_Side;
-			param.MergeDistSide = MergeDist_Side;
+			param.RoiHeightSide = roiHeight_Side;
+			param.RoiWidthSide = roiWidth_Side;
+			param.ThesholdSide = threshold_Side;
+			param.SizeMinSide = defectSizeMin_Side;
+			param.MergeDistSide = mergeDist_Side;
 
-			param.RoiHeightBtm = ROIHeight_Btm;
-			param.RoiWidthBtm = ROIWidth_Btm;
-			param.ThesholdBtm = Threshold_Btm;
-			param.SizeMinBtm = DefectSizeMin_Btm;
-			param.MergeDistBtm = MergeDist_Btm;
+			param.RoiHeightBtm = roiHeight_Btm;
+			param.RoiWidthBtm = roiWidth_Btm;
+			param.ThesholdBtm = threshold_Btm;
+			param.SizeMinBtm = defectSizeMin_Btm;
+			param.MergeDistBtm = mergeDist_Btm;
 
 			recipe.ParameterItemList.Add(param);
 		}

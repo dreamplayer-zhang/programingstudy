@@ -379,14 +379,14 @@ namespace Root_AOP01_Inspection.Module
             //            p_bStageVac = true;
             Thread.Sleep(200);
 
-            if (m_CamTDI90 != null && m_CamTDI90.p_CamInfo.p_eState == eCamState.Init)
-                m_CamTDI90.Connect();
-            if (m_CamTDI45 != null && m_CamTDI45.p_CamInfo.p_eState == eCamState.Init)
-                m_CamTDI45.Connect();
-            if (m_CamLADS.p_CamInfo._OpenStatus == false)
-                m_CamLADS.Connect();
-            if (m_CamTDISide != null && m_CamTDISide.p_CamInfo.p_eState == eCamState.Init)
-                m_CamTDISide.Connect();
+            //if (m_CamTDI90 != null && m_CamTDI90.p_CamInfo.p_eState == eCamState.Init)
+            //    m_CamTDI90.Connect();
+            //if (m_CamTDI45 != null && m_CamTDI45.p_CamInfo.p_eState == eCamState.Init)
+            //    m_CamTDI45.Connect();
+            //if (m_CamLADS.p_CamInfo._OpenStatus == false)
+            //    m_CamLADS.Connect();
+            //if (m_CamTDISide != null && m_CamTDISide.p_CamInfo.p_eState == eCamState.Init)
+            //    m_CamTDISide.Connect();
 
             m_axisSideZ.StartHome();
             if (m_axisSideZ.WaitReady() != "OK")
@@ -465,7 +465,7 @@ namespace Root_AOP01_Inspection.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Grab(this), false, "Run Grab");
+            AddModuleRunList(new Run_Grab(this), true, "Run Grab");
             AddModuleRunList(new Run_Grab45(this), false, "Run Grab 45");
             AddModuleRunList(new Run_GrabSideScan(this), false, "Run Side Scan");
             AddModuleRunList(new Run_LADS(this), false, "Run LADS");

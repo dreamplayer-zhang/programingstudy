@@ -51,7 +51,6 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region ToolBox
-        TCPIPClient m_tcpip; 
         public override void GetTools(bool bInit)
         {
             if (bInit) { }

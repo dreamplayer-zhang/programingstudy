@@ -55,14 +55,16 @@ namespace Root_AOP01_Packing
             {
                 
             }
+            int i = 0;
             public override string Run()
             {
                 Camera_Basler VRS = m_module.m_tapeVRS;
                 ImageData img = VRS.p_ImageViewer.p_ImageData;
-                string strVRSImageDir = "D:\\";
+                
                 if (VRS.Grab() == "OK")
                 {
-                    string strVRSImageFullPath = string.Format("D:\\VRSImage_{0}.bmp", 1);
+                    string strVRSImageFullPath = string.Format("D:\\VRSImage_{0}.bmp", i);
+                    i++;
                     img.SaveImageSync(strVRSImageFullPath);
                     //Grab error
                 }

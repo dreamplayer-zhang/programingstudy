@@ -45,7 +45,7 @@ namespace Root_EFEM.Module
 
         //forget
         #region DIO Function
-        bool m_bPlaced = false;
+        public bool m_bPlaced = false;
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present = m_bPlaced ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
@@ -654,17 +654,21 @@ namespace Root_EFEM.Module
         CEID m_ceidDocking;
         CEID m_ceidUnDocking;
         ALID m_alidPlaced;
+        public ALID m_alidInforeticle;
+        public CEID m_ceidUnloadReq;
         void InitGAF() 
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
             m_ceidDocking = m_gaf.GetCEID(this, "Docking");
             m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
+            m_ceidUnloadReq = m_gaf.GetCEID(this, "Unload Request");
+            m_alidInforeticle = m_gaf.GetALID(this, "Info Reticle Error", "Info Reticle Error");
         }
         #endregion
 
         #region ILoadport
-        public string RunDocking()
+        public string StartRunDocking()
         {
             if (p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runDocking.Clone();
@@ -673,7 +677,7 @@ namespace Root_EFEM.Module
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
 
-        public string RunUndocking()
+        public string StartRunUndocking()
         {
             if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runUndocking.Clone();
@@ -717,8 +721,8 @@ namespace Root_EFEM.Module
         }
 
         #region ModuleRun
-        ModuleRunBase m_runDocking;
-        ModuleRunBase m_runUndocking;
+        public ModuleRunBase m_runDocking;
+        public ModuleRunBase m_runUndocking;
         protected override void InitModuleRuns()
         {
             m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");
