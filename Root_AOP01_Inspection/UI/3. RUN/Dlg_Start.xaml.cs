@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using RootTools.Trees;
+using Root_AOP01_Inspection.UI._3._RUN;
 
 namespace Root_AOP01_Inspection
 {
@@ -24,6 +25,7 @@ namespace Root_AOP01_Inspection
     /// </summary>
     public partial class Dlg_Start : Window
     {
+        static public bool m_bShow = false;
         AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
         AOP01_Recipe m_recipe;
@@ -46,6 +48,7 @@ namespace Root_AOP01_Inspection
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+            m_bShow = false;
         }
         public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
             Loadport_Cymechs loadport2, AOP01_Engineer engineer)
@@ -55,124 +58,26 @@ namespace Root_AOP01_Inspection
             m_engineer = engineer;
             m_handler = engineer.m_handler;
             m_recipe = engineer.m_handler.m_recipe;
-            m_arm = wtrcleanunit.m_dicArm[0];
-            m_wtrcleanunit = wtrcleanunit;
-            m_wtr = m_wtrcleanunit.p_aArm[0];
-            m_mainvision = mainvision;
-            m_loadport[0] = loadport1;
-            m_loadport[1] = loadport2;
             listviewRCP.ItemsSource = m_aRecipe;
-            LoadportType = AOP01_Handler.eLoadport.Cymechs;
-            //RNRCount.DataContext = m_aRnR;
-            //RNRMode.DataContext = m_aRnR;
-            Test.DataContext = m_aRnR;
-            InitButtonLoad();
+            RNRset.DataContext = m_aRnR;
         }
         public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_RND loadport1,
             Loadport_RND loadport2, AOP01_Engineer engineer)
         {
-            RNR m_aRnR = new RNR();
+            m_aRnR = new RNR();
             m_aRecipe = new ObservableCollection<Recipe>();
             m_engineer = engineer;
             m_handler = engineer.m_handler;
             m_recipe = engineer.m_handler.m_recipe;
-            m_arm = wtrcleanunit.m_dicArm[0];
-            m_wtrcleanunit = wtrcleanunit;
-            m_wtr = m_wtrcleanunit.p_aArm[0];
-            m_mainvision = mainvision;
-            m_rndloadport[0] = loadport1;
-            m_rndloadport[1] = loadport2;
             listviewRCP.ItemsSource = m_aRecipe;
-            LoadportType = AOP01_Handler.eLoadport.RND;
-            //RNRCount.DataContext = m_aRnR;
-            //RNRMode.DataContext = m_aRnR;
-            InitButtonLoad();
+            RNRset.DataContext = m_aRnR;
         }
-
-        #region Button Load UnLoad
-        BackgroundWorker m_bgwLoad = new BackgroundWorker();
-        void InitButtonLoad()
+        ManualJobSchedule m_JobSchedule;
+        public void Init(ManualJobSchedule jobschdule)
         {
-            m_bgwLoad.DoWork += M_bgwLoad_DoWork;
-            m_bgwLoad.RunWorkerCompleted += M_bgwLoad_RunWorkerCompleted;
-        }
-        bool IsEnableLoad(int LPNum)
-        {
-            bool bReadyLoadport = (m_loadport[LPNum].p_eState == ModuleBase.eState.Ready);
-            bool bReadyToLoad = (m_loadport[LPNum].p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
-            bReadyToLoad = true;
-            bool bReadyState = (m_loadport[LPNum].m_qModuleRun.Count == 0);
-            bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
-            if (m_loadport[LPNum].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
-
-            if (m_handler.IsEnableRecovery() == true) return false;
-            return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && !m_loadport[LPNum].m_diPresent.p_bIn; //forget 조건
-        }
-        bool IsEnableUnload(int LPNum)
-        {
-            bool bReadyLoadport = m_loadport[LPNum].p_eState == ModuleBase.eState.Ready;
-            bool bPlace = m_loadport[LPNum].CheckPlaced();
-            bool bReadyToUnload = m_loadport[LPNum].p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload;
-            bool bAccess = m_loadport[LPNum].m_OHT.p_eAccessLP == GemCarrierBase.eAccessLP.Auto;
-            return bReadyLoadport && bPlace && bReadyToUnload && bAccess;
-        }
-
-        private void ButtonLoad1_Click(object sender, RoutedEventArgs e)
-        {
-            m_handler.m_nRnR = m_aRnR.p_bRnR ? m_aRnR.p_nRnR : 1;
-            if (IsEnableLoad(0) == false) return;
-            //if (m_manualjob.ShowPopup() == false) return;
-            m_bgwLoad.RunWorkerAsync();
-        }
-
-        private void ButtonUnLoadReq1_Click(object sender, RoutedEventArgs e)
-        {
-            if (IsEnableUnload(0) == false) return;
-            //m_loadport[0].m_ceidUnload.Send();
-        }
-
-        private void ButtonLoad2_Click(object sender, RoutedEventArgs e)
-        {
-            if (IsEnableLoad(1) == false) return;
-            //if (m_manualjob.ShowPopup() == false) return;
-            m_bgwLoad.RunWorkerAsync();
-        }
-
-        private void ButtonUnLoadReq2_Click(object sender, RoutedEventArgs e)
-        {
-            if (IsEnableUnload(1) == false) return;
-            //m_loadport.m_ceidUnload.Send();
-        }
-
-       
-        private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
-        {
-        //    ModuleRunBase moduleRun = m_loadport[0].m_runReadPodID.Clone();
-        //    m_loadport[0].StartRun(moduleRun);
-        //    Thread.Sleep(100);
-        //    while ((EQ.IsStop() != true) && m_loadport[0].m_qModuleRun.Count > 0) Thread.Sleep(10);
-        //    while ((EQ.IsStop() != true) && m_loadport[0].p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
-        //    moduleRun = m_loadport[0].m_runLoad.Clone();
-        //    m_loadport[0].StartRun(moduleRun);
-        //    Thread.Sleep(100);
-        //    while ((EQ.IsStop() != true) && m_loadport.m_qModuleRun.Count > 0) Thread.Sleep(10);
-        //    while ((EQ.IsStop() != true) && m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
-        }
-
-        private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            //switch (m_loadport.p_eState)
-            //{
-            //    case ModuleBase.eState.Ready:
-            //        m_loadport.m_infoPod.p_eState = InfoPod.eState.Load;
-            //        if (m_manualjob.SetInfoPod() != "OK") return;
-            //        m_loadport.m_infoPod.StartProcess();
-            //        Thread.Sleep(100);
-            //        EQ.p_eState = EQ.eState.Run;
-            //        break;
-            //}
-        }
-        #endregion
+            m_JobSchedule = jobschdule;
+            this.DataContext = jobschdule;
+        }   
         #region Recipe List
         public class Recipe : NotifyProperty
         {
@@ -256,6 +161,11 @@ namespace Root_AOP01_Inspection
             }
         }
         #endregion
+
+        private void ButtonStart_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = true;
+        }
     }
 
 }

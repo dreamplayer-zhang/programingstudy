@@ -492,7 +492,7 @@
                                 <TextBlock Text="Option" />
                             </GroupBox.Header>
                             <UniformGrid Margin="10,5">
-                                <StackPanel x:Name="Test" Orientation="Vertical">
+                                <StackPanel x:Name="RNRset" Orientation="Vertical">
                                     <CheckBox Name="RNRMode" Margin="10" Content="RNR Mode" IsChecked="{Binding p_bRnR}"/>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Name="RNRCount" Text=" RnR Count = " VerticalAlignment="Center"/>
@@ -544,9 +544,9 @@
                     Width="300"
                     Click="CloseButton_Click"
                     Style="{StaticResource SetupPanelBtn}" />
-            <Button Content="Start"
+            <Button Name="Start" Content="Start"
                     Width="300"
-                    Style="{StaticResource SetupPanelBtn}" />
+                    Style="{StaticResource SetupPanelBtn}" Click="ButtonStart_Click" />
         </StackPanel>
     </Grid>
 </Window>

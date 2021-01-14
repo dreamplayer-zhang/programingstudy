@@ -654,12 +654,14 @@ namespace Root_EFEM.Module
         CEID m_ceidDocking;
         CEID m_ceidUnDocking;
         ALID m_alidPlaced;
+        public ALID m_alidInforeticle;
         void InitGAF() 
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
             m_ceidDocking = m_gaf.GetCEID(this, "Docking");
             m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
+            m_alidInforeticle = m_gaf.GetALID(this, "Info Reticle Error", "Info Reticle Error");
         }
         #endregion
 
@@ -717,8 +719,8 @@ namespace Root_EFEM.Module
         }
 
         #region ModuleRun
-        ModuleRunBase m_runDocking;
-        ModuleRunBase m_runUndocking;
+        public ModuleRunBase m_runDocking;
+        public ModuleRunBase m_runUndocking;
         protected override void InitModuleRuns()
         {
             m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");

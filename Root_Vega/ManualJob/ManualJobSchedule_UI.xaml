@@ -130,7 +130,7 @@
                 <Grid Grid.Row="2" Height="auto">
                     <GroupBox FontSize="20" Header="Option" Height="auto" Foreground="White">
                         <StackPanel Orientation="Vertical">
-                            <CheckBox Content="RNR Mode" IsChecked="{Binding p_bRnR}" Foreground="White" VerticalAlignment="Center" Margin="10" Checked="CheckBox_Checked"/>
+                            <CheckBox Content="RNR Mode" IsChecked="{Binding p_bRnR}" Foreground="White" VerticalAlignment="Center" Margin="10"/>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text=" RnR Count = " VerticalAlignment="Center"/>
                                 <TextBox Text="{Binding p_nRnR}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left" />

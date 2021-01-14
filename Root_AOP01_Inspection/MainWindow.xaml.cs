@@ -125,12 +125,13 @@ namespace Root_AOP01_Inspection
         public Setup_Panel Setup;
         public Review_Panel Review;
         public Run_Panel Run;
+        //public Dlg_Start Dlg;
         #endregion
 
         #region ViewModel
         private Setup_ViewModel m_Setup;
         private Run_ViewModel m_Run;
-        private Dlg_ViewModel m_Dlg;
+        //private Dlg_ViewModel m_Dlg;
         #endregion
 
         public AOP01_Engineer m_engineer = new AOP01_Engineer();
@@ -162,14 +163,13 @@ namespace Root_AOP01_Inspection
 			switch (m_engineer.m_handler.LoadportType)
 			{
 				case AOP01_Handler.eLoadport.Cymechs:
-                    Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer);
+                    Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer); 
                     break;
 				case AOP01_Handler.eLoadport.RND:
                 default:
                     Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_RND)m_engineer.m_handler.m_aLoadport[0], (Loadport_RND)m_engineer.m_handler.m_aLoadport[1], m_engineer);
-					break;
+                    break;
 			}
-            //m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
         }
         void Init_ViewModel()
         {
@@ -189,6 +189,9 @@ namespace Root_AOP01_Inspection
 
             Run = new Run_Panel();
             Run.DataContext = m_Run;
+
+            //Dlg = new Dlg_Start();
+            //Dlg.DataContext = m_Dlg;
 
             MainPanel.Children.Clear();
             MainPanel.Children.Add(ModeSelect);

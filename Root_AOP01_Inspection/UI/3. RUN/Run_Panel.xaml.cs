@@ -10,6 +10,8 @@ using Root_EFEM.Module;
 using static Root_EFEM.Module.WTR_RND;
 using RootTools.Gem;
 using System.ComponentModel;
+using Root_AOP01_Inspection.UI._3._RUN;
+using System.Threading;
 
 namespace Root_AOP01_Inspection
 {
@@ -18,12 +20,12 @@ namespace Root_AOP01_Inspection
     /// </summary>
     public partial class Run_Panel : UserControl
     {
+        ManualJobSchedule m_manualjob;
         AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
         MainVision m_mainvision;
         WTRCleanUnit m_wtrcleanunit;
         WTRArm m_wtr;
-
         Arm m_arm;
         Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
         Loadport_RND[] m_rndloadport = new Loadport_RND[2];
@@ -47,6 +49,8 @@ namespace Root_AOP01_Inspection
             LoadportB_State.DataContext = loadport2;
             RTR_State.DataContext = wtrcleanunit;
             LoadportType = AOP01_Handler.eLoadport.Cymechs;
+            m_manualjob = new ManualJobSchedule(m_loadport[0],m_loadport[1], m_engineer);
+            InitButtonLoad();
             InitTimer();
         }
         public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_RND loadport1,
@@ -64,6 +68,8 @@ namespace Root_AOP01_Inspection
             LoadportB_State.DataContext = loadport2;
             RTR_State.DataContext = wtrcleanunit;
             LoadportType = AOP01_Handler.eLoadport.RND;
+            m_manualjob = new ManualJobSchedule(m_rndloadport[0], m_rndloadport[1], m_engineer);
+            InitButtonLoad();
             InitTimer();
         }
 
@@ -110,7 +116,7 @@ namespace Root_AOP01_Inspection
                     Alarm2.Background = m_rndloadport[1].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
                     break;                 
             }
-            ButtonLoad1.IsEnabled = IsEnableLoad(0);
+            //ButtonLoad1.IsEnabled = IsEnableLoad(0);
             ButtonUnLoadReq1.IsEnabled = IsEnableUnload(0);
             ButtonLoad2.IsEnabled = IsEnableLoad(1);
             ButtonUnLoadReq2.IsEnabled = IsEnableUnload(1);
@@ -143,12 +149,13 @@ namespace Root_AOP01_Inspection
             bool bAccess = m_loadport[LPNum].m_OHT.p_eAccessLP == GemCarrierBase.eAccessLP.Auto;
             return bReadyLoadport && bPlace && bReadyToUnload && bAccess;
         }
-
+        public bool m_btnload1 = false;
+        public bool m_btnload2 = false;
         private void ButtonLoad1_Click(object sender, RoutedEventArgs e)
         {
-            //m_handler.m_nRnR = m_aRnR.p_bRnR ? m_aRnR.p_nRnR : 1;
-            if (IsEnableLoad(0) == false) return;
-            //if (m_manualjob.ShowPopup() == false) return;
+            //if (IsEnableLoad(0) == false) return;
+            m_btnload1 = true;
+            if (m_manualjob.ShowPopup(m_engineer) == false) return;
             m_bgwLoad.RunWorkerAsync();
         }
 
@@ -161,7 +168,8 @@ namespace Root_AOP01_Inspection
         private void ButtonLoad2_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableLoad(1) == false) return;
-            //if (m_manualjob.ShowPopup() == false) return;
+            m_btnload2 = true;
+            if (m_manualjob.ShowPopup(m_engineer) == false) return;
             m_bgwLoad.RunWorkerAsync();
         }
 
@@ -174,30 +182,49 @@ namespace Root_AOP01_Inspection
 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            //    ModuleRunBase moduleRun = m_loadport[0].m_runReadPodID.Clone();
-            //    m_loadport[0].StartRun(moduleRun);
-            //    Thread.Sleep(100);
-            //    while ((EQ.IsStop() != true) && m_loadport[0].m_qModuleRun.Count > 0) Thread.Sleep(10);
-            //    while ((EQ.IsStop() != true) && m_loadport[0].p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
-            //    moduleRun = m_loadport[0].m_runLoad.Clone();
-            //    m_loadport[0].StartRun(moduleRun);
-            //    Thread.Sleep(100);
-            //    while ((EQ.IsStop() != true) && m_loadport.m_qModuleRun.Count > 0) Thread.Sleep(10);
-            //    while ((EQ.IsStop() != true) && m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+            if (m_btnload1 == true)
+            {
+                m_btnload1 = false;
+                //ModuleRunBase moduleRun = m_loadport.m_runReadPodID.Clone();
+                //m_loadport[0].StartRun(moduleRun);
+                //Thread.Sleep(100);
+                //while ((EQ.IsStop() != true) && m_loadport[0].m_qModuleRun.Count > 0) Thread.Sleep(10);
+                //while ((EQ.IsStop() != true) && m_loadport[0].p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+                ModuleRunBase moduleRun = m_loadport[0].m_runDocking.Clone();
+                m_loadport[0].StartRun(moduleRun);
+                Thread.Sleep(100);
+                while ((EQ.IsStop() != true) && m_loadport[0].m_qModuleRun.Count > 0) Thread.Sleep(10);
+                while ((EQ.IsStop() != true) && m_loadport[0].p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+                
+            }
+            else if(m_btnload2 == true)
+            {
+                m_btnload2 = false;
+                //ModuleRunBase moduleRun = m_loadport.m_runReadPodID.Clone();
+                //m_loadport[0].StartRun(moduleRun);
+                //Thread.Sleep(100);
+                //while ((EQ.IsStop() != true) && m_loadport[0].m_qModuleRun.Count > 0) Thread.Sleep(10);
+                //while ((EQ.IsStop() != true) && m_loadport[0].p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+                ModuleRunBase moduleRun = m_loadport[0].m_runDocking.Clone();
+                m_loadport[0].StartRun(moduleRun);
+                Thread.Sleep(100);
+                while ((EQ.IsStop() != true) && m_loadport[1].m_qModuleRun.Count > 0) Thread.Sleep(10);
+                while ((EQ.IsStop() != true) && m_loadport[1].p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+            }
         }
 
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //switch (m_loadport.p_eState)
-            //{
-            //    case ModuleBase.eState.Ready:
-            //        m_loadport.m_infoPod.p_eState = InfoPod.eState.Load;
-            //        if (m_manualjob.SetInfoPod() != "OK") return;
-            //        m_loadport.m_infoPod.StartProcess();
-            //        Thread.Sleep(100);
-            //        EQ.p_eState = EQ.eState.Run;
-            //        break;
-            //}
+            switch (m_loadport[0].p_eState)
+            {
+                case ModuleBase.eState.Ready:
+                    m_loadport[0].p_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+                    if (m_manualjob.SetInfoPod() != "OK") return;
+                    m_loadport[0].p_infoCarrier.StartProcess(m_loadport[0].p_infoWafer.p_id);
+                    Thread.Sleep(100);
+                    EQ.p_eState = EQ.eState.Run;
+                    break;
+            }
         }
         #endregion
         #region Button Recovery
