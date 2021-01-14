@@ -198,8 +198,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\Loader.cs" />
+    <Compile Include="Module\Rail.cs" />
     <Compile Include="Module\RinseU.cs" />
     <Compile Include="Module\Roller.cs" />
+    <Compile Include="Module\Storage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

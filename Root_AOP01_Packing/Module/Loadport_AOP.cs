@@ -261,7 +261,6 @@ namespace Root_AOP01_Packing.Module
 
         public override void Reset()
         {
-            //Run(CmdResetCPU());
             p_eState = eState.Init;
             base.Reset();
         }
@@ -280,16 +279,18 @@ namespace Root_AOP01_Packing.Module
                 p_sInfo = base.StateHome();
                 if (p_sInfo != "OK") return p_sInfo; 
             }
-            p_eState = eState.Ready;
+            p_sInfo = base.StateHome();
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
             p_infoCarrier.AfterHome();
-            return "OK";
+            return p_sInfo;
         }
         #endregion
 
         #region StateReady
         public override string StateReady()
         {
+            CheckPlaced();
             if (p_infoCarrier.m_bReqLoad)
             {
                 p_infoCarrier.m_bReqLoad = false;
@@ -319,7 +320,7 @@ namespace Root_AOP01_Packing.Module
         #endregion
 
         #region ILoadport
-        public string RunDocking()
+        public string StartRunDocking()
         {
             if (p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runDocking.Clone();
@@ -328,7 +329,7 @@ namespace Root_AOP01_Packing.Module
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
 
-        public string RunUndocking()
+        public string StartRunUndocking()
         {
             if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runUndocking.Clone();
@@ -340,6 +341,30 @@ namespace Root_AOP01_Packing.Module
         public bool p_bPlaced { get { return m_diPodCheck[0].p_bIn; } }
         public bool p_bPresent { get { return (m_diPodCheck[1].p_bIn && m_diPodCheck[2].p_bIn); } }
 
+        #endregion
+
+        #region Docking & Undocking
+        public string RunDocking()
+        {
+            if (p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return "InfoCarrier State not Placed";
+            if (Run(RunDoorMove(ePos.Open))) return p_sInfo;
+            if (Run(RunGuide(true))) return p_sInfo;
+            if (p_eDoor != eDoor.Open) return "Door Open Sensor Error";
+            p_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+            m_ceidDocking.Send();
+            return "OK";
+        }
+
+        public string RunUnDocking()
+        {
+            if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "InfoCarrier State not Dock";
+            if (Run(RunDoorMove(ePos.Close))) return p_sInfo;
+            if (Run(RunGuide(true))) return p_sInfo;
+            if (p_eDoor != eDoor.Close) return "Door Close Sensor Error";
+            m_ceidUnDocking.Send();
+            p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+            return "OK";
+        }
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }
@@ -389,27 +414,19 @@ namespace Root_AOP01_Packing.Module
                 InitModuleRun(module);
             }
 
-            bool m_bMapping = true;
             public override ModuleRunBase Clone()
             {
                 Run_Docking run = new Run_Docking(m_module);
-                run.m_bMapping = m_bMapping;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_bMapping = tree.Set(m_bMapping, m_bMapping, "Mapping", "Wafer Mapping When Loading", bVisible);
             }
 
             public override string Run()
             {
-                if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                //if (m_module.Run(m_module.CmdLoad(m_bMapping))) return p_sInfo;
-                //if (m_module.Run(m_module.CmdGetMapData())) return p_sInfo;
-                m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
-                m_module.m_ceidDocking.Send();
-                return "OK";
+                return m_module.RunDocking(); 
             }
         }
 
@@ -424,26 +441,19 @@ namespace Root_AOP01_Packing.Module
                 InitModuleRun(module);
             }
 
-            string m_sUndocking = "Undocking";
             public override ModuleRunBase Clone()
             {
                 Run_Undocking run = new Run_Undocking(m_module);
-                run.m_sUndocking = m_sUndocking;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_sUndocking = tree.Set(m_sUndocking, m_sUndocking, "Undocking", "Carrier Undocking", bVisible, true);
             }
 
             public override string Run()
             {
-                if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock) return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                //if (m_module.Run(m_module.CmdUnload())) return p_sInfo;
-                m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                m_module.m_ceidUnDocking.Send();
-                return "OK";
+                return m_module.RunUnDocking();
             }
         }
         #endregion
