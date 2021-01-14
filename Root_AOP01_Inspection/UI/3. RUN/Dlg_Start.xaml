@@ -509,28 +509,22 @@
                                      Margin="10,5">
                             <TextBlock Text="Loadport"
                                        VerticalAlignment="Center" />
-                            <TextBlock Text="LOADPORT 1"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Left" />
+                            <TextBlock Text="{Binding p_sLocID}" VerticalAlignment="Center" HorizontalAlignment="Left" TextAlignment="Left"/>
                             <TextBlock Text="Pod ID"
                                        VerticalAlignment="Center" />
-                            <TextBlock Text="POD00001"
-                                       VerticalAlignment="Center"
+                            <TextBox Text="{Binding p_sCarrierID}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left"
                                        HorizontalAlignment="Left" />
                             <TextBlock Text="Lot ID"
                                        VerticalAlignment="Center" />
-                            <TextBlock Text="LOT00001"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Left" />
+                            <TextBox Name="textBoxLotID" Text="{Binding p_sLotID}" MinWidth="50" HorizontalAlignment="Left" VerticalAlignment="Center" TextAlignment="Left" />
                             <TextBlock Text="Reticle ID"
                                        VerticalAlignment="Center" />
-                            <TextBlock Text="DUMMY001"
-                                       VerticalAlignment="Center"
+                            <TextBox x:Name="textBoxSlotID" Text="{Binding p_sSlotID}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left"
                                        HorizontalAlignment="Left" />
                             <TextBlock Text="Recipe ID"
                                        VerticalAlignment="Center" />
-                            <TextBlock Text="Recipe001.rcp"
-                                       VerticalAlignment="Center"
+                            <TextBlock Text="{Binding p_sRecipeName}"
+                                       VerticalAlignment="Center" TextAlignment="Left"
                                        HorizontalAlignment="Left" />
                         </UniformGrid>
                     </Grid>

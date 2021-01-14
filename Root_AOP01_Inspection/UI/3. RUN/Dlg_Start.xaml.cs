@@ -1,22 +1,10 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Controls;
-using System.Windows.Threading;
+﻿using System.Windows;
 using RootTools;
-using RootTools.Module;
-using Root_AOP01_Inspection.Module;
-using Root_EFEM.Module;
-using static Root_EFEM.Module.WTR_RND;
 using System.Windows.Input;
-using System.ComponentModel;
-using RootTools.Gem;
-using System.Threading;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Text;
-using RootTools.Trees;
 using Root_AOP01_Inspection.UI._3._RUN;
+
 
 namespace Root_AOP01_Inspection
 {
@@ -26,20 +14,14 @@ namespace Root_AOP01_Inspection
     public partial class Dlg_Start : Window
     {
         static public bool m_bShow = false;
-        AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
         AOP01_Recipe m_recipe;
-        MainVision m_mainvision;
-        WTRCleanUnit m_wtrcleanunit;
-        WTRArm m_wtr;
-        Arm m_arm;
         RNR m_aRnR;
-        Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
-        Loadport_RND[] m_rndloadport = new Loadport_RND[2];
-        AOP01_Handler.eLoadport LoadportType;
-        public Dlg_Start()
+        InfoCarrier m_infoCarrier = null;
+        public Dlg_Start(InfoCarrier infoCarrier)
         {
             InitializeComponent();
+            m_infoCarrier = infoCarrier;
         }
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -50,31 +32,22 @@ namespace Root_AOP01_Inspection
             this.Close();
             m_bShow = false;
         }
-        public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
-            Loadport_Cymechs loadport2, AOP01_Engineer engineer)
+        public void Init(AOP01_Handler handler)
         {
-            m_aRnR = new RNR();
-            m_aRecipe = new ObservableCollection<Recipe>();
-            m_engineer = engineer;
-            m_handler = engineer.m_handler;
-            m_recipe = engineer.m_handler.m_recipe;
-            listviewRCP.ItemsSource = m_aRecipe;
-            RNRset.DataContext = m_aRnR;
-        }
-        public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_RND loadport1,
-            Loadport_RND loadport2, AOP01_Engineer engineer)
-        {
-            m_aRnR = new RNR();
-            m_aRecipe = new ObservableCollection<Recipe>();
-            m_engineer = engineer;
-            m_handler = engineer.m_handler;
-            m_recipe = engineer.m_handler.m_recipe;
-            listviewRCP.ItemsSource = m_aRecipe;
-            RNRset.DataContext = m_aRnR;
+            //m_aRnR = new RNR();
+            //m_aRecipe = new ObservableCollection<Recipe>();
+            m_handler = handler;
+            m_recipe = m_handler.m_recipe;
+            //listviewRCP.ItemsSource = m_aRecipe;
+            //RNRset.DataContext = m_aRnR;
         }
         ManualJobSchedule m_JobSchedule;
         public void Init(ManualJobSchedule jobschdule)
         {
+            m_aRnR = new RNR();
+            m_aRecipe = new ObservableCollection<Recipe>();
+            listviewRCP.ItemsSource = m_aRecipe;
+            RNRset.DataContext = m_aRnR;
             m_JobSchedule = jobschdule;
             this.DataContext = jobschdule;
         }   
@@ -124,13 +97,18 @@ namespace Root_AOP01_Inspection
                 AddRecipe(rcpname, file.LastWriteTime.ToString());
             }
         }
+        public string sRecipe = "";
         void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {  
             Recipe typeItem = (Recipe)listviewRCP.SelectedItem;
             string sRecipeName = typeItem.p_sRecipeName.ToString();
-            string sRecipe = m_recipe.m_sPath + sRecipeName;
-            m_recipe.m_moduleRunList.OpenJob(sRecipe);
-            m_recipe.m_moduleRunList.RunTree(Tree.eMode.Init);
+            sRecipe = m_recipe.m_sPath + sRecipeName;
+
+            ////////////////////////////////////////////////////////
+
+
+            //m_recipe.m_moduleRunList.OpenJob(sRecipe);
+            //m_recipe.m_moduleRunList.RunTree(Tree.eMode.Init);
         }
         #endregion
 
@@ -164,6 +142,14 @@ namespace Root_AOP01_Inspection
 
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
+            InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(0);
+            if (infoWafer != null)
+            {
+                infoWafer.RecipeOpen(sRecipe);
+                m_handler.AddSequence(infoWafer);
+                m_handler.CalcSequence();
+                //m_infoCarrier.StartProcess(infoWafer.p_id);
+            }
             this.DialogResult = true;
         }
     }

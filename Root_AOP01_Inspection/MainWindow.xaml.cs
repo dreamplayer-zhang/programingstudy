@@ -160,16 +160,7 @@ namespace Root_AOP01_Inspection
             
             Init_ViewModel();
             Init_UI();
-			switch (m_engineer.m_handler.LoadportType)
-			{
-				case AOP01_Handler.eLoadport.Cymechs:
-                    Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer); 
-                    break;
-				case AOP01_Handler.eLoadport.RND:
-                default:
-                    Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_RND)m_engineer.m_handler.m_aLoadport[0], (Loadport_RND)m_engineer.m_handler.m_aLoadport[1], m_engineer);
-                    break;
-			}
+            Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer); 
         }
         void Init_ViewModel()
         {

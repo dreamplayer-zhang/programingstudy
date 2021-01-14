@@ -465,7 +465,7 @@ namespace Root_AOP01_Inspection.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Grab(this), false, "Run Grab");
+            AddModuleRunList(new Run_Grab(this), true, "Run Grab");
             AddModuleRunList(new Run_Grab45(this), false, "Run Grab 45");
             AddModuleRunList(new Run_GrabSideScan(this), false, "Run Side Scan");
             AddModuleRunList(new Run_LADS(this), false, "Run LADS");

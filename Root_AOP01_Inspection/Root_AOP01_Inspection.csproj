@@ -282,6 +282,9 @@
     <Compile Include="UI\1. SETUP\Setup_Panel.xaml.cs">
       <DependentUpon>Setup_Panel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_UserControl\Loadport_UI.xaml.cs">
+      <DependentUpon>Loadport_UI.xaml</DependentUpon>
+    </Compile>
     <Page Include="UI\3. RUN\Dlg_Start.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -405,6 +408,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. SETUP\Setup_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_UserControl\Loadport_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

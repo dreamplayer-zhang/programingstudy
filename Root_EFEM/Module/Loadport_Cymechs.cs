@@ -655,12 +655,14 @@ namespace Root_EFEM.Module
         CEID m_ceidUnDocking;
         ALID m_alidPlaced;
         public ALID m_alidInforeticle;
+        public CEID m_ceidUnloadReq;
         void InitGAF() 
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
             m_ceidDocking = m_gaf.GetCEID(this, "Docking");
             m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
+            m_ceidUnloadReq = m_gaf.GetCEID(this, "Unload Request");
             m_alidInforeticle = m_gaf.GetALID(this, "Info Reticle Error", "Info Reticle Error");
         }
         #endregion
