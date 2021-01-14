@@ -97,6 +97,7 @@ namespace RootTools.OHT.Semi
         bool _bHoAvailable = true; 
         bool p_bHoAvailable
         {
+            get { return m_doHoAvailable.p_bOn; }
             set
             {
                 if (m_doHoAvailable.p_bOn != value) return;
@@ -159,29 +160,58 @@ namespace RootTools.OHT.Semi
             m_log.Info(tp.ToString() + " Start StopWatch");
         }
 
+        StopWatch m_swTD = new StopWatch();
+        eTP m_eCheckTD = eTP.TD3;
+        int m_msTD = 0;
+        public void StartTD3()
+        {
+            m_eCheckTD = eTP.TD3;
+            m_msTD = 1000 * m_dicTP[eTP.TD3];
+            m_swTD.Start();
+            m_log.Info(eTP.TD3.ToString() + " Start StopWatch");
+        }
+
+        public string CheckTD3()
+        {
+            if (EQ.p_bSimulate) return "OK";
+            if (m_msTD <= 0) return "OK";
+            if (m_swTD.ElapsedMilliseconds < m_msTD) return "OK";
+            if (m_bOHTErr == true)
+            {
+                return "OK";
+            }
+            m_msTD = 0;
+            return "TD3 Timeout";
+        }
+
+
         string CheckTP()
         {
             if (EQ.p_bSimulate) return "OK";
             if (m_msTP <= 0) return "OK";
             if (m_swTP.ElapsedMilliseconds < m_msTP) return "OK";
+            if (m_bOHTErr == true)
+            {
+                return "OK";
+            }          
             m_msTP = 0;
-            m_bOHTErr = true; //KHd 201130 add
             switch (m_eCheckTP)
             {
-                case eTP.TP1: return "TP1 Timeout (TR_REQ signal did not turn ON within specified time.)";
-                case eTP.TP2: return "TP2 Timeout (BUSY signal did not turn ON within specified time.)";
+                case eTP.TP1: return "TP1 Timeout (TR_REQ signal did not\n turn ON within specified time.)";
+                case eTP.TP2: return "TP2 Timeout (BUSY signal did not\n turn ON within specified time.)";
                 case eTP.TP3:
-                    if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad) return "TP3 Timeout (Carrier was not detected within specified time.)";
-                    return "TP3 Timeout (Carrier was not removed within specified time.)";
+                    if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad) return "TP3 Timeout (Carrier was not\n detected within specified time.)";
+                    return "TP3 Timeout (Carrier was not\n removed within specified time.)";
                 case eTP.TP4:
-                    if (m_diBusy.p_bOn) return "TP4 Timeout (BUSY signal did not turn OFF within specified time.)";
-                    if (m_diTrReq.p_bOn) return "TP4 Timeout (TR_REQ signal did not turn OFF within specified time.)";
-                    return "TP4 Timeout (COMPT signal did not turn ON within specified time.)";
+                    if (m_diBusy.p_bOn) return "TP4 Timeout (BUSY signal did not\n turn OFF within specified time.)";
+                    if (m_diTrReq.p_bOn) return "TP4 Timeout (TR_REQ signal did not\n turn OFF within specified time.)";
+                    return "TP4 Timeout (COMPT signal did not\n turn ON within specified time.)";
                 case eTP.TP5:
-                    if (m_diValid.p_bOn) return "TP5 Timeout (VALID signal did not turn OFF within specified time.";
-                    if (m_diComplete.p_bOn) return "TP5 Timeout (COMPT signal did not turn OFF within specified time.";
-                    return "TP5 Timeout (CS_0 signal did not turn OFF within specified time.";
+                    if (m_diValid.p_bOn) return "TP5 Timeout (VALID signal did not\n turn OFF within specified time.)";
+                    if (m_diComplete.p_bOn) return "TP5 Timeout (COMPT signal did not\n turn OFF within specified time.)";
+                    return "TP5 Timeout (CS_0 signal did not\n turn OFF within specified time.)";
                 case eTP.TD3: return "TD3 Timeout";
+                    
             }
             return "OK";
         }
@@ -225,12 +255,12 @@ namespace RootTools.OHT.Semi
                     case eState.Ready_Off: StartTP(eTP.TP5); break;
                     default: StartTP(eTP.NA); break; 
                 }
-                if (value == eState.All_Off)
-                {
-                    m_doLoadReq.p_bOn = false;
-                    m_doUnloadReq.p_bOn = false;
-                    m_doReady.p_bOn = false;
-                }
+                //if (value == eState.All_Off)
+                //{
+                //    m_doLoadReq.p_bOn = false;
+                //    m_doUnloadReq.p_bOn = false;
+                //    m_doReady.p_bOn = false;
+                //}
             }
         }
         #endregion
@@ -255,10 +285,19 @@ namespace RootTools.OHT.Semi
             Thread.Sleep(2000);
             while (m_bThread)
             {
+                
+                if(EQ.p_eState == EQ.eState.Error)
+                {
+                    //p_sInfo = "System Error";
+                    //m_bOHTErr = true;
+                    //return;
+                }
+
                 Thread.Sleep(20);
                 if (m_bAuto && m_bAuto != m_bAuto_p)
                 {
-                    if(!m_bPODExist)
+                    m_carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Auto;
+                    if (!m_bPODExist)
                     {
                         m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                     }
@@ -266,15 +305,20 @@ namespace RootTools.OHT.Semi
                     {
                         m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
                     }
-                    m_bAuto_p = m_bAuto;
                 }
+                else if(!m_bAuto && m_bAuto != m_bAuto_p)
+                {
+                    m_carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Manual;
+                }
+                m_bAuto_p = m_bAuto;
                 p_eAccessLP = m_carrier.p_eAccessLP;
                 //p_bModuyleReady = (m_module.p_eState == ModuleBase.eState.Ready);
                 //p_eAccessLP = GemCarrierBase.eAccessLP.Manual;
                 p_bModuyleReady = true;
 
-                p_bES = m_diLightCurtain.p_bOn || (m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual);
-                p_bHoAvailable = p_bES || (p_bModuyleReady == false);
+                //p_bES = m_diLightCurtain.p_bOn || (m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual);
+                p_bES = m_bOHTErr || m_diLightCurtain.p_bOn || m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual;
+                p_bHoAvailable = (p_bES || p_bModuyleReady == false) || m_carrier.p_eTransfer == GemCarrierBase.eTransfer.TransferBlocked;
                 //p_bES = m_diLightCurtain.p_bOn 
                 //p_bHoAvailable = p_bES
 
@@ -282,6 +326,7 @@ namespace RootTools.OHT.Semi
                 if (sTP != "OK")
                 {
                     p_sInfo = sTP;
+                    m_bOHTErr = true; //KHd 201130 add
                     p_eState = eState.All_Off;
                 }
                 if (!m_bOHTErr && m_bAuto)
@@ -390,15 +435,15 @@ namespace RootTools.OHT.Semi
             get { return _eAccessLP; }
             set
             {
-                if (value == GemCarrierBase.eAccessLP.Manual)
-                {
-                    CheckCS(false);
-                    CheckDI(m_diValid, false);
-                    CheckDI(m_diTrReq, false);
-                    CheckDI(m_diBusy, false);
-                    CheckDI(m_diComplete, false);
-                    p_eState = eState.All_Off;
-                }
+                //if (value == GemCarrierBase.eAccessLP.Manual)
+                //{
+                //    CheckCS(false);
+                //    CheckDI(m_diValid, false);
+                //    CheckDI(m_diTrReq, false);
+                //    CheckDI(m_diBusy, false);
+                //    CheckDI(m_diComplete, false);
+                //    p_eState = eState.All_Off;
+                //}
                 if (_eAccessLP == value) return;
                 _eAccessLP = value;
                 if (value == GemCarrierBase.eAccessLP.Auto)
@@ -450,7 +495,8 @@ namespace RootTools.OHT.Semi
                 default: return;
             }
             if (m_carrier.p_ePresentSensor == present) return;
-            p_sInfo = p_id + " Illegal Prosent Sensor";
+            p_sInfo = p_id + " Illegal Present Sensor";
+            m_bOHTErr = true;
         }
 
         bool IsCS(bool bOn)
@@ -470,11 +516,19 @@ namespace RootTools.OHT.Semi
         
         void CheckDI(DI di, bool bOn)
         {
-            if (m_module.p_eState == ModuleBase.eState.Error) return; 
+            //if (m_module.p_eState == ModuleBase.eState.Error) return; 
             if (di.p_bOn == bOn) return; 
             string sOn = bOn ? "ON" : "OFF";
             m_bOHTErr = true;                  //KHD 201130 add
-            p_sInfo = p_id + m_eCheckTP.ToString() + " Illegal sequence (" + di.p_id + " signal was turned " + sOn + " improperly";
+            p_sInfo = p_id + m_eCheckTP.ToString() + " Illegal sequence \n(" + di.p_id + " signal was turned\n " + sOn + " improperly";
+        }
+
+        public void AutoCheckDI(DI di)
+        {
+            //if (m_module.p_eState == ModuleBase.eState.Error) return;
+            if (di.p_bOn != true) return;
+            m_bOHTErr = true;                  //KHD 201130 add
+            p_sInfo = p_id + m_eCheckTP.ToString() + " Illegal sequence \n(" + di.p_id + " signal was turned ON\n improperly";
         }
 
         bool IsLUReqDone()
