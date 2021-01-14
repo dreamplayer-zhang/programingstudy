@@ -238,8 +238,10 @@
     <Compile Include="EdgeResult.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />
+    <Compile Include="Module\EdgeSideVision\Run_InspectEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_InspectEdge.cs" />
     <Compile Include="Module\InspectionManagerBackside.cs" />
+    <Compile Include="Module\InspectionManagerEBR.cs" />
     <Compile Include="Module\InspectionManagerEdge.cs" />
     <Compile Include="Module\InspectionManagerFrontside.cs" />
     <Compile Include="Module\Vision\Run_AutoFocus.cs" />
