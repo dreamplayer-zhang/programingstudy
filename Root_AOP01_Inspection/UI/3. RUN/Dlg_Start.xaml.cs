@@ -48,6 +48,10 @@ namespace Root_AOP01_Inspection
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+            //m_bShow = false;
+        }
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
             m_bShow = false;
         }
         public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
