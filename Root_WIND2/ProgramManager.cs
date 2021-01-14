@@ -60,10 +60,12 @@ namespace Root_WIND2
         private ImageData roiLayer;
 
         private ImageData imageEdge;
+        private ImageData imageEBR;
 
         InspectionManagerFrontside inspectionFront;
         InspectionManagerBackside inspectionBack;
         InspectionManagerEdge inspectionEdge;
+        InspectionManagerEBR inspectionEBR;
         #endregion
 
         #region [Getter Setter]
@@ -75,9 +77,11 @@ namespace Root_WIND2
         public InspectionManagerFrontside InspectionFront { get => inspectionFront; private set => inspectionFront = value; }
         public InspectionManagerBackside InspectionBack { get => inspectionBack; private set => inspectionBack = value; }
         public InspectionManagerEdge InspectionEdge { get => inspectionEdge; private set => inspectionEdge = value; }
-        
+        public InspectionManagerEBR InspectionEBR { get => inspectionEBR; set => inspectionEBR = value; }
+
         public IDialogService DialogService { get => dialogService; set => dialogService = value; }
         public ImageData ImageEdge { get => imageEdge; private set => imageEdge = value; }
+        public ImageData ImageEBR { get => imageEBR; private set => imageEBR = value; }
         #endregion
 
         public bool Initialize()
@@ -121,8 +125,11 @@ namespace Root_WIND2
             if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
             {
                 imageEdge = GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
-                imageEdge.p_nByte = memoryTool.GetMemory("EdgeSide Vision.Memory", "EdgeSide Vision", "EdgeTop").p_nCount;                    
-			}
+                imageEdge.p_nByte = memoryTool.GetMemory("EdgeSide Vision.Memory", "EdgeSide Vision", Module.EdgeSideVision.EDGE_TYPE.EdgeTop.ToString()).p_nCount;
+
+                imageEBR = GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EBR);
+                imageEBR.p_nByte = memoryTool.GetMemory("EdgeSide Vision.Memory", "EdgeSide Vision", Module.EdgeSideVision.EDGE_TYPE.EBR.ToString()).p_nCount;
+            }
 
             return true;
         }
@@ -167,6 +174,10 @@ namespace Root_WIND2
 
                 this.Engineer.InspectionEdge = this.InspectionEdge;
                 this.Engineer.InspectionEdge.Recipe = this.recipe;
+
+                this.inspectionEBR = new InspectionManagerEBR(imageEBR.GetPtr(), imageEBR.p_Size.X, imageEBR.p_Size.Y);
+                this.Engineer.InspectionEBR = this.InspectionEBR;
+                this.Engineer.InspectionEBR.Recipe = this.recipe;
             }
             return true;
         }

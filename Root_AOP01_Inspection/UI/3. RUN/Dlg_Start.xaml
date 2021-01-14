@@ -11,10 +11,11 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Height="800"
-        Width="1200"
+        Width="800"
         Background="Gray">
     <Window.Resources>
         <converter:BoolToRunColorConverter x:Key="BoolToRunColorConverters" />
+
     </Window.Resources>
     <Grid Background="{StaticResource PanelBackGround}"
           Margin="1">
@@ -59,230 +60,9 @@
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <GroupBox Header="Loadport 1">
-                    <Grid Name="Loadport1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <UniformGrid Columns="2" Margin="10">
-                                <TextBlock Text="Pod ID"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Text="pod00001"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Left" />
-                                <TextBlock Text="Lot ID"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Text="lot00001"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Left" />
-                                <TextBlock Text="Reticle ID"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Text="dummy001"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Left" />
-                            </UniformGrid>
-                        </Grid>
-                        <Viewbox Margin="5"
-                                 VerticalAlignment="Top"
-                                 HorizontalAlignment="Right"
-                                 Width="15" Height="15">
-                            <CheckBox Name="Loadport1_Check" IsChecked="false" Checked="LP1CheckBox_Checked"/>
-                        </Viewbox>
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <!--<UniformGrid Columns="4"
-                                         Rows="2">-->
-                            <Grid Margin="3" x:Name="AccessManual1" Grid.Column="0" Grid.Row="0" 
-                                      Background="LightGray">
-                                <TextBlock Text="Manual"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                            </Grid>
-                            <Grid Margin="3" x:Name="AccessAuto1" Grid.Column="1" Grid.Row="0"
-                                      Background="LightGray">
-                                <TextBlock Text="Auto"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                            </Grid>
-                            <Grid Margin="3" x:Name="Present1" Grid.Column="2" Grid.Row="0"
-                                      Background="LightGray">
-                                <TextBlock Text="Present"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                            </Grid>
-                            <Grid Margin="3" x:Name="Placed1" Grid.Column="3" Grid.Row="0" 
-                                      Background="LightGray">
-                                <TextBlock Text="Placed" 
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center">
-                                </TextBlock>
-                            </Grid>
-                            <Grid Margin="3" x:Name="Load1" Grid.Column="0" Grid.Row="1"
-                                      Background="LightGray">
-                                <TextBlock Text="Load"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                            </Grid>
-                            <Grid Margin="3" x:Name="UnLoad1" Grid.Column="1" Grid.Row="1"
-                                      Background="LightGray">
-                                <TextBlock Text="Unload"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                            </Grid>
-                            <Grid Margin="3"  Grid.Column="2" Grid.Row="1"
-                                      Background="LightGray">
-                                <TextBlock Text="Reserve"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                            </Grid>
-                            <Grid Margin="3" x:Name="Alarm1" Grid.Column="3" Grid.Row="1"
-                                      Background="LightGray">
-                                <TextBlock Text="Alarm"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                            </Grid>
-
-                            <!--</UniformGrid>-->
-                        </Grid>
-                        <Grid Grid.Row="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Button Content="Load" Name="ButtonLoad1"
-                                    Margin="3,0"
-                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonLoad1_Click" />
-                            <Button Content="Unload" Name="ButtonUnLoad1"
-                                    Margin="3,0"
-                                    Grid.Column="1"
-                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoad1_Click" />
-                        </Grid>
-                    </Grid>
-                </GroupBox>
-                <GroupBox Header="Loadport 2" Grid.Row="1">
-                    <Grid Name="Loadport2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*" />
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <UniformGrid Columns="2" Margin="10">
-                                <TextBlock Text="Pod ID"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Text="pod00001"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Left" />
-                                <TextBlock Text="Lot ID"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Text="lot00001"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Left" />
-                                <TextBlock Text="Reticle ID"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Text="dummy001"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Left" />
-                            </UniformGrid>
-                        </Grid>
-                        <Viewbox Margin="5"
-                                 VerticalAlignment="Top"
-                                 HorizontalAlignment="Right"
-                                 Width="15"
-                                 Height="15">
-                            <CheckBox Name="Loadport2_Check" IsChecked="False" Checked="LP2CheckBox_Checked" />
-                        </Viewbox>
-                        <Grid Grid.Row="1">
-                            <UniformGrid Columns="4"
-                                         Rows="2">
-                                <Grid Margin="3" x:Name="AccessManual2"
-                                      Background="LightGray">
-                                    <TextBlock Text="Manual"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3" x:Name="AccessAuto2"
-                                      Background="LightGray">
-                                    <TextBlock Text="Auto"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3" x:Name="Present2"
-                                      Background="LightGray">
-                                    <TextBlock Text="Present"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3" x:Name="Placed2"
-                                      Background="LightGray">
-                                    <TextBlock Text="Placed"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3" x:Name="Load2"
-                                      Background="LightGray">
-                                    <TextBlock Text="Load"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3" x:Name="UnLoad2"
-                                      Background="LightGray">
-                                    <TextBlock Text="Unload"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
-                                      Background="LightGray">
-                                    <TextBlock Text="Reserve"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3" x:Name="Alarm2"
-                                      Background="LightGray">
-                                    <TextBlock Text="Alarm"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-
-                            </UniformGrid>
-                        </Grid>
-                        <Grid Grid.Row="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Button Content="Load" Name="ButtonLoad2"
-                                    Margin="3,0"
-                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonLoad2_Click" />
-                            <Button Content="Unload" Name="ButtonUnLoad2"
-                                    Margin="3,0"
-                                    Grid.Column="1"
-                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoad2_Click" />
-                        </Grid>
-                    </Grid>
-                </GroupBox>
-            </Grid>
-            <Grid Grid.Column="1">
                 <GroupBox Grid.Row="1"
                           Header="Result">
                     <Grid>
@@ -329,8 +109,14 @@
                                         Style="{StaticResource SetupPanelBtn}" Click="ButtonSearch_Click" VerticalAlignment="Top" />
                             </Grid>
                         </GroupBox>
+
                         <ListView
                             Grid.Row="1" x:Name="listviewRCP">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"/>
+                                </Style>
+                            </ListView.ItemContainerStyle>
                             <ListView.View>
                                 <GridView ColumnHeaderContainerStyle="{StaticResource ResourceKey=BasicGridViewColumn}">
                                     <GridViewColumn Width="40" Header="No.">
@@ -358,55 +144,9 @@
                             </ListView.View>
                         </ListView>
                     </Grid>
-                    <!--<DataGrid IsReadOnly="True"
-                                  Grid.Row="1">
-                            <DataGrid.Resources>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="HorizontalAlignment"
-                                            Value="Stretch" />
-                                    <Setter Property="HorizontalContentAlignment"
-                                            Value="Center" />
-                                </Style>
-                            </DataGrid.Resources>
-                            --><!--<DataGrid.Columns>
-                                <DataGridTextColumn  Header="No."
-                                                     Binding="{Binding Path=a}"
-                                                     Width="0.4*" />
-                                <DataGridTextColumn  Header="Recipe"
-                                                     Binding="{Binding Path=d}"
-                                                     Width="1*" />
-                                <DataGridTextColumn  Header="Date"
-                                                     Binding="{Binding Path=b}"
-                                                     Width="1.2*" />
-                            </DataGrid.Columns>-->
-                            <!--<local:Dummy a="0"
-                                         b="2020-11-27-05:55"
-                                         c="Reticle001"
-                                         d="Recipe001.rcp" />
-                            <local:Dummy a="1"
-                                         b="2020-11-27-07:05"
-                                         c="Reticle002"
-                                         d="Recipe002.rcp" />
-                            <local:Dummy a="2"
-                                         b="2020-11-27-08:12"
-                                         c="Reticle003"
-                                         d="Recipe003.rcp" />
-                            <local:Dummy a="3"
-                                         b="2020-11-27-11:34"
-                                         c="Reticle004"
-                                         d="Recipe004.rcp" />
-                            <local:Dummy a="4"
-                                         b="2020-11-27-11:34"
-                                         c="Reticle004"
-                                         d="Recipe004.rcp" />
-                            <local:Dummy a="5"
-                                         b="2020-11-27-11:34"
-                                         c="Reticle004"
-                                         d="Recipe004.rcp" />--><!--
-                        </DataGrid>-->
                 </GroupBox>
             </Grid>
-            <Grid Grid.Column="2">
+            <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="2.5*" />
                     <RowDefinition Height="*" />
@@ -747,18 +487,18 @@
                             </Border>
 
                         </Grid>
-                        <GroupBox Margin="10,0,10,5" Grid.Row="1">
+                        <GroupBox Margin="10,0,10,5" Grid.Row="2">
                             <GroupBox.Header>
                                 <TextBlock Text="Option" />
                             </GroupBox.Header>
-                            <UniformGrid Margin="10,5" Columns="2">
-                                <CheckBox Content="Option1" />
-                                <CheckBox Content="Option2" />
-                                <CheckBox Content="Option3" />
-                                <CheckBox Content="Option4" />
-                                <CheckBox Content="Option5" />
-                                <CheckBox Content="Option6" />
-                                <CheckBox Content="Option7" />
+                            <UniformGrid Margin="10,5">
+                                <StackPanel x:Name="RNRset" Orientation="Vertical">
+                                    <CheckBox Name="RNRMode" Margin="10" Content="RNR Mode" IsChecked="{Binding p_bRnR}"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Name="RNRCount" Text=" RnR Count = " VerticalAlignment="Center"/>
+                                        <TextBox Text="{Binding p_nRnR}" IsEnabled="{Binding ElementName=RNRMode, Path=IsChecked}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left" />
+                                    </StackPanel>
+                                </StackPanel>
                             </UniformGrid>
                         </GroupBox>
                     </Grid>
@@ -804,9 +544,9 @@
                     Width="300"
                     Click="CloseButton_Click"
                     Style="{StaticResource SetupPanelBtn}" />
-            <Button Content="Start"
+            <Button Name="Start" Content="Start"
                     Width="300"
-                    Style="{StaticResource SetupPanelBtn}" />
+                    Style="{StaticResource SetupPanelBtn}" Click="ButtonStart_Click" />
         </StackPanel>
     </Grid>
 </Window>

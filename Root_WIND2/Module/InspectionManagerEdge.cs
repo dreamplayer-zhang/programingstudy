@@ -38,8 +38,6 @@ namespace Root_WIND2
 		public enum InsepectionMode
 		{
 			EDGE,
-			//BACK,
-			//EBR,
 		}
 
 		private InsepectionMode inspectionMode = InsepectionMode.EDGE;
@@ -68,6 +66,11 @@ namespace Root_WIND2
 			this.SharedBufferR_Gray = ptrR;
 			this.SharedBufferG = ptrG;
 			this.SharedBufferB = ptrB;
+		}
+
+		public bool SetCameraInfo()
+		{
+			return true;
 		}
 
 		public bool CreateInspection()
@@ -151,6 +154,11 @@ namespace Root_WIND2
 			}
 
 			return true;
+		}
+
+		private void SetWorkplace(int degree)
+		{
+			//전체이미지 Y / 
 		}
 
 		public new void Start()

@@ -152,6 +152,10 @@ namespace Root_WIND2
         private InspectionManagerEdge inspectionEdge;
         public InspectionManagerEdge InspectionEdge { get => inspectionEdge; set => inspectionEdge = value; }
 
+        private InspectionManagerEBR inspectionEBR;
+        public InspectionManagerEBR InspectionEBR { get => inspectionEBR; set => inspectionEBR = value; }
+
+
         #region Tree Setup
         public TreeRoot m_treeRoot;
         void InitTree()

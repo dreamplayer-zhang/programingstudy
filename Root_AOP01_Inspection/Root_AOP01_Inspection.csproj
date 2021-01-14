@@ -197,6 +197,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UI\3. RUN\ManualJobSchedule.cs" />
     <Compile Include="UI\3. RUN\Dlg_Start.xaml.cs">
       <DependentUpon>Dlg_Start.xaml</DependentUpon>
     </Compile>
@@ -455,6 +456,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Control\UserControl\" />
+    <Folder Include="ManualJob\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
