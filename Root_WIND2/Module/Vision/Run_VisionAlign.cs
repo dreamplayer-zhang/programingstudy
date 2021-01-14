@@ -150,7 +150,7 @@ namespace Root_WIND2.Module
                     //int* pHeight = &height;
                     byte[] rawdata = Tools.LoadBitmapToRawdata(fullname, &width, &height);
                     
-                    result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), rawdata, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
+                    result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), rawdata, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
                 }
                 if(maxScore < result)
                 {

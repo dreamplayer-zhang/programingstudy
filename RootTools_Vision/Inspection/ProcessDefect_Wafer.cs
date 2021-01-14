@@ -252,14 +252,15 @@ namespace RootTools_Vision
                         DefectList[j].m_fSize = -123; // Merge된 Defect이 중복 저장되지 않도록...
                     }
                 }
-
-                DefectList[i].SetDefectIndex(nDefectIndex++);              
             }
+
 
             for (int i = 0; i < DefectList.Count; i++)
             {
-                if (DefectList[i].m_fSize != -123)
+                if (DefectList[i].m_fSize != -123) { 
                     MergeDefectList.Add(DefectList[i]);
+                    MergeDefectList[nDefectIndex-1].SetDefectIndex(nDefectIndex++);
+                }
             }
 
             return MergeDefectList;
