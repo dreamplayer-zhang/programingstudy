@@ -1,9 +1,5 @@
 ﻿using RootTools;
-using RootTools.Comm;
 using RootTools.Module;
-using System;
-using System.IO;
-using System.Threading;
 
 namespace Root_Rinse_Unloader.Module
 {

@@ -5,10 +5,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Root_Rinse_Unloader.Module
 {
@@ -46,7 +43,6 @@ namespace Root_Rinse_Unloader.Module
                 Empty,
                 Exist,
                 Arrived,
-                Done
             }
             eSensor _eSensor = eSensor.Empty;
             public eSensor p_eSensor
@@ -76,6 +72,11 @@ namespace Root_Rinse_Unloader.Module
                         break;
                 }
                 return "OK";
+            }
+
+            public bool IsArriveDone()
+            {
+                return m_diCheck[1].p_bIn == false; 
             }
 
             string m_id;
@@ -148,6 +149,11 @@ namespace Root_Rinse_Unloader.Module
             {
                 if (Run(m_dioPusher.RunSol(false))) return p_sInfo;
                 if (Run(RunPusherDown(true))) return p_sInfo;
+                while (m_storage.IsBusy())
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
                 m_dioPusher.Write(true);
                 int msTimeout = (1000 * m_dioPusher.m_secTimeout);
                 while (m_dioPusher.p_bDone == false)
@@ -162,6 +168,8 @@ namespace Root_Rinse_Unloader.Module
                 }
                 if (Run(m_dioPusher.RunSol(false))) return p_sInfo;
                 if (Run(RunPusherDown(false))) return p_sInfo;
+                foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
+                m_storage.StartMoveNextMagazine();
                 return "OK";
             }
             finally
@@ -192,7 +200,7 @@ namespace Root_Rinse_Unloader.Module
         }
         #endregion
 
-        #region Run
+        #region Run Run
         List<bool> m_bExist; 
         public string StartRun(List<bool> bExist)
         {
@@ -214,8 +222,11 @@ namespace Root_Rinse_Unloader.Module
                 if (EQ.IsStop()) return "EQ Stop";
             }
             Thread.Sleep((int)(1000 * secArrive));
-            //forget
-            return "OK"; 
+            foreach (Line line in m_aLine)
+            {
+                if (line.IsArriveDone() == false) return "Arrive Done Error"; 
+            }
+            return RunPusher(); 
         }
 
         bool IsExist()
@@ -258,10 +269,12 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         RinseU m_rinse;
-        public Rail(string id, IEngineer engineer, RinseU rinse)
+        Storage m_storage; 
+        public Rail(string id, IEngineer engineer, RinseU rinse, Storage storage)
         {
             p_id = id;
             m_rinse = rinse;
+            m_storage = storage; 
             InitLines();
             InitBase(id, engineer);
         }
@@ -371,7 +384,7 @@ namespace Root_Rinse_Unloader.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_secArrive = tree.Set(m_secArrive, m_secArrive, "Arrive", "Arrive Delay (sec)"); 
+                m_secArrive = tree.Set(m_secArrive, m_secArrive, "Arrive", "Arrive Delay (sec)", bVisible); 
             }
 
             public override string Run()

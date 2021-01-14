@@ -30,18 +30,24 @@ namespace Root_Rinse_Unloader.Engineer
         #region Module
         public ModuleList p_moduleList { get; set; }
         public RinseU m_rinse;
+        public Storage m_storage;
+        public Rail m_rail;
         public Roller m_roller;
-        public Rail m_rail; 
+        public Loader m_loader; 
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             m_rinse = new RinseU("Rinse", m_engineer);
             InitModule(m_rinse);
+            m_storage = new Storage("Storage", m_engineer, m_rinse);
+            InitModule(m_storage);
+            m_rail = new Rail("Rail", m_engineer, m_rinse, m_storage);
+            InitModule(m_rail);
             m_roller = new Roller("Roller", m_engineer, m_rinse, m_rail);
             InitModule(m_roller);
-            m_rail = new Rail("Rail", m_engineer, m_rinse);
-            InitModule(m_roller);
+            m_loader = new Loader("Loader", m_engineer, m_rinse, m_storage, m_roller);
+            InitModule(m_loader);
         }
 
         void InitModule(ModuleBase module)
