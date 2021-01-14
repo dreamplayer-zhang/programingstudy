@@ -111,7 +111,7 @@ namespace RootTools.Comm
         #endregion
 
         #region Receive
-        public delegate void dgOnReceive(byte[] aRead, ref int nRead);
+        public delegate void dgOnReceive(byte[] aRead, int nRead);
         public event dgOnReceive OnReceive;
 
         public int p_lRead
@@ -131,7 +131,7 @@ namespace RootTools.Comm
             int nRead = sp.Read(m_aRead, 0, p_lRead);
             string sRead = Encoding.ASCII.GetString(m_aRead, 0, nRead);
             m_commLog.Add(CommLog.eType.Receive, sRead);
-            if (OnReceive != null) OnReceive(m_aRead, ref nRead); 
+            if (OnReceive != null) OnReceive(m_aRead, nRead); 
         }
         #endregion
 

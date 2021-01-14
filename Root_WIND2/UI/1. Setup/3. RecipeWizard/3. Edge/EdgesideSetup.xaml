@@ -75,18 +75,21 @@
                                 <ColumnDefinition Width="167*"/>
                                 <ColumnDefinition Width="167*"/>
                             </Grid.ColumnDefinitions>
-                            <Button Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
+                            <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
                                     FontWeight="Bold" FontSize="12" 
                                     Content="Top" Grid.Column="0"
-                                    Command="{Binding btnTop}" Grid.ColumnSpan="2" />
-                            <Button Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
+                                    Command="{Binding btnTop}" Grid.ColumnSpan="2" 
+                                    IsChecked="{Binding IsTopChecked, Mode=TwoWay}"/>
+                            <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
                                     FontWeight="Bold" FontSize="12"
                                     Content="Side" Grid.Column="2"
-                                    Command="{Binding btnSide}" />
-                            <Button Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
+                                    Command="{Binding btnSide}"
+                                    IsChecked="{Binding IsSideChecked, Mode=TwoWay}"/>
+                            <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
                                     FontWeight="Bold" FontSize="12"
                                     Content="Bottom" Grid.Column="3"
-                                    Command="{Binding btnBottom}" />
+                                    Command="{Binding btnBottom}"
+                                    IsChecked="{Binding IsBtmChecked, Mode=TwoWay}"/>
                         </Grid>
                         <GroupBox Grid.Row="2" Header="Option" Grid.RowSpan="2" >
                             <Grid Margin="10,5">
@@ -99,7 +102,6 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-
                                 <TextBlock FontSize="12" Text="Enable EdgeSide Insp." Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                 <TextBlock FontSize="12" Text="Upload Image Size" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                 <TextBlock FontSize="12" Text="Upload Image Res." Style="{StaticResource BasicTb}" Grid.Row="2"/>
@@ -152,15 +154,18 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                     <RowDefinition/>
+                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
                                 <TextBlock FontSize="12" Text="Inspection ROI Height" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                 <TextBlock FontSize="12" Text="Inspection ROI Width" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                 <TextBlock FontSize="12" Text="Threshold" Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                 <TextBlock FontSize="12" Text="Size Minimum (um)" Style="{StaticResource BasicTb}" Grid.Row="3"/>
-                                <TextBox Text="{Binding ROIHeight}" Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Text="{Binding ROIWidth}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Text="{Binding Threshold}" Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Text="{Binding DefectSizeMin}" Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBlock FontSize="12" Text="Merge Distance " Style="{StaticResource BasicTb}" Grid.Row="4"/>
+                                <TextBox Text="{Binding ROIHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding ROIWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding Threshold, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding DefectSizeMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding MergeDist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                             </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="6" Header="Defect Code">
