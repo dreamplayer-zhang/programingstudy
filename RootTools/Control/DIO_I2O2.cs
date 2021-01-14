@@ -1,5 +1,6 @@
 ﻿using RootTools.Trees;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace RootTools.Control
 {
@@ -18,6 +19,25 @@ namespace RootTools.Control
             }
         }
 
+        public int m_secTimeout = 7; 
+        public string WaitDone()
+        {
+            int msWait = (int)(1000 * m_secTimeout);
+            while (m_swWrite.ElapsedMilliseconds < msWait)
+            {
+                if (EQ.IsStop()) return m_id + " EQ Stop";
+                if (p_bDone) return "OK";
+            }
+            return "DIO Timeout : " + m_id;
+        }
+
+        public string RunSol(bool bOn)
+        {
+            Write(bOn);
+            Thread.Sleep(200);
+            return WaitDone(); 
+        }
+
         public bool p_bOut
         {
             get { return m_aBitDO[1].p_bOn && (m_aBitDO[0].p_bOn == false); }
@@ -25,7 +45,7 @@ namespace RootTools.Control
 
         ListDIO m_listDI;
         ListDIO m_listDO;
-        string m_id;
+        public string m_id;
         Log m_log;
         public DIO_I2O2(IToolDIO tool, string id, Log log, bool bEnableRun, string sFalse, string sTrue)
         {
@@ -53,6 +73,7 @@ namespace RootTools.Control
             if (sDI1 != "OK") return sDI1;
             if (sDO0 != "OK") return sDO0;
             if (sDO1 != "OK") return sDO1;
+            m_secTimeout = tree.Set(m_secTimeout, m_secTimeout, "Timeout", "DIO WaitDone Timeout (sec)"); 
             m_eRun = (eRun)tree.Set(m_eRun, eRun.Nothing, "Run", "DIO Run Mode", p_bEnableRun);
             m_msRepeat = tree.Set(m_msRepeat, 1000, "Repeat", "Repeat Toggle Period (ms)", m_eRun == eRun.Repeat);
             return "OK";
@@ -106,10 +127,12 @@ namespace RootTools.Control
             return (m_listDO.m_aDIO[nDO].p_sID != "Output");
         }
 
+        public StopWatch m_swWrite = new StopWatch();
         public void Write(bool bOn)
         {
             m_aBitDO[0].Write(!bOn);
-            m_aBitDO[1].Write(bOn); 
+            m_aBitDO[1].Write(bOn);
+            m_swWrite.Start();
         }
 
         public bool p_bEnableRun { get; set; }

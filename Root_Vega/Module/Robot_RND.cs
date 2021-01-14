@@ -498,7 +498,7 @@ namespace Root_Vega.Module
 		}
 
         const int c_nReset = 3;
-        public override string StateHome()//CHECK
+        public override string StateHome()
         {
             if (EQ.p_bSimulate) return "OK";
             if (p_bDisableHomeWhenArmOpen && !m_diArmClose.p_bIn)

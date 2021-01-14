@@ -4,10 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
+             xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              xmlns:helper="clr-namespace:Helper"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:wpg="clr-namespace:System.Windows.Controls"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="838" d:DesignWidth="1683" Background="{StaticResource PanelBackGround}">
     <UserControl.Resources>
@@ -22,6 +24,14 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <ObjectDataProvider x:Key="DataFromEnum"
+                            MethodName="GetValues"
+                            ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="vision:IMAGE_CHANNEL"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </UserControl.Resources>
     <Grid DataContext="{Binding p_Spec_VM}">
         <ScrollViewer>
@@ -33,23 +43,23 @@
                         <ColumnDefinition Width="25*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Grid Grid.Column="0" DataContext="{Binding p_Mask_Viewer}">
+                    <Grid Grid.Column="0" DataContext="{Binding p_ROI_Viewer}">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition  Height="3*"/>
                         </Grid.RowDefinitions>
-                        <GroupBox Header="Mask"
+                        <GroupBox Header="ROI"
                               Background="{StaticResource GroupBoxBackground}">
                             <Grid>
                                 <ScrollViewer Grid.Row="0">
-                                    <DataGrid ItemsSource="{Binding p_cInspMask}"
-                                              SelectedItem="{Binding p_SelectedMask}"
+                                    <DataGrid ItemsSource="{Binding p_cInspROI}"
+                                              SelectedItem="{Binding p_SelectedROI}"
                                               SelectionMode="Single"
                                               IsReadOnly="True"
                                               RowHeaderWidth="0"
                                               AutoGenerateColumns="False">
                                         <DataGrid.Resources>
-                                            <CollectionViewSource Source="{Binding p_cInspMask}"
+                                            <CollectionViewSource Source="{Binding p_cInspROI}"
                                                                   x:Key="items" />
                                             <Style TargetType="DataGridColumnHeader">
                                                 <Setter Property="HorizontalAlignment"
@@ -75,19 +85,30 @@
                                                                 Binding="{Binding Converter={StaticResource IndexConverter},  
                                                                 ConverterParameter={StaticResource ResourceKey=items}}" />
 
+
                                             <DataGridTemplateColumn Width="*"
                                                                     Header="Color">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <Grid Background="{Binding p_Color, Converter={StaticResource ColorConverter}}"
-                                                              Margin="2" />
+                                                        <Grid Background="{Binding p_Color, Converter={StaticResource ColorConverter}}" Margin="2"/>
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
+
+                                            <!--<DataGridTemplateColumn Width="60"
+                                                                    Header="-">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Button Content="Delete"
+                                                                Margin="1"
+                                                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, 
+                                                                      Path=DataContext.DeleteROI}" />
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>-->
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </ScrollViewer>
-                                
                             </Grid>
                         </GroupBox>
                         <GroupBox Header="Viewer" Grid.Row="1">
@@ -95,6 +116,148 @@
                         </GroupBox>
                     </Grid>
                     <!--Mask&Insepection Method-->
+                    <Grid Grid.Column="1">
+                        <GroupBox Header="Inspection Item"
+                                      Background="{StaticResource GroupBoxBackground}">
+                            <StackPanel>
+                                <DataGrid ItemsSource="{Binding p_cInspItem}"
+                                              SelectedItem="{Binding p_selectedInspItem}"
+                                              SelectionMode="Single"
+                                              IsReadOnly="True"
+                                              AutoGenerateColumns="False">
+                                    <DataGrid.Resources>
+                                        <CollectionViewSource Source="{Binding p_cInspItem}" x:Key="items"/>
+                                        <Style TargetType="DataGridColumnHeader">
+                                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        </Style>
+                                        <Style x:Key="TextInCellCenter" TargetType="{x:Type TextBlock}" >
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                        </Style>
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+                                                             Color="Gainsboro"/>
+
+                                    </DataGrid.Resources>
+
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="No." Width="35"
+                                                                ElementStyle="{StaticResource TextInCellCenter}"
+                                                                Binding="{Binding Converter={StaticResource IndexConverter}, 
+                                                                ConverterParameter={StaticResource ResourceKey=items}}"/>
+
+                                        <DataGridTemplateColumn Header="Mask" Width="*">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    
+                                                    <!--<ComboBox     ItemsSource="{Binding p_cMask}"
+                                                                  SelectedItem="{Binding p_Mask, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  IsSynchronizedWithCurrentItem="False"
+                                                                  DisplayMemberPath="p_sName"
+                                                                  BorderThickness="1"
+                                                                  VerticalContentAlignment="Center">-->
+                                                    <ComboBox     ItemsSource="{Binding p_cInspROI}"
+                                                                  SelectedItem="{Binding p_InspROI, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  Background="AliceBlue"
+                                                                  IsSynchronizedWithCurrentItem="False"
+                                                                  BorderThickness="1"
+                                                                  DisplayMemberPath="p_Index"
+                                                                  HorizontalContentAlignment="Center"
+                                                                  VerticalContentAlignment="Center">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <Rectangle Fill="{Binding p_Color, Converter={StaticResource ColorConverter}}"
+                                                                               Width="15"
+                                                                               Height="15" Margin="5,0,10,0"/>
+                                                                    <TextBlock Text="{Binding p_Index}"  VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="SelectionChanged">
+                                                                <i:InvokeCommandAction Command="{Binding ComboBoxSelectionChanged_MaskItem}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </ComboBox>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <!--<DataGridTemplateColumn Header="Color" Width="*">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="2"
+                                                          Background="{Binding p_InspROI.p_Color, 
+                                                              Converter={StaticResource ColorConverter}}"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>-->
+                                        <DataGridTemplateColumn Header="Inspection Method" Width="1.5*">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ComboBox ItemsSource="{Binding p_cInspMethod}"
+                                                                  SelectedItem="{Binding p_InspMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  IsSynchronizedWithCurrentItem="False"
+                                                                  DisplayMemberPath="Name"
+                                                                  BorderThickness="1"
+                                                                  VerticalContentAlignment="Center">
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="SelectionChanged">
+                                                                <i:InvokeCommandAction Command="{Binding ComboBoxSelectionChanged_MethodItem}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </ComboBox>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <DataGridTextColumn Header="Value" Width="*"
+                                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                                    Binding="{Binding p_InspMethod.Value,
+                                                                    Converter={StaticResource StringConverter}}"/>
+                                        <DataGridTextColumn Header="Size(Pxl)" Width="*" 
+                                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                                    Binding="{Binding p_InspMethod.Size, 
+                                                                    Converter={StaticResource StringConverter}}"/>
+
+                                        <DataGridTemplateColumn Header="Channel" Width="*">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ComboBox     ItemsSource="{Binding Source={StaticResource DataFromEnum}}"
+                                                                  SelectedItem="{Binding p_InspChannel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  IsSynchronizedWithCurrentItem="False"
+                                                                  BorderThickness="1"
+                                                                  HorizontalContentAlignment="Center"
+                                                                  VerticalContentAlignment="Center">
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="SelectionChanged">
+                                                                <i:InvokeCommandAction Command="{Binding ComboBoxSelectionChanged_InspChannel}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </ComboBox>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        
+                                        <!--<DataGridTextColumn Header="Channel" Width="*" 
+                                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                                    Binding="{Binding p_InspMethod.p_inspMode, 
+                                                                    Converter={StaticResource StringConverter}}"/>-->
+                                        <DataGridTemplateColumn Width="60" Header="-">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Content="Delete" Margin="1" Height="25"
+                                                                    Command="{Binding btnDeleteInspItem}"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <Button Content="Add Inspection" Margin="1" Height="30"
+                                            Command="{Binding btnAddInspItem}"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </Grid>
                     <Grid Grid.Column="2">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -190,7 +353,7 @@
                             <GroupBox Header="Method Spec" Grid.Row="0" Grid.RowSpan="3"
                                   Background="{StaticResource GroupBoxBackground}">
                                 <GroupBox.Resources>
-                                    <local:PropertyConverter x:Key="PropertyConverter"/>
+                                    <local:PropertyConverter x:Key="PropertyConverter" />
                                 </GroupBox.Resources>
                                 <wpg:WpfPropertyGrid 
                                                     SelectedObject="{Binding p_selectedMethodItem, FallbackValue=null,
@@ -206,109 +369,6 @@
                         </Grid>
                     </Grid>
                     <!--Insepection Item-->
-                    <Grid Grid.Column="1">
-                        <GroupBox Header="Inspection Item"
-                                      Background="{StaticResource GroupBoxBackground}">
-                            <StackPanel>
-                                <DataGrid ItemsSource="{Binding p_cInspItem}"
-                                              SelectedItem="{Binding p_selectedInspItem}"
-                                              SelectionMode="Single"
-                                              IsReadOnly="True"
-                                              AutoGenerateColumns="False">
-                                    <DataGrid.Resources>
-                                        <CollectionViewSource Source="{Binding p_cInspItem}" x:Key="items"/>
-                                        <Style TargetType="DataGridColumnHeader">
-                                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                        </Style>
-                                        <Style x:Key="TextInCellCenter" TargetType="{x:Type TextBlock}" >
-                                            <Setter Property="TextAlignment" Value="Center"/>
-                                            <Setter Property="VerticalAlignment" Value="Center"/>
-                                        </Style>
-                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
-                                                             Color="Gainsboro"/>
-
-                                    </DataGrid.Resources>
-
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="No." Width="35"
-                                                                ElementStyle="{StaticResource TextInCellCenter}"
-                                                                Binding="{Binding Converter={StaticResource IndexConverter}, 
-                                                                ConverterParameter={StaticResource ResourceKey=items}}"/>
-
-                                        <DataGridTemplateColumn Header="Mask" Width="*">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <ComboBox     ItemsSource="{Binding p_cMask}"
-                                                                  SelectedItem="{Binding p_Mask, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                  IsSynchronizedWithCurrentItem="False"
-                                                                  DisplayMemberPath="p_sName"
-                                                                  BorderThickness="1"
-                                                                  VerticalContentAlignment="Center">
-                                                        <i:Interaction.Triggers>
-                                                            <i:EventTrigger EventName="SelectionChanged">
-                                                                <i:InvokeCommandAction Command="{Binding ComboBoxSelectionChanged_MaskItem}" />
-                                                            </i:EventTrigger>
-                                                        </i:Interaction.Triggers>
-                                                    </ComboBox>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Color" Width="*">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Grid Margin="2" Opacity="0.5" 
-                                                              Background="{Binding p_Mask.p_Color, 
-                                                              Converter={StaticResource ColorConverter}}"/>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn Header="Inspection Method" Width="1.5*">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <ComboBox ItemsSource="{Binding p_cInspMethod}"
-                                                                  SelectedItem="{Binding p_InspMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                  IsSynchronizedWithCurrentItem="False"
-                                                                  DisplayMemberPath="Name"
-                                                                  BorderThickness="1"
-                                                                  VerticalContentAlignment="Center">
-                                                        <i:Interaction.Triggers>
-                                                            <i:EventTrigger EventName="SelectionChanged">
-                                                                <i:InvokeCommandAction Command="{Binding ComboBoxSelectionChanged_MethodItem}" />
-                                                            </i:EventTrigger>
-                                                        </i:Interaction.Triggers>
-                                                    </ComboBox>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-
-                                        <DataGridTextColumn Header="Value" Width="*"
-                                                                    ElementStyle="{StaticResource TextInCellCenter}"
-                                                                    Binding="{Binding p_InspMethod.Name, 
-                                                                    Converter={StaticResource StringConverter}}"/>
-                                        <DataGridTextColumn Header="Size(Pxl)" Width="*" 
-                                                                    ElementStyle="{StaticResource TextInCellCenter}"
-                                                                    Binding="{Binding p_InspMethod.p_nSize, 
-                                                                    Converter={StaticResource StringConverter}}"/>
-                                        <DataGridTextColumn Header="Mode" Width="*" 
-                                                                    ElementStyle="{StaticResource TextInCellCenter}"
-                                                                    Binding="{Binding p_InspMethod.p_inspMode, 
-                                                                    Converter={StaticResource StringConverter}}"/>
-                                        <DataGridTemplateColumn Width="60" Header="-">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Button Content="Delete" Margin="1" Height="25"
-                                                                    Command="{Binding btnDeleteInspItem}"/>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                <Button Content="Add Inspection" Margin="1" Height="30"
-                                            Command="{Binding btnAddInspItem}"/>
-                            </StackPanel>
-                        </GroupBox>
-                    </Grid>
                 </Grid>
                 <Line Stroke="{StaticResource Splitter}"
                   Stretch="Fill"

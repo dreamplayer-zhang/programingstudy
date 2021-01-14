@@ -3,10 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:PackIcon="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="888" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
-        
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -22,29 +21,16 @@
             <StackPanel Orientation="Horizontal">
                 <Menu>
                     <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
-                                  Command="{Binding btnMode}"
-                                  BorderThickness="0,0,0,0">
+                              BorderBrush="#FF707070"
+                              BorderThickness="0,0,0,0">
                         <MenuItem.Header>
-                            <Grid Width="70" Height="25">
-                                <TextBlock Text="Mode"
-                                               FontSize="13"
-                                               FontWeight="Bold"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>
-                            </Grid>
-                        </MenuItem.Header>
-                    </MenuItem>
-                    <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
-                                  BorderThickness="0,0,0,0">
-                        <MenuItem.Header>
-                            <Grid Width="70" Height="25">
+                            <Grid Width="70"
+                                  Height="25">
                                 <TextBlock Text="File"
-                                               FontSize="13"
-                                               FontWeight="Bold"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
                             </Grid>
                         </MenuItem.Header>
                         <MenuItem Header="New">
@@ -55,11 +41,6 @@
                         <MenuItem Header="Load">
                             <!--<MenuItem.Icon>
                                 <material:PackIcon Kind="FileUploadOutline"/>
-                            </MenuItem.Icon>-->
-                        </MenuItem>
-                        <MenuItem Header="Import">
-                            <!--<MenuItem.Icon>
-                                <material:PackIcon Kind="FileImportOutline"/>
                             </MenuItem.Icon>-->
                         </MenuItem>
                         <MenuItem Header="Save">
@@ -73,38 +54,132 @@
                             </MenuItem.Icon>-->
                         </MenuItem>
                     </MenuItem>
-                </Menu>
-                <Menu>
                     <MenuItem Background="{StaticResource ControlBackGround}"
                               BorderBrush="#FF707070"
                               BorderThickness="0,0,0,0">
                         <MenuItem.Header>
-                            <Grid Width="80" Height="25">
-                                <TextBlock Text="Setup Map"
+                            <Grid Width="70"
+                                  Height="25">
+                                <TextBlock Text="View"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="Log">
+
+                        </MenuItem>
+                        <MenuItem Header="Alarm">
+
+                        </MenuItem>
+                        <MenuItem Header="FDC">
+
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                              BorderBrush="#FF707070"
+                              BorderThickness="0,0,0,0">
+                        <MenuItem.Header>
+                            <Grid Width="70"
+                                  Height="25">
+                                <TextBlock Text="Tool"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="Login">
+
+                        </MenuItem>
+                        <MenuItem Header="RTR">
+
+                        </MenuItem>
+                        <MenuItem Header="Loadport">
+
+                        </MenuItem>
+                        <MenuItem Header="Setting">
+
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                              BorderBrush="#FF707070"
+                              BorderThickness="0,0,0,0">
+                        <MenuItem.Header>
+                            <Grid Width="100"
+                                  Height="25">
+                                <TextBlock Text="Network"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="Online">
+
+                        </MenuItem>
+                        <MenuItem Header="Offline">
+
+                        </MenuItem>
+                        <MenuItem Header="GEM">
+
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                              BorderBrush="#FF707070"
+                              BorderThickness="0,0,0,0">
+                        <MenuItem.Header>
+                            <Grid Width="100"
+                                  Height="25">
+                                <TextBlock Text="Navigation"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="Setup Home" />
+                        <MenuItem Header="Inspction" />
+                        <MenuItem Header="Recipe Wizard">
+                            <MenuItem Header="Recipe Summary" />
+                            <MenuItem Header="PreAlign" />
+                            <MenuItem Header="FrontSide">
+                                <MenuItem Header="Front Summary" />
+                                <MenuItem Header="Alignment" />
+                                <MenuItem Header="General" />
+                            </MenuItem>
+                            <MenuItem Header="BackSide" />
+                            <MenuItem Header="EBR" />
+                            <MenuItem Header="Edge" />
+                        </MenuItem>
+                        <MenuItem Header="Matienance" />
+                        <MenuItem Header="GEM" />
+                    </MenuItem>
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                              BorderBrush="#FF707070"
+                              Command="{Binding btnMode}"
+                              BorderThickness="0,0,0,0">
+                        <MenuItem.Header>
+                            <Grid Width="100"
+                                  Height="25">
+                                <TextBlock Text="Mode Select"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+                </Menu>
+                <Button Width="100" BorderThickness="0" Background="{StaticResource ControlBackGround}"
+                        Command="{Binding btnPopUpSetting}">
+                    <TextBlock Text="Setting" 
                                                FontSize="13"
                                                FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="Setup Home"/>
-                        <MenuItem Header="Inspction"/>
-                        <MenuItem Header="Recipe Wizard">
-                            <MenuItem Header="Recipe Summary"/>
-                            <MenuItem Header="PreAlign"/>
-                            <MenuItem Header="FrontSide">
-                                <MenuItem Header="Front Summary"/>
-                                <MenuItem Header="Alignment"/>
-                                <MenuItem Header="General"/>
-                            </MenuItem>
-                            <MenuItem Header="BackSide"/>
-                            <MenuItem Header="EBR"/>
-                            <MenuItem Header="Edge"/>
-                        </MenuItem>
-                        <MenuItem Header="Matienance"/>
-                        <MenuItem Header="GEM"/>
-                    </MenuItem>
-                </Menu>
+                </Button>
                 <!--<Button Width="100" Content="Test"  Command="{Binding btnTest}"/>-->
 
 
@@ -138,8 +213,7 @@
                                     Command="{Binding p_CurrentPanel.DataContext.btnBack}"
                                     Background="{StaticResource ControlBackGround}">
                             <StackPanel Orientation="Horizontal">
-                                <!--<TextBlock Text="Back"/>-->
-                                <material:PackIcon Kind="ArrowLeftBold"/>
+                                <PackIcon:PackIconMaterial Kind="ArrowLeftBold"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -151,7 +225,7 @@
                                     Background="{StaticResource ControlBackGround}">
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Home"/>-->
-                                <material:PackIcon Kind="Home"/>
+                                <PackIcon:PackIconMaterial Kind="Home" />
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -163,8 +237,7 @@
                                     Command="{Binding btnNewRecipe}">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
-                                    <!--<TextBlock Text="Save"/>-->
-                                    <material:PackIcon Kind="FilePlusOutline"/>
+                                    <PackIcon:PackIconMaterial Kind="FolderPlus"/>
                                 </StackPanel>
                             </Button.Content>
                         </Button>
@@ -177,7 +250,8 @@
                                     Command="{Binding btnLoadRecipe}">
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Load"/>-->
-                                <material:PackIcon Kind="FolderOpen"/>
+                                <!--<material:PackIcon Kind="FolderOpen"/>-->
+                                <PackIcon:PackIconMaterial Kind="FolderOpen" />
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -189,8 +263,7 @@
                                     Command="{Binding btnSaveRecipe}">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
-                                    <!--<TextBlock Text="Save"/>-->
-                                    <material:PackIcon Kind="ContentSave"/>
+                                    <PackIcon:PackIconMaterial Kind="ContentSave" />
                                 </StackPanel>
                             </Button.Content>
                         </Button>

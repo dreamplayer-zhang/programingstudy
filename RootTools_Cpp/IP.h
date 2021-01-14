@@ -22,6 +22,7 @@ public:
 
 	  - pDst(결과 Mat)에 = 로 결과 대입 X, 반드시 copyTo Method를 사용해야 정상적으로 대입됨
 	*/
+
 	static void Threshold(BYTE* pSrc, BYTE* pDst, int nW, int nH, bool bDark, int thresh);
 	static void Threshold(BYTE* pSrc, BYTE* pDst, int nMemW, int nMemH, Point ptLT, Point ptRB, bool bDark, int thresh);
 
@@ -30,9 +31,9 @@ public:
 
 	static void Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nW, int nH, bool bDark);
 	static void Labeling_SubPix(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nW, int nH, bool bDark, int thresh, float Scale);
-
+	static void Masking(BYTE* pSrc, BYTE* pDst, std::vector<Point> vtStartPoint, std::vector<int> vtLength, int nW, int nH);
 	// Method 참고 : https://docs.opencv.org/2.4/doc/tutorials/imgproc/histograms/template_matching/template_matching.html
-	static float TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nSrcW, int nSrcH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt);
+	static float TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nSrcW, int nSrcH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt, int nChIdx);
 
 	// ********* D2D ******** //
 	static void SubtractAbs(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH);
@@ -45,10 +46,18 @@ public:
 	static void CreateGoldenImage_MedianAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH);
 	static void CreateGoldenImage_Median(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH);
 
+	static void CreateGoldenImage_Avg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH);
+	static void CreateGoldenImage_NearAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH);
+	static void CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH);
+	static void CreateGoldenImage_Median(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH);
+
 	// D2D 3.0
 	// EdgeSuppression, BrightSuppression Level은 1~10 단계, 0 = 사용 x
 	static void CreateDiffScaleMap(BYTE* pSrc, float* pDst, int nW, int nH, int nEdgeSuppressionLev, int nBrightSuppressionLev);
 	static void CreateHistogramWeightMap(BYTE* pSrc, BYTE* pGolden, float* pDst, int nW, int nH, int nWeightLev);
+
+	// ********* Pattern Inspection ******** //
+	static void HistogramBaseTreshold(BYTE* pSrc, BYTE* pDst, int nHistOffset, int nW, int nH, bool bDark);
 
 	// Elemetwise Operation
 	static void Multiply(BYTE* pSrc1, float* pSrc2, BYTE* pDst, int nW, int nH);
@@ -76,6 +85,7 @@ public:
 	static void ConvertRGB2H(BYTE* pR, BYTE* pG, BYTE* pB, BYTE* pOutH, int nW, int nH);
 	static void DrawContourMap(BYTE* pSrc, BYTE* pDst, int nW, int nH);
 	static void CutOutROI(BYTE* pSrc, BYTE* pDst, int nW, int nH, Point ptLT, Point ptRB);
+	static void GoldenImageReview(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH);
 
 	static void SobelEdgeDetection(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nDerivativeX = 1, int nDerivativeY = 0, int nKernelSize = 5, int nScale = 1, int nDelta = 1);
 	static void Histogram(BYTE* pSrc, BYTE* pDst, int nW, int nH, int channels, int dims, int histSize, float* ranges);

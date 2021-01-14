@@ -8,6 +8,7 @@ using RootTools.GAFs;
 using RootTools.ToolBoxs;
 using RootTools.Module;
 using RootTools.Control;
+using RootTools.Trees;
 
 namespace Root_WIND2
 {
@@ -30,6 +31,10 @@ namespace Root_WIND2
 
         public IControl ClassControl()
         {
+            switch (m_eControl)
+            {
+                case eControl.Ajin: return m_ajin;
+            }
             return m_ajin;
         }
 
@@ -57,13 +62,50 @@ namespace Root_WIND2
 
         public ModuleList ClassModuleList()
         {
-            return m_handler.m_moduleList;
+            return m_handler.p_moduleList;
         }
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
         {
             MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory);
+        }
+        #endregion
+
+        #region Mode
+        public enum eMode
+        {
+            Vision,
+            EFEM
+        }
+        public eMode m_eMode = eMode.Vision;
+
+        public bool m_bVisionEnable = false;
+
+        void RunTreeMode(Tree tree)
+        {
+            m_eMode = (eMode)tree.Set(m_eMode, m_eMode, "Mode", "Run Mode");
+            m_bVisionEnable = tree.Set(m_bVisionEnable, m_bVisionEnable, "VisionEnable", "VisionEnable");
+        }
+        #endregion
+
+        #region Control
+        enum eControl
+        {
+            Ajin
+        };
+        eControl m_eControl = eControl.Ajin;
+        void InitControl()
+        {
+            switch (m_eControl)
+            {
+                case eControl.Ajin: InitAjin(); break;
+            }
+        }
+
+        void RunTreeControl(Tree tree)
+        {
+            m_eControl = (eControl)tree.Set(m_eControl, m_eControl, "Control", "Select Control");
         }
         #endregion
 
@@ -80,32 +122,76 @@ namespace Root_WIND2
         #endregion
 
         #region XGem
+        bool m_bUseXGem = true;
         XGem m_xGem = null;
         XGem_UI m_xGemUI = new XGem_UI();
         void InitXGem()
         {
+            if (m_bUseXGem == false) return;
             m_xGem = new XGem();
             m_xGem.Init("XGem", this);
             m_xGemUI.Init(m_xGem);
             m_toolBox.AddToolSet(m_xGem, m_xGemUI);
         }
+
+        void RunTreeXGem(Tree tree)
+        {
+            m_bUseXGem = tree.Set(m_bUseXGem, m_bUseXGem, "Use", "Use XGem");
+        }
         #endregion
 
         public WIND2_Handler m_handler = new WIND2_Handler();
 
-        private InspectionManager_Vision inspectionVision;
-        public InspectionManager_Vision InspectionVision { get => inspectionVision; set => inspectionVision = value; }
-        private InspectionManager_EFEM inspectionEFEM;
-        public InspectionManager_EFEM InspectionEFEM { get => inspectionEFEM; set => inspectionEFEM = value; }
+        private InspectionManagerFrontside inspectionFront;
+        public InspectionManagerFrontside InspectionFront { get => inspectionFront; set => inspectionFront = value; }
+
+        private InspectionManagerBackside inspectionBack;
+        public InspectionManagerBackside InspectionBack { get => inspectionBack; set => inspectionBack = value; }
+
+
+        private InspectionManagerEdge inspectionEdge;
+        public InspectionManagerEdge InspectionEdge { get => inspectionEdge; set => inspectionEdge = value; }
+
+        private InspectionManagerEBR inspectionEBR;
+        public InspectionManagerEBR InspectionEBR { get => inspectionEBR; set => inspectionEBR = value; }
+
+
+        #region Tree Setup
+        public TreeRoot m_treeRoot;
+        void InitTree()
+        {
+            m_treeRoot = new TreeRoot(EQ.m_sModel, null);
+            m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
+            RunTree(Tree.eMode.RegRead);
+        }
+
+        private void M_treeRoot_UpdateTree()
+        {
+            RunTree(Tree.eMode.Update);
+            RunTree(Tree.eMode.RegWrite);
+            RunTree(Tree.eMode.Init);
+        }
+
+        public void RunTree(Tree.eMode mode)
+        {
+            m_treeRoot.p_eMode = mode;
+            RunTreeMode(m_treeRoot.GetTree("Mode"));
+            RunTreeControl(m_treeRoot.GetTree("Control"));
+            RunTreeXGem(m_treeRoot.GetTree("XGem"));
+            m_handler.RunTreeModule(m_treeRoot.GetTree("Module"));
+        }
+        #endregion
 
         public void Init(string id)
         {
             EQ.m_sModel = id;
             LogView.Init();
+            m_handler.m_engineer = this;
+            InitTree();
             m_login.Init();
             m_toolBox.Init(id, this);
-            InitAjin();
-            //            InitXGem();
+            InitControl();
+            InitXGem();
             m_handler.Init(id, this);
             m_gaf.Init(id, this);
         }
@@ -121,12 +207,12 @@ namespace Root_WIND2
 
         public string BuzzerOff()
         {
-            throw new System.NotImplementedException();
+            return "OK";
         }
 
         public string Recovery()
         {
-            throw new System.NotImplementedException();
+            return "OK"; 
         }
     }
 }

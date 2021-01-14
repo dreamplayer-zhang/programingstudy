@@ -110,14 +110,22 @@ namespace RootTools
                 SetImageSource();
             }
         }
-        public CPoint GetScaledDefectPos(CPoint cptDefectPos)
+        public CPoint GetScaledDefectPos(CPoint cptDefectPos, bool bRotate)
         {
             // variable
             CPoint cptReturn = new CPoint();
 
             // implement
-            cptReturn.X = Scaling(cptDefectPos.X, 0, p_ImageData.p_Size.X, 0, p_CanvasWidth);
-            cptReturn.Y = Scaling(cptDefectPos.Y, 0, p_ImageData.p_Size.Y, 0, p_CanvasHeight);
+            if (bRotate)
+            {
+                cptReturn.X = Scaling(cptDefectPos.X, 0, p_ImageData.p_Size.X, 0, p_CanvasHeight);
+                cptReturn.Y = Scaling(cptDefectPos.Y, 0, p_ImageData.p_Size.Y, 0, p_CanvasWidth);
+            }
+            else
+            {
+                cptReturn.X = Scaling(cptDefectPos.X, 0, p_ImageData.p_Size.X, 0, p_CanvasWidth);
+                cptReturn.Y = Scaling(cptDefectPos.Y, 0, p_ImageData.p_Size.Y, 0, p_CanvasHeight);
+            }
 
             return cptReturn;
         }
@@ -211,13 +219,31 @@ namespace RootTools
                         {
                             for (int yy = 0; yy < p_CanvasHeight; yy++)
                             {
+                                pix_x = p_View_Rect.Y + yy * p_View_Rect.Width / p_CanvasHeight;
                                 for (int xx = 0; xx < p_CanvasWidth; xx++)
                                 {
                                     pix_y = p_View_Rect.X + xx * p_View_Rect.Height / p_CanvasWidth;
-                                    pix_x = p_View_Rect.Y + yy * p_View_Rect.Width / p_CanvasHeight;
+
                                     view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
                                     view.Data[yy, xx, 1] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
                                     view.Data[yy, xx, 2] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                }
+                            }
+
+                            CPoint cptScaledDefectPos;
+                            for (int i = 0; i < lstDefect.Count; i++)
+                            {
+                                cptScaledDefectPos = GetScaledDefectPos(lstDefect[i], Rotate);
+                                for (int y = -1; y <= 1; y++)
+                                {
+                                    for (int x = -1; x <= 1; x++)
+                                    {
+                                        if (cptScaledDefectPos.Y - 1 < 0 || cptScaledDefectPos.Y + 1 > p_CanvasWidth) continue;
+                                        if (cptScaledDefectPos.X - 1 < 0 || cptScaledDefectPos.X + 1 > p_CanvasHeight) continue;
+                                        view.Data[cptScaledDefectPos.X + x, cptScaledDefectPos.Y + y, 0] = 255;
+                                        view.Data[cptScaledDefectPos.X + x, cptScaledDefectPos.Y + y, 1] = 0;
+                                        view.Data[cptScaledDefectPos.X + x, cptScaledDefectPos.Y + y, 2] = 0;
+                                    }
                                 }
                             }
                         }
@@ -307,9 +333,9 @@ namespace RootTools
                                 {
                                     pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
 
-                                    view.Data[yy, xx, 2] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
-                                    view.Data[yy, xx, 1] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
                                     view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                    view.Data[yy, xx, 1] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                    view.Data[yy, xx, 2] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
                                 }
                             }
 
@@ -317,7 +343,7 @@ namespace RootTools
                             CPoint cptScaledDefectPos;
                             for (int i = 0; i < lstDefect.Count; i++)
                             {
-                                cptScaledDefectPos = GetScaledDefectPos(lstDefect[i]);
+                                cptScaledDefectPos = GetScaledDefectPos(lstDefect[i], Rotate);
                                 for (int y = -1; y <= 1; y++)
                                 {
                                     for (int x = -1; x <= 1; x++)
@@ -351,9 +377,9 @@ namespace RootTools
                             {
                                 pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
 
-                                view.Data[yy, xx, 2] = ((byte*)ptrMem)[0 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
+                                view.Data[yy, xx, 0] = ((byte*)ptrMem)[0 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
                                 view.Data[yy, xx, 1] = ((byte*)ptrMem)[1 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
-                                view.Data[yy, xx, 0] = ((byte*)ptrMem)[2 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
+                                view.Data[yy, xx, 2] = ((byte*)ptrMem)[2 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
 
                             }
                         }

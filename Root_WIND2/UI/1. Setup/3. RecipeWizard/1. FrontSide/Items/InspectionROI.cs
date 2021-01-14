@@ -7,13 +7,26 @@ using System.Windows.Media;
 
 namespace Root_WIND2
 {
-    public class InspectionMask : ObservableObject
+    public class InspectionROI : ObservableObject
     {
-        public InspectionMask()
+        public InspectionROI()
         {
         }
 
-        private List<PointLine> m_Data = new List<PointLine>();
+        public int p_Index
+        {
+            get
+            {
+                return m_Index;
+            }
+            set
+            {
+                SetProperty(ref m_Index, value);
+            }
+
+        }
+        private int m_Index = 0;
+
         public List<PointLine> p_Data
         {
             get
@@ -25,7 +38,8 @@ namespace Root_WIND2
                 SetProperty(ref m_Data, value);
             }
         }
-        private int m_Size = 0;
+        private List<PointLine> m_Data = new List<PointLine>();
+
         public int p_Size
         {
             get
@@ -37,7 +51,8 @@ namespace Root_WIND2
                 SetProperty(ref m_Size, value);
             }
         }
-        private Color m_Color;
+        private int m_Size = 0;
+
         public Color p_Color
         {
             get
@@ -49,5 +64,6 @@ namespace Root_WIND2
                 SetProperty(ref m_Color, value);
             }
         }
+        private Color m_Color;
     }
 }

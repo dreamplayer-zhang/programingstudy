@@ -5,6 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:module="clr-namespace:RootTools.Module;assembly=RootTools"
              xmlns:gaf="clr-namespace:RootTools.GAFs;assembly=RootTools"
+             xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
+             xmlns:efem="clr-namespace:Root_EFEM;assembly=Root_EFEM"
+             xmlns:local="clr-namespace:Root_WIND2"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -15,14 +18,23 @@
         </Grid.ColumnDefinitions>
         <TabControl Grid.Column="0">
             <TabItem Header="Handler" Background="{Binding p_brushHandler}">
-                <TabControl>
+                <TabControl x:Name="tabControlHandler">
                     <TabItem Header="ModuleList" Background="{Binding p_brushHandler}">
                         <module:ModuleList_UI x:Name="moduleListUI"/>
+                    </TabItem>
+                    <TabItem Header="Recipe" Background="{Binding p_brushHandler}">
+                        <local:WIND2_Recipe_UI x:Name="recipeUI"/>
+                    </TabItem>
+                    <TabItem Header="Process" Background="{Binding p_brushHandler}">
+                        <efem:EFEM_Process_UI x:Name="processUI"/>
                     </TabItem>
                     <TabItem Header="GAF" Background="{Binding p_brushHandler}">
                         <gaf:GAF_UI x:Name="gafUI"/>
                     </TabItem>
                 </TabControl>
+            </TabItem>
+            <TabItem Header="Setup" Background="DarkBlue">
+                <tree:TreeUI x:Name="treeRootUI"/>
             </TabItem>
         </TabControl>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>

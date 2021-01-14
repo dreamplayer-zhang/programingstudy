@@ -33,8 +33,9 @@ namespace Root_AOP01_Inspection.Module
         #region AccessMode
         void TimerAccessMode()
         {
-            SetBrush(buttonAccessManual, m_loadport.p_infoCarrier.p_bAccessLP_Manual && p_bBlink);
-            SetBrush(buttonAccessAuto, m_loadport.p_infoCarrier.p_bAccessLP_Auto && p_bBlink);
+            bool bAuto = (m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto);
+            SetBrush(buttonAccessManual, !bAuto && p_bBlink);
+            SetBrush(buttonAccessAuto, bAuto && p_bBlink);
         }
 
         void ChangeLPState(GemCarrierBase.eAccessLP State)
@@ -167,17 +168,17 @@ namespace Root_AOP01_Inspection.Module
             bool bPodIn = p_bBlink ? !m_loadport.m_diPlaced.p_bIn : !m_loadport.m_diPresent.p_bIn;
             imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
             imageOutPod.Visibility = bPodIn ? Visibility.Hidden : Visibility.Visible;
-/*            if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
-            {
-                m_loadport.m_bLoadCheck = true;
-                m_loadport.m_bUnLoadCheck = false;
-            }
-            else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
-            {
-                m_loadport.m_bLoadCheck = false;
-                m_loadport.m_bUnLoadCheck = true;
-            }
-*/        }
+            //if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
+            //{
+            //    m_loadport.m_bLoadCheck = true;
+            //    m_loadport.m_bUnLoadCheck = false;
+            //}
+            //else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
+            //{
+            //    m_loadport.m_bLoadCheck = false;
+            //    m_loadport.m_bUnLoadCheck = true;
+            //}
+        }
 
         void SetBrush(Button button, bool bOn)
         {

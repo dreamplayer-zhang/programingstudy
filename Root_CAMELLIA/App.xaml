@@ -136,6 +136,11 @@
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
 
+        <Style x:Key="GridHeaderStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="Blue"/>
+            <Setter Property="FontWeight" Value="ExtraBold"/>
+        </Style>
+
         <Style x:Key="{x:Type ProgressBar}"
        TargetType="{x:Type ProgressBar}">
             <Setter Property="Foreground"

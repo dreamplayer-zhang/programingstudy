@@ -77,8 +77,8 @@ namespace Root_WIND2
                 SetProperty(ref m_SelGrabMode, value);
                 p_nStartLine = m_SelGrabMode.m_ScanStartLine;
                 p_nScanNum = m_SelGrabMode.m_ScanLineNum;
-                if (m_SelGrabMode.m_camera.p_sz.X != 0)
-                    p_nScanWholeLine = (int)Math.Ceiling(m_RunGrab.m_nWaferSize_mm * 1000 / (m_SelGrabMode.m_camera.p_sz.X * m_RunGrab.m_dResY_um));
+                //if (m_SelGrabMode.m_camera.p_sz.X != 0)
+                //    p_nScanWholeLine = (int)Math.Ceiling(m_RunGrab.m_nWaferSize_mm * 1000 / (m_SelGrabMode.m_camera.p_sz.X * m_RunGrab.m_dResY_um));
             }
         }
         #endregion

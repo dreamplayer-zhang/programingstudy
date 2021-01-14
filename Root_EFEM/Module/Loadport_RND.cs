@@ -4,6 +4,7 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHTNew;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
@@ -13,13 +14,14 @@ namespace Root_EFEM.Module
     public class Loadport_RND : ModuleBase, IWTRChild, ILoadport
     {
         #region ToolBox
-        DIO_I m_diPlaced;
-        DIO_I m_diPresent;
-        DIO_I m_diLoad;
-        DIO_I m_diUnload;
-        DIO_I m_diDoorOpen;
-        DIO_I m_diDocked;
+        public DIO_I m_diPlaced;
+        public DIO_I m_diPresent;
+        public DIO_I m_diLoad;
+        public DIO_I m_diUnload;
+        public DIO_I m_diDoorOpen;
+        public DIO_I m_diDocked;
         RS232 m_rs232;
+        OHT m_OHT; 
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
@@ -29,6 +31,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.Get(ref m_diDoorOpen, this, "DoorOpen");
             p_sInfo = m_toolBox.Get(ref m_diDocked, this, "Docked");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT"); 
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -68,7 +71,7 @@ namespace Root_EFEM.Module
 
         public List<string> p_asChildSlot
         {
-            get { return p_infoCarrier.m_asGemSlot; }
+            get { return p_infoCarrier.p_asGemSlot; }
         }
 
         public InfoWafer p_infoWafer { get; set; }
@@ -122,7 +125,7 @@ namespace Root_EFEM.Module
             return IsRunOK();
         }
 
-        public bool IsWaferExist(int nID = 0, bool bUseSensor = true)
+        public bool IsWaferExist(int nID = 0)
         {
             switch (p_infoCarrier.p_eState)
             {
@@ -256,7 +259,8 @@ namespace Root_EFEM.Module
                     if (EQ.IsStop()) return "EQ Stop";
                     Thread.Sleep(10);
                     ms10 += 10;
-                    if (ms10 > msDelay) return m_sLastCmd + " Has no Answer !!";
+                    if (ms10 > msDelay) 
+                        return m_sLastCmd + " Has no Answer !!";
                 }
                 return "OK";
             }
@@ -378,34 +382,22 @@ namespace Root_EFEM.Module
         {
             Run(CmdResetCPU());
             p_eState = eState.Init;
-            m_bNeedHome = true;
             base.Reset();
         }
 
         public override void ButtonHome()
         {
-            m_bNeedHome = true;
             base.ButtonHome();
         }
         #endregion
 
         #region StateHome
-        bool m_bNeedHome = true;
         public override string StateHome()
         {
             if (EQ.p_bSimulate == false)
             {
                 if (Run(CmdResetCPU())) return p_sInfo;
-                if (m_bNeedHome)
-                {
-                    if (Run(CmdHome())) return p_sInfo;
-                    m_bNeedHome = false;
-                }
-                else
-                {
-                    if (m_diDoorOpen.p_bIn) return p_id + " Door Opened";
-                    if (Run(CmdUnload())) return p_sInfo;
-                }
+                if (Run(CmdHome())) return p_sInfo;
             }
             p_eState = eState.Ready;
             p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
@@ -441,12 +433,14 @@ namespace Root_EFEM.Module
         SVID m_svidPlaced;
         CEID m_ceidDocking;
         CEID m_ceidUnDocking;
+        public CEID m_ceidUnloadReq;
         ALID m_alidPlaced;
         void InitGAF() 
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
             m_ceidDocking = m_gaf.GetCEID(this, "Docking");
             m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
+            m_ceidUnloadReq = m_gaf.GetCEID(this, "Unload Request");
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
         }
         #endregion
@@ -469,6 +463,10 @@ namespace Root_EFEM.Module
             while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
+
+        public bool p_bPlaced { get { return m_diPlaced.p_bIn; } }
+        public bool p_bPresent { get { return m_diPresent.p_bIn; } }
+
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }
@@ -532,7 +530,7 @@ namespace Root_EFEM.Module
                 if (m_module.Run(m_module.CmdLoad(m_bMapping))) return p_sInfo;
                 if (m_module.Run(m_module.CmdGetMapData())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
-                m_module.m_ceidDocking.Send(); 
+                m_module.m_ceidDocking.Send();
                 return "OK";
             }
         }

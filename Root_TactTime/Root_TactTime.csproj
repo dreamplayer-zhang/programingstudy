@@ -178,6 +178,7 @@
     <Compile Include="Module_UI.xaml.cs">
       <DependentUpon>Module_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Mold\Mold_Buffer.cs" />
     <Compile Include="Picker.cs" />
     <Compile Include="Picker_UI.xaml.cs">
       <DependentUpon>Picker_UI.xaml</DependentUpon>
@@ -250,5 +251,6 @@
       <Name>RootTools</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

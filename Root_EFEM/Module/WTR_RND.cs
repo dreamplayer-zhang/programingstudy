@@ -13,7 +13,7 @@ namespace Root_EFEM.Module
     public class WTR_RND : ModuleBase, IWTR
     {
         #region ToolBox
-        RS232 m_rs232;
+        protected RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
@@ -65,6 +65,14 @@ namespace Root_EFEM.Module
 
         void RunTreeArm(Tree tree, ref eArm eArm, bool bVisible)
         {
+            if (p_asArm.Count < 2)
+            {
+                foreach (Arm arm in m_dicArm.Values)
+                {
+                    if (arm.p_bEnable) eArm = arm.m_eArm; 
+                }
+                return; 
+            }
             string sArm = eArm.ToString();
             sArm = tree.Set(sArm, sArm, p_asArm, "Arm", "Select WTR Arm", bVisible);
             foreach (Arm arm in m_dicArm.Values)
@@ -93,12 +101,6 @@ namespace Root_EFEM.Module
                 return "OK";
             }
 
-            public override void RunTree(Tree tree)
-            {
-                base.RunTree(tree);
-                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "Wafer Check", "Wafer Check Option");
-            }
-
             public DIO_I m_diCheckVac;
             public DIO_I m_diArmClose;
             public void GetTools(ToolBox toolBox)
@@ -109,17 +111,23 @@ namespace Root_EFEM.Module
 
             enum eCheckWafer
             {
-                Vacuum,
-                InfoWafer
+                InfoWafer,
+                Sensor,
             };
-            eCheckWafer m_eCheckWafer = eCheckWafer.Vacuum;
+            eCheckWafer m_eCheckWafer = eCheckWafer.Sensor;
             public override bool IsWaferExist()
             {
                 switch (m_eCheckWafer)
                 {
-                    case eCheckWafer.Vacuum: return m_diCheckVac.p_bIn;
+                    case eCheckWafer.Sensor: return m_diCheckVac.p_bIn;
                     default: return (p_infoWafer != null);
                 }
+            }
+
+            public override void RunTree(Tree tree)
+            {
+                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "Wafer Check", "Wafer Check Option");
+                base.RunTree(tree);
             }
         }
         #endregion
@@ -411,7 +419,7 @@ namespace Root_EFEM.Module
         #endregion
 
         #region RS232
-        private void M_rs232_OnReceive(string sRead)
+        protected void M_rs232_OnReceive(string sRead)
         {
             string[] sReads = sRead.Split(' ');
             if (sReads[0] == "ERR") m_log.Error(GetErrorString(sReads[1]));
@@ -628,10 +636,12 @@ namespace Root_EFEM.Module
 
         #region InfoWafer UI
         InfoWaferWTR_UI m_ui;
+        public List<WTRArm> aArm;
+
         void InitInfoWaferUI()
         {
             m_ui = new InfoWaferWTR_UI();
-            List<WTRArm> aArm = new List<WTRArm>();
+            aArm = new List<WTRArm>();
             aArm.Add(m_dicArm[eArm.Upper]);
             aArm.Add(m_dicArm[eArm.Lower]);
             m_ui.Init(p_id + ".InfoWafer", aArm, m_engineer);
@@ -676,6 +686,7 @@ namespace Root_EFEM.Module
 
         public override void ThreadStop()
         {
+            m_ui.ThreadStop(); 
             base.ThreadStop();
         }
 
@@ -849,8 +860,8 @@ namespace Root_EFEM.Module
                     if (EQ.IsStop()) return "Stop";
                     Thread.Sleep(100);
                 }
-                if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
+                if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
                 m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
                 try
                 {
@@ -858,6 +869,7 @@ namespace Root_EFEM.Module
                     if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                     child.p_bLock = false;
+                    child.AfterGet(m_nChildID);
                 }
                 finally
                 {
@@ -928,8 +940,8 @@ namespace Root_EFEM.Module
                 }
                 int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
-                if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
+                if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
                 child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
                 try
                 {
@@ -937,11 +949,13 @@ namespace Root_EFEM.Module
                     if (m_module.Run(m_module.WriteCmd(eCmd.Put, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                     child.p_bLock = false;
+                    child.AfterPut(m_nChildID); 
                 }
                 finally
                 {
-                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
-                    else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    //if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                    //else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
                 if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";
                 return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;

@@ -1,5 +1,6 @@
 ﻿using RootTools.Module;
 using RootTools.Trees;
+using RootTools;
 using System.Collections.Generic;
 
 namespace Root_EFEM.Module
@@ -34,7 +35,7 @@ namespace Root_EFEM.Module
 
         string AfterPut(int nID);
 
-        bool IsWaferExist(int nID, bool bUseSensor = true);
+        bool IsWaferExist(int nID);
 
         void RunTreeTeach(Tree tree);
 

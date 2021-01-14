@@ -15,6 +15,9 @@ namespace Root_CAMELLIA
         public const double CanvasHeight = 1000;
         public const int ArrowLength = 15;
 
+        public const string RegNanoViewConfig = "NanoViewConfigPath";
+        public const string RegNanoViewPort = "NanoViewPort";
+
         public const string Dir_Preset = @"C:\Camellia\Preset\";
         public const string Dir_StageMap = @"C:\Camellia\StageMap\";
         public const string Dir_Recipe = @"C:\Camellia\Recipe\PRD\15Line\"; // 변경해야함

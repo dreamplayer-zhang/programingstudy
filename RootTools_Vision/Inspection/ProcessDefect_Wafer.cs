@@ -25,7 +25,7 @@ namespace RootTools_Vision
         {
         }
 
-        public override WORK_TYPE Type => WORK_TYPE.FINISHINGWORK;
+        public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_WAFER;
 
         public override void DoWork()
         {
@@ -90,9 +90,10 @@ namespace RootTools_Vision
                 }
             }
 
-            Workplace displayDefect = new Workplace();
+           
+            //Workplace displayDefect = new Workplace();
             foreach (Defect defect in MergeDefectList)
-                displayDefect.DefectList.Add(defect);
+                this.workplace.DefectList.Add(defect);
 
             string sDefectimagePath = @"D:\DefectImage";
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();    
@@ -116,7 +117,8 @@ namespace RootTools_Vision
                 //}
             }
 
-            WorkEventManager.OnInspectionDone(displayDefect, new InspectionDoneEventArgs(new List<CRect>(), true));
+            WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>(), true));
+            WorkEventManager.OnProcessDefectWaferDone(this.workplace, new PocessDefectWaferDoneEventArgs());
         }
 
         public override WorkBase Clone()
@@ -251,14 +253,15 @@ namespace RootTools_Vision
                         DefectList[j].m_fSize = -123; // Merge된 Defect이 중복 저장되지 않도록...
                     }
                 }
-
-                DefectList[i].SetDefectIndex(nDefectIndex++);              
             }
 
             for (int i = 0; i < DefectList.Count; i++)
             {
                 if (DefectList[i].m_fSize != -123)
+				{
                     MergeDefectList.Add(DefectList[i]);
+                    MergeDefectList[nDefectIndex - 1].SetDefectIndex(nDefectIndex++);              
+				}
             }
 
             return MergeDefectList;
@@ -291,7 +294,7 @@ namespace RootTools_Vision
                 if (nByteCnt == 1) { 
                     CLR_IP.Cpp_SaveDefectListBMP(
                        Path,
-                       (byte*)workplace.SharedBuffer.ToPointer(),
+                       (byte*)workplace.SharedBufferR_GRAY.ToPointer(),
                        workplace.SharedBufferWidth,
                        workplace.SharedBufferHeight,
                        defectArray
@@ -301,7 +304,7 @@ namespace RootTools_Vision
                 else if (nByteCnt == 3) { 
                     CLR_IP.Cpp_SaveDefectListBMP_Color(
                         Path,
-                       (byte*)workplace.SharedBufferR.ToPointer(),
+                       (byte*)workplace.SharedBufferR_GRAY.ToPointer(),
                        (byte*)workplace.SharedBufferG.ToPointer(),
                        (byte*)workplace.SharedBufferB.ToPointer(),
                        workplace.SharedBufferWidth,

@@ -13,6 +13,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.OHT.Semi;
 using RootTools.OHT.SSEM;
+using RootTools.OHTNew;
 using RootTools.Printer;
 using RootTools.RADS;
 using RootTools.RTC5s.LaserBright;
@@ -62,7 +63,7 @@ namespace RootTools.ToolBoxs
             if (value == null) value = new DIO_Is(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, asDI);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
-            for (int n = 0; n < asDI.Length; n++) module.m_listDO.AddBit(value.m_aBitDI[n]);
+            for (int n = 0; n < asDI.Length; n++) module.m_listDI.AddBit(value.m_aBitDI[n]);
             return "OK";
         }
 
@@ -71,7 +72,7 @@ namespace RootTools.ToolBoxs
             if (value == null) value = new DIO_Is(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sDI, nCount);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
-            for (int n = 0; n < nCount; n++) module.m_listDO.AddBit(value.m_aBitDI[n]);
+            for (int n = 0; n < nCount; n++) module.m_listDI.AddBit(value.m_aBitDI[n]);
             return "OK";
         }
 
@@ -443,6 +444,19 @@ namespace RootTools.ToolBoxs
             if (value == null)
             {
                 value = new OHT_SSEM(module.p_id + "." + id, module, carrier, m_toolDIO);
+                m_toolSetOHT.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            value.RunTreeToolBox(module.m_treeRootTool.GetTree(id));
+            return "OK";
+        }
+
+        public string Get(ref OHTNew.OHT value, ModuleBase module, GemCarrierBase carrier, string id)
+        {
+            if (m_toolSetOHT == null) m_toolSetOHT = InitToolSet("OHT");
+            if (value == null)
+            {
+                value = new OHTNew.OHT(module.p_id + "." + id, module, (ILoadport)module, carrier, m_toolDIO);
                 m_toolSetOHT.AddTool(value);
                 module.m_aTool.Add(value);
             }

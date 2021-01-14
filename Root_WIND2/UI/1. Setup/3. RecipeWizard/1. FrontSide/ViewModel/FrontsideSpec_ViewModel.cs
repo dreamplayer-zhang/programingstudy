@@ -10,10 +10,8 @@ using System.Windows.Input;
 
 namespace Root_WIND2
 {
-    class FrontsideSpec_ViewModel : ObservableObject
+    class FrontsideSpec_ViewModel : ObservableObject, IRecipeUILoadable
     {
-
-
         public Frontside_ViewModel m_front;
         public Recipe m_Recipe;
         public void init(Frontside_ViewModel front, Recipe recipe)
@@ -21,11 +19,8 @@ namespace Root_WIND2
             m_Recipe = recipe;
             m_front = front;
             ViewerInit();
-            m_cMask = new ObservableCollection<Mask>();
-            m_cInspMethod = new ObservableCollection<ParameterBase>();
+           
             m_cInspItem = new ObservableCollection<InspectionItem>();
-
-            p_cInspMethod = ParameterBase.GetChildClass();
 
             p_selectedMethodItem = null;
 
@@ -34,55 +29,30 @@ namespace Root_WIND2
 
         private void ViewerInit()
         {
-            p_Mask_Viewer = new FrontsideMask_ViewModel();
-            p_Mask_Viewer.p_VisibleMenu = Visibility.Collapsed;
-            p_Mask_Viewer.SetBackGroundWorker();
-            p_Mask_Viewer.p_ImageData = m_front.p_Mask_VM.p_ImageData;
-            p_Mask_Viewer.p_MaskLayer = m_front.p_Mask_VM.p_MaskLayer;
-            p_Mask_Viewer.p_cInspMask = m_front.p_Mask_VM.p_cInspMask;
-            p_Mask_Viewer.SetRoiRect();
-            //p_ROI_Viewer.SetLayerSource();
+            p_ROI_Viewer = new FrontsideMask_ViewModel();
+            p_ROI_Viewer.p_VisibleMenu = Visibility.Collapsed;
+            p_ROI_Viewer.SetBackGroundWorker();
+            p_ROI_Viewer.p_ImageData = m_front.p_ROI_VM.p_ImageData;
+            p_ROI_Viewer.p_ROILayer = m_front.p_ROI_VM.p_ROILayer;
+            p_ROI_Viewer.p_cInspROI = m_front.p_ROI_VM.p_cInspROI;
+            p_ROI_Viewer.SetRoiRect();
         }
 
         #region Property
-        private FrontsideMask_ViewModel m_Mask_Viewer;
-        public FrontsideMask_ViewModel p_Mask_Viewer
+        private FrontsideMask_ViewModel m_ROI_Viewer;
+        public FrontsideMask_ViewModel p_ROI_Viewer
         {
             get
             {
-                m_Mask_Viewer.p_ImageData = m_front.p_Mask_VM.p_ImageData;
-                m_Mask_Viewer.SetImageSource();
-                return m_Mask_Viewer;
+                m_ROI_Viewer.p_ImageData = m_front.p_ROI_VM.p_ImageData;
+                m_ROI_Viewer.SetImageSource();
+                if(m_ROI_Viewer.p_SelectedROI != null)
+                    m_ROI_Viewer._ReadROI();
+                return m_ROI_Viewer;
             }
             set
             {
-                SetProperty(ref m_Mask_Viewer, value);
-            }
-        }
-
-        private ObservableCollection<Mask> m_cMask;
-        public ObservableCollection<Mask> p_cMask
-        {
-            get
-            {
-                return m_cMask;
-            }
-            set
-            {
-                SetProperty(ref m_cMask, p_cMask);
-            }
-        }
-
-        private ObservableCollection<ParameterBase> m_cInspMethod;
-        public ObservableCollection<ParameterBase> p_cInspMethod
-        {
-            get
-            {
-                return m_cInspMethod;
-            }
-            set
-            {
-                SetProperty(ref m_cInspMethod, value);
+                SetProperty(ref m_ROI_Viewer, value);
             }
         }
 
@@ -99,22 +69,6 @@ namespace Root_WIND2
             }
         }
 
-        private Mask m_selectedMask;
-        public Mask p_selectedMask
-        {
-            get
-            {
-                return m_selectedMask;
-            }
-            set
-            {
-                if (p_selectedInspItem == null)
-                    return;
-                m_selectedInspItem.p_Mask = value;
-                SetProperty(ref m_selectedMask, value);
-            }
-        }
-
         private InspectionItem m_selectedInspItem;
         public InspectionItem p_selectedInspItem
         {
@@ -124,6 +78,7 @@ namespace Root_WIND2
             }
             set
             {
+                var asdf = p_ROI_Viewer.p_ImgSource;
                 SetProperty(ref m_selectedInspItem, value);
                 if(m_selectedInspItem != null)
                     p_selectedMethodItem = m_selectedInspItem.p_InspMethod;
@@ -142,22 +97,13 @@ namespace Root_WIND2
                 SetProperty(ref m_selectedMethodItem, value);
             }
         }
+
         #endregion
 
 
-        public ObservableCollection<ParameterBase> CloneMethod()
-        {
-            ObservableCollection<ParameterBase> method = new ObservableCollection<ParameterBase>();
-            foreach(ParameterBase param in p_cInspMethod)
-            {
-                method.Add((ParameterBase)param.Clone());
-            }
-            return method;
-        }
-
         public void ComboBoxItemChanged_Mask_Callback(object obj, EventArgs args)
         {
-            Mask mask = (Mask)obj;
+            InspectionROI mask = (InspectionROI)obj;
         }
 
         public void ComboBoxItemChanged_Method_Callback(object obj, EventArgs args)
@@ -172,8 +118,10 @@ namespace Root_WIND2
             InspectionItem item = obj as InspectionItem;
 
             p_cInspItem.Remove(item);
-            //p_cInspItem = p_cInspItem;
-
+            for (int i = 0; i < p_cInspItem.Count; i++)
+            {
+                p_cInspItem[i].p_Index = i;
+            }
             SetParameter();
         }
 
@@ -190,8 +138,7 @@ namespace Root_WIND2
             foreach(ParameterBase parameterBase in m_Recipe.ParameterItemList)
             {
                 InspectionItem item = new InspectionItem();
-                item.p_cMask = p_cMask;
-                item.p_cInspMethod = CloneMethod();
+                item.p_cInspROI = p_ROI_Viewer.p_cInspROI;
 
                 int selectMethod = 0;
                 for (int i = 0; i < item.p_cInspMethod.Count; i++)
@@ -215,17 +162,38 @@ namespace Root_WIND2
 
             if(p_cInspItem.Count > 0)
                 p_selectedInspItem = p_cInspItem[0];
+
+            SetParameter();
         }
 
         public void SetParameter()
         {
+            
             List<ParameterBase> paramList = new List<ParameterBase>();
             foreach(InspectionItem item in p_cInspItem)
             {
+                if (item.p_InspMethod is IMaskInspection)
+                {
+                    if (item.p_InspROI != null)
+                    {
+                        ((IMaskInspection)item.p_InspMethod).MaskIndex = item.p_InspROI.p_Index;
+                    }
+                }
+
+                if(item.p_InspMethod is IColorInspection)
+                {
+                    ((IColorInspection)item.p_InspMethod).IndexChannel = item.p_InspChannel;
+                }
+
                 paramList.Add(item.p_InspMethod);
             }
 
             this.m_Recipe.ParameterItemList = paramList;
+        }
+
+        public void Load()
+        {
+            LoadSpec();
         }
 
         #region ICommand
@@ -236,8 +204,8 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     InspectionItem item = new InspectionItem();
-                    item.p_cMask = p_cMask;
-                    item.p_cInspMethod = CloneMethod();
+                    item.p_cInspROI = p_ROI_Viewer.p_cInspROI;
+                    item.p_Index = p_cInspItem.Count();
                     item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
                     item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
                     item.ButtonClicked_Delete += ButtonClicked_Delete_Callback;
@@ -247,18 +215,18 @@ namespace Root_WIND2
                 });
             }
         }
-
         public ICommand ComboBoxSelectionChanged_MethodItem
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-                    m_selectedInspItem.p_InspMethod = p_cInspMethod[0];
+                    m_selectedInspItem.p_InspMethod = p_selectedInspItem.p_InspMethod;
                     SetParameter();
                 });
             }
         }
         #endregion
+
     }
 }

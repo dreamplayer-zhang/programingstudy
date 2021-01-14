@@ -77,6 +77,7 @@ namespace Root.Module
             m_axisZ.AddPos("First", "Second");
         }
         #endregion
+
         public Test(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);

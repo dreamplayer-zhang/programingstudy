@@ -4,6 +4,7 @@
     {
         public virtual void Write(bool bOn)
         {
+            if (EQ.p_bSimulate) p_bOn = bOn; 
         }
 
         public new void Init(int nID, Log log)

@@ -659,10 +659,21 @@ namespace RootTools.Control.Ajin
         {
             for (int i = 0; i < m_aDIO_I.Count; i++)
             {
-                if (!m_aDIO_I[i].p_bIn)
+                if (m_bDIO_I[i])
                 {
-                    string[] id = m_aDIO_I[i].m_id.Split('.');
-                    return " : " + id[1] + " Interlock Error";
+                    if (!m_aDIO_I[i].p_bIn)
+                    {
+                        string[] id = m_aDIO_I[i].m_id.Split('.');
+                        return " : " + id[1] + " Interlock Error";
+                    }
+                }
+            }
+            if (p_vaccumDIO_I != null)
+            {
+                if (p_vaccumDIO_I.p_bIn)
+                {
+                    string[] id = p_vaccumDIO_I.m_id.Split('.');
+                    return " : " + id[1] + "Interlock Error";
                 }
             }
             // IOList for true
@@ -760,6 +771,27 @@ namespace RootTools.Control.Ajin
             RunTreeSettingTrigger(m_treeRootSetting.GetTree("Trigger"));
             if (mode == Tree.eMode.RegRead) InitAxis(); 
             if (mode == Tree.eMode.Update) SetAxisStatus();
+        }
+        #endregion
+
+        #region Compensation
+        
+        public override bool CompensationSet(double dstartpos, double[] dpPosition, double[] dpCorrection)
+        {
+            uint res = AXM("AxmCompensationSet", CAXM.AxmCompensationSet(m_nAxis, dpPosition.Length, dstartpos, dpPosition, dpCorrection, 0));
+            if (res == 0)
+                return true;
+            else
+                return false;        
+        }
+
+        public override bool EnableCompensation(int isenable)
+        {
+            uint res = AXM("AxmCompensationEnable", CAXM.AxmCompensationEnable(m_nAxis, (uint)isenable));
+            if (res == 0)
+                return true;
+            else
+                return false;
         }
         #endregion
 

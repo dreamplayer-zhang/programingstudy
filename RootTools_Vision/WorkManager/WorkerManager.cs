@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 
 namespace RootTools_Vision
 {
@@ -12,7 +13,7 @@ namespace RootTools_Vision
     {
         List<Worker> workers;
 
-        List<WorkBundle> workBundleList = new List<WorkBundle>();
+        List<WorkBundle> workBundleList;
 
         WorkBundle workBundle;
         WorkplaceBundle workplaceBundle;
@@ -25,13 +26,13 @@ namespace RootTools_Vision
 
         private bool isStop = false;
 
-        WORKPLACE_STATE resultState = WORKPLACE_STATE.NONE;
-        WORKPLACE_STATE excuteCondition = WORKPLACE_STATE.NONE;
+        WORK_TYPE resultState = WORK_TYPE.NONE;
+        WORK_TYPE excuteCondition = WORK_TYPE.NONE;
 
 
         private int m_nLine = 0;
 
-        public WorkerManager(List<Worker> _workers, WORKPLACE_STATE _resultState, WORKPLACE_STATE _excuteCondition, STATE_CHECK_TYPE _state_check_type = STATE_CHECK_TYPE.CHIP)
+        public WorkerManager(List<Worker> _workers, WORK_TYPE _resultState, WORK_TYPE _excuteCondition, STATE_CHECK_TYPE _state_check_type = STATE_CHECK_TYPE.CHIP)
         {
             this.eStateCheckType = _state_check_type;
             foreach (Worker worker in _workers)
@@ -53,6 +54,7 @@ namespace RootTools_Vision
         {
             this.workBundle = _workbundle;
             this.workplaceBundle = _workplacebundle;
+            this.workBundleList = new List<WorkBundle>();
             this.workBundleList.Clear();
 
             foreach (Workplace wp in this.workplaceBundle)
@@ -76,7 +78,10 @@ namespace RootTools_Vision
         {
             if (eStateCheckType == STATE_CHECK_TYPE.WAFER)
             {
-                this.workplaceBundle.SetStateAll(this.resultState);
+                if (this.workplaceBundle != null)
+                {
+                    this.workplaceBundle.SetStateAll(this.resultState);
+                }
             }
             else
             {
@@ -95,6 +100,7 @@ namespace RootTools_Vision
                     worker.eWorkerState == WORKER_STATE.WORKING)
                     continue;
 
+                worker.eWorkerState = WORKER_STATE.WORK_ASSIGNED;
                 return worker;
             }
 
@@ -110,8 +116,22 @@ namespace RootTools_Vision
                 Worker worker = GetAvailableWorker();
                 while (worker != null)
                 {
-                    if(eStateCheckType == STATE_CHECK_TYPE.WAFER)
+                    if (this.isStop == true)
                     {
+                        worker.eWorkerState = WORKER_STATE.NONE;
+                        return;
+                    }
+
+                    if (this.workplaceBundle.CheckStateAll(WORK_TYPE.DEFECTPROCESS_WAFER) == true)
+                    {
+                        worker.eWorkerState = WORKER_STATE.NONE;
+                        break;
+                    }
+
+                    if (eStateCheckType == STATE_CHECK_TYPE.WAFER)
+                    {
+                        if (this.workplaceBundle == null) continue;
+
                         if(this.workplaceBundle.CheckStateAll(this.excuteCondition) == true)
                         {
                             worker.eWorkerState = WORKER_STATE.WORK_ASSIGNED;
@@ -120,17 +140,24 @@ namespace RootTools_Vision
                             this.workBundle.WorkplaceBundle = this.workplaceBundle;
                             worker.SetWorkBundle(this.workBundle.Clone());
                             worker.Start();
-                            break;
+
+                            worker = GetAvailableWorker();
+                        }
+                        else
+                        {
+                            worker.eWorkerState = WORKER_STATE.NONE;
                         }
                     }
                     else
                     {
                         Workplace workplace = this.workplaceBundle.GetWorkplaceByState(this.excuteCondition);
-                        if (workplace == null) return;
+                        if (workplace == null)
+                        {
+                            worker.eWorkerState = WORKER_STATE.NONE;
+                            return;
+                        }
 
                         workplace.IsOccupied = true;
-
-                        worker.eWorkerState = WORKER_STATE.WORK_ASSIGNED;
 
                         worker.SetWorkBundle(this.workBundleList[workplace.Index]);
                         worker.Start();
@@ -178,6 +205,13 @@ namespace RootTools_Vision
             WorkEventManager.WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
 
             this.isStop = true;
+
+            if(this.workplaceBundle != null)
+                this.workplaceBundle.Reset();
+
+            this.workBundle = null;
+            this.workplaceBundle = null;
+
         }
     }
 }

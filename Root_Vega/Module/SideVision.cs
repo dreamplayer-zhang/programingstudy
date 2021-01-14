@@ -539,7 +539,7 @@ namespace Root_Vega.Module
             if (bIgnoreExistSensor) bExist = (p_infoReticle != null);
             else
             {
-                bExist = m_diSideReticleExistSensor.p_bIn; //check
+                bExist = m_diSideReticleExistSensor.p_bIn;
             }
             p_brushReticleExist = bExist ? Brushes.Yellow : Brushes.Green;
             return bExist;
@@ -1396,7 +1396,8 @@ namespace Root_Vega.Module
                         if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
                         else
                         {
-                            dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                            dLeftCurrentScore = af.GetImageVarianceScore
+                                (img, m_nVarianceSize);
                             bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                         }
 

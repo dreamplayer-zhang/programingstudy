@@ -49,7 +49,7 @@ namespace RootTools.Camera.Silicon
                 SetProperty(ref m_nDeviceIndex, value);
             }
         }
-        string m_sMCF;
+        string m_sMCF = "";
         public string p_sMCF
         {
             get { return m_sMCF; }
@@ -424,7 +424,7 @@ namespace RootTools.Camera.Silicon
         void GrabEvent()
         {
             if (Grabed != null)
-                OnGrabed(new GrabedArgs(m_Memory, m_nFrameCnt, m_LastROI));
+                OnGrabed(new GrabedArgs(m_Memory, m_nFrameCnt, m_LastROI, p_nGrabProgress));
         }
         protected virtual void OnGrabed(GrabedArgs e)
         {

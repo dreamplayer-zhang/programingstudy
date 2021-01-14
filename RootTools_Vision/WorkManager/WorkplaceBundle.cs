@@ -58,6 +58,7 @@ namespace RootTools_Vision
                 workplace.SetSharedBuffer(sharedBuffer, width, height, byteCnt);
             }
         }
+
         public void SetSharedRGBBuffer(IntPtr sharedBufferR, IntPtr sharedBufferG, IntPtr sharedBufferB)
         {
             foreach (Workplace workplace in this)
@@ -65,6 +66,7 @@ namespace RootTools_Vision
                 workplace.SetSharedRGBBuffer(sharedBufferR, sharedBufferG, sharedBufferB);
             }
         }
+
         public new void Add(Workplace workplace)
         {
             workplace.PositionUpdated += WorkplacePositionUpdated_Callback;
@@ -74,7 +76,7 @@ namespace RootTools_Vision
         }
 
         private object lockObj = new object();
-        public Workplace GetWorkplaceByState(WORKPLACE_STATE state)
+        public Workplace GetWorkplaceByState(WORK_TYPE state)
         {
             lock(lockObj)
             {
@@ -91,7 +93,7 @@ namespace RootTools_Vision
             return null;
         }
 
-        public bool CheckStateAll(WORKPLACE_STATE state)
+        public bool CheckStateAll(WORK_TYPE state)
         {
             foreach(Workplace workplace in this)
             {
@@ -103,7 +105,7 @@ namespace RootTools_Vision
             return true;
         }
 
-        public bool CheckStateLine(int nLine, WORKPLACE_STATE state)
+        public bool CheckStateLine(int nLine, WORK_TYPE state)
         {
             bool bRst = true;
             foreach(Workplace workplace in this)
@@ -127,7 +129,7 @@ namespace RootTools_Vision
             return bRst;
         }
 
-        public void SetStateAll(WORKPLACE_STATE state)
+        public void SetStateAll(WORK_TYPE state)
         {
             foreach (Workplace workplace in this)
             {
@@ -135,7 +137,7 @@ namespace RootTools_Vision
             }
         }
 
-        public void SetStateLine(int nLine, WORKPLACE_STATE state)
+        public void SetStateLine(int nLine, WORK_TYPE state)
         {
             foreach (Workplace workplace in this)
             {
@@ -150,12 +152,6 @@ namespace RootTools_Vision
                 if (nLine < workplace.MapPositionX)
                     break;
             }
-        }
-
-        public void WorkplaceStateChanged_Callback(object obj)
-        {
-            if (WorkplaceStateChanged != null)
-                WorkplaceStateChanged(obj);
         }
 
         public void WorkplacePositionInitialized_Callback(object obj, int transX, int transY)
@@ -207,9 +203,22 @@ namespace RootTools_Vision
 
             RecipeType_WaferMap mapInfo = _recipe.WaferMap;
             OriginRecipe originRecipe = _recipe.GetRecipe<OriginRecipe>();
+            PositionRecipe positionRecipe = _recipe.GetRecipe<PositionRecipe>();
 
             WorkplaceBundle bundle = new WorkplaceBundle();
 
+
+            int maxMasterFeaturePositionX = int.MinValue;
+            int maxMasterFeaturePositionY = int.MinValue;
+            foreach (RecipeType_ImageData imageData in positionRecipe.ListMasterFeature)
+            {
+                if (maxMasterFeaturePositionX < imageData.PositionX + imageData.Width)
+                    maxMasterFeaturePositionX = imageData.PositionX;
+                if (maxMasterFeaturePositionY < imageData.PositionY + imageData.Height)
+                    maxMasterFeaturePositionY = imageData.PositionY;
+            }
+
+            bundle[0] = new Workplace(-1, -1, maxMasterFeaturePositionX + originRecipe.OriginX, maxMasterFeaturePositionY + originRecipe.OriginY, 0, 0);
 
             var wafermap = mapInfo.Data;
             int nSizeX = mapInfo.MapSizeX;

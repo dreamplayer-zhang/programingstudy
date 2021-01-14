@@ -15,6 +15,7 @@ namespace Root.Module
         #region ToolBox
         AxisXY m_axisXY;
         Axis m_axisZ;
+        Axis m_axisR;
         MemoryPool m_memoryPool;
         LightSet m_lightSet;
         CameraBasler m_camBasler;
@@ -23,6 +24,7 @@ namespace Root.Module
         {
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Stage");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Camera Z");
+            p_sInfo = m_toolBox.Get(ref m_axisR, this, "Camera R");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_camBasler, this, "Camera Basler");

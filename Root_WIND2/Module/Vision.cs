@@ -1,7 +1,7 @@
-﻿
-
+﻿using Root_EFEM;
+using Root_EFEM.Module;
 using RootTools;
-using RootTools.Camera;
+using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
 using RootTools.Light;
@@ -9,14 +9,13 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.RADS;
 using RootTools.Trees;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 
 namespace Root_WIND2.Module
 {
-    public class Vision : ModuleBase
+    public class Vision : ModuleBase, IWTRChild
     {
         #region ToolBox
         Axis m_axisRotate;
@@ -33,6 +32,8 @@ namespace Root_WIND2.Module
         RADSControl m_RADSControl;
 
         Camera_Dalsa m_CamMain;
+        Camera_Basler m_CamAlign;
+        Camera_Basler m_CamAutoFocus;
 
         #region [Getter Setter]
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
@@ -48,21 +49,30 @@ namespace Root_WIND2.Module
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
         public RADSControl RADSControl { get => m_RADSControl; private set => m_RADSControl = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
+        public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
+        public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
+
+        public RPoint AlignData = new RPoint(0, 0);
         #endregion
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
-            p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory",1);
+            if (p_eRemote != eRemote.Client)
+            {
+                p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
+                p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
+                p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
+                p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
+                p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
+                p_sInfo = m_toolBox.Get(ref m_lightSet, this);
+                p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
+                p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
+                p_sInfo = m_toolBox.Get(ref m_CamAlign, this, "AlignCam");
+                p_sInfo = m_toolBox.Get(ref m_CamAutoFocus, this, "AutoFocusCam");
+            }
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
-            p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
-            p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
-            m_axisRotate.StartMove(1000);
+            m_remote.GetTools(bInit);
         }
         #endregion
 
@@ -149,7 +159,7 @@ namespace Root_WIND2.Module
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
             m_memoryGroup2 = m_memoryPool2.GetGroup("group");
-            m_memoryGroup2.CreateMemory("ROI", 1, 4, 30000,30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+            m_memoryGroup2.CreateMemory("ROI", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
         }
 
         #endregion
@@ -157,11 +167,199 @@ namespace Root_WIND2.Module
         #region Axis
         private int m_pulseRound = 1000;
         public int PulseRound { get => this.m_pulseRound; set => this.m_pulseRound = value; }
-
         void RunTreeAxis(Tree tree)
         {
             m_pulseRound = tree.Set(m_pulseRound, m_pulseRound, "Rotate Pulse / Round", "Rotate" +
                 " Axis Pulse / 1 Round (pulse)");
+        }
+        #endregion
+
+        #region IWTRChild
+        bool _bLock = false;
+        public bool p_bLock
+        {
+            get
+            {
+                return _bLock;
+            }
+            set
+            {
+                if (_bLock == value)
+                    return;
+                _bLock = value;
+            }
+        }
+
+        bool IsLock()
+        {
+            for (int n = 0; n < 10; n++)
+            {
+                if (p_bLock == false)
+                    return false;
+                Thread.Sleep(100);
+            }
+            return true;
+        }
+
+        public List<string> p_asChildSlot
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public InfoWafer GetInfoWafer(int nID)
+        {
+            return p_infoWafer;
+        }
+
+        public void SetInfoWafer(int nID, InfoWafer infoWafer)
+        {
+            p_infoWafer = infoWafer;
+        }
+
+        public string IsGetOK(int nID)
+        {
+            if (p_eRemote == eRemote.Client)
+            {   
+                return "OK";
+            }
+            if (p_eState != eState.Ready)
+                return p_id + " eState not Ready";
+            if (p_infoWafer == null)
+                return p_id + " IsGetOK - InfoWafer not Exist";
+            return "OK";
+        }
+
+        public string IsPutOK(InfoWafer infoWafer, int nID)
+        {
+            if (p_eRemote == eRemote.Client)
+            {
+                return "OK";
+            }
+            if (p_eState != eState.Ready)
+                return p_id + " eState not Ready";
+            if (p_infoWafer != null)
+                return p_id + " IsPutOK - InfoWafer Exist";
+            if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false)
+                return p_id + " not Enable Wafer Size";
+            return "OK";
+        }
+
+        public int GetTeachWTR(InfoWafer infoWafer = null)
+        {
+            if (infoWafer == null)
+                infoWafer = p_infoWafer;
+            return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
+        }
+
+        public string BeforeGet(int nID)
+        {
+            //            string info = MoveReadyPos();
+            //            if (info != "OK") return info;
+            if (p_eRemote == eRemote.Client)
+            {
+                return m_remote.RemoteSend(Remote.eProtocol.BeforeGet, "Get", "Get");
+            }
+            else if (p_eRemote == eRemote.Server)
+            {
+                m_axisXY.StartMove("Position_0");
+                m_axisRotate.StartMove("Position_0");
+                m_axisZ.StartMove("Position_0");
+
+                m_axisXY.WaitReady();
+                m_axisRotate.WaitReady();
+                m_axisZ.WaitReady();
+            }
+            return "OK";
+        }
+
+        public override string ServerBeforeGet()
+        {
+            return BeforeGet(0);
+        }
+
+        public string BeforePut(int nID)
+        {
+            //            string info = MoveReadyPos();
+            //            if (info != "OK") return info;
+            if (p_eRemote == eRemote.Client)
+            {
+                return m_remote.RemoteSend(Remote.eProtocol.BeforePut, "Put", "Put");
+            }
+            else if(p_eRemote == eRemote.Server)
+            {
+                m_axisXY.StartMove("Position_0");
+                m_axisRotate.StartMove("Position_0");
+                m_axisZ.StartMove("Position_0");
+
+                m_axisXY.WaitReady();
+                m_axisRotate.WaitReady();
+                m_axisZ.WaitReady();
+            }
+            return "OK";
+        }
+        public override string ServerBeforePut()
+        {
+            return BeforePut(0);
+        }
+
+        public string AfterGet(int nID)
+        {
+            return "OK";
+        }
+
+        public string AfterPut(int nID)
+        {
+            return "OK";
+        }
+
+        enum eCheckWafer
+        {
+            InfoWafer,
+            Sensor
+        }
+        eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
+        public bool IsWaferExist(int nID)
+        {
+            switch (m_eCheckWafer)
+            {
+                case eCheckWafer.Sensor: return false; // m_diWaferExist.p_bIn;
+                default: return (p_infoWafer != null);
+            }
+        }
+
+        InfoWafer.WaferSize m_waferSize;
+        public void RunTreeTeach(Tree tree)
+        {
+            m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
+        }
+
+        string m_sInfoWafer = "";
+        InfoWafer _infoWafer = null;
+        public InfoWafer p_infoWafer
+        {
+            get
+            {
+                return _infoWafer;
+            }
+            set
+            {
+                m_sInfoWafer = (value == null) ? "" : value.p_id;
+                _infoWafer = value;
+                if (m_reg != null)
+                    m_reg.Write("sInfoWafer", m_sInfoWafer);
+                OnPropertyChanged();
+            }
+        }
+
+        Registry m_reg = null;
+        public void ReadInfoWafer_Registry()
+        {
+            m_reg = new Registry(p_id + ".InfoWafer");
+            m_sInfoWafer = m_reg.Read("sInfoWafer", m_sInfoWafer);
+            p_infoWafer = m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
         }
         #endregion
 
@@ -170,15 +368,24 @@ namespace Root_WIND2.Module
         {
             if (EQ.p_bSimulate)
                 return "OK";
-            //            p_bStageBlow = false;
-            //            p_bStageVac = true;
-            Thread.Sleep(200);
-            if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
-                m_CamMain.Connect();
-            p_sInfo = base.StateHome();
-            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
-            //p_bStageVac = false;
-            return "OK";
+
+            if (p_eRemote == eRemote.Client)
+            {
+                m_remote.RemoteSend(Remote.eProtocol.Initial, "INIT", "INIT");
+                return "OK";
+            }
+            else
+            {
+                //            p_bStageBlow = false;
+                //            p_bStageVac = true;
+                Thread.Sleep(200);
+                if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
+                    m_CamMain.Connect();
+                p_sInfo = base.StateHome();
+                p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+                //p_bStageVac = false;
+                return "OK";
+            }
         }
         #endregion
 
@@ -191,11 +398,12 @@ namespace Root_WIND2.Module
         }
         #endregion
 
-        public Vision(string id, IEngineer engineer)
+        public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
-            //            InitLineScan();
+            //            InitLineScan();+
             //            InitAreaScan();
-            base.InitBase(id, engineer);
+            base.InitBase(id, engineer, eRemote);
+            m_waferSize = new InfoWafer.WaferSize(id, false, false);
             //            InitMemory();
         }
 
@@ -208,13 +416,14 @@ namespace Root_WIND2.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), false, "Time Delay");
+            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
             AddModuleRunList(new Run_GrabLineScan(this), false, "Run Grab LineScan Camera");
             AddModuleRunList(new Run_Inspect(this), false, "Run Inspect");
+            AddModuleRunList(new Run_VisionAlign(this), false, "Run VisionAlign");
+            AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
             
         }
-
         #endregion
     }
 }

@@ -25,8 +25,7 @@
     
     <ScrollViewer VerticalScrollBarVisibility="Visible">
         <StackPanel>
-            <Grid Height="838"
-                  DataContext="{Binding p_Mask_VM}">
+            <Grid Height="838" DataContext="{Binding p_ROI_VM}">
                 <Grid Opacity="{Binding p_PageOpacity}" IsEnabled="{Binding p_PageEnable}">
                     <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2.5*"/>
@@ -57,14 +56,14 @@
                               Background="{StaticResource GroupBoxBackground}">
                             <ScrollViewer helper:AutoScrollHelper.AutoScroll="True">
                                 <StackPanel>
-                                    <DataGrid ItemsSource="{Binding p_cInspMask}"
-                                              SelectedItem="{Binding p_SelectedMask}"
+                                    <DataGrid ItemsSource="{Binding p_cInspROI}"
+                                              SelectedItem="{Binding p_SelectedROI}"
                                               SelectionMode="Single"
                                               IsReadOnly="True"
                                               RowHeaderWidth="0"
                                               AutoGenerateColumns="False">
                                         <DataGrid.Resources>
-                                            <CollectionViewSource Source="{Binding p_cInspMask}" x:Key="items"/>
+                                            <CollectionViewSource Source="{Binding p_cInspROI}" x:Key="items"/>
                                             <Style TargetType="DataGridColumnHeader">
                                                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
                                                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -85,10 +84,14 @@
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
-                                            <DataGridTextColumn Header="Index" Width="50"
+                                            <!--<DataGridTextColumn Header="Index" Width="50"
                                                                 ElementStyle="{StaticResource TextInCellCenter}"
                                                                 Binding="{Binding Converter={StaticResource IndexConverter},  
-                                                                ConverterParameter={StaticResource ResourceKey=items}}"/>
+                                                                ConverterParameter={StaticResource ResourceKey=items}}"/>-->
+                                            <DataGridTextColumn Header="Index"
+                                                                Width="50"
+                                                                Binding="{Binding p_Index}" 
+                                                                ElementStyle="{StaticResource TextInCellCenter}"/>
 
                                             <DataGridTextColumn Header="Size(byte)" Width="*" Binding="{Binding p_Size}"
                                                             ElementStyle="{StaticResource TextInCellCenter}"/>
@@ -106,7 +109,7 @@
                                                     <DataTemplate>
                                                         <Button Content="Delete" Margin="1" 
                                                             Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, 
-                                                                      Path=DataContext.DeleteMask}"/>
+                                                                      Path=DataContext.DeleteROI}"/>
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
@@ -144,15 +147,15 @@
                                 </ListBox>
                                 <StackPanel Grid.Row="1">
                                     <Button Content="Clear"
-                                            Command="{Binding ClearMask}"
+                                            Command="{Binding ClearROI}"
                                             VerticalAlignment="Top"
                                             Height="40"
                                             Margin="0,2" />
                                 </StackPanel>
                             </Grid>
                         </GroupBox>
-                        <Button Content="Create Mask" Style="{StaticResource PanelBtn}" Margin="2" Grid.Row="2" Command="{Binding CreateMask}"/>
-                        <Button Content="Save Mask" Style="{StaticResource PanelBtn}" Margin="2" Grid.Row="3" Command="{Binding SaveMask}"/>
+                        <Button Content="Create ROI" Style="{StaticResource PanelBtn}" Margin="2" Grid.Row="2" Command="{Binding CreateROI}"/>
+                        <Button Content="Save ROI" Style="{StaticResource PanelBtn}" Margin="2" Grid.Row="3" Command="{Binding SaveROI}"/>
                     </Grid>
                 </Grid>
                 <local:LoadingControl Grid.ColumnSpan="3" Panel.ZIndex="100"

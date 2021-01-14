@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,14 +18,14 @@ namespace Root_WIND2
 {
     class MapControl_ViewModel : ObservableObject
     {
-        InspectionManager_Vision m_InspectionManger;
+        WorkFactory m_InspectionManger;
         Recipe m_Recipe;
 
         public delegate void setMasterDie(object e);
         public event setMasterDie SetMasterDie;
         public int[] Map;
         CPoint MapSize;
-        public MapControl_ViewModel(InspectionManager_Vision inspectionManger, Recipe recipe = null)
+        public MapControl_ViewModel(WorkFactory inspectionManger, Recipe recipe = null)
         {
             if(recipe != null)
                 m_Recipe = recipe;
@@ -47,7 +48,8 @@ namespace Root_WIND2
         object lockObj = new object();
         private void MapStateChanged_Callback(object obj, WorkplaceStateChangedEventArgs args)
         {
-            lock(lockObj)
+            //lock(lockObj) //여기 lock걸면 deaklock 발생
+            try
             {
                 Workplace workplace = args.workplace;
 
@@ -56,7 +58,7 @@ namespace Root_WIND2
 
                 if (x < 0 || y < 0) return;
 
-                WORKPLACE_STATE state = workplace.STATE;
+                WORK_TYPE state = workplace.STATE;
 
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
                 {
@@ -68,35 +70,44 @@ namespace Root_WIND2
 
                     if (workplace.GetSubState(WORKPLACE_SUB_STATE.BAD_CHIP) == false)
                     {
+
                         Grid chip = p_MapItems[index];
-                        switch (state)
+                        lock (lockObj) //여기다가 lock걸면 화면 최대/최소화 시 맵이 회색으로 변함
                         {
-                            case WORKPLACE_STATE.NONE:
-                                //tb.Background = brushPosition;
+                            switch (state)
+                            { 
+                                case WORK_TYPE.NONE:
+                                    //tb.Background = brushPosition;
+                                    break;
+                                case WORK_TYPE.SNAP:
+                                    chip.Background = brushPreInspection;
                                 break;
-                            case WORKPLACE_STATE.SNAP:
-                                chip.Background = brushPreInspection;
+                                case WORK_TYPE.ALIGNMENT:
+                                    chip.Background = brushPosition;
                                 break;
-                            case WORKPLACE_STATE.READY:
-                                chip.Background = brushPosition;
+                                case WORK_TYPE.INSPECTION:
+                                    chip.Background = brushInspection;
                                 break;
-                            case WORKPLACE_STATE.INSPECTION:
-                                chip.Background = brushInspection;
+                                case WORK_TYPE.DEFECTPROCESS:
+                                    chip.Background = brushComplete;
                                 break;
-                            case WORKPLACE_STATE.DEFECTPROCESS:
-                                chip.Background = brushComplete;
+                                case WORK_TYPE.DEFECTPROCESS_WAFER:
+                                    chip.Background = brushCompleteWafer;
                                 break;
-                            case WORKPLACE_STATE.DEFECTPROCESS_WAFER:
-                                chip.Background = brushCompleteWafer;
-                                break;
+                            }
                         }
                     }
                     else
                     {
                         Grid chip = p_MapItems[index];
-                        chip.Background = brushBadChip;
+
+                        lock(this.lockObj) chip.Background = brushBadChip;
                     }
                 }));
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Map State Change Error\n");
             }
         }
 
@@ -104,8 +115,11 @@ namespace Root_WIND2
 
         public void CreateMapUI(int[] map = null, CPoint mapsize = null)
         {
+            // 여기 예외처리 이상함
             if (map == null)
             {
+                if (Map == null) return;
+
                 map = Map;
                 mapsize = MapSize;
             }

@@ -13,20 +13,28 @@ namespace Root_CAMELLIA
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            double center = (double)values[0];
-            double current = (double)values[1];
-            Axis axis = (Axis)values[2];
-            double res;
-            double ratio = (int)(BaseDefine.CanvasWidth / BaseDefine.ViewSize);
-            if (axis.p_id == "Camellia.StageXYX")
+            try
             {
-                res = (BaseDefine.CanvasWidth / 2) - ((center - current) / (10000 / ratio)) - (double.Parse((string)parameter) / 2);
+                double center = (double)values[0];
+                double current = (double)values[1];
+                Axis axis = (Axis)values[2];
+                double res;
+                double ratio = (int)(BaseDefine.CanvasWidth / BaseDefine.ViewSize);
+                if (axis.p_id == "Camellia.StageXYX")
+                {
+                    res = (BaseDefine.CanvasWidth / 2) + ((center - current) / (10000 / ratio)) - (double.Parse((string)parameter) / 2);
+                }
+                else
+                {
+                    res = (BaseDefine.CanvasHeight / 2) - ((center - current) / (10000 / ratio)) - (double.Parse((string)parameter) / 2);
+                }
+                return res;
             }
-            else
+            catch (Exception)
             {
-                res = (BaseDefine.CanvasHeight / 2) + ((center - current) / (10000 / ratio)) - (double.Parse((string)parameter) / 2);
             }
-            return res;
+            return values;
+         
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

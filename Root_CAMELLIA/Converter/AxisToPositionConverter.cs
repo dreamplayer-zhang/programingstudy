@@ -13,13 +13,21 @@ namespace Root_CAMELLIA
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            double pulse = (double)values[1];
-            double center = (double)values[2];
-            double res = pulse - center;
+            try
+            {
+                double pulse = (double)values[1];
+                double center = (double)values[2];
+                double res =  center - pulse;
 
-            res /= 10000;
+                res /= 10000;
+                return res.ToString("0.###") + "mm";
+            }
+            catch (Exception)
+            {
+            }
+            return values;
+         
 
-            return res.ToString("0.###") + "mm";
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

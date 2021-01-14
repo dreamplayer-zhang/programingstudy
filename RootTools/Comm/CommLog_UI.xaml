@@ -14,14 +14,14 @@
         <ListView Grid.Row="0" x:Name="listViewLog">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Time">
+                    <GridViewColumn Header="Time" Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding p_sTime}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Log">
+                    <GridViewColumn Header="Log" Width="500">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding p_sMsg}" Foreground="{Binding p_bColor}"/>

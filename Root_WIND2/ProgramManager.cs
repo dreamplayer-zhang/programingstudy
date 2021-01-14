@@ -60,9 +60,12 @@ namespace Root_WIND2
         private ImageData roiLayer;
 
         private ImageData imageEdge;
+        private ImageData imageEBR;
 
-        InspectionManager_Vision inspectionVision;
-        InspectionManager_EFEM inspectionEFEM;
+        InspectionManagerFrontside inspectionFront;
+        InspectionManagerBackside inspectionBack;
+        InspectionManagerEdge inspectionEdge;
+        InspectionManagerEBR inspectionEBR;
         #endregion
 
         #region [Getter Setter]
@@ -71,10 +74,14 @@ namespace Root_WIND2
         public Recipe Recipe { get => recipe; private set => recipe = value; }
         public ImageData Image { get => image; private set => image = value; }
         public ImageData ROILayer { get => roiLayer; private set => roiLayer = value; }
-        public InspectionManager_Vision InspectionVision { get => inspectionVision; private set => inspectionVision = value; }
-        public InspectionManager_EFEM InspectionEFEM { get => inspectionEFEM; private set => inspectionEFEM = value; }
+        public InspectionManagerFrontside InspectionFront { get => inspectionFront; private set => inspectionFront = value; }
+        public InspectionManagerBackside InspectionBack { get => inspectionBack; private set => inspectionBack = value; }
+        public InspectionManagerEdge InspectionEdge { get => inspectionEdge; private set => inspectionEdge = value; }
+        public InspectionManagerEBR InspectionEBR { get => inspectionEBR; set => inspectionEBR = value; }
+
         public IDialogService DialogService { get => dialogService; set => dialogService = value; }
         public ImageData ImageEdge { get => imageEdge; private set => imageEdge = value; }
+        public ImageData ImageEBR { get => imageEBR; private set => imageEBR = value; }
         #endregion
 
         public bool Initialize()
@@ -115,16 +122,21 @@ namespace Root_WIND2
 
             roiLayer = new ImageData(memoryTool.GetMemory("pool", "group", memoryNameROI));
             //roiLayer.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameROI).p_nCount;
+            if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+            {
+                imageEdge = GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
+                imageEdge.p_nByte = memoryTool.GetMemory("EdgeSide Vision.Memory", "EdgeSide Vision", Module.EdgeSideVision.EDGE_TYPE.EdgeTop.ToString()).p_nCount;
 
-            ImageEdge = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
-            //ImageEdge.p_nByte = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop).p_nByte;
+                imageEBR = GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EBR);
+                imageEBR.p_nByte = memoryTool.GetMemory("EdgeSide Vision.Memory", "EdgeSide Vision", Module.EdgeSideVision.EDGE_TYPE.EBR.ToString()).p_nCount;
+            }
 
             return true;
         }
 
         public ImageData GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE type)
         {
-            return engineer.m_handler.m_edgesideVision.GetMemoryData(type);
+            return engineer.m_handler.p_EdgeSideVision.GetMemoryData(type);
         }
 
         private bool InitMember()
@@ -134,20 +146,39 @@ namespace Root_WIND2
             if (!Directory.Exists(recipeFolderPath))
                 Directory.CreateDirectory(recipeFolderPath);
 
-            // Vision
-            this.InspectionVision = new InspectionManager_Vision(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
-            
-            this.Engineer.InspectionVision = this.InspectionVision;
-            this.Engineer.InspectionVision.Recipe = this.recipe;
+            // Front
+            this.InspectionFront = new InspectionManagerFrontside(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
+            this.InspectionFront.SetColorSharedBuffer(image.GetPtr(0), image.GetPtr(1), image.GetPtr(2));
 
-            // EFEM
-            this.InspectionEFEM = new InspectionManager_EFEM(ImageEdge.GetPtr(), ImageEdge.p_Size.X, ImageEdge.p_Size.Y, 3);
 
-            this.Engineer.InspectionEFEM = this.InspectionEFEM;
-            this.Engineer.InspectionEFEM.Recipe = this.recipe;
+            this.Engineer.InspectionFront = this.InspectionFront;
+            this.Engineer.InspectionFront.Recipe = this.recipe;
 
-           
+            // Back
+            this.InspectionBack = new InspectionManagerBackside(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
 
+            this.Engineer.InspectionBack = this.InspectionBack;
+            this.Engineer.InspectionBack.Recipe = this.recipe;
+
+            // Edge
+            if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+            {
+                if (imageEdge.p_nByte == 1)
+                    this.InspectionEdge = new InspectionManagerEdge(imageEdge.GetPtr(), imageEdge.p_Size.X, imageEdge.p_Size.Y, 3);
+
+                if (imageEdge.p_nByte == 3)
+                {
+                    this.InspectionEdge = new InspectionManagerEdge(imageEdge.GetPtr(), imageEdge.p_Size.X, imageEdge.p_Size.Y, 3);
+                    this.InspectionEdge.SetWorkplaceBuffer(imageEdge.GetPtr(0), imageEdge.GetPtr(1), imageEdge.GetPtr(2));
+                }
+
+                this.Engineer.InspectionEdge = this.InspectionEdge;
+                this.Engineer.InspectionEdge.Recipe = this.recipe;
+
+                this.inspectionEBR = new InspectionManagerEBR(imageEBR.GetPtr(), imageEBR.p_Size.X, imageEBR.p_Size.Y);
+                this.Engineer.InspectionEBR = this.InspectionEBR;
+                this.Engineer.InspectionEBR.Recipe = this.recipe;
+            }
             return true;
         }
 
@@ -169,7 +200,7 @@ namespace Root_WIND2
                 }
                 
                 this.Recipe.Clear();
-                ShowDialogSaveRecipe();
+                ShowDialogSaveRecipe(true);
 
                 WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
             }
@@ -179,12 +210,14 @@ namespace Root_WIND2
             }
         }
 
-        public void ShowDialogSaveRecipe()
+        public void ShowDialogSaveRecipe(bool bNew = false)
         {
             try
             {
                 SaveFileDialog dlg = new SaveFileDialog();
                 dlg.InitialDirectory = recipeFolderPath;
+
+                if (bNew == true) dlg.Title = "새로 만들기";
 
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == true)

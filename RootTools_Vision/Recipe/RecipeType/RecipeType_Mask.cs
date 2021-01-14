@@ -107,6 +107,43 @@ namespace RootTools_Vision
             boundingBox.Right = maxX;
             boundingBox.Bottom = maxY;
         }
+
+        public RecipeType_Mask(List<PointLine> _pointLines)
+        {
+            area = 0;
+            pointLines = new List<RecipeType_PointLine>();
+            boundingBox = new CRect();
+
+            int minX = int.MaxValue;
+            int minY = int.MaxValue;
+            int maxX = int.MinValue;
+            int maxY = int.MinValue;
+            foreach (PointLine pl in _pointLines)
+            {
+                pointLines.Add(new RecipeType_PointLine(pl.StartPt, pl.Width));
+
+                minX = minX > pl.StartPt.X ? pl.StartPt.X : minX;
+                minY = minY > pl.StartPt.Y ? pl.StartPt.Y : minY;
+                maxX = maxX < pl.StartPt.X + pl.Width ? pl.StartPt.X + pl.Width : maxX;
+                maxY = maxY < pl.StartPt.Y ? pl.StartPt.Y : maxY;
+
+                area += pl.Width;
+            }
+
+            boundingBox.Left = minX;
+            boundingBox.Top = minY;
+            boundingBox.Right = maxX;
+            boundingBox.Bottom = maxY;
+        }
+
+        public void CopyPointLinesTo(ref List<PointLine> _pointLines)
+        {
+            _pointLines.Clear();
+            foreach(RecipeType_PointLine pl in this.pointLines)
+            {
+                _pointLines.Add(new PointLine(pl.StartPoint, pl.Length));
+            }
+        }
     }
 
     public class RecipeType_PointLine
@@ -127,7 +164,7 @@ namespace RootTools_Vision
 
         public RecipeType_PointLine()
         {
-            
+
         }
 
         public RecipeType_PointLine(CPoint _startPoint, int _length)
@@ -149,3 +186,6 @@ namespace RootTools_Vision
         }
     }
 }
+
+
+

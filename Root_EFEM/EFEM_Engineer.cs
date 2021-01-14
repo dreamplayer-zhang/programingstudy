@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.Control.ACS;
 using RootTools.Control.Ajin;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -50,14 +51,16 @@ namespace Root_EFEM
         #region Control
         enum eControl
         {
-            Ajin
+            Ajin,
+            ACS
         };
         eControl m_eControl = eControl.Ajin; 
         void InitControl()
         {
             switch (m_eControl)
             {
-                case eControl.Ajin: InitAjin(); break; 
+                case eControl.Ajin: InitAjin(); break;
+                case eControl.ACS: InitACS(); break;
             }
         }
 
@@ -76,6 +79,18 @@ namespace Root_EFEM
             m_ajinUI.Init(m_ajin);
             m_toolBox.AddToolSet(m_ajin, m_ajinUI);
             m_toolBox.m_toolDIO = m_ajin.m_dio;
+        }
+        #endregion
+
+        #region ACS
+        public ACS m_ACS = new ACS();
+        ACS_UI m_ACSUI = new ACS_UI();
+        void InitACS()
+        {
+            m_ACS.Init("ACS", this);
+            m_ACSUI.Init(m_ACS);
+            m_toolBox.AddToolSet(m_ACS, m_ACSUI);
+            m_toolBox.m_toolDIO = m_ACS.m_dio;
         }
         #endregion
 

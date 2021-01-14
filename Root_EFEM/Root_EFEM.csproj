@@ -187,10 +187,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="InfoCarrier_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="InfoWaferChild_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -223,11 +219,6 @@
     <Compile Include="EFEM_Recipe_UI.xaml.cs">
       <DependentUpon>EFEM_Recipe_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="InfoCarrier.cs" />
-    <Compile Include="InfoCarrier_UI.xaml.cs">
-      <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="InfoWafer.cs" />
     <Compile Include="InfoWaferChild_UI.xaml.cs">
       <DependentUpon>InfoWaferChild_UI.xaml</DependentUpon>
     </Compile>
@@ -244,16 +235,16 @@
     <Compile Include="Module\Aligner_ATI_AOI.cs" />
     <Compile Include="Module\Aligner_RND.cs" />
     <Compile Include="Module\EFEM_AOP.cs" />
-    <Compile Include="Module\ILoadport.cs" />
     <Compile Include="Module\IWTRRun.cs" />
     <Compile Include="Module\Loadport_Cymechs.cs" />
+    <Compile Include="Module\RFID_Brooks.cs" />
+    <Compile Include="Module\RFID_Ceyon.cs" />
     <Compile Include="Module\Vision_AOP.cs" />
     <Compile Include="Module\Vision_Backside.cs" />
     <Compile Include="Module\Vision_EBR.cs" />
     <Compile Include="Module\IWTR.cs" />
     <Compile Include="Module\IWTRChild.cs" />
     <Compile Include="Module\Loadport_RND.cs" />
-    <Compile Include="Module\Vision.cs" />
     <Compile Include="Module\WTRArm.cs" />
     <Compile Include="Module\WTR_Cymechs.cs" />
     <Compile Include="Module\WTR_RND.cs" />

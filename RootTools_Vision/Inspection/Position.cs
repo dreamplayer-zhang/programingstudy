@@ -18,7 +18,7 @@ namespace RootTools_Vision
     public class Position : WorkBase
     {
         #region [Member Variables]
-        public override WORK_TYPE Type => WORK_TYPE.PREPARISON;
+        public override WORK_TYPE Type => WORK_TYPE.ALIGNMENT;
 
         WorkplaceBundle workplaceBundle;
         Workplace workplace;
@@ -29,6 +29,8 @@ namespace RootTools_Vision
         PositionParameter parameter;
 
         OriginRecipe recipeOrigin;
+
+        IntPtr InspectionSharedBuffer;
 
         #endregion
 
@@ -103,6 +105,11 @@ namespace RootTools_Vision
 
         public bool DoPosition_Wafer()
         {
+            this.InspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
+
+            if (this.positionRecipe.ListMasterFeature.Count == 0) 
+                return false;
+
             //if (this.positionRecipe.IndexMaxScoreMasterFeature == -1) // Feature가 셋팅이 안되어 있는 경우 전체 Feature 사용
             {
                 int outX = 0, outY = 0;
@@ -112,23 +119,23 @@ namespace RootTools_Vision
                 float score = 0;
                 float maxScore = 0;
                 int i = 0;
-                int maxIndex = -1;
+                int maxIndex = 0;
 
                 foreach(RecipeType_ImageData feature in this.positionRecipe.ListMasterFeature)
                 {
                     CPoint absPos = ConvertRelToAbs_Wafer(new CPoint(feature.PositionX, feature.PositionY));
-                    int startX = (absPos.X - this.parameter.SearchRangeX) < 0 ? 0 : (absPos.X - this.parameter.SearchRangeX);
-                    int startY = (absPos.Y - this.parameter.SearchRangeY) < 0 ? 0 : (absPos.Y - this.parameter.SearchRangeY);
-                    int endX = (absPos.X + feature.Width + this.parameter.SearchRangeX) >= this.workplace.SharedBufferWidth ? this.workplace.SharedBufferWidth : (absPos.X + feature.Width + this.parameter.SearchRangeX);
-                    int endY = (absPos.Y + feature.Height + this.parameter.SearchRangeY) >= this.workplace.SharedBufferHeight ? this.workplace.SharedBufferHeight : (absPos.Y + feature.Height + this.parameter.SearchRangeY);
+                    int startX = (absPos.X - this.parameter.WaferSearchRangeX) < 0 ? 0 : (absPos.X - this.parameter.WaferSearchRangeX);
+                    int startY = (absPos.Y - this.parameter.WaferSearchRangeY) < 0 ? 0 : (absPos.Y - this.parameter.WaferSearchRangeY);
+                    int endX = (absPos.X + feature.Width + this.parameter.WaferSearchRangeX) >= this.workplace.SharedBufferWidth ? this.workplace.SharedBufferWidth : (absPos.X + feature.Width + this.parameter.WaferSearchRangeX);
+                    int endY = (absPos.Y + feature.Height + this.parameter.WaferSearchRangeY) >= this.workplace.SharedBufferHeight ? this.workplace.SharedBufferHeight : (absPos.Y + feature.Height + this.parameter.WaferSearchRangeY);
 
                     unsafe
                     {
                         score =  CLR_IP.Cpp_TemplateMatching(
-                            (byte*)this.workplace.SharedBuffer.ToPointer(), feature.RawData, &outX, &outY, 
+                            (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY, 
                             this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                             feature.Width, feature.Height,
-                            startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt);
+                            startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt, (int)this.parameter.IndexChannel);
                     }
 
                     if( score > maxScore)
@@ -176,9 +183,12 @@ namespace RootTools_Vision
                 int transY = (int)(centerMatchingY - centerROIY);
 
 
-                if (maxScore >= this.parameter.MinScoreLimit) // Position 성공 시
+                if (maxScore >= this.parameter.WaferMinScoreLimit) // Position 성공 시
                 {
-                    this.workplace.SetImagePositionByTrans(transX, transY, true);
+                    foreach(Workplace wp in this.workplaceBundle)
+                    {
+                        wp.SetImagePositionByTrans(transX, transY);
+                    }
 
                     WorkEventManager.OnPositionDone(this.workplace, new PositionDoneEventArgs(new CPoint(maxStartX, maxStartY), new CPoint(maxEndX, maxEndY),
                             new CPoint(maxStartX + transX, maxStartY + transY), new CPoint(maxEndX + transX, maxEndY + transY), true));
@@ -195,6 +205,8 @@ namespace RootTools_Vision
 
         public bool DoPosition_Chip()
         {
+            this.InspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
+
             int outX = 0, outY = 0;
             int maxX = 0, maxY = 0;
             int maxStartX = 0, maxStartY = 0;
@@ -202,7 +214,7 @@ namespace RootTools_Vision
             float score = 0;
             float maxScore = 0;
             int i = 0;
-            int maxIndex = -1;
+            int maxIndex = 0;
 
             try
             {
@@ -213,18 +225,18 @@ namespace RootTools_Vision
                     {
                         CPoint absPos = ConvertRelToAbs_Chip(new CPoint(feature.PositionX, feature.PositionY));
 
-                        int startX = (absPos.X - this.parameter.SearchRangeX) < 0 ? 0 : (absPos.X - this.parameter.SearchRangeX);
-                        int startY = (absPos.Y - this.parameter.SearchRangeY) < 0 ? 0 : (absPos.Y - this.parameter.SearchRangeY);
-                        int endX = (absPos.X + feature.Width + this.parameter.SearchRangeX) >= this.workplace.SharedBufferWidth ? this.workplace.SharedBufferWidth : (absPos.X + feature.Width + this.parameter.SearchRangeX);
-                        int endY = (absPos.Y + feature.Height + this.parameter.SearchRangeY) >= this.workplace.SharedBufferHeight ? this.workplace.SharedBufferHeight : (absPos.Y + feature.Height + this.parameter.SearchRangeY);
+                        int startX = (absPos.X - this.parameter.ChipSearchRangeX) < 0 ? 0 : (absPos.X - this.parameter.ChipSearchRangeX);
+                        int startY = (absPos.Y - this.parameter.ChipSearchRangeY) < 0 ? 0 : (absPos.Y - this.parameter.ChipSearchRangeY);
+                        int endX = (absPos.X + feature.Width + this.parameter.ChipSearchRangeX) >= this.workplace.SharedBufferWidth ? this.workplace.SharedBufferWidth : (absPos.X + feature.Width + this.parameter.ChipSearchRangeX);
+                        int endY = (absPos.Y + feature.Height + this.parameter.ChipSearchRangeY) >= this.workplace.SharedBufferHeight ? this.workplace.SharedBufferHeight : (absPos.Y + feature.Height + this.parameter.ChipSearchRangeY);
 
                         unsafe
                         {
                             score = CLR_IP.Cpp_TemplateMatching(
-                                (byte*)this.workplace.SharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
+                                (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
                                 this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                                 feature.Width, feature.Height,
-                                startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt);
+                                startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt, (int)this.parameter.IndexChannel);
                         }
 
                         if (score > maxScore)
@@ -252,18 +264,18 @@ namespace RootTools_Vision
 
                     CPoint absPos = ConvertRelToAbs_Chip(new CPoint(feature.PositionX, feature.PositionY));
 
-                    int startX = (absPos.X - this.parameter.SearchRangeX) < 0 ? 0 : (absPos.X - this.parameter.SearchRangeX);
-                    int startY = (absPos.Y - this.parameter.SearchRangeY) < 0 ? 0 : (absPos.Y - this.parameter.SearchRangeY);
-                    int endX = (absPos.X + feature.Width + this.parameter.SearchRangeX) >= this.workplace.SharedBufferWidth ? this.workplace.SharedBufferWidth : (absPos.X + feature.Width + this.parameter.SearchRangeX);
-                    int endY = (absPos.Y + feature.Height + this.parameter.SearchRangeY) >= this.workplace.SharedBufferHeight ? this.workplace.SharedBufferHeight : (absPos.Y + feature.Height + this.parameter.SearchRangeY);
+                    int startX = (absPos.X - this.parameter.ChipSearchRangeX) < 0 ? 0 : (absPos.X - this.parameter.ChipSearchRangeX);
+                    int startY = (absPos.Y - this.parameter.ChipSearchRangeY) < 0 ? 0 : (absPos.Y - this.parameter.ChipSearchRangeY);
+                    int endX = (absPos.X + feature.Width + this.parameter.ChipSearchRangeX) >= this.workplace.SharedBufferWidth ? this.workplace.SharedBufferWidth : (absPos.X + feature.Width + this.parameter.ChipSearchRangeX);
+                    int endY = (absPos.Y + feature.Height + this.parameter.ChipSearchRangeY) >= this.workplace.SharedBufferHeight ? this.workplace.SharedBufferHeight : (absPos.Y + feature.Height + this.parameter.ChipSearchRangeY);
 
                     unsafe
                     {
                         score = CLR_IP.Cpp_TemplateMatching(
-                            (byte*)this.workplace.SharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
+                            (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
                             this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                             feature.Width, feature.Height,
-                            startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt);
+                            startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt, (int)this.parameter.IndexChannel);
                     }
 
                     maxScore = score;
@@ -303,7 +315,7 @@ namespace RootTools_Vision
                 int transY = (int)(centerMatchingY - tplCenterY);
 
 
-                if (maxScore >= this.parameter.MinScoreLimit) // Position 성공 시
+                if (maxScore >= this.parameter.ChipMinScoreLimit) // Position 성공 시
                 {
                     this.workplace.SetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS, true);
                     this.workplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, false);
@@ -323,8 +335,6 @@ namespace RootTools_Vision
                     WorkEventManager.OnPositionDone(this.workplace, new PositionDoneEventArgs(new CPoint(tplStartX, tplStartY), new CPoint(tplStartX + tplW, tplStartY + tplH),
                             new CPoint(tplStartX + transX, tplStartY + transY), new CPoint(tplStartX + tplW + transX, tplStartY + tplH + transY), false));
                 }
-
-
             }
             catch(Exception ex)
             {
@@ -361,20 +371,64 @@ namespace RootTools_Vision
         private void ExtractCurrentWorkplace()
         {
             // Copy 
-            int chipH = this.workplace.BufferSizeY;
-            int chipW = this.workplace.BufferSizeX;
+            //int chipH = this.workplace.BufferSizeY;
+            //int chipW = this.workplace.BufferSizeX;
 
-            int Left = this.workplace.PositionX;
-            int Top = this.workplace.PositionY - chipH;
-            int Right = this.workplace.PositionX + chipW;
-            int Bottom = this.workplace.PositionY;
+            //int Left = this.workplace.PositionX;
+            //int Top = this.workplace.PositionY - chipH;
+            //int Right = this.workplace.PositionX + chipW;
+            //int Bottom = this.workplace.PositionY;
 
-            int memH = this.workplace.SharedBufferHeight;
-            int memW = this.workplace.SharedBufferWidth;
+            //int memH = this.workplace.SharedBufferHeight;
+            //int memW = this.workplace.SharedBufferWidth;
 
-            for (int cnt = Top; cnt < Bottom; cnt++)
-                Marshal.Copy(new IntPtr(this.workplace.SharedBuffer.ToInt64() + (cnt * (Int64)memW + Left))
-                    , this.workplace.WorkplaceBuffer, chipW * (cnt - Top), chipW);
+            //for (int cnt = Top; cnt < Bottom; cnt++)
+            //    Marshal.Copy(new IntPtr(
+            //        this.InspectionSharedBuffer.ToInt64() + (cnt * (Int64)memW + Left))
+            //        , this.workplace.WorkplaceBuffer, chipW * (cnt - Top), chipW);
+
+
+            // 지금은 세개 다하는데 추후에 하나만 해야할 수 도....
+
+            Tools.ParallelImageCopy(
+                this.workplace.SharedBufferR_GRAY,
+                this.workplace.SharedBufferWidth,
+                this.workplace.SharedBufferHeight,
+                new CRect
+                (
+                    this.workplace.PositionX, 
+                    this.workplace.PositionY - this.workplace.BufferSizeY, 
+                    this.workplace.PositionX + this.workplace.BufferSizeX, 
+                    this.workplace.PositionY),
+                this.workplace.WorkplaceBufferR_GRAY);
+
+
+            if(this.workplace.SharedBufferByteCnt == 3)
+            {
+                Tools.ParallelImageCopy(
+                    this.workplace.SharedBufferG,
+                    this.workplace.SharedBufferWidth,
+                    this.workplace.SharedBufferHeight,
+                    new CRect
+                    (
+                        this.workplace.PositionX,
+                        this.workplace.PositionY - this.workplace.BufferSizeY,
+                        this.workplace.PositionX + this.workplace.BufferSizeX,
+                        this.workplace.PositionY),
+                    this.workplace.WorkplaceBufferG);
+
+                Tools.ParallelImageCopy(
+                    this.workplace.SharedBufferB,
+                    this.workplace.SharedBufferWidth,
+                    this.workplace.SharedBufferHeight,
+                    new CRect
+                    (
+                        this.workplace.PositionX,
+                        this.workplace.PositionY - this.workplace.BufferSizeY,
+                        this.workplace.PositionX + this.workplace.BufferSizeX,
+                        this.workplace.PositionY),
+                    this.workplace.WorkplaceBufferB);
+            }
         }
     }
 }

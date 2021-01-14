@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Threading;
 using RootTools.Control;
 using RootTools.OHT.Semi;
+using RootTools.OHTNew;
 
 namespace Root_EFEM.Module
 {
@@ -17,11 +18,13 @@ namespace Root_EFEM.Module
         RS232 m_rs232;
         public DIO_I m_diPlaced;
         public DIO_I m_diPresent;
-        DIO_I m_diOpen;
-        DIO_I m_diClose;
-        DIO_I m_diReady;
-        DIO_I m_diRun;
-        public OHT_Semi m_OHT; 
+        public DIO_I m_diOpen;
+        public DIO_I m_diClose;
+        public DIO_I m_diReady;
+        public DIO_I m_diRun;
+        public OHT_Semi m_OHT;
+        //public bool m_bLoadCheck = false;
+        //public bool m_bUnLoadCheck = false;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
@@ -71,7 +74,7 @@ namespace Root_EFEM.Module
 
         public List<string> p_asChildSlot
         {
-            get { return p_infoCarrier.m_asGemSlot; }
+            get { return p_infoCarrier.p_asGemSlot; }
         }
 
         public InfoWafer p_infoWafer { get; set; }
@@ -125,7 +128,7 @@ namespace Root_EFEM.Module
             return IsRunOK();
         }
 
-        public bool IsWaferExist(int nID = 0, bool bUseSensor = true)
+        public bool IsWaferExist(int nID = 0)
         {
             switch (p_infoCarrier.p_eState)
             {
@@ -606,12 +609,14 @@ namespace Root_EFEM.Module
                 }
             }
             p_eState = eState.Ready;
-            if(m_diPlaced.p_bIn && m_diPresent.p_bIn)
+            if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
             {
+                p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
                 m_bPlaced= true;
             }
             else
             {
+                p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
                 m_bPlaced = false;
             }
             
@@ -649,12 +654,14 @@ namespace Root_EFEM.Module
         CEID m_ceidDocking;
         CEID m_ceidUnDocking;
         ALID m_alidPlaced;
+        public ALID m_alidInforeticle;
         void InitGAF() 
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
             m_ceidDocking = m_gaf.GetCEID(this, "Docking");
             m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
+            m_alidInforeticle = m_gaf.GetALID(this, "Info Reticle Error", "Info Reticle Error");
         }
         #endregion
 
@@ -676,6 +683,9 @@ namespace Root_EFEM.Module
             while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
+
+        public bool p_bPlaced { get { return m_diPlaced.p_bIn; } }
+        public bool p_bPresent { get { return m_diPresent.p_bIn; } }
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }
@@ -709,8 +719,8 @@ namespace Root_EFEM.Module
         }
 
         #region ModuleRun
-        ModuleRunBase m_runDocking;
-        ModuleRunBase m_runUndocking;
+        public ModuleRunBase m_runDocking;
+        public ModuleRunBase m_runUndocking;
         protected override void InitModuleRuns()
         {
             m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");

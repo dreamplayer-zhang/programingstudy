@@ -40,15 +40,13 @@ namespace Root_EFEM
 
             public void ClearInfoWafer()
             {
-                m_bIgnoreExistSensor = false;
                 if (p_infoWafer == null) return;
                 if (IsWaferExist() == false) p_infoWafer = null;
             }
 
-            bool m_bIgnoreExistSensor = false;
             bool IsWaferExist()
             {
-                return (m_child != null) ? m_child.IsWaferExist(0, m_bIgnoreExistSensor) : m_arm.IsWaferExist();
+                return (m_child != null) ? m_child.IsWaferExist(0) : m_arm.IsWaferExist();
             }
 
             public Locate(IWTRChild child)
@@ -67,7 +65,6 @@ namespace Root_EFEM
             {
                 string sInfoWafer = (p_infoWafer == null) ? "Empty" : p_infoWafer.p_id;
                 tree.GetTree("InfoWafer").Set(sInfoWafer, sInfoWafer, m_id, "InfoWafer ID", true, true);
-                m_bIgnoreExistSensor = tree.GetTree("Ignore Exist Sensor", false).Set(m_bIgnoreExistSensor, m_bIgnoreExistSensor, m_id, "Ignore Exist Check Sensor");
             }
         }
 
@@ -76,6 +73,8 @@ namespace Root_EFEM
         /// <summary> 프로그램 시작시 Registry 에서 Wafer 정보 읽기 </summary>
         void InitLocate()
         {
+            if (m_wtr == null)
+                return;
             m_aLocate.Clear();
             foreach (WTRArm arm in m_wtr.p_aArm) InitLocateArm(arm);
             foreach (IWTRChild child in m_wtr.p_aChild) InitLocateChild(child);

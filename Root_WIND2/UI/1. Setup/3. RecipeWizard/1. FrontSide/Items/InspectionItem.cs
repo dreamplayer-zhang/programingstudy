@@ -20,20 +20,73 @@ namespace Root_WIND2
         public event ComboboxItemChanged ComboBoxItemChanged_Method;
         public event ButtonClicked ButtonClicked_Delete;
 
-        private ObservableCollection<Mask> m_cMask;
-        public ObservableCollection<Mask> p_cMask
+        public InspectionItem()
+        {
+            if(this.m_cInspROI != null) this.m_InspROI = this.m_cInspROI[0];
+            
+            m_cInspMethod = new ObservableCollection<ParameterBase>();
+            p_cInspMethod = ParameterBase.GetChildClass();
+
+            this.p_InspMethod = this.m_cInspMethod[1]; // Position
+            this.p_InspChannel = IMAGE_CHANNEL.R_GRAY;
+        }
+
+        public int p_Index
         {
             get
             {
-                return m_cMask;
+                return m_Index;
             }
             set
             {
-                SetProperty(ref m_cMask, value);
+                SetProperty(ref m_Index, value);
+            }
+
+        }
+        private int m_Index = 0;
+
+        private ObservableCollection<InspectionROI> m_cInspROI;
+        public ObservableCollection<InspectionROI> p_cInspROI
+        {
+            get
+            {
+                return m_cInspROI;
+            }
+            set
+            {
+                SetProperty(ref m_cInspROI, value);
             }
         }
 
-        private ObservableCollection<ParameterBase> m_cInspMethod;
+
+        private InspectionROI m_InspROI;
+        public InspectionROI p_InspROI
+        {
+            get
+            {
+                return m_InspROI;
+            }
+            set
+            {
+                SetProperty(ref m_InspROI, value);
+            }
+        }
+
+
+
+
+
+        private IMAGE_CHANNEL m_inspChannel;
+        public IMAGE_CHANNEL p_InspChannel
+        {
+            get => this.m_inspChannel;
+            set
+            {
+                SetProperty(ref this.m_inspChannel, value);
+            }
+        }
+
+
         public ObservableCollection<ParameterBase> p_cInspMethod
         {
             get
@@ -46,21 +99,8 @@ namespace Root_WIND2
                 SetProperty(ref m_cInspMethod, value);
             }
         }
+        private ObservableCollection<ParameterBase> m_cInspMethod;
 
-        private Mask m_Mask;
-        public Mask p_Mask
-        {
-            get
-            {
-                return m_Mask;
-            }
-            set
-            {
-                SetProperty(ref m_Mask, value);
-            }
-        }
-
-        private ParameterBase m_InspMethod;
         public ParameterBase p_InspMethod
         {
             get
@@ -72,6 +112,7 @@ namespace Root_WIND2
                 SetProperty(ref m_InspMethod, value);
             }
         }
+        private ParameterBase m_InspMethod;
 
         public ICommand ComboBoxSelectionChanged_MethodItem
         {
@@ -92,11 +133,10 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     if (ComboBoxItemChanged_Mask != null)
-                        ComboBoxItemChanged_Mask(p_Mask, new EventArgs());
+                        ComboBoxItemChanged_Mask(p_InspROI, new EventArgs());
                 });
             }
         }
-
 
         public ICommand btnDeleteInspItem
         {

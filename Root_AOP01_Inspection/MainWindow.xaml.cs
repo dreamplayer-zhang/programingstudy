@@ -4,6 +4,11 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Root_EFEM.Module;
+using Root_AOP01_Inspection.Module;
+using RootTools.GAFs;
+
+
 
 namespace Root_AOP01_Inspection
 {
@@ -120,15 +125,16 @@ namespace Root_AOP01_Inspection
         public Setup_Panel Setup;
         public Review_Panel Review;
         public Run_Panel Run;
+        //public Dlg_Start Dlg;
         #endregion
 
         #region ViewModel
         private Setup_ViewModel m_Setup;
         private Run_ViewModel m_Run;
+        //private Dlg_ViewModel m_Dlg;
         #endregion
 
         public AOP01_Engineer m_engineer = new AOP01_Engineer();
-        private ProgramManager program;
         public IDialogService dialogService;
 
         public MainWindow()
@@ -136,6 +142,7 @@ namespace Root_AOP01_Inspection
             InitializeComponent();
         }
 
+       // Run_Panel _Panel = new Run_Panel();
         void Init()
         {
             dialogService = new DialogService(this);
@@ -153,7 +160,16 @@ namespace Root_AOP01_Inspection
             
             Init_ViewModel();
             Init_UI();
-            //m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
+			switch (m_engineer.m_handler.LoadportType)
+			{
+				case AOP01_Handler.eLoadport.Cymechs:
+                    Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer); 
+                    break;
+				case AOP01_Handler.eLoadport.RND:
+                default:
+                    Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_RND)m_engineer.m_handler.m_aLoadport[0], (Loadport_RND)m_engineer.m_handler.m_aLoadport[1], m_engineer);
+                    break;
+			}
         }
         void Init_ViewModel()
         {
@@ -172,7 +188,10 @@ namespace Root_AOP01_Inspection
             //Review.DataContext =;;
 
             Run = new Run_Panel();
-            Run.DataContext = this;
+            Run.DataContext = m_Run;
+
+            //Dlg = new Dlg_Start();
+            //Dlg.DataContext = m_Dlg;
 
             MainPanel.Children.Clear();
             MainPanel.Children.Add(ModeSelect);

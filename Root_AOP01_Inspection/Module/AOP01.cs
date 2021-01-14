@@ -32,6 +32,8 @@ namespace Root_AOP01_Inspection.Module
         string[] m_asLamp = Enum.GetNames(typeof(eLamp));
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
         public DIO_Os m_doLamp;
+
+
         DIO_Os m_doBuzzer;
         DIO_I m_diEMS;
         DIO_I m_diProtectionBar;
@@ -78,6 +80,8 @@ namespace Root_AOP01_Inspection.Module
             p_sInfo = m_toolBox.Get(ref m_disideDoor, this, "Side Door");
             p_sInfo = m_toolBox.Get(ref m_diELECPNLDoorFan, this, "ELEC PNL Door Fan");
             p_sInfo = m_toolBox.Get(ref m_diETCDoorFan, this, "ETC Door Fan");
+
+
 
             p_sInfo = m_RFID.GetTools(this, bInit);
 
@@ -160,20 +164,6 @@ namespace Root_AOP01_Inspection.Module
             {
                 m_doBuzzer.Write(eBuzzer.BuzzerOff);
             }
-
-            //if(!m_diEMS.p_bIn)
-            //    m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the Emergency Buttons");
-            //else
-            //{
-            //    m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
-            //    m_alidProtectionBar.Run(!m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
-            //    m_alidCDA1Low.Run(m_diCDA1Low.p_bIn, "Please Check Value of CDA1");
-            //    m_alidCDA2Low.Run(m_diCDA2Low.p_bIn, "Please Check Value of CDA2");
-            //}
-            //            if(m_diInterlock_Key.p_bIn)
-            //{
-            //    m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
-            //}
             
             if (!m_diEMS.p_bIn && !m_diInterlock_Key.p_bIn)
             {
@@ -199,11 +189,6 @@ namespace Root_AOP01_Inspection.Module
                 }
                 m_alidLightCurtain.Run(m_diLightCurtain.p_bIn, "Please Check LightCurtain");
             }
-            
-            //if (m_robot != null)
-            //{
-            //    if (!m_diMCReset.p_bIn) m_robot.p_bDisableHomeWhenArmOpen = true; //CHECK
-            //}
         }
         #endregion
 
@@ -327,6 +312,7 @@ namespace Root_AOP01_Inspection.Module
         {
             p_id = id;
             base.InitBase(id, engineer);
+
             //m_robot = ((Vega_Handler)engineer.ClassHandler()).m_robot;
             InitTimer(); 
         }

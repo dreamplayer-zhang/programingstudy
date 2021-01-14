@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Database;
 using RootTools_Vision;
+using RootTools_CLR;
 using LiveCharts;
 using LiveCharts.Wpf;
 using System;
@@ -24,6 +25,7 @@ using Path = System.IO.Path;
 using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
 using Size = System.Windows.Size;
+using System.Collections;
 
 namespace Root_WIND2
 {
@@ -75,8 +77,47 @@ namespace Root_WIND2
                 return new RelayCommand(SearchLotinfoData);
             }
         }
-        #endregion
+        public ICommand btnLoadImage
+        {
+            get
+            {
+                return new RelayCommand(LoadGoldenImage);
+            }
+        }
+        public ICommand btnCheckAll
+        {
+            get
+            {
+                return new RelayCommand(SearchLotinfoData);
+            }
+        }
+        public ICommand btnUncheckAll
+        {
+            get
+            {
+                return new RelayCommand(SearchLotinfoData);
+            }
+        }
+        public ICommand btnShowTrend
+        {
+            get
+            {
+                return new RelayCommand(GoldenImageTrend);
+            }
+        }
+        public ICommand btnSaveTrend
+        {
+            get
+            {
+                return new RelayCommand(SearchLotinfoData);
+            }
+        }
+        public void GoldenImagelist_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0) ;
+        }
 
+        #endregion
 
         #region GET / SET
 
@@ -136,8 +177,12 @@ namespace Root_WIND2
                         string sReicpeFileName = sRecipeID + ".rcp";
                         recipe.Read(Path.Combine(sReicpePath, sRecipeID, sReicpeFileName));
                         m_DefectView.SetRecipe(recipe);
-
                         DisplayDefectData(sInspectionID);
+
+                        m_DefectView.tbRcpName.Text = sRecipeID.ToString();
+                        m_DefectView.tbWaferID.Text = (string)GetDataGridItem(lotinfo_Datatable, selectedRow, "WAFERID");
+                        m_DefectView.tbTotalCnt.Text = m_ReviewDefectlist.Count.ToString() + " (EA)";
+                        m_DefectView.tb_EdgeCnt.Text = m_ReviewDefectlist.Count.ToString() + " (EA)";
                     }
                     catch (Exception ex)
                     {
@@ -171,11 +216,11 @@ namespace Root_WIND2
                     }
                     //else if (defect.m_nDefectCode / 10000 == 2)  // Backside
                     {
-                        DisplaySelectedBackDefect(selectedRow);
+                        //DisplaySelectedBackDefect(selectedRow);
                     }
                     //else if (defect.m_nDefectCode / 10000 == 3) // Edge
                     {
-                    //    DisplayEdgeSelectedDefect(selectedRow); // To-do edge 전용으로만 보이니까 추후에 구조 수정필요
+                        DisplayEdgeSelectedDefect(selectedRow); // To-do edge 전용으로만 보이니까 추후에 구조 수정필요
                     }
 
                 }
@@ -492,6 +537,49 @@ namespace Root_WIND2
             }
         }
 
+        // Golden Image Trend Tab
+        private List<byte[]> goldenImagesData = new List<byte[]>();
+        private int goldenImageW = 0, goldenImageH = 0;
+        private ObservableCollection<ListViewItemTemplate> goldenImageList = new ObservableCollection<ListViewItemTemplate>();
+        public ObservableCollection<ListViewItemTemplate> GoldenImageList
+        {
+            get
+            {
+                return goldenImageList;
+            }
+            set
+            {
+                SetProperty(ref goldenImageList, value);
+                RaisePropertyChanged("GoldenImageList");
+            }
+        }
+
+        private int listViewIdx;
+        public int ListViewIdx
+        {
+            get
+            {
+                return listViewIdx;
+            }
+            set
+            {
+                SetProperty(ref listViewIdx, value);
+                GoldenImage = GoldenImageList[listViewIdx].GoldenImgData;
+            }
+        }
+        private BitmapSource goldenImage;
+        public BitmapSource GoldenImage
+        {
+            get
+            {
+                return goldenImage;
+            }
+            set
+            {
+                SetProperty(ref goldenImage, value);
+            }
+        }
+
         #endregion
 
         #region DataTypeEnum
@@ -524,7 +612,6 @@ namespace Root_WIND2
             else
                 p_DefectImage = null;
         }
-
         private void DisplaySelectedFrontDefect(DataRowView selectedRow)
         {
             if (m_ReviewDefectlist == null)
@@ -569,24 +656,26 @@ namespace Root_WIND2
             DrawDefectSizeGraph();              // Draw Defect Size Distribution Histogram
             DrawDefectGVGraph();                // Draw Defect GV Distribution Histogram
 
+            GoldenImageList.Clear();
         }
         private void ClassifyDefect()
         {
+            //m_DefectView.tbRcpName.Text = 
             foreach (Defect defect in m_ReviewDefectlist)
             {
                 // 대충 코드는 이런식으로 분류를 하면 되지않을까...
                 //if (defect.m_nDefectCode / 10000 == 1)  // Frontside
                 {
-                    //m_DefectView.AddFrontDefect(defect.m_fRelX, defect.m_fRelY);
+                    m_DefectView.AddFrontDefect(defect.m_fRelX, defect.m_fRelY);
                 }
                 //else if (defect.m_nDefectCode / 10000 == 2)  // Backside
                 {
-                    m_DefectView.AddBackDefect(defect.m_fRelX, defect.m_fRelY);
+                    //m_DefectView.AddBackDefect(defect.m_fRelX, defect.m_fRelY);
                 }
                 //else if (defect.m_nDefectCode / 10000 == 3) // Edge
                 {
-                //    double theta = CalculateEdgeDefectTheta(defect.m_fAbsY);
-                //    m_DefectView.AddEdgeDefect(theta);
+                    //double theta = CalculateEdgeDefectTheta(defect.m_fAbsY);
+                    //m_DefectView.AddEdgeDefect(theta);
                 }
             }
         }
@@ -627,7 +716,46 @@ namespace Root_WIND2
             string sLotInfo = "lotinfo";
             pLotinfo_Datatable = DatabaseManager.Instance.SelectTable(sLotInfo);
         }
+        public void LoadGoldenImage()
+        {
+            GoldenImageList.Clear();
 
+            if (recipe.RecipeFolderPath.Length == 0)
+                return;
+
+            string imgPath = recipe.RecipeFolderPath + @"RefImageHistory\";
+            DirectoryInfo di = new DirectoryInfo(recipe.RecipeFolderPath + @"RefImageHistory");
+            if (di.Exists == false)
+                return;
+           
+            List<string> imgNames =  Directory.GetFiles(imgPath, "*.bmp", SearchOption.AllDirectories).ToList();
+
+            foreach (string path in imgNames)
+            {
+                unsafe {
+                    fixed (int* w = &goldenImageW, h = &goldenImageH)
+                        goldenImagesData.Add(Tools.LoadBitmapToRawdata(path, w, h));
+
+                    ListViewItemTemplate temp = new ListViewItemTemplate();
+
+                    temp.GoldenImgData = new BitmapImage(new (path));
+                    temp.Title = path.Substring(imgPath.Length, path.Length - imgPath.Length - 4); // 끝에 .bmp 제거
+
+                    GoldenImageList.Add(temp);
+                }
+            }
+        }
+
+        public void GoldenImageTrend()
+        {
+            List<byte[]> goldenImg = new List<byte[]>();
+            
+            byte[] dstImg = new byte[goldenImagesData[0].Length];
+            CLR_IP.Cpp_GoldenImageReview(goldenImagesData.ToArray(), dstImg, goldenImagesData.Count, goldenImageW, goldenImageH);
+
+            GoldenImage = Tools.BitmapFromSource(Tools.CovertArrayToBitmap(dstImg, goldenImageW, goldenImageH, 3));
+
+        }
         public object GetDataGridItem(DataTable table, DataRow datarow, string sColumnName)
         {
             object result;
@@ -768,23 +896,13 @@ namespace Root_WIND2
 
             GVYMaxVal = GVHistogram.Max() + GVHistogram.Max() / 10 + 1;
 
-            for (int i = 0; i < binSz; i++)
-                DefectGVHistogram[0].Values.Add(GVHistogram[i]);
+            DefectGVHistogram[0].Values.AddRange(((IEnumerable)GVHistogram).Cast<object>());
 
             GVXLabel = new string[binSz];
 
-            //if (gvHistogramMode != GVHistogramType.All)
-            {
-                int yLabel = (gvHistogramMode == GVHistogramType.Bright) ? 128 : 0;
-                for (int i = yLabel; i < binSz; i++)
-                    GVXLabel[i - yLabel] = (yLabel + (i - yLabel) * 2).ToString() + "~" + (yLabel + (i - yLabel) * 2 + 1).ToString();
-            }
-            //else
-            //{
-            //    int yLabel = (gvHistogramMode == GVHistogramType.Bright) ? 128 : 0;
-            //    for (int i = yLabel; i < binSz; i++)
-            //        GVXLabel[i - yLabel] = i.ToString();
-            //}
+            int yLabel = (gvHistogramMode == GVHistogramType.Bright) ? 128 : 0;
+            for (int i = yLabel; i < binSz; i++)
+                GVXLabel[i - yLabel] = (yLabel + (i - yLabel) * 2).ToString() + "~" + (yLabel + (i - yLabel) * 2 + 1).ToString();
 
             GVYLabel = value => value.ToString("N");
         }
@@ -853,17 +971,31 @@ namespace Root_WIND2
             }
 
             SizeYMaxVal = SzHistogram.Max() + SzHistogram.Max() / 10 + 1;
-
-            for (int i = 0; i < binCount; i++)
-                DefectSizeHistogram[0].Values.Add(SzHistogram[i]);
+            
+            DefectSizeHistogram[0].Values.AddRange(((IEnumerable)SzHistogram).Cast<object>());
 
             SizeXLabel = new string[binCount];
             for (int i = 1; i <= binCount; i++)
-            {
                 SizeXLabel[i - 1] = ((i - 1) * mergeBin + minSz).ToString() + "~" + ((i - 1) * mergeBin + minSz + mergeBin - 1).ToString();
-            }
 
             SizeYLabel = value => value.ToString("N");
         }
+    }
+}
+
+public class ListViewItemTemplate
+{
+    private string _Title;
+    public string Title
+    {
+        get { return this._Title; }
+        set { this._Title = value; }
+    }
+
+    private BitmapImage _GoldenImgData;
+    public BitmapImage GoldenImgData
+    {
+        get { return this._GoldenImgData; }
+        set { this._GoldenImgData = value; }
     }
 }
