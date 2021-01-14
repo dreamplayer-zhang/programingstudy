@@ -29,9 +29,9 @@ namespace Root_Rinse_Loader.Module
             DIO_I[] m_diCheck = new DIO_I[3]; 
             public void GetTools(ToolBox toolBox)
             {
-                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[0], m_rail, m_id + ".Check0");
-                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[1], m_rail, m_id + ".Check1");
-                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[2], m_rail, m_id + ".Check2");
+                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[0], m_rail, m_id + ".Start");
+                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[1], m_rail, m_id + ".Mid");
+                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[2], m_rail, m_id + ".Arrived");
             }
 
             string m_id;
@@ -44,7 +44,7 @@ namespace Root_Rinse_Loader.Module
         }
 
         List<Line> m_aLine = new List<Line>(); 
-        void initILines()
+        void InitLines()
         {
             for (int n = 0; n < 4; n++) m_aLine.Add(new Line("Line" + n.ToString(), this)); 
         }
@@ -121,7 +121,7 @@ namespace Root_Rinse_Loader.Module
         {
             p_id = id;
             m_rinse = rinse; 
-            initILines(); 
+            InitLines(); 
             InitBase(id, engineer);
         }
 

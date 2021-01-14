@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Rinse_Unloader.Module;
+using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
@@ -28,16 +29,19 @@ namespace Root_Rinse_Unloader.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
-        //public AOP01 m_aop01;
-        //public MainVision m_mainVision;
+        public RinseU m_rinse;
+        public Roller m_roller;
+        public Rail m_rail; 
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            //m_aop01 = new AOP01("AOP01", m_engineer);
-            //InitModule(m_aop01);
-            //m_mainVision = new MainVision("MainVision", m_engineer);
-            //InitModule(m_mainVision);
+            m_rinse = new RinseU("Rinse", m_engineer);
+            InitModule(m_rinse);
+            m_roller = new Roller("Roller", m_engineer, m_rinse, m_rail);
+            InitModule(m_roller);
+            m_rail = new Rail("Rail", m_engineer, m_rinse);
+            InitModule(m_roller);
         }
 
         void InitModule(ModuleBase module)
