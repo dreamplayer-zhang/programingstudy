@@ -30,6 +30,12 @@ namespace Root_Rinse_Unloader.Module
                 if (_eStep == value) return;
                 _eStep = value;
                 OnPropertyChanged(); 
+                switch (value)
+                {
+                    case eStep.Empty:
+                        foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
+                        break; 
+                }
             }
         }
         #endregion
@@ -44,7 +50,10 @@ namespace Root_Rinse_Unloader.Module
             p_sInfo = m_toolBox.Get(ref m_axisAlign, this, "Align"); 
             p_sInfo = m_toolBox.Get(ref m_dioStopperUP, this, "StopperUp", "Down", "Up"); 
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
-            if (bInit) { }
+            if (bInit) 
+            {
+                InitPosWidth(); 
+            }
         }
         #endregion
 
@@ -251,28 +260,30 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region Align
+        public List<bool> m_bExist = new List<bool>();
         public string RunAlign()
         {
+            while (m_bExist.Count < 4) m_bExist.Add(false); 
             try
-            {
+                {
                 if (Run(RunRotate(false))) return p_sInfo;
                 if (Run(RunMoveAlign(false))) return p_sInfo;
                 if (Run(RunAlignerUp(true))) return p_sInfo;
                 if (Run(RunMoveAlign(true))) return p_sInfo;
                 if (Run(RunMoveAlign(false))) return p_sInfo;
                 if (Run(RunAlignerUp(false))) return p_sInfo;
+                m_bExist.Clear();
+                foreach (Line line in m_aLine) m_bExist.Add(line.p_eSensor != Line.eSensor.Empty);
                 switch (m_rinse.p_eMode)
                 {
                     case RinseU.eRunMode.Magazine:
                         RunStopperUp(false);
-                        List<bool> bExist = new List<bool>();
-                        foreach (Line line in m_aLine) bExist.Add(line.p_eSensor != Line.eSensor.Empty); 
                         while (m_rail.p_eState != eState.Ready)
                         {
                             Thread.Sleep(10);
                             if (EQ.IsStop()) return "EQ Stop"; 
                         }
-                        m_rail.StartRun(bExist); 
+                        m_rail.StartRun(m_bExist); 
                         RunRotate(true);
                         Thread.Sleep(100);
                         p_eStep = eStep.Send;
