@@ -28,7 +28,7 @@ namespace Root_AOP01_Inspection
         WTRArm m_wtr;
         Arm m_arm;
         Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
-        Loadport_RND[] m_rndloadport = new Loadport_RND[2];
+        //Loadport_RND[] m_rndloadport = new Loadport_RND[2];
         AOP01_Handler.eLoadport LoadportType;
         public Run_Panel()
         {
@@ -112,11 +112,6 @@ namespace Root_AOP01_Inspection
 				    case AOP01_Handler.eLoadport.Cymechs:
                     if (IsRunModule(m_loadport[0])) return true;
                     if (IsRunModule(m_loadport[1])) return true;
-                    break;
-                case AOP01_Handler.eLoadport.RND:
-                    default:
-                    if (IsRunModule(m_rndloadport[0])) return true;
-                    if (IsRunModule(m_rndloadport[1])) return true;
                     break;
 			    }
                 if (IsRunModule(m_wtrcleanunit)) return true;
