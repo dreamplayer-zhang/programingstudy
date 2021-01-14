@@ -26,5 +26,10 @@ namespace RootTools_Vision
         {
             return true;
         }
+
+        public override void Clear()
+        {
+            
+        }
     }
 }

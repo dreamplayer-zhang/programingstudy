@@ -10,7 +10,7 @@ using System.Windows.Input;
 
 namespace Root_WIND2
 {
-    class FrontsideSpec_ViewModel : ObservableObject
+    class FrontsideSpec_ViewModel : ObservableObject, IRecipeUILoadable
     {
         public Frontside_ViewModel m_front;
         public Recipe m_Recipe;
@@ -162,6 +162,8 @@ namespace Root_WIND2
 
             if(p_cInspItem.Count > 0)
                 p_selectedInspItem = p_cInspItem[0];
+
+            SetParameter();
         }
 
         public void SetParameter()
@@ -187,6 +189,11 @@ namespace Root_WIND2
             }
 
             this.m_Recipe.ParameterItemList = paramList;
+        }
+
+        public void Load()
+        {
+            LoadSpec();
         }
 
         #region ICommand

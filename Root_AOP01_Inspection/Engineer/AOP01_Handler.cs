@@ -5,6 +5,7 @@ using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHTNew;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
@@ -82,7 +83,7 @@ namespace Root_AOP01_Inspection
             Cymechs
         }
         eWTR m_eWTR = eWTR.RND;
-        ModuleBase m_wtr;
+        public ModuleBase m_wtr;
         void InitWTR()
         {
             switch (m_eWTR)
@@ -100,7 +101,7 @@ namespace Root_AOP01_Inspection
         #endregion
 
         #region Module Loadport
-        enum eLoadport
+        public enum eLoadport
         {
             RND,
             Cymechs,
@@ -108,6 +109,7 @@ namespace Root_AOP01_Inspection
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
         public List<ILoadport> m_aLoadport = new List<ILoadport>();
         int m_lLoadport = 2;
+        public eLoadport LoadportType;
         void InitLoadport()
         {
             ModuleBase module;
@@ -117,9 +119,15 @@ namespace Root_AOP01_Inspection
                 string sID = "Loadport" + cLP;
                 switch (m_aLoadportType[n])
                 {
-                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
-                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, true); break;
-                    default: module = new Loadport_RND(sID, m_engineer, true, true); break;
+                    case eLoadport.Cymechs: 
+                        module = new Loadport_Cymechs(sID, m_engineer, true, true);
+                        LoadportType = eLoadport.Cymechs;
+                        break;
+                    case eLoadport.RND: 
+                    default: 
+                        module = new Loadport_RND(sID, m_engineer, true, true);
+                        LoadportType = eLoadport.RND;
+                        break;
                 }
                 InitModule(module);
                 m_aLoadport.Add((ILoadport)module);
@@ -140,10 +148,19 @@ namespace Root_AOP01_Inspection
         #endregion
 
         #region StateHome
+        public bool m_bIsPossible_Recovery = false;
         public string StateHome()
         {
-            string sInfo = StateHome(p_moduleList.m_aModule);
+            //string sInfo = StateHome(p_moduleList.m_aModule); lyj temp
+            string sInfo = StateHome(m_wtr);
+            if (sInfo != "OK")
+            {
+                EQ.p_eState = EQ.eState.Init;
+                return sInfo;
+            }
+            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
+            if (sInfo == "OK") m_bIsPossible_Recovery = true;
             return sInfo;
         }
 

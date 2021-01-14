@@ -163,12 +163,14 @@ namespace Root_WIND2
         }
         public void UI_Redraw()
         {
-            p_Map_VM.LoadMapData(); // Map
-            m_Origin_VM.LoadOriginData(); // Origin
-            p_Position_VM.LoadPositonMark(); // Position
-            p_Spec_VM.LoadSpec();
-            p_Summary_VM.LoadSummaryData();
-            p_InspTest_VM.LoadInspTestData();
+            // 추후에 관리 통합할 수 있도록 변경
+            p_Map_VM.Load(); // Map
+            m_Origin_VM.Load(); // Origin
+            p_Position_VM.Load(); // Position
+            p_Spec_VM.Load();
+            p_Summary_VM.Load();
+            p_InspTest_VM.Load();
+            p_ROI_VM.Load();
         }
 
         public void Init()
@@ -195,6 +197,11 @@ namespace Root_WIND2
         {
             Main.SubPanel.Children.Clear();
             Main.SubPanel.Children.Add(page);
+        }
+
+        public void Load()
+        {
+            throw new NotImplementedException();
         }
 
         public ICommand btnFrontSummary

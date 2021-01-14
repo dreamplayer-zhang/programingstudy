@@ -632,13 +632,14 @@ namespace RootTools.Camera.Dalsa
         void GrabEvent()
         {
             if (Grabed != null)
-                OnGrabed(new GrabedArgs(m_Memory, m_nGrabTrigger, m_LastROI));
+                OnGrabed(new GrabedArgs(m_Memory, m_nGrabTrigger, m_LastROI, p_nGrabProgress));
         }
         protected virtual void OnGrabed(GrabedArgs e)
         {
             if (Grabed != null)
                 Grabed.Invoke(this, e);
         }
+
         public void GrabArea()
         {
             p_CamParam.ReadParamter();

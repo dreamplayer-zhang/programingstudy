@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Threading;
 using RootTools.Control;
 using RootTools.OHT.Semi;
+using RootTools.OHTNew;
 
 namespace Root_EFEM.Module
 {
@@ -17,11 +18,13 @@ namespace Root_EFEM.Module
         RS232 m_rs232;
         public DIO_I m_diPlaced;
         public DIO_I m_diPresent;
-        DIO_I m_diOpen;
-        DIO_I m_diClose;
-        DIO_I m_diReady;
-        DIO_I m_diRun;
-        public OHT_Semi m_OHT; 
+        public DIO_I m_diOpen;
+        public DIO_I m_diClose;
+        public DIO_I m_diReady;
+        public DIO_I m_diRun;
+        public OHT_Semi m_OHT;
+        //public bool m_bLoadCheck = false;
+        //public bool m_bUnLoadCheck = false;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
@@ -606,12 +609,14 @@ namespace Root_EFEM.Module
                 }
             }
             p_eState = eState.Ready;
-            if(m_diPlaced.p_bIn && m_diPresent.p_bIn)
+            if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
             {
+                p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
                 m_bPlaced= true;
             }
             else
             {
+                p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
                 m_bPlaced = false;
             }
             
@@ -676,6 +681,9 @@ namespace Root_EFEM.Module
             while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
+
+        public bool p_bPlaced { get { return m_diPlaced.p_bIn; } }
+        public bool p_bPresent { get { return m_diPresent.p_bIn; } }
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }

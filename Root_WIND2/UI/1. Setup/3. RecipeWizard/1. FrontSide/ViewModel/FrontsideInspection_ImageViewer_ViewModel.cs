@@ -279,25 +279,25 @@ namespace Root_WIND2
         private void RedrawShapes()
         {
             // 개선중..
-            watch.p_secTimeout = 1;
-            if (watch.IsRunning == true)
-            {
-                time += watch.ElapsedMilliseconds;
-                watch.Restart();
-            }
-            else
-            {
-                watch.Start();
-            }
+            //watch.p_secTimeout = 1;
+            //if (watch.IsRunning == true)
+            //{
+            //    time += watch.ElapsedMilliseconds;
+            //    watch.Restart();
+            //}
+            //else
+            //{
+            //    watch.Start();
+            //}
 
-            if (time < 1000 / 20)
-            {
-                return;
-            }
-            else
-            {
-                time = 0;
-            }
+            //if (time < 1000 / 20)
+            //{
+            //    return;
+            //}
+            //else
+            //{
+            //    time = 0;
+            //}
 
             foreach (TShape shape in Shapes)
             {
@@ -403,12 +403,6 @@ namespace Root_WIND2
             InfoTextBolcks.Clear();
             p_DrawElement.Clear();
         }
-
-        public void ChangeImageData(ImageData image = null, IDialogService dialogService = null)
-        {
-            base.init(image, dialogService);
-        }
-
 
 
         public CPoint leftClickPoint = new CPoint();

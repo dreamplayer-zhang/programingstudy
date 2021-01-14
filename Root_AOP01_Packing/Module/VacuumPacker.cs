@@ -3,6 +3,7 @@ using Root_EFEM.Module;
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -12,125 +13,750 @@ namespace Root_AOP01_Packing.Module
 {
     public class VacuumPacker : ModuleBase, IWTRChild
     {
-        int TestNum = 1;
         #region ToolBox
-        DIO_IO[] m_dioVacuum = new DIO_IO[2] { null, null };
-        DIO_O[] m_doBlow = new DIO_O[2];
-        Axis m_axisLoad;
-
-        DIO_I2O[] m_dioStep1 = new DIO_I2O[2] { null, null };
-        DIO_I2O m_dioStep2;
-        //DIO_O[] m_doHeater = new DIO_O[2] { null, null };
-
-        Axis m_axisGuide;
-        DIO_IO m_dioVacuumPump;
-        DIO_O m_doVacuumPumpBlow;
-
-        DIO_I2O m_dioTopClampUpDown; // LJM 201020 Add
-        DIO_I2O m_dioBtmClampUpDown; // LJM 201020 Add
-        DIO_I2O m_dioTopHeaterUpdown; // LJM 201020 Add
-        DIO_I2O m_dioBtmHeaterUpdown; // LJM 201020 Add
-        DIO_I2O m_dioTopTotalHeaterUpdown; // LJM 201020 Add
-        DIO_O m_doHeater; // LJM 201020 Add
-
         public override void GetTools(bool bInit)
         {
-            
-            if(TestNum == 0) // 기존
-            {
-                p_sInfo = m_toolBox.Get(ref m_dioVacuum[0], this, "Bottom Vacuum");
-                p_sInfo = m_toolBox.Get(ref m_doBlow[0], this, "Bottom Blow");
-                p_sInfo = m_toolBox.Get(ref m_dioVacuum[1], this, "Top Vacuum");
-                p_sInfo = m_toolBox.Get(ref m_doBlow[1], this, "Top Blow");
-                p_sInfo = m_toolBox.Get(ref m_axisLoad, this, "Load");
+            m_wrapper.GetTools(m_toolBox, bInit); 
+            m_stage.GetTools(m_toolBox, bInit);
+            m_transfer.GetTools(m_toolBox, bInit);
+            m_holder.GetTools(m_toolBox, bInit); 
+            m_loader.GetTools(m_toolBox, bInit);
+            m_heater.GetTools(m_toolBox, bInit);
+        }
+        #endregion
 
-                p_sInfo = m_toolBox.Get(ref m_dioStep1[0], this, "Step1Left", "Up", "Down");
-                p_sInfo = m_toolBox.Get(ref m_dioStep1[1], this, "Step1Right", "Up", "Down");
-                p_sInfo = m_toolBox.Get(ref m_dioStep2, this, "Step2", "Up", "Down");
-
-                //p_sInfo = m_toolBox.Get(ref m_doHeater[0], this, "Bottom Heater");
-                //p_sInfo = m_toolBox.Get(ref m_doHeater[1], this, "Top Heater");
-                p_sInfo = m_toolBox.Get(ref m_doHeater, this, "Heater Heating"); // 상면히터만사용하기로함.
-                p_sInfo = m_toolBox.Get(ref m_axisGuide, this, "Guide");
-                p_sInfo = m_toolBox.Get(ref m_dioVacuumPump, this, "VacuumPump");
-                p_sInfo = m_toolBox.Get(ref m_doVacuumPumpBlow, this, "Blow");
-            }
-            else if(TestNum == 1) // 1차 실링 테스트 // LJM 201020 Add
-            {
-                p_sInfo = m_toolBox.Get(ref m_axisLoad, this, "Load");
-                p_sInfo = m_toolBox.Get(ref m_axisGuide, this, "Guide");
-                p_sInfo = m_toolBox.Get(ref m_dioTopClampUpDown, this, "TopClamp", "Up", "Down");
-                p_sInfo = m_toolBox.Get(ref m_dioBtmClampUpDown, this, "BtmClamp", "Down", "Up");
-                p_sInfo = m_toolBox.Get(ref m_dioTopHeaterUpdown, this, "TopHeater", "Up", "Down");
-                p_sInfo = m_toolBox.Get(ref m_dioBtmHeaterUpdown, this, "BtmHeater", "Down", "Up");
-                p_sInfo = m_toolBox.Get(ref m_dioTopTotalHeaterUpdown, this, "TotalHeater", "Down", "Up");
-
-                p_sInfo = m_toolBox.Get(ref m_doHeater, this, "Heater Heating");
-            }
-
-            
-            if (bInit) InitTools();
+        #region Solvalue
+        public List<DIO_I2O2> m_aSolvalve = new List<DIO_I2O2>();
+        public void InitSolvalve(DIO_I2O2 sol)
+        {
+            if (sol == null) return;
+            m_aSolvalve.Add(sol);
+            sol.Write(false);
         }
 
-        void InitTools()
+        public List<string> p_asSol
         {
-            if(TestNum == 0)
+            get
+            {
+                List<string> asSol = new List<string>();
+                foreach (DIO_I2O2 sol in m_aSolvalve) asSol.Add(sol.m_id);
+                return asSol;
+            }
+        }
+
+        public DIO_I2O2 GetSolvalve(string sSol)
+        {
+            foreach (DIO_I2O2 sol in m_aSolvalve)
+            {
+                if (sol.m_id == sSol) return sol;
+            }
+            return null;
+        }
+        #endregion
+
+        #region Wrapper
+        public class Wrapper
+        {
+            Axis m_axisMove; // PickerX, 9번축
+            Axis m_axisPicker; // PickerZ, 10번축
+            DIO_IO[] m_dioVacuum = new DIO_IO[2]; // [0] 가운데줄 Y72, [1] 사이드줄 Y74
+            DIO_O[] m_doBlow = new DIO_O[2]; // [0] 가운데줄 Y73, [1] 사이드줄 Y74
+            DIO_I2O2 m_solPush; // X98,99, Y70,71
+            DIO_I m_diCheck; // X48
+            DIO_I m_diLevel; // X49
+            public void GetTools(ToolBox toolBox, bool bInit)
+            {
+                m_packer.p_sInfo = toolBox.Get(ref m_axisMove, m_packer, m_id + ".Move");
+                m_packer.p_sInfo = toolBox.Get(ref m_axisPicker, m_packer, m_id + ".Picker");
+                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum[0], m_packer, m_id + ".Vacuum Center");
+                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum[1], m_packer, m_id + ".Vacuum Side");
+                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[0], m_packer, m_id + ".Blow Center");
+                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[1], m_packer, m_id + ".Blow Side");
+                m_packer.p_sInfo = toolBox.Get(ref m_solPush, m_packer, m_id + ".Push", "Back", "Push");
+                m_packer.p_sInfo = toolBox.Get(ref m_diCheck, m_packer, m_id + ".Wrapper Check");
+                m_packer.p_sInfo = toolBox.Get(ref m_diLevel, m_packer, m_id + ".Wrapper Level");
+                if (bInit)
+                {
+                    m_packer.InitSolvalve(m_solPush);
+                    InitPos();
+                }
+            }
+
+            public enum ePosMove
+            {
+                Pick, //봉투잡는위치
+                Place, // 봉투놓는위치
+                Push // 푸셔 미는위치
+            }
+            public enum ePosPicker
+            {
+                Up, //위 위치
+                Down, // 아래 위치
+                Open, // 봉투벌리는 높이
+                Push // 푸셔 밀때의 높이
+            }
+            void InitPos()
             {
                 m_dioVacuum[0].Write(false);
                 m_dioVacuum[1].Write(false);
-                m_dioStep1[0].Write(false);
-                m_dioStep1[1].Write(false);
-                m_dioStep2.Write(false);
-                m_dioVacuumPump.Write(false);
-                m_doVacuumPumpBlow.Write(false);
-                InitAxisPosLoad();
-                InitAxisPosGuide();
+                m_axisMove.AddPos(Enum.GetNames(typeof(ePosMove)));
+                m_axisPicker.AddPos(Enum.GetNames(typeof(ePosPicker)));
             }
-            else if(TestNum == 1) // LJM 201020 Add
-            {
-                m_dioTopClampUpDown.Write(false);
-                m_dioBtmClampUpDown.Write(false);
-                m_dioTopHeaterUpdown.Write(false);
-                m_dioBtmHeaterUpdown.Write(false);
-                m_dioTopTotalHeaterUpdown.Write(true);
-                m_doHeater.Write(false);
-                InitAxisPosLoad();
-                InitAxisPosGuide();
-            }
-            
 
-            
+            public string RunMove(ePosMove ePos)
+            {
+                m_axisMove.StartMove(ePos);
+                return m_axisMove.WaitReady();
+            }
+
+            public string RunMove(ePosPicker ePos)
+            {
+                m_axisPicker.StartMove(ePos);
+                return m_axisPicker.WaitReady();
+            }
+
+            double m_secVac = 0.5;
+            double m_secBlow = 0.5;
+            public string RunVacOn()
+            {
+                m_dioVacuum[0].Write(true);
+                m_dioVacuum[1].Write(true);
+                int msVac = (int)(1000 * m_secVac);
+                while (m_dioVacuum[0].m_swWrite.ElapsedMilliseconds < msVac)
+                {
+                    Thread.Sleep(10);
+                    if (m_dioVacuum[0].p_bIn && m_dioVacuum[1].p_bIn) return "OK";
+                    if (EQ.IsStop()) return m_id + " EQ Stop";
+                }
+                return "Vacuum Sensor On Timeout";
+            }
+
+            public string RunVacOff(bool bCenter)
+            {
+                int nID = bCenter ? 0 : 1;
+                m_dioVacuum[nID].Write(false);
+                if (m_dioVacuum[nID].p_bIn)
+                {
+                    m_doBlow[nID].Write(true);
+                    Thread.Sleep((int)(1000 * m_secBlow));
+                    m_doBlow[nID].Write(false);
+                }
+                return "OK";
+            }
+
+            public string RunPush()
+            {
+                try
+                {
+                    string sRun = m_solPush.RunSol(true);
+                    if (sRun != "OK") return sRun;
+                    return m_solPush.RunSol(false);
+                }
+                finally { m_solPush.Write(false); }
+            }
+
+            public bool IsWapperExist()
+            {
+                return (m_diCheck.p_bIn && m_diLevel.p_bIn); 
+            }
+
+            public void RunTree(Tree tree)
+            {
+                m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Wait (sec)");
+                m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Vacuum Off Blow Time (sec)");
+            }
+
+            string m_id;
+            VacuumPacker m_packer;
+            public Wrapper(string id, VacuumPacker packer)
+            {
+                m_id = id;
+                m_packer = packer;
+            }
         }
+        public Wrapper m_wrapper;
         #endregion
 
-        #region Timeout
-        double m_sVac = 2;
-        double m_sBlow = 0.5;
-        double m_sSolStep1 = 5;
-        double m_sSolStep2 = 5;
-        double m_sVacuumPump = 20;
-        void RunTreeDIOWait(Tree tree)
+        #region Stage
+        public class Stage
         {
-            m_sVac = tree.Set(m_sVac, m_sVac, "Vac", "Vacuum Sensor Wait (sec)");
-            m_sBlow = tree.Set(m_sBlow, m_sBlow, "Blow", "Blow Time (sec)");
-            m_sSolStep1 = tree.Set(m_sSolStep1, m_sSolStep1, "Step1", "Sol Value Move Wait (sec)");
-            m_sSolStep2 = tree.Set(m_sSolStep2, m_sSolStep2, "Step2", "Sol Value Move Wait (sec)");
-            m_sVacuumPump = tree.Set(m_sVacuumPump, m_sVacuumPump, "Vacuum Pump", "Vacuum Sensor Wait (sec)");
+            DIO_O[] m_doVacuum = new DIO_O[2]; // [0] 센터 Vac Y82 , [1] 사이드 Vac Y84
+            DIO_O[] m_doBlow = new DIO_O[2]; // [0] 센터 Vac Y83 , [1] 사이드 Vac Y85
+            DIO_I2O2 m_solUp; // 돌리기위해서 올려주는 솔
+            DIO_I2O2 m_solRotate; // 90도 돌리는 솔
+            public void GetTools(ToolBox toolBox, bool bInit)
+            {
+                m_packer.p_sInfo = toolBox.Get(ref m_doVacuum[0], m_packer, m_id + ".Vacuum Center");
+                m_packer.p_sInfo = toolBox.Get(ref m_doVacuum[1], m_packer, m_id + ".Vacuum Side");
+                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[0], m_packer, m_id + ".Blow Center");
+                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[1], m_packer, m_id + ".Blow Side");
+                m_packer.p_sInfo = toolBox.Get(ref m_solUp, m_packer, m_id + ".Up", "Down", "Up");
+                m_packer.p_sInfo = toolBox.Get(ref m_solRotate, m_packer, m_id + ".Rotate", "Home", "90");
+                if (bInit)
+                {
+                    m_packer.InitSolvalve(m_solUp);
+                    m_packer.InitSolvalve(m_solRotate);
+                }
+            }
+
+            double m_secVac = 1;
+            public string RunVac(bool bCenter, bool bSide)
+            {
+                m_doVacuum[0].Write(bCenter);
+                m_doVacuum[1].Write(bSide);
+                m_doBlow[0].Write(!bCenter);
+                m_doBlow[1].Write(!bSide);
+                Thread.Sleep((int)(1000 * m_secVac));
+                m_doBlow[0].Write(false);
+                m_doBlow[1].Write(false);
+                return "OK";
+            }
+
+            public string RunUp(bool bUp)
+            {
+                return m_solUp.RunSol(bUp); 
+            }
+
+            public string RunRotate(bool bRotate)
+            {
+                if (m_solUp.p_bOut == false) return "State Down";
+                return m_solRotate.RunSol(bRotate); 
+            }
+
+            public void RunTree(Tree tree)
+            {
+                m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On & Off Delay (sec)");
+            }
+
+            string m_id;
+            VacuumPacker m_packer;
+            public Stage(string id, VacuumPacker packer)
+            {
+                m_id = id;
+                m_packer = packer;
+            }
         }
+
+        public Stage m_stage;
         #endregion
 
-        #region DIO Function
-        string RunSol(DIO_I2O dio, bool bOn, double sWait)
+        #region Transfer
+        public class Transfer
         {
-            dio.Write(bOn);
-            int msWait = (int)(1000 * sWait);
-            while (dio.p_bDone != true)
+            Axis m_axis; //11번축, 로더에서 패킹스테이지로 밀어주는 축
+            DIO_I2O2 m_solDown; // Y54,Y55 위아래 솔
+            DIO_I2O2 m_solPush; // Y56,Y57 푸셔 솔
+            public void GetTools(ToolBox toolBox, bool bInit)
             {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return p_id + " EQ Stop";
-                if (dio.m_swWrite.ElapsedMilliseconds > msWait) return dio.m_id + " Sol Valve Move Timeout";
+                m_packer.p_sInfo = toolBox.Get(ref m_axis, m_packer, m_id);
+                m_packer.p_sInfo = toolBox.Get(ref m_solDown, m_packer, m_id + ".Down", "Up", "Down");
+                m_packer.p_sInfo = toolBox.Get(ref m_solPush, m_packer, m_id + ".Push", "Back", "Push");
+                if (bInit)
+                {
+                    m_packer.InitSolvalve(m_solDown);
+                    m_packer.InitSolvalve(m_solPush);
+                    InitPos(); 
+                }
             }
-            return "OK";
+
+            public enum ePos
+            {
+                Ready, // 레디
+                Push //밀때 축 위치
+            }
+            void InitPos()
+            {
+                m_axis.AddPos(Enum.GetNames(typeof(ePos)));
+            }
+
+            public string RunMove(ePos ePos)
+            {
+                m_axis.StartMove(ePos);
+                return m_axis.WaitReady();
+            }
+
+            public string RunDown(bool bDown)
+            {
+                return m_solDown.RunSol(bDown);
+            }
+
+            public string RunPush()
+            {
+                try
+                {
+                    string sRun = m_solPush.RunSol(true);
+                    if (sRun != "OK") return sRun;
+                    return m_solPush.RunSol(false);
+                }
+                finally { m_solPush.Write(false); }
+            }
+
+            string m_id;
+            VacuumPacker m_packer;
+            public Transfer(string id, VacuumPacker packer)
+            {
+                m_id = id;
+                m_packer = packer;
+            }
+        }
+        public Transfer m_transfer;
+        #endregion
+
+        #region Holder
+        public class Holder
+        {
+            DIO_IO[] m_dioVacuum = new DIO_IO[2]; // 확인
+            DIO_O[] m_doBlow = new DIO_O[2];  // 확인
+            DIO_I2O2[] m_solHold = new DIO_I2O2[2]; //Y46~Y49 [0]위 [1]아래 
+            DIO_I2O2 m_solDown; // Y52,Y53 Guide Z
+            DIO_I2O2 m_solForward; //Y50,Y51 Guide 앞뒤로
+            public void GetTools(ToolBox toolBox, bool bInit)
+            {
+                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum[0], m_packer, m_id + ".UpHolder Vacuum");
+                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum[1], m_packer, m_id + ".DownHolder Vacuum");
+                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[0], m_packer, m_id + ".UpHolder Blow");
+                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[1], m_packer, m_id + ".DownHolder Blow");
+                m_packer.p_sInfo = toolBox.Get(ref m_solHold[0], m_packer, m_id + ".UpHolder", "Open", "Hold");
+                m_packer.p_sInfo = toolBox.Get(ref m_solHold[1], m_packer, m_id + ".DownHolder", "Open", "Hold");
+                m_packer.p_sInfo = toolBox.Get(ref m_solDown, m_packer, m_id + ".Down", "Up", "Down");
+                m_packer.p_sInfo = toolBox.Get(ref m_solForward, m_packer, m_id + ".Forward", "Backward", "Forward");
+                if (bInit)
+                {
+                    m_packer.InitSolvalve(m_solDown);
+                    m_packer.InitSolvalve(m_solForward);
+                    m_packer.InitSolvalve(m_solHold[0]);
+                    m_packer.InitSolvalve(m_solHold[1]);
+                }
+            }
+
+            double m_secVac = 1;
+            double m_secBlow = 1;
+            string RunVacuum(bool bOn)
+            {
+                m_dioVacuum[0].Write(bOn);
+                m_dioVacuum[1].Write(bOn); 
+                if (bOn)
+                {
+                    int msTimeout = (int)(1000 * m_secVac);
+                    StopWatch sw = new StopWatch(); 
+                    while (sw.ElapsedMilliseconds < msTimeout)
+                    {
+                        Thread.Sleep(10);
+                        if (m_dioVacuum[0].p_bIn && m_dioVacuum[1].p_bIn) return "OK"; 
+                    }
+                    return "Vacuum On timeout"; 
+                }
+                else
+                {
+                    m_doBlow[0].Write(true);
+                    m_doBlow[1].Write(true);
+                    Thread.Sleep((int)(1000 * m_secBlow));
+                    m_doBlow[0].Write(false);
+                    m_doBlow[1].Write(false);
+                }
+                return "OK";
+            }
+            
+            public string RunHold(bool bHold)
+            {
+                if (bHold == false) RunVacuum(false); 
+                m_solHold[0].Write(bHold);
+                m_solHold[1].Write(bHold);
+                int msTimeout = (int)(1000 * m_solHold[0].m_secTimeout);
+                StopWatch sw = new StopWatch(); 
+                while (sw.ElapsedMilliseconds < msTimeout)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop"; 
+                    if (m_solHold[0].p_bDone && m_solHold[1].p_bDone) return RunVacuum(true);
+                }
+                return "Hold Timeout"; 
+            }
+
+            public string RunForward(bool bForward)
+            {
+                if (m_packer.Run(RunHold(false))) return m_packer.p_sInfo; 
+                if (bForward)
+                {
+                    if (m_packer.Run(m_solDown.RunSol(true))) return m_packer.p_sInfo;
+                    if (m_packer.Run(m_solForward.RunSol(true))) return m_packer.p_sInfo;
+                }
+                else
+                {
+                    if (m_packer.Run(m_solForward.RunSol(false))) return m_packer.p_sInfo;
+                    if (m_packer.Run(m_solDown.RunSol(false))) return m_packer.p_sInfo;
+                }
+                return "OK";
+            }
+
+            public void RunTree(Tree tree)
+            {
+                m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Wait (sec)");
+                m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Vacuum Off Blow Time (sec)");
+            }
+
+            string m_id;
+            VacuumPacker m_packer;
+            public Holder(string id, VacuumPacker packer)
+            {
+                m_id = id;
+                m_packer = packer;
+            }
+        }
+        public Holder m_holder;
+        #endregion
+
+        #region Loader
+        public class Loader
+        {
+            Axis m_axisMove; // 7번축 전체적으로 움직이는 축
+            Axis m_axisBridge; // 8번축 브릿지축
+            Axis m_axisWidth; // 6번축 집게폭
+            DIO_I2O2 m_solPodPush; // Y29,30 이게멀까
+            DIO_I2O2 m_solRaise; // 삭제
+            DIO_I m_diPodCheck; // X92 Pod Check Sensor
+            DIO_O m_doVacuumPump; //Y68, Y60 노즐 Vac
+            public void GetTools(ToolBox toolBox, bool bInit)
+            {
+                m_packer.p_sInfo = toolBox.Get(ref m_axisMove, m_packer, m_id + ".Move");
+                m_packer.p_sInfo = toolBox.Get(ref m_axisBridge, m_packer, m_id + ".Bridge");
+                m_packer.p_sInfo = toolBox.Get(ref m_axisWidth, m_packer, m_id + ".Width");
+                m_packer.p_sInfo = toolBox.Get(ref m_solPodPush, m_packer, m_id + ".PodPush", "Back", "Push");
+                m_packer.p_sInfo = toolBox.Get(ref m_solRaise, m_packer, m_id + ".Raise", "Down", "Up");
+                m_packer.p_sInfo = toolBox.Get(ref m_diPodCheck, m_packer, m_id + ".Pod Check");
+                m_packer.p_sInfo = toolBox.Get(ref m_doVacuumPump, m_packer, m_id + ".Vacuum Pump");
+                if (bInit)
+                {
+                    m_packer.InitSolvalve(m_solPodPush); 
+                    m_packer.InitSolvalve(m_solRaise);
+                    InitPos();
+                }
+            }
+            
+            public enum eSpeed
+            {
+                //7번축 속도
+                Slow, 
+                Fast
+            }
+            public enum ePosMove
+            {
+                //7번축
+                Ready, //맨뒤
+                Vacuum, // Vac키는위치
+                Heating // 히팅할때 회피할 위치
+            }
+            public enum ePosBridge
+            {
+                //8번축
+                Ready,
+                Bridge
+            }
+            public enum ePosWidth
+            {
+                //6번축
+                Ready,
+                Open
+            }
+            void InitPos()
+            {
+                m_doVacuumPump.Write(false);
+                m_axisMove.AddSpeed(Enum.GetNames(typeof(eSpeed))); 
+                m_axisMove.AddPos(Enum.GetNames(typeof(ePosMove)));
+                m_axisBridge.AddPos(Enum.GetNames(typeof(ePosBridge)));
+                m_axisWidth.AddPos(Enum.GetNames(typeof(ePosWidth)));
+            }
+
+            public string RunMove(ePosMove ePos, eSpeed eSpeed)
+            {
+                m_axisMove.StartMove(ePos, 0, eSpeed);
+                return m_axisMove.WaitReady();
+            }
+
+            public string RunBridge(ePosBridge ePos)
+            {
+                m_axisBridge.StartMove(ePos);
+                return m_axisBridge.WaitReady();
+            }
+
+            public string RunMoveWidth(ePosWidth ePos)
+            {
+                m_axisWidth.StartMove(ePos);
+                return m_axisWidth.WaitReady();
+            }
+
+            public string RunPush()
+            {
+                try
+                {
+                    if (m_packer.Run(m_solPodPush.RunSol(true))) return m_packer.p_sInfo;
+                    Thread.Sleep(200);
+                    return m_solPodPush.RunSol(false);
+                }
+                finally { m_solPodPush.Write(false); }
+            }
+
+            public string RunRaise(bool bUp)
+            {
+                return m_solRaise.RunSol(bUp);
+            }
+
+            public bool IsPodExist()
+            {
+                return m_diPodCheck.p_bIn; 
+            }
+
+            public int m_secVac = 10; 
+            public string RunVacuumPump()
+            {
+                m_doVacuumPump.Write(true);
+                int msVac = (int)(1000 * m_secVac);
+                StopWatch sw = new StopWatch(); 
+                while (sw.ElapsedMilliseconds < msVac)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop"; 
+                }
+                return "OK";
+            }
+
+            public void RunTree(Tree tree)
+            {
+                m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Wait (sec)");
+            }
+
+            string m_id;
+            VacuumPacker m_packer;
+            public Loader(string id, VacuumPacker packer)
+            {
+                m_id = id;
+                m_packer = packer;
+            }
+        }
+        public Loader m_loader; 
+        #endregion
+
+        #region Heater
+        public class Heater
+        {
+            DIO_I2O2[] m_solSponge = new DIO_I2O2[2]; // [0] Y42,43 [1] Y34, 35 Sponge 위/아래 sol
+            DIO_I2O2[] m_solHeater = new DIO_I2O2[2]; // [0] Y44,45 [1] Y32, 33 heater 위/아래 sol
+            DIO_IO m_dioHeat; // Y11, X79 // 이상하다
+            DIO_O m_doHeatTimeout; //Y12
+            public void GetTools(ToolBox toolBox, bool bInit)
+            {
+                m_packer.p_sInfo = toolBox.Get(ref m_solSponge[0], m_packer, m_id + ".UpSponge", "Up", "Down");
+                m_packer.p_sInfo = toolBox.Get(ref m_solSponge[1], m_packer, m_id + ".DownSponge", "Down", "Up");
+                m_packer.p_sInfo = toolBox.Get(ref m_solHeater[0], m_packer, m_id + ".HeaterUp", "Down", "Up");
+                m_packer.p_sInfo = toolBox.Get(ref m_solHeater[1], m_packer, m_id + ".Silicone", "Up", "Down");
+                m_packer.p_sInfo = toolBox.Get(ref m_dioHeat, m_packer, m_id + ".Heat");
+                m_packer.p_sInfo = toolBox.Get(ref m_doHeatTimeout, m_packer, m_id + ".Heat Timeout");
+                if (bInit)
+                {
+                    m_dioHeat.Write(false);
+                    m_doHeatTimeout.Write(false); 
+                    m_packer.InitSolvalve(m_solSponge[0]);
+                    m_packer.InitSolvalve(m_solSponge[1]);
+                    m_packer.InitSolvalve(m_solHeater[0]);
+                    m_packer.InitSolvalve(m_solHeater[1]);
+                }
+            }
+
+            public string RunSponge(bool bClose)
+            {
+                m_solSponge[0].Write(bClose);
+                m_solSponge[1].Write(bClose);
+                int msTimeout = (int)(1000 * m_solSponge[0].m_secTimeout);
+                StopWatch sw = new StopWatch();
+                while (sw.ElapsedMilliseconds < msTimeout)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                    if (m_solSponge[0].p_bDone && m_solSponge[1].p_bDone) return "OK";
+                }
+                return "Sponge Timeout";
+            }
+
+            public string RunHeater(bool bClose)
+            {
+                m_solHeater[0].Write(bClose);
+                m_solHeater[1].Write(bClose);
+                int msTimeout = (int)(1000 * m_solHeater[0].m_secTimeout);
+                StopWatch sw = new StopWatch();
+                while (sw.ElapsedMilliseconds < msTimeout)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                    if (m_solHeater[0].p_bDone && m_solHeater[1].p_bDone) return "OK";
+                }
+                return "HeaterClose Timeout";
+            }
+
+            public double m_secHeat = 3; 
+            public string RunHeat()
+            {
+                try
+                {
+                    m_dioHeat.Write(true);
+                    StopWatch sw = new StopWatch();
+                    int msHeat = (int)(1000 * m_secHeat);
+                    while (sw.ElapsedMilliseconds < msHeat)
+                    {
+                        Thread.Sleep(10);
+                        if (EQ.IsStop()) return "EQ Stop";
+                    }
+                    return "OK";
+                }
+                finally { m_dioHeat.Write(false); }
+            }
+
+            public string RunHeatTimeout(bool bOn)
+            {
+                m_doHeatTimeout.Write(bOn);
+                return "OK";
+            }
+
+            public void RunTree(Tree tree)
+            {
+                m_secHeat = tree.Set(m_secHeat, m_secHeat, "Vacuum", "Vacuum On Wait (sec)");
+            }
+
+            string m_id;
+            VacuumPacker m_packer;
+            public Heater(string id, VacuumPacker packer)
+            {
+                m_id = id;
+                m_packer = packer;
+            }
+        }
+        public Heater m_heater;
+        #endregion
+
+        #region Function
+        public enum eStep
+        {
+            GetWrapper, // 봉투가져오기
+            HoldWrapper, // 벌리고 홀더가잡기까지
+            BackWrapper, // 피커 회피
+            InsertCase, // 봉투에 넣기
+            ReleaseWrapper, // 홀더놓기
+            CloseWrapper, //스폰지닫기
+            VacuumPump, //봉투에 vac하고 회피
+            Heating, // 히팅
+            Rotate, // 90도 돌리기
+            PushToLoader, //Picker가 다시 밀어주기
+            Unload, 
+        }
+
+        public string RunStep(eStep eStep)
+        {
+            switch (eStep)
+            {
+                case eStep.GetWrapper:
+                    if (m_wrapper.IsWapperExist() == false) return "No Wrapper";
+                    if (Run(m_wrapper.RunMove(Wrapper.ePosMove.Pick))) return p_sInfo;
+                    if (Run(m_wrapper.RunMove(Wrapper.ePosPicker.Down))) return p_sInfo;
+                    if (Run(m_wrapper.RunVacOn())) return p_sInfo;
+                    if (Run(m_wrapper.RunMove(Wrapper.ePosPicker.Up))) return p_sInfo;
+                    if (Run(m_wrapper.RunMove(Wrapper.ePosMove.Place))) return p_sInfo;
+                    if (Run(m_wrapper.RunMove(Wrapper.ePosPicker.Down))) return p_sInfo;
+                    if (Run(m_stage.RunVac(true, true))) return p_sInfo;
+                    if (Run(m_wrapper.RunVacOff(false))) return p_sInfo;
+                    if (Run(m_wrapper.RunMove(Wrapper.ePosPicker.Open))) return p_sInfo;
+                    return "OK";
+                case eStep.HoldWrapper:
+                    if (Run(m_holder.RunForward(true))) return p_sInfo;
+                    if (Run(m_holder.RunHold(true))) return p_sInfo;
+                    return "OK";
+                case eStep.BackWrapper:
+                    if (Run(m_wrapper.RunVacOff(true))) return p_sInfo;
+                    if (Run(m_wrapper.RunMove(Wrapper.ePosPicker.Up))) return p_sInfo;
+                    if (Run(m_wrapper.RunMove(Wrapper.ePosMove.Pick))) return p_sInfo;
+                    return "OK";
+                case eStep.InsertCase:
+                    try
+                    {
+                        if (Run(m_loader.RunMoveWidth(Loader.ePosWidth.Ready))) return p_sInfo;
+                        if (Run(m_loader.RunBridge(Loader.ePosBridge.Bridge))) return p_sInfo;
+                        if (Run(m_loader.RunMove(Loader.ePosMove.Vacuum, Loader.eSpeed.Slow))) return p_sInfo;
+                        if (Run(m_transfer.RunDown(true))) return p_sInfo;
+                        if (Run(m_transfer.RunMove(Transfer.ePos.Push))) return p_sInfo;
+                        if (Run(m_transfer.RunPush())) return p_sInfo;
+                    }
+                    finally 
+                    {
+                        m_transfer.RunDown(false); 
+                        m_transfer.RunMove(Transfer.ePos.Ready); 
+                    }
+                    return "OK";
+                case eStep.ReleaseWrapper:
+                    if (Run(m_holder.RunHold(false))) return p_sInfo;
+                    if (Run(m_holder.RunForward(false))) return p_sInfo;
+                    return "OK";
+                case eStep.CloseWrapper:
+                    if (Run(m_loader.RunMoveWidth(Loader.ePosWidth.Open))) return p_sInfo;
+                    if (Run(m_heater.RunSponge(true))) return p_sInfo;
+                    return "OK";
+                case eStep.VacuumPump:
+                    if (Run(m_loader.RunVacuumPump())) return p_sInfo;
+                    if (Run(m_loader.RunMove(Loader.ePosMove.Heating, Loader.eSpeed.Fast))) return p_sInfo; 
+                    return "OK";
+                case eStep.Heating:
+                    if (Run(m_heater.RunHeater(true))) return p_sInfo;
+                    if (Run(m_heater.RunHeat())) return p_sInfo;
+                    if (Run(m_heater.RunHeater(false))) return p_sInfo;
+                    if (Run(m_loader.RunMove(Loader.ePosMove.Ready, Loader.eSpeed.Slow))) return p_sInfo;
+                    return "OK";
+                case eStep.Rotate:
+                    if (Run(m_stage.RunVac(true, false))) return p_sInfo;
+                    if (Run(m_stage.RunUp(true))) return p_sInfo;
+                    if (Run(m_stage.RunRotate(true))) return p_sInfo;
+                    if (Run(m_stage.RunUp(false))) return p_sInfo;
+                    if (Run(m_stage.RunVac(true, true))) return p_sInfo;
+                    return "OK";
+                case eStep.PushToLoader:
+                    if (Run(m_wrapper.RunMove(Wrapper.ePosPicker.Push))) return p_sInfo;
+                    if (Run(m_stage.RunVac(false, false))) return p_sInfo;
+                    if (Run(m_wrapper.RunMove(Wrapper.ePosMove.Push))) return p_sInfo;
+                    if (Run(m_wrapper.RunPush())) return p_sInfo;
+                    if (Run(m_wrapper.RunMove(Wrapper.ePosMove.Pick))) return p_sInfo;
+                    if (Run(m_wrapper.RunMove(Wrapper.ePosPicker.Up))) return p_sInfo;
+                    if (Run(m_stage.RunRotate(false))) return p_sInfo;
+                    return "OK";
+                case eStep.Unload:
+                    if (Run(m_loader.RunMoveWidth(Loader.ePosWidth.Ready))) return p_sInfo;
+                    if (Run(m_loader.RunMove(Loader.ePosMove.Ready, Loader.eSpeed.Slow))) return p_sInfo;
+                    if (Run(m_loader.RunBridge(Loader.ePosBridge.Ready))) return p_sInfo;
+                    return "OK";
+            }
+            return "OK"; 
+        }
+
+        eStep[] m_aStep =
+        {
+            eStep.GetWrapper,
+            eStep.HoldWrapper,
+            eStep.BackWrapper,
+            eStep.InsertCase,
+            eStep.ReleaseWrapper,
+            eStep.CloseWrapper,
+            eStep.VacuumPump,
+            eStep.Heating,
+            eStep.Rotate,
+            eStep.PushToLoader,
+        };
+        public string RunPacking() //recover ???
+        {
+            foreach (eStep eStep in m_aStep)
+            {
+                if (Run(RunStep(eStep))) return p_sInfo; 
+            }
+            foreach (eStep eStep in m_aStep)
+            {
+                if (Run(RunStep(eStep))) return p_sInfo;
+            }
+            if (Run(RunStep(eStep.Unload))) return p_sInfo; 
+            return "OK"; 
         }
         #endregion
 
@@ -263,133 +889,6 @@ namespace Root_AOP01_Packing.Module
         }
         #endregion
 
-        #region Vacuum Function
-        string RunVacuum(bool bOn)
-        {
-            m_dioVacuum[0].Write(bOn);
-            m_dioVacuum[1].Write(bOn);
-            if (bOn == false)
-            {
-                m_doBlow[0].Write(true);
-                m_doBlow[1].Write(true);
-                Thread.Sleep((int)(1000 * m_sBlow));
-                m_doBlow[0].Write(false);
-                m_doBlow[1].Write(false);
-                return "OK";
-            }
-            int msVac = (int)(1000 * m_sVac);
-            while ((m_dioVacuum[0].p_bIn != bOn) || (m_dioVacuum[1].p_bIn != bOn))
-            {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return p_id + " EQ Stop";
-                if (m_dioVacuum[0].m_swWrite.ElapsedMilliseconds > msVac) return "Vacuum Sensor Timeout";
-            }
-            return "OK";
-        }
-        #endregion
-
-        #region Load Function
-        enum eLoad
-        {
-            Ready,
-            VacuumPump,
-            Heating,//Load
-        }
-        void InitAxisPosLoad()
-        {
-            m_axisLoad.AddPos(Enum.GetNames(typeof(eLoad)));
-        }
-
-        string RunLoad(eLoad load)
-        {
-            m_axisLoad.StartMove(load);
-            return m_axisLoad.WaitReady(3);
-        }
-        #endregion
-
-        #region Step Function
-        string RunStep1(bool bOn) // 전체실린더
-        {
-            RunSol(m_dioTopTotalHeaterUpdown, bOn, m_sSolStep2);
-            return "OK";
-        }
-
-        string RunStep2(bool bOn) // 스펀지 실린더
-        {
-            RunSol(m_dioTopClampUpDown, bOn, m_sSolStep2);
-            RunSol(m_dioBtmClampUpDown, bOn, m_sSolStep2);
-            return "OK";
-            //return RunSol(m_dioStep2, bOn, m_sSolStep2);
-        }
-        string RunStep3(bool bOn)  // 히터 실린더 
-        {
-            RunSol(m_dioTopHeaterUpdown, bOn, m_sSolStep2);
-            RunSol(m_dioBtmHeaterUpdown, bOn, m_sSolStep2);
-            return "OK";
-        }
-
-
-        #endregion
-
-        #region Heater
-        string RunHeater(double secHeat)
-        {
-            int msHeat = (int)(1000 * secHeat);
-            StopWatch sw = new StopWatch();
-            try
-            {
-                m_doHeater.Write(true);
-                while (sw.ElapsedMilliseconds < msHeat)
-                {
-                    Thread.Sleep(10);
-                    if (EQ.IsStop()) return p_id + " EQ Stop";
-                }
-                return "OK";
-            }
-            finally
-            {
-                m_doHeater.Write(false);
-            }
-        }
-        #endregion
-
-        #region Guide Function
-        enum eGuide
-        {
-            Ready,
-            Open
-        }
-        void InitAxisPosGuide()
-        {
-            m_axisGuide.AddPos(Enum.GetNames(typeof(eGuide))); 
-        }
-
-        string RunGuide(eGuide guide)
-        {
-            m_axisGuide.StartMove(guide);
-            return m_axisGuide.WaitReady(3);
-        }
-
-        string RunVacuumPump(bool bOn)
-        {
-            if (bOn == false)
-            {
-                m_dioVacuumPump.Write(false);
-                return "OK";
-            }
-            m_dioVacuumPump.Write(true);
-            int msTimeout = (int)(1000 * m_sVacuumPump);
-            StopWatch sw = new StopWatch();
-            while (m_dioVacuumPump.p_bIn == false)
-            {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return p_id + " EQ Stop";
-                if (sw.ElapsedMilliseconds > msTimeout) return "Vacuum Pump Sensor Timeout";
-            }
-            return "OK";
-        }
-        #endregion
-
         #region Override
         public override void RunTree(Tree tree)
         {
@@ -399,7 +898,11 @@ namespace Root_AOP01_Packing.Module
 
         void RunTreeSetup(Tree tree)
         {
-            RunTreeDIOWait(tree.GetTree("Timeout", false));
+            m_wrapper.RunTree(tree.GetTree("Wapper"));
+            m_stage.RunTree(tree.GetTree("Stage"));
+            m_holder.RunTree(tree.GetTree("Holder"));
+            m_loader.RunTree(tree.GetTree("Loader"));
+            m_heater.RunTree(tree.GetTree("Heater"));
         }
 
         public override void Reset()
@@ -418,13 +921,18 @@ namespace Root_AOP01_Packing.Module
             }
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
-
             return p_sInfo;
         }
         #endregion
 
         public VacuumPacker(string id, IEngineer engineer)
         {
+            m_wrapper = new Wrapper("Wrapper", this);
+            m_stage = new Stage("Stage", this); 
+            m_transfer = new Transfer("Transfer", this);
+            m_holder = new Holder("holder", this);
+            m_loader = new Loader("Loader", this);
+            m_heater = new Heater("Heater", this); 
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             base.InitBase(id, engineer);
         }
@@ -438,13 +946,8 @@ namespace Root_AOP01_Packing.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
-            AddModuleRunList(new Run_Vacuum(this), true, "Run Load");
-            AddModuleRunList(new Run_Guide(this), true, "Run Guide");
-            AddModuleRunList(new Run_Load(this), true, "Run Load");
-            AddModuleRunList(new Run_Step1(this), true, "Run Step1");
-            AddModuleRunList(new Run_Step2(this), true, "Run Step2");
-            AddModuleRunList(new Run_VacuumPump(this), true, "Run VacuumPump");
-            AddModuleRunList(new Run_Heating(this), true, "Run Heating");
+            AddModuleRunList(new Run_Solvalve(this), false, "Run Solvalve");
+            AddModuleRunList(new Run_Step(this), false, "Run Step");
             AddModuleRunList(new Run_Packing(this), true, "Run Packing");
         }
 
@@ -477,308 +980,98 @@ namespace Root_AOP01_Packing.Module
             }
         }
 
-        public class Run_Vacuum : ModuleRunBase
+        public class Run_Solvalve : ModuleRunBase
         {
             VacuumPacker m_module;
-            public Run_Vacuum(VacuumPacker module)
+            public Run_Solvalve(VacuumPacker module)
             {
                 m_module = module;
                 InitModuleRun(module);
             }
 
-            bool m_bVacOn = false; 
-            public override ModuleRunBase Clone()
-            {
-                Run_Vacuum run = new Run_Vacuum(m_module);
-                run.m_bVacOn = m_bVacOn;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_bVacOn = tree.Set(m_bVacOn, m_bVacOn, "Vacuum", "Run Vacuum", bVisible);
-            }
-
-            public override string Run()
-            {
-                return m_module.RunVacuum(m_bVacOn);
-            }
-        }
-
-        public class Run_Guide : ModuleRunBase
-        {
-            VacuumPacker m_module;
-            public Run_Guide(VacuumPacker module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            eGuide m_eGuide = eGuide.Ready; 
-            public override ModuleRunBase Clone()
-            {
-                Run_Guide run = new Run_Guide(m_module);
-                run.m_eGuide = m_eGuide;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_eGuide = (eGuide)tree.Set(m_eGuide, m_eGuide, "Guide", "Run Guide", bVisible);
-            }
-
-            public override string Run()
-            {
-                return m_module.RunGuide(m_eGuide);
-            }
-        }
-
-        public class Run_Load : ModuleRunBase
-        {
-            VacuumPacker m_module;
-            public Run_Load(VacuumPacker module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            eLoad m_eLoad = eLoad.Ready;
-            public override ModuleRunBase Clone()
-            {
-                Run_Load run = new Run_Load(m_module);
-                run.m_eLoad = m_eLoad;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_eLoad = (eLoad)tree.Set(m_eLoad, m_eLoad, "Load", "Run Load", bVisible);
-            }
-
-            public override string Run()
-            {
-                return m_module.RunLoad(m_eLoad);
-            }
-        }
-
-        public class Run_Step1 : ModuleRunBase
-        {
-            VacuumPacker m_module;
-            public Run_Step1(VacuumPacker module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
+            string m_sSol = "";
             bool m_bOn = false;
             public override ModuleRunBase Clone()
             {
-                Run_Step1 run = new Run_Step1(m_module);
+                Run_Solvalve run = new Run_Solvalve(m_module);
+                run.m_sSol = m_sSol;
                 run.m_bOn = m_bOn;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_bOn = tree.Set(m_bOn, m_bOn, "Down", "Run Load", bVisible);
+                m_sSol = tree.Set(m_sSol, m_sSol, m_module.p_asSol, "SolValve", "Run SolValve", bVisible);
+                m_bOn = tree.Set(m_bOn, m_bOn, "On", "Run SolValue On/Off", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunStep1(m_bOn);
+                DIO_I2O2 sol = m_module.GetSolvalve(m_sSol);
+                if (sol == null) return "Invalid Solvalve Name";
+                sol.Write(m_bOn);
+                return sol.WaitDone();
             }
         }
 
-        public class Run_Step2 : ModuleRunBase
+        public class Run_Step : ModuleRunBase
         {
             VacuumPacker m_module;
-            public Run_Step2(VacuumPacker module)
+            public Run_Step(VacuumPacker module)
             {
                 m_module = module;
                 InitModuleRun(module);
             }
 
-            bool m_bOn = false;
+            eStep m_eStep = eStep.GetWrapper;
             public override ModuleRunBase Clone()
             {
-                Run_Step2 run = new Run_Step2(m_module);
-                run.m_bOn = m_bOn;
+                Run_Step run = new Run_Step(m_module);
+                run.m_eStep = m_eStep;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_bOn = tree.Set(m_bOn, m_bOn, "Down", "Run Step2", bVisible);
+                m_eStep = (eStep)tree.Set(m_eStep, m_eStep, "Step", "Select Step", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunStep2(m_bOn);
+                return m_module.RunStep(m_eStep); 
             }
         }
-
-        public class Run_VacuumPump : ModuleRunBase
-        {
-            VacuumPacker m_module;
-            public Run_VacuumPump(VacuumPacker module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            bool m_bOn = false;
-            public override ModuleRunBase Clone()
-            {
-                Run_VacuumPump run = new Run_VacuumPump(m_module);
-                run.m_bOn = m_bOn;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_bOn = tree.Set(m_bOn, m_bOn, "On", "Run VacuumPump", bVisible);
-            }
-
-            public override string Run()
-            {
-                return m_module.RunVacuumPump(m_bOn);
-            }
-        }
-
-        public class Run_Heating : ModuleRunBase
-        {
-            VacuumPacker m_module;
-            double m_sHeat = 0;
-            double m_sVacTime = 0;
-            public Run_Heating(VacuumPacker module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            //double m_sHeat = 30; 
-            public override ModuleRunBase Clone()
-            {
-                Run_Heating run = new Run_Heating(m_module);
-                run.m_sHeat = m_sHeat;
-                run.m_sVacTime = m_sVacTime;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_sHeat = tree.Set(m_sHeat, m_sHeat, "Heating Time", "Heating Time (sec)", bVisible);
-                m_sVacTime = tree.Set(m_sVacTime, m_sVacTime, "Vaccume Time", "Vaccume Time (sec)", bVisible);
-            }
-
-            public override string Run()
-            {
-                if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // Total 실린더 Up
-                if (m_module.Run(m_module.RunLoad(eLoad.Heating))) return p_sInfo; // Load 축 이동 히팅기랑 간섭없는 위치로 이동.
-                if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo; // side 축 레디위치로 이동.
-                if (m_module.Run(m_module.RunGuide(eGuide.Open))) return p_sInfo; // side 축 open위치로 이동.
-                if (m_module.Run(m_module.RunStep1(false))) return p_sInfo; // Total 실린더 down
-                if (m_module.Run(m_module.RunStep2(true))) return p_sInfo; // 상단, 하단클램프 닫음
-                Thread.Sleep((int)m_sVacTime * 1000); // 진공상태 대기.
-                if (m_module.Run(m_module.RunStep3(true))) return p_sInfo; // 상부, 하부 히팅 실린더 닫음.
-                if (m_module.Run(m_module.RunStep2(false))) return p_sInfo; // 상단, 하단클램프 실린더 열음
-                if (m_module.Run(m_module.RunHeater(m_sHeat))) return p_sInfo; // 히팅
-                if (m_module.Run(m_module.RunStep3(false))) return p_sInfo; // 상부, 하부 히팅 실린더 열음.
-                if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // 상단, 하단클램프 및 Total 실린더 업.
-                if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo; // Load 축 이동 히팅기랑 간섭없는 위치로 이동.
-                if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo; // side 축 레디위치로 이동.
-                return "OK";
-            }
-        }
-        
 
         public class Run_Packing : ModuleRunBase
         {
             VacuumPacker m_module;
-
-            //eLoad m_eLoad = eLoad.Ready;            
-            //eGuide m_eGuide = eGuide.Ready;
-
-
-            double m_sCartride = 1;
-            double m_fDeg = 720;
-            double m_v = 120;
-            double m_acc = 2;
-            double m_sHeat = 0;
-            double m_sVacTime = 0;
-
             public Run_Packing(VacuumPacker module)
             {
                 m_module = module;
                 InitModuleRun(module);
-                
             }
 
+            int m_secVacuumPump = 5; 
+            double m_secHeat = 3; 
             public override ModuleRunBase Clone()
             {
                 Run_Packing run = new Run_Packing(m_module);
-                run.m_sCartride = m_sCartride;
-                run.m_fDeg = m_fDeg;
-                run.m_v = m_v;
-                run.m_acc = m_acc;
-                run.m_sVacTime = m_sVacTime;
-                run.m_sHeat = m_sHeat;
+                run.m_secVacuumPump = m_secVacuumPump;
+                run.m_secHeat = m_secHeat;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                //m_eLoad = (eLoad)tree.Set(m_eLoad, m_eLoad, "Load", "Run Load", bVisible);
-                //m_eGuide = (eGuide)tree.Set(m_eGuide, m_eGuide, "Guide", "Run Guide", bVisible);
-                m_sHeat = tree.Set(m_sHeat, m_sHeat, "Heating Time", "Heating Time (sec)", bVisible);
-                m_sVacTime = tree.Set(m_sVacTime, m_sVacTime, "Vaccume Time", "Vaccume Time (sec)", bVisible);
-
+                m_secVacuumPump = tree.Set(m_secVacuumPump, m_secVacuumPump, "Vacuum Pump", "Vacuum Pump Time (sec)", bVisible);
+                m_secHeat = tree.Set(m_secHeat, m_secHeat, "Heat", "Heat Time (sec)", bVisible);
             }
 
             public override string Run()
             {
-                for (int i = 0; i < 1; i++)
-                {
-                    if(m_module.TestNum == 1)
-                    {
-                        if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // Total 실린더 Up
-                        if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo; // side 축 레디위치로 이동.
-                        if (m_module.Run(m_module.RunLoad(eLoad.VacuumPump))) return p_sInfo; // Load 축 이동 하드웨어 리밋정도까지 최대한 이동한 작업점까지.
-                        if (m_module.Run(m_module.RunGuide(eGuide.Open))) return p_sInfo; // side 축 open위치로 이동.
-                        if (m_module.Run(m_module.RunStep1(false))) return p_sInfo; // Total 실린더 down
-                        if (m_module.Run(m_module.RunStep2(true))) return p_sInfo; // 상단, 하단클램프 닫음
-                        Thread.Sleep((int)m_sVacTime * 1000); // 진공상태 대기.
-                        if (m_module.Run(m_module.RunLoad(eLoad.Heating))) return p_sInfo; // Load 축 이동 히팅기랑 간섭없는 위치로 이동.
-                        if (m_module.Run(m_module.RunStep3(true))) return p_sInfo; // 상부, 하부 히팅 실린더 닫음.
-                        if (m_module.Run(m_module.RunHeater(m_sHeat))) return p_sInfo; // 히팅
-                        if (m_module.Run(m_module.RunStep2(false))) return p_sInfo; // 상단, 하단클램프 실린더 열음
-                        if (m_module.Run(m_module.RunStep3(false))) return p_sInfo; // 상부, 하부 히팅 실린더 열음.
-                        if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // 상단, 하단클램프 및 Total 실린더 업.
-                        if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo; // side 축 레디위치로 이동.
-                        if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo;
-
-                    }
-                    else
-                    {
-                        if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // Step1 위쪽, 아래쪽/ Step2 위쪽 작은실린더/ Load = Y축/ Guide = X축 , 
-                        if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo;
-                        if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo;
-                        if (m_module.Run(m_module.RunLoad(eLoad.VacuumPump))) return p_sInfo;
-                        if (m_module.Run(m_module.RunGuide(eGuide.Open))) return p_sInfo;
-                        if (m_module.Run(m_module.RunStep1(false))) return p_sInfo;
-                        //if (m_module.Run(m_module.RunVacuum(true))) return p_sInfo;                  
-                        if (m_module.Run(m_module.RunStep2(true))) return p_sInfo;
-                        //if (m_module.Run(m_module.RunHeater(m_sHeat))) return p_sInfo;
-                        if (m_module.Run(m_module.RunStep2(false))) return p_sInfo;
-                        if (m_module.Run(m_module.RunStep1(true))) return p_sInfo;
-                        if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo;
-                        if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo;
-                        //if (m_module.Run(m_module.RunLoad(eLoad.Load))) return p_sInfo;
-                        //if (m_module.Run(m_module.RunLoad(eLoad.Load))) return p_sInfo;
-                        //if (m_module.Run(m_module.RunLoad(eLoad.Load))) return p_sInfo;
-                    }
-                }
-                return "OK";
+                m_module.m_loader.m_secVac = m_secVacuumPump;
+                m_module.m_heater.m_secHeat = m_secHeat; 
+                return m_module.RunPacking();
             }
         }
         #endregion

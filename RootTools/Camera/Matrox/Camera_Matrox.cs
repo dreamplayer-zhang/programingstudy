@@ -499,12 +499,24 @@ namespace RootTools.Camera.Matrox
                         }
                     });
                     iBlock++;
+                    GrabEvent();
                     if (m_nGrabCount != 0)
                         p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
             }
             p_CamInfo.p_eState = eCamState.Ready;
             userObjectHandle.Free();
+        }
+
+        void GrabEvent()
+        {
+            if (Grabed != null)
+                OnGrabed(new GrabedArgs(null, m_nGrabTrigger, new CRect(), p_nGrabProgress));
+        }
+        protected virtual void OnGrabed(GrabedArgs e)
+        {
+            if (Grabed != null)
+                Grabed.Invoke(this, e);
         }
 
         public static MIL_INT LineScanArchiveFunction(MIL_INT HookType, MIL_ID EventId, IntPtr UserDataPtr)

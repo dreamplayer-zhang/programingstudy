@@ -4,6 +4,7 @@ using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHTNew;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
@@ -36,13 +37,16 @@ namespace Root_AOP01_Packing
         public VacuumPacker m_vacuumPacker;
         public IndividualElevator m_elevator;
         public Unloadport_AOP m_unloadport;
-        public WrappingContainer m_wrapping; 
+        public Vision_AOP m_visionAOP;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             InitWTR(); 
             InitLoadport();
 
+            m_visionAOP = new Vision_AOP("Vision", m_engineer);
+            InitModule(m_visionAOP);
+            
             m_tapePacker = new TapePacker("TapePacker", m_engineer);
             InitModule(m_tapePacker);
             ((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);
@@ -59,9 +63,6 @@ namespace Root_AOP01_Packing
             m_unloadport = new Unloadport_AOP("Unloadport", m_engineer);
             InitModule(m_unloadport);
             ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_unloadport);
-
-            m_wrapping = new WrappingContainer("WrappingContainer", m_engineer);
-            InitModule(m_wrapping);
 
             m_aWTR[0].RunTree(Tree.eMode.RegRead);
             m_aWTR[0].RunTree(Tree.eMode.Init);
@@ -91,7 +92,7 @@ namespace Root_AOP01_Packing
         #endregion
 
         #region Module WTR
-        List<ModuleBase> m_aWTR = new List<ModuleBase>(); 
+        public List<ModuleBase> m_aWTR = new List<ModuleBase>(); 
         void InitWTR()
         {
             m_aWTR.Add(new WTR_RND("WTR_A", m_engineer));

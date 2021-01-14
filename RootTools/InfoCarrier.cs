@@ -164,7 +164,8 @@ namespace RootTools
         void RunTreeSlot(Tree tree)
         {
             p_eWaferSize = (InfoWafer.eWaferSize)tree.Set(p_eWaferSize, p_eWaferSize, "Size", "Wafer Size");
-            p_lWafer = tree.Set(p_lWafer, p_lWafer, "Count", "Slot Count", true, true);
+            if (m_waferSize.m_bUseCount == false) p_lWafer = 1; 
+            else p_lWafer = tree.Set(p_lWafer, p_lWafer, "Count", "Slot Count", true, true);
         }
         #endregion
 
@@ -277,15 +278,31 @@ namespace RootTools
             }
             return "OK";
         }
+
+        public string SetSelectMapData(InfoCarrier infoCarrier)
+        {
+            //if (p_lWafer > aSlotState.Count) return "SetMapData Lendth Error";
+            for (int n = 0; n < p_lWafer; n++)
+            {
+                //if (aSlotState[n] == GemSlotBase.eState.Select) SetInfoWafer(n);
+                if (GetInfoWafer(n) != null)
+                {
+                    if (GetInfoWafer(n).p_eState != GemSlotBase.eState.Select) SetInfoWafer(n, null);
+                }
+            }
+            return "OK";
+        }
         #endregion
 
         #region UI
+        List<InfoCarrier_UI> m_aCarrierUI = new List<InfoCarrier_UI>(); 
         public UserControl p_ui
         {
             get
             {
                 InfoCarrier_UI ui = new InfoCarrier_UI();
                 ui.Init(this);
+                m_aCarrierUI.Add(ui); 
                 return ui;
             }
         }
@@ -341,6 +358,7 @@ namespace RootTools
 
         public void ThreadStop()
         {
+            foreach (InfoCarrier_UI ui in m_aCarrierUI) ui.m_timer.Stop(); 
         }
     }
 }

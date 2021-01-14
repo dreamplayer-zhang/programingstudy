@@ -25,7 +25,7 @@ namespace RootTools_Vision
         {
         }
 
-        public override WORK_TYPE Type => WORK_TYPE.FINISHINGWORK;
+        public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_WAFER;
 
         public override void DoWork()
         {
@@ -118,6 +118,7 @@ namespace RootTools_Vision
             }
 
             WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>(), true));
+            WorkEventManager.OnProcessDefectWaferDone(this.workplace, new PocessDefectWaferDoneEventArgs());
         }
 
         public override WorkBase Clone()
@@ -254,13 +255,13 @@ namespace RootTools_Vision
                 }
             }
 
-
             for (int i = 0; i < DefectList.Count; i++)
             {
-                if (DefectList[i].m_fSize != -123) { 
+                if (DefectList[i].m_fSize != -123)
+				{
                     MergeDefectList.Add(DefectList[i]);
-                    MergeDefectList[nDefectIndex-1].SetDefectIndex(nDefectIndex++);
-                }
+                    MergeDefectList[nDefectIndex - 1].SetDefectIndex(nDefectIndex++);              
+				}
             }
 
             return MergeDefectList;

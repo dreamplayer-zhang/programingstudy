@@ -60,10 +60,12 @@ namespace Root_WIND2
         private ImageData roiLayer;
 
         private ImageData imageEdge;
+        private ImageData imageEBR;
 
         InspectionManagerFrontside inspectionFront;
         InspectionManagerBackside inspectionBack;
         InspectionManagerEdge inspectionEdge;
+        InspectionManagerEBR inspectionEBR;
         #endregion
 
         #region [Getter Setter]
@@ -75,9 +77,11 @@ namespace Root_WIND2
         public InspectionManagerFrontside InspectionFront { get => inspectionFront; private set => inspectionFront = value; }
         public InspectionManagerBackside InspectionBack { get => inspectionBack; private set => inspectionBack = value; }
         public InspectionManagerEdge InspectionEdge { get => inspectionEdge; private set => inspectionEdge = value; }
-        
+        public InspectionManagerEBR InspectionEBR { get => inspectionEBR; set => inspectionEBR = value; }
+
         public IDialogService DialogService { get => dialogService; set => dialogService = value; }
         public ImageData ImageEdge { get => imageEdge; private set => imageEdge = value; }
+        public ImageData ImageEBR { get => imageEBR; private set => imageEBR = value; }
         #endregion
 
         public bool Initialize()
@@ -120,17 +124,19 @@ namespace Root_WIND2
             //roiLayer.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameROI).p_nCount;
             if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
             {
-                ImageEdge = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
-            }
-            //ImageEdge.p_nByte = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop).p_nByte;
+                imageEdge = GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
+                imageEdge.p_nByte = memoryTool.GetMemory("EdgeSide Vision.Memory", "EdgeSide Vision", Module.EdgeSideVision.EDGE_TYPE.EdgeTop.ToString()).p_nCount;
 
+                imageEBR = GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EBR);
+                imageEBR.p_nByte = memoryTool.GetMemory("EdgeSide Vision.Memory", "EdgeSide Vision", Module.EdgeSideVision.EDGE_TYPE.EBR.ToString()).p_nCount;
+            }
 
             return true;
         }
 
         public ImageData GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE type)
         {
-            return engineer.m_handler.m_edgesideVision.GetMemoryData(type);
+            return engineer.m_handler.p_EdgeSideVision.GetMemoryData(type);
         }
 
         private bool InitMember()
@@ -142,7 +148,9 @@ namespace Root_WIND2
 
             // Front
             this.InspectionFront = new InspectionManagerFrontside(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
-            
+            this.InspectionFront.SetColorSharedBuffer(image.GetPtr(0), image.GetPtr(1), image.GetPtr(2));
+
+
             this.Engineer.InspectionFront = this.InspectionFront;
             this.Engineer.InspectionFront.Recipe = this.recipe;
 
@@ -155,12 +163,22 @@ namespace Root_WIND2
             // Edge
             if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
             {
-                this.InspectionEdge = new InspectionManagerEdge(ImageEdge.GetPtr(), ImageEdge.p_Size.X, ImageEdge.p_Size.Y, 3);
+                if (imageEdge.p_nByte == 1)
+                    this.InspectionEdge = new InspectionManagerEdge(imageEdge.GetPtr(), imageEdge.p_Size.X, imageEdge.p_Size.Y, 3);
 
-                this.Engineer.InspectionEFEM = this.InspectionEdge;
-                this.Engineer.InspectionEFEM.Recipe = this.recipe;
+                if (imageEdge.p_nByte == 3)
+                {
+                    this.InspectionEdge = new InspectionManagerEdge(imageEdge.GetPtr(), imageEdge.p_Size.X, imageEdge.p_Size.Y, 3);
+                    this.InspectionEdge.SetWorkplaceBuffer(imageEdge.GetPtr(0), imageEdge.GetPtr(1), imageEdge.GetPtr(2));
+                }
+
+                this.Engineer.InspectionEdge = this.InspectionEdge;
+                this.Engineer.InspectionEdge.Recipe = this.recipe;
+
+                this.inspectionEBR = new InspectionManagerEBR(imageEBR.GetPtr(), imageEBR.p_Size.X, imageEBR.p_Size.Y);
+                this.Engineer.InspectionEBR = this.InspectionEBR;
+                this.Engineer.InspectionEBR.Recipe = this.recipe;
             }
-
             return true;
         }
 
@@ -182,7 +200,7 @@ namespace Root_WIND2
                 }
                 
                 this.Recipe.Clear();
-                ShowDialogSaveRecipe();
+                ShowDialogSaveRecipe(true);
 
                 WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
             }
@@ -192,12 +210,14 @@ namespace Root_WIND2
             }
         }
 
-        public void ShowDialogSaveRecipe()
+        public void ShowDialogSaveRecipe(bool bNew = false)
         {
             try
             {
                 SaveFileDialog dlg = new SaveFileDialog();
                 dlg.InitialDirectory = recipeFolderPath;
+
+                if (bNew == true) dlg.Title = "새로 만들기";
 
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == true)

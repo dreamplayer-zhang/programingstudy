@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -402,18 +403,28 @@ namespace RootTools_Vision
 
         public static void ParallelImageCopy(IntPtr ptrSrc, int srcStride, int srcHeight, CRect roi, byte[] byteDst)
         {
-            int top = roi.Top;
-            int bottom = roi.Bottom;
-            int left = roi.Left;
-            int right = roi.Right;
-            int width = roi.Width;
-            int height = roi.Height;
+            try
+            {
+                int top = roi.Top;
+                int bottom = roi.Bottom;
+                int left = roi.Left;
+                int right = roi.Right;
+                int width = roi.Width;
+                int height = roi.Height;
 
-            Parallel.For(top, bottom, (i) =>
-              {
-                  Marshal.Copy(new IntPtr(ptrSrc.ToInt64() + (i * (Int64)srcStride + left)), byteDst, width * (i - top), width);
+                Parallel.For(top, bottom, (i) =>
+                {
+                    if (byteDst == null)
+                        return;
 
-              });
+                    Marshal.Copy(new IntPtr(ptrSrc.ToInt64() + (i * (Int64)srcStride + left)), byteDst, width * (i - top), width);
+
+                });
+            }
+            catch(Exception ex)
+            {
+                //검사 종료할 경우 buffer 카피하다가 workplace가 reset되서 다운
+            }
         }
 
         public static System.Windows.Media.Imaging.BitmapSource BitmapFromSource(System.Drawing.Bitmap bitmap)

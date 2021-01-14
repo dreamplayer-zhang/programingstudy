@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Root_TactTime.Mold;
 using Root_TactTime.Pine2;
 using RootTools;
 using RootTools.Trees;
@@ -266,7 +267,7 @@ namespace Root_TactTime
         public TactTime()
         {
             p_secRun = 0;
-            m_model = new Pine2_Buffer(this); 
+            m_model = new Mold_Buffer(this); 
 
             InitColor(); 
             InitTree();

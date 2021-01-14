@@ -334,6 +334,18 @@ namespace RootTools.Gem
 
         #region Property
         public string p_sLocID { get; set; }
+
+        string _sLotID = "LotID";
+        public string p_sLotID 
+        {
+            get { return _sLotID; }
+            set
+            {
+                if (_sLotID == value) return;
+                _sLotID = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
         #region Tree Gem

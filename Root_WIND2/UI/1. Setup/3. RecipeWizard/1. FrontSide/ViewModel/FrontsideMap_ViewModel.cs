@@ -27,7 +27,7 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2
 {
-    public class FrontsideMap_ViewModel : ObservableObject
+    public class FrontsideMap_ViewModel : ObservableObject, IRecipeUILoadable
     {
         private Canvas canvas;
         int nWaferSize = 300;
@@ -593,6 +593,11 @@ namespace Root_WIND2
             }
 
             SetMapData();
+        }
+
+        public void Load()
+        {
+            this.LoadMapData();
         }
     }
 }

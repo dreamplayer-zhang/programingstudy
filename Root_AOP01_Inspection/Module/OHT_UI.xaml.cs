@@ -85,17 +85,17 @@ namespace Root_AOP01_Inspection.Module
             bool bPodIn = p_bBlink ? !m_loadport.m_diPlaced.p_bIn : !m_loadport.m_diPresent.p_bIn;
             imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
             imageOutPod.Visibility = bPodIn ? Visibility.Hidden : Visibility.Visible;
-/*            if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
-            {
-                m_loadport.m_bLoadCheck = true;
-                m_loadport.m_bUnLoadCheck = false;
-            }
-            else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
-            {
-                m_loadport.m_bLoadCheck = false;
-                m_loadport.m_bUnLoadCheck = true;
-            }
-*/        }
+            //if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
+            //{
+            //    m_loadport.m_bLoadCheck = true;
+            //    m_loadport.m_bUnLoadCheck = false;
+            //}
+            //else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
+            //{
+            //    m_loadport.m_bLoadCheck = false;
+            //    m_loadport.m_bUnLoadCheck = true;
+            //}
+        }
 
         void SetBrush(Button button, bool bOn)
         {

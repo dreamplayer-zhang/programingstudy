@@ -574,9 +574,9 @@ namespace RootTools
                         }
                         else if (p_ImageData.p_nByte == 3)
                         {
-                             if (p_eColorViewMode == eColorViewMode.All)
+                            if (p_eColorViewMode == eColorViewMode.All)
                             {
-                                if(p_ImageData.m_eMode == ImageData.eMode.MemoryRead)
+                                if (p_ImageData.m_eMode == ImageData.eMode.MemoryRead)
                                 {
                                     Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
                                     IntPtr ptrMemR = p_ImageData.GetPtr(0);
@@ -1405,7 +1405,7 @@ namespace RootTools
             double nY = p_View_Rect.Y + canvasPt.Y * p_View_Rect.Height / p_CanvasHeight;
             return new CPoint((int)nX, (int)nY);
         }
-        protected CPoint GetCanvasPoint(CPoint memPt)
+        public CPoint GetCanvasPoint(CPoint memPt)
         {
             if (p_View_Rect.Width > 0 && p_View_Rect.Height > 0)
             {

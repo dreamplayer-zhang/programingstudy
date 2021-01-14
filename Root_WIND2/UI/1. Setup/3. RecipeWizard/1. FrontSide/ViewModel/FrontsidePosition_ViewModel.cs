@@ -23,7 +23,7 @@ using System.Runtime.InteropServices;
 
 namespace Root_WIND2
 {
-    class FrontsidePosition_ViewModel : RootViewer_ViewModel
+    class FrontsidePosition_ViewModel : RootViewer_ViewModel, IRecipeUILoadable
     {
         BoxProcess eBoxProcess;
         ModifyType eModifyType;
@@ -804,7 +804,11 @@ namespace Root_WIND2
             }
         }
 
-         
+        public void Load()
+        {
+            LoadPositonMark();
+        }
+
         public ICommand SaveImage
         {
             get

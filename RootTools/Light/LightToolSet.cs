@@ -192,6 +192,36 @@ namespace RootTools.Light
         }
         #endregion
 
+        #region Light DAWOO Channel
+        const string c_sDAWOO = "DAWOO";
+        int m_nDAWOO = 0;
+        ObservableCollection<LightTool_DAWOO> m_aLightToolDAWOO = new ObservableCollection<LightTool_DAWOO>();
+        public ObservableCollection<LightTool_DAWOO> p_aLightToolDAWOO
+        {
+            get
+            {
+                return m_aLightToolDAWOO;
+            }
+            set
+            {
+                SetProperty(ref m_aLightToolDAWOO, value);
+            }
+        }
+
+        bool RunTreeDAWOO(Tree tree)
+        {
+            m_nDAWOO = tree.Set(m_nDAWOO, m_nDAWOO, "Count", "Light DAWOO Count");
+            while (p_aLightToolDAWOO.Count > m_nDAWOO)
+                p_aLightToolDAWOO.RemoveAt(p_aLightToolDAWOO.Count - 1);
+            while (p_aLightToolDAWOO.Count < m_nDAWOO)
+            {
+                LightTool_DAWOO lightTool = new LightTool_DAWOO(c_sDAWOO + "." + (char)('A' + p_aLightToolDAWOO.Count), m_engineer);
+                p_aLightToolDAWOO.Add(lightTool);
+            }
+            return true;
+        }
+        #endregion
+
         #region Tree
         private void M_treeRoot_UpdateTree()
         {
@@ -209,6 +239,7 @@ namespace RootTools.Light
             bChange |= Run4ChTree(m_treeRoot.GetTree(c_s4ch));
             bChange |= RunKwangwooTree(m_treeRoot.GetTree(c_sKwangwoo));
             bChange |= RunLVSTree(m_treeRoot.GetTree(c_sLVS));
+            bChange |= RunTreeDAWOO(m_treeRoot.GetTree(c_sDAWOO));
             if (bChange)
             {
                 p_asLightTool.Clear();
@@ -220,6 +251,8 @@ namespace RootTools.Light
                 foreach (LightTool_Kwangwoo lightTool in p_aLightToolKwangwoo)
                     AddTool(lightTool);
                 foreach (LightTool_LVS lightTool in p_aLightToolLVS)
+                    AddTool(lightTool);
+                foreach (LightTool_DAWOO lightTool in p_aLightToolDAWOO)
                     AddTool(lightTool);
                 if (OnToolChanged != null)
                     OnToolChanged();
@@ -272,6 +305,7 @@ namespace RootTools.Light
             else if (type == typeof(LightTool_4ch)) m_n4Ch++;
             else if (type == typeof(LightTool_Kwangwoo)) m_nKwangwoo++;
             else if (type == typeof(LightTool_LVS)) m_nLVS++;
+            else if (type == typeof(LightTool_DAWOO)) m_nDAWOO++;
             RunTree(Tree.eMode.Init);
         }
 
@@ -300,6 +334,12 @@ namespace RootTools.Light
                 if (m_nLVS == 0)
                     return;
                 m_nLVS--;
+            }
+            else if (type == typeof(LightTool_DAWOO))
+            {
+                if (m_nDAWOO == 0)
+                    return;
+                m_nDAWOO--;
             }
             RunTree(Tree.eMode.Init);
         }

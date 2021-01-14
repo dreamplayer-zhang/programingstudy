@@ -7,6 +7,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -37,6 +38,20 @@ namespace RootTools.Module
                 EQ.p_bPause = false;
                 OnPropertyChanged();
                 OnChanged(eChanged.State, value); 
+            }
+        }
+        protected int _nProgress = 0;
+        public int p_nProgress
+        {
+            get
+            {
+                return _nProgress;
+            }
+            set
+            {
+                if (_nProgress == value) return;
+                _nProgress = value;
+                OnPropertyChanged();
             }
         }
 
@@ -193,12 +208,12 @@ namespace RootTools.Module
                 case eState.Home:
                     p_bEnableHome = false;
                     p_sRun = "Stop";
-                    if (p_eRemote != eRemote.Client)
-                    {
+                    //if (p_eRemote != eRemote.Client)
+                    //{
                         string sStateHome = StateHome();
                         if (sStateHome == "OK") p_eState = eState.Ready;
                         else StopHome();
-                    }
+                    //}
                     break;
                 case eState.Ready:
                     p_bEnableHome = true;
@@ -707,7 +722,7 @@ namespace RootTools.Module
         void OnChanged(eChanged eChanged, dynamic value)
         {
             if (m_remote == null) return;
-            m_remote.RemoteSend(Remote.eProtocol.Module, eChanged.ToString(), value.ToString()); 
+            //m_remote.RemoteSend(Remote.eProtocol.Module, eChanged.ToString(), value.ToString()); 
         }
 
         public void UpdateModule(Remote.Protocol protocol)

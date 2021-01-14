@@ -12,820 +12,1028 @@
         <StackPanel>
             <Grid Height="866">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="8*" />
+                    <ColumnDefinition Width="20*" />
+                    <ColumnDefinition Width="35*" />
+                    <ColumnDefinition Width="10*" />
+                    <ColumnDefinition Width="15*" />
+                    <ColumnDefinition Width="20*" />
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="25*" />
-                        <RowDefinition Height="10*" />
-                        <RowDefinition Height="32.5*" />
-                        <RowDefinition Height="32.5*" />
+                        <RowDefinition Height="20*" />
+                        <RowDefinition Height="40*" />
+                        <RowDefinition Height="40*" />
                     </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="1"
-                              Header="Location">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0"
-                                  Background="LightSteelBlue"
-                                  Margin="5">
-                                <TextBlock Text="Loadport"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
-                            </Grid>
-                            <Grid Grid.Column="1"
-                                  Background="LightSteelBlue"
-                                  Margin="5">
-                                <TextBlock Text="RTR"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
-                            </Grid>
-                            <Grid Grid.Column="2"
-                                  Background="SteelBlue"
-                                  Margin="5">
-                                <TextBlock Text="Vision"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
-                            </Grid>
-                        </Grid>
-                    </GroupBox>
-
                     <GroupBox Grid.Row="0"
                               Header="Progress">
-                        <Grid>
+                        <Grid Margin="10,5">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="30*" />
-                                <RowDefinition Height="20*" />
-                                <RowDefinition Height="25*" />
-                                <RowDefinition Height="25*" />
+                                <RowDefinition Height="1*" />
+                                <RowDefinition Height="1*" />
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0"
-                                        Margin="10,0"
                                         VerticalAlignment="Center">
                                 <TextBlock Text="Total Progress"
-                                           FontSize="16"
+                                           FontSize="15"
                                            FontWeight="Bold" />
                                 <Grid>
-                                    <ProgressBar Height="30"
-                                                 Margin="0,5"
+                                    <ProgressBar Height="40"
+                                                 Margin="0,2"
                                                  Value="55"
                                                  Foreground="SeaGreen" />
                                     <TextBlock Text="55%"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
                                                FontWeight="Bold"
-                                               FontSize="13" />
+                                               FontSize="15" />
                                 </Grid>
                             </StackPanel>
-                            <UniformGrid Grid.Row="1"
-                                         Columns="2"
-                                         Margin="20,0">
+                            <UniformGrid Grid.Row="2"
+                                         Columns="2">
                                 <TextBlock Text="Need"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="00:00:00"
                                            VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
+                                           HorizontalAlignment="Left" />
                                 <TextBlock Text="Run"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="00:00:00"
                                            VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
+                                           HorizontalAlignment="Left" />
                             </UniformGrid>
-                            <Button Content="Pause / Resume"
-                                    Grid.Row="2"
-                                    Style="{StaticResource SetupPanelBtn}"
-                                    Margin="3" />
-                            <Button Content="Recovery"
-                                    Grid.Row="3"
-                                    Style="{StaticResource SetupPanelBtn}"
-                                    Margin="3" />
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="2"
-                              Header="Loadport 1">
-                        <Grid>
+
+                    <GroupBox Grid.Row="1" Header="Loadport 1">
+                        <Grid Name="Loadport1" Grid.Column="0">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="50*" />
-                                <RowDefinition Height="25*" />
-                                <RowDefinition Height="25*" />
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition />
                             </Grid.RowDefinitions>
-                            <UniformGrid Grid.Row="0"
-                                         Columns="4"
-                                         Rows="2">
-                                <Grid Margin="3"
-                                      Background="SteelBlue">
+                            <Grid Grid.Row="0">
+                                <UniformGrid Columns="2" Margin="10">
+                                    <TextBlock Text="Pod ID"
+                                           VerticalAlignment="Center" />
+                                    <TextBlock Text="pod00001"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left" />
+                                    <TextBlock Text="Lot ID"
+                                           VerticalAlignment="Center" />
+                                    <TextBlock Text="lot00001"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left" />
+                                    <TextBlock Text="Reticle ID"
+                                           VerticalAlignment="Center" />
+                                    <TextBlock Text="dummy001"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left" />
+                                </UniformGrid>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <!--<UniformGrid Columns="4"
+                                         Rows="2">-->
+                                <Grid Margin="3" x:Name="AccessManual1" Grid.Column="0" Grid.Row="0" 
+                                      Background="LightGray">
                                     <TextBlock Text="Manual"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="AccessAuto1" Grid.Column="1" Grid.Row="0"
                                       Background="LightGray">
                                     <TextBlock Text="Auto"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="Present1" Grid.Column="2" Grid.Row="0"
                                       Background="LightGray">
                                     <TextBlock Text="Present"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="Placed1" Grid.Column="3" Grid.Row="0" 
                                       Background="LightGray">
-                                    <TextBlock Text="Placed"
+                                    <TextBlock Text="Placed" 
                                                VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
+                                               HorizontalAlignment="Center">
+                                    </TextBlock>
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="Load1" Grid.Column="0" Grid.Row="1"
                                       Background="LightGray">
                                     <TextBlock Text="Load"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="UnLoad1" Grid.Column="1" Grid.Row="1"
                                       Background="LightGray">
                                     <TextBlock Text="Unload"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3"  Grid.Column="2" Grid.Row="1"
                                       Background="LightGray">
                                     <TextBlock Text="Reserve"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                                <Grid Margin="3"
+                                <Grid Margin="3" x:Name="Alarm1" Grid.Column="3" Grid.Row="1"
                                       Background="LightGray">
                                     <TextBlock Text="Alarm"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                 </Grid>
-                            </UniformGrid>
-                            <Grid Grid.Row="1">
-                                <Button Content="Start"
-                                        Style="{StaticResource SetupPanelBtn}"
-                                        Margin="3" />
+
+                                <!--</UniformGrid>-->
                             </Grid>
                             <Grid Grid.Row="2">
-                                <Button Content="Unload Request"
-                                        Style="{StaticResource SetupPanelBtn}"
-                                        Margin="3" />
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Button Content="Load" Name="ButtonLoad1"
+                                    Margin="3,0"
+                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonLoad1_Click" />
+                                <Button Content="UnloadRequest" Name="ButtonUnLoadReq1"
+                                    Margin="3,0"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoadReq1_Click" />
                             </Grid>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="3"
-                              Header="Loadport 2">
-                        <Grid>
+                    <GroupBox Grid.Row="2" Header="Loadport 2">
+                        <Grid Grid.Column="0" Name="Loadport2">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="50*" />
-                                <RowDefinition Height="25*" />
-                                <RowDefinition Height="25*" />
+                                <RowDefinition Height="2*" />
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition />
                             </Grid.RowDefinitions>
-                            <UniformGrid Grid.Row="0"
-                                         Columns="4"
-                                         Rows="2">
-                                <Grid Margin="3"
-                                      Background="SteelBlue">
-                                    <TextBlock Text="Manual"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
-                                      Background="LightGray">
-                                    <TextBlock Text="Auto"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
-                                      Background="LightGray">
-                                    <TextBlock Text="Present"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
-                                      Background="LightGray">
-                                    <TextBlock Text="Placed"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
-                                      Background="LightGray">
-                                    <TextBlock Text="Load"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
-                                      Background="LightGray">
-                                    <TextBlock Text="Unload"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
-                                      Background="LightGray">
-                                    <TextBlock Text="Reserve"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                                <Grid Margin="3"
-                                      Background="LightGray">
-                                    <TextBlock Text="Alarm"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                                </Grid>
-                            </UniformGrid>
+                            <Grid Grid.Row="0">
+                                <UniformGrid Columns="2" Margin="10">
+                                    <TextBlock Text="Pod ID"
+                                           VerticalAlignment="Center" />
+                                    <TextBlock Text="pod00001"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left" />
+                                    <TextBlock Text="Lot ID"
+                                           VerticalAlignment="Center" />
+                                    <TextBlock Text="lot00001"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left" />
+                                    <TextBlock Text="Reticle ID"
+                                           VerticalAlignment="Center" />
+                                    <TextBlock Text="dummy001"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left" />
+                                </UniformGrid>
+                            </Grid>
                             <Grid Grid.Row="1">
-                                <Button Content="Start"
-                                        Style="{StaticResource SetupPanelBtn}"
-                                        Margin="3" />
+                                <UniformGrid Columns="4"
+                                         Rows="2">
+                                    <Grid Margin="3" x:Name="AccessManual2"
+                                      Background="LightGray">
+                                        <TextBlock Text="Manual"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                    </Grid>
+                                    <Grid Margin="3" x:Name="AccessAuto2"
+                                      Background="LightGray">
+                                        <TextBlock Text="Auto"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                    </Grid>
+                                    <Grid Margin="3" x:Name="Present2"
+                                      Background="LightGray">
+                                        <TextBlock Text="Present"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                    </Grid>
+                                    <Grid Margin="3" x:Name="Placed2"
+                                      Background="LightGray">
+                                        <TextBlock Text="Placed"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                    </Grid>
+                                    <Grid Margin="3" x:Name="Load2"
+                                      Background="LightGray">
+                                        <TextBlock Text="Load"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                    </Grid>
+                                    <Grid Margin="3" x:Name="UnLoad2"
+                                      Background="LightGray">
+                                        <TextBlock Text="Unload"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                    </Grid>
+                                    <Grid Margin="3"
+                                      Background="LightGray">
+                                        <TextBlock Text="Reserve"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                    </Grid>
+                                    <Grid Margin="3" x:Name="Alarm2"
+                                      Background="LightGray">
+                                        <TextBlock Text="Alarm"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                    </Grid>
+
+                                </UniformGrid>
                             </Grid>
                             <Grid Grid.Row="2">
-                                <Button Content="Unload Request"
-                                        Style="{StaticResource SetupPanelBtn}"
-                                        Margin="3" />
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Button Content="Load" Name="ButtonLoad2"
+                                    Margin="3,0"
+                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonLoad2_Click" />
+                                <Button Content="UnloadRequest" Name="ButtonUnLoadReq2"
+                                    Margin="3,0"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoadReq2_Click" />
                             </Grid>
                         </Grid>
                     </GroupBox>
                 </Grid>
                 <Grid Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="12*" />
-                            <RowDefinition Height="88*" />
-                        </Grid.RowDefinitions>
-                        <GroupBox Grid.Row="0"
-                                  Header="Product">
-                            <UniformGrid Margin="20,3,20,0"
-                                         Columns="2">
-                                <TextBlock Text="Pod ID"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Text="-"
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="9*"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Grid.Row="0"
+                              Header="Loaction">
+                        <Grid Margin="10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0" x:Name ="ExistLoadport"
+                                  Margin="5"
+                                  Background="LightGray">
+                                <TextBlock Text="Loadport"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
-                                <TextBlock Text="Lot ID"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Text="-"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
-                                <TextBlock Text="Reticle ID"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Text="DummyWafer001"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
-                                <TextBlock Text="Recipe"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Text="test200804.rcp"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
-                            </UniformGrid>
-                        </GroupBox>
-                        <GroupBox Header="Image View"
-                                  Grid.Row="1">
-                            <Grid Margin="10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="80" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="80" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="80" />
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="80" />
-                                </Grid.RowDefinitions>
-                                <Grid Grid.Column="1"
-                                      Grid.Row="0"
-                                      Background="Black"
-                                      Margin="5">
-                                    <Image Source="/Root_AOP01_Inspection;component/Resource/top.PNG" />
-                                </Grid>
-                                <Grid Grid.Column="2"
-                                      Grid.Row="1"
-                                      Background="Black"
-                                      Margin="5">
-                                    <Image Source="/Root_AOP01_Inspection;component/Resource/Right.PNG" />
-                                </Grid>
-                                <Grid Grid.Column="0"
-                                      Grid.Row="1"
-                                      Background="Black"
-                                      Margin="5">
-                                    <Image Source="/Root_AOP01_Inspection;component/Resource/Left.PNG" />
-                                </Grid>
-                                <Grid Grid.Column="1"
-                                      Grid.Row="2"
-                                      Background="Black"
-                                      Margin="5">
-                                    <Image Source="/Root_AOP01_Inspection;component/Resource/bottom.PNG" />
-                                </Grid>
-                                <Grid Grid.Column="1"
-                                      Grid.Row="1"
-                                      Background="Black"
-                                      Margin="5">
-                                    <Image Source="/Root_AOP01_Inspection;component/Resource/ReticlDefect.PNG" />
-                                </Grid>
                             </Grid>
-                        </GroupBox>
-                    </Grid>
-                    <Grid Grid.Column="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="1" x:Name ="ExistRTR"
+                                  Margin="5"
+                                  Background="LightGray">
+                                <TextBlock Text="RTR" 
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                            <Grid Grid.Column="2" x:Name = "ExistVision"
+                                  Margin="5"
+                                  Background="LightGray">
+                                <TextBlock Text="Vision" 
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Image View"
+                              Grid.Row="1">
+                        <Grid Margin="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="80" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="80" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="80" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Column="1"
+                                  Grid.Row="0"
+                                  Background="Black"
+                                  Margin="5">
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/top.PNG" />
+                            </Grid>
+                            <Grid Grid.Column="2"
+                                  Grid.Row="1"
+                                  Background="Black"
+                                  Margin="5">
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/Right.PNG" />
+                            </Grid>
+                            <Grid Grid.Column="0"
+                                  Grid.Row="1"
+                                  Background="Black"
+                                  Margin="5">
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/Left.PNG" />
+                            </Grid>
+                            <Grid Grid.Column="1"
+                                  Grid.Row="2"
+                                  Background="Black"
+                                  Margin="5">
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/bottom.PNG" />
+                            </Grid>
+                            <Grid Grid.Column="1"
+                                  Grid.Row="1"
+                                  Background="Black"
+                                  Margin="5">
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/ReticlDefect.PNG" />
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1.5*" />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition Height="1.5*" />
+                        <RowDefinition Height="1.5*" />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Pellicle Expanding">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="1.5*" />
                                 <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition Height="1.5*" />
-                                <RowDefinition Height="1.5*" />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-
+                                <RowDefinition Height="30" />
                             </Grid.RowDefinitions>
-                            <GroupBox Header="Pellicle Expanding">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition Height="30" />
-                                    </Grid.RowDefinitions>
-                                    <UniformGrid Margin="5"
-                                                 Rows="3"
-                                                 Columns="2">
-                                        <TextBlock Text="Result"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="Pass"
-                                                   Foreground="Green"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="Min"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="0"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="Max"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="0"
-                                                   VerticalAlignment="Center" />
-                                    </UniformGrid>
-                                    <Grid Grid.Row="1"
-                                          Margin="5">
-                                        <ProgressBar Value="100"
-                                                     Foreground="SteelBlue" />
-                                        <TextBlock Text="100%"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" />
-                                    </Grid>
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Header="Pellicle Haze"
-                                      Grid.Row="1">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition Height="30" />
-                                    </Grid.RowDefinitions>
-                                    <UniformGrid Margin="5"
-                                                 Rows="1"
-                                                 Columns="2">
-                                        <TextBlock Text="Result"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="-"
-                                                   VerticalAlignment="Center" />
-                                    </UniformGrid>
-                                    <Grid Grid.Row="1"
-                                          Margin="5">
-                                        <ProgressBar Value="55"
-                                                     Foreground="SteelBlue" />
-                                        <TextBlock Text="55%"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" />
-                                    </Grid>
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Header="Pattern Discolor"
-                                      Grid.Row="2">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition Height="30" />
-                                    </Grid.RowDefinitions>
-                                    <UniformGrid Margin="5"
-                                                 Rows="1"
-                                                 Columns="2">
-                                        <TextBlock Text="Result"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="-"
-                                                   Foreground="Green"
-                                                   VerticalAlignment="Center" />
-                                    </UniformGrid>
-                                    <Grid Grid.Row="1"
-                                          Margin="5">
-                                        <ProgressBar Value="0"
-                                                     Foreground="SteelBlue" />
-                                        <TextBlock Text="0%"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" />
-                                    </Grid>
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Header="Align Key Exist"
-                                      Grid.Row="3">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition Height="30" />
-                                    </Grid.RowDefinitions>
-                                    <UniformGrid Margin="5"
-                                                 Rows="1"
-                                                 Columns="2">
-                                        <TextBlock Text="Result"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="-"
-                                                   Foreground="Green"
-                                                   VerticalAlignment="Center" />
-                                    </UniformGrid>
-                                    <Grid Grid.Row="1"
-                                          Margin="5">
-                                        <ProgressBar Value="0"
-                                                     Foreground="SteelBlue" />
-                                        <TextBlock Text="0%"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" />
-                                    </Grid>
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Header="Pattern Shift"
-                                      Grid.Row="4">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition Height="30" />
-                                    </Grid.RowDefinitions>
-                                    <UniformGrid Margin="5"
-                                                 Rows="3"
-                                                 Columns="2">
-                                        <TextBlock Text="Result"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="-"
-                                                   Foreground="Green"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="Center"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="0"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="Angle"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="0"
-                                                   VerticalAlignment="Center" />
-                                    </UniformGrid>
-                                    <Grid Grid.Row="1"
-                                          Margin="5">
-                                        <ProgressBar Value="0"
-                                                     Foreground="SteelBlue" />
-                                        <TextBlock Text="0%"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" />
-                                    </Grid>
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Header="Pellicle Shift"
-                                      Grid.Row="5">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition Height="30" />
-                                    </Grid.RowDefinitions>
-                                    <UniformGrid Margin="5"
-                                                 Rows="3"
-                                                 Columns="2">
-                                        <TextBlock Text="Result"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="-"
-                                                   Foreground="Green"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="Center"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="0"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="Angle"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="0"
-                                                   VerticalAlignment="Center" />
-                                    </UniformGrid>
-                                    <Grid Grid.Row="1"
-                                          Margin="5">
-                                        <ProgressBar Value="0"
-                                                     Foreground="SteelBlue" />
-                                        <TextBlock Text="0%"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" />
-                                    </Grid>
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Header="Pellicle FrontSide"
-                                      Grid.Row="6">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition Height="30" />
-                                    </Grid.RowDefinitions>
-                                    <UniformGrid Margin="5"
-                                                 Rows="1"
-                                                 Columns="2">
-                                        <TextBlock Text="Pellicle FrontSide"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="0"
-                                                   VerticalAlignment="Center" />
-                                    </UniformGrid>
-                                    <Grid Grid.Row="1"
-                                          Margin="5">
-                                        <ProgressBar Value="0"
-                                                     Foreground="SteelBlue" />
-                                        <TextBlock Text="0%"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" />
-                                    </Grid>
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Header="Barcode Scratch"
-                                      Grid.Row="7">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition Height="30" />
-                                    </Grid.RowDefinitions>
-                                    <UniformGrid Margin="10"
-                                                 Rows="1"
-                                                 Columns="2">
-                                        <TextBlock Text="Defect Count"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="0"
-                                                   VerticalAlignment="Center" />
-                                    </UniformGrid>
-                                    <Grid Grid.Row="1"
-                                          Margin="5">
-                                        <ProgressBar Value="0"
-                                                     Foreground="SteelBlue" />
-                                        <TextBlock Text="0%"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" />
-                                    </Grid>
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Header="Edge Broken"
-                                      Grid.Row="8">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition Height="30" />
-                                    </Grid.RowDefinitions>
-                                    <UniformGrid Margin="5"
-                                                 Rows="1"
-                                                 Columns="2">
-                                        <TextBlock Text="Defect Count"
-                                                   VerticalAlignment="Center" />
-                                        <TextBlock Text="0"
-                                                   VerticalAlignment="Center" />
-                                    </UniformGrid>
-                                    <Grid Grid.Row="1"
-                                          Margin="5">
-                                        <ProgressBar Value="0"
-                                                     Foreground="SteelBlue" />
-                                        <TextBlock Text="0%"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" />
-                                    </Grid>
-                                </Grid>
-                            </GroupBox>
+                            <UniformGrid Margin="10,5"
+                                         Rows="3"
+                                         Columns="2">
+                                <TextBlock Text="Result"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="Pass"
+                                           Foreground="Green"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="Min"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="0"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="Max"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="0"
+                                           VerticalAlignment="Center" />
+                            </UniformGrid>
+                            <Grid Grid.Row="1"
+                                  Margin="5,3">
+                                <ProgressBar Value="100"
+                                             Foreground="SteelBlue" />
+                                <TextBlock Text="100%"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
                         </Grid>
-                        <Grid Grid.Column="1">
+                    </GroupBox>
+                    <GroupBox Header="Pellicle Haze"
+                              Grid.Row="1">
+                        <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition />
-                                <RowDefinition Height="2*" />
+                                <RowDefinition Height="30" />
                             </Grid.RowDefinitions>
-                            <GroupBox Header="Defect Image"
-                                      Grid.Row="0">
-                                <Grid Background="Black">
-                                    <Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG" />
-                                </Grid>
-                            </GroupBox>
-                            <GroupBox Header="Defect List"
-                                      Grid.Row="1">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <WrapPanel>
-                                        <CheckBox Content="All"
-                                                  Margin="3"
-                                                  IsChecked="True" />
-                                        <CheckBox Content="Pellicle"
-                                                  Margin="3" />
-                                        <CheckBox Content="Barcode"
-                                                  Margin="3" />
-                                        <CheckBox Content="Edge"
-                                                  Margin="3" />
-                                    </WrapPanel>
-                                    <DataGrid IsReadOnly="True"
-                                              Grid.Row="1">
-                                        <DataGrid.Resources>
-                                            <Style TargetType="DataGridColumnHeader">
-                                                <Setter Property="HorizontalAlignment"
-                                                        Value="Stretch" />
-                                                <Setter Property="HorizontalContentAlignment"
-                                                        Value="Center" />
-                                            </Style>
-                                        </DataGrid.Resources>
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn  Header="No."
-                                                                 Binding="{Binding Path=a}"
-                                                                 Width="0.5*" />
-                                            <DataGridTextColumn  Header="Location"
-                                                                 Binding="{Binding Path=b}"
-                                                                 Width="1.5*" />
-                                            <DataGridTextColumn  Header="Size"
-                                                                 Binding="{Binding Path=c}"
-                                                                 Width="*" />
-                                            <DataGridTextColumn  Header="Gv"
-                                                                 Binding="{Binding Path=d}"
-                                                                 Width="0.5*" />
-                                            <DataGridTextColumn  Header="Code"
-                                                                 Binding="{Binding Path=e}"
-                                                                 Width="*" />
-                                        </DataGrid.Columns>
-                                        <local:Dummy a="0"
-                                                     b="1078, 2395"
-                                                     c="1.4mm"
-                                                     d="32"
-                                                     e="0x000000" />
-                                        <local:Dummy a="1"
-                                                     b="2395, 1078"
-                                                     c="2.2mm"
-                                                     d="24"
-                                                     e="0x000000" />
-                                        <local:Dummy a="2"
-                                                     b="8078, 3355"
-                                                     c="1.1mm"
-                                                     d="57"
-                                                     e="0x000000" />
-                                        <local:Dummy a="3"
-                                                     b="2678, 6345"
-                                                     c="1.8mm"
-                                                     d="61"
-                                                     e="0x000000" />
-                                        <local:Dummy a="4"
-                                                     b="4378, 6385"
-                                                     c="1.6mm"
-                                                     d="55"
-                                                     e="0x000000" />
-                                        <local:Dummy a="5"
-                                                     b="7178, 5375"
-                                                     c="1.6mm"
-                                                     d="71"
-                                                     e="0x000000" />
-                                        <local:Dummy a="6"
-                                                     b="8978, 3305"
-                                                     c="2.4mm"
-                                                     d="56"
-                                                     e="0x000000" />
-                                        <local:Dummy a="7"
-                                                     b="1078, 2395"
-                                                     c="1.4mm"
-                                                     d="32"
-                                                     e="0x000000" />
-                                        <local:Dummy a="8"
-                                                     b="2395, 1078"
-                                                     c="2.2mm"
-                                                     d="24"
-                                                     e="0x000000" />
-                                        <local:Dummy a="9"
-                                                     b="8078, 3355"
-                                                     c="1.1mm"
-                                                     d="57"
-                                                     e="0x000000" />
-                                        <local:Dummy a="10"
-                                                     b="2678, 6345"
-                                                     c="1.8mm"
-                                                     d="61"
-                                                     e="0x000000" />
-                                        <local:Dummy a="11"
-                                                     b="4378, 6385"
-                                                     c="1.6mm"
-                                                     d="55"
-                                                     e="0x000000" />
-                                        <local:Dummy a="12"
-                                                     b="7178, 5375"
-                                                     c="1.6mm"
-                                                     d="71"
-                                                     e="0x000000" />
-                                        <local:Dummy a="13"
-                                                     b="8978, 3305"
-                                                     c="2.4mm"
-                                                     d="56"
-                                                     e="0x000000" />
-                                        <local:Dummy a="14"
-                                                     b="2678, 6345"
-                                                     c="1.8mm"
-                                                     d="61"
-                                                     e="0x000000" />
-                                        <local:Dummy a="15"
-                                                     b="4378, 6385"
-                                                     c="1.6mm"
-                                                     d="55"
-                                                     e="0x000000" />
-                                        <local:Dummy a="16"
-                                                     b="7178, 5375"
-                                                     c="1.6mm"
-                                                     d="71"
-                                                     e="0x000000" />
-                                        <local:Dummy a="17"
-                                                     b="8978, 3305"
-                                                     c="2.4mm"
-                                                     d="56"
-                                                     e="0x000000" />
-                                        <local:Dummy a="18"
-                                                     b="2678, 6345"
-                                                     c="1.8mm"
-                                                     d="61"
-                                                     e="0x000000" />
-                                        <local:Dummy a="19"
-                                                     b="4378, 6385"
-                                                     c="1.6mm"
-                                                     d="55"
-                                                     e="0x000000" />
-                                        <local:Dummy a="20"
-                                                     b="7178, 5375"
-                                                     c="1.6mm"
-                                                     d="71"
-                                                     e="0x000000" />
-                                        <local:Dummy a="21"
-                                                     b="8978, 3305"
-                                                     c="2.4mm"
-                                                     d="56"
-                                                     e="0x000000" />
-                                        <local:Dummy a="22"
-                                                     b="2678, 6345"
-                                                     c="1.8mm"
-                                                     d="61"
-                                                     e="0x000000" />
-                                        <local:Dummy a="23"
-                                                     b="4378, 6385"
-                                                     c="1.6mm"
-                                                     d="55"
-                                                     e="0x000000" />
-                                        <local:Dummy a="24"
-                                                     b="7178, 5375"
-                                                     c="1.6mm"
-                                                     d="71"
-                                                     e="0x000000" />
-                                        <local:Dummy a="25"
-                                                     b="8978, 3305"
-                                                     c="2.4mm"
-                                                     d="56"
-                                                     e="0x000000" />
-                                        <local:Dummy a="26"
-                                                     b="7178, 5375"
-                                                     c="1.6mm"
-                                                     d="71"
-                                                     e="0x000000" />
-                                        <local:Dummy a="27"
-                                                     b="8978, 3305"
-                                                     c="2.4mm"
-                                                     d="56"
-                                                     e="0x000000" />
-                                        <local:Dummy a="28"
-                                                     b="2678, 6345"
-                                                     c="1.8mm"
-                                                     d="61"
-                                                     e="0x000000" />
-                                        <local:Dummy a="29"
-                                                     b="4378, 6385"
-                                                     c="1.6mm"
-                                                     d="55"
-                                                     e="0x000000" />
-                                        <local:Dummy a="30"
-                                                     b="7178, 5375"
-                                                     c="1.6mm"
-                                                     d="71"
-                                                     e="0x000000" />
-                                        <local:Dummy a="31"
-                                                     b="8978, 3305"
-                                                     c="2.4mm"
-                                                     d="56"
-                                                     e="0x000000" />
-                                    </DataGrid>
-                                </Grid>
-                            </GroupBox>
+                            <UniformGrid Margin="10,5"
+                                         Rows="1"
+                                         Columns="2">
+                                <TextBlock Text="Result"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="-"
+                                           VerticalAlignment="Center" />
+                            </UniformGrid>
+                            <Grid Grid.Row="1"
+                                  Margin="5,3">
+                                <ProgressBar Value="55"
+                                             Foreground="SteelBlue" />
+                                <TextBlock Text="55%"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
                         </Grid>
-                    </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Pattern Discolor"
+                              Grid.Row="2">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="30" />
+                            </Grid.RowDefinitions>
+                            <UniformGrid Margin="10,5"
+                                         Rows="1"
+                                         Columns="2">
+                                <TextBlock Text="Result"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="-"
+                                           Foreground="Green"
+                                           VerticalAlignment="Center" />
+                            </UniformGrid>
+                            <Grid Grid.Row="1"
+                                  Margin="5,3">
+                                <ProgressBar Value="0"
+                                             Foreground="SteelBlue" />
+                                <TextBlock Text="0%"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Align Key Exist"
+                              Grid.Row="3">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="30" />
+                            </Grid.RowDefinitions>
+                            <UniformGrid Margin="10,5"
+                                         Rows="1"
+                                         Columns="2">
+                                <TextBlock Text="Result"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="-"
+                                           Foreground="Green"
+                                           VerticalAlignment="Center" />
+                            </UniformGrid>
+                            <Grid Grid.Row="1"
+                                  Margin="5,3">
+                                <ProgressBar Value="0"
+                                             Foreground="SteelBlue" />
+                                <TextBlock Text="0%"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Pattern Shift"
+                              Grid.Row="4">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="30" />
+                            </Grid.RowDefinitions>
+                            <UniformGrid Margin="10,5"
+                                         Rows="3"
+                                         Columns="2">
+                                <TextBlock Text="Result"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="-"
+                                           Foreground="Green"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="Center"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="0"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="Angle"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="0"
+                                           VerticalAlignment="Center" />
+                            </UniformGrid>
+                            <Grid Grid.Row="1"
+                                  Margin="5,3">
+                                <ProgressBar Value="0"
+                                             Foreground="SteelBlue" />
+                                <TextBlock Text="0%"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Pellicle Shift"
+                              Grid.Row="5">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="30" />
+                            </Grid.RowDefinitions>
+                            <UniformGrid Margin="10,5"
+                                         Rows="3"
+                                         Columns="2">
+                                <TextBlock Text="Result"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="-"
+                                           Foreground="Green"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="Center"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="0"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="Angle"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="0"
+                                           VerticalAlignment="Center" />
+                            </UniformGrid>
+                            <Grid Grid.Row="1"
+                                  Margin="5,3">
+                                <ProgressBar Value="0"
+                                             Foreground="SteelBlue" />
+                                <TextBlock Text="0%"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Pellicle FrontSide"
+                              Grid.Row="6">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="30" />
+                            </Grid.RowDefinitions>
+                            <UniformGrid Margin="10,5"
+                                         Rows="1"
+                                         Columns="2">
+                                <TextBlock Text="Pellicle FrontSide"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="0"
+                                           VerticalAlignment="Center" />
+                            </UniformGrid>
+                            <Grid Grid.Row="1"
+                                  Margin="5,3">
+                                <ProgressBar Value="0"
+                                             Foreground="SteelBlue" />
+                                <TextBlock Text="0%"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Barcode Scratch"
+                              Grid.Row="7">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="30" />
+                            </Grid.RowDefinitions>
+                            <UniformGrid Margin="10,5"
+                                         Rows="1"
+                                         Columns="2">
+                                <TextBlock Text="Defect Count"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="0"
+                                           VerticalAlignment="Center" />
+                            </UniformGrid>
+                            <Grid Grid.Row="1"
+                                  Margin="5,3">
+                                <ProgressBar Value="0"
+                                             Foreground="SteelBlue" />
+                                <TextBlock Text="0%"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Edge Broken"
+                              Grid.Row="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="30" />
+                            </Grid.RowDefinitions>
+                            <UniformGrid Margin="10,5"
+                                         Rows="1"
+                                         Columns="2">
+                                <TextBlock Text="Defect Count"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="0"
+                                           VerticalAlignment="Center" />
+                            </UniformGrid>
+                            <Grid Grid.Row="1"
+                                  Margin="5,3">
+                                <ProgressBar Value="0"
+                                             Foreground="SteelBlue" />
+                                <TextBlock Text="0%"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Column="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="2.5*" />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Defect Image"
+                              Grid.Row="0">
+                        <Grid Background="Black">
+                            <Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG" />
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Defect List"
+                              Grid.Row="1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <WrapPanel>
+                                <CheckBox Content="All"
+                                          Margin="3"
+                                          IsChecked="True" />
+                                <CheckBox Content="Pellicle"
+                                          Margin="3" />
+                                <CheckBox Content="Barcode"
+                                          Margin="3" />
+                                <CheckBox Content="Edge"
+                                          Margin="3" />
+                            </WrapPanel>
+                            <DataGrid IsReadOnly="True"
+                                      Grid.Row="1">
+                                <DataGrid.Resources>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalAlignment"
+                                                Value="Stretch" />
+                                        <Setter Property="HorizontalContentAlignment"
+                                                Value="Center" />
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn  Header="No."
+                                                         Binding="{Binding Path=a}"
+                                                         Width="0.5*" />
+                                    <DataGridTextColumn  Header="Location"
+                                                         Binding="{Binding Path=b}"
+                                                         Width="1.5*" />
+                                    <DataGridTextColumn  Header="Size"
+                                                         Binding="{Binding Path=c}"
+                                                         Width="*" />
+                                    <DataGridTextColumn  Header="Gv"
+                                                         Binding="{Binding Path=d}"
+                                                         Width="0.5*" />
+                                    <DataGridTextColumn  Header="Code"
+                                                         Binding="{Binding Path=e}"
+                                                         Width="*" />
+                                </DataGrid.Columns>
+                                <local:Dummy a="0"
+                                             b="1078, 2395"
+                                             c="1.4mm"
+                                             d="32"
+                                             e="0x000000" />
+                                <local:Dummy a="1"
+                                             b="2395, 1078"
+                                             c="2.2mm"
+                                             d="24"
+                                             e="0x000000" />
+                                <local:Dummy a="2"
+                                             b="8078, 3355"
+                                             c="1.1mm"
+                                             d="57"
+                                             e="0x000000" />
+                                <local:Dummy a="3"
+                                             b="2678, 6345"
+                                             c="1.8mm"
+                                             d="61"
+                                             e="0x000000" />
+                                <local:Dummy a="4"
+                                             b="4378, 6385"
+                                             c="1.6mm"
+                                             d="55"
+                                             e="0x000000" />
+                                <local:Dummy a="5"
+                                             b="7178, 5375"
+                                             c="1.6mm"
+                                             d="71"
+                                             e="0x000000" />
+                                <local:Dummy a="6"
+                                             b="8978, 3305"
+                                             c="2.4mm"
+                                             d="56"
+                                             e="0x000000" />
+                                <local:Dummy a="7"
+                                             b="1078, 2395"
+                                             c="1.4mm"
+                                             d="32"
+                                             e="0x000000" />
+                                <local:Dummy a="8"
+                                             b="2395, 1078"
+                                             c="2.2mm"
+                                             d="24"
+                                             e="0x000000" />
+                                <local:Dummy a="9"
+                                             b="8078, 3355"
+                                             c="1.1mm"
+                                             d="57"
+                                             e="0x000000" />
+                                <local:Dummy a="10"
+                                             b="2678, 6345"
+                                             c="1.8mm"
+                                             d="61"
+                                             e="0x000000" />
+                                <local:Dummy a="11"
+                                             b="4378, 6385"
+                                             c="1.6mm"
+                                             d="55"
+                                             e="0x000000" />
+                                <local:Dummy a="12"
+                                             b="7178, 5375"
+                                             c="1.6mm"
+                                             d="71"
+                                             e="0x000000" />
+                                <local:Dummy a="13"
+                                             b="8978, 3305"
+                                             c="2.4mm"
+                                             d="56"
+                                             e="0x000000" />
+                                <local:Dummy a="14"
+                                             b="2678, 6345"
+                                             c="1.8mm"
+                                             d="61"
+                                             e="0x000000" />
+                                <local:Dummy a="15"
+                                             b="4378, 6385"
+                                             c="1.6mm"
+                                             d="55"
+                                             e="0x000000" />
+                                <local:Dummy a="16"
+                                             b="7178, 5375"
+                                             c="1.6mm"
+                                             d="71"
+                                             e="0x000000" />
+                                <local:Dummy a="17"
+                                             b="8978, 3305"
+                                             c="2.4mm"
+                                             d="56"
+                                             e="0x000000" />
+                                <local:Dummy a="18"
+                                             b="2678, 6345"
+                                             c="1.8mm"
+                                             d="61"
+                                             e="0x000000" />
+                                <local:Dummy a="19"
+                                             b="4378, 6385"
+                                             c="1.6mm"
+                                             d="55"
+                                             e="0x000000" />
+                                <local:Dummy a="20"
+                                             b="7178, 5375"
+                                             c="1.6mm"
+                                             d="71"
+                                             e="0x000000" />
+                                <local:Dummy a="21"
+                                             b="8978, 3305"
+                                             c="2.4mm"
+                                             d="56"
+                                             e="0x000000" />
+                                <local:Dummy a="22"
+                                             b="2678, 6345"
+                                             c="1.8mm"
+                                             d="61"
+                                             e="0x000000" />
+                                <local:Dummy a="23"
+                                             b="4378, 6385"
+                                             c="1.6mm"
+                                             d="55"
+                                             e="0x000000" />
+                                <local:Dummy a="24"
+                                             b="7178, 5375"
+                                             c="1.6mm"
+                                             d="71"
+                                             e="0x000000" />
+                                <local:Dummy a="25"
+                                             b="8978, 3305"
+                                             c="2.4mm"
+                                             d="56"
+                                             e="0x000000" />
+                                <local:Dummy a="26"
+                                             b="7178, 5375"
+                                             c="1.6mm"
+                                             d="71"
+                                             e="0x000000" />
+                                <local:Dummy a="27"
+                                             b="8978, 3305"
+                                             c="2.4mm"
+                                             d="56"
+                                             e="0x000000" />
+                                <local:Dummy a="28"
+                                             b="2678, 6345"
+                                             c="1.8mm"
+                                             d="61"
+                                             e="0x000000" />
+                                <local:Dummy a="29"
+                                             b="4378, 6385"
+                                             c="1.6mm"
+                                             d="55"
+                                             e="0x000000" />
+                                <local:Dummy a="30"
+                                             b="7178, 5375"
+                                             c="1.6mm"
+                                             d="71"
+                                             e="0x000000" />
+                                <local:Dummy a="31"
+                                             b="8978, 3305"
+                                             c="2.4mm"
+                                             d="56"
+                                             e="0x000000" />
+                            </DataGrid>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Column="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30*" />
+                        <RowDefinition Height="50*" />
+                        <RowDefinition Height="15*" />
+                    </Grid.RowDefinitions>
+                    <GroupBox Grid.Row="0">
+                        <StackPanel Grid.Row="1"
+                                Margin="0,10">
+                            <Button Content="Start"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Margin="0,0,0,10"
+                                Command="{Binding cmdStart}"/>
+                            <Button Content="Pause" 
+                                Style="{StaticResource SetupPanelBtn}"
+                                Margin="0,0,0,10"
+                                Name="PauseResume"
+                                Click="ButtonPause_Click" />
+                            <Button Content="Initialize"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Margin="0,0,0,10"
+                                Click="ButtonInitialize_Click" />
+                            <Button Content="Recovery"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Margin="0,0,0,10"
+                                Click="ButtonRecovery_Click" />
+                            <Button Content="Buzzer Off"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Margin="0,0,0,10"
+                                Click="ButtonBuzzerOff_Click" />
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Grid.Row="1"
+                        Header="Module State">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid Margin="10,5"
+                                  Grid.Row="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="LoadPort A"
+                                           VerticalAlignment="Bottom"
+                                           FontSize="13"
+                                           FontWeight="Bold" />
+                                <Border Grid.Row="1"
+                                        CornerRadius="2"
+                                        Margin="0,0,0,0"
+                                        BorderBrush="DimGray"
+                                        BorderThickness="1"
+                                        Background="{StaticResource PanelBackGround}">
+                                    <TextBlock Text="{Binding p_eState}" Name ="LoadportA_State"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Border>
+
+                            </Grid>
+                            <Grid Margin="10,5"
+                                  Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="LoadPort B"
+                                           VerticalAlignment="Bottom"
+                                           FontSize="13"
+                                           FontWeight="Bold" />
+                                <Border Grid.Row="1"
+                                        CornerRadius="2"
+                                        Margin="0,0,0,0"
+                                        BorderBrush="DimGray"
+                                        BorderThickness="1"
+                                        Background="{StaticResource PanelBackGround}">
+                                    <TextBlock Text="{Binding p_eState}" Name ="LoadportB_State"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Border>
+
+                            </Grid>
+                            <Grid Margin="10,5"
+                                  Grid.Row="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="RTR"
+                                           VerticalAlignment="Bottom"
+                                           FontSize="13"
+                                           FontWeight="Bold" />
+                                <Border Grid.Row="1"
+                                        CornerRadius="2"
+                                        BorderBrush="DimGray"
+                                        BorderThickness="1"
+                                        Background="{StaticResource PanelBackGround}">
+                                    <TextBlock Text="{Binding p_eState}" Name ="RTR_State"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Border>
+                            </Grid>
+                            <Grid Margin="10,5"
+                                  Grid.Row="3">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Pattern"
+                                           VerticalAlignment="Bottom"
+                                           FontSize="13"
+                                           FontWeight="Bold" />
+                                <Border Grid.Row="1"
+                                        CornerRadius="2"
+                                        BorderBrush="DimGray"
+                                        BorderThickness="1"
+                                        Background="{StaticResource PanelBackGround}">
+                                    <TextBlock Text="Ready"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Border>
+                            </Grid>
+                            <Grid Margin="10,5"
+                                  Grid.Row="4">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Pellicle"
+                                           VerticalAlignment="Bottom"
+                                           FontSize="13"
+                                           FontWeight="Bold" />
+                                <Border Grid.Row="1"
+                                        CornerRadius="2"
+                                        BorderBrush="DimGray"
+                                        BorderThickness="1"
+                                        Background="{StaticResource PanelBackGround}">
+                                    <TextBlock Text="Ready"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Border>
+                            </Grid>
+                            <Grid Margin="10,5"
+                                  Grid.Row="5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="LADS"
+                                           VerticalAlignment="Bottom"
+                                           FontSize="13"
+                                           FontWeight="Bold" />
+                                <Border Grid.Row="1"
+                                        CornerRadius="2"
+                                        BorderBrush="DimGray"
+                                        BorderThickness="1"
+                                        Background="{StaticResource PanelBackGround}">
+                                    <TextBlock Text="Ready"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Border>
+                            </Grid>
+                            <Grid Margin="10,5"
+                                  Grid.Row="6">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Side"
+                                           VerticalAlignment="Bottom"
+                                           FontSize="13"
+                                           FontWeight="Bold" />
+                                <Border Grid.Row="1"
+                                        CornerRadius="2"
+                                        BorderBrush="DimGray"
+                                        BorderThickness="1"
+                                        Background="{StaticResource PanelBackGround}">
+                                    <TextBlock Text="Ready"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Border>
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                <GroupBox Grid.Row="2">
+                        <StackPanel VerticalAlignment="Bottom">
+                            <Button x:Name="buttonOHT" Content="OHT" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
+                    Margin="0,0,0,10" Click="ButtonOHT_Click"/>
+                            <Button x:Name="buttonAlarmList" Content="AlarmList" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
+                    Margin="0,0,0,10" Click="ButtonAlarmList_Click"/>
+                        </StackPanel>
+                    </GroupBox>
                 </Grid>
             </Grid>
         </StackPanel>

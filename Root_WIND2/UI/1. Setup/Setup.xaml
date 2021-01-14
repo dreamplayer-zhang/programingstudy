@@ -3,10 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:PackIcon="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="888" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
-        
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -214,8 +213,7 @@
                                     Command="{Binding p_CurrentPanel.DataContext.btnBack}"
                                     Background="{StaticResource ControlBackGround}">
                             <StackPanel Orientation="Horizontal">
-                                <!--<TextBlock Text="Back"/>-->
-                                <material:PackIcon Kind="ArrowLeftBold"/>
+                                <PackIcon:PackIconMaterial Kind="ArrowLeftBold"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -227,7 +225,7 @@
                                     Background="{StaticResource ControlBackGround}">
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Home"/>-->
-                                <material:PackIcon Kind="Home"/>
+                                <PackIcon:PackIconMaterial Kind="Home" />
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -239,8 +237,7 @@
                                     Command="{Binding btnNewRecipe}">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
-                                    <!--<TextBlock Text="Save"/>-->
-                                    <material:PackIcon Kind="FilePlusOutline"/>
+                                    <PackIcon:PackIconMaterial Kind="FolderPlus"/>
                                 </StackPanel>
                             </Button.Content>
                         </Button>
@@ -253,7 +250,8 @@
                                     Command="{Binding btnLoadRecipe}">
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Load"/>-->
-                                <material:PackIcon Kind="FolderOpen"/>
+                                <!--<material:PackIcon Kind="FolderOpen"/>-->
+                                <PackIcon:PackIconMaterial Kind="FolderOpen" />
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -265,8 +263,7 @@
                                     Command="{Binding btnSaveRecipe}">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
-                                    <!--<TextBlock Text="Save"/>-->
-                                    <material:PackIcon Kind="ContentSave"/>
+                                    <PackIcon:PackIconMaterial Kind="ContentSave" />
                                 </StackPanel>
                             </Button.Content>
                         </Button>
