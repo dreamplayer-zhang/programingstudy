@@ -6,9 +6,9 @@ namespace RootTools.OHTNew
     {
         string p_id { get; set; }
 
-        string RunDocking();
+        string StartRunDocking();
 
-        string RunUndocking();
+        string StartRunUndocking();
 
         InfoCarrier p_infoCarrier { get; set; }
 
