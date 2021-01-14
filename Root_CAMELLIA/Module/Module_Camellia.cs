@@ -178,6 +178,7 @@ namespace Root_CAMELLIA.Module
         }
         #endregion
 
+        #endregion
 
         public override void GetTools(bool bInit)
         {
@@ -191,8 +192,6 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.Get(ref m_vacuum, this, "Vaccum On");
             p_sInfo = m_toolBox.Get(ref m_vacuumOnOff, this, "Vaccum OnOff");
         }
-        #endregion
-
         public Module_Camellia(string id, IEngineer engineer)
         {
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
