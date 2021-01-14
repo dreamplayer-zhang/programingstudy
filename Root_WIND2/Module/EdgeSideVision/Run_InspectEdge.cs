@@ -20,11 +20,11 @@ namespace Root_WIND2.Module
 		int sideOffset = 45;
 		int btmOffset = 90;
 
-		int roiHeight = 1000;
-		int roiWidth = 3000;
-		int threshhold = 12;
-		int size = 5;
-		int mergeDist = 5;
+		//int roiHeight = 1000;
+		//int roiWidth = 3000;
+		//int threshhold = 12;
+		//int size = 5;
+		//int mergeDist = 5;
 
 		#region [Getter/Setter]
 		public InspectionManagerEdge InspectionEdge
@@ -52,11 +52,11 @@ namespace Root_WIND2.Module
 			run.inspectionEdge = ProgramManager.Instance.InspectionEdge;
 			run.recipeName = recipeName;
 
-			run.roiHeight = roiHeight;
-			run.roiWidth = roiWidth;
-			run.size = size;
-			run.mergeDist = mergeDist;
-			run.threshhold = threshhold;
+			//run.roiHeight = roiHeight;
+			//run.roiWidth = roiWidth;
+			//run.size = size;
+			//run.mergeDist = mergeDist;
+			//run.threshhold = threshhold;
 
 			run.topOffset = topOffset;
 			run.sideOffset = sideOffset;
