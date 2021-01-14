@@ -267,7 +267,6 @@ namespace RootTools_Vision
         private void Reset()
         {
             this.workBundle.Clear();
-            this.workBundle = null;
 
             this.workplaceBundle.Reset();
 
