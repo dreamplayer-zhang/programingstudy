@@ -74,8 +74,6 @@ namespace Root_WIND2
             inspectionMgrVision = _inspectionMgrVision;
             inspectionMgrEdge = _inspectionMgrEdge;
             init();
-            
-            
         }
 
         public void init()
@@ -89,9 +87,7 @@ namespace Root_WIND2
         public void UI_Redraw()
         {
             frontsideVM.UI_Redraw();
-            // Back
-            // Edr
-            // Edge
+            edgeVM.UI_Redraw();
         }
 
         private void InitAllPanel()

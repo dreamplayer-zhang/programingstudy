@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Database;
 using RootTools_Vision;
+using RootTools_CLR;
 using LiveCharts;
 using LiveCharts.Wpf;
 using System;
@@ -101,7 +102,7 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(SearchLotinfoData);
+                return new RelayCommand(GoldenImageTrend);
             }
         }
         public ICommand btnSaveTrend
@@ -537,6 +538,8 @@ namespace Root_WIND2
         }
 
         // Golden Image Trend Tab
+        private List<byte[]> goldenImagesData = new List<byte[]>();
+        private int goldenImageW = 0, goldenImageH = 0;
         private ObservableCollection<ListViewItemTemplate> goldenImageList = new ObservableCollection<ListViewItemTemplate>();
         public ObservableCollection<ListViewItemTemplate> GoldenImageList
         {
@@ -576,6 +579,7 @@ namespace Root_WIND2
                 SetProperty(ref goldenImage, value);
             }
         }
+
         #endregion
 
         #region DataTypeEnum
@@ -728,14 +732,29 @@ namespace Root_WIND2
 
             foreach (string path in imgNames)
             {
-                
-                ListViewItemTemplate temp = new ListViewItemTemplate();
-                temp.GoldenImgData = new BitmapImage(new (path));
-                temp.Title = path.Substring(imgPath.Length, path.Length - imgPath.Length - 4); // 끝에 .bmp 제거
+                unsafe {
+                    fixed (int* w = &goldenImageW, h = &goldenImageH)
+                        goldenImagesData.Add(Tools.LoadBitmapToRawdata(path, w, h));
 
-                for(int i = 0; i < 3; i++)
-                GoldenImageList.Add(temp);
+                    ListViewItemTemplate temp = new ListViewItemTemplate();
+
+                    temp.GoldenImgData = new BitmapImage(new (path));
+                    temp.Title = path.Substring(imgPath.Length, path.Length - imgPath.Length - 4); // 끝에 .bmp 제거
+
+                    GoldenImageList.Add(temp);
+                }
             }
+        }
+
+        public void GoldenImageTrend()
+        {
+            List<byte[]> goldenImg = new List<byte[]>();
+            
+            byte[] dstImg = new byte[goldenImagesData[0].Length];
+            CLR_IP.Cpp_GoldenImageReview(goldenImagesData.ToArray(), dstImg, goldenImagesData.Count, goldenImageW, goldenImageH);
+
+            GoldenImage = Tools.BitmapFromSource(Tools.CovertArrayToBitmap(dstImg, goldenImageW, goldenImageH, 3));
+
         }
         public object GetDataGridItem(DataTable table, DataRow datarow, string sColumnName)
         {
