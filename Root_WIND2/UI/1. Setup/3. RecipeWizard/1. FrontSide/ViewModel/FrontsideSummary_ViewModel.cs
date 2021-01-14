@@ -25,7 +25,7 @@ namespace Root_WIND2
             this.recipe = _recipe;
 
             MapControl_VM = new MapControl_ViewModel(this.setup.InspectionVision, recipe);
-            MapControl_VM.SetMap(setup.InspectionVision.mapdata, new CPoint(14, 14));
+            MapControl_VM.SetMap(setup.InspectionVision.Recipe.WaferMap.Data, new CPoint(14, 14));
             
             timer.Interval = TimeSpan.FromSeconds(1);    
             timer.Tick += new EventHandler(DateTimeUpdate);         
@@ -297,7 +297,7 @@ namespace Root_WIND2
             }
             else
             {
-                MapControl_VM.SetMap(false, new CPoint(0, 5), setup.InspectionVision.mapdata, new CPoint(14, 14));
+                MapControl_VM.SetMap(false, new CPoint(0, 5), setup.InspectionVision.Recipe.WaferMap.Data, new CPoint(14, 14));
             }
         }
         private void SetMapData()

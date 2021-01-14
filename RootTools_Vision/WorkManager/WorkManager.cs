@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
     public enum STATE_CHECK_TYPE
     {

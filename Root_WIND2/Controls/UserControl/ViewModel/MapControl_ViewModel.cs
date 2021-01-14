@@ -53,12 +53,12 @@ namespace Root_WIND2
             {
                 Workplace workplace = args.workplace;
 
-                int x = workplace.MapPositionX;
-                int y = workplace.MapPositionY;
+                int x = workplace.MapIndexX;
+                int y = workplace.MapIndexY;
 
                 if (x < 0 || y < 0) return;
 
-                WORK_TYPE state = workplace.STATE;
+                WORK_TYPE state = workplace.WorkState;
 
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
                 {
@@ -116,9 +116,9 @@ namespace Root_WIND2
         public void CreateMapUI(int[] map = null, CPoint mapsize = null)
         {
             // 여기 예외처리 이상함
-            if (map == null)
+            if (map == null ||  map.Length == 0)
             {
-                if (Map == null) return;
+                if (Map == null || Map.Length == 0) return;
 
                 map = Map;
                 mapsize = MapSize;

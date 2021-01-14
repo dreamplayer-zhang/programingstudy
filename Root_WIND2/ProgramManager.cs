@@ -140,12 +140,13 @@ namespace Root_WIND2
                 Directory.CreateDirectory(recipeFolderPath);
 
             // Front
-            this.InspectionFront = new InspectionManagerFrontside(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
-            this.InspectionFront.SetColorSharedBuffer(image.GetPtr(0), image.GetPtr(1), image.GetPtr(2));
+            this.InspectionFront = new InspectionManagerFrontside(this.recipe, 
+                new SharedBufferInfo(image.GetPtr(0), image.p_Size.X, image.p_Size.Y, image.p_nByte, image.GetPtr(1), image.GetPtr(2)));
+
 
 
             this.Engineer.InspectionFront = this.InspectionFront;
-            this.Engineer.InspectionFront.Recipe = this.recipe;
+
 
             // Back
             this.InspectionBack = new InspectionManagerBackside(image.GetPtr(), image.p_Size.X, image.p_Size.Y);

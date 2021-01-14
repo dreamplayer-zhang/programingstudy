@@ -28,12 +28,12 @@ namespace Root_WIND2
 			this.sharedBufferByteCnt = _byteCnt;
 		}
 
-		protected override void InitWorkManager()
-		{
-			//this.Add(new WorkManager("Snap", WORK_TYPE.SNAP, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
-			this.Add(new WorkManager("EdgeSurface", WORK_TYPE.INSPECTION, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
-			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.WAFER));
-		}
+		//protected override void InitWorkManager()
+		//{
+		//	//this.Add(new WorkManager("Snap", WORK_TYPE.SNAP, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
+		//	this.Add(new WorkManager("EdgeSurface", WORK_TYPE.INSPECTION, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
+		//	this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.WAFER));
+		//}
 
 		public enum InsepectionMode
 		{
@@ -75,7 +75,7 @@ namespace Root_WIND2
 			return CreateInspection(this.recipe);
 		}
 
-		public override bool CreateInspection(Recipe _recipe)
+		public bool CreateInspection(Recipe _recipe)
 		{
 			workBundle = new WorkBundle();
 			workplaceBundle = new WorkplaceBundle();
@@ -84,19 +84,19 @@ namespace Root_WIND2
 			try 
 			{
 				// top
-				int memoryHeightTop = 10000;// this.SharedBufferHeight;
-				int memoryWidthTop = this.SharedBufferWidth;
+				//int memoryHeightTop = 10000;// this.SharedBufferHeight;
+				//int memoryWidthTop = this.SharedBufferWidth;
 				
-				for (int i = 0; i < memoryHeightTop / partitionNum; i++)
-				{
-					Workplace workplace = new Workplace(0, i, 0, partitionNum * i, memoryWidthTop, partitionNum);
-					workplace.SetSharedBuffer(this.SharedBufferR_Gray, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
-					workplace.SetSharedRGBBuffer(this.SharedBufferR_Gray, this.sharedBufferG, this.sharedBufferB);
+				//for (int i = 0; i < memoryHeightTop / partitionNum; i++)
+				//{
+				//	Workplace workplace = new Workplace(0, i, 0, partitionNum * i, memoryWidthTop, partitionNum);
+				//	workplace.SetSharedBuffer(this.SharedBufferR_Gray, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
+				//	workplace.SetSharedRGBBuffer(this.SharedBufferR_Gray, this.sharedBufferG, this.sharedBufferB);
 
-					workplaceBundle.Add(workplace);
-				}
-				workplaceBundle[0].SetSharedBuffer(this.SharedBufferR_Gray, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
-				workplaceBundle[0].SetSharedRGBBuffer(this.SharedBufferR_Gray, this.sharedBufferG, this.sharedBufferB);
+				//	workplaceBundle.Add(workplace);
+				//}
+				//workplaceBundle[0].SetSharedBuffer(this.SharedBufferR_Gray, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
+				//workplaceBundle[0].SetSharedRGBBuffer(this.SharedBufferR_Gray, this.sharedBufferG, this.sharedBufferB);
 
 				/*
 				// side
@@ -143,8 +143,8 @@ namespace Root_WIND2
 				workBundle.Add(processDefect_Wafer);
 				//workBundle.Add(processDefect);
 
-				if (this.SetBundles(this.workBundle, this.workplaceBundle) == false)
-					return false;
+				//if (this.SetBundles(this.workBundle, this.workplaceBundle) == false)
+				//	return false;
 			}
 			catch (Exception ex)
 			{
@@ -177,5 +177,25 @@ namespace Root_WIND2
 		{
 			base.Stop();
 		}
-	}
+
+        protected override void Initialize()
+        {
+            
+        }
+
+        protected override WorkplaceBundle CreateWorkplaceBundle()
+        {
+			return new WorkplaceBundle();
+        }
+
+        protected override WorkBundle CreateWorkBundle()
+        {
+			return new WorkBundle();
+        }
+
+        protected override bool Ready(WorkplaceBundle workplaces, WorkBundle works)
+        {
+			return true;
+        }
+    }
 }

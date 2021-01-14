@@ -34,6 +34,7 @@ namespace RootTools_Vision
         public MainWindow()
         {
             InitializeComponent();
+
         }
     }
 }

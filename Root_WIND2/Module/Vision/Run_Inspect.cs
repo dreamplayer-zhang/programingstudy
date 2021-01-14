@@ -114,10 +114,7 @@ namespace Root_WIND2.Module
                 if (this.inspectionFront.Recipe.Read(m_sRecipeName, true) == false)
                     return "Recipe Open Fail";
 
-                if (this.inspectionFront.CreateInspection() == false)
-                    return "Create Inspection Fail";
-
-                this.inspectionFront.Start(true);
+                this.inspectionFront.Start();
 
             }
             else

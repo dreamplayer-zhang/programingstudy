@@ -13,13 +13,10 @@ namespace RootTools_Vision
 {
 	public class EdgeSurface : WorkBase
 	{
-		WorkplaceBundle workplaceBundle;
-		Workplace workplace;
-
 		public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
 		private EdgeSurfaceParameter parameter;
-		private EdgeSurfaceRecipe recipe;
+		private EdgeSurfaceRecipe recipeEdgeSurface;
 
 		public EdgeSurface() : base()
 		{
@@ -31,58 +28,48 @@ namespace RootTools_Vision
 			return (WorkBase)this.MemberwiseClone();
 		}
 
-		public override void SetRecipe(Recipe _recipe)
+
+		protected override bool Preparation()
 		{
-			this.parameter = _recipe.GetRecipe<EdgeSurfaceParameter>();
-			this.recipe = _recipe.GetRecipe<EdgeSurfaceRecipe>();
+			if(this.parameter == null || this.recipeEdgeSurface == null)
+            {
+				this.parameter = recipe.GetRecipe<EdgeSurfaceParameter>();
+				this.recipeEdgeSurface = recipe.GetRecipe<EdgeSurfaceRecipe>();
+            }
+			return true;
 		}
 
-		public override void SetWorkplace(Workplace _workplace)
-		{
-			this.workplace = _workplace;
-		}
-
-		public override void SetWorkplaceBundle(WorkplaceBundle _workplace)
-		{
-			this.workplaceBundle = _workplace;
-		}
-
-		public override bool DoPrework()
-		{
-			return base.DoPrework();
-		}
-
-		public override void DoWork()
+		protected override bool Execution()
 		{
 			DoInspection();
-			//base.DoWork();
+			return true;
 		}
 
 		public void DoInspection()
 		{
-			if (this.workplace.Index == 0)
+			if (this.currentWorkplace.Index == 0)
 				return;
 
-			DoColorInspection(this.workplace.SharedBufferR_GRAY, parameter);
-			DoColorInspection(this.workplace.SharedBufferG, parameter);
-			DoColorInspection(this.workplace.SharedBufferB, parameter);
+			DoColorInspection(this.currentWorkplace.SharedBufferR_GRAY, parameter);
+			DoColorInspection(this.currentWorkplace.SharedBufferG, parameter);
+			DoColorInspection(this.currentWorkplace.SharedBufferB, parameter);
 
-			WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 		}
 
 		private void DoColorInspection(IntPtr sharedBuffer, EdgeSurfaceParameter param)
 		{
 			int roiHeight = 2000; //parameter.RoiHeight;
-			int roiWidth = this.workplace.SharedBufferWidth; //parameter.RoiWidth;
+			int roiWidth = this.currentWorkplace.SharedBufferWidth; //parameter.RoiWidth;
 			int threshold = 40; //parameter.Theshold;
 			int defectSize = 10; //parameter.Size;
 
 			int roiSize = roiWidth * roiHeight;
 
-			int left = this.workplace.PositionX;
-			int top = this.workplace.PositionY;
-			int right = this.workplace.PositionX + this.workplace.SharedBufferWidth;
-			int bottom = this.workplace.PositionY + roiHeight;
+			int left = this.currentWorkplace.PositionX;
+			int top = this.currentWorkplace.PositionY;
+			int right = this.currentWorkplace.PositionX + this.currentWorkplace.SharedBufferWidth;
+			int bottom = this.currentWorkplace.PositionY + roiHeight;
 
 			byte[] arrSrc = new byte[roiSize];
 			for (int cnt = top; cnt < bottom; cnt++)
@@ -129,24 +116,24 @@ namespace RootTools_Vision
 			//mat2.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_thresh_" + this.workplace.Index.ToString() + ".bmp");
 
 			// Add defect
-			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			for (int i = 0; i < label.Length; i++)
-			{
-				if (label[i].area > defectSize)
-				{
-					this.workplace.AddDefect(sInspectionID,
-						10001,
-						label[i].area,
-						label[i].value,
-						this.workplace.PositionX + label[i].boundLeft,
-						this.workplace.PositionY + label[i].boundTop,
-						Math.Abs(label[i].boundRight - label[i].boundLeft),
-						Math.Abs(label[i].boundBottom - label[i].boundTop),
-						this.workplace.MapPositionX,
-						this.workplace.MapPositionY
-						);
-				}
-			}
+			//string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			//for (int i = 0; i < label.Length; i++)
+			//{
+			//	if (label[i].area > defectSize)
+			//	{
+			//		this.currentWorkplace.AddDefect(sInspectionID,
+			//			10001,
+			//			label[i].area,
+			//			label[i].value,
+			//			this.currentWorkplace.PositionX + label[i].boundLeft,
+			//			this.currentWorkplace.PositionY + label[i].boundTop,
+			//			Math.Abs(label[i].boundRight - label[i].boundLeft),
+			//			Math.Abs(label[i].boundBottom - label[i].boundTop),
+			//			this.currentWorkplace.MapIndexX,
+			//			this.currentWorkplace.MapIndexY
+			//			);
+			//	}
+			//}
 		}
 	}
 }

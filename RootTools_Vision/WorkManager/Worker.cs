@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
     public enum WORKER_STATE
     {

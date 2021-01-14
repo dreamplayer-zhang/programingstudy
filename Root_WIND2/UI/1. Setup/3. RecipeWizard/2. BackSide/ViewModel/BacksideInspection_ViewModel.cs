@@ -102,25 +102,28 @@ namespace Root_WIND2
             Workplace workplace = obj as Workplace;
             List<String> textList = new List<String>();
             List<CRect> rectList = new List<CRect>();
-            foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
-            {
-                String text = "";
 
-                if (false) // Display Option : Rel Position
-                    text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
-                if (false) // Display Option : Defect Size
-                    text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
-                if (false) // Display Option : GV Value
-                    text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
 
-                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
-                textList.Add(text);
-            }
+            //RRRRRRRRRRRRRRRRR
+            //foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+            //{
+            //    String text = "";
 
-            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-            {
-                DrawRectDefect(rectList, textList, args.reDraw);
-            }));
+            //    if (false) // Display Option : Rel Position
+            //        text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
+            //    if (false) // Display Option : Defect Size
+            //        text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
+            //    if (false) // Display Option : GV Value
+            //        text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
+
+            //    rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+            //    textList.Add(text);
+            //}
+
+            //Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            //{
+            //    DrawRectDefect(rectList, textList, args.reDraw);
+            //}));
         }
 
         private void ProcessDefectDone_Callback(object obj, PocessDefectDoneEventArgs args)
@@ -158,7 +161,7 @@ namespace Root_WIND2
             }
             else
             {
-                p_MapControl_VM.SetMap(m_Setup.InspectionVision.mapdata, new CPoint(14, 14));
+                p_MapControl_VM.SetMap(m_Setup.InspectionVision.Recipe.WaferMap.Data, new CPoint(14, 14));
             }
 
             p_DrawTool_VM.Clear();
@@ -252,29 +255,31 @@ namespace Root_WIND2
 
             p_DrawTool_VM.Clear();
 
-            IntPtr SharedBuf = new IntPtr();
-            if (p_DrawTool_VM.p_ImageData.p_nByte == 3)
-            {
-                if (p_DrawTool_VM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
-                    SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr((int)p_DrawTool_VM.p_eColorViewMode - 1);
-                else // All 일때는 R채널로...
-                    SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr(0);
+            // RRRRRRRRRR
 
-                m_Setup.InspectionVision.SetColorSharedBuffer(p_DrawTool_VM.p_ImageData.GetPtr(0), p_DrawTool_VM.p_ImageData.GetPtr(1), p_DrawTool_VM.p_ImageData.GetPtr(2));
-            }
-            else
-            {
-                SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr();
-                m_Setup.InspectionVision.SharedBufferR_Gray = SharedBuf;
-            }
+            //IntPtr SharedBuf = new IntPtr();
+            //if (p_DrawTool_VM.p_ImageData.p_nByte == 3)
+            //{
+            //    if (p_DrawTool_VM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
+            //        SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr((int)p_DrawTool_VM.p_eColorViewMode - 1);
+            //    else // All 일때는 R채널로...
+            //        SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr(0);
 
-            m_Setup.InspectionVision.SharedBufferByteCnt = p_DrawTool_VM.p_ImageData.p_nByte;
+            //    m_Setup.InspectionVision.SetColorSharedBuffer(p_DrawTool_VM.p_ImageData.GetPtr(0), p_DrawTool_VM.p_ImageData.GetPtr(1), p_DrawTool_VM.p_ImageData.GetPtr(2));
+            //}
+            //else
+            //{
+            //    SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr();
+            //    m_Setup.InspectionVision.SharedBufferR_Gray = SharedBuf;
+            //}
 
-            if (m_Setup.InspectionVision.CreateInspection() == false)
-            {
-                return;
-            }
-            m_Setup.InspectionVision.Start(false);
+            //m_Setup.InspectionVision.SharedBufferByteCnt = p_DrawTool_VM.p_ImageData.p_nByte;
+
+            //if (m_Setup.InspectionVision.CreateInspection() == false)
+            //{
+            //    return;
+            //}
+            //m_Setup.InspectionVision.Start(false);
 
         }
 

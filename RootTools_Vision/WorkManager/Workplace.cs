@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RootTools.Database;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
     public enum WORK_TYPE
     {

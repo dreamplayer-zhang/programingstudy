@@ -1,17 +1,25 @@
-﻿using RootTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision.delete
+namespace RootTools_Vision
 {
     public class WorkEventManager
     {
+        #region [WorkDoneAll]
+        public static event EventHandler<WorkDoneAllEventArgs> WorkDoneAll;
+
+        public static void OnPositionDone(object obj, WorkDoneAllEventArgs args)
+        {
+            WorkDoneAll?.Invoke(obj, args);
+        }
+        #endregion
+
         #region [PositionDone]
         public static event EventHandler<PositionDoneEventArgs> PositionDone;
-        
+
         public static void OnPositionDone(object obj, PositionDoneEventArgs args)
         {
             PositionDone?.Invoke(obj, args);

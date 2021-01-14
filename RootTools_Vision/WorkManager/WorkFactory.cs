@@ -5,7 +5,7 @@ using System.Security.Authentication.ExtendedProtection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
     public abstract class WorkFactory
     {
