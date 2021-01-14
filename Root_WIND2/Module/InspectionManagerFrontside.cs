@@ -38,7 +38,7 @@ namespace Root_WIND2
         protected override void Initialize()
         {
             CreateWorkManager(WORK_TYPE.SNAP);
-            CreateWorkManager(WORK_TYPE.ALIGNMENT);
+            CreateWorkManager(WORK_TYPE.ALIGNMENT, 8);
             CreateWorkManager(WORK_TYPE.INSPECTION, 8);
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 8);
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 1, true);
