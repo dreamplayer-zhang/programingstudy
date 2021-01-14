@@ -72,8 +72,8 @@ namespace Root_AOP01_Inspection
 
                     if (p_bEnablePatternShift)
                     {
-                        MainVision.Run_ShiftAndRotation shiftAndRotation = (MainVision.Run_ShiftAndRotation)mainVision.CloneModuleRun("ShiftAndRotation");
-                        mainVision.StartRun(shiftAndRotation);
+                        MainVision.Run_PatternShiftAndRotation patternShiftAndRotation = (MainVision.Run_PatternShiftAndRotation)mainVision.CloneModuleRun("PatternShiftAndRotation");
+                        mainVision.StartRun(patternShiftAndRotation);
                     }
 
                     if (p_bEnableBarcodeInsp)
