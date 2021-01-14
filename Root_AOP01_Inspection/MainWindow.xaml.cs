@@ -148,15 +148,15 @@ namespace Root_AOP01_Inspection
             dialogService = new DialogService(this);
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
 
-            if (ProgramManager.Instance.Initialize() == false)
-            {
-                MessageBox.Show("Program Initialization fail");
-                return;
-            }
-
-            ProgramManager.Instance.DialogService = this.dialogService;
-
             m_engineer.Init("AOP01");
+            //if (ProgramManager.Instance.Initialize() == false)
+            //{
+            //    MessageBox.Show("Program Initialization fail");
+            //    return;
+            //}
+
+            //ProgramManager.Instance.DialogService = this.dialogService;
+
             
             Init_ViewModel();
             Init_UI();

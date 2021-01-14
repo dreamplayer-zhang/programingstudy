@@ -145,8 +145,42 @@ namespace Root_AOP01_Inspection.Module
                         m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
                         bStartTD3 = false;
                     }
-                }               
-                m_OHT.CheckTP3();
+                }
+                if (!m_OHT.m_bOHTErr)
+                {
+                    string Info = m_OHT.CheckTD3();
+                    if (Info != "OK")
+                    {
+                        m_OHT.p_sInfo = Info;
+                        m_OHT.m_bOHTErr = true;
+                    }
+                }
+
+            }
+            else if (m_OHT.p_eState == OHT_Semi.eState.LU_Req_Off || m_OHT.p_eState == OHT_Semi.eState.Ready_Off)
+            {
+                if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
+                {
+                    if (m_loadport.m_diPlaced.p_bIn || m_loadport.m_diPresent.p_bIn)
+                    {
+                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                    }
+                    else
+                    {
+                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                    }
+                }
+                else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
+                {
+                    if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
+                    {
+                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                    }
+                    else
+                    {
+                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                    }
+                }
             }
             else
             {

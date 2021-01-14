@@ -97,6 +97,7 @@ namespace RootTools.OHT.Semi
         bool _bHoAvailable = true; 
         bool p_bHoAvailable
         {
+            get { return m_doHoAvailable.p_bOn; }
             set
             {
                 if (m_doHoAvailable.p_bOn != value) return;
@@ -159,6 +160,31 @@ namespace RootTools.OHT.Semi
             m_log.Info(tp.ToString() + " Start StopWatch");
         }
 
+        StopWatch m_swTD = new StopWatch();
+        eTP m_eCheckTD = eTP.TD3;
+        int m_msTD = 0;
+        public void StartTD3()
+        {
+            m_eCheckTD = eTP.TD3;
+            m_msTD = 1000 * m_dicTP[eTP.TD3];
+            m_swTD.Start();
+            m_log.Info(eTP.TD3.ToString() + " Start StopWatch");
+        }
+
+        public string CheckTD3()
+        {
+            if (EQ.p_bSimulate) return "OK";
+            if (m_msTD <= 0) return "OK";
+            if (m_swTD.ElapsedMilliseconds < m_msTD) return "OK";
+            if (m_bOHTErr == true)
+            {
+                return "OK";
+            }
+            m_msTD = 0;
+            return "TD3 Timeout";
+        }
+
+
         string CheckTP()
         {
             if (EQ.p_bSimulate) return "OK";
@@ -169,7 +195,6 @@ namespace RootTools.OHT.Semi
                 return "OK";
             }          
             m_msTP = 0;
-            m_bOHTErr = true; //KHd 201130 add
             switch (m_eCheckTP)
             {
                 case eTP.TP1: return "TP1 Timeout (TR_REQ signal did not\n turn ON within specified time.)";
@@ -186,6 +211,7 @@ namespace RootTools.OHT.Semi
                     if (m_diComplete.p_bOn) return "TP5 Timeout (COMPT signal did not\n turn OFF within specified time.)";
                     return "TP5 Timeout (CS_0 signal did not\n turn OFF within specified time.)";
                 case eTP.TD3: return "TD3 Timeout";
+                    
             }
             return "OK";
         }
@@ -259,11 +285,12 @@ namespace RootTools.OHT.Semi
             Thread.Sleep(2000);
             while (m_bThread)
             {
+                
                 if(EQ.p_eState == EQ.eState.Error)
                 {
-                    p_sInfo = "System Error";
-                    m_bOHTErr = true;
-                    return;
+                    //p_sInfo = "System Error";
+                    //m_bOHTErr = true;
+                    //return;
                 }
 
                 Thread.Sleep(20);
@@ -299,6 +326,7 @@ namespace RootTools.OHT.Semi
                 if (sTP != "OK")
                 {
                     p_sInfo = sTP;
+                    m_bOHTErr = true; //KHd 201130 add
                     p_eState = eState.All_Off;
                 }
                 if (!m_bOHTErr && m_bAuto)
@@ -548,15 +576,6 @@ namespace RootTools.OHT.Semi
                 m_bThread = false;
                 m_thread.Join(); 
             }
-        }
-        public void StartTD3()
-        {
-            StartTP(eTP.TD3);
-        }
-
-        public void CheckTP3()
-        {
-            CheckTP();
         }
     }
 }
