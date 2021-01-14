@@ -91,12 +91,12 @@ namespace Root_AOP01_Inspection
 				case AOP01_Handler.eLoadport.Cymechs:
                     ExistLoadport.Background = (m_loadport[0].p_infoWafer != null) || (m_loadport[1].p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
                     Placed1.Background = m_loadport[0].m_diPlaced.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
-                    Present1.Background = m_loadport[0].m_diPresent.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
+                    Present1.Background = m_loadport[0].m_diPresent.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
                     //Load1.Background = m_loadport[0].m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
                     //UnLoad1.Background = m_loadport[0].m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
                     Alarm1.Background = m_loadport[0].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
-                    Placed2.Background = m_loadport[1].m_diPlaced.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
-                    Present2.Background = m_loadport[1].m_diPresent.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
+                    Placed2.Background = m_loadport[1].m_diPlaced.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
+                    Present2.Background = m_loadport[1].m_diPresent.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
                     //Load2.Background = m_loadport[1].m_bLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
                     //UnLoad2.Background = m_loadport[1].m_bUnLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
                     Alarm2.Background = m_loadport[1].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
@@ -104,13 +104,13 @@ namespace Root_AOP01_Inspection
 				case AOP01_Handler.eLoadport.RND:
                 default:
                     ExistLoadport.Background = (m_rndloadport[0].p_infoWafer != null) || (m_rndloadport[1].p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
-                    Placed1.Background = m_rndloadport[0].m_diPlaced.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
-                    Present1.Background = m_rndloadport[0].m_diPresent.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
+                    Placed1.Background = m_rndloadport[0].m_diPlaced.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
+                    Present1.Background = m_rndloadport[0].m_diPresent.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
                     //Load1.Background = m_rndloadport[0].m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
                     //UnLoad1.Background = m_rndloadport[0].m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
                     Alarm1.Background = m_rndloadport[0].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
-                    Placed2.Background = m_rndloadport[1].m_diPlaced.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
-                    Present2.Background = m_rndloadport[1].m_diPresent.p_bIn ? Brushes.SteelBlue : Brushes.LightGray;
+                    Placed2.Background = m_rndloadport[1].m_diPlaced.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
+                    Present2.Background = m_rndloadport[1].m_diPresent.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
                     //Load2.Background = m_rndloadport[1].m_bLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
                     //UnLoad2.Background = m_rndloadport[1].m_bUnLoadCheck ? Brushes.SteelBlue : Brushes.LightGray;
                     Alarm2.Background = m_rndloadport[1].p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;

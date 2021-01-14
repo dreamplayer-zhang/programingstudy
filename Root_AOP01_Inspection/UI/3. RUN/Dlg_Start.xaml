@@ -7,6 +7,7 @@
         xmlns:icon="clr-namespace:Root_AOP01_Inspection.Icon"
         xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
         mc:Ignorable="d"
+        Closing="Window_Closing"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
