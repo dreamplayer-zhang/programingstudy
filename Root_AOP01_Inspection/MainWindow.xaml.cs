@@ -145,18 +145,16 @@ namespace Root_AOP01_Inspection
         {
             dialogService = new DialogService(this);
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
-
-            m_engineer.Init("AOP01");
-            //if (ProgramManager.Instance.Initialize())
-            //{
-            //    ProgramManager.Instance.DialogService = this.dialogService;
-            //    m_engineer = ProgramManager.Instance.Engineer;//이중이므로 나중에 m_engineer 제거 필요
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Program Initialization fail");
-            //    return;
-            //}
+            if (ProgramManager.Instance.Initialize())
+            {
+                ProgramManager.Instance.DialogService = this.dialogService;
+                m_engineer = ProgramManager.Instance.Engineer;//이중이므로 나중에 m_engineer 제거 필요
+            }
+            else
+            {
+                MessageBox.Show("Program Initialization fail");
+                return;
+            }
 
             
             Init_ViewModel();
