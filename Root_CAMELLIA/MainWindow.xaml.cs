@@ -104,8 +104,9 @@ namespace Root_CAMELLIA
 
         void TimerUI()
         {
-            if (EQ.p_eState != EQ.eState.Run) m_bRecovery = false;
-            textState.Text = m_bRecovery ? "Recovery" : EQ.p_eState.ToString();
+            if (EQ.p_eState != EQ.eState.Run) EQ.p_bRecovery = false;
+            //textState.Text = m_bRecovery ? "Recovery" : EQ.p_eState.ToString();
+            textState.Text = EQ.p_bRecovery ? "Recovery" : EQ.p_eState.ToString();
         }
 
         void TimerLamp()
@@ -174,14 +175,13 @@ namespace Root_CAMELLIA
             return m_handler.IsEnableRecovery();
         }
 
-        bool m_bRecovery = false;
         private void buttonRecovery_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnable_Recovery() == false) return;
             m_handler.m_process.CalcRecover();
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Run;
-            m_bRecovery = true;
+            EQ.p_bRecovery = true;
         }
 
         bool IsEnable_Pause()

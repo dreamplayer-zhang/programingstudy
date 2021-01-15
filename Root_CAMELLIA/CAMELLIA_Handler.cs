@@ -366,11 +366,12 @@ namespace Root_CAMELLIA
                         StateHome();
                         break;
                     case EQ.eState.Run:
+                        if (EQ.IsStop()) return;
                         if (m_moduleList.m_qModuleRun.Count == 0)
                         {
-                            //CheckLoad();
+                            CheckLoad();
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            //CheckUnload();
+                            CheckUnload();
                             if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
@@ -394,9 +395,12 @@ namespace Root_CAMELLIA
                 {
                     //loadport.RunDocking();
                     if (loadport.StartRunDocking() != "OK") return;
-                    InfoCarrier infoCarrier = loadport.p_infoCarrier;
-                    ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
-                    manualJobSchedule.ShowPopup(); //p_moduleList.ClickRun();
+                    if(EQ.p_bRecovery == false)
+                    {
+                        InfoCarrier infoCarrier = loadport.p_infoCarrier;
+                        ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
+                        manualJobSchedule.ShowPopup();
+                    }
                 }
             }
         }

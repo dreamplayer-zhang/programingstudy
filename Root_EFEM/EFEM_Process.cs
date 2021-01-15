@@ -72,7 +72,7 @@ namespace Root_EFEM
         public List<Locate> m_aLocate = new List<Locate>();
         /// <summary> 프로그램 시작시 Registry 에서 Wafer 정보 읽기 </summary>
         void InitLocate()
-        {
+        { 
             if (m_wtr == null)
                 return;
             m_aLocate.Clear();
