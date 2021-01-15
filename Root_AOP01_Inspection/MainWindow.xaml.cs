@@ -7,8 +7,7 @@ using System.Windows.Input;
 using Root_EFEM.Module;
 using Root_AOP01_Inspection.Module;
 using RootTools.GAFs;
-
-
+using static Root_AOP01_Inspection.AOP01_Handler;
 
 namespace Root_AOP01_Inspection
 {
