@@ -244,12 +244,16 @@ namespace Root_EFEM
             InfoWafer infoWaferGet = (locateChild == null) ? null : locateChild.p_calcWafer;
             if ((infoWaferGet != null) && (locateChild != null))
             {
+
                 ModuleRunBase runGet = infoWaferGet.m_qCalcProcess.Dequeue();
                 string sArmGet = m_wtr.GetEnableAnotherArmID(runGet, armPut, infoWaferGet);
                 Locate locateArmGet = GetLocate(sArmGet);
-                locateArmGet.p_calcWafer = locateChild.p_calcWafer;
-                locateChild.p_calcWafer = null;
-                m_qSequence.Enqueue(new Sequence(runGet, infoWaferGet));
+                if (locateArmGet != null)
+                {
+                    locateArmGet.p_calcWafer = locateChild.p_calcWafer;
+                    locateChild.p_calcWafer = null;
+                    m_qSequence.Enqueue(new Sequence(runGet, infoWaferGet));
+                }
             }
             if (locateChild != null) locateChild.p_calcWafer = infoWaferPut;
             locateArmPut.p_calcWafer = null;

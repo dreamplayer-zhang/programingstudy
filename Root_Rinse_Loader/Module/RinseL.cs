@@ -61,6 +61,7 @@ namespace Root_Rinse_Loader.Module
         public RinseL(string id, IEngineer engineer)
         {
             p_id = id;
+            p_eRemote = eRemote.Client; 
             InitBase(id, engineer); 
         }
     }
