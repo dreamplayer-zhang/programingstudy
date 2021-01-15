@@ -151,6 +151,7 @@ namespace Root_AOP01_Inspection
             if (ProgramManager.Instance.Initialize())
             {
                 ProgramManager.Instance.DialogService = this.dialogService;
+                m_engineer = ProgramManager.Instance.Engineer;
             }
             else
             {
