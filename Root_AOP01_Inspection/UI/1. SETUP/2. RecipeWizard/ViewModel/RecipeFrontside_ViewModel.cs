@@ -1,5 +1,6 @@
 ﻿using System.Windows.Input;
 using Root_AOP01_Inspection.Module;
+using RootTools;
 
 namespace Root_AOP01_Inspection
 {
@@ -11,6 +12,9 @@ namespace Root_AOP01_Inspection
         {
             m_Setup = setup;
             m_Engineer = setup.m_MainWindow.m_engineer;
+
+            p_ImageViewer_VM = new RootViewer_ViewModel();
+            p_ImageViewer_VM.init(ProgramManager.Instance.ImageMain);
         }
 
         #region Property
@@ -31,6 +35,62 @@ namespace Root_AOP01_Inspection
         {
             get { return m_bEnablePatternShift; }
             set { SetProperty(ref m_bEnablePatternShift, value); }
+        }
+
+        #region Align Key Parameter
+        double m_dAlignKeyTemplateMatchingScore = 90;
+        public double p_dAlignKeyTemplateMatchingScore
+        {
+            get { return m_dAlignKeyTemplateMatchingScore; }
+            set { SetProperty(ref m_dAlignKeyTemplateMatchingScore, value); }
+        }
+
+        int m_nAlignKeyNGSpec_um = 30;
+        public int p_nAlignKeyNGSpec_um
+        {
+            get { return m_nAlignKeyNGSpec_um; }
+            set { SetProperty(ref m_nAlignKeyNGSpec_um, value); }
+        }
+        #endregion
+
+        #region Pattern Shift & Rotation Parameter
+        double m_dPatternShiftAndRotationTemplateMatchingScore = 90;
+        public double p_dPatternShiftAndRotationTemplateMatchingScore
+        {
+            get { return m_dPatternShiftAndRotationTemplateMatchingScore; }
+            set { SetProperty(ref m_dPatternShiftAndRotationTemplateMatchingScore, value); }
+        }
+
+        double m_dPatternShiftAndRotationShiftSpec = 0.5;
+        public double p_dPatternShiftAndRotationShiftSpec
+        {
+            get { return m_dPatternShiftAndRotationTemplateMatchingScore; }
+            set { SetProperty(ref m_dPatternShiftAndRotationTemplateMatchingScore, value); }
+        }
+
+        double m_dPatternShiftAndRotationRotationSpec = 0.5;
+        public double p_dPatternShiftAndRotationRotationSpec
+        {
+            get { return m_dPatternShiftAndRotationRotationSpec; }
+            set { SetProperty(ref m_dPatternShiftAndRotationRotationSpec, value); }
+        }
+        #endregion
+
+
+        #endregion
+
+        #region RootViewer
+        private RootViewer_ViewModel m_ImageViewer_VM;
+        public RootViewer_ViewModel p_ImageViewer_VM
+        {
+            get
+            {
+                return m_ImageViewer_VM;
+            }
+            set
+            {
+                SetProperty(ref m_ImageViewer_VM, value);
+            }
         }
         #endregion
 
@@ -67,18 +127,24 @@ namespace Root_AOP01_Inspection
                     if (p_bEnableAlignKeyInsp)
                     {
                         MainVision.Run_AlignKeyInspection alignKeyInspection = (MainVision.Run_AlignKeyInspection)mainVision.CloneModuleRun("AlignKeyInspection");
+                        alignKeyInspection.m_dMatchScore = p_dAlignKeyTemplateMatchingScore / 100;
+                        alignKeyInspection.m_nNGSpec_um = p_nAlignKeyNGSpec_um;
                         mainVision.StartRun(alignKeyInspection);
                     }
 
                     if (p_bEnablePatternShift)
                     {
                         MainVision.Run_PatternShiftAndRotation patternShiftAndRotation = (MainVision.Run_PatternShiftAndRotation)mainVision.CloneModuleRun("PatternShiftAndRotation");
+                        patternShiftAndRotation.m_dMatchScore = p_dPatternShiftAndRotationTemplateMatchingScore / 100;
+                        patternShiftAndRotation.m_dNGSpecDistance_um = p_dPatternShiftAndRotationShiftSpec;
+                        patternShiftAndRotation.m_dNGSpecDegree = p_dPatternShiftAndRotationRotationSpec;
                         mainVision.StartRun(patternShiftAndRotation);
                     }
 
                     if (p_bEnableBarcodeInsp)
                     {
                         MainVision.Run_BarcodeInspection barcodeInspection = (MainVision.Run_BarcodeInspection)mainVision.CloneModuleRun("BarcodeInspection");
+
                         mainVision.StartRun(barcodeInspection);
                     }
                 });

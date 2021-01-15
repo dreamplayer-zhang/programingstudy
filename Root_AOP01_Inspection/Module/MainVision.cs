@@ -2196,6 +2196,7 @@ namespace Root_AOP01_Inspection.Module
             public int m_nSearchArea = 2000;
             public double m_dMatchScore = 0.95;
             public int m_nThreshold = 70;
+            public int m_nNGSpec_um = 30;
 
             public Run_AlignKeyInspection(MainVision module)
             {
@@ -2209,6 +2210,7 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nSearchArea = m_nSearchArea;
                 run.m_dMatchScore = m_dMatchScore;
                 run.m_nThreshold = m_nThreshold;
+                run.m_nNGSpec_um = m_nNGSpec_um;
                 return run;
             }
 
@@ -2217,6 +2219,7 @@ namespace Root_AOP01_Inspection.Module
                 m_nSearchArea = tree.Set(m_nSearchArea, m_nSearchArea, "Search Area Size [px]", "Search Area Size [px]", bVisible);
                 m_dMatchScore = tree.Set(m_dMatchScore, m_dMatchScore, "Template Matching Score [0.0~1.0]", "Template Matching Score [0.0~1.0]", bVisible);
                 m_nThreshold = tree.Set(m_nThreshold, m_nThreshold, "Binary Threshold [GV]", "Binary Threshold [GV]", bVisible);
+                m_nNGSpec_um = tree.Set(m_nNGSpec_um, m_nNGSpec_um, "NG Spec [um]", "NG Spec [um]", bVisible);
             }
 
             public override string Run()

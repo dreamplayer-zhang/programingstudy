@@ -180,7 +180,7 @@ namespace Root_AOP01_Inspection
 			m_Engineer = m_Setup.m_MainWindow.m_engineer;
 
 			p_ImageViewer_VM = new Recipe45D_ImageViewer_ViewModel();
-			p_ImageViewer_VM.init(ProgramManager.Instance.Image);
+			p_ImageViewer_VM.init(ProgramManager.Instance.Image45D);
 			p_ImageViewer_VM.DrawDone += DrawDone_Callback;
 
 			CenterPoint.X = 4500;//p_ImageViewer_VM.p_ImageData.p_Size.X / 2;
