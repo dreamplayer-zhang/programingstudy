@@ -299,6 +299,7 @@ namespace Root_AOP01_Inspection
 
         void CheckLoad()
         {
+            if (m_process.m_qSequence.Count == 0) return; 
             EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
             string sLoadport = sequence.m_infoWafer.m_sModule;
             foreach (ILoadport loadport in m_aLoadport)
