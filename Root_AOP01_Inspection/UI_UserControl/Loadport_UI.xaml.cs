@@ -99,8 +99,10 @@ namespace Root_AOP01_Inspection.UI_UserControl
             return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && bPlaced;
         }
 
+        public static string sLoadportNum;
         private void ButtonLoad_Click(object sender, RoutedEventArgs e)
         {
+            sLoadportNum = m_loadport.p_id;
             //if (IsEnableLoad() == false) return;
             if (m_manualjob.ShowPopup(m_handler) == false) return;
             m_bgwLoad.RunWorkerAsync();

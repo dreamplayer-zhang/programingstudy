@@ -130,12 +130,6 @@ namespace Root_AOP01_Inspection
                 EQ.p_bStop = false;
                 m_handler.m_process.ClearInfoWafer();
                 EQ.p_eState = EQ.eState.Home;
-                //EQ.p_eState = EQ.eState.Init;
-                //m_mainvision.p_eState = ModuleBase.eState.Home;
-                //m_wtrcleanunit.p_eState = ModuleBase.eState.Home;
-                //m_loadport[0].p_eState = ModuleBase.eState.Home;
-                //m_loadport[1].p_eState = ModuleBase.eState.Home;
-                ////m_module.ButtonRun();
             }
             #endregion
 
