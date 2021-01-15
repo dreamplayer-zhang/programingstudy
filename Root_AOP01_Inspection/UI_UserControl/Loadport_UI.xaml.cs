@@ -81,7 +81,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
                 case ModuleBase.eState.Ready:
                     if (m_manualjob.SetInfoPod() != "OK") return;
                     Thread.Sleep(100);
-                    EQ.p_eState = EQ.eState.Run;
+                    //EQ.p_eState = EQ.eState.Run;
                     break;
             }
         }
@@ -101,7 +101,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
 
         private void ButtonLoad_Click(object sender, RoutedEventArgs e)
         {
-            if (IsEnableLoad() == false) return;
+            //if (IsEnableLoad() == false) return;
             if (m_manualjob.ShowPopup(m_handler) == false) return;
             m_bgwLoad.RunWorkerAsync();
         }

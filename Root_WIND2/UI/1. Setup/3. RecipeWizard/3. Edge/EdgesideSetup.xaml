@@ -5,6 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
+             xmlns:mouse="clr-namespace:mousebehavior;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="838" d:DesignWidth="1683" 
              Background="{StaticResource PanelBackGround}">
@@ -18,7 +21,6 @@
                 </Grid.ColumnDefinitions>
                 <Grid>
                     <Grid.RowDefinitions>
-
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
                     <WrapPanel/>
@@ -42,7 +44,38 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <GroupBox Header="Thumbnail" Grid.Row="0" Margin="0,0,0,0">
-                                <Grid Background="Black"></Grid>
+                                <Canvas Grid.Row="0"
+                            Focusable="True"
+                            obs:SizeObserver.Observe="true"
+                            obs:SizeObserver.ObservedWidth="{Binding DrawToolVM.p_ThumbWidth, Mode=OneWayToSource}"
+                            obs:SizeObserver.ObservedHeight="{Binding DrawToolVM.p_ThumbHeight, Mode=OneWayToSource}"
+                            Background="Black">
+                                    <Image Source="{Binding Path= DrawToolVM.p_ThumNailImgSource}" />
+                                    <Rectangle Margin="{Binding Path = DrawToolVM.p_TumbnailImgMargin}"
+                                   Width="{Binding DrawToolVM.p_TumbnailImg_Rect.Width}"
+                                   Height="{Binding DrawToolVM.p_TumbnailImg_Rect.Height}"
+                                   Stroke="Blue"
+                                   StrokeThickness="4" />
+                                    <i:Interaction.Behaviors>
+                                        <mouse:MouseBehaviour MouseEvent="{Binding DrawToolVM.MouseEvent, Mode=OneWayToSource}" />
+                                        <mouse:MouseBehaviour MouseX="{Binding DrawToolVM.p_TumbMouseX, Mode=OneWayToSource}"
+                                                  MouseY="{Binding DrawToolVM.p_TumbMouseY, Mode=OneWayToSource}" />
+                                    </i:Interaction.Behaviors>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                                            <i:InvokeCommandAction Command="{Binding DrawToolVM.TumbNailMouseLeftDown}" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseMove">
+                                            <i:InvokeCommandAction Command="{Binding DrawToolVM.TumbNailMouseMove}" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseLeave">
+                                            <i:InvokeCommandAction Command="{Binding DrawToolVM.TumbNailMouseLeave}" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                                            <i:InvokeCommandAction Command="{Binding DrawToolVM.TumbNailMouseLeftUp}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Canvas>
                             </GroupBox>
                         </Grid>
                     </Grid>

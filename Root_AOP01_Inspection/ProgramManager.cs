@@ -79,15 +79,24 @@ namespace Root_AOP01_Inspection
 			{
 				if (IsInitilized == false)
 				{
-					//InitEngineer("AOP01");
-					this.engineer = m_engineer;
-					InitMemory();
-					InitMember();
-					IsInitilized = true;
+					var eng = InitEngineer("AOP01");
+					var memory = InitMemory();
+					var mem = InitMember();
+					if (eng && memory && mem)
+					{
+						IsInitilized = true;
+						result = true;
+					}
+					else
+					{
+						IsInitilized = false;
+						result = false;
+					}
 				}
 			}
 			catch (Exception ex)
 			{
+				IsInitilized = false;
 				result = false;
 			}
 

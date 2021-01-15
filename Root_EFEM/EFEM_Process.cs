@@ -185,7 +185,7 @@ namespace Root_EFEM
                 InitCalc();
                 int lProcess = 0;
                 foreach (InfoWafer infoWafer in m_aCalcWafer) lProcess += infoWafer.m_qCalcProcess.Count;
-                while (CalcSequence()) ;
+                while (CalcSequence());
                 if (lProcess > m_qSequence.Count)
                 {
                     InitCalc();
@@ -232,7 +232,13 @@ namespace Root_EFEM
         {
             Locate locateArmPut = GetLocate(armPut.m_id);
             InfoWafer infoWaferPut = locateArmPut.p_calcWafer;
-            IWTRRun runPut = (IWTRRun)infoWaferPut.m_qCalcProcess.Dequeue(); //forget WTR ModuleRun
+            ModuleRunBase run = infoWaferPut.m_qCalcProcess.Dequeue();
+            if ((run is IWTRRun) == false)
+            {
+                m_qSequence.Enqueue(new Sequence(run, infoWaferPut));
+                return; 
+            }
+            IWTRRun runPut = (IWTRRun)run; //forget WTR ModuleRun
             runPut.SetArm(armPut); 
             Locate locateChild = GetLocate(runPut.p_sChild);
             InfoWafer infoWaferGet = (locateChild == null) ? null : locateChild.p_calcWafer;
