@@ -101,6 +101,7 @@
     </ApplicationDefinition>
     <Compile Include="Inspection\BacksideSurface.cs" />
     <Compile Include="Inspection\D2D.cs" />
+    <Compile Include="Inspection\EBR.cs" />
     <Compile Include="Inspection\EdgeSurface.cs" />
     <Compile Include="Inspection\ProcessDefect_Wafer.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
