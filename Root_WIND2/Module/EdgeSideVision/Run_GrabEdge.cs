@@ -62,8 +62,8 @@ namespace Root_WIND2.Module
 		int scanRate = 100;         // Camera Frame Spec 사용률 ? 1~100 %
 		int maxFrame = 100;
 
-		int sideFocusAxis = 26809;
-		int edgeDetectHeight = 200;
+		int sideFocusAxis = 0;
+		int edgeDetectHeight = 0;
 
 		public Run_GrabEdge(EdgeSideVision module)
 		{

@@ -257,7 +257,7 @@ namespace Root_WIND2
 			this.recipe = _recipe;
 
 			DrawToolVM = new RootViewer_ViewModel();
-			DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeTop));
+			DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeTop), ProgramManager.Instance.DialogService);
 		}
 
 		public void Scan()
@@ -276,28 +276,31 @@ namespace Root_WIND2
 
 		public void Inspect()
 		{
-			IntPtr sharedBuf = new IntPtr();
-			if (DrawToolVM.p_ImageData.p_nByte == 3)
-			{
-				if (DrawToolVM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
-					sharedBuf = DrawToolVM.p_ImageData.GetPtr((int)DrawToolVM.p_eColorViewMode - 1);
-				else // All 일때는 R채널로...
-					sharedBuf = DrawToolVM.p_ImageData.GetPtr(0);
-			}
-			else
-			{
-				sharedBuf = DrawToolVM.p_ImageData.GetPtr();
-			}
+			//IntPtr sharedBuf = new IntPtr();
+			//if (DrawToolVM.p_ImageData.p_nByte == 3)
+			//{
+			//	if (DrawToolVM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
+			//		sharedBuf = DrawToolVM.p_ImageData.GetPtr((int)DrawToolVM.p_eColorViewMode - 1);
+			//	else // All 일때는 R채널로...
+			//		sharedBuf = DrawToolVM.p_ImageData.GetPtr(0);
+			//}
+			//else
+			//{
+			//	sharedBuf = DrawToolVM.p_ImageData.GetPtr();
+			//}
 
-			setupVM.InspectionManagerEdge.SharedBufferR_Gray = sharedBuf;
-			if (DrawToolVM.p_ImageData.p_nByte == 3)
-			{
-				setupVM.InspectionManagerEdge.SharedBufferG = DrawToolVM.p_ImageData.GetPtr(1);
-				setupVM.InspectionManagerEdge.SharedBufferB = DrawToolVM.p_ImageData.GetPtr(2);
-			}
+			if (DrawToolVM.p_ImageData.p_nByte == 1)
+				setupVM.InspectionManagerEdge.SharedBufferR_Gray = DrawToolVM.p_ImageData.GetPtr();
+			else if (DrawToolVM.p_ImageData.p_nByte == 3)
+				setupVM.InspectionManagerEdge.SetWorkplaceBuffer(DrawToolVM.p_ImageData.GetPtr(0), DrawToolVM.p_ImageData.GetPtr(1), DrawToolVM.p_ImageData.GetPtr(2));
+
 			setupVM.InspectionManagerEdge.SharedBufferByteCnt = DrawToolVM.p_ImageData.p_nByte;
 			setupVM.InspectionManagerEdge.InspectionMode = InspectionManagerEdge.InsepectionMode.EDGE;
-			setupVM.InspectionManagerEdge.CreateInspection();
+			
+			if (setupVM.InspectionManagerEdge.CreateInspection() == false)
+			{
+				return;
+			}
 			setupVM.InspectionManagerEdge.Start();
 		}
 

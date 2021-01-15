@@ -17,7 +17,6 @@ namespace Root_WIND2
 		#region [Member Variables]
 		WorkBundle workBundle;
 		WorkplaceBundle workplaceBundle;
-
 		#endregion
 
 		public InspectionManagerEdge(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt = 1)
@@ -26,13 +25,6 @@ namespace Root_WIND2
 			this.sharedBufferWidth = _width;
 			this.sharedBufferHeight = _height;
 			this.sharedBufferByteCnt = _byteCnt;
-		}
-
-		protected override void InitWorkManager()
-		{
-			//this.Add(new WorkManager("Snap", WORK_TYPE.SNAP, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
-			this.Add(new WorkManager("EdgeSurface", WORK_TYPE.INSPECTION, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
-			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.WAFER));
 		}
 
 		public enum InsepectionMode
@@ -73,6 +65,13 @@ namespace Root_WIND2
 			return true;
 		}
 
+		protected override void InitWorkManager()
+		{
+			//this.Add(new WorkManager("Snap", WORK_TYPE.SNAP, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
+			this.Add(new WorkManager("EdgeSurface", WORK_TYPE.INSPECTION, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
+			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.WAFER));
+		}
+
 		public bool CreateInspection()
 		{
 			return CreateInspection(this.recipe);
@@ -103,7 +102,7 @@ namespace Root_WIND2
 
 				// side
 				RootTools.ImageData imageDataSide = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeSide);
-				int memoryHeightSide = imageDataSide.p_Size.Y;
+				int memoryHeightSide = 10000;// imageDataSide.p_Size.Y;
 				int memoryWidhtSide = imageDataSide.p_Size.X;
 				for (int i = 0; i < memoryHeightSide / partitionNum; i++)
 				{
@@ -116,7 +115,7 @@ namespace Root_WIND2
 
 				// bottom
 				RootTools.ImageData imageDataBtm = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeBottom);
-				int memoryHeightBtm = imageDataBtm.p_Size.Y;
+				int memoryHeightBtm = 10000;// imageDataBtm.p_Size.Y;
 				int memoryWidhtBtm = imageDataBtm.p_Size.X;
 				for (int i = 0; i < memoryHeightBtm / partitionNum; i++)
 				{
@@ -156,11 +155,6 @@ namespace Root_WIND2
 			return true;
 		}
 
-		private void SetWorkplace(int degree)
-		{
-			//전체이미지 Y / 
-		}
-
 		public new void Start()
 		{
 			if (this.Recipe == null)
@@ -183,5 +177,11 @@ namespace Root_WIND2
 		{
 			base.Stop();
 		}
+
+		private void SetWorkplace(int degree)
+		{
+			//전체이미지 Y / 
+		}
+
 	}
 }
