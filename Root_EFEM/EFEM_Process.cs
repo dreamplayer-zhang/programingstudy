@@ -348,6 +348,7 @@ namespace Root_EFEM
             foreach (IWTRChild child in m_wtr.p_aChild) CalcRecoverChild(child);
             ReCalcSequence();
             RunTree(Tree.eMode.Init);
+            if (EQ.p_nRnR > 0) EQ.p_nRnR = 0;
         }
 
         void CalcRecoverArm(WTRArm arm)
