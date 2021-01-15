@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Root_AOP01_Inspection"
+             xmlns:lp="clr-namespace:Root_AOP01_Inspection.UI_UserControl"
              mc:Ignorable="d"
              d:DesignHeight="866"
              d:DesignWidth="1912"
@@ -63,9 +64,14 @@
                             </UniformGrid>
                         </Grid>
                     </GroupBox>
-
-                    <GroupBox Grid.Row="1" Header="Loadport 1">
-                        <Grid Name="Loadport1" Grid.Column="0">
+                    <Grid Grid.Row="1">
+                        <lp:Loadport_UI x:Name="loadportA"/>
+                    </Grid>
+                    <Grid Grid.Row="2">
+                        <lp:Loadport_UI x:Name="loadportB"/>
+                    </Grid>
+                    <!--<GroupBox Grid.Row="1" Header="Loadport 1">-->
+                        <!--<Grid Name="Loadport1" Grid.Column="0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="2*"/>
                                 <RowDefinition Height="2*"/>
@@ -101,8 +107,8 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <!--<UniformGrid Columns="4"
-                                         Rows="2">-->
+                                --><!--<UniformGrid Columns="4"
+                                         Rows="2">--><!--
                                 <Grid Margin="3" x:Name="AccessManual1" Grid.Column="0" Grid.Row="0" 
                                       Background="LightGray">
                                     <TextBlock Text="Manual"
@@ -153,7 +159,7 @@
                                                HorizontalAlignment="Center" />
                                 </Grid>
 
-                                <!--</UniformGrid>-->
+                                --><!--</UniformGrid>--><!--
                             </Grid>
                             <Grid Grid.Row="2">
                                 <Grid.ColumnDefinitions>
@@ -168,9 +174,9 @@
                                     Grid.Column="1"
                                     Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoadReq1_Click" />
                             </Grid>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Grid.Row="2" Header="Loadport 2">
+                        </Grid>-->
+                    <!--</GroupBox>-->
+                    <!--<GroupBox Grid.Row="2" Header="Loadport 2">
                         <Grid Grid.Column="0" Name="Loadport2">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="2*" />
@@ -263,8 +269,8 @@
                                     Grid.Column="1"
                                     Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoadReq2_Click" />
                             </Grid>
-                        </Grid>
-                    </GroupBox>
+                        </Grid>-->
+                    <!--</GroupBox>-->
                 </Grid>
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
@@ -1028,10 +1034,12 @@
                     </GroupBox>
                 <GroupBox Grid.Row="2">
                         <StackPanel VerticalAlignment="Bottom">
-                            <Button x:Name="buttonOHT" Content="OHT" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
+                            <Button x:Name="buttonOHT" Content="OHT" Height="30" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
                     Margin="0,0,0,10" Click="ButtonOHT_Click"/>
-                            <Button x:Name="buttonAlarmList" Content="AlarmList" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
+                            <Button x:Name="buttonAlarmList" Height="30" Content="AlarmList" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
                     Margin="0,0,0,10" Click="ButtonAlarmList_Click"/>
+                            <Button x:Name="DoorCheck" Content="DoorLock Off" Height="30" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
+                    Margin="0,0,0,10" Click="DoorCheck_Click"/>
                         </StackPanel>
                     </GroupBox>
                 </Grid>

@@ -14,6 +14,8 @@ namespace Root_AOP01_Inspection
 	/// </summary>
 	public partial class App : Application
 	{
+		public static AOP01_Engineer m_engineer = new AOP01_Engineer();
+
 		public static string mPool = "MainVision.Vision Memory";
 		public static string mGroup = "MainVision";
 		public static string mMainMem = "Main";

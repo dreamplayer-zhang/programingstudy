@@ -14,7 +14,7 @@ using System.Windows;
 
 namespace Root_AOP01_Inspection
 {
-	public class ProgramManager
+	public class ProgramManager : MainWindow
 	{
 		//Single ton
 		private ProgramManager()
@@ -79,14 +79,24 @@ namespace Root_AOP01_Inspection
 			{
 				if (IsInitilized == false)
 				{
-					InitEngineer("AOP01");
-					InitMemory();
-					InitMember();
-					IsInitilized = true;
+					var eng = InitEngineer("AOP01");
+					var memory = InitMemory();
+					var mem = InitMember();
+					if (eng && memory && mem)
+					{
+						IsInitilized = true;
+						result = true;
+					}
+					else
+					{
+						IsInitilized = false;
+						result = false;
+					}
 				}
 			}
 			catch (Exception ex)
 			{
+				IsInitilized = false;
 				result = false;
 			}
 
@@ -95,13 +105,12 @@ namespace Root_AOP01_Inspection
 		private bool InitEngineer(string name)
 		{
 			this.engineer.Init(name);
-
 			return true;
 		}
 
 		private bool InitMemory()
 		{
-			memoryTool = engineer.ClassMemoryTool();
+			memoryTool = this.engineer.ClassMemoryTool();
 
 			image = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.mMainMem));
 			image.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mMainMem).p_nCount;

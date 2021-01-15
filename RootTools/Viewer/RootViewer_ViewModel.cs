@@ -882,6 +882,7 @@ namespace RootTools
                 //else
                 //    p_View_Rect = new System.Drawing.Rectangle(point.X, point.Y, Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom * p_CanvasWidth/3 / p_CanvasHeight), Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom));
             }
+            SetThumNailIamgeSource();
         }
         public unsafe void SetThumNailIamgeSource()
         {
@@ -1425,5 +1426,47 @@ namespace RootTools
             }
             return new Point(0, 0);
         }
+        private System.Windows.Input.MouseEventArgs _mouseEvent;
+        public System.Windows.Input.MouseEventArgs MouseEvent
+        {
+            get
+            {
+                return _mouseEvent;
+            }
+            set
+            {
+                SetProperty(ref _mouseEvent, value);
+            }
+        }
+
+        void TumbNailMove()
+        {
+            if (MouseEvent.LeftButton == MouseButtonState.Pressed)
+            {
+                double perX = (double)p_TumbMouseX / p_ThumbWidth;
+                double perY = (double)p_TumbMouseY / p_ThumbHeight;
+                CanvasMovePoint(perX, perY);
+            }
+        }
+        void ThumNailMoveStart()
+        {
+            TumbNailMove();
+        }
+
+        public ICommand TumbNailMouseMove
+        {
+            get
+            {
+                return new RelayCommand(TumbNailMove);
+            }
+        }
+        public ICommand TumbNailMouseLeftDown
+        {
+            get
+            {
+                return new RelayCommand(ThumNailMoveStart);
+            }
+        }
+
     }
 }

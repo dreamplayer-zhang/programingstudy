@@ -7,8 +7,7 @@ using System.Windows.Input;
 using Root_EFEM.Module;
 using Root_AOP01_Inspection.Module;
 using RootTools.GAFs;
-
-
+using static Root_AOP01_Inspection.AOP01_Handler;
 
 namespace Root_AOP01_Inspection
 {
@@ -125,12 +124,13 @@ namespace Root_AOP01_Inspection
         public Setup_Panel Setup;
         public Review_Panel Review;
         public Run_Panel Run;
+        //public Dlg_Start Dlg;
         #endregion
 
         #region ViewModel
         private Setup_ViewModel m_Setup;
         private Run_ViewModel m_Run;
-        private Dlg_ViewModel m_Dlg;
+        //private Dlg_ViewModel m_Dlg;
         #endregion
 
         public AOP01_Engineer m_engineer = new AOP01_Engineer();
@@ -141,35 +141,25 @@ namespace Root_AOP01_Inspection
             InitializeComponent();
         }
 
-       // Run_Panel _Panel = new Run_Panel();
         void Init()
         {
             dialogService = new DialogService(this);
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
-
-            if (ProgramManager.Instance.Initialize() == false)
+            if (ProgramManager.Instance.Initialize())
+            {
+                ProgramManager.Instance.DialogService = this.dialogService;
+                m_engineer = ProgramManager.Instance.Engineer;//이중이므로 나중에 m_engineer 제거 필요
+            }
+            else
             {
                 MessageBox.Show("Program Initialization fail");
                 return;
             }
 
-            ProgramManager.Instance.DialogService = this.dialogService;
-
-            m_engineer.Init("AOP01");
             
             Init_ViewModel();
             Init_UI();
-			switch (m_engineer.m_handler.LoadportType)
-			{
-				case AOP01_Handler.eLoadport.Cymechs:
-                    Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer);
-                    break;
-				case AOP01_Handler.eLoadport.RND:
-                default:
-                    Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_RND)m_engineer.m_handler.m_aLoadport[0], (Loadport_RND)m_engineer.m_handler.m_aLoadport[1], m_engineer);
-					break;
-			}
-            //m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
+            Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer);
         }
         void Init_ViewModel()
         {
@@ -189,6 +179,9 @@ namespace Root_AOP01_Inspection
 
             Run = new Run_Panel();
             Run.DataContext = m_Run;
+
+            //Dlg = new Dlg_Start();
+            //Dlg.DataContext = m_Dlg;
 
             MainPanel.Children.Clear();
             MainPanel.Children.Add(ModeSelect);

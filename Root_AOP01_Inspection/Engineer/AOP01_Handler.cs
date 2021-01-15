@@ -119,14 +119,14 @@ namespace Root_AOP01_Inspection
                 string sID = "Loadport" + cLP;
                 switch (m_aLoadportType[n])
                 {
-                    case eLoadport.Cymechs: 
-                        module = new Loadport_Cymechs(sID, m_engineer, true, true);
-                        LoadportType = eLoadport.Cymechs;
-                        break;
-                    case eLoadport.RND: 
-                    default: 
+                    case eLoadport.RND:
                         module = new Loadport_RND(sID, m_engineer, true, true);
                         LoadportType = eLoadport.RND;
+                        break;
+                    case eLoadport.Cymechs:
+                    default:
+                        module = new Loadport_Cymechs(sID, m_engineer, true, true);
+                        LoadportType = eLoadport.Cymechs;
                         break;
                 }
                 InitModule(module);
@@ -299,11 +299,12 @@ namespace Root_AOP01_Inspection
 
         void CheckLoad()
         {
+            if (m_process.m_qSequence.Count == 0) return; 
             EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
             string sLoadport = sequence.m_infoWafer.m_sModule;
             foreach (ILoadport loadport in m_aLoadport)
             {
-                if (loadport.p_id == sLoadport) loadport.RunDocking();
+                if (loadport.p_id == sLoadport) loadport.StartRunDocking();
             }
         }
 
@@ -320,7 +321,7 @@ namespace Root_AOP01_Inspection
                     {
                         if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
                     }
-                    if (bUndock) loadport.RunUndocking();
+                    if (bUndock) loadport.StartRunUndocking();
                 }
             }
         }

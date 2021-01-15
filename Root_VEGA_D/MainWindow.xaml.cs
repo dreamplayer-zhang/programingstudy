@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_AOP01_Inspection.ManualJob
+namespace Root_VEGA_D
 {
     /// <summary>
-    /// ManualJobSchedule_UI.xaml에 대한 상호 작용 논리
+    /// MainWindow.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class ManualJobSchedule_UI : Window
+    public partial class MainWindow : Window
     {
-        public ManualJobSchedule_UI()
+        public MainWindow()
         {
             InitializeComponent();
         }

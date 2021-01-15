@@ -161,6 +161,7 @@ namespace RootTools.Gem
                 if (_eTransfer == value) return;
                 m_log.Info("p_eTransfer " + _eTransfer.ToString() + " -> " + value.ToString());
                 _eTransfer = value;
+                OnPropertyChanged();
                 _eReqTransfer = value; 
                 SendCarrierOn();
                 RunTree(Tree.eMode.Init); 
