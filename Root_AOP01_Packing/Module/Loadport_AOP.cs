@@ -38,10 +38,107 @@ namespace Root_AOP01_Packing.Module
             p_sInfo = m_toolBox.Get(ref m_diDoor[1], this, "Door Open");
             p_sInfo = m_toolBox.Get(ref m_doManual, this, "Manual");
             p_sInfo = m_toolBox.Get(ref m_doAuto, this, "Auto");
+            p_sInfo = m_toolBox.Get(ref m_doPresent, this, "Present");
+            p_sInfo = m_toolBox.Get(ref m_doPlaced, this, "Placed");
+            p_sInfo = m_toolBox.Get(ref m_doLoad, this, "Load");
+            p_sInfo = m_toolBox.Get(ref m_doUnload, this, "Unload");
+            p_sInfo = m_toolBox.Get(ref m_doAlarm, this, "Alram");
             p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
             if (bInit) 
             {
-                InitPos(); 
+                InitPos();
+                m_doManual.Write(false);
+                m_doAuto.Write(false);
+                m_doPresent.Write(false);
+                m_doPlaced.Write(false);
+                m_doLoad.Write(false);
+                m_doUnload.Write(true); 
+            }
+        }
+        #endregion
+
+        #region Digital output
+        bool _doManual = false;
+        bool p_doManual
+        {
+            get { return _doManual; }
+            set
+            {
+                if (_doManual == value) return;
+                _doManual = value;
+                m_doManual.Write(value); 
+            }
+        }
+
+        bool _doAuto = false;
+        bool p_doAuto
+        {
+            get { return _doAuto; }
+            set
+            {
+                if (_doAuto == value) return;
+                _doAuto = value;
+                m_doAuto.Write(value);
+            }
+        }
+
+        bool _doPresent = false;
+        bool p_doPresent
+        {
+            get { return _doPresent; }
+            set
+            {
+                if (_doPresent == value) return;
+                _doPresent = value;
+                m_doPresent.Write(value);
+            }
+        }
+
+        bool _doPlaced = false;
+        bool p_doPlaced
+        {
+            get { return _doPlaced; }
+            set
+            {
+                if (_doPlaced == value) return;
+                _doPlaced = value;
+                m_doPlaced.Write(value);
+            }
+        }
+
+        bool _doLoad = false;
+        bool p_doLoad
+        {
+            get { return _doLoad; }
+            set
+            {
+                if (_doLoad == value) return;
+                _doLoad = value;
+                m_doLoad.Write(value);
+            }
+        }
+
+        bool _doUnload = false;
+        bool p_doUnload
+        {
+            get { return _doUnload; }
+            set
+            {
+                if (_doUnload == value) return;
+                _doUnload = value;
+                m_doUnload.Write(value);
+            }
+        }
+
+        bool _doAlram = false;
+        bool p_doAlram
+        {
+            get { return _doAlram; }
+            set
+            {
+                if (_doAlram == value) return;
+                _doAlram = value;
+                m_doAlram.Write(value);
             }
         }
         #endregion
@@ -136,6 +233,11 @@ namespace Root_AOP01_Packing.Module
                 int nDoor = m_diDoor[1].p_bIn ? 2 : 0;
                 if (m_diDoor[0].p_bIn) nDoor++;
                 p_eDoor = (eDoor)nDoor;
+                p_doManual = (EQ.p_eState != EQ.eState.Run);
+                p_doAuto = (EQ.p_eState == EQ.eState.Run);
+                p_doPresent = p_bPresent;
+                p_doPlaced = p_bPlaced;
+                p_doAlram = (p_eState == eState.Error); 
             }
         }
         #endregion
@@ -351,6 +453,8 @@ namespace Root_AOP01_Packing.Module
             if (Run(RunGuide(true))) return p_sInfo;
             if (p_eDoor != eDoor.Open) return "Door Open Sensor Error";
             p_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+            p_doUnload = false; 
+            p_doLoad = true; 
             m_ceidDocking.Send();
             return "OK";
         }
@@ -361,6 +465,8 @@ namespace Root_AOP01_Packing.Module
             if (Run(RunDoorMove(ePos.Close))) return p_sInfo;
             if (Run(RunGuide(true))) return p_sInfo;
             if (p_eDoor != eDoor.Close) return "Door Close Sensor Error";
+            p_doUnload = true;
+            p_doLoad = false;
             m_ceidUnDocking.Send();
             p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
             return "OK";
