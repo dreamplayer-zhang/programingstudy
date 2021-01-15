@@ -189,7 +189,7 @@ namespace Root_AOP01_Inspection
 
             private void ButtonBuzzerOff_Click(object sender, RoutedEventArgs e)
             {
-                m_engineer.BuzzerOff();
+                m_engineer.m_handler.m_aop01.BuzzerOff();
             }
 
         private void DoorCheck_Click(object sender, RoutedEventArgs e)

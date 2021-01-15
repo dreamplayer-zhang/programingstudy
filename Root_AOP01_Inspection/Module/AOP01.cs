@@ -145,16 +145,16 @@ namespace Root_AOP01_Inspection.Module
                 {
                     case EQ.eState.Error:
                         m_doDoorLock_Use.Write(false);
-                        m_doBuzzer.Write(eBuzzer.Buzzer2);
+                        //m_doBuzzer.Write(eBuzzer.Buzzer2);
                         m_doLamp.Write(eLamp.Red);
                         break;
                     case EQ.eState.Run:
                         m_doDoorLock_Use.Write(true);
-                        m_doBuzzer.Write(eBuzzer.Buzzer4);
+                        //m_doBuzzer.Write(eBuzzer.Buzzer4);
                         m_doLamp.Write(eLamp.Green);
                         break;
                     case EQ.eState.Home:
-                        m_doBuzzer.Write(eBuzzer.Buzzer3);
+                        //m_doBuzzer.Write(eBuzzer.Buzzer3);
                         m_doLamp.Write(eLamp.Green);
                         break;
                     case EQ.eState.Ready:
@@ -175,7 +175,7 @@ namespace Root_AOP01_Inspection.Module
 
             if (!m_diEMS.p_bIn)
             {
-                if (m_diCDA1Low.p_bIn && m_diCDA2Low.p_bIn)
+                if (!m_diCDA1Low.p_bIn && !m_diCDA2Low.p_bIn)
                     m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
                 else
                     m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMO Buttons");
@@ -185,8 +185,8 @@ namespace Root_AOP01_Inspection.Module
             {
                 m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
                 m_alidProtectionBar.Run(!m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
-                m_alidCDA1Low.Run(!m_diCDA1Low.p_bIn, "Please Check Value of CDA1");
-                m_alidCDA2Low.Run(!m_diCDA2Low.p_bIn, "Please Check Value of CDA2");
+                m_alidCDA1Low.Run(m_diCDA1Low.p_bIn, "Please Check Value of CDA1");
+                m_alidCDA2Low.Run(m_diCDA2Low.p_bIn, "Please Check Value of CDA2");
                 m_alid4CH_LED_Cont_FAN.Run(!m_di4CH_LED_Cont_FAN.p_bIn, "Please Check 4CH LED FAN");
                 m_alid12CH_LED_Cont_FAN.Run(!m_di12CH_LED_Cont_FAN.p_bIn, "Please Check 12CH LED FAN");
                 m_alidPC_FAN.Run(!m_diPC_FAN.p_bIn, "Please Check PC FAN");
@@ -349,7 +349,7 @@ namespace Root_AOP01_Inspection.Module
             base.ThreadStop();
         }
 
-        #region Show OHT -> Delete
+        #region Show OHT
         public void ShowOHT()
         {
             m_timer.Start(); 

@@ -55,12 +55,12 @@ namespace Root_AOP01_Inspection.UI_UserControl
         private void M_timer_Tick(object sender, EventArgs e)
         {
             Placed.Background = m_loadport.m_diPlaced.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
-            Present.Background = m_loadport.m_diPresent.p_bIn == true ? Brushes.SteelBlue : Brushes.LightGray;
+            Present.Background = m_loadport.m_diPresent.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
             //Load.Background = m_loadport.m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
             //UnLoad.Background = m_loadport.m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
             Alarm.Background = m_loadport.p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
-            //ButtonLoad.IsEnabled = IsEnableLoad();            temp
-            //ButtonUnLoadReq.IsEnabled = IsEnableUnloadReq();  temp
+            //ButtonLoad.IsEnabled = IsEnableLoad();            
+            //ButtonUnLoadReq.IsEnabled = IsEnableUnloadReq();  
         }
 
 
@@ -81,7 +81,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
                 case ModuleBase.eState.Ready:
                     if (m_manualjob.SetInfoPod() != "OK") return;
                     Thread.Sleep(100);
-                    //EQ.p_eState = EQ.eState.Run; temp
+                    EQ.p_eState = EQ.eState.Run; 
                     break;
             }
         }
@@ -101,7 +101,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
 
         private void ButtonLoad_Click(object sender, RoutedEventArgs e)
         {
-            //if (IsEnableLoad() == false) return;  temp
+            //if (IsEnableLoad() == false) return;
             if (m_manualjob.ShowPopup(m_handler) == false) return;
             m_bgwLoad.RunWorkerAsync();
         }
