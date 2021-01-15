@@ -138,7 +138,7 @@ namespace Root_AOP01_Packing.Module
             {
                 if (_doAlram == value) return;
                 _doAlram = value;
-                m_doAlram.Write(value);
+                m_doAlarm.Write(value);
             }
         }
         #endregion

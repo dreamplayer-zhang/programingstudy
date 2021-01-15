@@ -297,6 +297,7 @@ namespace RootTools.Light
 
         public void ThreadStop()
         {
+            foreach (ILightTool iLignt in p_aLightTool) iLignt.ThreadStop(); 
         }
 
         public void AddContoroller(Type type)
