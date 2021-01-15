@@ -61,7 +61,10 @@ namespace Root_AOP01_Inspection.Module
         public WTRCleanUnit(string id, IEngineer engineer) : base(id, engineer)
         {
             IWTRChild child = GetChild("MainVision");
-            int posWTR = child.GetTeachWTR();
+            if(child != null)
+            {
+                int posWTR = child.GetTeachWTR();
+            }
         }
 
         #region ModuleRun
