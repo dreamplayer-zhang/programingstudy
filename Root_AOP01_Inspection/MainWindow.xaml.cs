@@ -7,8 +7,7 @@ using System.Windows.Input;
 using Root_EFEM.Module;
 using Root_AOP01_Inspection.Module;
 using RootTools.GAFs;
-
-
+using static Root_AOP01_Inspection.AOP01_Handler;
 
 namespace Root_AOP01_Inspection
 {
@@ -162,7 +161,10 @@ namespace Root_AOP01_Inspection
             
             Init_ViewModel();
             Init_UI();
-            Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer); 
+            if (m_engineer.m_handler.m_aLoadportType[0] == eLoadport.Cymechs && m_engineer.m_handler.m_aLoadportType[1] == eLoadport.Cymechs)
+            {
+                Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer);
+            }
         }
         void Init_ViewModel()
         {
