@@ -236,7 +236,7 @@ namespace Root_VEGA_P.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Delay Time (sec)");
+                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Delay Time (sec)", bVisible);
             }
 
             public override string Run()
@@ -265,7 +265,7 @@ namespace Root_VEGA_P.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Delay Time (sec)");
+                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Delay Time (sec)", bVisible);
             }
 
             public override string Run()

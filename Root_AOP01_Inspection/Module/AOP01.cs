@@ -1,10 +1,14 @@
-﻿using RootTools;
+﻿using Root_EFEM.Module;
+using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
+using RootTools.OHT.Semi;
+using RootTools.OHTNew;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Windows.Threading;
@@ -204,6 +208,10 @@ namespace Root_AOP01_Inspection.Module
                     m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
                 }
                 m_alidLightCurtain.Run(m_diLightCurtain.p_bIn, "Please Check LightCurtain");
+                foreach (OHT_Semi OHT in p_aOHT)
+                {
+                    OHT.p_bLightCurtain = m_diLightCurtain.p_bIn;
+                }
             }
         }
         #endregion
@@ -333,6 +341,22 @@ namespace Root_AOP01_Inspection.Module
             #endregion
         }
         public RFID m_RFID = new RFID();
+        #endregion
+
+        #region OHT
+        List<OHT_Semi> p_aOHT
+        {
+            get
+            {
+                List<OHT_Semi> aOHT = new List<OHT_Semi>(); 
+                AOP01_Handler handler = (AOP01_Handler)m_engineer.ClassHandler();
+                foreach (ILoadport loadport in handler.m_aLoadport)
+                {
+                    aOHT.Add(((Loadport_Cymechs)loadport).m_OHT); 
+                }
+                return aOHT; 
+            }
+        }
         #endregion
 
         public AOP01(string id, IEngineer engineer)
