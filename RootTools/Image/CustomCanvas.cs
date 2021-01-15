@@ -11,6 +11,11 @@ using System.Windows.Media;
 
 namespace RootTools
 {
+	public enum eCanvasType
+	{
+		ImageViwer,
+		RootViewer,
+	}
 	public class CustomCanvas : Canvas
 	{
 		public Visual visual { get; set; }
@@ -24,13 +29,23 @@ namespace RootTools
 			get;
 			internal set;
 		}
+		public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(
+			nameof(CanvasType), typeof(eCanvasType), typeof(CustomCanvas),
+			new FrameworkPropertyMetadata(
+				eCanvasType.ImageViwer, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
+		public eCanvasType CanvasType
+		{
+			get { return (eCanvasType)GetValue(ValueProperty); }
+			set { SetValue(ValueProperty, value); }
+		}
 		public class CustomRect
 		{
 			public Rect Rect;
 			public Brush Brush;
 			public Pen Pen;
 			public double Scale;
+			public eCanvasType CanvasType;
 			public Rect ScaledRect
 			{
 				get
@@ -38,8 +53,16 @@ namespace RootTools
 					Rect temp = new Rect();
 					temp.Width = Rect.Width / Scale;//이건 맞음
 					temp.Height = Rect.Height / Scale;//이것도 맞음
-					temp.X = (Rect.X - StartPos.X) / Scale - (temp.Width / 2.0);
-					temp.Y = (Rect.Y - StartPos.Y) / Scale - (temp.Height / 2.0);
+					if(CanvasType == eCanvasType.RootViewer)
+					{
+						temp.X = (Rect.X - StartPos.X) / Scale;
+						temp.Y = (Rect.Y - StartPos.Y) / Scale;
+					}
+					else
+					{
+						temp.X = (Rect.X - StartPos.X) / Scale - (temp.Width / 2.0);
+						temp.Y = (Rect.Y - StartPos.Y) / Scale - (temp.Height / 2.0);
+					}
 
 					return temp;
 				}
@@ -61,6 +84,12 @@ namespace RootTools
 				return;
 
 			var scale = ImageSize.X / this.RenderSize.Width * Zoom;//때려맞춘 비율값
+
+			if(CanvasType == eCanvasType.RootViewer)
+			{
+				scale = ImageSize.Y / this.RenderSize.Height * Zoom;//때려맞춘 비율값
+			}
+
 			if (scale == 0)
 			{
 				scale = 1;
@@ -72,6 +101,7 @@ namespace RootTools
 				{
 					//보고 있는 메모리와 동일한경우 화면상에 출력
 					CustomRect mRect = rects[i];
+					mRect.CanvasType = this.CanvasType;
 					mRect.Scale = scale;
 					mRect.StartPos = StartPoint;
 

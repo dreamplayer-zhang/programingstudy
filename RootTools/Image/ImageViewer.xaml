@@ -55,7 +55,8 @@
 					Panel.ZIndex="0">
 				<Image Source="{Binding Path=p_ImgSource}"/>
 			</Canvas>
-			<local:CustomCanvas x:Name="canvas" obs:SizeObserver.Observe="true" Focusable="True">
+			<local:CustomCanvas x:Name="canvas" obs:SizeObserver.Observe="true" Focusable="True"
+								CanvasType="ImageViwer">
 			</local:CustomCanvas>
 			<ItemsControl ItemsSource="{Binding p_Element}" 
                           Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"

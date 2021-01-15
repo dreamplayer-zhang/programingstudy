@@ -192,27 +192,16 @@ namespace Root_AOP01_Inspection
 		private void SurfaceInspDone_Callback(object obj, InspectionDoneEventArgs args)
 		{
 			Workplace workplace = obj as Workplace;
-			List<string> textList = new List<string>();
-			List<CRect> rectList = new List<CRect>();
-			foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+			//List<string> textList = new List<string>();
+			//List<CRect> rectList = new List<CRect>();
+
+			if(workplace.DefectList.Count>0)
 			{
-				string text = "";
-
-				if (false) // Display Option : Rel Position
-					text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
-				if (false) // Display Option : Defect Size
-					text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
-				if (false) // Display Option : GV Value
-					text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
-
-				rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
-				textList.Add(text);
+				Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+				{
+					m_Setup.InspectionManager.AddDefect(workplace.DefectList);
+				}));
 			}
-
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				DrawRectDefect(rectList, textList, args.reDraw);
-			}));
 		}
 
 		public void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
@@ -250,7 +239,9 @@ namespace Root_AOP01_Inspection
 		private void DrawDone_Callback(CPoint leftTop, CPoint rightBottom)
 		{
 			p_ImageViewer_VM.Clear();
-			this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
+			m_Setup.InspectionManager.RefreshDefect();
+			//this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
+			
 		}
 
 		public ICommand commandInspTest
@@ -617,6 +608,7 @@ namespace Root_AOP01_Inspection
 		private void startTestInsp()
 		{
 			p_ImageViewer_VM.Clear();
+			m_Setup.InspectionManager.ClearDefect();
 
 			_StartRecipeTeaching();
 

@@ -16,6 +16,27 @@ namespace Root_AOP01_Inspection.Module
 {
 	public class InspectionManager_AOP : WorkFactory
 	{
+		/// <summary>
+		/// Defect 정보 변경 시 사용할 Event Handler
+		/// </summary>
+		/// <param name="item">Defect Information</param>
+		/// <param name="args">arguments. 필요한 경우 수정해서 사용</param>
+		public delegate void ChangeDefectInfoEventHanlder(List<RootTools.Database.Defect> item);
+		public delegate void EventHandler();
+		/// <summary>
+		/// UI에 Defect을 추가하기 위해 발생하는 Event
+		/// </summary>
+		public event ChangeDefectInfoEventHanlder AddDefectEvent;
+		/// <summary>
+		/// UI Defect을 지우기 위해 발생하는 Event
+		/// </summary>
+		public event EventHandler ClearDefectEvent;
+		/// <summary>
+		/// UI에 추가된 Defect 정보를 새로고침 하기위한 Event
+		/// </summary>
+		public event EventHandler RefreshDefectEvent;
+
+
 		SolidColorBrush brushSnap = System.Windows.Media.Brushes.LightSkyBlue;
 		SolidColorBrush brushPosition = System.Windows.Media.Brushes.SkyBlue;
 		SolidColorBrush brushPreInspection = System.Windows.Media.Brushes.Cornsilk;
@@ -143,6 +164,14 @@ namespace Root_AOP01_Inspection.Module
 			return true;
 		}
 
+		internal void AddDefect(List<Defect> defectList)
+		{
+			if (AddDefectEvent != null)
+			{
+				AddDefectEvent(defectList);
+			}
+		}
+
 		public void SnapDone_Callback(object obj, SnapDoneArgs args)
 		{
 			if (this.workplaceBundle == null) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
@@ -174,6 +203,15 @@ namespace Root_AOP01_Inspection.Module
 			DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
 
 			base.Start();
+		}
+
+		internal void RefreshDefect()
+		{
+			//Defect 그리기 새로고침 event발생
+			if (RefreshDefectEvent != null)
+			{
+				RefreshDefectEvent();
+			}
 		}
 
 		public void SetWorkplaceBuffer(IntPtr inspPtr, IntPtr ptrR, IntPtr ptrG, IntPtr ptrB)
@@ -210,6 +248,14 @@ namespace Root_AOP01_Inspection.Module
 			this.SharedBufferG = ptrG;
 			this.SharedBufferB = ptrB;
 			this.SharedBufferByteCnt = 3;
+		}
+
+		internal void ClearDefect()
+		{
+			if (ClearDefectEvent != null)
+			{
+				ClearDefectEvent();
+			}
 		}
 	}
 }
