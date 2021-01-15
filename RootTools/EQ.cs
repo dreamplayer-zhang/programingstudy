@@ -191,16 +191,5 @@ namespace RootTools
                 OnPropertyChanged();
             }
         }
-
-        bool _bRnR = false;
-        public bool p_bRnR
-        {
-            get { return _bRnR; }
-            set
-            {
-                _bRnR = value;
-                OnPropertyChanged();
-            }
-        }
     }
 }
