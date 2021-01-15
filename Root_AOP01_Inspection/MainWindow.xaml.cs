@@ -141,30 +141,27 @@ namespace Root_AOP01_Inspection
             InitializeComponent();
         }
 
-       // Run_Panel _Panel = new Run_Panel();
         void Init()
         {
             dialogService = new DialogService(this);
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
 
-            if (ProgramManager.Instance.Initialize())
-            {
-                ProgramManager.Instance.DialogService = this.dialogService;
-                m_engineer = ProgramManager.Instance.Engineer;//이중이므로 나중에 m_engineer 제거 필요
-            }
-            else
-            {
-                MessageBox.Show("Program Initialization fail");
-                return;
-            }
+            m_engineer.Init("AOP01");
+            //if (ProgramManager.Instance.Initialize())
+            //{
+            //    ProgramManager.Instance.DialogService = this.dialogService;
+            //    m_engineer = ProgramManager.Instance.Engineer;//이중이므로 나중에 m_engineer 제거 필요
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Program Initialization fail");
+            //    return;
+            //}
 
             
             Init_ViewModel();
             Init_UI();
-            if (m_engineer.m_handler.m_aLoadportType[0] == eLoadport.Cymechs && m_engineer.m_handler.m_aLoadportType[1] == eLoadport.Cymechs)
-            {
-                Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer);
-            }
+            Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer);
         }
         void Init_ViewModel()
         {

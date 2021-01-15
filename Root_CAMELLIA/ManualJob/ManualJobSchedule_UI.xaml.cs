@@ -158,7 +158,7 @@ namespace Root_CAMELLIA.ManualJob
 
         void InitSlotRecipeList()
         {
-            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\Camellia");
+            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\");
             FileInfo[] files = info.GetFiles("*.Camellia");
             List<string> asRecipeFile = new List<string>();
             foreach (FileInfo fileInfo in files)
@@ -193,7 +193,7 @@ namespace Root_CAMELLIA.ManualJob
 
         void InitRecipeList()
         {
-            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\Camellia");
+            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\");
             FileInfo[] files = info.GetFiles("*.Camellia");
             List<string> asRecipeFile = new List<string>();
             foreach(FileInfo fileInfo in files)
@@ -244,7 +244,7 @@ namespace Root_CAMELLIA.ManualJob
                     infoWafer.p_sWaferID = m_tboxWaferID[i].Text;
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {
-                        infoWafer.RecipeOpen("C:\\Recipe\\Camellia\\" + m_cbRecipe[i].Text);
+                        infoWafer.RecipeOpen("C:\\Recipe\\" + m_cbRecipe[i].Text);
                         m_infoCarrier.StartProcess(infoWafer.p_id); 
                     }
                 }
