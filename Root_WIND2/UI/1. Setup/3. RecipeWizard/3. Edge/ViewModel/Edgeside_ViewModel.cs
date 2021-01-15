@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,27 +10,29 @@ using System.Windows.Input;
 
 namespace Root_WIND2
 {
-	class Edge_ViewModel : ObservableObject
+	class Edgeside_ViewModel : ObservableObject
 	{
 		private Setup_ViewModel setupVM;
+		Recipe recipe;
 
-		public Edge_Panel Main;
-		public EdgeSetup_ViewModel PanelVM;
-		public EdgeSetupPage SetupPage;
+		public Edgeside_Panel Main;
+		public EdgesideSetup_ViewModel PanelVM;
+		public EdgesideSetup SetupPage;
 
-		public Edge_ViewModel(Setup_ViewModel setup)
+		public Edgeside_ViewModel(Setup_ViewModel setup)
 		{
 			this.setupVM = setup;
+			this.recipe = setup.Recipe;
 			Init();
 		}
 
 		public void Init()
 		{
-			Main = new Edge_Panel();
-			PanelVM = new EdgeSetup_ViewModel(setupVM);
-			PanelVM.Init();
+			Main = new Edgeside_Panel();
+			PanelVM = new EdgesideSetup_ViewModel();
+			PanelVM.Init(setupVM, recipe);
 
-			SetupPage = new EdgeSetupPage();
+			SetupPage = new EdgesideSetup();
 			SetupPage.DataContext = PanelVM;
 			SetPage(SetupPage);
 		}
@@ -70,6 +73,11 @@ namespace Root_WIND2
 		{
 			Main.SubPanel.Children.Clear();
 			Main.SubPanel.Children.Add(page);
+		}
+
+		public void UI_Redraw()
+		{
+			PanelVM.LoadParameter();
 		}
 
 	}

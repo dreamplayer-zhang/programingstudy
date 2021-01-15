@@ -39,7 +39,7 @@ namespace Root_AOP01_Inspection
 
         public ModuleList ClassModuleList() { return m_handler.p_moduleList; }
 
-        ToolBox m_toolBox = new ToolBox();
+        public ToolBox m_toolBox = new ToolBox();
         public ToolBox ClassToolBox() { return m_toolBox; }
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)

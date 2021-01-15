@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Root_WIND2.EdgeSetupPage"
+﻿<UserControl x:Class="Root_WIND2.EdgesideSetup"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -75,18 +75,21 @@
                                 <ColumnDefinition Width="167*"/>
                                 <ColumnDefinition Width="167*"/>
                             </Grid.ColumnDefinitions>
-                            <Button Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
+                            <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
                                     FontWeight="Bold" FontSize="12" 
                                     Content="Top" Grid.Column="0"
-                                    Command="{Binding btnTop}" Grid.ColumnSpan="2" />
-                            <Button Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
+                                    Command="{Binding btnTop}" Grid.ColumnSpan="2" 
+                                    IsChecked="{Binding IsTopChecked, Mode=TwoWay}"/>
+                            <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
                                     FontWeight="Bold" FontSize="12"
                                     Content="Side" Grid.Column="2"
-                                    Command="{Binding btnSide}" />
-                            <Button Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
+                                    Command="{Binding btnSide}"
+                                    IsChecked="{Binding IsSideChecked, Mode=TwoWay}"/>
+                            <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
                                     FontWeight="Bold" FontSize="12"
                                     Content="Bottom" Grid.Column="3"
-                                    Command="{Binding btnBottom}" />
+                                    Command="{Binding btnBottom}"
+                                    IsChecked="{Binding IsBtmChecked, Mode=TwoWay}"/>
                         </Grid>
                         <GroupBox Grid.Row="2" Header="Option" Grid.RowSpan="2" >
                             <Grid Margin="10,5">
@@ -99,7 +102,6 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-
                                 <TextBlock FontSize="12" Text="Enable EdgeSide Insp." Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                 <TextBlock FontSize="12" Text="Upload Image Size" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                 <TextBlock FontSize="12" Text="Upload Image Res." Style="{StaticResource BasicTb}" Grid.Row="2"/>
@@ -132,21 +134,13 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
                                     <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock FontSize="12" Text="R" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                <TextBlock FontSize="12" Text="G" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                <TextBlock FontSize="12" Text="B" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                <TextBlock FontSize="12" Text="White" Style="{StaticResource BasicTb}" Grid.Row="3"/>
+                                <TextBlock FontSize="12" Text="White" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                <TextBlock FontSize="12" Text="Side" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                 <Slider Grid.Column="1" Grid.Row="0" VerticalAlignment="Center"/>
                                 <Slider Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"/>
-                                <Slider Grid.Column="1" Grid.Row="2" VerticalAlignment="Center"/>
-                                <Slider Grid.Column="1" Grid.Row="3" VerticalAlignment="Center"/>
                                 <TextBox Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                                 <TextBox Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                             </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="5" Header="Spec">
@@ -161,16 +155,17 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                     <RowDefinition/>
-                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
                                 <TextBlock FontSize="12" Text="Inspection ROI Height" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                 <TextBlock FontSize="12" Text="Inspection ROI Width" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                 <TextBlock FontSize="12" Text="Threshold" Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                 <TextBlock FontSize="12" Text="Size Minimum (um)" Style="{StaticResource BasicTb}" Grid.Row="3"/>
-                                <TextBox Text="{Binding ROIHeight}" Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Text="{Binding ROIWidth}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Text="{Binding Threshold}" Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Text="{Binding DefectSizeMin}" Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBlock FontSize="12" Text="Merge Distance " Style="{StaticResource BasicTb}" Grid.Row="4"/>
+                                <TextBox Text="{Binding ROIHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding ROIWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding Threshold, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding DefectSizeMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding MergeDist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                             </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="6" Header="Defect Code">
@@ -183,14 +178,10 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                     <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock FontSize="12" Text="Intensity" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                <TextBlock FontSize="12" Text="Over GV USL" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                <TextBlock FontSize="12" Text="Under GV LSL" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                <TextBlock FontSize="12" Text="Over Size USL" Style="{StaticResource BasicTb}" Grid.Row="3"/>
-                                <TextBlock FontSize="12" Text="Under Size LSL" Style="{StaticResource BasicTb}" Grid.Row="4"/>
+                                <TextBlock FontSize="12" Text="Top" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                <TextBlock FontSize="12" Text="Side" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+                                <TextBlock FontSize="12" Text="Bottom" Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                 <ComboBox Grid.Row="0" Grid.Column="1" SelectedIndex="0" 
                                           VerticalAlignment="Center"
                                           HorizontalAlignment="Center">
@@ -214,28 +205,6 @@
                                     <ComboBoxItem Content="0x000060"/>
                                 </ComboBox>
                                 <ComboBox Grid.Row="2" Grid.Column="1" SelectedIndex="0" 
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center">
-                                    <ComboBoxItem Content="0x000000"/>
-                                    <ComboBoxItem Content="0x000010"/>
-                                    <ComboBoxItem Content="0x000020"/>
-                                    <ComboBoxItem Content="0x000030"/>
-                                    <ComboBoxItem Content="0x000040"/>
-                                    <ComboBoxItem Content="0x000050"/>
-                                    <ComboBoxItem Content="0x000060"/>
-                                </ComboBox>
-                                <ComboBox Grid.Row="3" Grid.Column="1" SelectedIndex="0" 
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center">
-                                    <ComboBoxItem Content="0x000000"/>
-                                    <ComboBoxItem Content="0x000010"/>
-                                    <ComboBoxItem Content="0x000020"/>
-                                    <ComboBoxItem Content="0x000030"/>
-                                    <ComboBoxItem Content="0x000040"/>
-                                    <ComboBoxItem Content="0x000050"/>
-                                    <ComboBoxItem Content="0x000060"/>
-                                </ComboBox>
-                                <ComboBox Grid.Row="4" Grid.Column="1" SelectedIndex="0" 
                                           VerticalAlignment="Center"
                                           HorizontalAlignment="Center">
                                     <ComboBoxItem Content="0x000000"/>

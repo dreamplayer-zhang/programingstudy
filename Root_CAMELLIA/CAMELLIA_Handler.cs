@@ -189,18 +189,19 @@ namespace Root_CAMELLIA
             RND
         }
         eAligner m_eAligner = eAligner.ATI;
+        public ModuleBase m_Aligner = null;
         void InitAligner()
         {
-            ModuleBase module = null;
+            
             switch (m_eAligner)
             {
-                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break;
-                case eAligner.RND: module = new Aligner_RND("Aligner", m_engineer); break;
+                case eAligner.ATI: m_Aligner = new Aligner_ATI("Aligner", m_engineer); break;
+                case eAligner.RND: m_Aligner = new Aligner_RND("Aligner", m_engineer); break;
             }
-            if (module != null)
+            if (m_Aligner != null)
             {
-                InitModule(module);
-                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+                InitModule(m_Aligner);
+                ((IWTR)m_wtr).AddChild((IWTRChild)m_Aligner);
             }
         }
 
@@ -220,11 +221,21 @@ namespace Root_CAMELLIA
         #endregion
 
         #region StateHome
+        public bool m_bIsPossible_Recovery = false;
         public string StateHome()
         {
-            string sInfo = StateHome(m_moduleList.m_aModule);
-            if (sInfo == "OK")
-                EQ.p_eState = EQ.eState.Ready;
+            //string sInfo = StateHome(m_moduleList.m_aModule);
+            //if (sInfo == "OK")
+            //    EQ.p_eState = EQ.eState.Ready;
+            //return sInfo;
+            string sInfo = StateHome(m_wtr);
+            if(sInfo != "OK")
+            {
+                EQ.p_eState = EQ.eState.Init;
+                return sInfo;
+            }
+            sInfo = StateHome((Loadport_RND)m_aLoadport[0], (Loadport_RND)m_aLoadport[1], m_Aligner, m_camellia);
+            if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
 
@@ -382,7 +393,7 @@ namespace Root_CAMELLIA
                 if (loadport.p_id == sLoadport)
                 {
                     //loadport.RunDocking();
-                    if (loadport.RunDocking() != "OK") return;
+                    if (loadport.StartRunDocking() != "OK") return;
                     InfoCarrier infoCarrier = loadport.p_infoCarrier;
                     ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
                     manualJobSchedule.ShowPopup(); //p_moduleList.ClickRun();
@@ -403,7 +414,7 @@ namespace Root_CAMELLIA
                     {
                         if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
                     }
-                    if (bUndock) loadport.RunUndocking();
+                    if (bUndock) loadport.StartRunUndocking();
                 }
             }
         }

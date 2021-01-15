@@ -19,11 +19,11 @@ namespace RootTools.OHT
             {
                 if (value == _sInfo) return;
                 _sInfo = value;
-                if (value != "OK")
-                {
-                    m_log.Error(value);
-                    m_module.p_eState = ModuleBase.eState.Error; 
-                }
+                //if (value != "OK")  //KHD 201222 del /test
+                //{
+                //    m_log.Error(value);
+                //    m_module.p_eState = ModuleBase.eState.Error; 
+                //}
                 OnPropertyChanged(); 
             }
         }

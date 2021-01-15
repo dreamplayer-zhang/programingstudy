@@ -40,7 +40,7 @@ namespace Root_Rinse_Loader.Module
         }
 
         List<Line> m_aLine = new List<Line>();
-        void initILines()
+        void InitILines()
         {
             for (int n = 0; n < 4; n++) m_aLine.Add(new Line("Line" + n.ToString(), this));
         }
@@ -104,7 +104,7 @@ namespace Root_Rinse_Loader.Module
         {
             p_id = id;
             m_rinse = rinse;
-            initILines();
+            InitILines();
             InitBase(id, engineer);
         }
 

@@ -34,6 +34,7 @@ namespace Root_CAMELLIA.UI_UserControl
 
         Loadport_RND m_loadport;
         CAMELLIA_Handler m_handler;
+        BackgroundWorker m_bgwLoad = new BackgroundWorker();
         public void Init(ILoadport loadport, CAMELLIA_Handler handler)
         {
             m_loadport = (Loadport_RND)loadport;
@@ -41,6 +42,24 @@ namespace Root_CAMELLIA.UI_UserControl
             this.DataContext = loadport;
 
             InitTimer();
+            m_bgwLoad.DoWork += M_bgwLoad_DoWork;
+            m_bgwLoad.RunWorkerCompleted += M_bgwLoad_RunWorkerCompleted;
+        }
+
+        private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            switch (m_loadport.p_eState) 
+            {
+                case ModuleBase.eState.Ready:
+                    //m_loadport.p_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+                    EQ.p_eState = EQ.eState.Run;
+                    break;
+            }
+        }
+
+        private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
+        {
+            //RFID Reading //working
         }
 
         bool IsEnableLoad()
@@ -50,11 +69,33 @@ namespace Root_CAMELLIA.UI_UserControl
             bReadyToLoad = true;
             bool bReadyState = (m_loadport.m_qModuleRun.Count == 0);
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
-            if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
+            //if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
+            bool bPlaced = m_loadport.CheckPlaced();
 
             if (m_handler.IsEnableRecovery() == true) return false;
-            return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState;
+            return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && bPlaced;
         }
+
+        private void buttonLoad_Click(object sender, RoutedEventArgs e)
+        {
+            m_bgwLoad.RunWorkerAsync();
+        }
+
+        bool IsEnableUnloadReq()
+        {
+            bool bReadyLoadport = (m_loadport.p_eState == ModuleBase.eState.Ready);
+            bool bReadyToUnload = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
+            bool bAccess = (m_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto);
+            bool bPlaced = m_loadport.CheckPlaced();
+            return bReadyLoadport && bReadyToUnload && bAccess & bPlaced;
+        }
+
+        private void buttonUnloadReq_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsEnableUnloadReq() == false) return;
+            m_loadport.m_ceidUnloadReq.Send();
+        }
+
 
         #region Timer
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -68,7 +109,11 @@ namespace Root_CAMELLIA.UI_UserControl
         private void M_timer_Tick(object sender, EventArgs e)
         {
             buttonLoad.IsEnabled = IsEnableLoad();
+            buttonUnloadReq.IsEnabled = IsEnableUnloadReq();
         }
+
         #endregion
+
+        
     }
 }

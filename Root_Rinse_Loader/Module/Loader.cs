@@ -109,7 +109,7 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
-        #region Load
+        #region Run Load
         public string RunLoad()
         {
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack"; 
@@ -196,6 +196,11 @@ namespace Root_Rinse_Loader.Module
             m_roller = roller;
             InitPickers(); 
             InitBase(id, engineer); 
+        }
+
+        public override void ThreadStop()
+        {
+            base.ThreadStop();
         }
 
         #region StartRun

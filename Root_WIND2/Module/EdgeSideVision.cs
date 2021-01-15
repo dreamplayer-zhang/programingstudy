@@ -443,6 +443,7 @@ namespace Root_WIND2.Module
 			AddModuleRunList(new Run_GrabEdge(this), true, "Run Grab Edge");
 			AddModuleRunList(new Run_GrabEBR(this), true, "Run Grab EBR");
 			AddModuleRunList(new Run_InspectEdge(this), true, "Run Inspect Edge");
+			AddModuleRunList(new Run_InspectEBR(this), true, "Run Inspect EBR");
 		}
 
 		public ImageData GetMemoryData(EDGE_TYPE data)

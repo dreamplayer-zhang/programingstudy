@@ -365,6 +365,10 @@
       <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="InfoWafer.cs" />
+    <Compile Include="Light\LightTool_DAWOO.cs" />
+    <Compile Include="Light\LightTool_DAWOO_UI.xaml.cs">
+      <DependentUpon>LightTool_DAWOO_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OHTNew\ILoadport.cs" />
     <Compile Include="OHTNew\OHT.cs" />
     <Compile Include="OHTNew\OHT_ButtonUI.xaml.cs">
@@ -861,6 +865,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Light\LightTool_4ch_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Light\LightTool_DAWOO_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
