@@ -191,5 +191,22 @@ namespace Root_AOP01_Inspection
             {
                 m_engineer.BuzzerOff();
             }
+
+        private void DoorCheck_Click(object sender, RoutedEventArgs e)
+        {
+            if((String)DoorCheck.Content== "DoorLock Off")
+            {
+                DoorCheck.Content = "DoorLock On";
+                m_engineer.m_handler.m_aop01.m_bDoorLock = false;
+            }
+            else
+            {
+                DoorCheck.Content = "DoorLock Off";
+                m_engineer.m_handler.m_aop01.m_bDoorLock = true;
+            }
+
+
+
         }
+    }
 }
