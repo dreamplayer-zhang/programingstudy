@@ -227,7 +227,8 @@ namespace RootTools.Module
                             m_qModuleRun.Clear();
                         }
                     }
-                    if (m_qModuleRun.Count > 0) p_eState = eState.Run;
+                    if (m_qModuleRun.Count > 0) 
+                        p_eState = eState.Run;
                     break;
                 case eState.Run:
                     p_bEnableHome = false;

@@ -16,7 +16,7 @@ using RootTools.OHTNew;
 
 namespace Root_CAMELLIA
 {
-    public class CAMELLIA_Handler : IHandler
+    public class CAMELLIA_Handler : NotifyProperty, IHandler
     {
         public ModuleList p_moduleList
         {
@@ -345,7 +345,18 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Thread
-        bool m_bThread = false;
+        bool _bThread = false;
+        public bool p_bThread 
+        {
+            get { return _bThread; }
+            set 
+            {
+                if (_bThread == value) return;
+                _bThread = value;
+                OnPropertyChanged();
+            }
+        }
+
         Thread m_thread = null;
         void InitThread()
         {
@@ -355,9 +366,9 @@ namespace Root_CAMELLIA
         
         void RunThread()
         {
-            m_bThread = true;
+            p_bThread = true;
             Thread.Sleep(100);
-            while (m_bThread)
+            while (p_bThread)
             {
                 Thread.Sleep(10);
                 switch (EQ.p_eState)
@@ -387,6 +398,7 @@ namespace Root_CAMELLIA
 
         void CheckLoad()
         {
+            if (m_process.m_qSequence.Count == 0) return;
             EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
             string sLoadport = sequence.m_infoWafer.m_sModule;
             foreach (ILoadport loadport in m_aLoadport)
@@ -441,9 +453,9 @@ namespace Root_CAMELLIA
 
         public void ThreadStop()
         {
-            if (m_bThread)
+            if (p_bThread)
             {
-                m_bThread = false;
+                p_bThread = false;
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
