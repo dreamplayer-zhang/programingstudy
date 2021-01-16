@@ -24,6 +24,9 @@
 					<Button Content="Inspection"
                             Command="{Binding commandInspTest}"
                             Style="{StaticResource SetupPanelBtn}"/>
+					<ToggleButton Content="Draw Edge Box" 
+								  Style="{StaticResource SetupPanelToggleBtn}"
+								  IsChecked="{Binding EdgeDrawMode}"/>
 				</StackPanel>
                 <Button Content="Back"
                         Command="{Binding btnBack}"

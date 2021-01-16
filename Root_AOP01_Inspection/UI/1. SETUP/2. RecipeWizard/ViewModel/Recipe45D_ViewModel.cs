@@ -115,6 +115,22 @@ namespace Root_AOP01_Inspection
 
 		#endregion
 
+		#region EdgeDrawMode
+		private bool _EdgeDrawMode;
+		public bool EdgeDrawMode
+		{
+			get
+			{
+				return _EdgeDrawMode;
+			}
+			set
+			{
+				SetProperty(ref _EdgeDrawMode, value);
+			}
+		}
+
+		#endregion
+
 		public ObservableCollection<UIElement> UIElements
 		{
 			get
@@ -177,6 +193,8 @@ namespace Root_AOP01_Inspection
 
 			SurfaceSize = 5;
 			SurfaceGV = 70;
+
+			EdgeDrawMode = false;
 		}
 
 		private void ProcessDefectDone_Callback(object obj, PocessDefectDoneEventArgs args)
@@ -240,7 +258,7 @@ namespace Root_AOP01_Inspection
 		{
 			p_ImageViewer_VM.Clear();
 			m_Setup.InspectionManager.RefreshDefect();
-			//this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
+			this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
 			
 		}
 
