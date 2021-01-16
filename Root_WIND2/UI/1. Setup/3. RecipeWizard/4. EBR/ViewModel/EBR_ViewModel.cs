@@ -20,9 +20,9 @@ namespace Root_WIND2
 
         public EBR_ViewModel(Setup_ViewModel setup)
         {
-            init();
             this.setupVM = setup;
             this.recipe = setup.Recipe;
+            init();
         }
 
         public void init()
