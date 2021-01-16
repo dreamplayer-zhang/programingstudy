@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools.Module;
+using System;
 
 namespace RootTools.OHTNew
 {
@@ -15,5 +16,9 @@ namespace RootTools.OHTNew
         bool p_bPlaced { get; }
 
         bool p_bPresent { get; }
+
+        ModuleRunBase GetLoadModuleRun();
+
+        ModuleRunBase GetUnLoadModuleRun();
     }
 }
