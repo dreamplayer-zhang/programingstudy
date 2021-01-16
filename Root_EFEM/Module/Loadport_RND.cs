@@ -14,12 +14,12 @@ namespace Root_EFEM.Module
     public class Loadport_RND : ModuleBase, IWTRChild, ILoadport
     {
         #region ToolBox
-        DIO_I m_diPlaced;
-        DIO_I m_diPresent;
-        DIO_I m_diLoad;
-        DIO_I m_diUnload;
-        DIO_I m_diDoorOpen;
-        DIO_I m_diDocked;
+        public DIO_I m_diPlaced;
+        public DIO_I m_diPresent;
+        public DIO_I m_diLoad;
+        public DIO_I m_diUnload;
+        public DIO_I m_diDoorOpen;
+        public DIO_I m_diDocked;
         RS232 m_rs232;
         OHT m_OHT; 
         public override void GetTools(bool bInit)
@@ -433,18 +433,20 @@ namespace Root_EFEM.Module
         SVID m_svidPlaced;
         CEID m_ceidDocking;
         CEID m_ceidUnDocking;
+        public CEID m_ceidUnloadReq;
         ALID m_alidPlaced;
         void InitGAF() 
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
             m_ceidDocking = m_gaf.GetCEID(this, "Docking");
             m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
+            m_ceidUnloadReq = m_gaf.GetCEID(this, "Unload Request");
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
         }
         #endregion
 
         #region ILoadport
-        public string RunDocking()
+        public string StartRunDocking()
         {
             if (p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK"; 
             ModuleRunBase run = m_runDocking.Clone();
@@ -453,7 +455,7 @@ namespace Root_EFEM.Module
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
 
-        public string RunUndocking()
+        public string StartRunUndocking()
         {
             if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runUndocking.Clone();

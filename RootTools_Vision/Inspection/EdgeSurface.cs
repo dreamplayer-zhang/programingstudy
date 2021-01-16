@@ -21,6 +21,13 @@ namespace RootTools_Vision
 		private EdgeSurfaceParameter parameter;
 		private EdgeSurfaceRecipe recipe;
 
+		public enum EdgeMapPositionX
+		{
+			Top = 0,
+			Side = 1,
+			Btm = 2
+		}
+
 		public EdgeSurface() : base()
 		{
 			m_sName = this.GetType().Name;
@@ -72,10 +79,37 @@ namespace RootTools_Vision
 
 		private void DoColorInspection(IntPtr sharedBuffer, EdgeSurfaceParameter param)
 		{
-			int roiHeight = 2000; //parameter.RoiHeight;
-			int roiWidth = this.workplace.SharedBufferWidth; //parameter.RoiWidth;
-			int threshold = 40; //parameter.Theshold;
-			int defectSize = 10; //parameter.Size;
+			int roiHeight; // 2000
+			int roiWidth; // this.workplace.SharedBufferWidth;
+			int threshold;  // 40
+			int defectSize; // 10
+
+			// parameter 구분하기
+			if (this.workplace.MapPositionX == (int)EdgeMapPositionX.Top)
+			{
+				roiHeight = parameter.RoiHeightTop;
+				roiWidth = parameter.RoiWidthTop;
+				threshold = parameter.ThesholdTop;
+				defectSize = parameter.SizeMinTop;
+			}
+			else if (this.workplace.MapPositionX == (int)EdgeMapPositionX.Side)
+			{
+				roiHeight = parameter.RoiHeightSide;
+				roiWidth = parameter.RoiWidthSide;
+				threshold = parameter.ThesholdSide;
+				defectSize = parameter.SizeMinSide;
+			}
+			else if (this.workplace.MapPositionX == (int)EdgeMapPositionX.Btm)
+			{
+				roiHeight = parameter.RoiHeightBtm;
+				roiWidth = parameter.RoiWidthBtm;
+				threshold = parameter.ThesholdBtm;
+				defectSize = parameter.SizeMinBtm;
+			}
+			else
+			{
+				return;
+			}
 
 			int roiSize = roiWidth * roiHeight;
 
@@ -85,16 +119,23 @@ namespace RootTools_Vision
 			int bottom = this.workplace.PositionY + roiHeight;
 
 			byte[] arrSrc = new byte[roiSize];
+			//for (int cnt = top; cnt < bottom; cnt++)
+			//{
+			//	Marshal.Copy(new IntPtr(sharedBuffer.ToInt64() + (cnt * (Int64)roiWidth))
+			//				, arrSrc
+			//				, roiWidth * (cnt - top)
+			//				, roiWidth);
+			//}
 			for (int cnt = top; cnt < bottom; cnt++)
 			{
-				Marshal.Copy(new IntPtr(sharedBuffer.ToInt64() + (cnt * (Int64)roiWidth))
+				Marshal.Copy(new IntPtr(sharedBuffer.ToInt64() + (cnt * (Int64)this.workplace.SharedBufferWidth))
 							, arrSrc
-							, roiWidth * (cnt - top)
-							, roiWidth);
+							, this.workplace.SharedBufferWidth * (cnt - top)
+							, this.workplace.SharedBufferWidth);
 			}
-			//Emgu.CV.Mat mat = new Emgu.CV.Mat((int)roiHeight, (int)roiWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
-			//Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
-			//mat.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_" + this.workplace.Index.ToString() + ".bmp");
+			Emgu.CV.Mat mat = new Emgu.CV.Mat((int)roiHeight, (int)roiWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+			Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
+			mat.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_" + this.workplace.Index.ToString() + ".bmp");
 
 			// profile 생성
 			List<int> temp = new List<int>();

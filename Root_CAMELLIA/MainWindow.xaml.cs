@@ -70,25 +70,6 @@ namespace Root_CAMELLIA
             this.DataContext = new MainWindow_ViewModel(this);
         }
 
-        
-
-        private void buttonPause_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        
-
-        private void buttonRecovery_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void buttonBuzzerOff_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         CAMELLIA_Engineer m_engineer;
         CAMELLIA_Handler m_handler;
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -98,6 +79,8 @@ namespace Root_CAMELLIA
             m_handler = m_engineer.m_handler;
             loadportA.Init(m_handler.m_aLoadport[0], m_handler);
             loadportB.Init(m_handler.m_aLoadport[1], m_handler);
+
+            InitTimer();
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -110,7 +93,25 @@ namespace Root_CAMELLIA
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            
+            TimerUI();
+            TimerLamp();
+
+            buttonResume.IsEnabled = IsEnable_Resume();
+            buttonPause.IsEnabled = IsEnable_Pause();
+            buttonInit.IsEnabled = IsEnable_Initial();
+            buttonRecovery.IsEnabled = IsEnable_Recovery();
+        }
+
+        void TimerUI()
+        {
+            if (EQ.p_eState != EQ.eState.Run) EQ.p_bRecovery = false;
+            //textState.Text = m_bRecovery ? "Recovery" : EQ.p_eState.ToString();
+            textState.Text = EQ.p_bRecovery ? "Recovery" : EQ.p_eState.ToString();
+        }
+
+        void TimerLamp()
+        {
+            //working
         }
 
         bool IsEnable_Resume()
@@ -138,11 +139,21 @@ namespace Root_CAMELLIA
             return true;
         }
 
+        private void buttonInit_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsEnable_Initial() == false) return;
+            EQ.p_bStop = false;
+            m_handler.m_process.ClearInfoWafer();
+            EQ.p_eState = EQ.eState.Home;
+            //Camellia Camera Connect
+        }
+
         bool IsRunModule()
         {
             if (IsRunModule((Loadport_RND)m_handler.m_aLoadport[0])) return true;
             if (IsRunModule((Loadport_RND)m_handler.m_aLoadport[1])) return true;
             if (IsRunModule(m_handler.m_wtr)) return true;
+            if (IsRunModule(m_handler.m_Aligner)) return true;
             if (IsRunModule(m_handler.m_camellia)) return true;
             return false;
         }
@@ -154,18 +165,40 @@ namespace Root_CAMELLIA
             return (module.m_qModuleRun.Count > 0);
         }
 
-        private void buttonInit_Click(object sender, RoutedEventArgs e)
-        {
-            if (IsEnable_Initial() == false) return;
-            EQ.p_bStop = false;
-            m_handler.m_process.ClearInfoWafer();
-            EQ.p_eState = EQ.eState.Home;
-
-        }
+        
 
         bool IsEnable_Recovery()
         {
-            return false;
+            if (IsRunModule()) return false;
+            if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (EQ.p_bStop == true) return false;
+            return m_handler.IsEnableRecovery();
+        }
+
+        private void buttonRecovery_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsEnable_Recovery() == false) return;
+            m_handler.m_process.CalcRecover();
+            EQ.p_bStop = false;
+            EQ.p_eState = EQ.eState.Run;
+            EQ.p_bRecovery = true;
+        }
+
+        bool IsEnable_Pause()
+        {
+            if (EQ.p_eState != EQ.eState.Run) return false;
+            return true;
+        }
+
+        private void buttonPause_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsEnable_Pause() == false) return;
+            EQ.p_eState = EQ.eState.Ready;
+        }
+
+        private void buttonBuzzerOff_Click(object sender, RoutedEventArgs e)
+        {
+            m_engineer.BuzzerOff();
         }
     }
 }

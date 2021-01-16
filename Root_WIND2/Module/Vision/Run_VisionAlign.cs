@@ -127,7 +127,7 @@ namespace Root_WIND2.Module
 
                     rawdata = Tools.LoadBitmapToRawdata(fullname, &width, &height);
 
-                    result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), rawdata, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
+                    result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), rawdata, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
                 }
                 if (maxScore < result)
                 {
@@ -164,7 +164,7 @@ namespace Root_WIND2.Module
 
             unsafe
             {
-                result = CLR_IP.Cpp_TemplateMatching((byte*)(src2.ToPointer()), findRawData, &resPosX2, &resPosY2, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
+                result = CLR_IP.Cpp_TemplateMatching((byte*)(src2.ToPointer()), findRawData, &resPosX2, &resPosY2, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
             }
 
             if (result < m_score)
@@ -206,7 +206,7 @@ namespace Root_WIND2.Module
                         int PosX = 0, PosY = 0;
                         unsafe
                         {
-                            result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), findRawData, &PosX, &PosY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
+                            result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), findRawData, &PosX, &PosY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
                         }
                         if (IsFirst)
                         {
@@ -263,7 +263,7 @@ namespace Root_WIND2.Module
             src = img.GetPtr();
             unsafe
             {
-                CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), findRawData, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
+                CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), findRawData, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
             }
            
             if (m_module.Run(axisXY.p_axisX.StartMove(pulse.X - (posX + (width / 2) - camWidth / 2) * m_AlignCamResolution * 10)))

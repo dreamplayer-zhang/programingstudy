@@ -364,7 +364,7 @@ namespace Root_EFEM
             string sLoadport = sequence.m_infoWafer.m_sModule; 
             foreach (ILoadport loadport in m_aLoadport)
             {
-                if (loadport.p_id == sLoadport) loadport.RunDocking(); 
+                if (loadport.p_id == sLoadport) loadport.StartRunDocking(); 
             }
         }
 
@@ -381,7 +381,7 @@ namespace Root_EFEM
                     {
                         if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false; 
                     }
-                    if (bUndock) loadport.RunUndocking(); 
+                    if (bUndock) loadport.StartRunUndocking(); 
                 }
             }
         }

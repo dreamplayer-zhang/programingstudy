@@ -5,9 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_AOP01_Inspection.Module"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="350"  Background="#FF2D2D30">
+             d:DesignHeight="700" d:DesignWidth="350"  Background="#FF2D2D30">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="3.3*"/>
@@ -73,7 +74,18 @@
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*"/>
-                <RowDefinition Height="8*"/>
+                <RowDefinition Height="2.5*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Transfer State" FontSize="15" FontWeight="Bold" Foreground="White" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center" Height="18" Width="100"/>
+            <Grid Grid.Row="1">
+                <TextBlock x:Name="blockTransferState"  HorizontalAlignment="Center" VerticalAlignment="Center" FontSize ="30" Foreground="White"/>
+            </Grid>
+        </Grid>
+        <Grid x:Name="grPioState" Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="23*"/>
+                <RowDefinition Height="282*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="PIO State" FontSize="15" FontWeight="Bold" Foreground="White" 
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -125,14 +137,14 @@
             </Grid>
         </Grid>
 
-        <Grid Grid.Row="3">
+        <Grid x:Name="grErrState" Grid.Row="4" Margin="0,0,0,-56">
             <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="2*"/>
-                <RowDefinition Height="1*"/>
+                <RowDefinition Height="28*"/>
+                <RowDefinition Height="97*"/>
+                <RowDefinition Height="42*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Error State" FontSize="15" FontWeight="Bold" Foreground="White" 
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                       HorizontalAlignment="Center" VerticalAlignment="Center" Height="18" />
             <TextBox Grid.Row="1" Background="White" Text="{Binding p_sInfo}" FontSize="16" Margin="1" IsEnabled="False"/>
             <Button Grid.Row="2" x:Name="buttonRetry" Content="Retry Key" Margin="3" FontWeight="Bold" Click="buttonRetry_Click"/>
         </Grid>

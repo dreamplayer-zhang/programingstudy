@@ -80,7 +80,7 @@ namespace Root_WIND2
         void InitSetupMode(ProgramManager program)
         {
             setupWindow = new Setup();
-            setupViewModel = new Setup_ViewModel(program.Recipe, program.InspectionFront, program.InspectionEdge);
+            setupViewModel = new Setup_ViewModel(program.Recipe, program.InspectionFront, program.InspectionEdge, program.InspectionEBR);
             setupWindow.DataContext = SetupViewModel;
         }
         void InitReviewMode(ProgramManager program)
@@ -94,6 +94,8 @@ namespace Root_WIND2
             runWindow = new Run();
             runViewModel = new Run_ViewModel(setupViewModel);
             runWindow.DataContext = runViewModel;
+
+
         }
 
         void InitSettingDialog()

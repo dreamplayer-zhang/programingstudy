@@ -82,7 +82,7 @@ namespace RootTools_Vision
 
         public CPoint ConvertRelToAbs_Chip(CPoint ptRel)
         {
-            return new CPoint(this.workplace.PositionX + ptRel.X, this.workplace.PositionY + ptRel.Y);
+            return new CPoint(this.workplace.PositionX + ptRel.X, this.workplace.PositionY + ptRel.Y + this.workplace.BufferSizeY);
         }
 
         public bool DoPosition()
@@ -135,7 +135,7 @@ namespace RootTools_Vision
                             (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY, 
                             this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                             feature.Width, feature.Height,
-                            startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt);
+                            startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt, (int)this.parameter.IndexChannel);
                     }
 
                     if( score > maxScore)
@@ -236,7 +236,7 @@ namespace RootTools_Vision
                                 (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
                                 this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                                 feature.Width, feature.Height,
-                                startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt);
+                                startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt, (int)this.parameter.IndexChannel);
                         }
 
                         if (score > maxScore)
@@ -275,7 +275,7 @@ namespace RootTools_Vision
                             (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
                             this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                             feature.Width, feature.Height,
-                            startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt);
+                            startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt, (int)this.parameter.IndexChannel);
                     }
 
                     maxScore = score;
@@ -397,9 +397,9 @@ namespace RootTools_Vision
                 new CRect
                 (
                     this.workplace.PositionX, 
-                    this.workplace.PositionY - this.workplace.BufferSizeY, 
+                    this.workplace.PositionY, 
                     this.workplace.PositionX + this.workplace.BufferSizeX, 
-                    this.workplace.PositionY),
+                    this.workplace.PositionY + this.workplace.BufferSizeY),
                 this.workplace.WorkplaceBufferR_GRAY);
 
 
@@ -412,9 +412,9 @@ namespace RootTools_Vision
                     new CRect
                     (
                         this.workplace.PositionX,
-                        this.workplace.PositionY - this.workplace.BufferSizeY,
+                        this.workplace.PositionY,
                         this.workplace.PositionX + this.workplace.BufferSizeX,
-                        this.workplace.PositionY),
+                        this.workplace.PositionY + this.workplace.BufferSizeY),
                     this.workplace.WorkplaceBufferG);
 
                 Tools.ParallelImageCopy(
@@ -424,9 +424,9 @@ namespace RootTools_Vision
                     new CRect
                     (
                         this.workplace.PositionX,
-                        this.workplace.PositionY - this.workplace.BufferSizeY,
+                        this.workplace.PositionY,
                         this.workplace.PositionX + this.workplace.BufferSizeX,
-                        this.workplace.PositionY),
+                        this.workplace.PositionY + this.workplace.BufferSizeY),
                     this.workplace.WorkplaceBufferB);
             }
         }
