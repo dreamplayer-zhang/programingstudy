@@ -105,7 +105,7 @@ namespace RootTools.Database
             return bConnect;
         }
 
- 
+
         public void ThreadConnect(int nThreadCount)
         {
             for (int i = 0; i < nThreadCount; i++)
@@ -117,29 +117,41 @@ namespace RootTools.Database
 
         public void SendQuery(string sQueryMessage) // Main
         {
-            try
+#if !DEBUG
+			try
             {
-                MySqlCommand cmd = new MySqlCommand(sQueryMessage, m_MainConnectSession.GetConnection());
-                cmd.ExecuteNonQuery();
-                //return cmd.ExecuteNonQuery();
+#endif
+            MySqlCommand cmd = new MySqlCommand(sQueryMessage, m_MainConnectSession.GetConnection());
+            cmd.ExecuteNonQuery();
+            //return cmd.ExecuteNonQuery();
+
+#if !DEBUG
             }
             catch (Exception ex)
             {
                 string sMessage = ex.Message;
             }
+
+#endif
         }
 
         public int SendThreadQuery(int nThreadID, string sQueryMessage) // Inspection Thread
         {
+#if !DEBUG
             try
             {
-                MySqlCommand cmd = new MySqlCommand(sQueryMessage, m_ThreadConnectSession[nThreadID].GetConnection());
-                return cmd.ExecuteNonQuery();
+
+#endif
+            MySqlCommand cmd = new MySqlCommand(sQueryMessage, m_ThreadConnectSession[nThreadID].GetConnection());
+            return cmd.ExecuteNonQuery();
+#if !DEBUG
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return -1;
             }
+
+#endif
         }
 
         public void ClearTableData(string _sTable)
@@ -153,54 +165,68 @@ namespace RootTools.Database
 
         public void SelectData()
         {
-            try
+#if !DEBUG
+			try
             {
-                DataSet data = new DataSet();
-                string sSelectQuery = "SELECT * FROM wind2.defect"; // Temp
-                MySqlDataAdapter ap = new MySqlDataAdapter();
-                ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
-                ap.Fill(data); // DataSet으로 전체 데이터 복사.
-                m_DefectTable = data.Tables[0].Copy();
-            }
+
+#endif
+            DataSet data = new DataSet();
+            string sSelectQuery = "SELECT * FROM wind2.defect"; // Temp
+            MySqlDataAdapter ap = new MySqlDataAdapter();
+            ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+            ap.Fill(data); // DataSet으로 전체 데이터 복사.
+            m_DefectTable = data.Tables[0].Copy();
+#if !DEBUG
+        }
             catch (Exception ex)
             {
                 string sMsg = ex.Message;
-            }
+    }
+#endif
         }
+
 
         public DataTable SelectTable(string sTable)
         {
             DataSet data = new DataSet();
             DataTable table;
-            try
+#if !DEBUG
+			try
             {
-                string sSelectQuery = string.Format("SELECT * FROM wind2.{0};", sTable);
-                MySqlDataAdapter ap = new MySqlDataAdapter();
-                ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
-                ap.Fill(data);
-                table = data.Tables[0].Copy();
-                return table;
-            }
+
+#endif
+            string sSelectQuery = string.Format("SELECT * FROM wind2.{0};", sTable);
+            MySqlDataAdapter ap = new MySqlDataAdapter();
+            ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+            ap.Fill(data);
+            table = data.Tables[0].Copy();
+            return table;
+#if !DEBUG
+		}
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
                 table = data.Tables[0].Copy();
                 return table;
             }
+#endif
         }
 
         public DataTable SelectTablewithInspectionID(string sTable, string sInspectionID)
         {
             DataSet data = new DataSet();
             DataTable table;
-            try
+#if !DEBUG
+			try
             {
-                string sSelectQuery = string.Format("SELECT * FROM wind2.{0} where m_strInspectionID = '{1}';", sTable, sInspectionID);
-                MySqlDataAdapter ap = new MySqlDataAdapter();
-                ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
-                ap.Fill(data);
-                table = data.Tables[0].Copy();
-                return table;
+#endif
+            string sSelectQuery = string.Format("SELECT * FROM wind2.{0} where m_strInspectionID = '{1}';", sTable, sInspectionID);
+            MySqlDataAdapter ap = new MySqlDataAdapter();
+            ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+            ap.Fill(data);
+            table = data.Tables[0].Copy();
+            return table;
+#if !DEBUG
             }
             catch (Exception ex)
             {
@@ -208,6 +234,8 @@ namespace RootTools.Database
                 table = data.Tables[0].Copy();
                 return table;
             }
+
+#endif
         }
 
         #endregion
@@ -217,84 +245,95 @@ namespace RootTools.Database
         public void AddDefectData(Defect _defect)
         {
             string sError;
-            try
+#if !DEBUG
+			try
             {
-                StringBuilder sbQuery = new StringBuilder();
-                StringBuilder sbColumList = new StringBuilder();
-                StringBuilder sbValueList = new StringBuilder();
-                Type type = typeof(Defect);
-                FieldInfo[] fld = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
-                for (int i = 0; i < fld.Length; i++)
+
+#endif
+            StringBuilder sbQuery = new StringBuilder();
+            StringBuilder sbColumList = new StringBuilder();
+            StringBuilder sbValueList = new StringBuilder();
+            Type type = typeof(Defect);
+            FieldInfo[] fld = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            for (int i = 0; i < fld.Length; i++)
+            {
+                var f = fld[i];
+                object obj = f.GetValue(_defect);
+                sbColumList.Append(f.Name);
+                sbValueList.Append("'" + obj + "'");
+                if (i != fld.Length - 1)
                 {
-                    var f = fld[i];
-                    object obj = f.GetValue(_defect);
-                    sbColumList.Append(f.Name);
-                    sbValueList.Append("'" + obj + "'");
-                    if (i != fld.Length - 1)
-                    {
-                        sbColumList.Append(",");
-                        sbValueList.Append(",");
-                    }
+                    sbColumList.Append(",");
+                    sbValueList.Append(",");
                 }
-                sbQuery.AppendFormat("INSERT INTO defect({0}) values({1})", sbColumList.ToString(), sbValueList.ToString());
-                SendQuery(sbQuery.ToString());
             }
+            sbQuery.AppendFormat("INSERT INTO defect({0}) values({1})", sbColumList.ToString(), sbValueList.ToString());
+            SendQuery(sbQuery.ToString());
+#if !DEBUG
+		}
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+
+#endif
         }
 
         public void AddDefectDataList(List<Defect> _defectlist)
         {
-            try
+#if !DEBUG
+			try
             {
-                StringBuilder temp = new StringBuilder();
-                StringBuilder sbQuery = new StringBuilder();
-                StringBuilder sbColumList = new StringBuilder();
-                StringBuilder sValueList = new StringBuilder();
-                List<string> sbValueList = new List<string>();
-                Type type = typeof(Defect);
-                FieldInfo[] fld = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
-          
-                for (int defectListNum = 0; defectListNum < _defectlist.Count; defectListNum++)
+#endif
+            StringBuilder temp = new StringBuilder();
+            StringBuilder sbQuery = new StringBuilder();
+            StringBuilder sbColumList = new StringBuilder();
+            StringBuilder sValueList = new StringBuilder();
+            List<string> sbValueList = new List<string>();
+            Type type = typeof(Defect);
+            FieldInfo[] fld = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+            for (int defectListNum = 0; defectListNum < _defectlist.Count; defectListNum++)
+            {
+                temp.Clear();
+                sbColumList.Clear();
+                for (int i = 0; i < fld.Length; i++)
                 {
-                    temp.Clear();
-                    sbColumList.Clear();
-                    for (int i = 0; i < fld.Length; i++)
+                    var f = fld[i];
+                    object obj = f.GetValue(_defectlist[defectListNum]);
+                    sbColumList.Append(f.Name);
+                    if (i == 0)
+                        temp.Append("(");
+
+                    temp.AppendFormat("'{0}'", obj);
+
+                    if (i != fld.Length - 1)
                     {
-                        var f = fld[i];
-                        object obj = f.GetValue(_defectlist[defectListNum]);
-                        sbColumList.Append(f.Name);
-                        if(i == 0)
-                            temp.Append("(");
-
-                        temp.AppendFormat("'{0}'", obj);
-
-                        if (i != fld.Length - 1)
-                        {
-                            sbColumList.Append(",");
-                            temp.Append(",");
-                        }
-                        else
-                            temp.Append(")");
+                        sbColumList.Append(",");
+                        temp.Append(",");
                     }
-                    sbValueList.Add(temp.ToString());
+                    else
+                        temp.Append(")");
                 }
-
-                sbQuery.AppendFormat("INSERT INTO defect({0}) values", sbColumList.ToString());
-                for (int i = 0; i < sbValueList.Count; i++)
-                {
-                    sbQuery.Append(sbValueList[i]);
-                    if (i != sbValueList.Count - 1)
-                        sbQuery.Append(",");
-                }
-                SendQuery(sbQuery.ToString());
+                sbValueList.Add(temp.ToString());
             }
+
+            sbQuery.AppendFormat("INSERT INTO defect({0}) values", sbColumList.ToString());
+            for (int i = 0; i < sbValueList.Count; i++)
+            {
+                sbQuery.Append(sbValueList[i]);
+                if (i != sbValueList.Count - 1)
+                    sbQuery.Append(",");
+            }
+            SendQuery(sbQuery.ToString());
+#if !DEBUG
+		}
             catch (Exception ex)
             {
                 MessageBox.Show("DB Query Error : (AddDefectDataList)" + ex.Message);
             }
+
+#endif
         }
 
         public void SetLotinfo(string lotid, string partid, string setupid, string cstid, string waferid, string recipeid)
