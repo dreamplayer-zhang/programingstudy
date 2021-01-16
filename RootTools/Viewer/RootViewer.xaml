@@ -99,8 +99,7 @@
 				
 				<tools:CustomCanvas x:Name="canvas" obs:SizeObserver.Observe="true" Focusable="True"
 					obs:SizeObserver.ObservedWidth="{Binding p_CanvasWidth, Mode=OneWayToSource}"
-					obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}"
-									CanvasType="RootViewer"/>
+					obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}"/>
 				
 				<Image Source="{Binding p_LayerSource}" Opacity="0.5" Grid.Column="1"/>
 
