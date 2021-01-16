@@ -101,6 +101,7 @@
     </ApplicationDefinition>
     <Compile Include="Inspection\BacksideSurface.cs" />
     <Compile Include="Inspection\D2D.cs" />
+    <Compile Include="Inspection\EBR.cs" />
     <Compile Include="Inspection\EdgeSurface.cs" />
     <Compile Include="Inspection\ProcessDefect_Wafer.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="Recipe\Interfaces\IDisplaySpecSummary.cs" />
     <Compile Include="Recipe\Interfaces\IFrontsideInspection.cs" />
     <Compile Include="Recipe\Interfaces\IMaskInspection.cs" />
+    <Compile Include="Recipe\Parameter\EBRParameter.cs" />
     <Compile Include="Recipe\Parameter\EdgeSurfaceParameter.cs" />
     <Compile Include="Recipe\Parameter\ParameterBase.cs" />
     <Compile Include="Recipe\Parameter\PositionParameter.cs" />
@@ -121,6 +123,7 @@
     <Compile Include="Recipe\RecipeType\RecipeType_WaferMap.cs" />
     <Compile Include="Recipe\Recipe\BacksideRecipe.cs" />
     <Compile Include="Recipe\Recipe\D2DRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EBRRecipe.cs" />
     <Compile Include="Recipe\Recipe\EdgeSurfaceRecipe.cs" />
     <Compile Include="Recipe\Recipe\OriginRecipe.cs" />
     <Compile Include="Recipe\Recipe\PositionRecipe.cs" />

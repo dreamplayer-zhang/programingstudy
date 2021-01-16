@@ -359,7 +359,7 @@ namespace Root_AOP01_Inspection.Module
             //MainVision.Main.
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             m_memoryMain = m_memoryGroup.CreateMemory(App.mMainMem, 1, 1, 1000, 1000);
-           
+
             m_memorySideLeft = m_memoryGroup.CreateMemory(App.mSideLeftMem, 1, 1, 1000, 1000);
             m_memorySideBottom = m_memoryGroup.CreateMemory(App.mSideBotMem, 1, 1, 1000, 1000);
             m_memorySideRight = m_memoryGroup.CreateMemory(App.mSideRightMem, 1, 1, 1000, 1000);
@@ -466,18 +466,26 @@ namespace Root_AOP01_Inspection.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Grab(this), true, "Run Grab");
-            AddModuleRunList(new Run_Grab45(this), false, "Run Grab 45");
-            AddModuleRunList(new Run_GrabSideScan(this), false, "Run Side Scan");
-            AddModuleRunList(new Run_LADS(this), false, "Run LADS");
-            AddModuleRunList(new Run_BarcodeInspection(this), false, "Run Barcode Inspection");
-            AddModuleRunList(new Run_MakeAlignTemplateImage(this), false, "Run MakeAlignTemplateImage");
-            AddModuleRunList(new Run_PatternAlign(this), false, "Run PatternAlign");
-            AddModuleRunList(new Run_ShiftAndRotation(this), false, "Run ShiftAndRotation");
-            AddModuleRunList(new Run_AlignKeyInspection(this), false, "Run AlignKeyInspection");
+            AddModuleRunList(new Run_Grab45(this), true, "Run Grab 45");
+            AddModuleRunList(new Run_GrabSideScan(this), true, "Run Side Scan");
+            AddModuleRunList(new Run_LADS(this), true, "Run LADS");
+            AddModuleRunList(new Run_BarcodeInspection(this), true, "Run Barcode Inspection");
+            AddModuleRunList(new Run_MakeAlignTemplateImage(this), true, "Run MakeAlignTemplateImage");
+            AddModuleRunList(new Run_PatternAlign(this), true, "Run PatternAlign");
+            AddModuleRunList(new Run_ShiftAndRotation(this), true, "Run ShiftAndRotation");
+            AddModuleRunList(new Run_AlignKeyInspection(this), true, "Run AlignKeyInspection");
+            AddModuleRunList(new Run_Flip(this), true, "Run Reticle Flip");
         }
         #endregion
 
-
+        public WTRCleanUnit p_wtr
+        {
+            get
+            {
+                AOP01_Handler handler = (AOP01_Handler)m_engineer.ClassHandler();
+                return (WTRCleanUnit)handler.m_wtr;
+            }
+        }
 
         public MainVision(string id, IEngineer engineer)
         {
@@ -491,6 +499,32 @@ namespace Root_AOP01_Inspection.Module
         public override void ThreadStop()
         {
             base.ThreadStop();
+        }
+        public class Run_Flip : ModuleRunBase
+        {
+            MainVision m_module;
+            public Run_Flip(MainVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+            public override ModuleRunBase Clone()
+            {
+                Run_Flip run = new Run_Flip(m_module);
+                return run;
+            }
+            string m_sFlip = "Flip";
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_sFlip = tree.Set(m_sFlip, m_sFlip, "Flip", "Reticle Flip Glass to Bottom", bVisible, true);
+            }
+            public override string Run()
+            {
+                if (EQ.p_bSimulate) return "OK";
+                m_module.p_wtr.StartFlip();
+                while (m_module.p_wtr.IsBusy()) Thread.Sleep(10);
+                return "OK";
+            }
         }
 
         public class Run_GrabSideScan : ModuleRunBase

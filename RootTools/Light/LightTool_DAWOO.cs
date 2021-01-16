@@ -340,6 +340,8 @@ namespace RootTools.Light
             InitRS232();
             InitTreeSetup(); 
             InitLight();
+
+            InitThread(); 
         }
 
         public void ThreadStop()

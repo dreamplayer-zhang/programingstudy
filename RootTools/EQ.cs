@@ -65,6 +65,18 @@ namespace RootTools
             if (msSimulate > 0) Thread.Sleep(msSimulate); 
             return m_EQ.p_bStop;
         }
+
+        public static bool p_bRecovery
+        {
+            get { return m_EQ.p_bRecovery; }
+            set { m_EQ.p_bRecovery = value; }
+        }
+
+        public static int p_nRnR
+        {
+            get { return m_EQ.p_nRnR; }
+            set { m_EQ.p_nRnR = value; }
+        }
     }
 
     public class _EQ : NotifyProperty
@@ -155,6 +167,28 @@ namespace RootTools
                 _bDoorOpen = value;
                 OnPropertyChanged();
                 if (OnChanged != null) OnChanged(eEQ.DoorOpen, value);
+            }
+        }
+
+        bool _bRecovery = false;
+        public bool p_bRecovery
+        {
+            get { return _bRecovery; }
+            set
+            {
+                _bRecovery = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int _nRnR = 0;
+        public int p_nRnR 
+        {
+            get { return _nRnR; }
+            set
+            {
+                _nRnR = value;
+                OnPropertyChanged();
             }
         }
     }

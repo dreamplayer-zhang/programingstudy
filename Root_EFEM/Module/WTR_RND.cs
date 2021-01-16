@@ -367,7 +367,7 @@ namespace Root_EFEM.Module
             m_dicCmd.Add(eCmd.MoveHome, "HOME");
             m_dicCmd.Add(eCmd.Grip, "GRIP");
             m_dicCmd.Add(eCmd.Get, "GET");
-            m_dicCmd.Add(eCmd.GetReady, "GRDT");
+            m_dicCmd.Add(eCmd.GetReady, "GRDY");
             m_dicCmd.Add(eCmd.Put, "PUT");
             m_dicCmd.Add(eCmd.PutReady, "PRDY");
             m_dicCmd.Add(eCmd.Extend, "EXTA");
