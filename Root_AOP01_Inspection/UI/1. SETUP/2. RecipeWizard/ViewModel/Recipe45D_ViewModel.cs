@@ -213,7 +213,7 @@ namespace Root_AOP01_Inspection
 			//List<string> textList = new List<string>();
 			//List<CRect> rectList = new List<CRect>();
 
-			if(workplace.DefectList.Count>0)
+			if (workplace.DefectList.Count > 0)
 			{
 				Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
 				{
@@ -227,7 +227,7 @@ namespace Root_AOP01_Inspection
 			if (reDraw)
 				p_ImageViewer_VM.Clear();
 
-			p_ImageViewer_VM.DrawRect(rectList,  Recipe45D_ImageViewer_ViewModel.ColorType.Defect, text);
+			p_ImageViewer_VM.DrawRect(rectList, Recipe45D_ImageViewer_ViewModel.ColorType.Defect, text);
 		}
 
 		private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
@@ -259,7 +259,7 @@ namespace Root_AOP01_Inspection
 			p_ImageViewer_VM.Clear();
 			m_Setup.InspectionManager.RefreshDefect();
 			this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
-			
+
 		}
 
 		public ICommand commandInspTest
@@ -277,106 +277,106 @@ namespace Root_AOP01_Inspection
 			{
 #endif
 			int memH = p_ImageViewer_VM.p_ImageData.p_Size.Y;
-				int memW = p_ImageViewer_VM.p_ImageData.p_Size.X;
+			int memW = p_ImageViewer_VM.p_ImageData.p_Size.X;
 
-				float centX = CenterPoint.X; // 레시피 티칭 값 가지고오기
-				float centY = CenterPoint.Y;
+			float centX = CenterPoint.X; // 레시피 티칭 값 가지고오기
+			float centY = CenterPoint.Y;
 
-				int outMapX = 40, outMapY = 40;
-				float outOriginX, outOriginY;
-				float outChipSzX, outChipSzY;
-				float outRadius = 80000;
-				bool isIncludeMode = true;
+			int outMapX = 40, outMapY = 40;
+			float outOriginX, outOriginY;
+			float outChipSzX, outChipSzY;
+			float outRadius = 80000;
+			bool isIncludeMode = true;
 
-				IntPtr MainImage = new IntPtr();
-				if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
-				{
-					if (p_eColorViewMode != eColorViewMode.All)
-						MainImage = p_ImageViewer_VM.p_ImageData.GetPtr((int)p_eColorViewMode - 1);
-					else
-						MainImage = p_ImageViewer_VM.p_ImageData.GetPtr(0);
-				}
+			IntPtr MainImage = new IntPtr();
+			if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
+			{
+				if (p_eColorViewMode != eColorViewMode.All)
+					MainImage = p_ImageViewer_VM.p_ImageData.GetPtr((int)p_eColorViewMode - 1);
 				else
-				{ // All 일때는 R채널로...
 					MainImage = p_ImageViewer_VM.p_ImageData.GetPtr(0);
-				}
+			}
+			else
+			{ // All 일때는 R채널로...
+				MainImage = p_ImageViewer_VM.p_ImageData.GetPtr(0);
+			}
 
-				Cpp_Point[] WaferEdge = null;
-				int[] mapData = null;
-				unsafe
+			Cpp_Point[] WaferEdge = null;
+			int[] mapData = null;
+			unsafe
+			{
+				int DownSample = 40;
+
+				fixed (byte* pImg = new byte[(long)(memW / DownSample) * (long)(memH / DownSample)]) // 원본 이미지 너무 커서 안열림
 				{
-					int DownSample = 40;
+					CLR_IP.Cpp_SubSampling((byte*)MainImage, pImg, memW, memH, 0, 0, memW, memH, DownSample);
 
-					fixed (byte* pImg = new byte[(long)(memW / DownSample) * (long)(memH / DownSample)]) // 원본 이미지 너무 커서 안열림
-					{
-						CLR_IP.Cpp_SubSampling((byte*)MainImage, pImg, memW, memH, 0, 0, memW, memH, DownSample);
+					// Param Down Scale
+					centX /= DownSample; centY /= DownSample;
+					outRadius /= DownSample;
+					memW /= DownSample; memH /= DownSample;
 
-						// Param Down Scale
-						centX /= DownSample; centY /= DownSample;
-						outRadius /= DownSample;
-						memW /= DownSample; memH /= DownSample;
+					WaferEdge = CLR_IP.Cpp_FindWaferEdge(pImg,
+						&centX, &centY,
+						&outRadius,
+						memW, memH,
+						1
+						);
 
-						WaferEdge = CLR_IP.Cpp_FindWaferEdge(pImg,
-							&centX, &centY,
-							&outRadius,
-							memW, memH,
-							1
-							);
-
-						mapData = CLR_IP.Cpp_GenerateMapData(
-							WaferEdge,
-							&outOriginX,
-							&outOriginY,
-							&outChipSzX,
-							&outChipSzY,
-							&outMapX,
-							&outMapY,
-							memW, memH,
-							1,
-							isIncludeMode
-							);
-					}
-
-					// Param Up Scale
-					centX *= DownSample; centY *= DownSample;
-					outRadius *= DownSample;
-					outOriginX *= DownSample; outOriginY *= DownSample;
-					outChipSzX *= DownSample; outChipSzY *= DownSample;
-
-					PolygonPt.Clear();
-					if (WAFEREDGE_UI != null)
-						WAFEREDGE_UI.Points.Clear();
-
-					for (int i = 0; i < WaferEdge.Length; i++)
-						PolygonPt.Add(new CPoint(WaferEdge[i].x * DownSample, WaferEdge[i].y * DownSample));
-
-					// UI Data Update
-					CenterPoint = new CPoint((int)centX, (int)centY);
-
-					canvasPoint = m_ImageViewer_VM.GetCanvasPoint(new CPoint(CenterPoint.X, CenterPoint.Y));
-					DrawCenterPoint(ColorType.WaferCenter);
-
-					// Wafer Edge Draw                
-					DrawPolygon(PolygonPt);
-					ReDrawWFCenter(ColorType.WaferCenter);
-
-					// Save Recipe
-					SetRecipeMapData(mapData, (int)outMapX, (int)outMapY, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);
-
-					backsideRecipe.CenterX = (int)centX;
-					backsideRecipe.CenterY = (int)centY;
-					backsideRecipe.Radius = (int)outRadius;
-
-					//SaveContourMap((int)centX, (int)centY, (int)outRadius);
+					mapData = CLR_IP.Cpp_GenerateMapData(
+						WaferEdge,
+						&outOriginX,
+						&outOriginY,
+						&outChipSzX,
+						&outChipSzY,
+						&outMapX,
+						&outMapY,
+						memW, memH,
+						1,
+						isIncludeMode
+						);
 				}
-				return true;
-			#if !DEBUG
+
+				// Param Up Scale
+				centX *= DownSample; centY *= DownSample;
+				outRadius *= DownSample;
+				outOriginX *= DownSample; outOriginY *= DownSample;
+				outChipSzX *= DownSample; outChipSzY *= DownSample;
+
+				PolygonPt.Clear();
+				if (WAFEREDGE_UI != null)
+					WAFEREDGE_UI.Points.Clear();
+
+				for (int i = 0; i < WaferEdge.Length; i++)
+					PolygonPt.Add(new CPoint(WaferEdge[i].x * DownSample, WaferEdge[i].y * DownSample));
+
+				// UI Data Update
+				CenterPoint = new CPoint((int)centX, (int)centY);
+
+				canvasPoint = m_ImageViewer_VM.GetCanvasPoint(new CPoint(CenterPoint.X, CenterPoint.Y));
+				DrawCenterPoint(ColorType.WaferCenter);
+
+				// Wafer Edge Draw                
+				DrawPolygon(PolygonPt);
+				ReDrawWFCenter(ColorType.WaferCenter);
+
+				// Save Recipe
+				SetRecipeMapData(mapData, (int)outMapX, (int)outMapY, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);
+
+				backsideRecipe.CenterX = (int)centX;
+				backsideRecipe.CenterY = (int)centY;
+				backsideRecipe.Radius = (int)outRadius;
+
+				//SaveContourMap((int)centX, (int)centY, (int)outRadius);
+			}
+			return true;
+#if !DEBUG
 			}
 			catch (Exception ex)
 			{
 				return false;
 			}
-			#endif
+#endif
 		}
 		private void SetRecipeMapData(int[] mapData, int mapX, int mapY, int originX, int originY, int chipSzX, int chipSzY)
 		{
@@ -394,18 +394,18 @@ namespace Root_AOP01_Inspection
 
 			mapInfo = new RecipeType_WaferMap(mapX, mapY, mapData);
 			int x = 0; int y = 0;
-			for (int i = 0; i < mapX*mapY; i++)
+			for (int i = 0; i < mapX * mapY; i++)
 			{
-				if(y==0 || y == mapY-1)
+				if (y == 0 || y == mapY - 1)
 				{
 					mapInfo.Data[i] = 0;
 				}
-				else if(x==0 || x == mapX-1)
+				else if (x == 0 || x == mapX - 1)
 				{
 					mapInfo.Data[i] = 0;
 				}
 				x++;
-				if(x >= mapX)
+				if (x >= mapX)
 				{
 					y++;
 					x = 0;
