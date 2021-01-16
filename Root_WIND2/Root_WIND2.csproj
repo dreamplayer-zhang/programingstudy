@@ -236,6 +236,10 @@
       <DependentUpon>LoadingBlock.xaml</DependentUpon>
     </Compile>
     <Compile Include="EdgeResult.cs" />
+    <Compile Include="ManualJob\ManualJobSchedule.cs" />
+    <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
+      <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />
     <Compile Include="Module\EdgeSideVision\Run_InspectEBR.cs" />
@@ -448,6 +452,10 @@
     <Page Include="Controls\UserControl\LoadingBlock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ManualJob\ManualJobSchedule_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontsideInspection.xaml">
       <Generator>MSBuild:Compile</Generator>
