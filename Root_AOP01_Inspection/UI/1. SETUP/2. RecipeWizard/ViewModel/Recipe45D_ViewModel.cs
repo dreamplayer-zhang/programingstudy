@@ -125,6 +125,17 @@ namespace Root_AOP01_Inspection
 			}
 			set
 			{
+				if (_EdgeDrawMode == value)
+					return;
+
+				if (m_ImageViewer_VM != null)
+				{
+					m_ImageViewer_VM.EdgeDrawMode = value;
+					if(value)
+					{
+						m_ImageViewer_VM.Clear();
+					}
+				}
 				SetProperty(ref _EdgeDrawMode, value);
 			}
 		}
@@ -230,6 +241,15 @@ namespace Root_AOP01_Inspection
 			p_ImageViewer_VM.DrawRect(rectList, Recipe45D_ImageViewer_ViewModel.ColorType.Defect, text);
 		}
 
+		private void showEdgeBox()
+		{
+
+		}
+		private void saveEdgeBox()
+		{
+
+		}
+
 		private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
 		{
 			Workplace workplace = obj as Workplace;
@@ -256,10 +276,38 @@ namespace Root_AOP01_Inspection
 
 		private void DrawDone_Callback(CPoint leftTop, CPoint rightBottom)
 		{
-			p_ImageViewer_VM.Clear();
-			m_Setup.InspectionManager.RefreshDefect();
-			this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
+			if (!EdgeDrawMode)
+			{
+				p_ImageViewer_VM.Clear();
+				this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
+			}
+			else
+			{
+				//edge box draw mode. 최대개수는 6개로 고정한다
+				this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, Recipe45D_ImageViewer_ViewModel.ColorType.FeatureMatching);
 
+				if (this.m_ImageViewer_VM.Shapes.Count > 7)
+				{
+					m_ImageViewer_VM.Shapes.RemoveAt(0);
+					m_ImageViewer_VM.p_DrawElement.RemoveAt(0);
+				}
+			}
+			m_Setup.InspectionManager.RefreshDefect();
+
+		}
+		public ICommand commandShowEdgeBox
+		{
+			get
+			{
+				return new RelayCommand(showEdgeBox);
+			}
+		}
+		public ICommand commandSaveEdgeBox
+		{
+			get
+			{
+				return new RelayCommand(saveEdgeBox);
+			}
 		}
 
 		public ICommand commandInspTest

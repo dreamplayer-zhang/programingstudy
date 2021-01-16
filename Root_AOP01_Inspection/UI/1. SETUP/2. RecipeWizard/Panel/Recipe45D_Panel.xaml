@@ -24,15 +24,25 @@
 					<Button Content="Inspection"
                             Command="{Binding commandInspTest}"
                             Style="{StaticResource SetupPanelBtn}"/>
+					<Rectangle Height="2"
+							   Margin="10,20"
+							   Stroke="Transparent"
+							   Fill="Gray"/>
 					<ToggleButton Content="Draw Edge Box" 
 								  Style="{StaticResource SetupPanelToggleBtn}"
 								  IsChecked="{Binding EdgeDrawMode}"/>
+					<Button Content="Show Edge Box"
+                            Command="{Binding commandShowEdgeBox}"
+                            Style="{StaticResource SetupPanelBtn}"/>
+					<Button Content="Save Edge Box"
+                            Command="{Binding commandSaveEdgeBox}"
+                            Style="{StaticResource SetupPanelBtn}"/>
 				</StackPanel>
-                <Button Content="Back"
+				<Button Content="Back"
                         Command="{Binding btnBack}"
                         Style="{StaticResource SetupPanelBtn}"
                         VerticalAlignment="Bottom"/>
-            </Grid>
+			</Grid>
         </Border>
 
         <Grid Grid.Column="1">

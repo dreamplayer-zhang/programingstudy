@@ -31,6 +31,7 @@ namespace Root_AOP01_Inspection
 	public class Recipe45D_ImageViewer_ViewModel : RootViewer_ViewModel
 	{
 		public event EventDrawDone DrawDone;
+		
 
 		public Recipe45D_ImageViewer_ViewModel()
 		{
@@ -39,7 +40,10 @@ namespace Root_AOP01_Inspection
 			//Shapes.CollectionChanged += Shapes_CollectionChanged;
 			//InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;
 		}
-
+		public override void PreviewMouseUp(object sender, MouseEventArgs e)
+		{
+			//base.PreviewMouseUp(sender, e);
+		}
 		private void Shapes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
 			var shapes = sender as ObservableCollection<TShape>;
@@ -87,6 +91,8 @@ namespace Root_AOP01_Inspection
 				m_DrawElement = value;
 			}
 		}
+
+		public bool EdgeDrawMode { get; internal set; }
 		#endregion
 
 		#region Command
@@ -413,6 +419,7 @@ namespace Root_AOP01_Inspection
 
 		public CPoint leftClickPoint = new CPoint();
 		public CPoint rightClickPoint = new CPoint();
+
 		//임시
 		public override void PreviewMouseDown(object sender, MouseEventArgs e)
 		{
@@ -426,15 +433,13 @@ namespace Root_AOP01_Inspection
 			if (e.RightButton == MouseButtonState.Pressed)
 			{
 				rightClickPoint = MemPt;
+				if (this.DrawDone != null)
+					DrawDone(leftClickPoint, rightClickPoint);
 			}
 			else if (e.LeftButton == MouseButtonState.Pressed)
 			{
 				leftClickPoint = MemPt;
 			}
-
-			if (this.DrawDone != null)
-				DrawDone(leftClickPoint, rightClickPoint);
-
 		}
 	}
 }

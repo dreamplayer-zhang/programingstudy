@@ -774,16 +774,7 @@
             <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
             <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
         </Style>
-        <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
-            <Setter Property="FontFamily" Value="Arial"/>
-            <Setter Property="FontSize" Value="15"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Margin" Value="10"/>
-            <Setter Property="Height" Value="40"/>
-            <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
-            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
-		</Style>
-		<Style TargetType="{x:Type ToggleButton}" x:Key="SetupPanelToggleBtn">
+		<Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
 			<Setter Property="FontFamily" Value="Arial"/>
 			<Setter Property="FontSize" Value="15"/>
 			<Setter Property="FontWeight" Value="Bold"/>
