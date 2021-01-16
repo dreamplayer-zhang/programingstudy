@@ -25,6 +25,12 @@ namespace RootTools
             Y = 0;
         }
 
+        public CPoint(System.Windows.Rect rect)
+        {
+            X = (int)(rect.X + rect.Width / 2);
+            Y = (int)(rect.Y + rect.Height / 2);
+        }
+
         public CPoint(int x, int y)
         {
             X = x;
