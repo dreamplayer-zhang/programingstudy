@@ -133,7 +133,7 @@ namespace Root_AOP01_Inspection.Module
 
 				workBundle = new WorkBundle();
 
-				BacksideSurface surface = new BacksideSurface();
+				ReticleSurface surface = new ReticleSurface();
 				surface.SetRecipe(recipe);
 
 				workBundle.Add(surface);
