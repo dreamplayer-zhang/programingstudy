@@ -414,6 +414,7 @@ namespace RootTools.Camera.Dalsa
             m_nGrabTrigger = 0;
             m_sapXfer.Snap((int)(m_nGrabCount));
             p_CamInfo.p_eState = eCamState.GrabMem;
+            m_nOffsetTest = 0;
             if (m_sapBuf.BytesPerPixel == 1)
                 m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));
             else
@@ -453,10 +454,12 @@ namespace RootTools.Camera.Dalsa
             m_nGrabTrigger = 0;
             m_sapXfer.Snap(m_nGrabCount);
             p_CamInfo.p_eState = eCamState.GrabMem;
-            
+
+            m_nOffsetTest = 0;
             m_GrabThread = new Thread(new ThreadStart(RunGrabLineColorScanThread));
             m_GrabThread.Start();
         }
+        int m_nOffsetTest = 0;
         private CRect m_LastROI = new CRect(0, 0, 0, 0);
         unsafe void RunGrabLineScanThread()
         {
@@ -532,9 +535,9 @@ namespace RootTools.Camera.Dalsa
                     {
                         int yp;
                         if (Scandir)
-                            yp = m_nGrabCount * nCamHeight - (y + (iBlock) * nCamHeight) + m_nInverseYOffset;
+                            yp = m_nGrabCount * nCamHeight - (y + (iBlock) * nCamHeight) + m_nInverseYOffset + m_nOffsetTest;
                         else
-                            yp = y + iBlock * nCamHeight + nScanOffsetY;
+                            yp = y + iBlock * nCamHeight + nScanOffsetY + m_nOffsetTest;
 
                         long n = nScanOffsetX + yp * nMemWidth;
                         IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt;

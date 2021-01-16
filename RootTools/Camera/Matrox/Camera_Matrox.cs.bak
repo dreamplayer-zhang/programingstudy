@@ -499,6 +499,7 @@ namespace RootTools.Camera.Matrox
                         }
                     });
                     iBlock++;
+                    GrabEvent();
                     if (m_nGrabCount != 0)
                         p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
@@ -507,13 +508,26 @@ namespace RootTools.Camera.Matrox
             userObjectHandle.Free();
         }
 
+        void GrabEvent()
+        {
+            if (Grabed != null)
+                OnGrabed(new GrabedArgs(null, m_nGrabTrigger, new CRect(), p_nGrabProgress));
+        }
+        protected virtual void OnGrabed(GrabedArgs e)
+        {
+            if (Grabed != null)
+                Grabed.Invoke(this, e);
+        }
+
         public static MIL_INT LineScanArchiveFunction(MIL_INT HookType, MIL_ID EventId, IntPtr UserDataPtr)
         {
             if (UserDataPtr != IntPtr.Zero)
             {
                 GCHandle handle = (GCHandle)(UserDataPtr);
-                Camera_Matrox cam = handle.Target as Camera_Matrox;
                 
+                Camera_Matrox cam = handle.Target as Camera_Matrox;
+                Console.Write(cam.m_nGrabTrigger);
+
                 if (cam != null)
                     cam.m_nGrabTrigger++;
             }

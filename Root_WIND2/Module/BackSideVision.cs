@@ -379,7 +379,7 @@ namespace Root_WIND2.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                     int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
-                    int nScanOffset_pulse = 30000;
+                    int nScanOffset_pulse = 50000;
 
                     while(m_grabMode.m_ScanLineNum > nScanLine)
                     {
