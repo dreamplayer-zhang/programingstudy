@@ -238,7 +238,8 @@
                                        VerticalAlignment="Center"
                                            FontWeight="Bold"
                                            Text="Location ID" Foreground="CornflowerBlue"></TextBlock>
-                                <TextBlock  Grid.Column="1" Text="test1234" Foreground="black" VerticalAlignment="Center"
+                                <TextBox  Grid.Column="1" Text="test1234" Foreground="black" VerticalAlignment="Center"
+                                          x:Name="textboxLocID"
                                             TextAlignment="Center"
                                             FontWeight="Bold"/>
                             </Grid>
@@ -254,7 +255,8 @@
                                        VerticalAlignment="Center"
                                            FontWeight="Bold"
                                            Text="Lot ID" Foreground="CornflowerBlue"></TextBlock>
-                                <TextBlock  Grid.Column="1" Text="test1234" Foreground="black" VerticalAlignment="Center"
+                                <TextBox  Grid.Column="1" Text="test1234" Foreground="black" VerticalAlignment="Center"
+                                                                                    x:Name="textboxLotID"
                                             TextAlignment="Center"
                                             FontWeight="Bold"/>
                             </Grid>
@@ -270,7 +272,8 @@
                                        VerticalAlignment="Center"
                                            FontWeight="Bold"
                                            Text="Cassette ID" Foreground="CornflowerBlue"></TextBlock>
-                                <TextBlock  Grid.Column="1" Text="test1234" Foreground="black" VerticalAlignment="Center"
+                                <TextBox  Grid.Column="1" Text="test1234" Foreground="black" VerticalAlignment="Center"
+                                                                                    x:Name="textboxCstID"
                                             TextAlignment="Center"
                                             FontWeight="Bold"/>
                             </Grid>
