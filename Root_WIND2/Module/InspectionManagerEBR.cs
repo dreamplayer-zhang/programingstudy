@@ -48,7 +48,7 @@ namespace Root_WIND2
 
 		protected override void InitWorkManager()
 		{
-			this.Add(new WorkManager("EBR", WORK_TYPE.INSPECTION, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 1));
+			this.Add(new WorkManager("EBR", WORK_TYPE.INSPECTION, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
 		}
 
 		public bool CreateInspection()
@@ -60,7 +60,6 @@ namespace Root_WIND2
 		{
 			try
 			{
-
 				Workplace workplace = new Workplace(0, 0, 0, 0, 1500, 2000);
 				workplaceBundle = new WorkplaceBundle();
 				workplaceBundle.Add(workplace);

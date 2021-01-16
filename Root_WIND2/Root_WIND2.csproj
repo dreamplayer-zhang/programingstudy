@@ -259,6 +259,7 @@
       <DependentUpon>SettingDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialog\SettingDialog\SettingDialog_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\4. EBR\ViewModel\EBRSetup_ViewModel.cs" />
     <Compile Include="UI\2. Review\Tuning.xaml.cs">
       <DependentUpon>Tuning.xaml</DependentUpon>
     </Compile>

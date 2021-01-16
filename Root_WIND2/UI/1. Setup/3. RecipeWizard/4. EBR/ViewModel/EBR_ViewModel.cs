@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools_Vision;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,33 +11,57 @@ namespace Root_WIND2
 {
     class EBR_ViewModel : ObservableObject
     {
-        Setup_ViewModel m_Setup;
+        Setup_ViewModel setupVM;
+        Recipe recipe;
 
         public EBR_Panel Main;
+        public EBRSetup_ViewModel SetupVM;
+        public EBRSetupPage SetupPage;
+
         public EBR_ViewModel(Setup_ViewModel setup)
         {
             init();
-            m_Setup = setup;
-
+            this.setupVM = setup;
+            this.recipe = setup.Recipe;
         }
+
         public void init()
         {
             Main = new EBR_Panel();
+            SetupVM = new EBRSetup_ViewModel();
+            SetupVM.Init(setupVM);
+
+            SetupPage = new EBRSetupPage();
+            SetupPage.DataContext = SetupVM;
+            SetPage(SetupPage);
         }
+
         public void SetPage(UserControl page)
         {
             Main.SubPanel.Children.Clear();
             Main.SubPanel.Children.Add(page);
         }
 
-        public ICommand btnEBRSummary
+        public ICommand btnEBRSetup
         {
             get
             {
-                return new RelayCommand(() =>
-                {
+                return new RelayCommand(() => SetPage(SetupPage));
+            }
+        }
+        public ICommand btnEBRSnap
+        {
+            get
+            {
+                return new RelayCommand(() => SetupVM.Scan());
+            }
+        }
 
-                });
+        public ICommand btnEBRInsp
+        {
+            get
+            {
+                return new RelayCommand(() => SetupVM.Inspect());
             }
         }
 
@@ -44,11 +69,13 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(() =>
-                {
-                    m_Setup.SetRecipeWizard();
-                });
+                return new RelayCommand(() => setupVM.SetRecipeWizard());
             }
+        }
+
+        public void UI_Redraw()
+        {
+            SetupVM.LoadParameter();
         }
     }
 }

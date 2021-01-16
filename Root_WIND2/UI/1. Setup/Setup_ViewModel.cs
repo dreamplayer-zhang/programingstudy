@@ -62,17 +62,19 @@ namespace Root_WIND2
 
         private InspectionManagerFrontside inspectionMgrVision;
         private InspectionManagerEdge inspectionMgrEdge;
+        private InspectionManagerEBR insperctionMgrEBR;
 
         public Setup_ViewModel()
         {
             init();
         }
 
-        public Setup_ViewModel(Recipe _recipe = null , InspectionManagerFrontside _inspectionMgrVision = null, InspectionManagerEdge _inspectionMgrEdge = null)
+        public Setup_ViewModel(Recipe _recipe = null , InspectionManagerFrontside _inspectionMgrVision = null, InspectionManagerEdge _inspectionMgrEdge = null, InspectionManagerEBR _insperctionMgrEBR = null)
         {        
             this.recipe = _recipe;
             inspectionMgrVision = _inspectionMgrVision;
             inspectionMgrEdge = _inspectionMgrEdge;
+            insperctionMgrEBR = _insperctionMgrEBR;
             init();
         }
 
@@ -88,6 +90,7 @@ namespace Root_WIND2
         {
             frontsideVM.UI_Redraw();
             edgeVM.UI_Redraw();
+            ebrVM.UI_Redraw();
         }
 
         private void InitAllPanel()
@@ -330,7 +333,7 @@ namespace Root_WIND2
         public Recipe Recipe { get => recipe; set => recipe = value; }
         public InspectionManagerFrontside InspectionVision { get => inspectionMgrVision; set => inspectionMgrVision = value; }
         public InspectionManagerEdge InspectionManagerEdge { get => inspectionMgrEdge; set => inspectionMgrEdge = value; }
-
+        public InspectionManagerEBR InsperctionMgrEBR { get => insperctionMgrEBR; set => insperctionMgrEBR = value; }
         #endregion
 
         #region Panel Change Method
