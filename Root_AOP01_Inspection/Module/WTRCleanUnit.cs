@@ -60,19 +60,24 @@ namespace Root_AOP01_Inspection.Module
 
         public WTRCleanUnit(string id, IEngineer engineer) : base(id, engineer)
         {
-            IWTRChild child = GetChild("MainVision");
-            if(child != null)
-            {
-                int posWTR = child.GetTeachWTR();
-            }
         }
 
+        #region Flip
+        public string StartFlip()
+        {
+            Run_Flip run = (Run_Flip)m_runFlip.Clone();
+            StartRun(run); 
+            return "OK"; 
+        }
+        #endregion
+
         #region ModuleRun
+        ModuleRunBase m_runFlip; 
         protected override void InitModuleRuns()
         {
             base.InitModuleRuns();
             AddModuleRunList(new Run_Clean(this), true, "RTR Run Clean");
-            AddModuleRunList(new Run_Flip(this), true, "Vision Reticle Flip Top to Bottom");
+            m_runFlip = AddModuleRunList(new Run_Flip(this), false, "Vision Reticle Flip Top to Bottom");
         }
 
         public class Run_Clean : ModuleRunBase
@@ -114,14 +119,19 @@ namespace Root_AOP01_Inspection.Module
                 {
                     if (m_sCleanPlane == "Top")
                     {
-                        //if(m_sThickness=="5mm")
-                        //    //Z축 2mm 이동
-                        //else if(m_sThickness=="3mm")
-                        //    //어떻게? Home or Ready 위치?
                         if (m_module.Run(m_module.WriteCmd(eCmd.PutReady, teachTopClean, 1, 1))) return p_sInfo; //Move to Ready of Teach
                         if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                         if (m_module.Run(m_module.WriteCmd(eCmd.Extend, teachTopClean, 1))) return p_sInfo; //Move to Teach
                         if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                        if(m_sThickness =="3mm")
+                        {
+                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, "0", "0", "0", "2", "0"))) return p_sInfo; //3mm Reticle Move
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                        }
+                        else if(m_sThickness == "5mm")
+                        {
+
+                        }
                         m_module.m_doTopBlow.Write(true); //Blow On
                         if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sCleanSpeed))) return p_sInfo; //Clean Speed Set
                         if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
@@ -162,6 +172,7 @@ namespace Root_AOP01_Inspection.Module
                 return "OK";
             }
         }
+
         public class Run_Flip : ModuleRunBase
         {
             WTRCleanUnit m_module;
@@ -177,12 +188,14 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
-                int teachReticleFlip = m_module.m_teachReticleFlip;
                 if (EQ.p_bSimulate) return "OK";
-
-
+                IWTRChild child = m_module.GetChild("MainVision");
+                int posWTR = child.GetTeachWTR(child.GetInfoWafer(0));
+                int teachReticleFlip = m_module.m_teachReticleFlip;
+                //if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, 1))) return p_sInfo;
+                //if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                 if (m_module.Run(m_module.WriteCmd(eCmd.Put, teachReticleFlip, 1))) return p_sInfo;
-
+                if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                 return "OK";
             }
         }

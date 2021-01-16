@@ -152,7 +152,7 @@ namespace Root_AOP01_Inspection
                 infoWafer.RecipeOpen(sRecipe);
                 m_handler.AddSequence(infoWafer);
                 m_handler.CalcSequence();
-                m_infoCarrier.StartProcess(infoWafer.p_id);
+                //m_infoCarrier.StartProcess(infoWafer.p_id);
             }
             this.DialogResult = true;
         }

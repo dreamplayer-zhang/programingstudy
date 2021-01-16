@@ -72,7 +72,7 @@ namespace Root_EFEM
         public List<Locate> m_aLocate = new List<Locate>();
         /// <summary> 프로그램 시작시 Registry 에서 Wafer 정보 읽기 </summary>
         void InitLocate()
-        {
+        { 
             if (m_wtr == null)
                 return;
             m_aLocate.Clear();
@@ -244,12 +244,16 @@ namespace Root_EFEM
             InfoWafer infoWaferGet = (locateChild == null) ? null : locateChild.p_calcWafer;
             if ((infoWaferGet != null) && (locateChild != null))
             {
+
                 ModuleRunBase runGet = infoWaferGet.m_qCalcProcess.Dequeue();
                 string sArmGet = m_wtr.GetEnableAnotherArmID(runGet, armPut, infoWaferGet);
                 Locate locateArmGet = GetLocate(sArmGet);
-                locateArmGet.p_calcWafer = locateChild.p_calcWafer;
-                locateChild.p_calcWafer = null;
-                m_qSequence.Enqueue(new Sequence(runGet, infoWaferGet));
+                if (locateArmGet != null)
+                {
+                    locateArmGet.p_calcWafer = locateChild.p_calcWafer;
+                    locateChild.p_calcWafer = null;
+                    m_qSequence.Enqueue(new Sequence(runGet, infoWaferGet));
+                }
             }
             if (locateChild != null) locateChild.p_calcWafer = infoWaferPut;
             locateArmPut.p_calcWafer = null;
@@ -344,6 +348,7 @@ namespace Root_EFEM
             foreach (IWTRChild child in m_wtr.p_aChild) CalcRecoverChild(child);
             ReCalcSequence();
             RunTree(Tree.eMode.Init);
+            if (EQ.p_nRnR > 0) EQ.p_nRnR = 0;
         }
 
         void CalcRecoverArm(WTRArm arm)

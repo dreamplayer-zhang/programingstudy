@@ -1034,10 +1034,12 @@
                     </GroupBox>
                 <GroupBox Grid.Row="2">
                         <StackPanel VerticalAlignment="Bottom">
-                            <Button x:Name="buttonOHT" Content="OHT" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
+                            <Button x:Name="buttonOHT" Content="OHT" Height="30" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
                     Margin="0,0,0,10" Click="ButtonOHT_Click"/>
-                            <Button x:Name="buttonAlarmList" Content="AlarmList" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
+                            <Button x:Name="buttonAlarmList" Height="30" Content="AlarmList" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
                     Margin="0,0,0,10" Click="ButtonAlarmList_Click"/>
+                            <Button x:Name="DoorCheck" Content="DoorLock Off" Height="30" VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
+                    Margin="0,0,0,10" Click="DoorCheck_Click"/>
                         </StackPanel>
                     </GroupBox>
                 </Grid>
