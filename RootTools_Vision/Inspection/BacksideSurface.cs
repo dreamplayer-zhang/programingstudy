@@ -77,7 +77,7 @@ namespace RootTools_Vision
             switch (parameter.DiffFilter)
             {
                 case DiffFilterMethod.Average:
-                    //CLR_IP.Cpp_AverageBlur(arrBinImg, arrBinImg, chipW, chipH);//문제 있음. ipp exception발생중
+                    CLR_IP.Cpp_AverageBlur(arrBinImg, arrBinImg, chipW, chipH);//문제 있음. ipp exception발생중
                     break;
                 case DiffFilterMethod.Gaussian:
                     CLR_IP.Cpp_GaussianBlur(arrBinImg, arrBinImg, chipW, chipH, 2);
