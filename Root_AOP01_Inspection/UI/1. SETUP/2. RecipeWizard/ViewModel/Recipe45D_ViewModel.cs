@@ -16,9 +16,18 @@ using RootTools;
 using RootTools_CLR;
 using RootTools_Vision;
 using static RootTools.RootViewer_ViewModel;
+using MBrushes = System.Windows.Media.Brushes;
+using DPoint = System.Drawing.Point;
+using System.Data;
 
 namespace Root_AOP01_Inspection
 {
+	enum ImageType
+	{
+		TDI,
+		VRS,
+		Mask,
+	}
 	class Recipe45D_ViewModel : ObservableObject
 	{
 		Setup_ViewModel m_Setup;
@@ -131,7 +140,7 @@ namespace Root_AOP01_Inspection
 				if (m_ImageViewer_VM != null)
 				{
 					m_ImageViewer_VM.EdgeDrawMode = value;
-					if(value)
+					if (value)
 					{
 						m_ImageViewer_VM.Clear();
 					}
@@ -142,6 +151,49 @@ namespace Root_AOP01_Inspection
 
 		#endregion
 
+		#region ResultDataTable
+		DataTable _OriginResultDataTable;
+		DataTable _ResultDataTable;
+		public DataTable ResultDataTable
+		{
+			get { return this._ResultDataTable; }
+			set
+			{
+				this._ResultDataTable = value;
+				this.RaisePropertyChanged();
+			}
+		}
+
+		#endregion
+
+		#region SelectedDataTable
+		DataRowView _SelectedDataTable;
+		public DataRowView SelectedDataTable
+		{
+			get { return this._SelectedDataTable; }
+			set
+			{
+				if (value != null)
+				{
+					this._SelectedDataTable = value;
+					SetData(this.SelectedDataTable, ImageType.TDI);
+				}
+			}
+		}
+		#endregion
+
+		#region SelectedTDIImage
+		private ImageSource _SelectedTDIImage;
+		public ImageSource SelectedTDIImage
+		{
+			get { return this._SelectedTDIImage; }
+			set
+			{
+				this._SelectedTDIImage = value;
+				this.RaisePropertyChanged();
+			}
+		}
+		#endregion
 		public ObservableCollection<UIElement> UIElements
 		{
 			get
@@ -201,14 +253,19 @@ namespace Root_AOP01_Inspection
 			WorkEventManager.PositionDone += PositionDone_Callback;
 			WorkEventManager.InspectionDone += SurfaceInspDone_Callback;
 			WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
+			WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
 
 			SurfaceSize = 5;
 			SurfaceGV = 70;
 
 			EdgeDrawMode = false;
 		}
+		private void WorkEventManager_ProcessDefectWaferDone(object sender, PocessDefectWaferDoneEventArgs e)
+		{
+			//ResultDataTable Update
+		}
 
-		private void ProcessDefectDone_Callback(object obj, ProcessDefectDoneEventArgs args)
+		private void ProcessDefectDone_Callback(object obj, PocessDefectDoneEventArgs args)
 		{
 			Workplace workplace = obj as Workplace;
 
@@ -243,13 +300,128 @@ namespace Root_AOP01_Inspection
 
 		private void showEdgeBox()
 		{
-
 		}
+		List<TRect> tempList = new List<TRect>();
 		private void saveEdgeBox()
 		{
-
+			if (m_ImageViewer_VM.TRectList.Count == 6)
+			{
+				tempList = new List<TRect>(m_ImageViewer_VM.TRectList);
+			}
 		}
+		string AOPImageRootPath = @"D:\DefectImage";
+		string currentInspection = RootTools.Database.DatabaseManager.Instance.InspectionID;
+		private void SetData(DataRowView selectedDataTable, ImageType type)
+		{
+			int idx = Convert.ToInt32(selectedDataTable["m_nDefectIndex"]);
 
+			if (System.IO.Directory.Exists(System.IO.Path.Combine(AOPImageRootPath)))
+			{
+				string imagePath = System.IO.Path.Combine(AOPImageRootPath, currentInspection, idx.ToString() + ".bmp");
+				if (System.IO.File.Exists(imagePath))
+				{
+					System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(imagePath);
+					SelectedTDIImage = ConvertImage(bmp);
+					bmp.Dispose();
+				}
+			}
+		}
+		public System.Windows.Media.ImageSource ConvertImage(System.Drawing.Image image)
+		{
+			try
+			{
+				if (image != null)
+				{
+					var bitmap = new System.Windows.Media.Imaging.BitmapImage();
+					bitmap.BeginInit();
+					System.IO.MemoryStream memoryStream = new System.IO.MemoryStream();
+					image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+					memoryStream.Seek(0, System.IO.SeekOrigin.Begin);
+					bitmap.StreamSource = memoryStream;
+					bitmap.EndInit();
+					return bitmap;
+				}
+			}
+			catch { }
+			return null;
+		}
+		CRect searchArea(int x_margin, int y_margin)
+		{
+			// variable
+			List<Rect> arcROIs = new List<Rect>();
+			List<DPoint> aptEdges = new List<DPoint>();
+			Recipe45D_ImageViewer_ViewModel ivvm = m_ImageViewer_VM;
+			RootTools.Inspects.eEdgeFindDirection eTempDirection = RootTools.Inspects.eEdgeFindDirection.TOP;
+			DPoint ptLeft1, ptLeft2, ptBottom, ptRight1, ptRight2, ptTop;
+			DPoint ptLT, ptRT, ptLB, ptRB;
+
+
+			arcROIs.Clear();
+			aptEdges.Clear();
+			for (int j = 0; j < 6; j++)
+			{
+				if (tempList.Count < 6) break;
+				arcROIs.Add(new Rect(
+					tempList[j].MemoryRect.Left,
+					tempList[j].MemoryRect.Top,
+					tempList[j].MemoryRect.Width,
+					tempList[j].MemoryRect.Height));
+			}
+			if (arcROIs.Count < 6) return new CRect(-1,-1,-1,-1);
+			for (int j = 0; j < arcROIs.Count; j++)
+			{
+				eTempDirection = InspectionManager_AOP.GetDirection(ivvm.p_ImageData, arcROIs[j]);
+				aptEdges.Add(InspectionManager_AOP.GetEdge(ivvm.p_ImageData, arcROIs[j], eTempDirection, true, true, 30));
+			}
+			// aptEeges에 있는 DPoint들을 좌표에 맞게 분배
+			List<DPoint> aSortedByX = aptEdges.OrderBy(x => x.X).ToList();
+			List<DPoint> aSortedByY = aptEdges.OrderBy(x => x.Y).ToList();
+			if (aSortedByX[0].Y < aSortedByX[1].Y)
+			{
+				ptLeft1 = aSortedByX[0];
+				ptLeft2 = aSortedByX[1];
+			}
+			else
+			{
+				ptLeft1 = aSortedByX[1];
+				ptLeft2 = aSortedByX[0];
+			}
+			if (aSortedByX[4].Y < aSortedByX[5].Y)
+			{
+				ptRight1 = aSortedByX[4];
+				ptRight2 = aSortedByX[5];
+			}
+			else
+			{
+				ptRight1 = aSortedByX[5];
+				ptRight2 = aSortedByX[4];
+			}
+			ptTop = aSortedByY[0];
+			ptBottom = aSortedByY[5];
+
+			ptLT = new DPoint(ptLeft1.X, ptTop.Y);
+			ptLB = new DPoint(ptLeft2.X, ptBottom.Y);
+			ptRB = new DPoint(ptRight2.X, ptBottom.Y);
+			ptRT = new DPoint(ptRight1.X, ptTop.Y);
+
+			//m_ImageViewer_VM.DrawLine(ptLT, ptLB, MBrushes.Lime);
+			//DrawLine(ptRB, ptRT, MBrushes.Lime);
+			//DrawLine(ptLT, ptRT, MBrushes.Lime);
+			//DrawLine(ptLB, ptRB, MBrushes.Lime);
+
+			m_ImageViewer_VM.DrawRect(new CPoint(ptLeft1.X-10, ptLeft1.Y-10), new CPoint(ptLeft1.X+10, ptLeft1.Y+10),Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
+			m_ImageViewer_VM.DrawRect(new CPoint(ptLeft2.X - 10, ptLeft2.Y - 10), new CPoint(ptLeft2.X + 10, ptLeft2.Y + 10), Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
+			m_ImageViewer_VM.DrawRect(new CPoint(ptBottom.X - 10, ptBottom.Y - 10), new CPoint(ptBottom.X + 10, ptBottom.Y + 10), Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
+			m_ImageViewer_VM.DrawRect(new CPoint(ptRight1.X - 10, ptRight1.Y - 10), new CPoint(ptRight1.X + 10, ptRight1.Y + 10), Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
+			m_ImageViewer_VM.DrawRect(new CPoint(ptRight2.X - 10, ptRight2.Y - 10), new CPoint(ptRight2.X + 10, ptRight2.Y + 10), Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
+			m_ImageViewer_VM.DrawRect(new CPoint(ptTop.X - 100, ptTop.Y - 100), new CPoint(ptTop.X + 100, ptTop.Y + 100), Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
+
+			m_ImageViewer_VM.DrawRect(new CPoint(ptLT.X, ptLT.Y), new CPoint(ptRB.X, ptRB.Y), Recipe45D_ImageViewer_ViewModel.ColorType.ChipFeature);
+
+			tempList.Clear();
+
+			return new CRect(new Point(ptLT.X + x_margin, ptLT.Y + y_margin), new Point(ptRB.X - x_margin, ptRB.Y - y_margin));
+		}
 		private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
 		{
 			Workplace workplace = obj as Workplace;
@@ -349,7 +521,7 @@ namespace Root_AOP01_Inspection
 				MainImage = p_ImageViewer_VM.p_ImageData.GetPtr(0);
 			}
 
-			Cpp_Point[] WaferEdge = null;
+			List<Cpp_Point> WaferEdge = new List<Cpp_Point>();
 			int[] mapData = null;
 			unsafe
 			{
@@ -364,15 +536,21 @@ namespace Root_AOP01_Inspection
 					outRadius /= DownSample;
 					memW /= DownSample; memH /= DownSample;
 
-					WaferEdge = CLR_IP.Cpp_FindWaferEdge(pImg,
-						&centX, &centY,
-						&outRadius,
-						memW, memH,
-						1
-						);
+					//WaferEdge = CLR_IP.Cpp_FindWaferEdge(pImg,
+					//	&centX, &centY,
+					//	&outRadius,
+					//	memW, memH,
+					//	1
+					//	).ToList();
+					//LT,LB,RB,RT
+					var area = searchArea(200,200);
+					WaferEdge.Add(new Cpp_Point(area.Left / DownSample, area.Top / DownSample));
+					WaferEdge.Add(new Cpp_Point(area.Left / DownSample, area.Bottom / DownSample));
+					WaferEdge.Add(new Cpp_Point(area.Right / DownSample, area.Bottom / DownSample));
+					WaferEdge.Add(new Cpp_Point(area.Right / DownSample, area.Top / DownSample));
 
 					mapData = CLR_IP.Cpp_GenerateMapData(
-						WaferEdge,
+						WaferEdge.ToArray(),
 						&outOriginX,
 						&outOriginY,
 						&outChipSzX,
@@ -395,7 +573,7 @@ namespace Root_AOP01_Inspection
 				if (WAFEREDGE_UI != null)
 					WAFEREDGE_UI.Points.Clear();
 
-				for (int i = 0; i < WaferEdge.Length; i++)
+				for (int i = 0; i < WaferEdge.Count; i++)
 					PolygonPt.Add(new CPoint(WaferEdge[i].x * DownSample, WaferEdge[i].y * DownSample));
 
 				// UI Data Update
@@ -705,11 +883,8 @@ namespace Root_AOP01_Inspection
 
 			m_Setup.InspectionManager.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
 
-			if (m_Setup.InspectionManager.CreateInspection() == false)
-			{
-				return;
-			}
-			m_Setup.InspectionManager.Start(false);
+
+			m_Setup.InspectionManager.Start(WORK_TYPE.SNAP);
 		}
 
 		public ICommand btnBack
