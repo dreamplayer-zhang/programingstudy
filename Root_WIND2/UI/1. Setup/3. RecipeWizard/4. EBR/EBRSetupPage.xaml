@@ -164,25 +164,26 @@
                         </Grid.RowDefinitions>
                         <GroupBox Grid.Row="0" Grid.Column="1" Header="Graph"
                                   Background="{StaticResource GroupBoxBackground}">
-                            <lvc:CartesianChart Series="{Binding MeasurementGraph}"
-                                                            LegendLocation="Top"
-                                                            DisableAnimations="true">
+                            <Grid>
+                                <lvc:CartesianChart Series="{Binding MeasurementGraph}"
+                                                    LegendLocation="Top"
+                                                    DisableAnimations="true">
                                 <lvc:CartesianChart.AxisX>
-                                    <lvc:Axis Title="{Binding XTitle}"
-                                                        Labels="{Binding XLabels}"
-                                                        MinValue="{Binding SizeFrom}"
-                                                        MaxValue="{Binding SizeTo}"
-                                                        Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
+                                        <lvc:Axis Title="{Binding XTitle}"
+                                                  Labels="{Binding XLabels}"
+                                                  Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
                                     </lvc:Axis>          
                                 </lvc:CartesianChart.AxisX>
                                 <lvc:CartesianChart.AxisY>
-                                    <lvc:Axis Title="{Binding YTitle}"
-                                                        LabelFormatter="{Binding SizeYLabel}"
-                                                        MinValue="0"
-                                                        MaxValue="{Binding SizeYMaxVal}">
+                                        <lvc:Axis Title="{Binding YTitle}"
+                                                  MinValue="0"
+                                                  MaxValue="1000"
+                                                  LabelFormatter="{Binding SizeYLabel}">
                                     </lvc:Axis>
                                 </lvc:CartesianChart.AxisY>
                             </lvc:CartesianChart>
+                                
+                            </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="1" Grid.Column="1" Header="Measurement Data"
                                   Background="{StaticResource GroupBoxBackground}">

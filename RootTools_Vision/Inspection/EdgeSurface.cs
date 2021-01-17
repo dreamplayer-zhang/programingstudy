@@ -35,7 +35,6 @@ namespace RootTools_Vision
 			return (WorkBase)this.MemberwiseClone();
 		}
 
-
 		protected override bool Preparation()
 		{
 			if(this.parameter == null || this.recipeEdgeSurface == null)

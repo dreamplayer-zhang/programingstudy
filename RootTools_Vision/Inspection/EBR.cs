@@ -22,7 +22,6 @@ namespace RootTools_Vision
 			m_sName = this.GetType().Name;
 		}
 
-
 		protected override bool Preparation()
 		{
 			this.parameter = this.recipe.GetRecipe<EBRParameter>();

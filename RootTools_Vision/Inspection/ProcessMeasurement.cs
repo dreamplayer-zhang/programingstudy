@@ -11,8 +11,6 @@ namespace RootTools_Vision
 	{
 		public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_ALL;
 
-		
-
 		protected override bool Preparation()
 		{
 			return true;
