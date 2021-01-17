@@ -413,6 +413,63 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
+        #region Inspection Result
+        bool m_bAlignKeyPass = true;
+        public bool p_bAlignKeyPass
+        {
+            get { return m_bAlignKeyPass; }
+            set 
+            {
+                m_bAlignKeyPass = value;
+                OnPropertyChanged();
+            }
+        }
+
+        bool m_bPatterhShiftPass = true;
+        public bool p_bPatternShiftPass
+        {
+            get { return m_bPatterhShiftPass; }
+            set
+            {
+                m_bPatterhShiftPass = value;
+                OnPropertyChanged();                
+            }
+        }
+
+        double m_dPatternShiftDistance = 0.0;
+        public double p_dPatternShiftDistance
+        {
+            get { return m_dPatternShiftDistance; }
+            set 
+            {
+                m_dPatternShiftDistance = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double m_dPatternShiftAngle = 0.0;
+        public double p_dPatternShiftAngle
+        {
+            get { return m_dPatternShiftAngle; }
+            set
+            {
+                m_dPatternShiftAngle = value;
+                OnPropertyChanged();
+            }
+        }
+
+        bool m_bBarcodePass = true;
+        public bool p_bBarcodePass
+        {
+            get { return m_bBarcodePass; }
+            set
+            {
+                m_bBarcodePass = value;
+                OnPropertyChanged();
+            }
+        }
+        #endregion
+
         #region Vision Algorithm
         Mat GetMatImage(MemoryData mem, CRect crtROI)
         {
@@ -1373,7 +1430,12 @@ namespace Root_AOP01_Inspection.Module
 
                 foreach (CvBlob blob in blobs.Values)
                 {
-                    Console.WriteLine("Width:" + blob.BoundingBox.Width + ", Height:" + blob.BoundingBox.Height);
+                    if (blob.BoundingBox.Width > 10/*Spec*/ || blob.BoundingBox.Height > 10/*Spec*/)
+                    {
+                        m_module.p_bBarcodePass = false;
+                        return "Fail";
+                    }
+                    //Console.WriteLine("Width:" + blob.BoundingBox.Width + ", Height:" + blob.BoundingBox.Height);
                 }
 
                 return "OK";
@@ -2108,16 +2170,26 @@ namespace Root_AOP01_Inspection.Module
 
                 // Get distance From InFeatureCentroid & OutFeatureCentroid
                 double dResultDistance = GetDistanceOfTwoPoint(cptInFeatureCentroid, cptOutFeatureCentroid);
+                m_module.p_dPatternShiftDistance = dResultDistance;
 
                 // Get Degree From OutLT & OutRT
                 double dThetaRadian = Math.Atan2((double)(cptarrOutResultCenterPositions[(int)eSearchPoint.RT].Y - cptarrOutResultCenterPositions[(int)eSearchPoint.LT].Y),
                                                           cptarrOutResultCenterPositions[(int)eSearchPoint.RT].X - cptarrOutResultCenterPositions[(int)eSearchPoint.LT].X);
                 double dThetaDegree = dThetaRadian * (180 / Math.PI);
+                m_module.p_dPatternShiftAngle = dThetaDegree;
 
                 // Judgement
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
-                if (m_dNGSpecDistance_um < (dResultDistance * moduleRunGrab.m_dResY_um)) return "Fail";
-                if (m_dNGSpecDegree < Math.Abs(dThetaDegree)) return "Fail";
+                if (m_dNGSpecDistance_um < (dResultDistance * moduleRunGrab.m_dResY_um))
+                {
+                    m_module.p_bPatternShiftPass = false;
+                    return "Fail";
+                }
+                if (m_dNGSpecDegree < Math.Abs(dThetaDegree))
+                {
+                    m_module.p_bPatternShiftPass = false;
+                    return "Fail";
+                }
                 
                 return "OK";
             }
@@ -2360,6 +2432,10 @@ namespace Root_AOP01_Inspection.Module
                                 }
                             }
                             Image<Gray, byte> imgSub = new Image<Gray, byte>(barrMaster);
+
+                            // 차영상 Blob 결과
+                            bool bResult = GetResultFromImage(imgSub);
+
                             string strName = "";
                             if (i == (int)eSearchPoint.LT) strName += eSearchPoint.LT.ToString() + "-";
                             else if (i == (int)eSearchPoint.RT) strName += eSearchPoint.RT.ToString() + "-";
@@ -2372,11 +2448,33 @@ namespace Root_AOP01_Inspection.Module
                             else strName += eSearchPoint.LB;
 
                             imgSub.Save("D:\\ESCHO_" + strName + ".BMP");
+
+                            if (bResult == false)
+                            {
+                                m_module.p_bAlignKeyPass = false;
+                                return "Fail";
+                            }
                         }
                     }
                 }
 
                 return "OK";
+            }
+
+            bool GetResultFromImage(Image<Gray, byte> img)
+            {
+                // variable
+                CvBlobs blobs = new CvBlobs();
+                CvBlobDetector blobDetector = new CvBlobDetector();
+
+                // implement
+                blobDetector.Detect(img, blobs);
+                foreach(CvBlob blob in blobs.Values)
+                {
+                    if (blob.BoundingBox.Width > m_nNGSpec_um / 5/*Resolution*/ || blob.BoundingBox.Height > m_nNGSpec_um / 5/*Resolution*/) return false;
+                }
+
+                return true;
             }
 
             Mat FloodFill(Mat matSrc, System.Drawing.Point ptSeed, int nPaintValue, out CRect crtBoundingBox,Connectivity connect)

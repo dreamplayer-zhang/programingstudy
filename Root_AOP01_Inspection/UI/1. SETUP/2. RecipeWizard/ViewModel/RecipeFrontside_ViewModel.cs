@@ -8,10 +8,17 @@ namespace Root_AOP01_Inspection
     {
         Setup_ViewModel m_Setup;
         AOP01_Engineer m_Engineer;
+        MainVision m_mainVision;
+        public MainVision p_mainVision
+        {
+            get { return m_mainVision; }
+            set { SetProperty(ref m_mainVision, value); }
+        }
         public RecipeFrontside_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
             m_Engineer = setup.m_MainWindow.m_engineer;
+            m_mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
 
             p_ImageViewer_VM = new RootViewer_ViewModel();
             p_ImageViewer_VM.init(ProgramManager.Instance.ImageMain);
@@ -64,8 +71,8 @@ namespace Root_AOP01_Inspection
         double m_dPatternShiftAndRotationShiftSpec = 0.5;
         public double p_dPatternShiftAndRotationShiftSpec
         {
-            get { return m_dPatternShiftAndRotationTemplateMatchingScore; }
-            set { SetProperty(ref m_dPatternShiftAndRotationTemplateMatchingScore, value); }
+            get { return m_dPatternShiftAndRotationShiftSpec; }
+            set { SetProperty(ref m_dPatternShiftAndRotationShiftSpec, value); }
         }
 
         double m_dPatternShiftAndRotationRotationSpec = 0.5;
@@ -76,6 +83,14 @@ namespace Root_AOP01_Inspection
         }
         #endregion
 
+        #region Barcode Inspection Parameter
+        int m_nBarcodeThreshold = 70;
+        public int p_nBarcodeThreshold
+        {
+            get { return m_nBarcodeThreshold; }
+            set { SetProperty(ref m_nBarcodeThreshold, value); }
+        }
+        #endregion
 
         #endregion
 
@@ -144,7 +159,7 @@ namespace Root_AOP01_Inspection
                     if (p_bEnableBarcodeInsp)
                     {
                         MainVision.Run_BarcodeInspection barcodeInspection = (MainVision.Run_BarcodeInspection)mainVision.CloneModuleRun("BarcodeInspection");
-
+                        barcodeInspection.m_nThreshold = p_nBarcodeThreshold;
                         mainVision.StartRun(barcodeInspection);
                     }
                 });

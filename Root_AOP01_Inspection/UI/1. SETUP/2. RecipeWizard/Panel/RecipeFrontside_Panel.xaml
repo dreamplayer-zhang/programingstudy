@@ -161,12 +161,12 @@
                                         <TextBlock FontSize="12" Text="Score" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock FontSize="12" Text="Shift Spec" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                         <TextBlock FontSize="12" Text="Rotation Spec [º]" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                        <TextBox Grid.Column="2" Grid.Row="0" Text="80" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                        <TextBox Grid.Column="2" Grid.Row="0" Text="{Binding p_dPatternShiftAndRotationTemplateMatchingScore}" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0" Grid.Row="1"/>
-                                        <TextBox Style="{StaticResource BasicTbox}" Text="0.5" Width="80" Height="20" Grid.Column="1" Grid.Row="1"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dPatternShiftAndRotationShiftSpec}" Width="80" Height="20" Grid.Column="1" Grid.Row="1"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text="mm" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0" Grid.Row="1"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0" Grid.Row="2"/>
-                                        <TextBox Style="{StaticResource BasicTbox}" Text="0.5" Width="80" Height="20" Grid.Column="1" Grid.Row="2"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dPatternShiftAndRotationRotationSpec}" Width="80" Height="20" Grid.Column="1" Grid.Row="2"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text="º" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0" Grid.Row="2"/>
                                     </Grid>
                                 </GroupBox>
@@ -191,7 +191,7 @@
                                 <GroupBox Grid.Row="6" Header="Barcode Scratch">
                                     <Grid Margin="3">
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="4*"/>
+                                            <RowDefinition Height="1*"/>
                                             <RowDefinition Height="5*"/>
                                         </Grid.RowDefinitions>
                                         <GroupBox Header="Spec">
@@ -202,20 +202,9 @@
                                                 </Grid.ColumnDefinitions>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition/>
-                                                    <RowDefinition/>
-                                                    <RowDefinition/>
-                                                    <RowDefinition/>
                                                 </Grid.RowDefinitions>
-                                                <TextBlock FontSize="12" Text="Use Absolute GV" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                                <TextBlock FontSize="12" Text="Pit Level" Style="{StaticResource BasicTb}" Grid.Row="3"/>
-                                                <TextBlock FontSize="12" Text="GV" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                                <TextBlock FontSize="12" Text="Size" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                                <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
-                                                      VerticalAlignment="Center"
-                                                      HorizontalAlignment="Center" Width="85"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="1" Text="0"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="2" Text="0"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="3" Text="0"/>
+                                                <TextBlock FontSize="12" Text="GV" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="0" Text="{Binding p_nBarcodeThreshold}"/>
                                             </Grid>
                                         </GroupBox>
                                         <GroupBox Header="Defect Code" Grid.Row="1">
@@ -297,6 +286,7 @@
                                     <RowDefinition Height="1*"/>
                                     <RowDefinition Height="2*"/>
                                     <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="1*"/>
                                     <RowDefinition Height="5*"/>
                                     <RowDefinition Height="6*"/>
                                 </Grid.RowDefinitions>
@@ -317,7 +307,7 @@
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                        <TextBlock FontWeight="Bold" FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                        <TextBlock FontWeight="Bold" FontSize="12" Text="{Binding p_mainVision.p_bAlignKeyPass}" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Header="Pattern Shift" Grid.Row="2">
@@ -332,39 +322,50 @@
                                             <RowDefinition/>
                                         </Grid.RowDefinitions>
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                        <TextBlock FontSize="12" Text="Center" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+                                        <TextBlock FontSize="12" Text="Distance" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                         <TextBlock FontSize="12" Text="Angle" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                        <TextBlock FontWeight="Bold" FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
-                                        <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="1" />
-                                        <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
+                                        <TextBlock FontWeight="Bold" FontSize="12" Text="{Binding p_mainVision.p_bPatternShiftPass}" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPatternShiftDistance}" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="1" />
+                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPatternShiftAngle}" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Header="Pellicle Shift" Grid.Row="3">
                                     <Grid Margin="5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="2*"/>
-                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="53*"/>
+                                            <ColumnDefinition Width="262*"/>
+                                            <ColumnDefinition Width="158*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
                                             <RowDefinition/>
                                             <RowDefinition/>
                                             <RowDefinition/>
                                         </Grid.RowDefinitions>
-                                        <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                        <TextBlock FontSize="12" Text="Center" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                        <TextBlock FontSize="12" Text="Angle" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                        <TextBlock FontWeight="Bold" FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
-                                        <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="1" />
-                                        <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
+                                        <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0" Grid.ColumnSpan="2" Margin="10,5,10,4"/>
+                                        <TextBlock FontSize="12" Text="Center" Style="{StaticResource BasicTb}" Grid.Row="1" Grid.ColumnSpan="2" Margin="10,5,10,4"/>
+                                        <TextBlock FontSize="12" Text="Angle" Style="{StaticResource BasicTb}" Grid.Row="2" Grid.ColumnSpan="2" Margin="10,5,10,4"/>
+                                        <TextBlock FontWeight="Bold" FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="0" Margin="10,5,10,4" />
+                                        <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="1" Margin="10,5,10,4" />
+                                        <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="2" Margin="10,5,10,4" />
                                     </Grid>
                                 </GroupBox>
-                                <GroupBox Grid.Row="4" Grid.Column="1" Header="Defect Image"
+                                <GroupBox Header="Barcode Scratch" Grid.Row="4">
+                                    <Grid Margin="5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                        <TextBlock FontWeight="Bold" FontSize="12" Text="{Binding p_mainVision.p_bBarcodePass}" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                    </Grid>
+                                </GroupBox>
+                                <GroupBox Grid.Row="5" Grid.Column="1" Header="Defect Image"
                                   Background="{StaticResource GroupBoxBackground}">
                                     <Grid Background="Black">
                                         <Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG"/>
                                     </Grid>
                                 </GroupBox>
-                                <GroupBox Grid.Row="5" Grid.Column="1" Header="Insepction Info"
+                                <GroupBox Grid.Row="6" Grid.Column="1" Header="Insepction Info"
                                   Background="{StaticResource GroupBoxBackground}">
                                     <DataGrid IsReadOnly="True" Grid.Row="1">
                                         <DataGrid.Resources>
