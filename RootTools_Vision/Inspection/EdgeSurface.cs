@@ -72,21 +72,21 @@ namespace RootTools_Vision
 			int defectSize; // 10
 
 			// parameter 구분하기
-			if (this.currentWorkplace.MapPositionX == (int)EdgeMapPositionX.Top)
+			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
 			{
 				roiHeight = parameter.RoiHeightTop;
 				roiWidth = parameter.RoiWidthTop;
 				threshold = parameter.ThesholdTop;
 				defectSize = parameter.SizeMinTop;
 			}
-			else if (this.currentWorkplace.MapPositionX == (int)EdgeMapPositionX.Side)
+			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Side)
 			{
 				roiHeight = parameter.RoiHeightSide;
 				roiWidth = parameter.RoiWidthSide;
 				threshold = parameter.ThesholdSide;
 				defectSize = parameter.SizeMinSide;
 			}
-			else if (this.currentWorkplace.MapPositionX == (int)EdgeMapPositionX.Btm)
+			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
 			{
 				roiHeight = parameter.RoiHeightBtm;
 				roiWidth = parameter.RoiWidthBtm;

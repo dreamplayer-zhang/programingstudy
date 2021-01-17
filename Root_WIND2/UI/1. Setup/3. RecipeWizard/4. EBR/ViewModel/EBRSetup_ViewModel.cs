@@ -1,4 +1,5 @@
 ﻿using LiveCharts;
+using LiveCharts.Wpf;
 using Root_WIND2.Module;
 using RootTools;
 using RootTools.Database;
@@ -35,7 +36,12 @@ namespace Root_WIND2
 
 		private DataTable measurementDataTable;
 		private SeriesCollection measurementGraph;
-		
+		private string[] xLabels;
+
+		private int sizeYMaxVal = 100; 
+		private double sizeFrom = 0;
+		private double sizeTo = 50;
+
 		#region [Getter / Setter]
 		public RootViewer_ViewModel DrawToolVM
 		{
@@ -168,6 +174,7 @@ namespace Root_WIND2
 			get => measurementDataTable;
 			set => SetProperty(ref measurementDataTable, value);
 		}
+
 		public SeriesCollection MeasurementGraph
 		{
 			get
@@ -177,9 +184,54 @@ namespace Root_WIND2
 			set
 			{
 				measurementGraph = value;
-				RaisePropertyChanged("Measurement");
+				RaisePropertyChanged("MeasurementGraph");
 			}
 		}
+
+		public string[] XLabels
+		{
+			get
+			{
+				return xLabels;
+			}
+			set
+			{
+				xLabels = value;
+				RaisePropertyChanged("XLabels");
+			}
+		}
+
+		public int SizeYMaxVal
+		{
+			get { return sizeYMaxVal; }
+			set
+			{
+				sizeYMaxVal = value;
+				RaisePropertyChanged("SizeYMaxVal");
+			}
+		}
+		public double SizeFrom
+		{
+			get { return sizeFrom; }
+			set
+			{
+				sizeFrom = value;
+				RaisePropertyChanged("SizeFrom");
+			}
+		}
+		public double SizeTo
+		{
+			get { return sizeTo; }
+			set
+			{
+				sizeTo = value;
+				RaisePropertyChanged("SizeTo");
+			}
+		}
+
+		public Func<float, string> YLabel { get; set; }
+		public string XTitle { get; set; }
+		public string YTitle { get; set; }
 		#endregion
 
 		public EBRSetup_ViewModel()
@@ -216,15 +268,7 @@ namespace Root_WIND2
 
 		public void Inspect()
 		{
-			setupVM.InsperctionMgrEBR.SharedBufferR_Gray = DrawToolVM.p_ImageData.GetPtr();
-			setupVM.InsperctionMgrEBR.SharedBufferByteCnt = DrawToolVM.p_ImageData.p_nByte;
-			setupVM.InsperctionMgrEBR.InspectionMode = InspectionManagerEBR.InsepectionMode.EBR;
-
-			if (setupVM.InsperctionMgrEBR.CreateInspection() == false)
-			{
-				return;
-			}
-			setupVM.InsperctionMgrEBR.Start();
+			ProgramManager.Instance.InspectionEBR.Start();
 		}
 
 		public void LoadParameter()
@@ -305,7 +349,60 @@ namespace Root_WIND2
 
 		private void DrawGraph()
 		{
+			if (MeasurementGraph == null)
+			{
+				MeasurementGraph = new SeriesCollection
+				{
+					new LineSeries
+					{
+						Title = "Bevel",
+						//Values = new ChartValues<double> { 6, 7, 3, 4 ,6 },
+						PointGeometry = null
+					},
+					new LineSeries
+					{
+						Title = "EBR",
+						//Values = new ChartValues<double> { 6, 7, 3, 4 ,6 },
+						PointGeometry = null
+					},
+				};
+			}
+			else
+			{
+				MeasurementGraph[0].Values.Clear();
+			}
 
+			int binCount = measurementDataTable.Rows.Count;
+			XLabels = new string[binCount];
+			for (int i = 1; i <= binCount; i++)
+			{
+				XLabels[i - 1] = (StepDegree * i).ToString();
+			}
+			YLabel = value => value.ToString("N");
+
+			DataRow[] dataBevels;
+			string expressionBevel = "m_fWidth >= 0";
+			dataBevels = measurementDataTable.Select(expressionBevel);
+
+			ChartValues<float> bevels = new ChartValues<float>();
+			foreach (DataRow table in dataBevels)
+			{
+				string data = table[5].ToString();
+				bevels.Add(float.Parse(data));
+			}
+			MeasurementGraph[0].Values = bevels;
+
+			DataRow[] dataEBR;
+			string expressionEBR = "m_fHeight >= 0";
+			dataEBR = measurementDataTable.Select(expressionEBR);
+
+			ChartValues<float> ebrs = new ChartValues<float>();
+			foreach (DataRow table in dataEBR)
+			{
+				string data = table[6].ToString();
+				ebrs.Add(float.Parse(data));
+			}
+			MeasurementGraph[1].Values = ebrs;
 		}
 	}
 

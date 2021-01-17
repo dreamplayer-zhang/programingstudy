@@ -50,17 +50,25 @@ namespace RootTools_Vision
     }
 
 
-    public class PocessDefectDoneEventArgs : EventArgs
+    public class ProcessDefectDoneEventArgs : EventArgs
     {
-        public PocessDefectDoneEventArgs()
+        public ProcessDefectDoneEventArgs()
         {
 
         }
     }
 
-    public class PocessDefectWaferDoneEventArgs : EventArgs
+    public class ProcessDefectWaferDoneEventArgs : EventArgs
     {
-        public PocessDefectWaferDoneEventArgs()
+        public ProcessDefectWaferDoneEventArgs()
+        {
+
+        }
+    }
+
+    public class ProcessMeasurementDoneEventArgs : EventArgs
+    {
+        public ProcessMeasurementDoneEventArgs()
         {
 
         }

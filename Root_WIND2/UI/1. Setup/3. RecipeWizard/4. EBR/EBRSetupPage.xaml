@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Root_WIND2" xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:local="clr-namespace:Root_WIND2" xmlns:tools="clr-namespace:RootTools;assembly=RootTools" xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="838" d:DesignWidth="1683" 
              Background="{StaticResource PanelBackGround}">
@@ -164,34 +164,38 @@
                         </Grid.RowDefinitions>
                         <GroupBox Grid.Row="0" Grid.Column="1" Header="Graph"
                                   Background="{StaticResource GroupBoxBackground}">
+                            <lvc:CartesianChart Series="{Binding MeasurementGraph}"
+                                                            LegendLocation="Top"
+                                                            DisableAnimations="true">
+                                <lvc:CartesianChart.AxisX>
+                                    <lvc:Axis Title="{Binding XTitle}"
+                                                        Labels="{Binding XLabels}"
+                                                        MinValue="{Binding SizeFrom}"
+                                                        MaxValue="{Binding SizeTo}"
+                                                        Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
+                                    </lvc:Axis>          
+                                </lvc:CartesianChart.AxisX>
+                                <lvc:CartesianChart.AxisY>
+                                    <lvc:Axis Title="{Binding YTitle}"
+                                                        LabelFormatter="{Binding SizeYLabel}"
+                                                        MinValue="0"
+                                                        MaxValue="{Binding SizeYMaxVal}">
+                                    </lvc:Axis>
+                                </lvc:CartesianChart.AxisY>
+                            </lvc:CartesianChart>
                         </GroupBox>
                         <GroupBox Grid.Row="1" Grid.Column="1" Header="Measurement Data"
                                   Background="{StaticResource GroupBoxBackground}">
-                            <!--<DataGrid IsReadOnly="True">
-                                <DataGrid.Resources>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                    </Style>
-                                </DataGrid.Resources>
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="No." Width="35" Binding="{Binding Path=no}"/>
-                                    <DataGridTextColumn Header="Angle" Width="*" Binding="{Binding Path=x}"/>
-                                    <DataGridTextColumn Header="EBR(um)" Width="*" Binding="{Binding Path=y}"/>
-                                    <DataGridTextColumn Header="Bevel(um)" Width="*" Binding="{Binding Path=width}"/>
-                                </DataGrid.Columns>
-                            </DataGrid>-->
-                            <DataGrid Name="Defect_Viewer"
-                                              ItemsSource="{Binding MeasurementDataTable}"
-                                              SelectedItem="{Binding SelectedMeasurement, Mode=TwoWay}"
-                                              SelectionMode="Single"
-                                              EnableColumnVirtualization="True"
-                                              EnableRowVirtualization="True"
-                                              VirtualizingPanel.VirtualizationMode="Recycling"
-                                              ScrollViewer.CanContentScroll="True"
-                                              IsReadOnly="True"
-                                              AutoGenerateColumns="True"
-                                              Grid.Row="1">
+                            <DataGrid ItemsSource="{Binding MeasurementDataTable}"
+                                      SelectedItem="{Binding SelectedMeasurement, Mode=TwoWay}"
+                                      SelectionMode="Single"
+                                      EnableColumnVirtualization="True"
+                                      EnableRowVirtualization="True"
+                                      VirtualizingPanel.VirtualizationMode="Recycling"
+                                      ScrollViewer.CanContentScroll="True"
+                                      IsReadOnly="True"
+                                      AutoGenerateColumns="True"
+                                      Grid.Row="1">
                                 <DataGrid.Resources>
                                     <Style TargetType="DataGridColumnHeader">
                                         <Setter Property="HorizontalAlignment"

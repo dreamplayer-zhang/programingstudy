@@ -122,7 +122,7 @@ namespace RootTools_Vision
                             (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY, 
                             this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
                             feature.Width, feature.Height,
-                            startX, startY, endX, endY, 5, this.currentWorkplace.SharedBufferByteCnt);
+                            startX, startY, endX, endY, 5, this.currentWorkplace.SharedBufferByteCnt, (int)parameter.IndexChannel);
                     }
 
                     if( score >= maxScore)
@@ -226,7 +226,7 @@ namespace RootTools_Vision
                                 (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
                                 this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
                                 feature.Width, feature.Height,
-                                startX, startY, endX, endY, 5, this.currentWorkplace.SharedBufferByteCnt);
+                                startX, startY, endX, endY, 5, this.currentWorkplace.SharedBufferByteCnt,(int)parameter.IndexChannel);
                         }
 
                         if (score > maxScore)
@@ -265,7 +265,7 @@ namespace RootTools_Vision
                             (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
                             this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
                             feature.Width, feature.Height,
-                            startX, startY, endX, endY, 5, this.currentWorkplace.SharedBufferByteCnt);
+                            startX, startY, endX, endY, 5, this.currentWorkplace.SharedBufferByteCnt, (int)parameter.IndexChannel);
                     }
 
                     maxScore = score;
