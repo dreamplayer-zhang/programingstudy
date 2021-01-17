@@ -44,7 +44,7 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <GroupBox Header="Thumbnail" Grid.Row="0" Margin="0,0,0,0">
-                                <Canvas Grid.Row="0"
+                                <Canvas Grid.Row="0" 
                             Focusable="True"
                             obs:SizeObserver.Observe="true"
                             obs:SizeObserver.ObservedWidth="{Binding DrawToolVM.p_ThumbWidth, Mode=OneWayToSource}"

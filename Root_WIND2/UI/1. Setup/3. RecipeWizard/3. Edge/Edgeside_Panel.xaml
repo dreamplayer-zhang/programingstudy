@@ -24,6 +24,9 @@
                     <Button Content="Inspection"
                             Style="{StaticResource PanelBtn}"
                             Command="{Binding btnEdgeInsp}"/>
+                    <Button Content="Wafer Load"
+                            Style="{StaticResource PanelBtn}"
+                            Command="{Binding btnWaferLoad}"/>
                 </StackPanel>
                 <Button Content="Back"
                         Command="{Binding btnBack}"

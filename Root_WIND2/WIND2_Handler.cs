@@ -419,13 +419,15 @@ namespace Root_WIND2
                         StateHome();
                         break;
                     case EQ.eState.Ready:
-                        CheckLoad();
+                        //CheckLoad();
                         break;
                     case EQ.eState.Run:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {   
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            //CheckUnload();
+
+                            if (m_process.m_qSequence.Count == 0)
+                                CheckUnload();
                             if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
@@ -453,7 +455,7 @@ namespace Root_WIND2
                     {
                         ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
                         manualJobSchedule.ShowPopup();
-                        m_process.m_qSequence.Enqueue(new EFEM_Process.Sequence(loadport.GetUnLoadModuleRun(),null));
+                        //m_process.m_qSequence.Enqueue(new EFEM_Process.Sequence(loadport.GetUnLoadModuleRun(),null));
                     });
                     
                 }
@@ -490,7 +492,14 @@ namespace Root_WIND2
                     {
                         if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
                     }
-                    if (bUndock) loadport.StartRunUndocking();
+                    if (bUndock)
+                    {
+                        loadport.StartRunUndocking();
+                        m_process.ClearInfoWafer();
+                        loadport.p_infoCarrier.ClearInfoWafer();
+                        loadport.p_infoCarrier.RunTreeWafer(Tree.eMode.Init);
+                        EQ.p_eState = EQ.eState.Ready;
+                    }
                 }
             }
         }
