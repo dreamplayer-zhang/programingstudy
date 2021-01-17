@@ -19,6 +19,7 @@ using static RootTools.RootViewer_ViewModel;
 using MBrushes = System.Windows.Media.Brushes;
 using DPoint = System.Drawing.Point;
 using System.Data;
+using MySql.Data.MySqlClient;
 
 namespace Root_AOP01_Inspection
 {
@@ -152,7 +153,7 @@ namespace Root_AOP01_Inspection
 		#endregion
 
 		#region ResultDataTable
-		DataTable _OriginResultDataTable;
+		//DataTable _OriginResultDataTable;
 		DataTable _ResultDataTable;
 		public DataTable ResultDataTable
 		{
@@ -250,9 +251,39 @@ namespace Root_AOP01_Inspection
 
 			EdgeDrawMode = false;
 		}
+
 		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
 		{
-			//ResultDataTable Update
+			ResultDataTable = new DataTable();
+
+			MySqlConnection _conn = new MySqlConnection();
+			string query = "SELECT * FROM inspections.defect;";
+			try
+			{
+				_conn = new MySqlConnection(App.connection);
+				_conn.Open();
+				var _cmd = new MySqlCommand
+				{
+					Connection = _conn,
+					CommandText = query
+				};
+				_cmd.ExecuteNonQuery();
+
+				var _da = new MySqlDataAdapter(_cmd);
+				_da.Fill(ResultDataTable);
+
+				var _cb = new MySqlCommandBuilder(_da);
+
+				_conn.Close();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message);
+			}
+			finally
+			{
+				if (_conn != null) _conn.Close();
+			}
 		}
 
 		private void ProcessDefectDone_Callback(object obj, ProcessDefectDoneEventArgs args)
@@ -300,13 +331,13 @@ namespace Root_AOP01_Inspection
 			}
 		}
 		string AOPImageRootPath = @"D:\DefectImage";
-		string currentInspection = RootTools.Database.DatabaseManager.Instance.InspectionID;
 		private void SetData(DataRowView selectedDataTable, ImageType type)
 		{
 			int idx = Convert.ToInt32(selectedDataTable["m_nDefectIndex"]);
 
 			if (System.IO.Directory.Exists(System.IO.Path.Combine(AOPImageRootPath)))
 			{
+				string currentInspection = RootTools.Database.DatabaseManager.Instance.InspectionID;
 				string imagePath = System.IO.Path.Combine(AOPImageRootPath, currentInspection, idx.ToString() + ".bmp");
 				if (System.IO.File.Exists(imagePath))
 				{
@@ -717,8 +748,11 @@ namespace Root_AOP01_Inspection
 		}
 		private void startTestInsp()
 		{
+			saveEdgeBox();
+
 			p_ImageViewer_VM.Clear();
 			m_Setup.InspectionManager.ClearDefect();
+			m_Setup.InspectionManager.ResetWorkManager();
 
 			_StartRecipeTeaching();
 

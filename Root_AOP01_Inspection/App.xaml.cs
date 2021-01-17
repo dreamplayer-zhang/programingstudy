@@ -23,6 +23,9 @@ namespace Root_AOP01_Inspection
 		public static string mSideRightMem = "SideRight";
 		public static string mSideTopMem = "SideTop";
 		public static string mSideBotMem = "SideBot";
+
+		public static string connection = @"server=localhost;uid=root;password=`ati5344;database=inspections;port=3306;charset=utf8";
+
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			base.OnStartup(e);

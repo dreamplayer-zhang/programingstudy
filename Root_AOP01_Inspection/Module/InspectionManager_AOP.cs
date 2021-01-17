@@ -496,6 +496,12 @@ namespace Root_AOP01_Inspection.Module
 
 			AOPEventManager.SnapDone += SnapDone_Callback;
 		}
+		public void ResetWorkManager()
+		{
+			AOPEventManager.SnapDone -= SnapDone_Callback;
+			Clear();
+			Initialize();
+		}
 
 		protected override WorkplaceBundle CreateWorkplaceBundle()
 		{

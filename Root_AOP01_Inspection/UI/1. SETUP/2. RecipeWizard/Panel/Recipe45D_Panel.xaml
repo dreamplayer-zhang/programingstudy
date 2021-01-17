@@ -283,14 +283,17 @@
                                   Background="{StaticResource GroupBoxBackground}">
                                     <Grid Background="Black">
                                         <!--<Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG"/>-->
-										<Image Source="{Binding CurrentImage}"/>
+										<Image Source="{Binding SelectedTDIImage}"/>
 									</Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="3" Header="Insepction Info"
                                   Background="{StaticResource GroupBoxBackground}">
 									<DataGrid IsReadOnly="True" Grid.Row="1" 
 											  ItemsSource="{Binding ResultDataTable}"
-											  SelectedItem="{Binding SelectedDataTable}">
+											  SelectionMode="Single"
+											  SelectedItem="{Binding SelectedDataTable}"
+											  AutoGenerateColumns="True">
+										<!--
                                         <DataGrid.Resources>
                                             <Style TargetType="DataGridColumnHeader">
                                                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -304,7 +307,7 @@
                                             <DataGridTextColumn  Header="Gv" Binding="{Binding Path=d}" Width="0.5*"/>
                                             <DataGridTextColumn  Header="Code" Binding="{Binding Path=e}" Width="*"/>
                                         </DataGrid.Columns>
-                                        <!--<local:Dummy a="0" b="1078, 2395" c="1.4mm" d="32" e="0x000000"/>
+                                        <local:Dummy a="0" b="1078, 2395" c="1.4mm" d="32" e="0x000000"/>
                                         <local:Dummy a="1" b="2395, 1078" c="2.2mm" d="24" e="0x000000"/>
                                         <local:Dummy a="2" b="8078, 3355" c="1.1mm" d="57" e="0x000000"/>
                                         <local:Dummy a="3" b="2678, 6345" c="1.8mm" d="61" e="0x000000"/>
