@@ -348,19 +348,7 @@ namespace Root_WIND2
 			//	sharedBuf = DrawToolVM.p_ImageData.GetPtr();
 			//}
 
-			if (DrawToolVM.p_ImageData.p_nByte == 1)
-				setupVM.InspectionManagerEdge.SharedBufferR_Gray = DrawToolVM.p_ImageData.GetPtr();
-			else if (DrawToolVM.p_ImageData.p_nByte == 3)
-				setupVM.InspectionManagerEdge.SetWorkplaceBuffer(DrawToolVM.p_ImageData.GetPtr(0), DrawToolVM.p_ImageData.GetPtr(1), DrawToolVM.p_ImageData.GetPtr(2));
-
-			setupVM.InspectionManagerEdge.SharedBufferByteCnt = DrawToolVM.p_ImageData.p_nByte;
-			setupVM.InspectionManagerEdge.InspectionMode = InspectionManagerEdge.InsepectionMode.EDGE;
-			
-			if (setupVM.InspectionManagerEdge.CreateInspection() == false)
-			{
-				return;
-			}
-			setupVM.InspectionManagerEdge.Start();
+			ProgramManager.Instance.InspectionEdge.Start();
 		}
 
 		private void ChangeViewer(string dataName)

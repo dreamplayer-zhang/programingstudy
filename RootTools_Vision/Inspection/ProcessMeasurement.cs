@@ -9,41 +9,27 @@ namespace RootTools_Vision
 {
 	public class ProcessMeasurement : WorkBase
 	{
-		Workplace workplace;
-		WorkplaceBundle workplaceBundle;
+		public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_ALL;
 
-		public override WORK_TYPE Type => WORK_TYPE.MEASUREMENTPROCESS;
+		
 
-		public override WorkBase Clone()
+		protected override bool Preparation()
 		{
-			return (WorkBase)this.MemberwiseClone();
+			return true;
 		}
 
-		public override void SetRecipe(Recipe _recipe)
-		{
-			m_sName = this.GetType().Name;
-		}
-
-		public override void SetWorkplace(Workplace workplace)
-		{
-			this.workplace = workplace;
-		}
-
-		public override void SetWorkplaceBundle(WorkplaceBundle workplace)
-		{
-			this.workplaceBundle = workplace;
-		}
-
-		public override void DoWork()
+		protected override bool Execution()
 		{
 			DoProcessMeasurement();
+			return true;
 		}
 
-		List<Defect> DefectList = new List<Defect>();
 		public void DoProcessMeasurement()
 		{
-			if (!(this.workplace.MapPositionX == -1 && this.workplace.MapPositionY == -1))
+			if (this.currentWorkplace.Index != 0)
 				return;
+
+			List<Defect> DefectList = new List<Defect>();
 
 			foreach (Workplace workplace in workplaceBundle)
 				foreach (Defect defect in workplace.DefectList)
@@ -51,7 +37,7 @@ namespace RootTools_Vision
 
 			DatabaseManager.Instance.AddDefectDataList(DefectList);
 
-			WorkEventManager.OnProcessMeasurementDone(this.workplace, new ProcessMeasurementDoneEventArgs());
+			WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
 		}
 	}
 }

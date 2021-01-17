@@ -20,7 +20,7 @@ namespace RootTools_Vision
         {
         }
 
-        public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_WAFER;
+        public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_ALL;
 
 
         protected override bool Preparation()
@@ -107,7 +107,7 @@ namespace RootTools_Vision
             //}
 
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
-            WorkEventManager.OnProcessDefectWaferDone(this.currentWorkplace, new PocessDefectWaferDoneEventArgs());
+            WorkEventManager.OnProcessDefectWaferDone(this.currentWorkplace, new ProcessDefectWaferDoneEventArgs());
         }
 
         public override WorkBase Clone()

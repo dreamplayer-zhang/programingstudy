@@ -89,9 +89,6 @@ namespace Root_WIND2.Module
 				if (this.inspectionEdge.SetCameraInfo() == false)
 					return "Set Camera Info Fail";
 
-				if (this.inspectionEdge.CreateInspection() == false)
-					return "Create Inspection Fail";
-
 				inspectionEdge.Start();
 				return "OK";
 			}

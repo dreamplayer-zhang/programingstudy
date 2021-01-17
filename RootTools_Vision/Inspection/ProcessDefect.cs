@@ -32,7 +32,7 @@ namespace RootTools_Vision
         {
 
 
-            WorkEventManager.OnProcessDefectDone(this.currentWorkplace, new PocessDefectDoneEventArgs());
+            WorkEventManager.OnProcessDefectDone(this.currentWorkplace, new ProcessDefectDoneEventArgs());
         }
     }
 }
