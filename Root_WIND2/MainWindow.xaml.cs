@@ -139,7 +139,7 @@ namespace Root_WIND2
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1);
             //////
-
+            logView.Init(LogView.m_logView);
             InitTimer();
         }
 

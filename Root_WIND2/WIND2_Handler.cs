@@ -453,6 +453,7 @@ namespace Root_WIND2
                     {
                         ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
                         manualJobSchedule.ShowPopup();
+                        m_process.m_qSequence.Enqueue(new EFEM_Process.Sequence(loadport.GetUnLoadModuleRun(),null));
                     });
                     
                 }
@@ -492,7 +493,6 @@ namespace Root_WIND2
                     if (bUndock) loadport.StartRunUndocking();
                 }
             }
-
         }
         #region Tree
         public void RunTreeModule(Tree tree)
