@@ -76,7 +76,7 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					roiHeight_Btm = value;
 				
-				SetParameter();
+				//SetParameter();
 			}
 		}
 		public int ROIWidth 
@@ -95,7 +95,7 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					roiWidth_Btm = value;
 
-				SetParameter();
+				//SetParameter();
 			}
 		}
 		public int Threshold
@@ -114,7 +114,7 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					threshold_Btm = value;
 
-				SetParameter();
+				//SetParameter();
 			}
 		}
 		public int DefectSizeMin
@@ -133,7 +133,7 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					defectSizeMin_Btm = value;
 
-				SetParameter();
+				//SetParameter();
 			}
 		}
 		public int MergeDist
@@ -152,7 +152,7 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					mergeDist_Btm = value;
 
-				SetParameter();
+				//SetParameter();
 			}
 		}
 		public int IllumWhite
@@ -171,7 +171,7 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					illumWhite_Btm = value;
 
-				SetParameter();
+				//SetParameter();
 			}
 		}
 		public int IllumSide
@@ -190,7 +190,7 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					illumSide_Btm = value;
 
-				SetParameter();
+				//SetParameter();
 			}
 		}
 
@@ -310,6 +310,13 @@ namespace Root_WIND2
 
 			DrawToolVM = new RootViewer_ViewModel();
 			DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeTop), ProgramManager.Instance.DialogService);
+
+			WIND2EventManager.BeforeRecipeSave += BeforeRecipeSave_Callback;
+		}
+
+		private void BeforeRecipeSave_Callback(object obj, RecipeEventArgs args)
+		{
+			SetParameter();
 		}
 
 		public void Scan()
@@ -365,7 +372,7 @@ namespace Root_WIND2
 			else if (dataName == "Bottom")
 				DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeBottom), ProgramManager.Instance.DialogService);
 			
-			SetParameter();
+			//SetParameter();
 		}
 
 		public void LoadParameter()
@@ -456,6 +463,7 @@ namespace Root_WIND2
 			param.IllumWhiteBtm = illumSide_Btm;
 			param.IllumSideBtm = illumSide_Btm;
 
+			//recipe.ParameterItemList.Clear();
 			recipe.ParameterItemList.Add(param);
 		}
 	}

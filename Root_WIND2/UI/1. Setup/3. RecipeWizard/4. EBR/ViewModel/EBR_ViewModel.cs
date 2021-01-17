@@ -22,10 +22,10 @@ namespace Root_WIND2
         {
             this.setupVM = setup;
             this.recipe = setup.Recipe;
-            init();
+            Init();
         }
 
-        public void init()
+        public void Init()
         {
             Main = new EBR_Panel();
             SetupVM = new EBRSetup_ViewModel();

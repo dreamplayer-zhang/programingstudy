@@ -168,7 +168,7 @@ namespace Root_WIND2
 
         public void SetParameter()
         {
-            
+            return;
             List<ParameterBase> paramList = new List<ParameterBase>();
             foreach(InspectionItem item in p_cInspItem)
             {
