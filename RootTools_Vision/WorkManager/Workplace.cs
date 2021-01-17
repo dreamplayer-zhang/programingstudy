@@ -16,6 +16,7 @@ namespace RootTools_Vision
         INSPECTION          = 0b0001000,
         DEFECTPROCESS       = 0b0010000,
         DEFECTPROCESS_WAFER = 0b0100000,
+        MEASUREMENTPROCESS  = 0b1000000,
     }
 
     public enum WORKPLACE_SUB_STATE

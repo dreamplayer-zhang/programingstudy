@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Database;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -60,24 +61,13 @@ namespace RootTools_Vision
 			if (this.workplace.Index == 0)
 				return;
 
-			//Inspect();
-
 			IntPtr ptrMem = this.workplace.SharedBufferR_GRAY;
-
 			int roiWidth = this.workplace.BufferSizeX;
 			int roiHeight = this.workplace.BufferSizeY;
-
 			int roiLeft = this.workplace.PositionX;
 			int roiTop = this.workplace.PositionY;
-			int roiRight = this.workplace.PositionX + roiWidth;
-			int roiBtm = this.workplace.PositionY + roiHeight;
 
-			//int[] arrAvg = new int[roiWidth];
-			//int[] arrEqual = new int[roiWidth];
 			int[] arrDiff = new int[roiWidth];
-			//arrAvg = DoAverage(ptrMem, roiLeft, roiTop, roiWidth, roiHeight);
-			//arrEqual = Equalize(arrAvg, cnt);
-			//arrDiff = DoDiff(arrEqual, cnt);
 
 			arrDiff = GetDiffArr(ptrMem, roiLeft, roiTop, roiWidth, roiHeight);
 			FindEdge(arrDiff);
@@ -102,7 +92,8 @@ namespace RootTools_Vision
 				int ySum = 0;
 				for (int y = top; y < btm; y += 10)
 				{
-					ySum += ((byte*)memory)[(y * width) + x];
+					//ySum += ((byte*)memory)[(y * width) + x];
+					ySum += ((byte*)memory)[(y * this.workplace.SharedBufferWidth) + x];
 				}
 				arrAvg[x - left] = ySum / ((btm - top) / 10);
 			}
@@ -135,71 +126,12 @@ namespace RootTools_Vision
 			return arrDiff;
 		}
 
-		/*
-		private unsafe int[] DoAverage(IntPtr memory, int left, int top, int width, int height)
-		{
-			int[] arrAvg = new int[width];
-			int right = left + width;
-			int btm = top + height;
-
-			for (int x = left; x < right; x++)
-			{
-				int ySum = 0;
-				for (int y = top; y < btm; y += 10)
-				{
-					ySum += ((byte*)memory)[(y * width) + x];
-				}
-				arrAvg[x - left] = ySum / ((btm - top) / 10);
-			}
-
-			return arrAvg;
-		}
-
-		private int[] Equalize(int[] arrAvg)
-		{
-			int[] arrEqual = new int[arrAvg.Length];
-			int equalCnt = 10; // parameter? y축으로 평균된 애들 smoothing 할때 몇개씩 할건지....
-
-			for (int i = 0; i < arrAvg.Length; i++)
-			{
-				int x0 = i - equalCnt;
-				int x1 = i + equalCnt;
-
-				if (x0 < 0)
-					x0 = 0;
-				if (x1 >= arrAvg.Length)
-					x1 = arrAvg.Length - 1;
-
-				int sum = 0;
-				for (int j = x0; j <= x1; j++)
-				{
-					sum += arrAvg[j];
-				}
-				arrEqual[i] = sum / (x1 - x0 + 1);
-			}
-
-			return arrEqual;
-		}
-
-		private int[] DoDiff(int[] arrEqual)
-		{
-			int[] arrDiff = new int[arrEqual.Length];
-			int equalCnt = 10; // parameter? y축으로 평균된 애들 smoothing 할때 몇개씩 할건지....
-
-			for (int x = equalCnt; x < arrEqual.Length - equalCnt; x++)
-			{
-				arrDiff[x] = arrEqual[x + equalCnt] - arrEqual[x - equalCnt];
-			}
-			return arrDiff;
-		}
-		*/
-
 		private void FindEdge(int[] arrDiff)
 		{
 			int xRange = this.parameter.XRange;
-			int diffEdge = this.parameter.EdgeDiff;
-			int diffBevel = this.parameter.BevelDiff;
-			int diffEBR = this.parameter.EBRDiff;
+			int diffEdge = this.parameter.DiffEdge;
+			int diffBevel = this.parameter.DiffBevel;
+			int diffEBR = this.parameter.DiffEBR;
 
 			double waferEdgeX, bevelX, ebrX;
 
@@ -210,8 +142,19 @@ namespace RootTools_Vision
 			}
 
 			waferEdgeX = FindEdge(arrDiff, arrDiff.Length - (2 * xRange), diffEdge);
-			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX), diffBevel);
-			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX), diffEBR);
+			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX), diffBevel + this.parameter.OffsetBevel);
+			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX), diffEBR + this.parameter.OffsetEBR);
+
+			// Add measurement
+			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			this.workplace.AddDefect(sInspectionID,
+									11111,
+									0, 0,
+									this.workplace.Index * this.parameter.StepDegree, 0,
+									(float)(waferEdgeX - bevelX),
+									(float)(waferEdgeX - ebrX),
+									this.workplace.MapPositionX,
+									this.workplace.MapPositionY);
 		}
 
 		private double FindEdge(int[] diff, int searchStartX, int standardDiff)

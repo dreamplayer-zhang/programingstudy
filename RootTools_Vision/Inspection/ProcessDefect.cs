@@ -52,7 +52,7 @@ namespace RootTools_Vision
             //        DatabaseManager.Instance.AddDefectDataList(workplace.DefectList);
             //    }
             //}
-            WorkEventManager.OnProcessDefectDone(this.workplace, new PocessDefectDoneEventArgs());
+            WorkEventManager.OnProcessDefectDone(this.workplace, new ProcessDefectDoneEventArgs());
         }
 
         public override WorkBase Clone()

@@ -118,7 +118,7 @@ namespace RootTools_Vision
             }
 
             WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>(), true));
-            WorkEventManager.OnProcessDefectWaferDone(this.workplace, new PocessDefectWaferDoneEventArgs());
+            WorkEventManager.OnProcessDefectWaferDone(this.workplace, new ProcessDefectWaferDoneEventArgs());
         }
 
         public override WorkBase Clone()

@@ -49,6 +49,8 @@ namespace Root_WIND2
 		protected override void InitWorkManager()
 		{
 			this.Add(new WorkManager("EBR", WORK_TYPE.INSPECTION, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
+			//this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.WAFER));
+			this.Add(new WorkManager("ProcessMeasurement", WORK_TYPE.MEASUREMENTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.WAFER));
 		}
 
 		public bool CreateInspection()
@@ -58,19 +60,40 @@ namespace Root_WIND2
 
 		public override bool CreateInspection(Recipe _recipe)
 		{
+			workBundle = new WorkBundle();
+			workplaceBundle = new WorkplaceBundle();
+
+			int notchY = _recipe.GetRecipe<EBRParameter>().NotchY; // notch memory Y 좌표
+			int stepDegree = _recipe.GetRecipe<EBRParameter>().StepDegree;
+			int workplaceCnt = 360 / stepDegree;
+			int imageHeight = 270000;
+			int imageHeightPerDegree = imageHeight / 360; // 1도 당 Image Height
+
+			int width = _recipe.GetRecipe<EBRParameter>().RoiWidth;
+			int height = _recipe.GetRecipe<EBRParameter>().RoiHeight;
+
 			try
 			{
-				Workplace workplace = new Workplace(0, 0, 0, 0, 1500, 2000);
-				workplaceBundle = new WorkplaceBundle();
-				workplaceBundle.Add(workplace);
+				for (int i = 0; i < 5/*workplaceCnt*/; i++)
+				{
+					int posY = (imageHeightPerDegree * i) - (height / 2);
+					if (posY <= 0)
+						posY = 0;
+					Workplace workplace = new Workplace(0, 0, 0, posY, width, height);
+					workplaceBundle.Add(workplace);
+				}
 				workplaceBundle.SetSharedBuffer(this.sharedBufferR_Gray, this.SharedBufferWidth, this.SharedBufferHeight);
 
 				EBR ebr = new EBR();
 				ebr.SetRecipe(this.recipe);
 				ebr.SetWorkplaceBundle(workplaceBundle);
-				
-				workBundle = new WorkBundle();
+
+				ProcessMeasurement processMeasurement = new ProcessMeasurement();
+				processMeasurement.SetRecipe(this.recipe);
+				processMeasurement.SetWorkplaceBundle(workplaceBundle);
+
 				workBundle.Add(ebr);
+				workBundle.Add(processMeasurement);
 
 				if (this.SetBundles(workBundle, workplaceBundle) == false)
 					return false;

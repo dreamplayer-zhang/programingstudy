@@ -128,7 +128,7 @@ namespace Root_WIND2
             }));
         }
 
-        private void ProcessDefectDone_Callback(object obj, PocessDefectDoneEventArgs args)
+        private void ProcessDefectDone_Callback(object obj, ProcessDefectDoneEventArgs args)
         {
             Workplace workplace = obj as Workplace;
 
