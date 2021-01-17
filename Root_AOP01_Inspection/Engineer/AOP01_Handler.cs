@@ -101,14 +101,15 @@ namespace Root_AOP01_Inspection
         #endregion
 
         #region Module Loadport
-        enum eLoadport
+        public enum eLoadport
         {
             RND,
             Cymechs,
         }
-        List<eLoadport> m_aLoadportType = new List<eLoadport>();
+        public List<eLoadport> m_aLoadportType = new List<eLoadport>();
         public List<ILoadport> m_aLoadport = new List<ILoadport>();
         int m_lLoadport = 2;
+        public eLoadport LoadportType;
         void InitLoadport()
         {
             ModuleBase module;
@@ -118,9 +119,15 @@ namespace Root_AOP01_Inspection
                 string sID = "Loadport" + cLP;
                 switch (m_aLoadportType[n])
                 {
-                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
-                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, true); break;
-                    default: module = new Loadport_RND(sID, m_engineer, true, true); break;
+                    case eLoadport.RND:
+                        module = new Loadport_RND(sID, m_engineer, true, true);
+                        LoadportType = eLoadport.RND;
+                        break;
+                    case eLoadport.Cymechs:
+                    default:
+                        module = new Loadport_Cymechs(sID, m_engineer, true, true);
+                        LoadportType = eLoadport.Cymechs;
+                        break;
                 }
                 InitModule(module);
                 m_aLoadport.Add((ILoadport)module);
@@ -292,11 +299,12 @@ namespace Root_AOP01_Inspection
 
         void CheckLoad()
         {
+            if (m_process.m_qSequence.Count == 0) return; 
             EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
             string sLoadport = sequence.m_infoWafer.m_sModule;
             foreach (ILoadport loadport in m_aLoadport)
             {
-                if (loadport.p_id == sLoadport) loadport.RunDocking();
+                if (loadport.p_id == sLoadport) loadport.StartRunDocking();
             }
         }
 
@@ -313,7 +321,7 @@ namespace Root_AOP01_Inspection
                     {
                         if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
                     }
-                    if (bUndock) loadport.RunUndocking();
+                    if (bUndock) loadport.StartRunUndocking();
                 }
             }
         }

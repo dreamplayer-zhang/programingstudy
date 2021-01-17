@@ -574,9 +574,9 @@ namespace RootTools
                         }
                         else if (p_ImageData.p_nByte == 3)
                         {
-                             if (p_eColorViewMode == eColorViewMode.All)
+                            if (p_eColorViewMode == eColorViewMode.All)
                             {
-                                if(p_ImageData.m_eMode == ImageData.eMode.MemoryRead)
+                                if (p_ImageData.m_eMode == ImageData.eMode.MemoryRead)
                                 {
                                     Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
                                     IntPtr ptrMemR = p_ImageData.GetPtr(0);
@@ -882,6 +882,7 @@ namespace RootTools
                 //else
                 //    p_View_Rect = new System.Drawing.Rectangle(point.X, point.Y, Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom * p_CanvasWidth/3 / p_CanvasHeight), Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom));
             }
+            SetThumNailIamgeSource();
         }
         public unsafe void SetThumNailIamgeSource()
         {
@@ -909,8 +910,20 @@ namespace RootTools
             else if (p_ImageData.p_nByte == 3)
             {
                 Image<Rgb, byte> view = new Image<Rgb, byte>(p_ThumbWidth, p_ThumbHeight);
-                IntPtr ptrMem = p_ImageData.GetPtr();
-                if (ptrMem == IntPtr.Zero)
+                IntPtr ptrMemR = p_ImageData.GetPtr(2);
+                IntPtr ptrMemG = p_ImageData.GetPtr(1);
+                IntPtr ptrMemB = p_ImageData.GetPtr(0);
+
+
+                if (ptrMemR == IntPtr.Zero)
+                    return;
+
+                byte[,,] viewPtr = view.Data;
+                byte* imageptrR = (byte*)ptrMemR.ToPointer();
+                byte* imageptrG = (byte*)ptrMemG.ToPointer();
+                byte* imageptrB = (byte*)ptrMemB.ToPointer();
+
+                if (ptrMemR == IntPtr.Zero)
                     return;
                 int pix_x = 0;
                 int pix_y = 0;
@@ -921,9 +934,9 @@ namespace RootTools
                     for (int xx = 0; xx < p_ThumbWidth; xx++)
                     {
                         pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
-                        view.Data[yy, xx, 2] = ((byte*)ptrMem)[0 + p_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
-                        view.Data[yy, xx, 1] = ((byte*)ptrMem)[1 + p_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
-                        view.Data[yy, xx, 0] = ((byte*)ptrMem)[2 + p_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        view.Data[yy, xx, 2] = ((byte*)imageptrR)[0 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        view.Data[yy, xx, 1] = ((byte*)imageptrG)[1 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        view.Data[yy, xx, 0] = ((byte*)imageptrB)[2 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
                     }
                 }
                 if (view.Width != 0 && view.Height != 0)
@@ -1405,7 +1418,7 @@ namespace RootTools
             double nY = p_View_Rect.Y + canvasPt.Y * p_View_Rect.Height / p_CanvasHeight;
             return new CPoint((int)nX, (int)nY);
         }
-        protected CPoint GetCanvasPoint(CPoint memPt)
+        public CPoint GetCanvasPoint(CPoint memPt)
         {
             if (p_View_Rect.Width > 0 && p_View_Rect.Height > 0)
             {
@@ -1425,5 +1438,47 @@ namespace RootTools
             }
             return new Point(0, 0);
         }
+        private System.Windows.Input.MouseEventArgs _mouseEvent;
+        public System.Windows.Input.MouseEventArgs MouseEvent
+        {
+            get
+            {
+                return _mouseEvent;
+            }
+            set
+            {
+                SetProperty(ref _mouseEvent, value);
+            }
+        }
+
+        void TumbNailMove()
+        {
+            if (MouseEvent.LeftButton == MouseButtonState.Pressed)
+            {
+                double perX = (double)p_TumbMouseX / p_ThumbWidth;
+                double perY = (double)p_TumbMouseY / p_ThumbHeight;
+                CanvasMovePoint(perX, perY);
+            }
+        }
+        void ThumNailMoveStart()
+        {
+            TumbNailMove();
+        }
+
+        public ICommand TumbNailMouseMove
+        {
+            get
+            {
+                return new RelayCommand(TumbNailMove);
+            }
+        }
+        public ICommand TumbNailMouseLeftDown
+        {
+            get
+            {
+                return new RelayCommand(ThumNailMoveStart);
+            }
+        }
+
     }
 }

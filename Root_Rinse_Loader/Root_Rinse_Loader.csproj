@@ -177,6 +177,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MainUI\Main_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -193,6 +197,9 @@
     <Compile Include="Engineer\RinseL_Handler_UI.xaml.cs">
       <DependentUpon>RinseL_Handler_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MainUI\Main_UI.xaml.cs">
+      <DependentUpon>Main_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -201,7 +208,7 @@
   <ItemGroup>
     <Compile Include="Module\Loader.cs" />
     <Compile Include="Module\Rail.cs" />
-    <Compile Include="Module\Rinse.cs" />
+    <Compile Include="Module\RinseL.cs" />
     <Compile Include="Module\Roller.cs" />
     <Compile Include="Module\Storage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -234,6 +241,10 @@
     <ProjectReference Include="..\RootTools\RootTools.csproj">
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Root_Rinse_Unloader\Root_Rinse_Unloader.csproj">
+      <Project>{5fc85c77-783d-4a56-b3a4-898aacbb8d0c}</Project>
+      <Name>Root_Rinse_Unloader</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

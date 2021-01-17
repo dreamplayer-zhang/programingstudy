@@ -5,17 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_AOP01_Inspection.Module"
         mc:Ignorable="d"
-        Title="OHTs_UI" Height="700" Width="700" WindowStyle="ToolWindow" Background="#FF2D2D30" Topmost="True">
+        Title="OHTs_UI" Height="900" Width="700" WindowStyle="ToolWindow" Background="#FF2D2D30" Topmost="True">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="29*"/>
+            <RowDefinition Height="98*"/>
+            <RowDefinition Height="743*"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="17*"/>
+            <ColumnDefinition Width="330*"/>
+            <ColumnDefinition Width="346*"/>
         </Grid.ColumnDefinitions>
-        <GroupBox Grid.Column="0" Header="Loadport A" Foreground="White" FontSize="15" Margin="8">
-            <local:OHT_UI x:Name="manualOHTA"/>
+        <GroupBox x:Name="gbOHTLoadport" Grid.Column="0" Header="Loadport A" Foreground="White" FontSize="15" Margin="8" Grid.ColumnSpan="2" Grid.RowSpan="3">
+            <local:OHT_UI x:Name="manualOHTA" Margin="0,0,0,55"/>
         </GroupBox>
-        <GroupBox Grid.Column="1" Header="Loadport B" Foreground="White" FontSize="15" Margin="8">
-            <local:OHT_UI x:Name="manualOHTB"/>
+        <GroupBox Grid.Column="2" Header="Loadport B" Foreground="White" FontSize="15" Margin="8" Grid.RowSpan="3">
+            <local:OHT_UI x:Name="manualOHTB" Margin="0,0,0,55"/>
         </GroupBox>
     </Grid>
 </Window>

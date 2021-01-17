@@ -40,7 +40,7 @@ namespace Root_Rinse_Loader.Module
         }
 
         List<Line> m_aLine = new List<Line>();
-        void initILines()
+        void InitILines()
         {
             for (int n = 0; n < 4; n++) m_aLine.Add(new Line("Line" + n.ToString(), this));
         }
@@ -99,10 +99,12 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
-        public Roller(string id, IEngineer engineer)
+        RinseL m_rinse;
+        public Roller(string id, IEngineer engineer, RinseL rinse)
         {
             p_id = id;
-            initILines();
+            m_rinse = rinse;
+            InitILines();
             InitBase(id, engineer);
         }
 
@@ -114,12 +116,12 @@ namespace Root_Rinse_Loader.Module
         #region StartRun
         public void StartRun()
         {
-            switch (Rinse.p_eMode)
+            switch (m_rinse.p_eMode)
             {
-                case Rinse.eMode.Magazine:
+                case RinseL.eRunMode.Magazine:
                     RunRotate(true);
                     break;
-                case Rinse.eMode.Stack:
+                case RinseL.eRunMode.Stack:
                     RunRotate(false);
                     break;
             }

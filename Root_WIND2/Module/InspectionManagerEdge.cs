@@ -14,12 +14,6 @@ namespace Root_WIND2
 {
 	public class InspectionManagerEdge : WorkFactory
 	{
-		#region [Member Variables]
-		WorkBundle workBundle;
-		WorkplaceBundle workplaceBundle;
-
-		#endregion
-
 		public InspectionManagerEdge(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt = 1)
 		{
 			this.sharedBufferR_Gray = _sharedBuffer;
@@ -27,23 +21,6 @@ namespace Root_WIND2
 			this.sharedBufferHeight = _height;
 			this.sharedBufferByteCnt = _byteCnt;
 		}
-
-		protected override void InitWorkManager()
-		{
-			//this.Add(new WorkManager("Snap", WORK_TYPE.SNAP, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
-			this.Add(new WorkManager("EdgeSurface", WORK_TYPE.INSPECTION, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
-			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.WAFER));
-		}
-
-		public enum InsepectionMode
-		{
-			EDGE,
-			//BACK,
-			//EBR,
-		}
-
-		private InsepectionMode inspectionMode = InsepectionMode.EDGE;
-		public InsepectionMode InspectionMode { get => inspectionMode; set => inspectionMode = value; }
 
 		private Recipe recipe;
 		private IntPtr sharedBufferR_Gray;
@@ -70,89 +47,89 @@ namespace Root_WIND2
 			this.SharedBufferB = ptrB;
 		}
 
-		public bool CreateInspection()
+		public bool SetCameraInfo()
 		{
-			return CreateInspection(this.recipe);
+			return true;
 		}
 
-		public override bool CreateInspection(Recipe _recipe)
+		#region [Overrides]
+		protected override void Initialize()
 		{
-			workBundle = new WorkBundle();
-			workplaceBundle = new WorkplaceBundle();
+			CreateWorkManager(WORK_TYPE.INSPECTION, 5);
+			CreateWorkManager(WORK_TYPE.DEFECTPROCESS_ALL);
+		}
 
-			int partitionNum = 2000;  // recipe
-			try 
-			{
-				// top
-				int memoryHeightTop = 10000;// this.SharedBufferHeight;
-				int memoryWidthTop = this.SharedBufferWidth;
-				
-				for (int i = 0; i < memoryHeightTop / partitionNum; i++)
-				{
-					Workplace workplace = new Workplace(0, i, 0, partitionNum * i, memoryWidthTop, partitionNum);
-					workplace.SetSharedBuffer(this.SharedBufferR_Gray, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
-					workplace.SetSharedRGBBuffer(this.SharedBufferR_Gray, this.sharedBufferG, this.sharedBufferB);
+		protected override WorkplaceBundle CreateWorkplaceBundle()
+		{
+			return CreateWorkplace_Edge();
+		}
 
-					workplaceBundle.Add(workplace);
-				}
-				workplaceBundle[0].SetSharedBuffer(this.SharedBufferR_Gray, memoryWidthTop, this.SharedBufferHeight, this.SharedBufferByteCnt);
-				workplaceBundle[0].SetSharedRGBBuffer(this.SharedBufferR_Gray, this.sharedBufferG, this.sharedBufferB);
+		protected override WorkBundle CreateWorkBundle()
+		{
+			WorkBundle workBundle = new WorkBundle();
+			EdgeSurface edgeSurface = new EdgeSurface();
+			edgeSurface.SetRecipe(this.recipe);
 
-				/*
-				// side
-				RootTools.ImageData imageDataSide = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeSide);
-				int memoryHeightSide = imageDataSide.p_Size.Y;
-				int memoryWidhtSide = imageDataSide.p_Size.X;
-				for (int i = 0; i < memoryHeightSide / partitionNum; i++)
-				{
-					Workplace workplace = new Workplace(0, i, 0, memoryHeightSide / partitionNum * i, memoryWidhtSide, partitionNum);
-					workplace.SetSharedBuffer(imageDataSide.GetPtr(0), memoryWidhtSide, memoryHeightSide, imageDataSide.p_nByte);
-					workplace.SetSharedRGBBuffer(imageDataSide.GetPtr(0), imageDataSide.GetPtr(1), imageDataSide.GetPtr(2));
+			ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
+			processDefect_Wafer.SetRecipe(this.recipe);
 
-					workplaceBundle.Add(workplace);
-				}
+			workBundle.Add(edgeSurface);
+			workBundle.Add(processDefect_Wafer);
 
-				// bottom
-				RootTools.ImageData imageDataBtm = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeBottom);
-				int memoryHeightBtm = imageDataBtm.p_Size.Y;
-				int memoryWidhtBtm = imageDataBtm.p_Size.X;
-				for (int i = 0; i < memoryHeightBtm / partitionNum; i++)
-				{
-					Workplace workplace = new Workplace(0, i, 0, memoryHeightBtm / partitionNum * i, memoryWidhtBtm, partitionNum);
-					workplace.SetSharedBuffer(imageDataBtm.GetPtr(0), memoryWidhtBtm, memoryHeightBtm, imageDataBtm.p_nByte);
-					workplace.SetSharedRGBBuffer(imageDataBtm.GetPtr(0), imageDataBtm.GetPtr(1), imageDataBtm.GetPtr(2));
+			return workBundle;
+		}
 
-					workplaceBundle.Add(workplace);
-				}
-				*/
-
-				EdgeSurface edgeSurface = new EdgeSurface();
-				edgeSurface.SetRecipe(this.recipe);
-				edgeSurface.SetWorkplaceBundle(workplaceBundle);
-
-				ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-				processDefect_Wafer.SetRecipe(this.recipe);
-				processDefect_Wafer.SetWorkplaceBundle(workplaceBundle);
-
-				// 이걸로 바꿔야함
-				//ProcessDefect processDefect = new ProcessDefect();
-				//processDefect.SetRecipe(this.recipe);
-				//processDefect.SetWorkplaceBundle(workplaceBundle);
-
-				workBundle.Add(edgeSurface);
-				workBundle.Add(processDefect_Wafer);
-				//workBundle.Add(processDefect);
-
-				if (this.SetBundles(this.workBundle, this.workplaceBundle) == false)
-					return false;
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show("Inspection 생성에 실패하였습니다.\n호출함수 : " + MethodBase.GetCurrentMethod().Name + "\nDetail : " + ex.Message);
-				return false;
-			}
-
+		protected override bool Ready(WorkplaceBundle workplaces, WorkBundle works)
+		{
 			return true;
+		}
+		#endregion
+
+		private WorkplaceBundle CreateWorkplace_Edge()
+		{
+			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
+			int partitionNum = recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightTop;  // 2000
+
+			int index = 0;
+
+			// top
+			RootTools.ImageData imageDataTop = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
+			int memoryHeightTop = 10000;// imageDataSide.p_Size.Y;
+			int memoryWidthTop = imageDataTop.p_Size.X;
+
+			for (int i = 0; i < memoryHeightTop / partitionNum; i++)
+			{
+				Workplace workplace = new Workplace(0, i, 0, partitionNum * i, memoryWidthTop, partitionNum, index++);
+				workplace.SetSharedBuffer(imageDataTop.GetPtr(0), memoryWidthTop, memoryHeightTop, imageDataTop.p_nByte, imageDataTop.GetPtr(1), imageDataTop.GetPtr(2));
+
+				workplaceBundle.Add(workplace);
+			}
+
+			// side
+			RootTools.ImageData imageDataSide = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeSide);
+			int memoryHeightSide = 10000;// imageDataSide.p_Size.Y;
+			int memoryWidhtSide = imageDataSide.p_Size.X;
+			for (int i = 0; i < memoryHeightSide / partitionNum; i++)
+			{
+				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Side, i, 0, memoryHeightSide / partitionNum * i, memoryWidhtSide, partitionNum, index++);
+				workplace.SetSharedBuffer(imageDataSide.GetPtr(0), memoryWidhtSide, memoryHeightSide, imageDataSide.p_nByte, imageDataSide.GetPtr(1), imageDataSide.GetPtr(2));
+
+				workplaceBundle.Add(workplace);
+			}
+
+			// bottom
+			RootTools.ImageData imageDataBtm = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeBottom);
+			int memoryHeightBtm = 10000;// imageDataBtm.p_Size.Y;
+			int memoryWidhtBtm = imageDataBtm.p_Size.X;
+			for (int i = 0; i < memoryHeightBtm / partitionNum; i++)
+			{
+				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Btm, i, 0, memoryHeightBtm / partitionNum * i, memoryWidhtBtm, partitionNum, index++);
+				workplace.SetSharedBuffer(imageDataBtm.GetPtr(0), memoryWidhtBtm, memoryHeightBtm, imageDataBtm.p_nByte, imageDataBtm.GetPtr(1), imageDataBtm.GetPtr(2));
+
+				workplaceBundle.Add(workplace);
+			}
+
+			return workplaceBundle;
 		}
 
 		public new void Start()
@@ -172,10 +149,5 @@ namespace Root_WIND2
 
 			base.Start();
 		}
-
-		public new void Stop()
-		{
-			base.Stop();
-		}
-	}
+    }
 }

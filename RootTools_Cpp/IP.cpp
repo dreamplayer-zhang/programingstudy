@@ -287,7 +287,7 @@ void IP::Masking(BYTE* pSrc, BYTE* pDst, std::vector<Point> vtStartPoint, std::v
 }
 
 // Position
-float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nMemW, int nMemH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt)
+float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nMemW, int nMemH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt, int nChIdx)
 {
     int64 roiW = (ptRB.x - (int64)ptLT.x);
     int64 roiH = (ptRB.y - (int64)ptLT.y);
@@ -323,23 +323,15 @@ float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nM
         split(imgTemp, bgr);
 
         Mat result;
-
-        double maxVal;
         Point minLoc, maxLoc;
 
-        for (int i = 0; i < 3; i++)
-        {
-            matchTemplate(imgSrc, bgr[i], result, method);
+        matchTemplate(imgSrc, bgr[2 - nChIdx], result, method);
 
-            minMaxLoc(result, NULL, &maxVal, NULL, &outMatchPoint); // 완벽하게 매칭될 경우 1
-
-            if (maxVal > chMax)
-                chMax = maxVal;
-        }
+        minMaxLoc(result, NULL, &chMax, NULL, &outMatchPoint); // 완벽하게 매칭될 경우 1
     }
 
 
-    return chMax * 100; // Matching Score
+    return (chMax * 100 > 1) ? chMax * 100 : 1; // Matching Score
 }
 
 // D2D 
@@ -562,6 +554,246 @@ void IP::CreateGoldenImage_Median(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, i
     imgAccumlate.convertTo(imgDst, CV_8UC1);
 }
 
+void IP::CreateGoldenImage_Avg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH)
+{
+    Mat imgAccumlate = Mat::zeros(nROIH, nROIW, CV_16UC1);
+    Mat imgDst = Mat(nROIH, nROIW, CV_8UC1, pDst);
+    
+    short* imgROI = new short[(int64)nROIW * nROIH];
+    byte* pHeader = NULL;
+
+    for (int i = 0; i < imgNum; i++)
+    {
+        pHeader = pSrc;
+        for (int idx = 0; idx < vtROILT[i].y; idx++)
+            pHeader += nMemW;
+
+        pHeader += vtROILT[i].x;
+        for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
+            std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[i].y)]); // byte* -> short*
+
+        Mat imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
+        imgAccumlate = imgAccumlate + imgSrc;
+     }
+
+    imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / imgNum);
+}
+void IP::CreateGoldenImage_NearAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH)
+{
+    Mat imgAccumlate = Mat::zeros(nROIH, nROIW, CV_16UC1);
+    Mat imgDst = Mat(nROIH, nROIW, CV_8UC1, pDst);
+    Mat imgAvg;
+
+    short* imgROI2b = new short[(int64)nROIW * nROIH];
+    byte* pHeader = NULL;
+    for (int i = 0; i < imgNum; i++)
+    {
+        pHeader = pSrc;
+        for (int idx = 0; idx < vtROILT[i].y; idx++)
+            pHeader += nMemW;
+
+        pHeader += vtROILT[i].x;
+        for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
+            std::copy(pHeader, pHeader + nROIW, &imgROI2b[nROIW * (r - (int64)vtROILT[i].y)]); // byte* -> short*
+
+        Mat imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI2b);
+        imgAccumlate = imgAccumlate + imgSrc;
+    }
+
+    imgAccumlate.convertTo(imgAvg, CV_8UC1, 1. / imgNum);
+
+    byte* imgROI1b = new byte[(int64)nROIW * nROIH];
+
+    pHeader = pSrc;
+    for (int idx = 0; idx < vtROILT[0].y; idx++)
+        pHeader += nMemW;
+
+    pHeader += vtROILT[0].x;
+    for (int64 r = vtROILT[0].y; r < vtROILT[0].y + nROIH; r++, pHeader += nMemW)
+        std::copy(pHeader, pHeader + nROIW, &imgROI1b[nROIW * (r - (int64)vtROILT[0].y)]);
+
+    Mat imgSrc = Mat(nROIH, nROIW, CV_8UC1, imgROI1b);
+
+    // Mean에 가장 가까운 값 선택
+    imgSrc.copyTo(imgDst);
+    Mat diff1, diff2, minDiff;
+    for (int i = 1; i < imgNum; i++) {
+        // result - avgImg 와 new Image - avgImg 의 값 중 Diff가 더 작은 픽셀들만 업데이트
+        pHeader = pSrc;
+        for (int idx = 0; idx < vtROILT[i].y; idx++)
+            pHeader += nMemW;
+
+        pHeader += vtROILT[i].x; 
+        for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
+            std::copy(pHeader, pHeader + nROIW, &imgROI1b[nROIW * (r - (int64)vtROILT[i].y)]);
+
+        imgSrc = Mat(nROIH, nROIW, CV_8UC1, imgROI1b);
+        cv::absdiff(imgAvg, imgSrc, diff1);
+        cv::absdiff(imgAvg, imgDst, diff2);
+
+        // minDiff 0 : diff1 < diff2 // 255 : diff1 > diff2
+
+        cv::subtract(diff1, diff2, minDiff);
+        cv::threshold(minDiff, minDiff, 1, 255, CV_THRESH_BINARY);
+        // Get the old pixels that are still ok
+        cv::bitwise_and(imgDst, minDiff, imgDst);
+        // Get the new pixels
+        cv::bitwise_or(imgDst, imgSrc & ~minDiff, imgDst);
+    }
+}
+void IP::CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH)
+{
+    Mat imgAccumlate = Mat::zeros(nROIH, nROIW, CV_16UC1);
+    Mat imgDst = Mat(nROIH, nROIW, CV_8UC1, pDst);
+    Mat imgSrc;
+
+    short* imgROI = new short[(int64)nROIW * nROIH];
+    byte* pHeader = NULL;
+
+    if (imgNum <= 4)
+    {
+        pHeader = pSrc;
+        for (int idx = 0; idx < vtROILT[0].y; idx++)
+            pHeader += nMemW;
+
+        pHeader += vtROILT[0].x;
+        for (int64 r = vtROILT[0].y; r < vtROILT[0].y + nROIH; r++, pHeader += nMemW)
+            std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[0].y)]); // byte* -> short*
+
+        Mat imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
+
+        Mat minImg = imgSrc.clone();
+        Mat maxImg = imgSrc.clone();
+
+        imgAccumlate = imgAccumlate + minImg;// pSrc[0]
+
+        for (int i = 1; i < imgNum; i++)
+        {
+            pHeader = pSrc;
+            for (int idx = 0; idx < vtROILT[i].y; idx++)
+                pHeader += nMemW;
+
+            pHeader += vtROILT[i].x;
+            for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
+                std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[i].y)]); // byte* -> short*
+
+            imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
+            
+            (cv::min)(imgSrc, minImg, minImg);
+            (cv::max)(imgSrc, maxImg, maxImg);
+
+            imgAccumlate = imgAccumlate + imgSrc;
+        }
+
+        cv::subtract(imgAccumlate, minImg, imgAccumlate);
+        cv::subtract(imgAccumlate, maxImg, imgAccumlate);
+
+        imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / (imgNum - 2));
+    }
+    else
+    {
+        pHeader = pSrc;
+        for (int idx = 0; idx < vtROILT[0].y; idx++)
+            pHeader += nMemW;
+
+        pHeader += vtROILT[0].x;
+        for (int64 r = vtROILT[0].y; r < vtROILT[0].y + nROIH; r++, pHeader += nMemW)
+            std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[0].y)]); // byte* -> short*
+
+        imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
+   
+        Mat minImg = imgSrc.clone();
+        Mat maxImg = imgSrc.clone();
+
+        imgAccumlate = imgAccumlate + minImg;// pSrc[0]
+
+        for (int cnt = 0; cnt < imgNum / 3; cnt++)
+        {
+            for (int i = cnt * 3; i < cnt * 3 + 3; i++)
+            {
+                pHeader = pSrc;
+                for (int idx = 0; idx < vtROILT[i].y; idx++)
+                    pHeader += nMemW;
+
+                pHeader += vtROILT[i].x;
+                for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
+                    std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[i].y)]); // byte* -> short*
+
+                imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
+
+                (cv::min)(imgSrc, minImg, minImg);
+                (cv::max)(imgSrc, maxImg, maxImg);
+
+                imgAccumlate = imgAccumlate + imgSrc;
+
+                cv::subtract(imgAccumlate, minImg, imgAccumlate);
+                cv::subtract(imgAccumlate, maxImg, imgAccumlate);
+            }
+        }
+
+        imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / (imgNum / 3));
+    }
+}
+void IP::CreateGoldenImage_Median(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH)
+{
+    Mat imgAccumlate = Mat::zeros(nROIH, nROIW, CV_16UC1);
+    Mat imgDst = Mat(nROIH, nROIW, CV_8UC1, pDst);
+    Mat imgSrc;
+    
+    Mat minImg;
+    Mat maxImg;
+
+    short* imgROI = new short[(int64)nROIW * nROIH];
+    byte* pHeader = NULL;
+
+    for (int i = 2; i < imgNum; i++)
+    {
+        if (i == 2)
+        {
+            pHeader = pSrc;
+            for (int idx = 0; idx < vtROILT[i].y; idx++)
+                pHeader += nMemW;
+
+            pHeader += vtROILT[i].x;
+            for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
+                std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[i].y)]); // byte* -> short*
+
+            imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
+
+            minImg = imgSrc.clone();
+            maxImg = imgSrc.clone();
+
+            imgAccumlate = imgAccumlate + minImg;
+        }
+        else
+        {
+            minImg = imgAccumlate.clone();
+            maxImg = imgAccumlate.clone();
+        }
+
+        for (int j = i - 2; j < i; j++)
+        {
+            pHeader = pSrc;
+            for (int idx = 0; idx < vtROILT[j].y; idx++)
+                pHeader += nMemW;
+
+            pHeader += vtROILT[j].x;
+            for (int64 r = vtROILT[j].y; r < vtROILT[j].y + nROIH; r++, pHeader += nMemW)
+                std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[j].y)]); // byte* -> short*
+
+            imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
+
+            (cv::min)(imgSrc, minImg, minImg);
+            (cv::max)(imgSrc, maxImg, maxImg);
+
+            imgAccumlate = imgAccumlate + imgSrc;
+        }
+
+        cv::subtract(imgAccumlate, minImg, imgAccumlate);
+        cv::subtract(imgAccumlate, maxImg, imgAccumlate);
+    }
+    imgAccumlate.convertTo(imgDst, CV_8UC1);
+}
 // D2D 3.0
 void IP::CreateDiffScaleMap(BYTE* pSrc, float* pDst, int nW, int nH, int nEdgeSuppressionLev, int nBrightSuppressionLev)
 {
@@ -649,6 +881,69 @@ void IP::CreateHistogramWeightMap(BYTE* pSrc, BYTE* pGolden, float* pDst, int nW
     }
     weightMap.convertTo(imgDst, CV_32FC1, (1 + nWeightLev / 5.0) / 255.0);
     cv::add(imgDst, Scalar(1), imgDst);
+}
+
+// ********* Pattern Inspection ******** //
+void IP::HistogramBaseTreshold(BYTE* pSrc, BYTE* pDst, int nHistOffset, int nW, int nH, bool bDark)
+{
+    Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+
+    int iterW = (nW / 200);
+    int iterH = (nH / 200);
+    float nROIW = (float)(nW - 1) / iterW;
+    float nROIH = (float)(nH - 1) / iterH;
+
+    Mat srcROI;
+    Mat dstROI;
+
+    Mat hist;
+    int histSize[1] = { 128 };
+    float histRanges[2] = { (128.0 * !bDark) + 0.0, (128.0 * !bDark) + 128.0 };
+    const float* ranges[1];
+    ranges[0] = histRanges;
+    int channels[1] = { 0 };
+
+    for (int i = 0; i < iterH - 1; i++)
+    {
+        for (int j = 0; j < iterW - 1; j++)
+        {
+            srcROI = imgSrc(Rect(Point(j * nROIW, i * nROIH), Point((j + 1) * nROIW, (i + 1) * nROIH)));
+            dstROI = imgDst(Rect(Point(j * nROIW, i * nROIH), Point((j + 1) * nROIW, (i + 1) * nROIH)));
+
+            calcHist(&srcROI, 1, channels, Mat(), hist, 1, histSize, ranges);
+            
+            Point minLoc, maxLoc;
+            cv::minMaxLoc(hist, 0, 0, &minLoc, &maxLoc);
+
+            int thresh = 0;
+            
+            if (bDark)
+            {
+                for (int i = maxLoc.y; i > 0; i--)
+                {
+                    if (hist.at<int>(i) == 0)
+                    {
+                        thresh = i;
+                        break;
+                    }
+                }
+                cv::threshold(srcROI, dstROI, thresh - nHistOffset, 255, CV_THRESH_BINARY_INV);
+            }
+            else
+            {
+                for (int i = maxLoc.y; i < 128; i++)
+                {
+                    if (hist.at<int>(i) == 0)
+                    {
+                        thresh = i+128;
+                        break;
+                    }
+                }
+                cv::threshold(srcROI, dstROI, thresh + nHistOffset, 255, CV_THRESH_BINARY);
+            }
+        }
+    }
 }
 
 // Elemetwise Operation
@@ -1169,7 +1464,31 @@ void IP::CutOutROI(BYTE* pSrc, BYTE* pDst, int nW, int nH, Point ptLT, Point ptR
     Mat ROI = pSrcImg(Rect(ptLT, ptRB));
     ROI.copyTo(pDstImg);
 }
+void IP::GoldenImageReview(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
+{
+    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
+    Mat imgDst = Mat(nH, nW, CV_8UC3, pDst);
+    Mat imgSrc1, imgSrc2;
+    
+    for (int i = 0; i < imgNum - 1; i++)
+    {
+        imgSrc1 = Mat(nH, nW, CV_8UC3, pSrc[i]);
+        cv::cvtColor(imgSrc1, imgSrc1, COLOR_RGB2GRAY);
+        imgSrc2 = Mat(nH, nW, CV_8UC3, pSrc[i + 1]);
+        cv::cvtColor(imgSrc2, imgSrc2, COLOR_RGB2GRAY);
 
+        cv::absdiff(imgSrc1, imgSrc2, imgSrc1);
+
+        imgSrc1.convertTo(imgSrc1, CV_16UC1);
+
+        imgAccumlate = imgAccumlate + imgSrc1;
+    }
+    imgAccumlate.convertTo(imgAccumlate, CV_8UC1, 1. / (imgNum - 1));
+    cv::blur(imgAccumlate, imgAccumlate, Size(21, 21));
+
+    cv::applyColorMap(imgAccumlate, imgDst, COLORMAP_BONE);
+    cv::cvtColor(imgDst, imgDst, COLOR_BGR2RGB);
+}
 
 void IP::SobelEdgeDetection(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nDerivativeX, int nDerivativeY, int nKernelSize, int nScale, int nDelta)
 {

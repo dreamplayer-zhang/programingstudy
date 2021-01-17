@@ -57,13 +57,13 @@ namespace Root_AOP01_Packing.Module
         #region Wrapper
         public class Wrapper
         {
-            Axis m_axisMove;
-            Axis m_axisPicker;
-            DIO_IO[] m_dioVacuum = new DIO_IO[2];
-            DIO_O[] m_doBlow = new DIO_O[2];
-            DIO_I2O2 m_solPush;
-            DIO_I m_diCheck;
-            DIO_I m_diLevel;
+            Axis m_axisMove; // PickerX, 9번축
+            Axis m_axisPicker; // PickerZ, 10번축
+            DIO_IO[] m_dioVacuum = new DIO_IO[2]; // [0] 가운데줄 Y72, [1] 사이드줄 Y74
+            DIO_O[] m_doBlow = new DIO_O[2]; // [0] 가운데줄 Y73, [1] 사이드줄 Y74
+            DIO_I2O2 m_solPush; // X98,99, Y70,71
+            DIO_I m_diCheck; // X48
+            DIO_I m_diLevel; // X49
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_axisMove, m_packer, m_id + ".Move");
@@ -84,16 +84,16 @@ namespace Root_AOP01_Packing.Module
 
             public enum ePosMove
             {
-                Pick,
-                Place,
-                Push
+                Pick, //봉투잡는위치
+                Place, // 봉투놓는위치
+                Push // 푸셔 미는위치
             }
             public enum ePosPicker
             {
-                Up,
-                Down,
-                Open,
-                Push
+                Up, //위 위치
+                Down, // 아래 위치
+                Open, // 봉투벌리는 높이
+                Push // 푸셔 밀때의 높이
             }
             void InitPos()
             {
@@ -180,10 +180,10 @@ namespace Root_AOP01_Packing.Module
         #region Stage
         public class Stage
         {
-            DIO_O[] m_doVacuum = new DIO_O[2];
-            DIO_O[] m_doBlow = new DIO_O[2];
-            DIO_I2O2 m_solUp;
-            DIO_I2O2 m_solRotate;
+            DIO_O[] m_doVacuum = new DIO_O[2]; // [0] 센터 Vac Y82 , [1] 사이드 Vac Y84
+            DIO_O[] m_doBlow = new DIO_O[2]; // [0] 센터 Vac Y83 , [1] 사이드 Vac Y85
+            DIO_I2O2 m_solUp; // 돌리기위해서 올려주는 솔
+            DIO_I2O2 m_solRotate; // 90도 돌리는 솔
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_doVacuum[0], m_packer, m_id + ".Vacuum Center");
@@ -243,9 +243,9 @@ namespace Root_AOP01_Packing.Module
         #region Transfer
         public class Transfer
         {
-            Axis m_axis;
-            DIO_I2O2 m_solDown;
-            DIO_I2O2 m_solPush;
+            Axis m_axis; //11번축, 로더에서 패킹스테이지로 밀어주는 축
+            DIO_I2O2 m_solDown; // Y54,Y55 위아래 솔
+            DIO_I2O2 m_solPush; // Y56,Y57 푸셔 솔
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_axis, m_packer, m_id);
@@ -261,8 +261,8 @@ namespace Root_AOP01_Packing.Module
 
             public enum ePos
             {
-                Ready,
-                Push
+                Ready, // 레디
+                Push //밀때 축 위치
             }
             void InitPos()
             {
@@ -305,11 +305,11 @@ namespace Root_AOP01_Packing.Module
         #region Holder
         public class Holder
         {
-            DIO_IO[] m_dioVacuum = new DIO_IO[2];
-            DIO_O[] m_doBlow = new DIO_O[2];
-            DIO_I2O2[] m_solHold = new DIO_I2O2[2];
-            DIO_I2O2 m_solDown;
-            DIO_I2O2 m_solForward;
+            DIO_IO[] m_dioVacuum = new DIO_IO[2]; // 확인
+            DIO_O[] m_doBlow = new DIO_O[2];  // 확인
+            DIO_I2O2[] m_solHold = new DIO_I2O2[2]; //Y46~Y49 [0]위 [1]아래 
+            DIO_I2O2 m_solDown; // Y52,Y53 Guide Z
+            DIO_I2O2 m_solForward; //Y50,Y51 Guide 앞뒤로
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum[0], m_packer, m_id + ".UpHolder Vacuum");
@@ -409,13 +409,13 @@ namespace Root_AOP01_Packing.Module
         #region Loader
         public class Loader
         {
-            Axis m_axisMove;
-            Axis m_axisBridge;
-            Axis m_axisWidth; 
-            DIO_I2O2 m_solPodPush;
-            DIO_I2O2 m_solRaise;
-            DIO_I m_diPodCheck;
-            DIO_O m_doVacuumPump;
+            Axis m_axisMove; // 7번축 전체적으로 움직이는 축
+            Axis m_axisBridge; // 8번축 브릿지축
+            Axis m_axisWidth; // 6번축 집게폭
+            DIO_I2O2 m_solPodPush; // Y29,30 이게멀까
+            DIO_I2O2 m_solRaise; // 삭제
+            DIO_I m_diPodCheck; // X92 Pod Check Sensor
+            DIO_O m_doVacuumPump; //Y68, Y60 노즐 Vac
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_axisMove, m_packer, m_id + ".Move");
@@ -435,22 +435,26 @@ namespace Root_AOP01_Packing.Module
             
             public enum eSpeed
             {
-                Slow,
+                //7번축 속도
+                Slow, 
                 Fast
             }
             public enum ePosMove
             {
-                Ready,
-                Vacuum,
-                Heatiing
+                //7번축
+                Ready, //맨뒤
+                Vacuum, // Vac키는위치
+                Heating // 히팅할때 회피할 위치
             }
             public enum ePosBridge
             {
+                //8번축
                 Ready,
                 Bridge
             }
             public enum ePosWidth
             {
+                //6번축
                 Ready,
                 Open
             }
@@ -535,10 +539,10 @@ namespace Root_AOP01_Packing.Module
         #region Heater
         public class Heater
         {
-            DIO_I2O2[] m_solSponge = new DIO_I2O2[2];
-            DIO_I2O2[] m_solHeater = new DIO_I2O2[2];
-            DIO_IO m_dioHeat;
-            DIO_O m_doHeatTimeout;
+            DIO_I2O2[] m_solSponge = new DIO_I2O2[2]; // [0] Y42,43 [1] Y34, 35 Sponge 위/아래 sol
+            DIO_I2O2[] m_solHeater = new DIO_I2O2[2]; // [0] Y44,45 [1] Y32, 33 heater 위/아래 sol
+            DIO_IO m_dioHeat; // Y11, X79 // 이상하다
+            DIO_O m_doHeatTimeout; //Y12
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_solSponge[0], m_packer, m_id + ".UpSponge", "Up", "Down");
@@ -631,17 +635,17 @@ namespace Root_AOP01_Packing.Module
         #region Function
         public enum eStep
         {
-            GetWrapper,
-            HoldWrapper,
-            BackWrapper,
-            InsertCase,
-            ReleaseWrapper,
-            CloseWrapper,
-            VacuumPump,
-            Heating,
-            Rotate,
-            PushToLoader,
-            Unload,
+            GetWrapper, // 봉투가져오기
+            HoldWrapper, // 벌리고 홀더가잡기까지
+            BackWrapper, // 피커 회피
+            InsertCase, // 봉투에 넣기
+            ReleaseWrapper, // 홀더놓기
+            CloseWrapper, //스폰지닫기
+            VacuumPump, //봉투에 vac하고 회피
+            Heating, // 히팅
+            Rotate, // 90도 돌리기
+            PushToLoader, //Picker가 다시 밀어주기
+            Unload, 
         }
 
         public string RunStep(eStep eStep)
@@ -695,7 +699,7 @@ namespace Root_AOP01_Packing.Module
                     return "OK";
                 case eStep.VacuumPump:
                     if (Run(m_loader.RunVacuumPump())) return p_sInfo;
-                    if (Run(m_loader.RunMove(Loader.ePosMove.Heatiing, Loader.eSpeed.Fast))) return p_sInfo; 
+                    if (Run(m_loader.RunMove(Loader.ePosMove.Heating, Loader.eSpeed.Fast))) return p_sInfo; 
                     return "OK";
                 case eStep.Heating:
                     if (Run(m_heater.RunHeater(true))) return p_sInfo;

@@ -18,19 +18,16 @@ namespace Root_WIND2
 {
     class MapControl_ViewModel : ObservableObject
     {
-        WorkFactory m_InspectionManger;
         Recipe m_Recipe;
 
         public delegate void setMasterDie(object e);
         public event setMasterDie SetMasterDie;
         public int[] Map;
         CPoint MapSize;
-        public MapControl_ViewModel(WorkFactory inspectionManger, Recipe recipe = null)
+        public MapControl_ViewModel(Recipe recipe = null)
         {
             if(recipe != null)
                 m_Recipe = recipe;
-
-            m_InspectionManger = inspectionManger;
 
             WorkEventManager.WorkplaceStateChanged += MapStateChanged_Callback;
         }
@@ -53,12 +50,12 @@ namespace Root_WIND2
             {
                 Workplace workplace = args.workplace;
 
-                int x = workplace.MapPositionX;
-                int y = workplace.MapPositionY;
+                int x = workplace.MapIndexX;
+                int y = workplace.MapIndexY;
 
                 if (x < 0 || y < 0) return;
 
-                WORK_TYPE state = workplace.STATE;
+                WORK_TYPE state = workplace.WorkState;
 
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
                 {
@@ -91,7 +88,7 @@ namespace Root_WIND2
                                 case WORK_TYPE.DEFECTPROCESS:
                                     chip.Background = brushComplete;
                                 break;
-                                case WORK_TYPE.DEFECTPROCESS_WAFER:
+                                case WORK_TYPE.DEFECTPROCESS_ALL:
                                     chip.Background = brushCompleteWafer;
                                 break;
                             }
@@ -116,9 +113,9 @@ namespace Root_WIND2
         public void CreateMapUI(int[] map = null, CPoint mapsize = null)
         {
             // 여기 예외처리 이상함
-            if (map == null)
+            if (map == null ||  map.Length == 0)
             {
-                if (Map == null) return;
+                if (Map == null || Map.Length == 0) return;
 
                 map = Map;
                 mapsize = MapSize;

@@ -236,10 +236,16 @@
       <DependentUpon>LoadingBlock.xaml</DependentUpon>
     </Compile>
     <Compile Include="EdgeResult.cs" />
+    <Compile Include="ManualJob\ManualJobSchedule.cs" />
+    <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
+      <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />
+    <Compile Include="Module\EdgeSideVision\Run_InspectEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_InspectEdge.cs" />
     <Compile Include="Module\InspectionManagerBackside.cs" />
+    <Compile Include="Module\InspectionManagerEBR.cs" />
     <Compile Include="Module\InspectionManagerEdge.cs" />
     <Compile Include="Module\InspectionManagerFrontside.cs" />
     <Compile Include="Module\Vision\Run_AutoFocus.cs" />
@@ -257,6 +263,7 @@
       <DependentUpon>SettingDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialog\SettingDialog\SettingDialog_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\4. EBR\ViewModel\EBRSetup_ViewModel.cs" />
     <Compile Include="UI\2. Review\Tuning.xaml.cs">
       <DependentUpon>Tuning.xaml</DependentUpon>
     </Compile>
@@ -303,10 +310,10 @@
     </Compile>
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideROI_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideSetup_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\3. Edge\EdgeSetupPage.xaml.cs">
-      <DependentUpon>EdgeSetupPage.xaml</DependentUpon>
+    <Compile Include="UI\1. Setup\3. RecipeWizard\3. Edge\EdgesideSetup.xaml.cs">
+      <DependentUpon>EdgesideSetup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1. Setup\3. RecipeWizard\3. Edge\ViewModel\EdgeSetup_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\3. Edge\ViewModel\EdgesideSetup_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\4. EBR\EBRSetupPage.xaml.cs">
       <DependentUpon>EBRSetupPage.xaml</DependentUpon>
     </Compile>
@@ -328,7 +335,7 @@
     </Compile>
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\Backside_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\4. EBR\ViewModel\EBR_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\3. Edge\ViewModel\Edge_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\3. Edge\ViewModel\Edgeside_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. Inspection\Inspection_ViewModel.cs" />
     <Compile Include="UI\1. Setup\1. Home\Home_ViewModel.cs" />
     <Compile Include="UI\1. Setup\5. GEM\GEM_ViewModel.cs" />
@@ -341,8 +348,8 @@
     <Compile Include="UI\1. Setup\3. RecipeWizard\4. EBR\EBR_Panel.xaml.cs">
       <DependentUpon>EBR_Panel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1. Setup\3. RecipeWizard\3. Edge\Edge_Panel.xaml.cs">
-      <DependentUpon>Edge_Panel.xaml</DependentUpon>
+    <Compile Include="UI\1. Setup\3. RecipeWizard\3. Edge\Edgeside_Panel.xaml.cs">
+      <DependentUpon>Edgeside_Panel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontsideSummary.xaml.cs">
       <DependentUpon>FrontsideSummary.xaml</DependentUpon>
@@ -447,6 +454,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ManualJob\ManualJobSchedule_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontsideInspection.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -471,7 +482,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1. Setup\3. RecipeWizard\3. Edge\EdgeSetupPage.xaml">
+    <Page Include="UI\1. Setup\3. RecipeWizard\3. Edge\EdgesideSetup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -507,7 +518,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1. Setup\3. RecipeWizard\3. Edge\Edge_Panel.xaml">
+    <Page Include="UI\1. Setup\3. RecipeWizard\3. Edge\Edgeside_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -699,6 +710,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\bevelmap2.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\VEGAImage.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

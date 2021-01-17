@@ -1,0 +1,140 @@
+﻿<UserControl x:Class="Root_AOP01_Inspection.UI_UserControl.Loadport_UI"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Root_AOP01_Inspection.UI_UserControl"
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="400" Background="{StaticResource PanelBackGround}">
+
+
+    <Grid>
+        <GroupBox Grid.Row="1" Header="{Binding p_id}">
+            <Grid Name="Loadport1" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <UniformGrid Columns="2" Margin="10">
+                        <Border BorderBrush="Gray"  BorderThickness="1">
+                            <TextBlock Text="Pod ID"
+                                           VerticalAlignment="Center" />
+                        </Border>
+                        <Border BorderBrush="Gray"  BorderThickness="1">
+                            <TextBlock Text="{Binding p_sCarrierID}" x:Name="textBoxPodID"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left" />
+                        </Border>
+                        <Border BorderBrush="Gray"  BorderThickness="1">
+                            <TextBlock Text="Lot ID"
+                                           VerticalAlignment="Center" />
+                        </Border>
+                        <Border BorderBrush="Gray"  BorderThickness="1">
+                            <TextBlock Text="{Binding p_sLotID}" x:Name="textBoxLotID"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left" />
+                        </Border>
+                        <Border BorderBrush="Gray"  BorderThickness="1">
+                            <TextBlock Text="Reticle ID"
+                                           VerticalAlignment="Center" />
+                        </Border>
+                        <Border BorderBrush="Gray"  BorderThickness="1">
+                            <TextBlock Text="{Binding p_sSlotID}" x:Name="textBoxSlotID"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left" />
+                        </Border>
+                        <Border BorderBrush="Gray"  BorderThickness="1">
+                            <TextBlock Text="Recipe ID"
+                                           VerticalAlignment="Center" />
+                        </Border>
+                        <Border BorderBrush="Gray"  BorderThickness="1">
+                            <TextBlock Text="{Binding p_sRecipe}" x:Name="textBoxRecipe"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left" />
+                        </Border>
+                    </UniformGrid>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <!--<UniformGrid Columns="4"
+                                         Rows="2">-->
+                    <Grid Margin="3" x:Name="AccessManual" Grid.Column="0" Grid.Row="0" 
+                                      Background="LightGray">
+                        <TextBlock Text="Manual"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                    </Grid>
+                    <Grid Margin="3" x:Name="AccessAuto" Grid.Column="1" Grid.Row="0"
+                                      Background="LightGray">
+                        <TextBlock Text="Auto"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                    </Grid>
+                    <Grid Margin="3" x:Name="Present" Grid.Column="2" Grid.Row="0"
+                                      Background="LightGray">
+                        <TextBlock Text="Present"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                    </Grid>
+                    <Grid Margin="3" x:Name="Placed" Grid.Column="3" Grid.Row="0" 
+                                      Background="LightGray">
+                        <TextBlock Text="Placed" 
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center">
+                        </TextBlock>
+                    </Grid>
+                    <Grid Margin="3" x:Name="Load" Grid.Column="0" Grid.Row="1"
+                                      Background="LightGray">
+                        <TextBlock Text="Load"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                    </Grid>
+                    <Grid Margin="3" x:Name="UnLoad" Grid.Column="1" Grid.Row="1"
+                                      Background="LightGray">
+                        <TextBlock Text="Unload"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                    </Grid>
+                    <Grid Margin="3"  Grid.Column="2" Grid.Row="1"
+                                      Background="LightGray">
+                        <TextBlock Text="Reserve"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                    </Grid>
+                    <Grid Margin="3" x:Name="Alarm" Grid.Column="3" Grid.Row="1"
+                                      Background="LightGray">
+                        <TextBlock Text="Alarm"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                    </Grid>
+
+                    <!--</UniformGrid>-->
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Button Content="Load" Name="ButtonLoad"
+                                    Margin="3,0"
+                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonLoad_Click"/>
+                    <Button Content="UnloadRequest" Name="ButtonUnLoadReq"
+                                    Margin="3,0"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SetupPanelBtn}" Click="ButtonUnLoadReq_Click"/>
+                </Grid>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>
