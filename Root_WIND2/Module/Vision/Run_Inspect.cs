@@ -28,6 +28,7 @@ namespace Root_WIND2.Module
         public int m_nWaferSize_mm = 1000;              // Wafer Size (mm)
         public int m_nMaxFrame = 100;                   // Camera max Frame 스펙
         public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
+        public int m_dVRSToTDIOffsetZ = 0;               // VRS랑 TDI Z축 Offset
         bool m_bInvDir = false;
         public GrabMode m_grabMode = null;
         string m_sGrabMode = "";
@@ -77,6 +78,7 @@ namespace Root_WIND2.Module
             run.m_nMaxFrame = m_nMaxFrame;
             run.m_nScanRate = m_nScanRate;
             run.p_sGrabMode = p_sGrabMode;
+            run.m_dVRSToTDIOffsetZ = m_dVRSToTDIOffsetZ;
 
             run.InspectionVision = ProgramManager.Instance.InspectionFront;
 
@@ -99,6 +101,7 @@ namespace Root_WIND2.Module
             m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
             m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+            m_dVRSToTDIOffsetZ = tree.Set(m_dVRSToTDIOffsetZ, m_dVRSToTDIOffsetZ,"VRS To TDI Offset", "VRS To TDI Offset", bVisible);
         }
 
         public override string Run()
@@ -158,8 +161,8 @@ namespace Root_WIND2.Module
 
                     // 위에서 아래로 찍는것을 정방향으로 함, 즉 Y축 값이 큰쪽에서 작은쪽으로 찍는것이 정방향
                     // Grab하기 위해 이동할 Y축의 시작 끝 점
-                    double dStartPosY = m_rpAxisCenter.Y + m_module.AlignData.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
-                    double dEndPosY = m_rpAxisCenter.Y + m_module.AlignData.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
+                    double dStartPosY = m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
+                    double dEndPosY = m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
                     m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
                     if (m_grabMode.m_bUseBiDirectionScan && Math.Abs(axisXY.p_axisY.p_posActual - dStartPosY) > Math.Abs(axisXY.p_axisY.p_posActual - dEndPosY))
@@ -170,9 +173,16 @@ namespace Root_WIND2.Module
                         m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
                     }
 
-                    double dPosX = m_rpAxisCenter.X + m_module.AlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * dXScale;
+                    double dPosX = m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * dXScale;
 
-                    if (m_module.Run(axisZ.StartMove(m_nFocusPosZ)))
+                    double dPosZ = m_nFocusPosZ;
+                    if (m_grabMode.m_dVRSFocusPos != 0)
+                    {
+                        dPosZ = m_grabMode.m_dVRSFocusPos + m_dVRSToTDIOffsetZ;
+                    }
+
+
+                    if (m_module.Run(axisZ.StartMove(dPosZ)))
                         return p_sInfo;
                     if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
                         return p_sInfo;
@@ -181,8 +191,8 @@ namespace Root_WIND2.Module
                     if (m_module.Run(axisZ.WaitReady()))
                         return p_sInfo;
 
-                    double dTriggerStartPosY = m_rpAxisCenter.Y + m_module.AlignData.Y - nTotalTriggerCount / 2;
-                    double dTriggerEndPosY = m_rpAxisCenter.Y + m_module.AlignData.Y + nTotalTriggerCount / 2 + 40000;
+                    double dTriggerStartPosY = m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - nTotalTriggerCount / 2;
+                    double dTriggerEndPosY = m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + nTotalTriggerCount / 2 + 40000;
                     axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
                     string strPool = m_grabMode.m_memoryPool.p_id;

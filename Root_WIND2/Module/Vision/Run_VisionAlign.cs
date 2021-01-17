@@ -40,7 +40,20 @@ namespace Root_WIND2.Module
         public int m_AlignCount = 1;
 
         const int PULSE_TO_UM = 10;
-        
+
+        public GrabMode m_grabMode = null;
+        string m_sGrabMode = "";
+
+        public string p_sGrabMode
+        {
+            get { return m_sGrabMode; }
+            set
+            {
+                m_sGrabMode = value;
+                m_grabMode = m_module.GetGrabMode(value);
+            }
+        }
+
 
         public Run_VisionAlign(Vision module)
         {
@@ -60,6 +73,7 @@ namespace Root_WIND2.Module
             run.m_saveAlignFailImagePath = m_saveAlignFailImagePath;
             run.m_AlignCamResolution = m_AlignCamResolution;
             run.m_AlignCount = m_AlignCount;
+            run.p_sGrabMode = p_sGrabMode;
             return run;
         }
 
@@ -72,6 +86,7 @@ namespace Root_WIND2.Module
             m_saveAlignFailImagePath = tree.SetFolder(m_saveAlignFailImagePath, m_saveAlignFailImagePath, "Align Feature Path", "Align Feature Path", bVisible);
             m_AlignCamResolution = tree.Set(m_AlignCamResolution, m_AlignCamResolution, "Align Cam Resolution", "Align Cam Resolution", bVisible);
             m_AlignCount = tree.Set(m_AlignCount, m_AlignCount, "Align count", "Align Count", bVisible);
+            p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
         }
 
         public override string Run()
@@ -93,7 +108,7 @@ namespace Root_WIND2.Module
             string strVRSImageDir = @"C:\Users\ATI\Desktop\image\";
             int camWidth = m_CamAlign.GetRoiSize().X;
             int camHeight = m_CamAlign.GetRoiSize().Y;
-            
+
             // 이미지 회득
             ImageData img = m_CamAlign.p_ImageViewer.p_ImageData;
             string strVRSImageFullPath;
@@ -265,7 +280,7 @@ namespace Root_WIND2.Module
             {
                 CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), findRawData, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3);
             }
-           
+
             if (m_module.Run(axisXY.p_axisX.StartMove(pulse.X - (posX + (width / 2) - camWidth / 2) * m_AlignCamResolution * 10)))
                 return p_sInfo;
             if (m_module.Run(axisXY.p_axisX.WaitReady()))
@@ -275,7 +290,12 @@ namespace Root_WIND2.Module
             if (m_module.Run(axisXY.p_axisY.WaitReady()))
                 return p_sInfo;
 
-            m_module.AlignData = new RPoint(-(posX + (width / 2) - camWidth / 2) * m_AlignCamResolution * 10, (posY + (height / 2) - camHeight / 2) * m_AlignCamResolution * 10);
+
+            m_grabMode.m_ptXYAlignData = new RPoint(-(posX + (width / 2) - camWidth / 2) * m_AlignCamResolution * 10, (posY + (height / 2) - camHeight / 2) * m_AlignCamResolution * 10);
+            m_module.RunTree(Tree.eMode.RegWrite);
+            m_module.RunTree(Tree.eMode.Init);
+
+
             return "OK";
         }
 
