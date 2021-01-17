@@ -82,9 +82,10 @@ namespace Root_WIND2
 			workBundle = new WorkBundle();
 			workplaceBundle = new WorkplaceBundle();
 
-			int partitionNum = _recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightTop;  // 2000
+			
 			try 
 			{
+				int partitionNum = _recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightTop;  // 2000
 				// top
 				int memoryHeightTop = 10000;// this.SharedBufferHeight;
 				int memoryWidthTop = this.SharedBufferWidth;
