@@ -61,7 +61,6 @@ namespace Root_WIND2.Module
         {
             Run_Inspect run = new Run_Inspect(m_module);
             run.p_sGrabMode = p_sGrabMode;
-            run.m_dVRSToTDIOffsetZ = m_dVRSToTDIOffsetZ;
 
             run.InspectionVision = ProgramManager.Instance.InspectionFront;
 
@@ -74,7 +73,6 @@ namespace Root_WIND2.Module
             m_sRecipeName = tree.SetFile(m_sRecipeName, m_sRecipeName, "rcp", "Recipe", "Recipe Name", bVisible);
             // 이거 다 셋팅 되어 있는거 가져와야함
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-            m_dVRSToTDIOffsetZ = tree.Set(m_dVRSToTDIOffsetZ, m_dVRSToTDIOffsetZ,"VRS To TDI Offset", "VRS To TDI Offset", bVisible);
         }
 
         public override string Run()
@@ -145,11 +143,11 @@ namespace Root_WIND2.Module
 
                     double dPosX = m_grabMode.m_rpAxisCenter.X  + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * dXScale;
 
-                    double dPosZ = m_nFocusPosZ;
-                    if (m_grabMode.m_dVRSFocusPos != 0)
-                    {
-                        dPosZ = m_grabMode.m_dVRSFocusPos + m_dVRSToTDIOffsetZ;
-                    }
+                    double dPosZ = m_grabMode.m_nFocusPosZ;
+                    //if (m_grabMode.m_dVRSFocusPos != 0)
+                    //{
+                    //    dPosZ = m_grabMode.m_dVRSFocusPos + m_dVRSToTDIOffsetZ;
+                    //}
 
 
                     if (m_module.Run(axisZ.StartMove(dPosZ)))
