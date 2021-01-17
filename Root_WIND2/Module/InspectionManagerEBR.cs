@@ -46,43 +46,65 @@ namespace Root_WIND2
 		public int SharedBufferHeight { get => sharedBufferHeight; set => sharedBufferHeight = value; }
 		public int SharedBufferByteCnt { get => sharedBufferByteCnt; set => sharedBufferByteCnt = value; }
 
-		protected override void InitWorkManager()
+
+		#region [Overrides]
+
+		protected override void Initialize()
 		{
-			this.Add(new WorkManager("EBR", WORK_TYPE.INSPECTION, WORK_TYPE.NONE, STATE_CHECK_TYPE.CHIP, 5));
+			CreateWorkManager(WORK_TYPE.INSPECTION, 5);
+			CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 5);
 		}
 
-		public bool CreateInspection()
+		protected override WorkplaceBundle CreateWorkplaceBundle()
 		{
-			return CreateInspection(this.recipe);
-		}
+			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
+			int notchY = recipe.GetRecipe<EBRParameter>().NotchY; // notch memory Y 좌표
+			int stepDegree = recipe.GetRecipe<EBRParameter>().StepDegree;
+			int workplaceCnt = 360 / stepDegree;
+			int imageHeight = 270000;
+			int imageHeightPerDegree = imageHeight / 360; // 1도 당 Image Height
 
-		public override bool CreateInspection(Recipe _recipe)
-		{
-			try
+			int width = recipe.GetRecipe<EBRParameter>().RoiWidth;
+			int height = recipe.GetRecipe<EBRParameter>().RoiHeight;
+
+			int index = 0;
+			for (int i = 0; i < 5/*workplaceCnt*/; i++)
 			{
-				Workplace workplace = new Workplace(0, 0, 0, 0, 1500, 2000);
-				workplaceBundle = new WorkplaceBundle();
+				int posY = (imageHeightPerDegree * i) - (height / 2);
+				if (posY <= 0)
+					posY = 0;
+				Workplace workplace = new Workplace(0, 0, 0, posY, width, height, index++);
 				workplaceBundle.Add(workplace);
-				workplaceBundle.SetSharedBuffer(this.sharedBufferR_Gray, this.SharedBufferWidth, this.SharedBufferHeight);
-
-				EBR ebr = new EBR();
-				ebr.SetRecipe(this.recipe);
-				ebr.SetWorkplaceBundle(workplaceBundle);
-				
-				workBundle = new WorkBundle();
-				workBundle.Add(ebr);
-
-				if (this.SetBundles(workBundle, workplaceBundle) == false)
-					return false;
 			}
-			catch (Exception ex)
-			{
-				MessageBox.Show("Inspection 생성에 실패하였습니다.\n호출함수 : " + MethodBase.GetCurrentMethod().Name + "\nDetail : " + ex.Message);
-				return false;
-			}
+			workplaceBundle.SetSharedBuffer(this.sharedBufferR_Gray, this.sharedBufferWidth, this.sharedBufferHeight, this.sharedBufferByteCnt, IntPtr.Zero, IntPtr.Zero);
 
+
+			return workplaceBundle;
+		}
+
+		protected override WorkBundle CreateWorkBundle()
+		{
+			WorkBundle workBundle = new WorkBundle();
+			EBR ebr = new EBR();
+			ebr.SetRecipe(this.recipe);
+			ebr.SetWorkplaceBundle(workplaceBundle);
+
+			ProcessMeasurement processMeasurement = new ProcessMeasurement();
+			processMeasurement.SetRecipe(this.recipe);
+			processMeasurement.SetWorkplaceBundle(workplaceBundle);
+
+			workBundle.Add(ebr);
+			workBundle.Add(processMeasurement);
+
+			return workBundle;
+		}
+
+		protected override bool Ready(WorkplaceBundle workplaces, WorkBundle works)
+		{
 			return true;
 		}
+
+		#endregion
 
 		public new void Start()
 		{
@@ -101,10 +123,5 @@ namespace Root_WIND2
 
 			base.Start();
 		}
-
-		public new void Stop()
-		{
-			base.Stop();
-		}
-	}
+    }
 }

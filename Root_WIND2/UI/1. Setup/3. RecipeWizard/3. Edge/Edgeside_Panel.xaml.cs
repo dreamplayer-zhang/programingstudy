@@ -24,5 +24,5 @@ namespace Root_WIND2
         {
             InitializeComponent();
         }
-    }
+	}
 }

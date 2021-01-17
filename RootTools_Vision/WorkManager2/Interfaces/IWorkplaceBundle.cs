@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision.delete
+namespace RootTools_Vision
 {
-    public interface IWorkable
-    {
-        void Start();
-        void Stop();
+    public interface IWorkplaceBundle
+    { 
+
     }
 }

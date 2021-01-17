@@ -54,8 +54,8 @@ namespace Root_WIND2.Module
 		{
 			try
 			{
-				//if (this.inspectionEBR.Recipe.Read(recipeName, true) == false)
-				//	return "Recipe Open Fail";
+				if (this.inspectionEBR.Recipe.Read(recipeName, true) == false)
+					return "Recipe Open Fail";
 
 				if (this.inspectionEBR.CreateInspection() == false)
 					return "Create Inspection Fail";

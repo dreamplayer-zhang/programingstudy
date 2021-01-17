@@ -12,42 +12,42 @@ namespace RootTools_Vision
 {
     public class BacksideSurface : WorkBase
     {
-        Workplace workplace;
-
         public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
         private IntPtr inspectionSharedBuffer;
-        private byte[] inspectionWorkplaceBuffer;
         private BacksideSurfaceParameter parameter;
-        private BacksideRecipe recipe;
+        private BacksideRecipe recipeBackside;
 
         public BacksideSurface() : base()
         {
             m_sName = this.GetType().Name;
         }
-
-        public override void SetRecipe(Recipe _recipe)
+        protected override bool Preparation()
         {
-            this.parameter = _recipe.GetRecipe<BacksideSurfaceParameter>();
-            this.recipe = _recipe.GetRecipe<BacksideRecipe>();
+            if(this.parameter == null || this.recipeBackside == null)
+            {
+                this.parameter = recipe.GetRecipe<BacksideSurfaceParameter>();
+                this.recipeBackside = recipe.GetRecipe<BacksideRecipe>();
+            }
+            return true;
         }
 
-        public override void DoWork()
+        protected override bool Execution()
         {
             DoInspection();
+
+            return true;
         }
 
-        public override void SetWorkplace(Workplace _workplace)
-        {
-            this.workplace = _workplace;
-        }
         public void DoInspection()
         {
-           if (this.workplace.Index == 0)
+            if (this.currentWorkplace.Index == 0)
                 return;
 
-            this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
-            this.inspectionWorkplaceBuffer = this.workplace.GetWorkplaceBuffer(this.parameter.IndexChannel);
+
+
+            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameter.IndexChannel);
+            byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameter.IndexChannel);
 
             bool isBackside = false;
 
@@ -62,16 +62,14 @@ namespace RootTools_Vision
             int nGrayLevel = parameter.Intensity; // Option
             int nDefectSz = parameter.Size; // Option     
 
-            int chipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
-            int chipW = this.workplace.BufferSizeX;
+            int chipH = this.currentWorkplace.Width; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
+            int chipW = this.currentWorkplace.Height;
 
             byte[] arrBinImg = new byte[chipW * chipH]; // Threashold 결과 array
             
-            //Position 안해서...?
-            ExtractCurrentWorkplace();
 
             // Dark
-            CLR_IP.Cpp_Threshold(workplace.WorkplaceBufferR_GRAY, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
+            CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
 
             // Filter
             switch (parameter.DiffFilter)
@@ -94,7 +92,7 @@ namespace RootTools_Vision
 
             // Labeling
             //var Label = CLR_IP.Cpp_Labeling(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp);
-            var Label = CLR_IP.Cpp_Labeling_SubPix(workplace.WorkplaceBufferR_GRAY, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel, 3);
+            var Label = CLR_IP.Cpp_Labeling_SubPix(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel, 3);
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
@@ -108,52 +106,29 @@ namespace RootTools_Vision
                 {
                     if (Label[i].area > nDefectSz)
                     {
-                        this.workplace.AddDefect(sInspectionID,
+                        this.currentWorkplace.AddDefect(sInspectionID,
                             10001,
                             Label[i].area,
                             Label[i].value,
-                            this.workplace.PositionX + Label[i].boundLeft,
-                            this.workplace.PositionY + Label[i].boundTop,
+                            this.currentWorkplace.PositionX + Label[i].boundLeft,
+                            this.currentWorkplace.PositionY + Label[i].boundTop,
                             Label[i].width,
                             Label[i].height,
-                            this.workplace.MapPositionX,
-                            this.workplace.MapPositionY
+                            this.currentWorkplace.MapPositionX,
+                            this.currentWorkplace.MapPositionY
                             );
                     }
                 }
             }
 
 
-            WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
         }
 
 
         public override WorkBase Clone()
         {
             return (WorkBase)this.MemberwiseClone();
-        }
-
-        public override void SetWorkplaceBundle(WorkplaceBundle workplace)
-        {
-            return;
-        }
-        private void ExtractCurrentWorkplace()
-        {
-            // Copy 
-            int chipH = this.workplace.BufferSizeY;
-            int chipW = this.workplace.BufferSizeX;
-
-            int Left = this.workplace.PositionX;
-            int Top = this.workplace.PositionY - chipH;
-            int Right = this.workplace.PositionX + chipW;
-            int Bottom = this.workplace.PositionY;
-
-            int memH = this.workplace.SharedBufferHeight;
-            int memW = this.workplace.SharedBufferWidth;
-
-            for (int cnt = Top; cnt < Bottom; cnt++)
-                Marshal.Copy(new IntPtr(this.workplace.SharedBufferR_GRAY.ToInt64() + (cnt * (Int64)memW + Left))
-                    , this.workplace.WorkplaceBufferR_GRAY, chipW * (cnt - Top), chipW);
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
     public class WorkerManager : IWorkable
     {

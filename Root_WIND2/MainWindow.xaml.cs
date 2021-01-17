@@ -44,6 +44,10 @@ namespace Root_WIND2
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             ThreadStop();
+
+            ProgramManager.Instance.Exit();
+            ProgramManager.Instance.Dispose();
+            GC.SuppressFinalize(this);
         }
         #endregion
 
@@ -51,9 +55,9 @@ namespace Root_WIND2
         DispatcherTimer m_timer = new DispatcherTimer();
         void InitTimer()
         {
-            m_timer.Interval = TimeSpan.FromMilliseconds(100);
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Start();
+            //m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            //m_timer.Tick += M_timer_Tick;
+            //m_timer.Start();
         }
 
         private void M_timer_Tick(object sender, EventArgs e)
@@ -102,7 +106,7 @@ namespace Root_WIND2
         }
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            this.Close();            
         }
         #endregion
 
@@ -125,7 +129,7 @@ namespace Root_WIND2
             ProgramManager.Instance.DialogService = this.dialogService;
 
 
-            if(UIManager.Instance.Initialize(ProgramManager.Instance) == false)
+            if (UIManager.Instance.Initialize(ProgramManager.Instance) == false)
             {
                 MessageBox.Show("UI Initialization fail");
                 return;

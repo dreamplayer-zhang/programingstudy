@@ -1,17 +1,25 @@
-﻿using RootTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision.delete
+namespace RootTools_Vision
 {
     public class WorkEventManager
     {
+        #region [WorkDoneAll]
+        public static event EventHandler<WorkDoneAllEventArgs> WorkDoneAll;
+
+        public static void OnPositionDone(object obj, WorkDoneAllEventArgs args)
+        {
+            WorkDoneAll?.Invoke(obj, args);
+        }
+        #endregion
+
         #region [PositionDone]
         public static event EventHandler<PositionDoneEventArgs> PositionDone;
-        
+
         public static void OnPositionDone(object obj, PositionDoneEventArgs args)
         {
             PositionDone?.Invoke(obj, args);
@@ -28,9 +36,9 @@ namespace RootTools_Vision.delete
         #endregion
 
         #region [ProcessDefectDone]
-        public static event EventHandler<ProcessDefectDoneEventArgs> ProcessDefectDone;
+        public static event EventHandler<PocessDefectDoneEventArgs> ProcessDefectDone;
 
-        public static void OnProcessDefectDone(object obj, ProcessDefectDoneEventArgs args)
+        public static void OnProcessDefectDone(object obj, PocessDefectDoneEventArgs args)
         {
             ProcessDefectDone?.Invoke(obj, args);
         }
@@ -38,22 +46,14 @@ namespace RootTools_Vision.delete
 
 
         #region [ProcessDefectWaferDone]
-        public static event EventHandler<ProcessDefectWaferDoneEventArgs> ProcessDefectWaferDone;
+        public static event EventHandler<PocessDefectWaferDoneEventArgs> ProcessDefectWaferDone;
 
-        public static void OnProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs args)
+        public static void OnProcessDefectWaferDone(object obj, PocessDefectWaferDoneEventArgs args)
         {
             ProcessDefectWaferDone?.Invoke(obj, args);
         }
         #endregion
 
-        #region [ProcessMeasurementDone]
-        public static event EventHandler<ProcessMeasurementDoneEventArgs> ProcessMeasurementDone;
-
-        public static void OnProcessMeasurementDone(object obj, ProcessMeasurementDoneEventArgs args)
-        {
-            ProcessMeasurementDone?.Invoke(obj, args);
-        }
-        #endregion
 
         #region [UIRedraw]
         public static event EventHandler<UIRedrawEventArgs> UIRedraw;
