@@ -99,7 +99,7 @@ namespace RootTools_Vision
 
             if (Label.Length > 0)
             {
-                this.workplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
+                this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
 
                 //Add Defect
                 for (int i = 0; i < Label.Length; i++)
@@ -114,8 +114,8 @@ namespace RootTools_Vision
                             this.currentWorkplace.PositionY + Label[i].boundTop,
                             Label[i].width,
                             Label[i].height,
-                            this.currentWorkplace.MapPositionX,
-                            this.currentWorkplace.MapPositionY
+                            this.currentWorkplace.MapIndexX,
+                            this.currentWorkplace.MapIndexY
                             );
                     }
                 }

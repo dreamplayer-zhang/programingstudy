@@ -14,10 +14,6 @@ namespace Root_WIND2
 {
 	public class InspectionManagerEdge : WorkFactory
 	{
-		#region [Member Variables]
-		WorkBundle workBundle;
-		WorkplaceBundle workplaceBundle;
-		#endregion
 
 		public InspectionManagerEdge(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt = 1)
 		{
@@ -26,14 +22,6 @@ namespace Root_WIND2
 			this.sharedBufferHeight = _height;
 			this.sharedBufferByteCnt = _byteCnt;
 		}
-
-		public enum InsepectionMode
-		{
-			EDGE,
-		}
-
-		private InsepectionMode inspectionMode = InsepectionMode.EDGE;
-		public InsepectionMode InspectionMode { get => inspectionMode; set => inspectionMode = value; }
 
 		private Recipe recipe;
 		private IntPtr sharedBufferR_Gray;
@@ -69,7 +57,7 @@ namespace Root_WIND2
 		protected override void Initialize()
 		{
 			CreateWorkManager(WORK_TYPE.INSPECTION, 5);
-			CreateWorkManager(WORK_TYPE.DEFECTPROCESS_WAFER);
+			CreateWorkManager(WORK_TYPE.DEFECTPROCESS_ALL);
 		}
 
 		protected override WorkplaceBundle CreateWorkplaceBundle()
@@ -82,11 +70,9 @@ namespace Root_WIND2
 			WorkBundle workBundle = new WorkBundle();
 			EdgeSurface edgeSurface = new EdgeSurface();
 			edgeSurface.SetRecipe(this.recipe);
-			edgeSurface.SetWorkplaceBundle(workplaceBundle);
 
 			ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
 			processDefect_Wafer.SetRecipe(this.recipe);
-			processDefect_Wafer.SetWorkplaceBundle(workplaceBundle);
 
 			workBundle.Add(edgeSurface);
 			workBundle.Add(processDefect_Wafer);

@@ -145,6 +145,7 @@ namespace RootTools_Vision
 
             WorkplaceBundle workplaces = CreateWorkplaceBundle();
             WorkBundle works = CreateWorkBundle();
+            works.SetWorkplacBundle(workplaces);
 
             if (Ready(workplaces, works) == false)
             {

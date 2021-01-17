@@ -14,7 +14,7 @@ namespace RootTools_Vision
         ALIGNMENT               = 0b0000100,
         INSPECTION              = 0b0001000,
         DEFECTPROCESS           = 0b0010000,
-        DEFECTPROCESS_WAFER     = 0b0100000,
+        DEFECTPROCESS_ALL     = 0b0100000,
     }
 
     public enum WORKMANAGER_STATE

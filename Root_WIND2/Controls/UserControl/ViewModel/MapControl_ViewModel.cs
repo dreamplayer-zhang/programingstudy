@@ -88,7 +88,7 @@ namespace Root_WIND2
                                 case WORK_TYPE.DEFECTPROCESS:
                                     chip.Background = brushComplete;
                                 break;
-                                case WORK_TYPE.DEFECTPROCESS_WAFER:
+                                case WORK_TYPE.DEFECTPROCESS_ALL:
                                     chip.Background = brushCompleteWafer;
                                 break;
                             }

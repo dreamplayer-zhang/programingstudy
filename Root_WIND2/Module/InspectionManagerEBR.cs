@@ -52,7 +52,7 @@ namespace Root_WIND2
 		protected override void Initialize()
 		{
 			CreateWorkManager(WORK_TYPE.INSPECTION, 5);
-			CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 5);
+			CreateWorkManager(WORK_TYPE.DEFECTPROCESS_ALL, 1, true);
 		}
 
 		protected override WorkplaceBundle CreateWorkplaceBundle()
@@ -68,6 +68,7 @@ namespace Root_WIND2
 			int height = recipe.GetRecipe<EBRParameter>().RoiHeight;
 
 			int index = 0;
+			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, index++));
 			for (int i = 0; i < 5/*workplaceCnt*/; i++)
 			{
 				int posY = (imageHeightPerDegree * i) - (height / 2);
@@ -86,15 +87,12 @@ namespace Root_WIND2
 		{
 			WorkBundle workBundle = new WorkBundle();
 			EBR ebr = new EBR();
-			ebr.SetRecipe(this.recipe);
-			ebr.SetWorkplaceBundle(workplaceBundle);
 
 			ProcessMeasurement processMeasurement = new ProcessMeasurement();
-			processMeasurement.SetRecipe(this.recipe);
-			processMeasurement.SetWorkplaceBundle(workplaceBundle);
 
 			workBundle.Add(ebr);
 			workBundle.Add(processMeasurement);
+			workBundle.SetRecipe(recipe);
 
 			return workBundle;
 		}
