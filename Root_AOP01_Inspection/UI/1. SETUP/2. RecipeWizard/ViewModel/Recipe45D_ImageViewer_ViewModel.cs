@@ -31,7 +31,10 @@ namespace Root_AOP01_Inspection
 	public class Recipe45D_ImageViewer_ViewModel : RootViewer_ViewModel
 	{
 		public event EventDrawDone DrawDone;
-		
+
+		Polygon WAFEREDGE_UI;
+		CPoint canvasPoint;
+		Grid CENTERPOINT_UI;
 
 		public Recipe45D_ImageViewer_ViewModel()
 		{
@@ -65,6 +68,7 @@ namespace Root_AOP01_Inspection
 
 		public ObservableCollection<TShape> Shapes = new ObservableCollection<TShape>();
 		public ObservableCollection<InfoTextBolck> InfoTextBolcks = new ObservableCollection<InfoTextBolck>();
+		public ObservableCollection<TRect> TRectList = new ObservableCollection<TRect>();
 		TShape rectInfo;
 
 		public enum ColorType
@@ -75,6 +79,10 @@ namespace Root_AOP01_Inspection
 			FeatureMatching,
 			FeatureMatchingFail,
 			Defect,
+			Teaching,
+			WaferEdge,
+			WaferCenter,
+			MapData,
 
 		}
 
@@ -106,6 +114,7 @@ namespace Root_AOP01_Inspection
 			rect.MemoryRect.Top = LT.Y;
 			rectInfo = Drawing(rectInfo, RB);
 			Shapes.Add(rectInfo);
+			TRectList.Add(rect);
 			p_DrawElement.Add(rectInfo.UIElement);
 
 			if (text != null)
@@ -126,14 +135,18 @@ namespace Root_AOP01_Inspection
 				rect.MemoryRect.Left = rectPoint.Left;
 				rect.MemoryRect.Top = rectPoint.Top;
 				rectInfo = Drawing(rectInfo, new CPoint(rectPoint.Right, rectPoint.Bottom));
+				TRectList.Add(rect);
 
 				Shapes.Add(rectInfo);
 				p_DrawElement.Add(rectInfo.UIElement);
 
-				if (textList[i] != null)
+				if (textList != null)
 				{
-					Grid textGrid = WriteInfoText(textList[i++], rect, color, FontSz);
-					InfoTextBolcks.Add(new InfoTextBolck(textGrid, rect));
+					if (textList[i] != null)
+					{
+						Grid textGrid = WriteInfoText(textList[i++], rect, color, FontSz);
+						InfoTextBolcks.Add(new InfoTextBolck(textGrid, rect));
+					}
 				}
 			}
 		}
@@ -185,8 +198,20 @@ namespace Root_AOP01_Inspection
 				case ColorType.Defect:
 					rectInfo = new TRect(Brushes.Red, 4, 1);
 					break;
+				case ColorType.MapData:
+					rectInfo = new TRect(Brushes.LimeGreen, 1, 1);
+					break;
+				case ColorType.Teaching:
+					rectInfo = new TRect(Brushes.Blue, 1, 1);
+					break;
+				case ColorType.WaferEdge:
+					rectInfo = new TRect(Brushes.Green, 1, 1);
+					break;
+				case ColorType.WaferCenter:
+					rectInfo = new TRect(Brushes.Magenta, 1, 1);
+					break;
 				default:
-					rectInfo = new TRect(Brushes.Black, 4, 1);
+					rectInfo = new TRect(Brushes.Black, 1, 1);
 					break;
 			}
 
@@ -396,6 +421,7 @@ namespace Root_AOP01_Inspection
 			Shapes.Clear();
 			InfoTextBolcks.Clear();
 			p_DrawElement.Clear();
+			TRectList.Clear();
 		}
 
 		public void DefectClear()

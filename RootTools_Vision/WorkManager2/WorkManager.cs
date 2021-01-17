@@ -1,4 +1,4 @@
-﻿#define WORKMANAGER_DEBUG
+﻿//#define WORKMANAGER_DEBUG
 
 using System;
 using System.Collections.Generic;

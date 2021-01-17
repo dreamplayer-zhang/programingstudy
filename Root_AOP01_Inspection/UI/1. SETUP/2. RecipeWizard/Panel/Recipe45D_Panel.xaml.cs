@@ -45,13 +45,13 @@ namespace Root_AOP01_Inspection
 			}));
 		}
 
-		private void InspectionManager_AddDefectEvent(List<RootTools.Database.Defect> items)
+		private void InspectionManager_AddDefectEvent(List<RootTools.Database.Defect> items, Brush brush, Pen pen)
 		{
 			foreach (var item in items)
 			{
 				RootTools.Database.Defect defectInfo = item as RootTools.Database.Defect;
 				var temp = new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom);
-				canvas.AddBlock(temp.Left, temp.Top, temp.Width, temp.Height, null, new Pen(Brushes.Red, 2));
+				canvas.AddBlock(temp.Left, temp.Top, temp.Width, temp.Height, brush, pen);
 			}
 		}
 

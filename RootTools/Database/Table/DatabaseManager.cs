@@ -61,6 +61,7 @@ namespace RootTools.Database
 
 		protected Lotinfo m_Loftinfo = new Lotinfo(); // 현재 Lot정보
 		protected string m_sInspectionID; // INSPECTION ID(DB PRIMARY KEY)
+		public string InspectionID { get { return m_sInspectionID; } }
 
 		public DataSet m_DataSet = new DataSet();
 		public DataTable m_DefectTable = new DataTable();

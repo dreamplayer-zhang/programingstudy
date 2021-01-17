@@ -206,9 +206,6 @@ namespace Root_AOP01_Inspection
 			}
 		}
 
-		Polygon WAFEREDGE_UI;
-		CPoint canvasPoint;
-		Grid CENTERPOINT_UI;
 		BacksideRecipe backsideRecipe
 		{
 			get
@@ -219,13 +216,6 @@ namespace Root_AOP01_Inspection
 		RecipeType_WaferMap mapInfo;
 		TShape rectInfo;
 
-		public enum ColorType
-		{
-			Teaching,
-			WaferEdge,
-			WaferCenter,
-			MapData,
-		}
 		private Recipe45D_ImageViewer_ViewModel m_ImageViewer_VM;
 		public Recipe45D_ImageViewer_ViewModel p_ImageViewer_VM
 		{
@@ -260,12 +250,12 @@ namespace Root_AOP01_Inspection
 
 			EdgeDrawMode = false;
 		}
-		private void WorkEventManager_ProcessDefectWaferDone(object sender, PocessDefectWaferDoneEventArgs e)
+		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
 		{
 			//ResultDataTable Update
 		}
 
-		private void ProcessDefectDone_Callback(object obj, PocessDefectDoneEventArgs args)
+		private void ProcessDefectDone_Callback(object obj, ProcessDefectDoneEventArgs args)
 		{
 			Workplace workplace = obj as Workplace;
 
@@ -367,7 +357,7 @@ namespace Root_AOP01_Inspection
 					tempList[j].MemoryRect.Width,
 					tempList[j].MemoryRect.Height));
 			}
-			if (arcROIs.Count < 6) return new CRect(-1,-1,-1,-1);
+			if (arcROIs.Count < 6) return new CRect(-1, -1, -1, -1);
 			for (int j = 0; j < arcROIs.Count; j++)
 			{
 				eTempDirection = InspectionManager_AOP.GetDirection(ivvm.p_ImageData, arcROIs[j]);
@@ -409,7 +399,7 @@ namespace Root_AOP01_Inspection
 			//DrawLine(ptLT, ptRT, MBrushes.Lime);
 			//DrawLine(ptLB, ptRB, MBrushes.Lime);
 
-			m_ImageViewer_VM.DrawRect(new CPoint(ptLeft1.X-10, ptLeft1.Y-10), new CPoint(ptLeft1.X+10, ptLeft1.Y+10),Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
+			m_ImageViewer_VM.DrawRect(new CPoint(ptLeft1.X - 10, ptLeft1.Y - 10), new CPoint(ptLeft1.X + 10, ptLeft1.Y + 10), Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
 			m_ImageViewer_VM.DrawRect(new CPoint(ptLeft2.X - 10, ptLeft2.Y - 10), new CPoint(ptLeft2.X + 10, ptLeft2.Y + 10), Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
 			m_ImageViewer_VM.DrawRect(new CPoint(ptBottom.X - 10, ptBottom.Y - 10), new CPoint(ptBottom.X + 10, ptBottom.Y + 10), Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
 			m_ImageViewer_VM.DrawRect(new CPoint(ptRight1.X - 10, ptRight1.Y - 10), new CPoint(ptRight1.X + 10, ptRight1.Y + 10), Recipe45D_ImageViewer_ViewModel.ColorType.Defect);
@@ -502,7 +492,7 @@ namespace Root_AOP01_Inspection
 			float centX = CenterPoint.X; // 레시피 티칭 값 가지고오기
 			float centY = CenterPoint.Y;
 
-			int outMapX = 40, outMapY = 40;
+			int outMapX = 10, outMapY = 10;
 			float outOriginX, outOriginY;
 			float outChipSzX, outChipSzY;
 			float outRadius = 80000;
@@ -536,14 +526,7 @@ namespace Root_AOP01_Inspection
 					outRadius /= DownSample;
 					memW /= DownSample; memH /= DownSample;
 
-					//WaferEdge = CLR_IP.Cpp_FindWaferEdge(pImg,
-					//	&centX, &centY,
-					//	&outRadius,
-					//	memW, memH,
-					//	1
-					//	).ToList();
-					//LT,LB,RB,RT
-					var area = searchArea(200,200);
+					var area = searchArea(200, 200);
 					WaferEdge.Add(new Cpp_Point(area.Left / DownSample, area.Top / DownSample));
 					WaferEdge.Add(new Cpp_Point(area.Left / DownSample, area.Bottom / DownSample));
 					WaferEdge.Add(new Cpp_Point(area.Right / DownSample, area.Bottom / DownSample));
@@ -568,23 +551,6 @@ namespace Root_AOP01_Inspection
 				outRadius *= DownSample;
 				outOriginX *= DownSample; outOriginY *= DownSample;
 				outChipSzX *= DownSample; outChipSzY *= DownSample;
-
-				PolygonPt.Clear();
-				if (WAFEREDGE_UI != null)
-					WAFEREDGE_UI.Points.Clear();
-
-				for (int i = 0; i < WaferEdge.Count; i++)
-					PolygonPt.Add(new CPoint(WaferEdge[i].x * DownSample, WaferEdge[i].y * DownSample));
-
-				// UI Data Update
-				CenterPoint = new CPoint((int)centX, (int)centY);
-
-				canvasPoint = m_ImageViewer_VM.GetCanvasPoint(new CPoint(CenterPoint.X, CenterPoint.Y));
-				DrawCenterPoint(ColorType.WaferCenter);
-
-				// Wafer Edge Draw                
-				DrawPolygon(PolygonPt);
-				ReDrawWFCenter(ColorType.WaferCenter);
 
 				// Save Recipe
 				SetRecipeMapData(mapData, (int)outMapX, (int)outMapY, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);
@@ -656,7 +622,7 @@ namespace Root_AOP01_Inspection
 		{
 			RemoveMapDataRect();
 			// Map Display
-			List<CRect> rectList = new List<CRect>();
+			List<RootTools.Database.Defect> rectList = new List<RootTools.Database.Defect>();
 			int offsetY = 0;
 			bool isOrigin = true;
 
@@ -671,29 +637,42 @@ namespace Root_AOP01_Inspection
 							mapInfo.MasterDieY = y;
 							isOrigin = false;
 						}
+						var data = new RootTools.Database.Defect();
 
-						rectList.Add(new CRect(OriginX + x * ChipSzX, offsetY + y * ChipSzY, OriginX + (x + 1) * ChipSzX, offsetY + (y + 1) * ChipSzY));
+						var left = OriginX + x * ChipSzX;
+						var top = offsetY + y * ChipSzY;
+						var right = OriginX + (x + 1) * ChipSzX;
+						var bot = offsetY + (y + 1) * ChipSzY;
+
+						var width = right - left;
+						var height = bot - top;
+						left = (int)(left - width / 2.0);
+						top = (int)(top - height / 2.0);
+
+						data.p_rtDefectBox = new Rect(left, top, width, height);
+						rectList.Add(data);
 					}
 
 
-			DrawRect(rectList, ColorType.MapData);
+			//m_ImageViewer_VM.DrawRect(rectList, Recipe45D_ImageViewer_ViewModel.ColorType.MapData);
+			m_Setup.InspectionManager.AddRect(rectList, null, new Pen(Brushes.Green, 2));
 		}
-		private void DrawRect(List<CRect> RectList, ColorType color, List<String> textList = null, int FontSz = 15)
-		{
-			foreach (CRect rectPoint in RectList)
-			{
-				SetShapeColor(color);
-				TRect rect = rectInfo as TRect;
+		//private void DrawRect(List<CRect> RectList, ColorType color, List<String> textList = null, int FontSz = 15)
+		//{
+		//	foreach (CRect rectPoint in RectList)
+		//	{
+		//		SetShapeColor(color);
+		//		TRect rect = rectInfo as TRect;
 
-				rect.MemPointBuffer = new CPoint(rectPoint.Left, rectPoint.Top);
-				rect.MemoryRect.Left = rectPoint.Left;
-				rect.MemoryRect.Top = rectPoint.Top;
-				rectInfo = Drawing(rectInfo, new CPoint(rectPoint.Right, rectPoint.Bottom));
+		//		rect.MemPointBuffer = new CPoint(rectPoint.Left, rectPoint.Top);
+		//		rect.MemoryRect.Left = rectPoint.Left;
+		//		rect.MemoryRect.Top = rectPoint.Top;
+		//		rectInfo = Drawing(rectInfo, new CPoint(rectPoint.Right, rectPoint.Bottom));
 
-				Shapes.Add(rectInfo);
-				m_ImageViewer_VM.p_ViewElement.Add(rectInfo.UIElement);
-			}
-		}
+		//		Shapes.Add(rectInfo);
+		//		m_ImageViewer_VM.p_ViewElement.Add(rectInfo.UIElement);
+		//	}
+		//}
 		private TShape Drawing(TShape shape, CPoint memPt)
 		{
 			TRect rect = shape as TRect;
@@ -736,119 +715,6 @@ namespace Root_AOP01_Inspection
 
 			return shape;
 		}
-		private void SetShapeColor(ColorType color)
-		{
-			switch (color)
-			{
-				case ColorType.MapData:
-					rectInfo = new TRect(Brushes.LimeGreen, 1, 1);
-					break;
-				default:
-					rectInfo = new TRect(Brushes.Black, 1, 1);
-					break;
-			}
-
-		}
-		private void ReDrawWFCenter(ColorType color)
-		{
-			if (CENTERPOINT_UI == null)
-				return;
-
-			if (m_ImageViewer_VM.p_ViewElement.Contains(CENTERPOINT_UI))
-				m_ImageViewer_VM.p_ViewElement.Remove(CENTERPOINT_UI);
-
-			foreach (UIElement ui in CENTERPOINT_UI.Children)
-			{
-				Line line = ui as Line;
-				line.Stroke = GetColorBrushType(color);
-			}
-
-			CPoint WFCenter = m_ImageViewer_VM.GetCanvasPoint(new CPoint(CenterPoint.X, CenterPoint.Y));
-			Canvas.SetLeft(CENTERPOINT_UI, WFCenter.X - 10);
-			Canvas.SetTop(CENTERPOINT_UI, WFCenter.Y - 10);
-
-			m_ImageViewer_VM.p_ViewElement.Add(CENTERPOINT_UI);
-		}
-		private void DrawPolygon(List<CPoint> memPolyPt)
-		{
-			if (m_ImageViewer_VM.p_ViewElement.Contains(WAFEREDGE_UI))
-				m_ImageViewer_VM.p_ViewElement.Remove(WAFEREDGE_UI);
-
-			if (WAFEREDGE_UI == null)
-			{
-				WAFEREDGE_UI = new Polygon();
-				WAFEREDGE_UI.Stroke = GetColorBrushType(ColorType.WaferEdge);
-				WAFEREDGE_UI.StrokeThickness = 3;
-				WAFEREDGE_UI.StrokeDashArray = new DoubleCollection { 2, 2 };
-			}
-			else
-				WAFEREDGE_UI.Points.Clear();
-
-			foreach (CPoint pt in memPolyPt)
-			{
-				CPoint a = new CPoint();
-				a = m_ImageViewer_VM.GetCanvasPoint(new CPoint(pt.X, pt.Y));
-				WAFEREDGE_UI.Points.Add(new Point(a.X, a.Y));
-			}
-			m_ImageViewer_VM.p_ViewElement.Add(WAFEREDGE_UI);
-		}
-		private void DrawCenterPoint(ColorType color)
-		{
-			if (m_ImageViewer_VM.p_ViewElement.Contains(CENTERPOINT_UI))
-				m_ImageViewer_VM.p_ViewElement.Remove(CENTERPOINT_UI);
-
-			if (CENTERPOINT_UI == null)
-			{
-				CENTERPOINT_UI = new Grid();
-				CENTERPOINT_UI.Width = 20;
-				CENTERPOINT_UI.Height = 20;
-
-				Line line1 = new Line();
-				line1.X1 = 0;
-				line1.Y1 = 0;
-				line1.X2 = 1;
-				line1.Y2 = 1;
-				//line1.Stroke = GetColorBrushType(color);
-				line1.StrokeThickness = 1.5;
-				line1.Stretch = Stretch.Fill;
-				Line line2 = new Line();
-				line2.X1 = 0;
-				line2.Y1 = 1;
-				line2.X2 = 1;
-				line2.Y2 = 0;
-				//line2.Stroke = GetColorBrushType(color);
-				line2.StrokeThickness = 1.5;
-				line2.Stretch = Stretch.Fill;
-				CENTERPOINT_UI.Children.Add(line1);
-				CENTERPOINT_UI.Children.Add(line2);
-			}
-
-			foreach (UIElement ui in CENTERPOINT_UI.Children)
-			{
-				Line line = ui as Line;
-				line.Stroke = GetColorBrushType(color);
-			}
-
-			Canvas.SetLeft(CENTERPOINT_UI, canvasPoint.X - 10);
-			Canvas.SetTop(CENTERPOINT_UI, canvasPoint.Y - 10);
-			m_ImageViewer_VM.p_ViewElement.Add(CENTERPOINT_UI);
-		}
-		private System.Windows.Media.SolidColorBrush GetColorBrushType(ColorType color)
-		{
-			switch (color) // 색상 정리 다시...
-			{
-				case ColorType.Teaching:
-					return Brushes.Blue;
-				case ColorType.WaferEdge:
-					return Brushes.Green;
-				case ColorType.WaferCenter:
-					return Brushes.Magenta;
-				case ColorType.MapData:
-					return Brushes.Yellow;
-				default:
-					return Brushes.Black;
-			}
-		}
 		private void startTestInsp()
 		{
 			p_ImageViewer_VM.Clear();
@@ -884,7 +750,7 @@ namespace Root_AOP01_Inspection
 			m_Setup.InspectionManager.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
 
 
-			m_Setup.InspectionManager.Start(WORK_TYPE.SNAP);
+			m_Setup.InspectionManager.InspectionStart();
 		}
 
 		public ICommand btnBack
