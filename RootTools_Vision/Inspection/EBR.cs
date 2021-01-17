@@ -12,67 +12,48 @@ namespace RootTools_Vision
 {
 	public class EBR : WorkBase
 	{
-		WorkplaceBundle workplaceBundle;
-		Workplace workplace;
-
 		public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
 		private EBRParameter parameter;
-		private EBRRecipe recipe;
+		private EBRRecipe recipeEBR;
 
 		public EBR() : base()
 		{
 			m_sName = this.GetType().Name;
 		}
 
-		public override WorkBase Clone()
+
+		protected override bool Preparation()
 		{
-			return (WorkBase)this.MemberwiseClone();
+			this.parameter = this.recipe.GetRecipe<EBRParameter>();
+			this.recipeEBR = this.recipe.GetRecipe<EBRRecipe>();
+
+			return true;
 		}
 
-		public override void SetRecipe(Recipe _recipe)
-		{
-			this.parameter = _recipe.GetRecipe<EBRParameter>();
-			this.recipe = _recipe.GetRecipe<EBRRecipe>();
-		}
-
-		public override void SetWorkplace(Workplace workplace)
-		{
-			this.workplace = workplace;
-		}
-
-		public override void SetWorkplaceBundle(WorkplaceBundle workplace)
-		{
-			this.workplaceBundle = workplace;
-		}
-
-		//public override bool DoPrework()
-		//{
-		//	return base.DoPrework();
-		//}
-
-		public override void DoWork()
+		protected override bool Execution()
 		{
 			DoInspection();
+			return true;
 		}
 
 		public void DoInspection()
 		{
-			if (this.workplace.Index == 0)
+			if (this.currentWorkplace.Index == 0)
 				return;
 
-			IntPtr ptrMem = this.workplace.SharedBufferR_GRAY;
-			int roiWidth = this.workplace.BufferSizeX;
-			int roiHeight = this.workplace.BufferSizeY;
-			int roiLeft = this.workplace.PositionX;
-			int roiTop = this.workplace.PositionY;
+			IntPtr ptrMem = this.currentWorkplace.SharedBufferR_GRAY;
+			int roiWidth = this.currentWorkplace.Width;
+			int roiHeight = this.currentWorkplace.Height;
+			int roiLeft = this.currentWorkplace.PositionX;
+			int roiTop = this.currentWorkplace.PositionY;
 
 			int[] arrDiff = new int[roiWidth];
 
 			arrDiff = GetDiffArr(ptrMem, roiLeft, roiTop, roiWidth, roiHeight);
 			FindEdge(arrDiff);
 
-			WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 		}
 
 		private unsafe int[] GetDiffArr(IntPtr memory, int left, int top, int width, int height)
@@ -93,7 +74,7 @@ namespace RootTools_Vision
 				for (int y = top; y < btm; y += 10)
 				{
 					//ySum += ((byte*)memory)[(y * width) + x];
-					ySum += ((byte*)memory)[(y * this.workplace.SharedBufferWidth) + x];
+					ySum += ((byte*)memory)[(y * this.currentWorkplace.SharedBufferWidth) + x];
 				}
 				arrAvg[x - left] = ySum / ((btm - top) / 10);
 			}
@@ -147,14 +128,14 @@ namespace RootTools_Vision
 
 			// Add measurement
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			this.workplace.AddDefect(sInspectionID,
+			this.currentWorkplace.AddDefect(sInspectionID,
 									11111,
 									0, 0,
-									this.workplace.Index * this.parameter.StepDegree, 0,
+									this.currentWorkplace.Index * this.parameter.StepDegree, 0,
 									(float)(waferEdgeX - bevelX),
 									(float)(waferEdgeX - ebrX),
-									this.workplace.MapPositionX,
-									this.workplace.MapPositionY);
+									this.currentWorkplace.MapIndexX,
+									this.currentWorkplace.MapIndexY);
 		}
 
 		private double FindEdge(int[] diff, int searchStartX, int standardDiff)
@@ -231,5 +212,6 @@ namespace RootTools_Vision
 
 			return sum;
 		}
-	}
+
+    }
 }
