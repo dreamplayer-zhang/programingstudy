@@ -18,19 +18,16 @@ namespace Root_WIND2
 {
     class MapControl_ViewModel : ObservableObject
     {
-        WorkFactory m_InspectionManger;
         Recipe m_Recipe;
 
         public delegate void setMasterDie(object e);
         public event setMasterDie SetMasterDie;
         public int[] Map;
         CPoint MapSize;
-        public MapControl_ViewModel(WorkFactory inspectionManger, Recipe recipe = null)
+        public MapControl_ViewModel(Recipe recipe = null)
         {
             if(recipe != null)
                 m_Recipe = recipe;
-
-            m_InspectionManger = inspectionManger;
 
             WorkEventManager.WorkplaceStateChanged += MapStateChanged_Callback;
         }

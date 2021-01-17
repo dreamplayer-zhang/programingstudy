@@ -31,10 +31,16 @@ namespace RootTools_Vision
 
     public partial class MainWindow : Window
     {
+        InspectionManager inspectionManager;
         public MainWindow()
         {
             InitializeComponent();
 
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            inspectionManager = new InspectionManager();
         }
     }
 }

@@ -68,7 +68,7 @@ namespace Root_WIND2
             m_Setup = setup;
             m_Recipe = setup.Recipe;
 
-            p_MapControl_VM = new MapControl_ViewModel(m_Setup.InspectionVision);
+            p_MapControl_VM = new MapControl_ViewModel();
             p_ImageViewer_VM = new FrontsideInspection_ImageViewer_ViewModel();
             p_ImageViewer_VM.DrawDone += DrawDone_Callback;
 
@@ -109,26 +109,25 @@ namespace Root_WIND2
             List<CRect> rectList = new List<CRect>();
 
 
-            // RRRRRRRRRR
-            //foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
-            //{
-            //    String text = "";
+            foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+            {
+                String text = "";
 
-            //    if (false) // Display Option : Rel Position
-            //        text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
-            //    if (false) // Display Option : Defect Size
-            //        text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
-            //    if (false) // Display Option : GV Value
-            //        text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
+                if (false) // Display Option : Rel Position
+                    text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
+                if (false) // Display Option : Defect Size
+                    text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
+                if (false) // Display Option : GV Value
+                    text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
 
-            //    rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
-            //    textList.Add(text);
-            //}
+                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+                textList.Add(text);
+            }
 
-            //Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-            //{
-            //        DrawRectDefect(rectList, textList, args.reDraw);
-            //}));
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            {
+                DrawRectDefect(rectList, textList, args.reDraw);
+            }));
         }
 
         private void ProcessDefectDone_Callback(object obj, PocessDefectDoneEventArgs args)
@@ -166,7 +165,7 @@ namespace Root_WIND2
             }
             else
             {
-                p_MapControl_VM.SetMap(m_Setup.InspectionVision.Recipe.WaferMap.Data, new CPoint(14, 14));
+                p_MapControl_VM.SetMap(m_Setup.Recipe.WaferMap.Data, new CPoint(14, 14));
             }
 
 
@@ -239,7 +238,7 @@ namespace Root_WIND2
         private void _btnStop()
         {
             timer.Stop();
-            m_Setup.InspectionVision.Stop();
+            ProgramManager.Instance.InspectionFront.Stop();
             DatabaseManager.Instance.SelectData();
             m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
         }
@@ -402,7 +401,7 @@ namespace Root_WIND2
 
             p_ImageViewer_VM.Clear();
 
-            m_Setup.InspectionVision.Start(WORK_TYPE.SNAP);
+            ProgramManager.Instance.InspectionFront.Start(WORK_TYPE.SNAP);
         }
 
 

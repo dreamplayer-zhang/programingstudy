@@ -17,6 +17,18 @@ namespace RootTools_Vision
         DEFECTPROCESS_WAFER     = 0b0100000,
     }
 
+    public enum WORKMANAGER_STATE
+    {
+        NONE = 0,
+        CREATED,
+        WAIT,
+        STOP,
+        EXIT,
+        CHECK,
+        ASSIGN,
+        DONE,
+    }
+
     #endregion
 
 

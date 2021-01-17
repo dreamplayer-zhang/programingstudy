@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -97,6 +98,7 @@ namespace RootTools_Vision
         {
             foreach (WorkManager wm in this.workManagers)
                 wm.Exit();
+            this.workManagers.Clear();
         }
 
 
@@ -108,9 +110,8 @@ namespace RootTools_Vision
         /// <param name="type">검사 시작 전 Workplace 상태(Default : NONE)</param>
         public void Start(WORK_TYPE type = WORK_TYPE.NONE)
         {
-            //GC.Collect() 이거 해야하나
-
             Stop();
+            //GC.Collect(2, GCCollectionMode.Optimized);
 
             WorkplaceBundle workplaces = CreateWorkplaceBundle();
             WorkBundle works = CreateWorkBundle();
@@ -124,6 +125,11 @@ namespace RootTools_Vision
 
             // Workplace State 초기화
             workplaces.SetWorkState(type);
+
+#if DEBUG
+            Debug.WriteLine("[Start]");
+            DebugOutput.PrintWorkplaceBundle(workplaces);
+#endif
 
             foreach (WorkManager wm in this.workManagers)
             {

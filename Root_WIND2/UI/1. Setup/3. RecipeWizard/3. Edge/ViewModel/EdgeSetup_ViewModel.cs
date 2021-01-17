@@ -74,11 +74,11 @@ namespace Root_WIND2
 				sharedBuf = DrawToolVM.p_ImageData.GetPtr();
 			}
 
-			setupVM.InspectionManagerEdge.SharedBufferR_Gray = sharedBuf;
-			setupVM.InspectionManagerEdge.InspectionMode = InspectionManagerEdge.InsepectionMode.EDGE;
-			setupVM.InspectionManagerEdge.SharedBufferByteCnt = DrawToolVM.p_ImageData.p_nByte;
-			setupVM.InspectionManagerEdge.CreateInspection();
-			setupVM.InspectionManagerEdge.Start();
+			ProgramManager.Instance.InspectionEdge.SharedBufferR_Gray = sharedBuf;
+			ProgramManager.Instance.InspectionEdge.InspectionMode = InspectionManagerEdge.InsepectionMode.EDGE;
+			ProgramManager.Instance.InspectionEdge.SharedBufferByteCnt = DrawToolVM.p_ImageData.p_nByte;
+			ProgramManager.Instance.InspectionEdge.CreateInspection();
+			ProgramManager.Instance.InspectionEdge.Start();
 		}
 
 		private void ChangeViewer(string dataName)

@@ -137,6 +137,7 @@ namespace RootTools_Vision.delete
         public int SharedBufferHeight { get => sharedBufferHeight; private set => sharedBufferHeight = value; }
         public int SharedBufferByteCnt { get => sharedBufferByteCnt; private set => sharedBufferByteCnt = value; }
         public bool IsOccupied { get => isOccupied; set => isOccupied = value; }
+        
         public List<Defect> DefectList { get => defectList; set => defectList = value; }
 
 

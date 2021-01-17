@@ -64,7 +64,7 @@ namespace Root_WIND2
             m_Setup = setup;
             m_Recipe = setup.Recipe;
 
-            p_MapControl_VM = new MapControl_ViewModel(ProgramManager.Instance.InspectionBack);
+            p_MapControl_VM = new MapControl_ViewModel();
             p_DrawTool_VM = new FrontsideInspection_ImageViewer_ViewModel();
 
             timer = new DispatcherTimer();
@@ -161,7 +161,7 @@ namespace Root_WIND2
             }
             else
             {
-                p_MapControl_VM.SetMap(m_Setup.InspectionVision.Recipe.WaferMap.Data, new CPoint(14, 14));
+                p_MapControl_VM.SetMap(m_Setup.Recipe.WaferMap.Data, new CPoint(14, 14));
             }
 
             p_DrawTool_VM.Clear();
@@ -230,7 +230,7 @@ namespace Root_WIND2
         private void _btnStop()
         {
             timer.Stop();
-            m_Setup.InspectionVision.Stop();
+            ProgramManager.Instance.InspectionFront.Stop();
             DatabaseManager.Instance.SelectData();
             m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
         }

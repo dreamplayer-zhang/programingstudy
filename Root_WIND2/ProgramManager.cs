@@ -13,7 +13,7 @@ using System.Windows;
 
 namespace Root_WIND2
 {
-    public class ProgramManager
+    public class ProgramManager : IDisposable
     {
         //Single ton
         private ProgramManager() 
@@ -21,7 +21,7 @@ namespace Root_WIND2
 
         }
 
-        private static readonly Lazy<ProgramManager> instance = new Lazy<ProgramManager>(() => new ProgramManager());
+        private static Lazy<ProgramManager> instance = new Lazy<ProgramManager>(() => new ProgramManager());
 
         public static ProgramManager Instance 
         { 
@@ -285,6 +285,28 @@ namespace Root_WIND2
             }
 
             this.recipe.Read(recipePath);
+        }
+
+        public void Dispose()
+        {
+            instance = null;
+            recipe = null;
+            GC.SuppressFinalize(this);
+        }
+
+        public void Exit()
+        {
+            this.InspectionFront.Exit();
+            this.inspectionBack.Exit();
+
+            this.InspectionFront = null;
+            this.inspectionBack = null;
+
+        }
+
+        ~ProgramManager()
+        {
+
         }
 
         #endregion

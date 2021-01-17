@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define WORKMANAGER_DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,9 +9,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
+
+
 namespace RootTools_Vision
 {
-    sealed internal class WorkManager : IWorkStartable
+    internal class WorkManager : IWorkStartable
     {
         #region [Members]
         private readonly WORK_TYPE workType;
@@ -19,6 +23,7 @@ namespace RootTools_Vision
 
         private List<Worker> workers;
 
+        private WORKMANAGER_STATE state = WORKMANAGER_STATE.NONE;
 
         // Task
         private Task task = null;
@@ -48,6 +53,19 @@ namespace RootTools_Vision
         {
             get => this.isStop;
         }
+        public WORKMANAGER_STATE State 
+        { 
+            get => state; 
+            set
+            {
+                this.state = value;
+#if WORKMANAGER_DEBUG
+#if DEBUG
+                DebugOutput.PrintWorkManagerInfo(this);
+#endif
+#endif
+            }
+        }
         #endregion
 
         private WorkManager() { }
@@ -74,9 +92,10 @@ namespace RootTools_Vision
             this.workers = new List<Worker>();
             for(int i=  0; i< this.WorkerNumber; i++)
             {
-                Worker wk = new Worker(cancellationTokenSource.Token);
+                Worker wk = new Worker(cancellationTokenSource.Token, i);
                 wk.WorkType = this.workType;
                 wk.WorkCompleted += WorkCompleted_Callback;
+                wk.WorkIncompleted += WorkIncompleted_Callback;
                 this.workers.Add(wk);
             }
 
@@ -84,6 +103,9 @@ namespace RootTools_Vision
 
 
             this.task = Task.Factory.StartNew(() => { Run(); }, cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            this.isStop = true;
+
+            this.State = WORKMANAGER_STATE.CREATED;
         }
 
         public bool SetWorkBundle(WorkBundle bundle)
@@ -108,10 +130,29 @@ namespace RootTools_Vision
             return true;
         }
 
+        private void WorkIncompleted_Callback(Workplace workplace)
+        {
+            workplace.IsOccupied = false;
+            workplace.WorkState = this.preWorkType;
+#if WORKMANAGER_DEBUG
+#if DEBUG
+            //if (workplace.WorkState == WORK_TYPE.DEFECTPROCESS_WAFER)
+            //    DebugOutput.PrintWorkplaceBundle(this.workplaceBundle);
+#endif
+#endif
+            _waitSignal.Set();
+        }
+
         private void WorkCompleted_Callback(Workplace workplace)
         {
             workplace.IsOccupied = false;
             workplace.WorkState = this.workType;
+#if WORKMANAGER_DEBUG
+#if DEBUG
+            //if (workplace.WorkState == WORK_TYPE.DEFECTPROCESS_WAFER)
+            //    DebugOutput.PrintWorkplaceBundle(this.workplaceBundle);
+#endif
+#endif
             _waitSignal.Set();
         }
 
@@ -119,40 +160,71 @@ namespace RootTools_Vision
         {
             while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
-                _waitSignal.WaitOne();
-
                 if (isStop == true)
                 {
+                    this.State = WORKMANAGER_STATE.STOP;
                     Reset();
                     _waitSignal.Reset();
+                    _waitSignal.WaitOne();
                     continue;
+                }
+                else
+                {
+                    this.State = WORKMANAGER_STATE.WAIT;
+                    _waitSignal.WaitOne();
                 }
 
                 if (cancellationTokenSource.Token.IsCancellationRequested)
                 {
+                    this.State = WORKMANAGER_STATE.EXIT;
                     return;
                 }
 
+
+                this.State = WORKMANAGER_STATE.CHECK;
                 // 아직 일이 남아있는지 체크
-                if(this.workplaceBundle.CheckStateCompleted(this.workType) == true) // 모두 완료되었다면,
+                if (this.workplaceBundle.CheckStateCompleted(this.workType) == true) // 모두 완료되었다면,
                 {
+                    //  종료 후 대기 초기화 시키면안됨
+                    //_waitSignal.Reset();
+                    //_waitSignal.WaitOne();
                     Stop();
                 }
                 else
                 {
-                    if(AssignWorkToWorker() == false)
-                    {
+                    this.State = WORKMANAGER_STATE.ASSIGN;
 
-                    }
+                    Task.Run(() =>
+                    {
+                        if (AssignWorkToWorker() == false)
+                        {
+#if WORKMANAGER_DEBUG
+#if DEBUG
+                            DebugOutput.PrintWorkManagerInfo(this, "False");
+#endif
+#endif
+                        }
+                        else
+                        {
+#if WORKMANAGER_DEBUG
+#if DEBUG
+                            DebugOutput.PrintWorkManagerInfo(this, "True");
+#endif
+#endif
+                        }
+                    });
                 }
 
-                
+                this.State = WORKMANAGER_STATE.DONE;
+
 
                 _waitSignal.Reset();
             }
         }
 
 
+
+        private object lockObj = new object();
         /// <summary>
         /// Worker를 선택할 때, WorkState를 이 메서드에서 확인안해도 되는 이유는 
         /// 단일 쓰레드이기 때문에 선택된 worker를 다시 할당할 수 없다.
@@ -161,28 +233,36 @@ namespace RootTools_Vision
         {
             if (this.isFull == true) // 전체 Workplace State 체크
             {
-                if (!this.workplaceBundle.CheckStateAll(this.preWorkType))
+                if (!this.workplaceBundle.CheckStateCompleted(this.preWorkType))
                     return false;
             }
+            
+            //if (worker == null) return false;
 
-            Worker worker = GetAvailableWorker();
-            while(worker != null)
+            lock (lockObj)
             {
-                
-                Workplace workplace = this.workplaceBundle.GetWorkplaceRemained(this.preWorkType);
-
-                
-                if (workplace == null || worker == null)
+                Worker worker = GetAvailableWorker();
+                while (worker != null)
                 {
-                    return false;
+
+                    Workplace workplace = this.workplaceBundle.GetWorkplaceRemained(this.preWorkType);
+
+
+                    if (workplace == null || worker == null)
+                    {
+                        return false;
+                    }
+#if WORKMANAGER_DEBUG
+#if DEBUG
+                    Debug.WriteLine(this.workType + " : " + workplace.MapIndexX + ", " + workplace.MapIndexY + " : " + "할당");
+#endif
+#endif
+
+                    worker.SetWorkplace(workplace);
+                    worker.Start();
+
+                    worker = GetAvailableWorker();
                 }
-
-                Debug.WriteLine(this.workType +" : " + workplace.MapIndexX + ", " + workplace.MapIndexY + " : " + "할당");
-
-                worker.SetWorkplace(workplace);
-                worker.Start();
-
-                worker = GetAvailableWorker();
             }
 
             return true;
@@ -209,12 +289,18 @@ namespace RootTools_Vision
             this.isStop = false;
 
             _waitSignal.Set();
+            foreach(Worker wk in workers)
+            {
+                wk.Exit();
+            }
+            workers.Clear();
         }
 
         public void Start()
         {
             this.isStop = false;
             _waitSignal.Set();
+           
         }
 
         /// <summary>
@@ -224,8 +310,7 @@ namespace RootTools_Vision
         public void Stop()
         {
             this.isStop = true;
-
-            foreach(Worker wk in workers)
+            foreach (Worker wk in workers)
             {
                 wk.Stop();
             }
@@ -233,9 +318,11 @@ namespace RootTools_Vision
 
         private void WorkplaceStateChanged_Callback(object obj, WorkplaceStateChangedEventArgs args)
         {
-            if (this.isStop == true) return;
-
             Workplace workplace = args.workplace;
+            if (this.isStop == true || this.state != WORKMANAGER_STATE.WAIT) return;
+
+            if (this.isFull == true && this.workplaceBundle.CheckStateAll(this.preWorkType) == false) return;
+
             if (workplace.WorkState == this.preWorkType)
             {
                 _waitSignal.Set();
@@ -268,7 +355,7 @@ namespace RootTools_Vision
         {
             this.workBundle.Clear();
 
-            this.workplaceBundle.Reset();
+            //this.workplaceBundle.Reset();  //새로 시작할때만 workbundle 초기화
 
             foreach (Worker worker in workers)
             {

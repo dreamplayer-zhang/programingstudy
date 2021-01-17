@@ -74,5 +74,10 @@ namespace RootTools_Vision.delete
         {
             Stop();
         }
+
+        ~WorkFactory()
+        {
+            Stop();
+        }
     }
 }

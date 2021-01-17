@@ -22,6 +22,8 @@ namespace RootTools_Vision
     sealed internal class Worker : IWorkStartable
     {
         #region [Members]
+
+        private readonly int workerIndex;
         private readonly CancellationToken token;
 
         private ManualResetEvent _waitSignal = new ManualResetEvent(false);
@@ -33,6 +35,7 @@ namespace RootTools_Vision
         private Workplace currentWorkplace;
 
         public event EventWorkCompleted WorkCompleted;
+        public event EventWorkCompleted WorkIncompleted;
 
         private byte[] workplaceBufferR_GRAY;
         private byte[] workplaceBufferG;
@@ -63,13 +66,23 @@ namespace RootTools_Vision
         {
             get => this.currentWorkplace;
         }
+
+        public int WorkerIndex
+        {
+            get => this.workerIndex;
+        }
         #endregion
 
-        public Worker(CancellationToken _token)
+        public Worker(CancellationToken _token, int index)
         {
             this.token = _token;
-
+            this.workerIndex = index;
             this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current); // 짧은 작업이 아닌 경우 LongRunning 옵션을 반드시 사용해야함. 자세한 것은 검색
+        }
+
+        ~Worker()
+        {
+
         }
 
 
@@ -122,11 +135,13 @@ namespace RootTools_Vision
             {
                 while (!token.IsCancellationRequested)
                 {
-                    if (this.workerState == WORKER_STATE.NONE || this.workerState == WORKER_STATE.WORK_COMPLETED)
-                    {
-                        this.workerState = WORKER_STATE.NONE;
+                    //if (this.workerState == WORKER_STATE.NONE || this.workerState == WORKER_STATE.WORK_COMPLETED)
+                    //{
+                    //    this.workerState = WORKER_STATE.NONE;
+                    //    _waitSignal.WaitOne();
+                    //}
+                    if(this.workerState != WORKER_STATE.WORK_ASSIGNED)
                         _waitSignal.WaitOne();
-                    }
 
                     if (this.isStop == true)
                     {
@@ -164,6 +179,9 @@ namespace RootTools_Vision
                                 continue;
                             else
                             {
+#if DEBUG
+                                DebugOutput.PrintWork(work);
+#endif
                                 work.DoWork();
                                 workDone = true;
                             }
@@ -175,21 +193,22 @@ namespace RootTools_Vision
                         }
                     }
 
-                    if(workDone == false && this.works.Count != 0) // 검사가 완료되지 않은 경우 루프를 반복한다.
-                    {
-                        Task.Delay(10);
-                        continue;
-                    }
-
-                    //Debug.WriteLine(this.workType + " : " + Workplace.MapIndexX + ", " + Workplace.MapIndexY);
-                    //if (this.workType == WORK_TYPE.DEFECTPROCESS)
-                    //{
-                    //    Debug.WriteLine("DONE");
-                    //}
-
                     _waitSignal.Reset();
 
-                    WorkDone();
+                    if (workDone == false && this.works.Count != 0)
+                    {
+#if DEBUG
+                        DebugOutput.PrintWorker(this, "Incomplete");                        
+#endif
+                        Incomplete();
+                    }
+                    else
+                    {
+#if DEBUG
+                        DebugOutput.PrintWorker(this, "Complete");
+#endif
+                        Complete();
+                    }
                 }
             }
             catch(Exception ex)
@@ -206,7 +225,18 @@ namespace RootTools_Vision
             }
         }
 
-        private void WorkDone()
+        private void Incomplete()
+        {
+            if (this.WorkIncompleted != null)
+                this.WorkIncompleted(this.currentWorkplace);
+
+            this.currentWorkplace = null;
+            this.works.Reset();
+
+            this.workerState = WORKER_STATE.WORK_COMPLETED;
+        }
+
+        private void Complete()
         {
             if (this.WorkCompleted != null)
                 this.WorkCompleted(this.currentWorkplace);

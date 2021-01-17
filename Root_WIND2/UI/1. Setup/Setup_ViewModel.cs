@@ -14,7 +14,7 @@ using RootTools_Vision;
 
 namespace Root_WIND2
 {
-    public class Setup_ViewModel : ObservableObject
+    public class Setup_ViewModel : ObservableObject, IDisposable
     {
         private UserControl m_CurrentPanel;
         public UserControl p_CurrentPanel
@@ -60,19 +60,14 @@ namespace Root_WIND2
         public Maintenance_ViewModel maintVM;
         private GEM_ViewModel gemVM;
 
-        private InspectionManagerFrontside inspectionMgrVision;
-        private InspectionManagerEdge inspectionMgrEdge;
-
         public Setup_ViewModel()
         {
             init();
         }
 
-        public Setup_ViewModel(Recipe _recipe = null , InspectionManagerFrontside _inspectionMgrVision = null, InspectionManagerEdge _inspectionMgrEdge = null)
+        public Setup_ViewModel(Recipe _recipe = null)
         {        
             this.recipe = _recipe;
-            inspectionMgrVision = _inspectionMgrVision;
-            inspectionMgrEdge = _inspectionMgrEdge;
             init();
             
             
@@ -332,8 +327,6 @@ namespace Root_WIND2
         
         internal RecipeWizard_ViewModel Wizard { get => wizardVM; set => wizardVM = value; }
         public Recipe Recipe { get => recipe; set => recipe = value; }
-        public InspectionManagerFrontside InspectionVision { get => inspectionMgrVision; set => inspectionMgrVision = value; }
-        public InspectionManagerEdge InspectionManagerEdge { get => inspectionMgrEdge; set => inspectionMgrEdge = value; }
 
         #endregion
 
@@ -447,6 +440,11 @@ namespace Root_WIND2
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
             p_NaviButtons.Add(m_btnNaviBackSide);
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
         }
         #endregion
 

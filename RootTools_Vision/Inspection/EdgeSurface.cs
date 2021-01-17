@@ -111,29 +111,29 @@ namespace RootTools_Vision
 			byte[] thresh = new byte[roiSize];
 			CLR_IP.Cpp_Threshold(diff, thresh, roiWidth, roiHeight, false, threshold);
 			var label = CLR_IP.Cpp_Labeling(diff, thresh, roiWidth, roiHeight, true);
-			//Emgu.CV.Mat mat2 = new Emgu.CV.Mat((int)roiHeight, (int)roiWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
-			//Marshal.Copy(thresh, 0, mat2.DataPointer, arrSrc.Length);
-			//mat2.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_thresh_" + this.workplace.Index.ToString() + ".bmp");
+            //Emgu.CV.Mat mat2 = new Emgu.CV.Mat((int)roiHeight, (int)roiWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+            //Marshal.Copy(thresh, 0, mat2.DataPointer, arrSrc.Length);
+            //mat2.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_thresh_" + this.workplace.Index.ToString() + ".bmp");
 
-			// Add defect
-			//string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			//for (int i = 0; i < label.Length; i++)
-			//{
-			//	if (label[i].area > defectSize)
-			//	{
-			//		this.currentWorkplace.AddDefect(sInspectionID,
-			//			10001,
-			//			label[i].area,
-			//			label[i].value,
-			//			this.currentWorkplace.PositionX + label[i].boundLeft,
-			//			this.currentWorkplace.PositionY + label[i].boundTop,
-			//			Math.Abs(label[i].boundRight - label[i].boundLeft),
-			//			Math.Abs(label[i].boundBottom - label[i].boundTop),
-			//			this.currentWorkplace.MapIndexX,
-			//			this.currentWorkplace.MapIndexY
-			//			);
-			//	}
-			//}
-		}
+            // Add defect
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+            for (int i = 0; i < label.Length; i++)
+            {
+                if (label[i].area > defectSize)
+                {
+                    this.currentWorkplace.AddDefect(sInspectionID,
+                        10001,
+                        label[i].area,
+                        label[i].value,
+                        this.currentWorkplace.PositionX + label[i].boundLeft,
+                        this.currentWorkplace.PositionY + label[i].boundTop,
+                        Math.Abs(label[i].boundRight - label[i].boundLeft),
+                        Math.Abs(label[i].boundBottom - label[i].boundTop),
+                        this.currentWorkplace.MapIndexX,
+                        this.currentWorkplace.MapIndexY
+                        );
+                }
+            }
+        }
 	}
 }

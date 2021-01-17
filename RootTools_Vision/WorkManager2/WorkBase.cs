@@ -60,6 +60,10 @@ namespace RootTools_Vision
             set { bWorkDone = value; }
         }
 
+#if DEBUG
+        public Workplace Workplace { get=> this.currentWorkplace; }
+#endif
+
 
         public abstract WORK_TYPE Type { get; }
 

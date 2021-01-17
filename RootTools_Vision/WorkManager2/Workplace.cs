@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,6 +57,8 @@ namespace RootTools_Vision
         private Dictionary<PREWORKDATA_KEY, object> preworkdataDicitonary = new Dictionary<PREWORKDATA_KEY, object>();
 
         private int subState;
+
+        private List<Defect> defectList = new List<Defect>();
 
         #endregion
 
@@ -210,6 +213,13 @@ namespace RootTools_Vision
             set => this.isOccupied = value;
         }
 
+        
+
+        public List<Defect> DefectList
+        {
+            get => this.defectList;
+            set => this.defectList = value;
+        }
         private Dictionary<PREWORKDATA_KEY, object> PreworkDataDictionary { get => preworkdataDicitonary; set => preworkdataDicitonary = value; }
 
         #endregion
@@ -321,6 +331,22 @@ namespace RootTools_Vision
 
             this.preworkdataDicitonary[key] = dataObj;
             //this.preworkDataList.Add(dataObj);
+        }
+
+        public void AddDefect(string sInspectionID, int defectCode, float defectSz, float defectVal, float defectAbsLeft, float defectAbsTop, float defectW, float defectH, int chipIdxX, int chipIdxY) // SurfaceDefectParam
+        {
+            Defect defect = new Defect(sInspectionID,
+                defectCode,
+                defectSz,
+                defectVal,
+                defectAbsLeft,
+                defectAbsTop,
+                defectW,
+                defectH,
+                chipIdxX,
+                chipIdxY);
+
+            defectList.Add(defect);
         }
 
         public object GetPreworkData(PREWORKDATA_KEY key)

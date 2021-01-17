@@ -115,10 +115,10 @@ namespace RootTools_Vision
                 if (nLine < workplace.MapIndexX)
                     continue;
 
-                if (nLine == workplace.MapIndexX && workplace.WorkState == state)
+                if (nLine == workplace.MapIndexX && workplace.WorkState >= state)
                     continue;
 
-                if (nLine == workplace.MapIndexX && workplace.WorkState != state) // 해당 Line에 State가 다른 workplace가 있으면 false
+                if (nLine == workplace.MapIndexX && workplace.WorkState < state) // 해당 Line에 State가 다른 workplace가 있으면 false
                 {
                     bRst = false;
                     break;

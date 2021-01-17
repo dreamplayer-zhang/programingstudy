@@ -158,6 +158,5 @@ namespace RootTools_Vision.delete
         {
             cancellationTokenSource.Cancel();
         }
-
     }
 }

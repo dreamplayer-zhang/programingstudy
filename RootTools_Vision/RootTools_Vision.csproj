@@ -99,6 +99,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="InspectionManager.cs" />
     <Compile Include="Inspection\BacksideSurface.cs" />
     <Compile Include="Inspection\D2D.cs" />
     <Compile Include="Inspection\EdgeSurface.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="Utility\Enums.cs" />
     <Compile Include="Utility\KlarfData.cs" />
     <Compile Include="Utility\KlarfData_Lot.cs" />
+    <Compile Include="WorkManager2\DebugOutput.cs" />
     <Compile Include="WorkManager2\Interfaces\IWorkplaceBundle.cs" />
     <Compile Include="WorkManager2\Interfaces\IWorkStartable.cs" />
     <Compile Include="WorkManager2\WorkBase.cs" />

@@ -34,6 +34,7 @@ namespace Root_WIND2
         }
 
 
+
         #region [Override]
         protected override void Initialize()
         {
@@ -41,7 +42,7 @@ namespace Root_WIND2
             CreateWorkManager(WORK_TYPE.ALIGNMENT, 8);
             CreateWorkManager(WORK_TYPE.INSPECTION, 4);
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 8);
-            CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 1, true);
+            CreateWorkManager(WORK_TYPE.DEFECTPROCESS_WAFER, 1, true);
 
             // Snap 이벤트 추가?
         }
