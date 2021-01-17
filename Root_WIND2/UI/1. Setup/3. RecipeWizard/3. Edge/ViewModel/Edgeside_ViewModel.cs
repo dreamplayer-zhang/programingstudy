@@ -68,6 +68,19 @@ namespace Root_WIND2
 				return new RelayCommand(() => setupVM.SetRecipeWizard());
 			}
 		}
+		public RelayCommand btnWaferLoad
+        {
+            get
+            {
+				return new RelayCommand(btnWaferLoadClick);
+            }
+        }
+
+		private void btnWaferLoadClick()
+        {
+			setupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRunOpen();
+			setupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRun();
+        }
 
 		private void SetPage(UserControl page)
 		{

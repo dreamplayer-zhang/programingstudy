@@ -158,8 +158,8 @@ namespace Root_WIND2
 
         void InitSlotRecipeList()
         {
-            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\Camellia");
-            FileInfo[] files = info.GetFiles("*.Camellia");
+            DirectoryInfo info = new DirectoryInfo("C:\\Recipe");
+            FileInfo[] files = info.GetFiles("*.WIND2");
             List<string> asRecipeFile = new List<string>();
             foreach (FileInfo fileInfo in files)
             {
@@ -193,8 +193,8 @@ namespace Root_WIND2
 
         void InitRecipeList()
         {
-            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\Camellia");
-            FileInfo[] files = info.GetFiles("*.Camellia");
+            DirectoryInfo info = new DirectoryInfo("C:\\Recipe");
+            FileInfo[] files = info.GetFiles("*.WIND2");
             List<string> asRecipeFile = new List<string>();
             foreach(FileInfo fileInfo in files)
             {
@@ -244,13 +244,14 @@ namespace Root_WIND2
                     infoWafer.p_sWaferID = m_tboxWaferID[i].Text;
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {
-                        infoWafer.RecipeOpen("C:\\Recipe\\Camellia\\" + m_cbRecipe[i].Text);
+                        infoWafer.RecipeOpen("C:\\Recipe\\" + m_cbRecipe[i].Text);
                         m_infoCarrier.StartProcess(infoWafer.p_id); 
                     }
                 }
             }
             m_infoCarrier.SetSelectMapData(m_infoCarrier);
             this.DialogResult = true;
+            EQ.p_eState = EQ.eState.Run;
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)

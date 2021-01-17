@@ -7,6 +7,7 @@
         Title="MainWindow" Height="800" Width="1400">
 
     <Grid>
-        <controls:BasicTreeView/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="344,204,0,0" VerticalAlignment="Top" Width="654" Height="411" Click="Button_Click"/>
+
     </Grid>
 </Window>

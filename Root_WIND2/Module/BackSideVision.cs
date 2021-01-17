@@ -355,7 +355,7 @@ namespace Root_WIND2.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {  
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
+           //     if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
             }
 
             public override string Run()
@@ -379,20 +379,33 @@ namespace Root_WIND2.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                     int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
-                    int nScanOffset_pulse = 10000;
+                    int nScanOffset_pulse = 50000;
 
-                    while(m_grabMode.m_ScanLineNum>nScanLine)
+                    while(m_grabMode.m_ScanLineNum > nScanLine)
                     {
                         if (EQ.IsStop())
                             return "OK";
 
-                        double dStartPosY = m_grabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
-                        double dEndPosY = m_grabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
+                        double dStartPosY = m_grabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2;
+                        double dEndPosY = m_grabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
-
-
-                        double dPosX = m_grabMode.m_rpAxisCenter.X - nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 
+                        if (m_grabMode.m_bUseBiDirectionScan && Math.Abs(axisXY.p_axisY.p_posActual - dStartPosY) > Math.Abs(axisXY.p_axisY.p_posActual - dEndPosY))
+                        {
+                            double dTemp = dStartPosY;
+                            dStartPosY = dEndPosY;
+                            dEndPosY = dTemp;
+                            dStartPosY += nScanOffset_pulse;
+                            dEndPosY -= nScanOffset_pulse;
+                            m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
+                        }
+                        else
+                        {
+                            dStartPosY -= nScanOffset_pulse;
+                            dEndPosY += nScanOffset_pulse;
+                        }
+                       
+                            double dPosX = m_grabMode.m_rpAxisCenter.X - nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 
                             + (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
 
                         if (m_module.Run(axisZ.StartMove(m_grabMode.m_nFocusPosZ)))
@@ -406,7 +419,15 @@ namespace Root_WIND2.Module
 
                         double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2;
                         double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2;
-                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY+90000, m_grabMode.m_dTrigger, true);
+                        if(Math.Abs(dTriggerEndPosY - dStartPosY) > Math.Abs(dTriggerStartPosY - dStartPosY) )
+                        {
+                            dTriggerEndPosY += nScanOffset_pulse;
+                        }
+                        else
+                        {
+                            dTriggerStartPosY -= nScanOffset_pulse;
+                        } 
+                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
                         string strPool = m_grabMode.m_memoryPool.p_id;
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
@@ -417,7 +438,7 @@ namespace Root_WIND2.Module
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
                         m_grabMode.Grabed += M_grabMode_Grabed;
 
-                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY+90000, nScanSpeed)))
+                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;

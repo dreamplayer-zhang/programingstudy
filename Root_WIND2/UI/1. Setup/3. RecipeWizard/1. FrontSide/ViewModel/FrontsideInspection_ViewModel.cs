@@ -68,7 +68,7 @@ namespace Root_WIND2
             m_Setup = setup;
             m_Recipe = setup.Recipe;
 
-            p_MapControl_VM = new MapControl_ViewModel(m_Setup.InspectionVision);
+            p_MapControl_VM = new MapControl_ViewModel();
             p_ImageViewer_VM = new FrontsideInspection_ImageViewer_ViewModel();
             p_ImageViewer_VM.DrawDone += DrawDone_Callback;
 
@@ -107,6 +107,8 @@ namespace Root_WIND2
             Workplace workplace = obj as Workplace;
             List<String> textList = new List<String>();
             List<CRect> rectList = new List<CRect>();
+
+
             foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
             {
                 String text = "";
@@ -124,11 +126,11 @@ namespace Root_WIND2
 
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                    DrawRectDefect(rectList, textList, args.reDraw);
+                DrawRectDefect(rectList, textList, args.reDraw);
             }));
         }
 
-        private void ProcessDefectDone_Callback(object obj, PocessDefectDoneEventArgs args)
+        private void ProcessDefectDone_Callback(object obj, ProcessDefectDoneEventArgs args)
         {
             Workplace workplace = obj as Workplace;
 
@@ -163,7 +165,7 @@ namespace Root_WIND2
             }
             else
             {
-                p_MapControl_VM.SetMap(m_Setup.InspectionVision.mapdata, new CPoint(14, 14));
+                p_MapControl_VM.SetMap(m_Setup.Recipe.WaferMap.Data, new CPoint(14, 14));
             }
 
 
@@ -236,7 +238,7 @@ namespace Root_WIND2
         private void _btnStop()
         {
             timer.Stop();
-            m_Setup.InspectionVision.Stop();
+            ProgramManager.Instance.InspectionFront.Stop();
             DatabaseManager.Instance.SelectData();
             m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
         }
@@ -397,43 +399,9 @@ namespace Root_WIND2
             //Temp
             timer.Start();
 
-            //if (DatabaseManager.Instance.GetConnectionStatus())
-            //{
-            //    string sTableName = "wind2.defect";
-            //    DatabaseManager.Instance.ClearTableData(sTableName);
-            //}
-
-            //m_Setup.InspectionManager.Recipe.GetParameter().Save();
-
             p_ImageViewer_VM.Clear();
 
-            IntPtr SharedBuf = new IntPtr();
-            //if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
-            //{
-            //    if (p_ImageViewer_VM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
-            //        SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr((int)p_ImageViewer_VM.p_eColorViewMode - 1);
-            //    else // All 일때는 R채널로...
-            //        SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr(0);
-
-            //    m_Setup.InspectionVision.SetWorkplaceBuffer(p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
-            //}
-            //else
-            //{
-            //    SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr();
-            //    m_Setup.InspectionVision.SetWorkplaceBuffer(p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
-            //}
-
-            SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr();
-            m_Setup.InspectionVision.SetColorSharedBuffer(p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
-
-            m_Setup.InspectionVision.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
-
-            if (m_Setup.InspectionVision.CreateInspection() == false)
-            {
-                return;
-            }
-            m_Setup.InspectionVision.Start(false);
-
+            ProgramManager.Instance.InspectionFront.Start(WORK_TYPE.SNAP);
         }
 
 

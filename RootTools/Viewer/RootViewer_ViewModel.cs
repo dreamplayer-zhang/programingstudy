@@ -910,8 +910,20 @@ namespace RootTools
             else if (p_ImageData.p_nByte == 3)
             {
                 Image<Rgb, byte> view = new Image<Rgb, byte>(p_ThumbWidth, p_ThumbHeight);
-                IntPtr ptrMem = p_ImageData.GetPtr();
-                if (ptrMem == IntPtr.Zero)
+                IntPtr ptrMemR = p_ImageData.GetPtr(2);
+                IntPtr ptrMemG = p_ImageData.GetPtr(1);
+                IntPtr ptrMemB = p_ImageData.GetPtr(0);
+
+
+                if (ptrMemR == IntPtr.Zero)
+                    return;
+
+                byte[,,] viewPtr = view.Data;
+                byte* imageptrR = (byte*)ptrMemR.ToPointer();
+                byte* imageptrG = (byte*)ptrMemG.ToPointer();
+                byte* imageptrB = (byte*)ptrMemB.ToPointer();
+
+                if (ptrMemR == IntPtr.Zero)
                     return;
                 int pix_x = 0;
                 int pix_y = 0;
@@ -922,9 +934,9 @@ namespace RootTools
                     for (int xx = 0; xx < p_ThumbWidth; xx++)
                     {
                         pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
-                        view.Data[yy, xx, 2] = ((byte*)ptrMem)[0 + p_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
-                        view.Data[yy, xx, 1] = ((byte*)ptrMem)[1 + p_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
-                        view.Data[yy, xx, 0] = ((byte*)ptrMem)[2 + p_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        view.Data[yy, xx, 2] = ((byte*)imageptrR)[0 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        view.Data[yy, xx, 1] = ((byte*)imageptrG)[1 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        view.Data[yy, xx, 0] = ((byte*)imageptrB)[2 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
                     }
                 }
                 if (view.Width != 0 && view.Height != 0)

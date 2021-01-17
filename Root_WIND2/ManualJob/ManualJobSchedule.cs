@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace Root_WIND2
 {
@@ -43,6 +44,7 @@ namespace Root_WIND2
         public bool ShowPopup()
         {
             if (ManualJobSchedule_UI.m_bShow) return false;
+            //사용할 메서드 및 동작
             ManualJobSchedule_UI jobschedulePopup = new ManualJobSchedule_UI(m_infoCarrier);
             jobschedulePopup.Init(this, m_infoCarrier);
             //m_handler.m_nRnR = p_bRnR ? p_nRnR : 1;   //working
