@@ -210,24 +210,31 @@
                         <GroupBox Grid.Row="0" Grid.Column="1" Header="Defect Image"
                                   Background="{StaticResource GroupBoxBackground}">
                             <Grid Background="Black">
+                                <Image Source="{Binding DefectImage}">
+                                </Image>
                             </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="1" Grid.Column="1" Header="Insepction Info"
                                   Background="{StaticResource GroupBoxBackground}">
-                            <DataGrid IsReadOnly="True" Grid.Row="1">
+                            <DataGrid Name="Defect_Viewer"
+                                              ItemsSource="{Binding DefectDataTable}"
+                                              SelectedItem="{Binding SelectedDefect, Mode=TwoWay}"
+                                              SelectionMode="Single"
+                                              EnableColumnVirtualization="True"
+                                              EnableRowVirtualization="True"
+                                              VirtualizingPanel.VirtualizationMode="Recycling"
+                                              ScrollViewer.CanContentScroll="True"
+                                              IsReadOnly="True"
+                                              AutoGenerateColumns="True"
+                                              Grid.Row="1">
                                 <DataGrid.Resources>
                                     <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalAlignment"
+                                                        Value="Stretch" />
+                                        <Setter Property="HorizontalContentAlignment"
+                                                        Value="Center" />
                                     </Style>
                                 </DataGrid.Resources>
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="No." Binding="{Binding Path=no}" Width="0.5*"/>
-                                    <DataGridTextColumn Header="Location" Binding="{Binding Path=xy}" Width="1.5*"/>
-                                    <DataGridTextColumn Header="Size" Binding="{Binding Path=size}" Width="*"/>
-                                    <DataGridTextColumn Header="Gv" Binding="{Binding Path=gv}" Width="0.5*"/>
-                                    <DataGridTextColumn Header="Code" Binding="{Binding Path=dc}" Width="*"/>
-                                </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
                     </Grid>

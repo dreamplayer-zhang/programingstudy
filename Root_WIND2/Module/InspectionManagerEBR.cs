@@ -84,7 +84,6 @@ namespace Root_WIND2
 		{
 			WorkBundle workBundle = new WorkBundle();
 			EBR ebr = new EBR();
-
 			ProcessMeasurement processMeasurement = new ProcessMeasurement();
 
 			workBundle.Add(ebr);

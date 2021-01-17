@@ -1,14 +1,20 @@
 ﻿using Root_WIND2.Module;
 using RootTools;
+using RootTools.Database;
 using RootTools.Module;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace Root_WIND2
 {
@@ -53,6 +59,10 @@ namespace Root_WIND2
 		private bool _IsTopChecked = true;
 		private bool _IsSideChecked = false;
 		private bool _IsBtmChecked = false;
+
+		private DataTable defectDataTable;
+		private object selectedDefect;
+		private BitmapSource defectImage;
 
 		#region [Getter / Setter]
 		public RootViewer_ViewModel DrawToolVM
@@ -242,6 +252,43 @@ namespace Root_WIND2
 				}
 			}
 		}
+
+		public DataTable DefectDataTable
+		{
+			get => defectDataTable;
+			set => SetProperty(ref defectDataTable, value);
+		}
+
+		public object SelectedDefect
+		{
+			get => selectedDefect;
+			set
+			{
+				SetProperty(ref selectedDefect, value);
+
+				DataRowView selectedRow = (DataRowView)SelectedDefect;
+				if (selectedRow != null)
+				{
+					int nIndex = (int)GetDataGridItem(DefectDataTable, selectedRow, "m_nDefectIndex");
+					string sInspectionID = (string)GetDataGridItem(DefectDataTable, selectedRow, "m_strInspectionID");
+					string sFileName = nIndex.ToString() + ".bmp";
+					DisplayDefectImage(sInspectionID, sFileName);
+				}
+			}
+		}
+
+		public BitmapSource DefectImage
+		{
+			get
+			{
+				return defectImage;
+			}
+			set
+			{
+				SetProperty(ref defectImage, value);
+			}
+
+		}
 		#endregion
 
 		public ICommand btnTop
@@ -312,11 +359,7 @@ namespace Root_WIND2
 			DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeTop), ProgramManager.Instance.DialogService);
 
 			WIND2EventManager.BeforeRecipeSave += BeforeRecipeSave_Callback;
-		}
-
-		private void BeforeRecipeSave_Callback(object obj, RecipeEventArgs args)
-		{
-			SetParameter();
+			WorkEventManager.ProcessDefectWaferDone += ProcessDefectWaferDone;
 		}
 
 		public void Scan()
@@ -335,19 +378,6 @@ namespace Root_WIND2
 
 		public void Inspect()
 		{
-			//IntPtr sharedBuf = new IntPtr();
-			//if (DrawToolVM.p_ImageData.p_nByte == 3)
-			//{
-			//	if (DrawToolVM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
-			//		sharedBuf = DrawToolVM.p_ImageData.GetPtr((int)DrawToolVM.p_eColorViewMode - 1);
-			//	else // All 일때는 R채널로...
-			//		sharedBuf = DrawToolVM.p_ImageData.GetPtr(0);
-			//}
-			//else
-			//{
-			//	sharedBuf = DrawToolVM.p_ImageData.GetPtr();
-			//}
-
 			ProgramManager.Instance.InspectionEdge.Start();
 		}
 
@@ -453,6 +483,58 @@ namespace Root_WIND2
 
 			//recipe.ParameterItemList.Clear();
 			recipe.ParameterItemList.Add(param);
+		}
+
+		public object GetDataGridItem(DataTable table, DataRowView selectedRow, string sColumnName)
+		{
+			object result;
+			for (int i = 0; i < table.Columns.Count; i++)
+			{
+				if (table.Columns[i].ColumnName == sColumnName)
+				{
+					result = selectedRow.Row.ItemArray[i];
+					return result;
+				}
+			}
+			return null;
+		}
+
+		public void DisplayDefectImage(string sInspectionID, string sDefectImageName)
+		{
+			string sDefectimagePath = @"D:\DefectImage";
+			sDefectimagePath = Path.Combine(sDefectimagePath, sInspectionID, sDefectImageName);
+			if (File.Exists(sDefectimagePath))
+			{
+				Bitmap defectImage = (Bitmap)Bitmap.FromFile(sDefectimagePath);
+				DefectImage = ImageHelper.GetBitmapSourceFromBitmap(defectImage);
+			}
+			else
+				DefectImage = null;
+		}
+
+		private void BeforeRecipeSave_Callback(object obj, RecipeEventArgs args)
+		{
+			SetParameter();
+		}
+
+		private void ProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs e)
+		{
+			Workplace workplace = obj as Workplace;
+
+			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+			{
+				UpdateDefectData();
+			}));
+		}
+
+		private void UpdateDefectData()
+		{
+			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			string sRecipeID = recipe.Name;
+			string sReicpeFileName = sRecipeID + ".rcp";
+
+			string sDefect = "defect";
+			DefectDataTable = DatabaseManager.Instance.SelectTablewithInspectionID(sDefect, sInspectionID);
 		}
 	}
 }

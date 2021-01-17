@@ -68,13 +68,11 @@ namespace Root_WIND2
 		{
 			WorkBundle workBundle = new WorkBundle();
 			EdgeSurface edgeSurface = new EdgeSurface();
-			edgeSurface.SetRecipe(this.recipe);
-
 			ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-			processDefect_Wafer.SetRecipe(this.recipe);
-
+			
 			workBundle.Add(edgeSurface);
 			workBundle.Add(processDefect_Wafer);
+			workBundle.SetRecipe(this.Recipe);
 
 			return workBundle;
 		}
