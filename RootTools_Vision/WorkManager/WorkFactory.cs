@@ -70,7 +70,7 @@ namespace RootTools_Vision.delete
             WorkEventManager.ProcessDefectWaferDone -= OnProcessDefectWaferDone_Callback;
         }
 
-        public void OnProcessDefectWaferDone_Callback(object obj, PocessDefectWaferDoneEventArgs args)
+        public void OnProcessDefectWaferDone_Callback(object obj, ProcessDefectWaferDoneEventArgs args)
         {
             Stop();
         }

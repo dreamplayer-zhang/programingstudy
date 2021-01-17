@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_CAMELLIA"
+        xmlns:lp="clr-namespace:Root_CAMELLIA.UI_UserControl"
         xmlns:Icon ="clr-namespace:Root_CAMELLIA.Control.Icon"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
         xmlns:met="clr-namespace:LibSR_Met;assembly=LibSR_Met"
@@ -17,6 +18,7 @@
         Height="1080"
         Width="1920"
         Title="CAMELLIA2"
+        Loaded="Window_Loaded"
         Background="{StaticResource PanelBackGround}">
     <Window.Resources>
         <local:AxisToPositionConverter x:Key="AxisToPositionConverter"/>
@@ -129,11 +131,21 @@
                            FontSize="32" FontWeight="Bold"/>
             </Border>
             <Grid Grid.Column="3">
-                <TextBlock Text="State : Now Process" 
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"  Text="State :  " 
                            FontSize="15"
                            FontWeight="Bold"
                            VerticalAlignment="Center"
-                           HorizontalAlignment="Center"/>
+                           HorizontalAlignment="Right"/>
+                <TextBlock Grid.Column="1" Text=" " 
+                           x:Name="textState"
+                           FontSize="15"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"/>
             </Grid>
             <StackPanel Grid.Column="4"
                         Orientation="Horizontal"
@@ -184,8 +196,9 @@
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.2*"/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="0.3*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
@@ -240,248 +253,21 @@
                         </UniformGrid>
                     </Grid>
                 </GroupBox>
-
-                <Grid Grid.Row="1">
+                <Grid Grid.Row="2">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <GroupBox Header="LoadPort 1" Grid.Row="0">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0">
-                                <GroupBox Header="Slot" Grid.Row="1">
-                                    <DataGrid Background="White">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="No" Width="35"/>
-                                            <DataGridTextColumn Header="Wafer ID" Width="1.5*"/>
-                                            <DataGridTextColumn Header="Recipe ID" Width="1.5*"/>
-                                            <DataGridTextColumn Header="State" Width="*"/>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </GroupBox>
-                            </Grid>
-                            <Grid Grid.Column="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="3*"/>
-                                    <RowDefinition Height="2*"/>
-                                    <RowDefinition Height="1.5*"/>
-                                    <RowDefinition Height="3.5*"/>
-                                </Grid.RowDefinitions>
-                                <GroupBox Header="Information" Grid.Row="0">
-                                    <UniformGrid Columns="2" Margin="0,1">
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                            <TextBlock Text="CST ID" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
-                                            <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                            <TextBlock Text="Lot ID" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
-                                            <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                            <TextBlock Text="Wafer ID" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
-                                            <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                            <TextBlock Text="Recipe" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
-                                            <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
-                                            <TextBlock Text="State" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,1,1">
-                                            <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                    </UniformGrid>
-                                </GroupBox>
-                                <GroupBox Header="State" Grid.Row="1">
-                                    <Border BorderBrush="Gray" BorderThickness="1">
-                                        <UniformGrid Columns="4" Rows="2">
-                                            <Border>
-                                                <TextBlock Text="Auto" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border Background="SeaGreen">
-                                                <TextBlock Text="Manual" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border>
-                                                <TextBlock Text="Placed" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border>
-                                                <TextBlock Text="Present" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border>
-                                                <TextBlock Text="Load" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border>
-                                                <TextBlock Text="Unload" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border>
-                                                <TextBlock Text="Reserve" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border Background="Crimson">
-                                                <TextBlock Text="Alarm" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                        </UniformGrid>
-                                    </Border>
-                                </GroupBox>
-                                <GroupBox Header="Progress" Grid.Row="2">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition/>
-                                            <RowDefinition Height="1.5*"/>
-                                        </Grid.RowDefinitions>
-                                        <Grid>
-                                            <TextBlock Text="0%" VerticalAlignment="Bottom" Margin="10,0"/>
-                                            <TextBlock Text="0 / 0" VerticalAlignment="Bottom" Margin="10,0" HorizontalAlignment="Right"/>
-                                        </Grid>
-                                        <ProgressBar Grid.Row="1"/>
-                                    </Grid>
-                                </GroupBox>
-                                <Grid Grid.Row="3">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <Button Content="Start / Stop" Style="{StaticResource SetupPanelBtn}"   Margin="2"/>
-                                    <Button Content="Load / Unload" Style="{StaticResource SetupPanelBtn}"  Margin="2" Grid.Row="1"/>
-                                    <Button Content="Unload Request" Style="{StaticResource SetupPanelBtn}" Margin="2" Grid.Row="2"/>
-                                    <Button Content="Manual / Auto" Style="{StaticResource SetupPanelBtn}"  Margin="2" Grid.Row="4"/>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="LoadPort 2" Grid.Row="1">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0">
-                                <GroupBox Header="Slot" Grid.Row="1">
-                                    <DataGrid Background="White">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="No" Width="35"/>
-                                            <DataGridTextColumn Header="Wafer ID" Width="1.5*"/>
-                                            <DataGridTextColumn Header="Recipe ID" Width="1.5*"/>
-                                            <DataGridTextColumn Header="State" Width="*"/>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </GroupBox>
-                            </Grid>
-                            <Grid Grid.Column="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="3*"/>
-                                    <RowDefinition Height="2*"/>
-                                    <RowDefinition Height="1.5*"/>
-                                    <RowDefinition Height="3.5*"/>
-                                </Grid.RowDefinitions>
-                                <GroupBox Header="Information" Grid.Row="0">
-                                    <UniformGrid Columns="2" Margin="0,1">
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                            <TextBlock Text="CST ID" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
-                                            <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                            <TextBlock Text="Lot ID" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
-                                            <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                            <TextBlock Text="Wafer ID" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
-                                            <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                            <TextBlock Text="Recipe" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
-                                            <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
-                                            <TextBlock Text="State" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                        <Border BorderBrush="Gray" BorderThickness="1,1,1,1">
-                                            <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0"/>
-                                        </Border>
-                                    </UniformGrid>
-                                </GroupBox>
-                                <GroupBox Header="State" Grid.Row="1">
-                                    <Border BorderBrush="Gray" BorderThickness="1">
-                                        <UniformGrid Columns="4" Rows="2">
-                                            <Border>
-                                                <TextBlock Text="Auto" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border>
-                                                <TextBlock Text="Manual" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border>
-                                                <TextBlock Text="Placed" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border>
-                                                <TextBlock Text="Present" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border>
-                                                <TextBlock Text="Load" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border>
-                                                <TextBlock Text="Unload" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border>
-                                                <TextBlock Text="Reserve" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                            <Border>
-                                                <TextBlock Text="Alarm" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Border>
-                                        </UniformGrid>
-                                    </Border>
-                                </GroupBox>
-                                <GroupBox Header="Progress" Grid.Row="2">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition/>
-                                            <RowDefinition Height="1.5*"/>
-                                        </Grid.RowDefinitions>
-                                        <Grid>
-                                            <TextBlock Text="0%" VerticalAlignment="Bottom" Margin="10,0"/>
-                                            <TextBlock Text="0 / 0" VerticalAlignment="Bottom" Margin="10,0" HorizontalAlignment="Right"/>
-                                        </Grid>
-                                        <ProgressBar Grid.Row="1"/>
-                                    </Grid>
-                                </GroupBox>
-                                <Grid Grid.Row="3">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <Button Content="Start / Stop" Style="{StaticResource SetupPanelBtn}"   Margin="2"/>
-                                    <Button Content="Load / Unload" Style="{StaticResource SetupPanelBtn}"  Margin="2" Grid.Row="1"/>
-                                    <Button Content="Unload Request" Style="{StaticResource SetupPanelBtn}" Margin="2" Grid.Row="2"/>
-                                    <Button Content="Manual / Auto" Style="{StaticResource SetupPanelBtn}"  Margin="2" Grid.Row="4"/>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    </GroupBox>
+                    <Grid Grid.Row="0">
+                        <lp:Loadport_UI x:Name="loadportA"/>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <lp:Loadport_UI x:Name="loadportB"/>
+                    </Grid>
                 </Grid>
+
             </Grid>
+            
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
@@ -935,6 +721,30 @@
                     <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
                 </TabItem>
             </TabControl>
+            <Grid Grid.Column="3">
+                <StackPanel Margin="10,45,10,15">
+                    <Button Content="Resume" x:Name="buttonResume" Margin="0,0,0,15" 
+                            Style="{StaticResource SetupPanelBtn}" 
+                            Height="40"
+                            Click="buttonResume_Click"/>
+                    <Button Content="Pause" x:Name="buttonPause" Margin="0,0,0,15" 
+                            Style="{StaticResource SetupPanelBtn}" 
+                            Height="40"
+                            Click="buttonPause_Click"/>
+                    <Button Content="Initial" x:Name="buttonInit" Margin="0,0,0,15" 
+                            Style="{StaticResource SetupPanelBtn}" 
+                            Height="40"
+                            Click="buttonInit_Click"/>
+                    <Button Content="Recovery" x:Name="buttonRecovery" Margin="0,0,0,15" 
+                            Style="{StaticResource SetupPanelBtn}" 
+                            Height="40"
+                            Click="buttonRecovery_Click"/>
+                    <Button Content="Buzzer Off" x:Name="buttonBuzzerOff" Margin="0,0,0,15" 
+                            Style="{StaticResource SetupPanelBtn}" 
+                            Height="40"
+                            Click="buttonBuzzerOff_Click"/>
+                </StackPanel>
+            </Grid>
         </Grid>
 
     </Grid>

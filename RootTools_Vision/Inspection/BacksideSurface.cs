@@ -97,29 +97,29 @@ namespace RootTools_Vision
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
 
-            //if (Label.Length > 0)
-            //{
-            //    this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
+            if (Label.Length > 0)
+            {
+                this.workplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
 
-            //    //Add Defect
-            //    for (int i = 0; i < Label.Length; i++)
-            //    {
-            //        if (Label[i].area > nDefectSz)
-            //        {
-            //            this.currentWorkplace.AddDefect(sInspectionID,
-            //                10001,
-            //                Label[i].area,
-            //                Label[i].value,
-            //                this.currentWorkplace.PositionX + Label[i].boundLeft,
-            //                this.currentWorkplace.PositionY - (chipH - Label[i].boundTop),
-            //                Label[i].width,
-            //                Label[i].height,
-            //                this.currentWorkplace.MapIndexX,
-            //                this.currentWorkplace.MapIndexY
-            //                );
-            //        }
-            //    }
-            //}
+                //Add Defect
+                for (int i = 0; i < Label.Length; i++)
+                {
+                    if (Label[i].area > nDefectSz)
+                    {
+                        this.currentWorkplace.AddDefect(sInspectionID,
+                            10001,
+                            Label[i].area,
+                            Label[i].value,
+                            this.currentWorkplace.PositionX + Label[i].boundLeft,
+                            this.currentWorkplace.PositionY + Label[i].boundTop,
+                            Label[i].width,
+                            Label[i].height,
+                            this.currentWorkplace.MapPositionX,
+                            this.currentWorkplace.MapPositionY
+                            );
+                    }
+                }
+            }
 
 
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...

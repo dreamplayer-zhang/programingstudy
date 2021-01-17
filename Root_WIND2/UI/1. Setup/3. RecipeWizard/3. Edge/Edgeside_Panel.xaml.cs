@@ -18,11 +18,11 @@ namespace Root_WIND2
     /// <summary>
     /// EdgePanel.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Edge_Panel : UserControl
+    public partial class Edgeside_Panel : UserControl
     {
-        public Edge_Panel()
+        public Edgeside_Panel()
         {
             InitializeComponent();
         }
-    }
+	}
 }

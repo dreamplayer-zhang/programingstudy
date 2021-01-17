@@ -77,10 +77,11 @@ namespace RootTools.GAFs
                 OnPropertyChanged();
             }
         }
+        public ALIDList_PopupUI alidPopup;
         public void ShowPopup()
         {
             if (ALIDList_PopupUI.m_bShow) return;
-            ALIDList_PopupUI alidPopup = new ALIDList_PopupUI();
+            alidPopup = new ALIDList_PopupUI();
             alidPopup.Init(this, m_engineer);
             alidPopup.Show();
         }

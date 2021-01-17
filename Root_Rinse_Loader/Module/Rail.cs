@@ -29,9 +29,9 @@ namespace Root_Rinse_Loader.Module
             DIO_I[] m_diCheck = new DIO_I[3]; 
             public void GetTools(ToolBox toolBox)
             {
-                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[0], m_rail, m_id + ".Check0");
-                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[1], m_rail, m_id + ".Check1");
-                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[2], m_rail, m_id + ".Check2");
+                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[0], m_rail, m_id + ".Start");
+                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[1], m_rail, m_id + ".Mid");
+                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[2], m_rail, m_id + ".Arrived");
             }
 
             string m_id;
@@ -44,7 +44,7 @@ namespace Root_Rinse_Loader.Module
         }
 
         List<Line> m_aLine = new List<Line>(); 
-        void initILines()
+        void InitLines()
         {
             for (int n = 0; n < 4; n++) m_aLine.Add(new Line("Line" + n.ToString(), this)); 
         }
@@ -116,10 +116,12 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
-        public Rail(string id, IEngineer engineer)
+        RinseL m_rinse; 
+        public Rail(string id, IEngineer engineer, RinseL rinse)
         {
             p_id = id;
-            initILines(); 
+            m_rinse = rinse; 
+            InitLines(); 
             InitBase(id, engineer);
         }
 
@@ -131,13 +133,13 @@ namespace Root_Rinse_Loader.Module
         #region StartRun
         public void StartRun()
         {
-            switch (Rinse.p_eMode)
+            switch (m_rinse.p_eMode)
             {
-                case Rinse.eMode.Magazine:
-                    RunMoveWidth(Rinse.p_widthStrip);
+                case RinseL.eRunMode.Magazine:
+                    RunMoveWidth(m_rinse.p_widthStrip);
                     RunRotate(true); 
                     break;
-                case Rinse.eMode.Stack:
+                case RinseL.eRunMode.Stack:
                     RunRotate(false); 
                     break; 
             }

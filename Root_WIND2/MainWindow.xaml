@@ -38,7 +38,7 @@
                            Height="18"
                            VerticalAlignment="Center"
                            Margin="3" />
-            <TextBlock Text="WIND2"
+            <TextBlock Text="WIND2 - Ver 0.01"
                        Foreground="White"
                        VerticalAlignment="Center"
                        FontSize="15"
@@ -101,7 +101,7 @@
         <Border Grid.Row="3" Grid.ColumnSpan="2" Panel.ZIndex="99">
             <TabControl>
                 <TabItem Header="ALL" FontSize="10">
-                    <TextBlock Text="Log Area" Margin="5"/>
+                    <tools:LogView_UI x:Name="logView" Margin="1" />
                 </TabItem>
                 <TabItem Header="System" FontSize="10">
                    

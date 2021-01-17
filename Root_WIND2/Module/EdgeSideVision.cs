@@ -157,7 +157,7 @@ namespace Root_WIND2.Module
 		public double Pulse360 { get => pulse360; set => pulse360 = value; }
 		double edgeCamTriggerRatio = 1; //캠익에서 트리거 분주비
 		public double EdgeCamTriggerRatio { get => edgeCamTriggerRatio; set => edgeCamTriggerRatio = value; }
-		double ebrCamTriggerRatio = 2/3;
+		double ebrCamTriggerRatio = 3.0/4;
 		public double EbrCamTriggerRatio { get => ebrCamTriggerRatio; set => ebrCamTriggerRatio = value; }
 		double margin = 36000;
 		public double Margin { get => margin; set => margin = value; }
@@ -443,6 +443,7 @@ namespace Root_WIND2.Module
 			AddModuleRunList(new Run_GrabEdge(this), true, "Run Grab Edge");
 			AddModuleRunList(new Run_GrabEBR(this), true, "Run Grab EBR");
 			AddModuleRunList(new Run_InspectEdge(this), true, "Run Inspect Edge");
+			AddModuleRunList(new Run_InspectEBR(this), true, "Run Inspect EBR");
 		}
 
 		public ImageData GetMemoryData(EDGE_TYPE data)

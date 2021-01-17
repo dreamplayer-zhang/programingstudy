@@ -94,6 +94,8 @@ namespace Root_WIND2
             runWindow = new Run();
             runViewModel = new Run_ViewModel(setupViewModel);
             runWindow.DataContext = runViewModel;
+
+
         }
 
         void InitSettingDialog()

@@ -229,7 +229,7 @@ namespace RootTools_Vision.delete
             int nDiePitchY = originRecipe.DiePitchY;
 
             int nOriginAbsX = originRecipe.OriginX;
-            int nOriginAbsY = originRecipe.OriginY;
+            int nOriginAbsY = originRecipe.OriginY - nDiePitchY;
 
             bundle.mapSizeX = nSizeX;
             bundle.mapSizeY = nSizeY;

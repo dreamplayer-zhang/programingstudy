@@ -30,7 +30,7 @@ namespace Root_AOP01_Inspection
         }
 
         #region Job
-        string m_sPath = "c:\\Recipe\\";
+        public string m_sPath = "c:\\Recipe\\";
         private void buttonOpen_Click(object sender, RoutedEventArgs e)
         {
             string sModel = EQ.m_sModel;

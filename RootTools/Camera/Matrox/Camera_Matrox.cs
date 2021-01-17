@@ -525,7 +525,8 @@ namespace RootTools.Camera.Matrox
             {
                 GCHandle handle = (GCHandle)(UserDataPtr);
                 Camera_Matrox cam = handle.Target as Camera_Matrox;
-                
+             //   Debug.WriteLine(cam.m_nGrabTrigger);
+
                 if (cam != null)
                     cam.m_nGrabTrigger++;
             }

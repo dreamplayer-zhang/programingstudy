@@ -105,7 +105,7 @@ namespace RootTools_Vision
                             Label[i].area,
                             Label[i].value,
                             this.workplace.PositionX + Label[i].boundLeft,
-                            this.workplace.PositionY - (chipH - Label[i].boundTop),
+                            this.workplace.PositionY + Label[i].boundTop,
                             Label[i].width,
                             Label[i].height,
                             this.workplace.MapIndexX,

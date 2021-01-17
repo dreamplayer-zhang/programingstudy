@@ -18,6 +18,7 @@
                         Command="{Binding btnSummary}"
                         Style="{StaticResource PanelBtn}"/>
                 <Button Content="Inspection"
+                        Visibility="Collapsed"
                         Command="{Binding btnInspection}"
                         Style="{StaticResource PanelBtn}"/>
                 <Button Content="Recipe Wizard"

@@ -54,7 +54,7 @@ namespace Root_WIND2
         private Frontside_ViewModel frontsideVM;
         private Backside_ViewModel backsideVM;
         private EBR_ViewModel ebrVM;
-        private Edge_ViewModel edgeVM;
+        private Edgeside_ViewModel edgeVM;
         //private InspTest_ViewModel inspTestVM;  //삭제
         private BacksideInspection_ViewModel backsideInspTestVM;
         public Maintenance_ViewModel maintVM;
@@ -69,8 +69,6 @@ namespace Root_WIND2
         {        
             this.recipe = _recipe;
             init();
-            
-            
         }
 
         public void init()
@@ -84,9 +82,8 @@ namespace Root_WIND2
         public void UI_Redraw()
         {
             frontsideVM.UI_Redraw();
-            // Back
-            // Edr
-            // Edge
+            edgeVM.UI_Redraw();
+            ebrVM.UI_Redraw();
         }
 
         private void InitAllPanel()
@@ -97,7 +94,7 @@ namespace Root_WIND2
             frontsideVM = new Frontside_ViewModel(this);
             backsideVM = new Backside_ViewModel(this);
             ebrVM = new EBR_ViewModel(this);
-            edgeVM = new Edge_ViewModel(this);
+            edgeVM = new Edgeside_ViewModel(this);
             maintVM = new Maintenance_ViewModel(this);
             gemVM = new GEM_ViewModel(this);
         }

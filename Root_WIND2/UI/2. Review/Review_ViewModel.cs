@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Database;
 using RootTools_Vision;
+using RootTools_CLR;
 using LiveCharts;
 using LiveCharts.Wpf;
 using System;
@@ -101,14 +102,14 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(SearchLotinfoData);
+                return new RelayCommand(GoldenImageTrend);
             }
         }
         public ICommand btnSaveTrend
         {
             get
             {
-                return new RelayCommand(SearchLotinfoData);
+                return new RelayCommand(SaveTrendImg);
             }
         }
         public void GoldenImagelist_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -537,6 +538,8 @@ namespace Root_WIND2
         }
 
         // Golden Image Trend Tab
+        private List<byte[]> goldenImagesData = new List<byte[]>();
+        private int goldenImageW = 0, goldenImageH = 0;
         private ObservableCollection<ListViewItemTemplate> goldenImageList = new ObservableCollection<ListViewItemTemplate>();
         public ObservableCollection<ListViewItemTemplate> GoldenImageList
         {
@@ -576,6 +579,7 @@ namespace Root_WIND2
                 SetProperty(ref goldenImage, value);
             }
         }
+
         #endregion
 
         #region DataTypeEnum
@@ -728,14 +732,92 @@ namespace Root_WIND2
 
             foreach (string path in imgNames)
             {
-                
-                ListViewItemTemplate temp = new ListViewItemTemplate();
-                temp.GoldenImgData = new BitmapImage(new (path));
-                temp.Title = path.Substring(imgPath.Length, path.Length - imgPath.Length - 4); // 끝에 .bmp 제거
+                unsafe {
+                    fixed (int* w = &goldenImageW, h = &goldenImageH)
+                        goldenImagesData.Add(Tools.LoadBitmapToRawdata(path, w, h));
 
-                for(int i = 0; i < 3; i++)
-                GoldenImageList.Add(temp);
+                    ListViewItemTemplate temp = new ListViewItemTemplate();
+
+                    temp.GoldenImgData = new BitmapImage(new (path));
+                    temp.Title = path.Substring(imgPath.Length, path.Length - imgPath.Length - 4); // 끝에 .bmp 제거
+
+                    GoldenImageList.Add(temp);
+                }
             }
+        }
+
+        public void GoldenImageTrend()
+        {
+            List<byte[]> goldenImg = new List<byte[]>();
+
+            if (goldenImagesData.Count == 0)
+                return;
+
+            byte[] dstImg = new byte[goldenImagesData[0].Length];
+            CLR_IP.Cpp_GoldenImageReview(goldenImagesData.ToArray(), dstImg, goldenImagesData.Count, goldenImageW, goldenImageH);
+
+            GoldenImage = Tools.BitmapFromSource(Tools.CovertArrayToBitmap(dstImg, goldenImageW, goldenImageH, 3));
+
+        }
+        public void SaveTrendImg()
+        {
+            int w = 2040;
+            int h = 1080;
+
+            byte[] rawData = new byte[w*h];
+
+            Tools.LoadBitmapToRawdata(@"D:\Images\AOP 포장기\VRSImage_2.bmp", rawData, w, h, 1);
+            
+            //********** int CalcTapeThickness(byte[] rawData, int w, int h) **********//
+            int measurementAreaW = w / 8;
+            int measurementAreaH = h;
+
+            bool[] isTapeArea = Enumerable.Repeat<bool>(false, h).ToArray<bool>();
+
+            Parallel.For(0, measurementAreaH, r =>
+            {
+                int lineSum = 0;
+                for (int c = w / 2 - w / 16; c < w / 2 + w / 16; c++)
+                {
+                    lineSum += rawData[r * w + c];
+                }
+                lineSum /= measurementAreaW;
+
+                isTapeArea[r] = (lineSum < 128) ? true: false;
+            });
+
+            bool startCalc = false;
+            int tapeThickness = 0;
+            for(int r = measurementAreaH - 10; r > 10; r--)
+            {
+                if (!startCalc)
+                {
+                    if (isTapeArea[r])
+                    {
+                        startCalc = true;
+                        for (int i = 0; i < w; i++)
+                            rawData[r * w + i] = 128;
+                    }
+                }
+                else
+                {
+                    if (!isTapeArea[r])
+                    {
+                        for (int i = 0; i < w; i++)
+                            rawData[r * w + i] = 128;
+                        break;
+                    }
+                   
+                    tapeThickness++;   
+                }  
+            }
+            for (int c = w / 2 - w / 16; c < w / 2 + w / 16; c++)
+                rawData[1000 * w + c] = 128;
+
+            //********** return tapeThickness **********//
+            Tools.SaveRawdataToBitmap(@"D:\TapeTicknessTest.bmp", rawData, w, h, 1);
+
+            float remainRatio = (float)(tapeThickness / 500.0 * 100);
         }
         public object GetDataGridItem(DataTable table, DataRow datarow, string sColumnName)
         {

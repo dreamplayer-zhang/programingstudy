@@ -248,13 +248,13 @@ namespace Root_Rinse_Loader.Module
         double m_secRunDelay = 0; 
         public string RunMagazine()
         {
-            for (int n = Rinse.p_iMagazine; n < 80; n++)
+            for (int n = m_rinse.p_iMagazine; n < 80; n++)
             {
                 ePos eMGZ = (ePos)(n / 20);
                 int iMGZ = n % 20;
                 if (Run(MoveMagazine(eMGZ, iMGZ))) return p_sInfo; 
                 if (Run(RunPusher())) return p_sInfo;
-                Rinse.p_iMagazine++; 
+                m_rinse.p_iMagazine++; 
                 Thread.Sleep((int)(1000 * m_secRunDelay)); 
             }
             return "OK";
@@ -310,9 +310,11 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
-        public Storage(string id, IEngineer engineer)
+        RinseL m_rinse;
+        public Storage(string id, IEngineer engineer, RinseL rinse)
         {
             p_id = id;
+            m_rinse = rinse;
             InitMagazine();
             InitStack(); 
             InitBase(id, engineer);
@@ -332,12 +334,12 @@ namespace Root_Rinse_Loader.Module
         #region StartRun
         public void StartRun()
         {
-            switch (Rinse.p_eMode)
+            switch (m_rinse.p_eMode)
             {
-                case Rinse.eMode.Magazine:
+                case RinseL.eRunMode.Magazine:
                     StartRun(m_runMagazine.Clone()); 
                     break;
-                case Rinse.eMode.Stack:
+                case RinseL.eRunMode.Stack:
                     MoveStack(); 
                     break;
             }

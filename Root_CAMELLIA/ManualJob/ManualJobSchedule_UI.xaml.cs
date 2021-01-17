@@ -158,7 +158,7 @@ namespace Root_CAMELLIA.ManualJob
 
         void InitSlotRecipeList()
         {
-            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\Camellia");
+            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\");
             FileInfo[] files = info.GetFiles("*.Camellia");
             List<string> asRecipeFile = new List<string>();
             foreach (FileInfo fileInfo in files)
@@ -193,7 +193,7 @@ namespace Root_CAMELLIA.ManualJob
 
         void InitRecipeList()
         {
-            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\Camellia");
+            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\");
             FileInfo[] files = info.GetFiles("*.Camellia");
             List<string> asRecipeFile = new List<string>();
             foreach(FileInfo fileInfo in files)
@@ -244,19 +244,35 @@ namespace Root_CAMELLIA.ManualJob
                     infoWafer.p_sWaferID = m_tboxWaferID[i].Text;
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {
-                        infoWafer.RecipeOpen("C:\\Recipe\\Camellia\\" + m_cbRecipe[i].Text);
+                        infoWafer.RecipeOpen("C:\\Recipe\\" + m_cbRecipe[i].Text);
                         m_infoCarrier.StartProcess(infoWafer.p_id); 
                     }
                 }
             }
-            //m_JobSchedule.SetInfoCarrier(m_infoCarrier);
             m_infoCarrier.SetSelectMapData(m_infoCarrier);
+            EQ.p_nRnR = (bool)checkRnR.IsChecked ? Convert.ToInt32(textboxRnR.Text) : 0;
             this.DialogResult = true;
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            for (int n = 0; n < m_infoCarrier.p_lWafer; n++)
+            {
+                if (m_infoCarrier.GetInfoWafer(n) != null) m_infoCarrier.SetInfoWafer(n, null);
+            }
             this.Close();
+        }
+
+        private void ToggleButton_Checked(object sender, RoutedEventArgs e)
+        {
+            textblockRnR.Visibility = Visibility.Visible;
+            textboxRnR.Visibility = Visibility.Visible;
+        }
+
+        private void ToggleButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            textblockRnR.Visibility = Visibility.Hidden;
+            textboxRnR.Visibility = Visibility.Hidden;
         }
     }
 }
