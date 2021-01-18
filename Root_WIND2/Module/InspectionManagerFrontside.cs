@@ -35,6 +35,8 @@ namespace Root_WIND2
 
 
 
+
+
         #region [Override]
         protected override void Initialize()
         {
@@ -44,8 +46,10 @@ namespace Root_WIND2
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 8);
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS_ALL, 1, true);
 
-            // Snap 이벤트 추가?
+            WIND2EventManager.SnapDone += SnapDone_Callback;
         }
+
+        
 
 
         /// <summary>
@@ -154,11 +158,11 @@ namespace Root_WIND2
                 int nSizeY = mapInfo.MapSizeY;
                 int nMasterX = mapInfo.MasterDieX;
                 int nMasterY = mapInfo.MasterDieY;
-                int nDiePitchX = originRecipe.DiePitchX;    //DitPitch 필요없음 삭제 예정
+                int nDiePitchX = originRecipe.DiePitchX;
                 int nDiePitchY = originRecipe.DiePitchY;
 
                 int nOriginAbsX = originRecipe.OriginX;
-                int nOriginAbsY = originRecipe.OriginY;
+                int nOriginAbsY = originRecipe.OriginY - originRecipe.DiePitchY; // 좌상단 기준
 
                 bundle.SizeX = nSizeX;
                 bundle.SizeY = nSizeY;
@@ -246,7 +250,7 @@ namespace Root_WIND2
                 }
 
                 bundle.SetSharedBuffer(this.bufferInfo);
-
+                this.workplaceBundle = bundle;
                 return bundle;
             }
             catch (Exception ex)
@@ -255,24 +259,24 @@ namespace Root_WIND2
             }
         }
 
-        //public void SnapDone_Callback(object obj, SnapDoneArgs args)
-        //{
-        //    if (this.workplaceBundle == null || this.IsStop == true) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
+        WorkplaceBundle workplaceBundle;
+        public void SnapDone_Callback(object obj, SnapDoneArgs args)
+        {
+            if (this.workplaceBundle == null || this.IsStop == true) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
 
-        //    Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
+            Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
 
-        //    foreach (Workplace wp in this.workplaceBundle)
-        //    {
-        //        if (wp.STATE >= WORK_TYPE.SNAP) continue;
+            foreach (Workplace wp in this.workplaceBundle)
+            {
+                if (wp.WorkState >= WORK_TYPE.SNAP) continue;
 
-        //        Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.BufferSizeY), new Point(wp.PositionX + wp.BufferSizeX, wp.PositionY));
+                Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.Width), new Point(wp.PositionX + wp.Width, wp.PositionY));
 
-        //        if (snapArea.Contains(checkArea) == true)
-        //        {
-        //            wp.STATE = WORK_TYPE.SNAP;
-        //        }
-        //    }
-
-        //}
+                if (snapArea.Contains(checkArea) == true)
+                {
+                    wp.WorkState = WORK_TYPE.SNAP;
+                }
+            }
+        }
     }
 }

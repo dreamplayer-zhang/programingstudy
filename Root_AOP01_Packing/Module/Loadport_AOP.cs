@@ -164,7 +164,7 @@ namespace Root_AOP01_Packing.Module
                 case GemCarrierBase.ePresent.Empty: m_svidPlaced.p_value = false; break;
                 case GemCarrierBase.ePresent.Exist: m_svidPlaced.p_value = true; break;
             }
-            return m_svidPlaced.p_value;
+            return (m_svidPlaced.p_value == null) ? false : m_svidPlaced.p_value;
         }
         #endregion
 

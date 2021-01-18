@@ -18,6 +18,18 @@ namespace RootTools_Vision
         //private WorkplaceBundle workplaces; // WorkplaceBundle은 유지하고 WorkBundle만 새로 생성하게...
 
         //List<SharedBufferInfo> bufferInfoList;
+        public bool IsStop
+        {
+            get
+            {                 
+               foreach(WorkManager wm in this.workManagers)
+               {
+                    if (wm.IsStop == false)
+                        return false;
+               }
+               return true;
+            }
+        }
 
         public WorkFactory()
         {

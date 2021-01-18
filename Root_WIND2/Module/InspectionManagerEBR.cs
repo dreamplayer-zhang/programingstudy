@@ -12,11 +12,6 @@ namespace Root_WIND2
 {
 	public class InspectionManagerEBR : WorkFactory
 	{
-		#region [Member Variables]
-		WorkBundle workBundle;
-		WorkplaceBundle workplaceBundle;
-		#endregion
-
 		public InspectionManagerEBR(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt = 1)
 		{
 			this.sharedBufferR_Gray = _sharedBuffer;
