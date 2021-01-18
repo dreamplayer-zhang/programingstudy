@@ -215,11 +215,6 @@ namespace RootTools_Vision
                             this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,  
                             wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
                         break;
-                    case CreateRefImageMethod.NearAverage:
-                        CLR_IP.Cpp_CreateGoldenImage_NearAvg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                            this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
-                            wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-                        break;
                     case CreateRefImageMethod.MedianAverage:
                         CLR_IP.Cpp_CreateGoldenImage_MedianAvg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
                             this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
@@ -311,7 +306,17 @@ namespace RootTools_Vision
             else
             {
                 if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
+                {
+                    System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                    sw.Start();
                     SetGoldenImage();
+                    sw.Stop();
+                    String a = "End Time: " + sw.ElapsedMilliseconds + "msec";
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"d:\SetGoldenImage.txt", true))
+                    {
+                        file.WriteLine(a);
+                    }
+                }
                 // Diff Image 계산
                 CLR_IP.Cpp_SubtractAbs(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
 
@@ -458,11 +463,6 @@ namespace RootTools_Vision
                     {
                         case CreateRefImageMethod.Average:
                             CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                                this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
-                                wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-                            break;
-                        case CreateRefImageMethod.NearAverage:
-                            CLR_IP.Cpp_CreateGoldenImage_NearAvg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
                                 this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                                 wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
                             break;
