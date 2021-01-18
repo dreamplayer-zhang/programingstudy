@@ -12,11 +12,6 @@ namespace Root_WIND2
 {
 	public class InspectionManagerEBR : WorkFactory
 	{
-		#region [Member Variables]
-		WorkBundle workBundle;
-		WorkplaceBundle workplaceBundle;
-		#endregion
-
 		public InspectionManagerEBR(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt = 1)
 		{
 			this.sharedBufferR_Gray = _sharedBuffer;
@@ -41,11 +36,9 @@ namespace Root_WIND2
 
 		public Recipe Recipe { get => recipe; set => recipe = value; }
 		public IntPtr SharedBufferR_Gray { get => sharedBufferR_Gray; set => sharedBufferR_Gray = value; }
-
 		public int SharedBufferWidth { get => sharedBufferWidth; set => sharedBufferWidth = value; }
 		public int SharedBufferHeight { get => sharedBufferHeight; set => sharedBufferHeight = value; }
 		public int SharedBufferByteCnt { get => sharedBufferByteCnt; set => sharedBufferByteCnt = value; }
-
 
 		#region [Overrides]
 
@@ -79,7 +72,6 @@ namespace Root_WIND2
 			}
 			workplaceBundle.SetSharedBuffer(this.sharedBufferR_Gray, this.sharedBufferWidth, this.sharedBufferHeight, this.sharedBufferByteCnt, IntPtr.Zero, IntPtr.Zero);
 
-
 			return workplaceBundle;
 		}
 
@@ -87,7 +79,6 @@ namespace Root_WIND2
 		{
 			WorkBundle workBundle = new WorkBundle();
 			EBR ebr = new EBR();
-
 			ProcessMeasurement processMeasurement = new ProcessMeasurement();
 
 			workBundle.Add(ebr);
@@ -101,7 +92,6 @@ namespace Root_WIND2
 		{
 			return true;
 		}
-
 		#endregion
 
 		public new void Start()

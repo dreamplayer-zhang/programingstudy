@@ -44,7 +44,6 @@ namespace RootTools_Vision
         }
         #endregion
 
-
         #region [ProcessDefectWaferDone]
         public static event EventHandler<ProcessDefectWaferDoneEventArgs> ProcessDefectWaferDone;
 
@@ -62,7 +61,6 @@ namespace RootTools_Vision
             ProcessMeasurementDone?.Invoke(obj, args);
         }
         #endregion
-
 
         #region [UIRedraw]
         public static event EventHandler<UIRedrawEventArgs> UIRedraw;

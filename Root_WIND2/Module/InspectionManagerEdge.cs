@@ -14,7 +14,6 @@ namespace Root_WIND2
 {
 	public class InspectionManagerEdge : WorkFactory
 	{
-
 		public InspectionManagerEdge(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt = 1)
 		{
 			this.sharedBufferR_Gray = _sharedBuffer;
@@ -69,13 +68,11 @@ namespace Root_WIND2
 		{
 			WorkBundle workBundle = new WorkBundle();
 			EdgeSurface edgeSurface = new EdgeSurface();
-			edgeSurface.SetRecipe(this.recipe);
-
 			ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-			processDefect_Wafer.SetRecipe(this.recipe);
-
+			
 			workBundle.Add(edgeSurface);
 			workBundle.Add(processDefect_Wafer);
+			workBundle.SetRecipe(this.Recipe);
 
 			return workBundle;
 		}

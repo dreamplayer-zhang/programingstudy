@@ -121,7 +121,8 @@ namespace Root_WIND2
             image.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameImage).p_nCount;
 
             roiLayer = new ImageData(memoryTool.GetMemory("pool", "group", memoryNameROI));
-            //roiLayer.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameROI).p_nCount;
+            roiLayer.p_nByte = memoryTool.GetMemory("pool", "group", memoryNameROI).p_nByte;
+
             if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
             {
                 imageEdge = GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
@@ -140,8 +141,7 @@ namespace Root_WIND2
             {
                 return engineer.m_handler.p_EdgeSideVision.GetMemoryData(type);
             }
-            else
-                return null;
+            return null;
         }
 
         private bool InitMember()

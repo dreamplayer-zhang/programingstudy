@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Root_WIND2
@@ -38,7 +39,7 @@ namespace Root_WIND2
 		private SeriesCollection measurementGraph;
 		private string[] xLabels;
 
-		private int sizeYMaxVal = 100; 
+		private int sizeYMaxVal = 1000; 
 		private double sizeFrom = 0;
 		private double sizeTo = 50;
 
@@ -349,6 +350,7 @@ namespace Root_WIND2
 
 		private void DrawGraph()
 		{
+			MeasurementGraph = null;
 			if (MeasurementGraph == null)
 			{
 				MeasurementGraph = new SeriesCollection
@@ -356,20 +358,14 @@ namespace Root_WIND2
 					new LineSeries
 					{
 						Title = "Bevel",
-						//Values = new ChartValues<double> { 6, 7, 3, 4 ,6 },
-						PointGeometry = null
+						Fill = Brushes.Transparent,
 					},
 					new LineSeries
 					{
 						Title = "EBR",
-						//Values = new ChartValues<double> { 6, 7, 3, 4 ,6 },
-						PointGeometry = null
+						Fill = Brushes.Transparent,
 					},
 				};
-			}
-			else
-			{
-				MeasurementGraph[0].Values.Clear();
 			}
 
 			int binCount = measurementDataTable.Rows.Count;

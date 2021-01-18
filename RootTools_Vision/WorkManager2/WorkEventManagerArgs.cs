@@ -15,8 +15,6 @@ namespace RootTools_Vision
         }
     }
 
-
-
     public class PositionDoneEventArgs : EventArgs
     {
         public readonly CPoint ptOldStart;
@@ -49,7 +47,6 @@ namespace RootTools_Vision
         }
     }
 
-
     public class ProcessDefectDoneEventArgs : EventArgs
     {
         public ProcessDefectDoneEventArgs()
@@ -81,7 +78,6 @@ namespace RootTools_Vision
 
         }
     }
-
 
     public class WorkplaceStateChangedEventArgs : EventArgs
     {
