@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Module;
+using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -70,7 +71,7 @@ namespace Root_Rinse_Unloader.Module
 
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
-            AddProtocol(p_id, eCmd.EQUeState, value); 
+            if (eEQ == _EQ.eEQ.State) AddProtocol(p_id, eCmd.EQUeState, value); 
         }
         #endregion
 
@@ -165,14 +166,24 @@ namespace Root_Rinse_Unloader.Module
                     {
                         case eCmd.SetMode:
                             SetMode(asRead[2]);
-                            AddProtocol(asRead[0], eCmd, asRead[2]); 
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            RunTree(Tree.eMode.Init); 
                             break;
                         case eCmd.SetWidth:
                             p_widthStrip = Convert.ToDouble(asRead[2]);
                             AddProtocol(asRead[0], eCmd, asRead[2]);
+                            RunTree(Tree.eMode.Init);
                             break;
                         case eCmd.EQLeState:
-                            EQ.p_eState = GetEQeState(asRead[2]);
+                            switch (GetEQeState(asRead[2]))
+                            {
+                                case EQ.eState.Home: 
+                                    if (EQ.p_eState != EQ.eState.Run) EQ.p_eState = EQ.eState.Home; //forget
+                                    break;
+                                case EQ.eState.Run: 
+                                    EQ.p_eState = EQ.eState.Run; 
+                                    break;
+                            }
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             break;
                     }
@@ -206,6 +217,15 @@ namespace Root_Rinse_Unloader.Module
                 if (asState[n] == sState) return (EQ.eState)n;
             }
             return EQ.eState.Null; 
+        }
+        #endregion
+
+        #region Tree
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode", true, true);
+            p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)", true, true);
         }
         #endregion
 

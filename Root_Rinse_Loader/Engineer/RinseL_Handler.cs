@@ -30,7 +30,6 @@ namespace Root_Rinse_Loader.Engineer
         #region Module
         public ModuleList p_moduleList { get; set; }
         RinseL m_rinse;
-        RinseU m_rinseU; //forget
         public Storage m_storage;
         public Rail m_rail;
         public Roller m_roller;
@@ -39,10 +38,8 @@ namespace Root_Rinse_Loader.Engineer
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            m_rinse = new RinseL("Rinse", m_engineer);
+            m_rinse = new RinseL("RinseL", m_engineer);
             InitModule(m_rinse);
-            m_rinseU = new RinseU("RinseU", m_engineer);
-            InitModule(m_rinseU);
             m_storage = new Storage("Storage", m_engineer, m_rinse);
             InitModule(m_storage);
             m_rail = new Rail("Rail", m_engineer, m_rinse);

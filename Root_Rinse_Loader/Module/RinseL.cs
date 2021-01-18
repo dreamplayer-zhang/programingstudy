@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Module;
+using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -86,7 +87,7 @@ namespace Root_Rinse_Loader.Module
 
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
-            AddProtocol(p_id, eCmd.EQLeState, value);
+            if (eEQ == _EQ.eEQ.State) AddProtocol(p_id, eCmd.EQLeState, value);
         }
         #endregion
 
@@ -209,6 +210,14 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
+        #region Tree
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
+            p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
+        }
+        #endregion
 
         public RinseL(string id, IEngineer engineer)
         {
