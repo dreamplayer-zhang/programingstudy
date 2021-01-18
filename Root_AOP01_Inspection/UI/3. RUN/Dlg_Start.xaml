@@ -504,13 +504,13 @@
                         </GroupBox>
                     </Grid>
                 </GroupBox>
-                <GroupBox Header="User Set" Grid.Row="1">
+                <GroupBox Name="UserSetBox" Header="User Set" Grid.Row="1">
                     <Grid>
                         <UniformGrid Columns="2"
                                      Margin="10,5">
-                            <TextBlock Text="Loadport"
+                            <TextBlock Text="Loadport" 
                                        VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding p_sLocID}" VerticalAlignment="Center" HorizontalAlignment="Left" TextAlignment="Left"/>
+                            <TextBlock Text="{Binding p_id}" Name="LoadportNum" VerticalAlignment="Center" HorizontalAlignment="Left" TextAlignment="Left"/>
                             <TextBlock Text="Pod ID"
                                        VerticalAlignment="Center" />
                             <TextBox Text="{Binding p_sCarrierID}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left"
@@ -524,7 +524,7 @@
                                        HorizontalAlignment="Left" />
                             <TextBlock Text="Recipe ID"
                                        VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding p_sRecipeName}"
+                            <TextBlock Text="{Binding p_sRecipe}" Name="RecipeID"
                                        VerticalAlignment="Center" TextAlignment="Left"
                                        HorizontalAlignment="Left" />
                         </UniformGrid>

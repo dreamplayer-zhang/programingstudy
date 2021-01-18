@@ -10,10 +10,11 @@ using System.Threading;
 
 namespace Root_EFEM.Module
 {
-    public class WTR_RND : ModuleBase, IWTR
+    public class RTR_RND : ModuleBase, IWTR
     {
         #region ToolBox
         protected RS232 m_rs232;
+        public int m_teachReticleFlip = -1;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
@@ -85,8 +86,8 @@ namespace Root_EFEM.Module
         {
             public eArm m_eArm;
 
-            WTR_RND m_module;
-            public Arm(string id, eArm arm, WTR_RND module, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
+            RTR_RND m_module;
+            public Arm(string id, eArm arm, RTR_RND module, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
             {
                 m_eArm = arm;
                 m_module = module;
@@ -391,7 +392,6 @@ namespace Root_EFEM.Module
             }
             return "OK";
         }
-
         bool m_bNeedHome = true;
         bool IsFailResetCPU()
         {
@@ -479,7 +479,7 @@ namespace Root_EFEM.Module
             return "OK";
         }
 
-        protected string WriteCmdManualMove(eCmd cmd, string sRMove, string sTMove, string sFMove, string sZMove, string sVMove)
+        protected string WriteCmdManualMove(eCmd cmd, string sRMove, string sTMove, string sZMove, string sFMove, string sVMove)
         {
             if (EQ.IsStop()) return "EQ Stop";
             Thread.Sleep(10);
@@ -492,7 +492,7 @@ namespace Root_EFEM.Module
             if (EQ.IsStop()) return "EQ Stop";
 
             string str = m_dicCmd[cmd];
-            string sMove = String.Format("{0},{1},{2},{3},{4}", sRMove, sTMove, sFMove, sZMove, sVMove);
+            string sMove = String.Format("{0},{1},{2},{3},{4}", sRMove, sTMove, sZMove, sFMove, sVMove);
             str += " " + sMove;
             m_log.Info(" [ Send --> " + str);
             m_eSendCmd = cmd;
@@ -588,6 +588,14 @@ namespace Root_EFEM.Module
             }
             return null;
         }
+        protected ModuleBase GetChild_Module(string sChild)
+        {
+            foreach (ModuleBase child in p_aChild)
+            {
+                if (child.p_id == sChild) return child;
+            }
+            return null;
+        }
 
         protected List<string> GetChildSlotNames(string sChild)
         {
@@ -676,7 +684,7 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-        public WTR_RND(string id, IEngineer engineer)
+        public RTR_RND(string id, IEngineer engineer)
         {
             InitCmd();
             InitArms(id, engineer);
@@ -739,8 +747,8 @@ namespace Root_EFEM.Module
 
         public class Run_ResetCPU : ModuleRunBase
         {
-            WTR_RND m_module;
-            public Run_ResetCPU(WTR_RND module)
+            RTR_RND m_module;
+            public Run_ResetCPU(RTR_RND module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -768,8 +776,8 @@ namespace Root_EFEM.Module
 
         public class Run_Grip : ModuleRunBase
         {
-            WTR_RND m_module;
-            public Run_Grip(WTR_RND module)
+            RTR_RND m_module;
+            public Run_Grip(RTR_RND module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -796,11 +804,12 @@ namespace Root_EFEM.Module
                 return m_module.m_dicArm[m_eArm].RunGrip(m_bGrip);
             }
         }
+        public static bool m_bDoflip = false;
 
         public class Run_Get : ModuleRunBase, IWTRRun
         {
-            WTR_RND m_module;
-            public Run_Get(WTR_RND module)
+            RTR_RND m_module;
+            public Run_Get(RTR_RND module)
             {
                 p_sChild = "";
                 m_module = module;
@@ -841,7 +850,9 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
+
                 IWTRChild child = m_module.GetChild(p_sChild);
+                ModuleBase child_module = m_module.GetChild_Module(p_sChild);
                 if (child == null) return "WTR Child not Found : " + p_sChild;
                 if (EQ.p_bSimulate)
                 {
@@ -849,7 +860,16 @@ namespace Root_EFEM.Module
                     child.SetInfoWafer(m_nChildID, null);
                     return "OK";
                 }
-                int posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
+                int posWTR = 0;
+                if (m_bDoflip == true && child.p_id == "MainVision")
+                {
+                    posWTR = m_module.m_teachReticleFlip;
+                    m_bDoflip = false;
+                }
+                else
+                {
+                    posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
+                }
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (child.p_eState != eState.Ready)
                 {
@@ -860,7 +880,17 @@ namespace Root_EFEM.Module
                     if (EQ.IsStop()) return "Stop";
                     Thread.Sleep(100);
                 }
+
+                if (p_sChild == "MainVision")
+                {
+                    while (child_module.IsBusy()) Thread.Sleep(10);
+                }
+
                 if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
+                if (p_sChild == "MainVision")
+                {
+                    while (child_module.IsBusy()) Thread.Sleep(10);
+                }
                 if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
                 m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
                 try
@@ -883,8 +913,8 @@ namespace Root_EFEM.Module
 
         public class Run_Put : ModuleRunBase, IWTRRun
         {
-            WTR_RND m_module;
-            public Run_Put(WTR_RND module)
+            RTR_RND m_module;
+            public Run_Put(RTR_RND module)
             {
                 p_sChild = "";
                 m_module = module;
@@ -926,6 +956,7 @@ namespace Root_EFEM.Module
             public override string Run()
             {
                 IWTRChild child = m_module.GetChild(p_sChild);
+                ModuleBase child_module = m_module.GetChild_Module(p_sChild);
                 if (child == null) return "WTR Child not Found : " + p_sChild;
                 if (EQ.p_bSimulate)
                 {
@@ -940,7 +971,15 @@ namespace Root_EFEM.Module
                 }
                 int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
+                if (p_sChild == "MainVision")
+                {
+                    while (child_module.IsBusy()) Thread.Sleep(10);
+                }
                 if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
+                if (p_sChild == "MainVision")
+                {
+                    while (child_module.IsBusy()) Thread.Sleep(10);
+                }
                 if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
                 child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
                 try

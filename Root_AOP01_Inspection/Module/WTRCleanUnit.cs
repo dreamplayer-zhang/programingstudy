@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Root_AOP01_Inspection.Module
 {
-    public class WTRCleanUnit : WTR_RND
+    public class WTRCleanUnit : RTR_RND
     {
         #region ToolBox
         public DIO_I m_diExistRTR;
@@ -43,7 +43,6 @@ namespace Root_AOP01_Inspection.Module
 
         public int m_teachCleanTop = -1;
         public int m_teachCleanBottom = -1;
-        public int m_teachReticleFlip = -1;
         public string m_extentionlength = "0";
         public string m_CleanSpeed = "7";
         public string m_OriginSpeed = "30";
@@ -77,7 +76,7 @@ namespace Root_AOP01_Inspection.Module
         {
             base.InitModuleRuns();
             AddModuleRunList(new Run_Clean(this), true, "RTR Run Clean");
-            m_runFlip = AddModuleRunList(new Run_Flip(this), false, "Vision Reticle Flip Top to Bottom");
+            m_runFlip = AddModuleRunList(new Run_Flip(this), true, "Vision Reticle Flip Top to Bottom");
         }
 
         public class Run_Clean : ModuleRunBase
@@ -125,7 +124,7 @@ namespace Root_AOP01_Inspection.Module
                         if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                         if(m_sThickness =="3mm")
                         {
-                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, "0", "0", "0", "2", "0"))) return p_sInfo; //3mm Reticle Move
+                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, "0", "0", "2", "0", "0"))) return p_sInfo; //3mm Reticle Move
                             if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                         }
                         else if(m_sThickness == "5mm")
@@ -173,13 +172,27 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
+        public MainVision p_mainvision
+        {
+            get
+            {
+                AOP01_Handler handler = (AOP01_Handler)m_engineer.ClassHandler();
+                return (MainVision)handler.m_mainVision;
+            }
+        }
+
         public class Run_Flip : ModuleRunBase
         {
-            WTRCleanUnit m_module;
+            public WTRCleanUnit m_module;
             public Run_Flip(WTRCleanUnit module)
             {
                 m_module = module;
                 InitModuleRun(module);
+            }
+            string m_sFlip = "Flip";
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_sFlip = tree.Set(m_sFlip, m_sFlip, "Flip", "Reticle Flip Glass to Bottom", bVisible, true);
             }
             public override ModuleRunBase Clone()
             {
@@ -188,13 +201,17 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
+                m_bDoflip = true;
+                int sReticleFlip = m_module.m_teachReticleFlip;
                 if (EQ.p_bSimulate) return "OK";
+                while (m_module.p_mainvision.IsBusy()) Thread.Sleep(10);
                 IWTRChild child = m_module.GetChild("MainVision");
-                int posWTR = child.GetTeachWTR(child.GetInfoWafer(0));
-                int teachReticleFlip = m_module.m_teachReticleFlip;
-                //if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, 1))) return p_sInfo;
-                //if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
-                if (m_module.Run(m_module.WriteCmd(eCmd.Put, teachReticleFlip, 1))) return p_sInfo;
+                if (m_module.p_mainvision.Run(child.BeforeGet(0))) return p_sInfo;
+                while (m_module.p_mainvision.IsBusy()) Thread.Sleep(10);
+                int posWTR = child.GetTeachWTR(m_module.m_dicArm[0].p_infoWafer);
+                if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, 1))) return p_sInfo;
+                if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                if (m_module.Run(m_module.WriteCmd(eCmd.Put, sReticleFlip, 1))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                 return "OK";
             }

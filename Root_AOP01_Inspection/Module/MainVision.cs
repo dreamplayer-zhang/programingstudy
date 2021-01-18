@@ -474,7 +474,7 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_PatternAlign(this), true, "Run PatternAlign");
             AddModuleRunList(new Run_ShiftAndRotation(this), true, "Run ShiftAndRotation");
             AddModuleRunList(new Run_AlignKeyInspection(this), true, "Run AlignKeyInspection");
-            AddModuleRunList(new Run_Flip(this), true, "Run Reticle Flip");
+            AddModuleRunList(new Run_Test(this), true, "Run Delay");
         }
         #endregion
 
@@ -500,32 +500,47 @@ namespace Root_AOP01_Inspection.Module
         {
             base.ThreadStop();
         }
-        public class Run_Flip : ModuleRunBase
+        public class Run_Test : ModuleRunBase
         {
             MainVision m_module;
-            public Run_Flip(MainVision module)
+            public RPoint m_rpAxisCenter = new RPoint();    // Side Center Position
+            public Run_Test(MainVision module)
             {
                 m_module = module;
                 InitModuleRun(module);
+
             }
             public override ModuleRunBase Clone()
             {
-                Run_Flip run = new Run_Flip(m_module);
+                Run_Test run = new Run_Test(m_module);
+                run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
                 return run;
             }
             string m_sFlip = "Flip";
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
                 m_sFlip = tree.Set(m_sFlip, m_sFlip, "Flip", "Reticle Flip Glass to Bottom", bVisible, true);
             }
             public override string Run()
             {
-                if (EQ.p_bSimulate) return "OK";
-                m_module.p_wtr.StartFlip();
-                while (m_module.p_wtr.IsBusy()) Thread.Sleep(10);
+                Thread.Sleep(1000);
+                AxisXY axisXY = m_module.m_axisXY;
+                double dStartPosY = m_rpAxisCenter.Y;
+
+
+
+                double dPosX = m_rpAxisCenter.X;
+
+
+                if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
+                    return p_sInfo;
+                Thread.Sleep(10000);
+                //m_module.p_eState = eState.Ready;
                 return "OK";
             }
         }
+        
 
         public class Run_GrabSideScan : ModuleRunBase
         {
