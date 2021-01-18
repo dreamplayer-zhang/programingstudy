@@ -211,8 +211,10 @@ namespace Root_AOP01_Inspection.Module
                 int posWTR = child.GetTeachWTR(m_module.m_dicArm[0].p_infoWafer);
                 if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, 1))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                m_module.m_dicArm[0].p_infoWafer = child.GetInfoWafer(0);
                 if (m_module.Run(m_module.WriteCmd(eCmd.Put, sReticleFlip, 1))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                child.SetInfoWafer(0, m_module.m_dicArm[0].p_infoWafer);
                 return "OK";
             }
         }
