@@ -71,6 +71,12 @@ namespace RootTools
             get { return m_EQ.p_bRecovery; }
             set { m_EQ.p_bRecovery = value; }
         }
+
+        public static int p_nRnR
+        {
+            get { return m_EQ.p_nRnR; }
+            set { m_EQ.p_nRnR = value; }
+        }
     }
 
     public class _EQ : NotifyProperty
@@ -171,6 +177,17 @@ namespace RootTools
             set
             {
                 _bRecovery = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int _nRnR = 0;
+        public int p_nRnR 
+        {
+            get { return _nRnR; }
+            set
+            {
+                _nRnR = value;
                 OnPropertyChanged();
             }
         }

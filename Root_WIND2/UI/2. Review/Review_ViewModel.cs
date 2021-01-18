@@ -109,7 +109,7 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(SearchLotinfoData);
+                return new RelayCommand(SaveTrendImg);
             }
         }
         public void GoldenImagelist_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -749,12 +749,75 @@ namespace Root_WIND2
         public void GoldenImageTrend()
         {
             List<byte[]> goldenImg = new List<byte[]>();
-            
+
+            if (goldenImagesData.Count == 0)
+                return;
+
             byte[] dstImg = new byte[goldenImagesData[0].Length];
             CLR_IP.Cpp_GoldenImageReview(goldenImagesData.ToArray(), dstImg, goldenImagesData.Count, goldenImageW, goldenImageH);
 
             GoldenImage = Tools.BitmapFromSource(Tools.CovertArrayToBitmap(dstImg, goldenImageW, goldenImageH, 3));
 
+        }
+        public void SaveTrendImg()
+        {
+            int w = 2040;
+            int h = 1080;
+
+            byte[] rawData = new byte[w*h];
+
+            Tools.LoadBitmapToRawdata(@"D:\Images\AOP 포장기\VRSImage_2.bmp", rawData, w, h, 1);
+            
+            //********** int CalcTapeThickness(byte[] rawData, int w, int h) **********//
+            int measurementAreaW = w / 8;
+            int measurementAreaH = h;
+
+            bool[] isTapeArea = Enumerable.Repeat<bool>(false, h).ToArray<bool>();
+
+            Parallel.For(0, measurementAreaH, r =>
+            {
+                int lineSum = 0;
+                for (int c = w / 2 - w / 16; c < w / 2 + w / 16; c++)
+                {
+                    lineSum += rawData[r * w + c];
+                }
+                lineSum /= measurementAreaW;
+
+                isTapeArea[r] = (lineSum < 128) ? true: false;
+            });
+
+            bool startCalc = false;
+            int tapeThickness = 0;
+            for(int r = measurementAreaH - 10; r > 10; r--)
+            {
+                if (!startCalc)
+                {
+                    if (isTapeArea[r])
+                    {
+                        startCalc = true;
+                        for (int i = 0; i < w; i++)
+                            rawData[r * w + i] = 128;
+                    }
+                }
+                else
+                {
+                    if (!isTapeArea[r])
+                    {
+                        for (int i = 0; i < w; i++)
+                            rawData[r * w + i] = 128;
+                        break;
+                    }
+                   
+                    tapeThickness++;   
+                }  
+            }
+            for (int c = w / 2 - w / 16; c < w / 2 + w / 16; c++)
+                rawData[1000 * w + c] = 128;
+
+            //********** return tapeThickness **********//
+            Tools.SaveRawdataToBitmap(@"D:\TapeTicknessTest.bmp", rawData, w, h, 1);
+
+            float remainRatio = (float)(tapeThickness / 500.0 * 100);
         }
         public object GetDataGridItem(DataTable table, DataRow datarow, string sColumnName)
         {

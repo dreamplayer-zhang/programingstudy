@@ -250,6 +250,7 @@ namespace Root_CAMELLIA.ManualJob
                 }
             }
             m_infoCarrier.SetSelectMapData(m_infoCarrier);
+            EQ.p_nRnR = (bool)checkRnR.IsChecked ? Convert.ToInt32(textboxRnR.Text) : 0;
             this.DialogResult = true;
         }
 
@@ -260,6 +261,18 @@ namespace Root_CAMELLIA.ManualJob
                 if (m_infoCarrier.GetInfoWafer(n) != null) m_infoCarrier.SetInfoWafer(n, null);
             }
             this.Close();
+        }
+
+        private void ToggleButton_Checked(object sender, RoutedEventArgs e)
+        {
+            textblockRnR.Visibility = Visibility.Visible;
+            textboxRnR.Visibility = Visibility.Visible;
+        }
+
+        private void ToggleButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            textblockRnR.Visibility = Visibility.Hidden;
+            textboxRnR.Visibility = Visibility.Hidden;
         }
     }
 }

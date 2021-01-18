@@ -54,7 +54,12 @@ namespace Root_AOP01_Inspection
 		private MemoryTool memoryTool;
 		private Recipe recipe;
 
-		private ImageData image;
+		private ImageData imageMain;
+		private ImageData image45D;
+		private ImageData imageSideLeft;
+		private ImageData imageSideTop;
+		private ImageData imageSideRight;
+		private ImageData imageSideBottom;
 		private ImageData roiLayer;
 
 		InspectionManager_AOP inspectionManager;
@@ -64,7 +69,13 @@ namespace Root_AOP01_Inspection
 		public AOP01_Engineer Engineer { get => engineer; private set => engineer = value; }
 		public MemoryTool MemoryTool { get => memoryTool; private set => memoryTool = value; }
 		public Recipe Recipe { get => recipe; private set => recipe = value; }
-		public ImageData Image { get => image; private set => image = value; }
+		public ImageData ImageMain { get => imageMain; private set => imageMain = value; }
+		public ImageData Image45D { get => image45D; private set => image45D = value; }
+		public ImageData ImageSideLeft { get => imageSideLeft; private set => imageSideLeft = value; }
+		public ImageData ImageSideTop { get => imageSideTop; private set => imageSideTop = value; }
+		public ImageData ImageSideRight { get => imageSideRight; private set => imageSideRight = value; }
+		public ImageData ImageSideBottom { get => imageSideBottom; private set => imageSideBottom = value; }
+
 		public ImageData ROILayer { get => roiLayer; private set => roiLayer = value; }
 		public InspectionManager_AOP InspectionManager { get => inspectionManager; private set => inspectionManager = value; }
 
@@ -112,8 +123,18 @@ namespace Root_AOP01_Inspection
 		{
 			memoryTool = this.engineer.ClassMemoryTool();
 
-			image = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.mMainMem));
-			image.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mMainMem).p_nCount;
+			imageMain = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.mMainMem));
+			imageMain.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mMainMem).p_nCount;
+			image45D = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.m45DMem));
+			image45D.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.m45DMem).p_nCount;
+			imageSideLeft = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideLeftMem));
+			imageSideLeft.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideLeftMem).p_nCount;
+			imageSideTop = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideTopMem));
+			imageSideTop.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideTopMem).p_nCount;
+			imageSideRight = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideRightMem));
+			imageSideRight.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideRightMem).p_nCount;
+			imageSideBottom = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideBotMem));
+			imageSideBottom.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideBotMem).p_nCount;
 
 			roiLayer = new ImageData(memoryTool.GetMemory("pool", "group", memoryNameROI));
 			//roiLayer.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameROI).p_nCount;
@@ -133,7 +154,7 @@ namespace Root_AOP01_Inspection
 				Directory.CreateDirectory(recipeFolderPath);
 
 			// Front
-			this.InspectionManager = new InspectionManager_AOP(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
+			this.InspectionManager = new InspectionManager_AOP(imageMain.GetPtr(), imageMain.p_Size.X, imageMain.p_Size.Y);
 
 			this.Engineer.InspectionManager = this.InspectionManager;
 			this.Engineer.InspectionManager.Recipe = this.recipe;

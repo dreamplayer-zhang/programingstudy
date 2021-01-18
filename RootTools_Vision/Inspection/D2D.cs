@@ -17,8 +17,6 @@ namespace RootTools_Vision
     public class D2D : WorkBase
     {
         #region [Member variables]
-        WorkplaceBundle workplaceBundle;
-        Workplace workplace;
 
         byte[] GoldenImage = null;
         float[] scaleMap = null;
@@ -28,13 +26,10 @@ namespace RootTools_Vision
         public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
         // D2D Recipe & Parameter
-        private Recipe recipe;
         private D2DParameter parameter;
         private D2DRecipe recipeD2D;
 
-
         private IntPtr inspectionSharedBuffer;
-        private byte[] inspectionWorkBuffer;
         #endregion
 
         public D2D() : base()
@@ -42,24 +37,24 @@ namespace RootTools_Vision
             m_sName = this.GetType().Name;
         }
 
-        public override void SetRecipe(Recipe _recipe)
+        protected override bool Preparation()
         {
-            this.recipe = _recipe;
-            this.parameter = _recipe.GetRecipe<D2DParameter>();
-            this.recipeD2D = _recipe.GetRecipe<D2DRecipe>();
-        }
-
-        public override bool DoPrework()
-        {
-            if (this.workplace.Index == 0)
+            if(this.parameter == null || this.recipeD2D == null)
             {
-                return base.DoPrework();
+                this.parameter = this.recipe.GetRecipe<D2DParameter>();
+                this.recipeD2D = this.recipe.GetRecipe<D2DRecipe>();
+            }
+            
+
+            if (this.currentWorkplace.Index == 0)
+            {
+                return true;
             }
 
-            this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
+            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameter.IndexChannel);
 
-            if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP) == true &&
-                this.workplaceBundle.CheckStateLine(this.workplace.MapPositionX, WORK_TYPE.ALIGNMENT) &&
+            if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP) == true &&
+                this.workplaceBundle.CheckStateLine(this.currentWorkplace.MapIndexX, WORK_TYPE.ALIGNMENT) &&
                 this.IsPreworkDone == false)
             {
                 CreateGoldenImage();
@@ -67,17 +62,17 @@ namespace RootTools_Vision
                 // Golden Image Workplace에 복사
                 foreach (Workplace wp in this.workplaceBundle)
                 {
-                    if (wp.MapPositionX == this.workplace.MapPositionX)
+                    if(wp.MapIndexX == this.currentWorkplace.MapIndexX)
                     {
                         wp.SetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE, (object)(GoldenImage) /*Tools.ByteArrayToObject(GoldenImage)*/);
                     }
                 }
             }
 
-            if (this.workplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) != null)
+            if(this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) != null)
             {
-                this.GoldenImage = this.workplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) as byte[];
-                return base.DoPrework();
+                this.GoldenImage = this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) as byte[];
+                return true;
             }
             else
             {
@@ -86,11 +81,11 @@ namespace RootTools_Vision
             }
         }
 
-        public override void DoWork()
+        protected override bool Execution()
         {
             DoInspection();
 
-            base.DoWork();
+            return true;
         }
 
         //public void SetGoldenImage()
@@ -161,11 +156,12 @@ namespace RootTools_Vision
         //}
         public void SetGoldenImage()
         {
+            List<byte[]> wpDatas = new List<byte[]>();
             // Index 계산
             List<int> mapYIdx = new List<int>();
             foreach (Workplace wp in this.workplaceBundle)
-                if (wp.MapPositionX == this.workplace.MapPositionX)
-                    mapYIdx.Add(wp.MapPositionY);
+                if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
+                    mapYIdx.Add(wp.MapIndexY);
 
             mapYIdx.Sort();
 
@@ -179,7 +175,7 @@ namespace RootTools_Vision
             }
             else
             {
-                int currentY = mapYIdx.IndexOf(this.workplace.MapPositionY);
+                int currentY = mapYIdx.IndexOf(this.currentWorkplace.MapIndexY);
 
                 if (mapYIdx[currentY] - 2 < mapYIdx[0])
                 {
@@ -198,45 +194,33 @@ namespace RootTools_Vision
                 }
             }
 
-            List<Cpp_Point> wpROIData = new List<Cpp_Point>();
-
             foreach (Workplace wp in this.workplaceBundle)
-                if (wp.MapPositionX == this.workplace.MapPositionX)
-                    if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
-                        if ((wp.MapPositionY >= startY) && (wp.MapPositionY <= endY) && wp.MapPositionY != this.workplace.MapPositionY)
-                            wpROIData.Add(new Cpp_Point(wp.PositionX, wp.PositionY));
+                if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
+                    if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
+                        if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY) && wp.MapIndexY != this.currentWorkplace.MapIndexY)
+                            wpDatas.Add(GetWorkplaceBuffer(this.parameter.IndexChannel));
 
-            unsafe
+            int width = currentWorkplace.Width;
+            int height = currentWorkplace.Height;
+
+            switch (parameter.CreateRefImage)
             {
-                switch (parameter.CreateRefImage)
-                {
-                    case CreateRefImageMethod.Average:
-                        CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count, 
-                            this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,  
-                            wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-                        break;
-                    case CreateRefImageMethod.NearAverage:
-                        CLR_IP.Cpp_CreateGoldenImage_NearAvg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                            this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
-                            wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-                        break;
-                    case CreateRefImageMethod.MedianAverage:
-                        CLR_IP.Cpp_CreateGoldenImage_MedianAvg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                            this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
-                            wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+                case CreateRefImageMethod.Average:
+                    CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas, GoldenImage, wpDatas.Count, width, height);
+                    break;
+                case CreateRefImageMethod.NearAverage:
+                    CLR_IP.Cpp_CreateGoldenImage_NearAvg(wpDatas, GoldenImage, wpDatas.Count, width, height);
+                    break;
+                case CreateRefImageMethod.MedianAverage:
+                    CLR_IP.Cpp_CreateGoldenImage_MedianAvg(wpDatas, GoldenImage, wpDatas.Count, width, height);
 
-                        break;
-                    case CreateRefImageMethod.Median:
-                        CLR_IP.Cpp_CreateGoldenImage_Median((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                            this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
-                            wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-                        break;
-                    default:
-                        CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                            this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
-                            wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-                        break;
-                }
+                    break;
+                case CreateRefImageMethod.Median:
+                    CLR_IP.Cpp_CreateGoldenImage_Median(wpDatas, GoldenImage, wpDatas.Count, width, height);
+                    break;
+                default:
+                    CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas, GoldenImage, wpDatas.Count, width, height);
+                    break;
             }
         }
         public void SetMultipleGoldenImages()
@@ -244,8 +228,8 @@ namespace RootTools_Vision
             // Index 계산
             List<int> mapYIdx = new List<int>();
             foreach (Workplace wp in this.workplaceBundle)
-                if (wp.MapPositionX == this.workplace.MapPositionX)
-                    mapYIdx.Add(wp.MapPositionY);
+                if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
+                    mapYIdx.Add(wp.MapIndexY);
 
             mapYIdx.Sort();
 
@@ -261,7 +245,7 @@ namespace RootTools_Vision
             }
             else
             {
-                int currentY = mapYIdx.IndexOf(this.workplace.MapPositionY);
+                int currentY = mapYIdx.IndexOf(this.currentWorkplace.MapIndexY);
 
                 startY = mapYIdx[(currentY == 0) ? 1 : 0];
                 middleY = mapYIdx[(currentY == mapYIdx.Count() / 2) ? mapYIdx.Count() / 2 + 1 : mapYIdx.Count() / 2];
@@ -269,35 +253,31 @@ namespace RootTools_Vision
             }
 
             foreach (Workplace wp in this.workplaceBundle)
-                if (wp.MapPositionX == this.workplace.MapPositionX)
-                    if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
-                        if ((wp.MapPositionY == startY) || (wp.MapPositionY == middleY) || (wp.MapPositionY == endY))
-                            GoldenImages.Add(wp.GetWorkplaceBuffer(this.parameter.IndexChannel));
-        }
-        public override void SetWorkplace(Workplace _workplace)
-        {
-            this.workplace = _workplace;
+                if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
+                    if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
+                        if ((wp.MapIndexY == startY) || (wp.MapIndexY == middleY) || (wp.MapIndexY == endY))
+                            GoldenImages.Add(GetWorkplaceBuffer(this.parameter.IndexChannel));
         }
         
         public void DoInspection()
         {
-            if (this.workplace.Index == 0)
+            if (this.currentWorkplace.Index == 0)
                 return;
 
-            if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == false || this.workplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) == null)
+            if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == false || this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) == null)
             {
                 return;
             }
 
-            this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
-            this.inspectionWorkBuffer = this.workplace.GetWorkplaceBuffer(this.parameter.IndexChannel);
+            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameter.IndexChannel);
+            byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameter.IndexChannel);
 
-            int memH = this.workplace.SharedBufferHeight;
-            int memW = this.workplace.SharedBufferWidth;
+            int memH = this.currentWorkplace.SharedBufferHeight;
+            int memW = this.currentWorkplace.SharedBufferWidth;
 
             // Recipe
-            int chipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
-            int chipW = this.workplace.BufferSizeX;
+            int chipH = this.currentWorkplace.Height; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
+            int chipW = this.currentWorkplace.Width;
 
             byte[] binImg = new byte[chipW * chipH];
             byte[] diffImg = new byte[chipW * chipH];
@@ -306,20 +286,20 @@ namespace RootTools_Vision
             {
                 SetMultipleGoldenImages();
                 // Diff Image 계산
-                CLR_IP.Cpp_SelectMinDiffinArea(inspectionWorkBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
+                CLR_IP.Cpp_SelectMinDiffinArea(workplaceBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
             }
             else
             {
                 if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
                     SetGoldenImage();
                 // Diff Image 계산
-                CLR_IP.Cpp_SubtractAbs(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
+                CLR_IP.Cpp_SubtractAbs(GoldenImage, workplaceBuffer, diffImg, chipW, chipH);
 
                 if (parameter.ScaleMap) // ScaleMap Option
                 {
-                    if (this.workplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) != null)
+                    if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) != null)
                     {
-                        this.scaleMap = this.workplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) as float[];
+                        this.scaleMap = this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) as float[];
                     }
 
                     else
@@ -339,7 +319,7 @@ namespace RootTools_Vision
                 if (parameter.HistWeightMap) // Histogram WeightMap
                 {
                     histWeightMap = new float[chipW * chipH];
-                    CLR_IP.Cpp_CreateHistogramWeightMap(inspectionWorkBuffer, GoldenImage, histWeightMap, chipW, chipH, 5);        // -> 뭔가 결과가 이상함... 수정 필요
+                    CLR_IP.Cpp_CreateHistogramWeightMap(workplaceBuffer, GoldenImage, histWeightMap, chipW, chipH, 5);        // -> 뭔가 결과가 이상함... 수정 필요
                     CLR_IP.Cpp_Multiply(diffImg, histWeightMap, diffImg, chipW, chipH);
                 }
             }
@@ -385,53 +365,54 @@ namespace RootTools_Vision
             CLR_IP.Cpp_Masking(binImg, binImg, maskStartPoint.ToArray(), maskLength.ToArray(), chipW, chipH);
 
             // Labeling
-            var Label = CLR_IP.Cpp_Labeling(inspectionWorkBuffer, binImg, chipW, chipH);
+            var Label = CLR_IP.Cpp_Labeling(workplaceBuffer, binImg, chipW, chipH);
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
-                //Add Defect
+            //Add Defect
             for (int i = 0; i < Label.Length; i++)
             {
                 if (Label[i].area > parameter.Size)
                 {
-                    this.workplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
+                    this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
 
-                    this.workplace.AddDefect(sInspectionID,
+                    this.currentWorkplace.AddDefect(sInspectionID,
                         10010,
                         Label[i].area,
                         Label[i].value,
-                        this.workplace.PositionX + Label[i].boundLeft,
-                        this.workplace.PositionY - (chipH - Label[i].boundTop),
+                        this.currentWorkplace.PositionX + Label[i].boundLeft,
+                        this.currentWorkplace.PositionY - (chipH - Label[i].boundTop),
                         Label[i].width,
                         Label[i].height,
-                        this.workplace.MapPositionX,
-                        this.workplace.MapPositionY
+                        this.currentWorkplace.MapIndexX,
+                        this.currentWorkplace.MapIndexY
                         );
                 }
 
             }
 
             GoldenImages.Clear();
-            WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
         }
 
         public void CreateGoldenImage()
         {
-            if(GoldenImage == null)
-                GoldenImage = new byte[this.workplace.BufferSizeX * this.workplace.BufferSizeY];
+            if (GoldenImage == null)
+                GoldenImage = new byte[this.currentWorkplace.Width * this.currentWorkplace.Height];
 
             if (parameter.RefImageUpdate == RefImageUpdateFreq.Line) // Line 별로 GoldenImage를 만들 경우
             {
+                List<byte[]> wpDatas = new List<byte[]>();
                 // Index 계산
                 List<int> mapYIdx = new List<int>();
                 foreach (Workplace wp in this.workplaceBundle)
-                    if (wp.MapPositionX == this.workplace.MapPositionX)
-                        mapYIdx.Add(wp.MapPositionY);
+                    if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
+                        mapYIdx.Add(wp.MapIndexY);
 
                 mapYIdx.Sort();
 
                 int startY = 0;
-                int endY = 0; 
+                int endY = 0;
 
                 if (mapYIdx.Count() < 5)
                 {
@@ -440,67 +421,39 @@ namespace RootTools_Vision
                 }
                 else // 중심에 있는 4개의 칩으로만 Golden Image 생성
                 {
-                    
+
                     startY = mapYIdx[mapYIdx.Count() / 2 - 1 - 2];
                     endY = mapYIdx[mapYIdx.Count() / 2 - 1 + 2];
                 }
-
-                List<Cpp_Point> wpROIData = new List<Cpp_Point>();
-
                 foreach (Workplace wp in this.workplaceBundle)
-                    if (wp.MapPositionX == this.workplace.MapPositionX)
-                        if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
-                            if ((wp.MapPositionY >= startY) && (wp.MapPositionY <= endY) && wp.MapPositionY != this.workplace.MapPositionY)
-                                wpROIData.Add(new Cpp_Point(wp.PositionX, wp.PositionY));
+                    if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
+                        if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
+                            if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY) && wp.MapIndexY != this.currentWorkplace.MapIndexY)
+                                wpDatas.Add(GetWorkplaceBuffer(this.parameter.IndexChannel));
 
-                unsafe { 
-                    switch (parameter.CreateRefImage)
-                    {
-                        case CreateRefImageMethod.Average:
-                            CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                                this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
-                                wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-                            break;
-                        case CreateRefImageMethod.NearAverage:
-                            CLR_IP.Cpp_CreateGoldenImage_NearAvg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                                this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
-                                wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-                            break;
-                        case CreateRefImageMethod.MedianAverage:
-                            CLR_IP.Cpp_CreateGoldenImage_MedianAvg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                                this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
-                                wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-                            break;
-                        case CreateRefImageMethod.Median:
-                            CLR_IP.Cpp_CreateGoldenImage_Median((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                                this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
-                                wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-                            break;
-                        default:
-                            CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                                this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
-                                wpROIData, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-                            break;
-                    }
+                int width = currentWorkplace.Width;
+                int height = currentWorkplace.Height;
+
+                switch (parameter.CreateRefImage)
+                {
+                    case CreateRefImageMethod.Average:
+                        CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas, GoldenImage, wpDatas.Count, width, height);
+                        break;
+                    case CreateRefImageMethod.NearAverage:
+                        CLR_IP.Cpp_CreateGoldenImage_NearAvg(wpDatas, GoldenImage, wpDatas.Count, width, height);
+                        break;
+                    case CreateRefImageMethod.MedianAverage:
+                        CLR_IP.Cpp_CreateGoldenImage_MedianAvg(wpDatas, GoldenImage, wpDatas.Count, width, height);
+
+                        break;
+                    case CreateRefImageMethod.Median:
+                        CLR_IP.Cpp_CreateGoldenImage_Median(wpDatas, GoldenImage, wpDatas.Count, width, height);
+                        break;
+                    default:
+                        CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas, GoldenImage, wpDatas.Count, width, height);
+                        break;
                 }
             }
-        }
-
-        public override WorkBase Clone()
-        {
-            return (WorkBase)this.MemberwiseClone();
-        }
-
-        public void CopyTo()
-        {
-            
-        }
-
-        public override void SetWorkplaceBundle(WorkplaceBundle _workplaceBundle)
-        {
-
-            this.workplaceBundle = _workplaceBundle;
-            return;
         }
     }
 }

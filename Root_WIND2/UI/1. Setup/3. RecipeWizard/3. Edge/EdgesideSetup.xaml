@@ -44,7 +44,7 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <GroupBox Header="Thumbnail" Grid.Row="0" Margin="0,0,0,0">
-                                <Canvas Grid.Row="0"
+                                <Canvas Grid.Row="0" 
                             Focusable="True"
                             obs:SizeObserver.Observe="true"
                             obs:SizeObserver.ObservedWidth="{Binding DrawToolVM.p_ThumbWidth, Mode=OneWayToSource}"
@@ -201,55 +201,6 @@
                                 <TextBox Text="{Binding MergeDist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                             </Grid>
                         </GroupBox>
-                        <GroupBox Grid.Row="6" Header="Defect Code">
-                            <Grid Margin="10,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <TextBlock FontSize="12" Text="Top" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                <TextBlock FontSize="12" Text="Side" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                <TextBlock FontSize="12" Text="Bottom" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                <ComboBox Grid.Row="0" Grid.Column="1" SelectedIndex="0" 
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center">
-                                    <ComboBoxItem Content="0x000000"/>
-                                    <ComboBoxItem Content="0x000010"/>
-                                    <ComboBoxItem Content="0x000020"/>
-                                    <ComboBoxItem Content="0x000030"/>
-                                    <ComboBoxItem Content="0x000040"/>
-                                    <ComboBoxItem Content="0x000050"/>
-                                    <ComboBoxItem Content="0x000060"/>
-                                </ComboBox>
-                                <ComboBox Grid.Row="1" Grid.Column="1" SelectedIndex="0" 
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center">
-                                    <ComboBoxItem Content="0x000000"/>
-                                    <ComboBoxItem Content="0x000010"/>
-                                    <ComboBoxItem Content="0x000020"/>
-                                    <ComboBoxItem Content="0x000030"/>
-                                    <ComboBoxItem Content="0x000040"/>
-                                    <ComboBoxItem Content="0x000050"/>
-                                    <ComboBoxItem Content="0x000060"/>
-                                </ComboBox>
-                                <ComboBox Grid.Row="2" Grid.Column="1" SelectedIndex="0" 
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center">
-                                    <ComboBoxItem Content="0x000000"/>
-                                    <ComboBoxItem Content="0x000010"/>
-                                    <ComboBoxItem Content="0x000020"/>
-                                    <ComboBoxItem Content="0x000030"/>
-                                    <ComboBoxItem Content="0x000040"/>
-                                    <ComboBoxItem Content="0x000050"/>
-                                    <ComboBoxItem Content="0x000060"/>
-                                </ComboBox>
-                            </Grid>
-                        </GroupBox>
                     </Grid>
                     <Grid Grid.Column="1">
                         <Grid.RowDefinitions>
@@ -259,76 +210,31 @@
                         <GroupBox Grid.Row="0" Grid.Column="1" Header="Defect Image"
                                   Background="{StaticResource GroupBoxBackground}">
                             <Grid Background="Black">
-                                <Image Source="/Root_WIND2;component/Resources/defect2.png"/>
+                                <Image Source="{Binding DefectImage}">
+                                </Image>
                             </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="1" Grid.Column="1" Header="Insepction Info"
                                   Background="{StaticResource GroupBoxBackground}">
-                            <DataGrid IsReadOnly="True" Grid.Row="1">
+                            <DataGrid Name="Defect_Viewer"
+                                              ItemsSource="{Binding DefectDataTable}"
+                                              SelectedItem="{Binding SelectedDefect, Mode=TwoWay}"
+                                              SelectionMode="Single"
+                                              EnableColumnVirtualization="True"
+                                              EnableRowVirtualization="True"
+                                              VirtualizingPanel.VirtualizationMode="Recycling"
+                                              ScrollViewer.CanContentScroll="True"
+                                              IsReadOnly="True"
+                                              AutoGenerateColumns="True"
+                                              Grid.Row="1">
                                 <DataGrid.Resources>
                                     <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalAlignment"
+                                                        Value="Stretch" />
+                                        <Setter Property="HorizontalContentAlignment"
+                                                        Value="Center" />
                                     </Style>
                                 </DataGrid.Resources>
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="No." Binding="{Binding Path=no}" Width="0.5*"/>
-                                    <DataGridTextColumn Header="Location" Binding="{Binding Path=xy}" Width="1.5*"/>
-                                    <DataGridTextColumn Header="Size" Binding="{Binding Path=size}" Width="*"/>
-                                    <DataGridTextColumn Header="Gv" Binding="{Binding Path=gv}" Width="0.5*"/>
-                                    <DataGridTextColumn Header="Code" Binding="{Binding Path=dc}" Width="*"/>
-                                </DataGrid.Columns>
-
-                                <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
                             </DataGrid>
                         </GroupBox>
                     </Grid>

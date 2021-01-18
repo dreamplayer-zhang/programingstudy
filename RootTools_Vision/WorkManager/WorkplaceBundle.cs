@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
     public delegate void EventStateChanged(object obj);
 
@@ -229,7 +229,7 @@ namespace RootTools_Vision
             int nDiePitchY = originRecipe.DiePitchY;
 
             int nOriginAbsX = originRecipe.OriginX;
-            int nOriginAbsY = originRecipe.OriginY;
+            int nOriginAbsY = originRecipe.OriginY - nDiePitchY;
 
             bundle.mapSizeX = nSizeX;
             bundle.mapSizeY = nSizeY;

@@ -23,6 +23,7 @@ namespace Root_AOP01_Inspection
 		public static string mSideRightMem = "SideRight";
 		public static string mSideTopMem = "SideTop";
 		public static string mSideBotMem = "SideBot";
+		public static string m45DMem = "TDI45";
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			base.OnStartup(e);
