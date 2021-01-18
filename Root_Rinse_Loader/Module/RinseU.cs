@@ -3,13 +3,15 @@ using RootTools.Comm;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Root_Rinse_Loader.Module
 {
-    public class RinseL : ModuleBase
+    public class RinseU : ModuleBase
     {
         #region eRunMode
         public enum eRunMode
@@ -28,7 +30,6 @@ namespace Root_Rinse_Loader.Module
                 if (_eMode == value) return;
                 _eMode = value;
                 OnPropertyChanged();
-                AddProtocol(p_id, eCmd.SetMode, value); 
             }
         }
 
@@ -41,7 +42,6 @@ namespace Root_Rinse_Loader.Module
                 if (_widthStrip == value) return;
                 _widthStrip = value;
                 OnPropertyChanged();
-                AddProtocol(p_id, eCmd.SetWidth, value); 
             }
         }
 
@@ -58,35 +58,21 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
-        #region Unloader EQ State
-        EQ.eState _eStateUnloader = EQ.eState.Init; 
-        EQ.eState p_eStateUnloader
-        {
-            get { return _eStateUnloader; }
-            set
-            {
-                if (_eStateUnloader == value) return;
-                _eStateUnloader = value;
-                OnPropertyChanged(); 
-            }
-        }
-        #endregion
-
         #region ToolBox
-        TCPIPClient m_tcpip; 
+        TCPIPServer m_tcpip;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP"); 
-            if (bInit) 
+            p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
+            if (bInit)
             {
-                EQ.m_EQ.OnChanged += M_EQ_OnChanged;
+                EQ.m_EQ.OnChanged += M_EQ_OnChanged; //forget
                 m_tcpip.EventReciveData += M_tcpip_EventReciveData;
             }
         }
 
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
-            AddProtocol(p_id, eCmd.EQLeState, value);
+            AddProtocol(p_id, eCmd.EQUeState, value);
         }
         #endregion
 
@@ -156,7 +142,7 @@ namespace Root_Rinse_Loader.Module
         {
             Protocol protocol = new Protocol(id, eCmd, value);
             if (id == p_id) m_qProtocolSend.Enqueue(protocol);
-            else m_qProtocolReply.Enqueue(protocol); 
+            else m_qProtocolReply.Enqueue(protocol);
             return protocol;
         }
         #endregion
@@ -179,10 +165,18 @@ namespace Root_Rinse_Loader.Module
                 {
                     switch (eCmd)
                     {
-                        case eCmd.EQUeState:
-                            p_eStateUnloader = GetEQeState(asRead[2]);
-                            AddProtocol(asRead[0], eCmd, asRead[2]); 
-                            break; 
+                        case eCmd.SetMode:
+                            SetMode(asRead[2]);
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            break;
+                        case eCmd.SetWidth:
+                            p_widthStrip = Convert.ToDouble(asRead[2]);
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            break;
+                        case eCmd.EQLeState:
+                            EQ.p_eState = GetEQeState(asRead[2]);
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            break;
                     }
                 }
             }
@@ -198,6 +192,14 @@ namespace Root_Rinse_Loader.Module
             return eCmd.Unknown;
         }
 
+        void SetMode(string sMode)
+        {
+            for (int n = 0; n < m_asRunMode.Length; n++)
+            {
+                if (sMode == m_asRunMode[n]) p_eMode = (eRunMode)n;
+            }
+        }
+
         EQ.eState GetEQeState(string sState)
         {
             string[] asState = Enum.GetNames(typeof(EQ.eState));
@@ -209,13 +211,12 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
-
-        public RinseL(string id, IEngineer engineer)
+        public RinseU(string id, IEngineer engineer)
         {
             p_id = id;
             InitBase(id, engineer);
 
-            InitThread(); 
+            InitThread();
         }
 
         public override void ThreadStop()
@@ -227,5 +228,6 @@ namespace Root_Rinse_Loader.Module
             }
             base.ThreadStop();
         }
+
     }
 }
