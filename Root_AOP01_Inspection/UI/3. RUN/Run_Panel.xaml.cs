@@ -198,9 +198,6 @@ namespace Root_AOP01_Inspection
                 DoorCheck.Content = "DoorLock Off";
                 m_engineer.m_handler.m_aop01.m_bDoorLock = true;
             }
-
-
-
         }
     }
 }

@@ -619,8 +619,8 @@ namespace Root_EFEM.Module
                 p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
                 m_bPlaced = false;
             }
-            
             p_infoCarrier.AfterHome();
+
             return "OK";
         }
         #endregion

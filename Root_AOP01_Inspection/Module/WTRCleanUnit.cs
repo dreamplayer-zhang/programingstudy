@@ -77,7 +77,7 @@ namespace Root_AOP01_Inspection.Module
         {
             base.InitModuleRuns();
             AddModuleRunList(new Run_Clean(this), true, "RTR Run Clean");
-            m_runFlip = AddModuleRunList(new Run_Flip(this), false, "Vision Reticle Flip Top to Bottom");
+            m_runFlip = AddModuleRunList(new Run_Flip(this), true, "Vision Reticle Flip Top to Bottom");
         }
 
         public class Run_Clean : ModuleRunBase
@@ -192,8 +192,8 @@ namespace Root_AOP01_Inspection.Module
                 IWTRChild child = m_module.GetChild("MainVision");
                 int posWTR = child.GetTeachWTR(child.GetInfoWafer(0));
                 int teachReticleFlip = m_module.m_teachReticleFlip;
-                //if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, 1))) return p_sInfo;
-                //if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, 1))) return p_sInfo;
+                if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                 if (m_module.Run(m_module.WriteCmd(eCmd.Put, teachReticleFlip, 1))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                 return "OK";
