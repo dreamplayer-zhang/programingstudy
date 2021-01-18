@@ -16,7 +16,6 @@
         Background="Gray">
     <Window.Resources>
         <converter:BoolToRunColorConverter x:Key="BoolToRunColorConverters" />
-
     </Window.Resources>
     <Grid Background="{StaticResource PanelBackGround}"
           Margin="1">

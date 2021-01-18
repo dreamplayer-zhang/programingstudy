@@ -22,6 +22,7 @@ namespace Root_AOP01_Inspection
         InfoCarrier m_infoCarrier = null;
         public Dlg_Start(InfoCarrier infoCarrier)
         {
+
             InitializeComponent();
             m_infoCarrier = infoCarrier;
         }
