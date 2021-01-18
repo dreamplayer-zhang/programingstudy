@@ -17,7 +17,7 @@ namespace Root_CAMELLIA
     {
         private MainWindow m_MainWindow;
         public DataManager DataManager;
-        public Met.Nanoview NanoView;
+        
 
         #region Property
         public Module_Camellia p_Module_Camellia
@@ -77,6 +77,7 @@ namespace Root_CAMELLIA
             m_MainWindow = mainwindow;
 
             Init();
+       
             ViewModelInit();
             DialogInit(mainwindow);
 
@@ -85,6 +86,10 @@ namespace Root_CAMELLIA
 
 
             InitNanoView();
+            if (p_InitNanoview)
+            {
+                InitTimer();
+            }
             //m_reg.Write(,);
         }
 
@@ -339,6 +344,8 @@ namespace Root_CAMELLIA
 
         }
 
+
+
         private void ViewModelInit()
         {
             EngineerViewModel = new Dlg_Engineer_ViewModel(this);
@@ -403,15 +410,40 @@ namespace Root_CAMELLIA
 
         #region Timer
         DispatcherTimer m_timer = new DispatcherTimer();
-        void InitTimer()
+        private DispatcherTimer m_LightSourcetimer = new DispatcherTimer();
+        private string m_LightSourcePath = "";
+        public string p_LightSourcePath { get; set; }
+        public void InitTimer()
         {
-            m_timer.Interval = TimeSpan.FromMilliseconds(100);
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Start();
+            //m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            //m_timer.Tick += M_timer_Tick;
+            //m_timer.Start();
+            p_LightSourcePath = SettingViewModel.m_reg.Read(BaseDefine.RegLightSourcePath, m_LightSourcePath);
+
+            m_LightSourcetimer.Interval = TimeSpan.FromMinutes(5);
+            m_LightSourcetimer.Tick += LightSourceTimer_Tick;
+            m_LightSourcetimer.Start();
+
+            //p_LightSourcePath = SettingViewModel.p_LightSourceLogPath;
+            //p_LightSourcePath = SettingViewModel.m_reg.Read(BaseDefine.RegLightSourcePath, m_LightSourcePath);
         }
+
         private void M_timer_Tick(object sender, EventArgs e)
         {
+
             //tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+        private void LightSourceTimer_Tick(object sender, EventArgs e)
+        {
+            if(p_LightSourcePath != "")
+            {
+                 App.m_nanoView.LightSourceLogging(p_LightSourcePath);
+            }
+        }
+
+        public void LightSourceTimer_Stop()
+        {
+            m_LightSourcetimer.Stop();
         }
         #endregion
 
@@ -467,6 +499,18 @@ namespace Root_CAMELLIA
                     dialog.LogUI.Init(LogView.m_logView);
                     dialog.ToolBoxUI.Init(App.m_engineer);
                     Nullable<bool> result = dialog.ShowDialog();
+                });
+            }
+        }
+
+        public ICommand CmdTest
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    test tes = new test();
+                    tes.ShowDialog();
                 });
             }
         }

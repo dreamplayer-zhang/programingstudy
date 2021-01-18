@@ -97,7 +97,7 @@
                 </LinearGradientBrush>
             </Grid.Background>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.2*"/>
+                <ColumnDefinition Width="1.5*"/>
                 <ColumnDefinition Width="1.8*"/>
                 <ColumnDefinition Width="4*"/>
                 <ColumnDefinition Width="1.8*"/>
@@ -108,6 +108,7 @@
                 <Button Content="Load" VerticalAlignment="Center" Height="40" Width="60" Margin="5"     Command="{Binding CmdLoad}"/>
                 <Button Content="Recipe" VerticalAlignment="Center" Height="40" Width="60" Margin="5"   Command="{Binding CmdRecipe}"/>
                 <Button Content="Engineer" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdEngineer}"/>
+                <Button Content="Test" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdTest}"/>
             </StackPanel>
             <Grid Grid.Column="1">
                 <TextBlock x:Name="tbTime"
