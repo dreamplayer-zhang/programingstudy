@@ -300,7 +300,7 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Calc Sequence
-        public int m_nRnR = 1;
+        //public int m_nRnR = 1;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
@@ -377,17 +377,18 @@ namespace Root_CAMELLIA
                         StateHome();
                         break;
                     case EQ.eState.Run:
-                        if (EQ.IsStop()) return;
                         if (m_moduleList.m_qModuleRun.Count == 0)
                         {
                             CheckLoad();
                             m_process.p_sInfo = m_process.RunNextSequence();
                             CheckUnload();
-                            if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            //if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 m_process.ReCalcSequence();
-                                m_nRnR--;
+                                //m_nRnR--;
+                                EQ.p_nRnR--;
                                 EQ.p_eState = EQ.eState.Run;
                             } 
                         }

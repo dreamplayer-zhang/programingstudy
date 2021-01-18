@@ -553,7 +553,7 @@ namespace RootTools.Camera.BaslerPylon
                 // Check if the image can be displayed.
                 if (grabResult.IsValid)
                 {
-                    if (!stopWatch.IsRunning || stopWatch.ElapsedMilliseconds > 33)
+                    if (!stopWatch.IsRunning)
                     {  
                         if (m_bLive)
                         {
@@ -571,23 +571,26 @@ namespace RootTools.Camera.BaslerPylon
                                 byte[] aBuf = grabResult.PixelData as byte[];
                                 Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
                             }
+                            GrabEvent();
 
+                            if (stopWatch.ElapsedMilliseconds > 33)
+                            {
+                                if (_dispatcher != null)
+                                {
+                                    _dispatcher.Invoke(new Action(delegate ()
+                                    {
+                                        m_ImageGrab.UpdateImage();
+                                    }));
+                                }
+                                else
+                                {
+                                    Application.Current.Dispatcher.Invoke((Action)delegate
+                                    {
+                                        m_ImageGrab.UpdateImage();
+                                    });
+                                }
+                            }
                             stopWatch.Reset();
-
-                            if (_dispatcher != null)
-                            {
-                                _dispatcher.Invoke(new Action(delegate ()
-                                {
-                                    m_ImageGrab.UpdateImage();
-                                }));
-                            }
-                            else
-                            {
-                                Application.Current.Dispatcher.Invoke((Action)delegate
-                                {
-                                    m_ImageGrab.UpdateImage();
-                                });
-                            }
                         }
                         else
                         {

@@ -494,6 +494,16 @@ namespace Root_EFEM.Module
         #region ModuleRun
         ModuleRunBase m_runDocking;
         ModuleRunBase m_runUndocking;
+
+        public ModuleRunBase GetUnLoadModuleRun()
+        {
+            return m_runUndocking;
+        }
+        public ModuleRunBase GetLoadModuleRun()
+        {
+            return m_runDocking;
+        }
+
         protected override void InitModuleRuns()
         {
             m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");

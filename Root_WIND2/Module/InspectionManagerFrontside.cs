@@ -18,144 +18,91 @@ namespace Root_WIND2
 {
     public class InspectionManagerFrontside : WorkFactory
     {
+        private readonly Recipe recipe;
+        public Recipe Recipe { get => recipe; }
 
-        SolidColorBrush brushSnap = System.Windows.Media.Brushes.LightSkyBlue;
-        SolidColorBrush brushPosition = System.Windows.Media.Brushes.SkyBlue;
-        SolidColorBrush brushPreInspection = System.Windows.Media.Brushes.Cornsilk;
-        SolidColorBrush brushInspection = System.Windows.Media.Brushes.Gold;
-        SolidColorBrush brushMeasurement = System.Windows.Media.Brushes.CornflowerBlue;
-        SolidColorBrush brushComplete = System.Windows.Media.Brushes.YellowGreen;
-
-
-        #region [Member Variables]
-        WorkBundle workBundle;
-        WorkplaceBundle workplaceBundle;
-
-        #endregion
-
-        public InspectionManagerFrontside(IntPtr _sharedBuffer, int _width, int _height)
+        private readonly SharedBufferInfo bufferInfo;
+        public SharedBufferInfo BufferInfo
         {
-            this.sharedBufferR_Gray = _sharedBuffer;
-            this.sharedBufferWidth = _width;
-            this.sharedBufferHeight = _height;
-            sharedBufferByteCnt = 1;
+            get => this.bufferInfo;
         }
 
-        protected override void InitWorkManager()
+        public InspectionManagerFrontside(Recipe recipe, SharedBufferInfo bufferInfo)
         {
-            this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP, 8));
-            this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORK_TYPE.ALIGNMENT, STATE_CHECK_TYPE.CHIP, 8));
-            this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.CHIP, 8));
-            this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
+            this.recipe = recipe;
+            this.bufferInfo = bufferInfo;
+        }
 
+
+
+
+
+        #region [Override]
+        protected override void Initialize()
+        {
+            CreateWorkManager(WORK_TYPE.SNAP);
+            CreateWorkManager(WORK_TYPE.ALIGNMENT, 8);
+            CreateWorkManager(WORK_TYPE.INSPECTION, 4);
+            CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 8);
+            CreateWorkManager(WORK_TYPE.DEFECTPROCESS_ALL, 1, true);
 
             WIND2EventManager.SnapDone += SnapDone_Callback;
         }
 
-        private Recipe recipe;
+        
 
-        private IntPtr sharedBufferR_Gray;
-        private IntPtr sharedBufferG;
-        private IntPtr sharedBufferB;
 
-        private int sharedBufferWidth;
-        private int sharedBufferHeight;
-        private int sharedBufferByteCnt;
-
-        public Recipe Recipe { get => recipe; set => recipe = value; }
-        public IntPtr SharedBufferR_Gray { get => sharedBufferR_Gray; set => sharedBufferR_Gray = value; }
-        public IntPtr SharedBufferG { get => sharedBufferG; set => sharedBufferG = value; }
-        public IntPtr SharedBufferB { get => sharedBufferB; set => sharedBufferB = value; }
-
-        public int SharedBufferWidth { get => sharedBufferWidth; set => sharedBufferWidth = value; }
-        public int SharedBufferHeight { get => sharedBufferHeight; set => sharedBufferHeight = value; }
-        public int SharedBufferByteCnt { get => sharedBufferByteCnt; set => sharedBufferByteCnt = value; }
-
-        public enum InspectionMode
+        /// <summary>
+        /// 다음 함수에서 생성한 WorkplaceBundle로 검사를 진행합니다.
+        /// </summary>
+        /// <returns></returns>
+        protected override WorkplaceBundle CreateWorkplaceBundle()
         {
-            FRONT,
-            BACK,
-            //EBR,
-            //EDGE,
+            return CreateWorkplaceBundle_WaferMap();
         }
 
-        private InspectionMode inspectionMode = InspectionMode.FRONT;
-        public InspectionMode p_InspectionMode { get => inspectionMode; set => inspectionMode = value; }
-
-        public int[] mapdata = new int[14 * 14];
-
-
-        public bool CreateInspection()
+        /// <summary>
+        /// 다음 함수에서 생성한 WorkBundle로 검사를 진행합니다.
+        /// </summary>
+        /// <returns></returns>
+        protected override WorkBundle CreateWorkBundle()
         {
-            return CreateInspection(this.recipe);
-        }
+            List<ParameterBase> paramList = recipe.ParameterItemList;
+            WorkBundle bundle = new WorkBundle();
 
-        public override bool CreateInspection(Recipe _recipe)
-        {
-            try
+            foreach (ParameterBase param in paramList)
             {
-                RecipeType_WaferMap waferMap = _recipe.WaferMap;
+                WorkBase work = (WorkBase)Tools.CreateInstance(param.InspectionType);
+                work.SetRecipe(recipe);
 
-                if (waferMap == null || waferMap.MapSizeX == 0 || waferMap.MapSizeY == 0)
-                {
-                    MessageBox.Show("Map 정보가 없습니다.");
-                    return false;
-                }
-
-                workplaceBundle = WorkplaceBundle.CreateWaferMap(_recipe);
-
-                this.SharedBufferByteCnt = 3; // 이거 수정해야함
-                workplaceBundle.SetSharedBuffer(this.SharedBufferR_Gray, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
-                workplaceBundle.SetSharedRGBBuffer(this.SharedBufferR_Gray, this.SharedBufferG, this.SharedBufferB);
-
-                workBundle = WorkBundle.CreateWorkBundle(_recipe, workplaceBundle);
-
-                if(this.SetBundles(workBundle, workplaceBundle) == false)
-                    return false;
+                bundle.Add(work);
             }
-            catch (Exception ex)
+
+            ProcessDefect processDefect = new ProcessDefect();
+            ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
+
+            bundle.Add(processDefect);
+            bundle.Add(processDefect_Wafer);
+
+            return bundle;
+        }
+
+
+        /// <summary>
+        /// 검사 정보(WorkplaceBundle, WorkBundle)을 생성 후 검사 시작 전에 상태를 확인하거나 변경합니다.
+        /// </summary>
+        /// <param name="workplaces"></param>
+        /// <param name="works"></param>
+        /// <returns>false를 반환하면 검사를 시작하지 않습니다.</returns>
+        protected override bool Ready(WorkplaceBundle workplaces, WorkBundle works)
+        {
+            if (this.Recipe.WaferMap == null)
             {
-                MessageBox.Show("Inspection 생성에 실패하였습니다.\n호출함수 : "+ MethodBase.GetCurrentMethod().Name + "\nDetail : " + ex.Message);
+                MessageBox.Show("맵정보가 존재하지 않습니다.");
                 return false;
             }
 
-            return true;
-        }
-
-        public void SnapDone_Callback(object obj, SnapDoneArgs args)
-        {
-            if (this.workplaceBundle == null || this.IsStop == true) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
-
-            Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
-
-            foreach (Workplace wp in this.workplaceBundle)
-            {
-                if (wp.STATE >= WORK_TYPE.SNAP) continue;
-
-                Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.BufferSizeY), new Point(wp.PositionX + wp.BufferSizeX, wp.PositionY));
-
-                if (snapArea.Contains(checkArea) == true)
-                {
-                    wp.STATE = WORK_TYPE.SNAP;
-                }
-            }
-
-        }
-
-        //object lockObj = new object();
-        //private void ChangedWorkplaceState_Callback(object _obj)
-        //{
-        //    lock (lockObj)
-        //    {
-        //        Workplace workplace = _obj as Workplace;
-
-        //        if (MapStateChanged != null && workplace.MapPositionX >= 0 && workplace.MapPositionY >= 0)
-        //            MapStateChanged(workplace.MapPositionX, workplace.MapPositionY, workplace.STATE);
-        //    }
-        //}
-
-        private new void Start()
-        {
+            // DB?
             string lotId = "Lotid";
             string partId = "Partid";
             string setupId = "SetupID";
@@ -166,42 +113,169 @@ namespace Root_WIND2
 
             DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
 
-            base.Start();
+            // 레시피를 사용안하는 곳도 있을 있으므로...
+            works.SetRecipe(recipe);
+
+            return true;
         }
 
-        public void SetColorSharedBuffer(IntPtr ptrR, IntPtr ptrG, IntPtr ptrB)
-        {
-            this.SharedBufferR_Gray = ptrR;
-            this.SharedBufferG = ptrG;
-            this.SharedBufferB = ptrB;
-            this.SharedBufferByteCnt = 3;
-        }
+        #endregion
 
-        public void Start(bool Snap)
-        {
-            if (this.Recipe == null && this.Recipe.WaferMap == null)
-                return;
 
-            if(Snap == false)
+        public WorkplaceBundle CreateWorkplaceBundle_WaferMap()
+        {
+            RecipeType_WaferMap mapInfo = recipe.WaferMap;
+            OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
+            PositionRecipe positionRecipe = recipe.GetRecipe<PositionRecipe>();
+
+            WorkplaceBundle bundle = new WorkplaceBundle();
+            try
             {
-                foreach (Workplace wp in this.workplaceBundle)
+                int maxMasterFeaturePositionX = int.MinValue;
+                int maxMasterFeaturePositionY = int.MinValue;
+                int maxMasterFeatureWidth = int.MinValue;
+                int maxMasterFeatureHeight = int.MinValue;
+                foreach (RecipeType_ImageData feature in positionRecipe.ListMasterFeature)
                 {
-                    wp.STATE = WORK_TYPE.SNAP;
-                }
-            }
+                    if (maxMasterFeaturePositionX < feature.PositionX + feature.Width)
+                    {
+                        maxMasterFeaturePositionX = feature.PositionX;
+                        maxMasterFeatureWidth = feature.Width;
+                    }
 
-            Start();
+                    if (maxMasterFeaturePositionY < feature.PositionY + feature.Height)
+                    {
+                        maxMasterFeaturePositionY = feature.PositionY;
+                        maxMasterFeatureHeight = feature.Height;
+                    }
+                }
+
+                //bundle.Add(new Workplace(-1, -1, maxMasterFeaturePositionX + originRecipe.OriginX + maxMasterFeatureWidth, maxMasterFeaturePositionY + originRecipe.OriginY + maxMasterFeatureHeight, 0, 0, bundle.Count));
+                bundle.Add(new Workplace(-1, -1, 0, 0, 0, 0, bundle.Count));
+
+                var wafermap = mapInfo.Data;
+                int nSizeX = mapInfo.MapSizeX;
+                int nSizeY = mapInfo.MapSizeY;
+                int nMasterX = mapInfo.MasterDieX;
+                int nMasterY = mapInfo.MasterDieY;
+                int nDiePitchX = originRecipe.DiePitchX;
+                int nDiePitchY = originRecipe.DiePitchY;
+
+                int nOriginAbsX = originRecipe.OriginX;
+                int nOriginAbsY = originRecipe.OriginY - originRecipe.DiePitchY; // 좌상단 기준
+
+                bundle.SizeX = nSizeX;
+                bundle.SizeY = nSizeY;
+
+                // Right
+                for (int x = nMasterX; x < nSizeX; x++)
+                {
+                    // Top
+                    for (int y = nMasterY; y >= 0; y--)
+                    {
+                        if (wafermap[x + y * nSizeX] == 1)
+                        {
+                            int distX = x - nMasterX;
+                            int distY = y - nMasterY;
+                            int nDieAbsX = nOriginAbsX + distX * nDiePitchX;
+                            int nDieAbsY = nOriginAbsY + distY * nDiePitchY;
+
+                            Workplace workplace = new Workplace(x, y, nDieAbsX, nDieAbsY, nDiePitchX, nDiePitchY, bundle.Count);
+
+                            if (y == nMasterY)
+                            {
+                                workplace.SetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP, true);
+                            }
+
+                            bundle.Add(workplace);
+                        }
+                    }
+
+                    // Bottom
+                    for (int y = nMasterY + 1; y < nSizeY; y++)
+                    {
+                        if (wafermap[x + y * nSizeX] == 1)
+                        {
+                            int distX = x - nMasterX;
+                            int distY = y - nMasterY;
+                            int nDieAbsX = nOriginAbsX + distX * nDiePitchX;
+                            int nDieAbsY = nOriginAbsY + distY * nDiePitchY;
+
+                            Workplace workplace = new Workplace(x, y, nDieAbsX, nDieAbsY, nDiePitchX, nDiePitchY, bundle.Count);
+                            bundle.Add(workplace);
+                        }
+                    }
+                }
+
+
+                // Left
+                for (int x = nMasterX - 1; x >= 0; x--)
+                {
+                    // Top
+                    for (int y = nMasterY; y >= 0; y--)
+                    {
+                        if (wafermap[x + y * nSizeX] == 1)
+                        {
+                            int distX = x - nMasterX;
+                            int distY = y - nMasterY;
+                            int nDieAbsX = nOriginAbsX + distX * nDiePitchX;
+                            int nDieAbsY = nOriginAbsY + distY * nDiePitchY;
+
+
+                            Workplace workplace = new Workplace(x, y, nDieAbsX, nDieAbsY, nDiePitchX, nDiePitchY, bundle.Count);
+
+                            if (y == nMasterY)
+                            {
+                                workplace.SetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP, true);
+                            }
+
+                            bundle.Add(workplace);
+                        }
+                    }
+
+                    // Bottom
+                    for (int y = nMasterY + 1; y < nSizeY; y++)
+                    {
+                        if (wafermap[x + y * nSizeX] == 1)
+                        {
+                            int distX = x - nMasterX;
+                            int distY = y - nMasterY;
+                            int nDieAbsX = nOriginAbsX + distX * nDiePitchX;
+                            int nDieAbsY = nOriginAbsY + distY * nDiePitchY;
+
+                            Workplace workplace = new Workplace(x, y, nDieAbsX, nDieAbsY, nDiePitchX, nDiePitchY, bundle.Count);
+                            bundle.Add(workplace);
+                        }
+                    }
+                }
+
+                bundle.SetSharedBuffer(this.bufferInfo);
+                this.workplaceBundle = bundle;
+                return bundle;
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException("Inspection 생성에 실패 하였습니다.\n", ex.Message);
+            }
         }
 
-        public void Stop()
+        WorkplaceBundle workplaceBundle;
+        public void SnapDone_Callback(object obj, SnapDoneArgs args)
         {
-            if(this.workplaceBundle != null)
-            {
-                this.workplaceBundle.Reset();
-                workBundle = null;
-                workplaceBundle = null;
+            if (this.workplaceBundle == null || this.IsStop == true) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
 
-                base.Stop();
+            Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
+
+            foreach (Workplace wp in this.workplaceBundle)
+            {
+                if (wp.WorkState >= WORK_TYPE.SNAP) continue;
+
+                Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.Width), new Point(wp.PositionX + wp.Width, wp.PositionY));
+
+                if (snapArea.Contains(checkArea) == true)
+                {
+                    wp.WorkState = WORK_TYPE.SNAP;
+                }
             }
         }
     }

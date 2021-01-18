@@ -7,12 +7,15 @@ using RootTools.Gem;
 using RootTools.Module;
 using RootTools.OHTNew;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Root_WIND2
 {
@@ -415,12 +418,16 @@ namespace Root_WIND2
                     case EQ.eState.Home:
                         StateHome();
                         break;
+                    case EQ.eState.Ready:
+                        //CheckLoad();
+                        break;
                     case EQ.eState.Run:
                         if (p_moduleList.m_qModuleRun.Count == 0)
-                        {
-                            //CheckLoad();
+                        {   
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            //CheckUnload();
+
+                            if (m_process.m_qSequence.Count == 0)
+                                CheckUnload();
                             if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
@@ -435,6 +442,64 @@ namespace Root_WIND2
         }
         #endregion
 
+        void CheckLoad()
+        {
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if(loadport.p_infoCarrier.p_eState ==InfoCarrier.eState.Dock)
+                {
+                    //Queue<EFEM_Process.Sequence> sequence = m_process.m_qSequence;
+                    if (m_process.m_qSequence.Count != 0) return;
+                    InfoCarrier infoCarrier = loadport.p_infoCarrier;
+                    Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
+                        manualJobSchedule.ShowPopup();
+                        //m_process.m_qSequence.Enqueue(new EFEM_Process.Sequence(loadport.GetUnLoadModuleRun(),null));
+                    });
+                    
+                }
+            }
+            //if (m_process.m_qSequence.Count == 0) return;
+            //EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
+            //string sLoadport = sequence.m_infoWafer.m_sModule;
+            //foreach (ILoadport loadport in m_aLoadport)
+            //{
+            //    if (loadport.p_id == sLoadport)
+            //    {
+            //        //loadport.RunDocking();
+            //        //if (loadport.StartRunDocking() != "OK") return;
+            //        if (EQ.p_bRecovery == false)
+            //        {
+            //            InfoCarrier infoCarrier = loadport.p_infoCarrier;
+            //            ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
+            //            manualJobSchedule.ShowPopup();
+            //        }
+            //    }
+            //}
+        }
+
+        void CheckUnload()
+        {
+            EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+                {
+                    string sLoadport = loadport.p_id;
+                    bool bUndock = true;
+                    foreach (EFEM_Process.Sequence sequence in aSequence)
+                    {
+                        if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
+                    }
+                    if (bUndock)
+                    {
+                        loadport.StartRunUndocking();
+                        EQ.p_eState = EQ.eState.Ready;
+                    }
+                }
+            }
+        }
         #region Tree
         public void RunTreeModule(Tree tree)
         {

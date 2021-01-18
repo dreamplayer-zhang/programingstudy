@@ -58,9 +58,9 @@ namespace Root_EFEM
 
         void InitTimer()
         {
-            m_timer.Interval = TimeSpan.FromSeconds(1);
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Start();
+            //m_timer.Interval = TimeSpan.FromSeconds(1);
+            //m_timer.Tick += M_timer_Tick;
+            //m_timer.Start();
         }
 
         private void M_timer_Tick(object sender, EventArgs e)
