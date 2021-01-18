@@ -246,8 +246,9 @@
       <DependentUpon>Explorer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converter\BoolConverter.cs" />
-    <Compile Include="UI_Dialog\test.xaml.cs">
-      <DependentUpon>test.xaml</DependentUpon>
+	  <Compile Include="UI_Dialog\test.xaml.cs">
+		  <DependentUpon>test.xaml</DependentUpon>
+	  </Compile>
     <Compile Include="ManualJob\ManualJobSchedule.cs" />
     <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
@@ -335,6 +336,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_Dialog\test.xaml">
+		<SubType>Designer</SubType>
+		<Generator>MSBuild:Compile</Generator>
+	</Page>
     <Page Include="ManualJob\ManualJobSchedule_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
