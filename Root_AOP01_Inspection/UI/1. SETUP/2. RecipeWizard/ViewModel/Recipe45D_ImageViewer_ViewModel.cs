@@ -34,7 +34,7 @@ namespace Root_AOP01_Inspection
 
         public Recipe45D_ImageViewer_ViewModel()
         {
-            base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
+            base.init(ProgramManager.Instance.ImageMain, ProgramManager.Instance.DialogService);
             p_VisibleMenu = Visibility.Visible;
             //Shapes.CollectionChanged += Shapes_CollectionChanged;
             //InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;

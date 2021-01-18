@@ -25,15 +25,17 @@ namespace Root_AOP01_Inspection.UI_UserControl
             InitializeComponent();
         }
 
+        AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
         Loadport_Cymechs m_loadport;
         InfoCarrier m_infoCarrier;
 
-        public void Init(ILoadport loadport, AOP01_Handler handler)
+        public void Init(ILoadport loadport, AOP01_Engineer engineer)
         {
             m_loadport = (Loadport_Cymechs)loadport;
             m_infoCarrier = m_loadport.p_infoCarrier;
-            m_handler = handler;
+            m_engineer = engineer;
+            m_handler = engineer.m_handler;
             this.DataContext = loadport;
             textBoxPodID.DataContext = loadport.p_infoCarrier;
             textBoxLotID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
@@ -42,7 +44,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
             InitButtonLoad();
             InitTimer();
 
-            m_manualjob = new ManualJobSchedule(m_loadport, m_handler, m_infoCarrier);
+            m_manualjob = new ManualJobSchedule(m_loadport, m_engineer, m_infoCarrier);
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -56,11 +58,11 @@ namespace Root_AOP01_Inspection.UI_UserControl
         {
             Placed.Background = m_loadport.m_diPlaced.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
             Present.Background = m_loadport.m_diPresent.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
-            //Load.Background = m_loadport.m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
-            //UnLoad.Background = m_loadport.m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
+            Load.Background = m_loadport.m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
+            UnLoad.Background = m_loadport.m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
             Alarm.Background = m_loadport.p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
-            //ButtonLoad.IsEnabled = IsEnableLoad();            
-            //ButtonUnLoadReq.IsEnabled = IsEnableUnloadReq();  
+            ButtonLoad.IsEnabled = IsEnableLoad();            
+            ButtonUnLoadReq.IsEnabled = IsEnableUnloadReq();  
         }
 
 
@@ -92,7 +94,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
             bReadyToLoad = true;
             bool bReadyState = (m_loadport.m_qModuleRun.Count == 0);
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
-            //if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
+            if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
             bool bPlaced = m_loadport.CheckPlaced();
 
             if (m_handler.IsEnableRecovery() == true) return false;
@@ -102,8 +104,10 @@ namespace Root_AOP01_Inspection.UI_UserControl
         public static string sLoadportNum;
         private void ButtonLoad_Click(object sender, RoutedEventArgs e)
         {
+            m_handler.m_nRnR = 1;
             sLoadportNum = m_loadport.p_id;
-            //if (IsEnableLoad() == false) return;
+            if (IsEnableLoad() == false) return;
+            m_loadport.StartRunDocking();
             if (m_manualjob.ShowPopup(m_handler) == false) return;
             m_bgwLoad.RunWorkerAsync();
         }

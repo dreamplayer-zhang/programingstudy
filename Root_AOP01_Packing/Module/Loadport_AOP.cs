@@ -138,7 +138,7 @@ namespace Root_AOP01_Packing.Module
             {
                 if (_doAlram == value) return;
                 _doAlram = value;
-                m_doAlram.Write(value);
+                m_doAlarm.Write(value);
             }
         }
         #endregion
@@ -164,7 +164,7 @@ namespace Root_AOP01_Packing.Module
                 case GemCarrierBase.ePresent.Empty: m_svidPlaced.p_value = false; break;
                 case GemCarrierBase.ePresent.Exist: m_svidPlaced.p_value = true; break;
             }
-            return m_svidPlaced.p_value;
+            return (m_svidPlaced.p_value == null) ? false : m_svidPlaced.p_value;
         }
         #endregion
 
@@ -503,6 +503,15 @@ namespace Root_AOP01_Packing.Module
         #region ModuleRun
         ModuleRunBase m_runDocking;
         ModuleRunBase m_runUndocking;
+        public ModuleRunBase GetUnLoadModuleRun()
+        {
+            return m_runUndocking;
+        }
+        public ModuleRunBase GetLoadModuleRun()
+        {
+            return m_runDocking;
+        }
+
         protected override void InitModuleRuns()
         {
             m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");
@@ -563,6 +572,8 @@ namespace Root_AOP01_Packing.Module
             }
         }
         #endregion
+
+        
     }
 }
 

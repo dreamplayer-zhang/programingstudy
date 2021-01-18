@@ -16,7 +16,7 @@ namespace Root_WIND2
 		Recipe recipe;
 
 		public Edgeside_Panel Main;
-		public EdgesideSetup_ViewModel PanelVM;
+		public EdgesideSetup_ViewModel SetupVM;
 		public EdgesideSetup SetupPage;
 
 		public Edgeside_ViewModel(Setup_ViewModel setup)
@@ -29,11 +29,11 @@ namespace Root_WIND2
 		public void Init()
 		{
 			Main = new Edgeside_Panel();
-			PanelVM = new EdgesideSetup_ViewModel();
-			PanelVM.Init(setupVM, recipe);
+			SetupVM = new EdgesideSetup_ViewModel();
+			SetupVM.Init(setupVM);
 
 			SetupPage = new EdgesideSetup();
-			SetupPage.DataContext = PanelVM;
+			SetupPage.DataContext = SetupVM;
 			SetPage(SetupPage);
 		}
 
@@ -49,7 +49,7 @@ namespace Root_WIND2
 		{
 			get
 			{
-				return new RelayCommand(() => PanelVM.Scan());
+				return new RelayCommand(() => SetupVM.Scan());
 			}
 		}
 
@@ -57,7 +57,7 @@ namespace Root_WIND2
 		{
 			get
 			{
-				return new RelayCommand(() => PanelVM.Inspect());
+				return new RelayCommand(() => SetupVM.Inspect());
 			}
 		}
 
@@ -68,6 +68,19 @@ namespace Root_WIND2
 				return new RelayCommand(() => setupVM.SetRecipeWizard());
 			}
 		}
+		public RelayCommand btnWaferLoad
+        {
+            get
+            {
+				return new RelayCommand(btnWaferLoadClick);
+            }
+        }
+
+		private void btnWaferLoadClick()
+        {
+			setupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRunOpen();
+			setupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRun();
+        }
 
 		private void SetPage(UserControl page)
 		{
@@ -77,7 +90,7 @@ namespace Root_WIND2
 
 		public void UI_Redraw()
 		{
-			PanelVM.LoadParameter();
+			SetupVM.LoadParameter();
 		}
 
 	}

@@ -7,7 +7,7 @@ using RootTools;
 using RootTools.Module;
 using Root_AOP01_Inspection.Module;
 using Root_EFEM.Module;
-using static Root_EFEM.Module.WTR_RND;
+using static Root_EFEM.Module.RTR_RND;
 using RootTools.Gem;
 using System.ComponentModel;
 using Root_AOP01_Inspection.UI._3._RUN;
@@ -28,7 +28,6 @@ namespace Root_AOP01_Inspection
         WTRArm m_wtr;
         Arm m_arm;
         Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
-        //Loadport_RND[] m_rndloadport = new Loadport_RND[2];
         AOP01_Handler.eLoadport LoadportType;
         public Run_Panel()
         {
@@ -46,11 +45,12 @@ namespace Root_AOP01_Inspection
             m_loadport[0] = loadport1;
             m_loadport[1] = loadport2;
             m_mainvision = mainvision;
-            loadportA.Init(m_handler.m_aLoadport[0], m_handler);
-            loadportB.Init(m_handler.m_aLoadport[1], m_handler);
+            loadportA.Init(m_handler.m_aLoadport[0], m_engineer);
+            loadportB.Init(m_handler.m_aLoadport[1], m_engineer);
             LoadportA_State.DataContext = loadport1;
             LoadportB_State.DataContext = loadport2;
             RTR_State.DataContext = wtrcleanunit;
+            MainVision_State.DataContext = mainvision;
             InitTimer();
         }
 
@@ -96,26 +96,21 @@ namespace Root_AOP01_Inspection
 
             bool IsEnableInitialization()
             {
-                if (IsRunModule()) return false;
+                //if (IsRunModule()) return false;
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Run: return false;
-                    case EQ.eState.Home: return false;
+                    //case EQ.eState.Home: return false;
                 }
                 return true;
             }
 
             bool IsRunModule()
             {
-			    switch (LoadportType)
-			    {
-				    case AOP01_Handler.eLoadport.Cymechs:
-                    if (IsRunModule(m_loadport[0])) return true;
-                    if (IsRunModule(m_loadport[1])) return true;
-                    break;
-			    }
-                if (IsRunModule(m_wtrcleanunit)) return true;
-                if (IsRunModule(m_handler.m_mainVision)) return true;
+                //if (IsRunModule(m_loadport[0])) return true;
+                //if (IsRunModule(m_loadport[1])) return true;
+                //if (IsRunModule(m_wtrcleanunit)) return true;
+                //if (IsRunModule(m_handler.m_mainVision)) return true;
                 return false;
             }
             bool IsRunModule(ModuleBase module)
@@ -127,7 +122,7 @@ namespace Root_AOP01_Inspection
             private void ButtonInitialize_Click(object sender, RoutedEventArgs e)
             {
                 if (IsEnableInitialization() == false) return;
-                EQ.p_bStop = false;
+                EQ.p_bStop = false; 
                 m_handler.m_process.ClearInfoWafer();
                 EQ.p_eState = EQ.eState.Home;
             }
@@ -188,19 +183,21 @@ namespace Root_AOP01_Inspection
 
         private void DoorCheck_Click(object sender, RoutedEventArgs e)
         {
-            if((String)DoorCheck.Content== "DoorLock Off")
+            if((String)DoorCheck.Content== "DoorAlarm Off")
             {
-                DoorCheck.Content = "DoorLock On";
-                m_engineer.m_handler.m_aop01.m_bDoorLock = false;
+                DoorCheck.Content = "DoorAlarm On";
+                m_engineer.m_handler.m_aop01.m_bDoorAlarm = false;
             }
             else
             {
-                DoorCheck.Content = "DoorLock Off";
-                m_engineer.m_handler.m_aop01.m_bDoorLock = true;
+                DoorCheck.Content = "DoorAlarm Off";
+                m_engineer.m_handler.m_aop01.m_bDoorAlarm = true;
             }
+        }
 
-
-
+        private void ButtonStop_Click(object sender, RoutedEventArgs e)
+        {
+            EQ.p_bStop = true;
         }
     }
 }

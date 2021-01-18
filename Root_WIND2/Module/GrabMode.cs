@@ -28,6 +28,10 @@ namespace Root_WIND2.Module
         string m_sCamera = "";
         public ICamera m_camera = null;
         CameraSet m_cameraSet;
+        public RPoint m_ptXYAlignData = new RPoint(0, 0);
+        public double m_dTDIToVRSOffsetX = 0;
+        public double m_dTDIToVRSOffsetY = 0;
+        public double m_dVRSFocusPos = 0;
         public RPoint m_rpAxisCenter = new RPoint();    // Wafer Center Position
         public CPoint m_cpMemoryOffset = new CPoint();  // Memory Offset
         public double m_dResX_um = 1;                   // Camera Resolution X
@@ -52,6 +56,7 @@ namespace Root_WIND2.Module
 
         void RunTreeCamera(Tree tree, bool bVisible, bool bReadOnly)
         {
+            
             m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
             m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
             m_nReverseOffsetY = tree.Set(m_nReverseOffsetY, 800, "ReverseOffsetY", "Reverse Scan 동작시 Y 이미지 Offset 설정");
@@ -59,6 +64,10 @@ namespace Root_WIND2.Module
             m_camera = m_cameraSet.Get(m_sCamera);
             m_ScanLineNum = tree.Set(m_ScanLineNum, m_ScanLineNum, "Scan Line Number", "Scan Line Number");
             m_ScanStartLine = tree.Set(m_ScanStartLine, m_ScanStartLine, "Scan Start Line", "Scan Start Line");
+            m_ptXYAlignData = tree.Set(m_ptXYAlignData, m_ptXYAlignData, "XY Align Data", "XY Align Data", bVisible, true);
+            m_dTDIToVRSOffsetX = tree.Set(m_dTDIToVRSOffsetX, m_dTDIToVRSOffsetX, "TDI To VRS Offset X", "TDI To VRS Offset X");
+            m_dTDIToVRSOffsetY = tree.Set(m_dTDIToVRSOffsetY, m_dTDIToVRSOffsetY, "TDI To VRS Offset Y", "TDI To VRS Offset Y");
+            m_dVRSFocusPos = tree.Set(m_dVRSFocusPos, m_dVRSFocusPos, "VRS Focus Z", "VRS Focus Z", bVisible, true);
         }
 
         public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false)
@@ -240,5 +249,7 @@ namespace Root_WIND2.Module
             RunTreeScanPos(tree.GetTree("ScanPos", false), bVisible, bReadOnly);
             RunTreeRADS(tree.GetTree("RADS", false), bVisible, bReadOnly);
         }
+
+        public virtual void RunTree(Tree.eMode mode) { }
     }
 }

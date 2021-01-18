@@ -52,7 +52,6 @@ namespace Root_WIND2.Module
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
 
-        public RPoint AlignData = new RPoint(0, 0);
         #endregion
 
         public override void GetTools(bool bInit)
@@ -96,6 +95,16 @@ namespace Root_WIND2.Module
                 if (sGrabMode == grabMode.p_sName) return grabMode;
             }
             return null;
+        }
+
+        public void ClearAlignData()
+        {
+            foreach (GrabMode grabMode in m_aGrabMode)
+            {
+                grabMode.m_ptXYAlignData = new RPoint(0, 0);
+                this.RunTree(Tree.eMode.RegWrite);
+                this.RunTree(Tree.eMode.Init);
+            }
         }
 
         void RunTreeGrabMode(Tree tree)
@@ -271,6 +280,8 @@ namespace Root_WIND2.Module
                 m_axisXY.WaitReady();
                 m_axisRotate.WaitReady();
                 m_axisZ.WaitReady();
+
+                ClearAlignData();
             }
             return "OK";
         }
@@ -381,6 +392,13 @@ namespace Root_WIND2.Module
                 Thread.Sleep(200);
                 if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
                     m_CamMain.Connect();
+
+                if (m_CamAlign != null)
+                    m_CamAlign.Connect();
+
+                if (m_CamAutoFocus != null)
+                    m_CamAutoFocus.Connect();
+
                 p_sInfo = base.StateHome();
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
                 //p_bStageVac = false;

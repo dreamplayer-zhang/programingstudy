@@ -15,12 +15,13 @@ namespace Root_AOP01_Inspection
     public partial class Dlg_Start : Window
     {
         static public bool m_bShow = false;
+        AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
         AOP01_Recipe m_recipe;
-        //RNR m_aRnR;
         InfoCarrier m_infoCarrier = null;
         public Dlg_Start(InfoCarrier infoCarrier)
         {
+
             InitializeComponent();
             m_infoCarrier = infoCarrier;
         }
@@ -36,19 +37,15 @@ namespace Root_AOP01_Inspection
         {
             m_bShow = false;
         }
-        public void Init(AOP01_Handler handler)
+        public void Init(AOP01_Engineer engineer)
         {
-            //m_aRnR = new RNR();
-            //m_aRecipe = new ObservableCollection<Recipe>();
-            m_handler = handler;
+            m_engineer = engineer;
+            m_handler = engineer.m_handler;
             m_recipe = m_handler.m_recipe;
-            //listviewRCP.ItemsSource = m_aRecipe;
-            //RNRset.DataContext = m_aRnR;
         }
         ManualJobSchedule m_JobSchedule;
         public void Init(ManualJobSchedule jobschdule)
         {
-            //m_aRnR = new RNR();
             m_aRecipe = new ObservableCollection<Recipe>();
             listviewRCP.ItemsSource = m_aRecipe;
             m_JobSchedule = jobschdule;
@@ -113,45 +110,17 @@ namespace Root_AOP01_Inspection
         #endregion
 
 
-        //#region RnR Property
-        //public class RNR : NotifyProperty
-        //{
-        //
-        //    bool _bRnR = false;
-        //    public bool p_bRnR
-        //    {
-        //        get { return _bRnR; }
-        //        set
-        //        {
-        //            _bRnR = value;
-        //            OnPropertyChanged();
-        //        }
-        //    }
-        //
-        //    int _nRnR = 1;
-        //    public int p_nRnR
-        //    {
-        //        get { return _nRnR; }
-        //        set
-        //        {
-        //            _nRnR = value;
-        //            OnPropertyChanged();
-        //        }
-        //    }
-        //}
-        //#endregion
-
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
-
+            m_handler.bInit = true;
             InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(0);
             if (infoWafer != null)
             {
                 infoWafer.RecipeOpen(sRecipe);
                 m_handler.AddSequence(infoWafer);
                 m_handler.CalcSequence();
-                //m_infoCarrier.StartProcess(infoWafer.p_id);
             }
+
             this.DialogResult = true;
         }
     }

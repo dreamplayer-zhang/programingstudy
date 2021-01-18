@@ -5,7 +5,7 @@ using System.Security.Authentication.ExtendedProtection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
     public abstract class WorkFactory
     {
@@ -70,7 +70,12 @@ namespace RootTools_Vision
             WorkEventManager.ProcessDefectWaferDone -= OnProcessDefectWaferDone_Callback;
         }
 
-        public void OnProcessDefectWaferDone_Callback(object obj, PocessDefectWaferDoneEventArgs args)
+        public void OnProcessDefectWaferDone_Callback(object obj, ProcessDefectWaferDoneEventArgs args)
+        {
+            Stop();
+        }
+
+        ~WorkFactory()
         {
             Stop();
         }

@@ -16,7 +16,6 @@
         Background="Gray">
     <Window.Resources>
         <converter:BoolToRunColorConverter x:Key="BoolToRunColorConverters" />
-
     </Window.Resources>
     <Grid Background="{StaticResource PanelBackGround}"
           Margin="1">
@@ -504,7 +503,7 @@
                         </GroupBox>
                     </Grid>
                 </GroupBox>
-                <GroupBox Header="User Set" Grid.Row="1">
+                <GroupBox Name="UserSetBox" Header="User Set" Grid.Row="1">
                     <Grid>
                         <UniformGrid Columns="2"
                                      Margin="10,5">
