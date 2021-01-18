@@ -162,16 +162,24 @@ namespace RootTools_Vision
             {
                 if (isStop == true)
                 {
-                    this.State = WORKMANAGER_STATE.STOP;
                     Reset();
+                    this.State = WORKMANAGER_STATE.STOP;
                     _waitSignal.Reset();
                     _waitSignal.WaitOne();
                     continue;
                 }
                 else
                 {
-                    this.State = WORKMANAGER_STATE.WAIT;
-                    _waitSignal.WaitOne();
+                    this.State = WORKMANAGER_STATE.READY;
+                    _waitSignal.WaitOne(100);
+                }
+
+                this.State = WORKMANAGER_STATE.CHECK;
+                // 아직 일이 남아있는지 체크
+                if (this.workplaceBundle.CheckStateCompleted(this.workType) == true) // 모두 완료되었다면,
+                {
+                    Stop();
+                    continue;
                 }
 
                 if (cancellationTokenSource.Token.IsCancellationRequested)
@@ -180,40 +188,26 @@ namespace RootTools_Vision
                     return;
                 }
 
-
-                this.State = WORKMANAGER_STATE.CHECK;
-                // 아직 일이 남아있는지 체크
-                if (this.workplaceBundle.CheckStateCompleted(this.workType) == true) // 모두 완료되었다면,
+                this.State = WORKMANAGER_STATE.ASSIGN;
+                Task.Run(() =>
                 {
-                    //  종료 후 대기 초기화 시키면안됨
-                    //_waitSignal.Reset();
-                    //_waitSignal.WaitOne();
-                    Stop();
-                }
-                else
-                {
-                    this.State = WORKMANAGER_STATE.ASSIGN;
-
-                    Task.Run(() =>
+                    if (AssignWorkToWorker() == false)
                     {
-                        if (AssignWorkToWorker() == false)
-                        {
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                            DebugOutput.PrintWorkManagerInfo(this, "False");
+                        DebugOutput.PrintWorkManagerInfo(this, "False");
 #endif
 #endif
-                        }
-                        else
-                        {
+                    }
+                    else
+                    {
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                            DebugOutput.PrintWorkManagerInfo(this, "True");
+                        DebugOutput.PrintWorkManagerInfo(this, "True");
 #endif
 #endif
-                        }
-                    });
-                }
+                    }
+                });
 
                 this.State = WORKMANAGER_STATE.DONE;
 
@@ -319,7 +313,7 @@ namespace RootTools_Vision
         private void WorkplaceStateChanged_Callback(object obj, WorkplaceStateChangedEventArgs args)
         {
             Workplace workplace = args.workplace;
-            if (this.isStop == true || this.state != WORKMANAGER_STATE.WAIT) return;
+            if (this.isStop == true || this.state != WORKMANAGER_STATE.READY) return;
 
             if (this.isFull == true && this.workplaceBundle.CheckStateAll(this.preWorkType) == false) return;
 
@@ -328,6 +322,21 @@ namespace RootTools_Vision
                 _waitSignal.Set();
                 //Debug.WriteLine("State - " + workplace.WorkState + " : " + workplace.MapIndexX + ", " + workplace.MapIndexY);
             }
+        }
+
+
+        public bool WaitStop()
+        {
+            Stop();
+
+            foreach(Worker wk in this.workers)
+            {
+                while (wk.WorkerState != WORKER_STATE.WORK_STOP) Task.Delay(10);
+            }
+
+            while (this.State != WORKMANAGER_STATE.STOP) Task.Delay(10);
+
+            return true;
         }
 
         /// <summary>
