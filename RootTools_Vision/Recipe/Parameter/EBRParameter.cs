@@ -15,13 +15,55 @@ namespace RootTools_Vision
 		}
 
 		#region [Parameter]
+		private int roiWidth;
+		private int roiHeight;
+		private int notchY;
+		private int stepDegree;
 		private int xRange;
-		private int edgeDiff;
-		private int bevelDiff;
-		private int ebrDiff;
+		private int diffEdge;
+		private int diffBevel;
+		private int diffEBR;
+		private int offsetBevel;
+		private int offsetEBR;
 		#endregion
 
 		#region [Getter/Setter]
+		[Category("Parameter")]
+		public int RoiWidth
+		{
+			get => this.roiWidth;
+			set
+			{
+				SetProperty<int>(ref this.roiWidth, value);
+			}
+		}
+		[Category("Parameter")]
+		public int RoiHeight
+		{
+			get => this.roiHeight;
+			set
+			{
+				SetProperty<int>(ref this.roiHeight, value);
+			}
+		}
+		[Category("Parameter")]
+		public int NotchY
+		{
+			get => this.notchY;
+			set
+			{
+				SetProperty<int>(ref this.notchY, value);
+			}
+		}
+		[Category("Parameter")]
+		public int StepDegree
+		{
+			get => this.stepDegree;
+			set
+			{
+				SetProperty<int>(ref this.stepDegree, value);
+			}
+		}
 		[Category("Parameter")]
 		public int XRange
 		{
@@ -32,30 +74,48 @@ namespace RootTools_Vision
 			}
 		}
 		[Category("Parameter")]
-		public int EdgeDiff
+		public int DiffEdge
 		{
-			get => this.edgeDiff;
+			get => this.diffEdge;
 			set
 			{
-				SetProperty<int>(ref this.edgeDiff, value);
+				SetProperty<int>(ref this.diffEdge, value);
 			}
 		}
 		[Category("Parameter")]
-		public int BevelDiff
+		public int DiffBevel
 		{
-			get => this.bevelDiff;
+			get => this.diffBevel;
 			set
 			{
-				SetProperty<int>(ref this.bevelDiff, value);
+				SetProperty<int>(ref this.diffBevel, value);
 			}
 		}
 		[Category("Parameter")]
-		public int EBRDiff
+		public int DiffEBR
 		{
-			get => this.ebrDiff;
+			get => this.diffEBR;
 			set
 			{
-				SetProperty<int>(ref this.ebrDiff, value);
+				SetProperty<int>(ref this.diffEBR, value);
+			}
+		}
+		[Category("Parameter")]
+		public int OffsetBevel
+		{
+			get => this.offsetBevel;
+			set
+			{
+				SetProperty<int>(ref this.offsetBevel, value);
+			}
+		}
+		[Category("Parameter")]
+		public int OffsetEBR
+		{
+			get => this.offsetEBR;
+			set
+			{
+				SetProperty<int>(ref this.offsetEBR, value);
 			}
 		}
 

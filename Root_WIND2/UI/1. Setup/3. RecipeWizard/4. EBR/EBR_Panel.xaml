@@ -14,14 +14,11 @@
         <Border BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
             <Grid>
                 <StackPanel Margin="0,10,0,0">
-                    <Button Content="Setup"
-                            Command="{Binding btnEBRSummary}"
-                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="Snap"
-                            Command="{Binding btnEBRIllum}"
+                            Command="{Binding btnEBRSnap}"
                             Style="{StaticResource PanelBtn}"/>
                     <Button Content="Inspection"
-                            Command="{Binding btnEBRSpec}"
+                            Command="{Binding btnEBRInsp}"
                             Style="{StaticResource PanelBtn}"/>
                 </StackPanel>
                 <Button Content="Back"

@@ -43,7 +43,7 @@ namespace Root_AOP01_Inspection.Module
 			//this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP));
 			this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP, 10));
 			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.CHIP));
-			this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
+			this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.DEFECTPROCESS_ALL, WORK_TYPE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
 
 			AOPEventManager.SnapDone += SnapDone_Callback;
 		}

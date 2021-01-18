@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RootTools.Database;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
     public enum WORK_TYPE
     {
@@ -16,6 +16,7 @@ namespace RootTools_Vision
         INSPECTION          = 0b0001000,
         DEFECTPROCESS       = 0b0010000,
         DEFECTPROCESS_WAFER = 0b0100000,
+        MEASUREMENTPROCESS  = 0b1000000,
     }
 
     public enum WORKPLACE_SUB_STATE
@@ -137,6 +138,7 @@ namespace RootTools_Vision
         public int SharedBufferHeight { get => sharedBufferHeight; private set => sharedBufferHeight = value; }
         public int SharedBufferByteCnt { get => sharedBufferByteCnt; private set => sharedBufferByteCnt = value; }
         public bool IsOccupied { get => isOccupied; set => isOccupied = value; }
+        
         public List<Defect> DefectList { get => defectList; set => defectList = value; }
 
 

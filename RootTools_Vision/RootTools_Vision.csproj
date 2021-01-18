@@ -99,11 +99,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="InspectionManager.cs" />
     <Compile Include="Inspection\BacksideSurface.cs" />
     <Compile Include="Inspection\D2D.cs" />
     <Compile Include="Inspection\EBR.cs" />
     <Compile Include="Inspection\EdgeSurface.cs" />
     <Compile Include="Inspection\ProcessDefect_Wafer.cs" />
+    <Compile Include="Inspection\ProcessMeasurement.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
     <Compile Include="Recipe\Parameter\BacksideSurfaceParameter.cs" />
     <Compile Include="Recipe\Parameter\D2DParameter.cs" />
@@ -137,6 +139,19 @@
     <Compile Include="Utility\Enums.cs" />
     <Compile Include="Utility\KlarfData.cs" />
     <Compile Include="Utility\KlarfData_Lot.cs" />
+    <Compile Include="WorkManager2\DebugOutput.cs" />
+    <Compile Include="WorkManager2\Interfaces\IWorkplaceBundle.cs" />
+    <Compile Include="WorkManager2\Interfaces\IWorkStartable.cs" />
+    <Compile Include="WorkManager2\WorkBase.cs" />
+    <Compile Include="WorkManager2\WorkBundle.cs" />
+    <Compile Include="WorkManager2\WorkDefines.cs" />
+    <Compile Include="WorkManager2\Worker.cs" />
+    <Compile Include="WorkManager2\WorkEventManager.cs" />
+    <Compile Include="WorkManager2\WorkEventManagerArgs.cs" />
+    <Compile Include="WorkManager2\WorkFactory.cs" />
+    <Compile Include="WorkManager2\WorkManager.cs" />
+    <Compile Include="WorkManager2\Workplace.cs" />
+    <Compile Include="WorkManager2\WorkplaceBundle.cs" />
     <Compile Include="WorkManager\WorkEventManager.cs" />
     <Compile Include="Inspection\ProcessDefect.cs" />
     <Compile Include="Utility\Tools.cs" />

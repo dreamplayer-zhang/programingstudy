@@ -108,7 +108,7 @@ namespace Root_AOP01_Inspection
             RND,
             Cymechs,
         }
-        List<eLoadport> m_aLoadportType = new List<eLoadport>();
+        public List<eLoadport> m_aLoadportType = new List<eLoadport>();
         public List<ILoadport> m_aLoadport = new List<ILoadport>();
         int m_lLoadport = 2;
         public eLoadport LoadportType;

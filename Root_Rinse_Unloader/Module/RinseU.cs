@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Module;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
@@ -16,6 +17,7 @@ namespace Root_Rinse_Unloader.Module
             Magazine,
             Stack
         }
+        string[] m_asRunMode = Enum.GetNames(typeof(eRunMode)); 
 
         eRunMode _eMode = eRunMode.Magazine;
         public eRunMode p_eMode
@@ -75,17 +77,10 @@ namespace Root_Rinse_Unloader.Module
         #region Protocol
         public enum eCmd
         {
+            Unknown,
             SetMode,
         }
-
-        public enum eReply
-        {
-            OK,
-            Command,
-            InvalidProtocol,
-            InvalidCommand,
-            InvalidValue,
-        }
+        public string[] m_asCmd = Enum.GetNames(typeof(eCmd)); 
 
         public class Protocol
         {
@@ -94,19 +89,9 @@ namespace Root_Rinse_Unloader.Module
                 get { return m_id + "," + m_eCmd.ToString() + "," + m_value.ToString(); }
             }
 
-            public eReply IsReply(string sRead)
-            {
-                string[] asRead = sRead.Split(',');
-                if (asRead.Length < 3) return eReply.InvalidProtocol; 
-                if (asRead[0] != m_id) return eReply.Command;
-                if (asRead[1] != m_eCmd.ToString()) return eReply.InvalidCommand;
-                if (asRead[2] != m_value.ToString()) return eReply.InvalidValue; 
-                return eReply.OK; 
-            }
-
-            string m_id; 
-            eCmd m_eCmd;
-            dynamic m_value; 
+            public string m_id; 
+            public eCmd m_eCmd;
+            public dynamic m_value; 
             public Protocol(string id, eCmd eCmd, dynamic value)
             {
                 m_id = id;
@@ -134,23 +119,26 @@ namespace Root_Rinse_Unloader.Module
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
-                if ((m_protocolSend == null) && (m_qProtocol.Count > 0))
+                if (m_qProtocol.Count > 0)
                 {
-                    m_protocolSend = m_qProtocol.Dequeue();
-                    m_tcpip.Send(m_protocolSend.p_sCmd); 
-                    Thread.Sleep(10);
-                    if (p_sInfo != "OK")
+                    Protocol protocol = m_qProtocol.Peek(); 
+                    if (protocol.m_id != p_id)
                     {
-                        m_protocolSend = null;
-                        m_qProtocol.Clear();
+                        m_qProtocol.Dequeue();
+                        m_tcpip.Send(protocol.p_sCmd);
+                    }
+                    else if (m_protocolSend == null)
+                    {
+                        m_protocolSend = m_qProtocol.Dequeue();
+                        m_tcpip.Send(m_protocolSend.p_sCmd);
                     }
                 }
             }
         }
 
-        public Protocol AddProtocol(eCmd eCmd, dynamic value)
+        public Protocol AddProtocol(string id, eCmd eCmd, dynamic value)
         {
-            Protocol protocol = new Protocol(p_id, eCmd, value);
+            Protocol protocol = new Protocol(id, eCmd, value);
             m_qProtocol.Enqueue(protocol);
             return protocol; 
         }
@@ -161,13 +149,49 @@ namespace Root_Rinse_Unloader.Module
         {
             try
             {
-                string sMsg = Encoding.Default.GetString(aBuf, 0, nSize);
-//                switch ()
-//                if (m_protocolSend.IsReply(sMsg))
+                string sRead = Encoding.Default.GetString(aBuf, 0, nSize);
+                string[] asRead = sRead.Split(',');
+                if (asRead.Length < 3)
+                {
+                    p_sInfo = "Invalid Protocol";
+                    return;
+                }
+                eCmd eCmd = GetCmd(asRead[1]);
+                if (asRead[0] != p_id)
+                {
+                    switch (eCmd)
+                    {
+                        case eCmd.SetMode:
+                            SetMode(asRead[2]);
+                            AddProtocol(asRead[0], eCmd, asRead[2]); 
+                            break;
+                    }
+                }
+                else
+                {
+
+                }
+
             }
             finally { }
         }
 
+        eCmd GetCmd(string sCmd)
+        {
+            for (int n = 0; n < m_asCmd.Length; n++)
+            {
+                if (sCmd == m_asCmd[n]) return (eCmd)n;
+            }
+            return eCmd.Unknown; 
+        }
+
+        void SetMode(string sMode)
+        {
+            for (int n = 0; n < m_asRunMode.Length; n++)
+            {
+                if (sMode == m_asRunMode[n]) p_eMode = (eRunMode)n;
+            }
+        }
         #endregion
 
         public RinseU(string id, IEngineer engineer)

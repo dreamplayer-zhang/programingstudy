@@ -13,6 +13,9 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using RootTools.Control;
+using System.Threading;
+using System.Collections.Concurrent;
+using static RootTools.Control.Axis;
 
 namespace Root_WIND2.Module
 {
@@ -20,6 +23,62 @@ namespace Root_WIND2.Module
     {
         Vision m_module;
         Camera_Basler m_CamAutoFocus;
+        int m_nStartFocusPosZ = 0;
+        int m_nEndFocusPosZ = 0;
+        // 추후 모드 추가
+
+        int m_nAFOffset = 0;
+        int m_nRange = 1000;
+        double m_dSpeed = 50000;
+        double m_dAcc = 0.5f;
+        double m_dDcc = 0.5f;
+
+        bool m_bUse2Step = false;
+        int m_nRange2 = 1000;
+        double m_dSpeed2 = 50000;
+        double m_dAcc2 = 0.5f;
+        double m_dDcc2 = 0.5f;
+        int m_nAFOffset2 = 0;
+
+
+        public GrabMode m_grabMode = null;
+        string m_sGrabMode = "";
+
+        #region AutoFocus Param
+        int nFrame = 0;
+        List<Mat> m_buff = new List<Mat>();
+        List<AF_Result> pos = new List<AF_Result>();
+        class AF_Result
+        {
+            public double pos;
+            public double score;
+            public AF_Result(double p, double s)
+            {
+                this.pos = p;
+                this.score = s;
+            }
+        }
+        class CalcParameter
+        {
+            public int matPos;
+            public double pos;
+
+            public CalcParameter(int matPos, double pos)
+            {
+                this.matPos = matPos;
+                this.pos = pos;
+            }
+        }
+        #endregion
+        public string p_sGrabMode
+        {
+            get { return m_sGrabMode; }
+            set
+            {
+                m_sGrabMode = value;
+                m_grabMode = m_module.GetGrabMode(value);
+            }
+        }
         public Run_AutoFocus(Vision module)
         {
             m_module = module;
@@ -30,117 +89,263 @@ namespace Root_WIND2.Module
         public override ModuleRunBase Clone()
         {
             Run_AutoFocus run = new Run_AutoFocus(m_module);
+            run.m_nStartFocusPosZ = m_nStartFocusPosZ;
+            run.m_nAFOffset = m_nAFOffset;
+            run.m_nRange = m_nRange;
+            run.m_dSpeed = m_dSpeed;
+            run.m_dAcc = m_dAcc;
+            run.m_dDcc = m_dDcc;
+            run.m_bUse2Step = m_bUse2Step;
+            run.m_nAFOffset2 = m_nAFOffset2;
+            run.m_nRange2 = m_nRange2;
+            run.m_dSpeed2 = m_dSpeed2;
+            run.m_dAcc2 = m_dAcc2;
+            run.m_dDcc2 = m_dDcc2;
+            run.p_sGrabMode = p_sGrabMode;
             return run;
         }
 
+
+
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
+            m_nStartFocusPosZ = tree.Set(m_nStartFocusPosZ, m_nStartFocusPosZ, "Auto Focus Start Pos", "Auto Focus Start Pos", bVisible);
+            p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+
+            m_nRange = tree.Set(m_nRange, m_nRange, "Set Range", "Set Range", bVisible);
+            m_dSpeed = tree.Set(m_dSpeed, m_dSpeed, "Set Speed", "Set Speed", bVisible);
+            m_dAcc = tree.Set(m_dAcc, m_dAcc, "Set Acc 1 Step", "Set Acc 1 Step", bVisible);
+            m_dDcc = tree.Set(m_dDcc, m_dDcc, "Set Dcc 1 Step", "Set Dcc 1 Step", bVisible);
+            m_nAFOffset = tree.Set(m_nAFOffset, m_nAFOffset, "Auto Focus Offset", "Auto Focus Offset", bVisible);
+
+            m_bUse2Step = tree.Set(m_bUse2Step, m_bUse2Step, "Use 2 Step", "Use 2 Step", bVisible);
+            m_nRange2 = tree.Set(m_nRange2, m_nRange2, "Set Range 2 Step", "Set Range 2 Step", bVisible);
+            m_dSpeed2 = tree.Set(m_dSpeed2, m_dSpeed2, "Set Speed 2 Step", "Set Speed 2 Step", bVisible);
+            m_dAcc2 = tree.Set(m_dAcc2, m_dAcc2, "Set Acc 2 Step", "Set Acc 2 Step", bVisible);
+            m_dDcc2 = tree.Set(m_dDcc2, m_dDcc2, "Set Dcc 2 Step", "Set Dcc 2 Step", bVisible);
+            m_nAFOffset2 = tree.Set(m_nAFOffset2, m_nAFOffset2, "Auto Focus Offset 2 Step", "Auto Focus Offset 2 Step", bVisible);
+
+
         }
 
         public override string Run()
         {
-            Axis axisZ = m_module.AxisZ;
-                int ab = 0;
-            //while (true)
-            //{
-            //    axisZ.StartMove(1000 * ab);
 
-            //}
-            
-            ImageData img = new ImageData(656, 492, 3);
-            //img.OpenFile(@"C:\Users\cgkim\Desktop\image\test.bmp",new CPoint(0,0));
-            //IntPtr intPtr = img.GetPtr();
-            img.LoadImageSync(@"C:\Users\cgkim\Desktop\VRS\Image__2021-01-08__09-10-16.bmp", new CPoint(0, 0));
-            //for (int i = 0; i < int.MaxValue; i++) ;
-            Mat matSrc = new Mat(new Size(656, 492), DepthType.Cv8U, 3, img.GetPtr(), (int)img.p_Stride);
-            Mat matLeft = new Mat(matSrc, new Rectangle(0, 0, 328, 492));
-            Mat matRight = new Mat(matSrc, new Rectangle(328, 0, 328, 492));
-            //Mat matHsv = new Mat();
-            //Mat matRedMask = new Mat();
-            //Mat matRedImg = new Mat();
-            // Mat matHsv = new Mat(new Size(2000, 2000), DepthType.Cv8U, 3, img.GetPtr(), (int)img.p_Stride);
-            // matSrc.CopyTo(matHsv);
-            VectorOfUMat rgb = new VectorOfUMat();// (656, 492, DepthType.Cv8U,1);
+            if (m_grabMode == null) return "Grab Mode == null";
 
+            try
+            {
+                m_grabMode.SetLight(true);
+                AxisXY axis = m_module.AxisXY;
+                Axis axisZ = m_module.AxisZ;
+
+
+
+                axis.StartMove(new RPoint(4242328, 3575458));
+                axis.WaitReady();
+
+                axisZ.StartMove(m_nStartFocusPosZ - (m_nRange / 2));
+                axisZ.WaitReady();
+
+                int movePos = m_nStartFocusPosZ;
+                int maxPos = movePos;
+
+
+                ImageData img = m_CamAutoFocus.p_ImageViewer.p_ImageData;
+                StopWatch sw = new StopWatch();
+
+                m_CamAutoFocus.Grabed -= M_CamAutoFocus_Grabed;
+                m_CamAutoFocus.Grabed += M_CamAutoFocus_Grabed;
+                if (m_CamAutoFocus.p_CamInfo._IsGrabbing == false)
+                    m_CamAutoFocus.GrabContinuousShot();
+
+                nFrame = 0;
+
+                while (nFrame == 0)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "OK";
+                }
+
+                Mat matSrc = new Mat(new Size(640, 480), DepthType.Cv8U, 3, img.GetPtr(), (int)img.p_Stride);
+                axisZ.StartMove(m_nStartFocusPosZ + (m_nRange / 2), m_dSpeed, m_dAcc, m_dDcc);
+                int nFrameDone = 0;
+                sw.Start();
+                nFrame = 0;
+                while (Math.Abs(axisZ.p_posActual - (m_nStartFocusPosZ + (m_nRange / 2))) > 10)
+                {
+                    if (EQ.IsStop()) return "OK";
+
+                    if (nFrameDone < nFrame)
+                    {
+                        double pos = axisZ.p_posActual;
+
+
+                        m_buff.Add(matSrc.Clone());
+
+                        CalcParameter param = new CalcParameter(nFrameDone, pos);
+
+                        ThreadPool.QueueUserWorkItem(CalcAutoFocus, param);
+                        nFrameDone++;
+
+                        Thread.Sleep(1);
+
+                    }
+
+                }
+                m_CamAutoFocus.StopGrab();
+                while (pos.Count != nFrameDone)
+                {
+                    Thread.Sleep(10);
+                }
+
+                axisZ.WaitReady();
+                System.Diagnostics.Debug.WriteLine(nFrameDone);
+                List<AF_Result> sss = pos.OrderBy(x => x.score).ToList();
+
+                double resPos = sss[0].pos + m_nAFOffset;
+                axisZ.StartMove(resPos);
+                axisZ.WaitReady();
+
+
+
+                if (m_bUse2Step)
+                {
+                    pos.Clear();
+                    axisZ.StartMove(resPos - (m_nRange2 / 2));
+                    axisZ.WaitReady();
+
+                    if (m_CamAutoFocus.p_CamInfo._IsGrabbing == false)
+                        m_CamAutoFocus.GrabContinuousShot();
+
+                    nFrame = 0;
+
+                    while (nFrame == 0)
+                    {
+                        Thread.Sleep(10);
+                        if (EQ.IsStop()) return "OK";
+                    }
+
+                    axisZ.StartMove(resPos + (m_nRange2 / 2), m_dSpeed2, m_dAcc2, m_dDcc2);
+                    nFrameDone = 0;
+                    sw.Start();
+                    nFrame = 0;
+                    while (Math.Abs(axisZ.p_posActual - (resPos + (m_nRange2 / 2))) > 10)
+                    {
+                        if (EQ.IsStop()) return "OK";
+
+                        if (nFrameDone < nFrame)
+                        {
+                            double pos = axisZ.p_posActual;
+
+
+                            m_buff.Add(matSrc.Clone());
+
+                            CalcParameter param = new CalcParameter(nFrameDone, pos);
+
+                            ThreadPool.QueueUserWorkItem(CalcAutoFocus, param);
+                            nFrameDone++;
+
+                            Thread.Sleep(1);
+
+                        }
+
+                    }
+                    m_CamAutoFocus.StopGrab();
+                    while (pos.Count != nFrameDone)
+                    {
+                        Thread.Sleep(10);
+                    }
+                    axisZ.WaitReady();
+                    System.Diagnostics.Debug.WriteLine(nFrameDone);
+                    sss = pos.OrderBy(x => x.score).ToList();
+
+                    resPos = sss[0].pos + m_nAFOffset2;
+                    axisZ.StartMove(resPos);
+                    axisZ.WaitReady();
+                }
+
+                m_grabMode.m_dVRSFocusPos = resPos;
+                m_module.RunTree(Tree.eMode.RegWrite);
+                m_module.RunTree(Tree.eMode.Init);
+                sw.Stop();
+                //System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
+                return "OK";
+            }
+            finally
+            {
+                //m_grabMode.SetLight(false);
+            }
+
+        }
+
+        private void M_CamAutoFocus_Grabed(object sender, EventArgs e)
+        {
+            nFrame++;
+        }
+
+        private void CalcAutoFocus(object obj)
+        {
+            Mat img = m_buff[m_buff.Count - 1];
+
+            StopWatch sw = new StopWatch();
+            sw.Start();
+            double curPos = ((CalcParameter)obj).pos;
+
+            VectorOfUMat rgb = new VectorOfUMat();
+            VectorOfUMat rgb2 = new VectorOfUMat();
+
+            Mat matLeft = new Mat(img, new Rectangle(10, 0, 310, 480));
+            Mat matRight = new Mat(img, new Rectangle(320, 0, 310, 480));
 
             CvInvoke.Split(matLeft, rgb);
+            CvInvoke.Split(matRight, rgb2);
+            byte[] bt = rgb[2].Bytes;
+            byte[] bt2 = rgb2[2].Bytes;
 
-            for(int i = 0; i < 3; i++)
+            int resPix = 0;
+            int resPix2 = 0;
+            int yPos = 0;
+            int yPos2 = 0;
+
+
+            var part = Partitioner.Create(0, matLeft.Height);
+            int leftwidth = matLeft.Width;
+            Parallel.ForEach(part, (i, state) =>
             {
-                //Emgu.CV.UI.ImageViewer.Show(rgb[i]);
-            }
-            CvInvoke.Threshold(rgb[2], rgb[2], 30, 255, ThresholdType.Binary);
-            //Emgu.CV.UI.ImageViewer.Show(rgb[2]);
-            //IntPtr ptr = rgb[2].Ptr;
-            //ImageData d = new ImageData(656,492);
-            //d.SetData(,ptr.scan0));
-            //d.SetData(,);
-            Bitmap a = rgb[0].Bitmap;
-            int whitePixel = 0;
-            //Array data = rgb[2].Data;Image<Gray , byte> grayImage;
-            Image<Gray, byte> image = rgb[2].ToImage<Gray,byte>();
-            for(int i = 0; i < image.Height; i++)
-            {
-                for(int j = 0; j < image.Width; j++)
+                for (int a = i.Item1; a < i.Item2; a++)
                 {
-                    byte af = image.Data[i, j, 0];
-                    if(af == 255)
+                    int pix = -1;
+                    int pix2 = -1;
+                    for (int j = 0; j < leftwidth; j++)
                     {
-                        whitePixel++;
+                        byte af = bt[(a * leftwidth) + j];
+                        byte af2 = bt2[(a * leftwidth) + j];
+                        pix += af;
+                        pix2 += af2;
                     }
-                    //byte b = image.Data[i, j, 1];
-                    //byte c = image.Data[i, j, 2];
-                }
-            }
-            //for (int i = 0; i < rgb[2].Cols; i++)
-            //{
-            //    for(int j = 0; j < rgb[2].Rows; j++)
-            //    {
-            //        //if(rgb[2].Data[0,1,1])
-            //    }
-            //}
-            Emgu.CV.UI.ImageViewer.Show(rgb[2]);
-            CvInvoke.Split(matRight, rgb);
-
-            for (int i = 0; i < 3; i++)
-            {
-                //Emgu.CV.UI.ImageViewer.Show(rgb[i]);
-            }
-            CvInvoke.Threshold(rgb[2], rgb[2], 30, 255, ThresholdType.Binary);
-            Emgu.CV.UI.ImageViewer.Show(rgb[2]);
-
-            int whitePixel2 = 0;
-            image = rgb[2].ToImage<Gray, byte>();
-            for (int i = 0; i < image.Height; i++)
-            {
-                for (int j = 0; j < image.Width; j++)
-                {
-                    byte af = image.Data[i, j, 0];
-                    if (af == 255)
+                    if (resPix < pix)
                     {
-                        whitePixel2++;
+                        resPix = pix;
+                        yPos = a;
                     }
-                    //byte b = image.Data[i, j, 1];
-                    //byte c = image.Data[i, j, 2];
+                    if (resPix2 < pix2)
+                    {
+                        resPix2 = pix2;
+                        yPos2 = a;
+                    }
+
                 }
-            }
-            ////CvInvoke.CvtColor(matSrc, matHsv, ColorConversion.Bgr2Hsv);
+            });
+            Thread.Sleep(0);
 
-            //MCvScalar lower_Red = new MCvScalar(0,0, 0);
-            //MCvScalar Upper_Red = new MCvScalar(110, 254, 254);
+            double res = Math.Abs(yPos - yPos2);
 
-            //CvInvoke.InRange(matHsv, new ScalarArray(lower_Red), new ScalarArray(Upper_Red), matRedMask);
-            ////CvInvoke.BitwiseAnd(matSrc, matSrc, matRedImg, matRedMask);
+            pos.Add(new AF_Result(curPos, res));
 
-            ////Mat matLeft = new Mat(matRedMask, new Rectangle(0, 0, 320, 480));
-            ////Mat matRight = new Mat(matRedMask, new Rectangle(320, 0, 320, 480));
-            //Emgu.CV.UI.ImageViewer.Show(matHsv);
-            //Emgu.CV.UI.ImageViewer.Show(matSrc);
-            //Emgu.CV.UI.ImageViewer.Show(matRedMask);
-            //Emgu.CV.UI.ImageViewer.Show(matLeft);
-            //Emgu.CV.UI.ImageViewer.Show(matRight);
+            sw.Stop();
 
-            return "OK";
         }
+
     }
 }

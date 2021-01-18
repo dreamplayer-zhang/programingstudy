@@ -36,9 +36,7 @@ namespace Root_WIND2.Module
 
 		public double startDegree = 0;
 		public double scanDegree = 360;
-		public double scanAcc = 0.1;	//sec
-		public int scanRate = 100;		// Camera Frame Spec 사용률 ? 1~100 %
-		public int maxFrame = 100;
+		public double scanAcc = 1;	//sec
 
 		public Run_GrabEBR(EdgeSideVision module)
 		{
@@ -52,9 +50,7 @@ namespace Root_WIND2.Module
 			run.p_sGrabModeEBR = p_sGrabModeEBR;
 			run.startDegree = startDegree;
 			run.scanDegree = scanDegree;
-			run.scanRate = scanRate;
 			run.scanAcc = scanAcc;
-			run.maxFrame = maxFrame;
 			return run;
 		}
 
@@ -63,9 +59,9 @@ namespace Root_WIND2.Module
 			startDegree = tree.Set(startDegree, startDegree, "Start Angle", "Degree", bVisible);
 			scanDegree = tree.Set(scanDegree, scanDegree, "Scan Angle", "Degree", bVisible);
 
-			scanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(scanRate, scanRate, "Scan Rate", "카메라 Frame 사용률 (1~ 100 %)", bVisible);
-			maxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(maxFrame, maxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
-			scanAcc = (tree.GetTree("Scan Velocity", false, bVisible)).Set(scanAcc, scanAcc, "Scan Acc", "Scan 축 가속도 (sec)", bVisible);
+			//scanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(scanRate, scanRate, "Scan Rate", "카메라 Frame 사용률 (1~ 100 %)", bVisible);
+			//maxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(maxFrame, maxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
+			//scanAcc = (tree.GetTree("Scan Velocity", false, bVisible)).Set(scanAcc, scanAcc, "Scan Acc", "Scan 축 가속도 (sec)", bVisible);
 
 			p_sGrabModeEBR = tree.Set(p_sGrabModeEBR, p_sGrabModeEBR, module.p_asGrabMode, "Grab Mode : EBR", "Select GrabMode", bVisible);
 			//if (m_gmEBR != null)
@@ -87,7 +83,7 @@ namespace Root_WIND2.Module
 				double pulsePerDegree = module.Pulse360 / 360;
 				int camHeight = module.CamEBR.GetRoiSize().Y;
 				int trigger = 1;
-				int scanSpeed = Convert.ToInt32((double)maxFrame * camHeight * trigger * (double)scanRate / 100); //5000;
+				int scanSpeed = Convert.ToInt32((double)gmEBR.m_nMaxFrame* camHeight * trigger * (double)gmEBR.m_nScanRate/ 100); //5000;
 
 				//double currPos = axisR.p_posActual - axisR.p_posActual % m_module.dPulse360;
 				//double triggerStart = currPos + (m_fStartDegree * pulsePerDegree);

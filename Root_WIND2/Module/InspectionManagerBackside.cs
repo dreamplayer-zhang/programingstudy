@@ -40,15 +40,15 @@ namespace Root_WIND2
             sharedBufferByteCnt = 1;
         }
 
-        protected override void InitWorkManager()
-        {
-            this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP));
-            this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORK_TYPE.ALIGNMENT, STATE_CHECK_TYPE.CHIP, 4));
-            this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.CHIP));
-            this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
+        //protected override void InitWorkManager()
+        //{
+        //    this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP));
+        //    this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORK_TYPE.ALIGNMENT, STATE_CHECK_TYPE.CHIP, 4));
+        //    this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.CHIP));
+        //    this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.DEFECTPROCESS_WAFER, WORK_TYPE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
 
-            WIND2EventManager.SnapDone += SnapDone_Callback;
-        }
+        //    WIND2EventManager.SnapDone += SnapDone_Callback;
+        //}
 
         private Recipe recipe;
         private IntPtr sharedBuffer;
@@ -91,7 +91,7 @@ namespace Root_WIND2
         }
 
 
-        public override bool CreateInspection(Recipe _recipe)
+        public bool CreateInspection(Recipe _recipe)
         {
             try
             {
@@ -105,30 +105,30 @@ namespace Root_WIND2
 
                 workBundle = new WorkBundle();
 
-                Position position = new Position();
-                workBundle.Add(position);
+                //Position position = new Position();
+                //workBundle.Add(position);
 
-                BacksideSurface surface = new BacksideSurface();
-                surface.SetRecipe(recipe);
+                //BacksideSurface surface = new BacksideSurface();
+                //surface.SetRecipe(recipe);
 
-                workBundle.Add(surface);
+                //workBundle.Add(surface);
 
-                ProcessDefect processDefect = new ProcessDefect();
-                workBundle.Add(processDefect);
+                //ProcessDefect processDefect = new ProcessDefect();
+                //workBundle.Add(processDefect);
 
-                workplaceBundle = WorkplaceBundle.CreateWaferMap(_recipe);
-                workplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
-                workplaceBundle.SetSharedRGBBuffer(this.SharedBufferR, this.SharedBufferG, this.SharedBufferB);
+                //workplaceBundle = WorkplaceBundle.CreateWaferMap(_recipe);
+                //workplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
+                //workplaceBundle.SetSharedRGBBuffer(this.SharedBufferR, this.SharedBufferG, this.SharedBufferB);
 
-                ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-                processDefect_Wafer.SetRecipe(recipe);
-                processDefect_Wafer.SetWorkplaceBundle(workplaceBundle);
-                workBundle.Add(processDefect_Wafer);
+                //ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
+                //processDefect_Wafer.SetRecipe(recipe);
+                //processDefect_Wafer.SetWorkplaceBundle(workplaceBundle);
+                //workBundle.Add(processDefect_Wafer);
 
-                workplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
+                //workplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
 
-                if (this.SetBundles(workBundle, workplaceBundle) == false)
-                    return false;
+                //if (this.SetBundles(workBundle, workplaceBundle) == false)
+                //    return false;
             }
             catch (Exception ex)
             {
@@ -140,19 +140,19 @@ namespace Root_WIND2
 
         public void SnapDone_Callback(object obj, SnapDoneArgs args)
         {
-            if (this.workplaceBundle == null) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
+            //if (this.workplaceBundle == null) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
 
-            Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
+            //Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
 
-            foreach (Workplace wp in this.workplaceBundle)
-            {
-                Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.BufferSizeY), new Point(wp.PositionX + wp.BufferSizeX, wp.PositionY));
+            //foreach (Workplace wp in this.workplaceBundle)
+            //{
+            //    Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.BufferSizeY), new Point(wp.PositionX + wp.BufferSizeX, wp.PositionY));
 
-                if (snapArea.Contains(checkArea) == true)
-                {
-                    wp.STATE = WORK_TYPE.SNAP;
-                }
-            }
+            //    if (snapArea.Contains(checkArea) == true)
+            //    {
+            //        wp.STATE = WORK_TYPE.SNAP;
+            //    }
+            //}
 
         }
 
@@ -180,23 +180,43 @@ namespace Root_WIND2
         }
         public void Start(bool Snap)
         {
-            if (this.Recipe == null && this.Recipe.WaferMap == null)
-                return;
+            //if (this.Recipe == null && this.Recipe.WaferMap == null)
+            //    return;
 
-            if (Snap == false)
-            {
-                foreach (Workplace wp in this.workplaceBundle)
-                {
-                    wp.STATE = WORK_TYPE.SNAP;
-                }
-            }
+            //if (Snap == false)
+            //{
+            //    foreach (Workplace wp in this.workplaceBundle)
+            //    {
+            //        wp.STATE = WORK_TYPE.SNAP;
+            //    }
+            //}
 
-            Start();
+            //Start();
         }
 
         public new void Stop()
         {
             base.Stop();
+        }
+
+        protected override void Initialize()
+        {
+            
+        }
+
+        protected override WorkplaceBundle CreateWorkplaceBundle()
+        {
+            return new WorkplaceBundle();
+        }
+
+        protected override WorkBundle CreateWorkBundle()
+        {
+            return new WorkBundle();
+        }
+
+        protected override bool Ready(WorkplaceBundle workplaces, WorkBundle works)
+        {
+            return true;
         }
     }
 }

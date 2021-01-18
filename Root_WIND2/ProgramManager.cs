@@ -13,7 +13,7 @@ using System.Windows;
 
 namespace Root_WIND2
 {
-    public class ProgramManager
+    public class ProgramManager : IDisposable
     {
         //Single ton
         private ProgramManager() 
@@ -21,7 +21,7 @@ namespace Root_WIND2
 
         }
 
-        private static readonly Lazy<ProgramManager> instance = new Lazy<ProgramManager>(() => new ProgramManager());
+        private static Lazy<ProgramManager> instance = new Lazy<ProgramManager>(() => new ProgramManager());
 
         public static ProgramManager Instance 
         { 
@@ -121,7 +121,8 @@ namespace Root_WIND2
             image.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameImage).p_nCount;
 
             roiLayer = new ImageData(memoryTool.GetMemory("pool", "group", memoryNameROI));
-            //roiLayer.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameROI).p_nCount;
+            roiLayer.p_nByte = memoryTool.GetMemory("pool", "group", memoryNameROI).p_nByte;
+
             if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
             {
                 imageEdge = GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
@@ -136,7 +137,11 @@ namespace Root_WIND2
 
         public ImageData GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE type)
         {
-            return engineer.m_handler.p_EdgeSideVision.GetMemoryData(type);
+            if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+            {
+                return engineer.m_handler.p_EdgeSideVision.GetMemoryData(type);
+            }
+            return null;
         }
 
         private bool InitMember()
@@ -147,12 +152,13 @@ namespace Root_WIND2
                 Directory.CreateDirectory(recipeFolderPath);
 
             // Front
-            this.InspectionFront = new InspectionManagerFrontside(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
-            this.InspectionFront.SetColorSharedBuffer(image.GetPtr(0), image.GetPtr(1), image.GetPtr(2));
+            this.InspectionFront = new InspectionManagerFrontside(this.recipe, 
+                new SharedBufferInfo(image.GetPtr(0), image.p_Size.X, image.p_Size.Y, image.p_nByte, image.GetPtr(1), image.GetPtr(2)));
+
 
 
             this.Engineer.InspectionFront = this.InspectionFront;
-            this.Engineer.InspectionFront.Recipe = this.recipe;
+
 
             // Back
             this.InspectionBack = new InspectionManagerBackside(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
@@ -295,6 +301,28 @@ namespace Root_WIND2
             }
 
             this.recipe.Read(recipePath);
+        }
+
+        public void Dispose()
+        {
+            instance = null;
+            recipe = null;
+            GC.SuppressFinalize(this);
+        }
+
+        public void Exit()
+        {
+            this.InspectionFront.Exit();
+            this.inspectionBack.Exit();
+
+            this.InspectionFront = null;
+            this.inspectionBack = null;
+
+        }
+
+        ~ProgramManager()
+        {
+
         }
 
         #endregion
