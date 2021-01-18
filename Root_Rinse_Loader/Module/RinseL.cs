@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Module;
+using System;
 
 namespace Root_Rinse_Loader.Module
 {
@@ -12,6 +13,7 @@ namespace Root_Rinse_Loader.Module
             Magazine,
             Stack
         }
+        string[] m_asRunMode = Enum.GetNames(typeof(eRunMode));
 
         eRunMode _eMode = eRunMode.Magazine;
         public eRunMode p_eMode

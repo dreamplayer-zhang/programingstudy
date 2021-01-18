@@ -385,6 +385,7 @@ namespace Root_EFEM
             if (m_qSequence.Count == 0)
             {
                 EQ.p_eState = EQ.eState.Ready;
+                ClearInfoWafer(); 
                 return "OK";
             }
             Sequence sequence = m_qSequence.Peek();
@@ -397,6 +398,7 @@ namespace Root_EFEM
             m_qSequence.Dequeue();
             InfoWafer infoWafer = sequence.m_infoWafer;
             if (infoWafer.m_qProcess.Count > 0) infoWafer.m_qProcess.Dequeue();
+            if (m_qSequence.Count == 0) ClearInfoWafer();
             RunTree(Tree.eMode.Init);
             return "OK";
         }
