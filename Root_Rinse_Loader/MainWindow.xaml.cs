@@ -22,6 +22,7 @@ namespace Root_Rinse_Loader
             if (!Directory.Exists(@"C:\Recipe\Rinse_Loader")) Directory.CreateDirectory(@"C:\Recipe\Rinse_Loader");
             m_engineer.Init("Rinse_Loader");
             engineerUI.Init(m_engineer); 
+            mainUI.Init(m_engineer); 
         }
         #endregion
 

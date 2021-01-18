@@ -138,7 +138,7 @@ namespace Root_AOP01_Inspection.Module
         #region Thread
         public EQ.eState m_eStatus = EQ.eState.Init;
         int m_nLamp_count = 0;
-        public bool m_bDoorLock = true;
+        public bool m_bDoorAlarm = true;
         protected override void RunThread()
         {
             base.RunThread();
@@ -196,12 +196,12 @@ namespace Root_AOP01_Inspection.Module
                 m_alidPC_FAN.Run(!m_diPC_FAN.p_bIn, "Please Check PC FAN");
                 m_alidELECPNLDoorFan.Run(!m_diELECPNLDoorFan.p_bIn, "Please Check ELEC PNL DoorFan");
                 m_alidETCDoorFan.Run(!m_diETCDoorFan.p_bIn, "Please Check ETC DoorFan");
-                if (m_bDoorLock)
+                if (m_bDoorAlarm)
                 {
-                    m_alidELECPNLDoor.Run(!m_diELECPNLDoor.p_bIn, "Please Check ELEC PNL Door Open");
-                    m_alidETCDoor.Run(!m_diETCDoor.p_bIn, "Please Check ETC Door Open");
-                    m_alidPCDoor.Run(!m_diPCDoor.p_bIn, "Please Check PC Door Open");
-                    m_alidsideDoor.Run(!m_disideDoor.p_bIn, "Please Check Side Door Open");
+                    m_alidELECPNLDoor.Run(m_diELECPNLDoor.p_bIn, "Please Check ELEC PNL Door Open");
+                    m_alidETCDoor.Run(m_diETCDoor.p_bIn, "Please Check ETC Door Open");
+                    m_alidPCDoor.Run(m_diPCDoor.p_bIn, "Please Check PC Door Open");
+                    m_alidsideDoor.Run(m_disideDoor.p_bIn, "Please Check Side Door Open");
                 }
                 if (m_diInterlock_Key.p_bIn)
                 {
@@ -211,6 +211,7 @@ namespace Root_AOP01_Inspection.Module
                 foreach (OHT_Semi OHT in p_aOHT)
                 {
                     OHT.p_bLightCurtain = m_diLightCurtain.p_bIn;
+                    OHT.P_bProtectionBar = !m_diProtectionBar.p_bIn;
                 }
             }
         }
