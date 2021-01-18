@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class SurfaceParameter : ParameterBase, IMaskInspection
+    public class SurfaceParameter : ParameterBase, IMaskInspection, IColorInspection
     {
         public SurfaceParameter() : base(typeof(Surface))
         {
@@ -63,13 +63,18 @@ namespace RootTools_Vision
             }
         }
         // ROI
-        private int maskIndex;
-        [Category("ROI")]
-        [DisplayName("ROI Index")]
+        [Browsable(false)]
         public int MaskIndex
         {
-            get => maskIndex;
-            set => maskIndex = value;
+            get;
+            set;
+        }
+
+        [Browsable(false)]
+        public IMAGE_CHANNEL IndexChannel 
+        {
+            get; 
+            set; 
         }
         #endregion
 
@@ -87,7 +92,7 @@ namespace RootTools_Vision
         {
             // string과 같이 new로 생성되는 변수가 있으면 MemberwiseClone을 사용하면안됩니다.
             // 현재 타입의 클래스를 생성해서 새로 값(객체)을 할당해주어야합니다.
-            return this.MemberwiseClone(); ;
+            return this.MemberwiseClone();
         }
 
     }

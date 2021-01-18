@@ -1,0 +1,156 @@
+﻿<UserControl x:Class="Root_CAMELLIA.UI_UserControl.Loadport_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_CAMELLIA.UI_UserControl"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="700" Background="WhiteSmoke">
+    <Grid>
+        <GroupBox Header="{Binding p_id}">
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <GroupBox Header="Slot">
+                        <DataGrid x:Name="datagridSlot" Background="White">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="No" Width="1*"/>
+                                <DataGridTextColumn Header="Wafer ID" Width="3.5*"/>
+                                <DataGridTextColumn Header="Recipe ID" Width="3.5*"/>
+                                <DataGridTextColumn Header="State" Width="2*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="3*"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="1.5*"/>
+                        <RowDefinition Height="3.5*"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Grid.Row="0" Header="Information">
+                        <UniformGrid Columns="2" Margin="0,1">
+                            <Border BorderBrush="Gray" BorderThickness="1">
+                                <TextBlock Text="Carrier ID" VerticalAlignment="Center" Margin="10,0"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1">
+                                <TextBlock Text="{Binding p_sCarrierID}" VerticalAlignment="Center" Margin="10,0"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1">
+                                <TextBlock Text="Lot ID" VerticalAlignment="Center" Margin="10,0"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1">
+                                <TextBlock Text="{Binding p_sLotID}" VerticalAlignment="Center" Margin="10,0"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1">
+                                <TextBlock Text="Recipe ID" VerticalAlignment="Center" Margin="10,0"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1">
+                                <TextBlock Text="{Binding p_sRecipeID}" VerticalAlignment="Center" Margin="10,0"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1">
+                                <TextBlock Text="Loadport State" VerticalAlignment="Center" Margin="10,0"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1">
+                                <TextBlock Text="{Binding p_sState}" VerticalAlignment="Center" Margin="10,0"/>
+                            </Border>
+                        </UniformGrid>
+                    </GroupBox>
+                    <GroupBox Grid.Row="1" Header="State">
+                        <Border BorderBrush="Gray" BorderThickness="1">
+                            <UniformGrid Columns="4" Rows="2">
+                                <Border>
+                                    <TextBlock Text="Auto" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                                <Border Background="SeaGreen">
+                                    <TextBlock Text="Manual" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                                <Border>
+                                    <TextBlock Text="Placed" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                                <Border>
+                                    <TextBlock Text="Present" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                                <Border>
+                                    <TextBlock Text="Load" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                                <Border>
+                                    <TextBlock Text="Unload" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                                <Border>
+                                    <TextBlock Text="Reserve" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                                <Border Background="Crimson">
+                                    <TextBlock Text="Alarm" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Border>
+                            </UniformGrid>
+                        </Border>
+                    </GroupBox>
+                    <GroupBox Grid.Row="2" Header="Progress">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="1.5*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="0%" VerticalAlignment="Bottom" Margin="10,0"/>
+                                <TextBlock Text="0 / 0" VerticalAlignment="Bottom" Margin="10,0" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <ProgressBar/>
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <Grid Grid.Row="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Button Content="Manual" Style="{StaticResource SetupPanelBtn}"   Margin="3"/>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Button Content="Auto" Style="{StaticResource SetupPanelBtn}"   Margin="3"/>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Button Content="In Service" Style="{StaticResource SetupPanelBtn}"   Margin="3"/>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Button Content="Out Of Service" Style="{StaticResource SetupPanelBtn}"   Margin="3"/>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Button x:Name="buttonLoad" Content="Load" 
+                                    Style="{StaticResource SetupPanelBtn}"   
+                                    Margin="3"
+                                    Click="buttonLoad_Click"/>
+                        </Grid>
+                        <Button x:Name="buttonUnloadReq" 
+                                Content="Unload Request" 
+                                Style="{StaticResource SetupPanelBtn}"  
+                                Margin="2" Grid.Row="4"
+                                Click="buttonUnloadReq_Click"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </GroupBox>
+        
+    </Grid>
+</UserControl>

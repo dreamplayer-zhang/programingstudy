@@ -1,10 +1,14 @@
-﻿using RootTools;
+﻿using Root_EFEM.Module;
+using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
+using RootTools.OHT.Semi;
+using RootTools.OHTNew;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Windows.Threading;
@@ -32,13 +36,15 @@ namespace Root_AOP01_Inspection.Module
         string[] m_asLamp = Enum.GetNames(typeof(eLamp));
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
         public DIO_Os m_doLamp;
+
+
         DIO_Os m_doBuzzer;
         DIO_I m_diEMS;
         DIO_I m_diProtectionBar;
         DIO_I m_diMCReset;
         DIO_I m_diCDA1Low;
         DIO_I m_diCDA2Low;
-        DIO_I m_diBuzzerOff;
+        DIO_IO m_dioBuzzerOff;
         DIO_I m_diDoorLock;
         DIO_I m_diInterlock_Key;
         DIO_I m_diLightCurtain;
@@ -63,7 +69,7 @@ namespace Root_AOP01_Inspection.Module
             p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
             p_sInfo = m_toolBox.Get(ref m_diCDA1Low, this, "CDA1 Low");
             p_sInfo = m_toolBox.Get(ref m_diCDA2Low, this, "CDA2 Low");
-            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
+            p_sInfo = m_toolBox.Get(ref m_dioBuzzerOff, this, "Buzzer Off");
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
             p_sInfo = m_toolBox.Get(ref m_diInterlock_Key, this, "InterLock Key");
             p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
@@ -78,6 +84,8 @@ namespace Root_AOP01_Inspection.Module
             p_sInfo = m_toolBox.Get(ref m_disideDoor, this, "Side Door");
             p_sInfo = m_toolBox.Get(ref m_diELECPNLDoorFan, this, "ELEC PNL Door Fan");
             p_sInfo = m_toolBox.Get(ref m_diETCDoorFan, this, "ETC Door Fan");
+
+
 
             p_sInfo = m_RFID.GetTools(this, bInit);
 
@@ -130,76 +138,93 @@ namespace Root_AOP01_Inspection.Module
         #region Thread
         public EQ.eState m_eStatus = EQ.eState.Init;
         int m_nLamp_count = 0;
-
+        public bool m_bDoorAlarm = true;
         protected override void RunThread()
         {
             base.RunThread();
 
-            m_doLamp.Write(eLamp.Red, EQ.p_eState == EQ.eState.Error);
-            m_doLamp.Write(eLamp.Yellow, EQ.p_eState == EQ.eState.Run);
-            m_doLamp.Write(eLamp.Green, EQ.p_eState == EQ.eState.Ready);
-
-            if (m_diBuzzerOff.p_bIn)
-                m_doBuzzer.Write(eBuzzer.BuzzerOff);
-
-            else if (m_eStatus != EQ.p_eState)
+            if (m_eStatus != EQ.p_eState)
             {
-                m_nLamp_count = 0;
                 switch (EQ.p_eState)
                 {
-                    case EQ.eState.Error: m_doBuzzer.Write(eBuzzer.Buzzer2); break;
-                    case EQ.eState.Run: m_doBuzzer.Write(eBuzzer.Buzzer4); break;
-                    case EQ.eState.Home: m_doBuzzer.Write(eBuzzer.Buzzer3); break;
-                    case EQ.eState.Ready: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
-                    case EQ.eState.Init: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
+                    case EQ.eState.Error:
+                        m_doDoorLock_Use.Write(false);
+                        //m_doBuzzer.Write(eBuzzer.Buzzer2);
+                        m_doLamp.Write(eLamp.Red);
+                        break;
+                    case EQ.eState.Run:
+                        m_doDoorLock_Use.Write(true);
+                        //m_doBuzzer.Write(eBuzzer.Buzzer4);
+                        m_doLamp.Write(eLamp.Green);
+                        break;
+                    case EQ.eState.Home:
+                        //m_doBuzzer.Write(eBuzzer.Buzzer3);
+                        m_doLamp.Write(eLamp.Green);
+                        break;
+                    case EQ.eState.Ready:
+                        m_doDoorLock_Use.Write(false);
+                        BuzzerOff();
+                        m_doLamp.Write(eLamp.Yellow);
+                        break;
+                    case EQ.eState.Init:
+                        m_doDoorLock_Use.Write(false);
+                        BuzzerOff();
+                        m_doLamp.Write(eLamp.Yellow);
+                        break;
                 }
                 m_eStatus = EQ.p_eState;
             }
-            m_nLamp_count++;
-            if (m_nLamp_count > 50)
-            {
-                m_doBuzzer.Write(eBuzzer.BuzzerOff);
-            }
+            if (m_dioBuzzerOff.p_bIn || (m_gaf.m_listALID.p_aALID.Count < 1))
+                BuzzerOff();
 
-            //if(!m_diEMS.p_bIn)
-            //    m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the Emergency Buttons");
-            //else
-            //{
-            //    m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
-            //    m_alidProtectionBar.Run(!m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
-            //    m_alidCDA1Low.Run(m_diCDA1Low.p_bIn, "Please Check Value of CDA1");
-            //    m_alidCDA2Low.Run(m_diCDA2Low.p_bIn, "Please Check Value of CDA2");
-            //}
-            //            if(m_diInterlock_Key.p_bIn)
-            //{
-            //    m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
-            //}
-            
-            if (!m_diEMS.p_bIn && !m_diInterlock_Key.p_bIn)
+            if (!m_diEMS.p_bIn)
             {
-                if (m_diCDA1Low.p_bIn && m_diCDA2Low.p_bIn)
+                if (!m_diCDA1Low.p_bIn && !m_diCDA2Low.p_bIn)
                     m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
                 else
                     m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMO Buttons");
                 m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
-            }            
+            }
             else
             {
                 m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
                 m_alidProtectionBar.Run(!m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
                 m_alidCDA1Low.Run(m_diCDA1Low.p_bIn, "Please Check Value of CDA1");
                 m_alidCDA2Low.Run(m_diCDA2Low.p_bIn, "Please Check Value of CDA2");
-                if (!m_diELECPNLDoorFan.p_bIn || !m_diETCDoorFan.p_bIn || !m_diPC_FAN.p_bIn || !m_di12CH_LED_Cont_FAN.p_bIn || !m_di4CH_LED_Cont_FAN.p_bIn)
-                    m_alidETCDoorFan.Run(false, "Fan Error");
-                if (!m_diELECPNLDoor.p_bIn || !m_diETCDoor.p_bIn || m_diPCDoor.p_bIn || m_disideDoor.p_bIn)
-                    m_alidETCDoorFan.Run(false, "Door Error");
+                m_alid4CH_LED_Cont_FAN.Run(!m_di4CH_LED_Cont_FAN.p_bIn, "Please Check 4CH LED FAN");
+                m_alid12CH_LED_Cont_FAN.Run(!m_di12CH_LED_Cont_FAN.p_bIn, "Please Check 12CH LED FAN");
+                m_alidPC_FAN.Run(!m_diPC_FAN.p_bIn, "Please Check PC FAN");
+                m_alidELECPNLDoorFan.Run(!m_diELECPNLDoorFan.p_bIn, "Please Check ELEC PNL DoorFan");
+                m_alidETCDoorFan.Run(!m_diETCDoorFan.p_bIn, "Please Check ETC DoorFan");
+                if (m_bDoorAlarm)
+                {
+                    m_alidELECPNLDoor.Run(m_diELECPNLDoor.p_bIn, "Please Check ELEC PNL Door Open");
+                    m_alidETCDoor.Run(m_diETCDoor.p_bIn, "Please Check ETC Door Open");
+                    m_alidPCDoor.Run(m_diPCDoor.p_bIn, "Please Check PC Door Open");
+                    m_alidsideDoor.Run(m_disideDoor.p_bIn, "Please Check Side Door Open");
+                }
                 if (m_diInterlock_Key.p_bIn)
                 {
                     m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
                 }
                 m_alidLightCurtain.Run(m_diLightCurtain.p_bIn, "Please Check LightCurtain");
+                foreach (OHT_Semi OHT in p_aOHT)
+                {
+                    OHT.p_bLightCurtain = m_diLightCurtain.p_bIn;
+                    OHT.P_bProtectionBar = !m_diProtectionBar.p_bIn;
+                }
             }
+        }
+        #endregion
 
+        #region BuzzerOff
+        public string BuzzerOff()
+        {
+            m_doBuzzer.Write(eBuzzer.Buzzer1, false);
+            m_doBuzzer.Write(eBuzzer.Buzzer2, false);
+            m_doBuzzer.Write(eBuzzer.Buzzer3, false);
+            m_doBuzzer.Write(eBuzzer.Buzzer4, false);
+            return "OK";
         }
         #endregion
 
@@ -319,6 +344,22 @@ namespace Root_AOP01_Inspection.Module
         public RFID m_RFID = new RFID();
         #endregion
 
+        #region OHT
+        List<OHT_Semi> p_aOHT
+        {
+            get
+            {
+                List<OHT_Semi> aOHT = new List<OHT_Semi>(); 
+                AOP01_Handler handler = (AOP01_Handler)m_engineer.ClassHandler();
+                foreach (ILoadport loadport in handler.m_aLoadport)
+                {
+                    aOHT.Add(((Loadport_Cymechs)loadport).m_OHT); 
+                }
+                return aOHT; 
+            }
+        }
+        #endregion
+
         public AOP01(string id, IEngineer engineer)
         {
             p_id = id;
@@ -333,19 +374,19 @@ namespace Root_AOP01_Inspection.Module
             base.ThreadStop();
         }
 
-        #region Show OHT -> Delete
+        #region Show OHT
         public void ShowOHT()
         {
             m_timer.Start(); 
         }
-
+        
         DispatcherTimer m_timer = new DispatcherTimer(); 
         void InitTimer()
         {
             m_timer.Interval = TimeSpan.FromMilliseconds(10);
             m_timer.Tick += M_timer_Tick;
         }
-
+        //
         OHTs_UI m_uiOHT;
         private void M_timer_Tick(object sender, EventArgs e)
         {
@@ -355,38 +396,38 @@ namespace Root_AOP01_Inspection.Module
             m_uiOHT.Show();
         }
         #endregion
-
-        #region ModuleRun
-        protected override void InitModuleRuns()
-        {
-            AddModuleRunList(new Run_ShowOHT(this), false, "Show_OHT"); //forget Delete
-        }
-
-        public class Run_ShowOHT : ModuleRunBase
-        {
-            AOP01 m_module;
-            public Run_ShowOHT(AOP01 module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            public override ModuleRunBase Clone()
-            {
-                Run_ShowOHT run = new Run_ShowOHT(m_module);
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-            }
-
-            public override string Run()
-            {
-                m_module.ShowOHT(); 
-                return "OK";
-            }
-        }
-        #endregion
+        //
+        //#region ModuleRun
+        //protected override void InitModuleRuns()
+        //{
+        //    AddModuleRunList(new Run_ShowOHT(this), false, "Show_OHT"); //forget Delete
+        //}
+        //
+        //public class Run_ShowOHT : ModuleRunBase
+        //{
+        //    AOP01 m_module;
+        //    public Run_ShowOHT(AOP01 module)
+        //    {
+        //        m_module = module;
+        //        InitModuleRun(module);
+        //    }
+        //
+        //    public override ModuleRunBase Clone()
+        //    {
+        //        Run_ShowOHT run = new Run_ShowOHT(m_module);
+        //        return run;
+        //    }
+        //
+        //    public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+        //    {
+        //    }
+        //
+        //    public override string Run()
+        //    {
+        //        m_module.ShowOHT(); 
+        //        return "OK";
+        //    }
+        //}
+        //#endregion
     }
 }

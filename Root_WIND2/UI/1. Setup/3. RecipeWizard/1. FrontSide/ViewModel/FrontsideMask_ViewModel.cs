@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2
 {
-    class FrontsideMask_ViewModel : RootViewer_ViewModel
+    class FrontsideMask_ViewModel : RootViewer_ViewModel, IRecipeUILoadable
     {
         Recipe m_Recipe;
         /// <summary>
@@ -1519,7 +1519,8 @@ namespace Root_WIND2
             if (ptrMem == IntPtr.Zero)
                 return;
             byte* bitmapPtr = (byte*)ptrMem.ToPointer();
-
+            if (p_SelectedROI == null)
+                return;
             p_SelectedROI.p_Data.Clear();
             PointLine DotLine = new PointLine();
             bool bStart = false;
@@ -1546,13 +1547,24 @@ namespace Root_WIND2
                             DotLine.Width = i - DotLine.StartPt.X;
                             bStart = false;
                             p_SelectedROI.p_Data.Add(DotLine);
-                            m_Recipe.GetRecipe<MaskRecipe>().MaskList[selectIndex].PointLines.Add(new RecipeType_PointLine(DotLine));
+                            //m_Recipe.GetRecipe<MaskRecipe>().MaskList[selectIndex].PointLines.Add(new RecipeType_PointLine(DotLine));
                             // MaskRecipe의 SelectedROI의 PointLine Type Add
                         }
                     }
                 }
             }
+            SetRecipeData();
         }
+
+        public void SetRecipeData()
+        {
+            m_Recipe.GetRecipe<MaskRecipe>().OriginPoint = this.BoxOffset;
+            for (int i = 0; i < p_cInspROI.Count; i++)
+            {
+                m_Recipe.GetRecipe<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data);
+            }
+        }
+
         private void Worker_SaveROI_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             p_PageEnable = true;
@@ -1581,6 +1593,16 @@ namespace Root_WIND2
             {
                 p_cInspROI[i].p_Index = i;
             }
+            if (p_cInspROI.Count == 0)
+            {
+                _ClearROI();
+            }
+            else
+            {
+                p_SelectedROI = p_cInspROI.Last();
+            }
+            
+            
         }
         private void _ClearROI()
         {
@@ -1630,6 +1652,30 @@ namespace Root_WIND2
             p_LoadingOpacity = 1;
             Worker_ShowAll.RunWorkerAsync();
         }
+
+        public void Load()
+        {
+            //
+            p_cInspROI.Clear();
+
+            foreach (RecipeType_Mask mask in m_Recipe.GetRecipe<MaskRecipe>().MaskList)
+            {
+                InspectionROI roi = new InspectionROI();
+                roi.p_Color = Colors.AliceBlue;
+                roi.p_Index = p_cInspROI.Count();
+
+                List<PointLine> pointLines = new List<PointLine>();
+                mask.CopyPointLinesTo(ref pointLines);
+                roi.p_Data = pointLines;
+                
+                p_cInspROI.Add(roi);
+            }
+
+            if (p_cInspROI.Count == 0) return;
+
+            p_SelectedROI = p_cInspROI.First();
+        }
+
         public ICommand ShowAll
         {
             get

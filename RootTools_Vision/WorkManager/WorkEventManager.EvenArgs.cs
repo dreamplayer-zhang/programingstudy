@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
     public class PositionDoneEventArgs : EventArgs
     {
@@ -40,12 +40,28 @@ namespace RootTools_Vision
     }
 
 
-    public class PocessDefectDoneEventArgs : EventArgs
+    public class ProcessDefectDoneEventArgs : EventArgs
     {
-        public PocessDefectDoneEventArgs()
+        public ProcessDefectDoneEventArgs()
         {
 
         }
+    }
+
+    public class ProcessDefectWaferDoneEventArgs : EventArgs
+    {
+        public ProcessDefectWaferDoneEventArgs()
+        {
+
+        }
+    }
+
+    public class ProcessMeasurementDoneEventArgs : EventArgs
+	{
+        public ProcessMeasurementDoneEventArgs()
+		{
+
+		}
     }
 
     public class UIRedrawEventArgs : EventArgs

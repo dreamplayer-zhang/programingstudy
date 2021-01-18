@@ -14,43 +14,30 @@ namespace RootTools_Vision
 {
     public class ProcessDefect_Wafer : WorkBase
     {
-        Workplace workplace;
-        WorkplaceBundle workplaceBundle;
-
-
-        Recipe recipe;
         BacksideRecipe recipeBackside;
 
         public ProcessDefect_Wafer()
         {
         }
 
-        public override WORK_TYPE Type => WORK_TYPE.FINISHINGWORK;
+        public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_ALL;
 
-        public override void DoWork()
+
+        protected override bool Preparation()
+        {
+            return true;
+        }
+
+        protected override bool Execution()
         {
             DoProcessDefect_Wafer();
-        }
 
-        public override void SetRecipe(Recipe _recipe)
-        {
-            this.recipe = _recipe;
-            this.recipeBackside = _recipe.GetRecipe<BacksideRecipe>();
-        }
-
-        public override void SetWorkplace(Workplace _workplace)
-        {
-            this.workplace = _workplace;
-        }
-
-        public override void SetWorkplaceBundle(WorkplaceBundle _workplaceBundle)
-        {
-            this.workplaceBundle = _workplaceBundle;
+            return true;
         }
 
         public void DoProcessDefect_Wafer()
         {
-            if (!(this.workplace.MapPositionX == -1 && this.workplace.MapPositionY == -1))
+            if (!(this.currentWorkplace.MapIndexX == -1 && this.currentWorkplace.MapIndexY == -1))
                 return;
 
             // Option Param
@@ -66,57 +53,61 @@ namespace RootTools_Vision
 
             if (isBackside)
             {
+                this.recipeBackside = this.recipe.GetRecipe<BacksideRecipe>();
                 waferCenterX = recipeBackside.CenterX;
                 waferCenterY = recipeBackside.CenterY;
                 radius = recipeBackside.Radius;
             }
 
-            // 구조는 나중에 생각해봅시다...
-            List<Defect> DefectList = CollectDefectData();
-            if(isBackside) // Backside Option
-                DeleteOutsideDefect(DefectList, waferCenterX, waferCenterY, radius, backsideOffset);
+            //Defect 넣는 부분 정리 필요
 
-            List<Defect> MergeDefectList = MergeDefect(DefectList, mergeDist);
+            //List<Defect> DefectList = CollectDefectData();
+            //if(isBackside) // Backside Option
+            //    DeleteOutsideDefect(DefectList, waferCenterX, waferCenterY, radius, backsideOffset);
 
-            foreach (Defect defect in MergeDefectList)
-            {
-                if (isBackside)
-                    defect.CalcAbsToRelPos(waferCenterX, waferCenterY);
+            //List<Defect> MergeDefectList = MergeDefect(DefectList, mergeDist);
 
-                else
-                {
-                    OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
-                    defect.CalcAbsToRelPos(originRecipe.OriginX, originRecipe.OriginY); // Frontside
-                }
-            }
+            //foreach (Defect defect in MergeDefectList)
+            //{
+            //    if (isBackside)
+            //        defect.CalcAbsToRelPos(waferCenterX, waferCenterY);
 
-            Workplace displayDefect = new Workplace();
-            foreach (Defect defect in MergeDefectList)
-                displayDefect.DefectList.Add(defect);
+            //    else
+            //    {
+            //        OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
+            //        defect.CalcAbsToRelPos(originRecipe.OriginX, originRecipe.OriginY); // Frontside
+            //    }
+            //}
 
-            string sDefectimagePath = @"D:\DefectImage";
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();    
-            SaveDefectImage(Path.Combine(sDefectimagePath, sInspectionID) , MergeDefectList, this.workplace.SharedBufferByteCnt);
+           
+            ////Workplace displayDefect = new Workplace();
+            //foreach (Defect defect in MergeDefectList)
+            //    this.workplace.DefectList.Add(defect);
 
-            //// Add Defect to DB
-            if (MergeDefectList.Count > 0)
-            {
-                DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
+            //string sDefectimagePath = @"D:\DefectImage";
+            //string sInspectionID = DatabaseManager.Instance.GetInspectionID();    
+            //SaveDefectImage(Path.Combine(sDefectimagePath, sInspectionID) , MergeDefectList, this.workplace.SharedBufferByteCnt);
 
-                //if (MergeDefectList.Count == 1)
-                //{
-                //    foreach (Defect defect in MergeDefectList)
-                //    {
-                //        DatabaseManager.Instance.AddDefectData(defect);
-                //    }
-                //}
-                //else
-                //{
-                //    DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
-                //}
-            }
+            ////// Add Defect to DB
+            //if (MergeDefectList.Count > 0)
+            //{
+            //    DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
 
-            WorkEventManager.OnInspectionDone(displayDefect, new InspectionDoneEventArgs(new List<CRect>(), true));
+            //    //if (MergeDefectList.Count == 1)
+            //    //{
+            //    //    foreach (Defect defect in MergeDefectList)
+            //    //    {
+            //    //        DatabaseManager.Instance.AddDefectData(defect);
+            //    //    }
+            //    //}
+            //    //else
+            //    //{
+            //    //    DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
+            //    //}
+            //}
+
+            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
+            WorkEventManager.OnProcessDefectWaferDone(this.currentWorkplace, new ProcessDefectWaferDoneEventArgs());
         }
 
         public override WorkBase Clone()
@@ -126,13 +117,15 @@ namespace RootTools_Vision
 
         public List<Defect> CollectDefectData()
         {
-            List<Defect> DefectList = new List<Defect>(); 
+            //List<Defect> DefectList = new List<Defect>(); 
 
-            foreach (Workplace workplace in workplaceBundle)
-                foreach (Defect defect in workplace.DefectList)
-                    DefectList.Add(defect);
+            //foreach (Workplace workplace in workplaceBundle)
+            //    foreach (Defect defect in workplace.DefectList)
+            //        DefectList.Add(defect);
 
-            return DefectList;
+            //return DefectList;
+
+            return null;
         }
 
         // Wafer Backside Inspection시 WaferCenterX,Y를 기준으로 Defect의 중심이 Radius - RadiusOffset보다 먼 거리에 있다면 제거
@@ -251,14 +244,15 @@ namespace RootTools_Vision
                         DefectList[j].m_fSize = -123; // Merge된 Defect이 중복 저장되지 않도록...
                     }
                 }
-
-                DefectList[i].SetDefectIndex(nDefectIndex++);              
             }
 
             for (int i = 0; i < DefectList.Count; i++)
             {
                 if (DefectList[i].m_fSize != -123)
+				{
                     MergeDefectList.Add(DefectList[i]);
+                    MergeDefectList[nDefectIndex - 1].SetDefectIndex(nDefectIndex++);              
+				}
             }
 
             return MergeDefectList;
@@ -291,9 +285,9 @@ namespace RootTools_Vision
                 if (nByteCnt == 1) { 
                     CLR_IP.Cpp_SaveDefectListBMP(
                        Path,
-                       (byte*)workplace.SharedBuffer.ToPointer(),
-                       workplace.SharedBufferWidth,
-                       workplace.SharedBufferHeight,
+                       (byte*)currentWorkplace.SharedBufferR_GRAY.ToPointer(),
+                       currentWorkplace.SharedBufferWidth,
+                       currentWorkplace.SharedBufferHeight,
                        defectArray
                        );
                 }
@@ -301,11 +295,11 @@ namespace RootTools_Vision
                 else if (nByteCnt == 3) { 
                     CLR_IP.Cpp_SaveDefectListBMP_Color(
                         Path,
-                       (byte*)workplace.SharedBufferR.ToPointer(),
-                       (byte*)workplace.SharedBufferG.ToPointer(),
-                       (byte*)workplace.SharedBufferB.ToPointer(),
-                       workplace.SharedBufferWidth,
-                       workplace.SharedBufferHeight,
+                       (byte*)currentWorkplace.SharedBufferR_GRAY.ToPointer(),
+                       (byte*)currentWorkplace.SharedBufferG.ToPointer(),
+                       (byte*)currentWorkplace.SharedBufferB.ToPointer(),
+                       currentWorkplace.SharedBufferWidth,
+                       currentWorkplace.SharedBufferHeight,
                        defectArray);
                 }
             }

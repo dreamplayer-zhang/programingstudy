@@ -1,6 +1,7 @@
 ﻿using Root_EFEM.Module;
 using RootTools;
 using RootTools.Module;
+using RootTools.OHTNew;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -72,7 +73,9 @@ namespace Root_EFEM
         public List<Locate> m_aLocate = new List<Locate>();
         /// <summary> 프로그램 시작시 Registry 에서 Wafer 정보 읽기 </summary>
         void InitLocate()
-        {
+        { 
+            if (m_wtr == null)
+                return;
             m_aLocate.Clear();
             foreach (WTRArm arm in m_wtr.p_aArm) InitLocateArm(arm);
             foreach (IWTRChild child in m_wtr.p_aChild) InitLocateChild(child);
@@ -125,20 +128,64 @@ namespace Root_EFEM
 
         void CalcInfoWaferProcess(InfoWafer infoWafer)
         {
+            //bool bFlip = false;
             if (infoWafer == null) return;
             Queue<ModuleRunBase> qProcess = infoWafer.m_qProcess;
+
             qProcess.Clear();
             qProcess.Enqueue(m_wtr.CloneRunGet(infoWafer.m_sModule, infoWafer.m_nSlot));
             for (int n = 0; n < infoWafer.m_moduleRunList.p_aModuleRun.Count; n++)
             {
                 ModuleRunBase moduleRun = infoWafer.m_moduleRunList.p_aModuleRun[n];
+                ModuleRunBase moduleRun2 = infoWafer.m_moduleRunList.p_aModuleRun[0];
+                ModuleRunBase moduleRun3 = infoWafer.m_moduleRunList.p_aModuleRun[0];
+                if (n>0)
+                {
+                    moduleRun3 = infoWafer.m_moduleRunList.p_aModuleRun[n-1];
+                }
+                if(n < infoWafer.m_moduleRunList.p_aModuleRun.Count -1)
+                {
+                    moduleRun2 = infoWafer.m_moduleRunList.p_aModuleRun[n+1];
+                }
+               
                 string sChild = moduleRun.m_moduleBase.p_id;
-                bool bGetPut = (sChild != m_wtr.p_id);
-                bool bPut = !IsSameModule(infoWafer.m_moduleRunList, n - 1, n);
-                if (bPut && bGetPut) qProcess.Enqueue(m_wtr.CloneRunPut(sChild, -1));
+                bool bGetPut = false;
+                bool bPut = false;
+                bool bGet = false;
+                if (moduleRun.m_sModuleRun=="Flip")
+                {
+                    bGetPut = false;
+                }
+                else
+                {
+                    bGetPut = (sChild != m_wtr.p_id);
+                }    
+                if (moduleRun3.m_sModuleRun != "Flip")
+                {
+                    bPut = !IsSameModule(infoWafer.m_moduleRunList, n - 1, n);
+                }
+                else
+                {
+                    bPut = false;
+                }
+
+                if (bPut && bGetPut)
+                {
+                    qProcess.Enqueue(m_wtr.CloneRunPut(sChild, -1));
+                }
                 qProcess.Enqueue(moduleRun);
-                bool bGet = !IsSameModule(infoWafer.m_moduleRunList, n, n + 1);
-                if (bGet && bGetPut) qProcess.Enqueue(m_wtr.CloneRunGet(sChild, -1));
+                if (moduleRun2.m_sModuleRun != "Flip")
+                {
+                    bGet = !IsSameModule(infoWafer.m_moduleRunList, n, n + 1);
+                }
+                else
+                {
+                    bGet = false;
+                }
+                if (bGet && bGetPut)
+                {
+                    qProcess.Enqueue(m_wtr.CloneRunGet(sChild, -1));
+                }
             }
             qProcess.Enqueue(m_wtr.CloneRunPut(infoWafer.m_sModule, infoWafer.m_nSlot));
             m_aInfoWafer.Add(infoWafer);
@@ -183,7 +230,7 @@ namespace Root_EFEM
                 InitCalc();
                 int lProcess = 0;
                 foreach (InfoWafer infoWafer in m_aCalcWafer) lProcess += infoWafer.m_qCalcProcess.Count;
-                while (CalcSequence()) ;
+                while (CalcSequence());
                 if (lProcess > m_qSequence.Count)
                 {
                     InitCalc();
@@ -201,7 +248,7 @@ namespace Root_EFEM
             }
         }
 
-        void InitCalc()
+        public void InitCalc()
         {
             m_qSequence.Clear();
             m_aCalcWafer.Clear();
@@ -230,18 +277,28 @@ namespace Root_EFEM
         {
             Locate locateArmPut = GetLocate(armPut.m_id);
             InfoWafer infoWaferPut = locateArmPut.p_calcWafer;
-            IWTRRun runPut = (IWTRRun)infoWaferPut.m_qCalcProcess.Dequeue(); //forget WTR ModuleRun
+            ModuleRunBase run = infoWaferPut.m_qCalcProcess.Dequeue();
+            if ((run is IWTRRun) == false)
+            {
+                m_qSequence.Enqueue(new Sequence(run, infoWaferPut));
+                return; 
+            }
+            IWTRRun runPut = (IWTRRun)run; //forget WTR ModuleRun
             runPut.SetArm(armPut); 
             Locate locateChild = GetLocate(runPut.p_sChild);
             InfoWafer infoWaferGet = (locateChild == null) ? null : locateChild.p_calcWafer;
             if ((infoWaferGet != null) && (locateChild != null))
             {
+
                 ModuleRunBase runGet = infoWaferGet.m_qCalcProcess.Dequeue();
                 string sArmGet = m_wtr.GetEnableAnotherArmID(runGet, armPut, infoWaferGet);
                 Locate locateArmGet = GetLocate(sArmGet);
-                locateArmGet.p_calcWafer = locateChild.p_calcWafer;
-                locateChild.p_calcWafer = null;
-                m_qSequence.Enqueue(new Sequence(runGet, infoWaferGet));
+                if (locateArmGet != null)
+                {
+                    locateArmGet.p_calcWafer = locateChild.p_calcWafer;
+                    locateChild.p_calcWafer = null;
+                    m_qSequence.Enqueue(new Sequence(runGet, infoWaferGet));
+                }
             }
             if (locateChild != null) locateChild.p_calcWafer = infoWaferPut;
             locateArmPut.p_calcWafer = null;
@@ -260,7 +317,7 @@ namespace Root_EFEM
             }
             ModuleRunBase moduleRun = infoWaferPut.m_qCalcProcess.Peek();
             if (moduleRun == null) return;
-            if (moduleRun.m_moduleBase.p_id == m_wtr.p_id) return;
+            if (moduleRun.m_moduleBase.p_id == m_wtr.p_id && moduleRun.m_sModuleRun != "Flip") return;
             m_qSequence.Enqueue(new Sequence(infoWaferPut.m_qCalcProcess.Dequeue(), infoWaferPut));
             CalcSequenceChild(infoWaferPut);
         }
@@ -280,7 +337,6 @@ namespace Root_EFEM
             }
             return false;
         }
-
         bool GetNextInfoWafer(int iArm, InfoWafer infoWaferGet)
         {
             WTRArm armGet = m_wtr.p_aArm[iArm];
@@ -336,6 +392,7 @@ namespace Root_EFEM
             foreach (IWTRChild child in m_wtr.p_aChild) CalcRecoverChild(child);
             ReCalcSequence();
             RunTree(Tree.eMode.Init);
+            if (EQ.p_nRnR > 0) EQ.p_nRnR = 0;
         }
 
         void CalcRecoverArm(WTRArm arm)
@@ -371,6 +428,7 @@ namespace Root_EFEM
             if (m_qSequence.Count == 0)
             {
                 EQ.p_eState = EQ.eState.Ready;
+                ClearInfoWafer();
                 return "OK";
             }
             Sequence sequence = m_qSequence.Peek();
@@ -383,6 +441,7 @@ namespace Root_EFEM
             m_qSequence.Dequeue();
             InfoWafer infoWafer = sequence.m_infoWafer;
             if (infoWafer.m_qProcess.Count > 0) infoWafer.m_qProcess.Dequeue();
+            if (m_qSequence.Count == 0) ClearInfoWafer();
             RunTree(Tree.eMode.Init);
             return "OK";
         }

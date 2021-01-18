@@ -11,10 +11,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Root_CAMELLIA.ManualJob;
+using RootTools.OHTNew;
 
 namespace Root_CAMELLIA
 {
-    public class CAMELLIA_Handler : IHandler
+    public class CAMELLIA_Handler : NotifyProperty, IHandler
     {
         public ModuleList p_moduleList
         {
@@ -65,6 +67,7 @@ namespace Root_CAMELLIA
 
             InitWTR();
             InitLoadport();
+            InitRFID();
             InitAligner();
             m_camellia = new Module_Camellia("Camellia", m_engineer);
             InitModule(m_camellia);
@@ -108,7 +111,7 @@ namespace Root_CAMELLIA
             Cymechs
         }
         eWTR m_eWTR = eWTR.RND;
-        ModuleBase m_wtr;
+        public ModuleBase m_wtr;
         void InitWTR()
         {
             switch (m_eWTR)
@@ -153,6 +156,19 @@ namespace Root_CAMELLIA
             }
         }
 
+        void InitRFID()
+        {
+            ModuleBase module;
+            char cID = 'A';
+            for(int n=0; n<m_lLoadport; n++, cID++)
+            {
+                string sID = "Rfid" + cID;
+                module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]);
+                InitModule(module);
+            }
+            
+        }
+
         public void RunTreeLoadport(Tree tree)
         {
             m_lLoadport = tree.Set(m_lLoadport, m_lLoadport, "Count", "Loadport Count");
@@ -173,18 +189,19 @@ namespace Root_CAMELLIA
             RND
         }
         eAligner m_eAligner = eAligner.ATI;
+        public ModuleBase m_Aligner = null;
         void InitAligner()
         {
-            ModuleBase module = null;
+            
             switch (m_eAligner)
             {
-                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break;
-                case eAligner.RND: module = new Aligner_RND("Aligner", m_engineer); break;
+                case eAligner.ATI: m_Aligner = new Aligner_ATI("Aligner", m_engineer); break;
+                case eAligner.RND: m_Aligner = new Aligner_RND("Aligner", m_engineer); break;
             }
-            if (module != null)
+            if (m_Aligner != null)
             {
-                InitModule(module);
-                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+                InitModule(m_Aligner);
+                ((IWTR)m_wtr).AddChild((IWTRChild)m_Aligner);
             }
         }
 
@@ -204,11 +221,21 @@ namespace Root_CAMELLIA
         #endregion
 
         #region StateHome
+        public bool m_bIsPossible_Recovery = false;
         public string StateHome()
         {
-            string sInfo = StateHome(m_moduleList.m_aModule);
-            if (sInfo == "OK")
-                EQ.p_eState = EQ.eState.Ready;
+            //string sInfo = StateHome(m_moduleList.m_aModule);
+            //if (sInfo == "OK")
+            //    EQ.p_eState = EQ.eState.Ready;
+            //return sInfo;
+            string sInfo = StateHome(m_wtr);
+            if(sInfo != "OK")
+            {
+                EQ.p_eState = EQ.eState.Init;
+                return sInfo;
+            }
+            sInfo = StateHome((Loadport_RND)m_aLoadport[0], (Loadport_RND)m_aLoadport[1], m_Aligner, m_camellia);
+            if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
 
@@ -273,7 +300,7 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Calc Sequence
-        public int m_nRnR = 1;
+        //public int m_nRnR = 1;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
@@ -318,19 +345,30 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Thread
-        bool m_bThread = false;
+        bool _bThread = false;
+        public bool p_bThread 
+        {
+            get { return _bThread; }
+            set 
+            {
+                if (_bThread == value) return;
+                _bThread = value;
+                OnPropertyChanged();
+            }
+        }
+
         Thread m_thread = null;
         void InitThread()
         {
             m_thread = new Thread(new ThreadStart(RunThread));
             m_thread.Start();
         }
-
+        
         void RunThread()
         {
-            m_bThread = true;
+            p_bThread = true;
             Thread.Sleep(100);
-            while (m_bThread)
+            while (p_bThread)
             {
                 Thread.Sleep(10);
                 switch (EQ.p_eState)
@@ -341,14 +379,16 @@ namespace Root_CAMELLIA
                     case EQ.eState.Run:
                         if (m_moduleList.m_qModuleRun.Count == 0)
                         {
-                            //CheckLoad();
+                            CheckLoad();
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            //CheckUnload();
-                            if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            CheckUnload();
+                            //if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 m_process.ReCalcSequence();
-                                m_nRnR--;
+                                //m_nRnR--;
+                                EQ.p_nRnR--;
                                 EQ.p_eState = EQ.eState.Run;
                             } 
                         }
@@ -359,28 +399,39 @@ namespace Root_CAMELLIA
 
         void CheckLoad()
         {
+            if (m_process.m_qSequence.Count == 0) return;
             EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
             string sLoadport = sequence.m_infoWafer.m_sModule;
-            foreach(ILoadport loadport in m_aLoadport)
+            foreach (ILoadport loadport in m_aLoadport)
             {
-                if (loadport.p_id == sLoadport) loadport.RunDocking();
+                if (loadport.p_id == sLoadport)
+                {
+                    //loadport.RunDocking();
+                    if (loadport.StartRunDocking() != "OK") return;
+                    if(EQ.p_bRecovery == false)
+                    {
+                        InfoCarrier infoCarrier = loadport.p_infoCarrier;
+                        ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
+                        manualJobSchedule.ShowPopup();
+                    }
+                }
             }
         }
 
         void CheckUnload()
         {
             EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();
-            foreach(ILoadport loadport in m_aLoadport)
+            foreach (ILoadport loadport in m_aLoadport)
             {
-                if(loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+                if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
                 {
                     string sLoadport = loadport.p_id;
                     bool bUndock = true;
-                    foreach(EFEM_Process.Sequence sequence in aSequence)
+                    foreach (EFEM_Process.Sequence sequence in aSequence)
                     {
                         if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
                     }
-                    if (bUndock) loadport.RunUndocking();
+                    if (bUndock) loadport.StartRunUndocking();
                 }
             }
         }
@@ -403,9 +454,9 @@ namespace Root_CAMELLIA
 
         public void ThreadStop()
         {
-            if (m_bThread)
+            if (p_bThread)
             {
-                m_bThread = false;
+                p_bThread = false;
                 EQ.p_bStop = true;
                 m_thread.Join();
             }

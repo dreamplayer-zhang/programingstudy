@@ -36,7 +36,10 @@ namespace Root_EFEM
 
         public UserControl p_ui { get { return this; } }
 
-        public void ThreadStop() { }
+        public void ThreadStop() 
+        {
+            m_timer.Stop(); 
+        }
         #endregion
 
         #region Tree

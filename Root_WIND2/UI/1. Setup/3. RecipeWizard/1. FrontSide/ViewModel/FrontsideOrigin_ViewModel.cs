@@ -9,7 +9,7 @@ using System.Windows.Media;
 
 namespace Root_WIND2
 {
-    class FrontsideOrigin_ViewModel : ObservableObject
+    class FrontsideOrigin_ViewModel : ObservableObject, IRecipeUILoadable
     {
         ImageData OriginImageData;
         TRect InspAreaBuf;
@@ -27,8 +27,8 @@ namespace Root_WIND2
             p_OriginBoxTool_VM.init(setup, recipe);
             p_OriginBoxTool_VM.BoxDone += P_BoxTool_VM_BoxDone;
 
-            MapControl_VM = new MapControl_ViewModel(this.setup.InspectionVision, recipe);
-            MapControl_VM.SetMap(setup.InspectionVision.mapdata, new CPoint(14, 14));
+            MapControl_VM = new MapControl_ViewModel(recipe);
+            MapControl_VM.SetMap(setup.Recipe.WaferMap.Data, new CPoint(14, 14));
 
             p_OriginTool_VM = new FrontsideOriginTool_ViewModel(recipe);
             p_OriginTool_VM.AddOrigin += P_OriginTool_VM_AddOrigin;
@@ -276,7 +276,7 @@ namespace Root_WIND2
             }
             else
             {
-                MapControl_VM.SetMap(true, new CPoint(0, 5), setup.InspectionVision.mapdata, new CPoint(14, 14));
+                MapControl_VM.SetMap(true, new CPoint(0, 5), setup.Recipe.WaferMap.Data, new CPoint(14, 14));
             }
         }
         private void SetMapData()
@@ -286,6 +286,11 @@ namespace Root_WIND2
 
             MasterDieX = m_Recipe.WaferMap.MasterDieX;
             MasterDieY = m_Recipe.WaferMap.MasterDieY;
+        }
+
+        public void Load()
+        {
+            LoadOriginData();
         }
     }
 }

@@ -44,6 +44,24 @@ namespace Root_WIND2
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             ThreadStop();
+
+            ProgramManager.Instance.Exit();
+            ProgramManager.Instance.Dispose();
+            GC.SuppressFinalize(this);
+        }
+        #endregion
+
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            //m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            //m_timer.Tick += M_timer_Tick;
+            //m_timer.Start();
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
         }
         #endregion
 
@@ -88,25 +106,8 @@ namespace Root_WIND2
         }
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            this.Close();            
         }
-        #endregion
-
-        #region UI
-        public SelectMode m_ModeUI;
-        public Setup m_Setup;
-        public Review m_Review;
-        public Run m_Run;
-        public SelectMode ModeUI;
-        public Setup Setup;
-        public Review Review;
-        public Run Run;
-        #endregion
-
-        #region ViewModel
-        private Setup_ViewModel m_SetupViewModel;
-        private Review_ViewModel m_ReviewViewModel;
-        private Run_ViewModel m_RunViewModel;
         #endregion
 
         public IDialogService dialogService;
@@ -116,9 +117,10 @@ namespace Root_WIND2
             dialogService = new DialogService(this);
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
             dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
-            
+            dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
 
-            if(ProgramManager.Instance.Initialize() == false)
+
+            if (ProgramManager.Instance.Initialize() == false)
             {
                 MessageBox.Show("Program Initialization fail");
                 return;
@@ -127,7 +129,7 @@ namespace Root_WIND2
             ProgramManager.Instance.DialogService = this.dialogService;
 
 
-            if(UIManager.Instance.Initialize(ProgramManager.Instance) == false)
+            if (UIManager.Instance.Initialize(ProgramManager.Instance) == false)
             {
                 MessageBox.Show("UI Initialization fail");
                 return;
@@ -141,6 +143,8 @@ namespace Root_WIND2
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1);
             //////
+            logView.Init(LogView.m_logView);
+            InitTimer();
         }
 
         void ThreadStop()

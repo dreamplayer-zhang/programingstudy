@@ -169,7 +169,7 @@ namespace RootTools.Camera.Dalsa
             }
             set
             {
-                SetFeatureValue(ref m_eDir, value, "SensorScanDirection", typeof(string));
+                SetFeatureValue(ref m_eDir, value, "sensorScanDirection", typeof(string));
             }
         }
 
@@ -275,7 +275,7 @@ namespace RootTools.Camera.Dalsa
                     break;
             }  
         }
-        void SetGrabDirection(eDir dir)
+        public void SetGrabDirection(eDir dir)
         {
             m_sapCam.SetFeatureValue("SensorScanDirection", dir.ToString());
         }

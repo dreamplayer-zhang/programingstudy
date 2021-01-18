@@ -25,6 +25,10 @@ namespace RootTools.Module
 
         private void ButtonRun_Click(object sender, RoutedEventArgs e)
         {
+            ModuleListRun();
+        }
+        public void ModuleListRun()
+        {
             m_moduleList.p_visibleRnR = Visibility.Hidden;
             m_moduleList.p_sInfo = m_moduleList.ClickRun();
         }
@@ -77,7 +81,7 @@ namespace RootTools.Module
             if (dlg.ShowDialog() == true) m_moduleRunList.SaveJob(dlg.FileName);
         }
 
-        private void ButtonOpen_Click(object sender, RoutedEventArgs e)
+        public void ModuleListRunOpen()
         {
             m_moduleList.p_visibleRnR = Visibility.Hidden;
             string sModel = "Run" + EQ.m_sModel;
@@ -87,6 +91,11 @@ namespace RootTools.Module
             dlg.Filter = sModel + " ModuleRunList (." + sModel + ")|*." + sModel;
             if (dlg.ShowDialog() == true) m_moduleRunList.OpenJob(dlg.FileName);
             InitModuleRunNames();
+        }
+
+        private void ButtonOpen_Click(object sender, RoutedEventArgs e)
+        {
+            ModuleListRunOpen();
         }
         #endregion
 

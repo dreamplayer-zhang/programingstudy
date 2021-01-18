@@ -7,6 +7,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -35,7 +36,22 @@ namespace RootTools.Module
                 m_log.Info("State : " + _eState.ToString() + " -> " + value.ToString()); 
                 _eState = value;
                 EQ.p_bPause = false;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
+                OnChanged(eChanged.State, value); 
+            }
+        }
+        protected int _nProgress = 0;
+        public int p_nProgress
+        {
+            get
+            {
+                return _nProgress;
+            }
+            set
+            {
+                if (_nProgress == value) return;
+                _nProgress = value;
+                OnPropertyChanged();
             }
         }
 
@@ -93,6 +109,16 @@ namespace RootTools.Module
         public virtual string StateHome()
         {
             return StateHome(m_listAxis);
+        }
+
+        public virtual string ServerBeforePut()
+        {
+            return "FALSE";
+        }
+
+        public virtual string ServerBeforeGet()
+        {
+            return "FALSE";
         }
 
         protected virtual void StopHome()
@@ -182,20 +208,27 @@ namespace RootTools.Module
                 case eState.Home:
                     p_bEnableHome = false;
                     p_sRun = "Stop";
-                    string sStateHome = StateHome();
-                    if (sStateHome == "OK") p_eState = eState.Ready;
-                    else StopHome();
+                    //if (p_eRemote != eRemote.Client)
+                    //{
+                        string sStateHome = StateHome();
+                        if (sStateHome == "OK") p_eState = eState.Ready;
+                        else StopHome();
+                    //}
                     break;
                 case eState.Ready:
                     p_bEnableHome = true;
                     p_sRun = p_sModuleRun;
-                    string sStateReady = StateReady();
-                    if (sStateReady != "OK")
+                    if (p_eRemote != eRemote.Client)
                     {
-                        p_eState = eState.Error;
-                        m_qModuleRun.Clear();
+                        string sStateReady = StateReady();
+                        if (sStateReady != "OK")
+                        {
+                            p_eState = eState.Error;
+                            m_qModuleRun.Clear();
+                        }
                     }
-                    if (m_qModuleRun.Count > 0) p_eState = eState.Run;
+                    if (m_qModuleRun.Count > 0) 
+                        p_eState = eState.Run;
                     break;
                 case eState.Run:
                     p_bEnableHome = false;
@@ -395,7 +428,11 @@ namespace RootTools.Module
             public enum eProtocol
             {
                 EQ,
+                Module,
                 ModuleRun,
+                Initial,
+                BeforeGet,
+                BeforePut,
             }
 
             public class Protocol
@@ -551,6 +588,11 @@ namespace RootTools.Module
             public string RemoteSend(eProtocol eProtocol, string sCmd, string sRun)
             {
                 Protocol protocol = new Protocol(m_module.p_eRemote, eProtocol, sCmd, sRun);
+                return RemoteSend(protocol); 
+            }
+
+            public string RemoteSend(Protocol protocol)
+            {
                 Send(protocol);
                 m_module.p_sInfo = protocol.WaitDone();
                 return m_module.p_sInfo;
@@ -564,6 +606,10 @@ namespace RootTools.Module
                 if (protocol.m_eRemote == m_module.p_eRemote) Recieve(protocol);
                 else
                 {
+                    switch (protocol.m_eProtocol)
+                    {
+                        case eProtocol.Module: m_module.UpdateModule(protocol); break;
+                    }
                 }
             }
             #endregion
@@ -590,11 +636,36 @@ namespace RootTools.Module
                 {
                     switch (protocol.m_eProtocol)
                     {
+                        case eProtocol.Module: m_module.UpdateModule(protocol); break;
                         case eProtocol.ModuleRun: ServerModuleRun(protocol); break;
+                        case eProtocol.Initial: InitialModule(protocol); break;
+                        case eProtocol.BeforeGet: BeforeGet(protocol); break;
+                        case eProtocol.BeforePut: BeforePut(protocol); break;
                         default:
                             break;
                     }
                 }
+            }
+            void BeforeGet(Protocol protocol)
+            {
+                protocol.p_sRun = m_module.ServerBeforeGet();
+                Send(protocol);
+            }
+            void BeforePut(Protocol protocol)
+            {
+                protocol.p_sRun = m_module.ServerBeforePut();
+                Send(protocol);
+            }
+
+            void InitialModule(Protocol protocol)
+            {
+                
+                m_module.p_eState = eState.Home;
+                while (m_module.IsBusy())
+                    Thread.Sleep(10);
+                EQ.p_eState = EQ.eState.Ready;
+                protocol.p_sRun = m_module.p_sInfo;
+                Send(protocol);
             }
 
             void ServerModuleRun(Protocol protocol)
@@ -608,7 +679,7 @@ namespace RootTools.Module
                 }
                 m_memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(protocol.p_sRun));
                 m_treeRoot.m_job = new Job(m_memoryStream, false, m_log);
-                m_treeRoot.p_eMode = Tree.eMode.JobOpen;
+                m_treeRoot.p_eMode = Tree.eMode.RegRead;
                 run.RunTree(m_treeRoot, true);
                 m_treeRoot.m_job.Close();
                 m_module.StartRun(run);
@@ -640,7 +711,48 @@ namespace RootTools.Module
                 m_treeRoot = new TreeRoot(module.p_id, module.m_log); 
             }
         }
-        public Remote m_remote; 
+        public Remote m_remote;
+        #endregion
+
+        #region Remote Module
+        public enum eChanged
+        {
+            State, 
+        }
+        string[] m_asChanged = Enum.GetNames(typeof(eChanged)); 
+        void OnChanged(eChanged eChanged, dynamic value)
+        {
+            if (m_remote == null) return;
+            //m_remote.RemoteSend(Remote.eProtocol.Module, eChanged.ToString(), value.ToString()); 
+        }
+
+        public void UpdateModule(Remote.Protocol protocol)
+        {
+            if (p_eRemote == protocol.m_eRemote) return; 
+            for (int n = 0; n < m_asChanged.Length; n++)
+            {
+                if (protocol.m_sCmd == m_asChanged[n])
+                {
+                    eChanged eChanged = (eChanged)n; 
+                    switch (eChanged)
+                    {
+                        case eChanged.State: p_eState = GetState(protocol.p_sRun); break;
+                    }
+                }
+            }
+            m_remote.RemoteSend(protocol);
+        }
+
+        string[] m_asState = Enum.GetNames(typeof(eState)); 
+        eState GetState(string sState)
+        {
+            for (int n = 0; n < m_asState.Length; n++)
+            {
+                if (sState == m_asState[n]) return (eState)n; 
+            }
+            return eState.Error; 
+        }
+
         #endregion
 
         #region Tree Tool
@@ -780,13 +892,13 @@ namespace RootTools.Module
             m_toolBox = enginner.ClassToolBox();
             InitDIO();
 
-            p_eState = eState.Init;
             InitModuleRuns();
             InitTreeTool(); 
             InitMemorys();
             InitTreeSetup(); 
             InitTreeRun();
             InitTreeQueue();
+            p_eState = eState.Init;
 
             RunTree(Tree.eMode.RegRead);
 

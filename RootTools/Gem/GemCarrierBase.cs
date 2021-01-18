@@ -56,7 +56,7 @@ namespace RootTools.Gem
                 if (_ePresentSensor == value) return;
                 m_log.Info("p_ePresentSensor " + _ePresentSensor.ToString() + " -> " + value.ToString());
                 _ePresentSensor = value;
-                if (m_gem != null)
+                if (m_gem != null && !m_gem.p_bOffline)
                 {
                     switch (value)
                     {
@@ -161,6 +161,7 @@ namespace RootTools.Gem
                 if (_eTransfer == value) return;
                 m_log.Info("p_eTransfer " + _eTransfer.ToString() + " -> " + value.ToString());
                 _eTransfer = value;
+                OnPropertyChanged();
                 _eReqTransfer = value; 
                 SendCarrierOn();
                 RunTree(Tree.eMode.Init); 
@@ -334,6 +335,18 @@ namespace RootTools.Gem
 
         #region Property
         public string p_sLocID { get; set; }
+
+        string _sLotID = "LotID";
+        public string p_sLotID 
+        {
+            get { return _sLotID; }
+            set
+            {
+                if (_sLotID == value) return;
+                _sLotID = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
         #region Tree Gem

@@ -111,29 +111,36 @@ namespace Root_AOP01_Inspection.Module
         #region RADS
         public RADSControl m_RADSControl;
         bool m_bUseRADS = false;
+        public bool pUseRADS
+        {
+            get
+            {
+                return m_bUseRADS;
+            }
+            set
+            {
+                m_bUseRADS = value;
+            }
+        }
         void RunTreeRADS(Tree tree, bool bVisible, bool bReadOnly)
         {
-            m_bUseRADS = tree.Set(m_bUseRADS, m_bUseRADS, "Use", "Using RADS", bVisible, false);
+            m_bUseRADS = tree.Set(pUseRADS, pUseRADS, "Use", "Using RADS", bVisible, false);
         }
 
-        public bool GetUseRADS()
-        {
-            return m_bUseRADS;
-        }
         #endregion
 
         #region Memory
         public MemoryPool m_memoryPool;
         public MemoryGroup m_memoryGroup;
         public MemoryData m_memoryData;
-        string m_sMemoryGroup = "";
         string m_sMemoryData = "Grab";
+        string m_sMemoryGroup;
 
         void RunTreeMemory(Tree tree, bool bVisible, bool bReadOnly)
         {
-            if (m_sMemoryGroup == "") m_sMemoryGroup = m_memoryPool.m_asGroup[0];
-            m_sMemoryGroup = tree.Set(m_sMemoryGroup, m_sMemoryGroup, m_memoryPool.m_asGroup, "Group", "Memory Group Name", bVisible, bReadOnly);
-            m_memoryGroup = m_memoryPool.GetGroup(m_sMemoryGroup);
+            if (App.mGroup == "") App.mGroup = m_memoryPool.m_asGroup[0];
+            App.mGroup = tree.Set(App.mGroup, App.mGroup, m_memoryPool.m_asGroup, "Group", "Memory Group Name", bVisible, bReadOnly);
+            m_memoryGroup = m_memoryPool.GetGroup(App.mGroup);
             if (m_memoryGroup == null) return;
             m_sMemoryData = tree.Set(m_sMemoryData, m_sMemoryData, m_memoryGroup.m_asMemory, "Data", "Memory Data Name", bVisible, bReadOnly);
             m_memoryData = m_memoryGroup.GetMemory(m_sMemoryData);

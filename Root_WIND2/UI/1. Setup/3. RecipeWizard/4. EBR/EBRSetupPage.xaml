@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Root_WIND2"
+             xmlns:local="clr-namespace:Root_WIND2" xmlns:tools="clr-namespace:RootTools;assembly=RootTools" xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="838" d:DesignWidth="1683" 
              Background="{StaticResource PanelBackGround}">
@@ -15,32 +15,35 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="6*"/>
                 </Grid.ColumnDefinitions>
-
-                <Grid Grid.Column="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="65*"/>
-                        <ColumnDefinition Width="35*"/>
-                    </Grid.ColumnDefinitions>
-                    <GroupBox Grid.Column="0"
-                          Header="Scan Image">
-                        <ScrollViewer>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <WrapPanel/>
+                    <Grid Grid.Column="0" Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80*"/>
+                            <ColumnDefinition Width="43*"/>
+                            <ColumnDefinition Width="173"/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Grid.Column="0" Header="Scan Image" Grid.ColumnSpan="2" Margin="0,0,0,0">
+                            <tools:RootViewer DataContext="{Binding DrawToolVM}"/>
+                            <!--<ScrollViewer>
                             <Grid Background="Black">
                                 <Image Source="/Root_WIND2;component/Resources/edge.png"
                                        Stretch="Fill" Margin="0,0,200,0"/>
                             </Grid>
-                        </ScrollViewer>
-                    </GroupBox>
-                    <Grid Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <GroupBox Header="Thumbnail" Grid.Row="0">
-                            <Grid Background="Black">
-                                <Image Source="/Root_WIND2;component/Resources/edge.png" Stretch="None"
-                                       HorizontalAlignment="Left"/>
-                            </Grid>
+                        </ScrollViewer>-->
                         </GroupBox>
+                        <Grid Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <GroupBox Header="Thumbnail" Grid.Row="0">
+                                <Grid Background="Black">
+                                </Grid>
+                            </GroupBox>
+                        </Grid>
                     </Grid>
                 </Grid>
                 <GridSplitter Grid.Column="1" 
@@ -58,8 +61,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*"/>
                             <RowDefinition Height="1*"/>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="3*"/>
                         </Grid.RowDefinitions>
                         <GroupBox Grid.Row="0" Header="Option">
                             <Grid Margin="10,5">
@@ -95,38 +97,64 @@
                                 </ComboBox>
                             </Grid>
                         </GroupBox>
-                        <GroupBox Grid.Row="1" Header="Illumination">
+                        <GroupBox Grid.Row="1" Header="Light" Height="140" VerticalAlignment="Top">
                             <Grid Margin="10,5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="10*"/>
+                                    <ColumnDefinition Width="72*"/>
+                                    <ColumnDefinition Width="278*"/>
+                                    <ColumnDefinition Width="92*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock FontSize="12" Text="Coaxial" Style="{StaticResource BasicTb}" Grid.Row="0" Grid.ColumnSpan="2" Margin="20,7,0,7"/>
+                                <TextBlock FontSize="12" Text="Trans" Style="{StaticResource BasicTb}" Grid.Row="1" Grid.ColumnSpan="2" Margin="20,7,0,7"/>
+                                <Slider Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Margin="0,5"/>
+                                <Slider Grid.Column="2" Grid.Row="1" VerticalAlignment="Center" Margin="0,5"/>
+                                <TextBox Grid.Column="3" Grid.Row="0" Style="{StaticResource BasicTbox}" Margin="18,11,0,10"/>
+                                <TextBox Grid.Column="3" Grid.Row="1" Style="{StaticResource BasicTbox}" Margin="18,11,0,10"/>
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Grid.Row="2" Header="Spec">
+                            <Grid Margin="10,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="345*"/>
+                                    <ColumnDefinition Width="116*"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
                                     <RowDefinition/>
                                     <RowDefinition/>
                                     <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock FontSize="12" Text="R" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                <TextBlock FontSize="12" Text="G" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                <TextBlock FontSize="12" Text="B" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                <TextBlock FontSize="12" Text="White" Style="{StaticResource BasicTb}" Grid.Row="3"/>
-                                <Slider Grid.Column="1" Grid.Row="0" VerticalAlignment="Center"/>
-                                <Slider Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"/>
-                                <Slider Grid.Column="1" Grid.Row="2" VerticalAlignment="Center"/>
-                                <Slider Grid.Column="1" Grid.Row="3" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Margin="7,5"/>
-                                <TextBox Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Margin="7,5"/>
-                                <TextBox Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Margin="7,5"/>
-                                <TextBox Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Margin="7,5"/>
+                                <TextBlock FontSize="12" Text="ROI Width" Style="{StaticResource BasicTb}" Grid.Row="0" Grid.Column="1" Margin="18,11,0,11"/>
+                                <TextBlock FontSize="12" Text="ROI Height" Style="{StaticResource BasicTb}" Grid.Row="1" Grid.Column="1" Margin="18,11,0,11"/>
+                                <TextBlock FontSize="12" Text="Step Degree" Style="{StaticResource BasicTb}" Grid.Row="2" Grid.Column="1" Margin="18,11,0,11"/>
+                                <TextBlock FontSize="12" Text="X Range (Equalization)" Style="{StaticResource BasicTb}" Grid.Row="3" Grid.Column="1" Margin="18,11,0,11"/>
+                                <TextBlock FontSize="12" Text="Standard GV Diff (EDGE)" Style="{StaticResource BasicTb}" Grid.Row="4" Grid.Column="1" Margin="18,11,0,11"/>
+                                <TextBlock FontSize="12" Text="Standard GV Diff (BEVEL)" Style="{StaticResource BasicTb}" Grid.Row="5" Grid.Column="1" Margin="18,11,0,10"/>
+                                <TextBlock FontSize="12" Text="Standard GV Diff (EBR)" Style="{StaticResource BasicTb}" Grid.Row="6" Grid.Column="1" Margin="18,11,0,11"/>
+                                <TextBlock FontSize="12" Text="Offset (BEVEL)" Style="{StaticResource BasicTb}" Grid.Row="7" Grid.Column="1" Margin="18,11,0,10"/>
+                                <TextBlock FontSize="12" Text="Offset (EBR)" Style="{StaticResource BasicTb}" Grid.Row="8" Grid.Column="1" Margin="18,11,0,10"/>
+                                <TextBox Text="{Binding ROIWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding ROIHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding StepDegree, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding XRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding DiffEdge, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding DiffBevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="5" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding DiffEBR, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="6" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding OffsetBevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="7" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding OffsetEBR, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="8" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
                             </Grid>
-                        </GroupBox>
-                        <GroupBox Grid.Row="2" Header="Spec">
-                            Intensity, USL/LSL, Step Degree(Count), Offset Bevel, Offset EBR, Others(X Ave/Y Ave)
-                        </GroupBox>
-                        <GroupBox Grid.Row="3" Header="Defect Code">
-
+                            <!--Intensity, USL/LSL, Step Degree(Count), Offset Bevel, Offset EBR, Others(X Ave/Y Ave)-->
                         </GroupBox>
                     </Grid>
                     <Grid Grid.Column="1">
@@ -136,48 +164,47 @@
                         </Grid.RowDefinitions>
                         <GroupBox Grid.Row="0" Grid.Column="1" Header="Graph"
                                   Background="{StaticResource GroupBoxBackground}">
-                            <Image Source="/Root_WIND2;component/Resources/EBR.PNG"/>
+                            <Grid>
+                                <lvc:CartesianChart Series="{Binding MeasurementGraph}"
+                                                    LegendLocation="Top"
+                                                    DisableAnimations="true">
+                                <lvc:CartesianChart.AxisX>
+                                        <lvc:Axis Title="{Binding XTitle}"
+                                                  Labels="{Binding XLabels}"
+                                                  Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
+                                    </lvc:Axis>          
+                                </lvc:CartesianChart.AxisX>
+                                <lvc:CartesianChart.AxisY>
+                                        <lvc:Axis Title="{Binding YTitle}"
+                                                  MinValue="0"
+                                                  MaxValue="1000"
+                                                  LabelFormatter="{Binding SizeYLabel}">
+                                    </lvc:Axis>
+                                </lvc:CartesianChart.AxisY>
+                            </lvc:CartesianChart>
+                                
+                            </Grid>
                         </GroupBox>
-                        <GroupBox Grid.Row="1" Grid.Column="1" Header="Insepction Info"
+                        <GroupBox Grid.Row="1" Grid.Column="1" Header="Measurement Data"
                                   Background="{StaticResource GroupBoxBackground}">
-                            <DataGrid IsReadOnly="True">
+                            <DataGrid ItemsSource="{Binding MeasurementDataTable}"
+                                      SelectedItem="{Binding SelectedMeasurement, Mode=TwoWay}"
+                                      SelectionMode="Single"
+                                      EnableColumnVirtualization="True"
+                                      EnableRowVirtualization="True"
+                                      VirtualizingPanel.VirtualizationMode="Recycling"
+                                      ScrollViewer.CanContentScroll="True"
+                                      IsReadOnly="True"
+                                      AutoGenerateColumns="True"
+                                      Grid.Row="1">
                                 <DataGrid.Resources>
                                     <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalAlignment"
+                                                        Value="Stretch" />
+                                        <Setter Property="HorizontalContentAlignment"
+                                                        Value="Center" />
                                     </Style>
                                 </DataGrid.Resources>
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="No." Width="35" Binding="{Binding Path=no}"/>
-                                    <DataGridTextColumn Header="Angle" Width="*" Binding="{Binding Path=x}"/>
-                                    <DataGridTextColumn Header="EBR(um)" Width="*" Binding="{Binding Path=y}"/>
-                                    <DataGridTextColumn Header="Bevel(um)" Width="*" Binding="{Binding Path=width}"/>
-                                </DataGrid.Columns>
-                                <local:DummyMask no="0" x="0" y="459.4" width="268.2"/>
-                                <local:DummyMask no="1" x="15" y="468.8" width="231.8"/>
-                                <local:DummyMask no="2" x="30" y="463.2" width="294.5"/>
-                                <local:DummyMask no="3" x="45" y="459.4" width="268.2"/>
-                                <local:DummyMask no="4" x="60" y="468.8" width="231.8"/>
-                                <local:DummyMask no="5" x="75" y="463.2" width="294.5"/>
-                                <local:DummyMask no="6" x="90" y="459.4" width="268.2"/>
-                                <local:DummyMask no="7" x="105" y="468.8" width="231.8"/>
-                                <local:DummyMask no="8" x="120" y="463.2" width="294.5"/>
-                                <local:DummyMask no="9" x="135" y="459.4" width="268.2"/>
-                                <local:DummyMask no="10" x="150" y="468.8" width="231.8"/>
-                                <local:DummyMask no="11" x="165" y="463.2" width="294.5"/>
-                                <local:DummyMask no="12" x="180" y="459.4" width="268.2"/>
-                                <local:DummyMask no="13" x="195" y="468.8" width="231.8"/>
-                                <local:DummyMask no="14" x="210" y="463.2" width="294.5"/>
-                                <local:DummyMask no="15" x="225" y="459.4" width="268.2"/>
-                                <local:DummyMask no="16" x="240" y="468.8" width="231.8"/>
-                                <local:DummyMask no="17" x="255" y="463.2" width="294.5"/>
-                                <local:DummyMask no="18" x="270" y="463.2" width="294.5"/>
-                                <local:DummyMask no="19" x="285" y="463.2" width="294.5"/>
-                                <local:DummyMask no="20" x="300" y="463.2" width="294.5"/>
-                                <local:DummyMask no="21" x="315" y="463.2" width="294.5"/>
-                                <local:DummyMask no="22" x="330" y="463.2" width="294.5"/>
-                                <local:DummyMask no="23" x="345" y="463.2" width="294.5"/>
-                                <local:DummyMask no="24" x="360" y="463.2" width="294.5"/>
                             </DataGrid>
                         </GroupBox>
                     </Grid>

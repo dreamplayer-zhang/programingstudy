@@ -1396,7 +1396,8 @@ namespace Root_Vega.Module
                         if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
                         else
                         {
-                            dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                            dLeftCurrentScore = af.GetImageVarianceScore
+                                (img, m_nVarianceSize);
                             bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                         }
 

@@ -3,6 +3,7 @@ using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHTNew;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
@@ -70,7 +71,8 @@ namespace Root_EFEM
         enum eWTR
         {
             RND,
-            Cymechs
+            Cymechs,
+            RTR_RND
         }
         eWTR m_eWTR = eWTR.RND;
         ModuleBase m_wtr;
@@ -78,7 +80,8 @@ namespace Root_EFEM
         {
             switch (m_eWTR)
             {
-                case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer);break; 
+                case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer);break;
+                case eWTR.RTR_RND: m_wtr = new RTR_RND("WTR", m_engineer); break;
                 default: m_wtr = new WTR_RND("WTR", m_engineer); break;
             }
             InitModule(m_wtr); 
@@ -363,7 +366,7 @@ namespace Root_EFEM
             string sLoadport = sequence.m_infoWafer.m_sModule; 
             foreach (ILoadport loadport in m_aLoadport)
             {
-                if (loadport.p_id == sLoadport) loadport.RunDocking(); 
+                if (loadport.p_id == sLoadport) loadport.StartRunDocking(); 
             }
         }
 
@@ -380,7 +383,7 @@ namespace Root_EFEM
                     {
                         if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false; 
                     }
-                    if (bUndock) loadport.RunUndocking(); 
+                    if (bUndock) loadport.StartRunUndocking(); 
                 }
             }
         }

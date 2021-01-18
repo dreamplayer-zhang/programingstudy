@@ -22,19 +22,52 @@ namespace Root_WIND2.Module
         #region Camera
         public event System.EventHandler Grabed;
         public bool m_bUseBiDirectionScan = false;
+        public eGrabDirection m_eDefaultCamDirection = eGrabDirection.Forward;
         public int m_nReverseOffsetY = 800;
         public eGrabDirection m_eGrabDirection = eGrabDirection.Forward;
         string m_sCamera = "";
         public ICamera m_camera = null;
         CameraSet m_cameraSet;
+        public RPoint m_ptXYAlignData = new RPoint(0, 0);
+        public double m_dTDIToVRSOffsetX = 0;
+        public double m_dTDIToVRSOffsetY = 0;
+        public double m_dVRSFocusPos = 0;
+        public RPoint m_rpAxisCenter = new RPoint();    // Wafer Center Position
+        public CPoint m_cpMemoryOffset = new CPoint();  // Memory Offset
+        public double m_dResX_um = 1;                   // Camera Resolution X
+        public double m_dResY_um = 1;                   // Camera Resolution Y
+        public int m_nFocusPosZ = 0;                    // Focus Position Z
+        public int m_nWaferSize_mm = 1000;              // Wafer Size (mm)
+        public int m_nMaxFrame = 100;                   // Camera max Frame 스펙
+        public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
+
+        void RunTreeOption(Tree tree, bool bVisible, bool bReadOnly)
+        {
+            m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
+            m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
+            m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam X Resolution", "X Resolution (um)", bVisible);
+            m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Cam Y Resolution", "Y Resolution (um)", bVisible);
+            m_nFocusPosZ = tree.Set(m_nFocusPosZ, m_nFocusPosZ, "Focus Z Position", "Focus Z Position", bVisible);
+            m_nWaferSize_mm = tree.Set(m_nWaferSize_mm, m_nWaferSize_mm, "Wafer Size Y", "Wafer Size Y", bVisible);
+            m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
+            m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
+        }
+            
+
         void RunTreeCamera(Tree tree, bool bVisible, bool bReadOnly)
         {
+            
+            m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
             m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
             m_nReverseOffsetY = tree.Set(m_nReverseOffsetY, 800, "ReverseOffsetY", "Reverse Scan 동작시 Y 이미지 Offset 설정");
             m_sCamera = tree.Set(m_sCamera, m_sCamera, m_cameraSet.p_asCamera, "Camera", "Select Camera", bVisible, bReadOnly);
             m_camera = m_cameraSet.Get(m_sCamera);
             m_ScanLineNum = tree.Set(m_ScanLineNum, m_ScanLineNum, "Scan Line Number", "Scan Line Number");
             m_ScanStartLine = tree.Set(m_ScanStartLine, m_ScanStartLine, "Scan Start Line", "Scan Start Line");
+            m_ptXYAlignData = tree.Set(m_ptXYAlignData, m_ptXYAlignData, "XY Align Data", "XY Align Data", bVisible, true);
+            m_dTDIToVRSOffsetX = tree.Set(m_dTDIToVRSOffsetX, m_dTDIToVRSOffsetX, "TDI To VRS Offset X", "TDI To VRS Offset X");
+            m_dTDIToVRSOffsetY = tree.Set(m_dTDIToVRSOffsetY, m_dTDIToVRSOffsetY, "TDI To VRS Offset Y", "TDI To VRS Offset Y");
+            m_dVRSFocusPos = tree.Set(m_dVRSFocusPos, m_dVRSFocusPos, "VRS Focus Z", "VRS Focus Z", bVisible, true);
         }
 
         public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false)
@@ -188,7 +221,14 @@ namespace Root_WIND2.Module
             dst.m_ScanStartLine = src.m_ScanStartLine;
             dst.m_sMemoryData = src.m_sMemoryData;
             dst.m_sMemoryGroup = src.m_sMemoryGroup;
-
+            dst.m_rpAxisCenter = new RPoint(src.m_rpAxisCenter);
+            dst.m_cpMemoryOffset = new CPoint(src.m_cpMemoryOffset);
+            dst.m_dResX_um = src.m_dResX_um;
+            dst.m_dResY_um = src.m_dResY_um;
+            dst.m_nFocusPosZ = src.m_nFocusPosZ;
+            dst.m_nWaferSize_mm = src.m_nWaferSize_mm;
+            dst.m_nMaxFrame = src.m_nMaxFrame;
+            dst.m_nScanRate = src.m_nScanRate;
             return dst;
         }
 
@@ -202,11 +242,14 @@ namespace Root_WIND2.Module
 
         public void RunTree(Tree tree, bool bVisible, bool bReadOnly)
         {
+            RunTreeOption(tree, bVisible, bReadOnly);
             RunTreeCamera(tree, bVisible, bReadOnly);
             RunTreeLight(tree.GetTree("LightPower", false), bVisible, bReadOnly);
             RunTreeMemory(tree.GetTree("Memory", false), bVisible, bReadOnly);
             RunTreeScanPos(tree.GetTree("ScanPos", false), bVisible, bReadOnly);
             RunTreeRADS(tree.GetTree("RADS", false), bVisible, bReadOnly);
         }
+
+        public virtual void RunTree(Tree.eMode mode) { }
     }
 }

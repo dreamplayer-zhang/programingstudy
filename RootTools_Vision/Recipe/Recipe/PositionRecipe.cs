@@ -190,5 +190,16 @@ namespace RootTools_Vision
 
             return rst;
         }
+
+        public override void Clear()
+        {
+            this.listMasterFeature.Clear();
+            this.listShotFeature.Clear();
+            this.listChipFeature.Clear();
+
+            this.indexMaxScoreMasterFeature = -1;
+            this.indexMaxScoreShotFeature = -1;
+            this.indexMaxScoreChipFeature = -1;
+        }
     }
 }

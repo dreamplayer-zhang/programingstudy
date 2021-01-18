@@ -9,87 +9,127 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace RootTools_Vision.Inspection
+namespace RootTools_Vision
 {
 	public class EdgeSurface : WorkBase
 	{
-		WorkplaceBundle workplaceBundle;
-		Workplace workplace;
-
 		public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
+
+		private EdgeSurfaceParameter parameter;
+		private EdgeSurfaceRecipe recipeEdgeSurface;
+
+		public enum EdgeMapPositionX
+		{
+			Top = 0,
+			Side = 1,
+			Btm = 2
+		}
+
+		public EdgeSurface() : base()
+		{
+			m_sName = this.GetType().Name;
+		}
 
 		public override WorkBase Clone()
 		{
 			return (WorkBase)this.MemberwiseClone();
 		}
 
-		public override bool DoPrework()
+		protected override bool Preparation()
 		{
-			if (this.workplace.Index == 0)
-				return base.DoPrework();
-
+			if(this.parameter == null || this.recipeEdgeSurface == null)
+            {
+				this.parameter = recipe.GetRecipe<EdgeSurfaceParameter>();
+				this.recipeEdgeSurface = recipe.GetRecipe<EdgeSurfaceRecipe>();
+            }
 			return true;
 		}
 
-		public override void DoWork()
+		protected override bool Execution()
 		{
 			DoInspection();
-			base.DoWork();
-		}
-
-		public override void SetRecipe(Recipe _recipe)
-		{
-			
-		}
-
-		public override void SetWorkplace(Workplace _workplace)
-		{
-			this.workplace = _workplace;
-		}
-
-		public override void SetWorkplaceBundle(WorkplaceBundle _workplace)
-		{
-			this.workplaceBundle = _workplace;
+			return true;
 		}
 
 		public void DoInspection()
 		{
-			//if (this.workplace.Index == 0)
-			//	return;
-						
-			int roiHeight = 1000; // recipe
-			int threshold = 12; // recipe
-			int defectSize = 5; // recipe
+			if (this.currentWorkplace.Index == 0)
+				return;
 
-			//int memH = this.workplace.SharedBufferHeight;
-			int memW = this.workplace.SharedBufferWidth;
-			int memSize = memW * roiHeight;
+			DoColorInspection(this.currentWorkplace.SharedBufferR_GRAY, parameter);
+			DoColorInspection(this.currentWorkplace.SharedBufferG, parameter);
+			DoColorInspection(this.currentWorkplace.SharedBufferB, parameter);
 
-			int left = this.workplace.PositionX;
-			int top = this.workplace.PositionY;
-			int right = this.workplace.PositionX + this.workplace.SharedBufferWidth; 
-			int bottom = this.workplace.PositionY + roiHeight;
+			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+		}
 
-			byte[] arrSrc = new byte[memSize];
-			for (int cnt = top; cnt < bottom; cnt++)
+		private void DoColorInspection(IntPtr sharedBuffer, EdgeSurfaceParameter param)
+		{
+			int roiHeight; // 2000
+			int roiWidth; // this.workplace.SharedBufferWidth;
+			int threshold;  // 40
+			int defectSize; // 10
+
+			// parameter 구분하기
+			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
 			{
-				Marshal.Copy(new IntPtr(this.workplace.SharedBuffer.ToInt64() + (cnt * (Int64)memW))
-							, arrSrc
-							, memW * (cnt - top)
-							, memW);
+				roiHeight = parameter.RoiHeightTop;
+				roiWidth = parameter.RoiWidthTop;
+				threshold = parameter.ThesholdTop;
+				defectSize = parameter.SizeMinTop;
+			}
+			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Side)
+			{
+				roiHeight = parameter.RoiHeightSide;
+				roiWidth = parameter.RoiWidthSide;
+				threshold = parameter.ThesholdSide;
+				defectSize = parameter.SizeMinSide;
+			}
+			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
+			{
+				roiHeight = parameter.RoiHeightBtm;
+				roiWidth = parameter.RoiWidthBtm;
+				threshold = parameter.ThesholdBtm;
+				defectSize = parameter.SizeMinBtm;
+			}
+			else
+			{
+				return;
 			}
 
-			//Emgu.CV.Mat mat = new Emgu.CV.Mat((int)roiHeight, (int)memW, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
-			//Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
-			//mat.Save(@"D:\mat_" + this.workplace.Index.ToString() + ".bmp");
+			int roiSize = roiWidth * roiHeight;
+
+			int left = this.currentWorkplace.PositionX;
+			int top = this.currentWorkplace.PositionY;
+			int right = this.currentWorkplace.PositionX + this.currentWorkplace.SharedBufferWidth;
+			int bottom = this.currentWorkplace.PositionY + roiHeight;
+
+			byte[] arrSrc = new byte[roiSize];
+			//for (int cnt = top; cnt < bottom; cnt++)
+			//{
+			//	Marshal.Copy(new IntPtr(sharedBuffer.ToInt64() + (cnt * (Int64)roiWidth))
+			//				, arrSrc
+			//				, roiWidth * (cnt - top)
+			//				, roiWidth);
+			//}
+			for (int cnt = top; cnt < bottom; cnt++)
+			{
+				Marshal.Copy(new IntPtr(sharedBuffer.ToInt64() + (cnt * (Int64)this.currentWorkplace.SharedBufferWidth))
+							, arrSrc
+							, this.currentWorkplace.SharedBufferWidth * (cnt - top)
+							, this.currentWorkplace.SharedBufferWidth);
+			}
+			Emgu.CV.Mat mat = new Emgu.CV.Mat((int)roiHeight, (int)roiWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+			Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
+			mat.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_" + this.currentWorkplace.Index.ToString() + ".bmp");
 
 			// profile 생성
 			List<int> temp = new List<int>();
 			List<int> profile = new List<int>();
-			for (long j = 0; j < memW; j++)
+			for (long j = 0; j < roiWidth; j++)
 			{
 				temp.Clear();
-				for (long i = 0; i < memSize; i += memW)
+				for (long i = 0; i < roiSize; i += roiWidth)
 				{
 					temp.Add(arrSrc[j + i]);
 				}
@@ -98,41 +138,42 @@ namespace RootTools_Vision.Inspection
 			}
 
 			// Calculate diff image (original - profile)
-			byte[] diff = new byte[memSize];
+			byte[] diff = new byte[roiSize];
 			for (int j = 0; j < roiHeight; j++)
 			{
-				for (int i = 0; i < memW; i++)
+				for (int i = 0; i < roiWidth; i++)
 				{
-					diff[(j * memW) + i] = (byte)(Math.Abs(arrSrc[(j * memW) + i] - profile[i]));
+					diff[(j * roiWidth) + i] = (byte)(Math.Abs(arrSrc[(j * roiWidth) + i] - profile[i]));
 				}
 			}
 
 			// Threshold
-			byte[] thresh = new byte[memSize];
-			CLR_IP.Cpp_Threshold(diff, thresh, memW, roiHeight, false, threshold);
-			var label = CLR_IP.Cpp_Labeling(diff, thresh, memW, roiHeight, true);
+			byte[] thresh = new byte[roiSize];
+			CLR_IP.Cpp_Threshold(diff, thresh, roiWidth, roiHeight, false, threshold);
+			var label = CLR_IP.Cpp_Labeling(diff, thresh, roiWidth, roiHeight, true);
+            //Emgu.CV.Mat mat2 = new Emgu.CV.Mat((int)roiHeight, (int)roiWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+            //Marshal.Copy(thresh, 0, mat2.DataPointer, arrSrc.Length);
+            //mat2.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_thresh_" + this.workplace.Index.ToString() + ".bmp");
 
-			// Add defect
-			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			for (int i = 0; i < label.Length; i++)
-			{
-				if (label[i].area > defectSize)
-				{
-					this.workplace.AddDefect(sInspectionID,
-						10001,
-						label[i].area,
-						label[i].value,
-						this.workplace.PositionX + label[i].boundLeft,
-						this.workplace.PositionY - label[i].boundTop,
-						Math.Abs(label[i].boundRight - label[i].boundLeft),
-						Math.Abs(label[i].boundBottom - label[i].boundTop),
-						this.workplace.MapPositionX,
-						this.workplace.MapPositionY
-						);
-				}
-			}
-
-			WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
-		}
+            // Add defect
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+            for (int i = 0; i < label.Length; i++)
+            {
+                if (label[i].area > defectSize)
+                {
+                    this.currentWorkplace.AddDefect(sInspectionID,
+                        10001,
+                        label[i].area,
+                        label[i].value,
+                        this.currentWorkplace.PositionX + label[i].boundLeft,
+                        this.currentWorkplace.PositionY + label[i].boundTop,
+                        Math.Abs(label[i].boundRight - label[i].boundLeft),
+                        Math.Abs(label[i].boundBottom - label[i].boundTop),
+                        this.currentWorkplace.MapIndexX,
+                        this.currentWorkplace.MapIndexY
+                        );
+                }
+            }
+        }
 	}
 }

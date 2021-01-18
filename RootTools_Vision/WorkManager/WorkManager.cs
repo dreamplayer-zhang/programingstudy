@@ -5,16 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
-    public enum WORK_TYPE
-    {
-        ALIGNMENT,
-        INSPECTION,
-        AFTERWORK,
-        FINISHINGWORK
-    }
-
     public enum STATE_CHECK_TYPE
     {
         CHIP = 0,
@@ -37,12 +29,12 @@ namespace RootTools_Vision
         /// <summary>
         /// WorkManager에서 객체를 생성해서 연결해주는 방식을 취함
         /// </summary>
-        public WorkManager(string _id, WORK_TYPE _type, WORKPLACE_STATE _resultState, WORKPLACE_STATE _excuteCondition, STATE_CHECK_TYPE _state_check_type,  int workerNum = 1)
+        public WorkManager(string _id, WORK_TYPE _workType, WORK_TYPE _preWorkType, STATE_CHECK_TYPE _state_check_type,  int workerNum = 1)
         {
             this.id = _id;
             if (workerNum < 1) workerNum = 1;
 
-            this.type = _type;
+            this.type = _workType;
 
             this.workers = new List<Worker>();
             for(int i= 0; i < workerNum; i++)
@@ -51,7 +43,7 @@ namespace RootTools_Vision
                 workers.Add(worker);
             }
 
-            this.workerManager = new WorkerManager(workers, _resultState, _excuteCondition, _state_check_type);
+            this.workerManager = new WorkerManager(workers, _workType, _preWorkType, _state_check_type);
         }
 
         public bool SetBundles(WorkBundle _workbundle, WorkplaceBundle _workplacebundle)
@@ -93,6 +85,11 @@ namespace RootTools_Vision
         public void Stop()
         {
             this.workerManager.Stop();
+            if(this.workplacebundle != null)
+                this.workplacebundle.Reset();
+
+            this.workplacebundle = null;
+            this.workbundle = null;
         }
     }
 }

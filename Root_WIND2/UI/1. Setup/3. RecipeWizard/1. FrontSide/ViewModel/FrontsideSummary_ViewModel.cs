@@ -17,19 +17,19 @@ using System.Windows.Threading;
 
 namespace Root_WIND2
 {
-    class FrontsideSummary_ViewModel : RootViewer_ViewModel
+    class FrontsideSummary_ViewModel : RootViewer_ViewModel, IRecipeUILoadable
     {
         public void init(Setup_ViewModel _setup, Recipe _recipe)
         {
             this.setup = _setup;
             this.recipe = _recipe;
 
-            MapControl_VM = new MapControl_ViewModel(this.setup.InspectionVision, recipe);
-            MapControl_VM.SetMap(setup.InspectionVision.mapdata, new CPoint(14, 14));
+            MapControl_VM = new MapControl_ViewModel(recipe);
+            MapControl_VM.SetMap(setup.Recipe.WaferMap.Data, new CPoint(14, 14));
             
-            timer.Interval = TimeSpan.FromSeconds(1);    
-            timer.Tick += new EventHandler(DateTimeUpdate);         
-            timer.Start();               
+            //timer.Interval = TimeSpan.FromSeconds(1);    
+            //timer.Tick += new EventHandler(DateTimeUpdate);         
+            //timer.Start();               
         }
 
         public void ConnectInspItemDataGrid(FrontsideSpec_ViewModel _spec)
@@ -297,7 +297,7 @@ namespace Root_WIND2
             }
             else
             {
-                MapControl_VM.SetMap(false, new CPoint(0, 5), setup.InspectionVision.mapdata, new CPoint(14, 14));
+                MapControl_VM.SetMap(false, new CPoint(0, 5), setup.Recipe.WaferMap.Data, new CPoint(14, 14));
             }
         }
         private void SetMapData()
@@ -355,6 +355,11 @@ namespace Root_WIND2
             SetMapData();
             DrawMapData();
             //LoadMasterImage();
+        }
+
+        public void Load()
+        {
+            LoadSummaryData();
         }
     }
 }

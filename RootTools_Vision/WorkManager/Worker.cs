@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
     public enum WORKER_STATE
     {
@@ -150,12 +150,13 @@ namespace RootTools_Vision
         {
             this.isStop = true;
             this.workerState = WORKER_STATE.NONE;
+
+            this.works = null;
         }
 
         public void Cancel()
         {
             cancellationTokenSource.Cancel();
         }
-
     }
 }

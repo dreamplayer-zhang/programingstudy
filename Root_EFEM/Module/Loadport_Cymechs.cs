@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Threading;
 using RootTools.Control;
 using RootTools.OHT.Semi;
+using RootTools.OHTNew;
 
 namespace Root_EFEM.Module
 {
@@ -17,11 +18,13 @@ namespace Root_EFEM.Module
         RS232 m_rs232;
         public DIO_I m_diPlaced;
         public DIO_I m_diPresent;
-        DIO_I m_diOpen;
-        DIO_I m_diClose;
-        DIO_I m_diReady;
-        DIO_I m_diRun;
-        public OHT_Semi m_OHT; 
+        public DIO_I m_diOpen;
+        public DIO_I m_diClose;
+        public DIO_I m_diReady;
+        public DIO_I m_diRun;
+        public OHT_Semi m_OHT;
+        public bool m_bLoadCheck = false;
+        public bool m_bUnLoadCheck = false;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
@@ -42,7 +45,7 @@ namespace Root_EFEM.Module
 
         //forget
         #region DIO Function
-        bool m_bPlaced = false;
+        public bool m_bPlaced = false;
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present = m_bPlaced ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
@@ -71,7 +74,7 @@ namespace Root_EFEM.Module
 
         public List<string> p_asChildSlot
         {
-            get { return p_infoCarrier.m_asGemSlot; }
+            get { return p_infoCarrier.p_asGemSlot; }
         }
 
         public InfoWafer p_infoWafer { get; set; }
@@ -328,6 +331,7 @@ namespace Root_EFEM.Module
             ClearError,
             Load,
             Unload,
+            GetMap,
         };
 
         Dictionary<eCmd, string> m_dicCmd = new Dictionary<eCmd, string>();
@@ -337,6 +341,7 @@ namespace Root_EFEM.Module
             m_dicCmd.Add(eCmd.ClearError, "RESET");
             m_dicCmd.Add(eCmd.Load, "LOAD");
             m_dicCmd.Add(eCmd.Unload, "UNLOAD");
+            m_dicCmd.Add(eCmd.GetMap, "SCAN DN");
         }
 
         public class Protocol
@@ -556,6 +561,14 @@ namespace Root_EFEM.Module
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitDone(m_secLoad);
         }
+
+        string CmdGetMap()
+        {
+            Protocol protocol = new Protocol(eCmd.GetMap, this);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitDone(m_secLoad);
+        }
+
         #endregion
 
         #region override
@@ -591,6 +604,7 @@ namespace Root_EFEM.Module
         bool m_bNeedHome = true;
         public override string StateHome()
         {
+
             if (EQ.p_bSimulate == false)
             {
                 if (Run(CmdResetCPU())) return p_sInfo;
@@ -605,16 +619,20 @@ namespace Root_EFEM.Module
                     if (Run(CmdUnload())) return p_sInfo;
                 }
             }
-            p_eState = eState.Ready;
-            if(m_diPlaced.p_bIn && m_diPresent.p_bIn)
+            if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
             {
+                p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
                 m_bPlaced= true;
+
+                if (Run(CmdLoad())) return p_sInfo;
+                if (Run(CmdUnload())) return p_sInfo;
             }
             else
             {
+                p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
                 m_bPlaced = false;
             }
-            
+            p_eState = eState.Ready;
             p_infoCarrier.AfterHome();
             return "OK";
         }
@@ -649,17 +667,21 @@ namespace Root_EFEM.Module
         CEID m_ceidDocking;
         CEID m_ceidUnDocking;
         ALID m_alidPlaced;
+        public ALID m_alidInforeticle;
+        public CEID m_ceidUnloadReq;
         void InitGAF() 
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
             m_ceidDocking = m_gaf.GetCEID(this, "Docking");
             m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
+            m_ceidUnloadReq = m_gaf.GetCEID(this, "Unload Request");
+            m_alidInforeticle = m_gaf.GetALID(this, "Info Reticle Error", "Info Reticle Error");
         }
         #endregion
 
         #region ILoadport
-        public string RunDocking()
+        public string StartRunDocking()
         {
             if (p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runDocking.Clone();
@@ -668,7 +690,7 @@ namespace Root_EFEM.Module
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
 
-        public string RunUndocking()
+        public string StartRunUndocking()
         {
             if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runUndocking.Clone();
@@ -676,6 +698,9 @@ namespace Root_EFEM.Module
             while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
+
+        public bool p_bPlaced { get { return m_diPlaced.p_bIn; } }
+        public bool p_bPresent { get { return m_diPresent.p_bIn; } }
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }
@@ -709,8 +734,18 @@ namespace Root_EFEM.Module
         }
 
         #region ModuleRun
-        ModuleRunBase m_runDocking;
-        ModuleRunBase m_runUndocking;
+        public ModuleRunBase m_runDocking;
+        public ModuleRunBase m_runUndocking;
+
+        public ModuleRunBase GetUnLoadModuleRun()
+        {
+            return m_runUndocking;
+        }
+        public ModuleRunBase GetLoadModuleRun()
+        {
+            return m_runDocking;
+        }
+
         protected override void InitModuleRuns()
         {
             m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");
@@ -743,10 +778,12 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
+                m_module.m_bUnLoadCheck = false;
                 if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 if (m_module.Run(m_module.CmdLoad())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
-                m_module.m_ceidDocking.Send(); 
+                m_module.m_ceidDocking.Send();
+                m_module.m_bLoadCheck = true;
                 return "OK";
             }
         }
@@ -777,10 +814,13 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
+                m_module.m_bLoadCheck = false;
                 if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock) return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                //if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
                 if (m_module.Run(m_module.CmdUnload())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                m_module.m_ceidUnDocking.Send(); 
+                m_module.m_ceidUnDocking.Send();
+                m_module.m_bUnLoadCheck = true;
                 return "OK";
             }
         }

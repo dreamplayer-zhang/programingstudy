@@ -19,12 +19,12 @@ namespace RootTools.Database
         bool m_bConnected = false;
         int m_ThreadID;
         MySqlConnection m_sqlConnection;
-        public Database_ConnectSession(int nThreadID)
+        public Database_ConnectSession(int nThreadID, string sServerName = "localhost", string sDBName = "wind2", string sUid = "root", string sPw= "root")
         {
             try
             {
                 m_ThreadID = nThreadID;
-                string sConeectCommand = string.Format("SERVER={0};DATABASE={1};UID={2};PASSWORD={3};", m_sServerName, m_SDbName, m_sUid, m_sPw);
+                string sConeectCommand = string.Format("SERVER={0};DATABASE={1};UID={2};PASSWORD={3};", sServerName, sDBName, sUid, sPw);
                 m_sqlConnection = new MySqlConnection(sConeectCommand);
             }
             catch (Exception ex)

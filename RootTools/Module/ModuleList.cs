@@ -106,20 +106,22 @@ namespace RootTools.Module
                     case EQ.eState.Init: p_sRun = "Home"; break;
                     case EQ.eState.Home: p_sRun = "Stop"; break;
                     case EQ.eState.Ready: p_sRun = "Run"; break;
-                    case EQ.eState.Run: p_sRun = "Stop";
-                        if (m_qModuleRun.Count > 0) 
+                    case EQ.eState.Run:
+                        p_sRun = "Stop";
+                        if (m_qModuleRun.Count > 0)
                         {
-                            ModuleRunBase moduleRun = m_qModuleRun.Dequeue();
+                            ModuleRunBase moduleRun = m_qModuleRun.Peek();
                             p_iRun = m_qModuleRun.Count;
                             moduleRun.StartRun();
                             Thread.Sleep(100);
-                            while (moduleRun.m_moduleBase.m_qModuleRun.Count > 0) Thread.Sleep(10); 
+                            while (moduleRun.m_moduleBase.m_qModuleRun.Count > 0) Thread.Sleep(10);
                             while (moduleRun.m_moduleBase.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
-                            if (m_qModuleRun.Count == 0)
+                            if (m_qModuleRun.Count <= 1)
                             {
                                 p_visibleRnR = Visibility.Visible;
                                 EQ.p_eState = EQ.eState.Ready;
                             }
+                            m_qModuleRun.Dequeue();
                         }
                         break;
                     case EQ.eState.Error: p_sRun = "Reset"; break;
@@ -144,7 +146,8 @@ namespace RootTools.Module
                     EQ.p_eState = EQ.eState.Init;
                     break;
                 case EQ.eState.Ready:
-                    if (m_qModuleRun.Count == 0) StartModuleRuns();
+                    if (m_qModuleRun.Count == 0) 
+                        StartModuleRuns();
                     else
                     {
                         m_qModuleRun.Clear();

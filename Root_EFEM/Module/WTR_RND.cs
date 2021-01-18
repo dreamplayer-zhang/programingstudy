@@ -69,9 +69,9 @@ namespace Root_EFEM.Module
             {
                 foreach (Arm arm in m_dicArm.Values)
                 {
-                    if (arm.p_bEnable) eArm = arm.m_eArm; 
+                    if (arm.p_bEnable) eArm = arm.m_eArm;
                 }
-                return; 
+                return;
             }
             string sArm = eArm.ToString();
             sArm = tree.Set(sArm, sArm, p_asArm, "Arm", "Select WTR Arm", bVisible);
@@ -367,7 +367,7 @@ namespace Root_EFEM.Module
             m_dicCmd.Add(eCmd.MoveHome, "HOME");
             m_dicCmd.Add(eCmd.Grip, "GRIP");
             m_dicCmd.Add(eCmd.Get, "GET");
-            m_dicCmd.Add(eCmd.GetReady, "GRDT");
+            m_dicCmd.Add(eCmd.GetReady, "GRDY");
             m_dicCmd.Add(eCmd.Put, "PUT");
             m_dicCmd.Add(eCmd.PutReady, "PRDY");
             m_dicCmd.Add(eCmd.Extend, "EXTA");
@@ -472,7 +472,7 @@ namespace Root_EFEM.Module
             if (EQ.IsStop()) return "EQ Stop";
 
             string str = m_dicCmd[cmd];
-            str += " " + sSpeed;           
+            str += " " + sSpeed;
             m_log.Info(" [ Send --> " + str);
             m_eSendCmd = cmd;
             m_rs232.Send(str);
@@ -636,10 +636,12 @@ namespace Root_EFEM.Module
 
         #region InfoWafer UI
         InfoWaferWTR_UI m_ui;
+        public List<WTRArm> aArm;
+
         void InitInfoWaferUI()
         {
             m_ui = new InfoWaferWTR_UI();
-            List<WTRArm> aArm = new List<WTRArm>();
+            aArm = new List<WTRArm>();
             aArm.Add(m_dicArm[eArm.Upper]);
             aArm.Add(m_dicArm[eArm.Lower]);
             m_ui.Init(p_id + ".InfoWafer", aArm, m_engineer);
@@ -684,6 +686,7 @@ namespace Root_EFEM.Module
 
         public override void ThreadStop()
         {
+            m_ui.ThreadStop();
             base.ThreadStop();
         }
 
@@ -706,16 +709,16 @@ namespace Root_EFEM.Module
 
         public string GetEnableAnotherArmID(ModuleRunBase runGet, WTRArm armPut, InfoWafer infoWafer)
         {
-            eArm eArmPut = ((Arm)armPut).m_eArm; 
+            eArm eArmPut = ((Arm)armPut).m_eArm;
             for (int n = 0; n < p_aArm.Count; n++)
             {
-                Arm armGet = (Arm)p_aArm[n]; 
+                Arm armGet = (Arm)p_aArm[n];
                 if (armGet.m_eArm != eArmPut)
                 {
                     if (armGet.IsEnableWaferSize(infoWafer))
                     {
                         ((Run_Get)runGet).m_eArm = armGet.m_eArm;
-                        return armGet.m_id; 
+                        return armGet.m_id;
                     }
                 }
             }
@@ -725,7 +728,7 @@ namespace Root_EFEM.Module
 
         #region ModuleRun
         ModuleRunBase m_runGet;
-        ModuleRunBase m_runPut; 
+        ModuleRunBase m_runPut;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_ResetCPU(this), false, "Reset WTR CPU");
@@ -784,7 +787,7 @@ namespace Root_EFEM.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_module.RunTreeArm(tree, ref m_eArm, bVisible); 
+                m_module.RunTreeArm(tree, ref m_eArm, bVisible);
                 m_bGrip = tree.Set(m_bGrip, m_bGrip, "Grip", "Grip Arm Grip", bVisible);
             }
 
@@ -799,7 +802,7 @@ namespace Root_EFEM.Module
             WTR_RND m_module;
             public Run_Get(WTR_RND module)
             {
-                p_sChild = ""; 
+                p_sChild = "";
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -883,7 +886,7 @@ namespace Root_EFEM.Module
             WTR_RND m_module;
             public Run_Put(WTR_RND module)
             {
-                p_sChild = ""; 
+                p_sChild = "";
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -946,7 +949,7 @@ namespace Root_EFEM.Module
                     if (m_module.Run(m_module.WriteCmd(eCmd.Put, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                     child.p_bLock = false;
-                    child.AfterPut(m_nChildID); 
+                    child.AfterPut(m_nChildID);
                 }
                 finally
                 {

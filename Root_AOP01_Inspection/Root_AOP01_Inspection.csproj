@@ -178,6 +178,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -196,8 +197,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UI\3. RUN\ManualJobSchedule.cs" />
+    <Compile Include="UI\3. RUN\Dlg_Start.xaml.cs">
+      <DependentUpon>Dlg_Start.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\AOP01.cs" />
+    <Compile Include="Module\EventArgs.cs" />
+    <Compile Include="Module\EventManager.cs" />
     <Compile Include="Module\GrabMode.cs" />
+    <Compile Include="Module\InspectionManager_AOP.cs" />
+    <Compile Include="Module\InspectionMode.cs" />
     <Compile Include="Module\MainVision.cs" />
     <Compile Include="Module\OHTs_UI.xaml.cs">
       <DependentUpon>OHTs_UI.xaml</DependentUpon>
@@ -208,6 +217,7 @@
     <Compile Include="Module\WTRCleanUnit.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="ProgramManager.cs" />
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\Recipe45D_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\3. Maintenance\ViewerTest.xaml.cs">
       <DependentUpon>ViewerTest.xaml</DependentUpon>
     </Compile>
@@ -222,6 +232,7 @@
     <Compile Include="UI\1. SETUP\2. RecipeWizard\Page\RecipeSummary_Page.xaml.cs">
       <DependentUpon>RecipeSummary_Page.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\3. RUN\Dlg_ViewModel.cs" />
     <Compile Include="UI\3. RUN\Run_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\4. GEM\GEM_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\3. Maintenance\Maintenance_ViewModel.cs" />
@@ -233,7 +244,7 @@
       <DependentUpon>NaviBtn.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\Recipe45D_ViewModel.cs" />
-    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeBackside_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeFrontside_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeEdge_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeLADS_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\RecipeWizard_ViewModel.cs" />
@@ -271,6 +282,13 @@
     <Compile Include="UI\1. SETUP\Setup_Panel.xaml.cs">
       <DependentUpon>Setup_Panel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_UserControl\Loadport_UI.xaml.cs">
+      <DependentUpon>Loadport_UI.xaml</DependentUpon>
+    </Compile>
+    <Page Include="UI\3. RUN\Dlg_Start.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Engineer\AOP01_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -393,6 +411,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI_UserControl\Loadport_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -426,6 +448,10 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RootTools_CLR\RootTools_CLR.vcxproj">
+      <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
+      <Name>RootTools_CLR</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RootTools_Vision\RootTools_Vision.csproj">
       <Project>{b9fa8faa-0522-41f3-99ad-eb307e385f76}</Project>
       <Name>RootTools_Vision</Name>
@@ -437,6 +463,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Control\UserControl\" />
+    <Folder Include="ManualJob\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

@@ -5,24 +5,25 @@ using System.Text;
 using System.Threading.Tasks;
 using RootTools.Database;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
-    public enum WORKPLACE_STATE
+    public enum WORK_TYPE
     {
         //32개 가능?
         NONE                = 0b0000000,
         SNAP                = 0b0000010,
-        READY               = 0b0000100,
+        ALIGNMENT           = 0b0000100,
         INSPECTION          = 0b0001000,
         DEFECTPROCESS       = 0b0010000,
         DEFECTPROCESS_WAFER = 0b0100000,
+        MEASUREMENTPROCESS  = 0b1000000,
     }
 
     public enum WORKPLACE_SUB_STATE
     {
-        POSITION_SUCCESS            = 0b00000001,
-        LINE_FIRST_CHIP             = 0b00000010,
-        WAFER_POSITION_SUCCESS      = 0b00000100,
+        WAFER_POSITION_SUCCESS      = 0b00000001,
+        POSITION_SUCCESS            = 0b00000010,
+        LINE_FIRST_CHIP             = 0b00000100,
         BAD_CHIP                    = 0b10000000,
     }
 
@@ -44,9 +45,9 @@ namespace RootTools_Vision
 
         public event EventPositionIntialized PositionIntialized;
 
-        private WORKPLACE_STATE state;
+        private WORK_TYPE state;
 
-        public WORKPLACE_STATE STATE
+        public WORK_TYPE STATE
         {
             get { return state; }
             set 
@@ -69,10 +70,11 @@ namespace RootTools_Vision
         private int transY;
         private int sizeX;
         private int sizeY;
-        private byte[] workplaceBuffer;
+        private byte[] workplaceBufferR_GRAY;
+        private byte[] workplaceBufferG;
+        private byte[] workplaceBufferB;
 
-        private IntPtr sharedBuffer;
-        private IntPtr sharedBufferR;
+        private IntPtr sharedBufferR_GRAY;
         private IntPtr sharedBufferG;
         private IntPtr sharedBufferB;
         private int sharedBufferWidth;
@@ -99,16 +101,28 @@ namespace RootTools_Vision
         public int BufferSizeX { get => sizeX; private set => sizeX = value; }
         public int BufferSizeY { get => sizeY; private set => sizeY = value; }
         
-        public byte[] WorkplaceBuffer { get => workplaceBuffer; private set => workplaceBuffer = value; }
-        public IntPtr SharedBuffer
-        {
-            get => sharedBuffer; 
-            private set => sharedBuffer = value; 
+        public byte[] WorkplaceBufferR_GRAY
+        { 
+            get => workplaceBufferR_GRAY; 
+            private set => workplaceBufferR_GRAY = value; 
         }
-        public IntPtr SharedBufferR
+
+        public byte[] WorkplaceBufferG
         {
-            get => sharedBufferR;
-            private set => sharedBufferR = value;
+            get => workplaceBufferG;
+            private set => workplaceBufferG = value;
+        }
+        public byte[] WorkplaceBufferB
+        {
+            get => workplaceBufferB;
+            private set => workplaceBufferB = value;
+        }
+
+
+        public IntPtr SharedBufferR_GRAY
+        {
+            get => sharedBufferR_GRAY;
+            private set => sharedBufferR_GRAY = value;
         }
         public IntPtr SharedBufferG
         {
@@ -124,6 +138,7 @@ namespace RootTools_Vision
         public int SharedBufferHeight { get => sharedBufferHeight; private set => sharedBufferHeight = value; }
         public int SharedBufferByteCnt { get => sharedBufferByteCnt; private set => sharedBufferByteCnt = value; }
         public bool IsOccupied { get => isOccupied; set => isOccupied = value; }
+        
         public List<Defect> DefectList { get => defectList; set => defectList = value; }
 
 
@@ -133,30 +148,45 @@ namespace RootTools_Vision
 
         public Workplace()
         {
-
+            //Reset();
         }
 
         public void Reset()
         {
-            this.STATE = WORKPLACE_STATE.NONE;
+            this.STATE = WORK_TYPE.NONE;
 
             this.PreworkDataDictionary.Clear();
 
             foreach(PREWORKDATA_KEY key in Enum.GetValues(typeof(PREWORKDATA_KEY)))
             {
                 this.preworkdataDicitonary.Add(key, null);
-            }            
+            }
+
+            workplaceBufferR_GRAY = null;
+            workplaceBufferG = null;
+            workplaceBufferB = null;
         }
 
         public void SetPreworkData(PREWORKDATA_KEY key, object dataObj)
         {
+            if(this.preworkdataDicitonary.Count != Enum.GetValues(typeof(PREWORKDATA_KEY)).Length)
+            {
+                foreach (PREWORKDATA_KEY tempkey in Enum.GetValues(typeof(PREWORKDATA_KEY)))
+                {
+                    if(this.preworkdataDicitonary.ContainsKey(tempkey) == false)
+                        this.preworkdataDicitonary.Add(tempkey, null);
+                }
+            }
+
             this.preworkdataDicitonary[key] = dataObj;
             //this.preworkDataList.Add(dataObj);
         }
 
         public object GetPreworkData(PREWORKDATA_KEY key)
         {
-            return this.preworkdataDicitonary[key];
+            if (preworkdataDicitonary.Count == 0) return null;
+
+            return this.preworkdataDicitonary[key];   
         }
 
 
@@ -170,7 +200,13 @@ namespace RootTools_Vision
             this.sizeX = szX;
             this.sizeY = szY;
             this.index = idx;
-            this.workplaceBuffer = new byte[szX * szY];
+            this.workplaceBufferR_GRAY = null;
+            this.workplaceBufferG = null;
+            this.workplaceBufferB = null;
+
+            this.workplaceBufferR_GRAY = new byte[szX * szY];
+            this.workplaceBufferG = new byte[szX * szY];
+            this.workplaceBufferB = new byte[szX * szY];
         }
 
 
@@ -189,17 +225,46 @@ namespace RootTools_Vision
             else subState = tempState;
         }
 
+        public IntPtr GetSharedBuffer(IMAGE_CHANNEL channel)
+        {
+            switch (channel)
+            {
+                case IMAGE_CHANNEL.R_GRAY:
+                    return SharedBufferR_GRAY;
+                case IMAGE_CHANNEL.G:
+                    return SharedBufferG;                    
+                case IMAGE_CHANNEL.B:
+                    return SharedBufferB;
+            }
+
+            return SharedBufferR_GRAY;
+        }
+
+        public byte[] GetWorkplaceBuffer(IMAGE_CHANNEL channel)
+        {
+            switch (channel)
+            {
+                case IMAGE_CHANNEL.R_GRAY:
+                    return workplaceBufferR_GRAY;
+                case IMAGE_CHANNEL.G:
+                    return workplaceBufferG;
+                case IMAGE_CHANNEL.B:
+                    return workplaceBufferB;
+            }
+
+            return workplaceBufferR_GRAY;
+        }
 
         public void SetSharedBuffer(IntPtr _sharedBuffer, int width, int height, int byteCnt)
         {
-            this.sharedBuffer = _sharedBuffer;
+            this.sharedBufferR_GRAY = _sharedBuffer;
             this.sharedBufferWidth = width;
             this.sharedBufferHeight = height;
             this.sharedBufferByteCnt = byteCnt;
         }
         public void SetSharedRGBBuffer(IntPtr _sharedBufferR, IntPtr _sharedBufferG, IntPtr _sharedBufferB)
         {
-            this.sharedBufferR = _sharedBufferR;
+            this.sharedBufferR_GRAY = _sharedBufferR;
             this.sharedBufferG = _sharedBufferG;
             this.sharedBufferB = _sharedBufferB;
         }
@@ -216,9 +281,6 @@ namespace RootTools_Vision
 
             this.transX = transX;
             this.transY = transY;
-
-            if (this.PositionIntialized != null && bApplyAll == true)
-                this.PositionIntialized(this, transX, transY);
         }
 
         public void MoveImagePosition(int transX, int transY, bool bUpdate = false)
@@ -230,9 +292,6 @@ namespace RootTools_Vision
 
             this.transX = transX;
             this.transY = transY;
-
-            if (this.PositionUpdated != null && bUpdate == true)
-                this.PositionUpdated(this);
         }
         public void AddDefect(string sInspectionID, int defectCode, float defectSz, float defectVal, float defectAbsLeft, float defectAbsTop, float defectW, float defectH, int chipIdxX, int chipIdxY) // SurfaceDefectParam
         {

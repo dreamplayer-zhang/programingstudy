@@ -5,15 +5,21 @@ using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHTNew;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Root_WIND2
 {
-    public class WIND2_Handler : IHandler
+    public class WIND2_Handler : ObservableObject, IHandler
     {
         public ModuleList p_moduleList { get; set; }
 
@@ -52,28 +58,58 @@ namespace Root_WIND2
         #region Module
         public WIND2_Recipe m_recipe;
         public EFEM_Process m_process;
-        public Vision m_vision;
-        public EdgeSideVision m_edgesideVision;
+        Vision m_vision;
+        public Vision p_Vision
+        {
+            get { return m_vision; }
+            set
+            {
+                SetProperty(ref m_vision, value);
+            }
+        }
+        EdgeSideVision m_edgesideVision;
+        public EdgeSideVision p_EdgeSideVision
+        {
+            get { return m_edgesideVision; }
+            set
+            {
+                SetProperty(ref m_edgesideVision, value);
+            }
+        }
         public BackSideVision m_backSideVision;
+        public BackSideVision p_BackSideVision
+        {
+            get { return m_backSideVision; }
+            set
+            {
+                SetProperty(ref m_backSideVision, value);
+            }
+        }
+
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             switch (m_engineer.m_eMode)
             {
-                case WIND2_Engineer.eMode.Vision: InitVisionModule(); break; 
-                case WIND2_Engineer.eMode.EFEM: InitEFEMModule(); break;
+                case WIND2_Engineer.eMode.Vision: 
+                    InitVisionModule(); 
+                    break;
+                case WIND2_Engineer.eMode.EFEM:
+                    InitEFEMModule();
+                    break;
             }
-
-            
         }
 
         void InitVisionModule()
         {
+            IWTR iWTR = (IWTR)m_wtr;
+
             m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_vision);
 
-            m_edgesideVision = new EdgeSideVision("EdgeSide Vision", m_engineer);
-            InitModule(m_edgesideVision);
+            m_recipe = new WIND2_Recipe("Recipe", m_engineer);
+            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
+            m_process = new EFEM_Process("Process", m_engineer, iWTR);
         }
 
         void InitEFEMModule()
@@ -82,14 +118,20 @@ namespace Root_WIND2
             IWTR iWTR = (IWTR)m_wtr;
             InitLoadport();
             InitAligner();
-            
+
             iWTR.AddChild(m_edgesideVision);
             m_backSideVision = new BackSideVision("BackSide Vision", m_engineer);
             InitModule(m_backSideVision);
             iWTR.AddChild(m_backSideVision);
+            m_edgesideVision = new EdgeSideVision("EdgeSide Vision", m_engineer);
+            InitModule(m_edgesideVision);
+            iWTR.AddChild(m_edgesideVision);
             m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Client);
-            InitModule(m_vision);
-            iWTR.AddChild(m_vision);
+            if (ProgramManager.Instance.Engineer.m_bVisionEnable)
+            {
+                InitModule(m_vision);
+                iWTR.AddChild(m_vision);
+            }
 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
@@ -122,6 +164,17 @@ namespace Root_WIND2
         }
         eWTR m_eWTR = eWTR.RND;
         ModuleBase m_wtr;
+        public ModuleBase p_WTR
+        {
+            get
+            {
+                return m_wtr;
+            }
+            set
+            {
+                SetProperty(ref m_wtr, value);
+            }
+        }
         void InitWTR()
         {
             switch (m_eWTR)
@@ -145,7 +198,18 @@ namespace Root_WIND2
             Cymechs,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
-        public List<ILoadport> m_aLoadport = new List<ILoadport>();
+        public ObservableCollection<ILoadport> m_aLoadport = new ObservableCollection<ILoadport>();
+        public ObservableCollection<ILoadport> p_aLoadport
+        {
+            get
+            {
+                return m_aLoadport;
+            }
+            set
+            {
+                SetProperty(ref m_aLoadport, value);
+            }
+        }
         int m_lLoadport = 2;
         void InitLoadport()
         {
@@ -186,18 +250,32 @@ namespace Root_WIND2
             RND
         }
         eAligner m_eAligner = eAligner.ATI;
+
+        ModuleBase m_Aligner;
+        public ModuleBase p_Aligner
+        {
+            get
+            {
+                return m_Aligner;
+            }
+            set
+            {
+                SetProperty(ref m_Aligner, value);
+            }
+        }
+
         void InitAligner()
         {
             ModuleBase module = null;
             switch (m_eAligner)
             {
-                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break;
-                case eAligner.RND: module = new Aligner_RND("Aligner", m_engineer); break;
+                case eAligner.ATI: p_Aligner = new Aligner_ATI("Aligner", m_engineer); break;
+                case eAligner.RND: p_Aligner = new Aligner_RND("Aligner", m_engineer); break;
             }
-            if (module != null)
+            if (p_Aligner != null)
             {
-                InitModule(module);
-                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+                InitModule(p_Aligner);
+                ((IWTR)m_wtr).AddChild((IWTRChild)p_Aligner);
             }
         }
 
@@ -320,6 +398,8 @@ namespace Root_WIND2
         #region Thread
         bool m_bThread = false;
         Thread m_thread = null;
+        public int m_nRnR = 1;
+        dynamic m_infoRnRSlot;
         void InitThread()
         {
             m_thread = new Thread(new ThreadStart(RunThread));
@@ -338,18 +418,92 @@ namespace Root_WIND2
                     case EQ.eState.Home:
                         StateHome();
                         break;
+                    case EQ.eState.Ready:
+                        //CheckLoad();
+                        break;
                     case EQ.eState.Run:
-                        m_process.p_sInfo = m_process.RunNextSequence();
+                        if (p_moduleList.m_qModuleRun.Count == 0)
+                        {   
+                            m_process.p_sInfo = m_process.RunNextSequence();
+
+                            if (m_process.m_qSequence.Count == 0)
+                                CheckUnload();
+                            if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            {
+                                m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
+                                m_process.ReCalcSequence();
+                                m_nRnR--;
+                                EQ.p_eState = EQ.eState.Run;
+                            }
+                        }
                         break;
                 }
             }
         }
         #endregion
 
+        void CheckLoad()
+        {
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if(loadport.p_infoCarrier.p_eState ==InfoCarrier.eState.Dock)
+                {
+                    //Queue<EFEM_Process.Sequence> sequence = m_process.m_qSequence;
+                    if (m_process.m_qSequence.Count != 0) return;
+                    InfoCarrier infoCarrier = loadport.p_infoCarrier;
+                    Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
+                        manualJobSchedule.ShowPopup();
+                        //m_process.m_qSequence.Enqueue(new EFEM_Process.Sequence(loadport.GetUnLoadModuleRun(),null));
+                    });
+                    
+                }
+            }
+            //if (m_process.m_qSequence.Count == 0) return;
+            //EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
+            //string sLoadport = sequence.m_infoWafer.m_sModule;
+            //foreach (ILoadport loadport in m_aLoadport)
+            //{
+            //    if (loadport.p_id == sLoadport)
+            //    {
+            //        //loadport.RunDocking();
+            //        //if (loadport.StartRunDocking() != "OK") return;
+            //        if (EQ.p_bRecovery == false)
+            //        {
+            //            InfoCarrier infoCarrier = loadport.p_infoCarrier;
+            //            ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
+            //            manualJobSchedule.ShowPopup();
+            //        }
+            //    }
+            //}
+        }
+
+        void CheckUnload()
+        {
+            EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+                {
+                    string sLoadport = loadport.p_id;
+                    bool bUndock = true;
+                    foreach (EFEM_Process.Sequence sequence in aSequence)
+                    {
+                        if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
+                    }
+                    if (bUndock)
+                    {
+                        loadport.StartRunUndocking();
+                        EQ.p_eState = EQ.eState.Ready;
+                    }
+                }
+            }
+        }
         #region Tree
         public void RunTreeModule(Tree tree)
         {
-            if (m_engineer.m_eMode == WIND2_Engineer.eMode.Vision) return; 
+            if (m_engineer.m_eMode == WIND2_Engineer.eMode.Vision) return;
             RunTreeWTR(tree.GetTree("WTR"));
             RunTreeLoadport(tree.GetTree("Loadport"));
             RunTreeAligner(tree.GetTree("Aligner"));

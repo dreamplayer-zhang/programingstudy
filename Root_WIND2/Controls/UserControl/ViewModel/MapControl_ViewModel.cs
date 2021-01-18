@@ -18,19 +18,16 @@ namespace Root_WIND2
 {
     class MapControl_ViewModel : ObservableObject
     {
-        InspectionManager_Vision m_InspectionManger;
         Recipe m_Recipe;
 
         public delegate void setMasterDie(object e);
         public event setMasterDie SetMasterDie;
         public int[] Map;
         CPoint MapSize;
-        public MapControl_ViewModel(InspectionManager_Vision inspectionManger, Recipe recipe = null)
+        public MapControl_ViewModel(Recipe recipe = null)
         {
             if(recipe != null)
                 m_Recipe = recipe;
-
-            m_InspectionManger = inspectionManger;
 
             WorkEventManager.WorkplaceStateChanged += MapStateChanged_Callback;
         }
@@ -53,12 +50,12 @@ namespace Root_WIND2
             {
                 Workplace workplace = args.workplace;
 
-                int x = workplace.MapPositionX;
-                int y = workplace.MapPositionY;
+                int x = workplace.MapIndexX;
+                int y = workplace.MapIndexY;
 
                 if (x < 0 || y < 0) return;
 
-                WORKPLACE_STATE state = workplace.STATE;
+                WORK_TYPE state = workplace.WorkState;
 
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
                 {
@@ -72,26 +69,26 @@ namespace Root_WIND2
                     {
 
                         Grid chip = p_MapItems[index];
-                        //lock (lockObj) //여기다가 lock걸면 화면 최대/최소화 시 맵이 회색으로 변함
+                        lock (lockObj) //여기다가 lock걸면 화면 최대/최소화 시 맵이 회색으로 변함
                         {
                             switch (state)
                             { 
-                                case WORKPLACE_STATE.NONE:
+                                case WORK_TYPE.NONE:
                                     //tb.Background = brushPosition;
                                     break;
-                                case WORKPLACE_STATE.SNAP:
+                                case WORK_TYPE.SNAP:
                                     chip.Background = brushPreInspection;
                                 break;
-                                case WORKPLACE_STATE.READY:
+                                case WORK_TYPE.ALIGNMENT:
                                     chip.Background = brushPosition;
                                 break;
-                                case WORKPLACE_STATE.INSPECTION:
+                                case WORK_TYPE.INSPECTION:
                                     chip.Background = brushInspection;
                                 break;
-                                case WORKPLACE_STATE.DEFECTPROCESS:
+                                case WORK_TYPE.DEFECTPROCESS:
                                     chip.Background = brushComplete;
                                 break;
-                                case WORKPLACE_STATE.DEFECTPROCESS_WAFER:
+                                case WORK_TYPE.DEFECTPROCESS_ALL:
                                     chip.Background = brushCompleteWafer;
                                 break;
                             }
@@ -101,7 +98,7 @@ namespace Root_WIND2
                     {
                         Grid chip = p_MapItems[index];
 
-                        chip.Background = brushBadChip;
+                        lock(this.lockObj) chip.Background = brushBadChip;
                     }
                 }));
             }
@@ -115,8 +112,11 @@ namespace Root_WIND2
 
         public void CreateMapUI(int[] map = null, CPoint mapsize = null)
         {
-            if (map == null)
+            // 여기 예외처리 이상함
+            if (map == null ||  map.Length == 0)
             {
+                if (Map == null || Map.Length == 0) return;
+
                 map = Map;
                 mapsize = MapSize;
             }

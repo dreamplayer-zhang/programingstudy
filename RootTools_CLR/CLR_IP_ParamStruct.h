@@ -28,6 +28,13 @@ public ref class Cpp_Point
 public:
 	int x;
 	int y;
+	
+	Cpp_Point()	{ }
+	Cpp_Point(int _x, int _y)
+	{
+		x = _x;
+		y = _y;
+	}
 };
 
 public ref class Cpp_Rect

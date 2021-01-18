@@ -10,10 +10,8 @@ using System.Windows.Input;
 
 namespace Root_WIND2
 {
-    class FrontsideSpec_ViewModel : ObservableObject
+    class FrontsideSpec_ViewModel : ObservableObject, IRecipeUILoadable
     {
-
-
         public Frontside_ViewModel m_front;
         public Recipe m_Recipe;
         public void init(Frontside_ViewModel front, Recipe recipe)
@@ -21,10 +19,8 @@ namespace Root_WIND2
             m_Recipe = recipe;
             m_front = front;
             ViewerInit();
-            m_cInspMethod = new ObservableCollection<ParameterBase>();
+           
             m_cInspItem = new ObservableCollection<InspectionItem>();
-
-            p_cInspMethod = ParameterBase.GetChildClass();
 
             p_selectedMethodItem = null;
 
@@ -57,19 +53,6 @@ namespace Root_WIND2
             set
             {
                 SetProperty(ref m_ROI_Viewer, value);
-            }
-        }
-
-        private ObservableCollection<ParameterBase> m_cInspMethod;
-        public ObservableCollection<ParameterBase> p_cInspMethod
-        {
-            get
-            {
-                return m_cInspMethod;
-            }
-            set
-            {
-                SetProperty(ref m_cInspMethod, value);
             }
         }
 
@@ -114,18 +97,9 @@ namespace Root_WIND2
                 SetProperty(ref m_selectedMethodItem, value);
             }
         }
+
         #endregion
 
-
-        public ObservableCollection<ParameterBase> CloneMethod()
-        {
-            ObservableCollection<ParameterBase> method = new ObservableCollection<ParameterBase>();
-            foreach(ParameterBase param in p_cInspMethod)
-            {
-                method.Add((ParameterBase)param.Clone());
-            }
-            return method;
-        }
 
         public void ComboBoxItemChanged_Mask_Callback(object obj, EventArgs args)
         {
@@ -165,7 +139,6 @@ namespace Root_WIND2
             {
                 InspectionItem item = new InspectionItem();
                 item.p_cInspROI = p_ROI_Viewer.p_cInspROI;
-                item.p_cInspMethod = CloneMethod();
 
                 int selectMethod = 0;
                 for (int i = 0; i < item.p_cInspMethod.Count; i++)
@@ -189,6 +162,8 @@ namespace Root_WIND2
 
             if(p_cInspItem.Count > 0)
                 p_selectedInspItem = p_cInspItem[0];
+
+            SetParameter();
         }
 
         public void SetParameter()
@@ -197,11 +172,27 @@ namespace Root_WIND2
             foreach(InspectionItem item in p_cInspItem)
             {
                 if (item.p_InspMethod is IMaskInspection)
-                    ((IMaskInspection)item.p_InspMethod).MaskIndex = item.p_InspROI.p_Index;
+                {
+                    if (item.p_InspROI != null)
+                    {
+                        ((IMaskInspection)item.p_InspMethod).MaskIndex = item.p_InspROI.p_Index;
+                    }
+                }
+
+                if(item.p_InspMethod is IColorInspection)
+                {
+                    ((IColorInspection)item.p_InspMethod).IndexChannel = item.p_InspChannel;
+                }
+
                 paramList.Add(item.p_InspMethod);
             }
 
             this.m_Recipe.ParameterItemList = paramList;
+        }
+
+        public void Load()
+        {
+            LoadSpec();
         }
 
         #region ICommand
@@ -214,7 +205,6 @@ namespace Root_WIND2
                     InspectionItem item = new InspectionItem();
                     item.p_cInspROI = p_ROI_Viewer.p_cInspROI;
                     item.p_Index = p_cInspItem.Count();
-                    item.p_cInspMethod = CloneMethod();
                     item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
                     item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
                     item.ButtonClicked_Delete += ButtonClicked_Delete_Callback;
@@ -230,11 +220,12 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    m_selectedInspItem.p_InspMethod = p_cInspMethod[0];
+                    m_selectedInspItem.p_InspMethod = p_selectedInspItem.p_InspMethod;
                     SetParameter();
                 });
             }
         }
         #endregion
+
     }
 }

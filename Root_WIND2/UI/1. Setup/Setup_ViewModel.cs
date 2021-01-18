@@ -14,7 +14,7 @@ using RootTools_Vision;
 
 namespace Root_WIND2
 {
-    public class Setup_ViewModel : ObservableObject
+    public class Setup_ViewModel : ObservableObject, IDisposable
     {
         private UserControl m_CurrentPanel;
         public UserControl p_CurrentPanel
@@ -54,26 +54,21 @@ namespace Root_WIND2
         private Frontside_ViewModel frontsideVM;
         private Backside_ViewModel backsideVM;
         private EBR_ViewModel ebrVM;
-        private Edge_ViewModel edgeVM;
-        private InspTest_ViewModel inspTestVM;
-        private BacksideInspTest_ViewModel backsideInspTestVM;
-        private Maintenance_ViewModel maintVM;
+        private Edgeside_ViewModel edgeVM;
+        //private InspTest_ViewModel inspTestVM;  //삭제
+        private BacksideInspection_ViewModel backsideInspTestVM;
+        public Maintenance_ViewModel maintVM;
         private GEM_ViewModel gemVM;
-
-        private InspectionManager_Vision inspectionMgrVision;
-        private InspectionManager_EFEM inspectionMgrEFEM;
 
         public Setup_ViewModel()
         {
             init();
         }
 
-        public Setup_ViewModel(Recipe _recipe = null , InspectionManager_Vision _inspectionMgrVision = null, InspectionManager_EFEM _inspectionMgrEFEM = null)
+        public Setup_ViewModel(Recipe _recipe = null)
         {        
             this.recipe = _recipe;
-            inspectionMgrVision = _inspectionMgrVision;
-            inspectionMgrEFEM = _inspectionMgrEFEM;
-            init();            
+            init();
         }
 
         public void init()
@@ -86,32 +81,9 @@ namespace Root_WIND2
 
         public void UI_Redraw()
         {
-            DrawInsptestMap();
             frontsideVM.UI_Redraw();
-            // Back
-            // Edr
-            // Edge
-        }
-
-        public void DrawInsptestMap()
-        {
-            RecipeType_WaferMap mapdata = recipe.WaferMap;
-            if (mapdata.Data != null)
-            {
-                int nMapX = mapdata.MapSizeX;
-                int nMapY = mapdata.MapSizeY;
-
-                if (p_CurrentPanel == inspTestVM.Main)
-                {
-                    inspTestVM.p_MapControl_VM.SetMap(mapdata.Data, new CPoint(nMapX, nMapY));
-                    inspTestVM.p_MapControl_VM.CreateMapUI();
-                }
-                else if (p_CurrentPanel == backsideInspTestVM.Main)
-                {
-                    backsideInspTestVM.p_MapControl_VM.SetMap(mapdata.Data, new CPoint(nMapX, nMapY));
-                    backsideInspTestVM.p_MapControl_VM.CreateMapUI();
-                }
-            }     
+            edgeVM.UI_Redraw();
+            ebrVM.UI_Redraw();
         }
 
         private void InitAllPanel()
@@ -122,9 +94,7 @@ namespace Root_WIND2
             frontsideVM = new Frontside_ViewModel(this);
             backsideVM = new Backside_ViewModel(this);
             ebrVM = new EBR_ViewModel(this);
-            edgeVM = new Edge_ViewModel(this);
-            inspTestVM = new InspTest_ViewModel(this);
-            backsideInspTestVM = new BacksideInspTest_ViewModel(this);
+            edgeVM = new Edgeside_ViewModel(this);
             maintVM = new Maintenance_ViewModel(this);
             gemVM = new GEM_ViewModel(this);
         }
@@ -163,8 +133,6 @@ namespace Root_WIND2
             m_btnNaviAlignMap = new NaviBtn("Map");
             m_btnNaviAlignMap.Btn.Click += Navi_AlignMapClick;
 
-            m_btnNaviInspTest = new NaviBtn("Test");
-            m_btnNaviInspTest.Btn.Click += Navi_InspBtn_Click;
 
             m_btnNaviGeneralMask = new NaviBtn("Mask");
             m_btnNaviGeneralMask.Btn.Click += NaviGeneralMaksBtn_Click;
@@ -176,85 +144,17 @@ namespace Root_WIND2
 
         private void InitEvent()
         {
-            //m_InspectionManager.MapStateChanged += MapStateChanged_Callback;
-            WorkEventManager.PositionDone += PositionDone_Callback;
-            WorkEventManager.InspectionDone += SurfaceInspDone_Callback;
-            WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
             WorkEventManager.UIRedraw += UIRedraw_Callback;
         }
 
         private void UIRedraw_Callback(object obj, UIRedrawEventArgs args)
         {
-            //Workplace workplace = obj as Workplace;
-            lock (this.lockObj)
             {
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
                 {
                   UI_Redraw();
                 }));
             }
-        }
-
-        object lockObj = new object();
-        private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
-        {
-            Workplace workplace = obj as Workplace;
-            lock(this.lockObj)
-            {
-                Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-                {
-                    String test = "";
-                    if(true) // Display Option : Position Trans
-                    {
-                        test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
-                    }
-                    if (workplace.Index == 0)
-                        inspTestVM.DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
-                    else
-                        inspTestVM.DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
-                }));
-            }
-        }
-        private void SurfaceInspDone_Callback(object obj, InspectionDoneEventArgs args)
-        {
-            Workplace workplace = obj as Workplace;
-            List<String> textList = new List<String>();
-            List<CRect> rectList = new List<CRect>();
-            foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
-            {
-                String text = "";
-
-                if (false) // Display Option : Rel Position
-                    text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
-                if (false) // Display Option : Defect Size
-                    text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
-                if (false) // Display Option : GV Value
-                    text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
-
-                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
-                textList.Add(text);
-            }
-
-            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-            {
-                if (p_CurrentPanel == inspTestVM.Main)
-                    inspTestVM.DrawRectDefect(rectList, textList, args.reDraw);
-                else
-                    backsideInspTestVM.DrawRectDefect(rectList, textList, args.reDraw);
-            }));
-        }
-
-        private void ProcessDefectDone_Callback(object obj, PocessDefectDoneEventArgs args)
-        {
-            Workplace workplace = obj as Workplace;
-
-            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-            {
-                if (p_CurrentPanel == inspTestVM.Main)
-                    inspTestVM.UpdateDataGrid();
-                if (p_CurrentPanel == inspTestVM.Main)
-                    backsideInspTestVM.UpdateDataGrid();
-            }));
         }
 
         #region Navi Buttons
@@ -284,8 +184,6 @@ namespace Root_WIND2
         public NaviBtn m_btnNaviGeneralMask;
         public NaviBtn m_btnNaviGeneralSetup;
 
-        // FrontSide - InspTest Navi Buttons
-        public NaviBtn m_btnNaviInspTest;
         // 
         #endregion
 
@@ -352,10 +250,10 @@ namespace Root_WIND2
         }
 
         // FrontSide - InspTest
-        void Navi_InspBtn_Click(object sender, RoutedEventArgs e)
-        {
-            SetFrontInspTest();
-        }
+        //void Navi_InspBtn_Click(object sender, RoutedEventArgs e)
+        //{
+        //    SetFrontInspTest();
+        //}
         #endregion
 
 
@@ -384,7 +282,7 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(ProgramManager.Instance.ShowDialogSaveRecipe);
+                return new RelayCommand(ProgramManager.Instance.NewRecipe);
             }
 
         }
@@ -414,12 +312,18 @@ namespace Root_WIND2
                 return new RelayCommand(ProgramManager.Instance.ShowDialogLoadRecipe);
             }
         }
-                
 
+        public ICommand btnPopUpSetting
+        {
+            get
+            {
+                return new RelayCommand(ShowSettingDialog);
+            }
+        }
+
+        
         internal RecipeWizard_ViewModel Wizard { get => wizardVM; set => wizardVM = value; }
         public Recipe Recipe { get => recipe; set => recipe = value; }
-        public InspectionManager_Vision InspectionVision { get => inspectionMgrVision; set => inspectionMgrVision = value; }
-        public InspectionManager_EFEM InspectionManagerEFEM { get => inspectionMgrEFEM; set => inspectionMgrEFEM = value; }
 
         #endregion
 
@@ -468,6 +372,24 @@ namespace Root_WIND2
             p_CurrentPanel = gemVM.Main;
             p_CurrentPanel.DataContext = gemVM;
         }
+
+        public void ShowSettingDialog()
+        {
+            Nullable<bool> result = ProgramManager.Instance.DialogService.ShowDialog(UIManager.Instance.SettingDialogViewModel);
+            if (result.HasValue)
+            {
+                if (result.Value)
+                {
+                    
+                }
+                else
+                {
+
+                }
+            }
+
+        }
+
         #endregion
 
         #region Recipe Wizard
@@ -510,101 +432,16 @@ namespace Root_WIND2
             p_CurrentPanel.DataContext = edgeVM;
         }
 
-        // FrontSide - Align
-
-      
-        //public void SetFrontAlignOrigin()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviFrontSide);
-        //    p_NaviButtons.Add(m_btnNaviAlignment);
-        //    p_NaviButtons.Add(m_btnNaviAlginOrigin);
-
-        //    //m_AlignMent.SetAlignOrigin();
-        //    m_AlignMent.SetPage(m_AlignMent.Origin);
-        //    p_CurrentPanel = m_AlignMent.Main;
-        //    p_CurrentPanel.DataContext = m_AlignMent;
-
-        //}
-        //public void SetFrontAlignPosition()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviFrontSide);
-        //    p_NaviButtons.Add(m_btnNaviAlignment);
-        //    p_NaviButtons.Add(m_btnNaviAlignDiePosition);
-
-        //    m_AlignMent.SetPage(m_AlignMent.Position);
-        //    m_AlignMent.p_Position_VM.init(this, m_AlignMent.m_Recipe);
-        //    p_CurrentPanel = m_AlignMent.Main;
-        //    p_CurrentPanel.DataContext = m_AlignMent;
-        //}
-        //public void SetFrontAlignMap()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviFrontSide);
-        //    p_NaviButtons.Add(m_btnNaviAlignment);
-        //    p_NaviButtons.Add(m_btnNaviAlignMap);
-
-        //    m_AlignMent.SetPage(m_AlignMent.Map);
-
-        //    p_CurrentPanel = m_AlignMent.Main;
-        //    p_CurrentPanel.DataContext = m_AlignMent;
-        //}
-
-        // FrontSide - General
-        //public void SetFrontGeneralMask()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviFrontSide);
-        //    p_NaviButtons.Add(m_btnNaviGeneral);
-        //    p_NaviButtons.Add(m_btnNaviGeneralMask);
-
-        //    m_General.SetPage(m_General.Mask);
-
-        //    p_CurrentPanel = m_General.Main;
-        //    p_CurrentPanel.DataContext = m_General;
-        //}
-        //public void SetFrontGeneralSetup()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviFrontSide);
-        //    p_NaviButtons.Add(m_btnNaviGeneral);
-        //    p_NaviButtons.Add(m_btnNaviGeneralSetup);
-
-        //    m_General.SetPage(m_General.Setup);
-
-        //    p_CurrentPanel = m_General.Main;
-        //    p_CurrentPanel.DataContext = m_General;
-        //}
-        // FrontSide Inspection TEST
-        public void SetFrontInspTest()
-        {
-            p_NaviButtons.Clear();
-            p_NaviButtons.Add(m_btnNaviRecipeWizard);
-            p_NaviButtons.Add(m_btnNaviFrontSide);
-            p_NaviButtons.Add(m_btnNaviInspTest);
-
-            inspTestVM.SetPage(inspTestVM.InspTest);
-
-            p_CurrentPanel = inspTestVM.Main;
-            p_CurrentPanel.DataContext = inspTestVM;
-        }
         public void SetBacksideInspTest()
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
             p_NaviButtons.Add(m_btnNaviBackSide);
-            p_NaviButtons.Add(m_btnNaviInspTest);
+        }
 
-            backsideInspTestVM.SetPage(backsideInspTestVM.InspTest);
-           
-            p_CurrentPanel = backsideInspTestVM.Main;
-            p_CurrentPanel.DataContext = backsideInspTestVM;
+        public void Dispose()
+        {
+            throw new NotImplementedException();
         }
         #endregion
 

@@ -4,6 +4,7 @@ using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHTNew;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
@@ -36,38 +37,43 @@ namespace Root_AOP01_Packing
         public VacuumPacker m_vacuumPacker;
         public IndividualElevator m_elevator;
         public Unloadport_AOP m_unloadport;
-        public WrappingContainer m_wrapping; 
+        public Vision_AOP m_visionAOP;
+        public Certification m_RNR;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             InitWTR(); 
             InitLoadport();
 
-            m_tapePacker = new TapePacker("TapePacker", m_engineer);
-            InitModule(m_tapePacker);
-            ((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);
-            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_tapePacker);
 
-            m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
-            InitModule(m_vacuumPacker);
-            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_vacuumPacker);
+            m_RNR = new Certification("Certification", m_engineer);
+            InitModule(m_RNR);
 
-            m_elevator = new IndividualElevator("IndividualElevator", m_engineer);
-            InitModule(m_elevator);
-            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_elevator);
+            //m_visionAOP = new Vision_AOP("Vision", m_engineer);
+            //InitModule(m_visionAOP);
 
-            m_unloadport = new Unloadport_AOP("Unloadport", m_engineer);
-            InitModule(m_unloadport);
-            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_unloadport);
+            //m_tapePacker = new TapePacker("TapePacker", m_engineer);
+            //InitModule(m_tapePacker);
+            //((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);
+            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_tapePacker);
 
-            m_wrapping = new WrappingContainer("WrappingContainer", m_engineer);
-            InitModule(m_wrapping);
+            //m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
+            //InitModule(m_vacuumPacker);
+            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_vacuumPacker);
 
-            m_aWTR[0].RunTree(Tree.eMode.RegRead);
-            m_aWTR[0].RunTree(Tree.eMode.Init);
-            m_aWTR[1].RunTree(Tree.eMode.RegRead);
-            m_aWTR[1].RunTree(Tree.eMode.Init);
-            //((IWTR)m_wtr).ReadInfoReticle_Registry(); //forget
+            //m_elevator = new IndividualElevator("IndividualElevator", m_engineer);
+            //InitModule(m_elevator);
+            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_elevator);
+
+            //m_unloadport = new Unloadport_AOP("Unloadport", m_engineer);
+            //InitModule(m_unloadport);
+            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_unloadport);
+
+            //m_aWTR[0].RunTree(Tree.eMode.RegRead);
+            //m_aWTR[0].RunTree(Tree.eMode.Init);
+            //m_aWTR[1].RunTree(Tree.eMode.RegRead);
+            //m_aWTR[1].RunTree(Tree.eMode.Init);
+            //((IWTR)m_aWTR[1]).ReadInfoReticle_Registry(); 
 
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();
@@ -91,7 +97,7 @@ namespace Root_AOP01_Packing
         #endregion
 
         #region Module WTR
-        List<ModuleBase> m_aWTR = new List<ModuleBase>(); 
+        public List<ModuleBase> m_aWTR = new List<ModuleBase>(); 
         void InitWTR()
         {
             m_aWTR.Add(new WTR_RND("WTR_A", m_engineer));
@@ -107,12 +113,12 @@ namespace Root_AOP01_Packing
         public List<ILoadport> m_aLoadport = new List<ILoadport>();
         void InitLoadport()
         {
-            Loadport_Cymechs loadportA = new Loadport_Cymechs("LoadportA", m_engineer, true, true);
+            Loadport_Cymechs loadportA = new Loadport_Cymechs("LoadportA", m_engineer, false, false);
             InitModule(loadportA);
             m_aLoadport.Add(loadportA);
             ((IWTR)m_aWTR[0]).AddChild((IWTRChild)loadportA);
 
-            Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, true, true);
+            Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, false, false);
             InitModule(loadportAOP);
             m_aLoadport.Add(loadportAOP);
             ((IWTR)m_aWTR[1]).AddChild((IWTRChild)loadportAOP);

@@ -184,17 +184,15 @@ namespace Root_ASIS.Module
             return "OK";
         }
 
-        double m_secGrip = 1; 
         string RunGrip(int nSide, bool bGrip)
         {
             m_dioGrip[nSide].Write(bGrip);
-            return m_dioGrip[nSide].WaitDone(m_secGrip); 
+            return m_dioGrip[nSide].WaitDone(); 
         }
 
         void RunTreeDIO(Tree tree)
         {
             m_secAlign = tree.Set(m_secAlign, m_secAlign, "Align", "DO Align Delay (sec)");
-            m_secGrip = tree.Set(m_secGrip, m_secGrip, "Grip", "DIO Grip Timeout (sec)");
             m_bUseCheckProduct = tree.Set(m_bUseCheckProduct, m_bUseCheckProduct, "Product", "Check ProductSensor"); 
         }
         #endregion

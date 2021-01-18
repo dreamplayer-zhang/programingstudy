@@ -248,6 +248,9 @@
     <Compile Include="Converter\BoolConverter.cs" />
     <Compile Include="UI_Dialog\test.xaml.cs">
       <DependentUpon>test.xaml</DependentUpon>
+    <Compile Include="ManualJob\ManualJobSchedule.cs" />
+    <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
+      <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_Engineer\Camellia_Recipe_UI.xaml.cs">
       <DependentUpon>Camellia_Recipe_UI.xaml</DependentUpon>
@@ -272,6 +275,9 @@
     </Compile>
     <Compile Include="Control\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_UserControl\Loadport_UI.xaml.cs">
+      <DependentUpon>Loadport_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\Dlg_Setting_ViewModel.cs" />
     <Compile Include="UI_Dialog\Dlg_Setting.xaml.cs">
@@ -329,6 +335,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_Dialog\test.xaml">
+    <Page Include="ManualJob\ManualJobSchedule_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -399,6 +406,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_Engineer\Camellia_ToolBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_UserControl\Loadport_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
