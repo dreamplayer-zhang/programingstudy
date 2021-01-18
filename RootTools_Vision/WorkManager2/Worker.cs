@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RootTools_Vision
 {
@@ -215,6 +216,7 @@ namespace RootTools_Vision
             {
                 exception = true;
                 //쓰레드 하나라도 죽으면 WorkFactory Thread 다시 생성하고, WorkFactory Reset
+                MessageBox.Show(ex.Message);
             }
             finally
             {
@@ -286,6 +288,8 @@ namespace RootTools_Vision
 
         private void CopyWorkplaceBuffer()
         {
+            if (this.currentWorkplace.Width == 0 || this.currentWorkplace.Height == 0) return;
+
             Tools.ParallelImageCopy(
                 this.currentWorkplace.SharedBufferR_GRAY,
                 this.currentWorkplace.SharedBufferWidth,
@@ -293,7 +297,7 @@ namespace RootTools_Vision
                 new CRect
                 (
                     this.currentWorkplace.PositionX,
-                    this.currentWorkplace.PositionY - this.currentWorkplace.Height,
+                    this.currentWorkplace.PositionY + this.currentWorkplace.Height,
                     this.currentWorkplace.PositionX + this.currentWorkplace.Width,
                     this.currentWorkplace.PositionY),
                 this.workplaceBufferR_GRAY);
@@ -308,7 +312,7 @@ namespace RootTools_Vision
                     new CRect
                     (
                         this.currentWorkplace.PositionX,
-                        this.currentWorkplace.PositionY - this.currentWorkplace.Height,
+                        this.currentWorkplace.PositionY + this.currentWorkplace.Height,
                         this.currentWorkplace.PositionX + this.currentWorkplace.Width,
                         this.currentWorkplace.PositionY),
                     this.workplaceBufferG);
@@ -320,7 +324,7 @@ namespace RootTools_Vision
                     new CRect
                     (
                         this.currentWorkplace.PositionX,
-                        this.currentWorkplace.PositionY - this.currentWorkplace.Height,
+                        this.currentWorkplace.PositionY + this.currentWorkplace.Height,
                         this.currentWorkplace.PositionX + this.currentWorkplace.Width,
                         this.currentWorkplace.PositionY),
                     this.workplaceBufferB);

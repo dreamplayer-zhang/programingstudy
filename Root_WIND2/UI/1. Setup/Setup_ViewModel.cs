@@ -81,7 +81,7 @@ namespace Root_WIND2
 
         public void UI_Redraw()
         {
-            //frontsideVM.UI_Redraw();
+            frontsideVM.UI_Redraw();
             edgeVM.UI_Redraw();
             ebrVM.UI_Redraw();
         }

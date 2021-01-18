@@ -136,7 +136,12 @@ namespace Root_WIND2
 
         public ImageData GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE type)
         {
-            return engineer.m_handler.p_EdgeSideVision.GetMemoryData(type);
+            if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+            {
+                return engineer.m_handler.p_EdgeSideVision.GetMemoryData(type);
+            }
+            else
+                return null;
         }
 
         private bool InitMember()
