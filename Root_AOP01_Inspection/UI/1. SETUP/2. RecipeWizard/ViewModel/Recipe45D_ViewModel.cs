@@ -630,11 +630,11 @@ namespace Root_AOP01_Inspection
 
 			m_Setup.InspectionManager.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
 
-			if (m_Setup.InspectionManager.CreateInspection() == false)
-			{
-				return;
-			}
-			m_Setup.InspectionManager.Start(false);
+			//if (m_Setup.InspectionManager.CreateInspection() == false)  //Del Temp LYJ
+			//{
+			//	return;
+			//}
+			//m_Setup.InspectionManager.Start(false);
 		}
 
 		public ICommand btnBack

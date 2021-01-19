@@ -154,10 +154,10 @@ namespace Root_AOP01_Inspection
 				Directory.CreateDirectory(recipeFolderPath);
 
 			// Front
-			this.InspectionManager = new InspectionManager_AOP(imageMain.GetPtr(), imageMain.p_Size.X, imageMain.p_Size.Y);
-
-			this.Engineer.InspectionManager = this.InspectionManager;
-			this.Engineer.InspectionManager.Recipe = this.recipe;
+			//this.InspectionManager = new InspectionManager_AOP(imageMain.GetPtr(), imageMain.p_Size.X, imageMain.p_Size.Y); //Del Temp LYJ
+			//
+			//this.Engineer.InspectionManager = this.InspectionManager;
+			//this.Engineer.InspectionManager.Recipe = this.recipe;
 
 			return true;
 		}

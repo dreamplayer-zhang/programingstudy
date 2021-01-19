@@ -126,6 +126,7 @@ namespace Root_AOP01_Inspection.UI._3._RUN
             Dlg_Start.m_bShow = true;
             dlg_Start.ShowDialog();
             m_handler.m_nRnR = p_bRnR ? p_nRnR : 1;
+            p_nRnR = 1;
             return dlg_Start.DialogResult == true;
         }
     }

@@ -592,7 +592,7 @@ namespace Root_AOP01_Inspection.Module
 
                 if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
                     return p_sInfo;
-                Thread.Sleep(10000);
+                Thread.Sleep(11000);
                 //m_module.p_eState = eState.Ready;
                 return "OK";
             }

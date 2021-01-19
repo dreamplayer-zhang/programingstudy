@@ -104,7 +104,6 @@ namespace Root_AOP01_Inspection.UI_UserControl
         public static string sLoadportNum;
         private void ButtonLoad_Click(object sender, RoutedEventArgs e)
         {
-            m_handler.m_nRnR = 1;
             sLoadportNum = m_loadport.p_id;
             if (IsEnableLoad() == false) return;
             m_loadport.StartRunDocking();
