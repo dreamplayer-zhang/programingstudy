@@ -36,7 +36,7 @@ namespace RootTools_CLR
 
 		// ********* D2D ******** //
 		static void Cpp_SubtractAbs(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH);
-		static void Cpp_SelectMinDiffinArea(array<byte>^ pSrcImg1, array<array<byte>^>^ pSrcImg2, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, int nAreaSize);
+		static void Cpp_SelectMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH);
 		static void Cpp_FindMinDiffLoc(array<byte>^ pSrcImg, array<byte>^ pInOutTarget, int nTransX, int nTransY, int nTargetW, int nTargetH, int nTrigger);
 
 		// Create Golden Image
