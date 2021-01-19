@@ -42,7 +42,7 @@ namespace Root_WIND2
         {
             CreateWorkManager(WORK_TYPE.SNAP);
             CreateWorkManager(WORK_TYPE.ALIGNMENT, 8);
-            CreateWorkManager(WORK_TYPE.INSPECTION, 1);
+            CreateWorkManager(WORK_TYPE.INSPECTION, 4);
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 8);
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS_ALL, 1, true);
 

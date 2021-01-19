@@ -226,8 +226,8 @@ namespace Root_WIND2
         }
         public void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
         {
-            //if (reDraw)
-            //    p_ImageViewer_VM.Clear();
+            if (reDraw)
+                p_ImageViewer_VM.Clear();
 
             p_ImageViewer_VM.DrawRect(rectList, FrontsideInspection_ImageViewer_ViewModel.ColorType.Defect, text);
         }

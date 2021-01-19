@@ -894,7 +894,10 @@ void IP::CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMe
                 Sum_High = _mm256_srai_epi16(Sum_High, 1);
                 Sum_Low = _mm256_srai_epi16(Sum_Low, 1);
 
-                _mm256_storeu_si256(pRst, _mm256_packus_epi16(Sum_Low, Sum_High));    
+                _mm256_storeu_si256(pRst, _mm256_packus_epi16(Sum_Low, Sum_High));
+
+                for (int k = 0; k < imgNum; k++)
+                    pRef[k]++;
             }
             else
             {
@@ -939,9 +942,6 @@ void IP::CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMe
             Sum_High = _mm256_div_epi16(Sum_High, DivRefNum);
             Sum_Low = _mm256_div_epi16(Sum_Low, DivRefNum);
             _mm256_storeu_si256(pRst, _mm256_packus_epi16(Sum_Low, Sum_High));
-
-            for (int k = 0; k < imgNum; k++)
-                pRef[k]++;
         }
         if (Width2 != 0) {
             if (imgNum <= 4)
@@ -1044,69 +1044,69 @@ void IP::CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMe
     Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
 }
 
-//void IP::CreateGoldenImage_NearAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH)
-//{
-//    Mat imgAccumlate = Mat::zeros(nROIH, nROIW, CV_16UC1);
-//    Mat imgDst = Mat(nROIH, nROIW, CV_8UC1, pDst);
-//    Mat imgAvg;
-//
-//    short* imgROI2b = new short[(int64)nROIW * nROIH];
-//    byte* pHeader = NULL;
-//    for (int i = 0; i < imgNum; i++)
-//    {
-//        pHeader = pSrc;
-//        for (int idx = 0; idx < vtROILT[i].y; idx++)
-//            pHeader += nMemW;
-//
-//        pHeader += vtROILT[i].x;
-//        for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
-//            std::copy(pHeader, pHeader + nROIW, &imgROI2b[nROIW * (r - (int64)vtROILT[i].y)]); // byte* -> short*
-//
-//        Mat imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI2b);
-//        imgAccumlate = imgAccumlate + imgSrc;
-//    }
-//
-//    imgAccumlate.convertTo(imgAvg, CV_8UC1, 1. / imgNum);
-//
-//    byte* imgROI1b = new byte[(int64)nROIW * nROIH];
-//
-//    pHeader = pSrc;
-//    for (int idx = 0; idx < vtROILT[0].y; idx++)
-//        pHeader += nMemW;
-//
-//    pHeader += vtROILT[0].x;
-//    for (int64 r = vtROILT[0].y; r < vtROILT[0].y + nROIH; r++, pHeader += nMemW)
-//        std::copy(pHeader, pHeader + nROIW, &imgROI1b[nROIW * (r - (int64)vtROILT[0].y)]);
-//
-//    Mat imgSrc = Mat(nROIH, nROIW, CV_8UC1, imgROI1b);
-//
-//    // Mean에 가장 가까운 값 선택
-//    imgSrc.copyTo(imgDst);
-//    Mat diff1, diff2, minDiff;
-//    for (int i = 1; i < imgNum; i++) {
-//        // result - avgImg 와 new Image - avgImg 의 값 중 Diff가 더 작은 픽셀들만 업데이트
-//        pHeader = pSrc;
-//        for (int idx = 0; idx < vtROILT[i].y; idx++)
-//            pHeader += nMemW;
-//
-//        pHeader += vtROILT[i].x; 
-//        for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
-//            std::copy(pHeader, pHeader + nROIW, &imgROI1b[nROIW * (r - (int64)vtROILT[i].y)]);
-//
-//        imgSrc = Mat(nROIH, nROIW, CV_8UC1, imgROI1b);
-//        cv::absdiff(imgAvg, imgSrc, diff1);
-//        cv::absdiff(imgAvg, imgDst, diff2);
-//
-//        // minDiff 0 : diff1 < diff2 // 255 : diff1 > diff2
-//
-//        cv::subtract(diff1, diff2, minDiff);
-//        cv::threshold(minDiff, minDiff, 1, 255, CV_THRESH_BINARY);
-//        // Get the old pixels that are still ok
-//        cv::bitwise_and(imgDst, minDiff, imgDst);
-//        // Get the new pixels
-//        cv::bitwise_or(imgDst, imgSrc & ~minDiff, imgDst);
-//    }
-//}
+void IP::CreateGoldenImage_NearAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH)
+{
+    Mat imgAccumlate = Mat::zeros(nROIH, nROIW, CV_16UC1);
+    Mat imgDst = Mat(nROIH, nROIW, CV_8UC1, pDst);
+    Mat imgAvg;
+
+    short* imgROI2b = new short[(int64)nROIW * nROIH];
+    byte* pHeader = NULL;
+    for (int i = 0; i < imgNum; i++)
+    {
+        pHeader = pSrc;
+        for (int idx = 0; idx < vtROILT[i].y; idx++)
+            pHeader += nMemW;
+
+        pHeader += vtROILT[i].x;
+        for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
+            std::copy(pHeader, pHeader + nROIW, &imgROI2b[nROIW * (r - (int64)vtROILT[i].y)]); // byte* -> short*
+
+        Mat imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI2b);
+        imgAccumlate = imgAccumlate + imgSrc;
+    }
+
+    imgAccumlate.convertTo(imgAvg, CV_8UC1, 1. / imgNum);
+
+    byte* imgROI1b = new byte[(int64)nROIW * nROIH];
+
+    pHeader = pSrc;
+    for (int idx = 0; idx < vtROILT[0].y; idx++)
+        pHeader += nMemW;
+
+    pHeader += vtROILT[0].x;
+    for (int64 r = vtROILT[0].y; r < vtROILT[0].y + nROIH; r++, pHeader += nMemW)
+        std::copy(pHeader, pHeader + nROIW, &imgROI1b[nROIW * (r - (int64)vtROILT[0].y)]);
+
+    Mat imgSrc = Mat(nROIH, nROIW, CV_8UC1, imgROI1b);
+
+    // Mean에 가장 가까운 값 선택
+    imgSrc.copyTo(imgDst);
+    Mat diff1, diff2, minDiff;
+    for (int i = 1; i < imgNum; i++) {
+        // result - avgImg 와 new Image - avgImg 의 값 중 Diff가 더 작은 픽셀들만 업데이트
+        pHeader = pSrc;
+        for (int idx = 0; idx < vtROILT[i].y; idx++)
+            pHeader += nMemW;
+
+        pHeader += vtROILT[i].x; 
+        for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
+            std::copy(pHeader, pHeader + nROIW, &imgROI1b[nROIW * (r - (int64)vtROILT[i].y)]);
+
+        imgSrc = Mat(nROIH, nROIW, CV_8UC1, imgROI1b);
+        cv::absdiff(imgAvg, imgSrc, diff1);
+        cv::absdiff(imgAvg, imgDst, diff2);
+
+        // minDiff 0 : diff1 < diff2 // 255 : diff1 > diff2
+
+        cv::subtract(diff1, diff2, minDiff);
+        cv::threshold(minDiff, minDiff, 1, 255, CV_THRESH_BINARY);
+        // Get the old pixels that are still ok
+        cv::bitwise_and(imgDst, minDiff, imgDst);
+        // Get the new pixels
+        cv::bitwise_or(imgDst, imgSrc & ~minDiff, imgDst);
+    }
+}
 
 void IP::MergeImage_Average(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nChipW, int nChipH)
 {

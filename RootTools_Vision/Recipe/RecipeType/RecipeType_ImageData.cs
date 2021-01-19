@@ -96,7 +96,6 @@ namespace RootTools_Vision
             if (bmp.PixelFormat == PixelFormat.Format8bppIndexed)
             {
                 this.ByteCnt = 1;
-                this.rawDataR = new byte[this.Width * this.Height];
             }
             else
             {
@@ -110,15 +109,12 @@ namespace RootTools_Vision
 
             Tools.LoadBitmapToRawdata(recipeFolderPath + this.FileName, this.rawData, this.Width, this.Height, this.ByteCnt);
 
-            if (this.ByteCnt == 3)
-                Tools.SpliteColor(this.rawData, this.rawDataR, this.rawDataG, this.rawDataB);
-            else
-                Array.Copy(this.rawData, this.rawDataR, this.rawData.Length);
+            Tools.SpliteColor(this.rawData, this.rawDataR, this.rawDataG, this.rawDataB);
 
-            //Tools.SaveRawdataToBitmap("D:\\Image.bmp", this.rawData, this.width, this.height, this.byteCnt);
-            //Tools.SaveRawdataToBitmap("D:\\ImageR.bmp", this.rawDataR, this.width, this.height, 1);
-            //Tools.SaveRawdataToBitmap("D:\\ImageG.bmp", this.rawDataG, this.width, this.height, 1);
-            //Tools.SaveRawdataToBitmap("D:\\ImageB.bmp", this.rawDataB, this.width, this.height, 1);
+            Tools.SaveRawdataToBitmap("D:\\Image.bmp", this.rawData, this.width, this.height, this.byteCnt);
+            Tools.SaveRawdataToBitmap("D:\\ImageR.bmp", this.rawDataR, this.width, this.height, 1);
+            Tools.SaveRawdataToBitmap("D:\\ImageG.bmp", this.rawDataG, this.width, this.height, 1);
+            Tools.SaveRawdataToBitmap("D:\\ImageB.bmp", this.rawDataB, this.width, this.height, 1);
 
             return true;
         }
