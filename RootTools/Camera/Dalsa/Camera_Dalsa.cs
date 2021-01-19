@@ -389,10 +389,6 @@ namespace RootTools.Camera.Dalsa
             m_MemPtr = memory.GetPtr();
 
             Scandir = bInvY;
-            if (Scandir)
-                m_CamParam.p_eDir = DalsaParameterSet.eDir.Reverse;
-            else
-                m_CamParam.p_eDir = DalsaParameterSet.eDir.Forward;
 
             if (m_sapBuf.BytesPerPixel > 1)
             {
@@ -400,7 +396,15 @@ namespace RootTools.Camera.Dalsa
                 m_GreenMemPtr = m_Memory.GetPtr(1);
                 m_BlueMemPtr = m_Memory.GetPtr(2);
             }
+            if(Scandir == true) //ybkwon0113
+            {
+                p_CamParam.SetGrabDirection(DalsaParameterSet.eDir.Forward);
 
+            }
+            else
+            {
+                p_CamParam.SetGrabDirection(DalsaParameterSet.eDir.Reverse);
+            }
             m_cpScanOffset = cpScanOffset;
             m_nInverseYOffset = ReverseOffsetY;
             m_nGrabCount = (int)Math.Truncate(1.0 * nLine / p_CamParam.p_Height);

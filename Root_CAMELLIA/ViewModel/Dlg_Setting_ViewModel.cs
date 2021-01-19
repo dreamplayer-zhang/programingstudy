@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using RootTools;
 using System;
 using System.Collections.Generic;
@@ -120,6 +121,18 @@ namespace Root_CAMELLIA
             }
         }
 
+        private string m_LightSourceLogPath = @"D:\";
+        public string p_LightSourceLogPath
+        {
+            get
+            {
+                return m_LightSourceLogPath;
+            }
+            set
+            {
+                SetProperty(ref m_LightSourceLogPath, value);
+            }
+        }
         #endregion
 
 
@@ -151,6 +164,7 @@ namespace Root_CAMELLIA
             {
                 MessageBox.Show("Parameter Load Error Check NanoView Initialize");
             }
+            p_LightSourceLogPath = m_reg.Read(BaseDefine.RegLightSourcePath, m_LightSourceLogPath);
         }
 
         public void LoadConfig()
@@ -171,9 +185,36 @@ namespace Root_CAMELLIA
                     {
                         LoadParameter();
                         p_Main.p_InitNanoview = true;
+                        p_Main.InitTimer();
                     }
                 });
 
+            }
+        }
+
+        private bool open = false;
+        public ICommand CmdLightSourceLogPath
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (open == true)
+                    {
+                        return;
+                    }
+                    open = true;
+                    CommonOpenFileDialog dlg = new CommonOpenFileDialog();
+                    dlg.IsFolderPicker = true;
+                   
+                    CommonFileDialogResult result = dlg.ShowDialog();
+                    if(result == CommonFileDialogResult.Ok)
+                    {
+                        p_LightSourceLogPath = dlg.FileName;
+                        m_reg.Write(BaseDefine.RegLightSourcePath, m_LightSourceLogPath);
+                    }
+                    open = false;
+                });
             }
         }
 
@@ -214,6 +255,7 @@ namespace Root_CAMELLIA
                         m_reg.Write(BaseDefine.RegNanoViewConfig, m_ConfigPath);
                         m_reg.Write(BaseDefine.RegNanoViewPort, m_NanoviewPort);
                         m_Main.p_InitNanoview = false;
+                        m_Main.LightSourceTimer_Stop();
                     }
                 });
             }

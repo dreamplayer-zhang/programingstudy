@@ -514,7 +514,7 @@ namespace Root_WIND2
 
 		private void BeforeRecipeSave_Callback(object obj, RecipeEventArgs args)
 		{
-			SetParameter();
+			//SetParameter();
 		}
 
 		private void ProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs e)
