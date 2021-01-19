@@ -494,7 +494,7 @@ namespace Root_WIND2
                     }
                     if (bUndock)
                     {
-                        loadport.StartRunUndocking();
+                        loadport.RunUndocking();
                         EQ.p_eState = EQ.eState.Ready;
                     }
                 }

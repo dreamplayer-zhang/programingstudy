@@ -7,9 +7,9 @@ namespace RootTools.OHTNew
     {
         string p_id { get; set; }
 
-        string StartRunDocking();
+        string RunDocking();
 
-        string StartRunUndocking();
+        string RunUndocking();
 
         InfoCarrier p_infoCarrier { get; set; }
 
@@ -17,8 +17,8 @@ namespace RootTools.OHTNew
 
         bool p_bPresent { get; }
 
-        ModuleRunBase GetLoadModuleRun();
+        ModuleRunBase GetModuleRunDocking();
 
-        ModuleRunBase GetUnLoadModuleRun();
+        ModuleRunBase GetModuleRunUndocking();
     }
 }

@@ -306,7 +306,7 @@ namespace Root_AOP01_Inspection
             string sLoadport = sequence.m_infoWafer.m_sModule;
             foreach (ILoadport loadport in m_aLoadport)
             {
-                if (loadport.p_id == sLoadport) loadport.StartRunDocking();
+                if (loadport.p_id == sLoadport) loadport.RunDocking();
             }
         }
 
@@ -323,7 +323,7 @@ namespace Root_AOP01_Inspection
                     {
                         if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
                     }
-                    if (bUndock&&!bInit) loadport.StartRunUndocking();
+                    if (bUndock&&!bInit) loadport.RunUndocking();
                     bInit = false;
                 }
             }
