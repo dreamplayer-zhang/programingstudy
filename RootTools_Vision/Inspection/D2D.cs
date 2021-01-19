@@ -231,11 +231,11 @@ namespace RootTools_Vision
             {
                 if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
                 {
-                    System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-                    sw.Start();
+                    //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                    //sw.Start();
                     SetGoldenImage();
-                    sw.Stop();
-                    String a = "End Time: " + sw.ElapsedMilliseconds + "msec";
+                    //sw.Stop();
+                    //String a = "End Time: " + sw.ElapsedMilliseconds + "msec";
                     //using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"d:\SetGoldenImage.txt", true))
                     //{
                     //    file.WriteLine(a);
@@ -367,11 +367,14 @@ namespace RootTools_Vision
                     startY = mapYIdx[0];
                     endY = mapYIdx[mapYIdx.Count() - 1];
                 }
-                else // 중심에 있는 4개의 칩으로만 Golden Image 생성
+                else 
                 {
-                    
+                    // 중심에 있는 4개의 칩으로만 Golden Image 생성
                     startY = mapYIdx[mapYIdx.Count() / 2 - 1 - 2];
                     endY = mapYIdx[mapYIdx.Count() / 2 - 1 + 2];
+                    // 칩 전체 다 쓰기
+                    //startY = mapYIdx[0];
+                    //endY = mapYIdx[mapYIdx.Count() - 1];
                 }
 
                 List<Cpp_Point> wpROIData = new List<Cpp_Point>();
@@ -379,7 +382,7 @@ namespace RootTools_Vision
                 foreach (Workplace wp in this.workplaceBundle)
                     if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
                         if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
-                            if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY) && wp.MapIndexY != this.currentWorkplace.MapIndexY)
+                            if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY))
                                 wpROIData.Add(new Cpp_Point(wp.PositionX, wp.PositionY));
 
                 unsafe { 
