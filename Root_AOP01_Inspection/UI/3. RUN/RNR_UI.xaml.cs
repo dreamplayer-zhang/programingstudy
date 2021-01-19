@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,22 @@ namespace Root_AOP01_Inspection.UI._3._RUN
     {
         AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
+        //RNR m_rnr;
+        //class RNR : NotifyProperty
+        //{
+        //    int _nRNRCount = 0;
+        //    public int p_nRNRCount
+        //    {
+        //        get { return _nRNRCount; }
+        //        set
+        //        {
+        //            if (_nRNRCount == value) return;
+        //            _nRNRCount = value;
+        //            OnPropertyChanged();
+        //        }
+        //    }
+        //}
+        
         public RNR_UI()
         {
             InitializeComponent();
@@ -30,8 +47,11 @@ namespace Root_AOP01_Inspection.UI._3._RUN
         }
         public void Init(AOP01_Engineer engineer)
         {
+            //RNR rnr = new RNR();
+            //m_rnr = rnr;
             m_engineer = engineer;
             m_handler = engineer.m_handler;
+            RNRCount.DataContext = m_handler.p_nRnRCount;
         }
         DispatcherTimer m_timer = new DispatcherTimer();
         void InitTimer()
@@ -42,7 +62,7 @@ namespace Root_AOP01_Inspection.UI._3._RUN
         }
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            RNRCount.DataContext = m_handler.m_nRnRCount;
+            RNRCount.Text =Convert.ToString(m_handler.p_nRnRCount);
         }
     }
 }

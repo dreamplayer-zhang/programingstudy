@@ -130,7 +130,7 @@ namespace Root_AOP01_Inspection.UI._3._RUN
                 m_handler.m_nRnR = p_nRnR;
                 RNR_UI rnr_ui = new RNR_UI();
                 rnr_ui.Init(m_engineer);
-                rnr_ui.ShowDialog();
+                rnr_ui.Show();
             }
             else if (!p_bRnR)
             {

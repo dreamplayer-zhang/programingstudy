@@ -158,7 +158,7 @@ namespace Root_AOP01_Inspection.Module
                         for (int i = 0; i < nClenaCount; i++)
                         {
                             if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0"))) return p_sInfo; //Claen Move Front
-                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo; //Claen Move Front
                             sRMove = "-" + sRMove;
                             if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0"))) return p_sInfo; //Clean Move Back
                             if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;

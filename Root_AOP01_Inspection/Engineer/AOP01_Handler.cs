@@ -232,7 +232,7 @@ namespace Root_AOP01_Inspection
 
         #region Calc Sequence
         public int m_nRnR = 1;
-        public int m_nRnRCount = 0;
+        public int p_nRnRCount = 0;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
@@ -302,7 +302,7 @@ namespace Root_AOP01_Inspection
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 m_process.ReCalcSequence();
                                 m_nRnR--;
-                                m_nRnRCount++;
+                                p_nRnRCount++;
                                 EQ.p_eState = EQ.eState.Run;
                             }
                         }

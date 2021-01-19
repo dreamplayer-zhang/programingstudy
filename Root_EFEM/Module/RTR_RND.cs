@@ -541,6 +541,8 @@ namespace Root_EFEM.Module
                     Thread.Sleep(100);
                 }
                 foreach (IWTRChild child in p_aChild) child.p_bLock = true;
+                if (Run(WriteCmdSetSpeed(eCmd.SetSpeed, "50"))) return p_sInfo; //Origin Speed Set 하드 코딩수정필요
+                if (Run(WaitReply(m_secMotion))) return p_sInfo;
                 if (m_bNeedHome)
                 {
                     if (Run(WriteCmd(eCmd.FindHome))) return p_sInfo;
