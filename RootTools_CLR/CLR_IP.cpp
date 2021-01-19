@@ -316,42 +316,6 @@ namespace RootTools_CLR
 			pDst = nullptr;
 		}
 	}
-	void CLR_IP::Cpp_CreateGoldenImage_NearAvg(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH)
-	{
-		using System::Runtime::InteropServices::GCHandle;
-		using System::Runtime::InteropServices::GCHandleType;
-
-		pin_ptr<byte> pDst = &pDstImg[0];
-		// pin each contained array<int>^
-		array<GCHandle>^ pins = gcnew array<GCHandle>(pSrcImg->Count);
-		for (int i = 0, i_max = pins->Length; i != i_max; ++i)
-			pins[i] = GCHandle::Alloc(pSrcImg[i], GCHandleType::Pinned);
-
-		try
-		{
-			// get int*s for each contained pinned array<int>^
-			array<byte*>^ arrays = gcnew array<byte*>(pins->Length);
-			for (int i = 0, i_max = arrays->Length; i != i_max; ++i)
-				arrays[i] = static_cast<byte*>(pins[i].AddrOfPinnedObject().ToPointer());
-
-			// pin outer array<int*>^
-			pin_ptr<byte*> pin = &arrays[0];
-
-			// pass outer pinned array<int*> to UNumeric::ChangeArray as an int**
-			// (note that no casts are necessary in correct code)
-			if (imgNum < 3)
-				IP::CreateGoldenImage_Avg(pin, pDst, imgNum, nMemW, nMemH);
-			else
-				IP::CreateGoldenImage_NearAvg(pin, pDst, imgNum, nMemW, nMemH);
-		}
-		finally
-		{
-			// unpin each contained array<int>^
-			for each (GCHandle pin in pins)
-				pin.Free();
-			pDst = nullptr;
-		}
-	}
 	void CLR_IP::Cpp_CreateGoldenImage_MedianAvg(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH)
 	{
 		using System::Runtime::InteropServices::GCHandle;
@@ -442,21 +406,6 @@ namespace RootTools_CLR
 		pSrc = nullptr;
 		pDst = nullptr;
 	}
-	void CLR_IP::Cpp_CreateGoldenImage_NearAvg(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH)
-	{
-		pin_ptr<byte> pSrc = &pSrcImg[0];
-		pin_ptr<byte> pDst = &pDstImg[0];
-
-		std::vector<Point> vtPoint;
-
-		for (int i = 0; i < ROILT->Count; i++)
-			vtPoint.push_back(Point(ROILT[i]->x, ROILT[i]->y));
-
-		IP::CreateGoldenImage_NearAvg(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, nROIW, nROIH);
-
-		pSrc = nullptr;
-		pDst = nullptr;
-	}
 	void CLR_IP::Cpp_CreateGoldenImage_MedianAvg(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
@@ -467,7 +416,10 @@ namespace RootTools_CLR
 		for (int i = 0; i < ROILT->Count; i++)
 			vtPoint.push_back(Point(ROILT[i]->x, ROILT[i]->y));
 
-		IP::CreateGoldenImage_MedianAvg(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, nROIW, nROIH);
+		if (imgNum < 4)
+			IP::CreateGoldenImage_Avg(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, nROIW, nROIH);
+		else
+			IP::CreateGoldenImage_MedianAvg(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, nROIW, nROIH);
 
 		pSrc = nullptr;
 		pDst = nullptr;
@@ -482,7 +434,10 @@ namespace RootTools_CLR
 		for (int i = 0; i < ROILT->Count; i++)
 			vtPoint.push_back(Point(ROILT[i]->x, ROILT[i]->y));
 
-		IP::CreateGoldenImage_Median(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, nROIW, nROIH);
+		if (imgNum < 4)
+			IP::CreateGoldenImage_Avg(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, nROIW, nROIH);
+		else
+			IP::CreateGoldenImage_Median(pSrc, pDst, imgNum, nMemW, nMemH, vtPoint, nROIW, nROIH);
 
 		pSrc = nullptr;
 		pDst = nullptr;
