@@ -367,11 +367,14 @@ namespace RootTools_Vision
                     startY = mapYIdx[0];
                     endY = mapYIdx[mapYIdx.Count() - 1];
                 }
-                else // 중심에 있는 4개의 칩으로만 Golden Image 생성
+                else 
                 {
-                    
+                    // 중심에 있는 4개의 칩으로만 Golden Image 생성
                     startY = mapYIdx[mapYIdx.Count() / 2 - 1 - 2];
                     endY = mapYIdx[mapYIdx.Count() / 2 - 1 + 2];
+                    // Line에 있는 침 다쓰기
+                    //startY = mapYIdx[0];
+                    //endY = mapYIdx[mapYIdx.Count() - 1];
                 }
 
                 List<Cpp_Point> wpROIData = new List<Cpp_Point>();
@@ -379,7 +382,7 @@ namespace RootTools_Vision
                 foreach (Workplace wp in this.workplaceBundle)
                     if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
                         if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
-                            if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY) && wp.MapIndexY != this.currentWorkplace.MapIndexY)
+                            if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY))
                                 wpROIData.Add(new Cpp_Point(wp.PositionX, wp.PositionY));
 
                 unsafe { 
