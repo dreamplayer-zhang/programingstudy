@@ -65,9 +65,11 @@ namespace Root_AOP01_Inspection
        
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true == true && m_wtr.p_infoWafer != null? Brushes.SteelBlue : Brushes.LightGray;
+            ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_wtr.p_infoWafer != null? Brushes.SteelBlue : Brushes.LightGray;
             ExistVision.Background = m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null? Brushes.SteelBlue : Brushes.LightGray;
-            ExistLoadport.Background = (m_loadport[0].p_infoWafer != null) || (m_loadport[1].p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
+            //ExistLoadport.Background = (m_loadport[0].p_infoWafer != null) || (m_loadport[1].p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
+            ButtonInitialize.IsEnabled = IsEnableInitialization();
+            ButtonRecovery.IsEnabled = IsEnableRecovery();
         }
         #endregion
         #region Button Recovery
@@ -96,21 +98,21 @@ namespace Root_AOP01_Inspection
 
             bool IsEnableInitialization()
             {
-                //if (IsRunModule()) return false;
+                if (IsRunModule()) return false;
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Run: return false;
-                    //case EQ.eState.Home: return false;
+                    case EQ.eState.Home: return false;
                 }
                 return true;
             }
 
             bool IsRunModule()
             {
-                //if (IsRunModule(m_loadport[0])) return true;
-                //if (IsRunModule(m_loadport[1])) return true;
-                //if (IsRunModule(m_wtrcleanunit)) return true;
-                //if (IsRunModule(m_handler.m_mainVision)) return true;
+                if (IsRunModule(m_loadport[0])) return true;
+                if (IsRunModule(m_loadport[1])) return true;
+                if (IsRunModule(m_wtrcleanunit)) return true;
+                if (IsRunModule(m_handler.m_mainVision)) return true;
                 return false;
             }
             bool IsRunModule(ModuleBase module)

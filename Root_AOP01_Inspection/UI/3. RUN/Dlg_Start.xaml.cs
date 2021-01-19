@@ -105,7 +105,7 @@ namespace Root_AOP01_Inspection
             Recipe typeItem = (Recipe)listviewRCP.SelectedItem;
             sRecipeName = typeItem.p_sRecipeName.ToString();
             RecipeID.Text = sRecipeName;
-            sRecipe = m_recipe.m_sPath + sRecipeName;   
+            sRecipe = m_recipe.m_sPath + sRecipeName;
         }
         #endregion
 
@@ -120,7 +120,6 @@ namespace Root_AOP01_Inspection
                 m_handler.AddSequence(infoWafer);
                 m_handler.CalcSequence();
             }
-
             this.DialogResult = true;
         }
     }

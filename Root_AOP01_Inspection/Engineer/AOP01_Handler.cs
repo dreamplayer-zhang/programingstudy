@@ -14,7 +14,7 @@ using System.Windows.Media;
 
 namespace Root_AOP01_Inspection
 {
-    public class AOP01_Handler : IHandler
+    public class AOP01_Handler : ObservableObject,IHandler
     {
         public bool bInit=false;
         #region UI Binding
@@ -29,6 +29,14 @@ namespace Root_AOP01_Inspection
             get { return Brushes.BurlyWood; }
             set { }
         }
+        public FFU p_FFU
+        {
+            get { return m_FFU; }
+            set
+            {
+                SetProperty(ref m_FFU, value);
+            }
+        }
         #endregion 
 
         #region Module
@@ -37,6 +45,7 @@ namespace Root_AOP01_Inspection
         public AOP01_Recipe m_recipe;
         public EFEM_Process m_process;
         public MainVision m_mainVision;
+        public FFU m_FFU;
 
         void InitModule()
         {
@@ -47,9 +56,10 @@ namespace Root_AOP01_Inspection
             InitLoadport();
             m_mainVision = new MainVision("MainVision", m_engineer);
             InitModule(m_mainVision);
-
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_mainVision);
+            m_FFU = new FFU("FFU", m_engineer);
+            InitModule(m_FFU);
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
             iWTR.ReadInfoReticle_Registry();
@@ -222,6 +232,7 @@ namespace Root_AOP01_Inspection
 
         #region Calc Sequence
         public int m_nRnR = 1;
+        public int m_nRnRCount = 0;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
@@ -291,6 +302,7 @@ namespace Root_AOP01_Inspection
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 m_process.ReCalcSequence();
                                 m_nRnR--;
+                                m_nRnRCount++;
                                 EQ.p_eState = EQ.eState.Run;
                             }
                         }

@@ -618,19 +618,19 @@ namespace Root_EFEM.Module
 //                    if (m_diDoorOpen.p_bIn) return p_id + " Door Opened";
                     if (Run(CmdUnload())) return p_sInfo;
                 }
-            }
-            if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
-            {
-                p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                m_bPlaced= true;
+                if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
+                {
+                    p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                    m_bPlaced = true;
 
-                if (Run(CmdLoad())) return p_sInfo;
-                if (Run(CmdUnload())) return p_sInfo;
-            }
-            else
-            {
-                p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
-                m_bPlaced = false;
+                    if (Run(CmdLoad())) return p_sInfo;
+                    if (Run(CmdUnload())) return p_sInfo;
+                }
+                else
+                {
+                    p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
+                    m_bPlaced = false;
+                }
             }
             p_eState = eState.Ready;
             p_infoCarrier.AfterHome();
