@@ -69,7 +69,7 @@ namespace Root_Rinse_Loader.MainUI
 
         private void buttonPickerSet_Click(object sender, RoutedEventArgs e)
         {
-            //forget
+            m_handler.StartPickerSet(); 
         }
         #endregion
     }

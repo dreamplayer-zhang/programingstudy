@@ -156,6 +156,7 @@ namespace Root_CAMELLIA
             }
         }
 
+        public List<IRFID> m_aRFID = new List<IRFID>();
         void InitRFID()
         {
             ModuleBase module;
@@ -163,10 +164,10 @@ namespace Root_CAMELLIA
             for(int n=0; n<m_lLoadport; n++, cID++)
             {
                 string sID = "Rfid" + cID;
-                module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]);
+                module = new RFID_Brooks(sID, m_engineer);
                 InitModule(module);
+                m_aRFID.Add((IRFID)module);
             }
-            
         }
 
         public void RunTreeLoadport(Tree tree)
@@ -234,7 +235,7 @@ namespace Root_CAMELLIA
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
-            sInfo = StateHome((Loadport_RND)m_aLoadport[0], (Loadport_RND)m_aLoadport[1], m_Aligner, m_camellia);
+            sInfo = StateHome((Loadport_RND)m_aLoadport[0], (Loadport_RND)m_aLoadport[1], m_Aligner, m_camellia, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1]);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
@@ -440,7 +441,7 @@ namespace Root_CAMELLIA
         string m_id;
         public CAMELLIA_Engineer m_engineer;
         public GAF m_gaf;
-        IGem m_gem;
+        public IGem m_gem;
 
         public void Init(string id, IEngineer engineer)
         {

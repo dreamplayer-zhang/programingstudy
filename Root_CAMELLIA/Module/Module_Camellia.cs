@@ -120,6 +120,16 @@ namespace Root_CAMELLIA.Module
         }
         #endregion
 
+        #region InfoWafer UI
+        InfoWaferChild_UI m_ui;
+        void InitInfoWaferUI()
+        {
+            m_ui = new InfoWaferChild_UI();
+            m_ui.Init(this);
+            m_aTool.Add(m_ui);
+        }
+        #endregion
+
         public List<string> p_asChildSlot
         {
             get
@@ -197,6 +207,7 @@ namespace Root_CAMELLIA.Module
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             base.InitBase(id, engineer);
             InitWorkPoint();
+            InitInfoWaferUI();
             m_DataManager = DataManager.Instance;
         }
 

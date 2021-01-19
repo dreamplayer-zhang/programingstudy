@@ -5,6 +5,7 @@ using RootTools.Gem;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -194,6 +195,36 @@ namespace Root_Rinse_Loader.Engineer
         }
         #endregion
 
+        #region PickerSet
+        BackgroundWorker m_bgwPickerSet = new BackgroundWorker(); 
+        void InitBackgroundWorker()
+        {
+            m_bgwPickerSet.DoWork += M_bgwPickerSet_DoWork;
+        }
+
+        private void M_bgwPickerSet_DoWork(object sender, DoWorkEventArgs e)
+        {
+            RunPickerSet(); 
+        }
+
+        string RunPickerSet()
+        {
+            m_loader.m_bPickersetMode = true; 
+            EQ.p_eState = EQ.eState.Run; 
+            m_storage.StartMoveStackReady();
+            while (m_storage.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+            if (EQ.IsStop()) return "EQ Stop";
+            m_loader.StartPickerSet();
+            return "OK";  
+        }
+
+        public string StartPickerSet()
+        {
+            m_bgwPickerSet.RunWorkerAsync();
+            return "OK";
+        }
+        #endregion
+
         string m_id;
         public RinseL_Engineer m_engineer;
         public GAF m_gaf;
@@ -206,6 +237,7 @@ namespace Root_Rinse_Loader.Engineer
             m_gaf = engineer.ClassGAF();
             m_gem = engineer.ClassGem();
             InitModule();
+            InitBackgroundWorker(); 
             InitThread();
             m_engineer.ClassMemoryTool().InitThreadProcess();
         }
