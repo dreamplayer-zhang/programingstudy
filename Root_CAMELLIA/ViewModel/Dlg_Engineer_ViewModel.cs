@@ -542,7 +542,8 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Module_Camellia.Run_Calibration calibration = (Module_Camellia.Run_Calibration)ModuleCamellia.CloneModuleRun("Calibration");
+            Module_Camellia.Run_CalibrationWaferCentering calibration = (Module_Camellia.Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("Calibration");
+            calibration.m_useCentering = false;
             calibration.Run();
         }
         private void InitCalibration()
@@ -553,7 +554,7 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Module_Camellia.Run_InitCalWaferCentering initCalibration = (Module_Camellia.Run_InitCalWaferCentering)ModuleCamellia.CloneModuleRun("InitCalWaferCentering");
+            Module_Camellia.Run_InitCalibration initCalibration = (Module_Camellia.Run_InitCalibration)ModuleCamellia.CloneModuleRun("InitCalWaferCentering");
             initCalibration.Run();
         }
         private void Centering()
@@ -564,7 +565,8 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Module_Camellia.Run_WaferCentering centering = (Module_Camellia.Run_WaferCentering)ModuleCamellia.CloneModuleRun("WaferCentering");
+            Module_Camellia.Run_CalibrationWaferCentering centering = (Module_Camellia.Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("WaferCentering");
+            centering.m_useCal = false;
             centering.Run();
         }
         private ObservableCollection<WorkPoint> GetWorkPoint(Dictionary<string, double> dic)

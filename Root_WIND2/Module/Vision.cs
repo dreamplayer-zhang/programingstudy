@@ -436,9 +436,9 @@ namespace Root_WIND2.Module
         {
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
-            AddModuleRunList(new Run_GrabLineScan(this), false, "Run Grab LineScan Camera");
-            AddModuleRunList(new Run_Inspect(this), false, "Run Inspect");
-            AddModuleRunList(new Run_VisionAlign(this), false, "Run VisionAlign");
+            AddModuleRunList(new Run_GrabLineScan(this), true, "Run Grab LineScan Camera");
+            AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
+            AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
             AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
             
         }

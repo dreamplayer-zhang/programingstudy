@@ -638,7 +638,8 @@ namespace Root_WIND2
                 return;
 
             int index = (int)GetDataGridItem(Defect_Datatable, selectedRow, "m_nDefectIndex");
-            double absY = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fAbsY");
+            //double absY = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fAbsY");
+            Double absY = 0;
             double theta = CalculateEdgeDefectTheta(absY);
 
             m_DefectView.DisplaySelectedEdgeDefect(m_ReviewDefectlist.Count, index, theta);

@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Root_Rinse_Loader.Engineer;
+using RootTools;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Root_Rinse_Loader.MainUI
 {
@@ -25,19 +17,60 @@ namespace Root_Rinse_Loader.MainUI
             InitializeComponent();
         }
 
+        RinseL_Engineer m_engineer; 
+        RinseL_Handler m_handler;
+        public void Init(RinseL_Engineer engineer)
+        {
+            m_engineer = engineer; 
+            m_handler = (RinseL_Handler)engineer.ClassHandler();
+            rinseUI.Init(m_handler.m_rinse); 
+            InitTimer(); 
+        }
+
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer(); 
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromSeconds(0.1);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start(); 
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            buttonHome.IsEnabled = EQ.p_eState != EQ.eState.Run;
+            buttonStart.IsEnabled = EQ.p_eState == EQ.eState.Ready;
+            buttonPause.IsEnabled = EQ.p_eState == EQ.eState.Run;
+            buttonReset.IsEnabled = EQ.p_eState == EQ.eState.Error; 
+            buttonPickerSet.IsEnabled = EQ.p_eState == EQ.eState.Ready;
+        }
+        #endregion
+
+        #region UI Control
         private void buttonHome_Click(object sender, RoutedEventArgs e)
         {
-
+            EQ.p_eState = EQ.eState.Home; 
         }
 
         private void buttonStart_Click(object sender, RoutedEventArgs e)
         {
-
+            EQ.p_eState = EQ.eState.Run; 
         }
 
         private void buttonPause_Click(object sender, RoutedEventArgs e)
         {
-
+            EQ.p_eState = EQ.eState.Ready; 
         }
+
+        private void buttonReset_Click(object sender, RoutedEventArgs e)
+        {
+            EQ.p_eState = EQ.eState.Ready; 
+        }
+
+        private void buttonPickerSet_Click(object sender, RoutedEventArgs e)
+        {
+            //forget
+        }
+        #endregion
     }
 }

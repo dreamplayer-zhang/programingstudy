@@ -178,7 +178,7 @@ namespace Root_WIND2
         {
             //m_SetupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRunOpen();
             //m_SetupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRun();
-            ((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_aLoadport[0].StartRunDocking();
+            ((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_aLoadport[0].RunDocking();
             //m_moduleRunList.OpenJob("C:\\Recipe\\RNR_ALL.RunWIND2");
         }
 

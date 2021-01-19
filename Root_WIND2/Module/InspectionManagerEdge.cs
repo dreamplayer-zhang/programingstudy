@@ -93,37 +93,35 @@ namespace Root_WIND2
 			// top
 			RootTools.ImageData imageDataTop = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
 			int memoryHeightTop = 10000;// imageDataSide.p_Size.Y;
-			int memoryWidthTop = imageDataTop.p_Size.X;
+			int memoryWidthTop = recipe.GetRecipe<EdgeSurfaceParameter>().RoiWidthTop;
 
+			workplaceBundle.Add(new Workplace(-1, -1, 0, 0, 0, 0, index++));
 			for (int i = 0; i < memoryHeightTop / partitionNum; i++)
 			{
 				Workplace workplace = new Workplace(0, i, 0, partitionNum * i, memoryWidthTop, partitionNum, index++);
 				workplace.SetSharedBuffer(imageDataTop.GetPtr(0), memoryWidthTop, memoryHeightTop, imageDataTop.p_nByte, imageDataTop.GetPtr(1), imageDataTop.GetPtr(2));
-
 				workplaceBundle.Add(workplace);
 			}
 
 			// side
 			RootTools.ImageData imageDataSide = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeSide);
 			int memoryHeightSide = 10000;// imageDataSide.p_Size.Y;
-			int memoryWidhtSide = imageDataSide.p_Size.X;
+			int memoryWidhtSide = recipe.GetRecipe<EdgeSurfaceParameter>().RoiWidthSide;
 			for (int i = 0; i < memoryHeightSide / partitionNum; i++)
 			{
 				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Side, i, 0, memoryHeightSide / partitionNum * i, memoryWidhtSide, partitionNum, index++);
 				workplace.SetSharedBuffer(imageDataSide.GetPtr(0), memoryWidhtSide, memoryHeightSide, imageDataSide.p_nByte, imageDataSide.GetPtr(1), imageDataSide.GetPtr(2));
-
 				workplaceBundle.Add(workplace);
 			}
 
 			// bottom
 			RootTools.ImageData imageDataBtm = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeBottom);
 			int memoryHeightBtm = 10000;// imageDataBtm.p_Size.Y;
-			int memoryWidhtBtm = imageDataBtm.p_Size.X;
+			int memoryWidhtBtm = recipe.GetRecipe<EdgeSurfaceParameter>().RoiWidthBtm;
 			for (int i = 0; i < memoryHeightBtm / partitionNum; i++)
 			{
 				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Btm, i, 0, memoryHeightBtm / partitionNum * i, memoryWidhtBtm, partitionNum, index++);
 				workplace.SetSharedBuffer(imageDataBtm.GetPtr(0), memoryWidhtBtm, memoryHeightBtm, imageDataBtm.p_nByte, imageDataBtm.GetPtr(1), imageDataBtm.GetPtr(2));
-
 				workplaceBundle.Add(workplace);
 			}
 
