@@ -16,13 +16,15 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Button Grid.Row="0" x:Name="buttonHome" Content="Initialize" Margin="4" Click="buttonHome_Click"/>
             <Button Grid.Row="1" x:Name="buttonStart" Content="Start" Margin="4" Click="buttonStart_Click"/>
             <Button Grid.Row="2" x:Name="buttonPause" Content="Pause" Margin="4" Click="buttonPause_Click"/>
+            <Button Grid.Row="3" x:Name="buttonReset" Content="Reset" Margin="4" Click="buttonReset_Click"/>
+            <Button Grid.Row="4" x:Name="buttonPickerSet" Content="Picker Set" Margin="4" Click="buttonPickerSet_Click"/>
         </Grid>
-        <Grid Grid.Column="1">
-
-        </Grid>
+        <local:Rinse_UI Grid.Column="1" x:Name="rinseUI"/>
     </Grid>
 </UserControl>

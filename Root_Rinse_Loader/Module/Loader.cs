@@ -12,6 +12,7 @@ namespace Root_Rinse_Loader.Module
     public class Loader : ModuleBase
     {
         #region ToolBox
+
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axis, this, "Loader"); 

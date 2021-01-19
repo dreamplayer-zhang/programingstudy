@@ -29,7 +29,7 @@ namespace Root_Rinse_Loader.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
-        RinseL m_rinse;
+        public RinseL m_rinse;
         public Storage m_storage;
         public Rail m_rail;
         public Roller m_roller;
