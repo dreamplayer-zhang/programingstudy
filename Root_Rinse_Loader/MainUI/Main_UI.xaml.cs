@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using Root_Rinse_Loader.Engineer;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Root_Rinse_Loader.MainUI
 {
@@ -23,6 +11,13 @@ namespace Root_Rinse_Loader.MainUI
         public Main_UI()
         {
             InitializeComponent();
+        }
+
+        RinseL_Engineer m_engineer; 
+        public void Init(RinseL_Engineer engineer)
+        {
+            m_engineer = engineer;
+            runUI.Init(engineer); 
         }
     }
 }

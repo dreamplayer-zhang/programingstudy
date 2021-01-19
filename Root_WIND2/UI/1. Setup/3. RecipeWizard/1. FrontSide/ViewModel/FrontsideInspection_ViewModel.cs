@@ -91,14 +91,16 @@ namespace Root_WIND2
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
                 {
                     String test = "";
-                    if (true) // Display Option : Position Trans
+                    if (workplace.Index == 0)
+                    {
+                        test += "Trans : {" + workplace.OffsetX.ToString() + ", " + workplace.OffsetY.ToString() + "}" + "\n";
+                        DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
+                    }
+                    else
                     {
                         test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
-                    }
-                    if (workplace.Index == 0)
-                        DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
-                    else
                         DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
+                    }
                 }));
             }
         }

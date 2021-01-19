@@ -419,7 +419,7 @@ namespace Root_WIND2
                         StateHome();
                         break;
                     case EQ.eState.Ready:
-                        //CheckLoad();
+                        CheckLoad();
                         break;
                     case EQ.eState.Run:
                         if (p_moduleList.m_qModuleRun.Count == 0)
@@ -494,10 +494,7 @@ namespace Root_WIND2
                     }
                     if (bUndock)
                     {
-                        loadport.StartRunUndocking();
-                        m_process.ClearInfoWafer();
-                        loadport.p_infoCarrier.ClearInfoWafer();
-                        loadport.p_infoCarrier.RunTreeWafer(Tree.eMode.Init);
+                        loadport.RunUndocking();
                         EQ.p_eState = EQ.eState.Ready;
                     }
                 }

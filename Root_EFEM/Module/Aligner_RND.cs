@@ -594,17 +594,17 @@ namespace Root_EFEM.Module
 
         public string AfterGet(int nID)
         {
-            string sGet = SendCmd(eCmd.ResetPos);
-            //m_bgwWaferExist.RunWorkerAsync(true);
-            m_bgwWaferExist.RunWorkerAsync(false);
-            return sGet; 
+            //string sGet = SendCmd(eCmd.ResetPos);
+            ////m_bgwWaferExist.RunWorkerAsync(true);
+            //m_bgwWaferExist.RunWorkerAsync(false);
+            return "OK"; 
         }
 
         public string AfterPut(int nID)
         {
-            string sPut = SendCmd(eCmd.VacuumOn);
-            m_bgwWaferExist.RunWorkerAsync(true);
-            return sPut; 
+            //string sPut = SendCmd(eCmd.VacuumOn);
+            //m_bgwWaferExist.RunWorkerAsync(true);
+            return "OK"; 
         }
 
         enum eCheckWafer

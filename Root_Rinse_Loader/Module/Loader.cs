@@ -12,11 +12,13 @@ namespace Root_Rinse_Loader.Module
     public class Loader : ModuleBase
     {
         #region ToolBox
+
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Loader"); 
-            p_sInfo = m_toolBox.Get(ref m_dioPickerDown, this, "PickerDown", "Up", "Down"); 
-            foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox); 
+            p_sInfo = m_toolBox.Get(ref m_axis, this, "Loader");
+            p_sInfo = m_toolBox.Get(ref m_dioPickerDown, this, "PickerDown", "Up", "Down");
+            p_sInfo = m_toolBox.Get(ref m_diPickerSet, this, "PickerSet");
+            foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox);
             if (bInit)
             {
                 InitPos();
@@ -54,15 +56,11 @@ namespace Root_Rinse_Loader.Module
         double m_secBlow = 0.5;
         public string RunVacuum(bool bOn)
         {
-            foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(bOn); 
+            foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(bOn);
             if (bOn)
             {
                 Thread.Sleep((int)(1000 * m_secVac));
-                foreach (Picker picker in m_aPicker)
-                {
-                    if (picker.m_dioVacuum.p_bIn) return "OK";
-                }
-                return "Run Pick Timeout"; 
+                return "OK";
             }
             else
             {
@@ -70,7 +68,7 @@ namespace Root_Rinse_Loader.Module
                 Thread.Sleep((int)(1000 * m_secBlow));
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
             }
-            return "OK"; 
+            return "OK";
         }
 
         void RunTreePicker(Tree tree)
@@ -85,7 +83,85 @@ namespace Root_Rinse_Loader.Module
         public string RunPickerDown(bool bDown)
         {
             m_dioPickerDown.Write(bDown);
-            return m_dioPickerDown.WaitDone(); 
+            return m_dioPickerDown.WaitDone();
+        }
+        #endregion
+
+        #region PickerSet
+        public bool m_bPickersetMode = false; 
+        public string StartPickerSet()
+        {
+            StartRun(m_runPickerSet.Clone()); 
+            return "OK"; 
+        }
+
+        string RunPickerSet()
+        {
+            try
+            {
+                if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
+                bool bDown = false;
+                bool bVacuum = false; 
+                while (true)
+                {
+                    switch (CheckPickerSet())
+                    {
+                        case ePickerSet.Stop: return "OK";
+                        case ePickerSet.UpDown:
+                            bDown = !bDown;
+                            if (Run(RunPickerDown(bDown))) return p_sInfo;
+                            break; 
+                        case ePickerSet.Vacuum:
+                            bVacuum = !bVacuum;
+                            if (Run(RunVacuum(bVacuum))) return p_sInfo;  
+                            break; 
+                    }
+                }
+            }
+            finally
+            {
+                RunPickerDown(false);
+                MoveLoader(ePos.Roller);
+                m_bPickersetMode = false; 
+            }
+        }
+
+        enum ePickerSet
+        {
+            UpDown,
+            Vacuum,
+            Stop
+        }
+
+        DIO_I m_diPickerSet;
+        StopWatch m_swPickerSet = new StopWatch();
+        bool _bPickerSet = false;
+        bool p_bPickerSet
+        {
+            get { return _bPickerSet; }
+            set
+            {
+                if (_bPickerSet == value) return;
+                _bPickerSet = value; 
+            }
+        }
+
+        ePickerSet CheckPickerSet()
+        {
+            while (p_bPickerSet == false)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return ePickerSet.Stop; 
+            }
+            m_swPickerSet.Start();
+            while (p_bPickerSet)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return ePickerSet.Stop;
+                if (m_swPickerSet.ElapsedMilliseconds > 3000) return ePickerSet.Stop; 
+            }
+            int nSec = (int)(m_swPickerSet.ElapsedMilliseconds / 1000);
+            return (m_swPickerSet.ElapsedMilliseconds < 1000) ? ePickerSet.UpDown : ePickerSet.Vacuum; 
         }
         #endregion
 
@@ -206,6 +282,7 @@ namespace Root_Rinse_Loader.Module
         #region StartRun
         public void StartRun()
         {
+            if (m_bPickersetMode) return; 
             switch (m_rinse.p_eMode)
             {
                 case RinseL.eRunMode.Magazine:
@@ -220,12 +297,14 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region ModuleRun
-        ModuleRunBase m_runRun; 
+        ModuleRunBase m_runRun;
+        ModuleRunBase m_runPickerSet;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Load(this), false, "Load Strip");
             AddModuleRunList(new Run_Unload(this), false, "Unload Strip");
-            m_runRun = AddModuleRunList(new Run_Run(this), false, "Move Strip");
+            m_runRun = AddModuleRunList(new Run_Run(this), true, "Run");
+            m_runPickerSet = AddModuleRunList(new Run_PickerSet(this), false, "PickerSet");
         }
 
         public class Run_Load : ModuleRunBase
@@ -289,7 +368,7 @@ namespace Root_Rinse_Loader.Module
 
             public override ModuleRunBase Clone()
             {
-                Run_Unload run = new Run_Unload(m_module);
+                Run_Run run = new Run_Run(m_module);
                 return run;
             }
 
@@ -309,6 +388,31 @@ namespace Root_Rinse_Loader.Module
                     if (m_module.Run(m_module.RunUnload())) return p_sInfo;
                 }
                 return "OK"; 
+            }
+        }
+
+        public class Run_PickerSet : ModuleRunBase
+        {
+            Loader m_module;
+            public Run_PickerSet(Loader module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_PickerSet run = new Run_PickerSet(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunPickerSet(); 
             }
         }
         #endregion

@@ -191,6 +191,15 @@ namespace RootTools_Vision
             return resData;
         }
 
+        public static void SpliteColor(byte[] srcColor, byte[] dstR, byte[] dstG, byte[] dstB)
+        {
+            for(int i = 0; i < srcColor.Length/3; i++)
+            {
+                dstR[i] = srcColor[i * 3];
+                dstG[i] = srcColor[i * 3 + 1];
+                dstB[i] = srcColor[i * 3 + 2];
+            }
+        }
         public static bool LoadBitmapToRawdata(string filepath, byte[] rawdata, int _width, int _height, int _byteCount)
         {
             //StopWatch stop = new StopWatch();

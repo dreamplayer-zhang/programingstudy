@@ -408,7 +408,7 @@ namespace Root_CAMELLIA
                 if (loadport.p_id == sLoadport)
                 {
                     //loadport.RunDocking();
-                    if (loadport.StartRunDocking() != "OK") return;
+                    if (loadport.RunDocking() != "OK") return;
                     if(EQ.p_bRecovery == false)
                     {
                         InfoCarrier infoCarrier = loadport.p_infoCarrier;
@@ -432,7 +432,7 @@ namespace Root_CAMELLIA
                     {
                         if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
                     }
-                    if (bUndock) loadport.StartRunUndocking();
+                    if (bUndock) loadport.RunUndocking();
                 }
             }
         }

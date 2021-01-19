@@ -16,6 +16,7 @@ namespace Root_AOP01_Inspection
 {
     public class AOP01_Handler : IHandler
     {
+        public bool bInit=false;
         #region UI Binding
         public Brush p_brushHandler
         {
@@ -80,7 +81,8 @@ namespace Root_AOP01_Inspection
         enum eWTR
         {
             RND,
-            Cymechs
+            Cymechs,
+            RTR_RND
         }
         eWTR m_eWTR = eWTR.RND;
         public ModuleBase m_wtr;
@@ -284,7 +286,7 @@ namespace Root_AOP01_Inspection
                             CheckLoad();
                             m_process.p_sInfo = m_process.RunNextSequence();
                             CheckUnload();
-                            if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 m_process.ReCalcSequence();
@@ -304,7 +306,7 @@ namespace Root_AOP01_Inspection
             string sLoadport = sequence.m_infoWafer.m_sModule;
             foreach (ILoadport loadport in m_aLoadport)
             {
-                if (loadport.p_id == sLoadport) loadport.StartRunDocking();
+                if (loadport.p_id == sLoadport) loadport.RunDocking();
             }
         }
 
@@ -321,7 +323,8 @@ namespace Root_AOP01_Inspection
                     {
                         if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
                     }
-                    if (bUndock) loadport.StartRunUndocking();
+                    if (bUndock&&!bInit) loadport.RunUndocking();
+                    bInit = false;
                 }
             }
         }

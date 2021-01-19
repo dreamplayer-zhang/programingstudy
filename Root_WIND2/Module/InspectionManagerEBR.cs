@@ -12,11 +12,6 @@ namespace Root_WIND2
 {
 	public class InspectionManagerEBR : WorkFactory
 	{
-		#region [Member Variables]
-		WorkBundle workBundle;
-		WorkplaceBundle workplaceBundle;
-		#endregion
-
 		public InspectionManagerEBR(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt = 1)
 		{
 			this.sharedBufferR_Gray = _sharedBuffer;
@@ -67,7 +62,7 @@ namespace Root_WIND2
 
 			int index = 0;
 			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, index++));
-			for (int i = 0; i < 5/*workplaceCnt*/; i++)
+			for (int i = 0; i < workplaceCnt; i++)
 			{
 				int posY = (imageHeightPerDegree * i) - (height / 2);
 				if (posY <= 0)
@@ -84,7 +79,6 @@ namespace Root_WIND2
 		{
 			WorkBundle workBundle = new WorkBundle();
 			EBR ebr = new EBR();
-
 			ProcessMeasurement processMeasurement = new ProcessMeasurement();
 
 			workBundle.Add(ebr);
