@@ -258,8 +258,8 @@ namespace RootTools_Vision
         {
             this.currentWorkplace = null;
 
-            this.works.Clear();
-            this.works = null;
+            //this.works.Clear();
+            //this.works = null;
 
             this.workerState = WORKER_STATE.NONE;
 

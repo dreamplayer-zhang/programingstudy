@@ -419,7 +419,7 @@ namespace Root_WIND2
                         StateHome();
                         break;
                     case EQ.eState.Ready:
-                        //CheckLoad();
+                        CheckLoad();
                         break;
                     case EQ.eState.Run:
                         if (p_moduleList.m_qModuleRun.Count == 0)
