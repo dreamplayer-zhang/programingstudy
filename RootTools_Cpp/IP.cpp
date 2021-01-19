@@ -500,10 +500,10 @@ void IP::CreateGoldenImage_MedianAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW
                 (cv::max)(imgSrc, maxImg, maxImg);
 
                 imgAccumlate = imgAccumlate + imgSrc;
-
-                cv::subtract(imgAccumlate, minImg, imgAccumlate);
-                cv::subtract(imgAccumlate, maxImg, imgAccumlate);
             }
+
+            cv::subtract(imgAccumlate, minImg, imgAccumlate);
+            cv::subtract(imgAccumlate, maxImg, imgAccumlate);
         }
 
         imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / (imgNum / 3));
@@ -554,30 +554,496 @@ void IP::CreateGoldenImage_Median(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, i
     imgAccumlate.convertTo(imgDst, CV_8UC1);
 }
 
-void IP::CreateGoldenImage_Avg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH)
+// SSE Version.
+void IP::CreateGoldenImage_Avg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nChipW, int nChipH)
 {
-    Mat imgAccumlate = Mat::zeros(nROIH, nROIW, CV_16UC1);
-    Mat imgDst = Mat(nROIH, nROIW, CV_8UC1, pDst);
-    
-    short* imgROI = new short[(int64)nROIW * nROIH];
+    if (imgNum < 4)
+    {
+        MergeImage_Average(pSrc, pDst, imgNum, nMemW, nMemH, vtROILT, nChipW, nChipH);
+        return;
+    }
+
+    LPBYTE* pChipLT = new LPBYTE[imgNum];
+    byte* pResult = pDst;
     byte* pHeader = NULL;
 
-    for (int i = 0; i < imgNum; i++)
+    for (int k = 0; k < imgNum; k++)
     {
         pHeader = pSrc;
-        for (int idx = 0; idx < vtROILT[i].y; idx++)
-            pHeader += nMemW;
+        for (int idx = 0; idx < vtROILT[k].y; idx++)
+            pHeader += nMemW; // 처음부터 다시 nMemW 더해주지 않도록 코드 최적화 필요
 
-        pHeader += vtROILT[i].x;
-        for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
-            std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[i].y)]); // byte* -> short*
+        pChipLT[k] = pHeader + vtROILT[k].x;
+    }
 
-        Mat imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
-        imgAccumlate = imgAccumlate + imgSrc;
-     }
+    int blockEndWidth = nChipW / 32;
+    int blockEndHeight = nChipH;
+    int Width2 = nChipW % 32;
 
-    imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / imgNum);
+    __m256i* pRst;
+    __m256i* (*pRef) = new __m256i * [imgNum];
+
+    __m256i Ref;
+    __m256i Ref_High, Ref_Low;
+    __m256i Result_High, Result_Low;
+    __m256i ZeroData = _mm256_setzero_si256();
+    __m256i DivRefNum = _mm256_set_epi16(imgNum, imgNum, imgNum, imgNum, imgNum, imgNum, imgNum, imgNum, imgNum, imgNum, imgNum, imgNum, imgNum, imgNum, imgNum, imgNum);
+
+    for (int r = 0; r < blockEndHeight; r++)
+    {
+        pRst = (__m256i*)(pResult);
+
+        for (int k = 0; k < imgNum; k++)
+            pRef[k] = (__m256i*)pChipLT[k];
+
+        for (int c = 0; c < blockEndWidth; c++, pRst++)
+        {
+            Ref = _mm256_load_si256(pRef[0]);
+
+            Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
+            Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
+
+            Result_High = _mm256_add_epi16(Ref_High, ZeroData);
+            Result_Low = _mm256_add_epi16(Ref_Low, ZeroData);
+
+            for (int k = 1; k < imgNum; k++)
+            {
+                Ref = _mm256_load_si256(pRef[k]);
+
+                Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
+                Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
+
+                Result_High = _mm256_add_epi16(Result_High, Ref_High);
+                Result_Low = _mm256_add_epi16(Result_Low, Ref_Low);
+            }
+
+            Result_High = _mm256_div_epi16(Result_High, DivRefNum);
+            Result_Low = _mm256_div_epi16(Result_Low, DivRefNum);
+            _mm256_storeu_si256(pRst, _mm256_packus_epi16(Result_Low, Result_High));
+
+            for (int k = 0; k < imgNum; k++)
+                pRef[k]++;
+
+        }
+
+        if (Width2 != 0) {
+            // 나머지 부분도 SSE로 구현
+            Ref = _mm256_loadu_si256(pRef[0]);
+
+            Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
+            Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
+
+            Result_High = _mm256_add_epi16(Ref_High, ZeroData);
+            Result_Low = _mm256_add_epi16(Ref_Low, ZeroData);
+
+            for (int k = 1; k < imgNum; k++)
+            {
+                Ref = _mm256_loadu_si256(pRef[k]);
+
+                Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
+                Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
+
+                Result_High = _mm256_add_epi16(Result_High, Ref_High);
+                Result_Low = _mm256_add_epi16(Result_Low, Ref_Low);
+            }
+
+            Result_High = _mm256_div_epi16(Result_High, DivRefNum);
+            Result_Low = _mm256_div_epi16(Result_Low, DivRefNum);
+
+            Result_High = _mm256_packus_epi16(Result_Low, Result_High);
+
+
+            for (int c = 0; c < Width2; c++)
+                pResult[c + blockEndWidth * 32] = Result_High.m256i_i8[c];
+        }
+        for (int k = 0; k < imgNum; k++)
+            pChipLT[k] += nMemW;
+
+        pResult += nChipW;
+    }
+    Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
 }
+void IP::CreateGoldenImage_Median(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nChipW, int nChipH)
+{
+    LPBYTE* pChipLT = new LPBYTE[imgNum];
+    byte* pResult = pDst;
+    byte* pHeader = NULL;
+
+    for (int k = 0; k < imgNum; k++)
+    {
+        pHeader = pSrc;
+        for (int idx = 0; idx < vtROILT[k].y; idx++)
+            pHeader += nMemW; // 처음부터 다시 nMemW 더해주지 않도록 코드 최적화 필요
+
+        pChipLT[k] = pHeader + vtROILT[k].x;
+    }
+
+    int blockEndWidth = nChipW / 32;
+    int blockEndHeight = nChipH;
+    int Width2 = nChipW % 32;
+
+    __m256i* pRst;
+    __m256i* (*pRef) = new __m256i * [imgNum];
+
+    __m256i Ref, Ref_High, Ref_Low;
+    __m256i Sum, Sum_High, Sum_Low;
+    __m256i Ref_Max, Ref_Max_High, Ref_Max_Low;
+    __m256i Ref_Min, Ref_Min_High, Ref_Min_Low;
+    __m256i ZeroData = _mm256_setzero_si256();
+
+    for (int r = 0; r < blockEndHeight; r++)
+    {
+        pRst = (__m256i*)(pResult);
+
+        for (int k = 0; k < imgNum; k++)
+            pRef[k] = (__m256i*)pChipLT[k];
+
+        for (int c = 0; c < blockEndWidth; c++, pRst++)
+        {
+            for (int k = 2; k < imgNum; k++)
+            {
+                if (k == 2)
+                {
+                    Ref = _mm256_loadu_si256(pRef[2]);
+
+                    Ref_Min = Ref;
+                    Ref_Max = Ref;
+
+                    Sum = Ref;
+                }
+                else
+                {
+                    Ref_Min = Sum;
+                    Ref_Max = Sum;
+                }
+
+                Sum_High = _mm256_unpackhi_epi8(Sum, ZeroData);
+                Sum_Low = _mm256_unpacklo_epi8(Sum, ZeroData);
+
+                for (int i = k - 2; i < k; i++)
+                {
+                    Ref = _mm256_loadu_si256(pRef[i]);
+
+                    Ref_Min = _mm256_min_epu8(Ref, Ref_Min);
+                    Ref_Max = _mm256_max_epu8(Ref, Ref_Max);
+
+                    Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
+                    Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
+
+                    Sum_High = _mm256_add_epi16(Sum_High, Ref_High);
+                    Sum_Low = _mm256_add_epi16(Sum_Low, Ref_Low);
+                }
+
+                Ref_Max_High = _mm256_unpackhi_epi8(Ref_Max, ZeroData);
+                Ref_Max_Low = _mm256_unpacklo_epi8(Ref_Max, ZeroData);
+
+                Sum_High = _mm256_sub_epi16(Sum_High, Ref_Max_High);
+                Sum_Low = _mm256_sub_epi16(Sum_Low, Ref_Max_Low);
+
+                Ref_Min_High = _mm256_unpackhi_epi8(Ref_Min, ZeroData);
+                Ref_Min_Low = _mm256_unpacklo_epi8(Ref_Min, ZeroData);
+
+                Sum_High = _mm256_sub_epi16(Sum_High, Ref_Min_High);
+                Sum_Low = _mm256_sub_epi16(Sum_Low, Ref_Min_Low);
+
+                Sum = _mm256_packus_epi16(Sum_Low, Sum_High);
+
+            }
+            _mm256_storeu_si256(pRst, Sum);
+            for (int k = 0; k < imgNum; k++)
+                pRef[k]++;
+        }
+
+        if (Width2 != 0) {
+            // 나머지 부분도 SSE로 구현
+            for (int k = 2; k < imgNum; k++)
+            {
+                if (k == 2)
+                {
+                    Ref = _mm256_loadu_si256(pRef[2]);
+
+                    Ref_Min = Ref;
+                    Ref_Max = Ref;
+
+                    Sum = Ref;
+                }
+                else
+                {
+                    Ref_Min = Sum;
+                    Ref_Max = Sum;
+                }
+
+                Sum_High = _mm256_unpackhi_epi8(Sum, ZeroData);
+                Sum_Low = _mm256_unpacklo_epi8(Sum, ZeroData);
+
+                for (int i = k - 2; i < k; i++)
+                {
+                    Ref = _mm256_loadu_si256(pRef[i]);
+
+                    Ref_Min = _mm256_min_epu8(Ref, Ref_Min);
+                    Ref_Max = _mm256_max_epu8(Ref, Ref_Max);
+
+                    Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
+                    Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
+
+                    Sum_High = _mm256_add_epi16(Sum_High, Ref_High);
+                    Sum_Low = _mm256_add_epi16(Sum_Low, Ref_Low);
+                }
+
+                Ref_Max_High = _mm256_unpackhi_epi8(Ref_Max, ZeroData);
+                Ref_Max_Low = _mm256_unpacklo_epi8(Ref_Max, ZeroData);
+
+                Sum_High = _mm256_sub_epi16(Sum_High, Ref_Max_High);
+                Sum_Low = _mm256_sub_epi16(Sum_Low, Ref_Max_Low);
+
+                Ref_Min_High = _mm256_unpackhi_epi8(Ref_Min, ZeroData);
+                Ref_Min_Low = _mm256_unpacklo_epi8(Ref_Min, ZeroData);
+
+                Sum_High = _mm256_sub_epi16(Sum_High, Ref_Min_High);
+                Sum_Low = _mm256_sub_epi16(Sum_Low, Ref_Min_Low);
+
+                Sum = _mm256_packus_epi16(Sum_Low, Sum_High);
+            }
+            for (int c = 0; c < Width2; c++)
+                pResult[c + blockEndWidth * 32] = Sum.m256i_i8[c];
+        }
+     
+        for (int k = 0; k < imgNum; k++)
+            pChipLT[k] += nMemW;
+
+        pResult += nChipW;
+    }
+    Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
+}
+void IP::CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nChipW, int nChipH)
+{
+    LPBYTE* pChipLT = new LPBYTE[imgNum];
+    byte* pResult = pDst;
+    byte* pHeader = NULL;
+
+    for (int k = 0; k < imgNum; k++)
+    {
+        pHeader = pSrc;
+        for (int idx = 0; idx < vtROILT[k].y; idx++)
+            pHeader += nMemW; // 처음부터 다시 nMemW 더해주지 않도록 코드 최적화 필요
+
+        pChipLT[k] = pHeader + vtROILT[k].x;
+    }
+
+    int blockEndWidth = nChipW / 32;
+    int blockEndHeight = nChipH;
+    int Width2 = nChipW % 32;
+
+    __m256i* pRst;
+    __m256i* (*pRef) = new __m256i * [imgNum];
+
+    __m256i Ref, Ref_High, Ref_Low;
+    __m256i Sum, Sum_High, Sum_Low;
+    __m256i Ref_Max, Ref_Max_High, Ref_Max_Low;
+    __m256i Ref_Min, Ref_Min_High, Ref_Min_Low;
+    __m256i ZeroData = _mm256_setzero_si256();
+    __m256i DivRefNum = _mm256_set_epi16((int)(imgNum / 3), (int)(imgNum / 3), (int)(imgNum / 3), (int)(imgNum / 3), (int)(imgNum / 3), (int)(imgNum / 3), (int)(imgNum / 3),
+        (int)(imgNum / 3), (int)(imgNum / 3), (int)(imgNum / 3), (int)(imgNum / 3), (int)(imgNum / 3), (int)(imgNum / 3), (int)(imgNum / 3), (int)(imgNum / 3), (int)(imgNum / 3));
+
+    for (int r = 0; r < blockEndHeight; r++)
+    {
+        pRst = (__m256i*)(pResult);
+
+        for (int k = 0; k < imgNum; k++)
+            pRef[k] = (__m256i*)pChipLT[k];
+
+        for (int c = 0; c < blockEndWidth; c++, pRst++)
+        {
+            if (imgNum <= 4)
+            {
+                Ref = _mm256_loadu_si256(pRef[0]);
+
+                Ref_Min = Ref;
+                Ref_Max = Ref;
+
+                Sum = Ref;
+                Sum_High = _mm256_unpackhi_epi8(Sum, ZeroData);
+                Sum_Low = _mm256_unpacklo_epi8(Sum, ZeroData);
+
+                for (int k = 1; k < imgNum; k++)
+                {
+                    Ref = _mm256_loadu_si256(pRef[k]);
+
+                    Ref_Min = _mm256_min_epu8(Ref, Ref_Min);
+                    Ref_Max = _mm256_max_epu8(Ref, Ref_Max);
+
+                    Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
+                    Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
+
+                    Sum_High = _mm256_add_epi16(Sum_High, Ref_High);
+                    Sum_Low = _mm256_add_epi16(Sum_Low, Ref_Low);
+                }
+
+                Ref_Max_High = _mm256_unpackhi_epi8(Ref_Max, ZeroData);
+                Ref_Max_Low = _mm256_unpacklo_epi8(Ref_Max, ZeroData);
+
+                Sum_High = _mm256_sub_epi16(Sum_High, Ref_Max_High);
+                Sum_Low = _mm256_sub_epi16(Sum_Low, Ref_Max_Low);
+
+                Ref_Min_High = _mm256_unpackhi_epi8(Ref_Min, ZeroData);
+                Ref_Min_Low = _mm256_unpacklo_epi8(Ref_Min, ZeroData);
+
+                Sum_High = _mm256_sub_epi16(Sum_High, Ref_Min_High);
+                Sum_Low = _mm256_sub_epi16(Sum_Low, Ref_Min_Low);
+
+                Sum_High = _mm256_srai_epi16(Sum_High, 1);
+                Sum_Low = _mm256_srai_epi16(Sum_Low, 1);
+
+                _mm256_storeu_si256(pRst, _mm256_packus_epi16(Sum_Low, Sum_High));
+
+                for (int k = 0; k < imgNum; k++)
+                    pRef[k]++;
+            }
+            else
+            {
+                Ref = _mm256_loadu_si256(pRef[0]);
+
+                Ref_Min = Ref;
+                Ref_Max = Ref;
+
+                Sum = Ref;
+                Sum_High = _mm256_unpackhi_epi8(Sum, ZeroData);
+                Sum_Low = _mm256_unpacklo_epi8(Sum, ZeroData);
+
+                for (int cnt = 0; cnt < imgNum / 3; cnt++)
+                {
+                    for (int k = cnt * 3; k < cnt * 3 + 3; k++)
+                    {
+                        Ref = _mm256_loadu_si256(pRef[k]);
+
+                        Ref_Min = _mm256_min_epu8(Ref, Ref_Min);
+                        Ref_Max = _mm256_max_epu8(Ref, Ref_Max);
+
+                        Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
+                        Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
+
+                        Sum_High = _mm256_add_epi16(Sum_High, Ref_High);
+                        Sum_Low = _mm256_add_epi16(Sum_Low, Ref_Low);
+                    }
+
+                    Ref_Max_High = _mm256_unpackhi_epi8(Ref_Max, ZeroData);
+                    Ref_Max_Low = _mm256_unpacklo_epi8(Ref_Max, ZeroData);
+
+                    Sum_High = _mm256_sub_epi16(Sum_High, Ref_Max_High);
+                    Sum_Low = _mm256_sub_epi16(Sum_Low, Ref_Max_Low);
+
+                    Ref_Min_High = _mm256_unpackhi_epi8(Ref_Min, ZeroData);
+                    Ref_Min_Low = _mm256_unpacklo_epi8(Ref_Min, ZeroData);
+
+                    Sum_High = _mm256_sub_epi16(Sum_High, Ref_Min_High);
+                    Sum_Low = _mm256_sub_epi16(Sum_Low, Ref_Min_Low);
+                }
+            }
+            Sum_High = _mm256_div_epi16(Sum_High, DivRefNum);
+            Sum_Low = _mm256_div_epi16(Sum_Low, DivRefNum);
+            _mm256_storeu_si256(pRst, _mm256_packus_epi16(Sum_Low, Sum_High));
+        }
+        if (Width2 != 0) {
+            if (imgNum <= 4)
+            {
+                Ref = _mm256_loadu_si256(pRef[0]);
+
+                Ref_Min = Ref;
+                Ref_Max = Ref;
+
+                Sum = Ref;
+                Sum_High = _mm256_unpackhi_epi8(Sum, ZeroData);
+                Sum_Low = _mm256_unpacklo_epi8(Sum, ZeroData);
+
+                for (int k = 1; k < imgNum; k++)
+                {
+                    Ref = _mm256_loadu_si256(pRef[k]);
+
+                    Ref_Min = _mm256_min_epu8(Ref, Ref_Min);
+                    Ref_Max = _mm256_max_epu8(Ref, Ref_Max);
+
+                    Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
+                    Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
+
+                    Sum_High = _mm256_add_epi16(Sum_High, Ref_High);
+                    Sum_Low = _mm256_add_epi16(Sum_Low, Ref_Low);
+                }
+
+                Ref_Max_High = _mm256_unpackhi_epi8(Ref_Max, ZeroData);
+                Ref_Max_Low = _mm256_unpacklo_epi8(Ref_Max, ZeroData);
+
+                Sum_High = _mm256_sub_epi16(Sum_High, Ref_Max_High);
+                Sum_Low = _mm256_sub_epi16(Sum_Low, Ref_Max_Low);
+
+                Ref_Min_High = _mm256_unpackhi_epi8(Ref_Min, ZeroData);
+                Ref_Min_Low = _mm256_unpacklo_epi8(Ref_Min, ZeroData);
+
+                Sum_High = _mm256_sub_epi16(Sum_High, Ref_Min_High);
+                Sum_Low = _mm256_sub_epi16(Sum_Low, Ref_Min_Low);
+
+                Sum_High = _mm256_srai_epi16(Sum_High, 1);
+                Sum_Low = _mm256_srai_epi16(Sum_Low, 1);
+
+                Sum = _mm256_packus_epi16(Sum_Low, Sum_High);
+
+                for (int c = 0; c < Width2; c++)
+                    pResult[c + blockEndWidth * 32] = Sum.m256i_i8[c];
+            }
+            else
+            {
+                Ref = _mm256_loadu_si256(pRef[0]);
+
+                Ref_Min = Ref;
+                Ref_Max = Ref;
+
+                Sum = Ref;
+                Sum_High = _mm256_unpackhi_epi8(Sum, ZeroData);
+                Sum_Low = _mm256_unpacklo_epi8(Sum, ZeroData);
+
+                for (int cnt = 0; cnt < imgNum / 3; cnt++)
+                {
+                    for (int k = cnt * 3; k < cnt * 3 + 3; k++)
+                    {
+                        Ref = _mm256_loadu_si256(pRef[k]);
+
+                        Ref_Min = _mm256_min_epu8(Ref, Ref_Min);
+                        Ref_Max = _mm256_max_epu8(Ref, Ref_Max);
+
+                        Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
+                        Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
+
+                        Sum_High = _mm256_add_epi16(Sum_High, Ref_High);
+                        Sum_Low = _mm256_add_epi16(Sum_Low, Ref_Low);
+                    }
+
+                    Ref_Max_High = _mm256_unpackhi_epi8(Ref_Max, ZeroData);
+                    Ref_Max_Low = _mm256_unpacklo_epi8(Ref_Max, ZeroData);
+
+                    Sum_High = _mm256_sub_epi16(Sum_High, Ref_Max_High);
+                    Sum_Low = _mm256_sub_epi16(Sum_Low, Ref_Max_Low);
+
+                    Ref_Min_High = _mm256_unpackhi_epi8(Ref_Min, ZeroData);
+                    Ref_Min_Low = _mm256_unpacklo_epi8(Ref_Min, ZeroData);
+
+                    Sum_High = _mm256_sub_epi16(Sum_High, Ref_Min_High);
+                    Sum_Low = _mm256_sub_epi16(Sum_Low, Ref_Min_Low);
+                }
+            }
+            Sum_High = _mm256_div_epi16(Sum_High, DivRefNum);
+            Sum_Low = _mm256_div_epi16(Sum_Low, DivRefNum);
+            Sum = _mm256_packus_epi16(Sum_Low, Sum_High);
+
+            for (int c = 0; c < Width2; c++)
+                pResult[c + blockEndWidth * 32] = Sum.m256i_i8[c];
+        }
+        for (int k = 0; k < imgNum; k++)
+            pChipLT[k] += nMemW;
+
+        pResult += nChipW;
+    }
+    Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
+}
+
 void IP::CreateGoldenImage_NearAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH)
 {
     Mat imgAccumlate = Mat::zeros(nROIH, nROIW, CV_16UC1);
@@ -641,159 +1107,44 @@ void IP::CreateGoldenImage_NearAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW
         cv::bitwise_or(imgDst, imgSrc & ~minDiff, imgDst);
     }
 }
-void IP::CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH)
-{
-    Mat imgAccumlate = Mat::zeros(nROIH, nROIW, CV_16UC1);
-    Mat imgDst = Mat(nROIH, nROIW, CV_8UC1, pDst);
-    Mat imgSrc;
 
-    short* imgROI = new short[(int64)nROIW * nROIH];
+void IP::MergeImage_Average(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nChipW, int nChipH)
+{
+    LPBYTE* pChipLT = new LPBYTE[imgNum];
     byte* pHeader = NULL;
 
-    if (imgNum <= 4)
+    for (int k = 0; k < imgNum; k++) 
     {
         pHeader = pSrc;
-        for (int idx = 0; idx < vtROILT[0].y; idx++)
-            pHeader += nMemW;
+        for (int idx = 0; idx < vtROILT[k].y; idx++)
+            pHeader += nMemW; // 처음부터 다시 nMemW 더해주지 않도록 코드 최적화 필요
 
-        pHeader += vtROILT[0].x;
-        for (int64 r = vtROILT[0].y; r < vtROILT[0].y + nROIH; r++, pHeader += nMemW)
-            std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[0].y)]); // byte* -> short*
-
-        Mat imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
-
-        Mat minImg = imgSrc.clone();
-        Mat maxImg = imgSrc.clone();
-
-        imgAccumlate = imgAccumlate + minImg;// pSrc[0]
-
-        for (int i = 1; i < imgNum; i++)
-        {
-            pHeader = pSrc;
-            for (int idx = 0; idx < vtROILT[i].y; idx++)
-                pHeader += nMemW;
-
-            pHeader += vtROILT[i].x;
-            for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
-                std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[i].y)]); // byte* -> short*
-
-            imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
-            
-            (cv::min)(imgSrc, minImg, minImg);
-            (cv::max)(imgSrc, maxImg, maxImg);
-
-            imgAccumlate = imgAccumlate + imgSrc;
-        }
-
-        cv::subtract(imgAccumlate, minImg, imgAccumlate);
-        cv::subtract(imgAccumlate, maxImg, imgAccumlate);
-
-        imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / (imgNum - 2));
+        pChipLT[k] = pHeader + vtROILT[k].x;
     }
-    else
-    {
-        pHeader = pSrc;
-        for (int idx = 0; idx < vtROILT[0].y; idx++)
-            pHeader += nMemW;
 
-        pHeader += vtROILT[0].x;
-        for (int64 r = vtROILT[0].y; r < vtROILT[0].y + nROIH; r++, pHeader += nMemW)
-            std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[0].y)]); // byte* -> short*
+    int nSum;
+    LPBYTE* p = new LPBYTE[imgNum];
+    byte* pResult = pDst;
+    for (int i = 0; i < nChipH; i++) {
+        for (int k = 0; k < imgNum; k++) 
+            p[k] = pChipLT[k];
 
-        imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
-   
-        Mat minImg = imgSrc.clone();
-        Mat maxImg = imgSrc.clone();
-
-        imgAccumlate = imgAccumlate + minImg;// pSrc[0]
-
-        for (int cnt = 0; cnt < imgNum / 3; cnt++)
-        {
-            for (int i = cnt * 3; i < cnt * 3 + 3; i++)
-            {
-                pHeader = pSrc;
-                for (int idx = 0; idx < vtROILT[i].y; idx++)
-                    pHeader += nMemW;
-
-                pHeader += vtROILT[i].x;
-                for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
-                    std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[i].y)]); // byte* -> short*
-
-                imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
-
-                (cv::min)(imgSrc, minImg, minImg);
-                (cv::max)(imgSrc, maxImg, maxImg);
-
-                imgAccumlate = imgAccumlate + imgSrc;
-
-                cv::subtract(imgAccumlate, minImg, imgAccumlate);
-                cv::subtract(imgAccumlate, maxImg, imgAccumlate);
+        for (int j = 0; j < nChipW; j++, pResult++) {
+            nSum = 0;
+            for (int k = 0; k < imgNum; k++) {
+                nSum += *p[k]++;
             }
+            if (nSum == 0)
+                *pResult = 0;
+            else				
+                *pResult = (BYTE)(nSum / imgNum);
         }
 
-        imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / (imgNum / 3));
+        for (int k = 0; k < imgNum; k++)
+            pChipLT[k] += nMemW;
     }
 }
-void IP::CreateGoldenImage_Median(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nROIW, int nROIH)
-{
-    Mat imgAccumlate = Mat::zeros(nROIH, nROIW, CV_16UC1);
-    Mat imgDst = Mat(nROIH, nROIW, CV_8UC1, pDst);
-    Mat imgSrc;
-    
-    Mat minImg;
-    Mat maxImg;
 
-    short* imgROI = new short[(int64)nROIW * nROIH];
-    byte* pHeader = NULL;
-
-    for (int i = 2; i < imgNum; i++)
-    {
-        if (i == 2)
-        {
-            pHeader = pSrc;
-            for (int idx = 0; idx < vtROILT[i].y; idx++)
-                pHeader += nMemW;
-
-            pHeader += vtROILT[i].x;
-            for (int64 r = vtROILT[i].y; r < vtROILT[i].y + nROIH; r++, pHeader += nMemW)
-                std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[i].y)]); // byte* -> short*
-
-            imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
-
-            minImg = imgSrc.clone();
-            maxImg = imgSrc.clone();
-
-            imgAccumlate = imgAccumlate + minImg;
-        }
-        else
-        {
-            minImg = imgAccumlate.clone();
-            maxImg = imgAccumlate.clone();
-        }
-
-        for (int j = i - 2; j < i; j++)
-        {
-            pHeader = pSrc;
-            for (int idx = 0; idx < vtROILT[j].y; idx++)
-                pHeader += nMemW;
-
-            pHeader += vtROILT[j].x;
-            for (int64 r = vtROILT[j].y; r < vtROILT[j].y + nROIH; r++, pHeader += nMemW)
-                std::copy(pHeader, pHeader + nROIW, &imgROI[nROIW * (r - (int64)vtROILT[j].y)]); // byte* -> short*
-
-            imgSrc = Mat(nROIH, nROIW, CV_16UC1, imgROI);
-
-            (cv::min)(imgSrc, minImg, minImg);
-            (cv::max)(imgSrc, maxImg, maxImg);
-
-            imgAccumlate = imgAccumlate + imgSrc;
-        }
-
-        cv::subtract(imgAccumlate, minImg, imgAccumlate);
-        cv::subtract(imgAccumlate, maxImg, imgAccumlate);
-    }
-    imgAccumlate.convertTo(imgDst, CV_8UC1);
-}
 // D2D 3.0
 void IP::CreateDiffScaleMap(BYTE* pSrc, float* pDst, int nW, int nH, int nEdgeSuppressionLev, int nBrightSuppressionLev)
 {

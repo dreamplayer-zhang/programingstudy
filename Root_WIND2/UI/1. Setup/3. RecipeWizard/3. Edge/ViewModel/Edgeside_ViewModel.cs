@@ -90,7 +90,7 @@ namespace Root_WIND2
 
 		public void UI_Redraw()
 		{
-			SetupVM.LoadParameter();
+			//SetupVM.LoadParameter();
 		}
 
 	}

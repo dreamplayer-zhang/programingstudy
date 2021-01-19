@@ -640,7 +640,7 @@ namespace Root_AOP01_Packing.Module
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
             AddModuleRunList(new Run_Solvalve(this), false, "Run Solvalve");
             AddModuleRunList(new Run_Rotate(this), false, "Run Rotate");
-            AddModuleRunList(new Run_Cover(this), false, "Run Cover Open, Close, Head Up");
+            AddModuleRunList(new Run_Cover(this), true, "Run Cover Open, Close, Head Up");
             AddModuleRunList(new Run_Taping(this), true, "Run Taping");
         }
 

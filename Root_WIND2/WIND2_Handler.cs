@@ -495,9 +495,6 @@ namespace Root_WIND2
                     if (bUndock)
                     {
                         loadport.StartRunUndocking();
-                        m_process.ClearInfoWafer();
-                        loadport.p_infoCarrier.ClearInfoWafer();
-                        loadport.p_infoCarrier.RunTreeWafer(Tree.eMode.Init);
                         EQ.p_eState = EQ.eState.Ready;
                     }
                 }
