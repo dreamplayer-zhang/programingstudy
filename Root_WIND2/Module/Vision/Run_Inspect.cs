@@ -113,7 +113,7 @@ namespace Root_WIND2.Module
                     {
                         inspectionFront.Stop();
                         return "OK";
-
+                    }
                     // 위에서 아래로 찍는것을 정방향으로 함, 즉 Y축 값이 큰쪽에서 작은쪽으로 찍는것이 정방향
                     // Grab하기 위해 이동할 Y축의 시작 끝 점
                     //ybkwon0113

@@ -54,7 +54,6 @@ namespace Root_WIND2
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS_ALL, 1, true);
 
             WIND2EventManager.SnapDone += SnapDone_Callback;
-            WIND2EventManager.InspectionDone += InspectionDone_Callback;
         }
 
         /// <summary>
