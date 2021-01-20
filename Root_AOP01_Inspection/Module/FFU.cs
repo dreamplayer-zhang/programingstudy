@@ -289,7 +289,7 @@ namespace Root_AOP01_Inspection.Module
 				//}
 			}
 
-			int m_lFan = 2;
+			int m_lFan = 6;
 			public void RunTreeUnit(Tree tree)
 			{
 				p_sUnit = tree.Set(p_sUnit, p_sUnit, "Unit ID", "Unit ID");

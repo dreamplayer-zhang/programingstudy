@@ -54,6 +54,7 @@ namespace Root_AOP01_Inspection
             InitModule(m_aop01); 
             InitWTR();
             InitLoadport();
+            InitRFID();
             m_mainVision = new MainVision("MainVision", m_engineer);
             InitModule(m_mainVision);
             IWTR iWTR = (IWTR)m_wtr;
@@ -144,6 +145,19 @@ namespace Root_AOP01_Inspection
                 InitModule(module);
                 m_aLoadport.Add((ILoadport)module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
+            }
+        }
+
+        void InitRFID()
+        {
+            ModuleBase module;
+            char cID = 'A';
+            for (int n = 0; n < m_lLoadport; n++, cID++)
+            {
+                string sID = "Rfid" + cID;
+                module = new RFID_Ceyon(sID, m_engineer, m_aLoadport[n]);
+                InitModule(module);
+
             }
         }
 

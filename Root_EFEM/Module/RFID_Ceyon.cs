@@ -7,12 +7,25 @@ using RootTools.Comm;
 using RootTools.Module;
 using RootTools;
 using System.Threading;
+using RootTools.Trees;
+using RootTools.OHTNew;
 
 namespace Root_EFEM.Module
 {
     public class RFID_Ceyon : ModuleBase
     {
         RS232 m_rs232;
+        public IHandler m_handler;
+        public ILoadport m_loadport;
+
+        public RFID_Ceyon(string sID, IEngineer engineer, ILoadport loadport)
+        {
+            p_id = sID;
+            this.InitBase(sID, engineer);
+            m_handler = engineer.ClassHandler();
+            m_loadport = loadport;
+
+        }
 
         #region CRC
         ushort[] m_uCRC =
@@ -74,7 +87,7 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-
+        #region RS232
         public override void GetTools(bool bInit)
         {
             p_sInfo = GetTools(this, bInit);
@@ -113,7 +126,7 @@ namespace Root_EFEM.Module
             m_aCmd[5] = nCh;
             CalcSend();
             m_rs232.m_sp.Write(m_aSend, 0, 15);
-            while(m_swRead.ElapsedMilliseconds < 10000)
+            while (m_swRead.ElapsedMilliseconds < 10000)
             {
                 if (m_bOnRead == false)
                 {
@@ -124,6 +137,67 @@ namespace Root_EFEM.Module
             }
             sRFID = "";
             return "RFID Read Fail : Timeout";
+        }
+        #endregion
+
+        public string StartRunReadRFID()
+        {
+            ModuleRunBase run = m_runReadRFID.Clone();
+            StartRun(run);
+            while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+            return EQ.IsStop() ? "EQ Stop" : "OK";
+        }
+
+        public ModuleRunBase m_runReadRFID;
+        protected override void InitModuleRuns()
+        {
+            m_runReadRFID = AddModuleRunList(new Run_ReadRFID(this, m_loadport), false, "Read RFID");
+        }
+        public class Run_ReadRFID : ModuleRunBase
+        {
+            RFID_Ceyon m_module;
+            ILoadport m_loadport;
+            //Loadport_Cymechs m_loadport;
+            public Run_ReadRFID(RFID_Ceyon module, ILoadport loadport)
+            {
+                m_module = module;
+                m_loadport = loadport;
+                InitModuleRun(module);
+            }
+
+            int m_nCh = 1;
+            string m_sSimulCarrierID = "CarrierID";
+            public override ModuleRunBase Clone()
+            {
+                Run_ReadRFID run = new Run_ReadRFID(m_module, m_loadport);
+                run.m_nCh = m_nCh;
+                run.m_sSimulCarrierID = m_sSimulCarrierID;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_nCh = tree.Set(m_nCh, m_nCh, "Channel", "RFID Channel", bVisible);
+                m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation", bVisible && EQ.p_bSimulate);
+            }
+
+            #region ModuleRun
+
+            public override string Run()
+            {
+                string sResult = "OK";
+                string sCarrierID = "";
+                if (EQ.p_bSimulate) sCarrierID = m_sSimulCarrierID;
+                else
+                {
+                    sResult = m_module.ReadRFID((byte)m_nCh, out sCarrierID);
+                    m_loadport.p_infoCarrier.p_sCarrierID = (sResult == "OK") ? sCarrierID : "";
+
+                }
+                if (sResult == "OK") m_loadport.p_infoCarrier.SendCarrierID(sCarrierID);
+                return sResult;
+            }
+            #endregion
         }
     }
 }

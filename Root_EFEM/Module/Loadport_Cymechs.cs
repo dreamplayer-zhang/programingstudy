@@ -643,11 +643,11 @@ namespace Root_EFEM.Module
         public override string StateReady()
         {
             CheckPlaced();
-/*            if (m_infoCarrier.m_bReqReadCarrierID)
-            {
-                m_infoCarrier.m_bReqReadCarrierID = false;
-                StartRun(m_runReadPodID);
-            } */
+            //if (p_infoCarrier.m_bReqReadCarrierID)
+            //{
+            //    p_infoCarrier.m_bReqReadCarrierID = false;
+            //    StartRun(m_runReadPodID);
+            //}
             if (p_infoCarrier.m_bReqLoad)
             {
                 p_infoCarrier.m_bReqLoad = false;

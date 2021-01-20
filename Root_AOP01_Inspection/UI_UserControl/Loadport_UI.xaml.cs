@@ -34,9 +34,11 @@ namespace Root_AOP01_Inspection.UI_UserControl
         {
             m_loadport = (Loadport_Cymechs)loadport;
             m_infoCarrier = m_loadport.p_infoCarrier;
+            
             m_engineer = engineer;
             m_handler = engineer.m_handler;
             this.DataContext = loadport;
+
             textBoxPodID.DataContext = loadport.p_infoCarrier;
             textBoxLotID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
             textBoxSlotID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
@@ -74,7 +76,6 @@ namespace Root_AOP01_Inspection.UI_UserControl
         }
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-                //RFID
         }
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
