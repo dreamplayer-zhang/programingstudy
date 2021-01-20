@@ -160,6 +160,13 @@ namespace RootTools_Vision
 
             if (File.Exists(recipePath))
             {
+                string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                using (StreamWriter writer = new StreamWriter(recipePath, true))
+                {
+                    writer.WriteLine(time + " - LoadRecipe()");
+                }
+
                 this.RecipePath = (string)recipePath.Clone();
 
                 recipePath = recipePath.Replace(".rcp", "");
@@ -224,6 +231,13 @@ namespace RootTools_Vision
 
         public bool Save(string recipePath)
         {
+            string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            using (StreamWriter writer = new StreamWriter(recipePath, true))
+            {
+                writer.WriteLine(time + " - SaveRecipe()");
+            }
+
             bool rst = true;
             this.RecipePath = (string)recipePath.Clone();
 
@@ -232,6 +246,8 @@ namespace RootTools_Vision
             string recipeFolderPath = recipePath.Substring(0 ,recipePath.LastIndexOf("\\") + 1);
 
             this.RecipeFolderPath = (string)recipeFolderPath.Clone();
+
+
 
             // Xml 파일을 읽은 뒤 이미지나 ROI 등을 불러오기 위해서 각 class에 대한 Save 함수를 호출한다.
             foreach (ParameterBase param in this.ParameterItemList)

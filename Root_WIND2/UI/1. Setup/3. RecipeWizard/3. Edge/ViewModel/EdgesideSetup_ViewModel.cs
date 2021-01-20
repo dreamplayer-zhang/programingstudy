@@ -83,9 +83,9 @@ namespace Root_WIND2
 					roiHeight_Side = value;
 				if (IsBtmChecked)
 					roiHeight_Btm = value;
-				
-				//SetParameter();
-			}
+
+                SetParameter();
+            }
 		}
 		public int ROIWidth 
 		{
@@ -103,8 +103,8 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					roiWidth_Btm = value;
 
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int Threshold
 		{
@@ -122,8 +122,8 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					threshold_Btm = value;
 
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int DefectSizeMin
 		{
@@ -141,8 +141,8 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					defectSizeMin_Btm = value;
 
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int MergeDist
 		{
@@ -160,8 +160,8 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					mergeDist_Btm = value;
 
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int IllumWhite
 		{
@@ -179,8 +179,8 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					illumWhite_Btm = value;
 
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int IllumSide
 		{
@@ -198,8 +198,8 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					illumSide_Btm = value;
 
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 
 		public bool IsTopChecked
@@ -518,8 +518,8 @@ namespace Root_WIND2
 
 		private void BeforeRecipeSave_Callback(object obj, RecipeEventArgs args)
 		{
-			//SetParameter();
-		}
+            //SetParameter(); // 이건 이제.. 필요없을듯
+        }
 
 		private void ProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs e)
 		{
