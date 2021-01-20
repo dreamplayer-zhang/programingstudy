@@ -212,8 +212,6 @@ namespace Root_AOP01_Inspection
         private void ButtonStop_Click(object sender, RoutedEventArgs e)
         {
             EQ.p_bStop = true;
-            while(IsRunModule())
-            EQ.p_eState = EQ.eState.Ready;  //확인 필요
         }
     }
 }
