@@ -233,7 +233,7 @@ namespace Root_WIND2
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
             OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 
-            recipe.LoadMasterImage();
+            //recipe.LoadMasterImage();
 
             originRecipe.OriginX = memPt.X;
             originRecipe.OriginY = memPt.Y;
