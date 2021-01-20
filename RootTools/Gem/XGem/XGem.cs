@@ -612,8 +612,7 @@ namespace RootTools.Gem.XGem
                 cSlot += '0'; 
                 sMap += cSlot;
             }
-            long nError = m_xGem.CMSSetSlotMap(carrier.
-                p_sLocID, sMap, carrier.p_sCarrierID, 0);
+            long nError = m_xGem.CMSSetSlotMap(carrier.p_sLocID, sMap, carrier.p_sCarrierID, 0);
             LogSend(nError, "CMSSetSlotMap", carrier.p_sLocID, sMap, carrier.p_sCarrierID, 0);
         }
 

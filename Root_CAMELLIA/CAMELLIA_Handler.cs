@@ -156,20 +156,6 @@ namespace Root_CAMELLIA
             }
         }
 
-        public List<IRFID> m_aRFID = new List<IRFID>();
-        void InitRFID()
-        {
-            ModuleBase module;
-            char cID = 'A';
-            for(int n=0; n<m_lLoadport; n++, cID++)
-            {
-                string sID = "Rfid" + cID;
-                module = new RFID_Brooks(sID, m_engineer);
-                InitModule(module);
-                m_aRFID.Add((IRFID)module);
-            }
-        }
-
         public void RunTreeLoadport(Tree tree)
         {
             m_lLoadport = tree.Set(m_lLoadport, m_lLoadport, "Count", "Loadport Count");
@@ -178,6 +164,22 @@ namespace Root_CAMELLIA
             for (int n = 0; n < m_lLoadport; n++)
             {
                 m_aLoadportType[n] = (eLoadport)treeType.Set(m_aLoadportType[n], m_aLoadportType[n], n.ToString("00"), "Loadport Type");
+            }
+        }
+        #endregion
+
+        #region Module RFID
+        public List<IRFID> m_aRFID = new List<IRFID>();
+        void InitRFID()
+        {
+            ModuleBase module;
+            char cID = 'A';
+            for (int n = 0; n < m_lLoadport; n++, cID++)
+            {
+                string sID = "Rfid" + cID;
+                module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]);
+                InitModule(module);
+                m_aRFID.Add((IRFID)module);
             }
         }
         #endregion

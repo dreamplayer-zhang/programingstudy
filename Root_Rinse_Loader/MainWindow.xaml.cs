@@ -14,6 +14,7 @@ namespace Root_Rinse_Loader
         {
             InitializeComponent();
             comboMain.ItemsSource = new string[] { "Main UI", "Engineer" };
+            comboMain.SelectedIndex = 0; 
         }
 
         #region Loaded

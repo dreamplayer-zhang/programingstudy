@@ -5,6 +5,7 @@ using RootTools.Gem;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -165,6 +166,37 @@ namespace Root_Rinse_Unloader.Engineer
                         break;
                 }
             }
+        }
+        #endregion
+
+        #region PickerSet
+        BackgroundWorker m_bgwPickerSet = new BackgroundWorker();
+        void InitBackgroundWorker()
+        {
+            m_bgwPickerSet.DoWork += M_bgwPickerSet_DoWork;
+        }
+
+        private void M_bgwPickerSet_DoWork(object sender, DoWorkEventArgs e)
+        {
+            RunPickerSet();
+        }
+
+        string RunPickerSet()
+        {
+            m_loader.m_bPickersetMode = true;
+            m_storage.StartMoveStackReady();
+            EQ.p_eState = EQ.eState.Run;
+            while (m_storage.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+            if (EQ.IsStop()) return "EQ Stop";
+            m_loader.StartPickerSet();
+            EQ.p_eState = EQ.eState.Run;
+            return "OK";
+        }
+
+        public string StartPickerSet()
+        {
+            m_bgwPickerSet.RunWorkerAsync();
+            return "OK";
         }
         #endregion
 
