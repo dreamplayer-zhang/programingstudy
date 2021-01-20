@@ -12,23 +12,19 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Recipe = RootTools_Vision.Recipe;
+using RecipeBase = RootTools_Vision.RecipeBase;
 
 namespace Root_WIND2
 {
     class MapControl_ViewModel : ObservableObject
     {
-        Recipe m_Recipe;
 
         public delegate void setMasterDie(object e);
         public event setMasterDie SetMasterDie;
         public int[] Map;
         CPoint MapSize;
-        public MapControl_ViewModel(Recipe recipe = null)
+        public MapControl_ViewModel()
         {
-            if(recipe != null)
-                m_Recipe = recipe;
-
             WorkEventManager.WorkplaceStateChanged += MapStateChanged_Callback;
         }
 
@@ -186,58 +182,63 @@ namespace Root_WIND2
             if(masterDie.X != -1)
                 p_MapItems[this.MapSize.Y * masterDie.X + masterDie.Y].Background = Brushes.Purple;
         }
-        public void SetMap(int[] map = null, CPoint mapsize = null)
+        public void SetMap()
         {
-            if (map == null)
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            RecipeType_WaferMap waferMap = recipe.WaferMap;
+            if(waferMap.Data == null || waferMap.Data.Length == 0)
             {
-                map = Map;
-                mapsize = MapSize;
+                waferMap.CreateWaferMap(1, 1, new int[1] { 1 });
             }
 
-            MapSize = new CPoint(mapsize.X, mapsize.Y);
-            Map = new int[mapsize.X * mapsize.Y];
-            Map = map;
+            MapSize = new CPoint(waferMap.MapSizeX, waferMap.MapSizeY);
+            Map = new int[MapSize.X * MapSize.Y];
+            Map = waferMap.Data;
 
             CreateMapUI();
             
         }
-        public void SetMap(bool addEvent, CPoint masterDie, int[] map = null, CPoint mapsize = null)
+        public void SetMap(bool addEvent, CPoint masterDie)
         {
-            if (map == null)
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            RecipeType_WaferMap waferMap = recipe.WaferMap;
+            if (waferMap.Data == null || waferMap.Data.Length == 0)
             {
-                map = Map;
-                mapsize = MapSize;
+                waferMap.CreateWaferMap(1, 1, new int[1] { 1 });
             }
 
-            MapSize = new CPoint(mapsize.X, mapsize.Y);
-            Map = new int[mapsize.X * mapsize.Y];
-            Map = map;
+            MapSize = new CPoint(waferMap.MapSizeX, waferMap.MapSizeY);
+            Map = new int[MapSize.X * MapSize.Y];
+            Map = waferMap.Data;
 
             CreateMap_OriginToolUI(addEvent, masterDie);
         }
         private void MAP_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+
             Grid selected = (Grid)sender;
             CPoint pos = (CPoint)selected.Tag;
 
             if (this.Map[this.MapSize.X * pos.Y + pos.X] != (int)CHIP_TYPE.NO_CHIP)
             {
-                p_MapItems[this.MapSize.Y * m_Recipe.WaferMap.MasterDieX + m_Recipe.WaferMap.MasterDieY].Background = Brushes.Green;             
+                p_MapItems[this.MapSize.Y * recipe.WaferMap.MasterDieX + recipe.WaferMap.MasterDieY].Background = Brushes.Green;             
                 selected.Background = Brushes.Purple;
 
-                m_Recipe.WaferMap.MasterDieX = pos.X;
-                m_Recipe.WaferMap.MasterDieY = pos.Y;
+                recipe.WaferMap.MasterDieX = pos.X;
+                recipe.WaferMap.MasterDieY = pos.Y;
 
                 SetMasterDie(pos);
             }
         }
         public void ChangeMasterImage(int dieX, int dieY)
         {
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
             if (this.Map.Length == 0) return;
 
             if(this.Map[this.MapSize.X * dieY + dieX] != (int)CHIP_TYPE.NO_CHIP)
             {
-                p_MapItems[this.MapSize.Y * m_Recipe.WaferMap.MasterDieX + m_Recipe.WaferMap.MasterDieY].Background = Brushes.Green;
+                p_MapItems[this.MapSize.Y * recipe.WaferMap.MasterDieX + recipe.WaferMap.MasterDieY].Background = Brushes.Green;
                 p_MapItems[this.MapSize.Y * dieX + dieY].Background = Brushes.Purple;
             }
         }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class SurfaceRecipe : RecipeBase
+    public class SurfaceRecipe : RecipeItemBase
     {
         int test = 0;
 

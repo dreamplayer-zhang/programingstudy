@@ -19,8 +19,6 @@ namespace Root_WIND2
 {
 	class EBRSetup_ViewModel : ObservableObject
 	{
-		Recipe recipe;
-		private WIND2_Engineer engineer;
 		private Setup_ViewModel setupVM;
 		private RootViewer_ViewModel drawToolVM;
 
@@ -237,16 +235,17 @@ namespace Root_WIND2
 
 		public EBRSetup_ViewModel()
 		{
-			engineer = ProgramManager.Instance.Engineer;
+			
 		}
 
 		public void Init(Setup_ViewModel _setup)
 		{
 			this.setupVM = _setup;
-			this.recipe = _setup.Recipe;
+
+			
 
 			DrawToolVM = new RootViewer_ViewModel();
-			DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EBR), ProgramManager.Instance.DialogService);
+			DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EBRImage"), GlobalObjects.Instance.Get<DialogService>());
 
 			WIND2EventManager.BeforeRecipeSave += BeforeRecipeSave_Callback;
 			WorkEventManager.InspectionDone += InspectionDone_Callback;
@@ -256,7 +255,7 @@ namespace Root_WIND2
 		public void Scan()
 		{
 			EQ.p_bStop = false;
-			EdgeSideVision edgeSideVision = ((WIND2_Handler)engineer.ClassHandler()).p_EdgeSideVision;
+			EdgeSideVision edgeSideVision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
 			if (edgeSideVision.p_eState != ModuleBase.eState.Ready)
 			{
 				MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
@@ -269,28 +268,32 @@ namespace Root_WIND2
 
 		public void Inspect()
 		{
-			ProgramManager.Instance.InspectionEBR.Start();
+			GlobalObjects.Instance.Get<InspectionManagerEBR>().Start();			
 		}
 
 		public void LoadParameter()
 		{
-			if (recipe.GetRecipe<EBRParameter>() == null)
+			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+
+			if (recipe.GetItem<EBRParameter>() == null)
 				return;
 
-			roiWidth = recipe.GetRecipe<EBRParameter>().RoiWidth;
-			roiHeight = recipe.GetRecipe<EBRParameter>().RoiHeight;
-			notchY = recipe.GetRecipe<EBRParameter>().NotchY;
-			stepDegree = recipe.GetRecipe<EBRParameter>().StepDegree;
-			xRange = recipe.GetRecipe<EBRParameter>().XRange;
-			diffEdge = recipe.GetRecipe<EBRParameter>().DiffEdge;
-			diffBevel = recipe.GetRecipe<EBRParameter>().DiffBevel;
-			diffEBR = recipe.GetRecipe<EBRParameter>().DiffEBR;
-			offsetBevel = recipe.GetRecipe<EBRParameter>().OffsetBevel;
-			offsetEBR = recipe.GetRecipe<EBRParameter>().OffsetEBR;
+			roiWidth = recipe.GetItem<EBRParameter>().RoiWidth;
+			roiHeight = recipe.GetItem<EBRParameter>().RoiHeight;
+			notchY = recipe.GetItem<EBRParameter>().NotchY;
+			stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
+			xRange = recipe.GetItem<EBRParameter>().XRange;
+			diffEdge = recipe.GetItem<EBRParameter>().DiffEdge;
+			diffBevel = recipe.GetItem<EBRParameter>().DiffBevel;
+			diffEBR = recipe.GetItem<EBRParameter>().DiffEBR;
+			offsetBevel = recipe.GetItem<EBRParameter>().OffsetBevel;
+			offsetEBR = recipe.GetItem<EBRParameter>().OffsetEBR;
 		}
 
 		public void SetParameter()
 		{
+			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+
 			EBRParameter param = new EBRParameter();
 			param.RoiWidth = roiWidth;
 			param.RoiHeight = roiHeight;
@@ -340,6 +343,8 @@ namespace Root_WIND2
 
 		private void UpdateDataGrid()
 		{
+			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 			string sRecipeID = recipe.Name;
 			string sReicpeFileName = sRecipeID + ".rcp";

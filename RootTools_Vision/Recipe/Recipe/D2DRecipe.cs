@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class D2DRecipe : RecipeBase
+    public class D2DRecipe : RecipeItemBase
     {
         public D2DRecipe()
         {

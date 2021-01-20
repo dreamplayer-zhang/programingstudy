@@ -242,6 +242,9 @@ namespace RootTools_Vision.Utility
 			tempString = string.Format("TiffFilename " + tiffFileName + ";\n");
 			sw.Write(tempString);
 		}
+
+
+
 		public void SetMEMMAP(RecipeType_WaferMap _mapdata)
 		{
 			tempString = string.Format("[P=" + partID + " ");        // Part ID : 현재 없음

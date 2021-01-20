@@ -17,27 +17,27 @@ namespace Root_WIND2
 
         public delegate void setOrigin(object e);
         public event setOrigin SetOrigin;
-        Recipe m_Recipe;
 
-        public void init(Setup_ViewModel setup, Recipe recipe)
+        public void init(Setup_ViewModel setup)
         {
-            m_Recipe = recipe;
             this.setup = setup;
             p_OriginBoxTool_VM = new FrontsideOriginBox_ViewModel();
-            p_OriginBoxTool_VM.init(setup, recipe);
+            p_OriginBoxTool_VM.init(setup);
             p_OriginBoxTool_VM.BoxDone += P_BoxTool_VM_BoxDone;
 
-            MapControl_VM = new MapControl_ViewModel(recipe);
-            MapControl_VM.SetMap(setup.Recipe.WaferMap.Data, new CPoint(14, 14));
+            MapControl_VM = new MapControl_ViewModel();
+            MapControl_VM.SetMap();
 
-            p_OriginTool_VM = new FrontsideOriginTool_ViewModel(recipe);
+            p_OriginTool_VM = new FrontsideOriginTool_ViewModel();
             p_OriginTool_VM.AddOrigin += P_OriginTool_VM_AddOrigin;
             p_OriginTool_VM.AddPitch += P_OriginTool_VM_AddPitch;
             p_OriginTool_VM.DelegateInspArea += P_OriginTool_VM_DelegateInspArea;
 
-            MasterDieX = m_Recipe.WaferMap.MasterDieX;
-            MasterDieY = m_Recipe.WaferMap.MasterDieY;
-            mapControl_VM.ChangeMasterImage(m_Recipe.WaferMap.MasterDieX, masterDieY);
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+
+            MasterDieX = recipe.WaferMap.MasterDieX;
+            MasterDieY = recipe.WaferMap.MasterDieY;
+            mapControl_VM.ChangeMasterImage(recipe.WaferMap.MasterDieX, masterDieY);
         }
         public void SetPage()
         {
@@ -87,7 +87,7 @@ namespace Root_WIND2
         {
             get
             {
-                mapControl_VM.ChangeMasterImage(masterDieX, m_Recipe.WaferMap.MasterDieY);                
+                mapControl_VM.ChangeMasterImage(masterDieX, GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieY);                
                 return masterDieX;
             }
             set
@@ -96,11 +96,11 @@ namespace Root_WIND2
 
                 if (val < 0)
                     val = 0;
-                if (val > m_Recipe.WaferMap.MapSizeX)
-                    val = m_Recipe.WaferMap.MapSizeX - 1;
+                if (val > GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MapSizeX)
+                    val = GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MapSizeX - 1;
 
                 SetProperty(ref masterDieX, value);
-                m_Recipe.WaferMap.MasterDieX = masterDieX;
+                GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieX = masterDieX;
             }
         }
         private int masterDieY = 5;
@@ -108,7 +108,7 @@ namespace Root_WIND2
         {
             get
             {                
-                mapControl_VM.ChangeMasterImage(m_Recipe.WaferMap.MasterDieX, masterDieY);
+                mapControl_VM.ChangeMasterImage(GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieX, masterDieY);
                 return masterDieY;
             }
             set
@@ -120,22 +120,22 @@ namespace Root_WIND2
                     
                     if (val < 0)
                         val = 0;
-                    if (val > m_Recipe.WaferMap.MapSizeY)
-                        val = m_Recipe.WaferMap.MapSizeY - 1;
+                    if (val > GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MapSizeY)
+                        val = GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MapSizeY - 1;
 
-                    if (map[masterDieX + (val * m_Recipe.WaferMap.MapSizeX)] == (int)CHIP_TYPE.NO_CHIP)
+                    if (map[masterDieX + (val * GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MapSizeX)] == (int)CHIP_TYPE.NO_CHIP)
                     {
                         int pos = 0;
                         while (true)
                         {
                             if (val - pos >= 0)
-                                if (map[masterDieX + ((val - pos) * m_Recipe.WaferMap.MapSizeX)] == (int)CHIP_TYPE.NORMAL)
+                                if (map[masterDieX + ((val - pos) * GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MapSizeX)] == (int)CHIP_TYPE.NORMAL)
                                 {
                                     masterDieY = val - pos;
                                     break;
                                 }
-                            if (val + pos < m_Recipe.WaferMap.MapSizeY)                
-                                if (map[masterDieX + ((val + pos) * m_Recipe.WaferMap.MapSizeX)] == (int)CHIP_TYPE.NORMAL)
+                            if (val + pos < GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MapSizeY)                
+                                if (map[masterDieX + ((val + pos) * GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MapSizeX)] == (int)CHIP_TYPE.NORMAL)
                                 {
                                     masterDieY = val + pos;
                                     break;
@@ -144,17 +144,17 @@ namespace Root_WIND2
 
                             if (pos > 100)
                             {
-                                masterDieY = m_Recipe.WaferMap.MapSizeX / 2;
+                                masterDieY = GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MapSizeX / 2;
                                 break;
                             }
                         }
                         SetProperty(ref masterDieY, masterDieY);
-                        m_Recipe.WaferMap.MasterDieY = masterDieY;
+                        GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieY = masterDieY;
                     }
                     else
                     {
                         SetProperty(ref masterDieY, val);
-                        m_Recipe.WaferMap.MasterDieY = masterDieY;
+                        GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieY = masterDieY;
                     }
                 }  
             }
@@ -205,7 +205,7 @@ namespace Root_WIND2
         #endregion
         public void LoadOriginData()
         {
-            OriginRecipe origin = m_Recipe.GetRecipe<OriginRecipe>();
+            OriginRecipe origin = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
             CPoint ptOrigin = new CPoint(origin.OriginX, origin.OriginY);
             CPoint ptPitchSize = new CPoint(origin.DiePitchX, origin.DiePitchY);
             CPoint ptPadding = new CPoint(origin.InspectionBufferOffsetX, origin.InspectionBufferOffsetY);
@@ -266,26 +266,26 @@ namespace Root_WIND2
         }
         private void DrawMapData()
         {
-            RecipeType_WaferMap mapdata = m_Recipe.WaferMap;
+            RecipeType_WaferMap mapdata = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
             if (mapdata.Data.Length > 0)
             {
                 int nMapX = mapdata.MapSizeX;
                 int nMapY = mapdata.MapSizeY;
 
-                MapControl_VM.SetMap(true, new CPoint(mapdata.MasterDieX, mapdata.MasterDieY), mapdata.Data, new CPoint(nMapX, nMapY));
+                MapControl_VM.SetMap(true, new CPoint(mapdata.MasterDieX, mapdata.MasterDieY));
             }
             else
             {
-                MapControl_VM.SetMap(true, new CPoint(0, 5), setup.Recipe.WaferMap.Data, new CPoint(14, 14));
+                MapControl_VM.SetMap(true, new CPoint(0, 0));
             }
         }
         private void SetMapData()
         {
-            MapSzX = m_Recipe.WaferMap.MapSizeX;
-            MapSzY = m_Recipe.WaferMap.MapSizeY;
+            MapSzX = GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MapSizeX;
+            MapSzY = GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MapSizeY;
 
-            MasterDieX = m_Recipe.WaferMap.MasterDieX;
-            MasterDieY = m_Recipe.WaferMap.MasterDieY;
+            MasterDieX = GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieX;
+            MasterDieY = GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieY;
         }
 
         public void Load()

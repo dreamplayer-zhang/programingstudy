@@ -41,6 +41,8 @@ namespace Root_WIND2.Module
 
         const int PULSE_TO_UM = 10;
 
+        public double m_dVRSToAlignOffsetZ = 0;
+
         public GrabMode m_grabMode = null;
         string m_sGrabMode = "";
 
@@ -74,6 +76,7 @@ namespace Root_WIND2.Module
             run.m_AlignCamResolution = m_AlignCamResolution;
             run.m_AlignCount = m_AlignCount;
             run.p_sGrabMode = p_sGrabMode;
+            run.m_dVRSToAlignOffsetZ = m_dVRSToAlignOffsetZ;
             return run;
         }
 
@@ -87,14 +90,38 @@ namespace Root_WIND2.Module
             m_AlignCamResolution = tree.Set(m_AlignCamResolution, m_AlignCamResolution, "Align Cam Resolution", "Align Cam Resolution", bVisible);
             m_AlignCount = tree.Set(m_AlignCount, m_AlignCount, "Align count", "Align Count", bVisible);
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+            m_dVRSToAlignOffsetZ = tree.Set(m_dVRSToAlignOffsetZ, m_dVRSToAlignOffsetZ, "VRS To Align Offset Z Pos", "VRS To Align Offset Z Pos", bVisible);
         }
 
         public override string Run()
         {
+            StopWatch sw = new StopWatch();
+
+            sw.Start();
+            if (m_CamAlign == null) return "Cam == null";
+
+            m_CamAlign.Connect();
+            while (!m_CamAlign.m_ConnectDone)
+            {
+                if (EQ.IsStop()) return "OK";
+            }
+
+
+            m_module.p_bStageVac = true;
             AxisXY axisXY = m_module.AxisXY;
             Axis axisZ = m_module.AxisZ;
 
-            if (m_module.Run(axisZ.StartMove(m_focusPosZ)))
+            if (m_grabMode == null) return "Grab Mode == null";
+
+            m_grabMode.SetLight(true);
+
+            double dPos = m_focusPosZ;
+            if(m_grabMode.m_dVRSFocusPos != 0)
+            {
+                dPos = m_grabMode.m_dVRSFocusPos + m_dVRSToAlignOffsetZ;
+            }
+
+            if (m_module.Run(axisZ.StartMove(dPos)))
                 return p_sInfo;
             if (m_module.Run(axisXY.StartMove(m_firstPointPulse)))
                 return p_sInfo;
@@ -281,21 +308,14 @@ namespace Root_WIND2.Module
                 CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), findRawData, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
             }
 
-            if (m_module.Run(axisXY.p_axisX.StartMove(pulse.X - (posX + (width / 2) - camWidth / 2) * m_AlignCamResolution * 10)))
-                return p_sInfo;
-            if (m_module.Run(axisXY.p_axisX.WaitReady()))
-                return p_sInfo;
-            if (m_module.Run(axisXY.p_axisY.StartMove(pulse.Y + (posY + (height / 2) - camHeight / 2) * m_AlignCamResolution * 10)))
-                return p_sInfo;
-            if (m_module.Run(axisXY.p_axisY.WaitReady()))
-                return p_sInfo;
-
-
             m_grabMode.m_ptXYAlignData = new RPoint(-(posX + (width / 2) - camWidth / 2) * m_AlignCamResolution * 10, (posY + (height / 2) - camHeight / 2) * m_AlignCamResolution * 10);
             m_module.RunTree(Tree.eMode.RegWrite);
             m_module.RunTree(Tree.eMode.Init);
 
+            m_grabMode.SetLight(false);
 
+            sw.Stop();
+            System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
             return "OK";
         }
 
