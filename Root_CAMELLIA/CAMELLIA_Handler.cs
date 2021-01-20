@@ -340,6 +340,7 @@ namespace Root_CAMELLIA
                 m_process.m_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
+                //for (int n = m_process.m_qSequence.Count - 1; n >= 0; n--)
                 {
                     if (CalcUnload(aDock[n], aSequence))
                     {
@@ -359,6 +360,7 @@ namespace Root_CAMELLIA
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule)
                 {
+                    if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
                     ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
                     EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
                     m_process.m_qSequence.Enqueue(sequenceDock);
@@ -418,7 +420,17 @@ namespace Root_CAMELLIA
                 OnPropertyChanged();
             }
         }
-
+        int _nRunLP = -1;
+        public int p_nRunLP 
+        {
+            get { return _nRunLP; }
+            set
+            {
+                if (_nRunLP == value) return;
+                _nRunLP = value;
+                OnPropertyChanged();
+            }
+        }
         Thread m_thread = null;
         void InitThread()
         {
@@ -447,12 +459,14 @@ namespace Root_CAMELLIA
                             //if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
+                                while (m_aLoadport[p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
+                                Thread.Sleep(1000);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
                                 //m_nRnR--;
                                 EQ.p_nRnR--;
                                 EQ.p_eState = EQ.eState.Run;
-                            } 
+                            }
                         }
                         break;
                 }
