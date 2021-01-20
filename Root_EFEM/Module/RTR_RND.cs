@@ -12,6 +12,7 @@ namespace Root_EFEM.Module
 {
     public class RTR_RND : ModuleBase, IWTR
     {
+
         #region ToolBox
         protected RS232 m_rs232;
         public int m_teachReticleFlip = -1;
@@ -524,8 +525,10 @@ namespace Root_EFEM.Module
 
         #region Home
         const int c_nReset = 3;
+        public string m_OriginSpeed = "30";
         public override string StateHome()
         {
+
             if (EQ.p_bSimulate)
             {
                 p_eState = eState.Ready;
@@ -541,7 +544,7 @@ namespace Root_EFEM.Module
                     Thread.Sleep(100);
                 }
                 foreach (IWTRChild child in p_aChild) child.p_bLock = true;
-                if (Run(WriteCmdSetSpeed(eCmd.SetSpeed, "50"))) return p_sInfo; //Origin Speed Set 하드 코딩수정필요
+                if (Run(WriteCmdSetSpeed(eCmd.SetSpeed, m_OriginSpeed))) return p_sInfo; //Origin Speed Set 하드 코딩수정필요
                 if (Run(WaitReply(m_secMotion))) return p_sInfo;
                 if (m_bNeedHome)
                 {

@@ -45,7 +45,7 @@ namespace Root_AOP01_Inspection.Module
         public int m_teachCleanBottom = -1;
         public string m_extentionlength = "0";
         public string m_CleanSpeed = "7";
-        public string m_OriginSpeed = "30";
+        
         void RunTreeClean(Tree tree)
         {
             m_teachCleanTop = tree.Set(m_teachCleanTop, m_teachCleanTop, "Top Clean Teach", "RTR Top Clean Index");
@@ -103,7 +103,6 @@ namespace Root_AOP01_Inspection.Module
                 m_sCleanPlane = tree.Set(m_sCleanPlane, m_sCleanPlane, m_asCleanPlane, "Clean Plane", "Clean Plane", bVisible);
                 m_sCleanCount = tree.Set(m_sCleanCount, m_sCleanCount, "Clean Count", "Clean Count", bVisible);
             }
-
             public override string Run()
             {
                 if (EQ.p_bSimulate) return "OK";
