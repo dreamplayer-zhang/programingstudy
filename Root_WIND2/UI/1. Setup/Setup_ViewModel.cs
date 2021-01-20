@@ -88,13 +88,16 @@ namespace Root_WIND2
 
         private void InitAllPanel()
         {
+            if(ProgramManager.Instance.Engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+            {
+                backsideVM = new Backside_ViewModel(this);
+                edgeVM = new Edgeside_ViewModel(this);
+                ebrVM = new EBR_ViewModel(this);
+            }
+            frontsideVM = new Frontside_ViewModel(this);      
             homeVM = new Home_ViewModel(this);
-            inspectionVM = new Inspection_ViewModel(this);
             Wizard = new RecipeWizard_ViewModel(this);
-            frontsideVM = new Frontside_ViewModel(this);
-            backsideVM = new Backside_ViewModel(this);
-            ebrVM = new EBR_ViewModel(this);
-            edgeVM = new Edgeside_ViewModel(this);
+            inspectionVM = new Inspection_ViewModel(this);
             maintVM = new Maintenance_ViewModel(this);
             gemVM = new GEM_ViewModel(this);
         }

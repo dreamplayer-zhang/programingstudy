@@ -667,6 +667,7 @@
     <Resource Include="Resources\Origin.PNG" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Module\BacksideVision\" />
     <Folder Include="UI\Tune\" />
   </ItemGroup>
   <ItemGroup>

@@ -97,14 +97,15 @@ namespace Root_WIND2.Module
             return null;
         }
 
-        public void ClearAlignData()
+        public void ClearData()
         {
             foreach (GrabMode grabMode in m_aGrabMode)
             {
                 grabMode.m_ptXYAlignData = new RPoint(0, 0);
-                this.RunTree(Tree.eMode.RegWrite);
-                this.RunTree(Tree.eMode.Init);
+                grabMode.m_dVRSFocusPos = 0;
             }
+            this.RunTree(Tree.eMode.RegWrite);
+            this.RunTree(Tree.eMode.Init);
         }
 
         void RunTreeGrabMode(Tree tree)
@@ -281,7 +282,7 @@ namespace Root_WIND2.Module
                 m_axisRotate.WaitReady();
                 m_axisZ.WaitReady();
 
-                ClearAlignData();
+                ClearData();
             }
             return "OK";
         }
@@ -383,6 +384,7 @@ namespace Root_WIND2.Module
             if (p_eRemote == eRemote.Client)
             {
                 m_remote.RemoteSend(Remote.eProtocol.Initial, "INIT", "INIT");
+                ClearData();
                 return "OK";
             }
             else
@@ -393,15 +395,16 @@ namespace Root_WIND2.Module
                 if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
                     m_CamMain.Connect();
 
-                if (m_CamAlign != null)
-                    m_CamAlign.Connect();
+                //if (m_CamAlign != null)
+                //    m_CamAlign.Connect();
 
-                if (m_CamAutoFocus != null)
-                    m_CamAutoFocus.Connect();
+                //if (m_CamAutoFocus != null)
+                //    m_CamAutoFocus.Connect();
 
                 p_sInfo = base.StateHome();
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
                 //p_bStageVac = false;
+                ClearData();
                 return "OK";
             }
         }
