@@ -68,7 +68,8 @@ namespace Root_CAMELLIA.UI_UserControl
             while ((EQ.IsStop() != true) && m_rfid.m_qModuleRun.Count > 0) Thread.Sleep(10);
             while ((EQ.IsStop() != true) && m_rfid.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
             while ((EQ.IsStop() != true) && m_rfid.m_bReadID != true) Thread.Sleep(10);
-            m_loadport.p_infoCarrier.p_sCarrierID = m_rfid.m_sReadID;
+            //m_loadport.p_infoCarrier.p_sCarrierID = m_rfid.m_sReadID;
+            //m_loadport.p_infoCarrier.SendCarrierID(m_rfid.m_sReadID);
             Thread.Sleep(100);
         }
 
