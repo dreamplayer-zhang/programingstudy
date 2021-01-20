@@ -13,6 +13,8 @@ namespace Root_Rinse_Unloader
         public MainWindow()
         {
             InitializeComponent();
+            comboMain.ItemsSource = new string[] { "Main UI", "Engineer" };
+            comboMain.SelectedIndex = 0;
         }
 
         #region Loaded
@@ -22,6 +24,7 @@ namespace Root_Rinse_Unloader
             if (!Directory.Exists(@"C:\Recipe\Rinse_Unloader")) Directory.CreateDirectory(@"C:\Recipe\Rinse_Unloader");
             m_engineer.Init("Rinse_Unloader");
             engineerUI.Init(m_engineer);
+            mainUI.Init(m_engineer);
         }
         #endregion
 
@@ -29,6 +32,14 @@ namespace Root_Rinse_Unloader
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             m_engineer.ThreadStop();
+        }
+        #endregion
+
+        #region UI Controls
+        private void comboMain_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (comboMain.SelectedIndex < 0) return;
+            tabMain.SelectedIndex = comboMain.SelectedIndex;
         }
         #endregion
     }

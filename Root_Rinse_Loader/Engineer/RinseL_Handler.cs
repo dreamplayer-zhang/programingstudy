@@ -188,9 +188,9 @@ namespace Root_Rinse_Loader.Engineer
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
-                    case EQ.eState.Run:break;
+                    case EQ.eState.Run: break;
                 }
-                p_bRun = (EQ.p_eState == EQ.eState.Run); 
+                p_bRun = (EQ.p_eState == EQ.eState.Run);
             }
         }
         #endregion

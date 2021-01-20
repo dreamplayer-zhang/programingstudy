@@ -4,12 +4,25 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_Rinse_Unloader"
+        xmlns:mainUI="clr-namespace:Root_Rinse_Unloader.MainUI"
         xmlns:engineer="clr-namespace:Root_Rinse_Unloader.Engineer"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
         Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
     <Grid>
-        <engineer:RinseU_Engineer_UI x:Name="engineerUI"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ComboBox Grid.Column="0" x:Name="comboMain" SelectionChanged="comboMain_SelectionChanged"/>
+        <TabControl Grid.Row="1" x:Name="tabMain">
+            <TabItem Header="MainUI" Height="0">
+                <mainUI:Main_UI x:Name="mainUI"/>
+            </TabItem>
+            <TabItem Header="Engineer" Height="0">
+                <engineer:RinseU_Engineer_UI x:Name="engineerUI"/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
