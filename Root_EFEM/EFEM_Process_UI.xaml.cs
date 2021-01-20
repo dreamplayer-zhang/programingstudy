@@ -33,6 +33,7 @@ namespace Root_EFEM
             treeSequenceUI.Init(process.m_treeSequence);
             process.RunTree(Tree.eMode.Init);
 
+            buttonSetRecover.IsEnabled = false; 
             InitTimer(); 
         }
 
@@ -44,7 +45,7 @@ namespace Root_EFEM
 
         private void buttonSetRecover_Click(object sender, RoutedEventArgs e)
         {
-            m_process.CalcRecover();
+            //m_process.CalcRecover(); //forget Delete Button
         }
 
         private void buttonRunStep_Click(object sender, RoutedEventArgs e)

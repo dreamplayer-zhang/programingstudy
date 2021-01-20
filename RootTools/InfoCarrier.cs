@@ -215,6 +215,7 @@ namespace RootTools
         {
             if (nID < 0) return null;
             if (nID >= p_lWafer) return null;
+            //if (m_aInfoWafer[nID] == null) m_aInfoWafer[nID] = (InfoWafer)m_aGemSlot[nID]; //lyj del
             return m_aInfoWafer[nID];
         }
 

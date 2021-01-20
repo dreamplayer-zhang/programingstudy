@@ -210,7 +210,36 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Grid>
+    <Grid Background="BurlyWood">
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <SolidColorBrush Color="Transparent"/>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding p_ManualJobBlink}" Value="True">
+                        <DataTrigger.EnterActions>
+                            <BeginStoryboard Name="sbBlink">
+                                <Storyboard RepeatBehavior="Forever">
+                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                    AutoReverse="True"
+                                                    From="Transparent" To="#FF406859" FillBehavior="Stop"
+                                                    BeginTime="0:0:0" Duration="0:0:2"/>
+                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                    From="#FF406859" To="Transparent"
+                                                    BeginTime="0:0:2" Duration="0:0:2"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.EnterActions>
+                        <DataTrigger.ExitActions>
+                            <RemoveStoryboard BeginStoryboardName="sbBlink"/>
+                        </DataTrigger.ExitActions>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*"/>
             <ColumnDefinition Width="6*"/>

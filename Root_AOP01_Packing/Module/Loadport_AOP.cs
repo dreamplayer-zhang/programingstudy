@@ -164,7 +164,7 @@ namespace Root_AOP01_Packing.Module
                 case GemCarrierBase.ePresent.Empty: m_svidPlaced.p_value = false; break;
                 case GemCarrierBase.ePresent.Exist: m_svidPlaced.p_value = true; break;
             }
-            return m_svidPlaced.p_value;
+            return (m_svidPlaced.p_value == null) ? false : m_svidPlaced.p_value;
         }
         #endregion
 
@@ -422,7 +422,7 @@ namespace Root_AOP01_Packing.Module
         #endregion
 
         #region ILoadport
-        public string StartRunDocking()
+        public string RunDocking()
         {
             if (p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runDocking.Clone();
@@ -431,7 +431,7 @@ namespace Root_AOP01_Packing.Module
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
 
-        public string StartRunUndocking()
+        public string RunUndocking()
         {
             if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runUndocking.Clone();
@@ -442,11 +442,10 @@ namespace Root_AOP01_Packing.Module
 
         public bool p_bPlaced { get { return m_diPodCheck[0].p_bIn; } }
         public bool p_bPresent { get { return (m_diPodCheck[1].p_bIn && m_diPodCheck[2].p_bIn); } }
-
         #endregion
 
         #region Docking & Undocking
-        public string RunDocking()
+        public string RunDock()
         {
             if (p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return "InfoCarrier State not Placed";
             if (Run(RunDoorMove(ePos.Open))) return p_sInfo;
@@ -459,7 +458,7 @@ namespace Root_AOP01_Packing.Module
             return "OK";
         }
 
-        public string RunUnDocking()
+        public string RunUnDock()
         {
             if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "InfoCarrier State not Dock";
             if (Run(RunDoorMove(ePos.Close))) return p_sInfo;
@@ -503,11 +502,11 @@ namespace Root_AOP01_Packing.Module
         #region ModuleRun
         ModuleRunBase m_runDocking;
         ModuleRunBase m_runUndocking;
-        public ModuleRunBase GetUnLoadModuleRun()
+        public ModuleRunBase GetModuleRunUndocking()
         {
             return m_runUndocking;
         }
-        public ModuleRunBase GetLoadModuleRun()
+        public ModuleRunBase GetModuleRunDocking()
         {
             return m_runDocking;
         }
@@ -541,7 +540,7 @@ namespace Root_AOP01_Packing.Module
 
             public override string Run()
             {
-                return m_module.RunDocking(); 
+                return m_module.RunDock(); 
             }
         }
 
@@ -568,7 +567,7 @@ namespace Root_AOP01_Packing.Module
 
             public override string Run()
             {
-                return m_module.RunUnDocking();
+                return m_module.RunUnDock();
             }
         }
         #endregion

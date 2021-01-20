@@ -21,7 +21,7 @@ namespace RootTools_Vision
     {
         NONE = 0,
         CREATED,
-        WAIT,
+        READY,
         STOP,
         EXIT,
         CHECK,

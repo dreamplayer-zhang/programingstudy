@@ -23,8 +23,8 @@ namespace Root_EFEM.Module
         public DIO_I m_diReady;
         public DIO_I m_diRun;
         public OHT_Semi m_OHT;
-        //public bool m_bLoadCheck = false;
-        //public bool m_bUnLoadCheck = false;
+        public bool m_bLoadCheck = false;
+        public bool m_bUnLoadCheck = false;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
@@ -331,6 +331,7 @@ namespace Root_EFEM.Module
             ClearError,
             Load,
             Unload,
+            GetMap,
         };
 
         Dictionary<eCmd, string> m_dicCmd = new Dictionary<eCmd, string>();
@@ -340,6 +341,7 @@ namespace Root_EFEM.Module
             m_dicCmd.Add(eCmd.ClearError, "RESET");
             m_dicCmd.Add(eCmd.Load, "LOAD");
             m_dicCmd.Add(eCmd.Unload, "UNLOAD");
+            m_dicCmd.Add(eCmd.GetMap, "SCAN DN");
         }
 
         public class Protocol
@@ -559,6 +561,14 @@ namespace Root_EFEM.Module
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitDone(m_secLoad);
         }
+
+        string CmdGetMap()
+        {
+            Protocol protocol = new Protocol(eCmd.GetMap, this);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitDone(m_secLoad);
+        }
+
         #endregion
 
         #region override
@@ -594,6 +604,7 @@ namespace Root_EFEM.Module
         bool m_bNeedHome = true;
         public override string StateHome()
         {
+
             if (EQ.p_bSimulate == false)
             {
                 if (Run(CmdResetCPU())) return p_sInfo;
@@ -608,18 +619,20 @@ namespace Root_EFEM.Module
                     if (Run(CmdUnload())) return p_sInfo;
                 }
             }
-            p_eState = eState.Ready;
             if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
             {
                 p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
                 m_bPlaced= true;
+
+                if (Run(CmdLoad())) return p_sInfo;
+                if (Run(CmdUnload())) return p_sInfo;
             }
             else
             {
                 p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
                 m_bPlaced = false;
             }
-            
+            p_eState = eState.Ready;
             p_infoCarrier.AfterHome();
             return "OK";
         }
@@ -668,7 +681,7 @@ namespace Root_EFEM.Module
         #endregion
 
         #region ILoadport
-        public string StartRunDocking()
+        public string RunDocking()
         {
             if (p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runDocking.Clone();
@@ -677,7 +690,7 @@ namespace Root_EFEM.Module
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
 
-        public string StartRunUndocking()
+        public string RunUndocking()
         {
             if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runUndocking.Clone();
@@ -724,11 +737,11 @@ namespace Root_EFEM.Module
         public ModuleRunBase m_runDocking;
         public ModuleRunBase m_runUndocking;
 
-        public ModuleRunBase GetUnLoadModuleRun()
+        public ModuleRunBase GetModuleRunUndocking()
         {
             return m_runUndocking;
         }
-        public ModuleRunBase GetLoadModuleRun()
+        public ModuleRunBase GetModuleRunDocking()
         {
             return m_runDocking;
         }
@@ -765,10 +778,12 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
+                m_module.m_bUnLoadCheck = false;
                 if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 if (m_module.Run(m_module.CmdLoad())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
-                m_module.m_ceidDocking.Send(); 
+                m_module.m_ceidDocking.Send();
+                m_module.m_bLoadCheck = true;
                 return "OK";
             }
         }
@@ -799,10 +814,13 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
+                m_module.m_bLoadCheck = false;
                 if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock) return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                //if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
                 if (m_module.Run(m_module.CmdUnload())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                m_module.m_ceidUnDocking.Send(); 
+                m_module.m_ceidUnDocking.Send();
+                m_module.m_bUnLoadCheck = true;
                 return "OK";
             }
         }

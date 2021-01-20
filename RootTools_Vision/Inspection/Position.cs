@@ -69,7 +69,7 @@ namespace RootTools_Vision
 
         public CPoint ConvertRelToAbs_Chip(CPoint ptRel)
         {
-            return new CPoint(this.currentWorkplace.PositionX + ptRel.X, this.currentWorkplace.PositionY + ptRel.Y);
+            return new CPoint(this.currentWorkplace.PositionX + ptRel.X, this.currentWorkplace.PositionY + this.recipeOrigin.DiePitchY + ptRel.Y);
         }
 
         public bool DoPosition()
@@ -119,10 +119,10 @@ namespace RootTools_Vision
                     unsafe
                     {
                         score =  CLR_IP.Cpp_TemplateMatching(
-                            (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY, 
+                            (byte*)this.InspectionSharedBuffer.ToPointer(), feature.GetColorRowData(parameter.IndexChannel), &outX, &outY, 
                             this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
                             feature.Width, feature.Height,
-                            startX, startY, endX, endY, 5, this.currentWorkplace.SharedBufferByteCnt, (int)parameter.IndexChannel);
+                            startX, startY, endX, endY, 5, 1, (int)parameter.IndexChannel);
                     }
 
                     if( score >= maxScore)
@@ -143,7 +143,7 @@ namespace RootTools_Vision
 
 
 
-                CPoint ptAbs = ConvertRelToAbs_Chip(new CPoint(this.positionRecipe.ListMasterFeature[maxIndex].PositionX, this.positionRecipe.ListMasterFeature[maxIndex].PositionY));
+                CPoint ptAbs = ConvertRelToAbs_Wafer(new CPoint(this.positionRecipe.ListMasterFeature[maxIndex].PositionX, this.positionRecipe.ListMasterFeature[maxIndex].PositionY));
                 int tplStartX = ptAbs.X;
                 int tplStartY = ptAbs.Y;
                 int tplW = this.positionRecipe.ListMasterFeature[maxIndex].Width;
@@ -160,14 +160,14 @@ namespace RootTools_Vision
                 float centerROIY = (maxStartY + maxEndY)/ 2;
 
                 // Matching 중심 위치
-                float centerMatchingX = (int)(maxX + tplW / 2);
-                float centerMatchingY = (int)(maxY + tplH / 2);
+                float centerMatchingX = (int)maxX + tplW / 2;
+                float centerMatchingY = (int)maxY + tplH / 2;
 
                 //int transX = (int)(centerROIX - centerMatchingX);
                 //int transY = (int)(centerROIY - centerMatchingY);
 
-                int transX = (int)(centerMatchingX - centerROIX);
-                int transY = (int)(centerMatchingY - centerROIY);
+                int transX = (int)(centerMatchingX - tplCenterX);
+                int transY = (int)(centerMatchingY - tplCenterY);
 
 
                 if (maxScore >= this.parameter.WaferMinScoreLimit) // Position 성공 시
@@ -223,10 +223,10 @@ namespace RootTools_Vision
                         unsafe
                         {
                             score = CLR_IP.Cpp_TemplateMatching(
-                                (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
+                                (byte*)this.InspectionSharedBuffer.ToPointer(), feature.GetColorRowData(parameter.IndexChannel), &outX, &outY,
                                 this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
                                 feature.Width, feature.Height,
-                                startX, startY, endX, endY, 5, this.currentWorkplace.SharedBufferByteCnt,(int)parameter.IndexChannel);
+                                startX, startY, endX, endY, 5, 1,(int)parameter.IndexChannel);
                         }
 
                         if (score > maxScore)
@@ -262,7 +262,7 @@ namespace RootTools_Vision
                     unsafe
                     {
                         score = CLR_IP.Cpp_TemplateMatching(
-                            (byte*)this.InspectionSharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
+                            (byte*)this.InspectionSharedBuffer.ToPointer(), feature.GetColorRowData(parameter.IndexChannel), &outX, &outY,
                             this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
                             feature.Width, feature.Height,
                             startX, startY, endX, endY, 5, this.currentWorkplace.SharedBufferByteCnt, (int)parameter.IndexChannel);
@@ -295,8 +295,8 @@ namespace RootTools_Vision
                 float centerROIY = (maxStartY + maxEndY) / 2;
 
                 // Matching 중심 위치
-                float centerMatchingX = (int)(maxX + tplW / 2);
-                float centerMatchingY = (int)(maxY + tplH / 2);
+                float centerMatchingX = (int)maxX + tplW / 2;
+                float centerMatchingY = (int)maxY + tplH / 2;
 
                 //int transX = (int)(centerROIX - centerMatchingX);
                 //int transY = (int)(centerROIY - centerMatchingY);
