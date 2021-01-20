@@ -10,9 +10,9 @@ namespace Root_Rinse_Loader.MainUI
     /// <summary>
     /// RunUI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class RunUI : UserControl
+    public partial class Run_UI : UserControl
     {
-        public RunUI()
+        public Run_UI()
         {
             InitializeComponent();
         }
