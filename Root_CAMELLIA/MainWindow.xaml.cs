@@ -178,7 +178,7 @@ namespace Root_CAMELLIA
         private void buttonRecovery_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnable_Recovery() == false) return;
-            m_handler.m_process.CalcRecover();
+            m_handler.CalcRecover();
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Run;
             EQ.p_bRecovery = true;

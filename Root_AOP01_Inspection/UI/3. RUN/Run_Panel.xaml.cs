@@ -85,7 +85,7 @@ namespace Root_AOP01_Inspection
             {
                 if (IsEnableRecovery() == false) return;
                 m_handler.m_bIsPossible_Recovery = false;
-                m_handler.m_process.CalcRecover();
+                m_handler.CalcRecover();
                 EQ.p_bStop = false;
                 EQ.p_eState = EQ.eState.Run;
                 m_bRecovery = true;

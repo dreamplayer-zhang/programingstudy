@@ -47,6 +47,7 @@ namespace Root_EFEM
             m_recipe = new EFEM_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
             m_process = new EFEM_Process("Process", m_engineer, iWTR);
+            CalcRecover(); 
         }
 
         void InitModule(ModuleBase module)
@@ -294,12 +295,23 @@ namespace Root_EFEM
         public void CalcSequence()
         {
             m_process.ReCalcSequence();
+            CalcDockingUndocking(); 
+        }
+
+        public void CalcRecover()
+        {
+            m_process.CalcRecover();
+            CalcDockingUndocking();
+        }
+
+        void CalcDockingUndocking()
+        {
             List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
             while (m_process.m_qSequence.Count > 0) aSequence.Add(m_process.m_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
             foreach (ILoadport loadport in m_aLoadport)
             {
-                if (CalcDocking(loadport, aSequence)) aDock.Add(loadport); 
+                if (CalcDocking(loadport, aSequence)) aDock.Add(loadport);
             }
             while (aSequence.Count > 0)
             {
@@ -308,16 +320,16 @@ namespace Root_EFEM
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
                 {
-                    if (CheckUnload(aDock[n], aSequence))
+                    if (CalcUnload(aDock[n], aSequence))
                     {
                         ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
                         EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
                         m_process.m_qSequence.Enqueue(sequenceUndock);
-                        aDock.RemoveAt(n); 
+                        aDock.RemoveAt(n);
                     }
                 }
             }
-            m_process.RunTree(Tree.eMode.Init); 
+            m_process.RunTree(Tree.eMode.Init);
         }
 
         bool CalcDocking(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
@@ -335,7 +347,7 @@ namespace Root_EFEM
             return false; 
         }
 
-        bool CheckUnload(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcUnload(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
         {
             foreach (EFEM_Process.Sequence sequence in aSequence)
             {
