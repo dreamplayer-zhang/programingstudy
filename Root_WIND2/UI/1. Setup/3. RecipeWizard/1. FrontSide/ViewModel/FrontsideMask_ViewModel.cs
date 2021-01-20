@@ -19,7 +19,6 @@ namespace Root_WIND2
 {
     class FrontsideMask_ViewModel : RootViewer_ViewModel, IRecipeUILoadable
     {
-        Recipe m_Recipe;
         /// <summary>
         /// 전체 Memory의 좌표와 ROI Memory 좌표의 Offset
         /// </summary>
@@ -34,16 +33,15 @@ namespace Root_WIND2
         ToolType eToolType;
         ModifyType eModifyType;
 
-        public void Init(Setup_ViewModel setup, Recipe recipe)
+        public void Init(Setup_ViewModel setup)
         {
             base.init();
             p_VisibleMenu = Visibility.Collapsed;
 
             BufferInspROI.CollectionChanged += BufferInspROI_CollectionChanged;
             SetBackGroundWorker();
-
-            p_ROILayer = ProgramManager.Instance.ROILayer;
-            m_Recipe = recipe;
+            
+            p_ROILayer = GlobalObjects.Instance.GetNamed<ImageData>("MaskImage");
         }
         public void SetOrigin(object e)
         {
@@ -1558,10 +1556,11 @@ namespace Root_WIND2
 
         public void SetRecipeData()
         {
-            m_Recipe.GetRecipe<MaskRecipe>().OriginPoint = this.BoxOffset;
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            recipe.GetItem<MaskRecipe>().OriginPoint = this.BoxOffset;
             for (int i = 0; i < p_cInspROI.Count; i++)
             {
-                m_Recipe.GetRecipe<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data);
+                recipe.GetItem<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data);
             }
         }
 
@@ -1582,7 +1581,10 @@ namespace Root_WIND2
             roi.p_Index = p_cInspROI.Count();
             p_cInspROI.Add(roi);
             p_SelectedROI = p_cInspROI.Last();
-            m_Recipe.GetRecipe<MaskRecipe>().MaskList.Add(new RecipeType_Mask());
+
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+
+            recipe.GetItem<MaskRecipe>().MaskList.Add(new RecipeType_Mask());
         }
         private void _DeleteROI()
         {
@@ -1658,7 +1660,8 @@ namespace Root_WIND2
             //
             p_cInspROI.Clear();
 
-            foreach (RecipeType_Mask mask in m_Recipe.GetRecipe<MaskRecipe>().MaskList)
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            foreach (RecipeType_Mask mask in recipe.GetItem<MaskRecipe>().MaskList)
             {
                 InspectionROI roi = new InspectionROI();
                 roi.p_Color = Colors.AliceBlue;

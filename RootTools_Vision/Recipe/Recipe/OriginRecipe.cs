@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 
 namespace RootTools_Vision
 {
-    public class OriginRecipe : RecipeBase
+    public class OriginRecipe : RecipeItemBase
     {
         #region [Parameter]
         private int originX;

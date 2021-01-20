@@ -13,10 +13,11 @@ namespace RootTools_Vision
     internal enum WORKER_STATE
     {
         NONE = 0,
-        WORK_ASSIGNED = 1,
-        WORKING = 2,
-        WORK_COMPLETED = 3,
-        WORK_STOP = 4,
+        WORK_ASSIGNED,
+        WORKING,
+        WORK_COMPLETED,
+        WORK_STOP,
+        WORK_EXIT,
     }
 
     public delegate void EventWorkCompleted(Workplace obj);
@@ -81,11 +82,6 @@ namespace RootTools_Vision
             this.workerIndex = index;
             this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current); // 짧은 작업이 아닌 경우 LongRunning 옵션을 반드시 사용해야함. 자세한 것은 검색
             this.isStop = true;
-        }
-
-        ~Worker()
-        {
-
         }
 
 
@@ -153,6 +149,8 @@ namespace RootTools_Vision
 
                     if (token.IsCancellationRequested)
                     {
+                        this.workerState = WORKER_STATE.WORK_EXIT;
+                        this.task = null;
                         return;
                     }
 
@@ -329,5 +327,7 @@ namespace RootTools_Vision
                     this.workplaceBufferB);
             }
         }
+
+
     }
 }

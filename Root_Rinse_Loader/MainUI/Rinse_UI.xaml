@@ -12,10 +12,12 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ComboBox Grid.Row="0" x:Name="comboBoxMode" Margin="4" SelectedItem="{Binding p_eMode}"/>
         <TextBox Grid.Row="1" x:Name="textBoxWidth" Margin="4" TextAlignment="Center" Text="{Binding p_widthStrip}" PreviewKeyDown="textBoxWidth_PreviewKeyDown"/>
         <TextBlock Grid.Row="2" x:Name="textBlockState" Margin="4" Text="{Binding p_eState}"/>
-        <TextBlock Grid.Row="3" x:Name="textBlockUnload" Margin="4" Text="{Binding p_eStateUnloader}"/>
+        <TextBlock Grid.Row="3" x:Name="textBlockRinse" Margin="4" Text="{Binding p_eStateRinse}"/>
+        <TextBlock Grid.Row="4" x:Name="textBlockUnload" Margin="4" Text="{Binding p_eStateUnloader}"/>
     </Grid>
 </UserControl>

@@ -37,7 +37,7 @@ public:
 
 	// ********* D2D ******** //
 	static void SubtractAbs(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH);
-	static void SelectMinDiffinArea(BYTE* pSrc1, BYTE** pSrc2, BYTE* pDst, int imgNum, int nW, int nH, int nAreaSize);
+	static void SelectMinDiffinArea(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtRefROILT, Point vtCurROILT, int stride, int nChipW, int nChipH);
 	static Point FindMinDiffLoc(BYTE* pSrc, BYTE* pInOutTarget, int nTargetW, int nTargetH, int nTrigger);
 
 	// Create Golden Image

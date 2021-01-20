@@ -21,7 +21,7 @@ namespace RootTools_Vision
         public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
         private IntPtr inspectionSharedBuffer;
-        private SurfaceParameter parameter;
+        private SurfaceParameter parameterSurface;
         private SurfaceRecipe recipeSurface;
 
         public Surface() : base()
@@ -31,10 +31,10 @@ namespace RootTools_Vision
 
         protected override bool Preparation()
         {
-            if(this.parameter == null || this.recipeSurface == null)
+            if(this.parameterSurface == null || this.recipeSurface == null)
             {
-                this.parameter = this.recipe.GetRecipe<SurfaceParameter>();
-                this.recipeSurface = this.recipe.GetRecipe<SurfaceRecipe>();
+                this.parameterSurface = (SurfaceParameter)this.parameter;
+                this.recipeSurface = this.recipe.GetItem<SurfaceRecipe>();
             }
             return true;
         }
@@ -49,13 +49,13 @@ namespace RootTools_Vision
             if (this.workplace.Index == 0)
                 return;
 
-            this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameter.IndexChannel);
-            byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameter.IndexChannel);
+            this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameterSurface.IndexChannel);
+            byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameterSurface.IndexChannel);
 
             // Inspection Param
-            bool isDarkInsp = !parameter.IsBright; // Option
-            int nGrayLevel = parameter.Intensity; // Option
-            int nDefectSz = parameter.Size; // Option     
+            bool isDarkInsp = !parameterSurface.IsBright; // Option
+            int nGrayLevel = parameterSurface.Intensity; // Option
+            int nDefectSz = parameterSurface.Size; // Option     
 
             int chipH = this.workplace.Width; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
             int chipW = this.workplace.Height;
@@ -66,7 +66,7 @@ namespace RootTools_Vision
             CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
 
             // Filter
-            switch (parameter.DiffFilter)
+            switch (parameterSurface.DiffFilter)
             {
                 case DiffFilterMethod.Average:
                     CLR_IP.Cpp_AverageBlur(arrBinImg, arrBinImg, chipW, chipH);

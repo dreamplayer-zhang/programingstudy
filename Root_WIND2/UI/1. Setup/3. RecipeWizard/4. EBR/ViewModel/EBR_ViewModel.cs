@@ -12,7 +12,7 @@ namespace Root_WIND2
     class EBR_ViewModel : ObservableObject
     {
         Setup_ViewModel setupVM;
-        Recipe recipe;
+        RecipeBase recipe;
 
         public EBR_Panel Main;
         public EBRSetup_ViewModel SetupVM;
@@ -21,7 +21,6 @@ namespace Root_WIND2
         public EBR_ViewModel(Setup_ViewModel setup)
         {
             this.setupVM = setup;
-            this.recipe = setup.Recipe;
             Init();
         }
 

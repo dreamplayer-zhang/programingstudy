@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 
 namespace RootTools_Vision
 {
-    public class MaskRecipe : RecipeBase
+    public class MaskRecipe : RecipeItemBase
     {
         CPoint originPoint;
         CRect boundingBox;

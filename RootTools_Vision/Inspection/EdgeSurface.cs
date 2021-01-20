@@ -15,7 +15,7 @@ namespace RootTools_Vision
 	{
 		public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
-		private EdgeSurfaceParameter parameter;
+		private EdgeSurfaceParameter parameterEdge;
 		private EdgeSurfaceRecipe recipeEdgeSurface;
 
 		public enum EdgeMapPositionX
@@ -37,10 +37,10 @@ namespace RootTools_Vision
 
 		protected override bool Preparation()
 		{
-			if(this.parameter == null || this.recipeEdgeSurface == null)
+			if(this.parameterEdge == null || this.recipeEdgeSurface == null)
             {
-				this.parameter = recipe.GetRecipe<EdgeSurfaceParameter>();
-				this.recipeEdgeSurface = recipe.GetRecipe<EdgeSurfaceRecipe>();
+				this.parameterEdge = this.parameter as EdgeSurfaceParameter;
+				this.recipeEdgeSurface = recipe.GetItem<EdgeSurfaceRecipe>();
             }
 			return true;
 		}
@@ -56,9 +56,9 @@ namespace RootTools_Vision
 			if (this.currentWorkplace.Index == 0)
 				return;
 
-			DoColorInspection(this.currentWorkplace.SharedBufferR_GRAY, parameter);
-			DoColorInspection(this.currentWorkplace.SharedBufferG, parameter);
-			DoColorInspection(this.currentWorkplace.SharedBufferB, parameter);
+			DoColorInspection(this.currentWorkplace.SharedBufferR_GRAY, parameterEdge);
+			DoColorInspection(this.currentWorkplace.SharedBufferG, parameterEdge);
+			DoColorInspection(this.currentWorkplace.SharedBufferB, parameterEdge);
 
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 		}
@@ -73,24 +73,24 @@ namespace RootTools_Vision
 			// parameter 구분하기
 			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
 			{
-				roiHeight = parameter.RoiHeightTop;
-				roiWidth = parameter.RoiWidthTop;
-				threshold = parameter.ThesholdTop;
-				defectSize = parameter.SizeMinTop;
+				roiHeight = parameterEdge.RoiHeightTop;
+				roiWidth = parameterEdge.RoiWidthTop;
+				threshold = parameterEdge.ThesholdTop;
+				defectSize = parameterEdge.SizeMinTop;
 			}
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Side)
 			{
-				roiHeight = parameter.RoiHeightSide;
-				roiWidth = parameter.RoiWidthSide;
-				threshold = parameter.ThesholdSide;
-				defectSize = parameter.SizeMinSide;
+				roiHeight = parameterEdge.RoiHeightSide;
+				roiWidth = parameterEdge.RoiWidthSide;
+				threshold = parameterEdge.ThesholdSide;
+				defectSize = parameterEdge.SizeMinSide;
 			}
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
 			{
-				roiHeight = parameter.RoiHeightBtm;
-				roiWidth = parameter.RoiWidthBtm;
-				threshold = parameter.ThesholdBtm;
-				defectSize = parameter.SizeMinBtm;
+				roiHeight = parameterEdge.RoiHeightBtm;
+				roiWidth = parameterEdge.RoiWidthBtm;
+				threshold = parameterEdge.ThesholdBtm;
+				defectSize = parameterEdge.SizeMinBtm;
 			}
 			else
 			{

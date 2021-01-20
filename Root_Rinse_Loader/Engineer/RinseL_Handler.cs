@@ -210,11 +210,12 @@ namespace Root_Rinse_Loader.Engineer
         string RunPickerSet()
         {
             m_loader.m_bPickersetMode = true; 
-            EQ.p_eState = EQ.eState.Run; 
             m_storage.StartMoveStackReady();
+            EQ.p_eState = EQ.eState.Run;
             while (m_storage.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             if (EQ.IsStop()) return "EQ Stop";
             m_loader.StartPickerSet();
+            EQ.p_eState = EQ.eState.Run;
             return "OK";  
         }
 

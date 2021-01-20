@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Comm;
+using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -59,6 +60,27 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
+        #region Rinse
+        DIO_I m_diRinseRun;
+
+        public enum eRinseRun
+        {
+            Ready,
+            Run,
+        }
+        eRinseRun _eStateRinse = eRinseRun.Ready;
+        public eRinseRun p_eStateRinse
+        {
+            get { return _eStateRinse; }
+            set
+            {
+                if (_eStateRinse == value) return;
+                _eStateRinse = value;
+                OnPropertyChanged(); 
+            }
+        }
+        #endregion
+
         #region Unloader EQ State
         EQ.eState _eStateUnloader = EQ.eState.Init; 
         public EQ.eState p_eStateUnloader
@@ -77,7 +99,8 @@ namespace Root_Rinse_Loader.Module
         TCPIPClient m_tcpip; 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP"); 
+            p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
+            p_sInfo = m_toolBox.Get(ref m_diRinseRun, this, "Rinse Run"); 
             if (bInit) 
             {
                 EQ.m_EQ.OnChanged += M_EQ_OnChanged;
@@ -140,6 +163,7 @@ namespace Root_Rinse_Loader.Module
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
+                p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready; 
                 if (m_qProtocolReply.Count > 0)
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();

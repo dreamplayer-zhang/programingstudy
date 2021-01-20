@@ -344,29 +344,111 @@ void IP::SubtractAbs(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH)
 
     cv::absdiff(imgSrc1, imgSrc2, imgDst);
 }
-void IP::SelectMinDiffinArea(BYTE* pSrc1, BYTE** pSrc2, BYTE* pDst, int imgNum, int nW, int nH, int nAreaSize)
+void IP::SelectMinDiffinArea(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtRefROILT, Point vtCurROILT, int stride, int nChipW, int nChipH)
 {
-    Mat imgSrc1 = Mat(nH, nW, CV_8UC1, pSrc1);
-    Mat imgSrcROI1 = imgSrc1(Rect(nAreaSize, nAreaSize, nW - nAreaSize * 2, nH - nAreaSize * 2));
+    // 복잡하니깐 Padding 없이...
+    nChipW -= stride * 2;
+    nChipH -= stride * 2;
+    
+    int kernelSz = stride * 2 + 1;
+    // SSE 
+    LPBYTE* pRefChipLT = new LPBYTE[imgNum];
+    LPBYTE pCurChipLT;
 
-    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
-    Mat imgDstROI = imgDst(Rect(nAreaSize, nAreaSize, nW - nAreaSize * 2, nH - nAreaSize * 2));
-    cv::add(imgDstROI, Scalar(255), imgDstROI);
-    Mat Diff;
-    for (int i = 0; i < imgNum; i++)
+    byte* pResult = pDst;
+    byte* pHeader = NULL;
+
+    for (int k = 0; k < imgNum; k++)
     {
-        Mat imgSrc2 = Mat(nH, nW, CV_8UC1, pSrc2[i]);
+        pHeader = pSrc;
+        for (int idx = 0; idx < vtRefROILT[k].y + stride; idx++)
+            pHeader += nMemW; 
 
-        for (int r = -nAreaSize; r <= nAreaSize; r++)
-        {
-            for (int c = -nAreaSize; c <= nAreaSize; c++)
+        pRefChipLT[k] = pHeader + vtRefROILT[k].x - stride;
+    }
+
+    pHeader = pSrc;
+    for (int idx = 0; idx < vtCurROILT.y + stride; idx++)
+        pHeader += nMemW; 
+
+    pCurChipLT = pHeader + vtCurROILT.x - stride;
+
+    int blockEndWidth = nChipW / 32;
+    int blockEndHeight = nChipH;
+    int Width2 = nChipW % 32;
+
+    __m256i* pRst;
+    __m256i* pCurImg;
+    __m256i* (*pStrideImg) = new __m256i * [kernelSz * kernelSz - 1];
+    __m256i* pImgsMedian_High = new __m256i [imgNum];
+    __m256i* pImgsMedian_Low = new __m256i [imgNum];
+
+    __m256i Cur, Cur_High, Cur_Low;
+    __m256i Ref, Ref_High, Ref_Low;
+    __m256i Sum, Sum_High, Sum_Low;
+    __m256i Ref_Max, Ref_Max_High, Ref_Max_Low;
+    __m256i Ref_Min, Ref_Min_High, Ref_Min_Low; 
+    __m256i Result_High, Result_Low;
+    __m256i ZeroData = _mm256_setzero_si256();
+
+    
+	for (int r = 0; r < blockEndHeight; r++)
+	{
+		pRst = (__m256i*)(pResult);
+        pCurImg = (__m256i*)pCurChipLT;
+
+		for (int c = 0; c < blockEndWidth; c++, pRst++)
+		{
+			for (int imgIdx = 0; imgIdx < imgNum; imgIdx++)
+			{
+                int idx = 0;
+                for (int kernel_r = -stride; kernel_r < stride; kernel_r++)
+                    for (int kernel_c = -stride; kernel_c < stride; kernel_c++)
+                        if (!(kernel_r == 0 && kernel_c == 0))
+                            pStrideImg[idx = 0] = (__m256i*)pRefChipLT[imgIdx] + (nMemW * kernel_r) + kernel_c;
+
+                Cur = _mm256_loadu_si256(pCurImg);
+                Cur_High = _mm256_unpackhi_epi8(Cur, ZeroData);
+                Cur_Low = _mm256_unpacklo_epi8(Cur, ZeroData);
+
+                Ref = _mm256_loadu_si256(pStrideImg[0]);
+
+                Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
+                Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
+
+                Ref_Min_High = _mm256_sub_epi16(Ref_High, Cur_High);
+                Ref_Min_Low = _mm256_sub_epi16(Ref_Low, Cur_Low);
+                
+                for (int k = 1; k < kernelSz * kernelSz - 1; k++)
+                {
+                    Ref = _mm256_loadu_si256(pStrideImg[k]);
+
+                    Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
+                    Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
+
+                    Result_High = _mm256_sub_epi16(Ref_High, Cur_High);
+                    Result_Low = _mm256_sub_epi16(Ref_Low, Cur_Low);
+
+                    Ref_Min_High = _mm256_min_epi16(Ref_Min_High, Result_High);
+                    Ref_Min_Low = _mm256_min_epi16(Ref_Min_Low, Result_Low);
+                }
+                pImgsMedian_High[imgIdx] = Ref_Min_High;
+                pImgsMedian_Low[imgIdx] = Ref_Min_Low;
+			} // 내일 와서 디버깅 해보기 가능한가...
+
+            // Median 한 단음에 Store 하면 끝!
+            for (int imgIdx = 0; imgIdx < imgNum; imgIdx++)
             {
-                Mat imgSrcROI2 = imgSrc2(Rect(nAreaSize + r, nAreaSize + c, nW - nAreaSize * 2, nH - nAreaSize * 2));
-                cv::absdiff(imgSrcROI1, imgSrcROI2, Diff);
-                //Min값 선택
-                (cv::min)(imgDstROI, Diff, imgDstROI);
+
             }
+
+            for (int k = 0; k < kernelSz * kernelSz - 1; k++)
+                pStrideImg[k]++;			
         }
+        for (int k = 0; k < kernelSz * kernelSz - 1; k++)
+            pRefChipLT[k] += nMemW;
+
+        pResult += nChipW;
     }
 }
 Point IP::FindMinDiffLoc(BYTE* pSrc, BYTE* pInOutTarget, int nTargetW, int nTargetH, int nTrigger)
@@ -401,135 +483,9 @@ Point IP::FindMinDiffLoc(BYTE* pSrc, BYTE* pInOutTarget, int nTargetW, int nTarg
 }
 
 // Create Golden Image
-void IP::CreateGoldenImage_Avg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
-{
-    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
-    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
-
-    for (int i = 0; i < imgNum; i++)
-    {
-        Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
-        imgSrc.convertTo(imgSrc, CV_16UC1);
-        imgAccumlate = imgAccumlate + imgSrc;
-    }
-
-    imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / imgNum);
-}
-void IP::CreateGoldenImage_MedianAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
-{
-    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
-    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
-    Mat imgSrc;
-    if (imgNum <= 4)
-    {
-        imgSrc = Mat(nH, nW, CV_8UC1, pSrc[0]);
-        imgSrc.convertTo(imgSrc, CV_16UC1);
-
-        Mat minImg = imgSrc.clone();
-        Mat maxImg = imgSrc.clone();
-
-        imgAccumlate = imgAccumlate + minImg;// pSrc[0]
-
-        for (int i = 1; i < imgNum; i++)
-        {
-            imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
-            imgSrc.convertTo(imgSrc, CV_16UC1);
-
-            (cv::min)(imgSrc, minImg, minImg);
-            (cv::max)(imgSrc, maxImg, maxImg);
-
-            imgAccumlate = imgAccumlate + imgSrc;
-        }
-
-        cv::subtract(imgAccumlate, minImg, imgAccumlate);
-        cv::subtract(imgAccumlate, maxImg, imgAccumlate);
-
-        imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / (imgNum - 2));
-    }
-    else
-    {
-        imgSrc = Mat(nH, nW, CV_8UC1, pSrc[0]);
-        imgSrc.convertTo(imgSrc, CV_16UC1);
-
-        Mat minImg = imgSrc.clone();
-        Mat maxImg = imgSrc.clone();
-
-        imgAccumlate = imgAccumlate + minImg;// pSrc[0]
-
-        for (int cnt = 0; cnt < imgNum / 3; cnt++)
-        {
-            for (int i = cnt * 3; i < cnt * 3 + 3; i++)
-            {
-                imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
-                imgSrc.convertTo(imgSrc, CV_16UC1);
-
-                (cv::min)(imgSrc, minImg, minImg);
-                (cv::max)(imgSrc, maxImg, maxImg);
-
-                imgAccumlate = imgAccumlate + imgSrc;
-            }
-
-            cv::subtract(imgAccumlate, minImg, imgAccumlate);
-            cv::subtract(imgAccumlate, maxImg, imgAccumlate);
-        }
-
-        imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / (imgNum / 3));
-    }
-}
-void IP::CreateGoldenImage_Median(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
-{
-    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
-    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
-    Mat imgSrc;
-
-    Mat minImg;
-    Mat maxImg;
-
-    for (int i = 2; i < imgNum; i++)
-    {
-        if (i == 2)
-        {
-            imgSrc = Mat(nH, nW, CV_8UC1, pSrc[0]);
-            imgSrc.convertTo(imgSrc, CV_16UC1);
-
-            minImg = imgSrc.clone();
-            maxImg = imgSrc.clone();
-
-            imgAccumlate = imgAccumlate + minImg;
-        }
-        else
-        {
-            minImg = imgAccumlate.clone();
-            maxImg = imgAccumlate.clone();
-        }  
-
-        for (int j = i - 2; j < i; j++)
-        {
-            
-            imgSrc = Mat(nH, nW, CV_8UC1, pSrc[j]);
-            imgSrc.convertTo(imgSrc, CV_16UC1);
-
-            (cv::min)(imgSrc, minImg, minImg);
-            (cv::max)(imgSrc, maxImg, maxImg);
-
-            imgAccumlate = imgAccumlate + imgSrc;
-        }
-
-        cv::subtract(imgAccumlate, minImg, imgAccumlate);
-        cv::subtract(imgAccumlate, maxImg, imgAccumlate);
-    }
-    imgAccumlate.convertTo(imgDst, CV_8UC1);
-}
-
 // SSE Version.
 void IP::CreateGoldenImage_Avg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nChipW, int nChipH)
 {
-    /*if (imgNum < 4)
-    {
-        MergeImage_Average(pSrc, pDst, imgNum, nMemW, nMemH, vtROILT, nChipW, nChipH);
-        return;
-    }*/
-
     LPBYTE* pChipLT = new LPBYTE[imgNum];
     byte* pResult = pDst;
     byte* pHeader = NULL;
@@ -1009,7 +965,127 @@ void IP::CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMe
     }
     //Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
 }
+// OpenCV로 개발... 느려서 안씀
+void IP::CreateGoldenImage_Avg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
+{
+    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
 
+    for (int i = 0; i < imgNum; i++)
+    {
+        Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
+        imgSrc.convertTo(imgSrc, CV_16UC1);
+        imgAccumlate = imgAccumlate + imgSrc;
+    }
+
+    imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / imgNum);
+}
+void IP::CreateGoldenImage_MedianAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
+{
+    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+    Mat imgSrc;
+    if (imgNum <= 4)
+    {
+        imgSrc = Mat(nH, nW, CV_8UC1, pSrc[0]);
+        imgSrc.convertTo(imgSrc, CV_16UC1);
+
+        Mat minImg = imgSrc.clone();
+        Mat maxImg = imgSrc.clone();
+
+        imgAccumlate = imgAccumlate + minImg;// pSrc[0]
+
+        for (int i = 1; i < imgNum; i++)
+        {
+            imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
+            imgSrc.convertTo(imgSrc, CV_16UC1);
+
+            (cv::min)(imgSrc, minImg, minImg);
+            (cv::max)(imgSrc, maxImg, maxImg);
+
+            imgAccumlate = imgAccumlate + imgSrc;
+        }
+
+        cv::subtract(imgAccumlate, minImg, imgAccumlate);
+        cv::subtract(imgAccumlate, maxImg, imgAccumlate);
+
+        imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / (imgNum - 2));
+    }
+    else
+    {
+        imgSrc = Mat(nH, nW, CV_8UC1, pSrc[0]);
+        imgSrc.convertTo(imgSrc, CV_16UC1);
+
+        Mat minImg = imgSrc.clone();
+        Mat maxImg = imgSrc.clone();
+
+        imgAccumlate = imgAccumlate + minImg;// pSrc[0]
+
+        for (int cnt = 0; cnt < imgNum / 3; cnt++)
+        {
+            for (int i = cnt * 3; i < cnt * 3 + 3; i++)
+            {
+                imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
+                imgSrc.convertTo(imgSrc, CV_16UC1);
+
+                (cv::min)(imgSrc, minImg, minImg);
+                (cv::max)(imgSrc, maxImg, maxImg);
+
+                imgAccumlate = imgAccumlate + imgSrc;
+            }
+
+            cv::subtract(imgAccumlate, minImg, imgAccumlate);
+            cv::subtract(imgAccumlate, maxImg, imgAccumlate);
+        }
+
+        imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / (imgNum / 3));
+    }
+}
+void IP::CreateGoldenImage_Median(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
+{
+    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+    Mat imgSrc;
+
+    Mat minImg;
+    Mat maxImg;
+
+    for (int i = 2; i < imgNum; i++)
+    {
+        if (i == 2)
+        {
+            imgSrc = Mat(nH, nW, CV_8UC1, pSrc[0]);
+            imgSrc.convertTo(imgSrc, CV_16UC1);
+
+            minImg = imgSrc.clone();
+            maxImg = imgSrc.clone();
+
+            imgAccumlate = imgAccumlate + minImg;
+        }
+        else
+        {
+            minImg = imgAccumlate.clone();
+            maxImg = imgAccumlate.clone();
+        }
+
+        for (int j = i - 2; j < i; j++)
+        {
+
+            imgSrc = Mat(nH, nW, CV_8UC1, pSrc[j]);
+            imgSrc.convertTo(imgSrc, CV_16UC1);
+
+            (cv::min)(imgSrc, minImg, minImg);
+            (cv::max)(imgSrc, maxImg, maxImg);
+
+            imgAccumlate = imgAccumlate + imgSrc;
+        }
+
+        cv::subtract(imgAccumlate, minImg, imgAccumlate);
+        cv::subtract(imgAccumlate, maxImg, imgAccumlate);
+    }
+    imgAccumlate.convertTo(imgDst, CV_8UC1);
+}
+// 그냥 for문....
 void IP::MergeImage_Average(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nChipW, int nChipH)
 {
     LPBYTE* pChipLT = new LPBYTE[imgNum];
