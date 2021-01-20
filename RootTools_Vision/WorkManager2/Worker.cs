@@ -22,6 +22,8 @@ namespace RootTools_Vision
 
     public delegate void EventWorkCompleted(Workplace obj);
 
+    public delegate void EventRequestStop();
+
     sealed internal class Worker : IWorkStartable
     {
         #region [Members]
@@ -39,6 +41,7 @@ namespace RootTools_Vision
 
         public event EventWorkCompleted WorkCompleted;
         public event EventWorkCompleted WorkIncompleted;
+        public event EventRequestStop RequestStop;
 
         private byte[] workplaceBufferR_GRAY;
         private byte[] workplaceBufferG;
@@ -214,13 +217,16 @@ namespace RootTools_Vision
             {
                 exception = true;
                 //쓰레드 하나라도 죽으면 WorkFactory Thread 다시 생성하고, WorkFactory Reset
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("예기치 못한 상황 발생으로 검사를 중단합니다.\n" + ex.Message);
             }
             finally
             {
                 if(exception == true)
                 {
+                    this.task = null;
+                    this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
+                    WorkEventManager.OnRequestStop(this, new RequestStopEventArgs());
                 }
             }
         }
