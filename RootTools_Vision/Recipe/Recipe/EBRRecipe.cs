@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-	public class EBRRecipe : RecipeBase
+	public class EBRRecipe : RecipeItemBase
 	{
 		public override void Clear()
 		{

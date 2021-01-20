@@ -181,6 +181,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MainUI\Rinse_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainUI\Run_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -200,6 +208,12 @@
     <Compile Include="MainUI\Main_UI.xaml.cs">
       <DependentUpon>Main_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MainUI\Rinse_UI.xaml.cs">
+      <DependentUpon>Rinse_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainUI\Run_UI.xaml.cs">
+      <DependentUpon>Run_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -209,7 +223,6 @@
     <Compile Include="Module\Loader.cs" />
     <Compile Include="Module\Rail.cs" />
     <Compile Include="Module\RinseL.cs" />
-    <Compile Include="Module\RinseU.cs" />
     <Compile Include="Module\Roller.cs" />
     <Compile Include="Module\Storage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

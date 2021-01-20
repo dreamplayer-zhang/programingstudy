@@ -52,7 +52,7 @@ namespace Root_AOP01_Inspection
 
 		private AOP01_Engineer engineer = new AOP01_Engineer();
 		private MemoryTool memoryTool;
-		private Recipe recipe;
+		private RecipeBase recipe;
 
 		private ImageData imageMain;
 		private ImageData image45D;
@@ -68,7 +68,7 @@ namespace Root_AOP01_Inspection
 		#region [Getter Setter]
 		public AOP01_Engineer Engineer { get => engineer; private set => engineer = value; }
 		public MemoryTool MemoryTool { get => memoryTool; private set => memoryTool = value; }
-		public Recipe Recipe { get => recipe; private set => recipe = value; }
+		public RecipeBase Recipe { get => recipe; private set => recipe = value; }
 		public ImageData ImageMain { get => imageMain; private set => imageMain = value; }
 		public ImageData Image45D { get => image45D; private set => image45D = value; }
 		public ImageData ImageSideLeft { get => imageSideLeft; private set => imageSideLeft = value; }
@@ -148,7 +148,7 @@ namespace Root_AOP01_Inspection
 
 		private bool InitMember()
 		{
-			recipe = new Recipe();
+			recipe = new RecipeBase();
 
 			if (!Directory.Exists(recipeFolderPath))
 				Directory.CreateDirectory(recipeFolderPath);

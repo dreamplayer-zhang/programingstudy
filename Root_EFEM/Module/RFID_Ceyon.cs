@@ -12,7 +12,7 @@ using RootTools.OHTNew;
 
 namespace Root_EFEM.Module
 {
-    public class RFID_Ceyon : ModuleBase
+    public class RFID_Ceyon : ModuleBase, IRFID
     {
         RS232 m_rs232;
         public IHandler m_handler;
@@ -26,6 +26,8 @@ namespace Root_EFEM.Module
             m_loadport = loadport;
 
         }
+
+        byte nCh = 0;
 
         #region CRC
         ushort[] m_uCRC =
@@ -119,7 +121,40 @@ namespace Root_EFEM.Module
         }
 
         StopWatch m_swRead = new StopWatch();
-        public string ReadRFID(byte nCh, out string sRFID)
+        ModuleRunBase _runReadID;
+        public ModuleRunBase m_runReadID
+        {
+            get { return _runReadID; }
+            set
+            {
+                _runReadID = value;
+                OnPropertyChanged();
+            }
+        }
+
+        string _sReadID = "";
+        public string m_sReadID
+        {
+            get { return _sReadID; }
+            set
+            {
+                _sReadID = value;
+                OnPropertyChanged();
+            }
+        }
+
+        bool _bReadID = false;
+        public bool m_bReadID
+        {
+            get { return _bReadID; }
+            set
+            {
+                if (_bReadID == value) return;
+                _bReadID = value;
+                OnPropertyChanged();
+            }
+        }
+        public string ReadRFID()
         {
             m_swRead.Restart();
             m_bOnRead = true;
@@ -130,12 +165,12 @@ namespace Root_EFEM.Module
             {
                 if (m_bOnRead == false)
                 {
-                    sRFID = m_sRFID;
+                    _sReadID = m_sRFID;
                     return "OK";
                 }
                 Thread.Sleep(20);
             }
-            sRFID = "";
+            _sReadID = "";
             return "RFID Read Fail : Timeout";
         }
         #endregion

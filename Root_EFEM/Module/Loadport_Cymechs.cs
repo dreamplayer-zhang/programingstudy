@@ -681,7 +681,7 @@ namespace Root_EFEM.Module
         #endregion
 
         #region ILoadport
-        public string StartRunDocking()
+        public string RunDocking()
         {
             if (p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runDocking.Clone();
@@ -690,7 +690,7 @@ namespace Root_EFEM.Module
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
 
-        public string StartRunUndocking()
+        public string RunUndocking()
         {
             if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "OK";
             ModuleRunBase run = m_runUndocking.Clone();
@@ -737,11 +737,11 @@ namespace Root_EFEM.Module
         public ModuleRunBase m_runDocking;
         public ModuleRunBase m_runUndocking;
 
-        public ModuleRunBase GetUnLoadModuleRun()
+        public ModuleRunBase GetModuleRunUndocking()
         {
             return m_runUndocking;
         }
-        public ModuleRunBase GetLoadModuleRun()
+        public ModuleRunBase GetModuleRunDocking()
         {
             return m_runDocking;
         }

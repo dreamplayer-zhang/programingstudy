@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -35,10 +36,12 @@ namespace Root_CAMELLIA.UI_UserControl
         Loadport_RND m_loadport;
         CAMELLIA_Handler m_handler;
         BackgroundWorker m_bgwLoad = new BackgroundWorker();
-        public void Init(ILoadport loadport, CAMELLIA_Handler handler)
+        RFID_Brooks m_rfid;
+        public void Init(ILoadport loadport, CAMELLIA_Handler handler, IRFID rfid)
         {
             m_loadport = (Loadport_RND)loadport;
             m_handler = handler;
+            m_rfid = (RFID_Brooks)rfid;
             this.DataContext = loadport;
 
             InitTimer();
@@ -52,6 +55,7 @@ namespace Root_CAMELLIA.UI_UserControl
             {
                 case ModuleBase.eState.Ready:
                     //m_loadport.p_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+                    EQ.p_nRnR = 0;
                     EQ.p_eState = EQ.eState.Run;
                     break;
             }
@@ -59,7 +63,13 @@ namespace Root_CAMELLIA.UI_UserControl
 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            //RFID Reading //working
+            ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
+            m_rfid.StartRun(moduleRun);
+            while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
+            //while ((EQ.IsStop() != true) && m_rfid.m_bReadID != true) Thread.Sleep(10);
+            m_loadport.StartRun(m_loadport.GetModuleRunDocking().Clone());
+            while ((EQ.IsStop() != true) && m_loadport.IsBusy()) Thread.Sleep(10);
+            Thread.Sleep(100);
         }
 
         bool IsEnableLoad()

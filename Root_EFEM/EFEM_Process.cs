@@ -79,7 +79,6 @@ namespace Root_EFEM
             m_aLocate.Clear();
             foreach (WTRArm arm in m_wtr.p_aArm) InitLocateArm(arm);
             foreach (IWTRChild child in m_wtr.p_aChild) InitLocateChild(child);
-            CalcRecover();
         }
 
         void InitLocateArm(WTRArm arm)

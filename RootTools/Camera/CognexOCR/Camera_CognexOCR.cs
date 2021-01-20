@@ -251,11 +251,11 @@ namespace RootTools.Camera.CognexOCR
             return null;
         }
         public double GetFps() { return 0; }
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY=0, bool bInvY = false, int ReserveOffsetY = 0) { }
         public string StopGrab()
         {
             return "FALSE";
         }
-        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReserveOffsetY = 0) { }
     }
 }

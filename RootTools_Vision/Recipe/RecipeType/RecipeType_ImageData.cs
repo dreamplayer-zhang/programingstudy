@@ -93,9 +93,14 @@ namespace RootTools_Vision
             this.Width = bmp.Width;
             this.Height = bmp.Height;
 
+            this.rawData = new byte[this.Width * this.Height * this.byteCnt];
+            Tools.LoadBitmapToRawdata(recipeFolderPath + this.FileName, this.rawData, this.Width, this.Height, this.ByteCnt);
             if (bmp.PixelFormat == PixelFormat.Format8bppIndexed)
             {
                 this.ByteCnt = 1;
+                this.rawDataR = new byte[this.Width * this.Height];
+
+                Array.Copy(this.rawData, this.rawDataR, rawData.Length);
             }
             else
             {
@@ -104,17 +109,14 @@ namespace RootTools_Vision
                 this.rawDataR = new byte[this.Width * this.Height];
                 this.rawDataG = new byte[this.Width * this.Height];
                 this.rawDataB = new byte[this.Width * this.Height];
+
+                Tools.SpliteColor(this.rawData, this.rawDataR, this.rawDataG, this.rawDataB);
             }
-            this.rawData = new byte[this.Width * this.Height * this.byteCnt];
-
-            Tools.LoadBitmapToRawdata(recipeFolderPath + this.FileName, this.rawData, this.Width, this.Height, this.ByteCnt);
-
-            Tools.SpliteColor(this.rawData, this.rawDataR, this.rawDataG, this.rawDataB);
-
-            Tools.SaveRawdataToBitmap("D:\\Image.bmp", this.rawData, this.width, this.height, this.byteCnt);
-            Tools.SaveRawdataToBitmap("D:\\ImageR.bmp", this.rawDataR, this.width, this.height, 1);
-            Tools.SaveRawdataToBitmap("D:\\ImageG.bmp", this.rawDataG, this.width, this.height, 1);
-            Tools.SaveRawdataToBitmap("D:\\ImageB.bmp", this.rawDataB, this.width, this.height, 1);
+            
+            //Tools.SaveRawdataToBitmap("D:\\Image.bmp", this.rawData, this.width, this.height, this.byteCnt);
+            //Tools.SaveRawdataToBitmap("D:\\ImageR.bmp", this.rawDataR, this.width, this.height, 1);
+            //Tools.SaveRawdataToBitmap("D:\\ImageG.bmp", this.rawDataG, this.width, this.height, 1);
+            //Tools.SaveRawdataToBitmap("D:\\ImageB.bmp", this.rawDataB, this.width, this.height, 1);
 
             return true;
         }

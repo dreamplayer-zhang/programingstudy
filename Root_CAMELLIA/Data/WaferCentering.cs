@@ -32,13 +32,6 @@ namespace Root_CAMELLIA.Data
         public RPoint m_ptCenter = new RPoint();
         public RPoint m_ptStageCenter = new RPoint();
 
-        //public void FindEdge(byte[] imgBuf, ePos pos)
-        //{
-        //    Mat matSrc = new Mat("emgutest.bmp");
-        //    CvInvoke.Imshow("test", matSrc);
-
-        //}
-        //public void FindEdge(byte[] ImgBuf, ePos pos, CPoint ptROI)
         public void CalCenterPoint(CPoint ptROI, double resolutionX, double resolutionY, RPoint ptLTPulse, RPoint ptRTPulse, RPoint ptRBPulse)
         {
             Point ptAvgLT = new Point();
@@ -145,22 +138,16 @@ namespace Root_CAMELLIA.Data
             {
                 case eDir.LT:
                     vector = new Point(0, 1);
-                    //edge = GetEdgePoint(matInsp, new PointF(ptROI.X / 2, ptROI.Y / 2), vector, nSearchRange, nSearchLength, nSearchLevel);
-                    //m_ptLT = edge;
                     tempList = m_ptLT;
                     startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y / 2 - (nSearchLength / 2));
                     break;
                 case eDir.RT:
                     vector = new Point(0, 1);
-                    //edge = GetEdgePoint(matInsp, new PointF(ptROI.X / 2, ptROI.Y / 2), vector, nSearchRange, nSearchLength, nSearchLevel);
-                    //m_ptRT = edge;
                     tempList = m_ptRT;
                     startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y / 2 - (nSearchLength / 2));
                     break;
                 case eDir.RB:
                     vector = new Point(0, -1);
-                    //edge = GetEdgePoint(matInsp, new PointF(ptROI.X / 2, ptROI.Y / 2), vector, nSearchRange, nSearchLength, nSearchLevel);
-                    //m_ptRB = edge;
                     tempList = m_ptRB;
                     startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y / 2 + (nSearchLength / 2));
                     break;
@@ -171,12 +158,12 @@ namespace Root_CAMELLIA.Data
                 edge = GetEdgePoint(matInsp, new PointF(startPt.X + (i * nSearchRange / 2), startPt.Y), vector, nSearchRange, nSearchLength, nSearchLevel);
                 tempList.Add(edge);
             }
-            //m_ptLT = edge;
+
             for (int i = 0; i < tempList.Count; i++)
             {
                 CvInvoke.Circle(matTest, tempList[i], 5, new MCvScalar(0, 255, 0));
             }
-            Emgu.CV.UI.ImageViewer.Show(matTest);
+            //Emgu.CV.UI.ImageViewer.Show(matTest);
         }
 
         public Point GetEdgePoint(Mat Image, PointF ptStart, Point vector, int nSearchRange, int nSearchLength, int nSearchLevel)

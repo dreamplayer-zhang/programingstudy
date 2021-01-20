@@ -107,7 +107,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
         {
             sLoadportNum = m_loadport.p_id;
             if (IsEnableLoad() == false) return;
-            m_loadport.StartRunDocking();
+            m_loadport.RunDocking();
             if (m_manualjob.ShowPopup(m_handler) == false) return;
             m_bgwLoad.RunWorkerAsync();
         }

@@ -1,6 +1,8 @@
 ﻿using RootTools;
 using RootTools.Comm;
+using RootTools.Control;
 using RootTools.Module;
+using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -58,9 +60,30 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
+        #region Rinse
+        DIO_I m_diRinseRun;
+
+        public enum eRinseRun
+        {
+            Ready,
+            Run,
+        }
+        eRinseRun _eStateRinse = eRinseRun.Ready;
+        public eRinseRun p_eStateRinse
+        {
+            get { return _eStateRinse; }
+            set
+            {
+                if (_eStateRinse == value) return;
+                _eStateRinse = value;
+                OnPropertyChanged(); 
+            }
+        }
+        #endregion
+
         #region Unloader EQ State
         EQ.eState _eStateUnloader = EQ.eState.Init; 
-        EQ.eState p_eStateUnloader
+        public EQ.eState p_eStateUnloader
         {
             get { return _eStateUnloader; }
             set
@@ -76,7 +99,8 @@ namespace Root_Rinse_Loader.Module
         TCPIPClient m_tcpip; 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP"); 
+            p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
+            p_sInfo = m_toolBox.Get(ref m_diRinseRun, this, "Rinse Run"); 
             if (bInit) 
             {
                 EQ.m_EQ.OnChanged += M_EQ_OnChanged;
@@ -86,7 +110,7 @@ namespace Root_Rinse_Loader.Module
 
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
-            AddProtocol(p_id, eCmd.EQLeState, value);
+            if (eEQ == _EQ.eEQ.State) AddProtocol(p_id, eCmd.EQLeState, value);
         }
         #endregion
 
@@ -139,6 +163,7 @@ namespace Root_Rinse_Loader.Module
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
+                p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready; 
                 if (m_qProtocolReply.Count > 0)
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();
@@ -209,13 +234,21 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
+        #region Tree
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
+            p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
+        }
+        #endregion
 
         public RinseL(string id, IEngineer engineer)
         {
             p_id = id;
             InitBase(id, engineer);
 
-            InitThread(); 
+            InitThread();
         }
 
         public override void ThreadStop()

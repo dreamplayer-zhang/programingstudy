@@ -85,11 +85,11 @@ namespace RootTools_Vision
             throw new NotImplementedException();
         }
 
-        public override object Clone()
-        {
-            // string과 같이 new로 생성되는 변수가 있으면 MemberwiseClone을 사용하면안됩니다.
-            // 현재 타입의 클래스를 생성해서 새로 값(객체)을 할당해주어야합니다.
-            return this.MemberwiseClone(); ;
-        }
+        //public override object Clone()
+        //{
+        //    // string과 같이 new로 생성되는 변수가 있으면 MemberwiseClone을 사용하면안됩니다.
+        //    // 현재 타입의 클래스를 생성해서 새로 값(객체)을 할당해주어야합니다.
+        //    return this.MemberwiseClone(); ;
+        //}
     }
 }
