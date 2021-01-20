@@ -103,6 +103,13 @@ namespace RootTools_Vision
 				arrDiff[x] = arrEqual[x + xRange] - arrEqual[x - xRange];
 			}
 
+			StreamWriter sw = new StreamWriter(@"D:\EBR" + this.currentWorkplace.Index.ToString() + ".csv");
+			for (int i = 0;  i < arrDiff.Length; i++)
+            {
+				sw.WriteLine(arrAvg[i] + "," + arrEqual[i] + "," + arrDiff[i]);
+            }
+			sw.Close();
+
 			return arrDiff;
 		}
 
@@ -124,6 +131,10 @@ namespace RootTools_Vision
 			waferEdgeX = FindEdge(arrDiff, arrDiff.Length - (2 * xRange), diffEdge);
 			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX), diffBevel + this.parameterEBR.OffsetBevel);
 			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX), diffEBR + this.parameterEBR.OffsetEBR);
+
+			//StreamWriter sw = new StreamWriter(@"D:\EBRInsp" + this.currentWorkplace.Index.ToString() + ".csv");
+			//sw.WriteLine(waferEdgeX + "," + bevelX + "," + ebrX);
+			//sw.Close();
 
 			// Add measurement
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();

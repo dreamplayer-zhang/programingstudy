@@ -10,12 +10,19 @@
         Loaded="Window_Loaded"
         Closing="Window_Closing"
         Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
-    <TabControl>
-        <TabItem Header="MainUI">
-            <mainUI:Main_UI x:Name="mainUI"/>
-        </TabItem>
-        <TabItem Header="Engineer">
-            <engineer:RinseL_Engineer_UI x:Name="engineerUI"/>
-        </TabItem>
-    </TabControl>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ComboBox Grid.Column="0" x:Name="comboMain" SelectionChanged="comboMain_SelectionChanged"/>
+        <TabControl Grid.Row="1" x:Name="tabMain">
+            <TabItem Header="MainUI" Height="0">
+                <mainUI:Main_UI x:Name="mainUI"/>
+            </TabItem>
+            <TabItem Header="Engineer" Height="0">
+                <engineer:RinseL_Engineer_UI x:Name="engineerUI"/>
+            </TabItem>
+        </TabControl>
+    </Grid>
 </Window>

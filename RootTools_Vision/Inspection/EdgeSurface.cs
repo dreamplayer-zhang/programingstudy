@@ -101,30 +101,27 @@ namespace RootTools_Vision
 
 			int left = this.currentWorkplace.PositionX;
 			int top = this.currentWorkplace.PositionY;
-			int right = this.currentWorkplace.PositionX + this.currentWorkplace.SharedBufferWidth;
+			int right = this.currentWorkplace.PositionX + roiWidth;
 			int bottom = this.currentWorkplace.PositionY + roiHeight;
 
-			byte[] arrSrc = new byte[roiSize];
-			//for (int cnt = top; cnt < bottom; cnt++)
-			//{
-			//	Marshal.Copy(new IntPtr(sharedBuffer.ToInt64() + (cnt * (Int64)roiWidth))
-			//				, arrSrc
-			//				, roiWidth * (cnt - top)
-			//				, roiWidth);
-			//}
-			for (int cnt = top; cnt < bottom; cnt++)
-			{
-				Marshal.Copy(new IntPtr(sharedBuffer.ToInt64() + (cnt * (Int64)this.currentWorkplace.SharedBufferWidth))
-							, arrSrc
-							, this.currentWorkplace.SharedBufferWidth * (cnt - top)
-							, this.currentWorkplace.SharedBufferWidth);
-			}
-			Emgu.CV.Mat mat = new Emgu.CV.Mat((int)roiHeight, (int)roiWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
-			Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
-			mat.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_" + this.currentWorkplace.Index.ToString() + ".bmp");
+            byte[] arrSrc = new byte[roiSize];
+            for (int cnt = top; cnt < bottom; cnt++)
+            {
+                Marshal.Copy(new IntPtr(sharedBuffer.ToInt64() + (cnt * (Int64)this.currentWorkplace.SharedBufferWidth))
+                            , arrSrc
+                            , this.currentWorkplace.SharedBufferWidth * (cnt - top)
+                            , this.currentWorkplace.SharedBufferWidth);
+            }
 
-			// profile 생성
-			List<int> temp = new List<int>();
+            //byte[] arrSrc = new byte[roiSize]; 
+            //arrSrc = this.GetWorkplaceBuffer(IMAGE_CHANNEL.)
+
+            Emgu.CV.Mat mat = new Emgu.CV.Mat((int)roiHeight, (int)roiWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+            Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
+            mat.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_" + this.currentWorkplace.Index.ToString() + ".bmp");
+
+            // profile 생성
+            List<int> temp = new List<int>();
 			List<int> profile = new List<int>();
 			for (long j = 0; j < roiWidth; j++)
 			{

@@ -181,7 +181,7 @@ namespace Root_WIND2
             WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
             //m_SetupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRunOpen();
             //m_SetupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRun();
-            ((WIND2_Handler)(engineer.ClassHandler())).p_aLoadport[0].StartRunDocking();
+            ((WIND2_Handler)(engineer.ClassHandler())).p_aLoadport[0].RunDocking();
             //m_moduleRunList.OpenJob("C:\\Recipe\\RNR_ALL.RunWIND2");
         }
 

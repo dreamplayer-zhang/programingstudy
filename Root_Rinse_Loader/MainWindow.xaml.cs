@@ -13,6 +13,7 @@ namespace Root_Rinse_Loader
         public MainWindow()
         {
             InitializeComponent();
+            comboMain.ItemsSource = new string[] { "Main UI", "Engineer" };
         }
 
         #region Loaded
@@ -33,5 +34,12 @@ namespace Root_Rinse_Loader
         }
         #endregion
 
+        #region UI Controls
+        private void comboMain_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (comboMain.SelectedIndex < 0) return;
+            tabMain.SelectedIndex = comboMain.SelectedIndex; 
+        }
+        #endregion
     }
 }

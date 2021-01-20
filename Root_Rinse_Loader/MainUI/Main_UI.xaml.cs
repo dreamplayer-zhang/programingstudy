@@ -16,7 +16,8 @@ namespace Root_Rinse_Loader.MainUI
         RinseL_Engineer m_engineer; 
         public void Init(RinseL_Engineer engineer)
         {
-            m_engineer = engineer; 
+            m_engineer = engineer;
+            runUI.Init(engineer); 
         }
     }
 }

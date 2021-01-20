@@ -61,7 +61,7 @@ namespace Root_Rinse_Loader.Module
 
         #region Unloader EQ State
         EQ.eState _eStateUnloader = EQ.eState.Init; 
-        EQ.eState p_eStateUnloader
+        public EQ.eState p_eStateUnloader
         {
             get { return _eStateUnloader; }
             set
@@ -224,7 +224,7 @@ namespace Root_Rinse_Loader.Module
             p_id = id;
             InitBase(id, engineer);
 
-            InitThread(); 
+            InitThread();
         }
 
         public override void ThreadStop()

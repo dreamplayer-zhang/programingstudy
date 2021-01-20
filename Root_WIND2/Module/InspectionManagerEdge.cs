@@ -81,6 +81,7 @@ namespace Root_WIND2
 			int memoryHeightTop = this.SharedBufferInfoArray[0].Height;
 			int memoryWidthTop = this.SharedBufferInfoArray[0].Width;
 
+			workplaceBundle.Add(new Workplace(-1, -1, 0, 0, 0, 0, index++));
 			for (int i = 0; i < memoryHeightTop / partitionNum; i++)
 			{
 				Workplace workplace = new Workplace(0, i, 0, partitionNum * i, memoryWidthTop, partitionNum, index++);

@@ -22,7 +22,6 @@ namespace RootTools_Vision
     public enum CreateRefImageMethod
     {
         Average = 0,
-        NearAverage,
         MedianAverage,
         Median,
     }

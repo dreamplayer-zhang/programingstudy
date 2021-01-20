@@ -58,7 +58,7 @@ namespace Root_WIND2
 
 			int index = 0;
 			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, index++));
-			for (int i = 0; i < 5/*workplaceCnt*/; i++)
+			for (int i = 0; i < workplaceCnt; i++)
 			{
 				int posY = (imageHeightPerDegree * i) - (height / 2);
 				if (posY <= 0)

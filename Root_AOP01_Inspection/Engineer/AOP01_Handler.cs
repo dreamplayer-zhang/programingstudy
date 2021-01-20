@@ -233,6 +233,65 @@ namespace Root_AOP01_Inspection
         public void CalcSequence()
         {
             m_process.ReCalcSequence();
+            CalcDockingUndocking();
+        }
+
+        public void CalcRecover()
+        {
+            m_process.CalcRecover();
+            CalcDockingUndocking();
+        }
+
+        void CalcDockingUndocking()
+        {
+            List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
+            while (m_process.m_qSequence.Count > 0) aSequence.Add(m_process.m_qSequence.Dequeue());
+            List<ILoadport> aDock = new List<ILoadport>();
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if (CalcDocking(loadport, aSequence)) aDock.Add(loadport);
+            }
+            while (aSequence.Count > 0)
+            {
+                EFEM_Process.Sequence sequence = aSequence[0];
+                m_process.m_qSequence.Enqueue(sequence);
+                aSequence.RemoveAt(0);
+                for (int n = aDock.Count - 1; n >= 0; n--)
+                {
+                    if (CalcUnload(aDock[n], aSequence))
+                    {
+                        ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
+                        EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
+                        m_process.m_qSequence.Enqueue(sequenceUndock);
+                        aDock.RemoveAt(n);
+                    }
+                }
+            }
+            m_process.RunTree(Tree.eMode.Init);
+        }
+
+        bool CalcDocking(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        {
+            foreach (EFEM_Process.Sequence sequence in aSequence)
+            {
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule)
+                {
+                    ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
+                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    m_process.m_qSequence.Enqueue(sequenceDock);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool CalcUnload(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        {
+            foreach (EFEM_Process.Sequence sequence in aSequence)
+            {
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return false;
+            }
+            return true;
         }
         #endregion
 
@@ -283,13 +342,13 @@ namespace Root_AOP01_Inspection
                     case EQ.eState.Run:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
-                            CheckLoad();
+                            //CheckLoad();
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            CheckUnload();
+                            //CheckUnload();
                             if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
-                                m_process.ReCalcSequence();
+                                CalcSequence();
                                 m_nRnR--;
                                 EQ.p_eState = EQ.eState.Run;
                             }
@@ -298,7 +357,7 @@ namespace Root_AOP01_Inspection
                 }
             }
         }
-
+        /*
         void CheckLoad()
         {
             if (m_process.m_qSequence.Count == 0) return; 
@@ -306,7 +365,7 @@ namespace Root_AOP01_Inspection
             string sLoadport = sequence.m_infoWafer.m_sModule;
             foreach (ILoadport loadport in m_aLoadport)
             {
-                if (loadport.p_id == sLoadport) loadport.StartRunDocking();
+                if (loadport.p_id == sLoadport) loadport.RunDocking();
             }
         }
 
@@ -323,11 +382,11 @@ namespace Root_AOP01_Inspection
                     {
                         if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
                     }
-                    if (bUndock&&!bInit) loadport.StartRunUndocking();
+                    if (bUndock&&!bInit) loadport.RunUndocking();
                     bInit = false;
                 }
             }
-        }
+        } */
         #endregion
 
         #region Tree

@@ -77,9 +77,8 @@ namespace Root_CAMELLIA
             //App.m_engineer.Init("Camellia");
             m_engineer = App.m_engineer;
             m_handler = m_engineer.m_handler;
-            loadportA.Init(m_handler.m_aLoadport[0], m_handler);
-            loadportB.Init(m_handler.m_aLoadport[1], m_handler);
-
+            loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
+            loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
             InitTimer();
         }
 
@@ -178,7 +177,7 @@ namespace Root_CAMELLIA
         private void buttonRecovery_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnable_Recovery() == false) return;
-            m_handler.m_process.CalcRecover();
+            m_handler.CalcRecover();
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Run;
             EQ.p_bRecovery = true;

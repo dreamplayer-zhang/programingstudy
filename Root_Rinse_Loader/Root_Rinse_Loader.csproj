@@ -181,6 +181,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MainUI\Rinse_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainUI\RunUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -203,6 +207,9 @@
     </Compile>
     <Compile Include="MainUI\Main_UI.xaml.cs">
       <DependentUpon>Main_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainUI\Rinse_UI.xaml.cs">
+      <DependentUpon>Rinse_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainUI\RunUI.xaml.cs">
       <DependentUpon>RunUI.xaml</DependentUpon>
