@@ -304,6 +304,17 @@ namespace RootTools_Vision
                 }
             }
         }
+        private void SaveTiffImage(String Path, List<Defect> DefectList, int nByteCnt)
+        {
+            Path += "\\";
+            DirectoryInfo di = new DirectoryInfo(Path);
+            if (!di.Exists)
+                di.Create();
+
+
+            
+        }
+        
 
 
     }

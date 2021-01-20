@@ -9,6 +9,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.RADS;
 using RootTools.Trees;
+using RootTools_Vision.Utility;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -35,6 +36,8 @@ namespace Root_WIND2.Module
         Camera_Basler m_CamAlign;
         Camera_Basler m_CamAutoFocus;
 
+        KlarfData_Lot m_KlarfData_Lot;
+
         #region [Getter Setter]
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
         public Axis AxisZ { get => m_axisZ; private set => m_axisZ = value; }
@@ -52,6 +55,7 @@ namespace Root_WIND2.Module
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
 
+        public KlarfData_Lot KlarfData_Lot { get => m_KlarfData_Lot; private set => m_KlarfData_Lot = value; }
         #endregion
 
         public override void GetTools(bool bInit)

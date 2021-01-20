@@ -12,6 +12,7 @@ using System.Windows.Threading;
 using RootTools;
 using RootTools.Database;
 using RootTools_Vision;
+using RootTools_Vision.Utility;
 
 
 namespace Root_WIND2
@@ -47,6 +48,7 @@ namespace Root_WIND2
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS_ALL, 1, true);
 
             WIND2EventManager.SnapDone += SnapDone_Callback;
+            WIND2EventManager.InspectionDone += InspectionDone_Callback;
         }
 
         
@@ -277,6 +279,13 @@ namespace Root_WIND2
                     wp.WorkState = WORK_TYPE.SNAP;
                 }
             }
+        }
+
+        public void InspectionDone_Callback(object obj, InspectionDoneArgs args)
+        {
+            KlarfData_Lot lot = new KlarfData_Lot();
+            lot.SaveKlarf("test", false);
+            ////RootTools_Vision.SaveKlarf("test", true);
         }
     }
 }

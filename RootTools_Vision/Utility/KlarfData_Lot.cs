@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace RootTools_Vision.Utility
 {
-    class KlarfData_Lot
+    public class KlarfData_Lot
     {
 		public KlarfData_Lot()
 		{
