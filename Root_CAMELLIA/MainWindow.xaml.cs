@@ -77,9 +77,8 @@ namespace Root_CAMELLIA
             //App.m_engineer.Init("Camellia");
             m_engineer = App.m_engineer;
             m_handler = m_engineer.m_handler;
-            loadportA.Init(m_handler.m_aLoadport[0], m_handler);
-            loadportB.Init(m_handler.m_aLoadport[1], m_handler);
-
+            loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
+            loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
             InitTimer();
         }
 

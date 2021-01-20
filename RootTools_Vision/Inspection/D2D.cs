@@ -21,7 +21,6 @@ namespace RootTools_Vision
         byte[] GoldenImage = null;
         float[] scaleMap = null;
         float[] histWeightMap = null;
-        List<byte[]> GoldenImages = new List<byte[]>();
 
         public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
@@ -161,7 +160,7 @@ namespace RootTools_Vision
                 }
             }
         }
-        public void SetMultipleGoldenImages()
+        public void SetTriggerGoldenImage()
         {
             // Index 계산
             List<int> mapYIdx = new List<int>();
@@ -172,29 +171,51 @@ namespace RootTools_Vision
             mapYIdx.Sort();
 
             int startY;
-            int middleY;
             int endY;
 
-            if (mapYIdx.Count() < 3)
+            if (mapYIdx.Count() < 5)
             {
                 startY = mapYIdx[0];
-                middleY = mapYIdx[1];
-                endY = mapYIdx[2];
+                endY = mapYIdx[mapYIdx.Count() - 1];
             }
             else
             {
                 int currentY = mapYIdx.IndexOf(this.currentWorkplace.MapIndexY);
 
-                startY = mapYIdx[(currentY == 0) ? 1 : 0];
-                middleY = mapYIdx[(currentY == mapYIdx.Count() / 2) ? mapYIdx.Count() / 2 + 1 : mapYIdx.Count() / 2];
-                endY = mapYIdx[(currentY == mapYIdx.Count() - 1) ? mapYIdx.Count() - 2 : mapYIdx.Count() - 1];
+                if (mapYIdx[currentY] - 2 < mapYIdx[0])
+                {
+                    startY = mapYIdx[0];
+                    endY = mapYIdx[currentY] + 2 + (2 - (mapYIdx[currentY] - startY));
+                }
+                else if (mapYIdx[currentY] + 2 > mapYIdx[mapYIdx.Count() - 1])
+                {
+                    endY = mapYIdx[mapYIdx.Count() - 1];
+                    startY = mapYIdx[currentY] - 2 - (2 - (endY - mapYIdx[currentY]));
+                }
+                else
+                {
+                    startY = mapYIdx[currentY] - 2;
+                    endY = mapYIdx[currentY] + 2;
+                }
             }
+
+            List<Cpp_Point> wpROIData = new List<Cpp_Point>();
+            Cpp_Point curROIData = new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY);
 
             foreach (Workplace wp in this.workplaceBundle)
                 if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
                     if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
-                        if ((wp.MapIndexY == startY) || (wp.MapIndexY == middleY) || (wp.MapIndexY == endY))
-                            GoldenImages.Add(GetWorkplaceBuffer(this.parameter.IndexChannel));
+                        if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY) && wp.MapIndexY != this.currentWorkplace.MapIndexY)
+                            wpROIData.Add(new Cpp_Point(wp.PositionX, wp.PositionY));
+
+            
+            unsafe
+            {
+                //???
+                CLR_IP.Cpp_SelectMinDiffinArea((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
+                                    this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
+                                    wpROIData, curROIData, 1, this.currentWorkplace.Width, this.currentWorkplace.Height);
+            }
         }
 
         
@@ -223,9 +244,9 @@ namespace RootTools_Vision
 
             if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) // JHChoi D2D Algorithm 
             {
-                SetMultipleGoldenImages();
+                SetTriggerGoldenImage();
                 // Diff Image 계산
-                CLR_IP.Cpp_SelectMinDiffinArea(inspectionWorkBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
+                //CLR_IP.Cpp_SelectMinDiffinArea(inspectionWorkBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
             }
             else
             {
@@ -268,7 +289,7 @@ namespace RootTools_Vision
                 if (parameter.HistWeightMap) // Histogram WeightMap
                 {
                     histWeightMap = new float[chipW * chipH];
-                    CLR_IP.Cpp_CreateHistogramWeightMap(inspectionWorkBuffer, GoldenImage, histWeightMap, chipW, chipH, 5);        // -> 뭔가 결과가 이상함... 수정 필요
+                    CLR_IP.Cpp_CreateHistogramWeightMap(inspectionWorkBuffer, GoldenImage, histWeightMap, chipW, chipH, 5);
                     CLR_IP.Cpp_Multiply(diffImg, histWeightMap, diffImg, chipW, chipH);
                 }
             }
@@ -340,7 +361,7 @@ namespace RootTools_Vision
 
             }
 
-            GoldenImages.Clear();
+            //GoldenImages.Clear();
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
         }
 
