@@ -154,7 +154,10 @@ namespace Root_EFEM.Module
                 OnPropertyChanged();
             }
         }
-        public string ReadRFID()
+        
+
+
+        public string ReadRFID(byte nCh, out string sRFID)
         {
             m_swRead.Restart();
             m_bOnRead = true;
@@ -165,12 +168,12 @@ namespace Root_EFEM.Module
             {
                 if (m_bOnRead == false)
                 {
-                    _sReadID = m_sRFID;
+                    sRFID = m_sRFID;
                     return "OK";
                 }
                 Thread.Sleep(20);
             }
-            _sReadID = "";
+            sRFID = "";
             return "RFID Read Fail : Timeout";
         }
         #endregion
@@ -188,6 +191,12 @@ namespace Root_EFEM.Module
         {
             m_runReadRFID = AddModuleRunList(new Run_ReadRFID(this, m_loadport), false, "Read RFID");
         }
+
+        public string ReadRFID()
+        {
+            throw new NotImplementedException();
+        }
+
         public class Run_ReadRFID : ModuleRunBase
         {
             RFID_Ceyon m_module;

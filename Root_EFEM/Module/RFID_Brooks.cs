@@ -106,6 +106,7 @@ namespace Root_EFEM.Module
         }
 
 
+
         public string ReadRFID()
         {
             m_bReadID = false;
@@ -287,6 +288,11 @@ namespace Root_EFEM.Module
         protected override void InitModuleRuns()
         {
             _runReadID = AddModuleRunList(new Run_ReadRFID(this), true, "RFID Read");
+        }
+
+        public string ReadRFID(byte nCh, out string sRFID)
+        {
+            throw new NotImplementedException();
         }
 
         public class Run_ReadRFID : ModuleRunBase
