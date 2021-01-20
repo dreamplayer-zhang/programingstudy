@@ -28,6 +28,7 @@ namespace Root_AOP01_Inspection
         WTRArm m_wtr;
         Arm m_arm;
         Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
+        RFID_Ceyon[] m_rfid = new RFID_Ceyon[2];
         AOP01_Handler.eLoadport LoadportType;
         public Run_Panel()
         {
@@ -35,7 +36,7 @@ namespace Root_AOP01_Inspection
         }
 
         public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
-            Loadport_Cymechs loadport2, AOP01_Engineer engineer)
+            Loadport_Cymechs loadport2, AOP01_Engineer engineer, RFID_Ceyon rfid1, RFID_Ceyon rfid2)
         {
             m_engineer = engineer;
             m_handler = engineer.m_handler;
@@ -45,8 +46,10 @@ namespace Root_AOP01_Inspection
             m_loadport[0] = loadport1;
             m_loadport[1] = loadport2;
             m_mainvision = mainvision;
-            loadportA.Init(m_handler.m_aLoadport[0], m_engineer);
-            loadportB.Init(m_handler.m_aLoadport[1], m_engineer);
+            m_rfid[0] = rfid1;
+            m_rfid[1] = rfid2;
+            loadportA.Init(m_handler.m_aLoadport[0], m_engineer, m_rfid[0]);
+            loadportB.Init(m_handler.m_aLoadport[1], m_engineer, m_rfid[1]);
             LoadportA_State.DataContext = loadport1;
             LoadportB_State.DataContext = loadport2;
             RTR_State.DataContext = wtrcleanunit;
@@ -56,12 +59,12 @@ namespace Root_AOP01_Inspection
         }
         void InitFFU()
         {
-            //FanUI0.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[0];
-            //FanUI1.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[1];
-            //FanUI2.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[2];
-            //FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
-            //FanUI4.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[4];
-            //FanUI5.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[5];
+            FanUI0.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[0];
+            FanUI1.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[1];
+            FanUI2.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[2];
+            FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
+            FanUI4.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[4];
+            FanUI5.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[5];
         }
 
         #region Timer

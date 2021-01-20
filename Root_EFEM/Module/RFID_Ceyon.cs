@@ -121,7 +121,7 @@ namespace Root_EFEM.Module
         }
 
         StopWatch m_swRead = new StopWatch();
-        ModuleRunBase _runReadID;
+        public ModuleRunBase _runReadID;
         public ModuleRunBase m_runReadID
         {
             get { return _runReadID; }
@@ -180,16 +180,15 @@ namespace Root_EFEM.Module
 
         public string StartRunReadRFID()
         {
-            ModuleRunBase run = m_runReadRFID.Clone();
+            ModuleRunBase run = _runReadID.Clone();
             StartRun(run);
             while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
 
-        public ModuleRunBase m_runReadRFID;
         protected override void InitModuleRuns()
         {
-            m_runReadRFID = AddModuleRunList(new Run_ReadRFID(this, m_loadport), false, "Read RFID");
+            _runReadID = AddModuleRunList(new Run_ReadRFID(this, m_loadport), false, "Read RFID");
         }
 
         public string ReadRFID()
@@ -210,11 +209,13 @@ namespace Root_EFEM.Module
             }
 
             int m_nCh = 1;
+            bool m_bRFID = false;
             string m_sSimulCarrierID = "CarrierID";
             public override ModuleRunBase Clone()
             {
                 Run_ReadRFID run = new Run_ReadRFID(m_module, m_loadport);
                 run.m_nCh = m_nCh;
+                run.m_bRFID = m_bRFID;
                 run.m_sSimulCarrierID = m_sSimulCarrierID;
                 return run;
             }
@@ -222,6 +223,7 @@ namespace Root_EFEM.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_nCh = tree.Set(m_nCh, m_nCh, "Channel", "RFID Channel", bVisible);
+                m_bRFID = tree.Set(m_bRFID, m_bRFID, "Use", "Run ReadRFID", bVisible);
                 m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation", bVisible && EQ.p_bSimulate);
             }
 
@@ -232,7 +234,7 @@ namespace Root_EFEM.Module
                 string sResult = "OK";
                 string sCarrierID = "";
                 if (EQ.p_bSimulate) sCarrierID = m_sSimulCarrierID;
-                else
+                else if(m_bRFID)
                 {
                     sResult = m_module.ReadRFID((byte)m_nCh, out sCarrierID);
                     m_loadport.p_infoCarrier.p_sCarrierID = (sResult == "OK") ? sCarrierID : "";

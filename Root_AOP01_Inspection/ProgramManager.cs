@@ -148,7 +148,7 @@ namespace Root_AOP01_Inspection
 
 		private bool InitMember()
 		{
-			recipe = new RecipeBase();
+			//recipe = new RecipeBase();
 
 			if (!Directory.Exists(recipeFolderPath))
 				Directory.CreateDirectory(recipeFolderPath);

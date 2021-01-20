@@ -29,14 +29,16 @@ namespace Root_AOP01_Inspection.UI_UserControl
         AOP01_Handler m_handler;
         Loadport_Cymechs m_loadport;
         InfoCarrier m_infoCarrier;
+        RFID_Ceyon m_rfid;
 
-        public void Init(ILoadport loadport, AOP01_Engineer engineer)
+        public void Init(ILoadport loadport, AOP01_Engineer engineer, IRFID rfid)
         {
             m_loadport = (Loadport_Cymechs)loadport;
             m_infoCarrier = m_loadport.p_infoCarrier;
             
             m_engineer = engineer;
             m_handler = engineer.m_handler;
+            m_rfid = (RFID_Ceyon)rfid;
             this.DataContext = loadport;
 
             textBoxPodID.DataContext = loadport.p_infoCarrier;
@@ -76,6 +78,9 @@ namespace Root_AOP01_Inspection.UI_UserControl
         }
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
+            ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
+            m_rfid.StartRun(moduleRun);
+            while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
         }
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
