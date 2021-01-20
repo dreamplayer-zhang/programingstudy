@@ -15,7 +15,8 @@ namespace RootTools_Vision
         NONE = 0,
         WORK_ASSIGNED = 1,
         WORKING = 2,
-        WORK_COMPLETED = 3
+        WORK_COMPLETED = 3,
+        WORK_STOP = 4,
     }
 
     public delegate void EventWorkCompleted(Workplace obj);
@@ -79,6 +80,7 @@ namespace RootTools_Vision
             this.token = _token;
             this.workerIndex = index;
             this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current); // 짧은 작업이 아닌 경우 LongRunning 옵션을 반드시 사용해야함. 자세한 것은 검색
+            this.isStop = true;
         }
 
         ~Worker()
@@ -136,19 +138,17 @@ namespace RootTools_Vision
             {
                 while (!token.IsCancellationRequested)
                 {
-                    //if (this.workerState == WORKER_STATE.NONE || this.workerState == WORKER_STATE.WORK_COMPLETED)
-                    //{
-                    //    this.workerState = WORKER_STATE.NONE;
-                    //    _waitSignal.WaitOne();
-                    //}
-                    if(this.workerState != WORKER_STATE.WORK_ASSIGNED)
-                        _waitSignal.WaitOne();
-
                     if (this.isStop == true)
                     {
                         Reset();
+                        this.workerState = WORKER_STATE.WORK_STOP;
                         _waitSignal.Reset();
                         _waitSignal.WaitOne();
+                    }
+                    else
+                    {
+                        if (this.workerState != WORKER_STATE.WORK_ASSIGNED)
+                            _waitSignal.WaitOne();
                     }
 
                     if (token.IsCancellationRequested)
@@ -258,14 +258,13 @@ namespace RootTools_Vision
         {
             this.currentWorkplace = null;
 
-            this.works.Clear();
-            this.works = null;
+            //if(this.works != null)
+            //{
+            //    this.works.Clear();
+            //    this.works = null;
+            //}
 
             this.workerState = WORKER_STATE.NONE;
-
-            this.workplaceBufferR_GRAY = null;
-            this.workplaceBufferG = null;
-            this.workplaceBufferB = null;
         }
 
         public void Exit()

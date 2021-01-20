@@ -205,6 +205,7 @@ namespace Root_CAMELLIA.ManualJob
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            m_JobSchedule.p_ManualJobBlink = false;
             e.Cancel = true;
             this.Hide();
         }

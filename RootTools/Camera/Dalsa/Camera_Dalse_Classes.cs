@@ -275,7 +275,7 @@ namespace RootTools.Camera.Dalsa
                     break;
             }  
         }
-        void SetGrabDirection(eDir dir)
+        public void SetGrabDirection(eDir dir)
         {
             m_sapCam.SetFeatureValue("SensorScanDirection", dir.ToString());
         }

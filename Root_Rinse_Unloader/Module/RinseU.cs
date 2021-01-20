@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Module;
+using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -70,7 +71,7 @@ namespace Root_Rinse_Unloader.Module
 
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
-            //m_remote.RemoteSend(Remote.eProtocol.EQ, eEQ.ToString(), value.ToString());
+            if (eEQ == _EQ.eEQ.State) AddProtocol(p_id, eCmd.EQUeState, value); 
         }
         #endregion
 
@@ -79,6 +80,9 @@ namespace Root_Rinse_Unloader.Module
         {
             Unknown,
             SetMode,
+            SetWidth,
+            EQLeState,
+            EQUeState,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd)); 
 
@@ -103,7 +107,8 @@ namespace Root_Rinse_Unloader.Module
 
         #region Thread Send
         Protocol m_protocolSend = null;
-        Queue<Protocol> m_qProtocol = new Queue<Protocol>();
+        Queue<Protocol> m_qProtocolSend = new Queue<Protocol>();
+        Queue<Protocol> m_qProtocolReply = new Queue<Protocol>();
         bool m_bRunSend = false;
         Thread m_threadSend;
         void InitThread()
@@ -119,19 +124,15 @@ namespace Root_Rinse_Unloader.Module
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
-                if (m_qProtocol.Count > 0)
+                if (m_qProtocolReply.Count > 0)
                 {
-                    Protocol protocol = m_qProtocol.Peek(); 
-                    if (protocol.m_id != p_id)
-                    {
-                        m_qProtocol.Dequeue();
-                        m_tcpip.Send(protocol.p_sCmd);
-                    }
-                    else if (m_protocolSend == null)
-                    {
-                        m_protocolSend = m_qProtocol.Dequeue();
-                        m_tcpip.Send(m_protocolSend.p_sCmd);
-                    }
+                    Protocol protocol = m_qProtocolReply.Dequeue();
+                    m_tcpip.Send(protocol.p_sCmd);
+                }
+                else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
+                {
+                    m_protocolSend = m_qProtocolSend.Dequeue();
+                    m_tcpip.Send(m_protocolSend.p_sCmd);
                 }
             }
         }
@@ -139,8 +140,9 @@ namespace Root_Rinse_Unloader.Module
         public Protocol AddProtocol(string id, eCmd eCmd, dynamic value)
         {
             Protocol protocol = new Protocol(id, eCmd, value);
-            m_qProtocol.Enqueue(protocol);
-            return protocol; 
+            if (id == p_id) m_qProtocolSend.Enqueue(protocol);
+            else m_qProtocolReply.Enqueue(protocol);
+            return protocol;
         }
         #endregion
 
@@ -157,23 +159,37 @@ namespace Root_Rinse_Unloader.Module
                     return;
                 }
                 eCmd eCmd = GetCmd(asRead[1]);
-                if (asRead[0] != p_id)
+                if (asRead[0] == p_id) m_protocolSend = null;
+                else
                 {
                     switch (eCmd)
                     {
                         case eCmd.SetMode:
                             SetMode(asRead[2]);
-                            AddProtocol(asRead[0], eCmd, asRead[2]); 
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            RunTree(Tree.eMode.Init); 
+                            break;
+                        case eCmd.SetWidth:
+                            p_widthStrip = Convert.ToDouble(asRead[2]);
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            RunTree(Tree.eMode.Init);
+                            break;
+                        case eCmd.EQLeState:
+                            switch (GetEQeState(asRead[2]))
+                            {
+                                case EQ.eState.Home: 
+                                    if (EQ.p_eState != EQ.eState.Run) EQ.p_eState = EQ.eState.Home; //forget
+                                    break;
+                                case EQ.eState.Run: 
+                                    EQ.p_eState = EQ.eState.Run; 
+                                    break;
+                            }
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
                             break;
                     }
                 }
-                else
-                {
-
-                }
-
             }
-            finally { }
+            catch (Exception e) { p_sInfo = "EventRecieveData Exception : " + e.Message; }
         }
 
         eCmd GetCmd(string sCmd)
@@ -192,12 +208,43 @@ namespace Root_Rinse_Unloader.Module
                 if (sMode == m_asRunMode[n]) p_eMode = (eRunMode)n;
             }
         }
+
+        EQ.eState GetEQeState(string sState)
+        {
+            string[] asState = Enum.GetNames(typeof(EQ.eState)); 
+            for(int n = 0; n < asState.Length; n++)
+            {
+                if (asState[n] == sState) return (EQ.eState)n;
+            }
+            return EQ.eState.Null; 
+        }
+        #endregion
+
+        #region Tree
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode", true, true);
+            p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)", true, true);
+        }
         #endregion
 
         public RinseU(string id, IEngineer engineer)
         {
             p_id = id;
             InitBase(id, engineer);
+
+            InitThread(); 
+        }
+
+        public override void ThreadStop()
+        {
+            if (m_bRunSend)
+            {
+                m_bRunSend = false;
+                m_threadSend.Join(); 
+            }
+            base.ThreadStop();
         }
 
     }
