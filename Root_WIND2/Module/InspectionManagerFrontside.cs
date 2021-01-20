@@ -18,23 +18,29 @@ namespace Root_WIND2
 {
     public class InspectionManagerFrontside : WorkFactory
     {
-        private readonly Recipe recipe;
-        public Recipe Recipe { get => recipe; }
+        #region [Members]
+        private readonly RecipeFront recipe;
+        private readonly SharedBufferInfo sharedBufferInfo;
+        #endregion
 
-        private readonly SharedBufferInfo bufferInfo;
-        public SharedBufferInfo BufferInfo
-        {
-            get => this.bufferInfo;
+        #region [Properties]
+        public RecipeFront Recipe 
+        { 
+            get => recipe; 
         }
 
-        public InspectionManagerFrontside(Recipe recipe, SharedBufferInfo bufferInfo)
+        
+        public SharedBufferInfo SharedBufferInfo
+        {
+            get => this.sharedBufferInfo;
+        }
+        #endregion
+
+        public InspectionManagerFrontside(RecipeFront recipe, SharedBufferInfo bufferInfo)
         {
             this.recipe = recipe;
-            this.bufferInfo = bufferInfo;
+            this.sharedBufferInfo = bufferInfo;
         }
-
-
-
 
 
         #region [Override]
@@ -49,15 +55,20 @@ namespace Root_WIND2
             WIND2EventManager.SnapDone += SnapDone_Callback;
         }
 
-        
-
-
         /// <summary>
         /// 다음 함수에서 생성한 WorkplaceBundle로 검사를 진행합니다.
         /// </summary>
         /// <returns></returns>
         protected override WorkplaceBundle CreateWorkplaceBundle()
         {
+            RecipeType_WaferMap waferMap = recipe.WaferMap;
+
+            if (waferMap == null || waferMap.MapSizeX == 0 || waferMap.MapSizeY == 0)
+            {
+                MessageBox.Show("Map 정보가 없습니다.");
+                return null;
+            }
+
             return CreateWorkplaceBundle_WaferMap();
         }
 
@@ -74,6 +85,7 @@ namespace Root_WIND2
             {
                 WorkBase work = (WorkBase)Tools.CreateInstance(param.InspectionType);
                 work.SetRecipe(recipe);
+                work.SetParameter(param); // 같은 class를 사용하는 parameter 객체가 존재할 수 있으므로 반드시 work를 생성할 때 parameter를 셋팅
 
                 bundle.Add(work);
             }
@@ -125,8 +137,8 @@ namespace Root_WIND2
         public WorkplaceBundle CreateWorkplaceBundle_WaferMap()
         {
             RecipeType_WaferMap mapInfo = recipe.WaferMap;
-            OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
-            PositionRecipe positionRecipe = recipe.GetRecipe<PositionRecipe>();
+            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+            PositionRecipe positionRecipe = recipe.GetItem<PositionRecipe>();
 
             WorkplaceBundle bundle = new WorkplaceBundle();
             try
@@ -249,7 +261,7 @@ namespace Root_WIND2
                     }
                 }
 
-                bundle.SetSharedBuffer(this.bufferInfo);
+                bundle.SetSharedBuffer(this.sharedBufferInfo);
                 this.workplaceBundle = bundle;
                 return bundle;
             }
@@ -277,6 +289,11 @@ namespace Root_WIND2
                     wp.WorkState = WORK_TYPE.SNAP;
                 }
             }
+        }
+
+        ~InspectionManagerFrontside()
+        {
+
         }
     }
 }

@@ -57,16 +57,14 @@ namespace Root_WIND2
 
 
         Setup_ViewModel m_Setup;
-        Recipe m_Recipe;
         public Backside_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
-            m_Recipe = setup.Recipe;
 
             p_BacksideSetup_VM = new BacksideSetup_ViewModel();
 
             p_BacksideROI_VM = new BacksideROI_ViewModel();
-            p_BacksideROI_VM.init(m_Setup, m_Recipe);
+            p_BacksideROI_VM.init(m_Setup);
 
             p_BacksideInspection_VM = new BacksideInspection_ViewModel();
             p_BacksideInspection_VM.init(m_Setup);

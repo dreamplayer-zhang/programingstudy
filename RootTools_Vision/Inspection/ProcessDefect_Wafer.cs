@@ -53,7 +53,7 @@ namespace RootTools_Vision
 
             if (isBackside)
             {
-                this.recipeBackside = this.recipe.GetRecipe<BacksideRecipe>();
+                this.recipeBackside = this.recipe.GetItem<BacksideRecipe>();
                 waferCenterX = recipeBackside.CenterX;
                 waferCenterY = recipeBackside.CenterY;
                 radius = recipeBackside.Radius;
@@ -62,7 +62,7 @@ namespace RootTools_Vision
             //Defect 넣는 부분 정리 필요
 
             //List<Defect> DefectList = CollectDefectData();
-            //if(isBackside) // Backside Option
+            //if (isBackside) // Backside Option
             //    DeleteOutsideDefect(DefectList, waferCenterX, waferCenterY, radius, backsideOffset);
 
             //List<Defect> MergeDefectList = MergeDefect(DefectList, mergeDist);
@@ -79,14 +79,14 @@ namespace RootTools_Vision
             //    }
             //}
 
-           
+
             ////Workplace displayDefect = new Workplace();
             //foreach (Defect defect in MergeDefectList)
             //    this.workplace.DefectList.Add(defect);
 
             //string sDefectimagePath = @"D:\DefectImage";
-            //string sInspectionID = DatabaseManager.Instance.GetInspectionID();    
-            //SaveDefectImage(Path.Combine(sDefectimagePath, sInspectionID) , MergeDefectList, this.workplace.SharedBufferByteCnt);
+            //string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+            //SaveDefectImage(Path.Combine(sDefectimagePath, sInspectionID), MergeDefectList, this.workplace.SharedBufferByteCnt);
 
             ////// Add Defect to DB
             //if (MergeDefectList.Count > 0)

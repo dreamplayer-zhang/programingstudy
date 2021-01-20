@@ -7,6 +7,7 @@ using RootTools.Gem;
 using RootTools.Module;
 using RootTools.OHTNew;
 using RootTools.Trees;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -127,7 +128,9 @@ namespace Root_WIND2
             InitModule(m_edgesideVision);
             iWTR.AddChild(m_edgesideVision);
             m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Client);
-            if (ProgramManager.Instance.Engineer.m_bVisionEnable)
+
+            WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+            if (engineer.m_bVisionEnable)
             {
                 InitModule(m_vision);
                 iWTR.AddChild(m_vision);

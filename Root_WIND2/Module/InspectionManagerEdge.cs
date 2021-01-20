@@ -14,39 +14,26 @@ namespace Root_WIND2
 {
 	public class InspectionManagerEdge : WorkFactory
 	{
-		public InspectionManagerEdge(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt = 1)
+		#region [Memberws]
+		private readonly RecipeEdge recipe;
+		private readonly SharedBufferInfo[] bufferInfoArray;
+		#endregion
+		#region [Properties]
+		public RecipeEdge Recipe
+        {
+			get => this.recipe;
+        }
+		public SharedBufferInfo[] SharedBufferInfoArray
 		{
-			this.sharedBufferR_Gray = _sharedBuffer;
-			this.sharedBufferWidth = _width;
-			this.sharedBufferHeight = _height;
-			this.sharedBufferByteCnt = _byteCnt;
-		}
+			get => this.bufferInfoArray;
+        }
+		#endregion
 
-		private Recipe recipe;
-		private IntPtr sharedBufferR_Gray;
-		private IntPtr sharedBufferG;
-		private IntPtr sharedBufferB;
-
-		private int sharedBufferWidth;
-		private int sharedBufferHeight;
-		private int sharedBufferByteCnt;
-
-		public Recipe Recipe { get => recipe; set => recipe = value; }
-		public IntPtr SharedBufferR_Gray { get => sharedBufferR_Gray; set => sharedBufferR_Gray = value; }
-		public IntPtr SharedBufferG { get => sharedBufferG; set => sharedBufferG = value; }
-		public IntPtr SharedBufferB { get => sharedBufferB; set => sharedBufferB = value; }
-
-		public int SharedBufferWidth { get => sharedBufferWidth; set => sharedBufferWidth = value; }
-		public int SharedBufferHeight { get => sharedBufferHeight; set => sharedBufferHeight = value; }
-		public int SharedBufferByteCnt { get => sharedBufferByteCnt; set => sharedBufferByteCnt = value; }
-
-		public void SetWorkplaceBuffer(IntPtr ptrR, IntPtr ptrG, IntPtr ptrB)
+		public InspectionManagerEdge(RecipeEdge _recipe, SharedBufferInfo[] _bufferInfo)
 		{
-			this.SharedBufferR_Gray = ptrR;
-			this.SharedBufferG = ptrG;
-			this.SharedBufferB = ptrB;
+			this.recipe = _recipe;
+			this.bufferInfoArray = _bufferInfo;
 		}
-
 		public bool SetCameraInfo()
 		{
 			return true;
@@ -86,43 +73,40 @@ namespace Root_WIND2
 		private WorkplaceBundle CreateWorkplace_Edge()
 		{
 			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
-			int partitionNum = recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightTop;  // 2000
+			int partitionNum = recipe.GetItem<EdgeSurfaceParameter>().RoiHeightTop;  // 2000
 
 			int index = 0;
 
 			// top
-			RootTools.ImageData imageDataTop = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
-			int memoryHeightTop = 10000;// imageDataSide.p_Size.Y;
-			int memoryWidthTop = imageDataTop.p_Size.X;
+			int memoryHeightTop = this.SharedBufferInfoArray[0].Height;
+			int memoryWidthTop = this.SharedBufferInfoArray[0].Width;
 
 			for (int i = 0; i < memoryHeightTop / partitionNum; i++)
 			{
 				Workplace workplace = new Workplace(0, i, 0, partitionNum * i, memoryWidthTop, partitionNum, index++);
-				workplace.SetSharedBuffer(imageDataTop.GetPtr(0), memoryWidthTop, memoryHeightTop, imageDataTop.p_nByte, imageDataTop.GetPtr(1), imageDataTop.GetPtr(2));
+				workplace.SetSharedBuffer(this.SharedBufferInfoArray[0]);
 
 				workplaceBundle.Add(workplace);
 			}
 
 			// side
-			RootTools.ImageData imageDataSide = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeSide);
 			int memoryHeightSide = 10000;// imageDataSide.p_Size.Y;
-			int memoryWidhtSide = imageDataSide.p_Size.X;
+			int memoryWdithSide = this.SharedBufferInfoArray[1].Width;
 			for (int i = 0; i < memoryHeightSide / partitionNum; i++)
 			{
-				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Side, i, 0, memoryHeightSide / partitionNum * i, memoryWidhtSide, partitionNum, index++);
-				workplace.SetSharedBuffer(imageDataSide.GetPtr(0), memoryWidhtSide, memoryHeightSide, imageDataSide.p_nByte, imageDataSide.GetPtr(1), imageDataSide.GetPtr(2));
+				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Side, i, 0, memoryHeightSide / partitionNum * i, memoryWdithSide, partitionNum, index++);
+				workplace.SetSharedBuffer(this.SharedBufferInfoArray[1]);
 
 				workplaceBundle.Add(workplace);
 			}
 
 			// bottom
-			RootTools.ImageData imageDataBtm = ProgramManager.Instance.GetEdgeMemory(Module.EdgeSideVision.EDGE_TYPE.EdgeBottom);
 			int memoryHeightBtm = 10000;// imageDataBtm.p_Size.Y;
-			int memoryWidhtBtm = imageDataBtm.p_Size.X;
+			int memoryWidhtBtm = this.SharedBufferInfoArray[2].Width;
 			for (int i = 0; i < memoryHeightBtm / partitionNum; i++)
 			{
 				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Btm, i, 0, memoryHeightBtm / partitionNum * i, memoryWidhtBtm, partitionNum, index++);
-				workplace.SetSharedBuffer(imageDataBtm.GetPtr(0), memoryWidhtBtm, memoryHeightBtm, imageDataBtm.p_nByte, imageDataBtm.GetPtr(1), imageDataBtm.GetPtr(2));
+				workplace.SetSharedBuffer(this.SharedBufferInfoArray[2]);
 
 				workplaceBundle.Add(workplace);
 			}

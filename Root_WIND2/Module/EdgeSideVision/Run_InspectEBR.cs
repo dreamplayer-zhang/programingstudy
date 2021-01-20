@@ -1,5 +1,6 @@
 ﻿using RootTools.Module;
 using RootTools.Trees;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,15 +13,10 @@ namespace Root_WIND2.Module
 	{
 		EdgeSideVision module;
 
-		InspectionManagerEBR inspectionEBR;
 		string recipeName = string.Empty;
 
 		#region [Getter/Setter]
-		public InspectionManagerEBR InspectionEBR
-		{
-			get => inspectionEBR;
-			set => inspectionEBR = value;
-		}
+
 		public string RecipeName
 		{
 			get => recipeName;
@@ -31,14 +27,12 @@ namespace Root_WIND2.Module
 		public Run_InspectEBR(EdgeSideVision module)
 		{
 			this.module = module;
-			inspectionEBR = ((WIND2_Engineer)module.m_engineer).InspectionEBR;
 			InitModuleRun(module);
 		}
 
 		public override ModuleRunBase Clone()
 		{
 			Run_InspectEBR run = new Run_InspectEBR(module);
-			run.InspectionEBR = ProgramManager.Instance.InspectionEBR;
 			run.recipeName = recipeName;
 
 			return run;
@@ -54,8 +48,11 @@ namespace Root_WIND2.Module
 		{
 			try
 			{
-				if (this.inspectionEBR.Recipe.Read(recipeName, true) == false)
+				InspectionManagerEBR inspectionEBR = GlobalObjects.Instance.Get<InspectionManagerEBR>();
+
+				if (inspectionEBR.Recipe.Read(recipeName, true) == false)
 					return "Recipe Open Fail";
+
 
 				inspectionEBR.Start();
 				return "OK";

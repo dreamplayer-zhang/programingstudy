@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 
 namespace RootTools_Vision
 {
-    public class PositionRecipe : RecipeBase
+    public class PositionRecipe : RecipeItemBase
     {
         #region [Parameter]
         private List<RecipeType_ImageData> listMasterFeature;

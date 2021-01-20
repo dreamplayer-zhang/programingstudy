@@ -29,7 +29,8 @@ namespace RootTools_Vision
 
     public abstract class WorkBase : ObservableObject
     {
-        protected Recipe recipe;
+        protected RecipeBase recipe;
+        protected ParameterBase parameter;
         protected Workplace currentWorkplace;
         protected WorkplaceBundle workplaceBundle;
 
@@ -68,9 +69,14 @@ namespace RootTools_Vision
         public abstract WORK_TYPE Type { get; }
 
 
-        public void SetRecipe(Recipe recipe)
+        public void SetRecipe(RecipeBase recipe)
         {
             this.recipe = recipe;
+        }
+
+        public void SetParameter(ParameterBase param)
+        {
+            this.parameter = param;
         }
 
         public void SetWorkplace(Workplace workplace)
