@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-	public class EdgeSurfaceRecipe : RecipeBase
+	public class EdgeSurfaceRecipe : RecipeItemBase
 	{
 		public EdgeSurfaceRecipe()
 		{

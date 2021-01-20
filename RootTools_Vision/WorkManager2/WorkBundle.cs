@@ -9,7 +9,7 @@ namespace RootTools_Vision
 {
     public class WorkBundle : ObservableCollection<WorkBase>
     {
-        public void SetRecipe(Recipe recipe)
+        public void SetRecipe(RecipeBase recipe)
         {
             foreach (WorkBase work in this)
             {

@@ -24,8 +24,6 @@ namespace Root_WIND2.Module
         public GrabMode m_grabMode = null;
         string m_sGrabMode = "";
 
-        InspectionManagerFrontside inspectionFront;
-
         #region [Getter Setter]
         public string RecipeName 
         { 
@@ -42,18 +40,11 @@ namespace Root_WIND2.Module
                 m_grabMode = m_module.GetGrabMode(value);
             }
         }
-
-        public InspectionManagerFrontside InspectionVision 
-        {  
-            get => inspectionFront;
-            set => inspectionFront = value;
-        }
         #endregion
 
         public Run_Inspect(Vision module)
         {
             m_module = module;
-            inspectionFront = ((WIND2_Engineer)module.m_engineer).InspectionFront;
             InitModuleRun(module);
         }
 
@@ -61,9 +52,6 @@ namespace Root_WIND2.Module
         {
             Run_Inspect run = new Run_Inspect(m_module);
             run.p_sGrabMode = p_sGrabMode;
-
-            run.InspectionVision = ProgramManager.Instance.InspectionFront;
-
             run.RecipeName = this.RecipeName;
             return run;
         }
@@ -79,22 +67,22 @@ namespace Root_WIND2.Module
         {
             m_module.p_bStageVac = true;
             //레시피에 GrabMode 저장하고 있어야함
-
-            this.inspectionFront.Stop();
+            InspectionManagerFrontside inspectionFront = GlobalObjects.Instance.Get<InspectionManagerFrontside>();
+            inspectionFront.Stop();
 
             if (m_grabMode == null) return "Grab Mode == null";
 
             if (EQ.IsStop() == false)
             {
-                if (this.inspectionFront.Recipe.Read(m_sRecipeName, true) == false)
+                if (inspectionFront.Recipe.Read(m_sRecipeName, true) == false)
                     return "Recipe Open Fail";
 
-                this.inspectionFront.Start();
+                inspectionFront.Start();
 
             }
             else
             {
-                this.inspectionFront.Stop();
+                inspectionFront.Stop();
             }
 
             /// Snap Start (이거 나중에 구조 변경 필요할듯...)
@@ -122,6 +110,8 @@ namespace Root_WIND2.Module
                 while (m_grabMode.m_ScanLineNum > nScanLine)
                 {
                     if (EQ.IsStop())
+                    {
+                        inspectionFront.Stop();
                         return "OK";
 
                     // 위에서 아래로 찍는것을 정방향으로 함, 즉 Y축 값이 큰쪽에서 작은쪽으로 찍는것이 정방향

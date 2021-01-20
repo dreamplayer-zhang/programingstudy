@@ -114,27 +114,26 @@ namespace Root_WIND2
 
 
         Setup_ViewModel m_Setup;
-        Recipe m_Recipe;
+        RecipeBase m_Recipe;
         public Frontside_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
-            m_Recipe = setup.Recipe;
 
             p_Summary_VM = new FrontsideSummary_ViewModel();
-            p_Summary_VM.init(setup, m_Recipe);
+            p_Summary_VM.init(setup);
             
             p_Origin_VM = new FrontsideOrigin_ViewModel();
             p_Origin_VM.SetOrigin += P_Origin_VM_SetOrigin;
-            p_Origin_VM.init(setup, m_Recipe);
+            p_Origin_VM.init(setup);
 
             p_Position_VM = new FrontsidePosition_ViewModel();
-            p_Position_VM.init(setup, m_Recipe);
+            p_Position_VM.init(setup);
 
             p_ROI_VM = new FrontsideMask_ViewModel();
-            p_ROI_VM.Init(setup,m_Recipe);
+            p_ROI_VM.Init(setup);
 
             p_Spec_VM = new FrontsideSpec_ViewModel();
-            p_Spec_VM.init(this, m_Recipe);
+            p_Spec_VM.init(this);
 
             p_Origin_VM.MapControl_VM.SetMasterDie += P_Origin_VM_SetMasterDie;
 

@@ -25,8 +25,7 @@ namespace RootTools_Vision
         public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
         // D2D Recipe & Parameter
-
-        private D2DParameter parameter;
+        private D2DParameter parameterD2D;
         private D2DRecipe recipeD2D;
 
 
@@ -41,15 +40,19 @@ namespace RootTools_Vision
 
         protected override bool Preparation()
         {
+            if(this.parameterD2D == null || this.recipeD2D == null)
+            {
+                this.parameterD2D = (D2DParameter)this.parameter;
+                this.recipeD2D = this.recipe.GetItem<D2DRecipe>();
+            }
+            
+
             if (this.currentWorkplace.Index == 0)
             {
                 return true;
             }
-            this.parameter = this.recipe.GetRecipe<D2DParameter>();
-            this.recipeD2D = this.recipe.GetRecipe<D2DRecipe>();
 
-
-            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameter.IndexChannel);
+            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterD2D.IndexChannel);
 
             if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP) == true &&
                 this.workplaceBundle.CheckStateLine(this.currentWorkplace.MapIndexX, WORK_TYPE.ALIGNMENT) &&
@@ -134,7 +137,7 @@ namespace RootTools_Vision
 
             unsafe
             {
-                switch (parameter.CreateRefImage)
+                switch (parameterD2D.CreateRefImage)
                 {
                     case CreateRefImageMethod.Average:
                         CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count, 
@@ -229,8 +232,8 @@ namespace RootTools_Vision
                 return;
             }
 
-            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameter.IndexChannel);
-            this.inspectionWorkBuffer = this.GetWorkplaceBuffer(this.parameter.IndexChannel);
+            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterD2D.IndexChannel);
+            this.inspectionWorkBuffer = this.GetWorkplaceBuffer(this.parameterD2D.IndexChannel);
 
             int memH = this.currentWorkplace.SharedBufferHeight;
             int memW = this.currentWorkplace.SharedBufferWidth;
@@ -242,7 +245,7 @@ namespace RootTools_Vision
             byte[] binImg = new byte[chipW * chipH];
             byte[] diffImg = new byte[chipW * chipH];
 
-            if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) // JHChoi D2D Algorithm 
+            if (parameterD2D.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) // JHChoi D2D Algorithm 
             {
                 SetTriggerGoldenImage();
                 // Diff Image 계산
@@ -250,7 +253,7 @@ namespace RootTools_Vision
             }
             else
             {
-                if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
+                if (parameterD2D.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
                 {
                     //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
                     //sw.Start();
@@ -265,7 +268,7 @@ namespace RootTools_Vision
                 // Diff Image 계산
                 CLR_IP.Cpp_SubtractAbs(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
 
-                if (parameter.ScaleMap) // ScaleMap Option
+                if (parameterD2D.ScaleMap) // ScaleMap Option
                 {
                     if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) != null)
                     {
@@ -286,7 +289,7 @@ namespace RootTools_Vision
                     CLR_IP.Cpp_Multiply(diffImg, scaleMap, diffImg, chipW, chipH);
                 }
 
-                if (parameter.HistWeightMap) // Histogram WeightMap
+                if (parameterD2D.HistWeightMap) // Histogram WeightMap
                 {
                     histWeightMap = new float[chipW * chipH];
                     CLR_IP.Cpp_CreateHistogramWeightMap(inspectionWorkBuffer, GoldenImage, histWeightMap, chipW, chipH, 5);
@@ -296,7 +299,7 @@ namespace RootTools_Vision
             
 
             // Filter
-            switch (parameter.DiffFilter)
+            switch (parameterD2D.DiffFilter)
             {
                 case DiffFilterMethod.Average:
                     CLR_IP.Cpp_AverageBlur(diffImg, diffImg, chipW, chipH);
@@ -315,22 +318,22 @@ namespace RootTools_Vision
             }
 
             // Threshold 값으로 Defect 탐색
-            CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, parameter.Intensity);
+            CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, parameterD2D.Intensity);
             
 
             // Mask
-            MaskRecipe mask = this.recipe.GetRecipe<MaskRecipe>(); //요기다 추가해줘용
+            MaskRecipe mask = this.recipe.GetItem<MaskRecipe>(); //요기다 추가해줘용
 
-            Cpp_Point[] maskStartPoint = new Cpp_Point[mask.MaskList[this.parameter.MaskIndex].PointLines.Count];
-            int[] maskLength = new int[mask.MaskList[this.parameter.MaskIndex].PointLines.Count];
+            Cpp_Point[] maskStartPoint = new Cpp_Point[mask.MaskList[this.parameterD2D.MaskIndex].PointLines.Count];
+            int[] maskLength = new int[mask.MaskList[this.parameterD2D.MaskIndex].PointLines.Count];
 
             Cpp_Point tempPt = new Cpp_Point();
-            for(int i = 0; i < mask.MaskList[this.parameter.MaskIndex].PointLines.Count; i++)
+            for(int i = 0; i < mask.MaskList[this.parameterD2D.MaskIndex].PointLines.Count; i++)
             {
                 maskStartPoint[i] = new Cpp_Point();
-                maskStartPoint[i].x = mask.MaskList[this.parameter.MaskIndex].PointLines[i].StartPoint.X;
-                maskStartPoint[i].y = mask.MaskList[this.parameter.MaskIndex].PointLines[i].StartPoint.Y;
-                maskLength[i] = mask.MaskList[this.parameter.MaskIndex].PointLines[i].Length;
+                maskStartPoint[i].x = mask.MaskList[this.parameterD2D.MaskIndex].PointLines[i].StartPoint.X;
+                maskStartPoint[i].y = mask.MaskList[this.parameterD2D.MaskIndex].PointLines[i].StartPoint.Y;
+                maskLength[i] = mask.MaskList[this.parameterD2D.MaskIndex].PointLines[i].Length;
             }
             CLR_IP.Cpp_Masking(binImg, binImg, maskStartPoint.ToArray(), maskLength.ToArray(), chipW, chipH);
 
@@ -342,7 +345,7 @@ namespace RootTools_Vision
                 //Add Defect
             for (int i = 0; i < Label.Length; i++)
             {
-                if (Label[i].area > parameter.Size)
+                if (Label[i].area > parameterD2D.Size)
                 {
                     this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
 
@@ -370,7 +373,7 @@ namespace RootTools_Vision
             if(GoldenImage == null)
                 GoldenImage = new byte[this.currentWorkplace.Width * this.currentWorkplace.Height];
 
-            if (parameter.RefImageUpdate == RefImageUpdateFreq.Line) // Line 별로 GoldenImage를 만들 경우
+            if (parameterD2D.RefImageUpdate == RefImageUpdateFreq.Line) // Line 별로 GoldenImage를 만들 경우
             {
                 // Index 계산
                 List<int> mapYIdx = new List<int>();
@@ -407,7 +410,7 @@ namespace RootTools_Vision
                                 wpROIData.Add(new Cpp_Point(wp.PositionX, wp.PositionY));
 
                 unsafe { 
-                    switch (parameter.CreateRefImage)
+                    switch (parameterD2D.CreateRefImage)
                     {
                         case CreateRefImageMethod.Average:
                             CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,

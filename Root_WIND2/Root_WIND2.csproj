@@ -250,6 +250,10 @@
     <Compile Include="Module\InspectionManagerFrontside.cs" />
     <Compile Include="Module\Vision\Run_AutoFocus.cs" />
     <Compile Include="Module\Vision\Run_VisionAlign.cs" />
+    <Compile Include="Recipe\RecipeBack.cs" />
+    <Compile Include="Recipe\RecipeEBR.cs" />
+    <Compile Include="Recipe\RecipeEdge.cs" />
+    <Compile Include="Recipe\RecipeFront.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\BacksideInspection.xaml.cs">
       <DependentUpon>BacksideInspection.xaml</DependentUpon>
     </Compile>
@@ -277,7 +281,6 @@
     <Compile Include="Module\Vision\Run_GrabLineScan.cs" />
     <Compile Include="Module\Vision\Run_Inspect.cs" />
     <Compile Include="Module\Common\Run_Rotate.cs" />
-    <Compile Include="ProgramManager.cs" />
     <Compile Include="UIManager.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\InspectionROI.cs" />
     <Compile Include="Module\EdgeSideVision.cs" />

@@ -42,12 +42,6 @@ namespace Root_WIND2
             }
         }
 
-        private Recipe recipe;
-        public Recipe pRecipe { get => recipe; set => recipe = value; }
-
-        //public MainWindow m_MainWindow;
-        public ProgramManager programManager;
-
         private Home_ViewModel homeVM;
         private Inspection_ViewModel inspectionVM;
         private RecipeWizard_ViewModel wizardVM;
@@ -62,12 +56,6 @@ namespace Root_WIND2
 
         public Setup_ViewModel()
         {
-            init();
-        }
-
-        public Setup_ViewModel(Recipe _recipe = null)
-        {        
-            this.recipe = _recipe;
             init();
         }
 
@@ -285,7 +273,10 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(ProgramManager.Instance.NewRecipe);
+                return new RelayCommand(()=>
+                {
+                    MessageBox.Show("WIND2 전체 레시피 저장하는거 구현해줘요");
+                });
             }
 
         }
@@ -296,14 +287,15 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    if (this.Recipe.RecipePath == "")
-                    {
-                        ProgramManager.Instance.ShowDialogSaveRecipe();
-                    }
-                    else
-                    {
-                        ProgramManager.Instance.SaveRecipe(this.Recipe.RecipePath);
-                    }
+                    // 각패널 별로있어야함
+                    //if (this.Recipe.RecipePath == "")
+                    //{
+                    //    ProgramManager.Instance.ShowDialogSaveRecipe();
+                    //}
+                    //else
+                    //{
+                    //    ProgramManager.Instance.SaveRecipe(this.Recipe.RecipePath);
+                    //}
                 });
             }
         }
@@ -312,7 +304,10 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(ProgramManager.Instance.ShowDialogLoadRecipe);
+                return new RelayCommand(()=>
+                {
+                    MessageBox.Show("WIND2 전체 레시피 로드하는거 구현해줘요");
+                });
             }
         }
 
@@ -326,7 +321,6 @@ namespace Root_WIND2
 
         
         internal RecipeWizard_ViewModel Wizard { get => wizardVM; set => wizardVM = value; }
-        public Recipe Recipe { get => recipe; set => recipe = value; }
 
         #endregion
 
@@ -378,18 +372,20 @@ namespace Root_WIND2
 
         public void ShowSettingDialog()
         {
-            Nullable<bool> result = ProgramManager.Instance.DialogService.ShowDialog(UIManager.Instance.SettingDialogViewModel);
-            if (result.HasValue)
-            {
-                if (result.Value)
-                {
-                    
-                }
-                else
-                {
 
-                }
-            }
+            MessageBox.Show("Setting Dialog 연결해줘요!");
+            //Nullable<bool> result = ProgramManager.Instance.DialogService.ShowDialog(UIManager.Instance.SettingDialogViewModel);
+            //if (result.HasValue)
+            //{
+            //    if (result.Value)
+            //    {
+                    
+            //    }
+            //    else
+            //    {
+
+            //    }
+            //}
 
         }
 

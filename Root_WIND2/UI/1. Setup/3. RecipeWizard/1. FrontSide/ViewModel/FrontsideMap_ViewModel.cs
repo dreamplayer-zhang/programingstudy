@@ -50,8 +50,6 @@ namespace Root_WIND2
         int nShotSizeX = 1;
         int nShotSizeY = 1;
 
-        Recipe recipe;
-        //MapData m_WaferMap;
         #region GET/SET
         public Canvas myCanvas { get => canvas; set => canvas = value; }
         public int WaferSize { get => nWaferSize; set => nWaferSize = value; }
@@ -61,7 +59,9 @@ namespace Root_WIND2
             set
             {
                 SetProperty(ref mapSizeX, value);
-                recipe.WaferMap.MapSizeX = mapSizeX;
+
+                RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+                waferMap.MapSizeX = mapSizeX;
             }
         }
         public int MapSizeY
@@ -70,7 +70,9 @@ namespace Root_WIND2
             set
             {
                 SetProperty(ref mapSizeY, value);
-                recipe.WaferMap.MapSizeY = mapSizeY;
+
+                RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+                waferMap.MapSizeY = mapSizeY;
             }
         }
         public int OriginX 
@@ -79,7 +81,9 @@ namespace Root_WIND2
             set
             {
                 SetProperty(ref nOriginX, value);
-                recipe.WaferMap.MasterDieX = nOriginX;
+
+                RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+                waferMap.MasterDieX = nOriginX;
             }
         }
         public int OriginY
@@ -88,7 +92,9 @@ namespace Root_WIND2
             set
             {
                 SetProperty(ref nOriginY, value);
-                recipe.WaferMap.MasterDieY = nOriginY;
+
+                RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+                waferMap.MasterDieY = nOriginY;
             }
         }
         public int ShotX { get => nShotX; set => nShotX = value; }
@@ -183,15 +189,18 @@ namespace Root_WIND2
         {
         }
 
-        public void Init(Setup_ViewModel setup, FrontSideMap map, Recipe _recipe)
+        public void Init(Setup_ViewModel setup, FrontSideMap map, RecipeBase _recipe)
         {
             this.canvas = map.myCanvas;
-            this.recipe = _recipe;
 
-            this.MapSizeX = this.recipe.WaferMap.MapSizeX;
-            this.MapSizeY = this.recipe.WaferMap.MapSizeY;
-            this.OriginX = this.recipe.WaferMap.MasterDieX;
-            this.OriginY = this.recipe.WaferMap.MasterDieY;
+
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+
+            this.MapSizeX = waferMap.MapSizeX;
+            this.MapSizeY = waferMap.MapSizeY;
+            this.OriginX = waferMap.MasterDieX;
+            this.OriginY = waferMap.MasterDieY;
+
             this.mapdata = new int[this.MapSizeX * this.MapSizeY];
             DrawMaps();
         }
@@ -275,12 +284,14 @@ namespace Root_WIND2
 
         public void SetMapData()
         {
-            this.recipe.WaferMap.CreateWaferMap(MapSizeX, MapSizeY, mapdata);
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+
+            waferMap.CreateWaferMap(MapSizeX, MapSizeY, mapdata);
         }
 
         public void LoadMapData()
-        {     
-            RecipeType_WaferMap waferMap = recipe.WaferMap;
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
 
             if(waferMap.Data != null)
             {

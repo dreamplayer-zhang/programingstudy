@@ -21,7 +21,7 @@ namespace Root_WIND2
     /// </summary>
     public partial class DefectView : UserControl
     {
-        Recipe recipe;
+        RecipeBase recipe;
         public DefectView()
         {
             InitializeComponent();
@@ -30,7 +30,7 @@ namespace Root_WIND2
             cb_Front.IsChecked = true;
         }
 
-        public void SetRecipe(Recipe _recipe)
+        public void SetRecipe(RecipeBase _recipe)
         {
             this.recipe = _recipe;
         }
@@ -224,7 +224,7 @@ namespace Root_WIND2
         }
         private void AddFrontDefect(Canvas canvas, double x, double y, Brush brush = null)
         {
-            OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
+            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
             RecipeType_WaferMap mapdata = recipe.WaferMap;
 
             Rectangle defect = new Rectangle();
@@ -264,7 +264,7 @@ namespace Root_WIND2
         }
         private void AddBackDefect(Canvas canvas, double x, double y, Brush brush = null)
         {
-            BacksideRecipe backsideRecipe = recipe.GetRecipe<BacksideRecipe>();
+            BacksideRecipe backsideRecipe = recipe.GetItem<BacksideRecipe>();
             RecipeType_WaferMap mapdata = recipe.WaferMap;
 
             Rectangle defect = new Rectangle();

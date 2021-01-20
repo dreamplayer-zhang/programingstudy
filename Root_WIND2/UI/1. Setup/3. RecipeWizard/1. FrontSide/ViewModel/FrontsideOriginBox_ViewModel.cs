@@ -27,9 +27,9 @@ namespace Root_WIND2
         public delegate void boxDone(object e);
         #endregion
 
-        public void init(Setup_ViewModel setup, Recipe recipe)
+        public void init(Setup_ViewModel setup)
         {
-            base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
+            base.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
             p_VisibleMenu = System.Windows.Visibility.Visible;
         }
 

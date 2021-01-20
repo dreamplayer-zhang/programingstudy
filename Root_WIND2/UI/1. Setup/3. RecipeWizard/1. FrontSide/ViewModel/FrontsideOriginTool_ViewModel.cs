@@ -27,14 +27,10 @@ namespace Root_WIND2
         CPoint OriginPoint = new CPoint();
         CPoint PitchPoint = new CPoint();
 
-        Recipe m_Recipe;
-        OriginRecipe m_OriginRecipe;
 
-        public FrontsideOriginTool_ViewModel(Recipe _recipe)
+        public FrontsideOriginTool_ViewModel()
         {
             base.init();
-            m_Recipe = _recipe;
-            m_OriginRecipe = _recipe.GetRecipe<OriginRecipe>();
             p_VisibleMenu = System.Windows.Visibility.Collapsed;
         }
 
@@ -107,14 +103,16 @@ namespace Root_WIND2
                     DrawOriginArea(m_Padding);
                 }
 
-                m_OriginRecipe.OriginX = m_OriginPoint.X;
-                m_OriginRecipe.OriginY = m_OriginPoint.Y;
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+                originRecipe.OriginX = m_OriginPoint.X;
+                originRecipe.OriginY = m_OriginPoint.Y;
                 return m_OriginPoint;
             }
             set
             {
-                m_OriginRecipe.OriginX = value.X;
-                m_OriginRecipe.OriginY = value.Y;
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+                originRecipe.OriginX = value.X;
+                originRecipe.OriginY = value.Y;
 
                 SetProperty(ref m_OriginPoint, value);
             }
@@ -123,7 +121,7 @@ namespace Root_WIND2
         public CPoint p_PitchSize
         {
             get
-            {                
+            {
                 //if (m_PitchSize.X != 0 || m_PitchSize.Y != 0)
                 //{
                 //    int x = OriginPoint.X + m_PitchSize.X;
@@ -132,15 +130,20 @@ namespace Root_WIND2
                 //    DrawPitchPoint(PitchPoint);
                 //    DrawOriginArea(m_Padding);
                 //}
-                m_OriginRecipe.DiePitchX = m_PitchSize.X;
-                m_OriginRecipe.DiePitchY = m_PitchSize.Y;
+
+                // Recipe
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+                originRecipe.DiePitchX = m_PitchSize.X;
+                originRecipe.DiePitchY = m_PitchSize.Y;
 
                 return m_PitchSize;
             }
             set
             {
-                m_OriginRecipe.DiePitchX = value.X;
-                m_OriginRecipe.DiePitchY = value.Y;
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+                originRecipe.DiePitchX = value.X;
+                originRecipe.DiePitchY = value.Y;
 
                 SetProperty(ref m_PitchSize, value);
             }
@@ -151,16 +154,20 @@ namespace Root_WIND2
             get
             {
                 DrawOriginArea(m_Padding);
-                m_OriginRecipe.InspectionBufferOffsetX = m_Padding.X;
-                m_OriginRecipe.InspectionBufferOffsetY = m_Padding.Y;
+
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+                originRecipe.InspectionBufferOffsetX = m_Padding.X;
+                originRecipe.InspectionBufferOffsetY = m_Padding.Y;
 
                 return m_Padding;
             }
             set
             {
                 DrawOriginArea(value);
-                m_OriginRecipe.InspectionBufferOffsetX = value.X;
-                m_OriginRecipe.InspectionBufferOffsetY = value.Y;
+
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+                originRecipe.InspectionBufferOffsetX = value.X;
+                originRecipe.InspectionBufferOffsetY = value.Y;
 
                 SetProperty(ref m_Padding, value);
             }
@@ -223,8 +230,13 @@ namespace Root_WIND2
             p_ViewElement.Add(Origin_UI); // UI
 
             // Recipe
-            m_OriginRecipe.OriginX = memPt.X; 
-            m_OriginRecipe.OriginY = memPt.Y;
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+
+            recipe.LoadMasterImage();
+
+            originRecipe.OriginX = memPt.X;
+            originRecipe.OriginY = memPt.Y;
         }
         private void DrawPitchPoint(CPoint memPt)
         {
@@ -449,13 +461,17 @@ namespace Root_WIND2
             int byteCount = this.p_ImageData.p_nByte;
             byte[] rawdata = this.p_ImageData.GetByteArray();
 
-            this.m_Recipe.SaveMasterImage(posX, posY, width, height, byteCount, rawdata);
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+
+            recipe.SaveMasterImage(posX, posY, width, height, byteCount, rawdata);
         }
         public void _loadMasterImage()
         {
-            this.m_Recipe.LoadMasterImage();
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
 
-            OriginRecipe originRecipe = this.m_Recipe.GetRecipe<OriginRecipe>();
+            recipe.LoadMasterImage();
+
+            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 
             ImageData BoxImageData = new ImageData(originRecipe.MasterImage.Width, originRecipe.MasterImage.Height, originRecipe.MasterImage.ByteCnt);
 

@@ -13,7 +13,6 @@ namespace Root_WIND2
 	class Edgeside_ViewModel : ObservableObject
 	{
 		private Setup_ViewModel setupVM;
-		Recipe recipe;
 
 		public Edgeside_Panel Main;
 		public EdgesideSetup_ViewModel SetupVM;
@@ -22,7 +21,6 @@ namespace Root_WIND2
 		public Edgeside_ViewModel(Setup_ViewModel setup)
 		{
 			this.setupVM = setup;
-			this.recipe = setup.Recipe;
 			Init();
 		}
 

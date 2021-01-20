@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 
 namespace RootTools_Vision
 {
-    public class Recipe : IRecipe
+    public abstract class RecipeBase : IRecipe
     {
         #region [Member Variables]
         private string name = "";
@@ -18,7 +18,7 @@ namespace RootTools_Vision
 
         RecipeType_WaferMap waferMap = new RecipeType_WaferMap();
 
-        private List<RecipeBase> recipeItemList;
+        private List<RecipeItemBase> recipeItemList;
         private List<ParameterBase> parameterItemList;
         #endregion
 
@@ -27,7 +27,7 @@ namespace RootTools_Vision
         public RecipeType_WaferMap WaferMap { get => waferMap; set => waferMap = value; }
 
         [XmlIgnore]
-        public List<RecipeBase> RecipeItemList { get => recipeItemList; set => recipeItemList = value; }
+        public List<RecipeItemBase> RecipeItemList { get => recipeItemList; set => recipeItemList = value; }
 
         [XmlIgnore]
         public List<ParameterBase> ParameterItemList { get => parameterItemList; set => parameterItemList = value; }
@@ -41,10 +41,86 @@ namespace RootTools_Vision
         //private List<WaferInfoBase> waferInfoItemList;
 
 
-        public Recipe()
+        /// <summary>
+        /// RecipeItem의 각 class는 단일 객체만 허용
+        /// ParameterItem의 각 class는 다중 객체 허용 
+        /// </summary>
+        public RecipeBase()
         {
-            RecipeItemList = Tools.GetEnumerableOfType<RecipeBase>().ToList<RecipeBase>();
-            ParameterItemList = new List<ParameterBase>();
+            //RecipeItemList = Tools.GetEnumerableOfType<RecipeBase>().ToList<RecipeBase>();
+            recipeItemList = new List<RecipeItemBase>();
+            parameterItemList = new List<ParameterBase>();
+
+            Initilize();
+        }
+
+        /// <summary>
+        /// 레시피에 파라매터와 레시피 항목을 추가합니다.
+        /// </summary>
+        public abstract void Initilize();
+
+
+        /// <summary>
+        /// 레시피 항목을 추가합니다.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>class가 RecipeBase를 상속하지 않을 경우 false 반환</returns>
+        public bool RegisterRecipeItem<T>()
+        {
+            if(typeof(T).BaseType != typeof(RecipeItemBase))
+            {
+                MessageBox.Show("등록하려는 레시피 항목의 RecipeBase 클래스를 상속받지 않습니다.");
+                return false;
+            }
+            this.recipeItemList.Add((RecipeItemBase)Tools.CreateInstance(typeof(T)));
+
+            return true;
+        }
+
+        /// <summary>
+        /// ※※※※※ 이 메서드는 같은 타입의 parameter를 여러개 사용 않지 않는 경우에만 사용하세요. ※※※※※※
+        /// 파라매터 항목을 추가합니다.
+        /// 파라매터는 하나의 class가 여러개의 객체를 생성할 수 있습니다.
+        /// 파라매터를 기준으로 Inspection작업들을 생성합니다.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>class가 RecipeBase를 상속하지 않을 경우 false 반환</returns>
+        public bool RegisterParameterItem<T>()
+        {
+            if (typeof(T).BaseType != typeof(ParameterBase))
+            {
+                MessageBox.Show("등록하려는 레시피 항목의 ParameterBase 클래스를 상속받지 않습니다.");
+                return false;
+            }
+            this.parameterItemList.Add((ParameterBase)Tools.CreateInstance(typeof(T)));
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// 중복되는 Parameter 타입일 경우 GetItem을 통해서 불러올 경우 첫번째 항목만 불러와집니다.
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public bool RegsiterParameterItem(ParameterBase param)
+        {
+            this.parameterItemList.Add(param.Clone());
+            return true;
+        }
+
+        /// <summary>
+        /// 중복되는 Parameter 타입일 경우 GetItem을 통해서 불러올 경우 첫번째 항목만 불러와집니다.
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public bool RegsiterParameterItems(List<ParameterBase>paramList)
+        {
+            foreach(ParameterBase param in paramList)
+            {
+                this.parameterItemList.Add(param.Clone());
+            }
+            return true;
         }
 
         public void Clear()
@@ -55,7 +131,7 @@ namespace RootTools_Vision
 
             waferMap = new RecipeType_WaferMap();
 
-            foreach(RecipeBase recipe in RecipeItemList)
+            foreach(RecipeItemBase recipe in RecipeItemList)
             {
                 recipe.Clear();
             }
@@ -103,8 +179,8 @@ namespace RootTools_Vision
                 using (Stream reader = new FileStream(recipeFolderPath + "Base.xml", FileMode.Open))
                 {
                     XmlSerializer xml = new XmlSerializer(this.GetType());
-                    Recipe temp = this;
-                    temp = (Recipe)xml.Deserialize(reader);
+                    RecipeBase temp = this;
+                    temp = (RecipeBase)xml.Deserialize(reader);
 
                     this.WaferMap = temp.WaferMap;
                 }
@@ -119,7 +195,7 @@ namespace RootTools_Vision
                 using (Stream reader = new FileStream(recipeFolderPath + "Recipe.xml", FileMode.Open))
                 {
                     XmlSerializer xml = new XmlSerializer(this.RecipeItemList.GetType());
-                    this.RecipeItemList = (List<RecipeBase>)xml.Deserialize(reader);
+                    this.RecipeItemList = (List<RecipeItemBase>)xml.Deserialize(reader);
                 }
 
                 // Inspection Info(?)
@@ -132,7 +208,7 @@ namespace RootTools_Vision
                     param.Read(recipeFolderPath);
                 }
 
-                foreach(RecipeBase recipe in this.RecipeItemList)
+                foreach(RecipeItemBase recipe in this.RecipeItemList)
                 {
                     recipe.Read(recipeFolderPath);
                 }
@@ -163,7 +239,7 @@ namespace RootTools_Vision
                 param.Save(recipeFolderPath);
             }
 
-            foreach (RecipeBase recipe in this.RecipeItemList)
+            foreach (RecipeItemBase recipe in this.RecipeItemList)
             {
                 recipe.Save(recipeFolderPath);
             }
@@ -200,7 +276,7 @@ namespace RootTools_Vision
 
         public void SaveMasterImage(int _posX, int _posY, int _width, int _height, int _byteCnt, byte[] _rawData)
         {
-            OriginRecipe recipe = this.GetRecipe<OriginRecipe>();
+            OriginRecipe recipe = this.GetItem<OriginRecipe>();
 
             recipe.MasterImage = new RecipeType_ImageData(_posX, _posY, _width, _height, _byteCnt, _rawData);
             recipe.MasterImage.FileName = "MasterImage.bmp";
@@ -211,14 +287,14 @@ namespace RootTools_Vision
         {
             if (this.RecipeFolderPath == "") return;
 
-            OriginRecipe recipe = this.GetRecipe<OriginRecipe>();
+            OriginRecipe recipe = this.GetItem<OriginRecipe>();
 
             recipe.MasterImage = new RecipeType_ImageData();
             recipe.MasterImage.FileName = "MasterImage.bmp";
             recipe.MasterImage.Read(this.RecipeFolderPath);
         }
 
-        public T GetRecipe<T>()
+        public T GetItem<T>()
         {
             foreach (IRecipe recipe in RecipeItemList)
             {
@@ -231,6 +307,8 @@ namespace RootTools_Vision
                 if (recipe.GetType() == typeof(T))
                     return (T)recipe;
             }
+
+            MessageBox.Show("Recipe 항목이나 Parameter 항목이 존재하지 않습니다. \nRegisterRecipe(혹은 RegisterParameter) 메서드를 통해 등록하십시오.");
 
             return default(T);
         }
