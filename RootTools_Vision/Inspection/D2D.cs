@@ -137,7 +137,7 @@ namespace RootTools_Vision
 
             unsafe
             {
-                switch (parameter.CreateRefImage)
+                switch (parameterD2D.CreateRefImage)
                 {
                     case CreateRefImageMethod.Average:
                         CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count, 
@@ -232,8 +232,8 @@ namespace RootTools_Vision
                 return;
             }
 
-            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameter.IndexChannel);
-            this.inspectionWorkBuffer = this.GetWorkplaceBuffer(this.parameter.IndexChannel);
+            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterD2D.IndexChannel);
+            this.inspectionWorkBuffer = this.GetWorkplaceBuffer(this.parameterD2D.IndexChannel);
 
             int memH = this.currentWorkplace.SharedBufferHeight;
             int memW = this.currentWorkplace.SharedBufferWidth;
@@ -253,7 +253,7 @@ namespace RootTools_Vision
             }
             else
             {
-                if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
+                if (parameterD2D.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
                 {
                     //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
                     //sw.Start();
@@ -410,7 +410,7 @@ namespace RootTools_Vision
                                 wpROIData.Add(new Cpp_Point(wp.PositionX, wp.PositionY));
 
                 unsafe { 
-                    switch (parameter.CreateRefImage)
+                    switch (parameterD2D.CreateRefImage)
                     {
                         case CreateRefImageMethod.Average:
                             CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
