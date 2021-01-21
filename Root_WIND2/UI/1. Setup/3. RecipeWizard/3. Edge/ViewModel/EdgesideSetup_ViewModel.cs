@@ -20,8 +20,6 @@ namespace Root_WIND2
 {
 	class EdgesideSetup_ViewModel : ObservableObject
 	{
-		Recipe recipe;
-		private WIND2_Engineer engineer;
 		private Setup_ViewModel setupVM;
 		private RootViewer_ViewModel drawToolVM;
 
@@ -85,9 +83,9 @@ namespace Root_WIND2
 					roiHeight_Side = value;
 				if (IsBtmChecked)
 					roiHeight_Btm = value;
-				
-				//SetParameter();
-			}
+
+                SetParameter();
+            }
 		}
 		public int ROIWidth 
 		{
@@ -105,8 +103,8 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					roiWidth_Btm = value;
 
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int Threshold
 		{
@@ -124,8 +122,8 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					threshold_Btm = value;
 
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int DefectSizeMin
 		{
@@ -143,8 +141,8 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					defectSizeMin_Btm = value;
 
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int MergeDist
 		{
@@ -162,8 +160,8 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					mergeDist_Btm = value;
 
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int IllumWhite
 		{
@@ -181,8 +179,8 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					illumWhite_Btm = value;
 
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int IllumSide
 		{
@@ -200,8 +198,8 @@ namespace Root_WIND2
 				if (IsBtmChecked)
 					illumSide_Btm = value;
 
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 
 		public bool IsTopChecked
@@ -347,16 +345,15 @@ namespace Root_WIND2
 
 		public EdgesideSetup_ViewModel()
 		{
-			engineer = ProgramManager.Instance.Engineer;
+
 		}
 
 		public void Init(Setup_ViewModel _setup)
 		{
 			this.setupVM = _setup;
-			this.recipe = _setup.Recipe;
 
 			DrawToolVM = new RootViewer_ViewModel();
-			DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeTop), ProgramManager.Instance.DialogService);
+			DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
 
 			WIND2EventManager.BeforeRecipeSave += BeforeRecipeSave_Callback;
 			WorkEventManager.ProcessDefectWaferDone += ProcessDefectWaferDone;
@@ -364,8 +361,9 @@ namespace Root_WIND2
 
 		public void Scan()
 		{
+			
 			EQ.p_bStop = false;
-			EdgeSideVision edgeSideVision = ((WIND2_Handler)engineer.ClassHandler()).p_EdgeSideVision;
+			EdgeSideVision edgeSideVision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
 			if (edgeSideVision.p_eState != ModuleBase.eState.Ready)
 			{
 				MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
@@ -378,49 +376,53 @@ namespace Root_WIND2
 
 		public void Inspect()
 		{
-			ProgramManager.Instance.InspectionEdge.Start();
+			GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();			
 		}
 
 		private void ChangeViewer(string dataName)
 		{
-			if (dataName == "Top")
-				DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeTop), ProgramManager.Instance.DialogService);
-			else if (dataName == "Side")
-				DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeSide), ProgramManager.Instance.DialogService);
-			else if (dataName == "Bottom")
-				DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeBottom), ProgramManager.Instance.DialogService);
+
 			
-			//SetParameter();
-		}
+			if (dataName == "Top")
+				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
+			else if (dataName == "Side")
+				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeSideImage"), GlobalObjects.Instance.Get<DialogService>());
+			else if (dataName == "Bottom")
+				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeBottomImage"), GlobalObjects.Instance.Get<DialogService>());
+
+            SetParameter();
+        }
 
 		public void LoadParameter()
 		{
-			if (recipe.GetRecipe<EdgeSurfaceParameter>() == null)
+			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+
+			if (recipe.GetItem<EdgeSurfaceParameter>() == null)
 				return;
 
-			roiHeight_Top = recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightTop;
-			roiWidth_Top = recipe.GetRecipe<EdgeSurfaceParameter>().RoiWidthTop;
-			threshold_Top = recipe.GetRecipe<EdgeSurfaceParameter>().ThesholdTop;
-			defectSizeMin_Top = recipe.GetRecipe<EdgeSurfaceParameter>().SizeMinTop;
-			mergeDist_Top = recipe.GetRecipe<EdgeSurfaceParameter>().MergeDistTop;
-			illumWhite_Top = recipe.GetRecipe<EdgeSurfaceParameter>().IllumWhiteTop;
-			illumSide_Top = recipe.GetRecipe<EdgeSurfaceParameter>().IllumSideTop;
+			roiHeight_Top = recipe.GetItem<EdgeSurfaceParameter>().RoiHeightTop;
+			roiWidth_Top = recipe.GetItem<EdgeSurfaceParameter>().RoiWidthTop;
+			threshold_Top = recipe.GetItem<EdgeSurfaceParameter>().ThesholdTop;
+			defectSizeMin_Top = recipe.GetItem<EdgeSurfaceParameter>().SizeMinTop;
+			mergeDist_Top = recipe.GetItem<EdgeSurfaceParameter>().MergeDistTop;
+			illumWhite_Top = recipe.GetItem<EdgeSurfaceParameter>().IllumWhiteTop;
+			illumSide_Top = recipe.GetItem<EdgeSurfaceParameter>().IllumSideTop;
 
-			roiHeight_Side = recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightSide;
-			roiWidth_Side = recipe.GetRecipe<EdgeSurfaceParameter>().RoiWidthSide;
-			threshold_Side = recipe.GetRecipe<EdgeSurfaceParameter>().ThesholdSide;
-			defectSizeMin_Side = recipe.GetRecipe<EdgeSurfaceParameter>().SizeMinSide;
-			mergeDist_Side = recipe.GetRecipe<EdgeSurfaceParameter>().MergeDistSide;
-			illumWhite_Side = recipe.GetRecipe<EdgeSurfaceParameter>().IllumWhiteSide;
-			illumSide_Side = recipe.GetRecipe<EdgeSurfaceParameter>().IllumSideSide;
+			roiHeight_Side = recipe.GetItem<EdgeSurfaceParameter>().RoiHeightSide;
+			roiWidth_Side = recipe.GetItem<EdgeSurfaceParameter>().RoiWidthSide;
+			threshold_Side = recipe.GetItem<EdgeSurfaceParameter>().ThesholdSide;
+			defectSizeMin_Side = recipe.GetItem<EdgeSurfaceParameter>().SizeMinSide;
+			mergeDist_Side = recipe.GetItem<EdgeSurfaceParameter>().MergeDistSide;
+			illumWhite_Side = recipe.GetItem<EdgeSurfaceParameter>().IllumWhiteSide;
+			illumSide_Side = recipe.GetItem<EdgeSurfaceParameter>().IllumSideSide;
 
-			roiHeight_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().RoiHeightBtm;
-			roiWidth_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().RoiWidthBtm;
-			threshold_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().ThesholdBtm;
-			defectSizeMin_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().SizeMinBtm;
-			mergeDist_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().MergeDistBtm;
-			illumWhite_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().IllumWhiteBtm;
-			illumSide_Btm = recipe.GetRecipe<EdgeSurfaceParameter>().IllumSideBtm;
+			roiHeight_Btm = recipe.GetItem<EdgeSurfaceParameter>().RoiHeightBtm;
+			roiWidth_Btm = recipe.GetItem<EdgeSurfaceParameter>().RoiWidthBtm;
+			threshold_Btm = recipe.GetItem<EdgeSurfaceParameter>().ThesholdBtm;
+			defectSizeMin_Btm = recipe.GetItem<EdgeSurfaceParameter>().SizeMinBtm;
+			mergeDist_Btm = recipe.GetItem<EdgeSurfaceParameter>().MergeDistBtm;
+			illumWhite_Btm = recipe.GetItem<EdgeSurfaceParameter>().IllumWhiteBtm;
+			illumSide_Btm = recipe.GetItem<EdgeSurfaceParameter>().IllumSideBtm;
 
 			if (IsTopChecked)
 			{
@@ -456,6 +458,8 @@ namespace Root_WIND2
 
 		public void SetParameter()
 		{
+			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+
 			EdgeSurfaceParameter param = new EdgeSurfaceParameter();
 			param.RoiHeightTop = roiHeight_Top;
 			param.RoiWidthTop = roiWidth_Top;
@@ -514,8 +518,8 @@ namespace Root_WIND2
 
 		private void BeforeRecipeSave_Callback(object obj, RecipeEventArgs args)
 		{
-			//SetParameter();
-		}
+            //SetParameter(); // 이건 이제.. 필요없을듯
+        }
 
 		private void ProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs e)
 		{
@@ -529,6 +533,8 @@ namespace Root_WIND2
 
 		private void UpdateDefectData()
 		{
+			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 			string sRecipeID = recipe.Name;
 			string sReicpeFileName = sRecipeID + ".rcp";

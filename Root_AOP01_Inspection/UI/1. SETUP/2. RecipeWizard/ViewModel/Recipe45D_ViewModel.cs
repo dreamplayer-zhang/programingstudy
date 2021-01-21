@@ -27,7 +27,7 @@ namespace Root_AOP01_Inspection
 		List<CPoint> PolygonPt = new List<CPoint>();
 		public ObservableCollection<TShape> Shapes = new ObservableCollection<TShape>();
 		private ObservableCollection<UIElement> m_UIElements = new ObservableCollection<UIElement>();
-		Recipe recipe
+		RecipeBase recipe
 		{
 			get
 			{
@@ -149,7 +149,7 @@ namespace Root_AOP01_Inspection
 		{
 			get
 			{
-				return recipe.GetRecipe<BacksideRecipe>();
+				return recipe.GetItem<BacksideRecipe>();
 			}
 		}
 		RecipeType_WaferMap mapInfo;
@@ -387,7 +387,7 @@ namespace Root_AOP01_Inspection
 			backsideRecipe.DiePitchX = chipSzX;
 			backsideRecipe.DiePitchY = chipSzY;
 
-			OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
+			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 			originRecipe.DiePitchX = chipSzX;
 			originRecipe.DiePitchY = chipSzY;
 			originRecipe.OriginX = originX;
@@ -609,7 +609,7 @@ namespace Root_AOP01_Inspection
 		private void startTestInsp()
 		{
 			p_ImageViewer_VM.Clear();
-			var temp = m_Setup.InspectionManager.Recipe.GetRecipe<BacksideRecipe>();
+			var temp = m_Setup.InspectionManager.Recipe.GetItem<BacksideRecipe>();
 			temp = backsideRecipe;
 
 			IntPtr SharedBuf = new IntPtr();

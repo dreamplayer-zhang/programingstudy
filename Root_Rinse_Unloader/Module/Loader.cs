@@ -194,6 +194,72 @@ namespace Root_Rinse_Unloader.Module
         }
         #endregion
 
+        #region PickerSet
+        public bool m_bPickersetMode = false;
+        public string StartPickerSet()
+        {
+            StartRun(m_runPickerSet.Clone());
+            return "OK";
+        }
+
+        string RunPickerSet()
+        {
+            try
+            {
+                if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
+                bool bDown = false;
+                bool bVacuum = false;
+                while (true)
+                {
+                    switch (CheckPickerSet())
+                    {
+                        case ePickerSet.Stop: return "OK";
+                        case ePickerSet.UpDown:
+                            bDown = !bDown;
+                            if (Run(RunPickerDown(bDown))) return p_sInfo;
+                            break;
+                        case ePickerSet.Vacuum:
+                            bVacuum = !bVacuum;
+                            if (Run(RunVacuum(bVacuum))) return p_sInfo;
+                            break;
+                    }
+                }
+            }
+            finally
+            {
+                RunPickerDown(false);
+                MoveLoader(ePos.Roller);
+                m_bPickersetMode = false;
+            }
+        }
+
+        enum ePickerSet
+        {
+            UpDown,
+            Vacuum,
+            Stop
+        }
+
+        DIO_I m_diPickerSet;
+        StopWatch m_swPickerSet = new StopWatch();
+        ePickerSet CheckPickerSet()
+        {
+            while (m_diPickerSet.p_bIn == false)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return ePickerSet.Stop;
+            }
+            m_swPickerSet.Start();
+            while (m_diPickerSet.p_bIn)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return ePickerSet.Stop;
+                if (m_swPickerSet.ElapsedMilliseconds > 3000) return ePickerSet.Stop;
+            }
+            return (m_swPickerSet.ElapsedMilliseconds < 1000) ? ePickerSet.UpDown : ePickerSet.Vacuum;
+        }
+        #endregion
+
         #region Tree
         public override void RunTree(Tree tree)
         {
@@ -238,11 +304,13 @@ namespace Root_Rinse_Unloader.Module
 
         #region ModuleRun
         ModuleRunBase m_runRun;
+        ModuleRunBase m_runPickerSet;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Load(this), false, "Load Strip");
             AddModuleRunList(new Run_Unload(this), false, "Unload Strip");
             m_runRun = AddModuleRunList(new Run_Run(this), false, "Move Strip");
+            m_runPickerSet = AddModuleRunList(new Run_PickerSet(this), false, "PickerSet");
         }
 
         public class Run_Load : ModuleRunBase
@@ -326,6 +394,31 @@ namespace Root_Rinse_Unloader.Module
                     if (m_module.Run(m_module.RunUnload())) return p_sInfo;
                 }
                 return "OK";
+            }
+        }
+
+        public class Run_PickerSet : ModuleRunBase
+        {
+            Loader m_module;
+            public Run_PickerSet(Loader module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_PickerSet run = new Run_PickerSet(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunPickerSet();
             }
         }
         #endregion

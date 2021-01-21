@@ -23,6 +23,9 @@ namespace Root_WIND2.Module
     {
         Vision m_module;
         Camera_Basler m_CamAutoFocus;
+
+        RPoint m_ptVRSCamPos = new RPoint();
+
         int m_nStartFocusPosZ = 0;
         int m_nEndFocusPosZ = 0;
         // 추후 모드 추가
@@ -102,6 +105,7 @@ namespace Root_WIND2.Module
             run.m_dAcc2 = m_dAcc2;
             run.m_dDcc2 = m_dDcc2;
             run.p_sGrabMode = p_sGrabMode;
+            run.m_ptVRSCamPos = m_ptVRSCamPos;
             return run;
         }
 
@@ -110,6 +114,7 @@ namespace Root_WIND2.Module
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
             m_nStartFocusPosZ = tree.Set(m_nStartFocusPosZ, m_nStartFocusPosZ, "Auto Focus Start Pos", "Auto Focus Start Pos", bVisible);
+            m_ptVRSCamPos = tree.Set(m_ptVRSCamPos, m_ptVRSCamPos, "VRS Cam Pos", "VRS Cam Pos", bVisible);
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
 
             m_nRange = tree.Set(m_nRange, m_nRange, "Set Range", "Set Range", bVisible);
@@ -130,6 +135,14 @@ namespace Root_WIND2.Module
 
         public override string Run()
         {
+            if (m_CamAutoFocus == null) return "Cam == null";
+
+            m_CamAutoFocus.Connect();
+            while (!m_CamAutoFocus.m_ConnectDone)
+            {
+                if (EQ.IsStop()) return "OK";
+            }
+            m_grabMode.SetLight(true);
 
             if (m_grabMode == null) return "Grab Mode == null";
 
@@ -139,9 +152,8 @@ namespace Root_WIND2.Module
                 AxisXY axis = m_module.AxisXY;
                 Axis axisZ = m_module.AxisZ;
 
-
-
-                axis.StartMove(new RPoint(4242328, 3575458));
+                //axis.StartMove(new RPoint(4242328, 3575458));
+                axis.StartMove(m_ptVRSCamPos);
                 axis.WaitReady();
 
                 axisZ.StartMove(m_nStartFocusPosZ - (m_nRange / 2));
@@ -154,11 +166,12 @@ namespace Root_WIND2.Module
                 ImageData img = m_CamAutoFocus.p_ImageViewer.p_ImageData;
                 StopWatch sw = new StopWatch();
 
-                m_CamAutoFocus.Grabed -= M_CamAutoFocus_Grabed;
-                m_CamAutoFocus.Grabed += M_CamAutoFocus_Grabed;
+                m_CamAutoFocus.Grabed -= CamAutoFocus_Grabed;
+                m_CamAutoFocus.Grabed += CamAutoFocus_Grabed;
                 if (m_CamAutoFocus.p_CamInfo._IsGrabbing == false)
                     m_CamAutoFocus.GrabContinuousShot();
 
+                pos.Clear();
                 nFrame = 0;
 
                 while (nFrame == 0)
@@ -201,9 +214,9 @@ namespace Root_WIND2.Module
 
                 axisZ.WaitReady();
                 System.Diagnostics.Debug.WriteLine(nFrameDone);
-                List<AF_Result> sss = pos.OrderBy(x => x.score).ToList();
+                List<AF_Result> orderList = pos.OrderBy(x => x.score).ToList();
 
-                double resPos = sss[0].pos + m_nAFOffset;
+                double resPos = orderList[0].pos + m_nAFOffset;
                 axisZ.StartMove(resPos);
                 axisZ.WaitReady();
 
@@ -258,9 +271,9 @@ namespace Root_WIND2.Module
                     }
                     axisZ.WaitReady();
                     System.Diagnostics.Debug.WriteLine(nFrameDone);
-                    sss = pos.OrderBy(x => x.score).ToList();
+                    orderList = pos.OrderBy(x => x.score).ToList();
 
-                    resPos = sss[0].pos + m_nAFOffset2;
+                    resPos = orderList[0].pos + m_nAFOffset2;
                     axisZ.StartMove(resPos);
                     axisZ.WaitReady();
                 }
@@ -274,12 +287,13 @@ namespace Root_WIND2.Module
             }
             finally
             {
+                m_grabMode.SetLight(false);
                 //m_grabMode.SetLight(false);
             }
 
         }
 
-        private void M_CamAutoFocus_Grabed(object sender, EventArgs e)
+        private void CamAutoFocus_Grabed(object sender, EventArgs e)
         {
             nFrame++;
         }

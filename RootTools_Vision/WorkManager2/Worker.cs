@@ -13,13 +13,16 @@ namespace RootTools_Vision
     internal enum WORKER_STATE
     {
         NONE = 0,
-        WORK_ASSIGNED = 1,
-        WORKING = 2,
-        WORK_COMPLETED = 3,
-        WORK_STOP = 4,
+        WORK_ASSIGNED,
+        WORKING,
+        WORK_COMPLETED,
+        WORK_STOP,
+        WORK_EXIT,
     }
 
     public delegate void EventWorkCompleted(Workplace obj);
+
+    public delegate void EventRequestStop();
 
     sealed internal class Worker : IWorkStartable
     {
@@ -38,6 +41,7 @@ namespace RootTools_Vision
 
         public event EventWorkCompleted WorkCompleted;
         public event EventWorkCompleted WorkIncompleted;
+        public event EventRequestStop RequestStop;
 
         private byte[] workplaceBufferR_GRAY;
         private byte[] workplaceBufferG;
@@ -81,11 +85,6 @@ namespace RootTools_Vision
             this.workerIndex = index;
             this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current); // 짧은 작업이 아닌 경우 LongRunning 옵션을 반드시 사용해야함. 자세한 것은 검색
             this.isStop = true;
-        }
-
-        ~Worker()
-        {
-
         }
 
 
@@ -153,6 +152,8 @@ namespace RootTools_Vision
 
                     if (token.IsCancellationRequested)
                     {
+                        this.workerState = WORKER_STATE.WORK_EXIT;
+                        this.task = null;
                         return;
                     }
 
@@ -216,13 +217,16 @@ namespace RootTools_Vision
             {
                 exception = true;
                 //쓰레드 하나라도 죽으면 WorkFactory Thread 다시 생성하고, WorkFactory Reset
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("예기치 못한 상황 발생으로 검사를 중단합니다.\n" + ex.Message);
             }
             finally
             {
                 if(exception == true)
                 {
+                    this.task = null;
+                    this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
+                    WorkEventManager.OnRequestStop(this, new RequestStopEventArgs());
                 }
             }
         }
@@ -329,5 +333,7 @@ namespace RootTools_Vision
                     this.workplaceBufferB);
             }
         }
+
+
     }
 }

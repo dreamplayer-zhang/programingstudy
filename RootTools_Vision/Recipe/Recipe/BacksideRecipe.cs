@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class BacksideRecipe : RecipeBase
+    public class BacksideRecipe : RecipeItemBase
     {
         #region [Parameter]
         //

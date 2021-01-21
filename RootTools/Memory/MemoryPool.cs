@@ -36,7 +36,7 @@ namespace RootTools.Memory
 
         bool CreatePool(double fGB)
         {
-            StopWatch sw = new StopWatch();
+             StopWatch sw = new StopWatch();
             long nPool = (long)Math.Ceiling(fGB * c_fGB);
             try
             {

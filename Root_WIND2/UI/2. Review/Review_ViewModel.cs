@@ -31,7 +31,7 @@ namespace Root_WIND2
 {
     class Review_ViewModel : ObservableObject
     {
-        Recipe recipe;
+        RecipeBase recipe;
         List<Defect> m_ReviewDefectlist;
 
         private ObservableCollection<UIElement> m_Element = new ObservableCollection<UIElement>();
@@ -56,7 +56,7 @@ namespace Root_WIND2
         public void init()
         {
             p_Element.Add(m_DefectView);
-            recipe = new Recipe();
+            recipe = new RecipeFront();
         }
 
         #region Command Btn
@@ -638,7 +638,8 @@ namespace Root_WIND2
                 return;
 
             int index = (int)GetDataGridItem(Defect_Datatable, selectedRow, "m_nDefectIndex");
-            double absY = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fAbsY");
+            //double absY = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fAbsY");
+            Double absY = 0;
             double theta = CalculateEdgeDefectTheta(absY);
 
             m_DefectView.DisplaySelectedEdgeDefect(m_ReviewDefectlist.Count, index, theta);

@@ -66,6 +66,7 @@ namespace RootTools.Camera.BaslerPylon
         int m_nGrabTimeout = 2000;
         ImageData m_ImageGrab;
         ImageViewer_ViewModel m_ImageViewer;
+        public bool m_ConnectDone = false;
         public ImageViewer_ViewModel p_ImageViewer
         {
             get
@@ -319,8 +320,12 @@ namespace RootTools.Camera.BaslerPylon
 
                 }
                 UpdateCamInfo(ConnectCamInfo, m_cam);
+                m_ConnectDone = true;
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                m_ConnectDone = false;
+            }
         }
 
         void bgw_Connect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -336,8 +341,17 @@ namespace RootTools.Camera.BaslerPylon
 
         public void Connect()
         {
-            if (!bgw_Connect.IsBusy)
-                bgw_Connect.RunWorkerAsync();
+            if (m_cam == null)
+            {
+                if (!bgw_Connect.IsBusy)
+                    bgw_Connect.RunWorkerAsync();
+            }
+            else if (m_cam.IsConnected ==false)
+            {
+                if(!bgw_Connect.IsBusy)
+                    bgw_Connect.RunWorkerAsync();
+            }
+            
         }
 
         void UpdateValue()
@@ -349,6 +363,7 @@ namespace RootTools.Camera.BaslerPylon
             if (m_cam != null)
             {
                 m_cam.Close();
+                m_ConnectDone = false;
             }
         }
 
@@ -682,7 +697,7 @@ namespace RootTools.Camera.BaslerPylon
         int m_nFrameTotal;
         MemoryData m_Memory;
         CPoint m_cpScanOffset;
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReverseOffsetY = 0)
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReverseOffsetY = 0)
         {
             try
             {
@@ -716,6 +731,6 @@ namespace RootTools.Camera.BaslerPylon
             GrabStop();
             return "OK"; 
         }
-        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReserveOffsetY = 0) { }
     }
 }

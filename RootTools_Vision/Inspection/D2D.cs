@@ -21,13 +21,11 @@ namespace RootTools_Vision
         byte[] GoldenImage = null;
         float[] scaleMap = null;
         float[] histWeightMap = null;
-        List<byte[]> GoldenImages = new List<byte[]>();
 
         public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
         // D2D Recipe & Parameter
-
-        private D2DParameter parameter;
+        private D2DParameter parameterD2D;
         private D2DRecipe recipeD2D;
 
 
@@ -42,15 +40,19 @@ namespace RootTools_Vision
 
         protected override bool Preparation()
         {
+            if(this.parameterD2D == null || this.recipeD2D == null)
+            {
+                this.parameterD2D = (D2DParameter)this.parameter;
+                this.recipeD2D = this.recipe.GetItem<D2DRecipe>();
+            }
+            
+
             if (this.currentWorkplace.Index == 0)
             {
                 return true;
             }
-            this.parameter = this.recipe.GetRecipe<D2DParameter>();
-            this.recipeD2D = this.recipe.GetRecipe<D2DRecipe>();
 
-
-            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameter.IndexChannel);
+            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterD2D.IndexChannel);
 
             if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP) == true &&
                 this.workplaceBundle.CheckStateLine(this.currentWorkplace.MapIndexX, WORK_TYPE.ALIGNMENT) &&
@@ -135,7 +137,7 @@ namespace RootTools_Vision
 
             unsafe
             {
-                switch (parameter.CreateRefImage)
+                switch (parameterD2D.CreateRefImage)
                 {
                     case CreateRefImageMethod.Average:
                         CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count, 
@@ -161,7 +163,7 @@ namespace RootTools_Vision
                 }
             }
         }
-        public void SetMultipleGoldenImages()
+        public void SetTriggerGoldenImage()
         {
             // Index 계산
             List<int> mapYIdx = new List<int>();
@@ -172,29 +174,51 @@ namespace RootTools_Vision
             mapYIdx.Sort();
 
             int startY;
-            int middleY;
             int endY;
 
-            if (mapYIdx.Count() < 3)
+            if (mapYIdx.Count() < 5)
             {
                 startY = mapYIdx[0];
-                middleY = mapYIdx[1];
-                endY = mapYIdx[2];
+                endY = mapYIdx[mapYIdx.Count() - 1];
             }
             else
             {
                 int currentY = mapYIdx.IndexOf(this.currentWorkplace.MapIndexY);
 
-                startY = mapYIdx[(currentY == 0) ? 1 : 0];
-                middleY = mapYIdx[(currentY == mapYIdx.Count() / 2) ? mapYIdx.Count() / 2 + 1 : mapYIdx.Count() / 2];
-                endY = mapYIdx[(currentY == mapYIdx.Count() - 1) ? mapYIdx.Count() - 2 : mapYIdx.Count() - 1];
+                if (mapYIdx[currentY] - 2 < mapYIdx[0])
+                {
+                    startY = mapYIdx[0];
+                    endY = mapYIdx[currentY] + 2 + (2 - (mapYIdx[currentY] - startY));
+                }
+                else if (mapYIdx[currentY] + 2 > mapYIdx[mapYIdx.Count() - 1])
+                {
+                    endY = mapYIdx[mapYIdx.Count() - 1];
+                    startY = mapYIdx[currentY] - 2 - (2 - (endY - mapYIdx[currentY]));
+                }
+                else
+                {
+                    startY = mapYIdx[currentY] - 2;
+                    endY = mapYIdx[currentY] + 2;
+                }
             }
+
+            List<Cpp_Point> wpROIData = new List<Cpp_Point>();
+            Cpp_Point curROIData = new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY);
 
             foreach (Workplace wp in this.workplaceBundle)
                 if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
                     if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
-                        if ((wp.MapIndexY == startY) || (wp.MapIndexY == middleY) || (wp.MapIndexY == endY))
-                            GoldenImages.Add(GetWorkplaceBuffer(this.parameter.IndexChannel));
+                        if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY) && wp.MapIndexY != this.currentWorkplace.MapIndexY)
+                            wpROIData.Add(new Cpp_Point(wp.PositionX, wp.PositionY));
+
+            
+            unsafe
+            {
+                //???
+                CLR_IP.Cpp_SelectMinDiffinArea((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
+                                    this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
+                                    wpROIData, curROIData, 1, this.currentWorkplace.Width, this.currentWorkplace.Height);
+            }
         }
 
         
@@ -208,8 +232,8 @@ namespace RootTools_Vision
                 return;
             }
 
-            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameter.IndexChannel);
-            this.inspectionWorkBuffer = this.GetWorkplaceBuffer(this.parameter.IndexChannel);
+            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterD2D.IndexChannel);
+            this.inspectionWorkBuffer = this.GetWorkplaceBuffer(this.parameterD2D.IndexChannel);
 
             int memH = this.currentWorkplace.SharedBufferHeight;
             int memW = this.currentWorkplace.SharedBufferWidth;
@@ -221,21 +245,21 @@ namespace RootTools_Vision
             byte[] binImg = new byte[chipW * chipH];
             byte[] diffImg = new byte[chipW * chipH];
 
-            if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) // JHChoi D2D Algorithm 
+            if (parameterD2D.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) // JHChoi D2D Algorithm 
             {
-                SetMultipleGoldenImages();
+                SetTriggerGoldenImage();
                 // Diff Image 계산
-                CLR_IP.Cpp_SelectMinDiffinArea(inspectionWorkBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
+                //CLR_IP.Cpp_SelectMinDiffinArea(inspectionWorkBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
             }
             else
             {
-                if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
+                if (parameterD2D.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
                 {
-                    System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-                    sw.Start();
+                    //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                    //sw.Start();
                     SetGoldenImage();
-                    sw.Stop();
-                    String a = "End Time: " + sw.ElapsedMilliseconds + "msec";
+                    //sw.Stop();
+                    //String a = "End Time: " + sw.ElapsedMilliseconds + "msec";
                     //using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"d:\SetGoldenImage.txt", true))
                     //{
                     //    file.WriteLine(a);
@@ -244,7 +268,7 @@ namespace RootTools_Vision
                 // Diff Image 계산
                 CLR_IP.Cpp_SubtractAbs(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
 
-                if (parameter.ScaleMap) // ScaleMap Option
+                if (parameterD2D.ScaleMap) // ScaleMap Option
                 {
                     if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) != null)
                     {
@@ -265,17 +289,17 @@ namespace RootTools_Vision
                     CLR_IP.Cpp_Multiply(diffImg, scaleMap, diffImg, chipW, chipH);
                 }
 
-                if (parameter.HistWeightMap) // Histogram WeightMap
+                if (parameterD2D.HistWeightMap) // Histogram WeightMap
                 {
                     histWeightMap = new float[chipW * chipH];
-                    CLR_IP.Cpp_CreateHistogramWeightMap(inspectionWorkBuffer, GoldenImage, histWeightMap, chipW, chipH, 5);        // -> 뭔가 결과가 이상함... 수정 필요
+                    CLR_IP.Cpp_CreateHistogramWeightMap(inspectionWorkBuffer, GoldenImage, histWeightMap, chipW, chipH, 5);
                     CLR_IP.Cpp_Multiply(diffImg, histWeightMap, diffImg, chipW, chipH);
                 }
             }
             
 
             // Filter
-            switch (parameter.DiffFilter)
+            switch (parameterD2D.DiffFilter)
             {
                 case DiffFilterMethod.Average:
                     CLR_IP.Cpp_AverageBlur(diffImg, diffImg, chipW, chipH);
@@ -294,22 +318,22 @@ namespace RootTools_Vision
             }
 
             // Threshold 값으로 Defect 탐색
-            CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, parameter.Intensity);
+            CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, parameterD2D.Intensity);
             
 
             // Mask
-            MaskRecipe mask = this.recipe.GetRecipe<MaskRecipe>(); //요기다 추가해줘용
+            MaskRecipe mask = this.recipe.GetItem<MaskRecipe>(); //요기다 추가해줘용
 
-            Cpp_Point[] maskStartPoint = new Cpp_Point[mask.MaskList[this.parameter.MaskIndex].PointLines.Count];
-            int[] maskLength = new int[mask.MaskList[this.parameter.MaskIndex].PointLines.Count];
+            Cpp_Point[] maskStartPoint = new Cpp_Point[mask.MaskList[this.parameterD2D.MaskIndex].PointLines.Count];
+            int[] maskLength = new int[mask.MaskList[this.parameterD2D.MaskIndex].PointLines.Count];
 
             Cpp_Point tempPt = new Cpp_Point();
-            for(int i = 0; i < mask.MaskList[this.parameter.MaskIndex].PointLines.Count; i++)
+            for(int i = 0; i < mask.MaskList[this.parameterD2D.MaskIndex].PointLines.Count; i++)
             {
                 maskStartPoint[i] = new Cpp_Point();
-                maskStartPoint[i].x = mask.MaskList[this.parameter.MaskIndex].PointLines[i].StartPoint.X;
-                maskStartPoint[i].y = mask.MaskList[this.parameter.MaskIndex].PointLines[i].StartPoint.Y;
-                maskLength[i] = mask.MaskList[this.parameter.MaskIndex].PointLines[i].Length;
+                maskStartPoint[i].x = mask.MaskList[this.parameterD2D.MaskIndex].PointLines[i].StartPoint.X;
+                maskStartPoint[i].y = mask.MaskList[this.parameterD2D.MaskIndex].PointLines[i].StartPoint.Y;
+                maskLength[i] = mask.MaskList[this.parameterD2D.MaskIndex].PointLines[i].Length;
             }
             CLR_IP.Cpp_Masking(binImg, binImg, maskStartPoint.ToArray(), maskLength.ToArray(), chipW, chipH);
 
@@ -321,7 +345,7 @@ namespace RootTools_Vision
                 //Add Defect
             for (int i = 0; i < Label.Length; i++)
             {
-                if (Label[i].area > parameter.Size)
+                if (Label[i].area > parameterD2D.Size)
                 {
                     this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
 
@@ -340,7 +364,7 @@ namespace RootTools_Vision
 
             }
 
-            GoldenImages.Clear();
+            //GoldenImages.Clear();
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
         }
 
@@ -349,7 +373,7 @@ namespace RootTools_Vision
             if(GoldenImage == null)
                 GoldenImage = new byte[this.currentWorkplace.Width * this.currentWorkplace.Height];
 
-            if (parameter.RefImageUpdate == RefImageUpdateFreq.Line) // Line 별로 GoldenImage를 만들 경우
+            if (parameterD2D.RefImageUpdate == RefImageUpdateFreq.Line) // Line 별로 GoldenImage를 만들 경우
             {
                 // Index 계산
                 List<int> mapYIdx = new List<int>();
@@ -367,11 +391,14 @@ namespace RootTools_Vision
                     startY = mapYIdx[0];
                     endY = mapYIdx[mapYIdx.Count() - 1];
                 }
-                else // 중심에 있는 4개의 칩으로만 Golden Image 생성
+                else 
                 {
-                    
+                    // 중심에 있는 4개의 칩으로만 Golden Image 생성
                     startY = mapYIdx[mapYIdx.Count() / 2 - 1 - 2];
                     endY = mapYIdx[mapYIdx.Count() / 2 - 1 + 2];
+                    // 칩 전체 다 쓰기
+                    //startY = mapYIdx[0];
+                    //endY = mapYIdx[mapYIdx.Count() - 1];
                 }
 
                 List<Cpp_Point> wpROIData = new List<Cpp_Point>();
@@ -379,11 +406,11 @@ namespace RootTools_Vision
                 foreach (Workplace wp in this.workplaceBundle)
                     if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
                         if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
-                            if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY) && wp.MapIndexY != this.currentWorkplace.MapIndexY)
+                            if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY))
                                 wpROIData.Add(new Cpp_Point(wp.PositionX, wp.PositionY));
 
                 unsafe { 
-                    switch (parameter.CreateRefImage)
+                    switch (parameterD2D.CreateRefImage)
                     {
                         case CreateRefImageMethod.Average:
                             CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,

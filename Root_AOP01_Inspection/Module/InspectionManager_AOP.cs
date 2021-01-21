@@ -48,7 +48,7 @@ namespace Root_AOP01_Inspection.Module
 			AOPEventManager.SnapDone += SnapDone_Callback;
 		}
 
-		private Recipe recipe;
+		private RecipeBase recipe;
 		private IntPtr sharedBuffer;
 
 		private IntPtr sharedBufferR_Gray;
@@ -60,7 +60,7 @@ namespace Root_AOP01_Inspection.Module
 		private int sharedBufferHeight;
 		private int sharedBufferByteCnt;
 
-		public Recipe Recipe { get => recipe; set => recipe = value; }
+		public RecipeBase Recipe { get => recipe; set => recipe = value; }
 		public IntPtr SharedBufferR_Gray { get => sharedBufferR_Gray; set => sharedBufferR_Gray = value; }
 		public IntPtr SharedBufferR { get => sharedBufferR; set => sharedBufferR = value; }
 		public IntPtr SharedBufferG { get => sharedBufferG; set => sharedBufferG = value; }
@@ -98,7 +98,7 @@ namespace Root_AOP01_Inspection.Module
 		}
 
 
-		public override bool CreateInspection(Recipe _recipe)
+		public override bool CreateInspection(RecipeBase _recipe)
 		{
 			try
 			{

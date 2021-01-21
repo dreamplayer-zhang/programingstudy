@@ -12,33 +12,29 @@ namespace Root_WIND2
 {
 	public class InspectionManagerEBR : WorkFactory
 	{
-		public InspectionManagerEBR(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt = 1)
+		#region [Members]
+		private readonly RecipeEBR recipe;
+		private readonly SharedBufferInfo sharedBufferInfo;
+		#endregion
+
+		#region [Properties]
+		public RecipeEBR Recipe
 		{
-			this.sharedBufferR_Gray = _sharedBuffer;
-			this.sharedBufferWidth = _width;
-			this.sharedBufferHeight = _height;
-			this.sharedBufferByteCnt = _byteCnt;
+			get => this.recipe;
 		}
 
-		public enum InsepectionMode
+		public SharedBufferInfo SharedBufferInfo
 		{
-			EBR,
+			get => this.sharedBufferInfo;
 		}
+		#endregion
 
-		private InsepectionMode inspectionMode = InsepectionMode.EBR;
-		public InsepectionMode InspectionMode { get => inspectionMode; set => inspectionMode = value; }
+		public InspectionManagerEBR(RecipeEBR _recipe, SharedBufferInfo _bufferInfo)
+		{
+			this.recipe = _recipe;
+			this.sharedBufferInfo = _bufferInfo;
 
-		private Recipe recipe;
-		private IntPtr sharedBufferR_Gray;
-		private int sharedBufferWidth;
-		private int sharedBufferHeight;
-		private int sharedBufferByteCnt;
-
-		public Recipe Recipe { get => recipe; set => recipe = value; }
-		public IntPtr SharedBufferR_Gray { get => sharedBufferR_Gray; set => sharedBufferR_Gray = value; }
-		public int SharedBufferWidth { get => sharedBufferWidth; set => sharedBufferWidth = value; }
-		public int SharedBufferHeight { get => sharedBufferHeight; set => sharedBufferHeight = value; }
-		public int SharedBufferByteCnt { get => sharedBufferByteCnt; set => sharedBufferByteCnt = value; }
+		}
 
 		#region [Overrides]
 
@@ -51,18 +47,18 @@ namespace Root_WIND2
 		protected override WorkplaceBundle CreateWorkplaceBundle()
 		{
 			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
-			int notchY = recipe.GetRecipe<EBRParameter>().NotchY; // notch memory Y 좌표
-			int stepDegree = recipe.GetRecipe<EBRParameter>().StepDegree;
+			int notchY = recipe.GetItem<EBRParameter>().NotchY; // notch memory Y 좌표
+			int stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
 			int workplaceCnt = 360 / stepDegree;
 			int imageHeight = 270000;
 			int imageHeightPerDegree = imageHeight / 360; // 1도 당 Image Height
 
-			int width = recipe.GetRecipe<EBRParameter>().RoiWidth;
-			int height = recipe.GetRecipe<EBRParameter>().RoiHeight;
+			int width = recipe.GetItem<EBRParameter>().RoiWidth;
+			int height = recipe.GetItem<EBRParameter>().RoiHeight;
 
 			int index = 0;
 			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, index++));
-			for (int i = 0; i < 5/*workplaceCnt*/; i++)
+			for (int i = 0; i < workplaceCnt; i++)
 			{
 				int posY = (imageHeightPerDegree * i) - (height / 2);
 				if (posY <= 0)
@@ -70,7 +66,6 @@ namespace Root_WIND2
 				Workplace workplace = new Workplace(0, 0, 0, posY, width, height, index++);
 				workplaceBundle.Add(workplace);
 			}
-			workplaceBundle.SetSharedBuffer(this.sharedBufferR_Gray, this.sharedBufferWidth, this.sharedBufferHeight, this.sharedBufferByteCnt, IntPtr.Zero, IntPtr.Zero);
 
 			return workplaceBundle;
 		}

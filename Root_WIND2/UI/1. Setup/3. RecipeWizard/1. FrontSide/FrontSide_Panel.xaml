@@ -13,10 +13,47 @@
         </Grid.ColumnDefinitions>
         <Border BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
             <Grid>
-                <StackPanel Margin="0,10,0,0">
-                    <Button Content="FrontSide Summary"
+                <StackPanel Margin="0,0,0,0">
+                    <Grid Background="White" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition Height="30"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Row="0"                        
+                                   Grid.Column="0" Grid.ColumnSpan="3"
+                                   Content="Frontside"
+                                   BorderThickness="0,0, 0, 1"
+                                   FontSize="25" FontWeight="SemiBold"
+                                   HorizontalAlignment="Stretch"
+                                   Command="{Binding btnFrontSummary}"
+                                   />
+                        <Button Content="New"
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                BorderThickness="0,0, 1, 0"
+                                Command="{Binding btnFrontNewRecipe}"
+                                />
+                        <Button Content="Save"
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                BorderThickness="0,0, 1, 0"
+                                Command="{Binding btnFrontSaveRecipe}"
+                                />
+                        <Button Content="Load"
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                BorderThickness="0"
+                                Command="{Binding btnFrontLoadRecipe}"
+                                />
+                    </Grid>
+                    <!--<Button Content="FrontSide Summary"
                             Command="{Binding btnFrontSummary}"
-                            Style="{StaticResource PanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>-->
                     <Button Content="Map"
                             Command="{Binding btnFrontMap}"
                             Style="{StaticResource PanelBtn}"/>

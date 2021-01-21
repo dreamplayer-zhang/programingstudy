@@ -14,7 +14,7 @@ namespace RootTools_Vision
 	{
 		public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
-		private EBRParameter parameter;
+		private EBRParameter parameterEBR;
 		private EBRRecipe recipeEBR;
 
 		public EBR() : base()
@@ -24,8 +24,8 @@ namespace RootTools_Vision
 
 		protected override bool Preparation()
 		{
-			this.parameter = this.recipe.GetRecipe<EBRParameter>();
-			this.recipeEBR = this.recipe.GetRecipe<EBRRecipe>();
+			this.parameterEBR = this.parameter as EBRParameter;
+			this.recipeEBR = this.recipe.GetItem<EBRRecipe>();
 
 			return true;
 		}
@@ -64,7 +64,7 @@ namespace RootTools_Vision
 			int right = left + width;
 			int btm = top + height;
 
-			int xRange = this.parameter.XRange;
+			int xRange = this.parameterEBR.XRange;
 
 			// average
 			for (int x = left; x < right; x++)
@@ -103,15 +103,22 @@ namespace RootTools_Vision
 				arrDiff[x] = arrEqual[x + xRange] - arrEqual[x - xRange];
 			}
 
+			StreamWriter sw = new StreamWriter(@"D:\EBR" + this.currentWorkplace.Index.ToString() + ".csv");
+			for (int i = 0;  i < arrDiff.Length; i++)
+            {
+				sw.WriteLine(arrAvg[i] + "," + arrEqual[i] + "," + arrDiff[i]);
+            }
+			sw.Close();
+
 			return arrDiff;
 		}
 
 		private void FindEdge(int[] arrDiff)
 		{
-			int xRange = this.parameter.XRange;
-			int diffEdge = this.parameter.DiffEdge;
-			int diffBevel = this.parameter.DiffBevel;
-			int diffEBR = this.parameter.DiffEBR;
+			int xRange = this.parameterEBR.XRange;
+			int diffEdge = this.parameterEBR.DiffEdge;
+			int diffBevel = this.parameterEBR.DiffBevel;
+			int diffEBR = this.parameterEBR.DiffEBR;
 
 			double waferEdgeX, bevelX, ebrX;
 
@@ -122,15 +129,19 @@ namespace RootTools_Vision
 			}
 
 			waferEdgeX = FindEdge(arrDiff, arrDiff.Length - (2 * xRange), diffEdge);
-			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX), diffBevel + this.parameter.OffsetBevel);
-			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX), diffEBR + this.parameter.OffsetEBR);
+			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX), diffBevel + this.parameterEBR.OffsetBevel);
+			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX), diffEBR + this.parameterEBR.OffsetEBR);
+
+			//StreamWriter sw = new StreamWriter(@"D:\EBRInsp" + this.currentWorkplace.Index.ToString() + ".csv");
+			//sw.WriteLine(waferEdgeX + "," + bevelX + "," + ebrX);
+			//sw.Close();
 
 			// Add measurement
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 			this.currentWorkplace.AddDefect(sInspectionID,
 									11111,
 									0, 0,
-									this.currentWorkplace.Index * this.parameter.StepDegree, 0,
+									this.currentWorkplace.Index * this.parameterEBR.StepDegree, 0,
 									(float)(waferEdgeX - bevelX),
 									(float)(waferEdgeX - ebrX),
 									this.currentWorkplace.MapIndexX,
@@ -163,7 +174,7 @@ namespace RootTools_Vision
 
 		private double FindEqualizeEdge(int[] diff, int peakX)
 		{
-			int xRange = this.parameter.XRange;
+			int xRange = this.parameterEBR.XRange;
 			double[] arrDiffSum = null;
 
 			if (peakX < xRange)
@@ -201,7 +212,7 @@ namespace RootTools_Vision
 
 		private double FindEdgeSum(int[] diff, int pointX)
 		{
-			int xRange = this.parameter.XRange;
+			int xRange = this.parameterEBR.XRange;
 			double sum = 0;
 
 			for (int x = pointX - xRange; x < pointX; x++)

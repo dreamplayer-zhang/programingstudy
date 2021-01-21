@@ -99,6 +99,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GlobalObjects.cs" />
     <Compile Include="InspectionManager.cs" />
     <Compile Include="Inspection\BacksideSurface.cs" />
     <Compile Include="Inspection\D2D.cs" />
@@ -119,7 +120,7 @@
     <Compile Include="Recipe\Parameter\ParameterBase.cs" />
     <Compile Include="Recipe\Parameter\PositionParameter.cs" />
     <Compile Include="Recipe\Parameter\SurfaceParameter.cs" />
-    <Compile Include="Recipe\Recipe.cs" />
+    <Compile Include="Recipe\RecipeBase.cs" />
     <Compile Include="Recipe\RecipeType\RecipeType_ImageData.cs" />
     <Compile Include="Recipe\RecipeType\RecipeType_Mask.cs" />
     <Compile Include="Recipe\RecipeType\RecipeType_WaferMap.cs" />
@@ -129,7 +130,7 @@
     <Compile Include="Recipe\Recipe\EdgeSurfaceRecipe.cs" />
     <Compile Include="Recipe\Recipe\OriginRecipe.cs" />
     <Compile Include="Recipe\Recipe\PositionRecipe.cs" />
-    <Compile Include="Recipe\Recipe\RecipeBase.cs" />
+    <Compile Include="Recipe\Recipe\RecipeItemBase.cs" />
     <Compile Include="Recipe\Recipe\MaskRecipe.cs" />
     <Compile Include="Recipe\Recipe\SurfaceRecipe.cs" />
     <Compile Include="UserControls\BasicTreeView.xaml.cs">
@@ -139,6 +140,7 @@
     <Compile Include="Utility\Enums.cs" />
     <Compile Include="Utility\KlarfData.cs" />
     <Compile Include="Utility\KlarfData_Lot.cs" />
+    <Compile Include="SingleObject.cs" />
     <Compile Include="WorkManager2\DebugOutput.cs" />
     <Compile Include="WorkManager2\Interfaces\IWorkplaceBundle.cs" />
     <Compile Include="WorkManager2\Interfaces\IWorkStartable.cs" />
