@@ -15,6 +15,8 @@ using RootTools_Vision;
 using System.Drawing;
 using RootTools.Database;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 
 namespace Root_WIND2
 {
@@ -120,12 +122,14 @@ namespace Root_WIND2
 
         void Init()
         {
-            if(RegisterGlobalObjects() == false)
+            CreateGlobalPaths();
+
+
+            if (RegisterGlobalObjects() == false)
             {
                 MessageBox.Show("Program Initialization fail");
                 return;
             }
-
 
             if (UIManager.Instance.Initialize() == false)
             {
@@ -143,6 +147,7 @@ namespace Root_WIND2
             //////
             logView.Init(LogView.m_logView);
             InitTimer();
+
         }
 
         void ThreadStop()
@@ -279,6 +284,15 @@ namespace Root_WIND2
             }
 
             return true;
+        }
+
+
+        public void CreateGlobalPaths()
+        {
+            Type t = typeof(Constants.Path);
+            FieldInfo[] fields = t.GetFields(BindingFlags.Static | BindingFlags.Public);
+            foreach (FieldInfo field in fields)
+                Directory.CreateDirectory(field.GetValue(null).ToString());
         }
     }
 }

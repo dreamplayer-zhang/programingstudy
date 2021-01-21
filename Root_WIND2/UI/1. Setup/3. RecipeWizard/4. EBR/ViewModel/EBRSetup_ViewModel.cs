@@ -56,8 +56,8 @@ namespace Root_WIND2
 			set
 			{
 				SetProperty(ref roiWidth, value);
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int ROIHeight
 		{
@@ -68,8 +68,8 @@ namespace Root_WIND2
 			set
 			{
 				SetProperty(ref roiHeight, value);
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int NotchY
 		{
@@ -80,8 +80,8 @@ namespace Root_WIND2
 			set
 			{
 				SetProperty(ref notchY, value);
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int StepDegree
 		{
@@ -92,8 +92,8 @@ namespace Root_WIND2
 			set
 			{
 				SetProperty(ref stepDegree, value);
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int XRange
 		{
@@ -104,8 +104,8 @@ namespace Root_WIND2
 			set
 			{
 				SetProperty(ref xRange, value);
-				//SetParameter();
-			}
+                SetParameter();
+            }
 		}
 		public int DiffEdge
 		{
@@ -116,7 +116,7 @@ namespace Root_WIND2
 			set
 			{
 				SetProperty(ref diffEdge, value);
-				//SetParameter();
+				SetParameter();
 			}
 		}
 		public int DiffBevel
@@ -128,7 +128,7 @@ namespace Root_WIND2
 			set
 			{
 				SetProperty(ref diffBevel, value);
-				//SetParameter();
+				SetParameter();
 			}
 		}
 		public int DiffEBR
@@ -140,7 +140,7 @@ namespace Root_WIND2
 			set
 			{
 				SetProperty(ref diffEBR, value);
-				//SetParameter();
+				SetParameter();
 			}
 		}
 		public int OffsetBevel
@@ -152,7 +152,7 @@ namespace Root_WIND2
 			set
 			{
 				SetProperty(ref offsetBevel, value);
-				//SetParameter();
+				SetParameter();
 			}
 		}
 		public int OffsetEBR
@@ -164,7 +164,7 @@ namespace Root_WIND2
 			set
 			{
 				SetProperty(ref offsetEBR, value);
-				//SetParameter();
+				SetParameter();
 			}
 		}
 

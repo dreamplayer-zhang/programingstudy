@@ -431,7 +431,8 @@ namespace Root_EFEM
                 return EQ.IsStop()? "EQ Stop" : "OK";
             }
             Sequence sequence = m_qSequence.Peek();
-            if (sequence.m_moduleRun.m_moduleBase == wtr)
+            bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport; 
+            if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport) 
             {
                 sequence.m_moduleRun.StartRun();
                 while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
