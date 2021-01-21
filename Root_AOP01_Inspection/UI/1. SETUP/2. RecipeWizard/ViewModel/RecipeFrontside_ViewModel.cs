@@ -71,8 +71,11 @@ namespace Root_AOP01_Inspection
 
 			SurfaceSize = 5;
 			SurfaceGV = 60;
-			InspectionOffsetX = 900;
+			InspectionOffsetX_Left = 900;
+			InspectionOffsetX_Right = 900;
 			InspectionOffsetY = 900;
+			OutmapX = 40;
+			OutmapY = 40;
 
 			EdgeDrawMode = false;
 		}
@@ -188,18 +191,34 @@ namespace Root_AOP01_Inspection
 		}
 		#endregion
 
-		#region InspectionOffsetX
+		#region InspectionOffsetX_Left
 
-		private int _InspectionOffsetX;
-		public int InspectionOffsetX
+		private int _InspectionOffsetX_Left;
+		public int InspectionOffsetX_Left
 		{
 			get
 			{
-				return _InspectionOffsetX;
+				return _InspectionOffsetX_Left;
 			}
 			set
 			{
-				SetProperty(ref _InspectionOffsetX, value);
+				SetProperty(ref _InspectionOffsetX_Left, value);
+			}
+		}
+		#endregion
+
+		#region InspectionOffsetX_Right
+
+		private int _InspectionOffsetX_Right;
+		public int InspectionOffsetX_Right
+		{
+			get
+			{
+				return _InspectionOffsetX_Right;
+			}
+			set
+			{
+				SetProperty(ref _InspectionOffsetX_Right, value);
 			}
 		}
 		#endregion
@@ -216,6 +235,38 @@ namespace Root_AOP01_Inspection
 			set
 			{
 				SetProperty(ref _InspectionOffsetY, value);
+			}
+		}
+		#endregion
+
+		#region OutmapX
+
+		private int _OutmapX;
+		public int OutmapX
+		{
+			get
+			{
+				return _OutmapX;
+			}
+			set
+			{
+				SetProperty(ref _OutmapX, value);
+			}
+		}
+		#endregion
+
+		#region OutmapY
+
+		private int _OutmapY;
+		public int OutmapY
+		{
+			get
+			{
+				return _OutmapY;
+			}
+			set
+			{
+				SetProperty(ref _OutmapY, value);
 			}
 		}
 		#endregion
@@ -490,7 +541,7 @@ namespace Root_AOP01_Inspection
 			}
 		}
 
-		CRect searchArea(int x_margin, int y_margin)
+		CRect searchArea(int x_left_margin, int y_top_margin, int x_right_margin, int y_bot_margin)
 		{
 			// variable
 			List<Rect> arcROIs = new List<Rect>();
@@ -563,7 +614,7 @@ namespace Root_AOP01_Inspection
 
 			m_ImageViewer_VM.DrawRect(new CPoint(ptLT.X, ptLT.Y), new CPoint(ptRB.X, ptRB.Y), RecipeFrontside_Viewer_ViewModel.ColorType.ChipFeature);
 
-			return new CRect(new Point(ptLT.X + x_margin, ptLT.Y + y_margin), new Point(ptRB.X - x_margin, ptRB.Y - y_margin));
+			return new CRect(new Point(ptLT.X + x_left_margin, ptLT.Y + y_top_margin), new Point(ptRB.X - x_right_margin, ptRB.Y - y_top_margin));
 		}
 		private bool _StartRecipeTeaching()
 		{
@@ -577,7 +628,6 @@ namespace Root_AOP01_Inspection
 			float centX = CenterPoint.X; // 레시피 티칭 값 가지고오기
 			float centY = CenterPoint.Y;
 
-			int outMapX = 40, outMapY = 40;
 			float outOriginX, outOriginY;
 			float outChipSzX, outChipSzY;
 			float outRadius = 80000;
@@ -605,12 +655,16 @@ namespace Root_AOP01_Inspection
 				fixed (byte* pImg = new byte[(long)(memW / DownSample) * (long)(memH / DownSample)]) // 원본 이미지 너무 커서 안열림
 				{
 					CLR_IP.Cpp_SubSampling((byte*)MainImage, pImg, memW, memH, 0, 0, memW, memH, DownSample);
-					var area = searchArea(InspectionOffsetX, InspectionOffsetY);
+					var area = searchArea(InspectionOffsetX_Left, InspectionOffsetY, _InspectionOffsetX_Right, InspectionOffsetY);
 
 
 					string sDefectimagePath = @"D:\DefectImage";
 					string sInspectionID = RootTools.Database.DatabaseManager.Instance.GetInspectionID();
 					string outputSize = string.Format("Left:{0} Top:{1} Right:{2} Bottom:{3}", area.Left,area.Top,area.Right,area.Bottom);
+					if(!System.IO.Directory.Exists(System.IO.Path.Combine(sDefectimagePath, sInspectionID)))
+					{
+						System.IO.Directory.CreateDirectory(System.IO.Path.Combine(sDefectimagePath, sInspectionID));
+					}
 					System.IO.File.WriteAllText(System.IO.Path.Combine(sDefectimagePath, sInspectionID, "TotalSize.txt"), outputSize);
 					//그다음 이미지 축소 저장
 					Image<Gray, byte> mapImage = new Image<Gray, byte>(memW/ DownSample, memH/ DownSample, memW/ DownSample, (IntPtr)pImg);
@@ -621,6 +675,9 @@ namespace Root_AOP01_Inspection
 					outRadius /= DownSample;
 					memW /= DownSample; memH /= DownSample;
 
+					int outmap_x = OutmapX;
+					int outmap_y = OutmapY;
+					
 					WaferEdge.Add(new Cpp_Point(area.Left / DownSample, area.Top / DownSample));
 					WaferEdge.Add(new Cpp_Point(area.Left / DownSample, area.Bottom / DownSample));
 					WaferEdge.Add(new Cpp_Point(area.Right / DownSample, area.Bottom / DownSample));
@@ -632,13 +689,15 @@ namespace Root_AOP01_Inspection
 						&outOriginY,
 						&outChipSzX,
 						&outChipSzY,
-						&outMapX,
-						&outMapY,
+						&outmap_x,
+						&outmap_y,
 						memW, memH,
 						1,
 						isIncludeMode
 						);
-				}
+						OutmapX = outmap_x;
+						OutmapY = outmap_y;
+					}
 
 				//// Param Up Scale
 				centX *= DownSample; centY *= DownSample;
@@ -647,7 +706,7 @@ namespace Root_AOP01_Inspection
 				outChipSzX *= DownSample; outChipSzY *= DownSample;
 
 				// Save Recipe
-				SetRecipeMapData(mapData, (int)outMapX, (int)outMapY, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);
+				SetRecipeMapData(mapData, (int)OutmapX, (int)OutmapY, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);
 
 				backsideRecipe.CenterX = (int)centX;
 				backsideRecipe.CenterY = (int)centY;
