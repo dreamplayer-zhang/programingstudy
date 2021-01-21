@@ -78,9 +78,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
         }
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
-            m_rfid.StartRun(moduleRun);
-            while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
+
         }
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -112,6 +110,11 @@ namespace Root_AOP01_Inspection.UI_UserControl
         {
             sLoadportNum = m_loadport.p_id;
             if (IsEnableLoad() == false) return;
+            if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;
+            else if (m_loadport.p_id == "LoadportB") EQ.p_nRunLP = 1;
+            ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
+            m_rfid.StartRun(moduleRun);
+            while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
             m_loadport.RunDocking();
             if (m_manualjob.ShowPopup(m_handler) == false) return;
             m_bgwLoad.RunWorkerAsync();
