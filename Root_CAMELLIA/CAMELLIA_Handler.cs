@@ -420,17 +420,7 @@ namespace Root_CAMELLIA
                 OnPropertyChanged();
             }
         }
-        int _nRunLP = -1;
-        public int p_nRunLP 
-        {
-            get { return _nRunLP; }
-            set
-            {
-                if (_nRunLP == value) return;
-                _nRunLP = value;
-                OnPropertyChanged();
-            }
-        }
+
         Thread m_thread = null;
         void InitThread()
         {
@@ -459,7 +449,7 @@ namespace Root_CAMELLIA
                             //if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
-                                while (m_aLoadport[p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
+                                while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
                                 Thread.Sleep(1000);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
