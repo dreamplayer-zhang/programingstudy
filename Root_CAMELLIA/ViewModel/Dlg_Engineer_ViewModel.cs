@@ -211,6 +211,41 @@ namespace Root_CAMELLIA
         }
         private Axis _AxisLifter;
 
+        private Visibility _tttt = Visibility.Hidden;
+        public Visibility tttt
+        {
+            get
+            {
+                return _tttt;
+            }
+            set
+            {
+                SetProperty(ref _tttt, value);
+            }
+        }
+
+        public int asdf = 0;
+        public ICommand CmdTest
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    asdf++;
+
+                    if(asdf > 10 && asdf <= 20)
+                    {
+                        tttt = Visibility.Visible;
+                    }
+                    else if(asdf > 20)
+                    {
+                        tttt = Visibility.Hidden;
+                        asdf = 0;
+                    }
+                    
+                });
+            }
+        }
 
         #endregion
 
@@ -513,7 +548,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    Module_Camellia.Run_Measure measure = (Module_Camellia.Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+                    Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
                     ModuleCamellia.mwvm.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
 
                     CloseRequested(this, new DialogCloseRequestedEventArgs(true));
@@ -531,7 +566,7 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Module_Camellia.Run_Measure measure = (Module_Camellia.Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+            Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
             measure.Run();
         }
         private void Calibration()
@@ -542,7 +577,7 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Module_Camellia.Run_CalibrationWaferCentering calibration = (Module_Camellia.Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("Calibration");
+            Run_CalibrationWaferCentering calibration = (Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("Calibration");
             calibration.m_useCentering = false;
             calibration.Run();
         }
@@ -554,7 +589,7 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Module_Camellia.Run_InitCalibration initCalibration = (Module_Camellia.Run_InitCalibration)ModuleCamellia.CloneModuleRun("InitCalWaferCentering");
+            Run_InitCalibration initCalibration = (Run_InitCalibration)ModuleCamellia.CloneModuleRun("InitCalWaferCentering");
             initCalibration.Run();
         }
         private void Centering()
@@ -565,7 +600,7 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Module_Camellia.Run_CalibrationWaferCentering centering = (Module_Camellia.Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("WaferCentering");
+            Run_CalibrationWaferCentering centering = (Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("WaferCentering");
             centering.m_useCal = false;
             centering.Run();
         }

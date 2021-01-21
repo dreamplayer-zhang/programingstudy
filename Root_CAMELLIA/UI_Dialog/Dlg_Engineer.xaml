@@ -99,7 +99,7 @@
                                     <Button FontWeight="Bold"
                                             Content="Test"
                                             Width="100"
-                                            Margin="5,5" />
+                                            Margin="5,5" Command="{Binding CmdTest}" />
                                 </StackPanel>
                             </Grid>
                             <Grid Height="610">
@@ -834,7 +834,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Handler"
-                     Width="100">
+                     Width="100" Visibility="{Binding tttt, UpdateSourceTrigger=PropertyChanged}">
                 <Grid>
                     <local:Camellia_Hander_UI x:Name="HandlerUI" />
                 </Grid>

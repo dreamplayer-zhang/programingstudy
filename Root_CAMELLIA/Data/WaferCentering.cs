@@ -27,8 +27,8 @@ namespace Root_CAMELLIA.Data
         public eDir p_Dir { get; set; }
 
         public List<Point> m_ptLT = new List<Point>();
-        private List<Point> m_ptRT = new List<Point>();
-        private List<Point> m_ptRB = new List<Point>();
+        public List<Point> m_ptRT = new List<Point>();
+        public List<Point> m_ptRB = new List<Point>();
         public RPoint m_ptCenter = new RPoint();
         public RPoint m_ptStageCenter = new RPoint();
 
@@ -115,6 +115,54 @@ namespace Root_CAMELLIA.Data
             else return;
             cy = d * cx + yi;
             r = Math.Sqrt((p0.X - cx) * (p0.X - cx) + (p0.Y - cy) * (p0.Y - cy));
+        }
+
+        public void FindEdge(object obj)
+        {
+            ImageData ImgData = ((CenteringParam)obj).img;
+            CPoint ptROI = ((CenteringParam)obj).pt;
+            eDir dir = ((CenteringParam)obj).dir;
+            int nSearchRange = ((CenteringParam)obj).searchRange;
+            int nSearchLength = ((CenteringParam)obj).searchLength;
+            int nSearchLevel = ((CenteringParam)obj).searchLevel;
+            Mat matSrc = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
+            Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
+            Mat matInsp = new Mat(ptROI.X, ptROI.Y, DepthType.Cv8U, 3);
+
+            matSrc.CopyTo(matInsp);
+            CvInvoke.CvtColor(matInsp, matInsp, ColorConversion.Bgr2Gray);
+
+            CvInvoke.MedianBlur(matInsp, matInsp, 7);
+
+            Point vector = new Point();
+            Point edge = new Point();
+            var tempList = new List<Point>();
+            PointF startPt = new PointF();
+            switch (dir)
+            {
+                case eDir.LT:
+                    vector = new Point(0, 1);
+                    tempList = m_ptLT;
+                    //startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y / 2 - (nSearchLength / 2));
+                    startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
+                    break;
+                case eDir.RT:
+                    vector = new Point(0, 1);
+                    tempList = m_ptRT;
+                    startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
+                    break;
+                case eDir.RB:
+                    vector = new Point(0, -1);
+                    tempList = m_ptRB;
+                    startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y);
+                    break;
+            }
+            tempList.Clear();
+            for (int i = 0; i < nSearchRange; i++)
+            {
+                edge = GetEdgePoint(matInsp, new PointF(startPt.X + (i * nSearchRange), startPt.Y), vector, nSearchRange, nSearchLength, nSearchLevel);
+                tempList.Add(edge);
+            }
         }
 
         public void FindEdge(ImageData ImgData, CPoint ptROI, int nSearchRange, int nSearchLength, int nSearchLevel, eDir dir)
@@ -296,6 +344,25 @@ namespace Root_CAMELLIA.Data
             if (y < 0) y = 0;
             if (x >= Image.Width) x = Image.Width - 1;
             if (y >= Image.Height) y = Image.Height - 1;
+        }
+    }
+    public class CenteringParam
+    {
+        public ImageData img;
+        public CPoint pt;
+        public int searchRange;
+        public int searchLength;
+        public int searchLevel;
+        public WaferCentering.eDir dir;
+
+        public CenteringParam(ImageData img, CPoint pt, int searchRange, int searchLength, int searchLevel, WaferCentering.eDir dir)
+        {
+            this.img = img;
+            this.pt = pt;
+            this.searchRange = searchRange;
+            this.searchLength = searchLength;
+            this.searchLevel = searchLevel;
+            this.dir = dir;
         }
     }
 }
