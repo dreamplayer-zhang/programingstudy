@@ -379,14 +379,14 @@ namespace Root_AOP01_Inspection.Module
             //            p_bStageVac = true;
             Thread.Sleep(200);
 
-            //if (m_CamTDI90 != null && m_CamTDI90.p_CamInfo.p_eState == eCamState.Init)
-            //    m_CamTDI90.Connect();
-            //if (m_CamTDI45 != null && m_CamTDI45.p_CamInfo.p_eState == eCamState.Init)
-            //    m_CamTDI45.Connect();
-            //if (m_CamLADS.p_CamInfo._OpenStatus == false)
-            //    m_CamLADS.Connect();
-            //if (m_CamTDISide != null && m_CamTDISide.p_CamInfo.p_eState == eCamState.Init)
-            //    m_CamTDISide.Connect();
+            if (m_CamTDI90 != null && m_CamTDI90.p_CamInfo.p_eState == eCamState.Init)
+                m_CamTDI90.Connect();
+            if (m_CamTDI45 != null && m_CamTDI45.p_CamInfo.p_eState == eCamState.Init)
+                m_CamTDI45.Connect();
+            if (m_CamLADS.p_CamInfo._OpenStatus == false)
+                m_CamLADS.Connect();
+            if (m_CamTDISide != null && m_CamTDISide.p_CamInfo.p_eState == eCamState.Init)
+                m_CamTDISide.Connect();
 
             m_axisSideZ.StartHome();
             if (m_axisSideZ.WaitReady() != "OK")
