@@ -40,14 +40,14 @@ namespace Root_AOP01_Inspection.Module
             m_ScanStartLine = tree.Set(m_ScanStartLine, m_ScanStartLine, "Scan Start Line", "Scan Start Line");
         }
 
-        public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false)
+        public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false)
         {
-            m_camera.GrabLineScan(memory, cpScanOffset, nLine, bInvY, m_nReverseOffsetY);
+            m_camera.GrabLineScan(memory, cpScanOffset, nLine, nScanOffsetY, bInvY, m_nReverseOffsetY);
             m_camera.Grabed += m_camera_Grabed;
         }
-        public void StartGrabColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false)
+        public void StartGrabColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false)
         {
-            m_camera.GrabLineScanColor(memory, cpScanOffset, nLine, bInvY, m_nReverseOffsetY);
+            m_camera.GrabLineScanColor(memory, cpScanOffset, nLine, nScanOffsetY, bInvY, m_nReverseOffsetY);
             m_camera.Grabed += m_camera_Grabed;
         }
         void m_camera_Grabed(object sender, System.EventArgs e)
