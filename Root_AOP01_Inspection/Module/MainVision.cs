@@ -379,14 +379,14 @@ namespace Root_AOP01_Inspection.Module
             //            p_bStageVac = true;
             Thread.Sleep(200);
 
-            //if (m_CamTDI90 != null && m_CamTDI90.p_CamInfo.p_eState == eCamState.Init)
-            //    m_CamTDI90.Connect();
-            //if (m_CamTDI45 != null && m_CamTDI45.p_CamInfo.p_eState == eCamState.Init)
-            //    m_CamTDI45.Connect();
-            //if (m_CamLADS.p_CamInfo._OpenStatus == false)
-            //    m_CamLADS.Connect();
-            //if (m_CamTDISide != null && m_CamTDISide.p_CamInfo.p_eState == eCamState.Init)
-            //    m_CamTDISide.Connect();
+            if (m_CamTDI90 != null && m_CamTDI90.p_CamInfo.p_eState == eCamState.Init)
+                m_CamTDI90.Connect();
+            if (m_CamTDI45 != null && m_CamTDI45.p_CamInfo.p_eState == eCamState.Init)
+                m_CamTDI45.Connect();
+            if (m_CamLADS.p_CamInfo._OpenStatus == false)
+                m_CamLADS.Connect();
+            if (m_CamTDISide != null && m_CamTDISide.p_CamInfo.p_eState == eCamState.Init)
+                m_CamTDISide.Connect();
 
             m_axisSideZ.StartHome();
             if (m_axisSideZ.WaitReady() != "OK")
@@ -734,7 +734,7 @@ namespace Root_AOP01_Inspection.Module
                         string strMemory = curScanPos.ToString();
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
@@ -863,7 +863,7 @@ namespace Root_AOP01_Inspection.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
@@ -1009,7 +1009,7 @@ namespace Root_AOP01_Inspection.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
                         CAXM.AxmContiStart(((AjinAxis)axisXY.p_axisY).m_nAxis, 0, 0);
                         Thread.Sleep(10);
@@ -1222,7 +1222,7 @@ namespace Root_AOP01_Inspection.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
@@ -2220,12 +2220,30 @@ namespace Root_AOP01_Inspection.Module
                 // Get distance From InFeatureCentroid & OutFeatureCentroid
                 double dResultDistance = GetDistanceOfTwoPoint(cptInFeatureCentroid, cptOutFeatureCentroid);
                 m_module.p_dPatternShiftDistance = dResultDistance;
+                
 
-                // Get Degree From OutLT & OutRT
-                double dThetaRadian = Math.Atan2((double)(cptarrOutResultCenterPositions[(int)eSearchPoint.RT].Y - cptarrOutResultCenterPositions[(int)eSearchPoint.LT].Y),
-                                                          cptarrOutResultCenterPositions[(int)eSearchPoint.RT].X - cptarrOutResultCenterPositions[(int)eSearchPoint.LT].X);
-                double dThetaDegree = dThetaRadian * (180 / Math.PI);
-                m_module.p_dPatternShiftAngle = dThetaDegree;
+                // Get Degree
+                CPoint cptOutLeftCenter = new CPoint((cptarrOutResultCenterPositions[(int)eSearchPoint.LT].X + cptarrOutResultCenterPositions[(int)eSearchPoint.LB].X) / 2,
+                                                     (cptarrOutResultCenterPositions[(int)eSearchPoint.LT].Y + cptarrOutResultCenterPositions[(int)eSearchPoint.LB].Y) / 2);
+                CPoint cptOutRightCenter = new CPoint((cptarrOutResultCenterPositions[(int)eSearchPoint.RT].X + cptarrOutResultCenterPositions[(int)eSearchPoint.RB].X) / 2,
+                                                      (cptarrOutResultCenterPositions[(int)eSearchPoint.RT].Y + cptarrOutResultCenterPositions[(int)eSearchPoint.RB].Y) / 2);
+                CPoint cptInLeftCenter = new CPoint((cptarrInResultCenterPositions[(int)eSearchPoint.LT].X + cptarrInResultCenterPositions[(int)eSearchPoint.LB].X) / 2,
+                                                     (cptarrInResultCenterPositions[(int)eSearchPoint.LT].Y + cptarrInResultCenterPositions[(int)eSearchPoint.LB].Y) / 2);
+                CPoint cptInRightCenter = new CPoint((cptarrInResultCenterPositions[(int)eSearchPoint.RT].X + cptarrInResultCenterPositions[(int)eSearchPoint.RB].X) / 2,
+                                                     (cptarrInResultCenterPositions[(int)eSearchPoint.RT].Y + cptarrInResultCenterPositions[(int)eSearchPoint.RB].Y) / 2);
+                double dOutLineThetaRadian = Math.Atan2((double)(cptOutLeftCenter.Y - cptOutRightCenter.Y),
+                                                        (double)(cptOutLeftCenter.X - cptOutRightCenter.X));
+                double dOutLineThetaDegree = dOutLineThetaRadian * (180 / Math.PI);
+
+                double dInLineThetaRadian = Math.Atan2((double)(cptInLeftCenter.Y - cptInRightCenter.Y),
+                                                       (double)(cptInLeftCenter.X - cptInRightCenter.X));
+                double dInLineThetaDegree = dInLineThetaRadian * (180 / Math.PI);
+
+                m_module.p_dPatternShiftAngle = Math.Abs(dOutLineThetaDegree - dInLineThetaDegree);
+                //double dThetaRadian = Math.Atan2((double)(cptarrOutResultCenterPositions[(int)eSearchPoint.RT].Y - cptarrOutResultCenterPositions[(int)eSearchPoint.LT].Y),
+                //                                 (double)(cptarrOutResultCenterPositions[(int)eSearchPoint.RT].X - cptarrOutResultCenterPositions[(int)eSearchPoint.LT].X));
+                //double dThetaDegree = dThetaRadian * (180 / Math.PI);
+                //m_module.p_dPatternShiftAngle = dThetaDegree;
 
                 // Judgement
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
@@ -2234,12 +2252,12 @@ namespace Root_AOP01_Inspection.Module
                     m_module.p_bPatternShiftPass = false;
                     return "Fail";
                 }
-                if (m_dNGSpecDegree < Math.Abs(dThetaDegree))
+                if (m_dNGSpecDegree < m_module.p_dPatternShiftAngle)
                 {
                     m_module.p_bPatternShiftPass = false;
                     return "Fail";
                 }
-                
+                m_module.p_bPatternShiftPass = true;
                 return "OK";
             }
 
@@ -2403,7 +2421,7 @@ namespace Root_AOP01_Inspection.Module
                         CRect crtFoundRect = new CRect(ptStart, ptEnd);
                         Mat matFound = m_module.GetMatImage(mem, crtFoundRect);
                         Mat matBinary = new Mat();
-                        CvInvoke.Threshold(matFound, matBinary, m_nThreshold, 128, ThresholdType.Binary);
+                        CvInvoke.Threshold(matFound, matBinary, m_nThreshold, 128, ThresholdType.BinaryInv);
                         Image<Gray, byte> imgBinary = matBinary.ToImage<Gray, byte>();
                         CvBlobs blobs = new CvBlobs();
                         CvBlobDetector blobDetector = new CvBlobDetector();
@@ -2421,20 +2439,21 @@ namespace Root_AOP01_Inspection.Module
                         CRect crtBoundingBox;
                         Mat matResult = FloodFill(matBinary, ptsContour[0], 255, out crtBoundingBox, Connectivity.EightConnected);
                         matResult = matResult - matBinary;
-                        if (i == (int)eSearchPoint.RT)  // Flip Horizontal
-                        {
-                            CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
-                        }
-                        else if (i == (int)eSearchPoint.RB) // Flip Horizontal & Vertical
-                        {
-                            CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
-                            CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
-                        }
-                        else if (i == (int)eSearchPoint.LB) // Flip Vertical
-                        {
-                            CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
-                        }
+                        //if (i == (int)eSearchPoint.RT)  // Flip Horizontal
+                        //{
+                        //    CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
+                        //}
+                        //else if (i == (int)eSearchPoint.RB) // Flip Horizontal & Vertical
+                        //{
+                        //    CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
+                        //    CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
+                        //}
+                        //else if (i == (int)eSearchPoint.LB) // Flip Vertical
+                        //{
+                        //    CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
+                        //}
                         matarr[i] = matResult.Clone();
+                        //matResult.Save("D:\\TEST" + i + ".bmp");
                     }
                 }
 
@@ -2481,6 +2500,7 @@ namespace Root_AOP01_Inspection.Module
                                 }
                             }
                             Image<Gray, byte> imgSub = new Image<Gray, byte>(barrMaster);
+                            //imgSub = imgSub.Erode(1);
 
                             // 차영상 Blob 결과
                             bool bResult = GetResultFromImage(imgSub);
@@ -2498,15 +2518,15 @@ namespace Root_AOP01_Inspection.Module
 
                             imgSub.Save("D:\\ESCHO_" + strName + ".BMP");
 
-                            if (bResult == false)
-                            {
-                                m_module.p_bAlignKeyPass = false;
-                                return "Fail";
-                            }
+                            //if (bResult == false)
+                            //{
+                            //    m_module.p_bAlignKeyPass = false;
+                            //    return "Fail";
+                            //}
                         }
                     }
                 }
-
+                m_module.p_bAlignKeyPass = true;
                 return "OK";
             }
 
@@ -2736,7 +2756,7 @@ namespace Root_AOP01_Inspection.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)grab.m_nMaxFrame * grab.m_grabMode.m_dTrigger * nCamHeight * grab.m_nScanRate / 100);
-                        grab.m_grabMode.StartGrab(mem, cptMemoryOffset, nReticleSizeY_px, grab.m_grabMode.m_bUseBiDirectionScan);
+                        grab.m_grabMode.StartGrab(mem, cptMemoryOffset, nReticleSizeY_px, 0, grab.m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
