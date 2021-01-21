@@ -338,6 +338,7 @@ namespace Root_EFEM
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule)
                 {
+                    if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
                     ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
                     EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
                     m_process.m_qSequence.Enqueue(sequenceDock);

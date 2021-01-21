@@ -76,8 +76,8 @@ namespace Root_CAMELLIA.UI_UserControl
             //while ((EQ.IsStop() != true) && m_rfid.m_bReadID != true) Thread.Sleep(10);
             m_loadport.StartRun(m_loadport.GetModuleRunDocking().Clone());
 
-            if (m_loadport.p_id == "LoadportA") m_handler.p_nRunLP = 0;
-            else if (m_loadport.p_id == "LoadportB") m_handler.p_nRunLP = 1;
+            if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;
+            else if (m_loadport.p_id == "LoadportB") EQ.p_nRunLP = 1;
 
             while ((EQ.IsStop() != true) && m_loadport.IsBusy()) Thread.Sleep(10);
             //m_loadport.p_infoCarrier.p_eState = InfoCarrier.eState.Dock;
