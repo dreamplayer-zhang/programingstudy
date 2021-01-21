@@ -71,7 +71,7 @@ namespace Root_CAMELLIA
                         break;
                 }
             }
-            infoCarrier.SetMapData(aSlot);
+            infoCarrier.SetMapData(aSlot, sMap);
             ManualJobSchedule jobSchedule = new ManualJobSchedule(infoCarrier);
             jobSchedule.ShowPopup();
         }

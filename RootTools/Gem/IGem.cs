@@ -29,7 +29,8 @@ namespace RootTools.Gem
 
         void SendCarrierID(GemCarrierBase carrier, string sCarrierID);
 
-        void SendSlotMap(GemCarrierBase carrier, List<GemSlotBase.eState> aMap);
+        //void SendSlotMap(GemCarrierBase carrier, List<GemSlotBase.eState> aMap);
+        void SendSlotMap(GemCarrierBase carrier, string sMap);
 
         string CMSSetReadyToLoad(GemCarrierBase carrier); 
 

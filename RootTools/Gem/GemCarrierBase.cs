@@ -17,20 +17,20 @@ namespace RootTools.Gem
             VerificationFailed
         }
 
-        eGemState _eGemState = eGemState.NotRead;
-        public eGemState p_eGemState
+        eGemState _eStateCarrierID = eGemState.NotRead;
+        public eGemState p_eStateCarrierID
         {
-            get { return _eGemState; }
+            get { return _eStateCarrierID; }
             set
             {
-                if (_eGemState == value) return;
-                m_log.Info("p_eState " + _eGemState.ToString() + " -> " + value.ToString());
-                _eGemState = value;
+                if (_eStateCarrierID == value) return;
+                m_log.Info("p_eState " + _eStateCarrierID.ToString() + " -> " + value.ToString());
+                _eStateCarrierID = value;
             }
         }
 
         eGemState _eStateSlotMap = eGemState.NotRead;
-        public eGemState p_eSlotMapState
+        public eGemState p_eStateSlotMap
         {
             get { return _eStateSlotMap; }
             set
@@ -292,12 +292,13 @@ namespace RootTools.Gem
         /// <summary> InfoWafer 와 비슷하지만 Wafer를 빼가도 null로 바꾸지 않는다. </summary>
         public List<GemSlotBase> m_aGemSlot = new List<GemSlotBase>();
 
-        public void SendSlotMap()
+        public void SendSlotMap(string sMap)
         {
             if (m_gem == null) return;
-            List<GemSlotBase.eState> aMap = new List<GemSlotBase.eState>();
-            foreach (GemSlotBase slot in m_aGemSlot) aMap.Add(slot.p_eState);
-            m_gem.SendSlotMap(this, aMap); 
+            //List<GemSlotBase.eState> aMap = new List<GemSlotBase.eState>();
+            //foreach (GemSlotBase slot in m_aGemSlot) aMap.Add(slot.p_eState);
+            m_gem.SendSlotMap(this, sMap);
+            m_log.Info("Send Carrier Slotmap : " + sMap);
         }
 
         public string SetSlotInfo(int nIndex, GemSlotBase.eState state, string sLotID, string sSlotID) 

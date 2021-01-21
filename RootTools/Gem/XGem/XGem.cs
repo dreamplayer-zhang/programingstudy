@@ -580,8 +580,9 @@ namespace RootTools.Gem.XGem
             LogRcv("OnCMSCarrierIDStatusChanged", sLocID, nState, sCarrierID);
             GemCarrierBase carrier = GetGemCarrier(sLocID);
             if (carrier == null) return;
-            p_sInfo = "eGemState : " + carrier.p_eGemState.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString(); 
-            carrier.p_eGemState = (GemCarrierBase.eGemState)nState;
+            //p_sInfo = "eGemState : " + carrier.p_eGemState.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString(); 
+            p_sInfo = "eStateCarrierID : " + carrier.p_eStateCarrierID.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString();
+            carrier.p_eStateCarrierID = (GemCarrierBase.eGemState)nState;
             p_sInfo = "sCarrierID : " + carrier.p_sCarrierID + " -> " + sCarrierID; 
             carrier.p_sCarrierID = sCarrierID;
         }
@@ -591,8 +592,9 @@ namespace RootTools.Gem.XGem
             LogRcv("OnCMSSlotMapStatusChanged", sLocID, nState, sCarrierID);
             GemCarrierBase carrier = GetGemCarrier(sLocID);
             if (carrier == null) return;
-            p_sInfo = "eSlotMapState : " + carrier.p_eSlotMapState.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString(); 
-            carrier.p_eSlotMapState = (GemCarrierBase.eGemState)nState;
+            //p_sInfo = "eSlotMapState : " + carrier.p_eSlotMapState.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString(); 
+            p_sInfo = "eStateSlotMap : " + carrier.p_eStateSlotMap.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString();
+            carrier.p_eStateSlotMap = (GemCarrierBase.eGemState)nState;
             p_sInfo = "sCarrierID : " + carrier.p_sCarrierID + " -> " + sCarrierID;
             carrier.p_sCarrierID = sCarrierID;
         }
@@ -603,15 +605,16 @@ namespace RootTools.Gem.XGem
             LogSend(nError, "CMSSetCarrierID", carrier.p_sLocID, sCarrierID, 0);
         }
 
-        public void SendSlotMap(GemCarrierBase carrier, List<GemSlotBase.eState> aMap)
+        //public void SendSlotMap(GemCarrierBase carrier, List<GemSlotBase.eState> aMap)
+        public void SendSlotMap(GemCarrierBase carrier, string sMap)
         {
-            string sMap = "";
-            foreach (GemSlotBase.eState state in aMap)
-            {
-                char cSlot = (char)state;
-                cSlot += '0'; 
-                sMap += cSlot;
-            }
+            //string sMap = "";
+            //foreach (GemSlotBase.eState state in aMap)
+            //{
+            //    char cSlot = (char)state;
+            //    cSlot += '0'; 
+            //    sMap += cSlot;
+            //}
             long nError = m_xGem.CMSSetSlotMap(carrier.p_sLocID, sMap, carrier.p_sCarrierID, 0);
             LogSend(nError, "CMSSetSlotMap", carrier.p_sLocID, sMap, carrier.p_sCarrierID, 0);
         }
