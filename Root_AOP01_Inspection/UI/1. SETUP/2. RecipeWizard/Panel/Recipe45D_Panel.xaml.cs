@@ -26,15 +26,15 @@ namespace Root_AOP01_Inspection
 		{
 			InitializeComponent();
 			//AddDefectEvent
-			ProgramManager.Instance.InspectionManager.AddDefectEvent += InspectionManager_AddDefectEvent;
-			ProgramManager.Instance.InspectionManager.ClearDefectEvent += InspectionManager_ClearDefect;
-			ProgramManager.Instance.InspectionManager.RefreshDefectEvent += InspectionManager_AOP_RefreshDefect;
+			ProgramManager.Instance.PellInspectionManager.AddDefectEvent += InspectionManager_AddDefectEvent;
+			ProgramManager.Instance.PellInspectionManager.ClearDefectEvent += InspectionManager_ClearDefect;
+			ProgramManager.Instance.PellInspectionManager.RefreshDefectEvent += InspectionManager_AOP_RefreshDefect;
 		}
 		~Recipe45D_Panel()
 		{
-			ProgramManager.Instance.InspectionManager.AddDefectEvent -= InspectionManager_AddDefectEvent;
-			ProgramManager.Instance.InspectionManager.ClearDefectEvent -= InspectionManager_ClearDefect;
-			ProgramManager.Instance.InspectionManager.RefreshDefectEvent -= InspectionManager_AOP_RefreshDefect;
+			ProgramManager.Instance.PellInspectionManager.AddDefectEvent -= InspectionManager_AddDefectEvent;
+			ProgramManager.Instance.PellInspectionManager.ClearDefectEvent -= InspectionManager_ClearDefect;
+			ProgramManager.Instance.PellInspectionManager.RefreshDefectEvent -= InspectionManager_AOP_RefreshDefect;
 		}
 
 		private void InspectionManager_AOP_RefreshDefect()

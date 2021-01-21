@@ -15,28 +15,11 @@ using System.Windows.Threading;
 
 namespace Root_AOP01_Inspection
 {
-	public struct InfoTextBolck
-	{
-		public InfoTextBolck(Grid grid, TRect pos)
-		{
-			this.grid = grid;
-			this.pos = pos;
-		}
-		public Grid grid;
-		public TRect pos;
-	}
-
-	public delegate void EventDrawDone(CPoint leftTop, CPoint rightBottom); //임시
-
-	public class Recipe45D_ImageViewer_ViewModel : RootViewer_ViewModel
+	public class RecipeFrontside_Viewer_ViewModel : RootViewer_ViewModel
 	{
 		public event EventDrawDone DrawDone;
 
-		Polygon WAFEREDGE_UI;
-		CPoint canvasPoint;
-		Grid CENTERPOINT_UI;
-
-		public Recipe45D_ImageViewer_ViewModel()
+		public RecipeFrontside_Viewer_ViewModel()
 		{
 			base.init(ProgramManager.Instance.Image45D, ProgramManager.Instance.DialogService);
 			p_VisibleMenu = Visibility.Visible;

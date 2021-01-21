@@ -529,7 +529,7 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_BarcodeInspection(this), true, "Run Barcode Inspection");
             AddModuleRunList(new Run_MakeAlignTemplateImage(this), true, "Run MakeAlignTemplateImage");
             AddModuleRunList(new Run_PatternAlign(this), true, "Run PatternAlign");
-            AddModuleRunList(new Run_ShiftAndRotation(this), true, "Run ShiftAndRotation");
+            AddModuleRunList(new Run_PatternShiftAndRotation(this), true, "Run Pattern ShiftAndRotation");
             AddModuleRunList(new Run_AlignKeyInspection(this), true, "Run AlignKeyInspection");
             AddModuleRunList(new Run_Flip(this), true, "Run Reticle Flip");
         }

@@ -198,6 +198,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeFrontside_Viewer_ViewModel.cs" />
     <Compile Include="UI\3. RUN\ManualJobSchedule.cs" />
     <Compile Include="UI\3. RUN\Dlg_Start.xaml.cs">
       <DependentUpon>Dlg_Start.xaml</DependentUpon>

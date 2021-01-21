@@ -25,6 +25,8 @@ namespace Root_AOP01_Inspection
 		public static string mSideBotMem = "SideBot";
 
 		public static string connection = @"server=localhost;uid=root;password=`ati5344;database=inspections;port=3306;charset=utf8";
+
+		public static string AOPImageRootPath = @"D:\DefectImage";
 		public static string m45DMem = "TDI45";
 		protected override void OnStartup(StartupEventArgs e)
 		{

@@ -48,8 +48,10 @@ namespace Root_AOP01_Inspection
         private RecipeEdge_ViewModel m_RecipeEdge;
         private RecipeLADS_ViewModel m_RecipeLADS;
 
-        InspectionManager_AOP inspectionManager;
-        public InspectionManager_AOP InspectionManager { get => inspectionManager; private set => inspectionManager = value; }
+        InspectionManager_AOP pellInspectionManager;
+        public InspectionManager_AOP PellInspectionManager { get => pellInspectionManager; private set => pellInspectionManager = value; }
+        InspectionManager_AOP patternInspectionManager;
+        public InspectionManager_AOP PatternInspectionManager { get => patternInspectionManager; private set => patternInspectionManager = value; }
 
         public Setup_ViewModel(MainWindow mainwindow)
         {
@@ -59,7 +61,8 @@ namespace Root_AOP01_Inspection
             Init_NaviBtn();
 
             Set_HomePanel();
-            inspectionManager = ProgramManager.Instance.InspectionManager;
+            pellInspectionManager = ProgramManager.Instance.PellInspectionManager;
+            patternInspectionManager = ProgramManager.Instance.PatternInspectionManager;
         }
 
         void Init_ViewModel()

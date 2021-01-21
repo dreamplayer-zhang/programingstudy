@@ -38,6 +38,9 @@ namespace Root_AOP01_Inspection.Module
 		/// </summary>
 		public event EventHandler RefreshDefectEvent;
 
+		public static event EventHandler PellInspectionDone;
+		public static event EventHandler PatternInspectionDone;
+
 
 		SolidColorBrush brushSnap = System.Windows.Media.Brushes.LightSkyBlue;
 		SolidColorBrush brushPosition = System.Windows.Media.Brushes.SkyBlue;
@@ -440,8 +443,7 @@ namespace Root_AOP01_Inspection.Module
 			//	}
 			//}
 		}
-
-		public void InspectionStart()
+		public void InitInspectionInfo()
 		{
 			string lotId = "Lotid";
 			string partId = "Partid";
@@ -452,8 +454,11 @@ namespace Root_AOP01_Inspection.Module
 			string recipeName = recipe.Name;
 			var temp = DatabaseManager.Instance.GetConnectionStatus();
 			DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
+		}
 
-			base.Start();
+		public void InspectionStart()
+		{
+			base.Start(WORK_TYPE.NONE);
 		}
 
 		internal void RefreshDefect()

@@ -41,7 +41,7 @@ namespace Root_AOP01_Inspection
 		{
 			get
 			{
-				return m_Setup.InspectionManager.Recipe;
+				return m_Setup.PellInspectionManager.Recipe;
 			}
 		}
 
@@ -144,6 +144,7 @@ namespace Root_AOP01_Inspection
 					if (value)
 					{
 						m_ImageViewer_VM.Clear();
+						tempList.Clear();
 					}
 				}
 				SetProperty(ref _EdgeDrawMode, value);
@@ -245,6 +246,7 @@ namespace Root_AOP01_Inspection
 			WorkEventManager.InspectionDone += SurfaceInspDone_Callback;
 			WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
 			WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
+			InspectionManager_AOP.PellInspectionDone += InspectionManager_AOP_PellInspectionDone;
 
 			SurfaceSize = 5;
 			SurfaceGV = 70;
@@ -252,8 +254,9 @@ namespace Root_AOP01_Inspection
 			EdgeDrawMode = false;
 		}
 
-		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
+		private void InspectionManager_AOP_PellInspectionDone()
 		{
+			ResultDataTable = null;
 			ResultDataTable = new DataTable();
 
 			MySqlConnection _conn = new MySqlConnection();
@@ -286,6 +289,10 @@ namespace Root_AOP01_Inspection
 			}
 		}
 
+		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
+		{
+		}
+
 		private void ProcessDefectDone_Callback(object obj, ProcessDefectDoneEventArgs args)
 		{
 			Workplace workplace = obj as Workplace;
@@ -306,21 +313,9 @@ namespace Root_AOP01_Inspection
 			{
 				Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
 				{
-					m_Setup.InspectionManager.AddDefect(workplace.DefectList);
+					m_Setup.PellInspectionManager.AddDefect(workplace.DefectList);
 				}));
 			}
-		}
-
-		public void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
-		{
-			if (reDraw)
-				p_ImageViewer_VM.Clear();
-
-			p_ImageViewer_VM.DrawRect(rectList, Recipe45D_ImageViewer_ViewModel.ColorType.Defect, text);
-		}
-
-		private void showEdgeBox()
-		{
 		}
 		List<TRect> tempList = new List<TRect>();
 		private void saveEdgeBox()
@@ -330,15 +325,14 @@ namespace Root_AOP01_Inspection
 				tempList = new List<TRect>(m_ImageViewer_VM.TRectList);
 			}
 		}
-		string AOPImageRootPath = @"D:\DefectImage";
 		private void SetData(DataRowView selectedDataTable, ImageType type)
 		{
 			int idx = Convert.ToInt32(selectedDataTable["m_nDefectIndex"]);
 
-			if (System.IO.Directory.Exists(System.IO.Path.Combine(AOPImageRootPath)))
+			if (System.IO.Directory.Exists(System.IO.Path.Combine(App.AOPImageRootPath)))
 			{
 				string currentInspection = RootTools.Database.DatabaseManager.Instance.InspectionID;
-				string imagePath = System.IO.Path.Combine(AOPImageRootPath, currentInspection, idx.ToString() + ".bmp");
+				string imagePath = System.IO.Path.Combine(App.AOPImageRootPath, currentInspection, idx.ToString() + ".bmp");
 				if (System.IO.File.Exists(imagePath))
 				{
 					System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(imagePath);
@@ -439,8 +433,6 @@ namespace Root_AOP01_Inspection
 
 			m_ImageViewer_VM.DrawRect(new CPoint(ptLT.X, ptLT.Y), new CPoint(ptRB.X, ptRB.Y), Recipe45D_ImageViewer_ViewModel.ColorType.ChipFeature);
 
-			tempList.Clear();
-
 			return new CRect(new Point(ptLT.X + x_margin, ptLT.Y + y_margin), new Point(ptRB.X - x_margin, ptRB.Y - y_margin));
 		}
 		private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
@@ -485,15 +477,8 @@ namespace Root_AOP01_Inspection
 					m_ImageViewer_VM.p_DrawElement.RemoveAt(0);
 				}
 			}
-			m_Setup.InspectionManager.RefreshDefect();
+			m_Setup.PellInspectionManager.RefreshDefect();
 
-		}
-		public ICommand commandShowEdgeBox
-		{
-			get
-			{
-				return new RelayCommand(showEdgeBox);
-			}
 		}
 		public ICommand commandSaveEdgeBox
 		{
@@ -686,7 +671,7 @@ namespace Root_AOP01_Inspection
 
 
 			//m_ImageViewer_VM.DrawRect(rectList, Recipe45D_ImageViewer_ViewModel.ColorType.MapData);
-			m_Setup.InspectionManager.AddRect(rectList, null, new Pen(Brushes.Green, 2));
+			m_Setup.PellInspectionManager.AddRect(rectList, null, new Pen(Brushes.Green, 2));
 		}
 		//private void DrawRect(List<CRect> RectList, ColorType color, List<String> textList = null, int FontSz = 15)
 		//{
@@ -748,15 +733,20 @@ namespace Root_AOP01_Inspection
 		}
 		private void startTestInsp()
 		{
+			ResultDataTable = null;
+			ResultDataTable = new DataTable();
+			SelectedDataTable = null;
+
 			saveEdgeBox();
 
 			p_ImageViewer_VM.Clear();
-			m_Setup.InspectionManager.ClearDefect();
-			m_Setup.InspectionManager.ResetWorkManager();
+			m_Setup.PellInspectionManager.ClearDefect();
+			m_Setup.PellInspectionManager.ResetWorkManager();
+			m_Setup.PatternInspectionManager.InitInspectionInfo();
 
 			_StartRecipeTeaching();
 
-			var temp = m_Setup.InspectionManager.Recipe.GetRecipe<BacksideRecipe>();
+			var temp = m_Setup.PellInspectionManager.Recipe.GetRecipe<BacksideRecipe>();
 			temp = backsideRecipe;
 
 			BacksideSurfaceParameter surParam = new BacksideSurfaceParameter();
@@ -773,18 +763,18 @@ namespace Root_AOP01_Inspection
 				else // All 일때는 R채널로...
 					SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr(0);
 
-				m_Setup.InspectionManager.SetColorSharedBuffer(p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
+				m_Setup.PellInspectionManager.SetColorSharedBuffer(p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
 			}
 			else
 			{
 				SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr();
-				m_Setup.InspectionManager.SharedBufferR_Gray = SharedBuf;
+				m_Setup.PellInspectionManager.SharedBufferR_Gray = SharedBuf;
 			}
 
-			m_Setup.InspectionManager.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
+			m_Setup.PellInspectionManager.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
 
 
-			m_Setup.InspectionManager.InspectionStart();
+			m_Setup.PellInspectionManager.InspectionStart();
 		}
 
 		public ICommand btnBack

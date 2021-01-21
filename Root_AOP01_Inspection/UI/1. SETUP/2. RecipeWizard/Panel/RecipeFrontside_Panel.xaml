@@ -20,6 +20,16 @@
                     <Button Content="Inspection"
                             Command="{Binding btnInspection}"
                             Style="{StaticResource SetupPanelBtn}"/>
+					<Rectangle Height="2"
+							   Margin="10,20"
+							   Stroke="Transparent"
+							   Fill="Gray"/>
+					<ToggleButton Content="Draw Edge Box" 
+								  Style="{StaticResource SetupPanelToggleBtn}"
+								  IsChecked="{Binding EdgeDrawMode}"/>
+					<Button Content="Show Edge Box"
+                            Command="{Binding commandShowEdgeBox}"
+                            Style="{StaticResource SetupPanelBtn}"/>
                 </StackPanel>
                 <Button Content="Back"
                         Command="{Binding btnBack}"
@@ -39,7 +49,8 @@
 
                         <Grid Grid.Column="0">
                             <GroupBox Grid.Column="0" Header="Frontside Image">
-                                <tools:RootViewer DataContext="{Binding p_ImageViewer_VM}"/>
+								<tools:RootViewer DataContext="{Binding p_ImageViewer_VM}"
+												  x:Name="canvas"/>
                                 <!--<Image Source="/Root_AOP01_Inspection;component/Resource/ReticleMap2.PNG"/>-->
                             </GroupBox>
                         </Grid>
@@ -58,7 +69,7 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="3.5*"/>
                                     <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="2.7*"/>
                                     <RowDefinition Height="1.5*"/>
                                     <RowDefinition Height="1.5*"/>
                                     <RowDefinition Height="1.5*"/>
@@ -86,7 +97,8 @@
 
                                         <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
                                               VerticalAlignment="Center"
-                                              HorizontalAlignment="Center" Width="85"/>
+                                              HorizontalAlignment="Center" Width="85"
+                                                      IsChecked="{Binding p_bEnablePatternDiscolor}"/>
                                         <ToggleButton Content="True" Grid.Row="1" Grid.Column="1" 
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center" Width="85"
@@ -119,14 +131,47 @@
                                 </GroupBox>
                                 <GroupBox Grid.Row="2" Header="Parttern DisColor">
                                     <Grid Margin="5">
-                                        <Grid.ColumnDefinitions>
+                                        <!--<Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="2*"/>
                                             <ColumnDefinition Width="1*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock FontSize="12" Text="Discolor Spe(mm)" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                        </Grid.ColumnDefinitions>-->
+
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="3*"/>
+												<ColumnDefinition Width="1*"/>
+											</Grid.ColumnDefinitions>
+											<Grid.RowDefinitions>
+												<RowDefinition/>
+												<RowDefinition/>
+											    <RowDefinition/>
+											<RowDefinition/>
+											<RowDefinition/>
+										</Grid.RowDefinitions>
+											<TextBlock FontSize="12" Text="Birght Inspection" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+											<!--<TextBlock FontSize="12" Text="Pit Level" Style="{StaticResource BasicTb}" Grid.Row="3"/>-->
+											<TextBlock FontSize="12" Text="GV" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+										<TextBlock FontSize="12" Text="Size" Style="{StaticResource BasicTb}" Grid.Row="2"/>
+										<TextBlock FontSize="12" Text="Inspection Offset X" Style="{StaticResource BasicTb}" Grid.Row="3"/>
+										<TextBlock FontSize="12" Text="Inspection Offset Y" Style="{StaticResource BasicTb}" Grid.Row="4"/>
+										<ToggleButton Content="{Binding BrightGV}" Grid.Row="0" Grid.Column="1" 
+                                                      VerticalAlignment="Stretch"
+                                                      HorizontalAlignment="Center" Width="85"
+															  Margin="0,5"
+															  IsChecked="{Binding AbsoluteGV}"/>
+											<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="1" 
+														 Text="{Binding SurfaceGV}"/>
+										<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="2" 
+														 Text="{Binding SurfaceSize}"/>
+										<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="3" 
+														 Text="{Binding InspectionOffsetX}"/>
+										<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="4" 
+														 Text="{Binding InspectionOffsetY}"/>
+										<!--<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="3" 
+														 Text="{Binding PitLevel}"/>-->
+										<!--<TextBlock FontSize="12" Text="Discolor Spe(mm)" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0"/>
                                         <TextBox Style="{StaticResource BasicTbox}" Text="1" Width="80" Height="20" Grid.Column="1" Grid.Row="0"/>
-                                        <TextBlock Style="{StaticResource BasicTb}" Text="mm" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0"/>
+                                        <TextBlock Style="{StaticResource BasicTb}" Text="mm" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0"/>-->
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="3" Header="Align Key">
@@ -362,13 +407,17 @@
                                 <GroupBox Grid.Row="5" Grid.Column="1" Header="Defect Image"
                                   Background="{StaticResource GroupBoxBackground}">
                                     <Grid Background="Black">
-                                        <Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG"/>
+										<Image Source="{Binding SelectedTDIImage}"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="6" Grid.Column="1" Header="Insepction Info"
                                   Background="{StaticResource GroupBoxBackground}">
-                                    <DataGrid IsReadOnly="True" Grid.Row="1">
-                                        <DataGrid.Resources>
+									<DataGrid IsReadOnly="True" Grid.Row="1" 
+											  ItemsSource="{Binding ResultDataTable}"
+											  SelectionMode="Single"
+											  SelectedItem="{Binding SelectedDataTable}"
+											  AutoGenerateColumns="True">
+										<!--<DataGrid.Resources>
                                             <Style TargetType="DataGridColumnHeader">
                                                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
                                                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -394,7 +443,7 @@
                                         <local:Dummy a="10" b="2678, 6345" c="1.8mm" d="61" e="0x000000"/>
                                         <local:Dummy a="11" b="4378, 6385" c="1.6mm" d="55" e="0x000000"/>
                                         <local:Dummy a="12" b="7178, 5375" c="1.6mm" d="71" e="0x000000"/>
-                                        <local:Dummy a="13" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="13" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>-->
                                     </DataGrid>
                                 </GroupBox>
                             </Grid>
