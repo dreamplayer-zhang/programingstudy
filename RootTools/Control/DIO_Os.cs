@@ -75,7 +75,12 @@ namespace RootTools.Control
             if (nDO >= m_listDO.m_aDIO.Count) return true;
             return (m_listDO.m_aDIO[nDO].p_sID != "Output");
         }
-        
+
+        public void AllOff()
+        {
+            foreach (BitDO bitDO in m_aBitDO) bitDO.Write(false); 
+        }
+
         public void Write(Enum eDO, bool bOn)
         {
             Write(eDO.ToString(), bOn);
