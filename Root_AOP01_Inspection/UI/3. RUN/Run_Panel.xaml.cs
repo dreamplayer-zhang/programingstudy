@@ -28,7 +28,7 @@ namespace Root_AOP01_Inspection
         WTRArm m_wtr;
         Arm m_arm;
         Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
-        RFID_Ceyon[] m_rfid = new RFID_Ceyon[2];
+        RFID_Brooks[] m_rfid = new RFID_Brooks[2];
         AOP01_Handler.eLoadport LoadportType;
         public Run_Panel()
         {
@@ -36,7 +36,7 @@ namespace Root_AOP01_Inspection
         }
 
         public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
-            Loadport_Cymechs loadport2, AOP01_Engineer engineer, RFID_Ceyon rfid1, RFID_Ceyon rfid2)
+            Loadport_Cymechs loadport2, AOP01_Engineer engineer, RFID_Brooks rfid1, RFID_Brooks rfid2)
         {
             m_engineer = engineer;
             m_handler = engineer.m_handler;
@@ -100,7 +100,7 @@ namespace Root_AOP01_Inspection
         {
             if (IsEnableRecovery() == false) return;
             m_handler.m_bIsPossible_Recovery = false;
-            m_handler.m_process.CalcRecover();
+            m_handler.CalcRecover();
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Run;
             m_bRecovery = true;
