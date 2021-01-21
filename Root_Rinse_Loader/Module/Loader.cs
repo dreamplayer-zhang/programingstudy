@@ -85,19 +85,49 @@ namespace Root_Rinse_Loader.Module
             return "OK";
         }
 
-        void RunTreePicker(Tree tree)
-        {
-            m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum Sensor Wait (sec)");
-            m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
-        }
-        #endregion
-
-        #region Picker Up & Down
         DIO_I2O2 m_dioPickerDown;
         public string RunPickerDown(bool bDown)
         {
             m_dioPickerDown.Write(bDown);
             return m_dioPickerDown.WaitDone();
+        }
+
+        int m_nShake = 0;
+        double[] m_secShake = new double[2] { 0.3, 0.2 }; 
+        public string RunShakeUp()
+        {
+            try
+            {
+                for (int n = 0; n < m_nShake; n++)
+                {
+                    m_dioPickerDown.Write(false);
+                    Thread.Sleep((int)(1000 * m_secShake[0]));
+                    m_dioPickerDown.Write(true);
+                    Thread.Sleep((int)(1000 * m_secShake[1]));
+                }
+                return RunPickerDown(false);
+            }
+            finally
+            {
+                foreach (Picker picker in m_aPicker)
+                {
+                    if (picker.m_dioVacuum.p_bIn == false) picker.m_dioVacuum.Write(false); 
+                }
+            }
+        }
+
+        void RunTreePicker(Tree tree)
+        {
+            m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum Sensor Wait (sec)");
+            m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
+            m_nShake = tree.Set(m_nShake, m_nShake, "Shake", "Shake Up Count");
+            RunTreePickerShake(tree.GetTree("Shake Delay", true, m_nShake > 0), m_nShake > 0); 
+        }
+
+        void RunTreePickerShake(Tree tree, bool bVisible)
+        {
+            m_secShake[0] = tree.Set(m_secShake[0], m_secShake[0], "Up", "Shake Up Time (sec)", bVisible);
+            m_secShake[1] = tree.Set(m_secShake[1], m_secShake[1], "Down", "Shake Down Time (sec)", bVisible);
         }
         #endregion
 
@@ -204,7 +234,7 @@ namespace Root_Rinse_Loader.Module
             if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
             if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
-            if (Run(RunPickerDown(false))) return p_sInfo;
+            if (Run(RunShakeUp())) return p_sInfo;
             if (Run(m_storage.StartMoveStackReady())) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             return "OK";
