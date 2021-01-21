@@ -2,6 +2,7 @@
 using Emgu.CV.Cvb;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using Emgu.CV.Util;
 using Root_EFEM;
 using Root_EFEM.Module;
 using RootTools;
@@ -517,6 +518,131 @@ namespace Root_AOP01_Inspection.Module
 
             return bFoundTemplate;
         }
+
+        public enum eSearchDirection
+        {
+            TopToBottom = 0,
+            LeftToRight,
+            RightToLeft,
+            BottomToTop,
+        }
+
+        unsafe int GetEdge(MemoryData mem, CRect crtROI, int nProfileSize, eSearchDirection eDirection, int nThreshold, bool bDarkBackground)
+        {
+            if (nProfileSize > crtROI.Width) return 0;
+            if (nProfileSize > crtROI.Height) return 0;
+
+            // variable
+            ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+            IntPtr p = mem.GetPtr();
+            byte* bp;
+
+            // implement
+            img.SetData(p, crtROI, (int)mem.W);
+            int nCount = 0;
+            switch (eDirection)
+            {
+                case eSearchDirection.TopToBottom:
+                    for (int y = 0; y < img.p_Size.Y; y++)
+                    {
+                        nCount = 0;
+                        bp = (byte*)img.GetPtr() + y * img.p_Stride + (img.p_Size.X / 2);
+                        for (int x = -(nProfileSize / 2); x < (nProfileSize / 2); x++)
+                        {
+                            byte* bpCurrent = bp + x;
+                            if (bDarkBackground)
+                            {
+                                if (*bpCurrent > nThreshold) nCount++;
+                            }
+                            else
+                            {
+                                if (*bpCurrent < nThreshold) nCount++;
+                            }
+                        }
+                        if (nCount == nProfileSize) return y;
+                    }
+                    break;
+                case eSearchDirection.LeftToRight:
+                    for (int x = 0; x < img.p_Size.X; x++)
+                    {
+                        nCount = 0;
+                        bp = (byte*)img.GetPtr() + x + (img.p_Size.Y / 2) * img.p_Stride;
+                        for (int y = -(nProfileSize / 2); y < (nProfileSize / 2); y++)
+                        {
+                            byte* bpCurrent = bp + y * img.p_Stride;
+                            if (bDarkBackground)
+                            {
+                                if (*bpCurrent > nThreshold) nCount++;
+                            }
+                            else
+                            {
+                                if (*bpCurrent < nThreshold) nCount++;
+                            }
+                        }
+                        if (nCount == nProfileSize) return x;
+                    }
+                    break;
+                case eSearchDirection.RightToLeft:
+                    for (int x = img.p_Size.X - 1; x >= 0; x--)
+                    {
+                        nCount = 0;
+                        bp = (byte*)img.GetPtr() + x + (img.p_Size.Y / 2) * img.p_Stride;
+                        for (int y = -(nProfileSize / 2); y < (nProfileSize / 2); y++)
+                        {
+                            byte* bpCurrent = bp + y * img.p_Stride;
+                            if (bDarkBackground)
+                            {
+                                if (*bpCurrent > nThreshold) nCount++;
+                            }
+                            else
+                            {
+                                if (*bpCurrent < nThreshold) nCount++;
+                            }
+                        }
+                        if (nCount == nProfileSize) return x;
+                    }
+                    break;
+                case eSearchDirection.BottomToTop:
+                    for (int y = img.p_Size.Y - 2; y >= 0; y--) // img의 마지막줄은 0으로 채워질 수 있기 때문에 마지막의 전줄부터 탐색
+                    {
+                        nCount = 0;
+                        bp = (byte*)img.GetPtr() + y * img.p_Stride + (img.p_Size.X / 2);
+                        for (int x = -(nProfileSize / 2); x < (nProfileSize / 2); x++)
+                        {
+                            byte* bpCurrent = bp + x;
+                            if (bDarkBackground)
+                            {
+                                if (*bpCurrent > nThreshold) nCount++;
+                            }
+                            else
+                            {
+                                if (*bpCurrent < nThreshold) nCount++;
+                            }
+                        }
+                        if (nCount == nProfileSize) return y;
+                    }
+                    break;
+            }
+
+            return 0;
+        }
+
+        double GetDistanceOfTwoPoint(CPoint cpt1, CPoint cpt2)
+        {
+            // variable
+            double dX1, dX2, dY1, dY2;
+            double dResultDistance = 0;
+
+            // implement
+            dX1 = cpt1.X;
+            dX2 = cpt2.X;
+            dY1 = cpt1.Y;
+            dY2 = cpt2.Y;
+
+            dResultDistance = Math.Sqrt(((dX1 - dX2) * (dX1 - dX2)) + ((dY1 - dY2) * (dY1 - dY2)));
+
+            return dResultDistance;
+        }
         #endregion
 
         #region ModuleRun
@@ -529,8 +655,9 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_BarcodeInspection(this), true, "Run Barcode Inspection");
             AddModuleRunList(new Run_MakeAlignTemplateImage(this), true, "Run MakeAlignTemplateImage");
             AddModuleRunList(new Run_PatternAlign(this), true, "Run PatternAlign");
-            AddModuleRunList(new Run_PatternShiftAndRotation(this), true, "Run ShiftAndRotation");
+            AddModuleRunList(new Run_PatternShiftAndRotation(this), true, "Run PatternShiftAndRotation");
             AddModuleRunList(new Run_AlignKeyInspection(this), true, "Run AlignKeyInspection");
+            AddModuleRunList(new Run_PellicleShiftAndRotation(this), true, "Run PellicleShiftAndRotation");
             AddModuleRunList(new Run_Test(this), true, "Run Delay");
         }
         #endregion
@@ -2222,7 +2349,7 @@ namespace Root_AOP01_Inspection.Module
                 cptInFeatureCentroid = GetCentroidFromPolygonPointArray(cptarrInResultCenterPositions);
 
                 // Get distance From InFeatureCentroid & OutFeatureCentroid
-                double dResultDistance = GetDistanceOfTwoPoint(cptInFeatureCentroid, cptOutFeatureCentroid);
+                double dResultDistance = m_module.GetDistanceOfTwoPoint(cptInFeatureCentroid, cptOutFeatureCentroid);
                 m_module.p_dPatternShiftDistance = dResultDistance;
                 
 
@@ -2302,23 +2429,6 @@ namespace Root_AOP01_Inspection.Module
                 cptCentroid.Y = (int)dCentroidY;
 
                 return cptCentroid;
-            }
-
-            double GetDistanceOfTwoPoint(CPoint cpt1, CPoint cpt2)
-            {
-                // variable
-                double dX1, dX2, dY1, dY2;
-                double dResultDistance = 0;
-
-                // implement
-                dX1 = cpt1.X;
-                dX2 = cpt2.X;
-                dY1 = cpt1.Y;
-                dY2 = cpt2.Y;
-
-                dResultDistance = Math.Sqrt(((dX1 - dX2) * (dX1 - dX2)) + ((dY1 - dY2) * (dY1 - dY2)));
-
-                return dResultDistance;
             }
         }
         #endregion
@@ -2678,6 +2788,10 @@ namespace Root_AOP01_Inspection.Module
             public int m_nRightFrameScanLine = 1;
             public int m_nFrameheight = 5;
 
+            public int m_nReticleEdgeThreshold = 20;
+            public int m_nFrameEdgeThreshold = 40;
+            public int m_nSearchArea = 100;
+
             public CPoint m_cptReticleEdgeTLROI = new CPoint();
             public CPoint m_cptReticleEdgeTRROI = new CPoint();
             public CPoint m_cptReticleEdgeRTROI = new CPoint();
@@ -2708,6 +2822,11 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nLeftFrameScanLine = m_nLeftFrameScanLine;
                 run.m_nRightFrameScanLine = m_nRightFrameScanLine;
                 run.m_nFrameheight = m_nFrameheight;
+                run.m_nSearchArea = m_nSearchArea;
+
+                run.m_nReticleEdgeThreshold = m_nReticleEdgeThreshold;
+                run.m_nFrameEdgeThreshold = m_nFrameEdgeThreshold;
+
 
                 run.m_cptReticleEdgeTLROI = m_cptReticleEdgeTLROI;
                 run.m_cptReticleEdgeTRROI = m_cptReticleEdgeTRROI;
@@ -2736,6 +2855,10 @@ namespace Root_AOP01_Inspection.Module
                 m_nRightFrameScanLine = tree.Set(m_nRightFrameScanLine, m_nRightFrameScanLine, "Right Frame Scan Line Number", "Right Frame Scan Line Number", bVisible);
                 m_nFrameheight = tree.Set(m_nFrameheight, m_nFrameheight, "Frame Height [mm]", "Frame Height [mm]", bVisible);
 
+                m_nReticleEdgeThreshold = tree.Set(m_nReticleEdgeThreshold, m_nReticleEdgeThreshold, "Reticle Edge Threshold", "Reticle Edge Threshold", bVisible);
+                m_nFrameEdgeThreshold = tree.Set(m_nFrameEdgeThreshold, m_nFrameEdgeThreshold, "Frame Edge Threshold", "Frame Edge Threshold", bVisible);
+                m_nSearchArea = tree.Set(m_nSearchArea, m_nSearchArea, "Search Area", "Search Area", bVisible);
+
                 m_cptReticleEdgeTLROI = tree.Set(m_cptReticleEdgeTLROI, m_cptReticleEdgeTLROI, "TL Reticle Edge", "TL Reticle Edge", bVisible);
                 m_cptReticleEdgeTRROI = tree.Set(m_cptReticleEdgeTRROI, m_cptReticleEdgeTRROI, "TR Reticle Edge", "TR Reticle Edge", bVisible);
                 m_cptReticleEdgeRTROI = tree.Set(m_cptReticleEdgeRTROI, m_cptReticleEdgeRTROI, "RT Reticle Edge", "RT Reticle Edge", bVisible);
@@ -2758,8 +2881,124 @@ namespace Root_AOP01_Inspection.Module
             public override string Run()
             {
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
+                VectorOfPoint contour = new VectorOfPoint();
+                double dReticleAngle = 0;
+                double dFrameAngle = 0;
 
+                // Reticle Edge
+                CRect crtReticleEdgeTL = new CRect(new CPoint(m_cptReticleEdgeTLROI.X - (m_nSearchArea / 2), m_cptReticleEdgeTLROI.Y - (m_nSearchArea / 2)), 
+                                                   new CPoint(m_cptReticleEdgeTLROI.X + (m_nSearchArea / 2), m_cptReticleEdgeTLROI.Y + (m_nSearchArea / 2)));
+                CRect crtReticleEdgeTR = new CRect(new CPoint(m_cptReticleEdgeTRROI.X - (m_nSearchArea / 2), m_cptReticleEdgeTRROI.Y - (m_nSearchArea / 2)),
+                                                   new CPoint(m_cptReticleEdgeTRROI.X + (m_nSearchArea / 2), m_cptReticleEdgeTRROI.Y + (m_nSearchArea / 2)));
+                CRect crtReticleEdgeRT = new CRect(new CPoint(m_cptReticleEdgeRTROI.X - (m_nSearchArea / 2), m_cptReticleEdgeRTROI.Y - (m_nSearchArea / 2)),
+                                                   new CPoint(m_cptReticleEdgeRTROI.X + (m_nSearchArea / 2), m_cptReticleEdgeRTROI.Y + (m_nSearchArea / 2)));
+                CRect crtReticleEdgeRB = new CRect(new CPoint(m_cptReticleEdgeRBROI.X - (m_nSearchArea / 2), m_cptReticleEdgeRBROI.Y - (m_nSearchArea / 2)),
+                                                   new CPoint(m_cptReticleEdgeRBROI.X + (m_nSearchArea / 2), m_cptReticleEdgeRBROI.Y + (m_nSearchArea / 2)));
+                CRect crtReticleEdgeBR = new CRect(new CPoint(m_cptReticleEdgeBRROI.X - (m_nSearchArea / 2), m_cptReticleEdgeBRROI.Y - (m_nSearchArea / 2)),
+                                                   new CPoint(m_cptReticleEdgeBRROI.X + (m_nSearchArea / 2), m_cptReticleEdgeBRROI.Y + (m_nSearchArea / 2)));
+                CRect crtReticleEdgeBL = new CRect(new CPoint(m_cptReticleEdgeBLROI.X - (m_nSearchArea / 2), m_cptReticleEdgeBLROI.Y - (m_nSearchArea / 2)),
+                                                   new CPoint(m_cptReticleEdgeBLROI.X + (m_nSearchArea / 2), m_cptReticleEdgeBLROI.Y + (m_nSearchArea / 2)));
+                CRect crtReticleEdgeLB = new CRect(new CPoint(m_cptReticleEdgeLBROI.X - (m_nSearchArea / 2), m_cptReticleEdgeLBROI.Y - (m_nSearchArea / 2)),
+                                                   new CPoint(m_cptReticleEdgeLBROI.X + (m_nSearchArea / 2), m_cptReticleEdgeLBROI.Y + (m_nSearchArea / 2)));
+                CRect crtReticleEdgeLT = new CRect(new CPoint(m_cptReticleEdgeLTROI.X - (m_nSearchArea / 2), m_cptReticleEdgeLTROI.Y - (m_nSearchArea / 2)),
+                                                   new CPoint(m_cptReticleEdgeLTROI.X + (m_nSearchArea / 2), m_cptReticleEdgeLTROI.Y + (m_nSearchArea / 2)));
 
+                System.Drawing.Point[] ptsReticleEdge = new System.Drawing.Point[8];
+                int nTL = m_module.GetEdge(mem, crtReticleEdgeTL, m_nSearchArea/2, eSearchDirection.TopToBottom, m_nReticleEdgeThreshold, true);
+                ptsReticleEdge[0] = new System.Drawing.Point(m_cptReticleEdgeTLROI.X, m_cptReticleEdgeTLROI.Y - (m_nSearchArea / 2) + nTL);
+                int nTR = m_module.GetEdge(mem, crtReticleEdgeTR, m_nSearchArea/2, eSearchDirection.TopToBottom, m_nReticleEdgeThreshold, true);
+                ptsReticleEdge[1] = new System.Drawing.Point(m_cptReticleEdgeTRROI.X, m_cptReticleEdgeTRROI.Y - (m_nSearchArea / 2) + nTR);
+                int nRT = m_module.GetEdge(mem, crtReticleEdgeRT, m_nSearchArea/2, eSearchDirection.RightToLeft, m_nReticleEdgeThreshold, true);
+                ptsReticleEdge[2] = new System.Drawing.Point(m_cptReticleEdgeRTROI.X - (m_nSearchArea / 2) + nRT, m_cptReticleEdgeRTROI.Y);
+                int nRB = m_module.GetEdge(mem, crtReticleEdgeRB, m_nSearchArea/2, eSearchDirection.RightToLeft, m_nReticleEdgeThreshold, true);
+                ptsReticleEdge[3] = new System.Drawing.Point(m_cptReticleEdgeRBROI.X - (m_nSearchArea / 2) + nRB, m_cptReticleEdgeRBROI.Y);
+                int nBR = m_module.GetEdge(mem, crtReticleEdgeBR, m_nSearchArea/2, eSearchDirection.BottomToTop, m_nReticleEdgeThreshold, true);
+                ptsReticleEdge[4] = new System.Drawing.Point(m_cptReticleEdgeBRROI.X, m_cptReticleEdgeBRROI.Y - (m_nSearchArea / 2) + nBR);
+                int nBL = m_module.GetEdge(mem, crtReticleEdgeBL, m_nSearchArea/2, eSearchDirection.BottomToTop, m_nReticleEdgeThreshold, true);
+                ptsReticleEdge[5] = new System.Drawing.Point(m_cptReticleEdgeBLROI.X, m_cptReticleEdgeBLROI.Y - (m_nSearchArea / 2) + nBL);
+                int nLB = m_module.GetEdge(mem, crtReticleEdgeLB, m_nSearchArea/2, eSearchDirection.LeftToRight, m_nReticleEdgeThreshold, true);
+                ptsReticleEdge[6] = new System.Drawing.Point(m_cptReticleEdgeLBROI.X - (m_nSearchArea / 2) + nLB, m_cptReticleEdgeLBROI.Y);
+                int nLT = m_module.GetEdge(mem, crtReticleEdgeLT, m_nSearchArea/2, eSearchDirection.LeftToRight, m_nReticleEdgeThreshold, true);
+                ptsReticleEdge[7] = new System.Drawing.Point(m_cptReticleEdgeLTROI.X - (m_nSearchArea / 2) + nLT, m_cptReticleEdgeLTROI.Y);
+                contour.Push(ptsReticleEdge);
+                RotatedRect rtReticleEdge = CvInvoke.MinAreaRect(contour);
+                dReticleAngle = rtReticleEdge.Angle;
+                while(true)
+                {
+                    if (dReticleAngle <= 10 && dReticleAngle >= -10)
+                    {
+                        break;
+                    }
+                    else if (dReticleAngle > 10)
+                    {
+                        dReticleAngle -= 90;
+                    }
+                    else if (dReticleAngle < -10)
+                    {
+                        dReticleAngle += 90;
+                    }
+                }
+                
+                contour.Clear();
+
+                // Frame Edge
+                CRect crtFrameEdgeTL = new CRect(new CPoint(m_cptFrameEdgeTLROI.X - (m_nSearchArea / 2), m_cptFrameEdgeTLROI.Y - (m_nSearchArea / 2)),
+                                                 new CPoint(m_cptFrameEdgeTLROI.X + (m_nSearchArea / 2), m_cptFrameEdgeTLROI.Y + (m_nSearchArea / 2)));
+                CRect crtFrameEdgeTR = new CRect(new CPoint(m_cptFrameEdgeTRROI.X - (m_nSearchArea / 2), m_cptFrameEdgeTRROI.Y - (m_nSearchArea / 2)),
+                                                 new CPoint(m_cptFrameEdgeTRROI.X + (m_nSearchArea / 2), m_cptFrameEdgeTRROI.Y + (m_nSearchArea / 2)));
+                CRect crtFrameEdgeRT = new CRect(new CPoint(m_cptFrameEdgeRTROI.X - (m_nSearchArea / 2), m_cptFrameEdgeRTROI.Y - (m_nSearchArea / 2)),
+                                                 new CPoint(m_cptFrameEdgeRTROI.X + (m_nSearchArea / 2), m_cptFrameEdgeRTROI.Y + (m_nSearchArea / 2)));
+                CRect crtFrameEdgeRB = new CRect(new CPoint(m_cptFrameEdgeRBROI.X - (m_nSearchArea / 2), m_cptFrameEdgeRBROI.Y - (m_nSearchArea / 2)),
+                                                 new CPoint(m_cptFrameEdgeRBROI.X + (m_nSearchArea / 2), m_cptFrameEdgeRBROI.Y + (m_nSearchArea / 2)));
+                CRect crtFrameEdgeBR = new CRect(new CPoint(m_cptFrameEdgeBRROI.X - (m_nSearchArea / 2), m_cptFrameEdgeBRROI.Y - (m_nSearchArea / 2)),
+                                                 new CPoint(m_cptFrameEdgeBRROI.X + (m_nSearchArea / 2), m_cptFrameEdgeBRROI.Y + (m_nSearchArea / 2)));
+                CRect crtFrameEdgeBL = new CRect(new CPoint(m_cptFrameEdgeBLROI.X - (m_nSearchArea / 2), m_cptFrameEdgeBLROI.Y - (m_nSearchArea / 2)),
+                                                 new CPoint(m_cptFrameEdgeBLROI.X + (m_nSearchArea / 2), m_cptFrameEdgeBLROI.Y + (m_nSearchArea / 2)));
+                CRect crtFrameEdgeLB = new CRect(new CPoint(m_cptFrameEdgeLBROI.X - (m_nSearchArea / 2), m_cptFrameEdgeLBROI.Y - (m_nSearchArea / 2)),
+                                                 new CPoint(m_cptFrameEdgeLBROI.X + (m_nSearchArea / 2), m_cptFrameEdgeLBROI.Y + (m_nSearchArea / 2)));
+                CRect crtFrameEdgeLT = new CRect(new CPoint(m_cptFrameEdgeLTROI.X - (m_nSearchArea / 2), m_cptFrameEdgeLTROI.Y - (m_nSearchArea / 2)),
+                                                 new CPoint(m_cptFrameEdgeLTROI.X + (m_nSearchArea / 2), m_cptFrameEdgeLTROI.Y + (m_nSearchArea / 2)));
+
+                System.Drawing.Point[] ptsFrameEdge = new System.Drawing.Point[8];
+                nTL = m_module.GetEdge(mem, crtFrameEdgeTL, m_nSearchArea/2, eSearchDirection.BottomToTop, m_nFrameEdgeThreshold, false);
+                ptsFrameEdge[0] = new System.Drawing.Point(m_cptFrameEdgeTLROI.X, m_cptFrameEdgeTLROI.Y - (m_nSearchArea / 2) + nTL);
+                nTR = m_module.GetEdge(mem, crtFrameEdgeTR, m_nSearchArea/2, eSearchDirection.BottomToTop, m_nFrameEdgeThreshold, false);
+                ptsFrameEdge[1] = new System.Drawing.Point(m_cptFrameEdgeTRROI.X, m_cptFrameEdgeTRROI.Y - (m_nSearchArea / 2) + nTR);
+                nRT = m_module.GetEdge(mem, crtFrameEdgeRT, m_nSearchArea/2, eSearchDirection.LeftToRight, m_nFrameEdgeThreshold, false);
+                ptsFrameEdge[2] = new System.Drawing.Point(m_cptFrameEdgeRTROI.X - (m_nSearchArea / 2) + nRT, m_cptFrameEdgeRTROI.Y);
+                nRB = m_module.GetEdge(mem, crtFrameEdgeRB, m_nSearchArea/2, eSearchDirection.LeftToRight, m_nFrameEdgeThreshold, false);
+                ptsFrameEdge[3] = new System.Drawing.Point(m_cptFrameEdgeRBROI.X - (m_nSearchArea / 2) + nRB, m_cptFrameEdgeRBROI.Y);
+                nBR = m_module.GetEdge(mem, crtFrameEdgeBR, m_nSearchArea/2, eSearchDirection.TopToBottom, m_nFrameEdgeThreshold, false);
+                ptsFrameEdge[4] = new System.Drawing.Point(m_cptFrameEdgeBRROI.X, m_cptFrameEdgeBRROI.Y - (m_nSearchArea / 2) + nBR);
+                nBL = m_module.GetEdge(mem, crtFrameEdgeBL, m_nSearchArea/2, eSearchDirection.TopToBottom, m_nFrameEdgeThreshold, false);
+                ptsFrameEdge[5] = new System.Drawing.Point(m_cptFrameEdgeBLROI.X, m_cptFrameEdgeBLROI.Y - (m_nSearchArea / 2) + nBL);
+                nLB = m_module.GetEdge(mem, crtFrameEdgeLB, m_nSearchArea/2, eSearchDirection.RightToLeft, m_nFrameEdgeThreshold, false);
+                ptsFrameEdge[6] = new System.Drawing.Point(m_cptFrameEdgeLBROI.X - (m_nSearchArea / 2) + nLB, m_cptFrameEdgeLBROI.Y);
+                nLT = m_module.GetEdge(mem, crtFrameEdgeLT, m_nSearchArea/2, eSearchDirection.RightToLeft, m_nFrameEdgeThreshold, false);
+                ptsFrameEdge[7] = new System.Drawing.Point(m_cptFrameEdgeLTROI.X - (m_nSearchArea / 2) + nLT, m_cptFrameEdgeLTROI.Y);
+                contour.Push(ptsFrameEdge);
+                RotatedRect rtFrameEdge = CvInvoke.MinAreaRect(contour);
+                dFrameAngle = rtFrameEdge.Angle;
+                while (true)
+                {
+                    if (dFrameAngle <= 10 && dFrameAngle >= -10)
+                    {
+                        break;
+                    }
+                    else if (dFrameAngle > 10)
+                    {
+                        dFrameAngle -= 90;
+                    }
+                    else if (dFrameAngle < -10)
+                    {
+                        dFrameAngle += 90;
+                    }
+                }
+                contour.Clear();
+
+                // Judgement
+                double dResultDistance = m_module.GetDistanceOfTwoPoint(new CPoint((int)rtReticleEdge.Center.X, (int)rtReticleEdge.Center.Y), new CPoint((int)rtFrameEdge.Center.X, (int)rtFrameEdge.Center.Y));
+                double dResultAngle = Math.Abs(dFrameAngle - dReticleAngle);
 
                 return "OK";
 
