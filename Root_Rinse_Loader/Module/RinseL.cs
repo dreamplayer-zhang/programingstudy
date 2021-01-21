@@ -111,7 +111,17 @@ namespace Root_Rinse_Loader.Module
 
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
-            if (eEQ == _EQ.eEQ.State) AddProtocol(p_id, eCmd.EQLeState, value);
+            if (eEQ == _EQ.eEQ.State)
+            {
+                AddProtocol(p_id, eCmd.EQLeState, value);
+                switch ((EQ.eState)value)
+                {
+                    case EQ.eState.Error: RunBuzzer(eBuzzer.Error); break;
+                    case EQ.eState.Home: RunBuzzer(eBuzzer.Home); break;
+                    case EQ.eState.Ready: RunBuzzerOff(); break; 
+                }
+
+            }
         }
         #endregion
 
@@ -279,8 +289,8 @@ namespace Root_Rinse_Loader.Module
             p_bAir = m_diAir.p_bIn;
             p_bDoorLock = m_diDoorLock.p_bIn; 
             if (m_swBlick.ElapsedMilliseconds < 500) return;
-            m_bBlink = !m_bBlink; 
             m_swBlick.Start();
+            m_bBlink = !m_bBlink; 
             m_dioStart.Write(m_bBlink && (EQ.p_eState == EQ.eState.Ready)); 
             m_dioStop.Write(m_bBlink && (EQ.p_eState == EQ.eState.Run));
             m_dioReset.Write(m_bBlink && (EQ.p_eState == EQ.eState.Error));
@@ -344,7 +354,8 @@ namespace Root_Rinse_Loader.Module
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
-                p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready; 
+                p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready;
+                RunThreadDIO(); 
                 if (m_qProtocolReply.Count > 0)
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();
@@ -428,21 +439,8 @@ namespace Root_Rinse_Loader.Module
         {
             p_id = id;
             InitBase(id, engineer);
-            EQ.m_EQ.OnChanged += M_EQ_OnChanged1;
 
             InitThread();
-        }
-
-        private void M_EQ_OnChanged1(_EQ.eEQ eEQ, dynamic value)
-        {
-            if (eEQ == _EQ.eEQ.State)
-            {
-                switch ((EQ.eState)value)
-                {
-                    case EQ.eState.Error: RunBuzzer(eBuzzer.Error); break;
-                    case EQ.eState.Home: RunBuzzer(eBuzzer.Home); break;
-                }
-            }
         }
 
         public override void ThreadStop()

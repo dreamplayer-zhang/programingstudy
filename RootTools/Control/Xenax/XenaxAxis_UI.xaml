@@ -1,0 +1,264 @@
+﻿<UserControl x:Class="RootTools.Control.Xenax.XenaxAxis_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RootTools.Control.Xenax"
+             xmlns:tree="clr-namespace:RootTools.Trees" 
+             mc:Ignorable="d" Background="White">
+    <UserControl.Resources>
+        <Style TargetType="Button">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Background" Value="Beige"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0" BorderBrush="Black" BorderThickness="1">
+            <GroupBox.Header>
+                <TextBlock Text="Status" Foreground="Black" FontWeight="Bold" />
+            </GroupBox.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="0" Content="{Binding p_eState}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" x:Name="buttonServoOn" Content="Servo" Margin="2" Click="buttonServoOn_Click"/>
+                <Button Grid.Column="2" x:Name="buttonAlarm" Content="Alarm" Margin="2" Click="buttonAlarm_Click"/>
+                <Button Grid.Column="3" x:Name="buttonInPos" Content="InPos" Margin="2"/>
+                <Button Grid.Column="4" x:Name="buttonLimitM" Content="-" Margin="2"/>
+                <Button Grid.Column="5" x:Name="buttonHome" Content="Home" Margin="2"/>
+                <Button Grid.Column="6" x:Name="buttonLimitP" Content="+" Margin="2"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">
+            <GroupBox.Header>
+                <TextBlock Text="Position and Velocity" Foreground="Black" FontWeight="Bold" />
+            </GroupBox.Header>
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Label Content="Command = " VerticalAlignment="Center"/>
+                    <Label Content="{Binding p_posCommand}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Label Content="Actual = " VerticalAlignment="Center"/>
+                    <Label Content="{Binding p_posActual}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Label Content="Velocity = " VerticalAlignment="Center"/>
+                    <Label Content="{Binding p_vNow}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Vertical">
+                <GroupBox BorderBrush="Black" BorderThickness="1" Margin="0,0,0,10">
+                    <GroupBox.Header>
+                        <TextBlock Text="Home" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" x:Name="buttonRunHome" Content="Home" Margin="3" Click="buttonRunHome_Click"/>
+                        <ProgressBar Grid.Column="1" Margin="3" Orientation="Horizontal" Value="{Binding p_progressHome}"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">
+                    <GroupBox.Header>
+                        <TextBlock Text="Jog" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Speed" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" x:Name="comboSpeedJog" ItemsSource="{Binding p_asSpeed}" Margin="3"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="13*"/>
+                                <ColumnDefinition Width="10*"/>
+                                <ColumnDefinition Width="7*"/>
+                                <ColumnDefinition Width="5*"/>
+                                <ColumnDefinition Width="7*"/>
+                                <ColumnDefinition Width="10*"/>
+                                <ColumnDefinition Width="13*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="buttonJogM3" Margin="3" Content="◀◀◀" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogM3_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="1" x:Name="buttonJogM2" Margin="3" Content="◀◀" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogM2_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="2" x:Name="buttonJogM1" Margin="3" Content="◀" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogM1_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="4" x:Name="buttonJogP1" Margin="3" Content="▶" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogP1_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="5" x:Name="buttonJogP2" Margin="3" Content="▶▶" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogP2_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="6" x:Name="buttonJogP3" Margin="3" Content="▶▶▶" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogP3_PreviewMouseLeftButtonDown"/>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">
+                    <GroupBox.Header>
+                        <TextBlock Text="Shift" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Speed" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" x:Name="comboSpeedShift" ItemsSource="{Binding p_asSpeed}" Margin="3"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="buttonShiftM" Click="buttonShiftM_Click" Margin="3" Content="◀"/>
+                            <TextBox Grid.Column="1" x:Name="textBoxShift" TextAlignment="Center" Margin="3"/>
+                            <Button Grid.Column="2" x:Name="buttonShiftP" Click="buttonShiftP_Click" Margin="3" Content="▶"/>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">
+                    <GroupBox.Header>
+                        <TextBlock Text="Move" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Speed" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" x:Name="comboSpeedMove" ItemsSource="{Binding p_asSpeed}" Margin="3"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="buttonMove" Content="Move" Margin="3" Click="buttonMove_Click"/>
+                            <ComboBox Grid.Column="1" x:Name="comboMovePos" ItemsSource="{Binding p_asPos}" Margin="3"/>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="3*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="buttonMoveStop" Content="Stop" Margin="3" Click="buttonMoveStop_Click"/>
+                            <Button Grid.Column="2" x:Name="buttonSetPos" Content="Set Position" Margin="3" Click="buttonSetPos_Click"/>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">
+                    <GroupBox.Header>
+                        <TextBlock Text="Repeat" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Speed" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" x:Name="comboSpeedRepeat" ItemsSource="{Binding p_asSpeed}" Margin="3"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="buttonRepeat" Content="Repeat" Margin="3" Click="buttonRepeat_Click"/>
+                            <ComboBox Grid.Column="1" x:Name="comboRepeatPos0" ItemsSource="{Binding p_asPos}" Margin="3"/>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="buttonRepeatStop" Content="Stop" Margin="3" Click="buttonRepeatStop_Click"/>
+                            <ComboBox Grid.Column="1" x:Name="comboRepeatPos1" ItemsSource="{Binding p_asPos}" Margin="3"/>
+                        </Grid>
+                        <CheckBox Grid.Row="3" x:Name="checkBoxTrigger" Content="Trigger On" Margin="3"/>
+                    </Grid>
+                </GroupBox>
+                <Grid>
+                    <Button x:Name="buttonStop" Content="Stop Axis" Height="30" Margin="3" Click="buttonStop_Click"/>
+                </Grid>
+            </StackPanel>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+            <TabControl Grid.Column="2">
+                <TabItem>
+                    <TabItem.Header>
+                        <WrapPanel>
+
+                            <TextBlock Text="Motion"></TextBlock>
+                        </WrapPanel>
+                    </TabItem.Header>
+                    <tree:TreeUI x:Name="treeRootUI"/>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <WrapPanel>
+
+                            <TextBlock Text="Setting"></TextBlock>
+                        </WrapPanel>
+                    </TabItem.Header>
+                    <tree:TreeUI x:Name="treeRootSettingUI"/>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <WrapPanel>
+
+                            <TextBlock Text="Interlock"></TextBlock>
+                        </WrapPanel>
+                    </TabItem.Header>
+                    <tree:TreeUI x:Name="treeRootInterlockUI"/>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </Grid>
+</UserControl>
