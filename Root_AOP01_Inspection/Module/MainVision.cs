@@ -1387,6 +1387,7 @@ namespace Root_AOP01_Inspection.Module
             public int m_nROIHeight = 5000;
             public bool m_bDarkBackground = true;
             public int m_nThreshold = 70;
+            public int m_nSubImageThreshold = 70;
 
             public Run_BarcodeInspection(MainVision module)
             {
@@ -1402,6 +1403,7 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nROIHeight = m_nROIHeight;
                 run.m_bDarkBackground = m_bDarkBackground;
                 run.m_nThreshold = m_nThreshold;
+                run.m_nSubImageThreshold = m_nSubImageThreshold;
                 return run;
             }
 
@@ -1412,6 +1414,7 @@ namespace Root_AOP01_Inspection.Module
                 m_nROIHeight = (tree.GetTree("Barcode ROI", false, bVisible)).Set(m_nROIHeight, m_nROIHeight, "Barcode ROI Height", "Barcode ROI Height", bVisible);
                 m_bDarkBackground = tree.Set(m_bDarkBackground, m_bDarkBackground, "Dark Background", "Dark Background", bVisible);
                 m_nThreshold = tree.Set(m_nThreshold, m_nThreshold, "Find Edge Threshold", "Find Edge Threshold", bVisible);
+                m_nSubImageThreshold = tree.Set(m_nSubImageThreshold, m_nSubImageThreshold, "Sub Image Threshold", "Sub Image Threshold", bVisible);
             }
 
             public override string Run()
@@ -1426,9 +1429,6 @@ namespace Root_AOP01_Inspection.Module
                 // ROI따기
                 int nTop = GetEdge(mem, crtROI, 50, eSearchDirection.TopToBottom, m_nThreshold, m_bDarkBackground);
                 int nBottom = GetEdge(mem, crtROI, 50, eSearchDirection.BottomToTop, m_nThreshold, m_bDarkBackground);
-                //CRect crtTopBox = new CRect(new CPoint(cptStartROIPoint.X, cptStartROIPoint.Y + nTop), new CPoint(cptEndROIPoint.X, cptStartROIPoint.Y + nTop + 100));
-                //int nLeft = GetEdge(mem, crtTopBox, 10, eSearchDirection.LeftToRight, m_nThreshold, m_bDarkBackground);
-                //int nRight = GetEdge(mem, crtTopBox, 10, eSearchDirection.RightToLeft, m_nThreshold, m_bDarkBackground);
                 int nLeft = GetBarcodeSideEdge(mem, crtROI, 10, eSearchDirection.LeftToRight, m_nThreshold, m_bDarkBackground);
                 int nRight = GetBarcodeSideEdge(mem, crtROI, 10, eSearchDirection.RightToLeft, m_nThreshold, m_bDarkBackground);
                 CRect crtBarcode = new CRect(m_cptBarcodeLTPoint.X + nLeft, m_cptBarcodeLTPoint.Y + nTop, m_cptBarcodeLTPoint.X + nRight, m_cptBarcodeLTPoint.Y + nBottom);
@@ -1462,15 +1462,19 @@ namespace Root_AOP01_Inspection.Module
                 Mat matSub = GetRowProfileMat(matCutting);
 
                 // 차영상 구하기
-                Mat matResult;
-                if (m_bDarkBackground) matResult = matSub - matCutting;
-                else matResult = matCutting - matSub;
-                //Mat matResult = matCutting - matSub;
+                Mat matResult;// = new Mat(matCutting.Rows, matCutting.Cols, matCutting.Depth, matCutting.NumberOfChannels);
+                Mat matResult2;
+                Mat matResult3;
+
+                matResult2 = matCutting - matSub;
+                matResult3 = matSub - matCutting;
+                matResult = matResult2 + matResult3;
+
                 matResult.Save("D:\\Result.bmp");
 
                 // 차영상에서 Blob Labeling
                 Mat matBinary = new Mat();
-                CvInvoke.Threshold(matResult, matBinary, 70, 255, ThresholdType.Binary);
+                CvInvoke.Threshold(matResult, matBinary, m_nSubImageThreshold, 255, ThresholdType.Binary);
                 matBinary.Save("D:\\BinaryResult.bmp");
                 CvBlobs blobs = new CvBlobs();
                 CvBlobDetector blobDetector = new CvBlobDetector();
@@ -1633,7 +1637,7 @@ namespace Root_AOP01_Inspection.Module
                                     }
                                 }
                             }
-                            if (nFlipCount > 10) return x;
+                            if (nFlipCount > 30) return x;
                         }
                         return 0;
 
@@ -2673,7 +2677,25 @@ namespace Root_AOP01_Inspection.Module
             public int m_nLeftFrameScanLine = 0;
             public int m_nRightFrameScanLine = 1;
             public int m_nFrameheight = 5;
-            
+
+            public CPoint m_cptReticleEdgeTLROI = new CPoint();
+            public CPoint m_cptReticleEdgeTRROI = new CPoint();
+            public CPoint m_cptReticleEdgeRTROI = new CPoint();
+            public CPoint m_cptReticleEdgeRBROI = new CPoint();
+            public CPoint m_cptReticleEdgeBRROI = new CPoint();
+            public CPoint m_cptReticleEdgeBLROI = new CPoint();
+            public CPoint m_cptReticleEdgeLBROI = new CPoint();
+            public CPoint m_cptReticleEdgeLTROI = new CPoint();
+
+            public CPoint m_cptFrameEdgeTLROI = new CPoint();
+            public CPoint m_cptFrameEdgeTRROI = new CPoint();
+            public CPoint m_cptFrameEdgeRTROI = new CPoint();
+            public CPoint m_cptFrameEdgeRBROI = new CPoint();
+            public CPoint m_cptFrameEdgeBRROI = new CPoint();
+            public CPoint m_cptFrameEdgeBLROI = new CPoint();
+            public CPoint m_cptFrameEdgeLBROI = new CPoint();
+            public CPoint m_cptFrameEdgeLTROI = new CPoint();
+
             public Run_PellicleShiftAndRotation(MainVision module)
             {
                 m_module = module;
@@ -2687,6 +2709,24 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nRightFrameScanLine = m_nRightFrameScanLine;
                 run.m_nFrameheight = m_nFrameheight;
 
+                run.m_cptReticleEdgeTLROI = m_cptReticleEdgeTLROI;
+                run.m_cptReticleEdgeTRROI = m_cptReticleEdgeTRROI;
+                run.m_cptReticleEdgeRTROI = m_cptReticleEdgeRTROI;
+                run.m_cptReticleEdgeRBROI = m_cptReticleEdgeRBROI;
+                run.m_cptReticleEdgeBRROI = m_cptReticleEdgeBRROI;
+                run.m_cptReticleEdgeBLROI = m_cptReticleEdgeBLROI;
+                run.m_cptReticleEdgeLBROI = m_cptReticleEdgeLBROI;
+                run.m_cptReticleEdgeLTROI = m_cptReticleEdgeLTROI;
+
+                run.m_cptFrameEdgeTLROI = m_cptFrameEdgeTLROI; 
+                run.m_cptFrameEdgeTRROI = m_cptFrameEdgeTRROI; 
+                run.m_cptFrameEdgeRTROI = m_cptFrameEdgeRTROI; 
+                run.m_cptFrameEdgeRBROI = m_cptFrameEdgeRBROI; 
+                run.m_cptFrameEdgeBRROI = m_cptFrameEdgeBRROI; 
+                run.m_cptFrameEdgeBLROI = m_cptFrameEdgeBLROI; 
+                run.m_cptFrameEdgeLBROI = m_cptFrameEdgeLBROI;
+                run.m_cptFrameEdgeLTROI = m_cptFrameEdgeLTROI;
+
                 return run;
             }
 
@@ -2695,85 +2735,109 @@ namespace Root_AOP01_Inspection.Module
                 m_nLeftFrameScanLine = tree.Set(m_nLeftFrameScanLine, m_nLeftFrameScanLine, "Left Frame Scan Line Number", "Left Frame Scan Line Number", bVisible);
                 m_nRightFrameScanLine = tree.Set(m_nRightFrameScanLine, m_nRightFrameScanLine, "Right Frame Scan Line Number", "Right Frame Scan Line Number", bVisible);
                 m_nFrameheight = tree.Set(m_nFrameheight, m_nFrameheight, "Frame Height [mm]", "Frame Height [mm]", bVisible);
+
+                m_cptReticleEdgeTLROI = tree.Set(m_cptReticleEdgeTLROI, m_cptReticleEdgeTLROI, "TL Reticle Edge", "TL Reticle Edge", bVisible);
+                m_cptReticleEdgeTRROI = tree.Set(m_cptReticleEdgeTRROI, m_cptReticleEdgeTRROI, "TR Reticle Edge", "TR Reticle Edge", bVisible);
+                m_cptReticleEdgeRTROI = tree.Set(m_cptReticleEdgeRTROI, m_cptReticleEdgeRTROI, "RT Reticle Edge", "RT Reticle Edge", bVisible);
+                m_cptReticleEdgeRBROI = tree.Set(m_cptReticleEdgeRBROI, m_cptReticleEdgeRBROI, "RB Reticle Edge", "RB Reticle Edge", bVisible);
+                m_cptReticleEdgeBRROI = tree.Set(m_cptReticleEdgeBRROI, m_cptReticleEdgeBRROI, "BR Reticle Edge", "BR Reticle Edge", bVisible);
+                m_cptReticleEdgeBLROI = tree.Set(m_cptReticleEdgeBLROI, m_cptReticleEdgeBLROI, "BL Reticle Edge", "BL Reticle Edge", bVisible);
+                m_cptReticleEdgeLBROI = tree.Set(m_cptReticleEdgeLBROI, m_cptReticleEdgeLBROI, "LB Reticle Edge", "LB Reticle Edge", bVisible);
+                m_cptReticleEdgeLTROI = tree.Set(m_cptReticleEdgeLTROI, m_cptReticleEdgeLTROI, "LT Reticle Edge", "LT Reticle Edge", bVisible);
+
+                m_cptFrameEdgeTLROI = tree.Set(m_cptFrameEdgeTLROI, m_cptFrameEdgeTLROI, "TL Frame Edge", "TL Frame Edge", bVisible);
+                m_cptFrameEdgeTRROI = tree.Set(m_cptFrameEdgeTRROI, m_cptFrameEdgeTRROI, "TR Frame Edge", "TR Frame Edge", bVisible);
+                m_cptFrameEdgeRTROI = tree.Set(m_cptFrameEdgeRTROI, m_cptFrameEdgeRTROI, "RT Frame Edge", "RT Frame Edge", bVisible);
+                m_cptFrameEdgeRBROI = tree.Set(m_cptFrameEdgeRBROI, m_cptFrameEdgeRBROI, "RB Frame Edge", "RB Frame Edge", bVisible);
+                m_cptFrameEdgeBRROI = tree.Set(m_cptFrameEdgeBRROI, m_cptFrameEdgeBRROI, "BR Frame Edge", "BR Frame Edge", bVisible);
+                m_cptFrameEdgeBLROI = tree.Set(m_cptFrameEdgeBLROI, m_cptFrameEdgeBLROI, "BL Frame Edge", "BL Frame Edge", bVisible);
+                m_cptFrameEdgeLBROI = tree.Set(m_cptFrameEdgeLBROI, m_cptFrameEdgeLBROI, "LB Frame Edge", "LB Frame Edge", bVisible);
+                m_cptFrameEdgeLTROI = tree.Set(m_cptFrameEdgeLTROI, m_cptFrameEdgeLTROI, "LT Frame Edge", "LT Frame Edge", bVisible);
             }
 
             public override string Run()
             {
-                Run_Grab grab = (Run_Grab)m_module.CloneModuleRun("Grab");
+                MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
 
-                if (grab.m_grabMode == null) return "Grab Mode == null";
 
-                try
-                {
-                    grab.m_grabMode.SetLight(true);
-
-                    AxisXY axisXY = m_module.m_axisXY;
-                    Axis axisZ = m_module.m_axisZ;
-                    CPoint cptMemoryOffset = new CPoint(grab.m_cpMemoryOffset);
-                    int nScanLine = 0;
-                    int nMMPerUM = 1000;
-                    int nCamWidth = grab.m_grabMode.m_camera.GetRoiSize().X;
-                    int nCamHeight = grab.m_grabMode.m_camera.GetRoiSize().Y;
-
-                    double dXScale = grab.m_dResX_um * 10;
-                    cptMemoryOffset.X += (m_nLeftFrameScanLine + grab.m_grabMode.m_ScanStartLine) * nCamWidth;
-                    grab.m_grabMode.m_dTrigger = Convert.ToInt32(10 * grab.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
-                    int nReticleSizeY_px = Convert.ToInt32(grab.m_nReticleSize_mm * nMMPerUM / grab.m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
-                    int nTotalTriggerCount = Convert.ToInt32(grab.m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
-                    int nScanOffset_pulse = 100000; //가속버퍼구간
-
-                    for (int i = 0; i<2; i++)
-                    {
-                        if (EQ.IsStop()) return "OK";
-
-                        double dStartPosY = grab.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
-                        double dEndPosY = grab.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
-
-                        grab.m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
-
-                        double dPosX = 0;
-                        if (i == 0) // Left Frame Scan
-                            dPosX = grab.m_rpAxisCenter.X + nReticleSizeY_px * (double)grab.m_grabMode.m_dTrigger / 2 - (m_nLeftFrameScanLine/*nScanLine*/ + grab.m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
-                        else // Right Frame Scan
-                            dPosX = grab.m_rpAxisCenter.X + nReticleSizeY_px * (double)grab.m_grabMode.m_dTrigger / 2 - (m_nRightFrameScanLine/*nScanLine*/ + grab.m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
-
-                        if (m_module.Run(axisZ.StartMove(grab.m_nFocusPosZ - (m_nFrameheight * nMMPerUM * 10))))   // 기존높이 - 프레임높이
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady()))
-                            return p_sInfo;
-                        if (m_module.Run(axisZ.WaitReady()))
-                            return p_sInfo;
-
-                        double dTriggerStartPosY = grab.m_rpAxisCenter.Y - nTotalTriggerCount / 2;
-                        double dTriggerEndPosY = grab.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
-                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, grab.m_grabMode.m_dTrigger, true);
-
-                        string strPool = grab.m_grabMode.m_memoryPool.p_id;
-                        string strGroup = grab.m_grabMode.m_memoryGroup.p_id;
-                        string strMemory = grab.m_grabMode.m_memoryData.p_id;
-
-                        MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
-                        int nScanSpeed = Convert.ToInt32((double)grab.m_nMaxFrame * grab.m_grabMode.m_dTrigger * nCamHeight * grab.m_nScanRate / 100);
-                        grab.m_grabMode.StartGrab(mem, cptMemoryOffset, nReticleSizeY_px, 0, grab.m_grabMode.m_bUseBiDirectionScan);
-
-                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady()))
-                            return p_sInfo;
-                        axisXY.p_axisY.RunTrigger(false);
-
-                        cptMemoryOffset.X = (m_nRightFrameScanLine + grab.m_grabMode.m_ScanStartLine) * nCamWidth;
-                    }
-                    grab.m_grabMode.m_camera.StopGrab();
-                }
-                finally
-                {
-                    grab.m_grabMode.SetLight(false);
-                }
 
                 return "OK";
+
+                //Run_Grab grab = (Run_Grab)m_module.CloneModuleRun("Grab");
+
+                //if (grab.m_grabMode == null) return "Grab Mode == null";
+
+                //try
+                //{
+                //    grab.m_grabMode.SetLight(true);
+
+                //    AxisXY axisXY = m_module.m_axisXY;
+                //    Axis axisZ = m_module.m_axisZ;
+                //    CPoint cptMemoryOffset = new CPoint(grab.m_cpMemoryOffset);
+                //    int nScanLine = 0;
+                //    int nMMPerUM = 1000;
+                //    int nCamWidth = grab.m_grabMode.m_camera.GetRoiSize().X;
+                //    int nCamHeight = grab.m_grabMode.m_camera.GetRoiSize().Y;
+
+                //    double dXScale = grab.m_dResX_um * 10;
+                //    cptMemoryOffset.X += (m_nLeftFrameScanLine + grab.m_grabMode.m_ScanStartLine) * nCamWidth;
+                //    grab.m_grabMode.m_dTrigger = Convert.ToInt32(10 * grab.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
+                //    int nReticleSizeY_px = Convert.ToInt32(grab.m_nReticleSize_mm * nMMPerUM / grab.m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
+                //    int nTotalTriggerCount = Convert.ToInt32(grab.m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
+                //    int nScanOffset_pulse = 100000; //가속버퍼구간
+
+                //    for (int i = 0; i<2; i++)
+                //    {
+                //        if (EQ.IsStop()) return "OK";
+
+                //        double dStartPosY = grab.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
+                //        double dEndPosY = grab.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
+
+                //        grab.m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
+
+                //        double dPosX = 0;
+                //        if (i == 0) // Left Frame Scan
+                //            dPosX = grab.m_rpAxisCenter.X + nReticleSizeY_px * (double)grab.m_grabMode.m_dTrigger / 2 - (m_nLeftFrameScanLine/*nScanLine*/ + grab.m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
+                //        else // Right Frame Scan
+                //            dPosX = grab.m_rpAxisCenter.X + nReticleSizeY_px * (double)grab.m_grabMode.m_dTrigger / 2 - (m_nRightFrameScanLine/*nScanLine*/ + grab.m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
+
+                //        if (m_module.Run(axisZ.StartMove(grab.m_nFocusPosZ - (m_nFrameheight * nMMPerUM * 10))))   // 기존높이 - 프레임높이
+                //            return p_sInfo;
+                //        if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
+                //            return p_sInfo;
+                //        if (m_module.Run(axisXY.WaitReady()))
+                //            return p_sInfo;
+                //        if (m_module.Run(axisZ.WaitReady()))
+                //            return p_sInfo;
+
+                //        double dTriggerStartPosY = grab.m_rpAxisCenter.Y - nTotalTriggerCount / 2;
+                //        double dTriggerEndPosY = grab.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
+                //        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, grab.m_grabMode.m_dTrigger, true);
+
+                //        string strPool = grab.m_grabMode.m_memoryPool.p_id;
+                //        string strGroup = grab.m_grabMode.m_memoryGroup.p_id;
+                //        string strMemory = grab.m_grabMode.m_memoryData.p_id;
+
+                //        MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                //        int nScanSpeed = Convert.ToInt32((double)grab.m_nMaxFrame * grab.m_grabMode.m_dTrigger * nCamHeight * grab.m_nScanRate / 100);
+                //        grab.m_grabMode.StartGrab(mem, cptMemoryOffset, nReticleSizeY_px, 0, grab.m_grabMode.m_bUseBiDirectionScan);
+
+                //        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
+                //            return p_sInfo;
+                //        if (m_module.Run(axisXY.WaitReady()))
+                //            return p_sInfo;
+                //        axisXY.p_axisY.RunTrigger(false);
+
+                //        cptMemoryOffset.X = (m_nRightFrameScanLine + grab.m_grabMode.m_ScanStartLine) * nCamWidth;
+                //    }
+                //    grab.m_grabMode.m_camera.StopGrab();
+                //}
+                //finally
+                //{
+                //    grab.m_grabMode.SetLight(false);
+                //}
+
+                //return "OK";
             }
         }
         #endregion
