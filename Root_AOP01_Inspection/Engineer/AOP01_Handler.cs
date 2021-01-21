@@ -375,6 +375,7 @@ namespace Root_AOP01_Inspection
                             //CheckUnload();
                             if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
+                                while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
                                 m_nRnR--;

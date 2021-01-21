@@ -13,7 +13,36 @@
         </Grid.ColumnDefinitions>
         <Border BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
             <Grid>
-                <StackPanel Margin="0,10,0,0">
+                <StackPanel Margin="0,0,0,0">
+                    <Grid Background="White" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition Height="30"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Row="0"                        
+                                   Grid.Column="0" Grid.ColumnSpan="2"
+                                   Content="EBR"
+                                   BorderThickness="0,0, 0, 1"
+                                   FontSize="25" FontWeight="SemiBold"
+                                   HorizontalAlignment="Stretch"
+                                   />
+                        <Button Content="Save Recipe"
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                BorderThickness="0,0, 1, 0"
+                                Command="{Binding btnEBRSaveRecipe}"
+                                />
+                        <Button Content="Load Recipe"
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                BorderThickness="0"
+                                Command="{Binding btnEBRLoadRecipe}"
+                                />
+                    </Grid>
                     <Button Content="Snap"
                             Command="{Binding btnEBRSnap}"
                             Style="{StaticResource PanelBtn}"/>

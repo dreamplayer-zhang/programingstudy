@@ -1,4 +1,5 @@
-﻿using Root_EFEM.Module;
+﻿using Root_CAMELLIA.ManualJob;
+using Root_EFEM.Module;
 using RootTools;
 using RootTools.Gem;
 using RootTools.Module;
@@ -55,7 +56,13 @@ namespace Root_CAMELLIA.UI_UserControl
             {
                 case ModuleBase.eState.Ready:
                     //m_loadport.p_infoCarrier.p_eState = InfoCarrier.eState.Dock;
-                    EQ.p_nRnR = 0;
+                    if (EQ.p_bRecovery == false)
+                    {
+                        InfoCarrier infoCarrier = m_loadport.p_infoCarrier;
+                        ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
+                        manualJobSchedule.ShowPopup();
+                    }
+                    //EQ.p_nRnR = 0;
                     EQ.p_eState = EQ.eState.Run;
                     break;
             }
@@ -63,12 +70,17 @@ namespace Root_CAMELLIA.UI_UserControl
 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
-            m_rfid.StartRun(moduleRun);
-            while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
+            //ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
+            //m_rfid.StartRun(moduleRun);
+            //while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
             //while ((EQ.IsStop() != true) && m_rfid.m_bReadID != true) Thread.Sleep(10);
             m_loadport.StartRun(m_loadport.GetModuleRunDocking().Clone());
+
+            if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;
+            else if (m_loadport.p_id == "LoadportB") EQ.p_nRunLP = 1;
+
             while ((EQ.IsStop() != true) && m_loadport.IsBusy()) Thread.Sleep(10);
+            //m_loadport.p_infoCarrier.p_eState = InfoCarrier.eState.Dock;
             Thread.Sleep(100);
         }
 
