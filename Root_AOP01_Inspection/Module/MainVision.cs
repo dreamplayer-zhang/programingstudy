@@ -2220,12 +2220,30 @@ namespace Root_AOP01_Inspection.Module
                 // Get distance From InFeatureCentroid & OutFeatureCentroid
                 double dResultDistance = GetDistanceOfTwoPoint(cptInFeatureCentroid, cptOutFeatureCentroid);
                 m_module.p_dPatternShiftDistance = dResultDistance;
+                
 
-                // Get Degree From OutLT & OutRT
-                double dThetaRadian = Math.Atan2((double)(cptarrOutResultCenterPositions[(int)eSearchPoint.RT].Y - cptarrOutResultCenterPositions[(int)eSearchPoint.LT].Y),
-                                                          cptarrOutResultCenterPositions[(int)eSearchPoint.RT].X - cptarrOutResultCenterPositions[(int)eSearchPoint.LT].X);
-                double dThetaDegree = dThetaRadian * (180 / Math.PI);
-                m_module.p_dPatternShiftAngle = dThetaDegree;
+                // Get Degree
+                CPoint cptOutLeftCenter = new CPoint((cptarrOutResultCenterPositions[(int)eSearchPoint.LT].X + cptarrOutResultCenterPositions[(int)eSearchPoint.LB].X) / 2,
+                                                     (cptarrOutResultCenterPositions[(int)eSearchPoint.LT].Y + cptarrOutResultCenterPositions[(int)eSearchPoint.LB].Y) / 2);
+                CPoint cptOutRightCenter = new CPoint((cptarrOutResultCenterPositions[(int)eSearchPoint.RT].X + cptarrOutResultCenterPositions[(int)eSearchPoint.RB].X) / 2,
+                                                      (cptarrOutResultCenterPositions[(int)eSearchPoint.RT].Y + cptarrOutResultCenterPositions[(int)eSearchPoint.RB].Y) / 2);
+                CPoint cptInLeftCenter = new CPoint((cptarrInResultCenterPositions[(int)eSearchPoint.LT].X + cptarrInResultCenterPositions[(int)eSearchPoint.LB].X) / 2,
+                                                     (cptarrInResultCenterPositions[(int)eSearchPoint.LT].Y + cptarrInResultCenterPositions[(int)eSearchPoint.LB].Y) / 2);
+                CPoint cptInRightCenter = new CPoint((cptarrInResultCenterPositions[(int)eSearchPoint.RT].X + cptarrInResultCenterPositions[(int)eSearchPoint.RB].X) / 2,
+                                                     (cptarrInResultCenterPositions[(int)eSearchPoint.RT].Y + cptarrInResultCenterPositions[(int)eSearchPoint.RB].Y) / 2);
+                double dOutLineThetaRadian = Math.Atan2((double)(cptOutLeftCenter.Y - cptOutRightCenter.Y),
+                                                        (double)(cptOutLeftCenter.X - cptOutRightCenter.X));
+                double dOutLineThetaDegree = dOutLineThetaRadian * (180 / Math.PI);
+
+                double dInLineThetaRadian = Math.Atan2((double)(cptInLeftCenter.Y - cptInRightCenter.Y),
+                                                       (double)(cptInLeftCenter.X - cptInRightCenter.X));
+                double dInLineThetaDegree = dInLineThetaRadian * (180 / Math.PI);
+
+                m_module.p_dPatternShiftAngle = Math.Abs(dOutLineThetaDegree - dInLineThetaDegree);
+                //double dThetaRadian = Math.Atan2((double)(cptarrOutResultCenterPositions[(int)eSearchPoint.RT].Y - cptarrOutResultCenterPositions[(int)eSearchPoint.LT].Y),
+                //                                 (double)(cptarrOutResultCenterPositions[(int)eSearchPoint.RT].X - cptarrOutResultCenterPositions[(int)eSearchPoint.LT].X));
+                //double dThetaDegree = dThetaRadian * (180 / Math.PI);
+                //m_module.p_dPatternShiftAngle = dThetaDegree;
 
                 // Judgement
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
@@ -2234,12 +2252,12 @@ namespace Root_AOP01_Inspection.Module
                     m_module.p_bPatternShiftPass = false;
                     return "Fail";
                 }
-                if (m_dNGSpecDegree < Math.Abs(dThetaDegree))
+                if (m_dNGSpecDegree < m_module.p_dPatternShiftAngle)
                 {
                     m_module.p_bPatternShiftPass = false;
                     return "Fail";
                 }
-                
+                m_module.p_bPatternShiftPass = true;
                 return "OK";
             }
 
@@ -2403,7 +2421,7 @@ namespace Root_AOP01_Inspection.Module
                         CRect crtFoundRect = new CRect(ptStart, ptEnd);
                         Mat matFound = m_module.GetMatImage(mem, crtFoundRect);
                         Mat matBinary = new Mat();
-                        CvInvoke.Threshold(matFound, matBinary, m_nThreshold, 128, ThresholdType.Binary);
+                        CvInvoke.Threshold(matFound, matBinary, m_nThreshold, 128, ThresholdType.BinaryInv);
                         Image<Gray, byte> imgBinary = matBinary.ToImage<Gray, byte>();
                         CvBlobs blobs = new CvBlobs();
                         CvBlobDetector blobDetector = new CvBlobDetector();
@@ -2421,20 +2439,21 @@ namespace Root_AOP01_Inspection.Module
                         CRect crtBoundingBox;
                         Mat matResult = FloodFill(matBinary, ptsContour[0], 255, out crtBoundingBox, Connectivity.EightConnected);
                         matResult = matResult - matBinary;
-                        if (i == (int)eSearchPoint.RT)  // Flip Horizontal
-                        {
-                            CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
-                        }
-                        else if (i == (int)eSearchPoint.RB) // Flip Horizontal & Vertical
-                        {
-                            CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
-                            CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
-                        }
-                        else if (i == (int)eSearchPoint.LB) // Flip Vertical
-                        {
-                            CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
-                        }
+                        //if (i == (int)eSearchPoint.RT)  // Flip Horizontal
+                        //{
+                        //    CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
+                        //}
+                        //else if (i == (int)eSearchPoint.RB) // Flip Horizontal & Vertical
+                        //{
+                        //    CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
+                        //    CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
+                        //}
+                        //else if (i == (int)eSearchPoint.LB) // Flip Vertical
+                        //{
+                        //    CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
+                        //}
                         matarr[i] = matResult.Clone();
+                        //matResult.Save("D:\\TEST" + i + ".bmp");
                     }
                 }
 
@@ -2481,6 +2500,7 @@ namespace Root_AOP01_Inspection.Module
                                 }
                             }
                             Image<Gray, byte> imgSub = new Image<Gray, byte>(barrMaster);
+                            //imgSub = imgSub.Erode(1);
 
                             // 차영상 Blob 결과
                             bool bResult = GetResultFromImage(imgSub);
@@ -2498,15 +2518,15 @@ namespace Root_AOP01_Inspection.Module
 
                             imgSub.Save("D:\\ESCHO_" + strName + ".BMP");
 
-                            if (bResult == false)
-                            {
-                                m_module.p_bAlignKeyPass = false;
-                                return "Fail";
-                            }
+                            //if (bResult == false)
+                            //{
+                            //    m_module.p_bAlignKeyPass = false;
+                            //    return "Fail";
+                            //}
                         }
                     }
                 }
-
+                m_module.p_bAlignKeyPass = true;
                 return "OK";
             }
 
