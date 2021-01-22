@@ -120,7 +120,6 @@ namespace Root_Rinse_Loader.Module
                     case EQ.eState.Home: RunBuzzer(eBuzzer.Home); break;
                     case EQ.eState.Ready: RunBuzzerOff(); break; 
                 }
-
             }
         }
         #endregion

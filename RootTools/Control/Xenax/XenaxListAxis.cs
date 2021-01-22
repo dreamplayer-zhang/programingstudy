@@ -17,7 +17,6 @@ namespace RootTools.Control.Xenax
             XenaxAxis axis = new XenaxAxis();
             axis.Init(this, id, log);
             m_aAxis.Add(axis);
-            m_qSetAxis.Enqueue(axis);
             if (OnChangeAxisList != null) OnChangeAxisList();
             return axis;
         }
@@ -96,11 +95,6 @@ namespace RootTools.Control.Xenax
         public void ThreadStop()
         {
             m_log.Info("ThreadStop Start");
-            if (m_bThread)
-            {
-                m_bThread = false;
-                m_thread.Join();
-            }
             foreach (XenaxAxis axis in m_aAxis) axis.ThreadStop();
             m_log.Info("ThreadStop Done");
         }
