@@ -382,6 +382,7 @@
       <DependentUpon>SRP350_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
+    <Compile Include="Viewer\Root_Viewer.cs" />
     <Compile Include="ViewModelHelper\DrawData.cs" />
     <Compile Include="GAFs\ALID.cs" />
     <Compile Include="GAFs\ALIDList.cs" />

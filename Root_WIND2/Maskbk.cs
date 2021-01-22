@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2
 {
-    class FrontsideMask_ViewModel : RootViewer_ViewModel, IRecipeUILoadable
+    class test : RootViewer_ViewModel
     {
         /// <summary>
         /// 전체 Memory의 좌표와 ROI Memory 좌표의 Offset
@@ -40,8 +40,8 @@ namespace Root_WIND2
 
             BufferInspROI.CollectionChanged += BufferInspROI_CollectionChanged;
             SetBackGroundWorker();
-            
-            p_ROILayer = GlobalObjects.Instance.GetNamed<ImageData>("MaskImage");
+
+
         }
         public void SetOrigin(object e)
         {
@@ -109,7 +109,7 @@ namespace Root_WIND2
             set
             {
                 SetProperty(ref m_SelectedROI, value);
-                if(value != null)
+                if (value != null)
                     _ReadROI();
             }
         }
@@ -154,7 +154,7 @@ namespace Root_WIND2
                             CropShape = null;
                         }
                 }
-                    
+
                 SetProperty(ref m_SelectedToolIndex, value);
             }
         }
@@ -210,7 +210,7 @@ namespace Root_WIND2
         private Stack<TShape[]> History = new Stack<TShape[]>();
         public ObservableCollection<TShape> BufferInspROI = new ObservableCollection<TShape>();
         private void BufferInspROI_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {           
+        {
             var shapes = sender as ObservableCollection<TShape>;
             foreach (TShape shape in shapes)
             {
@@ -272,7 +272,7 @@ namespace Root_WIND2
                             BufferInspROI.Remove(CropShape);
                             CropShape = null;
                         }
-                        
+
                     }
                     break;
                 case ToolProcess.Drawing:
@@ -418,8 +418,6 @@ namespace Root_WIND2
         #endregion
 
         #region Draw Method
-
-        #region Line
         private void StartDrawLine(Brush color, double thickness, double opacity, CPoint startMemPt, CPoint startCanvasPt)
         {
             CurrentShape = new TLine(color, thickness, opacity);
@@ -448,9 +446,7 @@ namespace Root_WIND2
             }
             base.SetLayerSource();
         }
-        #endregion
 
-        #region Rect
         private void StartDrawRect(Brush color, double thickness, double opacity, CPoint startMemPt, CPoint startCanvasPt)
         {
             CurrentShape = new TRect(color, thickness, opacity);
@@ -488,14 +484,14 @@ namespace Root_WIND2
             //double CpixSizeX = Math.Ceiling((double)p_CanvasWidth / (double)p_View_Rect.Width);
             //double CpixSizeY = Math.Ceiling((double)p_CanvasHeight / (double)p_View_Rect.Height);
 
-            double pixSizeX =(double)p_CanvasWidth / (double)p_View_Rect.Width;
+            double pixSizeX = (double)p_CanvasWidth / (double)p_View_Rect.Width;
             double pixSizeY = (double)p_CanvasHeight / (double)p_View_Rect.Height;
 
             CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
             CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
             Point canvasLT = new Point(GetCanvasDoublePoint(LT - BoxOffset).X, GetCanvasDoublePoint(LT - BoxOffset).Y);
             Point canvasRB = new Point(GetCanvasDoublePoint(RB - BoxOffset).X, GetCanvasDoublePoint(RB - BoxOffset).Y);
-           //CPoint canvasLT = new CPoint(GetCanvasPoint(LT - BoxOffset));
+            //CPoint canvasLT = new CPoint(GetCanvasPoint(LT - BoxOffset));
             //CPoint canvasRB = new CPoint(GetCanvasPoint(RB - BoxOffset));
 
             Canvas.SetLeft(rect.CanvasRect, canvasLT.X - pixSizeX / 2);
@@ -523,17 +519,15 @@ namespace Root_WIND2
 
             rect.CanvasRect.ContextMenu = cMenu;
         }
-        #endregion
 
-        #region Polygon
         private void StartDrawPolygon(Brush color, double thickness, double opacity, CPoint startMemPt, CPoint startCanvasPt)
         {
             CurrentShape = new TPolygon(color, thickness, opacity);
             TPolygon polygon = CurrentShape as TPolygon;
             polygon.CanvasPolygon.Visibility = Visibility.Hidden;
             p_UIElements.Add(polygon.CanvasPolyLine);
-           
-            polygon.ListMemoryPoint.Add(startMemPt); 
+
+            polygon.ListMemoryPoint.Add(startMemPt);
             polygon.CanvasPolyLine.Points.Add(new Point(startCanvasPt.X, startCanvasPt.Y));
             polygon.CanvasPolyLine.Points.Add(new Point(startCanvasPt.X, startCanvasPt.Y));
         }
@@ -569,9 +563,7 @@ namespace Root_WIND2
 
             CreateModifyTool_Polygon(polygon);
         }
-        #endregion
 
-        #region Crop
         private void StartDrawCropTool(Brush color, double thickness, double opacity, CPoint startMemPt, CPoint startCanvasPt)
         {
             CropShape = new TCropTool(color, thickness, opacity);
@@ -612,8 +604,8 @@ namespace Root_WIND2
             CPoint canvasLT = new CPoint(GetCanvasPoint(LT - BoxOffset));
             CPoint canvasRB = new CPoint(GetCanvasPoint(RB - BoxOffset));
 
-            Canvas.SetLeft(crop.CanvasRect, canvasLT.X - pixSizeX/2);
-            Canvas.SetTop(crop.CanvasRect, canvasLT.Y - pixSizeY/2);
+            Canvas.SetLeft(crop.CanvasRect, canvasLT.X - pixSizeX / 2);
+            Canvas.SetTop(crop.CanvasRect, canvasLT.Y - pixSizeY / 2);
 
             crop.CanvasRect.Width = Math.Abs(canvasRB.X - canvasLT.X + pixSizeX);
             crop.CanvasRect.Height = Math.Abs(canvasRB.Y - canvasLT.Y + pixSizeY);
@@ -633,13 +625,24 @@ namespace Root_WIND2
             width = crop.CanvasRect.Width;
             height = crop.CanvasRect.Height;
 
-            CRect nowRect = new CRect(crop.MemoryRect.Left-BoxOffset.X, crop.MemoryRect.Top - BoxOffset.Y, crop.MemoryRect.Right+1 - BoxOffset.X, crop.MemoryRect.Bottom+1- BoxOffset.Y);
+            CRect nowRect = new CRect(crop.MemoryRect.Left - BoxOffset.X, crop.MemoryRect.Top - BoxOffset.Y, crop.MemoryRect.Right - BoxOffset.X, crop.MemoryRect.Bottom - BoxOffset.Y);
             ImageData rectImageData = new ImageData(nowRect.Width, nowRect.Height, 4);
             rectImageData.SetData(p_ROILayer.GetPtr(), nowRect, (int)p_ROILayer.p_Stride, 4);
-            
 
+            for (int i = 0; i < rectImageData.m_aBuf.Length / 4; i++)
+            {
+                // rectImageData.m_aBuf[3 + (4 * i)] = 255;
+            }
+            ////CropImage 
+            //Grid CropArea = new Grid();
+            //Canvas.SetLeft(CropArea, left);
+            //Canvas.SetTop(CropArea, top);
+            //CropArea.Width = width;
+            //CropArea.Height = height;
+
+            //CropImage UI
             Image CropImage = new Image();
-            CropImage.Opacity = 1;            
+            CropImage.Opacity = 0.7;
             CropImage.Source = rectImageData.GetBitMapSource(4);
             Canvas.SetLeft(CropImage, left);
             Canvas.SetTop(CropImage, top);
@@ -652,7 +655,6 @@ namespace Root_WIND2
             crop.CropImageData = rectImageData;
             p_UIElements.Add(CropImage);
         }
-        #endregion
 
         private void MenuAdd_Click(object sender, RoutedEventArgs e)
         {
@@ -674,10 +676,10 @@ namespace Root_WIND2
         #region Modify Method
         private void UIElement_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if(m_KeyEvent != null)
+            if (m_KeyEvent != null)
                 if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
                     return;
-            if (p_SelectedToolIndex == 0 )
+            if (p_SelectedToolIndex == 0)
             {
                 TShape shape = (sender as Shape).Tag as TShape;
                 if (shape.isSelected)
@@ -692,7 +694,7 @@ namespace Root_WIND2
         }
         private void UIElement_MouseEnter(object sender, MouseEventArgs e)
         {
-            if(p_SelectedToolIndex == 0)
+            if (p_SelectedToolIndex == 0)
                 p_Cursor = Cursors.Hand;
         }
         private void UIElement_MouseLeave(object sender, MouseEventArgs e)
@@ -705,23 +707,14 @@ namespace Root_WIND2
             ModifyPointBuffer = currentMemPt - BoxOffset;
             eToolProcess = ToolProcess.Modifying;
             if (CropShape != null)
-            {
                 if (m_KeyEvent == null)
-                {
-                    DrawRectBitmap((CropShape as TCropTool).MemoryRect, 0, 0, 0, 0, BoxOffset);
-                    SetLayerSource();
                     return;
-                }
-                if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
-                {
-                }
-                else
-                {
-                    CRect rect = (CropShape as TCropTool).MemoryRect;
-                    CRect cropRect = new CRect(rect.Left, rect.Top, rect.Right + 1, rect.Bottom + 1);
-                    DrawRectBitmap((CropShape as TCropTool).MemoryRect, 0, 0, 0, 0, BoxOffset);
-                }
-
+            if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
+            {
+            }
+            else
+            {
+                DrawRectBitmap((CropShape as TCropTool).MemoryRect, 0, 0, 0, 0, BoxOffset);
             }
             SetLayerSource();
         }
@@ -762,13 +755,12 @@ namespace Root_WIND2
                     {
                         case TCropTool:
                             TCropTool crop = shape as TCropTool;
-                            CRect selectRect = new CRect(crop.MemoryRect.Left, crop.MemoryRect.Top, crop.MemoryRect.Right + 1, crop.MemoryRect.Bottom + 1);
                             byte r = p_SelectedROI.p_Color.R;
                             byte g = p_SelectedROI.p_Color.G;
                             byte b = p_SelectedROI.p_Color.B;
                             byte a = p_SelectedROI.p_Color.A;
                             //현재 memoryRect의 시작주소를 p_roilayer에서 가져와서 cropshape의 imagedata만큼 복사?
-                            CropRectSetData(crop.CropImageData, selectRect, BoxOffset);
+                            CropRectSetData(crop.CropImageData, crop.MemoryRect, BoxOffset);
                             //p_UIElements.Clear();
                             SetLayerSource();
                             break;
@@ -776,7 +768,7 @@ namespace Root_WIND2
                             CreateModifyTool_Line(shape as TLine);
                             break;
                         case TRect:
-                             CreateModifyTool_Rect(shape as TRect);
+                            CreateModifyTool_Rect(shape as TRect);
                             break;
                         case TPolygon:
                             CreateModifyTool_Polygon(shape as TPolygon);
@@ -788,7 +780,7 @@ namespace Root_WIND2
             p_Cursor = Cursors.Arrow;
             eToolProcess = ToolProcess.None;
             eModifyType = ModifyType.None;
-            if(CropShape != null)
+            if (CropShape != null)
                 if (CropShape.UIElement.IsMouseOver)
                     eModifyType = ModifyType.ScrollAll;
         }
@@ -981,13 +973,12 @@ namespace Root_WIND2
             p_UIElements.Add(polygon.ModifyTool);
         }
 
-      
         private void LineModifyPointLeft_MouseEnter(object sender, MouseEventArgs e)
         {
             Ellipse ModifyPoint = sender as Ellipse;
             CPoint LeftPoint = ModifyPoint.Tag as CPoint;
             TLine line = (ModifyPoint.Parent as Grid).Tag as TLine;
-             
+
             if (ModifyPoint.VerticalAlignment == VerticalAlignment.Top)
                 p_Cursor = Cursors.SizeNWSE;
             else
@@ -1031,7 +1022,7 @@ namespace Root_WIND2
                 if (index.Y == 1)
                 {
                     p_Cursor = Cursors.SizeWE;
-                    eModifyType = ModifyType.Left;                   
+                    eModifyType = ModifyType.Left;
                 }
                 if (index.Y == 2)
                 {
@@ -1080,7 +1071,7 @@ namespace Root_WIND2
         private void ModifyPoint_MouseLeave(object sender, MouseEventArgs e)
         {
             p_Cursor = Cursors.Arrow;
-            if(e.LeftButton == MouseButtonState.Released)
+            if (e.LeftButton == MouseButtonState.Released)
                 eModifyType = ModifyType.None;
         }
         private void SelectRect_MouseEnter(object sender, MouseEventArgs e)
@@ -1115,7 +1106,7 @@ namespace Root_WIND2
             }
         }
         private void Modifying_CropTool(TCropTool crop, CPoint currentMemPt)
-        { 
+        {
             int offset_x = currentMemPt.X - ModifyPointBuffer.X;
             int offset_y = currentMemPt.Y - ModifyPointBuffer.Y;
             CPoint ptOffset = new CPoint(offset_x, offset_y);
@@ -1144,9 +1135,9 @@ namespace Root_WIND2
             int offset_x = currentMemPt.X - ModifyPointBuffer.X;
             int offset_y = currentMemPt.Y - ModifyPointBuffer.Y;
             CPoint ptOffset = new CPoint(offset_x, offset_y);
-                
+
             if (rect.isSelected)
-            {          
+            {
                 rect.ModifyTool.Visibility = Visibility.Collapsed;
                 int left, top, right, bottom;
                 left = rect.MemoryRect.Left;
@@ -1200,12 +1191,12 @@ namespace Root_WIND2
                         p_Cursor = Cursors.Cross;
                         break;
                 }
-                
+
                 rect.MemoryRect.Left = left;
                 rect.MemoryRect.Top = top;
                 rect.MemoryRect.Right = right;
                 rect.MemoryRect.Bottom = bottom;
-                
+
                 RedrawRect(rect);
             }
         }
@@ -1315,7 +1306,7 @@ namespace Root_WIND2
                             CreateModifyTool_Polygon(shape as TPolygon);
                             break;
                     }
-                    if(shape.ModifyTool != null)
+                    if (shape.ModifyTool != null)
                         shape.ModifyTool.Visibility = Visibility.Visible;
                 }
             }
@@ -1355,7 +1346,7 @@ namespace Root_WIND2
                 Canvas.SetLeft(CropImage, canvasLT.X - pixSizeX / 2);
                 Canvas.SetTop(CropImage, canvasLT.Y - pixSizeY / 2);
             }
-            
+
 
         }
         private void RedrawRect(TRect rect)
@@ -1366,16 +1357,16 @@ namespace Root_WIND2
             CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
             CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
 
-            CPoint canvasLT = new CPoint(GetCanvasPoint(LT-BoxOffset));
-            CPoint canvasRB = new CPoint(GetCanvasPoint(RB-BoxOffset));
+            CPoint canvasLT = new CPoint(GetCanvasPoint(LT - BoxOffset));
+            CPoint canvasRB = new CPoint(GetCanvasPoint(RB - BoxOffset));
             int width = Math.Abs(canvasRB.X - canvasLT.X);
             int height = Math.Abs(canvasRB.Y - canvasLT.Y);
             rect.CanvasRect.Width = width + pixSizeX;
             rect.CanvasRect.Height = height + pixSizeY;
-            
-            
-            Canvas.SetLeft(rect.CanvasRect, canvasLT.X - pixSizeX/2);
-            Canvas.SetTop(rect.CanvasRect, canvasLT.Y - pixSizeY/2);
+
+
+            Canvas.SetLeft(rect.CanvasRect, canvasLT.X - pixSizeX / 2);
+            Canvas.SetTop(rect.CanvasRect, canvasLT.Y - pixSizeY / 2);
             Canvas.SetRight(rect.CanvasRect, canvasRB.X);
             Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
         }
@@ -1407,7 +1398,7 @@ namespace Root_WIND2
             Worker_ShowAll.RunWorkerCompleted += Worker_ShowAll_RunWorkerCompleted;
         }
 
-        private  void Worker_ShowAll_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void Worker_ShowAll_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             p_PageEnable = true;
             p_PageOpacity = 1;
@@ -1483,7 +1474,7 @@ namespace Root_WIND2
             UInt32* fPtr = (UInt32*)bitmapPtr;
 
             foreach (PointLine data in p_SelectedROI.p_Data)
-            {   
+            {
                 for (int x = data.StartPt.X; x < data.StartPt.X + data.Width; x++)
                 {
                     fPtr[(data.StartPt.Y * p_ROILayer.p_Size.X + x)] = clr;
@@ -1526,13 +1517,11 @@ namespace Root_WIND2
             if (ptrMem == IntPtr.Zero)
                 return;
             byte* bitmapPtr = (byte*)ptrMem.ToPointer();
-            if (p_SelectedROI == null)
-                return;
+
             p_SelectedROI.p_Data.Clear();
             PointLine DotLine = new PointLine();
             bool bStart = false;
             CPoint size = p_ImageData.p_Size;
-            int selectIndex = p_cInspROI.IndexOf(p_SelectedROI);
             for (int j = 0; j < size.Y; j++)
             {
                 for (int i = 0; i < size.X; i++)
@@ -1554,25 +1543,12 @@ namespace Root_WIND2
                             DotLine.Width = i - DotLine.StartPt.X;
                             bStart = false;
                             p_SelectedROI.p_Data.Add(DotLine);
-                            //m_Recipe.GetRecipe<MaskRecipe>().MaskList[selectIndex].PointLines.Add(new RecipeType_PointLine(DotLine));
-                            // MaskRecipe의 SelectedROI의 PointLine Type Add
                         }
                     }
+
                 }
             }
-            SetRecipeData();
         }
-
-        public void SetRecipeData()
-        {
-            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-            recipe.GetItem<MaskRecipe>().OriginPoint = this.BoxOffset;
-            for (int i = 0; i < p_cInspROI.Count; i++)
-            {
-                recipe.GetItem<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data);
-            }
-        }
-
         private void Worker_SaveROI_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             p_PageEnable = true;
@@ -1587,33 +1563,14 @@ namespace Root_WIND2
         {
             InspectionROI roi = new InspectionROI();
             roi.p_Color = Colors.AliceBlue;
-            roi.p_Index = p_cInspROI.Count();
             p_cInspROI.Add(roi);
             p_SelectedROI = p_cInspROI.Last();
-
-            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-
-            recipe.GetItem<MaskRecipe>().MaskList.Add(new RecipeType_Mask());
         }
         private void _DeleteROI()
         {
             p_cInspROI.Remove(p_SelectedROI);
-            if(p_cInspROI.Count > 0)
+            if (p_cInspROI.Count > 0)
                 p_SelectedROI = p_cInspROI.Last();
-            for (int i = 0; i < p_cInspROI.Count; i++)
-            {
-                p_cInspROI[i].p_Index = i;
-            }
-            if (p_cInspROI.Count == 0)
-            {
-                _ClearROI();
-            }
-            else
-            {
-                p_SelectedROI = p_cInspROI.Last();
-            }
-            
-            
         }
         private void _ClearROI()
         {
@@ -1636,9 +1593,9 @@ namespace Root_WIND2
             p_PageOpacity = 0.3;
             p_LoadingOpacity = 1;
 
-            Worker_SaveROI.RunWorkerAsync();  
+            Worker_SaveROI.RunWorkerAsync();
         }
-        public void _ReadROI()
+        private void _ReadROI()
         {
             if (Worker_ReadROI.IsBusy)
                 return;
@@ -1663,31 +1620,6 @@ namespace Root_WIND2
             p_LoadingOpacity = 1;
             Worker_ShowAll.RunWorkerAsync();
         }
-
-        public void Load()
-        {
-            //
-            p_cInspROI.Clear();
-
-            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-            foreach (RecipeType_Mask mask in recipe.GetItem<MaskRecipe>().MaskList)
-            {
-                InspectionROI roi = new InspectionROI();
-                roi.p_Color = Colors.AliceBlue;
-                roi.p_Index = p_cInspROI.Count();
-
-                List<PointLine> pointLines = new List<PointLine>();
-                mask.CopyPointLinesTo(ref pointLines);
-                roi.p_Data = pointLines;
-                
-                p_cInspROI.Add(roi);
-            }
-
-            if (p_cInspROI.Count == 0) return;
-
-            p_SelectedROI = p_cInspROI.First();
-        }
-
         public ICommand ShowAll
         {
             get

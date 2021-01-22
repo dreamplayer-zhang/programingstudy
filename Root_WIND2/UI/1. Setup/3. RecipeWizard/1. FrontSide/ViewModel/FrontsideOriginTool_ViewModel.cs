@@ -186,14 +186,17 @@ namespace Root_WIND2
             if (memPt.X == 0 || memPt.Y == 0)
                 return;
 
+            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
+            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
             CPoint viewPt = memPt - Offset;
             CPoint canvasPt = GetCanvasPoint(viewPt);
-
+            
             if (Origin_UI == null)
             {
                 Origin_UI = new Grid();
                 Origin_UI.Width = 20;
                 Origin_UI.Height = 20;
+
                 #region Line
                 Line line1 = new Line();
                 line1.X1 = 0;
@@ -201,7 +204,7 @@ namespace Root_WIND2
                 line1.X2 = 1;
                 line1.Y2 = 1;
                 line1.Stroke = Brushes.Red;
-                line1.StrokeThickness = 2;
+                line1.StrokeThickness = 3;
                 line1.Stretch = Stretch.Fill;
 
                 Line line2 = new Line();
@@ -210,7 +213,7 @@ namespace Root_WIND2
                 line2.X2 = 1;
                 line2.Y2 = 0;
                 line2.Stroke = Brushes.Red;
-                line2.StrokeThickness = 2;
+                line2.StrokeThickness = 3;
                 line2.Stretch = Stretch.Fill;
 
                 Origin_UI.Children.Add(line1);
@@ -218,10 +221,9 @@ namespace Root_WIND2
                 #endregion
             }
 
-            Canvas.SetLeft(Origin_UI, canvasPt.X - 10);
-            Canvas.SetTop(Origin_UI, canvasPt.Y - 10);
+            Canvas.SetLeft(Origin_UI, canvasPt.X - pixSizeX/2 - 10);
+            Canvas.SetTop(Origin_UI, canvasPt.Y + pixSizeY/2 - 10);
 
-            var aa = Origin_UI.Children;
 
             if (p_ViewElement.Contains(Origin_UI))
                 p_ViewElement.Remove(Origin_UI);
@@ -243,6 +245,8 @@ namespace Root_WIND2
             if (memPt.X == 0 || memPt.Y == 0)
                 return;
 
+            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
+            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
             CPoint viewPt = memPt - Offset;
             CPoint canvasPt = GetCanvasPoint(viewPt);
 
@@ -251,6 +255,7 @@ namespace Root_WIND2
                 Pitch_UI = new Grid();
                 Pitch_UI.Width = 20;
                 Pitch_UI.Height = 20;
+
                 #region Line
                 Line line1 = new Line();
                 line1.X1 = 0;
@@ -258,7 +263,7 @@ namespace Root_WIND2
                 line1.X2 = 1;
                 line1.Y2 = 1;
                 line1.Stroke = Brushes.Green;
-                line1.StrokeThickness = 2;
+                line1.StrokeThickness = 3;
                 line1.Stretch = Stretch.Fill;
                 Line line2 = new Line();
                 line2.X1 = 0;
@@ -266,14 +271,14 @@ namespace Root_WIND2
                 line2.X2 = 1;
                 line2.Y2 = 0;
                 line2.Stroke = Brushes.Green;
-                line2.StrokeThickness = 2;
+                line2.StrokeThickness = 3;
                 line2.Stretch = Stretch.Fill;
                 Pitch_UI.Children.Add(line1);
                 Pitch_UI.Children.Add(line2);
                 #endregion
             }
-            Canvas.SetLeft(Pitch_UI, canvasPt.X - 10);
-            Canvas.SetTop(Pitch_UI, canvasPt.Y - 10);
+            Canvas.SetLeft(Pitch_UI, canvasPt.X + pixSizeX/2 - 10);
+            Canvas.SetTop(Pitch_UI, canvasPt.Y - pixSizeY/2 - 10);
 
             if (p_ViewElement.Contains(Pitch_UI))
                 p_ViewElement.Remove(Pitch_UI);
@@ -313,19 +318,22 @@ namespace Root_WIND2
             CPoint viewOriginPt = OriginPoint - Offset;
             CPoint viewPitchPt = PitchPoint - Offset;
 
+            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
+            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
+
             CPoint LT = new CPoint(viewOriginPt.X - padding.X, viewPitchPt.Y - padding.Y);
             CPoint RB = new CPoint(viewPitchPt.X + padding.X, viewOriginPt.Y + padding.Y);
+
             CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
             CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
 
-            int width = Math.Abs(canvasRB.X - canvasLT.X);
-            int height = Math.Abs(canvasRB.Y - canvasLT.Y);
 
-            Canvas.SetLeft(InspArea.CanvasRect, canvasLT.X);
-            Canvas.SetTop(InspArea.CanvasRect, canvasLT.Y);
 
-            InspArea.CanvasRect.Width = width;
-            InspArea.CanvasRect.Height = height;
+            Canvas.SetLeft(InspArea.CanvasRect, canvasLT.X - pixSizeX/2);
+            Canvas.SetTop(InspArea.CanvasRect, canvasLT.Y - pixSizeY/2);
+
+            InspArea.CanvasRect.Width = Math.Abs(canvasRB.X - canvasLT.X + pixSizeX);
+            InspArea.CanvasRect.Height = Math.Abs(canvasRB.Y - canvasLT.Y + pixSizeY);
 
             if (p_ViewElement.Contains(InspArea.CanvasRect))
             {
