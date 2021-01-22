@@ -406,5 +406,4 @@ namespace Root_WIND2
 			MeasurementGraph[1].Values = ebrs;
 		}
 	}
-
 }

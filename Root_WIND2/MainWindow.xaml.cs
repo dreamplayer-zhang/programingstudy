@@ -171,7 +171,7 @@ namespace Root_WIND2
         private string memoryEdgeTop = "EdgeTop";
         private string memoryEdgeSide = "EdgeSide";
         private string memoryEdgeBottom = "EdgeBottom";
-        private string memoryEdgeEBR = "EdgeEBR";
+        private string memoryEdgeEBR = "EBR";
 
 
         public bool RegisterGlobalObjects()
