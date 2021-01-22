@@ -403,7 +403,7 @@ namespace RootTools.Control.ACS
             try
             {
                 int nMotor = p_channel.GetMotorState(m_nAxis);
-                p_bSeroOn = ((nMotor & p_channel.ACSC_MST_ENABLE) != 0);
+                p_bServoOn = ((nMotor & p_channel.ACSC_MST_ENABLE) != 0);
                 p_sensorInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
                 int nLimit = (int)aLimit.GetValue(m_nAxis);
                 p_sensorMinusLimit = (nLimit & p_channel.ACSC_SAFETY_LL) != 0;

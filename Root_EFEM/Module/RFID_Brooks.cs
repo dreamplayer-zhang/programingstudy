@@ -324,7 +324,7 @@ namespace Root_EFEM.Module
                         sResult = m_module.ReadRFID();
                     }
                 }
-                if (sResult == "OK") m_module.m_loadport.p_infoCarrier.SendCarrierID(m_module.m_sReadID);
+                if (sResult == "OK") m_module.m_loadport.p_infoCarrier.p_sCarrierID = m_module.m_sReadID;
                 return sResult;
             }
         }

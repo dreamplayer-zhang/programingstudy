@@ -37,10 +37,12 @@ namespace Root_WIND2
 
             MasterDieX = recipe.WaferMap.MasterDieX;
             MasterDieY = recipe.WaferMap.MasterDieY;
-            mapControl_VM.ChangeMasterImage(recipe.WaferMap.MasterDieX, masterDieY);
+            mapControl_VM.ChangeMasterDie(recipe.WaferMap.MasterDieX, masterDieY);
         }
         public void SetPage()
         {
+            MapControl_VM.SetMap();
+
             DrawMapData();
             SetMapData();
         }
@@ -87,7 +89,8 @@ namespace Root_WIND2
         {
             get
             {
-                mapControl_VM.ChangeMasterImage(masterDieX, GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieY);                
+                // 이거 수정해야함....ㅁ;ㅣㄴ아ㅓㄻ;ㅣ나얼;미ㅏㅓ
+                //mapControl_VM.ChangeMasterDie(masterDieX, GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieY);                
                 return masterDieX;
             }
             set
@@ -108,7 +111,7 @@ namespace Root_WIND2
         {
             get
             {                
-                mapControl_VM.ChangeMasterImage(GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieX, masterDieY);
+                //mapControl_VM.ChangeMasterDie(GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieX, masterDieY);
                 return masterDieY;
             }
             set

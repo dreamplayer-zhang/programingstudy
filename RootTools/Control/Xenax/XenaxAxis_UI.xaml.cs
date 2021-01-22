@@ -6,20 +6,20 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace RootTools.Control.ACS
+namespace RootTools.Control.Xenax
 {
     /// <summary>
-    /// ACSAxis_UI.xaml에 대한 상호 작용 논리
+    /// XenaxAxis_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class ACSAxis_UI : UserControl
+    public partial class XenaxAxis_UI : UserControl
     {
-        public ACSAxis_UI()
+        public XenaxAxis_UI()
         {
             InitializeComponent();
         }
 
-        ACSAxis m_axis;
-        public void Init(ACSAxis axis)
+        XenaxAxis m_axis;
+        public void Init(XenaxAxis axis)
         {
             this.DataContext = axis;
             m_axis = axis;
@@ -33,8 +33,10 @@ namespace RootTools.Control.ACS
             textBoxShift.Text = "0";
             treeRootUI.Init(axis.m_treeRoot);
             treeRootSettingUI.Init(axis.m_treeRootSetting);
+            treeRootInterlockUI.Init(axis.m_treeRootInterlock);
             axis.RunTree(Tree.eMode.Init);
             axis.RunTreeSetting(Tree.eMode.Init);
+            axis.RunTreeInterlock(Tree.eMode.Init);
             StartTimer();
         }
 
@@ -169,7 +171,6 @@ namespace RootTools.Control.ACS
             if (m_bRepeat == false) return;
             if (m_axis.p_eState != Axis.eState.Ready) return;
             string sDst = m_bDstRepeat ? comboRepeatPos1.Text : comboRepeatPos0.Text;
-            m_axis.RunTrigger(m_bDstRepeat && (checkBoxTrigger.IsChecked == true)); 
             m_axis.StartMove(sDst, 0, comboSpeedRepeat.Text);
             m_bDstRepeat = !m_bDstRepeat;
         }
