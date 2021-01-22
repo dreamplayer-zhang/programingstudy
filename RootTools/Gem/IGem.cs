@@ -17,6 +17,8 @@ namespace RootTools.Gem
 
         long SetCEID(CEID ecv);
 
+        long SetCEID(long nCEID);
+
         long SetAlarm(ALID alid, bool bSet);
 
         void AddGemCarrier(GemCarrierBase carrier);

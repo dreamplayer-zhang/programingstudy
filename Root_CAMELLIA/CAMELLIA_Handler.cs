@@ -71,6 +71,7 @@ namespace Root_CAMELLIA
             InitAligner();
             m_camellia = new Module_Camellia("Camellia", m_engineer);
             InitModule(m_camellia);
+            InitXGem();
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_camellia);
             m_wtr.RunTree(Tree.eMode.RegRead);
@@ -181,6 +182,15 @@ namespace Root_CAMELLIA
                 InitModule(module);
                 m_aRFID.Add((IRFID)module);
             }
+        }
+        #endregion
+
+        #region Module Gem
+        public ModuleBase m_XGem = null;
+        void InitXGem()
+        {
+            m_XGem = new Gem_XGem300Pro("Gem300", m_engineer, m_gem, m_aLoadport);
+            InitModule(m_XGem);
         }
         #endregion
 
