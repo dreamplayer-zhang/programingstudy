@@ -381,8 +381,6 @@ namespace Root_WIND2
 
 		private void ChangeViewer(string dataName)
 		{
-
-			
 			if (dataName == "Top")
 				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
 			else if (dataName == "Side")
