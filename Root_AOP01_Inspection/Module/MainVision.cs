@@ -389,11 +389,41 @@ namespace Root_AOP01_Inspection.Module
             if (m_CamTDISide != null && m_CamTDISide.p_CamInfo.p_eState == eCamState.Init)
                 m_CamTDISide.Connect();
 
-            m_axisSideZ.StartHome();
+            // Theta와 SideZ 충돌 방지를 위해 SideZ축을 Safety 위치로 우선 이동하도록 Home 시퀀스 수정
+            if (base.p_eState == eState.Run) return "Invalid State : Run";
+            if (EQ.IsStop()) return "Home Stop";
+            if (m_axisSideZ != null) m_axisSideZ.ServoOn(true);
+            Thread.Sleep(200);
+            if (EQ.IsStop()) return "Home Stop";
+            if (m_axisSideZ != null) base.p_sInfo = m_axisSideZ.StartHome();
+            while (true)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop(1000)) return "Home Stop";
+                bool bDone = true;
+                if ((m_axisSideZ != null) && (m_axisSideZ.p_eState == Axis.eState.Home)) bDone = false;
+                if (bDone) break;
+            }
+
+            if (m_axisSideZ.WaitReady() != "OK")
+                return "Error";
+            
+            m_axisSideZ.StartMove(eAxisPos.ReadyPos);
             if (m_axisSideZ.WaitReady() != "OK")
                 return "Error";
 
-            p_sInfo = base.StateHome();
+            var listAxis = new List<Axis>(base.m_listAxis);
+            for (int i = 0; i < listAxis.Count; i++)
+            {
+                if (listAxis[i].p_id == "MainVision.Axis Side Z")
+                {
+                    listAxis.RemoveAt(i);
+                    break;
+                }
+            }
+            p_sInfo = base.StateHome(listAxis);
+            //
+
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             //p_bStageVac = false;
             return "OK";

@@ -17,7 +17,7 @@ namespace Root_AOP01_Inspection.Module
         public enum eScanPos
         {
             SideLeft =0,
-            SideBottom,
+            SideBot,
             SideRight,
             SideTop,
         }
