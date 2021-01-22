@@ -710,7 +710,7 @@ namespace Root_Vega.Module
                 {
                     m_module.m_infoPod.SetInfoReticleExist();
                 }
-                m_module.m_infoPod.SendSlotMap();
+                //m_module.m_infoPod.SendSlotMap();
                 return "OK";
             }
         }

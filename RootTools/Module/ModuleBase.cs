@@ -274,7 +274,7 @@ namespace RootTools.Module
             return StateHome(listAxis);
         }
 
-        string StateHome(List<Axis> aAxis)
+        public string StateHome(List<Axis> aAxis)
         {
             if (aAxis.Count == 0) return "OK";
             if (p_eState == eState.Run) return "Invalid State : Run";
