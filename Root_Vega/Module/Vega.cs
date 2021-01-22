@@ -77,9 +77,14 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_diInterlock_Key, this, "InterLock Key");
             p_sInfo = m_toolBox.Get(ref m_di12chLED1FanAlarm, this, "12Ch LED 1 Fan Alarm");
             p_sInfo = m_toolBox.Get(ref m_di12chLED2FanAlarm, this, "12Ch LED 2 Fan Alarm");
+            p_sInfo = m_toolBox.Get(ref m_doIonizerOnOff, this, "Ionizer On/Off");
             p_sInfo = m_RFID.GetTools(this, bInit);
-            
-                if (bInit) InitALID(); 
+
+            if (bInit)
+            {
+                InitALID();
+                m_doIonizerOnOff.Write(false);
+            }
         }
         #endregion
 

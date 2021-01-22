@@ -59,7 +59,7 @@ namespace RootTools.Control.Xenax
         #region Status
         void Timer_Status()
         {
-            Timer_Status(buttonServoOn, m_axis.p_bSeroOn);
+            Timer_Status(buttonServoOn, m_axis.p_bServoOn);
             Timer_Status(buttonAlarm, m_axis.p_sensorAlarm);
             Timer_Status(buttonInPos, m_axis.p_sensorInPos);
             Timer_Status(buttonLimitM, m_axis.p_sensorMinusLimit);
@@ -75,7 +75,7 @@ namespace RootTools.Control.Xenax
 
         private void buttonServoOn_Click(object sender, RoutedEventArgs e)
         {
-            m_axis.ServoOn(!m_axis.p_bSeroOn);
+            m_axis.ServoOn(!m_axis.p_bServoOn);
         }
 
         private void buttonAlarm_Click(object sender, RoutedEventArgs e)

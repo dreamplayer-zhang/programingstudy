@@ -248,7 +248,7 @@ namespace RootTools.Control.Ajin
             for (int n = 0; n < 200; n++)
             {
                 Thread.Sleep(10); 
-                if (bOn == p_bSeroOn)
+                if (bOn == p_bServoOn)
                 {
                     Thread.Sleep(10);
                     return;
@@ -493,13 +493,6 @@ namespace RootTools.Control.Ajin
         #endregion
 
         #region Ajin Functions
-        public string SetPosTypeBound(double fPositivePos, double fNegativePos)
-        {
-            if (m_nAxis < 0) return "Axis not Assigned";
-            if (AXM("AxmStatusSetPosType", CAXM.AxmStatusSetPosType(m_nAxis, 1, fPositivePos * p_pulsepUnit, fNegativePos * p_pulsepUnit)) != 0) return p_sInfo;
-            return "OK";
-        }
-
         public string SetGantry(AjinAxis axisSlave)
         {
             if (m_nAxis < 0) return "Axis not Assigned";
@@ -610,7 +603,7 @@ namespace RootTools.Control.Ajin
             uint uRead = 0;
             uint uReadM = 0;
             AXM("AxmSignalIsServoOn", CAXM.AxmSignalIsServoOn(m_nAxis, ref uRead));
-            p_bSeroOn = (uRead > 0);
+            p_bServoOn = (uRead > 0);
             AXM("AxmHomeReadSignal", CAXM.AxmHomeReadSignal(m_nAxis, ref uRead));
             p_sensorHome = (uRead > 0); 
             AXM("AxmSignalReadLimit", CAXM.AxmSignalReadLimit(m_nAxis, ref uRead, ref uReadM));
