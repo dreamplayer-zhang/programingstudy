@@ -231,7 +231,7 @@ namespace Root_WIND2
                 SetMasterDie(pos);
             }
         }
-        public void ChangeMasterImage(int dieX, int dieY)
+        public void ChangeMasterDie(int dieX, int dieY)
         {
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
             if (this.Map.Length == 0) return;

@@ -91,7 +91,7 @@ namespace Root_WIND2
                     String test = "";
                     if (workplace.Index == 0)
                     {
-                        test += "Trans : {" + workplace.OffsetX.ToString() + ", " + workplace.OffsetY.ToString() + "}" + "\n";
+                        test += "Trans : {" + workplace.OffsetX.ToString() + ", " + workplace.OffsetX.ToString() + "}" + "\n";
                         DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
                     }
                     else

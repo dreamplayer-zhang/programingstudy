@@ -190,7 +190,7 @@ namespace RootTools_Vision
                 this.State = WORKMANAGER_STATE.ASSIGN;
                 if(this.workplaceBundle != null)
                 {
-                    Task.Run(() =>
+                    //Task.Run(() =>
                     {
                         if (AssignWorkToWorker() == false)
                         {
@@ -208,7 +208,8 @@ namespace RootTools_Vision
 #endif
 #endif
                         }
-                    });
+                    }
+                    //);
                 }
 
 
