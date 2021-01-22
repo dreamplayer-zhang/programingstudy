@@ -253,6 +253,9 @@
     <Compile Include="Control\Xenax\XenaxListAxis_UI.xaml.cs">
       <DependentUpon>XenaxListAxis_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Xenax\Xenax_UI.xaml.cs">
+      <DependentUpon>Xenax_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Database\Database_DataView.xaml.cs">
       <DependentUpon>Database_DataView.xaml</DependentUpon>
     </Compile>
@@ -811,6 +814,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\Xenax\XenaxListAxis_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Xenax\Xenax_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

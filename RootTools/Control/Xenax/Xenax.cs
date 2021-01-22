@@ -34,7 +34,6 @@ namespace RootTools.Control.Xenax
         }
         #endregion
 
-
         IEngineer m_engineer;
         Log m_log;
         public TreeRoot m_treeRoot;
