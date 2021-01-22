@@ -242,8 +242,6 @@ namespace Root_WIND2
 		{
 			this.setupVM = _setup;
 
-			
-
 			DrawToolVM = new RootViewer_ViewModel();
 			DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EBRImage"), GlobalObjects.Instance.Get<DialogService>());
 
@@ -306,7 +304,7 @@ namespace Root_WIND2
 			param.OffsetBevel = offsetBevel;
 			param.OffsetEBR = offsetEBR;
 
-			//recipe.ParameterItemList.Clear();
+			recipe.ParameterItemList.Clear();
 			recipe.ParameterItemList.Add(param);
 		}
 
@@ -406,5 +404,4 @@ namespace Root_WIND2
 			MeasurementGraph[1].Values = ebrs;
 		}
 	}
-
 }

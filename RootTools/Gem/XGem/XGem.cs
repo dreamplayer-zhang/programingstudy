@@ -420,6 +420,15 @@ namespace RootTools.Gem.XGem
             return nError; 
         }
 
+        public long SetCEID(long nCEID)
+        {
+            if (p_bEnable == false) return -1;
+            long nError = p_bEnable ? m_xGem.GEMSetEvent(nCEID) : 0;
+            LogSend(nError, "GEMSetEvent", nCEID);
+            p_sInfo = "SetCEID " + nCEID;
+            return nError;
+        }
+
         long[] m_svID = new long[1];
         string[] m_svValue = new string[1];
         public long SetSV(SVID sv, dynamic value)
@@ -794,7 +803,7 @@ namespace RootTools.Gem.XGem
                 {
                     aErrorCode.Add((long)GemPJ.eError.Invalid_AttibuteValue);
                     p_sLastError = "RecipeID not Found : " + psRcpID[n]; 
-                    asErrorMsg.Add(p_sLastError); 
+                    asErrorMsg.Add(p_sLastError);
                 }
                 for (int i = 0; i < pnMtrlCount[n]; i++, iMtrl++)
                 {

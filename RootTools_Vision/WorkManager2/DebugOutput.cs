@@ -38,6 +38,36 @@ namespace RootTools_Vision
             Debug.Write(builder.ToString());
         }
 
+
+        public static void PrintWorkplaceBundleOffset(WorkplaceBundle wb)
+        {
+            int w = wb.SizeX;
+            int h = wb.SizeY;
+
+            string[,] map = new string[w, h];
+            foreach (Workplace wp in wb)
+            {
+                if (wp.MapIndexX == -1 && wp.MapIndexY == -1) continue;
+                map[wp.MapIndexX, wp.MapIndexY] = string.Format("[{0:D4},{1:D4}]", Math.Abs(wp.OffsetX), Math.Abs(wp.OffsetY));
+            }
+            StringBuilder builder = new StringBuilder();
+
+            for (int i = 0; i < h; i++)
+            {
+                for (int j = 0; j < w; j++)
+                {
+                    if (map[j, i] == null) 
+                        builder.Append("[0000,0000]");
+                    else
+                        builder.Append(map[j, i]);
+                }
+                builder.Append("\n");
+            }
+
+            Debug.Write(builder.ToString());
+            Debug.Write("\n\n");
+        }
+
         public static void PrintWorkManagerInfo(WorkManager wm, string append = "")
         {
             string output = "[WorkManager]" + LL + wm.WorkType.ToString() + LL + wm.State.ToString() + LL + append;
