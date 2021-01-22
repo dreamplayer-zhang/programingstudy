@@ -37,6 +37,7 @@ namespace RootTools.Control.Xenax
             axis.RunTree(Tree.eMode.Init);
             axis.RunTreeSetting(Tree.eMode.Init);
             axis.RunTreeInterlock(Tree.eMode.Init);
+            tabItemComm.Content = axis.p_commUI; 
             StartTimer();
         }
 

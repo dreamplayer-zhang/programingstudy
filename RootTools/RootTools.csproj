@@ -244,6 +244,7 @@
       <DependentUpon>Modbus_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Comm\RS232byte.cs" />
+    <Compile Include="Control\Xenax\Xenax.cs" />
     <Compile Include="Control\Xenax\XenaxAxis.cs" />
     <Compile Include="Control\Xenax\XenaxAxis_UI.xaml.cs">
       <DependentUpon>XenaxAxis_UI.xaml</DependentUpon>
