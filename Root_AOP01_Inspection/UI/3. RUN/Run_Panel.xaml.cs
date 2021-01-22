@@ -81,7 +81,7 @@ namespace Root_AOP01_Inspection
             ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_wtr.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
             ExistVision.Background = m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
             //ExistLoadport.Background = (m_loadport[0].p_infoWafer != null) || (m_loadport[1].p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
-            //ButtonInitialize.IsEnabled = IsEnableInitialization();
+            ButtonInitialize.IsEnabled = IsEnableInitialization();
             ButtonRecovery.IsEnabled = IsEnableRecovery();
         }
         #endregion
@@ -137,7 +137,7 @@ namespace Root_AOP01_Inspection
         }
         private void ButtonInitialize_Click(object sender, RoutedEventArgs e)
         {
-            //if (IsEnableInitialization() == false) return;
+            if (IsEnableInitialization() == false) return;
             EQ.p_bStop = false;
             m_handler.m_process.ClearInfoWafer();
             m_handler.m_nRnR = 0; //Init 할때 RNR 카운트초기화

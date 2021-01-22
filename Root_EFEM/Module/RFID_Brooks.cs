@@ -126,8 +126,8 @@ namespace Root_EFEM.Module
 
             //End of Package (End + CheckSum1 + CheckSum2 + CheckSum3 + CheckSum4)
             sCmd += m_cEndCharacter;
-            Int16 nXOR = 0;
-            Int16 nAdd = 0;
+            Int32 nXOR = 0x00;
+            Int32 nAdd = 0;
             byte[] aCMD = Encoding.Default.GetBytes(sCmd);
             for (int n = 0; n < aCMD.Length; n++)
             {
@@ -137,10 +137,16 @@ namespace Root_EFEM.Module
             {
                 nAdd += aCMD[n];
             }
-            sCmd += (char)(nXOR >> 8); // CheckSum1
-            sCmd += (char)(nXOR); // CheckSum2
-            sCmd += (char)(nAdd >> 8); // CheckSum3
-            sCmd += (char)(nAdd); // CheckSum4
+            nXOR = nXOR % (16 * 16);
+            sCmd += (nXOR / 16).ToString("X");
+            sCmd += (nXOR % 16).ToString("X");
+            nAdd = nAdd % (16 * 16);
+            sCmd += (nAdd / 16).ToString("X");
+            sCmd += (nAdd % 16).ToString("X");
+            //sCmd += (char)(nXOR >> 8); // CheckSum1
+            //sCmd += (char)(nXOR); // CheckSum2
+            //sCmd += (char)(nAdd >> 8); // CheckSum3
+            //sCmd += (char)(nAdd); // CheckSum4
 
             //m_serial.Write(sCmd);
             m_rs232.Send(sCmd);
