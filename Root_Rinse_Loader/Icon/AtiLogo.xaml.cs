@@ -13,31 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_Rinse_Loader.MainUI
+namespace Root_Rinse_Loader.Icon
 {
     /// <summary>
-    /// RunUI.xaml에 대한 상호 작용 논리
+    /// AtiLogo.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class RunUI : UserControl
+    public partial class AtiLogo : UserControl
     {
-        public RunUI()
+        public AtiLogo()
         {
             InitializeComponent();
-        }
-
-        private void buttonHome_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void buttonStart_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void buttonPause_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

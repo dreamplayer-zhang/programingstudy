@@ -79,7 +79,6 @@ namespace Root_EFEM
             m_aLocate.Clear();
             foreach (WTRArm arm in m_wtr.p_aArm) InitLocateArm(arm);
             foreach (IWTRChild child in m_wtr.p_aChild) InitLocateChild(child);
-            CalcRecover();
         }
 
         void InitLocateArm(WTRArm arm)
@@ -425,14 +424,15 @@ namespace Root_EFEM
         public string RunNextSequence()
         {
             ModuleBase wtr = (ModuleBase)m_wtr;
-            if (m_qSequence.Count == 0)
+            if ((m_qSequence.Count == 0) || EQ.IsStop())
             {
                 EQ.p_eState = EQ.eState.Ready;
                 ClearInfoWafer();
-                return "OK";
+                return EQ.IsStop() ? "EQ Stop" : "OK";
             }
             Sequence sequence = m_qSequence.Peek();
-            if (sequence.m_moduleRun.m_moduleBase == wtr)
+            bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport; 
+            if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport) 
             {
                 sequence.m_moduleRun.StartRun();
                 while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);

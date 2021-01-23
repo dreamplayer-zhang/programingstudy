@@ -248,10 +248,9 @@ namespace RootTools_Vision
 		}
 		#endregion
 
-		public override object Clone()
-		{
-			return this.MemberwiseClone();
-		}
-		
+		//public override object Clone()
+		//{
+		//	return this.MemberwiseClone();
+		//}
 	}
 }

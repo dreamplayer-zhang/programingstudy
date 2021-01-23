@@ -33,6 +33,19 @@ namespace Root_CAMELLIA.ManualJob
             }
         }
 
+        bool _ManualJobBlick = false;
+        public bool p_ManualJobBlink
+        {
+            get { return _ManualJobBlick; }
+            set
+            {
+                if (_ManualJobBlick == value) return;
+                _ManualJobBlick = value;
+                OnPropertyChanged();
+            }
+        }
+
+
         public InfoCarrier m_infoCarrier = null;
         public ManualJobSchedule(InfoCarrier infoCarrier)
         {
@@ -42,6 +55,7 @@ namespace Root_CAMELLIA.ManualJob
 
         public bool ShowPopup()
         {
+            p_ManualJobBlink = true;
             if (ManualJobSchedule_UI.m_bShow) return false;
             ManualJobSchedule_UI jobschedulePopup = new ManualJobSchedule_UI(m_infoCarrier);
             jobschedulePopup.Init(this, m_infoCarrier);

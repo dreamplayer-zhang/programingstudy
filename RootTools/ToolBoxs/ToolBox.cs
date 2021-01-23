@@ -7,6 +7,7 @@ using RootTools.Camera.Silicon;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Gem;
+using RootTools.Gem.XGem;
 using RootTools.Inspects;
 using RootTools.Light;
 using RootTools.Memory;
@@ -334,6 +335,8 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
         #endregion
+
+        
 
         #region ITool Comm
         ToolSet m_toolSetComm = null;

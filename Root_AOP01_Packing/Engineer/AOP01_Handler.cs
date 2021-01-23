@@ -49,13 +49,13 @@ namespace Root_AOP01_Packing
             m_RNR = new Certification("Certification", m_engineer);
             InitModule(m_RNR);
 
-            //m_visionAOP = new Vision_AOP("Vision", m_engineer);
-            //InitModule(m_visionAOP);
+            m_visionAOP = new Vision_AOP("Vision", m_engineer);
+            InitModule(m_visionAOP);
 
-            //m_tapePacker = new TapePacker("TapePacker", m_engineer);
-            //InitModule(m_tapePacker);
-            //((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);
-            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_tapePacker);
+            m_tapePacker = new TapePacker("TapePacker", m_engineer);
+            InitModule(m_tapePacker);
+            ((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);
+            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_tapePacker);
 
             //m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
             //InitModule(m_vacuumPacker);
@@ -69,14 +69,17 @@ namespace Root_AOP01_Packing
             //InitModule(m_unloadport);
             //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_unloadport);
 
-            //m_aWTR[0].RunTree(Tree.eMode.RegRead);
-            //m_aWTR[0].RunTree(Tree.eMode.Init);
-            //m_aWTR[1].RunTree(Tree.eMode.RegRead);
-            //m_aWTR[1].RunTree(Tree.eMode.Init);
-            //((IWTR)m_aWTR[1]).ReadInfoReticle_Registry(); 
+            m_aWTR[0].RunTree(Tree.eMode.RegRead);
+            m_aWTR[0].RunTree(Tree.eMode.Init);
+            m_aWTR[1].RunTree(Tree.eMode.RegRead);
+            m_aWTR[1].RunTree(Tree.eMode.Init);
+            ((IWTR)m_aWTR[1]).ReadInfoReticle_Registry();
 
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
-            m_recipe.AddModule();
+            //m_recipe.AddModule();
+            foreach (ModuleBase module in p_moduleList.m_aModule.Keys)
+                m_recipe.AddModule(module);
+
             m_process = new AOP01_Process("Process", m_engineer, this);
         }
 

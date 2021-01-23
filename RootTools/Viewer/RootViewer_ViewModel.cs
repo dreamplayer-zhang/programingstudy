@@ -980,9 +980,9 @@ namespace RootTools
         }
         public virtual unsafe void DrawRectBitmap(CRect rect, byte r, byte g, byte b, byte a, CPoint offset = null)
         {
-            Parallel.For(rect.Left, rect.Right + 1, x =>
+            Parallel.For(rect.Left, rect.Right , x =>
               {
-                  Parallel.For(rect.Top, rect.Bottom + 1, y =>
+                  Parallel.For(rect.Top, rect.Bottom , y =>
                   {
                       CPoint pixelPt = new CPoint(x - offset.X, y - offset.Y);
                       DrawPixelBitmap(pixelPt, r, g, b, a);

@@ -244,6 +244,18 @@
       <DependentUpon>Modbus_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Comm\RS232byte.cs" />
+    <Compile Include="Control\Xenax\Xenax.cs" />
+    <Compile Include="Control\Xenax\XenaxAxis.cs" />
+    <Compile Include="Control\Xenax\XenaxAxis_UI.xaml.cs">
+      <DependentUpon>XenaxAxis_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Xenax\XenaxListAxis.cs" />
+    <Compile Include="Control\Xenax\XenaxListAxis_UI.xaml.cs">
+      <DependentUpon>XenaxListAxis_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Xenax\Xenax_UI.xaml.cs">
+      <DependentUpon>Xenax_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Database\Database_DataView.xaml.cs">
       <DependentUpon>Database_DataView.xaml</DependentUpon>
     </Compile>
@@ -385,6 +397,7 @@
       <DependentUpon>TK4SModuleUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
+    <Compile Include="Viewer\Root_Viewer.cs" />
     <Compile Include="Comm\TK4SGourpUI.xaml.cs">
       <DependentUpon>TK4SGourpUI.xaml</DependentUpon>
     </Compile>
@@ -799,6 +812,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\Ajin\Ajin_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Xenax\XenaxAxis_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Xenax\XenaxListAxis_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Xenax\Xenax_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

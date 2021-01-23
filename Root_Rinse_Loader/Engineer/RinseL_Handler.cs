@@ -5,6 +5,7 @@ using RootTools.Gem;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -29,7 +30,7 @@ namespace Root_Rinse_Loader.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
-        RinseL m_rinse;
+        public RinseL m_rinse;
         public Storage m_storage;
         public Rail m_rail;
         public Roller m_roller;
@@ -187,10 +188,41 @@ namespace Root_Rinse_Loader.Engineer
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
-                    case EQ.eState.Run:break;
+                    case EQ.eState.Run: break;
                 }
-                p_bRun = (EQ.p_eState == EQ.eState.Run); 
+                p_bRun = (EQ.p_eState == EQ.eState.Run);
             }
+        }
+        #endregion
+
+        #region PickerSet
+        BackgroundWorker m_bgwPickerSet = new BackgroundWorker(); 
+        void InitBackgroundWorker()
+        {
+            m_bgwPickerSet.DoWork += M_bgwPickerSet_DoWork;
+        }
+
+        private void M_bgwPickerSet_DoWork(object sender, DoWorkEventArgs e)
+        {
+            RunPickerSet(); 
+        }
+
+        string RunPickerSet()
+        {
+            m_loader.m_bPickersetMode = true; 
+            m_storage.StartMoveStackReady();
+            EQ.p_eState = EQ.eState.Run;
+            while (m_storage.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+            if (EQ.IsStop()) return "EQ Stop";
+            m_loader.StartPickerSet();
+            EQ.p_eState = EQ.eState.Run;
+            return "OK";  
+        }
+
+        public string StartPickerSet()
+        {
+            m_bgwPickerSet.RunWorkerAsync();
+            return "OK";
         }
         #endregion
 
@@ -206,6 +238,7 @@ namespace Root_Rinse_Loader.Engineer
             m_gaf = engineer.ClassGAF();
             m_gem = engineer.ClassGem();
             InitModule();
+            InitBackgroundWorker(); 
             InitThread();
             m_engineer.ClassMemoryTool().InitThreadProcess();
         }

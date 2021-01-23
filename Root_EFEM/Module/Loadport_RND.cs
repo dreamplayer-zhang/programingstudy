@@ -353,7 +353,7 @@ namespace Root_EFEM.Module
                         break;
                 }
             }
-            p_infoCarrier.SetMapData(aSlot);
+            p_infoCarrier.SetMapData(aSlot, sMap);
             return bUndefined ? "Undifined MapData" : "OK";
         }
 
@@ -475,6 +475,8 @@ namespace Root_EFEM.Module
             InitCmd();
             p_id = id;
             p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
+            if (id == "LoadportA") p_infoCarrier.p_sLocID = "LP1";
+            else if (id == "LoadportB") p_infoCarrier.p_sLocID = "LP2";
             m_aTool.Add(p_infoCarrier);
             InitBase(id, engineer);
             InitGAF();
@@ -536,6 +538,7 @@ namespace Root_EFEM.Module
             public override string Run()
             {
                 if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 if (m_module.Run(m_module.CmdLoad(m_bMapping))) return p_sInfo;
                 if (m_module.Run(m_module.CmdGetMapData())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;

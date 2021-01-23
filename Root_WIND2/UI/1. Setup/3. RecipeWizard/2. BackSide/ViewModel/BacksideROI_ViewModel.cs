@@ -20,12 +20,9 @@ namespace Root_WIND2
             p_VisibleMenu = Visibility.Visible;
             //Shapes.CollectionChanged += Shapes_CollectionChanged;            
         }
-        public void init(Setup_ViewModel setup, Recipe _recipe)
+        public void init(Setup_ViewModel setup)
         {
-            this.recipe = _recipe;
-            backsideRecipe = _recipe.GetRecipe<BacksideRecipe>();
-            mapInfo = _recipe.WaferMap;
-            base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
+            base.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
             p_VisibleMenu = System.Windows.Visibility.Visible;
         }
         
@@ -38,10 +35,6 @@ namespace Root_WIND2
         List<CPoint> PolygonPt = new List<CPoint>();
         public ObservableCollection<TShape> Shapes = new ObservableCollection<TShape>();
 
-        Recipe recipe;
-        BacksideRecipe backsideRecipe;
-        RecipeType_WaferMap mapInfo;
-
         CPoint canvasPoint;
         CPoint memoryPoint;
 
@@ -50,6 +43,8 @@ namespace Root_WIND2
         private int mapSizeX = 40;
         private int mapSizeY = 40;
         private int radius = 20000;
+
+        private RecipeType_WaferMap mapInfo = new RecipeType_WaferMap();
 
         private ObservableCollection<UIElement> m_UIElements = new ObservableCollection<UIElement>();
         #endregion
@@ -214,6 +209,8 @@ namespace Root_WIND2
                 // Save Recipe
                 SetRecipeMapData(mapData, (int)outMapX, (int)outMapY, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);
 
+                BacksideRecipe backsideRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<BacksideRecipe>();
+
                 backsideRecipe.CenterX = (int)centX;
                 backsideRecipe.CenterY = (int)centY;
                 backsideRecipe.Radius = (int)outRadius;
@@ -249,21 +246,22 @@ namespace Root_WIND2
         }
         private void SetRecipeMapData(int[] mapData, int mapX, int mapY, int originX, int originY, int chipSzX, int chipSzY)
         {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
+            BacksideRecipe backsideRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<BacksideRecipe>();
             // Map Data Recipe 생성
             backsideRecipe.OriginX = originX;
             backsideRecipe.OriginY = originY;
             backsideRecipe.DiePitchX = chipSzX;
             backsideRecipe.DiePitchY = chipSzY;
 
-            OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
             originRecipe.DiePitchX = chipSzX;
             originRecipe.DiePitchY = chipSzY;
             originRecipe.OriginX = originX;
             originRecipe.OriginY = originY;
 
-            mapInfo = new RecipeType_WaferMap(mapX, mapY, mapData);
+            this.mapInfo = new RecipeType_WaferMap(mapX, mapY, mapData);
 
-            this.recipe.WaferMap = mapInfo;
+            GlobalObjects.Instance.Get<RecipeBack>().WaferMap = mapInfo;
 
             if (true) // Display Map Data Option화
                 DrawMapData(mapData, mapX, mapY, originX, originY, chipSzX, chipSzY);

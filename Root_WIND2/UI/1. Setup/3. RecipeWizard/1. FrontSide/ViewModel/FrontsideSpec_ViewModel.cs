@@ -13,10 +13,8 @@ namespace Root_WIND2
     class FrontsideSpec_ViewModel : ObservableObject, IRecipeUILoadable
     {
         public Frontside_ViewModel m_front;
-        public Recipe m_Recipe;
-        public void init(Frontside_ViewModel front, Recipe recipe)
+        public void init(Frontside_ViewModel front)
         {
-            m_Recipe = recipe;
             m_front = front;
             ViewerInit();
            
@@ -135,7 +133,9 @@ namespace Root_WIND2
         {
             p_cInspItem.Clear();
 
-            foreach(ParameterBase parameterBase in m_Recipe.ParameterItemList)
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+
+            foreach(ParameterBase parameterBase in recipe.ParameterItemList)
             {
                 InspectionItem item = new InspectionItem();
                 item.p_cInspROI = p_ROI_Viewer.p_cInspROI;
@@ -187,7 +187,8 @@ namespace Root_WIND2
                 paramList.Add(item.p_InspMethod);
             }
 
-            this.m_Recipe.ParameterItemList = paramList;
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            recipe.ParameterItemList = paramList;
         }
 
         public void Load()

@@ -143,7 +143,7 @@ namespace RootTools_Vision
 
         public int TransY
         {
-            get => this.transX;
+            get => this.transY;
         }
 
         public int OffsetX
@@ -300,6 +300,12 @@ namespace RootTools_Vision
         {
             this.offsetX = _offsetX;
             this.offsetY = _offsetY;
+        }
+
+        public void AddOffset(int _offsetX, int _offsetY)
+        {
+            this.offsetX += _offsetX;
+            this.offsetY += _offsetY;
         }
 
         public void SetTrans(int _transX, int _transY)
