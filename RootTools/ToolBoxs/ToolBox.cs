@@ -509,6 +509,22 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
         #endregion
+        #region ITool TK4S
+        ToolSet m_toolTK4S = null;
+        public string Get(ref TK4SGroup value, ModuleBase module, string id , IDialogService dialogService = null)
+        {
+            if (m_toolTK4S == null)
+                m_toolTK4S = InitToolSet("TK4S");
+            if (value == null)
+            {
+                value = new TK4SGroup(module.p_id + "." + id, module.m_log, dialogService);
+                m_toolTK4S.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            return "OK";
+        }
+        #endregion
+
 
         #region IToolSet
         public Dictionary<IToolSet, UserControl> m_aToolSet = new Dictionary<IToolSet, UserControl>();

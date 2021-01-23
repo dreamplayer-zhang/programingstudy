@@ -59,6 +59,7 @@ namespace Root_WIND2
         public WIND2_Recipe m_recipe;
         public EFEM_Process m_process;
         Vision m_vision;
+        WIND2 m_WIND2;
         public Vision p_Vision
         {
             get { return m_vision; }
@@ -132,6 +133,8 @@ namespace Root_WIND2
                 InitModule(m_vision);
                 iWTR.AddChild(m_vision);
             }
+            m_WIND2 = new WIND2("WIND2", m_engineer);
+            InitModule(m_WIND2);
 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
@@ -440,6 +443,7 @@ namespace Root_WIND2
                 }
             }
         }
+        
         #endregion
 
         void CheckLoad()
@@ -538,6 +542,8 @@ namespace Root_WIND2
                 p_moduleList.ThreadStop();
                 foreach (ModuleBase module in p_moduleList.m_aModule.Keys)
                     module.ThreadStop();
+                if (m_engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+                    m_vision.ThreadStop();
             }
         }
     }

@@ -381,7 +381,13 @@
     <Compile Include="Printer\SRP350_UI.xaml.cs">
       <DependentUpon>SRP350_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Comm\TK4SModuleUI.xaml.cs">
+      <DependentUpon>TK4SModuleUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
+    <Compile Include="Comm\TK4SGourpUI.xaml.cs">
+      <DependentUpon>TK4SGourpUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModelHelper\DrawData.cs" />
     <Compile Include="GAFs\ALID.cs" />
     <Compile Include="GAFs\ALIDList.cs" />
@@ -973,6 +979,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RADS\RADSControl_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\TK4SGourpUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\TK4SModuleUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

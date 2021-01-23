@@ -4,16 +4,46 @@ using System.IO.Ports;
 using System.Diagnostics;
 using EasyModbus;
 using System.Collections.Generic;
+using System.Windows.Controls;
+using System.Collections.ObjectModel;
 
 namespace RootTools
 {
-    class TK4SGroup
+    public class TK4SGroup : ObservableObject ,ITool
     {
+
+        #region ITool
+        public UserControl p_ui
+        {
+            get
+            {
+                TK4SGourpUI ui = new TK4SGourpUI();
+                ui.Init(this);
+                return ui;
+            }
+        }
+        public string p_id
+        {
+            get; set;
+        }
+        #endregion
+
         ModbusClient m_client = new ModbusClient();
         Thread m_threadCommunicate;
         bool m_bRunThread;
 
         string m_sSerialPort = "COM0";
+        public string p_sSerialPort
+        {
+            get
+            {
+                return m_sSerialPort;
+            }
+            set
+            {
+                SetProperty(ref m_sSerialPort, value);
+            }
+        }
         int m_nBaudrate = 9600;
         Parity m_eParity = Parity.None;
         StopBits m_eStopBit = StopBits.Two;
@@ -22,13 +52,49 @@ namespace RootTools
         int m_nInterval = 1000;
         int m_nCountModule = 1;
 
-        List<TK4S> m_aTK4S = new List<TK4S>(); 
+        ObservableCollection<TK4S> m_aTK4S = new ObservableCollection<TK4S>(); 
+        public ObservableCollection<TK4S> p_aTK4S
+        {
+            get
+            {
+                return m_aTK4S;
+            }
+            set
+            {
+                SetProperty(ref m_aTK4S, value);
+            }
+        }
+         TK4S m_SelectedTK4S = null;
+
+        public TK4S p_SelectedTK4S
+        {
+            get
+            {
+                return m_SelectedTK4S;
+            }
+            set
+            {
+                SetProperty(ref m_SelectedTK4S, value);
+            }
+        }
+
+
         bool m_bBusy = false;
         Stopwatch m_swWaitRecive = new Stopwatch();
         int m_nTimeout = 3000;
+        Log m_log;
+        private readonly IDialogService m_DialogService;
 
-        public bool Init()
+        public TK4SGroup(string id, Log log, IDialogService dialogService = null)
         {
+            p_id = id;
+            m_log = log;
+            m_DialogService = dialogService;
+        }
+        
+         
+        public bool Init()
+        {   
             m_client.SerialPort = m_sSerialPort;
             m_client.Baudrate = m_nBaudrate;
             m_client.Parity = m_eParity;
@@ -57,11 +123,7 @@ namespace RootTools
             {
                 Thread.Sleep(10);
                 if (!m_client.Connected)
-                {
-                    Thread.Sleep(3000);
-                    m_client.Connect();
-                    continue;
-                }
+                    return;
 
                 for (int n = 0; n < m_aTK4S.Count; n++)
                 {
@@ -69,7 +131,7 @@ namespace RootTools
                     try
                     {
                         m_bBusy = true;
-                        m_client.UnitIdentifier = (byte)m_aTK4S[n].m_nAddress;
+                        m_client.UnitIdentifier = (byte)m_aTK4S[n].p_nAddress;
                         m_client.ReadInputRegisters(1000, 2);
                         if (WaitReciveOK() == false)
                         {
@@ -117,7 +179,7 @@ namespace RootTools
                 Int16 nValue = (Int16)(m_client.receiveData[3] * 256 + m_client.receiveData[4]);
                 int nDecimal = (int)(m_client.receiveData[3] * 256 + m_client.receiveData[4]);
                 double dValue = nValue / ((nDecimal + 1) * 10);
-                m_aTK4S[nAddress].m_dValue = dValue;
+                m_aTK4S[nAddress].p_dValue = dValue;
             }
             catch (Exception)
             {
@@ -134,17 +196,76 @@ namespace RootTools
             }
         }
 
-        public class TK4S
+        public void ThreadStop()
         {
-            public int m_nAddress = 0;
-            public bool m_bAlarm = false;
-            public string m_sAlarmMessage = "";
-            public double m_dValue = 0.0;
-            
-            public TK4S(int nAddress)
+            m_bRunThread = false;
+            if(m_threadCommunicate != null)
+                m_threadCommunicate.Join();
+
+        }
+
+        public void AddModule()
+        {
+            p_aTK4S.Add(new TK4S(p_aTK4S.Count));
+        }
+
+        public void RemoveModule()
+        {
+            p_aTK4S.RemoveAt(p_aTK4S.Count-1);
+        }
+
+        public RelayCommand CommandAddModule
+        {
+            get
             {
-                m_nAddress = nAddress;
+                return new RelayCommand(AddModule);
+            }
+        }
+
+        public RelayCommand CommandRemoveModule
+        {
+            get
+            {
+                return new RelayCommand(RemoveModule);
             }
         }
     }
+    public class TK4S : ObservableObject, IDialogRequestClose
+    {
+        public string p_sID
+        {
+            get; set;
+        }
+        public int p_nAddress
+        {
+            get; set;
+        }
+        public int p_nDecimalPoint
+        {
+            get;set;
+        }
+
+        public double p_dValue
+        {
+            get; set;
+        }
+
+        public double p_dMaxValue
+        {
+            get;set;
+        }
+        public double p_dMinValue
+        {
+            get;set;
+        }
+
+        public TK4S(int nAddress)
+        {
+            p_nAddress = nAddress;
+            p_sID = nAddress.ToString();
+        }
+
+        public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
+    }
+
 }
