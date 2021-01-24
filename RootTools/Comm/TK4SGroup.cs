@@ -130,6 +130,7 @@ namespace RootTools
             {
                 p_aTK4S.Clear();
                 p_aTK4S = new ObservableCollection<TK4S>();
+                p_sSerialPort = GeneralFunction.ReadINIFile(sSectionFDC, sSectionPort,m_sFilePath);
 
                 int nCount = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionFDC, sSectionCount, m_sFilePath));
                 for (int i = 0; i < nCount; i++)
@@ -152,7 +153,15 @@ namespace RootTools
             m_client.StopBits = m_eStopBit;
             //for (int n = 0; n < m_nTryConnect; n++)
             //{
-            m_client.Connect();
+            try
+            {
+
+                m_client.Connect();
+            }
+            catch
+            {
+
+            }
             //    if (m_client.Connected)
             //    {
             //        break;
@@ -184,7 +193,7 @@ namespace RootTools
                     try
                     {
                         m_bBusy = true;
-                        //m_client.UnitIdentifier = (byte)m_aTK4S[n].p_nAddress;
+                        m_client.UnitIdentifier = (byte)m_aTK4S[n].p_nAddress;
                         m_client.ReadInputRegisters(1000, 2);
                         if (WaitReciveOK() == false)
                         {
