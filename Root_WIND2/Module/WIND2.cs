@@ -107,9 +107,9 @@ namespace Root_WIND2
             while (m_bThreadCheck)
             {
                 Thread.Sleep(1000);
-                DoorCheck();
-                FanCheck();
-                AlarmCheck();
+                //DoorCheck();
+                //FanCheck();
+                //AlarmCheck();
                 //if (_diEMS.p_bIn)
                 //{
                 //	this.p_eState = eState.Error;
