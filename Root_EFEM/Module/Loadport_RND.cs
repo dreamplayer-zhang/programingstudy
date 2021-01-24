@@ -353,7 +353,7 @@ namespace Root_EFEM.Module
                         break;
                 }
             }
-            p_infoCarrier.SetMapData(aSlot, sMap);
+            p_infoCarrier.SetMapData(aSlot);
             return bUndefined ? "Undifined MapData" : "OK";
         }
 
@@ -469,7 +469,8 @@ namespace Root_EFEM.Module
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }
-        public Loadport_RND(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
+        public IRFID m_rfid;
+        public Loadport_RND(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount, IRFID rfid = null)
         {
             p_bLock = false;
             InitCmd();
@@ -477,6 +478,7 @@ namespace Root_EFEM.Module
             p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
             if (id == "LoadportA") p_infoCarrier.p_sLocID = "LP1";
             else if (id == "LoadportB") p_infoCarrier.p_sLocID = "LP2";
+            m_rfid = rfid;
             m_aTool.Add(p_infoCarrier);
             InitBase(id, engineer);
             InitGAF();
@@ -515,34 +517,104 @@ namespace Root_EFEM.Module
         {
             Loadport_RND m_module;
             InfoCarrier m_infoCarrier;
+            //RFID_Brooks m_rfid;
             public Run_Docking(Loadport_RND module)
             {
                 m_module = module;
                 m_infoCarrier = module.p_infoCarrier;
+                //m_rfid = (RFID_Brooks)module.m_rfid;
                 InitModuleRun(module);
             }
 
+            string m_sSimulCarrierID = "CarrierID";
+            string m_sSimulSlotmap = "";
             bool m_bMapping = true;
+            bool m_bReadRFID = true;
             public override ModuleRunBase Clone()
             {
                 Run_Docking run = new Run_Docking(m_module);
+                run.m_sSimulCarrierID = m_sSimulCarrierID;
+                run.m_sSimulSlotmap = m_sSimulSlotmap;
                 run.m_bMapping = m_bMapping;
+                run.m_bReadRFID = m_bReadRFID;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation", bVisible && EQ.p_bSimulate);
+                m_sSimulSlotmap = tree.Set(m_sSimulSlotmap, m_sSimulSlotmap, "Simulation Slotmap", "Slotmap When p_bSimulation", bVisible && EQ.p_bSimulate);
                 m_bMapping = tree.Set(m_bMapping, m_bMapping, "Mapping", "Wafer Mapping When Loading", bVisible);
+                m_bReadRFID = tree.Set(m_bReadRFID, m_bReadRFID, "Read RFID", "Read RFID", bVisible);
             }
 
             public override string Run()
             {
-                if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                if (m_module.Run(m_module.CmdLoad(m_bMapping))) return p_sInfo;
-                if (m_module.Run(m_module.CmdGetMapData())) return p_sInfo;
-                m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
-                m_module.m_ceidDocking.Send();
+                string sResult = "OK";
+                if (EQ.p_bSimulate)
+                {
+                    //m_infoCarrier.p_bCarrierOn = true;
+                    m_infoCarrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                    m_infoCarrier.p_sCarrierID = m_sSimulCarrierID;
+                }
+                else
+                {
+                    if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                    if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+
+                    if (m_bReadRFID)
+                    {
+                        sResult = m_module.m_rfid.ReadRFID();
+                        m_infoCarrier.p_sCarrierID = (sResult == "OK") ? m_module.m_rfid.m_sReadID : "";
+                    }
+                    else m_infoCarrier.p_sCarrierID = m_sSimulCarrierID;
+                }
+                if (sResult == "OK") m_infoCarrier.SendCarrierID(m_infoCarrier.p_sCarrierID);
+                else return p_sInfo + " SendCarrierID : " + m_infoCarrier.p_sCarrierID;
+
+                while(m_infoCarrier.p_eStateCarrierID != GemCarrierBase.eGemState.VerificationOK)
+                {
+                    Thread.Sleep(10);
+                    if (m_infoCarrier.p_eStateCarrierID == GemCarrierBase.eGemState.VerificationFailed)
+                        return p_sInfo + " infoCarrier.p_eStateCarrierID = " + m_infoCarrier.p_eStateCarrierID.ToString();
+                }
+                if(m_infoCarrier.p_eTransfer != GemCarrierBase.eTransfer.TransferBlocked)
+                    return p_sInfo + " infoCarrier.p_eTransfer = " + m_infoCarrier.p_eTransfer.ToString();
+
+                if (EQ.p_bSimulate)
+                {
+                    InfoCarrier infoCarrier = m_infoCarrier;
+                    List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
+                    string sMap = m_sSimulSlotmap;
+                    foreach (char ch in sMap)
+                    {
+                        switch (ch)
+                        {
+                            case '0': aSlot.Add(GemSlotBase.eState.Empty); break;
+                            case '1': aSlot.Add(GemSlotBase.eState.Exist); break;
+                            case 'D': aSlot.Add(GemSlotBase.eState.Double); break;
+                            case 'C': aSlot.Add(GemSlotBase.eState.Cross); break;
+                            default:
+                                aSlot.Add(GemSlotBase.eState.Undefined);
+                                break;
+                        }
+                    }
+                    infoCarrier.SetMapData(aSlot);
+                }
+                else
+                {
+                    if (m_module.Run(m_module.CmdLoad(m_bMapping))) return p_sInfo;
+                    if (m_module.Run(m_module.CmdGetMapData())) return p_sInfo;
+                    m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+                }
+                m_infoCarrier.SendSlotMap();
+                while(m_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
+                {
+                    Thread.Sleep(10);
+                    if (m_infoCarrier.p_eStateSlotMap == GemCarrierBase.eGemState.VerificationFailed)
+                        return p_sInfo + " infoCarrier.p_eStateSlotMap = " + m_infoCarrier.p_eStateSlotMap.ToString();
+                }
+                //m_module.m_ceidDocking.Send();
                 return "OK";
             }
         }

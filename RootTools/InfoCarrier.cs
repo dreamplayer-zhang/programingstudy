@@ -67,18 +67,6 @@ namespace RootTools
             return "OK";
         }
 
-        string _sSlotmap = "";
-        public string p_sSlotmap
-        {
-            get { return _sSlotmap; }
-            set
-            {
-                if (_sSlotmap == value) return;
-                _sSlotmap = value;
-                OnPropertyChanged();
-            }
-        }
-
         void RunTreeProperty(Tree tree)
         {
             _eState = (eState)tree.Set(_eState, _eState, "State", "Carrier State");
@@ -281,12 +269,12 @@ namespace RootTools
         #endregion
 
         #region Mapping Function
-        public string SetMapData(List<GemSlotBase.eState> aSlotState, string sMap)
+        public string SetMapData(List<GemSlotBase.eState> aSlotState)
         {
-            p_sSlotmap = sMap;
             if (p_lWafer > aSlotState.Count) return "SetMapData Lendth Error";
             for (int n = 0; n < p_lWafer; n++)
             {
+                m_aGemSlot[n].p_eState = aSlotState[n];
                 if (aSlotState[n] == GemSlotBase.eState.Exist) SetInfoWafer(n);
                 else SetInfoWafer(n, null);
             }

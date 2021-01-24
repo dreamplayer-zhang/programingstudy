@@ -71,7 +71,7 @@ namespace RootTools.Gem
 
         #region Carrier
         bool _bCarrierOn = false; 
-        bool p_bCarrierOn
+        public bool p_bCarrierOn
         {
             get { return _bCarrierOn; }
             set
@@ -268,7 +268,12 @@ namespace RootTools.Gem
         #region CarrierID
         public void SendCarrierID(string sCarrierID)
         {
-            if (m_gem == null) return; //jws
+            if (m_gem == null)
+            {
+                p_eStateCarrierID = eGemState.VerificationOK;
+                p_eTransfer = eTransfer.TransferBlocked;
+                return; 
+            }
             m_gem.SendCarrierID(this, sCarrierID);
             p_sCarrierID = sCarrierID; 
             m_log.Info("Send CarrierID : " + sCarrierID);
@@ -292,13 +297,17 @@ namespace RootTools.Gem
         /// <summary> InfoWafer 와 비슷하지만 Wafer를 빼가도 null로 바꾸지 않는다. </summary>
         public List<GemSlotBase> m_aGemSlot = new List<GemSlotBase>();
 
-        public void SendSlotMap(string sMap)
+        public void SendSlotMap()
         {
-            if (m_gem == null) return;
-            //List<GemSlotBase.eState> aMap = new List<GemSlotBase.eState>();
-            //foreach (GemSlotBase slot in m_aGemSlot) aMap.Add(slot.p_eState);
-            m_gem.SendSlotMap(this, sMap);
-            m_log.Info("Send Carrier Slotmap : " + sMap);
+            if (m_gem == null)
+            {
+                p_eStateSlotMap = eGemState.VerificationOK;
+                return;
+            }
+            List<GemSlotBase.eState> aMap = new List<GemSlotBase.eState>();
+            foreach (GemSlotBase slot in m_aGemSlot) aMap.Add(slot.p_eState);
+            m_gem.SendSlotMap(this, aMap);
+            m_log.Info("Send Carrier Slotmap : " + aMap);
         }
 
         public string SetSlotInfo(int nIndex, GemSlotBase.eState state, string sLotID, string sSlotID) 

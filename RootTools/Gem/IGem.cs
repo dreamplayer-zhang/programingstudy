@@ -31,8 +31,7 @@ namespace RootTools.Gem
 
         void SendCarrierID(GemCarrierBase carrier, string sCarrierID);
 
-        //void SendSlotMap(GemCarrierBase carrier, List<GemSlotBase.eState> aMap);
-        void SendSlotMap(GemCarrierBase carrier, string sMap);
+        void SendSlotMap(GemCarrierBase carrier, List<GemSlotBase.eState> aMap);
 
         string CMSSetReadyToLoad(GemCarrierBase carrier); 
 
@@ -55,5 +54,7 @@ namespace RootTools.Gem
         void STSSetTransport(string sLocID, GemSlotBase gemSlot, GemSlotBase.eSTS state);
 
         void STSSetProcessing(GemSlotBase gemSlot, GemSlotBase.eSTSProcess process);
+
+        void DeleteAllJobInfo();
     }
 }

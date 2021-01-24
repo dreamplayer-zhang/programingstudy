@@ -70,10 +70,6 @@ namespace Root_CAMELLIA.UI_UserControl
 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            //ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
-            //m_rfid.StartRun(moduleRun);
-            //while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
-            //while ((EQ.IsStop() != true) && m_rfid.m_bReadID != true) Thread.Sleep(10);
             m_loadport.StartRun(m_loadport.GetModuleRunDocking().Clone());
 
             if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;
