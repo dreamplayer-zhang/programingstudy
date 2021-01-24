@@ -93,7 +93,7 @@
                                             FontWeight="Bold" Foreground="White"
                                             TextAlignment="Center">
                                     </TextBlock>
-                                    <lvc:Gauge Grid.Row="1" Margin="0" From="0" To="100"
+                                    <lvc:Gauge Grid.Row="1" Margin="0" From="{Binding p_dMinValue}" To="{Binding p_dMaxValue}"
                                             InnerRadius="30" LabelsVisibility="Hidden"
                                                 Background="White"
                                             Foreground="Black"

@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 using RootTools;
 
 namespace Root_WIND2
@@ -31,9 +33,13 @@ namespace Root_WIND2
 
         public void AddWarning(string str)
         {
-            if (p_WarnList.Count > 10)
-                p_WarnList.RemoveAt(0);
-            p_WarnList.Add(str);
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            {
+                if (p_WarnList.Count > 10)
+                    p_WarnList.RemoveAt(0);
+                p_WarnList.Add( DateTime.Now.ToString() + " : " + str);
+            }));
+
         }
 
 

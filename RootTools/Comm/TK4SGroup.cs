@@ -10,6 +10,9 @@ using System.IO;
 
 namespace RootTools
 {
+
+    public delegate void delegateString(string str);
+
     public class TK4SGroup : ObservableObject, ITool
     {
 
@@ -32,6 +35,8 @@ namespace RootTools
         ModbusClient m_client = new ModbusClient();
         Thread m_threadCommunicate;
         bool m_bRunThread;
+
+        public event delegateString OnDetectLimit;
 
         string m_sSerialPort = "COM0";
         public string p_sSerialPort
@@ -133,14 +138,17 @@ namespace RootTools
                 p_sSerialPort = GeneralFunction.ReadINIFile(sSectionFDC, sSectionPort,m_sFilePath);
 
                 int nCount = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionFDC, sSectionCount, m_sFilePath));
+               
                 for (int i = 0; i < nCount; i++)
                 {
-                    p_aTK4S.Add(new TK4S());
-                    p_aTK4S[i].p_sID = GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleName, m_sFilePath);
-                    p_aTK4S[i].p_nAddress = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleAddress, m_sFilePath));
-                    p_aTK4S[i].p_nDecimalPoint = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleDP, m_sFilePath));
-                    p_aTK4S[i].p_dMaxValue = Convert.ToDouble(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMax, m_sFilePath));
-                    p_aTK4S[i].p_dMinValue = Convert.ToDouble(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMin, m_sFilePath));
+                    TK4S temp = new TK4S();
+                    temp.p_sID = GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleName, m_sFilePath);
+                    temp.p_nAddress = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleAddress, m_sFilePath));
+                    temp.p_nDecimalPoint = Convert.ToDouble(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleDP, m_sFilePath));
+                    temp.p_dMaxValue = Convert.ToDouble(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMax, m_sFilePath));
+                    temp.p_dMinValue = Convert.ToDouble(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMin, m_sFilePath));
+                    p_aTK4S.Add(temp);
+                    p_aTK4S[p_aTK4S.Count-1].OnDetectLimit += TK4SGroup_OnDetectLimit;
                 }
             }
         }
@@ -241,10 +249,14 @@ namespace RootTools
                 int nLength = (int)m_client.receiveData[2];
                 Int16 nValue = (Int16)(m_client.receiveData[3] * 256 + m_client.receiveData[4]);
                 int nDecimal = (int)(m_client.receiveData[3] * 256 + m_client.receiveData[4]);
-                double dValue = nValue / ((nDecimal + 1) * 10);
-                //m_aTK4S[nAddress].p_dValue = dValue;
+                double dValue = 0.0;
+                if (m_aTK4S[nAddress - 1].p_nDecimalPoint == 0)
+                    dValue = nValue;
+                else
+                    dValue = nValue * ((m_aTK4S[nAddress - 1]. p_nDecimalPoint));
+                m_aTK4S[nAddress-1].p_dValue = dValue;
             }
-            catch (Exception)
+            catch (Exception e)
             {
 
             }
@@ -259,9 +271,15 @@ namespace RootTools
         }
 
         public void AddModule()
-        {
-            p_aTK4S.Add(new TK4S(p_aTK4S.Count));
+        {   
+            p_aTK4S.Add(new TK4S(p_aTK4S.Count+1));
+            p_aTK4S[p_aTK4S.Count - 1].OnDetectLimit += TK4SGroup_OnDetectLimit;
             SaveModule();
+        }
+
+        private void TK4SGroup_OnDetectLimit(string str)
+        {
+            OnDetectLimit(str);
         }
 
         public void RemoveModule()
@@ -315,10 +333,11 @@ namespace RootTools
     {
         string m_sID = "";
         int m_nAddress = 0;
-        int m_nDecimalPoint = 0;
+        double m_nDecimalPoint = 0;
         double m_dValue = 0;
         double m_dMaxValue = 0;
         double m_dMinValue = 0;
+        public event delegateString OnDetectLimit;
 
         public string p_sID
         {
@@ -344,7 +363,7 @@ namespace RootTools
             }
         }
 
-        public int p_nDecimalPoint
+        public double p_nDecimalPoint
         {
             get
             {
@@ -364,6 +383,10 @@ namespace RootTools
             }
             set
             {
+                if (m_dMaxValue < value || m_dMinValue > value)
+                {
+                    OnDetectLimit("FDC : " + m_sID + " Value : " + m_dValue + " Limit ( " +m_dMinValue + ", " +m_dMaxValue + " )" );
+                }
                 SetProperty(ref m_dValue, value);
             }
         }
@@ -382,7 +405,7 @@ namespace RootTools
         {
             get
             {
-                return m_dMaxValue;
+                return m_dMinValue;
             }
             set
             {
@@ -396,7 +419,7 @@ namespace RootTools
 
         public TK4S(int nAddress)
         {
-            //p_nAddress = nAddress;
+            p_nAddress = nAddress;
             //p_sID = nAddress.ToString();
         }
 

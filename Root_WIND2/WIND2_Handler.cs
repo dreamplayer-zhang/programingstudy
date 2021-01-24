@@ -61,6 +61,17 @@ namespace Root_WIND2
         public EFEM_Process m_process;
         Vision m_vision;
         WIND2 m_WIND2;
+        public WIND2 p_WIND2
+        {
+            get
+            {
+                return m_WIND2;
+            }
+            set
+            {
+                SetProperty(ref m_WIND2, value);
+            }
+        }
         public Vision p_Vision
         {
             get { return m_vision; }
