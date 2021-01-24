@@ -81,6 +81,12 @@
     <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
     </Reference>
+    <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.Wpf.0.9.7\lib\net45\LiveCharts.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
     </Reference>
@@ -313,6 +319,7 @@
     <Compile Include="Control\Ajin\AjinLib\AXL.cs" />
     <Compile Include="Control\Ajin\AjinLib\AXM.cs" />
     <Compile Include="Control\DIO_I2O.cs" />
+    <Compile Include="GeneralFunction.cs" />
     <Compile Include="ImageProcess\AutoFocus.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler_Classes.cs" />

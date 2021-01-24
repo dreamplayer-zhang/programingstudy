@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RootTools;
 using RootTools.Module;
+using RootTools_Vision;
 
 namespace Root_WIND2
 {
@@ -14,7 +15,7 @@ namespace Root_WIND2
 
 		public override void GetTools(bool bInit)
 		{
-			m_toolBox.Get(ref m_tk4s, this, "FDC", ProgramManager.Instance.DialogService);
+			m_toolBox.Get(ref m_tk4s, this, "FDC", GlobalObjects.Instance.Get<DialogService>());
 		}
 
 		public WIND2(string id, IEngineer engineer)
