@@ -1,6 +1,4 @@
-﻿using RootTools.Trees;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System.Collections.Generic;
 
 namespace RootTools.Control.Xenax
 {
@@ -44,52 +42,16 @@ namespace RootTools.Control.Xenax
                 m_log.Error("p_sInfo = " + value);
             }
         }
-
-        StopWatch m_swAXM = new StopWatch();
-        uint AXM(string sFunc, uint uResult)
-        {
-            if (uResult == 0) return uResult;
-            if (m_log == null) return uResult;
-            if (m_swAXM.ElapsedMilliseconds < 1000) return uResult;
-            p_sInfo = sFunc + " Xenax Error = " + uResult.ToString();
-            m_log.Error(m_id + "." + p_sInfo);
-            m_swAXM.Start();
-            return uResult;
-        }
-
-        string AXM(string sFunc, string sError)
-        {
-            if (sError == "OK") return sError;
-            if (m_log == null) return sError;
-            if (m_swAXM.ElapsedMilliseconds < 1000) return sError;
-            p_sInfo = sFunc + " Xenax Error = " + sError;
-            m_log.Error(m_id + "." + p_sInfo);
-            m_swAXM.Start();
-            return sError;
-        }
-        #endregion
-
-        #region Thread InitAxis
-        int m_lAxisXenax = 0;
-        string InitAxis()
-        {
-            AXM("AxmInfoGetAxisCount", CAXM.AxmInfoGetAxisCount(ref m_lAxisXenax));
-            return "OK";
-        }
-
         #endregion
 
         string m_id;
         Log m_log;
         IEngineer m_engineer;
-        bool m_bAXL = false;
-        public void Init(string id, IEngineer engineer, bool bAXL)
+        public void Init(string id, IEngineer engineer)
         {
             m_id = id;
             m_engineer = engineer;
-            m_bAXL = bAXL;
             m_log = LogView.GetLog(id);
-            AXM("Init Axis Error (ReStart SW) : ", InitAxis());
         }
 
         public void ThreadStop()
@@ -97,11 +59,6 @@ namespace RootTools.Control.Xenax
             m_log.Info("ThreadStop Start");
             foreach (XenaxAxis axis in m_aAxis) axis.ThreadStop();
             m_log.Info("ThreadStop Done");
-        }
-
-        public void RunTree(Tree tree)
-        {
-            tree.Set(m_lAxisXenax, m_lAxisXenax, "Detect", "Detected Axis Count", true, true);
         }
 
         public void RunEmergency()
