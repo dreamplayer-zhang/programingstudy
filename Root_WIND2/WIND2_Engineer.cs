@@ -125,6 +125,8 @@ namespace Root_WIND2
         bool m_bUseXGem = true;
         XGem m_xGem = null;
         XGem_UI m_xGemUI = new XGem_UI();
+        WIND2_Warning m_Warn = new WIND2_Warning();
+
         void InitXGem()
         {
             if (m_bUseXGem == false) return;

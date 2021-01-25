@@ -37,7 +37,6 @@ namespace Root_WIND2
 		}
 
 		#region [Overrides]
-
 		protected override void Initialize()
 		{
 			CreateWorkManager(WORK_TYPE.INSPECTION, 5);

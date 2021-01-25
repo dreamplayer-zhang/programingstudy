@@ -15,5 +15,6 @@ namespace RootTools
         string m_sReadID { get; set; }
         bool m_bReadID { get; set; }
         ModuleRunBase m_runReadID { get; set; }
+
     }
 }

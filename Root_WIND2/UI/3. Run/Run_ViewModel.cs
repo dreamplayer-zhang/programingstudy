@@ -7,6 +7,7 @@ using RootTools.OHTNew;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -113,6 +114,19 @@ namespace Root_WIND2
         RootViewer_ViewModel m_Viewer = new RootViewer_ViewModel();
         MemoryTool m_ToolMemory;
         ImageData m_imagedata;
+        ObservableCollection<TK4S> m_aTK4S = new ObservableCollection<TK4S>();
+        public ObservableCollection<TK4S> p_aTK4S
+        {
+            get
+            {
+                return m_aTK4S;
+            }
+            set
+            {
+                SetProperty(ref m_aTK4S, value);
+            }
+        }
+
 
         public RootViewer_ViewModel p_Viewer
         {
@@ -154,6 +168,7 @@ namespace Root_WIND2
                 p_Viewer.SetImageData(m_imagedata);
 
                 p_ModuleList = engineer.ClassModuleList();
+                p_aTK4S = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_tk4s.p_aTK4S;
             }
         }
 

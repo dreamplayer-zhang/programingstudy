@@ -62,6 +62,24 @@ namespace RootTools_Vision
         }
 
 
+        /// <summary>
+        /// 맵 Index를 사용하여 Workplace를 가져온다
+        /// </summary>
+        /// <param name="mapX"></param>
+        /// <param name="mapY"></param>
+        /// <returns></returns>
+        public Workplace GetWorkplace(int mapX, int mapY)
+        {
+            foreach(Workplace wp in this)
+            {
+                if(wp.MapIndexX == mapX && wp.MapIndexY == mapY)
+                {
+                    return wp;
+                }
+            }
+            return null;
+        }
+
         // 다른 쓰레드를 사용하는 WorkManager에서 동시에 접근할 수 있지만
         // WorkManager는 순차적인 상태를 체크하므로 Lock이 필요없음
         public Workplace GetWorkplaceRemained(WORK_TYPE preWorkType)

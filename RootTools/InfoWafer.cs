@@ -219,8 +219,10 @@ namespace RootTools
             m_moduleRunList.Clear();
             foreach (GemPJ pj in m_aPJ)
             {
+                m_sManualRecipe = pj.m_sRecipeID;
                 p_sRecipe = pj.m_sRecipeID;
-                m_moduleRunList.OpenJob(pj.m_sRecipeID, false);
+                //m_moduleRunList.OpenJob(pj.m_sRecipeID, false);
+                m_moduleRunList.OpenJob(pj.m_sRecipeID, true);
             }
             m_qProcess.Clear();
         }

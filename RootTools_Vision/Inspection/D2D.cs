@@ -40,6 +40,8 @@ namespace RootTools_Vision
 
         protected override bool Preparation()
         {
+            if (this.currentWorkplace == null) return false;
+
             if(this.parameterD2D == null || this.recipeD2D == null)
             {
                 this.parameterD2D = (D2DParameter)this.parameter;

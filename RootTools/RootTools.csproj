@@ -82,6 +82,12 @@
     <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
     </Reference>
+    <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.Wpf.0.9.7\lib\net45\LiveCharts.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
     </Reference>
@@ -245,6 +251,18 @@
       <DependentUpon>Modbus_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Comm\RS232byte.cs" />
+    <Compile Include="Control\Xenax\Xenax.cs" />
+    <Compile Include="Control\Xenax\XenaxAxis.cs" />
+    <Compile Include="Control\Xenax\XenaxAxis_UI.xaml.cs">
+      <DependentUpon>XenaxAxis_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Xenax\XenaxListAxis.cs" />
+    <Compile Include="Control\Xenax\XenaxListAxis_UI.xaml.cs">
+      <DependentUpon>XenaxListAxis_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Xenax\Xenax_UI.xaml.cs">
+      <DependentUpon>Xenax_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Database\Database_DataView.xaml.cs">
       <DependentUpon>Database_DataView.xaml</DependentUpon>
     </Compile>
@@ -302,6 +320,7 @@
     <Compile Include="Control\Ajin\AjinLib\AXL.cs" />
     <Compile Include="Control\Ajin\AjinLib\AXM.cs" />
     <Compile Include="Control\DIO_I2O.cs" />
+    <Compile Include="GeneralFunction.cs" />
     <Compile Include="ImageProcess\AutoFocus.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler_Classes.cs" />
@@ -382,7 +401,14 @@
     <Compile Include="Printer\SRP350_UI.xaml.cs">
       <DependentUpon>SRP350_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Comm\TK4SModuleUI.xaml.cs">
+      <DependentUpon>TK4SModuleUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
+    <Compile Include="Viewer\Root_Viewer.cs" />
+    <Compile Include="Comm\TK4SGourpUI.xaml.cs">
+      <DependentUpon>TK4SGourpUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModelHelper\DrawData.cs" />
     <Compile Include="GAFs\ALID.cs" />
     <Compile Include="GAFs\ALIDList.cs" />
@@ -797,6 +823,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\Xenax\XenaxAxis_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Xenax\XenaxListAxis_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Xenax\Xenax_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Database\Database_DataView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -974,6 +1012,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RADS\RADSControl_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\TK4SGourpUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\TK4SModuleUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
