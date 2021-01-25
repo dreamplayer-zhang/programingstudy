@@ -30,6 +30,7 @@ namespace Root_Rinse_Loader
             engineerUI.Init(m_engineer);
             mainUI.Init(m_engineer);
             m_handler = (RinseL_Handler)m_engineer.ClassHandler();
+            Init(); 
         }
 
         void Init()
