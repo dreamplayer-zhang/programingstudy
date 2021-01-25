@@ -37,10 +37,12 @@ namespace Root_WIND2
 
             MasterDieX = recipe.WaferMap.MasterDieX;
             MasterDieY = recipe.WaferMap.MasterDieY;
-            mapControl_VM.ChangeMasterImage(recipe.WaferMap.MasterDieX, masterDieY);
+            mapControl_VM.ChangeMasterDie(recipe.WaferMap.MasterDieX, masterDieY);
         }
         public void SetPage()
         {
+            MapControl_VM.SetMap();
+
             DrawMapData();
             SetMapData();
         }
@@ -87,7 +89,8 @@ namespace Root_WIND2
         {
             get
             {
-                mapControl_VM.ChangeMasterImage(masterDieX, GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieY);                
+                // 이거 수정해야함....ㅁ;ㅣㄴ아ㅓㄻ;ㅣ나얼;미ㅏㅓ
+                //mapControl_VM.ChangeMasterDie(masterDieX, GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieY);                
                 return masterDieX;
             }
             set
@@ -108,7 +111,7 @@ namespace Root_WIND2
         {
             get
             {                
-                mapControl_VM.ChangeMasterImage(GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieX, masterDieY);
+                //mapControl_VM.ChangeMasterDie(GlobalObjects.Instance.Get<RecipeFront>().WaferMap.MasterDieX, masterDieY);
                 return masterDieY;
             }
             set
@@ -228,14 +231,12 @@ namespace Root_WIND2
         {
             TRect BOX = e as TRect;
             int byteCnt = p_OriginBoxTool_VM.p_ImageData.p_nByte;
-
-            ImageData BoxImageData = new ImageData(BOX.MemoryRect.Width, BOX.MemoryRect.Height, byteCnt);
+            long stride = p_OriginBoxTool_VM.p_ImageData.p_Stride;
+            CRect boxImageRect = new CRect(BOX.MemoryRect.Left, BOX.MemoryRect.Top, BOX.MemoryRect.Right+1, BOX.MemoryRect.Bottom+1);
+            ImageData BoxImageData = new ImageData(boxImageRect.Width, boxImageRect.Height, byteCnt);
 
             BoxImageData.m_eMode = ImageData.eMode.ImageBuffer;
-            BoxImageData.SetData(p_OriginBoxTool_VM.p_ImageData
-                , new CRect(BOX.MemoryRect.Left, BOX.MemoryRect.Top, BOX.MemoryRect.Right, BOX.MemoryRect.Bottom)
-                , (int)p_OriginBoxTool_VM.p_ImageData.p_Stride, byteCnt);
-
+            BoxImageData.SetData(p_OriginBoxTool_VM.p_ImageData, boxImageRect, (int)stride, byteCnt);
             p_OriginTool_VM.Offset = new CPoint(BOX.MemoryRect.Left, BOX.MemoryRect.Top);
             p_OriginTool_VM.p_ImageData = BoxImageData;
             p_OriginTool_VM.SetRoiRect();
@@ -246,7 +247,7 @@ namespace Root_WIND2
             TRect InspAreaBuf = e as TRect;
             p_OriginBoxTool_VM.AddInspArea(InspAreaBuf);
 
-            CRect rect = new CRect(InspAreaBuf.MemoryRect.Left, InspAreaBuf.MemoryRect.Top, InspAreaBuf.MemoryRect.Right, InspAreaBuf.MemoryRect.Bottom);
+            CRect rect = new CRect(InspAreaBuf.MemoryRect.Left, InspAreaBuf.MemoryRect.Top, InspAreaBuf.MemoryRect.Right+1, InspAreaBuf.MemoryRect.Bottom+1);
             OriginImageData = new ImageData(rect.Width, rect.Height, p_OriginBoxTool_VM.p_ImageData.p_nByte);
             OriginImageData.m_eMode = ImageData.eMode.ImageBuffer;
             //OriginImageData.SetData(p_OriginBoxTool_VM.p_ImageData.GetPtr(), InspAreaBuf.MemoryRect, (int)p_OriginBoxTool_VM.p_ImageData.p_Stride, p_OriginBoxTool_VM.p_ImageData.p_nByte);

@@ -336,9 +336,10 @@ namespace Root_WIND2
             get
             {
                 return new RelayCommand(() =>
-                {
-                    SetPage(Origin);
+                { 
                     p_Origin_VM.SetPage();
+                    SetPage(Origin);
+                    
                 });
             }
         }

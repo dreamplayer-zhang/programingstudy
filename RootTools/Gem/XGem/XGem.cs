@@ -420,6 +420,15 @@ namespace RootTools.Gem.XGem
             return nError; 
         }
 
+        public long SetCEID(long nCEID)
+        {
+            if (p_bEnable == false) return -1;
+            long nError = p_bEnable ? m_xGem.GEMSetEvent(nCEID) : 0;
+            LogSend(nError, "GEMSetEvent", nCEID);
+            p_sInfo = "SetCEID " + nCEID;
+            return nError;
+        }
+
         long[] m_svID = new long[1];
         string[] m_svValue = new string[1];
         public long SetSV(SVID sv, dynamic value)
@@ -557,6 +566,16 @@ namespace RootTools.Gem.XGem
             return null;
         }
 
+        string GetGemLocID(string sCarrierID)
+        {
+            foreach (GemCarrierBase carrier in m_aCarrier)
+            {
+                if (carrier.p_sCarrierID == sCarrierID) return carrier.p_sLocID;
+            }
+            p_sLastError = "Can't Find Carrier : " + sCarrierID;
+            return null;
+        }
+
         public void SendLPInfo(GemCarrierBase carrier)
         {
             long nError = m_xGem.CMSSetLPInfo(carrier.p_sLocID, (long)carrier.p_eReqTransfer, (long)carrier.p_eReqAccessLP, 0, 0, carrier.p_sCarrierID);
@@ -580,8 +599,9 @@ namespace RootTools.Gem.XGem
             LogRcv("OnCMSCarrierIDStatusChanged", sLocID, nState, sCarrierID);
             GemCarrierBase carrier = GetGemCarrier(sLocID);
             if (carrier == null) return;
-            p_sInfo = "eGemState : " + carrier.p_eGemState.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString(); 
-            carrier.p_eGemState = (GemCarrierBase.eGemState)nState;
+            //p_sInfo = "eGemState : " + carrier.p_eGemState.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString(); 
+            p_sInfo = "eStateCarrierID : " + carrier.p_eStateCarrierID.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString();
+            carrier.p_eStateCarrierID = (GemCarrierBase.eGemState)nState;
             p_sInfo = "sCarrierID : " + carrier.p_sCarrierID + " -> " + sCarrierID; 
             carrier.p_sCarrierID = sCarrierID;
         }
@@ -591,8 +611,9 @@ namespace RootTools.Gem.XGem
             LogRcv("OnCMSSlotMapStatusChanged", sLocID, nState, sCarrierID);
             GemCarrierBase carrier = GetGemCarrier(sLocID);
             if (carrier == null) return;
-            p_sInfo = "eSlotMapState : " + carrier.p_eSlotMapState.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString(); 
-            carrier.p_eSlotMapState = (GemCarrierBase.eGemState)nState;
+            //p_sInfo = "eSlotMapState : " + carrier.p_eSlotMapState.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString(); 
+            p_sInfo = "eStateSlotMap : " + carrier.p_eStateSlotMap.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString();
+            carrier.p_eStateSlotMap = (GemCarrierBase.eGemState)nState;
             p_sInfo = "sCarrierID : " + carrier.p_sCarrierID + " -> " + sCarrierID;
             carrier.p_sCarrierID = sCarrierID;
         }
@@ -609,7 +630,7 @@ namespace RootTools.Gem.XGem
             foreach (GemSlotBase.eState state in aMap)
             {
                 char cSlot = (char)state;
-                cSlot += '0'; 
+                cSlot += '0';
                 sMap += cSlot;
             }
             long nError = m_xGem.CMSSetSlotMap(carrier.p_sLocID, sMap, carrier.p_sCarrierID, 0);
@@ -791,12 +812,13 @@ namespace RootTools.Gem.XGem
                 {
                     aErrorCode.Add((long)GemPJ.eError.Invalid_AttibuteValue);
                     p_sLastError = "RecipeID not Found : " + psRcpID[n]; 
-                    asErrorMsg.Add(p_sLastError); 
+                    asErrorMsg.Add(p_sLastError);
                 }
                 for (int i = 0; i < pnMtrlCount[n]; i++, iMtrl++)
                 {
                     LogRcv("OnPJReqVerify", nMsgID, n, psPJobID[n], psMtrlID[iMtrl], psSlotInfo[iMtrl]);
-                    GemCarrierBase carrier = GetGemCarrier(psMtrlID[iMtrl]); 
+                    //GemCarrierBase carrier = GetGemCarrier(psMtrlID[iMtrl]); 
+                    GemCarrierBase carrier = GetGemCarrier(GetGemLocID(psMtrlID[iMtrl]));
                     if (carrier == null)
                     {
                         aErrorCode.Add((long)GemPJ.eError.Invalid_AttibuteValue);
@@ -834,7 +856,7 @@ namespace RootTools.Gem.XGem
             m_aPJ.Add(pj);
             for (int n = 0; n < nMtrlCount; n++)
             {
-                GemCarrierBase carrier = GetGemCarrier(psMtrlID[n]);
+                GemCarrierBase carrier = GetGemCarrier(GetGemLocID(psMtrlID[n]));
                 if (carrier != null)
                 {
                     for (int i = 0; i < psSlotInfo[n].Length; i++)
@@ -966,11 +988,11 @@ namespace RootTools.Gem.XGem
 
         void CJDeleted(string sCJobID)
         {
-            if (p_cjRun.m_sCJobID == sCJobID)
+            if (p_cjRun != null && p_cjRun.m_sCJobID == sCJobID)
             {
-                m_aCJFinish.Add(p_cjRun); 
+                m_aCJFinish.Add(p_cjRun);
                 p_cjRun = null;
-                return; 
+                return;
             }
             GemCJ[] aCJ = m_qCJ.ToArray();
             m_qCJ.Clear(); 
@@ -1122,16 +1144,22 @@ namespace RootTools.Gem.XGem
         }
 
         bool m_bStart = false; 
-        string m_sPathConfig = "C:\\ATI\\GEM300.cfg";
+        string m_sPathConfig = "C:\\Init\\GEM300.cfg";
         void XGemConfigFile()
         {
             try
             {
                 long nError = m_xGem.Initialize(m_sPathConfig);
                 LogSend(nError, "Initialize", m_sPathConfig);
-                if (nError == 0) m_bStart = true; 
+                if (nError == 0) m_bStart = true;
             }
             catch { p_sInfo = "Initialize File Open Error : " + m_sPathConfig; }
+        }
+
+        public void DeleteAllJobInfo()
+        {
+            m_xGem.PJDelAllJobInfo();
+            m_xGem.CJDelAllJobInfo();
         }
 
         void XGemStart()
@@ -1204,7 +1232,8 @@ namespace RootTools.Gem.XGem
                         step = eThreadStep.Processing;
                         break;
                     case eThreadStep.Processing:
-                        if (p_cjRun == null) step = eThreadStep.Complete;
+                        if (p_cjRun == null) 
+                            step = eThreadStep.Complete;
                         break;
                     case eThreadStep.Complete:
                         GemCJ cj = m_aCJFinish[m_aCJFinish.Count - 1]; 
@@ -1215,6 +1244,7 @@ namespace RootTools.Gem.XGem
                                 carrier.p_eReqAccess = GemCarrierBase.eAccess.CarrierCompleted;
                             }
                         }
+                        step = eThreadStep.Ready;
                         break; 
                 }
             }

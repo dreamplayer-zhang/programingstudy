@@ -71,6 +71,7 @@ namespace Root_CAMELLIA
             InitAligner();
             m_camellia = new Module_Camellia("Camellia", m_engineer);
             InitModule(m_camellia);
+            //InitXGem();
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_camellia);
             m_wtr.RunTree(Tree.eMode.RegRead);
@@ -184,6 +185,15 @@ namespace Root_CAMELLIA
         }
         #endregion
 
+        #region Module Gem
+        public ModuleBase m_XGem = null;
+        void InitXGem()
+        {
+            m_XGem = new Gem_XGem300Pro("Gem300", m_engineer, m_gem, m_aLoadport);
+            InitModule(m_XGem);
+        }
+        #endregion
+
         #region Module Aligner
         enum eAligner
         {
@@ -239,6 +249,11 @@ namespace Root_CAMELLIA
             }
             sInfo = StateHome((Loadport_RND)m_aLoadport[0], (Loadport_RND)m_aLoadport[1], m_Aligner, m_camellia, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1]);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
+
+            if (m_gem != null)
+            {
+                m_gem.DeleteAllJobInfo();
+            }
             return sInfo;
         }
 

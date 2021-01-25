@@ -198,7 +198,7 @@ namespace RootTools
             }
         }
 
-        int _nRunLP = -1;
+        int _nRunLP = 0;
         public int p_nRunLP
         {
             get { return _nRunLP; }

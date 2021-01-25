@@ -4,28 +4,154 @@ using System.IO.Ports;
 using System.Diagnostics;
 using EasyModbus;
 using System.Collections.Generic;
+using System.Windows.Controls;
+using System.Collections.ObjectModel;
+using System.IO;
 
 namespace RootTools
 {
-    class TK4SGroup
+
+    public delegate void delegateString(string str);
+
+    public class TK4SGroup : ObservableObject, ITool
     {
+
+        #region ITool
+        public UserControl p_ui
+        {
+            get
+            {
+                TK4SGourpUI ui = new TK4SGourpUI();
+                ui.Init(this);
+                return ui;
+            }
+        }
+        public string p_id
+        {
+            get; set;
+        }
+        #endregion
+
         ModbusClient m_client = new ModbusClient();
         Thread m_threadCommunicate;
         bool m_bRunThread;
 
+        public event delegateString OnDetectLimit;
+
         string m_sSerialPort = "COM0";
+        public string p_sSerialPort
+        {
+            get
+            {
+                return m_sSerialPort;
+            }
+            set
+            {
+                SetProperty(ref m_sSerialPort, value);
+            }
+        }
         int m_nBaudrate = 9600;
         Parity m_eParity = Parity.None;
         StopBits m_eStopBit = StopBits.Two;
-
         int m_nTryConnect = 3;
         int m_nInterval = 1000;
-        int m_nCountModule = 1;
 
-        List<TK4S> m_aTK4S = new List<TK4S>(); 
+        ObservableCollection<TK4S> m_aTK4S = new ObservableCollection<TK4S>();
+        public ObservableCollection<TK4S> p_aTK4S
+        {
+            get
+            {
+                return m_aTK4S;
+            }
+            set
+            {
+                SetProperty(ref m_aTK4S, value);
+            }
+        }
+        TK4S m_SelectedTK4S = null;
+
+        public TK4S p_SelectedTK4S
+        {
+            get
+            {
+                return m_SelectedTK4S;
+            }
+            set
+            {
+                SetProperty(ref m_SelectedTK4S, value);
+            }
+        }
+
+
         bool m_bBusy = false;
         Stopwatch m_swWaitRecive = new Stopwatch();
         int m_nTimeout = 3000;
+        Log m_log;
+        string m_sFilePath = @"C:\WIND2\Init\FDCSetting.ini";
+        int nCount;
+
+        private readonly IDialogService m_DialogService;
+
+        public TK4SGroup(string id, Log log, IDialogService dialogService = null)
+        {
+            p_id = id;
+            m_log = log;
+            m_DialogService = dialogService;
+            LoadModule();
+            Init();
+        }
+
+        string sSectionFDC = "FDC";
+        string sSectionPort = "COMPort";
+        string sSectionCount = "Count";
+        string sSectionModule = "TK4S ";
+        string sSectionModuleName = "Name";
+        string sSectionModuleAddress = "Address";
+        string sSectionModuleDP = "Point";
+        string sSectionModuleMax = "Max";
+        string sSectionModuleMin = "Min";
+
+        public void SaveModule()
+        {
+            FileInfo file = new FileInfo(m_sFilePath);
+            DirectoryInfo dir = file.Directory;
+            if (!dir.Exists)
+                dir.Create();
+            GeneralFunction.WriteINIFile(sSectionFDC, sSectionPort, p_sSerialPort, m_sFilePath);
+            GeneralFunction.WriteINIFile(sSectionFDC, sSectionCount, p_aTK4S.Count.ToString(), m_sFilePath);
+            for (int i = 0; i < p_aTK4S.Count; i++)
+            {
+                GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleName, p_aTK4S[i].p_sID, m_sFilePath);
+                GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleAddress, p_aTK4S[i].p_nAddress.ToString(), m_sFilePath);
+                GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleDP, p_aTK4S[i].p_nDecimalPoint.ToString(), m_sFilePath);
+                GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleMax, p_aTK4S[i].p_dMaxValue.ToString(), m_sFilePath);
+                GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleMin, p_aTK4S[i].p_dMinValue.ToString(), m_sFilePath);
+            }
+        }
+
+        public void LoadModule()
+        {
+            if (File.Exists(m_sFilePath))
+            {
+                p_aTK4S.Clear();
+                p_aTK4S = new ObservableCollection<TK4S>();
+                p_sSerialPort = GeneralFunction.ReadINIFile(sSectionFDC, sSectionPort,m_sFilePath);
+
+                int nCount = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionFDC, sSectionCount, m_sFilePath));
+               
+                for (int i = 0; i < nCount; i++)
+                {
+                    TK4S temp = new TK4S();
+                    temp.p_sID = GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleName, m_sFilePath);
+                    temp.p_nAddress = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleAddress, m_sFilePath));
+                    temp.p_nDecimalPoint = Convert.ToDouble(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleDP, m_sFilePath));
+                    temp.p_dMaxValue = Convert.ToDouble(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMax, m_sFilePath));
+                    temp.p_dMinValue = Convert.ToDouble(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMin, m_sFilePath));
+                    p_aTK4S.Add(temp);
+                    p_aTK4S[p_aTK4S.Count-1].OnDetectLimit += TK4SGroup_OnDetectLimit;
+                }
+            }
+        }
 
         public bool Init()
         {
@@ -33,19 +159,30 @@ namespace RootTools
             m_client.Baudrate = m_nBaudrate;
             m_client.Parity = m_eParity;
             m_client.StopBits = m_eStopBit;
-            for (int n = 0; n < m_nTryConnect; n++)
+            //for (int n = 0; n < m_nTryConnect; n++)
+            //{
+            try
             {
+
                 m_client.Connect();
-                if (m_client.Connected) 
-                {
-                    break;
-                }
-                Thread.Sleep(100);
             }
-            m_client.SendDataChanged += m_client_SendDataChanged;
-            m_client.ReceiveDataChanged += m_client_ReceiveDataChanged;
-            m_threadCommunicate = new Thread(RunThread);
-            m_threadCommunicate.Start();
+            catch
+            {
+
+            }
+            //    if (m_client.Connected)
+            //    {
+            //        break;
+            //    }
+            //    Thread.Sleep(100);
+            //}
+            if (m_client.Connected)
+            {
+                m_client.SendDataChanged += m_client_SendDataChanged;
+                m_client.ReceiveDataChanged += m_client_ReceiveDataChanged;
+                m_threadCommunicate = new Thread(RunThread);
+                m_threadCommunicate.Start();
+            }
             return m_client.Connected;
         }
 
@@ -56,20 +193,15 @@ namespace RootTools
             while (m_bRunThread)
             {
                 Thread.Sleep(10);
-                if (!m_client.Connected)
-                {
-                    Thread.Sleep(3000);
-                    m_client.Connect();
-                    continue;
-                }
 
                 for (int n = 0; n < m_aTK4S.Count; n++)
                 {
-                    if (m_bRunThread == false) return;
+                    if (m_bRunThread == false)
+                        return;
                     try
                     {
                         m_bBusy = true;
-                        m_client.UnitIdentifier = (byte)m_aTK4S[n].m_nAddress;
+                        m_client.UnitIdentifier = (byte)m_aTK4S[n].p_nAddress;
                         m_client.ReadInputRegisters(1000, 2);
                         if (WaitReciveOK() == false)
                         {
@@ -93,7 +225,8 @@ namespace RootTools
             {
                 Thread.Sleep(10);
             }
-            if (m_bBusy) return false;
+            if (m_bBusy)
+                return false;
             return true;
         }
 
@@ -116,35 +249,182 @@ namespace RootTools
                 int nLength = (int)m_client.receiveData[2];
                 Int16 nValue = (Int16)(m_client.receiveData[3] * 256 + m_client.receiveData[4]);
                 int nDecimal = (int)(m_client.receiveData[3] * 256 + m_client.receiveData[4]);
-                double dValue = nValue / ((nDecimal + 1) * 10);
-                m_aTK4S[nAddress].m_dValue = dValue;
+                double dValue = 0.0;
+                if (m_aTK4S[nAddress - 1].p_nDecimalPoint == 0)
+                    dValue = nValue;
+                else
+                    dValue = nValue * ((m_aTK4S[nAddress - 1]. p_nDecimalPoint));
+                m_aTK4S[nAddress-1].p_dValue = dValue;
             }
-            catch (Exception)
+            catch (Exception e)
             {
 
             }
             m_bBusy = false;
         }
 
-        void Reallocate()
+        public void ThreadStop()
         {
-            while (m_aTK4S.Count < m_nCountModule)
+            m_bRunThread = false;
+            if (m_threadCommunicate != null)
+                m_threadCommunicate.Join();
+        }
+
+        public void AddModule()
+        {   
+            p_aTK4S.Add(new TK4S(p_aTK4S.Count+1));
+            p_aTK4S[p_aTK4S.Count - 1].OnDetectLimit += TK4SGroup_OnDetectLimit;
+            SaveModule();
+        }
+
+        private void TK4SGroup_OnDetectLimit(string str)
+        {
+            OnDetectLimit(str);
+        }
+
+        public void RemoveModule()
+        {
+            p_aTK4S.RemoveAt(p_aTK4S.Count - 1);
+            SaveModule();
+            LoadModule();
+        }
+
+
+        public RelayCommand CommandAddModule
+        {
+            get
             {
-                m_aTK4S.Add(new TK4S(m_aTK4S.Count));
+                return new RelayCommand(AddModule);
             }
         }
 
-        public class TK4S
+        public RelayCommand CommandRemoveModule
         {
-            public int m_nAddress = 0;
-            public bool m_bAlarm = false;
-            public string m_sAlarmMessage = "";
-            public double m_dValue = 0.0;
-            
-            public TK4S(int nAddress)
+            get
             {
-                m_nAddress = nAddress;
+                return new RelayCommand(RemoveModule);
             }
         }
+
+        public void DoubleClickAction()
+        {
+            var viewModel = m_SelectedTK4S;
+            Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+            if (result.HasValue)
+            {
+                if (result.Value)
+                {
+                }
+            }
+        }
+
+        public RelayCommand MyDoubleClickCommand
+        {
+            get
+            {
+                return new RelayCommand(DoubleClickAction);
+            }
+        }
+
     }
+
+    [Serializable]
+    public class TK4S : ObservableObject, IDialogRequestClose
+    {
+        string m_sID = "";
+        int m_nAddress = 0;
+        double m_nDecimalPoint = 0;
+        double m_dValue = 0;
+        double m_dMaxValue = 0;
+        double m_dMinValue = 0;
+        public event delegateString OnDetectLimit;
+
+        public string p_sID
+        {
+            get
+            {
+                return m_sID;
+            }
+            set
+            {
+                SetProperty(ref m_sID, value);
+            }
+        }
+
+        public int p_nAddress
+        {
+            get
+            {
+                return m_nAddress;
+            }
+            set
+            {
+                SetProperty(ref m_nAddress, value);
+            }
+        }
+
+        public double p_nDecimalPoint
+        {
+            get
+            {
+                return m_nDecimalPoint;
+            }
+            set
+            {
+                SetProperty(ref m_nDecimalPoint, value);
+            }
+        }
+
+        public double p_dValue
+        {
+            get
+            {
+                return m_dValue;
+            }
+            set
+            {
+                if (m_dMaxValue < value || m_dMinValue > value)
+                {
+                    OnDetectLimit("FDC : " + m_sID + " Value : " + m_dValue + " Limit ( " +m_dMinValue + ", " +m_dMaxValue + " )" );
+                }
+                SetProperty(ref m_dValue, value);
+            }
+        }
+        public double p_dMaxValue
+        {
+            get
+            {
+                return m_dMaxValue;
+            }
+            set
+            {
+                SetProperty(ref m_dMaxValue, value);
+            }
+        }
+        public double p_dMinValue
+        {
+            get
+            {
+                return m_dMinValue;
+            }
+            set
+            {
+                SetProperty(ref m_dMinValue, value);
+            }
+        }
+
+        public TK4S()
+        {
+        }
+
+        public TK4S(int nAddress)
+        {
+            p_nAddress = nAddress;
+            //p_sID = nAddress.ToString();
+        }
+
+        [field: NonSerialized]
+        public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
+    }
+
 }
