@@ -7,11 +7,7 @@ using RootTools;
 using RootTools.Module;
 using Root_AOP01_Inspection.Module;
 using Root_EFEM.Module;
-using static Root_EFEM.Module.RTR_RND;
-using RootTools.Gem;
-using System.ComponentModel;
 using Root_AOP01_Inspection.UI._3._RUN;
-using System.Threading;
 
 namespace Root_AOP01_Inspection
 {
@@ -26,7 +22,7 @@ namespace Root_AOP01_Inspection
         MainVision m_mainvision;
         WTRCleanUnit m_wtrcleanunit;
         WTRArm m_wtr;
-        Arm m_arm;
+        RTR_RND.Arm m_arm;
         Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
         AOP01_Handler.eLoadport LoadportType;
         public Run_Panel()
