@@ -29,7 +29,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
         AOP01_Handler m_handler;
         Loadport_Cymechs m_loadport;
         InfoCarrier m_infoCarrier;
-        RFID_Ceyon m_rfid;
+        RFID_Brooks m_rfid;
 
         public void Init(ILoadport loadport, AOP01_Engineer engineer, IRFID rfid)
         {
@@ -38,7 +38,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
             
             m_engineer = engineer;
             m_handler = engineer.m_handler;
-            m_rfid = (RFID_Ceyon)rfid;
+            m_rfid = (RFID_Brooks)rfid;
             this.DataContext = loadport;
 
             textBoxPodID.DataContext = loadport.p_infoCarrier;

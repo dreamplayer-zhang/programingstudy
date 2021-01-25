@@ -154,7 +154,7 @@ namespace Root_EFEM.Module
                 OnPropertyChanged();
             }
         }
-        
+
 
 
         public string ReadRFID(byte nCh, out string sRFID)
@@ -178,6 +178,33 @@ namespace Root_EFEM.Module
         }
         #endregion
 
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            RunTreeSetup(tree.GetTree("Setup", false));
+        }
+        void RunTreeSetup(Tree tree)
+        {
+            RunTimeoutTree(tree.GetTree("Timeout", false));
+            RunSettingTree(tree.GetTree("Setting", false));
+        }
+
+        int m_secRS232 = 2;
+        void RunTimeoutTree(Tree tree)
+        {
+            m_secRS232 = tree.Set(m_secRS232, m_secRS232, "RS232", "Timeout (sec)");
+        }
+        public int m_nCh = 1;
+        public bool m_bRFID = false;
+        public string m_sSimulCarrierID = "CarrierID";
+        void RunSettingTree(Tree tree)
+        {
+            m_nCh = tree.Set(m_nCh, m_nCh, "Channel", "RFID Channel");
+            m_bRFID = tree.Set(m_bRFID, m_bRFID, "Use", "Run ReadRFID");
+            m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation");
+        }
+
+
         public string StartRunReadRFID()
         {
             ModuleRunBase run = _runReadID.Clone();
@@ -196,6 +223,7 @@ namespace Root_EFEM.Module
             throw new NotImplementedException();
         }
 
+        #region ModuleRun
         public class Run_ReadRFID : ModuleRunBase
         {
             RFID_Ceyon m_module;
@@ -208,39 +236,31 @@ namespace Root_EFEM.Module
                 InitModuleRun(module);
             }
 
-            int m_nCh = 1;
-            bool m_bRFID = false;
-            string m_sSimulCarrierID = "CarrierID";
+            
             public override ModuleRunBase Clone()
             {
                 Run_ReadRFID run = new Run_ReadRFID(m_module, m_loadport);
-                run.m_nCh = m_nCh;
-                run.m_bRFID = m_bRFID;
-                run.m_sSimulCarrierID = m_sSimulCarrierID;
                 return run;
             }
 
+            string m_sReadRFID = "RFID";
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_nCh = tree.Set(m_nCh, m_nCh, "Channel", "RFID Channel", bVisible);
-                m_bRFID = tree.Set(m_bRFID, m_bRFID, "Use", "Run ReadRFID", bVisible);
-                m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation", bVisible && EQ.p_bSimulate);
+                m_sReadRFID = tree.Set(m_sReadRFID, m_sReadRFID, "RFID", "Read RFID", bVisible, true);
             }
-
-            #region ModuleRun
 
             public override string Run()
             {
                 string sResult = "OK";
                 string sCarrierID = "";
-                if (EQ.p_bSimulate) sCarrierID = m_sSimulCarrierID;
-                else if(m_bRFID)
+                if (EQ.p_bSimulate) sCarrierID = m_module.m_sSimulCarrierID;
+                else if (m_module.m_bRFID)
                 {
-                    sResult = m_module.ReadRFID((byte)m_nCh, out sCarrierID);
-                    m_loadport.p_infoCarrier.p_sCarrierID = (sResult == "OK") ? sCarrierID : "";
+                    sResult = m_module.ReadRFID((byte)m_module.m_nCh, out sCarrierID);
+                    //m_loadport.p_infoCarrier.p_sCarrierID = (sResult == "OK") ? sCarrierID : "";
 
                 }
-                if (sResult == "OK") m_loadport.p_infoCarrier.SendCarrierID(sCarrierID);
+                //if (sResult == "OK") m_loadport.p_infoCarrier.SendCarrierID(sCarrierID);
                 return sResult;
             }
             #endregion

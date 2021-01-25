@@ -157,7 +157,7 @@ namespace Root_AOP01_Inspection
             for (int n = 0; n < m_lLoadport; n++, cID++)
             {
                 string sID = "Rfid" + cID;
-                module = new RFID_Ceyon(sID, m_engineer, m_aLoadport[n]);
+                module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]);
                 InitModule(module);
                 m_aRFID.Add((IRFID)module);
             }
@@ -187,7 +187,7 @@ namespace Root_AOP01_Inspection
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
-            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision, (RFID_Ceyon)m_aRFID[0], (RFID_Ceyon)m_aRFID[1]);
+            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1]);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             if (sInfo == "OK") m_bIsPossible_Recovery = true;
             return sInfo;

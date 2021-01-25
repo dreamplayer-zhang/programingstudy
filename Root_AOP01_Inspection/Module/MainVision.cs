@@ -33,8 +33,8 @@ namespace Root_AOP01_Inspection.Module
         Axis m_axisSideZ;
         AxisXY m_axisXY;
         public DIO_I m_diExistVision;
-        DIO_O m_doVac;
-        DIO_O m_doBlow;
+        public DIO_I m_diReticleTiltCheck;
+        public DIO_I m_diReticleFrameCheck;
         MemoryPool m_memoryPool;
         MemoryGroup m_memoryGroup;
         MemoryData m_memoryMain;
@@ -71,12 +71,12 @@ namespace Root_AOP01_Inspection.Module
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diExistVision, this, "Reticle Exist on Vision");
+            p_sInfo = m_toolBox.Get(ref m_diReticleTiltCheck, this, "Reticle Tilt Check");
+            p_sInfo = m_toolBox.Get(ref m_diReticleFrameCheck, this, "Reticle Frame Check");
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
             p_sInfo = m_toolBox.Get(ref m_axisSideZ, this, "Axis Side Z");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
-            p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Vision Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_CamTDI90, this, "TDI 90");
@@ -124,40 +124,6 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
-        #region DIO
-        public bool p_bStageVac
-        {
-            get
-            {
-                return m_doVac.p_bOut;
-            }
-            set
-            {
-                if (m_doVac.p_bOut == value)
-                    return;
-                m_doVac.Write(value);
-            }
-        }
-
-        public bool p_bStageBlow
-        {
-            get
-            {
-                return m_doBlow.p_bOut;
-            }
-            set
-            {
-                if (m_doBlow.p_bOut == value)
-                    return;
-                m_doBlow.Write(value);
-            }
-        }
-
-        public void RunBlow(int msDelay)
-        {
-            m_doBlow.DelayOff(msDelay);
-        }
-        #endregion
 
         #region Axis Position
         public enum eAxisPos
@@ -379,14 +345,14 @@ namespace Root_AOP01_Inspection.Module
             //            p_bStageVac = true;
             Thread.Sleep(200);
 
-            //if (m_CamTDI90 != null && m_CamTDI90.p_CamInfo.p_eState == eCamState.Init)
-            //    m_CamTDI90.Connect();
-            //if (m_CamTDI45 != null && m_CamTDI45.p_CamInfo.p_eState == eCamState.Init)
-            //    m_CamTDI45.Connect();
-            //if (m_CamLADS.p_CamInfo._OpenStatus == false)
-            //    m_CamLADS.Connect();
-            //if (m_CamTDISide != null && m_CamTDISide.p_CamInfo.p_eState == eCamState.Init)
-            //    m_CamTDISide.Connect();
+            if (m_CamTDI90 != null && m_CamTDI90.p_CamInfo.p_eState == eCamState.Init)
+                m_CamTDI90.Connect();
+            if (m_CamTDI45 != null && m_CamTDI45.p_CamInfo.p_eState == eCamState.Init)
+                m_CamTDI45.Connect();
+            if (m_CamLADS.p_CamInfo._OpenStatus == false)
+                m_CamLADS.Connect();
+            if (m_CamTDISide != null && m_CamTDISide.p_CamInfo.p_eState == eCamState.Init)
+                m_CamTDISide.Connect();
 
             m_axisSideZ.StartHome();
             if (m_axisSideZ.WaitReady() != "OK")
@@ -592,7 +558,7 @@ namespace Root_AOP01_Inspection.Module
 
                 if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
                     return p_sInfo;
-                Thread.Sleep(11000);
+                Thread.Sleep(10000);
                 //m_module.p_eState = eState.Ready;
                 return "OK";
             }
@@ -734,7 +700,7 @@ namespace Root_AOP01_Inspection.Module
                         string strMemory = curScanPos.ToString();
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        //m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
@@ -863,7 +829,7 @@ namespace Root_AOP01_Inspection.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        //m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
@@ -1009,7 +975,7 @@ namespace Root_AOP01_Inspection.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        //m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
                         CAXM.AxmContiStart(((AjinAxis)axisXY.p_axisY).m_nAxis, 0, 0);
                         Thread.Sleep(10);
@@ -1222,7 +1188,7 @@ namespace Root_AOP01_Inspection.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
-                        //m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, m_grabMode.m_bUseBiDirectionScan);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
@@ -2736,7 +2702,7 @@ namespace Root_AOP01_Inspection.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)grab.m_nMaxFrame * grab.m_grabMode.m_dTrigger * nCamHeight * grab.m_nScanRate / 100);
-                        //grab.m_grabMode.StartGrab(mem, cptMemoryOffset, nReticleSizeY_px, grab.m_grabMode.m_bUseBiDirectionScan);
+                        grab.m_grabMode.StartGrab(mem, cptMemoryOffset, nReticleSizeY_px, 0, grab.m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;

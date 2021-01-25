@@ -779,6 +779,7 @@ namespace Root_EFEM.Module
             public override string Run()
             {
                 m_module.m_bUnLoadCheck = false;
+                if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
                 if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 if (m_module.Run(m_module.CmdLoad())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
@@ -815,8 +816,7 @@ namespace Root_EFEM.Module
             public override string Run()
             {
                 m_module.m_bLoadCheck = false;
-                if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
-                else return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock) return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 //if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
                 if (m_module.Run(m_module.CmdUnload())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;

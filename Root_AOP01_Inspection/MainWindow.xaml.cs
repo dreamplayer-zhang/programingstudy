@@ -161,7 +161,7 @@ namespace Root_AOP01_Inspection
             Init_UI();
             if (m_engineer.m_handler.m_aLoadportType[0] == eLoadport.Cymechs && m_engineer.m_handler.m_aLoadportType[1] == eLoadport.Cymechs)
             {
-                Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer, (RFID_Ceyon)m_engineer.m_handler.m_aRFID[0], (RFID_Ceyon)m_engineer.m_handler.m_aRFID[1]);
+                Run.Init(m_engineer.m_handler.m_mainVision, (WTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer, (RFID_Brooks)m_engineer.m_handler.m_aRFID[0], (RFID_Brooks)m_engineer.m_handler.m_aRFID[1]);
             }
         }
         void Init_ViewModel()

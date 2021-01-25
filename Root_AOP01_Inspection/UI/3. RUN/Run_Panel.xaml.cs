@@ -28,7 +28,7 @@ namespace Root_AOP01_Inspection
         WTRArm m_wtr;
         Arm m_arm;
         Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
-        RFID_Ceyon[] m_rfid = new RFID_Ceyon[2];
+        RFID_Brooks[] m_rfid = new RFID_Brooks[2];
         AOP01_Handler.eLoadport LoadportType;
         public Run_Panel()
         {
@@ -36,7 +36,7 @@ namespace Root_AOP01_Inspection
         }
 
         public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
-            Loadport_Cymechs loadport2, AOP01_Engineer engineer, RFID_Ceyon rfid1, RFID_Ceyon rfid2)
+            Loadport_Cymechs loadport2, AOP01_Engineer engineer, RFID_Brooks rfid1, RFID_Brooks rfid2)
         {
             m_engineer = engineer;
             m_handler = engineer.m_handler;
@@ -81,7 +81,7 @@ namespace Root_AOP01_Inspection
             ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_wtr.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
             ExistVision.Background = m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
             //ExistLoadport.Background = (m_loadport[0].p_infoWafer != null) || (m_loadport[1].p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
-            //ButtonInitialize.IsEnabled = IsEnableInitialization();
+            ButtonInitialize.IsEnabled = IsEnableInitialization();
             ButtonRecovery.IsEnabled = IsEnableRecovery();
         }
         #endregion
@@ -137,7 +137,7 @@ namespace Root_AOP01_Inspection
         }
         private void ButtonInitialize_Click(object sender, RoutedEventArgs e)
         {
-            //if (IsEnableInitialization() == false) return;
+            if (IsEnableInitialization() == false) return;
             EQ.p_bStop = false;
             m_handler.m_process.ClearInfoWafer();
             m_handler.m_nRnR = 0; //Init 할때 RNR 카운트초기화
