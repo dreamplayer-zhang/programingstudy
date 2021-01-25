@@ -61,7 +61,7 @@
                             <Border Grid.Row="1"
                                     Grid.RowSpan="3"
                                     Grid.ColumnSpan="4"
-                                    BorderThickness="1"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
                                     BorderBrush="Black"
                                     CornerRadius="0">
                                 <Border.OpacityMask>
