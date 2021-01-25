@@ -113,7 +113,7 @@ namespace Root_Rinse_Loader.Module
                 m_storage.p_sInfo = toolBox.Get(ref m_diCheck[3], m_storage, m_id + ".Check3");
             }
 
-            bool _bLevel = false; 
+            bool _bLevel = false;
             public bool p_bLevel
             {
                 get { return _bLevel; }
@@ -217,19 +217,32 @@ namespace Root_Rinse_Loader.Module
         }
 
         double m_posStackReady = 0; 
-        double m_fJogScale = 1; 
+        double m_fJogScale = 0.5; 
         public string MoveStackReady()
         {
-            if (m_posStackReady != m_axis.p_posCommand) MoveStack();
+            if (Math.Abs(m_posStackReady - m_axis.p_posCommand) > 100) MoveStack();
             if (m_stack.p_bLevel)
             {
-                m_axis.Jog(-m_fJogScale); 
+                m_axis.Jog(-m_fJogScale);
                 while (m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
+                m_axis.StopAxis();
+                Thread.Sleep(500);
             }
+            m_axis.StartMove(m_axis.p_posCommand - 10000);
+            m_axis.WaitReady();
             m_axis.Jog(m_fJogScale);
             while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
-            m_posStackReady = m_axis.p_posCommand; 
-            return "OK"; 
+            m_posStackReady = m_axis.p_posCommand;
+            m_axis.StopAxis();
+            m_axis.WaitReady();
+            Thread.Sleep(500);
+            m_posStackReady = m_axis.p_posCommand;
+            return "OK";
+        }
+
+        public void StartShiftDown()
+        {
+            m_axis.StartMove(m_axis.p_posCommand - 10000); 
         }
 
         public bool p_bIsEnablePick
@@ -296,6 +309,7 @@ namespace Root_Rinse_Loader.Module
             while (m_bThreadCheck)
             {
                 Thread.Sleep(10);
+                m_stack.CheckSensor(); 
                 foreach (Magazine magazine in m_aMagazine) magazine.CheckSensor(); 
             }
         }

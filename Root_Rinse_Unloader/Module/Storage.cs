@@ -189,14 +189,22 @@ namespace Root_Rinse_Unloader.Module
         double m_fJogScale = 1;
         public string MoveStackReady()
         {
-            if (m_posStackReady != m_axis.p_posCommand) MoveStack();
+            if (Math.Abs(m_posStackReady - m_axis.p_posCommand) > 100) MoveStack();
             if (m_stack.p_bLevel)
             {
                 m_axis.Jog(-m_fJogScale);
                 while (m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
+                m_axis.StopAxis();
+                Thread.Sleep(500);
             }
+            m_axis.StartMove(m_axis.p_posCommand - 10000);
+            m_axis.WaitReady();
             m_axis.Jog(m_fJogScale);
             while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
+            m_posStackReady = m_axis.p_posCommand;
+            m_axis.StopAxis();
+            m_axis.WaitReady();
+            Thread.Sleep(500);
             m_posStackReady = m_axis.p_posCommand;
             return "OK";
         }
