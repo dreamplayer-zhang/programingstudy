@@ -116,10 +116,15 @@ namespace Root_WIND2
             }
             set
             {
+
+                SetProperty(ref masterDieY, value);
                 int[] map = mapControl_VM.GetMap();
                 if(map.Length != 0)
                 {
                     int val = value;
+
+
+                    // 버그
                     
                     if (val < 0)
                         val = 0;

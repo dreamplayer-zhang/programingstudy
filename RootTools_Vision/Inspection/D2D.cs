@@ -75,6 +75,7 @@ namespace RootTools_Vision
             if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) != null)
             {
                 this.GoldenImage = this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) as byte[];
+
                 return true;
             }
             else
@@ -234,6 +235,8 @@ namespace RootTools_Vision
                 return;
             }
 
+
+
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterD2D.IndexChannel);
             this.inspectionWorkBuffer = this.GetWorkplaceBuffer(this.parameterD2D.IndexChannel);
 
@@ -243,6 +246,10 @@ namespace RootTools_Vision
             // Recipe
             int chipH = this.currentWorkplace.Height; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
             int chipW = this.currentWorkplace.Width;
+
+#if DEBUG
+            //DebugOutput.PrintWorkplaceInfo(this.currentWorkplace);
+#endif
 
             byte[] binImg = new byte[chipW * chipH];
             byte[] diffImg = new byte[chipW * chipH];
@@ -269,6 +276,11 @@ namespace RootTools_Vision
                 }
                 // Diff Image 계산
                 CLR_IP.Cpp_SubtractAbs(GoldenImage, inspectionWorkBuffer, diffImg, chipW, chipH);
+
+
+                // Golden Image 저장
+                //Tools.SaveRawdataToBitmap("D:\\golden" + this.currentWorkplace.MapIndexX + "_" + this.currentWorkplace.MapIndexY + ".bmp",
+                //    this.GoldenImage, this.currentWorkplace.Width, this.currentWorkplace.Height, 1);
 
                 if (parameterD2D.ScaleMap) // ScaleMap Option
                 {

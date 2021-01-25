@@ -10,7 +10,222 @@
         </Style>
         
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
-       
+
+        <!--#region [New Design] -->
+        
+        <!--#region [Color Definition] -->
+        <SolidColorBrush x:Key="main_background" Color="#080820"/>
+        <SolidColorBrush x:Key="sidetap_parent_background" Color="#080820"/>
+        <SolidColorBrush x:Key="sidetap_child_background" Color="#151540"/>
+        <SolidColorBrush x:Key="main_view_background" Color="AliceBlue"/>
+
+        <!-- sidetap -->
+        <SolidColorBrush x:Key="sidetap_parent_menu_normal" Color="#202040"/>
+        <SolidColorBrush x:Key="sidetap_parent_menu_mouseover" Color="#404070"/>
+        <!--<SolidColorBrush x:Key="sidetap_parent_menu_selected" Color="DarkSlateBlue"/>-->
+
+        <SolidColorBrush x:Key="sidetap_child_menu_normal" Color="#151540"/>
+        <SolidColorBrush x:Key="sidetap_child_menu_mouseover" Color="#404080"/>
+        <SolidColorBrush x:Key="sidetap_child_menu_selected" Color="#5070DD"/>
+
+        <SolidColorBrush x:Key="sidetap_parent_menu_text" Color="White"/>
+        <SolidColorBrush x:Key="sidetap_child_menu_text" Color="White"/>
+
+
+        <SolidColorBrush x:Key="main_view_groupbox_background" Color="#202035"/>
+
+        <SolidColorBrush x:Key="sidetap_child_button_normal" Color="#5050A0"/>
+        <SolidColorBrush x:Key="sidetap_child_button_mouseover" Color="#7070B0"/>
+        <SolidColorBrush x:Key="sidetap_child_button_press" Color="#3030A0"/>
+        <SolidColorBrush x:Key="sidetap_child_button_text" Color="White"/>
+
+        <!--#endregion-->
+        
+        <!--#region [Button Style] -->
+        <Style x:Key="sidetap_parent_radiobutton" TargetType="RadioButton">
+            <Setter Property="OverridesDefaultStyle" Value="False"/>
+            <Setter Property="Background" Value="{StaticResource sidetap_parent_menu_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource sidetap_parent_menu_text}"/>
+            <Setter Property="Margin" Value="4,0,0,4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border BorderThickness="0" 
+                                CornerRadius="4, 0, 0, 4"
+                                Padding="4"
+                                Width="65"
+                                Height="60"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_background}"/>
+                                <!--<Setter Property="Margin" Value="4, 4, 0, 4"/>
+                                <Setter Property="Width" Value="44"/>-->
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_parent_menu_mouseover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="sidetap_child_radiobutton" TargetType="RadioButton">
+            <Setter Property="Background" Value="{StaticResource sidetap_child_menu_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource sidetap_child_menu_text}"/>
+            <Setter Property="Margin" Value="4,0,0,4"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                Height="40"
+                                CornerRadius="4, 0, 0, 4"
+                                Padding="15, 0, 0, 0"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_menu_selected}"/>
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_menu_mouseover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="sidetap_child_button" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource sidetap_child_button_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource sidetap_child_menu_text}"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                Height="30"
+                                CornerRadius="15"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_button_press}"/>
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_button_mouseover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="groupbox_button" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource sidetap_child_button_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource sidetap_child_menu_text}"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                Height="30"
+                                CornerRadius="15"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_button_press}"/>
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_button_mouseover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--#endregion-->
+
+        <!--#region [GroupBox Style] -->
+        <Style x:Key="main_view_groupbox" TargetType="GroupBox">
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type GroupBox}" >
+                        
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="24"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="Header"
+                                    Grid.Row="0"
+                                    Padding="10,0,0,0"
+                                    CornerRadius="2,2,0,0"
+                                    VerticalAlignment="Stretch"
+                                    Background="{StaticResource main_view_groupbox_background}">
+                                <ContentPresenter VerticalAlignment="Center" ContentSource="Header" RecognizesAccessKey="True" />
+                            </Border>
+                            <Border Grid.Row="1" 
+                                    CornerRadius="0,0,2,2"
+                                    Background="{StaticResource main_view_groupbox_background}">
+                                <ContentPresenter />
+                            </Border>
+                            <Grid.Effect>
+                                <DropShadowEffect ShadowDepth="1" Color="Gray"/>
+                            </Grid.Effect>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--#endregion-->
+        
+        <!--#endregion-->
+        
+        
+
         <!--Color-->
         <SolidColorBrush x:Key="PanelBackGround" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
         <SolidColorBrush x:Key="ControlBackGround" Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
