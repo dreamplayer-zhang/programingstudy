@@ -26,7 +26,7 @@ namespace RootTools_Vision.delete
 
         protected abstract void InitWorkManager();
 
-        public abstract bool CreateInspection(Recipe _recipe);
+        public abstract bool CreateInspection(RecipeBase _recipe);
 
         public void  Init()
         {

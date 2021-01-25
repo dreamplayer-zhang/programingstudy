@@ -121,7 +121,7 @@ namespace RootTools.Module
                                 p_visibleRnR = Visibility.Visible;
                                 EQ.p_eState = EQ.eState.Ready;
                             }
-                            m_qModuleRun.Dequeue();
+                            if (m_qModuleRun.Count > 0) m_qModuleRun.Dequeue();
                         }
                         break;
                     case EQ.eState.Error: p_sRun = "Reset"; break;

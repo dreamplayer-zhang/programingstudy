@@ -88,4 +88,11 @@ namespace RootTools_Vision
             this.workplace = _workplace;
         }
     }
+
+    public class RequestStopEventArgs : EventArgs
+    {
+        public RequestStopEventArgs()
+        {
+        }
+    }
 }

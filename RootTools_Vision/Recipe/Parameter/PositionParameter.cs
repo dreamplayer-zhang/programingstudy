@@ -8,6 +8,13 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
+
+    public enum POSITION_METHOD
+    {
+        Dependent = 0,
+        Independent
+    }
+
     public class PositionParameter : ParameterBase, IMaskInspection, IColorInspection
     {
         public PositionParameter() : base(typeof(Position))
@@ -16,6 +23,7 @@ namespace RootTools_Vision
         }
 
         #region [Parameter]
+        private POSITION_METHOD method = POSITION_METHOD.Dependent;
         private int chipSearchRangeX = 100;
         private int chipSearchRangeY = 100;
         private int chipMinScoreLimit = 60;
@@ -26,6 +34,16 @@ namespace RootTools_Vision
 
 
         #region [Getter Setter]
+
+        [DisplayName("Method")]
+        public POSITION_METHOD Method
+        {
+            get => this.method;
+            set
+            {
+                SetProperty<POSITION_METHOD>(ref this.method, value);
+            }
+        }
 
         [DisplayName("Chip Search Range X")]
         public int ChipSearchRangeX
@@ -111,11 +129,11 @@ namespace RootTools_Vision
             throw new NotImplementedException();
         }
 
-        public override object Clone()
-        {
-            // string과 같이 new로 생성되는 변수가 있으면 MemberwiseClone을 사용하면안됩니다.
-            // 현재 타입의 클래스를 생성해서 새로 값(객체)을 할당해주어야합니다.
-            return this.MemberwiseClone(); ;
-        }
+        //public override object Clone()
+        //{
+        //    // string과 같이 new로 생성되는 변수가 있으면 MemberwiseClone을 사용하면안됩니다.
+        //    // 현재 타입의 클래스를 생성해서 새로 값(객체)을 할당해주어야합니다.
+        //    return this.MemberwiseClone(); ;
+        //}
     }
 }

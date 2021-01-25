@@ -21,7 +21,7 @@ namespace Root_EFEM.Module
         public DIO_I m_diDoorOpen;
         public DIO_I m_diDocked;
         RS232 m_rs232;
-        OHT m_OHT; 
+        OHT m_OHT;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
@@ -31,7 +31,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.Get(ref m_diDoorOpen, this, "DoorOpen");
             p_sInfo = m_toolBox.Get(ref m_diDocked, this, "Docked");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT"); 
+            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -44,26 +44,37 @@ namespace Root_EFEM.Module
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present;
-            if (m_diPlaced.p_bIn != m_diPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
-            else present = m_diPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-            if (p_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + p_infoCarrier.p_eState);
+            if (m_diPlaced.p_bIn != m_diPresent.p_bIn)
+                present = GemCarrierBase.ePresent.Unknown;
+            else
+                present = m_diPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            if (p_infoCarrier.CheckPlaced(present) != "OK")
+                m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + p_infoCarrier.p_eState);
             switch (p_infoCarrier.p_ePresentSensor)
             {
-                case GemCarrierBase.ePresent.Empty: m_svidPlaced.p_value = false; break;
-                case GemCarrierBase.ePresent.Exist: m_svidPlaced.p_value = true; break;
+                case GemCarrierBase.ePresent.Empty:
+                    m_svidPlaced.p_value = false;
+                    break;
+                case GemCarrierBase.ePresent.Exist:
+                    m_svidPlaced.p_value = true;
+                    break;
             }
             return m_svidPlaced.p_value;
         }
         #endregion
 
         #region IWTRChild
-        public bool p_bLock { get; set; }
+        public bool p_bLock
+        {
+            get; set;
+        }
 
         bool IsLock()
         {
             for (int n = 0; n < 10; n++)
             {
-                if (p_bLock == false) return false;
+                if (p_bLock == false)
+                    return false;
                 Thread.Sleep(100);
             }
             return true;
@@ -71,10 +82,16 @@ namespace Root_EFEM.Module
 
         public List<string> p_asChildSlot
         {
-            get { return p_infoCarrier.p_asGemSlot; }
+            get
+            {
+                return p_infoCarrier.p_asGemSlot;
+            }
         }
 
-        public InfoWafer p_infoWafer { get; set; }
+        public InfoWafer p_infoWafer
+        {
+            get; set;
+        }
 
         public InfoWafer GetInfoWafer(int nID)
         {
@@ -88,30 +105,34 @@ namespace Root_EFEM.Module
 
         public int GetTeachWTR(InfoWafer infoWafer = null)
         {
-            return p_infoCarrier.GetTeachWTR(infoWafer); 
+            return p_infoCarrier.GetTeachWTR(infoWafer);
         }
 
         public string IsGetOK(int nID)
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            if (p_eState != eState.Ready)
+                return p_id + " eState not Ready";
             return p_infoCarrier.IsGetOK(nID);
         }
 
         public string IsPutOK(InfoWafer infoWafer, int nID)
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            if (p_eState != eState.Ready)
+                return p_id + " eState not Ready";
             return p_infoCarrier.IsPutOK(nID);
         }
 
         public string BeforeGet(int nID)
         {
-            if (GetInfoWafer(nID) == null) return p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null";
+            if (GetInfoWafer(nID) == null)
+                return p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null";
             return IsRunOK();
         }
 
         public string BeforePut(int nID)
         {
-            if (GetInfoWafer(nID) != null) return p_id + nID.ToString("00") + " BeforePut : InfoWafer != null";
+            if (GetInfoWafer(nID) != null)
+                return p_id + nID.ToString("00") + " BeforePut : InfoWafer != null";
             return IsRunOK();
         }
 
@@ -129,15 +150,18 @@ namespace Root_EFEM.Module
         {
             switch (p_infoCarrier.p_eState)
             {
-                case InfoCarrier.eState.Empty: return false;
-                case InfoCarrier.eState.Placed: return false;
+                case InfoCarrier.eState.Empty:
+                    return false;
+                case InfoCarrier.eState.Placed:
+                    return false;
             }
             return (p_infoCarrier.GetInfoWafer(nID) != null);
         }
 
         string IsRunOK()
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            if (p_eState != eState.Ready)
+                return p_id + " eState not Ready";
             return p_infoCarrier.IsRunOK();
         }
 
@@ -182,7 +206,8 @@ namespace Root_EFEM.Module
         {
             for (int n = 0; n < m_sErrorMsgs.Length / 2; n++)
             {
-                if (m_sErrorMsgs[n, 0] == sCode) return m_sErrorMsgs[n, 1];
+                if (m_sErrorMsgs[n, 0] == sCode)
+                    return m_sErrorMsgs[n, 1];
             }
             return "Can't Find Error Massage !!";
         }
@@ -219,26 +244,33 @@ namespace Root_EFEM.Module
         {
             string[] sReads = sRead.Split(' ');
             m_log.Info(" <-- Recv] " + sRead);
-            if (sRead == "MLD EOD") return;
+            if (sRead == "MLD EOD")
+                return;
             Run(ReplyCmd(sReads));
-            if (p_sInfo != "OK") p_eState = eState.Error;
+            if (p_sInfo != "OK")
+                p_eState = eState.Error;
             m_eSendCmd = eCmd.None;
         }
 
         string m_sLastCmd = "";
         string WriteCmd(eCmd cmd, params object[] objs)
         {
-            if (EQ.IsStop()) return "EQ Stop";
+            if (EQ.IsStop())
+                return "EQ Stop";
             Thread.Sleep(10);
             if (m_eSendCmd != eCmd.None)
             {
-                if (EQ.IsStop()) return "EQ Stop";
+                if (EQ.IsStop())
+                    return "EQ Stop";
                 Thread.Sleep(200);
-                if (m_eSendCmd != eCmd.None) return "RS232 Communication Error !!";
+                if (m_eSendCmd != eCmd.None)
+                    return "RS232 Communication Error !!";
             }
-            if (EQ.IsStop()) return "EQ Stop";
+            if (EQ.IsStop())
+                return "EQ Stop";
             string str = m_dicCmd[cmd];
-            for (int n = 0; n < objs.Length; n++) str += "," + objs[n].ToString();
+            for (int n = 0; n < objs.Length; n++)
+                str += "," + objs[n].ToString();
             m_log.Info(" [ Send --> " + str);
             m_sLastCmd = str;
             m_eSendCmd = cmd;
@@ -250,16 +282,19 @@ namespace Root_EFEM.Module
         {
             try
             {
-                if (EQ.IsStop()) return "EQ Stop";
+                if (EQ.IsStop())
+                    return "EQ Stop";
                 int msDelay = 1000 * secTimeout;
                 int ms10 = 0;
-                if (m_rs232.p_bConnect == false) return m_sLastCmd + " RS232 not Connect !!";
+                if (m_rs232.p_bConnect == false)
+                    return m_sLastCmd + " RS232 not Connect !!";
                 while (m_eSendCmd != eCmd.None)
                 {
-                    if (EQ.IsStop()) return "EQ Stop";
+                    if (EQ.IsStop())
+                        return "EQ Stop";
                     Thread.Sleep(10);
                     ms10 += 10;
-                    if (ms10 > msDelay) 
+                    if (ms10 > msDelay)
                         return m_sLastCmd + " Has no Answer !!";
                 }
                 return "OK";
@@ -283,54 +318,77 @@ namespace Root_EFEM.Module
         #region RS232 Commend
         string CmdHome()
         {
-            if (Run(WriteCmd(eCmd.Home))) return p_sInfo;
-            if (Run(WaitReply(m_secHome))) return p_sInfo;
+            if (Run(WriteCmd(eCmd.Home)))
+                return p_sInfo;
+            if (Run(WaitReply(m_secHome)))
+                return p_sInfo;
             return "OK";
         }
 
         string CmdResetCPU()
         {
-            if (Run(WriteCmd(eCmd.ResetCPU))) return p_sInfo;
-            if (Run(WaitReply(m_secRS232))) return p_sInfo;
-            return "OK";    
+            if (Run(WriteCmd(eCmd.ResetCPU)))
+                return p_sInfo;
+            if (Run(WaitReply(m_secRS232)))
+                return p_sInfo;
+            return "OK";
         }
 
         string CmdLoad(bool bMapping = true)
         {
             // if (IsLock()) return m_id + " Lock by WTR";
             eCmd cmd = bMapping ? eCmd.MappingLoad : eCmd.Load;
-            if (Run(WriteCmd(cmd))) return p_sInfo;
-            if (Run(WaitReply(m_secMotion))) return p_sInfo;
+            if (Run(WriteCmd(cmd)))
+                return p_sInfo;
+            if (Run(WaitReply(m_secMotion)))
+                return p_sInfo;
             return "OK";
         }
 
         string CmdUnload()
         {
-            if (IsLock()) return p_id + " Lock by WTR";
-            if (Run(WriteCmd(eCmd.Unload))) return p_sInfo;
-            if (Run(WaitReply(m_secMotion))) return p_sInfo;
+            if (IsLock())
+                return p_id + " Lock by WTR";
+            if (Run(WriteCmd(eCmd.Unload)))
+                return p_sInfo;
+            if (Run(WaitReply(m_secMotion)))
+                return p_sInfo;
             return "OK";
         }
 
         string CmdGetMapData()
         {
-            if (Run(WriteCmd(eCmd.GetMapData, "1"))) return p_sInfo;
-            if (Run(WaitReply(m_secRS232))) return p_sInfo;
+            if (Run(WriteCmd(eCmd.GetMapData, "1")))
+                return p_sInfo;
+            if (Run(WaitReply(m_secRS232)))
+                return p_sInfo;
             return "OK";
         }
 
         string ReplyCmd(string[] sMsgs)
         {
-            if (sMsgs.Length < 1) return p_id + " Reply Message Too Short";
+            if (sMsgs.Length < 1)
+                return p_id + " Reply Message Too Short";
             //if (m_dicCmd[m_eSendCmd] != sMsgs[0]) return p_id + " Commnuication Error : " + m_sLastCmd + " != " + sMsgs[0];
             if (m_dicCmd[eCmd.GetMapData] == sMsgs[0])
             {
-                if (Run(CheckReplyError(2, sMsgs))) return p_sInfo;
-                if (Run(SetLoadportMapData(sMsgs[1]))) return p_sInfo;
+                if (Run(CheckReplyError(2, sMsgs)))
+                {
+                    m_alidLoportReplyError.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
+                if (Run(SetLoadportMapData(sMsgs[1])))
+                {   
+                    return p_sInfo;
+                }
             }
             else
             {
-                if (Run(CheckReplyError(1, sMsgs))) return p_sInfo;
+                if (Run(CheckReplyError(1, sMsgs)))
+                {
+                    m_alidLoportReplyError.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
             }
             return "OK";
         }
@@ -343,10 +401,20 @@ namespace Root_EFEM.Module
             {
                 switch (ch)
                 {
-                    case '0': aSlot.Add(GemSlotBase.eState.Empty); break;
-                    case '1': aSlot.Add(GemSlotBase.eState.Exist); break;
-                    case 'D': aSlot.Add(GemSlotBase.eState.Double); break;
-                    case 'C': aSlot.Add(GemSlotBase.eState.Cross); break;
+                    case '0':
+                        aSlot.Add(GemSlotBase.eState.Empty);
+                        break;
+                    case '1':
+                        aSlot.Add(GemSlotBase.eState.Exist);
+                        break;
+                    case 'D':
+                        aSlot.Add(GemSlotBase.eState.Double);
+                        m_alidDoubleWafer.Run(true, "Wafer Double Check");
+                        break;
+                    case 'C':
+                        aSlot.Add(GemSlotBase.eState.Cross);
+                        m_alidCrossWafer.Run(true, "Wafer Cross Check");
+                        break;
                     default:
                         bUndefined = true;
                         aSlot.Add(GemSlotBase.eState.Undefined);
@@ -359,8 +427,10 @@ namespace Root_EFEM.Module
 
         string CheckReplyError(int nError, string[] sMsgs)
         {
-            if (sMsgs.Length > nError) return p_id + " Reply Error : " + m_sLastCmd + " -> " + GetErrorString(sMsgs[nError]);
-            if (sMsgs.Length < nError) return p_id + " Short Reply Massage : " + m_sLastCmd;
+            if (sMsgs.Length > nError)
+                return p_id + " Reply Error : " + m_sLastCmd + " -> " + GetErrorString(sMsgs[nError]);
+            if (sMsgs.Length < nError)
+                return p_id + " Short Reply Massage : " + m_sLastCmd;
             return "OK";
         }
         #endregion
@@ -396,8 +466,10 @@ namespace Root_EFEM.Module
         {
             if (EQ.p_bSimulate == false)
             {
-                if (Run(CmdResetCPU())) return p_sInfo;
-                if (Run(CmdHome())) return p_sInfo;
+                if (Run(CmdResetCPU()))
+                    return p_sInfo;
+                if (Run(CmdHome()))
+                    return p_sInfo;
             }
             p_eState = eState.Ready;
             p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
@@ -410,11 +482,11 @@ namespace Root_EFEM.Module
         public override string StateReady()
         {
             CheckPlaced();
-/*            if (m_infoCarrier.m_bReqReadCarrierID)
-            {
-                m_infoCarrier.m_bReqReadCarrierID = false;
-                StartRun(m_runReadPodID);
-            } */
+            /*            if (m_infoCarrier.m_bReqReadCarrierID)
+                        {
+                            m_infoCarrier.m_bReqReadCarrierID = false;
+                            StartRun(m_runReadPodID);
+                        } */
             if (p_infoCarrier.m_bReqLoad)
             {
                 p_infoCarrier.m_bReqLoad = false;
@@ -435,50 +507,83 @@ namespace Root_EFEM.Module
         CEID m_ceidUnDocking;
         public CEID m_ceidUnloadReq;
         ALID m_alidPlaced;
-        void InitGAF() 
+        ALID m_alidDoubleWafer;
+        ALID m_alidCrossWafer;
+        ALID m_alidLoportReplyError;
+
+        void InitGAF()
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
             m_ceidDocking = m_gaf.GetCEID(this, "Docking");
             m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
             m_ceidUnloadReq = m_gaf.GetCEID(this, "Unload Request");
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
+            m_alidCrossWafer = m_gaf.GetALID(this, "Cross Wafer Check Error", "Cross Wafer Checked");
+            m_alidDoubleWafer = m_gaf.GetALID(this, "Double Wafer Check Error", "Double Wafer Checked");
+            m_alidLoportReplyError = m_gaf.GetALID(this, "LoadPort Reply Error", "Loadport Reply Error");
         }
         #endregion
 
         #region ILoadport
         public string RunDocking()
         {
-            if (p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK"; 
+            if (p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+                return "OK";
             ModuleRunBase run = m_runDocking.Clone();
             StartRun(run);
-            while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10); 
+            while (IsBusy() && (EQ.IsStop() == false))
+                Thread.Sleep(10);
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
 
         public string RunUndocking()
         {
-            if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "OK";
+            if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock)
+                return "OK";
             ModuleRunBase run = m_runUndocking.Clone();
             StartRun(run);
-            while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+            while (IsBusy() && (EQ.IsStop() == false))
+                Thread.Sleep(10);
             return EQ.IsStop() ? "EQ Stop" : "OK";
         }
 
-        public bool p_bPlaced { get { return m_diPlaced.p_bIn; } }
-        public bool p_bPresent { get { return m_diPresent.p_bIn; } }
+        public bool p_bPlaced
+        {
+            get
+            {
+                return m_diPlaced.p_bIn;
+            }
+        }
+        public bool p_bPresent
+        {
+            get
+            {
+                return m_diPresent.p_bIn;
+            }
+        }
         #endregion
 
-        public InfoCarrier p_infoCarrier { get; set; }
-        public Loadport_RND(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
+        public InfoCarrier p_infoCarrier
+        {
+            get; set;
+        }
+        public IRFID m_rfid;
+        public Loadport_RND(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount, IRFID rfid = null)
         {
             p_bLock = false;
             InitCmd();
             p_id = id;
             p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
+            if (id == "LoadportA")
+                p_infoCarrier.p_sLocID = "LP1";
+            else if (id == "LoadportB")
+                p_infoCarrier.p_sLocID = "LP2";
+            m_rfid = rfid;
             m_aTool.Add(p_infoCarrier);
             InitBase(id, engineer);
             InitGAF();
-            if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
+            if (m_gem != null)
+                m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
         }
 
         public override void ThreadStop()
@@ -513,33 +618,119 @@ namespace Root_EFEM.Module
         {
             Loadport_RND m_module;
             InfoCarrier m_infoCarrier;
+            //RFID_Brooks m_rfid;
             public Run_Docking(Loadport_RND module)
             {
                 m_module = module;
                 m_infoCarrier = module.p_infoCarrier;
+                //m_rfid = (RFID_Brooks)module.m_rfid;
                 InitModuleRun(module);
             }
 
+            string m_sSimulCarrierID = "CarrierID";
+            string m_sSimulSlotmap = "";
             bool m_bMapping = true;
+            bool m_bReadRFID = true;
             public override ModuleRunBase Clone()
             {
                 Run_Docking run = new Run_Docking(m_module);
+                run.m_sSimulCarrierID = m_sSimulCarrierID;
+                run.m_sSimulSlotmap = m_sSimulSlotmap;
                 run.m_bMapping = m_bMapping;
+                run.m_bReadRFID = m_bReadRFID;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation", bVisible && EQ.p_bSimulate);
+                m_sSimulSlotmap = tree.Set(m_sSimulSlotmap, m_sSimulSlotmap, "Simulation Slotmap", "Slotmap When p_bSimulation", bVisible && EQ.p_bSimulate);
                 m_bMapping = tree.Set(m_bMapping, m_bMapping, "Mapping", "Wafer Mapping When Loading", bVisible);
+                m_bReadRFID = tree.Set(m_bReadRFID, m_bReadRFID, "Read RFID", "Read RFID", bVisible);
             }
 
             public override string Run()
             {
-                if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                if (m_module.Run(m_module.CmdLoad(m_bMapping))) return p_sInfo;
-                if (m_module.Run(m_module.CmdGetMapData())) return p_sInfo;
-                m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
-                m_module.m_ceidDocking.Send();
+                string sResult = "OK";
+                if (EQ.p_bSimulate)
+                {
+                    //m_infoCarrier.p_bCarrierOn = true;
+                    m_infoCarrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                    m_infoCarrier.p_sCarrierID = m_sSimulCarrierID;
+                }
+                else
+                {
+                    if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed)
+                        return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                    if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+                        return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+
+                    if (m_bReadRFID)
+                    {
+                        sResult = m_module.m_rfid.ReadRFID();
+                        m_infoCarrier.p_sCarrierID = (sResult == "OK") ? m_module.m_rfid.m_sReadID : "";
+                    }
+                    else
+                        m_infoCarrier.p_sCarrierID = m_sSimulCarrierID;
+                }
+                if (sResult == "OK")
+                    m_infoCarrier.SendCarrierID(m_infoCarrier.p_sCarrierID);
+                else
+                    return p_sInfo + " SendCarrierID : " + m_infoCarrier.p_sCarrierID;
+
+                while (m_infoCarrier.p_eStateCarrierID != GemCarrierBase.eGemState.VerificationOK)
+                {
+                    Thread.Sleep(10);
+                    if (m_infoCarrier.p_eStateCarrierID == GemCarrierBase.eGemState.VerificationFailed)
+                        return p_sInfo + " infoCarrier.p_eStateCarrierID = " + m_infoCarrier.p_eStateCarrierID.ToString();
+                }
+                if (m_infoCarrier.p_eTransfer != GemCarrierBase.eTransfer.TransferBlocked)
+                    return p_sInfo + " infoCarrier.p_eTransfer = " + m_infoCarrier.p_eTransfer.ToString();
+
+                if (EQ.p_bSimulate)
+                {
+                    InfoCarrier infoCarrier = m_infoCarrier;
+                    List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
+                    string sMap = m_sSimulSlotmap;
+                    foreach (char ch in sMap)
+                    {
+                        switch (ch)
+                        {
+                            case '0':
+                                aSlot.Add(GemSlotBase.eState.Empty);
+                                break;
+                            case '1':
+                                aSlot.Add(GemSlotBase.eState.Exist);
+                                break;
+                            case 'D':
+                                aSlot.Add(GemSlotBase.eState.Double);
+                                break;
+                            case 'C':
+                                aSlot.Add(GemSlotBase.eState.Cross);
+                                break;
+                            default:
+                                aSlot.Add(GemSlotBase.eState.Undefined);
+                                break;
+                        }
+                    }
+                    infoCarrier.SetMapData(aSlot);
+                }
+                else
+                {
+                    if (m_module.Run(m_module.CmdLoad(m_bMapping)))
+                        return p_sInfo;
+                    if (m_module.Run(m_module.CmdGetMapData()))
+                        return p_sInfo;
+                    m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+                }
+                m_infoCarrier.SendSlotMap();
+                while (m_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
+                {
+                    Thread.Sleep(10);
+                    if (m_infoCarrier.p_eStateSlotMap == GemCarrierBase.eGemState.VerificationFailed)
+                        return p_sInfo + " infoCarrier.p_eStateSlotMap = " + m_infoCarrier.p_eStateSlotMap.ToString();
+                }
+                //m_module.m_ceidDocking.Send();
                 return "OK";
             }
         }
@@ -570,10 +761,12 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
-                if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock) return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                if (m_module.Run(m_module.CmdUnload())) return p_sInfo;
+                if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
+                    return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                if (m_module.Run(m_module.CmdUnload()))
+                    return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                m_module.m_ceidUnDocking.Send(); 
+                m_module.m_ceidUnDocking.Send();
                 return "OK";
             }
         }

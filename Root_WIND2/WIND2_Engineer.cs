@@ -125,6 +125,8 @@ namespace Root_WIND2
         bool m_bUseXGem = true;
         XGem m_xGem = null;
         XGem_UI m_xGemUI = new XGem_UI();
+        WIND2_Warning m_Warn = new WIND2_Warning();
+
         void InitXGem()
         {
             if (m_bUseXGem == false) return;
@@ -141,20 +143,6 @@ namespace Root_WIND2
         #endregion
 
         public WIND2_Handler m_handler = new WIND2_Handler();
-
-        private InspectionManagerFrontside inspectionFront;
-        public InspectionManagerFrontside InspectionFront { get => inspectionFront; set => inspectionFront = value; }
-
-        private InspectionManagerBackside inspectionBack;
-        public InspectionManagerBackside InspectionBack { get => inspectionBack; set => inspectionBack = value; }
-
-
-        private InspectionManagerEdge inspectionEdge;
-        public InspectionManagerEdge InspectionEdge { get => inspectionEdge; set => inspectionEdge = value; }
-
-        private InspectionManagerEBR inspectionEBR;
-        public InspectionManagerEBR InspectionEBR { get => inspectionEBR; set => inspectionEBR = value; }
-
 
         #region Tree Setup
         public TreeRoot m_treeRoot;

@@ -292,7 +292,7 @@ namespace RootTools.Camera.Dalsa
         public bool p_bOnGrab { get { return m_sapXfer.Grabbing; } }
 
         bool m_bLive = false; 
-        public void GrabLineScan(MemoryData memory, CPoint cp0, int nLine, bool bInvY = false, int yInvOffset = 0)
+        public void GrabLineScan(MemoryData memory, CPoint cp0, int nLine, int nScanOffsetY = 0, bool bInvY = false, int yInvOffset = 0)
         {
             SetMemoryData(memory);
             p_sInfo = StartGrab(cp0, nLine, bInvY, yInvOffset); 
@@ -488,6 +488,6 @@ namespace RootTools.Camera.Dalsa
 
         public double GetFps() { return 0; }
 
-        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReserveOffsetY = 0) { }
     }
 }

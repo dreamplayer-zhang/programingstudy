@@ -3,6 +3,7 @@ using RootTools;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -114,27 +115,26 @@ namespace Root_WIND2
 
 
         Setup_ViewModel m_Setup;
-        Recipe m_Recipe;
+        RecipeBase m_Recipe;
         public Frontside_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
-            m_Recipe = setup.Recipe;
 
             p_Summary_VM = new FrontsideSummary_ViewModel();
-            p_Summary_VM.init(setup, m_Recipe);
+            p_Summary_VM.init(setup);
             
             p_Origin_VM = new FrontsideOrigin_ViewModel();
             p_Origin_VM.SetOrigin += P_Origin_VM_SetOrigin;
-            p_Origin_VM.init(setup, m_Recipe);
+            p_Origin_VM.init(setup);
 
             p_Position_VM = new FrontsidePosition_ViewModel();
-            p_Position_VM.init(setup, m_Recipe);
+            p_Position_VM.init(setup);
 
             p_ROI_VM = new FrontsideMask_ViewModel();
-            p_ROI_VM.Init(setup,m_Recipe);
+            p_ROI_VM.Init(setup);
 
             p_Spec_VM = new FrontsideSpec_ViewModel();
-            p_Spec_VM.init(this, m_Recipe);
+            p_Spec_VM.init(this);
 
             p_Origin_VM.MapControl_VM.SetMasterDie += P_Origin_VM_SetMasterDie;
 
@@ -161,7 +161,7 @@ namespace Root_WIND2
         {
             p_Origin_VM.SetMasterDie(e);
         }
-        public void UI_Redraw()
+        public void UpdateUI()
         {
             // 추후에 관리 통합할 수 있도록 변경
             p_Map_VM.Load(); // Map
@@ -215,6 +215,112 @@ namespace Root_WIND2
                 });
             }
         }
+
+        public ICommand btnFrontNewRecipe
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+                    dlg.InitialDirectory = Constants.Path.RecipeFrontRootPath;
+                    dlg.Title = "Save Recipe";
+                    dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                        string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                        string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                        string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+                        string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                        DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+                        if (!dir.Exists)
+                            dir.Create();
+
+                        RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                        recipe.Clear();
+
+                        recipe.Name = sFileNameNoExt;
+                        recipe.RecipePath = sFullPath;
+                        recipe.RecipeFolderPath = sRecipeFolderPath;
+
+                        recipe.Save(sFullPath);
+                    }
+                });
+            }
+        }
+
+        public ICommand btnFrontSaveRecipe
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                    if(recipe.RecipePath != "")
+                    {
+                        recipe.Save(recipe.RecipePath);
+                    }
+                    else
+                    {
+                        System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+                        dlg.InitialDirectory = Constants.Path.RecipeFrontRootPath;
+                        dlg.Title = "Save Recipe";
+                        dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                        if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        {
+                            string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                            string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                            string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                            string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+                            string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                            DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+                            if (!dir.Exists)
+                                dir.Create();
+
+                            recipe.Name = sFileNameNoExt;
+                            recipe.RecipePath = sFullPath;
+                            recipe.RecipeFolderPath = sRecipeFolderPath;
+
+                            recipe.Save(sFullPath);
+                        }
+                    }
+                });
+            }
+        }
+
+        public ICommand btnFrontLoadRecipe
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+                    dlg.InitialDirectory = Constants.Path.RecipeFrontRootPath;
+                    dlg.Title = "Load Recipe";
+                    dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                        string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                        string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                        string sFullPath = Path.Combine(sFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                        DirectoryInfo dir = new DirectoryInfo(sFolderPath);
+                        if (!dir.Exists)
+                            dir.Create();
+
+                        RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                        recipe.Read(sFullPath);
+
+                        UpdateUI();
+                    }
+                });
+            }
+        }
+
         public ICommand btnFrontMap
         {
             get
@@ -230,9 +336,10 @@ namespace Root_WIND2
             get
             {
                 return new RelayCommand(() =>
-                {
-                    SetPage(Origin);
+                { 
                     p_Origin_VM.SetPage();
+                    SetPage(Origin);
+                    
                 });
             }
         }

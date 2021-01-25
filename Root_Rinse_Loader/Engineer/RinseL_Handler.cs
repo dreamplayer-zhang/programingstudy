@@ -188,9 +188,9 @@ namespace Root_Rinse_Loader.Engineer
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
-                    case EQ.eState.Run:break;
+                    case EQ.eState.Run: break;
                 }
-                p_bRun = (EQ.p_eState == EQ.eState.Run); 
+                p_bRun = (EQ.p_eState == EQ.eState.Run);
             }
         }
         #endregion
@@ -210,11 +210,12 @@ namespace Root_Rinse_Loader.Engineer
         string RunPickerSet()
         {
             m_loader.m_bPickersetMode = true; 
-            EQ.p_eState = EQ.eState.Run; 
             m_storage.StartMoveStackReady();
+            EQ.p_eState = EQ.eState.Run;
             while (m_storage.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             if (EQ.IsStop()) return "EQ Stop";
             m_loader.StartPickerSet();
+            EQ.p_eState = EQ.eState.Run;
             return "OK";  
         }
 

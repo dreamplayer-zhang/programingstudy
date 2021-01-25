@@ -64,7 +64,7 @@ namespace RootTools_Vision.delete
 
         public abstract void SetWorkplaceBundle(WorkplaceBundle workplace);
 
-        public abstract void SetRecipe(Recipe _recipe);
+        public abstract void SetRecipe(RecipeBase _recipe);
 
         public abstract WorkBase Clone();
 

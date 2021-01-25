@@ -77,6 +77,12 @@ namespace RootTools
             get { return m_EQ.p_nRnR; }
             set { m_EQ.p_nRnR = value; }
         }
+
+        public static int p_nRunLP
+        {
+            get { return m_EQ.p_nRunLP; }
+            set { m_EQ.p_nRunLP = value; }
+        }
     }
 
     public class _EQ : NotifyProperty
@@ -188,6 +194,18 @@ namespace RootTools
             set
             {
                 _nRnR = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int _nRunLP = 0;
+        public int p_nRunLP
+        {
+            get { return _nRunLP; }
+            set
+            {
+                if (_nRunLP == value) return;
+                _nRunLP = value;
                 OnPropertyChanged();
             }
         }

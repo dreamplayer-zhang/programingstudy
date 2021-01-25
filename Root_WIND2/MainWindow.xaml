@@ -13,6 +13,7 @@
         Height="1080"
         Width="1920"
         Title="WIND2"
+        x:Name="mainWindow"
         Background="{StaticResource PanelBackGround}"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
@@ -94,18 +95,18 @@
 
         <!--Log Area Start-->
         <GridSplitter Grid.Row="2" 
-                      Height="3"
+                      Height="5"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
                       Background="{StaticResource Splitter}"
                       ShowsPreview="True" Grid.ColumnSpan="2"/>
-        <Border Grid.Row="3" Grid.ColumnSpan="2" Panel.ZIndex="99">
+        <Border Grid.Row="3" Grid.ColumnSpan="2" Panel.ZIndex="99" Margin="3">
             <TabControl>
-                <TabItem Header="ALL" FontSize="10">
+                <TabItem Header="Log" FontSize="10">
                     <tools:LogView_UI x:Name="logView" Margin="1" />
                 </TabItem>
-                <TabItem Header="System" FontSize="10">
-                   
+                <TabItem Header="Warning" FontSize="10">
+                    <local:Warning_UI x:Name="WarningUI"></local:Warning_UI>
                 </TabItem>
                 <TabItem Header="Inspection" FontSize="10"/>
                 <TabItem Header="I/O" FontSize="10"/>

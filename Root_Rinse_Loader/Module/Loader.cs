@@ -52,6 +52,18 @@ namespace Root_Rinse_Loader.Module
             for (int n = 0; n < 4; n++) m_aPicker.Add(new Picker("Picker" + n.ToString(), this));
         }
 
+        bool _bVacuum = false; 
+        public bool p_bVacuum
+        {
+            get { return _bVacuum; }
+            set
+            {
+                if (_bVacuum == value) return;
+                _bVacuum = value;
+                OnPropertyChanged(); 
+            }
+        }
+
         double m_secVac = 2;
         double m_secBlow = 0.5;
         public string RunVacuum(bool bOn)
@@ -60,6 +72,7 @@ namespace Root_Rinse_Loader.Module
             if (bOn)
             {
                 Thread.Sleep((int)(1000 * m_secVac));
+                p_bVacuum = true; 
                 return "OK";
             }
             else
@@ -67,101 +80,54 @@ namespace Root_Rinse_Loader.Module
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
                 Thread.Sleep((int)(1000 * m_secBlow));
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
+                p_bVacuum = false; 
             }
             return "OK";
         }
 
-        void RunTreePicker(Tree tree)
-        {
-            m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum Sensor Wait (sec)");
-            m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
-        }
-        #endregion
-
-        #region Picker Up & Down
         DIO_I2O2 m_dioPickerDown;
         public string RunPickerDown(bool bDown)
         {
             m_dioPickerDown.Write(bDown);
             return m_dioPickerDown.WaitDone();
         }
-        #endregion
 
-        #region PickerSet
-        public bool m_bPickersetMode = false; 
-        public string StartPickerSet()
-        {
-            StartRun(m_runPickerSet.Clone()); 
-            return "OK"; 
-        }
-
-        string RunPickerSet()
+        int m_nShake = 0;
+        double[] m_secShake = new double[2] { 0.3, 0.2 }; 
+        public string RunShakeUp()
         {
             try
             {
-                if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
-                bool bDown = false;
-                bool bVacuum = false; 
-                while (true)
+                for (int n = 0; n < m_nShake; n++)
                 {
-                    switch (CheckPickerSet())
-                    {
-                        case ePickerSet.Stop: return "OK";
-                        case ePickerSet.UpDown:
-                            bDown = !bDown;
-                            if (Run(RunPickerDown(bDown))) return p_sInfo;
-                            break; 
-                        case ePickerSet.Vacuum:
-                            bVacuum = !bVacuum;
-                            if (Run(RunVacuum(bVacuum))) return p_sInfo;  
-                            break; 
-                    }
+                    m_dioPickerDown.Write(false);
+                    Thread.Sleep((int)(1000 * m_secShake[0]));
+                    m_dioPickerDown.Write(true);
+                    Thread.Sleep((int)(1000 * m_secShake[1]));
                 }
+                return RunPickerDown(false);
             }
             finally
             {
-                RunPickerDown(false);
-                MoveLoader(ePos.Roller);
-                m_bPickersetMode = false; 
+                foreach (Picker picker in m_aPicker)
+                {
+                    if (picker.m_dioVacuum.p_bIn == false) picker.m_dioVacuum.Write(false); 
+                }
             }
         }
 
-        enum ePickerSet
+        void RunTreePicker(Tree tree)
         {
-            UpDown,
-            Vacuum,
-            Stop
+            m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum Sensor Wait (sec)");
+            m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
+            m_nShake = tree.Set(m_nShake, m_nShake, "Shake", "Shake Up Count");
+            RunTreePickerShake(tree.GetTree("Shake Delay", true, m_nShake > 0), m_nShake > 0); 
         }
 
-        DIO_I m_diPickerSet;
-        StopWatch m_swPickerSet = new StopWatch();
-        bool _bPickerSet = false;
-        bool p_bPickerSet
+        void RunTreePickerShake(Tree tree, bool bVisible)
         {
-            get { return _bPickerSet; }
-            set
-            {
-                if (_bPickerSet == value) return;
-                _bPickerSet = value; 
-            }
-        }
-
-        ePickerSet CheckPickerSet()
-        {
-            while (p_bPickerSet == false)
-            {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return ePickerSet.Stop; 
-            }
-            m_swPickerSet.Start();
-            while (p_bPickerSet)
-            {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return ePickerSet.Stop;
-                if (m_swPickerSet.ElapsedMilliseconds > 3000) return ePickerSet.Stop; 
-            }
-            int nSec = (int)(m_swPickerSet.ElapsedMilliseconds / 1000);
-            return (m_swPickerSet.ElapsedMilliseconds < 1000) ? ePickerSet.UpDown : ePickerSet.Vacuum; 
+            m_secShake[0] = tree.Set(m_secShake[0], m_secShake[0], "Up", "Shake Up Time (sec)", bVisible);
+            m_secShake[1] = tree.Set(m_secShake[1], m_secShake[1], "Down", "Shake Down Time (sec)", bVisible);
         }
         #endregion
 
@@ -185,7 +151,73 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
-        #region Run Load
+        #region PickerSet
+        public bool m_bPickersetMode = false;
+        public string StartPickerSet()
+        {
+            StartRun(m_runPickerSet.Clone());
+            return "OK";
+        }
+
+        string RunPickerSet()
+        {
+            try
+            {
+                if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
+                bool bDown = false;
+                bool bVacuum = false;
+                while (true)
+                {
+                    switch (CheckPickerSet())
+                    {
+                        case ePickerSet.Stop: return "OK";
+                        case ePickerSet.UpDown:
+                            bDown = !bDown;
+                            if (Run(RunPickerDown(bDown))) return p_sInfo;
+                            break;
+                        case ePickerSet.Vacuum:
+                            bVacuum = !bVacuum;
+                            if (Run(RunVacuum(bVacuum))) return p_sInfo;
+                            break;
+                    }
+                }
+            }
+            finally
+            {
+                RunPickerDown(false);
+                MoveLoader(ePos.Roller);
+                m_bPickersetMode = false;
+            }
+        }
+
+        enum ePickerSet
+        {
+            UpDown,
+            Vacuum,
+            Stop
+        }
+
+        DIO_I m_diPickerSet;
+        StopWatch m_swPickerSet = new StopWatch();
+        ePickerSet CheckPickerSet()
+        {
+            while (m_diPickerSet.p_bIn == false)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return ePickerSet.Stop;
+            }
+            m_swPickerSet.Start();
+            while (m_diPickerSet.p_bIn)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return ePickerSet.Stop;
+                if (m_swPickerSet.ElapsedMilliseconds > 3000) return ePickerSet.Stop;
+            }
+            return (m_swPickerSet.ElapsedMilliseconds < 1000) ? ePickerSet.UpDown : ePickerSet.Vacuum;
+        }
+        #endregion
+
+        #region Run Load & Unload
         public string RunLoad()
         {
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack"; 
@@ -202,7 +234,7 @@ namespace Root_Rinse_Loader.Module
             if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
             if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
-            if (Run(RunPickerDown(false))) return p_sInfo;
+            if (Run(RunShakeUp())) return p_sInfo;
             if (Run(m_storage.StartMoveStackReady())) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             return "OK";
@@ -223,14 +255,12 @@ namespace Root_Rinse_Loader.Module
             return "OK";
         }
 
-        public bool IsLoad()
+        public string RunRun()
         {
-            if (m_aPicker[0].m_dioVacuum.p_bOut == false) return false; 
-            foreach (Picker picker in m_aPicker)
-            {
-                if (picker.m_dioVacuum.p_bIn) return true; 
-            }
-            return false; 
+            if (m_bPickersetMode) return "OK";
+            if (m_rinse.p_eStateRinse != RinseL.eRinseRun.Run) return "Rinse State not Run";
+            if (m_rinse.p_eStateUnloader != EQ.eState.Run) return "Rinse Unloader State not Run";
+            return p_bVacuum ? RunUnload() : RunLoad(); 
         }
         #endregion
 
@@ -378,14 +408,10 @@ namespace Root_Rinse_Loader.Module
 
             public override string Run()
             {
-                if (m_module.IsLoad())
+                while (EQ.p_eState == EQ.eState.Run)
                 {
-                    if (m_module.Run(m_module.RunUnload())) return p_sInfo; 
-                }
-                while (EQ.p_eState == EQ.eState.Run) //forget me not
-                {
-                    if (m_module.Run(m_module.RunLoad())) return p_sInfo;
-                    if (m_module.Run(m_module.RunUnload())) return p_sInfo;
+                    Thread.Sleep(10); 
+                    if (m_module.Run(m_module.RunRun())) return p_sInfo; 
                 }
                 return "OK"; 
             }

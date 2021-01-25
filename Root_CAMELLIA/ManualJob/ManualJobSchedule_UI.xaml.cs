@@ -246,7 +246,7 @@ namespace Root_CAMELLIA.ManualJob
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {
                         infoWafer.RecipeOpen("C:\\Recipe\\" + m_cbRecipe[i].Text);
-                        m_infoCarrier.StartProcess(infoWafer.p_id); 
+                        //m_infoCarrier.StartProcess(infoWafer.p_id); 
                     }
                 }
             }

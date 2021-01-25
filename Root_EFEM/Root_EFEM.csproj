@@ -235,6 +235,7 @@
     <Compile Include="Module\Aligner_ATI_AOI.cs" />
     <Compile Include="Module\Aligner_RND.cs" />
     <Compile Include="Module\EFEM_AOP.cs" />
+    <Compile Include="Module\Gem_XGem300Pro.cs" />
     <Compile Include="Module\IWTRRun.cs" />
     <Compile Include="Module\Loadport_Cymechs.cs" />
     <Compile Include="Module\RFID_Brooks.cs" />
@@ -281,6 +282,5 @@
       <Name>RootTools</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

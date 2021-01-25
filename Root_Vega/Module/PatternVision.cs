@@ -971,7 +971,7 @@ namespace Root_Vega.Module
                         //int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * (double)m_nScanRate / 100);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * (double)m_nScanRate / 100);
 
-                        m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, 0, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
@@ -1547,7 +1547,7 @@ namespace Root_Vega.Module
                         if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                         if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
                         m_module.p_axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos, m_dTriggerPeriod, m_dTriggerUptime, true);
-                        m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, 0, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
@@ -1600,7 +1600,7 @@ namespace Root_Vega.Module
                             if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                             if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
                             m_module.p_axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos, m_dTriggerPeriod, m_dTriggerUptime, true);
-                            m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                            m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, 0, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
                             if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
                             if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                             axisXY.p_axisY.RunTrigger(false);

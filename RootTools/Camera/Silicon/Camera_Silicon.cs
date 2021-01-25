@@ -384,7 +384,7 @@ namespace RootTools.Camera.Silicon
         int m_nFrameCnt;
         CRect m_LastROI;
         Thread m_GrabThread;
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0)
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReserveOffsetY = 0)
         {
             SetSisoParam();
             AllocateGrabberMem(szBuf);
@@ -452,7 +452,7 @@ namespace RootTools.Camera.Silicon
         {
         }
 
-        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReserveOffsetY = 0) { }
 
         #region RelayCommand
         public RelayCommand ConnectCommand

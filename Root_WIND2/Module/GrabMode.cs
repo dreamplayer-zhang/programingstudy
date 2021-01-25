@@ -40,6 +40,7 @@ namespace Root_WIND2.Module
         public int m_nWaferSize_mm = 1000;              // Wafer Size (mm)
         public int m_nMaxFrame = 100;                   // Camera max Frame 스펙
         public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
+        public int m_nYOffset = 0;
 
         void RunTreeOption(Tree tree, bool bVisible, bool bReadOnly)
         {
@@ -47,16 +48,15 @@ namespace Root_WIND2.Module
             m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
             m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam X Resolution", "X Resolution (um)", bVisible);
             m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Cam Y Resolution", "Y Resolution (um)", bVisible);
+            m_nYOffset = tree.Set(m_nYOffset, m_nYOffset, "Cam Y Offset", "Y Tilt(pxl)", bVisible);
             m_nFocusPosZ = tree.Set(m_nFocusPosZ, m_nFocusPosZ, "Focus Z Position", "Focus Z Position", bVisible);
             m_nWaferSize_mm = tree.Set(m_nWaferSize_mm, m_nWaferSize_mm, "Wafer Size Y", "Wafer Size Y", bVisible);
             m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
             m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
         }
-            
 
         void RunTreeCamera(Tree tree, bool bVisible, bool bReadOnly)
         {
-            
             m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
             m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
             m_nReverseOffsetY = tree.Set(m_nReverseOffsetY, 800, "ReverseOffsetY", "Reverse Scan 동작시 Y 이미지 Offset 설정");
@@ -70,14 +70,14 @@ namespace Root_WIND2.Module
             m_dVRSFocusPos = tree.Set(m_dVRSFocusPos, m_dVRSFocusPos, "VRS Focus Z", "VRS Focus Z", bVisible, true);
         }
 
-        public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false)
+        public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine ,int nScanOffsetY =0 , bool bInvY = false)
         {
-            m_camera.GrabLineScan(memory, cpScanOffset, nLine, bInvY, m_nReverseOffsetY);
+            m_camera.GrabLineScan(memory, cpScanOffset, nLine, nScanOffsetY, bInvY , m_nReverseOffsetY);
             m_camera.Grabed += m_camera_Grabed;
         }
-        public void StartGrabColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false)
+        public void StartGrabColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY=0, bool bInvY = false)
         {
-            m_camera.GrabLineScanColor(memory, cpScanOffset, nLine, bInvY, m_nReverseOffsetY);
+            m_camera.GrabLineScanColor(memory, cpScanOffset, nLine, nScanOffsetY, bInvY,  m_nReverseOffsetY);
             m_camera.Grabed += m_camera_Grabed;
         }
         void m_camera_Grabed(object sender, System.EventArgs e)

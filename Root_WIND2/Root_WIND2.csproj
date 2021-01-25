@@ -211,6 +211,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Constants.cs" />
     <Compile Include="Controls\UserControl\ColorPicker.xaml.cs">
       <DependentUpon>ColorPicker.xaml</DependentUpon>
     </Compile>
@@ -240,6 +241,7 @@
     <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Maskbk.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />
     <Compile Include="Module\EdgeSideVision\Run_InspectEBR.cs" />
@@ -250,6 +252,10 @@
     <Compile Include="Module\InspectionManagerFrontside.cs" />
     <Compile Include="Module\Vision\Run_AutoFocus.cs" />
     <Compile Include="Module\Vision\Run_VisionAlign.cs" />
+    <Compile Include="Recipe\RecipeBack.cs" />
+    <Compile Include="Recipe\RecipeEBR.cs" />
+    <Compile Include="Recipe\RecipeEdge.cs" />
+    <Compile Include="Recipe\RecipeFront.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\BacksideInspection.xaml.cs">
       <DependentUpon>BacksideInspection.xaml</DependentUpon>
     </Compile>
@@ -269,6 +275,9 @@
     </Compile>
     <Compile Include="UI\Interfaces\IRecipeUILoadable.cs" />
     <Compile Include="Module\WIND2.cs" />
+    <Compile Include="Warning_UI.xaml.cs">
+      <DependentUpon>Warning_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WIND2EventArgs.cs" />
     <Compile Include="WIND2EventManager.cs" />
     <Compile Include="Module\BackSideVision.cs" />
@@ -277,7 +286,6 @@
     <Compile Include="Module\Vision\Run_GrabLineScan.cs" />
     <Compile Include="Module\Vision\Run_Inspect.cs" />
     <Compile Include="Module\Common\Run_Rotate.cs" />
-    <Compile Include="ProgramManager.cs" />
     <Compile Include="UIManager.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\InspectionROI.cs" />
     <Compile Include="Module\EdgeSideVision.cs" />
@@ -427,6 +435,7 @@
     <Compile Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml.cs">
       <DependentUpon>WIND2_Recipe_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WIND2_Warning.cs" />
     <Page Include="Controls\UserControl\ColorPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -623,6 +632,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Warning_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -668,6 +681,7 @@
     <Resource Include="Resources\Origin.PNG" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Module\BacksideVision\" />
     <Folder Include="UI\Tune\" />
   </ItemGroup>
   <ItemGroup>

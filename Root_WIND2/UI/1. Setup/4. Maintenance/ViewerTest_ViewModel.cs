@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Memory;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +47,7 @@ namespace Root_WIND2.UI
 
         public void Init(MemoryTool tool)
         {
-            m_Viewer.init(null, ProgramManager.Instance.DialogService);
+            m_Viewer.init(null, GlobalObjects.Instance.Get<DialogService>());
             m_ToolMemory = tool;
 
             m_imagedata = new ImageData(m_ToolMemory.GetMemory("Vision.Memory", "Vision", "Main"));

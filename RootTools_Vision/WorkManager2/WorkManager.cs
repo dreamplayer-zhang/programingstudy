@@ -166,7 +166,6 @@ namespace RootTools_Vision
                     this.State = WORKMANAGER_STATE.STOP;
                     _waitSignal.Reset();
                     _waitSignal.WaitOne();
-                    continue;
                 }
                 else
                 {
@@ -176,7 +175,7 @@ namespace RootTools_Vision
 
                 this.State = WORKMANAGER_STATE.CHECK;
                 // 아직 일이 남아있는지 체크
-                if (this.workplaceBundle.CheckStateCompleted(this.workType) == true) // 모두 완료되었다면,
+                if (this.workplaceBundle != null && this.workplaceBundle.CheckStateCompleted(this.workType) == true) // 모두 완료되었다면,
                 {
                     Stop();
                     continue;
@@ -189,25 +188,30 @@ namespace RootTools_Vision
                 }
 
                 this.State = WORKMANAGER_STATE.ASSIGN;
-                Task.Run(() =>
+                if(this.workplaceBundle != null)
                 {
-                    if (AssignWorkToWorker() == false)
+                    //Task.Run(() =>
                     {
+                        if (AssignWorkToWorker() == false)
+                        {
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                        DebugOutput.PrintWorkManagerInfo(this, "False");
+                            DebugOutput.PrintWorkManagerInfo(this, "False");
 #endif
 #endif
-                    }
-                    else
-                    {
+                        }
+                        else
+                        {
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                        DebugOutput.PrintWorkManagerInfo(this, "True");
+                            DebugOutput.PrintWorkManagerInfo(this, "True");
 #endif
 #endif
+                        }
                     }
-                });
+                    //);
+                }
+
 
                 this.State = WORKMANAGER_STATE.DONE;
 

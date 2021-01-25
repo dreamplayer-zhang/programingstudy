@@ -274,6 +274,7 @@ namespace RootTools
             if (p_lWafer > aSlotState.Count) return "SetMapData Lendth Error";
             for (int n = 0; n < p_lWafer; n++)
             {
+                m_aGemSlot[n].p_eState = aSlotState[n];
                 if (aSlotState[n] == GemSlotBase.eState.Exist) SetInfoWafer(n);
                 else SetInfoWafer(n, null);
             }

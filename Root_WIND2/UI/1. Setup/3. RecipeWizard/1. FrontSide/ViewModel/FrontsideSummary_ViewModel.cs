@@ -19,13 +19,12 @@ namespace Root_WIND2
 {
     class FrontsideSummary_ViewModel : RootViewer_ViewModel, IRecipeUILoadable
     {
-        public void init(Setup_ViewModel _setup, Recipe _recipe)
+        public void init(Setup_ViewModel _setup)
         {
             this.setup = _setup;
-            this.recipe = _recipe;
 
-            MapControl_VM = new MapControl_ViewModel(recipe);
-            MapControl_VM.SetMap(setup.Recipe.WaferMap.Data, new CPoint(14, 14));
+            MapControl_VM = new MapControl_ViewModel();
+            MapControl_VM.SetMap();
             
             //timer.Interval = TimeSpan.FromSeconds(1);    
             //timer.Tick += new EventHandler(DateTimeUpdate);         
@@ -39,7 +38,7 @@ namespace Root_WIND2
 
         #region [Member Variables]
         Setup_ViewModel setup;
-        Recipe recipe;
+
         DispatcherTimer timer = new DispatcherTimer();
         ImageData masterImageData;
         #endregion
@@ -193,7 +192,8 @@ namespace Root_WIND2
 
                 if (displayOption == DisplayOption.None)
                 {
-                    OriginRecipe originRecipe = this.recipe.GetRecipe<OriginRecipe>();
+                    
+                    OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
                     Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
                     {
                         MasterImg = masterImageData.GetBitMapSource(originRecipe.MasterImage.ByteCnt);
@@ -287,26 +287,28 @@ namespace Root_WIND2
         }
         private void DrawMapData()
         {
-            RecipeType_WaferMap mapdata = recipe.WaferMap;
+
+            RecipeType_WaferMap mapdata = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
             if (mapdata.Data.Length > 0)
             {
                 int nMapX = mapdata.MapSizeX;
                 int nMapY = mapdata.MapSizeY;
 
-                MapControl_VM.SetMap(false, new CPoint(mapdata.MasterDieX, mapdata.MasterDieY), mapdata.Data, new CPoint(nMapX, nMapY));
+                MapControl_VM.SetMap(false, new CPoint(mapdata.MasterDieX, mapdata.MasterDieY));
             }
             else
             {
-                MapControl_VM.SetMap(false, new CPoint(0, 5), setup.Recipe.WaferMap.Data, new CPoint(14, 14));
+                MapControl_VM.SetMap(false, new CPoint(0, 0));
             }
         }
         private void SetMapData()
         {
-            MapSzX = recipe.WaferMap.MapSizeX;
-            MapSzY = recipe.WaferMap.MapSizeY;
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            MapSzX = waferMap.MapSizeX;
+            MapSzY = waferMap.MapSizeY;
 
-            OriginDieX = recipe.WaferMap.MasterDieX;
-            OriginDieY = recipe.WaferMap.MasterDieY;
+            OriginDieX = waferMap.MasterDieX;
+            OriginDieY = waferMap.MasterDieY;
 
             //ChipSizeX = recipe.WaferMap.;
             //ChipSizeY = recipe.WaferMap.;
@@ -329,9 +331,10 @@ namespace Root_WIND2
         }
         public void LoadMasterImage()
         {
-            this.recipe.LoadMasterImage();
 
-            OriginRecipe originRecipe = this.recipe.GetRecipe<OriginRecipe>();
+            GlobalObjects.Instance.Get<RecipeFront>().LoadMasterImage();
+
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
             if (originRecipe.MasterImage != null)
             {
                 masterImageData = new ImageData(originRecipe.MasterImage.Width, originRecipe.MasterImage.Height, originRecipe.MasterImage.ByteCnt);

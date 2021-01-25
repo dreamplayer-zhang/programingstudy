@@ -15,12 +15,14 @@ namespace Root_EFEM.Module
         const char m_cEndCharacter = (char)0x0D;
         RS232 m_rs232;
         public IHandler m_handle;
+        ILoadport m_loadport;
 
-        public RFID_Brooks(string sID, IEngineer engineer)
+        public RFID_Brooks(string sID, IEngineer engineer, ILoadport loadport)
         {
             p_id = sID;
             this.InitBase(sID, engineer);
             m_handle = engineer.ClassHandler();
+            m_loadport = loadport;
         }
 
         public override void GetTools(bool bInit)
@@ -315,10 +317,14 @@ namespace Root_EFEM.Module
             {
                 string sResult = "OK";
                 if (EQ.p_bSimulate) m_module.m_sReadID = m_sSimulCarrierID;
-                else if (m_bRFID)
+                else
                 {
-                    sResult = m_module.ReadRFID();
+                    if (m_bRFID)
+                    {
+                        sResult = m_module.ReadRFID();
+                    }
                 }
+                if (sResult == "OK") m_module.m_loadport.p_infoCarrier.p_sCarrierID = m_module.m_sReadID;
                 return sResult;
             }
         }

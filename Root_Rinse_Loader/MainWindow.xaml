@@ -4,25 +4,550 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_Rinse_Loader"
+        xmlns:icon="clr-namespace:Root_Rinse_Loader.Icon"
         xmlns:mainUI="clr-namespace:Root_Rinse_Loader.MainUI"
         xmlns:engineer="clr-namespace:Root_Rinse_Loader.Engineer"
         mc:Ignorable="d"
+        WindowStyle="None"
+        AllowsTransparency="False"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        ResizeMode="CanResizeWithGrip"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
-        Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
+        Height="1080"
+        Width="1920"
+        Background="{StaticResource PanelBackGround}"
+        Title="Rinse Loader">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <ComboBox Grid.Column="0" x:Name="comboMain" SelectionChanged="comboMain_SelectionChanged"/>
-        <TabControl Grid.Row="1" x:Name="tabMain">
-            <TabItem Header="MainUI" Height="0">
-                <mainUI:Main_UI x:Name="mainUI"/>
-            </TabItem>
-            <TabItem Header="Engineer" Height="0">
-                <engineer:RinseL_Engineer_UI x:Name="engineerUI"/>
-            </TabItem>
-        </TabControl>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8.4*" />
+                <RowDefinition Height="1.6*" />
+            </Grid.RowDefinitions>
+
+            <!--Title Bar-->
+            <Grid Grid.Row="0"
+                  Name="TitleBar"
+                  Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+                  MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <StackPanel Orientation="Horizontal">
+                    <Viewbox Margin="3"
+                             VerticalAlignment="Center">
+                        <icon:AtiLogo />
+                    </Viewbox>
+                    <TextBlock Text="Rinse Loader  -  Ver. 0.0.1"
+                               VerticalAlignment="Center"
+                               FontSize="12"
+                               Margin="5,0,0,0"
+                               Grid.Column="1" />
+                </StackPanel>
+
+                <TextBlock FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center" />
+                <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
+                            HorizontalAlignment="Right"
+                            Orientation="Horizontal"
+                            Grid.Column="2">
+                    <Button Style="{StaticResource SystemButton}"
+                            x:Name="MinimizeButton"
+                            Width="30"
+                            Height="25"
+                            Margin="0,0,0,0"
+                            Click="MinimizeButton_Click">
+                        <Path Style="{StaticResource MinimizeIconKey}" />
+                    </Button>
+                    <Button Style="{StaticResource SystemButton}"
+                            x:Name="MaximizeButton"
+                            Width="30"
+                            Height="25"
+                            Margin="0,0,0,0"
+                            Click="MaximizeButton_Click">
+                        <Path Style="{StaticResource MaximizeIconKey}" />
+                    </Button>
+                    <Button Style="{StaticResource SystemButton}"
+                            x:Name="NormalizeButton"
+                            Width="30"
+                            Height="25"
+                            Margin="0,0,0,0"
+                            Click="NormalizeButton_Click">
+                        <Path Style="{StaticResource NormalizeIconKey}" />
+                    </Button>
+                    <!--<Button Style="{StaticResource SystemButton}"
+                            x:Name="CloseButton"
+                            Width="30"
+                            Height="25"
+                            Margin="0,0,0,0"
+                            Click="CloseButton_Click"
+                            VerticalAlignment="Bottom">
+                        <Path Style="{StaticResource CloseIconKey}" />
+                    </Button>-->
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.Background>
+                    <LinearGradientBrush EndPoint="0.5,1"
+                                         StartPoint="0.5,0">
+                        <GradientStop Color="LightSteelBlue"
+                                      Offset="0" />
+                        <GradientStop Color="White"
+                                      Offset="2" />
+                    </LinearGradientBrush>
+                </Grid.Background>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="4*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Border Width="60"
+                        HorizontalAlignment="Left"
+                        Margin="5"
+                        BorderBrush="#FF707070"
+                        BorderThickness="1">
+                    <Grid Opacity="0.8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid Background="Crimson" />
+                        <Grid Background="Gold"
+                              Grid.Row="1" />
+                        <Grid Background="SeaGreen"
+                              Grid.Row="2" />
+                    </Grid>
+                </Border>
+                <Grid Grid.Column="1">
+                    <TextBlock x:Name="tbTime"
+                               Text="2020-10-10 15:39:47"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left" />
+                </Grid>
+                <Border Grid.Column="2"
+                        CornerRadius="0,0,50,50">
+                    <Border.Background>
+                        <LinearGradientBrush EndPoint="0.5,1"
+                                             StartPoint="0.5,0">
+                            <GradientStop Color="SteelBlue"
+                                          Offset="0" />
+                            <GradientStop Color="White"
+                                          Offset="2" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <TextBlock Text="LOADER"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               FontSize="32"
+                               FontWeight="Bold" />
+                </Border>
+                <Grid Grid.Column="3">
+                    <TextBlock Grid.Column="0"
+                               Text="Last Log"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center" />
+                </Grid>
+                <StackPanel Grid.Column="4"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <Button Content="Exit"
+                            Click="CloseButton_Click"
+                            VerticalAlignment="Center"
+                            Height="40"
+                            Width="60"
+                            Margin="5"
+                            Command="{Binding CmdExit}" />
+                </StackPanel>
+            </Grid>
+            <Border Grid.Row="2"
+                    BorderThickness="0,1,0,1"
+                    BorderBrush="Black">
+                <TabControl Background="Transparent">
+                    <TabItem Header="UI" Width="100" Height="20">
+                        <Grid Margin="30,20"
+                              Visibility="Visible">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="9*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="2*" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0"
+                                  Grid.ColumnSpan="2"
+                                  Height="1"
+                                  VerticalAlignment="Top"
+                                  Background="Black" />
+                            <Grid Grid.Row="1"
+                                  Grid.ColumnSpan="2"
+                                  Height="1"
+                                  Margin="0,0"
+                                  Background="Black" />
+                            <Grid Grid.Row="3"
+                                  Grid.ColumnSpan="2"
+                                  Height="1"
+                                  Margin="0,0"
+                                  Background="Black" />
+                            <Grid Grid.Row="5"
+                                  Grid.ColumnSpan="2"
+                                  Height="1"
+                                  Margin="0,0"
+                                  Background="Black" />
+                            <Grid Grid.Row="6"
+                                  Grid.ColumnSpan="2"
+                                  Height="1"
+                                  VerticalAlignment="Bottom"
+                                  Background="Black" />
+                            <TextBlock Text="State"
+                                       Grid.Row="0"
+                                       FontSize="35"
+                                       FontWeight="Bold"
+                                       FontFamily="Arial"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="Option"
+                                       Grid.Row="2"
+                                       FontSize="35"
+                                       FontWeight="Bold"
+                                       FontFamily="Arial"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="Move"
+                                       Grid.Row="4"
+                                       FontSize="35"
+                                       FontWeight="Bold"
+                                       FontFamily="Arial"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="Clamp"
+                                       Grid.Row="6"
+                                       FontSize="35"
+                                       FontWeight="Bold"
+                                       FontFamily="Arial"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
+
+                            <Grid Grid.Row="0"
+                                  Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <GroupBox Header="Loader State"
+                                          Margin="5,10"
+                                          Grid.Column="0"
+                                          BorderThickness="0">
+                                    <Border Margin="5"
+                                            CornerRadius="10"
+                                            Background="SeaGreen">
+                                        <TextBlock Text="Ready"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                </GroupBox>
+                                <GroupBox Header="Unloader State"
+                                          Margin="5,10"
+                                          Grid.Column="1"
+                                          BorderThickness="0">
+                                    <Border Margin="5"
+                                            CornerRadius="10"
+                                            Background="SeaGreen">
+                                        <TextBlock Text="Ready"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                </GroupBox>
+                                <GroupBox Header="Rinse State"
+                                          Grid.Column="2"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Border Margin="5"
+                                            CornerRadius="10"
+                                            Background="SteelBlue">
+                                        <TextBlock Text="Run"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                </GroupBox>
+                            </Grid>
+                            <Grid Grid.Row="2"
+                                  Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <GroupBox Header="Mode"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Magazine / Stack"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Header="Strip Width"
+                                          Grid.Column="1"
+                                          BorderThickness="0"
+                                          Margin="5,10">
+                                    <Grid Background="#FFDDDDDD"
+                                          Margin="5,0">
+                                        <TextBox Text="77"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 Margin="0,0,60,0"
+                                                 Width="300"
+                                                 Height="70"
+                                                 FontSize="30"
+                                                 FontWeight="Bold"
+                                                 FontFamily="Arial"
+                                                 HorizontalContentAlignment="Center"
+                                                 VerticalContentAlignment="Center" />
+                                        <TextBlock Text="mm"
+                                                   Margin="0,20,10,0"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Right"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial" />
+                                    </Grid>
+                                </GroupBox>
+                            </Grid>
+                            <Grid Grid.Row="4"
+                                  Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <GroupBox Header="Jog Move"
+                                          Grid.Column="0"
+                                          Grid.Row="0"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="LIFT UP"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="1"
+                                          Grid.Row="0"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="LIFT DOWN"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Header="Move Level"
+                                          Grid.Column="0"
+                                          Grid.Row="1"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Move - 1"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="1"
+                                          Grid.Row="1"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Move - 2"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="2"
+                                          Grid.Row="1"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Move - 3"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="3"
+                                          Grid.Row="1"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Move - 4"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+
+                            </Grid>
+                            <Grid Grid.Row="6"
+                                  Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <GroupBox Header="Clamp Level"
+                                          Grid.Column="0"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Clamp - 1"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="1"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Clamp - 2"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="2"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Clamp - 3"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="3"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Clamp - 4"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+
+                            </Grid>
+
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Engineer" Width="100">
+                        <engineer:RinseL_Engineer_UI x:Name="engineerUI" />
+                    </TabItem>
+                </TabControl>
+            </Border>
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Button Content="Initialize"
+                        Grid.Column="0"
+                        Margin="10"
+                        FontSize="40"
+                        FontWeight="Bold"
+                        FontFamily="Arial"
+                        BorderBrush="{x:Null}" />
+                <Button Content="Start"
+                        Grid.Column="1"
+                        Margin="10"
+                        FontSize="40"
+                        FontWeight="Bold"
+                        FontFamily="Arial"
+                        BorderBrush="{x:Null}" />
+                <Button Content="Pause"
+                        Grid.Column="2"
+                        Margin="10"
+                        FontSize="40"
+                        FontWeight="Bold"
+                        FontFamily="Arial"
+                        BorderBrush="{x:Null}" />
+                <Button Content="Reset"
+                        Grid.Column="3"
+                        Margin="10"
+                        FontSize="40"
+                        FontWeight="Bold"
+                        FontFamily="Arial"
+                        BorderBrush="{x:Null}" />
+                <Button Content="Picker Set"
+                        Grid.Column="4"
+                        Margin="10"
+                        FontSize="40"
+                        FontWeight="Bold"
+                        FontFamily="Arial"
+                        BorderBrush="{x:Null}" />
+            </Grid>
+            <Grid Grid.Row="2"
+                  Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition  Height="25" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <ComboBox Grid.Row="0"
+                          x:Name="comboMain"
+                          SelectionChanged="comboMain_SelectionChanged" />
+                <TabControl Grid.Row="1"
+                            x:Name="tabMain">
+                    <TabItem Header="MainUI"
+                             Height="0">
+                        <mainUI:Main_UI x:Name="mainUI" />
+                    </TabItem>
+                    <TabItem Header="Engineer"
+                             Height="0">
+                        
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Grid>
+
     </Grid>
 </Window>

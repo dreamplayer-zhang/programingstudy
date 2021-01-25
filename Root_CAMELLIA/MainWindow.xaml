@@ -719,7 +719,7 @@
                 <TabItem Header="Log" Width="80">
                 </TabItem>
                 <TabItem Header="RT Graph">
-                    <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
+                    <!--<met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>-->
                 </TabItem>
             </TabControl>
             <Grid Grid.Column="3">
