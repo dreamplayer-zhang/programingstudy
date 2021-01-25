@@ -197,6 +197,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Engineer\AOP01_Process.cs" />
+    <Compile Include="Engineer\AOP01_Process_UI.xaml.cs">
+      <DependentUpon>AOP01_Process_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\3. RUN\ManualJobSchedule.cs" />
     <Compile Include="UI\3. RUN\Dlg_Start.xaml.cs">
       <DependentUpon>Dlg_Start.xaml</DependentUpon>
@@ -285,6 +289,10 @@
     <Compile Include="UI_UserControl\Loadport_UI.xaml.cs">
       <DependentUpon>Loadport_UI.xaml</DependentUpon>
     </Compile>
+    <Page Include="Engineer\AOP01_Process_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\3. RUN\Dlg_Start.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

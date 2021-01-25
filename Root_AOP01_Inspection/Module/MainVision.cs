@@ -201,6 +201,7 @@ namespace Root_AOP01_Inspection.Module
             m_reg = new Registry(p_id + ".InfoWafer");
             m_sInfoWafer = m_reg.Read("sInfoWafer", m_sInfoWafer);
             p_infoWafer = m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
+            p_eSide = (eSide)m_reg.Read("p_eSide", p_eSide); 
         }
         #endregion
 
@@ -676,6 +677,22 @@ namespace Root_AOP01_Inspection.Module
         #endregion
 
         #region ModuleRun
+        public enum eSide
+        {
+            Top,
+            Bottom,
+        }
+        eSide _eSide = eSide.Top;
+        public eSide p_eSide
+        {
+            get { return _eSide; }
+            set
+            {
+                if (_eSide == value) return;
+                _eSide = value;
+                m_reg.Write("p_eSide", (int)p_eSide); 
+            }
+        }
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Grab(this), true, "Run Grab");
@@ -936,6 +953,7 @@ namespace Root_AOP01_Inspection.Module
             }
             public Run_Grab(MainVision module)
             {
+                m_valueGeneral = eSide.Top; 
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -1066,6 +1084,7 @@ namespace Root_AOP01_Inspection.Module
             }
             public Run_Grab45(MainVision module)
             {
+                m_valueGeneral = eSide.Top;
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -1290,6 +1309,7 @@ namespace Root_AOP01_Inspection.Module
             }
             public Run_LADS(MainVision module)
             {
+                m_valueGeneral = eSide.Top; //forget
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -1326,6 +1346,7 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+                m_module.p_eSide = m_valueGeneral; //forget
                 if (m_grabMode == null) return "Grab Mode == null";
 
                 try
