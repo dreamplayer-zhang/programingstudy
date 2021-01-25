@@ -151,7 +151,7 @@ namespace Root_EFEM
                 bool bGetPut = false;
                 bool bPut = false;
                 bool bGet = false;
-                if (moduleRun.m_sModuleRun=="Flip")
+                if (moduleRun.m_sModuleRun=="Flip") //forget Delete Flip
                 {
                     bGetPut = false;
                 }
