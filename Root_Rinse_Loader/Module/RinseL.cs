@@ -150,6 +150,7 @@ namespace Root_Rinse_Loader.Module
         DIO_I m_diDoorLock;
         DIO_Os m_doLamp;
         DIO_Os m_doBuzzer;
+        DIO_I m_diLightCurtain;
         void GetToolsDIO()
         {
             p_sInfo = m_toolBox.Get(ref m_dioStart, this, "Start");
@@ -161,6 +162,7 @@ namespace Root_Rinse_Loader.Module
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
             p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
+            p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
         }
 
         bool _bStart = false; 
