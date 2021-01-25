@@ -346,7 +346,7 @@ namespace RootTools
             m_module = module;
             p_sModule = module.p_id;
             p_id = p_sModule + ".InfoCarrier";
-            p_sCarrierID = p_sModule;
+            //p_sCarrierID = p_sModule; //LYJ Carrier ID Loadport 들어가는거 삭제
             p_sLocID = sLocID;
             m_engineer = engineer;
             m_gem = m_engineer.ClassGem();

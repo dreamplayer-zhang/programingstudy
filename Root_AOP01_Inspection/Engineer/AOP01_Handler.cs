@@ -14,7 +14,7 @@ using System.Windows.Media;
 
 namespace Root_AOP01_Inspection
 {
-    public class AOP01_Handler : IHandler
+    public class AOP01_Handler : ObservableObject,IHandler
     {
         public bool bInit=false;
         #region UI Binding
@@ -29,6 +29,14 @@ namespace Root_AOP01_Inspection
             get { return Brushes.BurlyWood; }
             set { }
         }
+        public FFU p_FFU
+        {
+            get { return m_FFU; }
+            set
+            {
+                SetProperty(ref m_FFU, value);
+            }
+        }
         #endregion 
 
         #region Module
@@ -37,6 +45,7 @@ namespace Root_AOP01_Inspection
         public AOP01_Recipe m_recipe;
         public EFEM_Process m_process;
         public MainVision m_mainVision;
+        public FFU m_FFU;
 
         void InitModule()
         {
@@ -45,11 +54,13 @@ namespace Root_AOP01_Inspection
             InitModule(m_aop01); 
             InitWTR();
             InitLoadport();
+            InitRFID();
             m_mainVision = new MainVision("MainVision", m_engineer);
             InitModule(m_mainVision);
-
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_mainVision);
+            m_FFU = new FFU("FFU", m_engineer);
+            InitModule(m_FFU);
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
             iWTR.ReadInfoReticle_Registry();
@@ -137,6 +148,22 @@ namespace Root_AOP01_Inspection
             }
         }
 
+        #region Module RFID
+        public List<IRFID> m_aRFID = new List<IRFID>();
+        void InitRFID()
+        {
+            ModuleBase module;
+            char cID = 'A';
+            for (int n = 0; n < m_lLoadport; n++, cID++)
+            {
+                string sID = "Rfid" + cID;
+                module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]);
+                InitModule(module);
+                m_aRFID.Add((IRFID)module);
+            }
+        }
+        #endregion
+
         public void RunTreeLoadport(Tree tree)
         {
             m_lLoadport = tree.Set(m_lLoadport, m_lLoadport, "Count", "Loadport Count");
@@ -160,7 +187,7 @@ namespace Root_AOP01_Inspection
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
-            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision);
+            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1]);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             if (sInfo == "OK") m_bIsPossible_Recovery = true;
             return sInfo;
@@ -222,6 +249,7 @@ namespace Root_AOP01_Inspection
 
         #region Calc Sequence
         public int m_nRnR = 1;
+        public int p_nRnRCount = 0;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
@@ -347,9 +375,11 @@ namespace Root_AOP01_Inspection
                             //CheckUnload();
                             if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
+                                while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
                                 m_nRnR--;
+                                p_nRnRCount++;
                                 EQ.p_eState = EQ.eState.Run;
                             }
                         }

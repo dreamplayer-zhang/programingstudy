@@ -142,76 +142,78 @@ namespace Root_AOP01_Inspection.Module
         protected override void RunThread()
         {
             base.RunThread();
-
-            if (m_eStatus != EQ.p_eState)
+            if (!EQ.p_bSimulate)
             {
-                switch (EQ.p_eState)
+                if (m_eStatus != EQ.p_eState)
                 {
-                    case EQ.eState.Error:
-                        m_doDoorLock_Use.Write(false);
-                        //m_doBuzzer.Write(eBuzzer.Buzzer2);
-                        m_doLamp.Write(eLamp.Red);
-                        break;
-                    case EQ.eState.Run:
-                        m_doDoorLock_Use.Write(true);
-                        //m_doBuzzer.Write(eBuzzer.Buzzer4);
-                        m_doLamp.Write(eLamp.Green);
-                        break;
-                    case EQ.eState.Home:
-                        //m_doBuzzer.Write(eBuzzer.Buzzer3);
-                        m_doLamp.Write(eLamp.Green);
-                        break;
-                    case EQ.eState.Ready:
-                        m_doDoorLock_Use.Write(false);
-                        BuzzerOff();
-                        m_doLamp.Write(eLamp.Yellow);
-                        break;
-                    case EQ.eState.Init:
-                        m_doDoorLock_Use.Write(false);
-                        BuzzerOff();
-                        m_doLamp.Write(eLamp.Yellow);
-                        break;
+                    switch (EQ.p_eState)
+                    {
+                        case EQ.eState.Error:
+                            m_doDoorLock_Use.Write(false);
+                            //m_doBuzzer.Write(eBuzzer.Buzzer2);
+                            m_doLamp.Write(eLamp.Red);
+                            break;
+                        case EQ.eState.Run:
+                            m_doDoorLock_Use.Write(true);
+                            //m_doBuzzer.Write(eBuzzer.Buzzer4);
+                            m_doLamp.Write(eLamp.Green);
+                            break;
+                        case EQ.eState.Home:
+                            //m_doBuzzer.Write(eBuzzer.Buzzer3);
+                            m_doLamp.Write(eLamp.Green);
+                            break;
+                        case EQ.eState.Ready:
+                            m_doDoorLock_Use.Write(false);
+                            BuzzerOff();
+                            m_doLamp.Write(eLamp.Yellow);
+                            break;
+                        case EQ.eState.Init:
+                            m_doDoorLock_Use.Write(false);
+                            BuzzerOff();
+                            m_doLamp.Write(eLamp.Yellow);
+                            break;
+                    }
+                    m_eStatus = EQ.p_eState;
                 }
-                m_eStatus = EQ.p_eState;
-            }
-            if (m_dioBuzzerOff.p_bIn || (m_gaf.m_listALID.p_aALID.Count < 1))
-                BuzzerOff();
+                if (m_dioBuzzerOff.p_bIn || (m_gaf.m_listALID.p_aALID.Count < 1))
+                    BuzzerOff();
 
-            if (!m_diEMS.p_bIn)
-            {
-                if (!m_diCDA1Low.p_bIn && !m_diCDA2Low.p_bIn)
-                    m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
+                if (!m_diEMS.p_bIn)
+                {
+                    if (!m_diCDA1Low.p_bIn && !m_diCDA2Low.p_bIn)
+                        m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
+                    else
+                        m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMO Buttons");
+                    m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
+                }
                 else
-                    m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMO Buttons");
-                m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
-            }
-            else
-            {
-                m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
-                m_alidProtectionBar.Run(!m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
-                m_alidCDA1Low.Run(m_diCDA1Low.p_bIn, "Please Check Value of CDA1");
-                m_alidCDA2Low.Run(m_diCDA2Low.p_bIn, "Please Check Value of CDA2");
-                m_alid4CH_LED_Cont_FAN.Run(!m_di4CH_LED_Cont_FAN.p_bIn, "Please Check 4CH LED FAN");
-                m_alid12CH_LED_Cont_FAN.Run(!m_di12CH_LED_Cont_FAN.p_bIn, "Please Check 12CH LED FAN");
-                m_alidPC_FAN.Run(!m_diPC_FAN.p_bIn, "Please Check PC FAN");
-                m_alidELECPNLDoorFan.Run(!m_diELECPNLDoorFan.p_bIn, "Please Check ELEC PNL DoorFan");
-                m_alidETCDoorFan.Run(!m_diETCDoorFan.p_bIn, "Please Check ETC DoorFan");
-                if (m_bDoorAlarm)
                 {
-                    m_alidELECPNLDoor.Run(m_diELECPNLDoor.p_bIn, "Please Check ELEC PNL Door Open");
-                    m_alidETCDoor.Run(m_diETCDoor.p_bIn, "Please Check ETC Door Open");
-                    m_alidPCDoor.Run(m_diPCDoor.p_bIn, "Please Check PC Door Open");
-                    m_alidsideDoor.Run(m_disideDoor.p_bIn, "Please Check Side Door Open");
-                }
-                if (m_diInterlock_Key.p_bIn)
-                {
-                    m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
-                }
-                m_alidLightCurtain.Run(m_diLightCurtain.p_bIn, "Please Check LightCurtain");
-                foreach (OHT_Semi OHT in p_aOHT)
-                {
-                    OHT.p_bLightCurtain = m_diLightCurtain.p_bIn;
-                    OHT.P_bProtectionBar = !m_diProtectionBar.p_bIn;
+                    m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
+                    m_alidProtectionBar.Run(!m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
+                    m_alidCDA1Low.Run(m_diCDA1Low.p_bIn, "Please Check Value of CDA1");
+                    m_alidCDA2Low.Run(m_diCDA2Low.p_bIn, "Please Check Value of CDA2");
+                    m_alid4CH_LED_Cont_FAN.Run(!m_di4CH_LED_Cont_FAN.p_bIn, "Please Check 4CH LED FAN");
+                    m_alid12CH_LED_Cont_FAN.Run(!m_di12CH_LED_Cont_FAN.p_bIn, "Please Check 12CH LED FAN");
+                    m_alidPC_FAN.Run(!m_diPC_FAN.p_bIn, "Please Check PC FAN");
+                    m_alidELECPNLDoorFan.Run(!m_diELECPNLDoorFan.p_bIn, "Please Check ELEC PNL DoorFan");
+                    m_alidETCDoorFan.Run(!m_diETCDoorFan.p_bIn, "Please Check ETC DoorFan");
+                    if (m_bDoorAlarm)
+                    {
+                        m_alidELECPNLDoor.Run(m_diELECPNLDoor.p_bIn, "Please Check ELEC PNL Door Open");
+                        m_alidETCDoor.Run(m_diETCDoor.p_bIn, "Please Check ETC Door Open");
+                        m_alidPCDoor.Run(m_diPCDoor.p_bIn, "Please Check PC Door Open");
+                        m_alidsideDoor.Run(m_disideDoor.p_bIn, "Please Check Side Door Open");
+                    }
+                    if (m_diInterlock_Key.p_bIn)
+                    {
+                        m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
+                    }
+                    m_alidLightCurtain.Run(m_diLightCurtain.p_bIn, "Please Check LightCurtain");
+                    foreach (OHT_Semi OHT in p_aOHT)
+                    {
+                        OHT.p_bLightCurtain = m_diLightCurtain.p_bIn;
+                        OHT.P_bProtectionBar = !m_diProtectionBar.p_bIn;
+                    }
                 }
             }
         }
@@ -349,13 +351,13 @@ namespace Root_AOP01_Inspection.Module
         {
             get
             {
-                List<OHT_Semi> aOHT = new List<OHT_Semi>(); 
+                List<OHT_Semi> aOHT = new List<OHT_Semi>();
                 AOP01_Handler handler = (AOP01_Handler)m_engineer.ClassHandler();
                 foreach (ILoadport loadport in handler.m_aLoadport)
                 {
-                    aOHT.Add(((Loadport_Cymechs)loadport).m_OHT); 
+                    aOHT.Add(((Loadport_Cymechs)loadport).m_OHT);
                 }
-                return aOHT; 
+                return aOHT;
             }
         }
         #endregion
@@ -364,9 +366,7 @@ namespace Root_AOP01_Inspection.Module
         {
             p_id = id;
             base.InitBase(id, engineer);
-
-            //m_robot = ((Vega_Handler)engineer.ClassHandler()).m_robot;
-            InitTimer(); 
+            InitTimer();
         }
 
         public override void ThreadStop()
@@ -377,16 +377,15 @@ namespace Root_AOP01_Inspection.Module
         #region Show OHT
         public void ShowOHT()
         {
-            m_timer.Start(); 
+            m_timer.Start();
         }
-        
-        DispatcherTimer m_timer = new DispatcherTimer(); 
+
+        DispatcherTimer m_timer = new DispatcherTimer();
         void InitTimer()
         {
             m_timer.Interval = TimeSpan.FromMilliseconds(10);
             m_timer.Tick += M_timer_Tick;
         }
-        //
         OHTs_UI m_uiOHT;
         private void M_timer_Tick(object sender, EventArgs e)
         {
@@ -396,38 +395,5 @@ namespace Root_AOP01_Inspection.Module
             m_uiOHT.Show();
         }
         #endregion
-        //
-        //#region ModuleRun
-        //protected override void InitModuleRuns()
-        //{
-        //    AddModuleRunList(new Run_ShowOHT(this), false, "Show_OHT"); //forget Delete
-        //}
-        //
-        //public class Run_ShowOHT : ModuleRunBase
-        //{
-        //    AOP01 m_module;
-        //    public Run_ShowOHT(AOP01 module)
-        //    {
-        //        m_module = module;
-        //        InitModuleRun(module);
-        //    }
-        //
-        //    public override ModuleRunBase Clone()
-        //    {
-        //        Run_ShowOHT run = new Run_ShowOHT(m_module);
-        //        return run;
-        //    }
-        //
-        //    public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-        //    {
-        //    }
-        //
-        //    public override string Run()
-        //    {
-        //        m_module.ShowOHT(); 
-        //        return "OK";
-        //    }
-        //}
-        //#endregion
     }
 }
