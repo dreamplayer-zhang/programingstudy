@@ -257,7 +257,7 @@
                                     <Border Margin="5"
                                             CornerRadius="10"
                                             Background="SeaGreen">
-                                        <TextBlock Text="Ready"
+                                        <TextBlock x:Name="textBlockState" Text="{Binding p_eState}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
@@ -272,7 +272,7 @@
                                     <Border Margin="5"
                                             CornerRadius="10"
                                             Background="SeaGreen">
-                                        <TextBlock Text="Ready"
+                                        <TextBlock x:Name="textBolckUnloadState" Text="{Binding p_eStateUnloader}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
@@ -287,7 +287,7 @@
                                     <Border Margin="5"
                                             CornerRadius="10"
                                             Background="SteelBlue">
-                                        <TextBlock Text="Run"
+                                        <TextBlock x:Name="textBlockRinseState" Text="{Binding p_eStateRinse}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
@@ -307,12 +307,13 @@
                                 <GroupBox Header="Mode"
                                           Margin="5,10"
                                           BorderThickness="0">
-                                    <Button Content="Magazine / Stack"
+                                    <Button x:Name="buttonMode" Content="{Binding p_eMode}"
                                             Margin="5,0"
                                             FontSize="30"
                                             FontWeight="Bold"
                                             FontFamily="Arial"
-                                            BorderBrush="{x:Null}" />
+                                            BorderBrush="{x:Null}"
+                                            Click="buttonMode_Click"/>
                                 </GroupBox>
                                 <GroupBox Header="Strip Width"
                                           Grid.Column="1"
@@ -320,7 +321,7 @@
                                           Margin="5,10">
                                     <Grid Background="#FFDDDDDD"
                                           Margin="5,0">
-                                        <TextBox Text="77"
+                                        <TextBox x:Name="textBoxWidth" Text="{Binding p_widthStrip}"
                                                  HorizontalAlignment="Center"
                                                  VerticalAlignment="Center"
                                                  Margin="0,0,60,0"

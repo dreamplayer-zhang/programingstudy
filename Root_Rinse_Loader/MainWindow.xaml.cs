@@ -1,4 +1,6 @@
 ﻿using Root_Rinse_Loader.Engineer;
+using Root_Rinse_Loader.Module;
+using RootTools;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
@@ -20,12 +22,23 @@ namespace Root_Rinse_Loader
 
         #region Loaded
         RinseL_Engineer m_engineer = new RinseL_Engineer();
+        RinseL_Handler m_handler; 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if (!Directory.Exists(@"C:\Recipe\Rinse_Loader")) Directory.CreateDirectory(@"C:\Recipe\Rinse_Loader");
             m_engineer.Init("Rinse_Loader");
-            engineerUI.Init(m_engineer); 
-            mainUI.Init(m_engineer); 
+            engineerUI.Init(m_engineer);
+            mainUI.Init(m_engineer);
+            m_handler = (RinseL_Handler)m_engineer.ClassHandler();
+        }
+
+        void Init()
+        {
+            textBlockState.DataContext = EQ.m_EQ;
+            textBolckUnloadState.DataContext = m_handler.m_rinse;
+            textBlockRinseState.DataContext = m_handler.m_rinse;
+            buttonMode.DataContext = m_handler.m_rinse;
+            textBoxWidth.DataContext = m_handler.m_rinse; 
         }
         #endregion
 
@@ -88,5 +101,10 @@ namespace Root_Rinse_Loader
             this.Close();
         }
         #endregion
+
+        private void buttonMode_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_rinse.p_eMode = (RinseL.eRunMode)(1 - (int)m_handler.m_rinse.p_eMode);
+        }
     }
 }
