@@ -145,6 +145,7 @@ namespace Root_WIND2
             DatabaseManager.Instance.SetDatabase(1);
             //////
             logView.Init(LogView.m_logView);
+            WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
             InitTimer();
 
         }
@@ -171,6 +172,7 @@ namespace Root_WIND2
         private string memoryEdgeSide = "EdgeSide";
         private string memoryEdgeBottom = "EdgeBottom";
         private string memoryEdgeEBR = "EBR";
+        
 
 
         public bool RegisterGlobalObjects()
@@ -179,6 +181,8 @@ namespace Root_WIND2
             {
                 // Engineer
                 WIND2_Engineer engineer = GlobalObjects.Instance.Register<WIND2_Engineer>();
+                DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
+                WIND2_Warning warning = GlobalObjects.Instance.Register<WIND2_Warning>();
                 engineer.Init("WIND2");
 
                 MemoryTool memoryTool = engineer.ClassMemoryTool();
@@ -268,10 +272,11 @@ namespace Root_WIND2
 
 
                 // DialogService
-                DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
+               
                 dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
                 dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
                 dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
+                dialogService.Register<TK4S, TK4SModuleUI>();
 
 
 

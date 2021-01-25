@@ -236,14 +236,12 @@ namespace Root_WIND2
         {
             TRect BOX = e as TRect;
             int byteCnt = p_OriginBoxTool_VM.p_ImageData.p_nByte;
-
-            ImageData BoxImageData = new ImageData(BOX.MemoryRect.Width, BOX.MemoryRect.Height, byteCnt);
+            long stride = p_OriginBoxTool_VM.p_ImageData.p_Stride;
+            CRect boxImageRect = new CRect(BOX.MemoryRect.Left, BOX.MemoryRect.Top, BOX.MemoryRect.Right+1, BOX.MemoryRect.Bottom+1);
+            ImageData BoxImageData = new ImageData(boxImageRect.Width, boxImageRect.Height, byteCnt);
 
             BoxImageData.m_eMode = ImageData.eMode.ImageBuffer;
-            BoxImageData.SetData(p_OriginBoxTool_VM.p_ImageData
-                , new CRect(BOX.MemoryRect.Left, BOX.MemoryRect.Top, BOX.MemoryRect.Right, BOX.MemoryRect.Bottom)
-                , (int)p_OriginBoxTool_VM.p_ImageData.p_Stride, byteCnt);
-
+            BoxImageData.SetData(p_OriginBoxTool_VM.p_ImageData, boxImageRect, (int)stride, byteCnt);
             p_OriginTool_VM.Offset = new CPoint(BOX.MemoryRect.Left, BOX.MemoryRect.Top);
             p_OriginTool_VM.p_ImageData = BoxImageData;
             p_OriginTool_VM.SetRoiRect();
@@ -254,7 +252,7 @@ namespace Root_WIND2
             TRect InspAreaBuf = e as TRect;
             p_OriginBoxTool_VM.AddInspArea(InspAreaBuf);
 
-            CRect rect = new CRect(InspAreaBuf.MemoryRect.Left, InspAreaBuf.MemoryRect.Top, InspAreaBuf.MemoryRect.Right, InspAreaBuf.MemoryRect.Bottom);
+            CRect rect = new CRect(InspAreaBuf.MemoryRect.Left, InspAreaBuf.MemoryRect.Top, InspAreaBuf.MemoryRect.Right+1, InspAreaBuf.MemoryRect.Bottom+1);
             OriginImageData = new ImageData(rect.Width, rect.Height, p_OriginBoxTool_VM.p_ImageData.p_nByte);
             OriginImageData.m_eMode = ImageData.eMode.ImageBuffer;
             //OriginImageData.SetData(p_OriginBoxTool_VM.p_ImageData.GetPtr(), InspAreaBuf.MemoryRect, (int)p_OriginBoxTool_VM.p_ImageData.p_Stride, p_OriginBoxTool_VM.p_ImageData.p_nByte);

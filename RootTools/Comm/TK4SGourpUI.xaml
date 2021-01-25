@@ -1,0 +1,121 @@
+﻿<UserControl x:Class="RootTools.TK4SGourpUI"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:packicon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:local="clr-namespace:RootTools" xmlns:converter="clr-namespace:ViewConverter"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf" mc:Ignorable="d"
+        Background="White" d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converter:ListViewContentsWidthConverter x:Key="ListViewContentsWidthConverters" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="8*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid>
+            <GroupBox Header="Comm Setting">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Com Port" VerticalAlignment="Center"
+                            HorizontalAlignment="Center" FontWeight="Bold"></TextBlock>
+                    <TextBox Grid.Column="1" Text="{Binding p_sSerialPort}" Foreground="black"
+                            VerticalAlignment="Center" BorderThickness="0" TextAlignment="Center"
+                            FontWeight="Bold" />
+                    <TextBlock Text="Connect State" Grid.Column="2" VerticalAlignment="Center"
+                            HorizontalAlignment="Center" FontWeight="Bold"></TextBlock>
+                    <TextBlock Text="Connected" Grid.Column="3" VerticalAlignment="Center"
+                            HorizontalAlignment="Center" FontWeight="Bold"></TextBlock>
+                </Grid>
+            </GroupBox>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Button Command="{Binding CommandAddModule}" Content="Add"></Button>
+                <Button Grid.Column="1" Command="{Binding CommandRemoveModule}" Content="Remove"></Button>
+            </Grid>
+            <ListBox Grid.Row="1" ItemsSource="{Binding p_aTK4S}"
+                    SelectedItem="{Binding p_SelectedTK4S}" Background="{PriorityBinding}"
+                    BorderBrush="Black" BorderThickness="0">
+                <ListBox.Template>
+                    <ControlTemplate>
+                        <GroupBox Header="Module">
+                            <ItemsPresenter />
+                        </GroupBox>
+                    </ControlTemplate>
+                </ListBox.Template>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Background="White" VerticalAlignment="Top"></WrapPanel>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="3" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Border BorderThickness="2" x:Name="ItemBorder" BorderBrush="Black"
+                                    Background="#FF1B1B1C" Height="200" CornerRadius="5" Width="100">
+                                <Border.InputBindings>
+                                    <MouseBinding MouseAction="LeftDoubleClick"
+                                            Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=DataContext.MyDoubleClickCommand}" />
+                                </Border.InputBindings>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="50"></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock HorizontalAlignment="Center" Height="Auto"
+                                            TextWrapping="Wrap" Text="{Binding p_sID}"
+                                            VerticalAlignment="Center" FontSize="17"
+                                            FontWeight="Bold" Foreground="White"
+                                            TextAlignment="Center">
+                                    </TextBlock>
+                                    <lvc:Gauge Grid.Row="1" Margin="0" From="{Binding p_dMinValue}" To="{Binding p_dMaxValue}"
+                                            InnerRadius="30" LabelsVisibility="Hidden"
+                                                Background="White"
+                                            Foreground="Black"
+                                            HighFontSize="20" GaugeActiveFill="#FF3399FF"
+                                            Value="{Binding p_dValue}">
+                                    </lvc:Gauge>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                        <!--<DataTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="Black"></Setter>
+                            </Trigger>
+                            <DataTrigger
+                                    Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}"
+                                    Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="Black"></Setter>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>-->
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </Grid>
+</UserControl>

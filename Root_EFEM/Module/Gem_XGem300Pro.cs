@@ -49,11 +49,11 @@ namespace Root_EFEM.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_SendCarrierID(this), true, "Carrier ID Send Event");
-            AddModuleRunList(new Run_SendSlotMap(this), true, "Carrier Slotmap Send Event");
+            AddModuleRunList(new Run_SendCarrierID(this), false, "Carrier ID Send Event");
+            AddModuleRunList(new Run_SendSlotMap(this), false, "Carrier Slotmap Send Event");
             AddModuleRunList(new Run_SetEvent(this), true, "Set Event");
-            AddModuleRunList(new Run_ReadyToLoad(this), true, "CMS ReadyToLoad");
-            AddModuleRunList(new Run_ReadyToUnload(this), true, "CMS ReadyToUnload");
+            AddModuleRunList(new Run_ReadyToLoad(this), false, "CMS ReadyToLoad");
+            AddModuleRunList(new Run_ReadyToUnload(this), false, "CMS ReadyToUnload");
         }
 
         public class Run_SendCarrierID : ModuleRunBase
@@ -108,7 +108,7 @@ namespace Root_EFEM.Module
             {
                 m_module = module;
                 m_loadport = m_module.m_aLoadport[EQ.p_nRunLP];
-                m_sMap = m_loadport.p_infoCarrier.p_sSlotmap;
+                //m_sMap = m_loadport.p_infoCarrier.p_sSlotmap;
                 InitModuleRun(module);
             }
 
@@ -124,8 +124,8 @@ namespace Root_EFEM.Module
             }
             public override string Run()
             {
-                m_loadport.p_infoCarrier.p_sSlotmap = m_sMap;
-                m_loadport.p_infoCarrier.SendSlotMap(m_sMap);
+                //m_loadport.p_infoCarrier.p_sSlotmap = m_sMap;
+                m_loadport.p_infoCarrier.SendSlotMap();
                 while (m_loadport.p_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
                 {
                     Thread.Sleep(10);

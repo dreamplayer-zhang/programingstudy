@@ -241,6 +241,7 @@
     <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Maskbk.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />
     <Compile Include="Module\EdgeSideVision\Run_InspectEBR.cs" />
@@ -298,6 +299,9 @@
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_Temp\1.Setup\Setup_ViewModel.cs" />
+    <Compile Include="Warning_UI.xaml.cs">
+      <DependentUpon>Warning_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WIND2EventArgs.cs" />
     <Compile Include="WIND2EventManager.cs" />
     <Compile Include="Module\BackSideVision.cs" />
@@ -455,6 +459,7 @@
     <Compile Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml.cs">
       <DependentUpon>WIND2_Recipe_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WIND2_Warning.cs" />
     <Page Include="Controls\UserControl\ColorPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -650,6 +655,10 @@
     <Page Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Warning_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideOrigin.xaml">
       <SubType>Designer</SubType>

@@ -82,7 +82,6 @@ namespace Root_EFEM
             switch (m_eWTR)
             {
                 case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer);break;
-                case eWTR.RTR_RND: m_wtr = new RTR_RND("WTR", m_engineer); break;
                 default: m_wtr = new WTR_RND("WTR", m_engineer); break;
             }
             InitModule(m_wtr); 

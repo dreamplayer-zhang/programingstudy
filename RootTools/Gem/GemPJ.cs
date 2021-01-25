@@ -97,7 +97,8 @@ namespace RootTools.Gem
             int iIndex = GetCarrierIndex(carrier);
             List<GemSlotBase.eState> aSlotState = m_aSlotState[iIndex];
             while (aSlotState.Count <= iSlot) aSlotState.Add(GemSlotBase.eState.Empty);
-            aSlotState[iSlot] = GemSlotBase.eState.Exist; 
+            aSlotState[iSlot] = GemSlotBase.eState.Exist;
+            //carrier.m_aGemSlot[iSlot].p_eState = GemSlotBase.eState.Select;
         }
 
         int GetCarrierIndex(GemCarrierBase carrier)
@@ -137,6 +138,7 @@ namespace RootTools.Gem
             m_log = log;
             m_sPJobID = sPJobID;
             m_eAutoStart = autoStart;
+            sRcpID = string.Format("C:\\Recipe\\{0}.Camellia", sRcpID);
             m_sRecipeID = sRcpID;
         }
     }

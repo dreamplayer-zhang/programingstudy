@@ -491,7 +491,7 @@ namespace Root_EFEM.Module
             SetLoadportMapData(aSlot, asMap[0], GemSlotBase.eState.Exist);
             SetLoadportMapData(aSlot, asMap[1], GemSlotBase.eState.Cross);
             SetLoadportMapData(aSlot, asMap[2], GemSlotBase.eState.Double);
-            p_infoCarrier.SetMapData(aSlot, sMap); 
+            p_infoCarrier.SetMapData(aSlot); 
             return false;
         }
 
@@ -618,19 +618,19 @@ namespace Root_EFEM.Module
 //                    if (m_diDoorOpen.p_bIn) return p_id + " Door Opened";
                     if (Run(CmdUnload())) return p_sInfo;
                 }
-            }
-            if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
-            {
-                p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                m_bPlaced= true;
+                if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
+                {
+                    p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                    m_bPlaced = true;
 
-                if (Run(CmdLoad())) return p_sInfo;
-                if (Run(CmdUnload())) return p_sInfo;
-            }
-            else
-            {
-                p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
-                m_bPlaced = false;
+                    if (Run(CmdLoad())) return p_sInfo;
+                    if (Run(CmdUnload())) return p_sInfo;
+                }
+                else
+                {
+                    p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
+                    m_bPlaced = false;
+                }
             }
             p_eState = eState.Ready;
             p_infoCarrier.AfterHome();
@@ -643,11 +643,11 @@ namespace Root_EFEM.Module
         public override string StateReady()
         {
             CheckPlaced();
-/*            if (m_infoCarrier.m_bReqReadCarrierID)
-            {
-                m_infoCarrier.m_bReqReadCarrierID = false;
-                StartRun(m_runReadPodID);
-            } */
+            //if (p_infoCarrier.m_bReqReadCarrierID)
+            //{
+            //    p_infoCarrier.m_bReqReadCarrierID = false;
+            //    StartRun(m_runReadPodID);
+            //}
             if (p_infoCarrier.m_bReqLoad)
             {
                 p_infoCarrier.m_bReqLoad = false;
@@ -779,6 +779,7 @@ namespace Root_EFEM.Module
             public override string Run()
             {
                 m_module.m_bUnLoadCheck = false;
+                if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
                 if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 if (m_module.Run(m_module.CmdLoad())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;

@@ -604,8 +604,6 @@ namespace Root_Vega.Module
 
             m_axisZ.p_eState = Axis.eState.Ready;
             m_axisTheta.p_eState = Axis.eState.Ready;
-
-            m_vega.m_doIonizerOnOff.Write(false);//check
         }
 
         public override void ThreadStop()

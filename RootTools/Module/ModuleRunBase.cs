@@ -7,6 +7,10 @@ namespace RootTools.Module
 {
     public class ModuleRunBase : ObservableObject
     {
+        #region General Purpose
+        public dynamic m_valueGeneral; 
+        #endregion
+
         #region eRunState
         public enum eRunState
         {
