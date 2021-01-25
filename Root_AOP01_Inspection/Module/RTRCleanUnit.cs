@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Root_AOP01_Inspection.Module
 {
-    public class WTRCleanUnit : RTR_RND
+    public class RTRCleanUnit : RTR_RND
     {
         #region ToolBox
         public DIO_I m_diExistRTR;
@@ -57,7 +57,7 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
-        public WTRCleanUnit(string id, IEngineer engineer) : base(id, engineer)
+        public RTRCleanUnit(string id, IEngineer engineer) : base(id, engineer)
         {
         }
 
@@ -81,8 +81,8 @@ namespace Root_AOP01_Inspection.Module
 
         public class Run_Clean : ModuleRunBase
         {
-            WTRCleanUnit m_module;
-            public Run_Clean(WTRCleanUnit module)
+            RTRCleanUnit m_module;
+            public Run_Clean(RTRCleanUnit module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -182,8 +182,8 @@ namespace Root_AOP01_Inspection.Module
 
         public class Run_Flip : ModuleRunBase
         {
-            public WTRCleanUnit m_module;
-            public Run_Flip(WTRCleanUnit module)
+            public RTRCleanUnit m_module;
+            public Run_Flip(RTRCleanUnit module)
             {
                 m_module = module;
                 InitModuleRun(module);

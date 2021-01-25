@@ -202,11 +202,11 @@
     <Compile Include="Engineer\AOP01_Process_UI.xaml.cs">
       <DependentUpon>AOP01_Process_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\FFU_Fan_UI.xaml.cs">
+      <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\RTR_RND.cs" />
-	  <Compile Include="Module\FFU.cs" />
-	  <Compile Include="Module\FFU_Fan_UI.xaml.cs">
-		  <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>
-	  </Compile>
+    <Compile Include="Module\FFU.cs" />
     <Compile Include="UI\3. RUN\ManualJobSchedule.cs" />
     <Compile Include="UI\3. RUN\Dlg_Start.xaml.cs">
       <DependentUpon>Dlg_Start.xaml</DependentUpon>
@@ -224,7 +224,7 @@
     <Compile Include="Module\OHT_UI.xaml.cs">
       <DependentUpon>OHT_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Module\WTRCleanUnit.cs" />
+    <Compile Include="Module\RTRCleanUnit.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="ProgramManager.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\Recipe45D_ImageViewer_ViewModel.cs" />
@@ -298,6 +298,14 @@
     <Compile Include="UI_UserControl\Loadport_UI.xaml.cs">
       <DependentUpon>Loadport_UI.xaml</DependentUpon>
     </Compile>
+    <Page Include="Engineer\AOP01_Process_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Module\FFU_Fan_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\3. RUN\Dlg_Start.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

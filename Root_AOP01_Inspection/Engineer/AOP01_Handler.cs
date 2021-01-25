@@ -1,4 +1,5 @@
-﻿using Root_AOP01_Inspection.Module;
+﻿using Root_AOP01_Inspection.Engineer;
+using Root_AOP01_Inspection.Module;
 using Root_EFEM;
 using Root_EFEM.Module;
 using RootTools;
@@ -43,7 +44,7 @@ namespace Root_AOP01_Inspection
         public ModuleList p_moduleList { get; set; }
         public AOP01 m_aop01; 
         public AOP01_Recipe m_recipe;
-        public EFEM_Process m_process;
+        public AOP01_Process m_process;
         public MainVision m_mainVision;
         public FFU m_FFU;
 
@@ -67,7 +68,7 @@ namespace Root_AOP01_Inspection
 
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR);
+            m_process = new AOP01_Process("Process", m_engineer, iWTR);
         }
 
         void InitModule(ModuleBase module)
@@ -102,7 +103,7 @@ namespace Root_AOP01_Inspection
             switch (m_eWTR)
             {
                 case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer); break;
-                default: m_wtr = new WTRCleanUnit("WTR", m_engineer); break;
+                default: m_wtr = new RTRCleanUnit("RTR", m_engineer); break;
             }
             InitModule(m_wtr);
         }
@@ -272,7 +273,7 @@ namespace Root_AOP01_Inspection
 
         void CalcDockingUndocking()
         {
-            List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
+            List<AOP01_Process.Sequence> aSequence = new List<AOP01_Process.Sequence>();
             while (m_process.m_qSequence.Count > 0) aSequence.Add(m_process.m_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
             foreach (ILoadport loadport in m_aLoadport)
@@ -281,7 +282,7 @@ namespace Root_AOP01_Inspection
             }
             while (aSequence.Count > 0)
             {
-                EFEM_Process.Sequence sequence = aSequence[0];
+                AOP01_Process.Sequence sequence = aSequence[0];
                 m_process.m_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
@@ -289,7 +290,7 @@ namespace Root_AOP01_Inspection
                     if (CalcUnload(aDock[n], aSequence))
                     {
                         ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
-                        EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
+                        AOP01_Process.Sequence sequenceUndock = new AOP01_Process.Sequence(runUndocking, sequence.m_infoWafer);
                         m_process.m_qSequence.Enqueue(sequenceUndock);
                         aDock.RemoveAt(n);
                     }
@@ -298,14 +299,14 @@ namespace Root_AOP01_Inspection
             m_process.RunTree(Tree.eMode.Init);
         }
 
-        bool CalcDocking(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcDocking(ILoadport loadport, List<AOP01_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (AOP01_Process.Sequence sequence in aSequence)
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule)
                 {
                     ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
-                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    AOP01_Process.Sequence sequenceDock = new AOP01_Process.Sequence(runDocking, sequence.m_infoWafer);
                     m_process.m_qSequence.Enqueue(sequenceDock);
                     return true;
                 }
@@ -313,9 +314,9 @@ namespace Root_AOP01_Inspection
             return false;
         }
 
-        bool CalcUnload(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcUnload(ILoadport loadport, List<AOP01_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (AOP01_Process.Sequence sequence in aSequence)
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) return false;
             }

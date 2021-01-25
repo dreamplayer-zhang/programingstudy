@@ -20,7 +20,7 @@ namespace Root_AOP01_Inspection
         AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
         MainVision m_mainvision;
-        WTRCleanUnit m_wtrcleanunit;
+        RTRCleanUnit m_wtrcleanunit;
         WTRArm m_wtr;
         RTR_RND.Arm m_arm;
         Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
@@ -31,7 +31,7 @@ namespace Root_AOP01_Inspection
             InitializeComponent();
         }
 
-        public void Init(MainVision mainvision, WTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
+        public void Init(MainVision mainvision, RTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
             Loadport_Cymechs loadport2, AOP01_Engineer engineer, RFID_Brooks rfid1, RFID_Brooks rfid2)
         {
             m_engineer = engineer;

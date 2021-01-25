@@ -142,7 +142,7 @@ namespace Root_AOP01_Inspection.Engineer
                     ModuleRunBase run = m_wtr.CloneRunPut(sChild, -1);
                     if (sChild == "MainVision")
                     {
-                        ((RTR_RND.Run_Put)run).m_eSide = moduleRun.m_valueGeneral;
+                            ((RTR_RND.Run_Put)run).m_eSide = moduleRun.m_valueGeneral;
                     }
                     qProcess.Enqueue(run);
                 }

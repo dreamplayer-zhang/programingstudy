@@ -713,7 +713,6 @@ namespace Root_AOP01_Inspection.Module
             run.m_nChildID = nSlot;
             return run;
         }
-
         public ModuleRunBase CloneRunPut(string sChild, int nSlot)
         {
             Run_Put run = (Run_Put)m_runPut.Clone();
@@ -877,7 +876,7 @@ namespace Root_AOP01_Inspection.Module
                 {
                     if (child.p_id == "MainVision") 
                     {
-                        MainVision vision = (MainVision)m_module.m_engineer.ClassHandler();
+                        MainVision vision = ((AOP01_Handler)m_module.m_engineer.ClassHandler()).m_mainVision;
                         posWTR = vision.GetTeachWTR(vision.p_eSide, child.GetInfoWafer(m_nChildID)); 
                     }
                     else posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
@@ -928,6 +927,7 @@ namespace Root_AOP01_Inspection.Module
             RTR_RND m_module;
             public Run_Put(RTR_RND module)
             {
+                m_eArm = eArm.Upper;
                 p_sChild = "";
                 m_module = module;
                 InitModuleRun(module);
@@ -943,6 +943,7 @@ namespace Root_AOP01_Inspection.Module
                 run.m_eArm = m_eArm;
                 run.p_sChild = p_sChild;
                 run.m_nChildID = m_nChildID;
+                run.m_eSide = m_eSide;
                 return run;
             }
 
@@ -968,6 +969,7 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+
                 IWTRChild child = m_module.GetChild(p_sChild);
                 ModuleBase child_module = m_module.GetChild_Module(p_sChild);
                 if (child == null) return "WTR Child not Found : " + p_sChild;
@@ -985,7 +987,7 @@ namespace Root_AOP01_Inspection.Module
                 int posWTR = 0;
                 if (child.p_id == "MainVision")
                 {
-                    MainVision vision = (MainVision)m_module.m_engineer.ClassHandler();
+                    MainVision vision = ((AOP01_Handler)m_module.m_engineer.ClassHandler()).m_mainVision;
                     posWTR = vision.GetTeachWTR(m_eSide, m_module.m_dicArm[m_eArm].p_infoWafer); 
                 }
                 else posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
