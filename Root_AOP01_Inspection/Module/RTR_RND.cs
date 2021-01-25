@@ -14,6 +14,7 @@ namespace Root_AOP01_Inspection.Module
 {
     public class RTR_RND : ModuleBase, IWTR
     {
+
         #region ToolBox
         protected RS232 m_rs232;
         public int m_teachReticleFlip = -1;
@@ -526,8 +527,10 @@ namespace Root_AOP01_Inspection.Module
 
         #region Home
         const int c_nReset = 3;
+        public string m_OriginSpeed = "30";
         public override string StateHome()
         {
+
             if (EQ.p_bSimulate)
             {
                 p_eState = eState.Ready;
@@ -543,13 +546,15 @@ namespace Root_AOP01_Inspection.Module
                     Thread.Sleep(100);
                 }
                 foreach (IWTRChild child in p_aChild) child.p_bLock = true;
+                if (Run(WriteCmdSetSpeed(eCmd.SetSpeed, m_OriginSpeed))) return p_sInfo; //Origin Speed Set 하드 코딩수정필요
+                if (Run(WaitReply(m_secMotion))) return p_sInfo;
                 if (m_bNeedHome)
                 {
                     if (Run(WriteCmd(eCmd.FindHome))) return p_sInfo;
                 }
                 else
                 {
-                    if (Run(WriteCmd(eCmd.MoveHome))) return p_sInfo;
+                    if (Run(WriteCmd(eCmd.FindHome))) return p_sInfo;
                 }
                 m_bNeedHome = false;
                 if (Run(WaitReply(m_secHome))) return p_sInfo;
@@ -1005,9 +1010,7 @@ namespace Root_AOP01_Inspection.Module
                     child.AfterPut(m_nChildID);
                 }
                 finally
-                {
-                    //if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
-                    //else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                {                
                     m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
                 if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";

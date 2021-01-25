@@ -380,11 +380,11 @@ namespace Root_EFEM
         public string RunNextSequence()
         {
             ModuleBase wtr = (ModuleBase)m_wtr;
-            if ((m_qSequence.Count == 0) || EQ.IsStop())
+            if (m_qSequence.Count == 0 || EQ.IsStop())
             {
                 EQ.p_eState = EQ.eState.Ready;
                 ClearInfoWafer();
-                return EQ.IsStop() ? "EQ Stop" : "OK";
+                return EQ.IsStop()? "EQ Stop" : "OK";
             }
             Sequence sequence = m_qSequence.Peek();
             bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport; 

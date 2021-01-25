@@ -6,7 +6,11 @@ using System.IO;
 using Root_AOP01_Inspection.UI._3._RUN;
 using System.ComponentModel;
 using Root_AOP01_Inspection.UI_UserControl;
-using RootTools.Gem;
+using Root_EFEM.Module;
+using RootTools.Module;
+using System.Threading;
+using System.Windows.Threading;
+using System;
 
 namespace Root_AOP01_Inspection
 {
@@ -22,7 +26,6 @@ namespace Root_AOP01_Inspection
         InfoCarrier m_infoCarrier = null;
         public Dlg_Start(InfoCarrier infoCarrier)
         {
-
             InitializeComponent();
             m_infoCarrier = infoCarrier;
         }
@@ -30,29 +33,57 @@ namespace Root_AOP01_Inspection
         {
             this.DragMove();
         }
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             m_bShow = false;
         }
-        public void Init(AOP01_Engineer engineer)
+        ManualJobSchedule m_JobSchedule;
+        Loadport_Cymechs m_loadport;
+        public void Init(ManualJobSchedule jobschdule, AOP01_Engineer engineer, Loadport_Cymechs loadport)
         {
             m_engineer = engineer;
             m_handler = engineer.m_handler;
             m_recipe = m_handler.m_recipe;
-        }
-        ManualJobSchedule m_JobSchedule;
-        public void Init(ManualJobSchedule jobschdule)
-        {
+            m_loadport = loadport;
             m_aRecipe = new ObservableCollection<Recipe>();
             listviewRCP.ItemsSource = m_aRecipe;
             m_JobSchedule = jobschdule;
             this.DataContext = jobschdule;
+            UserSetBox.DataContext = loadport.p_infoCarrier;
             LoadportNum.Text = Loadport_UI.sLoadportNum;
-        }   
+            InitTimer();
+            if (m_loadport.p_infoCarrier.p_sCarrierID != "")
+                textBoxPodID.IsEnabled = false;
+        }
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(20);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            if(textBoxPodID.Text=="")
+            {
+                Start.IsEnabled = false;
+                Start.Content="Put Pod ID";
+            }
+            else
+            {
+                Start.IsEnabled = true;
+                Start.Content = "Start";
+            }
+        }
+        //public void Init(ManualJobSchedule jobschdule)
+        //{
+        //    m_aRecipe = new ObservableCollection<Recipe>();
+        //    listviewRCP.ItemsSource = m_aRecipe;
+        //    m_JobSchedule = jobschdule;
+        //    this.DataContext = jobschdule;
+        //    LoadportNum.Text = Loadport_UI.sLoadportNum;
+        //}   
         #region Recipe List
         public class Recipe : NotifyProperty
         {
@@ -106,7 +137,7 @@ namespace Root_AOP01_Inspection
             Recipe typeItem = (Recipe)listviewRCP.SelectedItem;
             sRecipeName = typeItem.p_sRecipeName.ToString();
             RecipeID.Text = sRecipeName;
-            sRecipe = m_recipe.m_sPath + sRecipeName;   
+            sRecipe = m_recipe.m_sPath + sRecipeName;
         }
         #endregion
 
@@ -121,8 +152,14 @@ namespace Root_AOP01_Inspection
                 m_handler.AddSequence(infoWafer);
                 m_handler.CalcSequence();
             }
-
             this.DialogResult = true;
+        }
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            m_loadport.RunUndocking();
+            m_infoCarrier.p_sCarrierID = "";
+            //while ((EQ.IsStop() != true) && m_loadport.IsBusy()) Thread.Sleep(10);
+            this.Close();
         }
     }
 

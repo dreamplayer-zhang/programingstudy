@@ -31,7 +31,8 @@ namespace Root_AOP01_Inspection
 		{
 			get
 			{
-				return m_Setup.InspectionManager.Recipe;
+				//return m_Setup.InspectionManager.Recipe;
+				return recipe;
 			}
 		}
 
@@ -609,8 +610,8 @@ namespace Root_AOP01_Inspection
 		private void startTestInsp()
 		{
 			p_ImageViewer_VM.Clear();
-			var temp = m_Setup.InspectionManager.Recipe.GetItem<BacksideRecipe>();
-			temp = backsideRecipe;
+			//var temp = m_Setup.InspectionManager.Recipe.GetItem<BacksideRecipe>();
+			//temp = backsideRecipe;
 
 			IntPtr SharedBuf = new IntPtr();
 			if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
@@ -630,11 +631,11 @@ namespace Root_AOP01_Inspection
 
 			m_Setup.InspectionManager.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
 
-			if (m_Setup.InspectionManager.CreateInspection() == false)
-			{
-				return;
-			}
-			m_Setup.InspectionManager.Start(false);
+			//if (m_Setup.InspectionManager.CreateInspection() == false)  //Del Temp LYJ
+			//{
+			//	return;
+			//}
+			//m_Setup.InspectionManager.Start(false);
 		}
 
 		public ICommand btnBack

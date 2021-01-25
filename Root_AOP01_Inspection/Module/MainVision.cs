@@ -34,8 +34,8 @@ namespace Root_AOP01_Inspection.Module
         Axis m_axisSideZ;
         AxisXY m_axisXY;
         public DIO_I m_diExistVision;
-        DIO_O m_doVac;
-        DIO_O m_doBlow;
+        public DIO_I m_diReticleTiltCheck;
+        public DIO_I m_diReticleFrameCheck;
         MemoryPool m_memoryPool;
         MemoryGroup m_memoryGroup;
         MemoryData m_memoryMain;
@@ -72,12 +72,12 @@ namespace Root_AOP01_Inspection.Module
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diExistVision, this, "Reticle Exist on Vision");
+            p_sInfo = m_toolBox.Get(ref m_diReticleTiltCheck, this, "Reticle Tilt Check");
+            p_sInfo = m_toolBox.Get(ref m_diReticleFrameCheck, this, "Reticle Frame Check");
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
             p_sInfo = m_toolBox.Get(ref m_axisSideZ, this, "Axis Side Z");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
-            p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Vision Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_CamTDI90, this, "TDI 90");
@@ -125,40 +125,6 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
-        #region DIO
-        public bool p_bStageVac
-        {
-            get
-            {
-                return m_doVac.p_bOut;
-            }
-            set
-            {
-                if (m_doVac.p_bOut == value)
-                    return;
-                m_doVac.Write(value);
-            }
-        }
-
-        public bool p_bStageBlow
-        {
-            get
-            {
-                return m_doBlow.p_bOut;
-            }
-            set
-            {
-                if (m_doBlow.p_bOut == value)
-                    return;
-                m_doBlow.Write(value);
-            }
-        }
-
-        public void RunBlow(int msDelay)
-        {
-            m_doBlow.DelayOff(msDelay);
-        }
-        #endregion
 
         #region Axis Position
         public enum eAxisPos
