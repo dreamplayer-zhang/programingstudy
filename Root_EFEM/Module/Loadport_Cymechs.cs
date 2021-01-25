@@ -491,7 +491,7 @@ namespace Root_EFEM.Module
             SetLoadportMapData(aSlot, asMap[0], GemSlotBase.eState.Exist);
             SetLoadportMapData(aSlot, asMap[1], GemSlotBase.eState.Cross);
             SetLoadportMapData(aSlot, asMap[2], GemSlotBase.eState.Double);
-            p_infoCarrier.SetMapData(aSlot, sMap); 
+            p_infoCarrier.SetMapData(aSlot); 
             return false;
         }
 

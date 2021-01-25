@@ -193,7 +193,10 @@ namespace RootTools
 			{
 				IntPtr ptr = imgData.GetPtr();
 				for (int i = rect.Height - 1; i >= 0; i--)
+				{
+					
 					Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * stride), m_aBuf, i * rect.Width, rect.Width);
+				}
 			}
 
 			else if (nByte == 3)
