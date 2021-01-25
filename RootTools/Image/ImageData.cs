@@ -658,22 +658,24 @@ namespace RootTools
 
 		void Worker_MemoryClear_DoWork(object sender, DoWorkEventArgs e)
 		{
-			byte[] pBuf = new byte[p_Size.X];
+			CPoint sz = p_Size;
+			int np = sz.Y / 100;
+			byte[] pBuf = new byte[sz.X];
 			int nProgress = 0;
-			//for (int y = 0; y < p_Size.Y; y++)
-			//{
-			Parallel.For(0, p_Size.Y, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (y) =>
+		
+			Parallel.For(0, sz.Y, new ParallelOptions { MaxDegreeOfParallelism = 20 }, (y) =>
 			{
 				if (Worker_MemoryClear.CancellationPending)
 					return;
-				Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + (long)p_Size.X * y), p_Size.X);
+				Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + (long)sz.X * y), sz.X);
 				if (p_nByte == 3)
 				{
-					Marshal.Copy(pBuf, 0, (IntPtr)((long)m_MemData.GetPtr(1) + (long)p_Size.X * y), p_Size.X);
-					Marshal.Copy(pBuf, 0, (IntPtr)((long)m_MemData.GetPtr(2) + (long)p_Size.X * y), p_Size.X);
+					Marshal.Copy(pBuf, 0, (IntPtr)((long)m_MemData.GetPtr(1) + (long)sz.X * y), sz.X);
+					Marshal.Copy(pBuf, 0, (IntPtr)((long)m_MemData.GetPtr(2) + (long)sz.X * y), sz.X);
 				}
 				nProgress++;
-				p_nProgress = Convert.ToInt32(((double)nProgress / p_Size.Y) * 100);
+				if(nProgress % np == 0)
+				p_nProgress = Convert.ToInt32(((double)nProgress / sz.Y) * 100); ; 
 			});
 		}
 
