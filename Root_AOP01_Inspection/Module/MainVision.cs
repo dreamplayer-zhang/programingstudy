@@ -275,7 +275,7 @@ namespace Root_AOP01_Inspection.Module
                 return p_id + " eState not Ready";
             if (p_infoWafer != null)
                 return p_id + " IsPutOK - InfoWafer Exist";
-            if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false)
+            if (m_waferSize[(int)p_eSide].GetData(infoWafer.p_eSize).m_bEnable == false)
                 return p_id + " not Enable Wafer Size";
             return "OK";
         }
@@ -284,7 +284,14 @@ namespace Root_AOP01_Inspection.Module
         {
             if (infoWafer == null)
                 infoWafer = p_infoWafer;
-            return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
+            return m_waferSize[0].GetData(infoWafer.p_eSize).m_teachWTR;
+        }
+
+        public int GetTeachWTR(eSide eSide, InfoWafer infoWafer = null)
+        {
+            if (infoWafer == null)
+                infoWafer = p_infoWafer;
+            return m_waferSize[(int)p_eSide].GetData(infoWafer.p_eSize).m_teachWTR;
         }
 
         private string MoveReadyPos()
@@ -348,10 +355,11 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
-        InfoWafer.WaferSize m_waferSize;
+        InfoWafer.WaferSize[] m_waferSize = new InfoWafer.WaferSize[2];
         public void RunTreeTeach(Tree tree)
         {
-            m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
+            m_waferSize[0].RunTreeTeach(tree.GetTree(m_waferSize[0].m_id, false));
+            m_waferSize[1].RunTreeTeach(tree.GetTree(m_waferSize[1].m_id, false));
         }
         #endregion
 
@@ -726,7 +734,8 @@ namespace Root_AOP01_Inspection.Module
         public MainVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
-            m_waferSize = new InfoWafer.WaferSize(id, false, false);
+            m_waferSize[0] = new InfoWafer.WaferSize(id + "." + eSide.Top.ToString(), false, false);
+            m_waferSize[1] = new InfoWafer.WaferSize(id + "." + eSide.Bottom.ToString(), false, false);
             ladsinfos = new List<LADSInfo>();
             InitMemorys();
             InitPosAlign();

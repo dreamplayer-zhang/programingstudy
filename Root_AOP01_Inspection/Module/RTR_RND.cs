@@ -1,4 +1,6 @@
-﻿using RootTools;
+﻿using Root_EFEM;
+using Root_EFEM.Module;
+using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
@@ -8,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Root_EFEM.Module
+namespace Root_AOP01_Inspection.Module
 {
     public class RTR_RND : ModuleBase, IWTR
     {
@@ -868,7 +870,12 @@ namespace Root_EFEM.Module
                 }
                 else
                 {
-                    posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
+                    if (child.p_id == "MainVision") 
+                    {
+                        MainVision vision = (MainVision)m_module.m_engineer.ClassHandler();
+                        posWTR = vision.GetTeachWTR(vision.p_eSide, child.GetInfoWafer(m_nChildID)); 
+                    }
+                    else posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
                 }
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (child.p_eState != eState.Ready)
@@ -924,6 +931,7 @@ namespace Root_EFEM.Module
             public string p_sChild { get; set; }
             public eArm m_eArm = eArm.Upper;
             public int m_nChildID = 0;
+            public MainVision.eSide m_eSide = MainVision.eSide.Top; 
             public override ModuleRunBase Clone()
             {
                 Run_Put run = new Run_Put(m_module);
@@ -969,7 +977,13 @@ namespace Root_EFEM.Module
                     if (EQ.IsStop()) return "Stop";
                     Thread.Sleep(100);
                 }
-                int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
+                int posWTR = 0;
+                if (child.p_id == "MainVision")
+                {
+                    MainVision vision = (MainVision)m_module.m_engineer.ClassHandler();
+                    posWTR = vision.GetTeachWTR(m_eSide, m_module.m_dicArm[m_eArm].p_infoWafer); 
+                }
+                else posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (p_sChild == "MainVision")
                 {
