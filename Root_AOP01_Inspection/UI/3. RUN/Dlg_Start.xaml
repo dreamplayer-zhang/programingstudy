@@ -512,7 +512,7 @@
                             <TextBlock Text="{Binding p_id}" Name="LoadportNum" VerticalAlignment="Center" HorizontalAlignment="Left" TextAlignment="Left"/>
                             <TextBlock Text="Pod ID"
                                        VerticalAlignment="Center" />
-                            <TextBox Text="{Binding p_sCarrierID}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left"
+                            <TextBox Name="textBoxPodID" Text="{Binding p_sCarrierID}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left"
                                        HorizontalAlignment="Left" />
                             <TextBlock Text="Lot ID"
                                        VerticalAlignment="Center" />
