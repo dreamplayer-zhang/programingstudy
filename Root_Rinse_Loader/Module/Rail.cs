@@ -54,8 +54,8 @@ namespace Root_Rinse_Loader.Module
         Axis m_axisWidth;
         public enum ePos
         {
-            W70,
-            W100
+            W75,
+            W85
         }
         void InitPosWidth()
         {
@@ -64,9 +64,9 @@ namespace Root_Rinse_Loader.Module
 
         public string RunMoveWidth(double fWidth)
         {
-            double fW70 = m_axisWidth.GetPosValue(ePos.W70);
-            double fW100 = m_axisWidth.GetPosValue(ePos.W100);
-            double dPos = (fW100 - fW70) * (fWidth - 70) / 30;
+            double fW75 = m_axisWidth.GetPosValue(ePos.W75);
+            double fW85 = m_axisWidth.GetPosValue(ePos.W85);
+            double dPos = (fW85 - fW75) * (fWidth - 75) / 10;
             m_axisWidth.StartMove(dPos);
             return m_axisWidth.WaitReady(); 
         }
