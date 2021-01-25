@@ -394,11 +394,11 @@ namespace Root_WIND2
 
         public void DefectClear()
         {
-            foreach (TShape shape in Shapes)
-            {
+            //foreach (TShape shape in Shapes)
+            //{
                 
 
-            }
+            //}
             Shapes.Clear();
             InfoTextBolcks.Clear();
             p_DrawElement.Clear();

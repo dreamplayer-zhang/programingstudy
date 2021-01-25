@@ -160,7 +160,7 @@ namespace RootTools_Vision
                 }
             }
         }
-        public void SetTriggerGoldenImage()
+        public List<Cpp_Point> TriggerDiffImage()
         {
             // Index 계산
             List<int> mapYIdx = new List<int>();
@@ -200,7 +200,6 @@ namespace RootTools_Vision
             }
 
             List<Cpp_Point> wpROIData = new List<Cpp_Point>();
-            Cpp_Point curROIData = new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY);
 
             foreach (Workplace wp in this.workplaceBundle)
                 if (wp.MapIndexX == this.currentWorkplace.MapIndexX)
@@ -208,14 +207,7 @@ namespace RootTools_Vision
                         if ((wp.MapIndexY >= startY) && (wp.MapIndexY <= endY) && wp.MapIndexY != this.currentWorkplace.MapIndexY)
                             wpROIData.Add(new Cpp_Point(wp.PositionX, wp.PositionY));
 
-            
-            unsafe
-            {
-                //???
-                CLR_IP.Cpp_SelectMinDiffinArea((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                                    this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
-                                    wpROIData, curROIData, 1, this.currentWorkplace.Width, this.currentWorkplace.Height);
-            }
+            return wpROIData;
         }
 
         
@@ -244,9 +236,23 @@ namespace RootTools_Vision
 
             if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) // JHChoi D2D Algorithm 
             {
-                SetTriggerGoldenImage();
-                // Diff Image 계산
-                //CLR_IP.Cpp_SelectMinDiffinArea(inspectionWorkBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
+                unsafe
+                {
+                    //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                    //sw.Start();
+
+                    List<Cpp_Point> wpROIData = TriggerDiffImage();
+                    CLR_IP.Cpp_SelectMinDiffinArea((byte*)this.inspectionSharedBuffer.ToPointer(), diffImg, wpROIData.Count,
+                                        this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
+                                        wpROIData, new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY)
+                                        , 1, this.currentWorkplace.Width, this.currentWorkplace.Height);
+                    //sw.Stop();
+                    //String a = "" + sw.ElapsedMilliseconds;
+                    //using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"d:\SetGoldenImage.txt", true))
+                    //{
+                    //    file.WriteLine(a);
+                    //}
+                }
             }
             else
             {
@@ -293,7 +299,6 @@ namespace RootTools_Vision
                     CLR_IP.Cpp_Multiply(diffImg, histWeightMap, diffImg, chipW, chipH);
                 }
             }
-            
 
             // Filter
             switch (parameter.DiffFilter)
@@ -316,7 +321,6 @@ namespace RootTools_Vision
 
             // Threshold 값으로 Defect 탐색
             CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, parameter.Intensity);
-            
 
             // Mask
             MaskRecipe mask = this.recipe.GetRecipe<MaskRecipe>(); //요기다 추가해줘용
@@ -325,7 +329,7 @@ namespace RootTools_Vision
             int[] maskLength = new int[mask.MaskList[this.parameter.MaskIndex].PointLines.Count];
 
             Cpp_Point tempPt = new Cpp_Point();
-            for(int i = 0; i < mask.MaskList[this.parameter.MaskIndex].PointLines.Count; i++)
+            for (int i = 0; i < mask.MaskList[this.parameter.MaskIndex].PointLines.Count; i++)
             {
                 maskStartPoint[i] = new Cpp_Point();
                 maskStartPoint[i].x = mask.MaskList[this.parameter.MaskIndex].PointLines[i].StartPoint.X;
@@ -339,7 +343,7 @@ namespace RootTools_Vision
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
-                //Add Defect
+            //Add Defect
             for (int i = 0; i < Label.Length; i++)
             {
                 if (Label[i].area > parameter.Size)
@@ -358,10 +362,8 @@ namespace RootTools_Vision
                         this.currentWorkplace.MapIndexY
                         );
                 }
-
             }
 
-            //GoldenImages.Clear();
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
         }
 
