@@ -1,5 +1,6 @@
 ﻿using RootTools.Trees;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 
 namespace RootTools.Control
@@ -58,6 +59,8 @@ namespace RootTools.Control
             m_aBitDO.Add(new BitDO());
             m_aBitDO.Add(new BitDO());
             tool.p_listIDIO.Add(this);
+
+            InitBackgroundWorker(); 
         }
 
         public string RunTree(Tree tree)
@@ -142,6 +145,7 @@ namespace RootTools.Control
             Repeat
         };
         eRun m_eRun = eRun.Nothing;
+
         bool[,] m_bDO = new bool[2, 2] { { false, false }, { false, false } };
         public void RunDIO()
         {
@@ -158,16 +162,36 @@ namespace RootTools.Control
                     break;
                 case eRun.OffbyInput:
                     if (m_bDO[1, 0] && m_aBitDI[0].p_bOn) m_aBitDO[0].Write(false);
-                    if (m_bDO[1, 1] && m_aBitDI[2].p_bOn) m_aBitDO[1].Write(false);
+                    if (m_bDO[1, 1] && m_aBitDI[1].p_bOn) m_aBitDO[1].Write(false);
                     break;
-                case eRun.Repeat: Repeat(); break;
+            }
+            p_bRepeat = (m_eRun == eRun.Repeat);
+        }
+
+        #region Repeat
+        bool _bRepeat = false; 
+        bool p_bRepeat
+        {
+            get { return _bRepeat; }
+            set
+            {
+                if (_bRepeat == value) return;
+                if (value && !m_bgwRepeat.IsBusy) m_bgwRepeat.RunWorkerAsync(); 
             }
         }
 
-        void Repeat()
+        BackgroundWorker m_bgwRepeat = new BackgroundWorker(); 
+        void InitBackgroundWorker()
+        {
+            m_bgwRepeat.DoWork += M_bgwRepeat_DoWork;
+        }
+
+        private void M_bgwRepeat_DoWork(object sender, DoWorkEventArgs e)
         {
             RunSol(true);
-            RunSol(false); 
+            RunSol(false);
+            if (p_bRepeat == false) return; 
         }
+        #endregion
     }
 }
