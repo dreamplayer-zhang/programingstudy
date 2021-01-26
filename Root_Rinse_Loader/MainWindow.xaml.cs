@@ -141,6 +141,7 @@ namespace Root_Rinse_Loader
 
         private void buttonHome_Click(object sender, RoutedEventArgs e)
         {
+            EQ.p_bStop = false; 
             EQ.p_eState = EQ.eState.Home;
         }
 
@@ -168,12 +169,12 @@ namespace Root_Rinse_Loader
         #region PickerSet Control Function
         private void buttonPickerSetUp_Click(object sender, RoutedEventArgs e)
         {
-            m_handler.m_loader.RunPickerDown(true); 
+            m_handler.m_loader.RunPickerDown(false); 
         }
 
         private void buttonPickerSetDown_Click(object sender, RoutedEventArgs e)
         {
-            m_handler.m_loader.RunPickerDown(false);
+            m_handler.m_loader.RunPickerDown(true);
         }
 
         private void buttonPickerSetVacOn_Click(object sender, RoutedEventArgs e)
