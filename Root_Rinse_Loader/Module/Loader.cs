@@ -16,7 +16,7 @@ namespace Root_Rinse_Loader.Module
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axis, this, "Loader");
-            p_sInfo = m_toolBox.Get(ref m_dioPickerDown, this, "PickerDown", "Up", "Down");
+            p_sInfo = m_toolBox.Get(ref m_dioPickerDown, this, "PickerDown", "Up", "Down", true, true);
             p_sInfo = m_toolBox.Get(ref m_diPickerSet, this, "PickerSet");
             foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox);
             if (bInit)
@@ -178,8 +178,9 @@ namespace Root_Rinse_Loader.Module
             }
             finally
             {
-                m_storage.StartStackDown(); 
+                m_storage.StartStackDown();
                 RunPickerDown(false);
+                Thread.Sleep(200);
                 MoveLoader(ePos.Roller);
                 m_bPickersetMode = false;
             }
@@ -206,7 +207,7 @@ namespace Root_Rinse_Loader.Module
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return ePickerSet.Stop;
-                if (m_swPickerSet.ElapsedMilliseconds > 3000) return ePickerSet.Stop;
+                if (m_swPickerSet.ElapsedMilliseconds > 5000) return ePickerSet.Stop;
             }
             return (m_swPickerSet.ElapsedMilliseconds < 1000) ? ePickerSet.UpDown : ePickerSet.Vacuum;
         }
@@ -221,6 +222,12 @@ namespace Root_Rinse_Loader.Module
         #region Run Load & Unload
         public string RunLoad()
         {
+            if (m_storage.m_stack.p_bCheck == false)
+            {
+                m_rinse.RunBuzzer(RinseL.eBuzzer.Finish);
+                EQ.p_eState = EQ.eState.Ready;
+                return "OK";
+            }
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack"; 
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
@@ -229,7 +236,9 @@ namespace Root_Rinse_Loader.Module
                 if (Run(m_storage.MoveStackReady())) return p_sInfo;
             }
             if (Run(RunPickerDown(true))) return p_sInfo;
+            Thread.Sleep(200);
             if (Run(RunVacuum(true))) return p_sInfo;
+            Thread.Sleep(200);
             m_storage.StartStackDown();
             if (Run(RunShakeUp())) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
@@ -244,9 +253,11 @@ namespace Root_Rinse_Loader.Module
             if (Run(m_roller.RunRotate(false))) return p_sInfo;
             Thread.Sleep(100); 
             if (Run(RunPickerDown(true))) return p_sInfo;
+            Thread.Sleep(200);
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(m_roller.RunRotate(true))) return p_sInfo;
+            if (m_storage.m_stack.p_bCheck) return "OK"; 
             if (Run(MoveLoader(ePos.Rail))) return p_sInfo;
             return "OK";
         }
@@ -254,8 +265,8 @@ namespace Root_Rinse_Loader.Module
         public string RunRun()
         {
             if (m_bPickersetMode) return "OK";
-            if (m_rinse.p_eStateRinse != RinseL.eRinseRun.Run) return "Rinse State not Run";
-            if (m_rinse.p_eStateUnloader != EQ.eState.Run) return "Rinse Unloader State not Run";
+            //if (m_rinse.p_eStateRinse != RinseL.eRinseRun.Run) return "Rinse State not Run";
+            //if (m_rinse.p_eStateUnloader != EQ.eState.Run) return "Rinse Unloader State not Run";
             return p_bVacuum ? RunUnload() : RunLoad(); 
         }
         #endregion

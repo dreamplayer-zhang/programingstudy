@@ -344,7 +344,7 @@
                                                  FontWeight="Bold"
                                                  FontFamily="Arial"
                                                  HorizontalContentAlignment="Center"
-                                                 VerticalContentAlignment="Center" />
+                                                 VerticalContentAlignment="Center" PreviewKeyDown="textBoxWidth_PreviewKeyDown"/>
                                         <TextBlock Text="mm"
                                                    Margin="0,20,10,0"
                                                    VerticalAlignment="Center"

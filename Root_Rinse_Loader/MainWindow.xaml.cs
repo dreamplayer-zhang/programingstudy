@@ -5,6 +5,8 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -111,7 +113,7 @@ namespace Root_Rinse_Loader
             buttonHome.IsEnabled = EQ.p_eState != EQ.eState.Run;
             buttonStart.IsEnabled = EQ.p_eState == EQ.eState.Ready;
             buttonPause.IsEnabled = EQ.p_eState == EQ.eState.Run;
-            buttonReset.IsEnabled = EQ.p_eState == EQ.eState.Error;
+            buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Error) || (EQ.p_eState == EQ.eState.Ready);
             buttonPickerSet.IsEnabled = EQ.p_eState == EQ.eState.Ready;
 
             m_nBlink = (m_nBlink + 1) % 100;
@@ -146,12 +148,21 @@ namespace Root_Rinse_Loader
 
         private void buttonReset_Click(object sender, RoutedEventArgs e)
         {
+            m_handler.m_rinse.RunBuzzerOff(); 
             EQ.p_eState = EQ.eState.Ready;
         }
 
         private void buttonPickerSet_Click(object sender, RoutedEventArgs e)
         {
             m_handler.StartPickerSet();
+        }
+
+        private void textBoxWidth_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+            DependencyProperty property = TextBox.TextProperty;
+            BindingExpression binding = BindingOperations.GetBindingExpression((TextBox)sender, property);
+            if (binding != null) binding.UpdateSource();
         }
         #endregion
 
@@ -176,5 +187,6 @@ namespace Root_Rinse_Loader
             m_handler.m_loader.RunVacuum(false);
         }
         #endregion
+
     }
 }
