@@ -19,8 +19,6 @@ namespace Root_Rinse_Loader
         public MainWindow()
         {
             InitializeComponent();
-            comboMain.ItemsSource = new string[] { "Main UI", "Engineer" };
-            comboMain.SelectedIndex = 0;
             InitTimer();
         }
 
@@ -32,7 +30,6 @@ namespace Root_Rinse_Loader
             if (!Directory.Exists(@"C:\Recipe\Rinse_Loader")) Directory.CreateDirectory(@"C:\Recipe\Rinse_Loader");
             m_engineer.Init("Rinse_Loader");
             engineerUI.Init(m_engineer);
-            mainUI.Init(m_engineer);
             m_handler = (RinseL_Handler)m_engineer.ClassHandler();
             Init(); 
         }
@@ -51,14 +48,6 @@ namespace Root_Rinse_Loader
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             m_engineer.ThreadStop();
-        }
-        #endregion
-
-        #region UI Controls
-        private void comboMain_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-            if (comboMain.SelectedIndex < 0) return;
-            tabMain.SelectedIndex = comboMain.SelectedIndex; 
         }
         #endregion
 
@@ -129,7 +118,7 @@ namespace Root_Rinse_Loader
             bool bBlink = m_nBlink < 50;
             gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
             gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Run)) ? Brushes.Gold : Brushes.YellowGreen;
-            gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.SeaGreen : Brushes.DarkGreen; 
+            gridGreen.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.SeaGreen : Brushes.DarkGreen; 
         }
         #endregion
 

@@ -240,7 +240,7 @@ namespace Root_Rinse_Loader.Module
 
         public void StartStackDown()
         {
-            m_axis.StartMove(m_axis.p_posCommand - m_pulseDown); 
+            m_axis.StartMove(m_posStackReady - m_pulseDown); 
         }
 
         public bool p_bIsEnablePick
