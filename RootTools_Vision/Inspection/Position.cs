@@ -529,7 +529,7 @@ namespace RootTools_Vision
                     //    }
                     //}
 #if DEBUG
-                    DebugOutput.PrintWorkplaceBundleOffset(this.workplaceBundle);
+                    //DebugOutput.PrintWorkplaceBundleOffset(this.workplaceBundle);
 #endif
                     //this.workplaceBundle.GetWorkplace(this.currentWorkplace.MapIndexX + 1, this.currentWorkplace.MapIndexY + 1);
 

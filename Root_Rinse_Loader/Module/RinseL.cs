@@ -21,7 +21,7 @@ namespace Root_Rinse_Loader.Module
         }
         string[] m_asRunMode = Enum.GetNames(typeof(eRunMode));
 
-        eRunMode _eMode = eRunMode.Magazine;
+        eRunMode _eMode = eRunMode.Stack;
         public eRunMode p_eMode
         {
             get { return _eMode; }
@@ -150,6 +150,7 @@ namespace Root_Rinse_Loader.Module
         DIO_I m_diDoorLock;
         DIO_Os m_doLamp;
         DIO_Os m_doBuzzer;
+        DIO_I m_diLightCurtain;
         void GetToolsDIO()
         {
             p_sInfo = m_toolBox.Get(ref m_dioStart, this, "Start");
@@ -161,6 +162,7 @@ namespace Root_Rinse_Loader.Module
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
             p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
+            p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
         }
 
         bool _bStart = false; 
@@ -349,7 +351,7 @@ namespace Root_Rinse_Loader.Module
         void RunThreadSend()
         {
             m_bRunSend = true;
-            Thread.Sleep(1000);
+            Thread.Sleep(5000);
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
@@ -440,6 +442,8 @@ namespace Root_Rinse_Loader.Module
             InitBase(id, engineer);
 
             InitThread();
+            AddProtocol(p_id, eCmd.SetMode, p_eMode);
+            AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
         }
 
         public override void ThreadStop()

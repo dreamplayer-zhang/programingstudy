@@ -155,12 +155,6 @@ namespace RootTools.Camera.Dalsa
         List<byte[]> m_buffR = new List<byte[]>();
         List<byte[]> m_buffG = new List<byte[]>();
         List<byte[]> m_buffB = new List<byte[]>();
-        List<byte[]> m_buffRAA = new List<byte[]>();
-        List<byte[]> m_buffRBB = new List<byte[]>();
-        List<byte[]> m_buffGAA = new List<byte[]>();
-        List<byte[]> m_buffGBB = new List<byte[]>();
-        List<byte[]> m_buffBAA = new List<byte[]>();
-        List<byte[]> m_buffBBB = new List<byte[]>();
         const int overlapsize = 100;
 
         List<byte[]> m_OverlapR = new List<byte[]>();

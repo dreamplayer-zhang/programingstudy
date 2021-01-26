@@ -76,6 +76,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EasyModbus, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Emgu.CV.UI">
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
     </Reference>
@@ -197,6 +198,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Engineer\AOP01_Process.cs" />
+    <Compile Include="Engineer\AOP01_Process_UI.xaml.cs">
+      <DependentUpon>AOP01_Process_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\FFU_Fan_UI.xaml.cs">
+      <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RTR_RND.cs" />
+    <Compile Include="Module\FFU.cs" />
     <Compile Include="UI\3. RUN\ManualJobSchedule.cs" />
     <Compile Include="UI\3. RUN\Dlg_Start.xaml.cs">
       <DependentUpon>Dlg_Start.xaml</DependentUpon>
@@ -214,7 +224,7 @@
     <Compile Include="Module\OHT_UI.xaml.cs">
       <DependentUpon>OHT_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Module\WTRCleanUnit.cs" />
+    <Compile Include="Module\RTRCleanUnit.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="ProgramManager.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\Recipe45D_ImageViewer_ViewModel.cs" />
@@ -233,6 +243,9 @@
       <DependentUpon>RecipeSummary_Page.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\3. RUN\Dlg_ViewModel.cs" />
+    <Compile Include="UI\3. RUN\RNR_UI.xaml.cs">
+      <DependentUpon>RNR_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\3. RUN\Run_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\4. GEM\GEM_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\3. Maintenance\Maintenance_ViewModel.cs" />
@@ -285,6 +298,14 @@
     <Compile Include="UI_UserControl\Loadport_UI.xaml.cs">
       <DependentUpon>Loadport_UI.xaml</DependentUpon>
     </Compile>
+    <Page Include="Engineer\AOP01_Process_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Module\FFU_Fan_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\3. RUN\Dlg_Start.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -346,6 +367,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. SETUP\2. RecipeWizard\Panel\RecipeLADS_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\3. RUN\RNR_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

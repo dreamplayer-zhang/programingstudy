@@ -196,32 +196,13 @@ namespace Root_Rinse_Loader.Engineer
         #endregion
 
         #region PickerSet
-        BackgroundWorker m_bgwPickerSet = new BackgroundWorker(); 
-        void InitBackgroundWorker()
-        {
-            m_bgwPickerSet.DoWork += M_bgwPickerSet_DoWork;
-        }
-
-        private void M_bgwPickerSet_DoWork(object sender, DoWorkEventArgs e)
-        {
-            RunPickerSet(); 
-        }
-
-        string RunPickerSet()
-        {
-            m_loader.m_bPickersetMode = true; 
-            m_storage.StartMoveStackReady();
-            EQ.p_eState = EQ.eState.Run;
-            while (m_storage.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
-            if (EQ.IsStop()) return "EQ Stop";
-            m_loader.StartPickerSet();
-            EQ.p_eState = EQ.eState.Run;
-            return "OK";  
-        }
-
         public string StartPickerSet()
         {
-            m_bgwPickerSet.RunWorkerAsync();
+            if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist";
+            m_loader.m_bPickersetMode = true; 
+            p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
+            EQ.p_bStop = false;
+            EQ.p_eState = EQ.eState.Run; 
             return "OK";
         }
         #endregion
@@ -238,7 +219,6 @@ namespace Root_Rinse_Loader.Engineer
             m_gaf = engineer.ClassGAF();
             m_gem = engineer.ClassGem();
             InitModule();
-            InitBackgroundWorker(); 
             InitThread();
             m_engineer.ClassMemoryTool().InitThreadProcess();
         }
