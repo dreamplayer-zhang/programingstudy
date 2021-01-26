@@ -223,8 +223,9 @@ namespace Root_Rinse_Loader.Module
         {
             if (m_storage.m_stack.p_bCheck == false)
             {
-                m_rinse.RunBuzzer(RinseL.eBuzzer.Finish); 
-                return "Done";
+                m_rinse.RunBuzzer(RinseL.eBuzzer.Finish);
+                EQ.p_eState = EQ.eState.Ready;
+                return "OK";
             }
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack"; 
             if (Run(RunPickerDown(false))) return p_sInfo;
@@ -234,8 +235,9 @@ namespace Root_Rinse_Loader.Module
                 if (Run(m_storage.MoveStackReady())) return p_sInfo;
             }
             if (Run(RunPickerDown(true))) return p_sInfo;
-            Thread.Sleep(2000); 
+            Thread.Sleep(200);
             if (Run(RunVacuum(true))) return p_sInfo;
+            Thread.Sleep(200);
             m_storage.StartStackDown();
             if (Run(RunShakeUp())) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
@@ -250,10 +252,11 @@ namespace Root_Rinse_Loader.Module
             if (Run(m_roller.RunRotate(false))) return p_sInfo;
             Thread.Sleep(100); 
             if (Run(RunPickerDown(true))) return p_sInfo;
-            Thread.Sleep(2000);
+            Thread.Sleep(200);
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(m_roller.RunRotate(true))) return p_sInfo;
+            if (m_storage.m_stack.p_bCheck) return "OK"; 
             if (Run(MoveLoader(ePos.Rail))) return p_sInfo;
             return "OK";
         }
