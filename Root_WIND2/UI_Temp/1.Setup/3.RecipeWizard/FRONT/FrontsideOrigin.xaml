@@ -7,6 +7,84 @@
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <!-- checkbox -->
+        <Style x:Key="imageViewer_toolbar_checkbox" TargetType="CheckBox">
+            <Setter Property="OverridesDefaultStyle" Value="False"/>
+            <Setter Property="Background" Value="#444480"/>
+            <Setter Property="Foreground" Value="{StaticResource sidetap_parent_menu_text}"/>
+            <Setter Property="Margin" Value="4,0,0,0"/>
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <Border x:Name="bd"
+                                BorderThickness="2" 
+                                CornerRadius="4, 4, 4, 4"
+                                Padding="4"
+                                Width="36"
+                                Height="36"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="#222244"/>
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#77EEEE"/>
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#555599"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Button -->
+        <Style x:Key="imageViewer_toolbar_button" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="False"/>
+            <Setter Property="Background" Value="#444480"/>
+            <Setter Property="Foreground" Value="{StaticResource sidetap_parent_menu_text}"/>
+            <Setter Property="Margin" Value="4,0,0,0"/>
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="bd"
+                                BorderThickness="0" 
+                                CornerRadius="4, 4, 4, 4"
+                                Padding="4"
+                                Width="36"
+                                Height="36"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#555599"/>
+                            </Trigger>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#222244"/>
+                                <Setter Property="Foreground" Value="#888888"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
 
     <Grid Background="{StaticResource main_view_background}">
         <Grid.RowDefinitions>
@@ -25,21 +103,24 @@
                   Header="Image VIew" Style="{StaticResource main_view_groupbox}">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="24"/>
+                    <RowDefinition Height="40"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Content="Origin"/> <!-- 한번에 둘다 -->
-                    <Button Content="Pitch"/> <!-- 수정하는 경우만 따로-->
-                    <Button Content="Open"/>
-                    <Button Content="Clear"/>
-                    <Button Content="RGB"/>
-                    <Button Content="Ruler"/>
-                    <Button Content="AA"/>
+                <StackPanel Grid.Column="1"  Orientation="Horizontal">
+                    <TextBox  Margin="4" IsReadOnly="True" Text="{Binding DisplayViewerState}" Width ="60" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="12" FontWeight="Bold"/>
+                    <CheckBox Content="Origin" IsChecked="{Binding IsOriginChecked, Mode=TwoWay}" Command="{Binding btnOriginCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Pitch" IsChecked="{Binding IsPitchChecked, Mode=TwoWay}" Command="{Binding btnPitchCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Rular" IsChecked="{Binding IsRularChecked, Mode=TwoWay}" Command="{Binding btnRularCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <Button Content="Open" Command="{Binding btnOpenCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Save" Command="{Binding btnSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Clear" Command="{Binding btnClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>
                 </StackPanel>
-                <tools:RootViewer Grid.Row="1" >
-                </tools:RootViewer>
+                <!--<Border Grid.Row="1" Background="Black"/>-->
+                <Grid Grid.Row="1" >
+                    <tools:RootViewer DataContext="{Binding ImageViewerVM}"/>
+                </Grid>
             </Grid>
         </GroupBox>
             
