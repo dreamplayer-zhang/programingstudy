@@ -501,43 +501,43 @@
                                           Grid.Column="0"
                                           Margin="5,10"
                                           BorderThickness="0">
-                                    <Button Content="Up"
+                                    <Button x:Name="buttonPickerSetUp" Content="Up"
                                             Margin="5,0"
                                             FontSize="30"
                                             FontWeight="Bold"
                                             FontFamily="Arial"
-                                            BorderBrush="{x:Null}" />
+                                            BorderBrush="{x:Null}" Click="buttonPickerSetUp_Click"/>
                                 </GroupBox>
                                 <GroupBox Grid.Column="1"
                                           Margin="5,10"
                                           BorderThickness="0">
-                                    <Button Content="Down"
+                                    <Button x:Name="buttonPickerSetDown" Content="Down"
                                             Margin="5,0"
                                             FontSize="30"
                                             FontWeight="Bold"
                                             FontFamily="Arial"
-                                            BorderBrush="{x:Null}" />
+                                            BorderBrush="{x:Null}" Click="buttonPickerSetDown_Click"/>
                                 </GroupBox>
                                 <GroupBox Grid.Column="2"
                                           Header="Vacuum"
                                           Margin="5,10"
                                           BorderThickness="0">
-                                    <Button Content="On"
+                                    <Button x:Name="buttonPickerSetVacOn" Content="On"
                                             Margin="5,0"
                                             FontSize="30"
                                             FontWeight="Bold"
                                             FontFamily="Arial"
-                                            BorderBrush="{x:Null}" />
+                                            BorderBrush="{x:Null}" Click="buttonPickerSetVacOn_Click"/>
                                 </GroupBox>
                                 <GroupBox Grid.Column="3"
                                           Margin="5,10"
                                           BorderThickness="0">
-                                    <Button Content="Off"
+                                    <Button x:Name="buttonPickerSetVacOff" Content="Off"
                                             Margin="5,0"
                                             FontSize="30"
                                             FontWeight="Bold"
                                             FontFamily="Arial"
-                                            BorderBrush="{x:Null}" />
+                                            BorderBrush="{x:Null}" Click="buttonPickerSetVacOff_Click"/>
                                 </GroupBox>
 
                             </Grid>

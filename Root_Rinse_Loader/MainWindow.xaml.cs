@@ -164,5 +164,27 @@ namespace Root_Rinse_Loader
             m_handler.StartPickerSet();
         }
         #endregion
+
+        #region PickerSet Control Function
+        private void buttonPickerSetUp_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_loader.RunPickerDown(true); 
+        }
+
+        private void buttonPickerSetDown_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_loader.RunPickerDown(false);
+        }
+
+        private void buttonPickerSetVacOn_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_loader.RunVacuum(true); 
+        }
+
+        private void buttonPickerSetVacOff_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_loader.RunVacuum(false);
+        }
+        #endregion
     }
 }
