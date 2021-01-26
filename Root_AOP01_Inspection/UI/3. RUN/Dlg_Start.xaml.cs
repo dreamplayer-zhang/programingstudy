@@ -76,15 +76,8 @@ namespace Root_AOP01_Inspection
                 Start.Content = "Start";
             }
         }
-        //public void Init(ManualJobSchedule jobschdule)
-        //{
-        //    m_aRecipe = new ObservableCollection<Recipe>();
-        //    listviewRCP.ItemsSource = m_aRecipe;
-        //    m_JobSchedule = jobschdule;
-        //    this.DataContext = jobschdule;
-        //    LoadportNum.Text = Loadport_UI.sLoadportNum;
-        //}   
-        #region Recipe List
+ 
+        #region Recipe
         public class Recipe : NotifyProperty
         {
             int _nNumber = 1;
@@ -125,9 +118,27 @@ namespace Root_AOP01_Inspection
             string[] Getfiles = Directory.GetFiles(m_recipe.m_sPath, "*.AOP01");
             foreach (string files in Getfiles)
             {
+
                 FileInfo file = new FileInfo(files);
                 string rcpname = file.Name;
-                AddRecipe(rcpname, file.LastWriteTime.ToString());
+                DateTime rcpdate = file.LastWriteTime;
+                if (cbRecipe.IsChecked == true)
+                {
+                    if(TextBoxRecipe.Text==rcpname)
+                        AddRecipe(rcpname, file.LastWriteTime.ToString());
+                }
+                else if (cbDate.IsChecked == true)
+                {
+                    if(DatePicker.SelectedDate == rcpdate)
+                        AddRecipe(rcpname, file.LastWriteTime.ToString());
+                }
+                else if(cbRecipe.IsChecked == true && cbDate.IsChecked == true)
+                {
+                    if(TextBoxRecipe.Text == rcpname && DatePicker.SelectedDate == rcpdate)
+                        AddRecipe(rcpname, file.LastWriteTime.ToString());
+                }
+                else
+                    AddRecipe(rcpname, file.LastWriteTime.ToString());
             }
         }
         public string sRecipeName = "";
@@ -141,7 +152,7 @@ namespace Root_AOP01_Inspection
         }
         #endregion
 
-
+        #region Button Start
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
             m_handler.bInit = true;
@@ -154,6 +165,9 @@ namespace Root_AOP01_Inspection
             }
             this.DialogResult = true;
         }
+        #endregion
+
+        #region Button Close
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             m_loadport.RunUndocking();
@@ -161,6 +175,7 @@ namespace Root_AOP01_Inspection
             //while ((EQ.IsStop() != true) && m_loadport.IsBusy()) Thread.Sleep(10);
             this.Close();
         }
+        #endregion
     }
 
 }
