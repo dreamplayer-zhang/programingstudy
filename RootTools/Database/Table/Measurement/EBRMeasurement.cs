@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace RootTools.Database
 {
-    class MeasurementManager
-    {
-    }
+	public class EBRMeasurement : Measurement
+	{
+
+	}
 }
