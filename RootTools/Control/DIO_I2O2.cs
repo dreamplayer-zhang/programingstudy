@@ -38,10 +38,7 @@ namespace RootTools.Control
             return WaitDone(); 
         }
 
-        public bool p_bOut
-        {
-            get { return m_aBitDO[1].p_bOn && (m_aBitDO[0].p_bOn == false); }
-        }
+        public bool p_bOut { get; set; }
 
         ListDIO m_listDI;
         ListDIO m_listDO;
@@ -75,7 +72,6 @@ namespace RootTools.Control
             if (sDO1 != "OK") return sDO1;
             m_secTimeout = tree.Set(m_secTimeout, m_secTimeout, "Timeout", "DIO WaitDone Timeout (sec)"); 
             m_eRun = (eRun)tree.Set(m_eRun, eRun.Nothing, "Run", "DIO Run Mode", p_bEnableRun);
-            m_msRepeat = tree.Set(m_msRepeat, 1000, "Repeat", "Repeat Toggle Period (ms)", m_eRun == eRun.Repeat);
             return "OK";
         }
 
@@ -130,6 +126,7 @@ namespace RootTools.Control
         public StopWatch m_swWrite = new StopWatch();
         public void Write(bool bOn)
         {
+            p_bOut = bOn; 
             m_aBitDO[0].Write(!bOn);
             m_aBitDO[1].Write(bOn);
             m_swWrite.Start();
@@ -167,14 +164,10 @@ namespace RootTools.Control
             }
         }
 
-        StopWatch m_swRepeat = new StopWatch();
-        int m_msRepeat = 1000;
         void Repeat()
         {
-            if (m_swRepeat.ElapsedMilliseconds < m_msRepeat) return;
-            m_swRepeat.Restart();
-            if (m_aBitDO[0].p_bOn) Write(true);
-            else if (m_aBitDO[1].p_bOn) Write(false);
+            RunSol(true);
+            RunSol(false); 
         }
     }
 }

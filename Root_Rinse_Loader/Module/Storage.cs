@@ -151,7 +151,7 @@ namespace Root_Rinse_Loader.Module
                 m_storage = storage; 
             }
         }
-        Stack m_stack; 
+        public Stack m_stack; 
         void InitStack()
         {
             m_stack = new Stack("Stack", this); 
@@ -217,7 +217,7 @@ namespace Root_Rinse_Loader.Module
         }
 
         double m_pulseDown = 10000; 
-        double m_posStackReady = 0; 
+        double m_posStackReady = -100000; 
         double m_fJogScale = 0.5; 
         public string MoveStackReady()
         {

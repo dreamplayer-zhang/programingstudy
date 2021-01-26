@@ -16,7 +16,7 @@ namespace Root_Rinse_Loader.Module
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axis, this, "Loader");
-            p_sInfo = m_toolBox.Get(ref m_dioPickerDown, this, "PickerDown", "Up", "Down");
+            p_sInfo = m_toolBox.Get(ref m_dioPickerDown, this, "PickerDown", "Up", "Down", true, true);
             p_sInfo = m_toolBox.Get(ref m_diPickerSet, this, "PickerSet");
             foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox);
             if (bInit)
@@ -221,6 +221,11 @@ namespace Root_Rinse_Loader.Module
         #region Run Load & Unload
         public string RunLoad()
         {
+            if (m_storage.m_stack.p_bCheck == false)
+            {
+                m_rinse.RunBuzzer(RinseL.eBuzzer.Finish); 
+                return "Done";
+            }
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack"; 
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
@@ -229,6 +234,7 @@ namespace Root_Rinse_Loader.Module
                 if (Run(m_storage.MoveStackReady())) return p_sInfo;
             }
             if (Run(RunPickerDown(true))) return p_sInfo;
+            Thread.Sleep(2000); 
             if (Run(RunVacuum(true))) return p_sInfo;
             m_storage.StartStackDown();
             if (Run(RunShakeUp())) return p_sInfo;
@@ -254,8 +260,8 @@ namespace Root_Rinse_Loader.Module
         public string RunRun()
         {
             if (m_bPickersetMode) return "OK";
-            if (m_rinse.p_eStateRinse != RinseL.eRinseRun.Run) return "Rinse State not Run";
-            if (m_rinse.p_eStateUnloader != EQ.eState.Run) return "Rinse Unloader State not Run";
+            //if (m_rinse.p_eStateRinse != RinseL.eRinseRun.Run) return "Rinse State not Run";
+            //if (m_rinse.p_eStateUnloader != EQ.eState.Run) return "Rinse Unloader State not Run";
             return p_bVacuum ? RunUnload() : RunLoad(); 
         }
         #endregion
