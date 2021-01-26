@@ -21,7 +21,7 @@ namespace Root_Rinse_Unloader.Module
         }
         string[] m_asRunMode = Enum.GetNames(typeof(eRunMode)); 
 
-        eRunMode _eMode = eRunMode.Magazine;
+        eRunMode _eMode = eRunMode.Stack;
         public eRunMode p_eMode
         {
             get { return _eMode; }
@@ -311,7 +311,7 @@ namespace Root_Rinse_Unloader.Module
         void RunThreadSend()
         {
             m_bRunSend = true;
-            Thread.Sleep(1000);
+            Thread.Sleep(5000);
             while (m_bRunSend)
             {
                 Thread.Sleep(10);

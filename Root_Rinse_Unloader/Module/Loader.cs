@@ -50,6 +50,18 @@ namespace Root_Rinse_Unloader.Module
             for (int n = 0; n < 4; n++) m_aPicker.Add(new Picker("Picker" + n.ToString(), this));
         }
 
+        bool _bVacuum = false;
+        public bool p_bVacuum
+        {
+            get { return _bVacuum; }
+            set
+            {
+                if (_bVacuum == value) return;
+                _bVacuum = value;
+                OnPropertyChanged();
+            }
+        }
+
         double m_secVac = 2;
         double m_secBlow = 0.5;
         public string RunVacuum(bool bOn)
@@ -59,6 +71,7 @@ namespace Root_Rinse_Unloader.Module
                 if (m_roller.m_bExist[n]) m_aPicker[n].m_dioVacuum.Write(bOn);
                 Thread.Sleep(200); 
             }
+            p_bVacuum = bOn; 
             if (bOn)
             {
                 StopWatch sw = new StopWatch();
@@ -112,6 +125,7 @@ namespace Root_Rinse_Unloader.Module
         public enum ePos
         {
             Roller,
+            Ready,
             Stotage,
         }
         void InitPos()
@@ -131,18 +145,18 @@ namespace Root_Rinse_Unloader.Module
         {
             if (m_rinse.p_eMode != RinseU.eRunMode.Stack) return "Run mode is not Stack";
             if (Run(RunPickerDown(false))) return p_sInfo;
-            if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
+            if (Run(MoveLoader(ePos.Ready))) return p_sInfo;
             while (m_roller.p_eStep != Roller.eStep.Picker)
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop"; 
             }
+            if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(RunPickerDown(false))) return p_sInfo;
             m_roller.p_eStep = Roller.eStep.Empty;
             if (Run(m_roller.RunRotate(true))) return p_sInfo;
-            if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
             return "OK";
         }
 
@@ -159,7 +173,7 @@ namespace Root_Rinse_Unloader.Module
             if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(RunPickerDown(false))) return p_sInfo;
-            if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
+            if (Run(MoveLoader(ePos.Ready))) return p_sInfo;
             m_storage.StartMoveStackReady(); 
             return "OK";
         }
@@ -173,6 +187,12 @@ namespace Root_Rinse_Unloader.Module
             }
             return false;
         }
+
+        public string RunRun()
+        {
+            if (m_bPickersetMode) return "OK";
+            return p_bVacuum ? RunUnload() : RunLoad();
+        }
         #endregion
 
         #region State Home
@@ -183,8 +203,11 @@ namespace Root_Rinse_Unloader.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            RunPickerDown(false);
+            RunVacuum(false); 
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            m_axis.StartMove(ePos.Ready); 
             return p_sInfo;
         }
 
@@ -374,7 +397,7 @@ namespace Root_Rinse_Unloader.Module
 
             public override ModuleRunBase Clone()
             {
-                Run_Unload run = new Run_Unload(m_module);
+                Run_Run run = new Run_Run(m_module);
                 return run;
             }
 
@@ -384,14 +407,10 @@ namespace Root_Rinse_Unloader.Module
 
             public override string Run()
             {
-                if (m_module.IsLoad())
+                while (EQ.p_eState == EQ.eState.Run)
                 {
-                    if (m_module.Run(m_module.RunUnload())) return p_sInfo;
-                }
-                while (EQ.p_eState == EQ.eState.Run) //forget me not
-                {
-                    if (m_module.Run(m_module.RunLoad())) return p_sInfo;
-                    if (m_module.Run(m_module.RunUnload())) return p_sInfo;
+                    Thread.Sleep(10);
+                    if (m_module.Run(m_module.RunRun())) return p_sInfo;
                 }
                 return "OK";
             }
