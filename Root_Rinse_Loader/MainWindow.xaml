@@ -115,10 +115,10 @@
                             <RowDefinition />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Grid Background="Crimson" />
-                        <Grid Background="Gold"
+                        <Grid x:Name="gridRed" Background="Crimson" />
+                        <Grid x:Name="gridYellow" Background="Gold"
                               Grid.Row="1" />
-                        <Grid Background="SeaGreen"
+                        <Grid x:Name="gridGreen" Background="SeaGreen"
                               Grid.Row="2" />
                     </Grid>
                 </Border>
@@ -556,41 +556,41 @@
                     <ColumnDefinition />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Button Content="Initialize"
+                <Button x:Name="buttonHome" Content="Initialize"
                         Grid.Column="0"
                         Margin="10"
                         FontSize="40"
                         FontWeight="Bold"
                         FontFamily="Arial"
-                        BorderBrush="{x:Null}" />
-                <Button Content="Start"
+                        BorderBrush="{x:Null}" Click="buttonHome_Click"/>
+                <Button x:Name="buttonStart" Content="Start"
                         Grid.Column="1"
                         Margin="10"
                         FontSize="40"
                         FontWeight="Bold"
                         FontFamily="Arial"
-                        BorderBrush="{x:Null}" />
-                <Button Content="Pause"
+                        BorderBrush="{x:Null}" Click="buttonStart_Click"/>
+                <Button x:Name="buttonPause" Content="Pause"
                         Grid.Column="2"
                         Margin="10"
                         FontSize="40"
                         FontWeight="Bold"
                         FontFamily="Arial"
-                        BorderBrush="{x:Null}" />
-                <Button Content="Reset"
+                        BorderBrush="{x:Null}" Click="buttonPause_Click"/>
+                <Button x:Name="buttonReset" Content="Reset"
                         Grid.Column="3"
                         Margin="10"
                         FontSize="40"
                         FontWeight="Bold"
                         FontFamily="Arial"
-                        BorderBrush="{x:Null}" />
-                <Button Content="Picker Set"
+                        BorderBrush="{x:Null}" Click="buttonReset_Click"/>
+                <Button x:Name="buttonPickerSet" Content="Picker Set"
                         Grid.Column="4"
                         Margin="10"
                         FontSize="40"
                         FontWeight="Bold"
                         FontFamily="Arial"
-                        BorderBrush="{x:Null}" />
+                        BorderBrush="{x:Null}" Click="buttonPickerSet_Click"/>
             </Grid>
             <Grid Grid.Row="2"
                   Visibility="Collapsed">

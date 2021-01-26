@@ -113,6 +113,7 @@ namespace Root_Rinse_Loader.Module
                 {
                     if (picker.m_dioVacuum.p_bIn == false) picker.m_dioVacuum.Write(false); 
                 }
+                Thread.Sleep(100); 
             }
         }
 
@@ -137,6 +138,7 @@ namespace Root_Rinse_Loader.Module
         public enum ePos
         {
             Stotage,
+            Rail,
             Roller
         }
         void InitPos()
@@ -221,7 +223,8 @@ namespace Root_Rinse_Loader.Module
         public string RunLoad()
         {
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack"; 
-            if (Run(RunPickerDown(false))) return p_sInfo; 
+            if (Run(RunPickerDown(false))) return p_sInfo;
+            if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
             if (m_storage.p_bIsEnablePick == false)
             {
                 if (Run(m_storage.StartMoveStackReady())) return p_sInfo;
@@ -231,11 +234,10 @@ namespace Root_Rinse_Loader.Module
                     if (EQ.IsStop()) return "EQ Stop";
                 }
             }
-            if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
             if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
+            m_storage.StartStackDown();
             if (Run(RunShakeUp())) return p_sInfo;
-            if (Run(m_storage.StartMoveStackReady())) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             return "OK";
         }
@@ -245,13 +247,13 @@ namespace Root_Rinse_Loader.Module
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack";
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
-            //forget Check Stip Exist -> Error ??
             if (Run(m_roller.RunRotate(false))) return p_sInfo;
-            Thread.Sleep(100); //forget Delete
+            Thread.Sleep(100); 
             if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(m_roller.RunRotate(true))) return p_sInfo;
+            if (Run(MoveLoader(ePos.Rail))) return p_sInfo;
             return "OK";
         }
 
