@@ -5,6 +5,8 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -153,6 +155,14 @@ namespace Root_Rinse_Loader
         {
             m_handler.StartPickerSet();
         }
+
+        private void textBoxWidth_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+            DependencyProperty property = TextBox.TextProperty;
+            BindingExpression binding = BindingOperations.GetBindingExpression((TextBox)sender, property);
+            if (binding != null) binding.UpdateSource();
+        }
         #endregion
 
         #region PickerSet Control Function
@@ -176,5 +186,6 @@ namespace Root_Rinse_Loader
             m_handler.m_loader.RunVacuum(false);
         }
         #endregion
+
     }
 }

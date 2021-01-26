@@ -250,6 +250,7 @@ namespace Root_Rinse_Loader.Module
             if (Run(m_roller.RunRotate(false))) return p_sInfo;
             Thread.Sleep(100); 
             if (Run(RunPickerDown(true))) return p_sInfo;
+            Thread.Sleep(2000);
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(m_roller.RunRotate(true))) return p_sInfo;

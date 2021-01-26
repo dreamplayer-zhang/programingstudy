@@ -442,6 +442,8 @@ namespace Root_Rinse_Loader.Module
             InitBase(id, engineer);
 
             InitThread();
+            AddProtocol(p_id, eCmd.SetMode, p_eMode);
+            AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
         }
 
         public override void ThreadStop()
