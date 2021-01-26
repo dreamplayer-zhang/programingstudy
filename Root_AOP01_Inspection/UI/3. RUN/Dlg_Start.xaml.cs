@@ -11,6 +11,7 @@ using RootTools.Module;
 using System.Threading;
 using System.Windows.Threading;
 using System;
+using System.Linq;
 
 namespace Root_AOP01_Inspection
 {
@@ -121,10 +122,12 @@ namespace Root_AOP01_Inspection
 
                 FileInfo file = new FileInfo(files);
                 string rcpname = file.Name;
-                DateTime rcpdate = file.LastWriteTime;
+                string temprcpname = Path.GetFileNameWithoutExtension(rcpname).ToLower();
+                DateTime rcpdate = file.LastWriteTime.Date;
                 if (cbRecipe.IsChecked == true)
                 {
-                    if(TextBoxRecipe.Text==rcpname)
+                    string TempRcpText = TextBoxRecipe.Text.ToLower();
+                    if (temprcpname.Contains(TempRcpText))
                         AddRecipe(rcpname, file.LastWriteTime.ToString());
                 }
                 else if (cbDate.IsChecked == true)
@@ -134,7 +137,8 @@ namespace Root_AOP01_Inspection
                 }
                 else if(cbRecipe.IsChecked == true && cbDate.IsChecked == true)
                 {
-                    if(TextBoxRecipe.Text == rcpname && DatePicker.SelectedDate == rcpdate)
+                    string TempRcpText = TextBoxRecipe.Text.ToLower();
+                    if (temprcpname.Contains(TempRcpText) && DatePicker.SelectedDate == rcpdate)
                         AddRecipe(rcpname, file.LastWriteTime.ToString());
                 }
                 else
