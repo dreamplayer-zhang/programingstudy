@@ -107,7 +107,7 @@ namespace Root_AOP01_Inspection
 
         bool IsEnableInitialization()
         {
-            if (IsRunModule()) return false;
+            if (!IsRunModule()) return true;
             switch (EQ.p_eState)
             {
                 case EQ.eState.Run: return false;
