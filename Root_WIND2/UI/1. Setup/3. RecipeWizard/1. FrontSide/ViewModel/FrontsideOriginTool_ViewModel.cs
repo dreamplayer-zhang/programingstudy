@@ -320,7 +320,6 @@ namespace Root_WIND2
 
             if (p_View_Rect.Width == 0) return;
             if (p_View_Rect.Height == 0) return;
-
             double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
             double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
 

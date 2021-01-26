@@ -21,7 +21,7 @@ namespace Root_Rinse_Loader.Module
         }
         string[] m_asRunMode = Enum.GetNames(typeof(eRunMode));
 
-        eRunMode _eMode = eRunMode.Magazine;
+        eRunMode _eMode = eRunMode.Stack;
         public eRunMode p_eMode
         {
             get { return _eMode; }
@@ -148,6 +148,7 @@ namespace Root_Rinse_Loader.Module
         DIO_I m_diEMG;
         DIO_I m_diAir;
         DIO_I m_diDoorLock;
+        DIO_I m_diBuzzerOff; 
         DIO_Os m_doLamp;
         DIO_Os m_doBuzzer;
         DIO_I m_diLightCurtain;
@@ -160,6 +161,7 @@ namespace Root_Rinse_Loader.Module
             p_sInfo = m_toolBox.Get(ref m_diEMG, this, "Emergency");
             p_sInfo = m_toolBox.Get(ref m_diAir, this, "Air Pressure");
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
             p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
             p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
@@ -268,6 +270,19 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
+        bool _bBuzzerOff = false;
+        public bool p_bBuzzerOff
+        {
+            get { return _bBuzzerOff; }
+            set
+            {
+                if (_bBuzzerOff == value) return;
+                _bBuzzerOff = value;
+                OnPropertyChanged();
+                if (value) RunBuzzerOff(); 
+            }
+        }
+
         public void RunBuzzer(eBuzzer eBuzzer)
         {
             m_doBuzzer.Write(eBuzzer); 
@@ -288,7 +303,8 @@ namespace Root_Rinse_Loader.Module
             p_bHome = m_dioHome.p_bIn;
             p_bEMG = m_diEMG.p_bIn;
             p_bAir = m_diAir.p_bIn;
-            p_bDoorLock = m_diDoorLock.p_bIn; 
+            p_bDoorLock = m_diDoorLock.p_bIn;
+            p_bBuzzerOff = m_diBuzzerOff.p_bIn; 
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();
             m_bBlink = !m_bBlink; 
@@ -351,7 +367,7 @@ namespace Root_Rinse_Loader.Module
         void RunThreadSend()
         {
             m_bRunSend = true;
-            Thread.Sleep(1000);
+            Thread.Sleep(5000);
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
@@ -442,6 +458,8 @@ namespace Root_Rinse_Loader.Module
             InitBase(id, engineer);
 
             InitThread();
+            AddProtocol(p_id, eCmd.SetMode, p_eMode);
+            AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
         }
 
         public override void ThreadStop()

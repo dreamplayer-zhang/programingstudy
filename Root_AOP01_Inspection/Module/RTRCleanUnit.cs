@@ -61,14 +61,6 @@ namespace Root_AOP01_Inspection.Module
         {
         }
 
-        #region Flip
-        public string StartFlip()
-        {
-            Run_Flip run = (Run_Flip)m_runFlip.Clone();
-            StartRun(run); 
-            return "OK"; 
-        }
-        #endregion
 
         #region ModuleRun
         ModuleRunBase m_runFlip; 
@@ -76,7 +68,6 @@ namespace Root_AOP01_Inspection.Module
         {
             base.InitModuleRuns();
             AddModuleRunList(new Run_Clean(this), true, "RTR Run Clean");
-            m_runFlip = AddModuleRunList(new Run_Flip(this), true, "Vision Reticle Flip Top to Bottom");
         }
 
         public class Run_Clean : ModuleRunBase
@@ -167,53 +158,6 @@ namespace Root_AOP01_Inspection.Module
                         m_module.m_doBottomBlow.Write(false); //Blow off
                     }
                 }
-                return "OK";
-            }
-        }
-
-        public MainVision p_mainvision
-        {
-            get
-            {
-                AOP01_Handler handler = (AOP01_Handler)m_engineer.ClassHandler();
-                return (MainVision)handler.m_mainVision;
-            }
-        }
-
-        public class Run_Flip : ModuleRunBase
-        {
-            public RTRCleanUnit m_module;
-            public Run_Flip(RTRCleanUnit module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-            string m_sFlip = "Flip";
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_sFlip = tree.Set(m_sFlip, m_sFlip, "Flip", "Reticle Flip Glass to Bottom", bVisible, true);
-            }
-            public override ModuleRunBase Clone()
-            {
-                Run_Flip run = new Run_Flip(m_module);
-                return run;
-            }
-            public override string Run()
-            {
-                m_bDoflip = true;
-                int sReticleFlip = m_module.m_teachReticleFlip;
-                if (EQ.p_bSimulate) return "OK";
-                while (m_module.p_mainvision.IsBusy()) Thread.Sleep(10);
-                IWTRChild child = m_module.GetChild("MainVision");
-                if (m_module.p_mainvision.Run(child.BeforeGet(0))) return p_sInfo;
-                while (m_module.p_mainvision.IsBusy()) Thread.Sleep(10);
-                int posWTR = child.GetTeachWTR(m_module.m_dicArm[0].p_infoWafer);
-                if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, 1))) return p_sInfo;
-                if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
-                m_module.m_dicArm[0].p_infoWafer = child.GetInfoWafer(0);
-                if (m_module.Run(m_module.WriteCmd(eCmd.Put, sReticleFlip, 1))) return p_sInfo;
-                if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
-                child.SetInfoWafer(0, m_module.m_dicArm[0].p_infoWafer);
                 return "OK";
             }
         }

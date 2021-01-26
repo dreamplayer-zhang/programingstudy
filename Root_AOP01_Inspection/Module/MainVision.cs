@@ -730,11 +730,11 @@ namespace Root_AOP01_Inspection.Module
                 run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
                 return run;
             }
-            string m_sFlip = "Flip";
+            string m_sFlip = "Test";
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
-                m_sFlip = tree.Set(m_sFlip, m_sFlip, "Flip", "Reticle Flip Glass to Bottom", bVisible, true);
+                m_sFlip = tree.Set(m_sFlip, m_sFlip, "Test", "Bottom", bVisible, true);
             }
             public override string Run()
             {

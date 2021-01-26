@@ -791,5 +791,19 @@ namespace RootTools_CLR
 		pSrc = nullptr;
 		pDst = nullptr;
 	}
+	ResizeSSE m_ResizeSSE[3];
+	void CLR_IP::Cpp_CreatInterpolationData(int i, double dXScale, double dXShift, int nWidth)
+	{
+		m_ResizeSSE[i].CreatInterpolationData(dXScale, dXShift, nWidth);
+	}
+	void CLR_IP::Cpp_ProcessInterpolation(int i,int  thid, BYTE* pSrcImg, int nSrcHeight, int nSrcWidth, int nFovWidth, LPBYTE* ppTarget, int nXOffset, int nYOffset, int nDir, int nSy, int nEy)
+	{
+		m_ResizeSSE[i].ProcessInterpolation(thid, pSrcImg, nSrcHeight, nSrcWidth, nFovWidth, ppTarget, nXOffset, nYOffset, nDir, nSy, nEy);
+	}
+	void CLR_IP::Cpp_ProcessInterpolation(int i,int  thid, BYTE* pSrcImg, int nSrcHeight, int nSrcWidth, int nFovWidth, LPBYTE pTarget)
+	{
+		m_ResizeSSE[i].ProcessInterpolation(thid, pSrcImg, nSrcHeight, nSrcWidth, nFovWidth, pTarget);
+	}
+
 
 }
