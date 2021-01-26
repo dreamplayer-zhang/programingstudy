@@ -216,11 +216,12 @@ namespace Root_Rinse_Loader.Module
             return m_axis.WaitReady();
         }
 
+        double m_pulseDown = 10000; 
         double m_posStackReady = 0; 
         double m_fJogScale = 0.5; 
         public string MoveStackReady()
         {
-            if (Math.Abs(m_posStackReady - m_axis.p_posCommand) > 100) MoveStack();
+            if (m_axis.p_posCommand > m_posStackReady - m_pulseDown) MoveStack();
             if (m_stack.p_bLevel)
             {
                 m_axis.Jog(-m_fJogScale);
@@ -228,21 +229,18 @@ namespace Root_Rinse_Loader.Module
                 m_axis.StopAxis();
                 Thread.Sleep(500);
             }
-            m_axis.StartMove(m_axis.p_posCommand - 10000);
-            m_axis.WaitReady();
             m_axis.Jog(m_fJogScale);
             while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
             m_posStackReady = m_axis.p_posCommand;
             m_axis.StopAxis();
             m_axis.WaitReady();
             Thread.Sleep(500);
-            m_posStackReady = m_axis.p_posCommand;
             return "OK";
         }
 
-        public void StartShiftDown()
+        public void StartStackDown()
         {
-            m_axis.StartMove(m_axis.p_posCommand - 10000); 
+            m_axis.StartMove(m_posStackReady - m_pulseDown); 
         }
 
         public bool p_bIsEnablePick
@@ -253,7 +251,8 @@ namespace Root_Rinse_Loader.Module
         void RunTreeElevator(Tree tree)
         {
             m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Magazine Slot Pitch (pulse)");
-            m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Jog Scale", "Jog Move Scale (0 ~ 1)"); 
+            m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Jog Scale", "Jog Move Scale (0 ~ 1)");
+            m_pulseDown = tree.Set(m_pulseDown, m_pulseDown, "Stack Down", "Stack Down (pulse)"); 
         }
         #endregion
 

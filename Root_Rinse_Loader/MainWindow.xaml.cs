@@ -1,10 +1,13 @@
 ﻿using Root_Rinse_Loader.Engineer;
 using Root_Rinse_Loader.Module;
 using RootTools;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Root_Rinse_Loader
 {
@@ -16,8 +19,7 @@ namespace Root_Rinse_Loader
         public MainWindow()
         {
             InitializeComponent();
-            comboMain.ItemsSource = new string[] { "Main UI", "Engineer" };
-            comboMain.SelectedIndex = 0; 
+            InitTimer();
         }
 
         #region Loaded
@@ -28,7 +30,6 @@ namespace Root_Rinse_Loader
             if (!Directory.Exists(@"C:\Recipe\Rinse_Loader")) Directory.CreateDirectory(@"C:\Recipe\Rinse_Loader");
             m_engineer.Init("Rinse_Loader");
             engineerUI.Init(m_engineer);
-            mainUI.Init(m_engineer);
             m_handler = (RinseL_Handler)m_engineer.ClassHandler();
             Init(); 
         }
@@ -47,14 +48,6 @@ namespace Root_Rinse_Loader
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             m_engineer.ThreadStop();
-        }
-        #endregion
-
-        #region UI Controls
-        private void comboMain_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-            if (comboMain.SelectedIndex < 0) return;
-            tabMain.SelectedIndex = comboMain.SelectedIndex; 
         }
         #endregion
 
@@ -103,9 +96,85 @@ namespace Root_Rinse_Loader
         }
         #endregion
 
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromSeconds(0.01);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+
+        int m_nBlink = 0;
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            buttonHome.IsEnabled = EQ.p_eState != EQ.eState.Run;
+            buttonStart.IsEnabled = EQ.p_eState == EQ.eState.Ready;
+            buttonPause.IsEnabled = EQ.p_eState == EQ.eState.Run;
+            buttonReset.IsEnabled = EQ.p_eState == EQ.eState.Error;
+            buttonPickerSet.IsEnabled = EQ.p_eState == EQ.eState.Ready;
+
+            m_nBlink = (m_nBlink + 1) % 100;
+            bool bBlink = m_nBlink < 50;
+            gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
+            gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Run)) ? Brushes.Gold : Brushes.YellowGreen;
+            gridGreen.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.SeaGreen : Brushes.DarkGreen; 
+        }
+        #endregion
+
+        #region Control Function
         private void buttonMode_Click(object sender, RoutedEventArgs e)
         {
             m_handler.m_rinse.p_eMode = (RinseL.eRunMode)(1 - (int)m_handler.m_rinse.p_eMode);
         }
+
+        private void buttonHome_Click(object sender, RoutedEventArgs e)
+        {
+            EQ.p_bStop = false; 
+            EQ.p_eState = EQ.eState.Home;
+        }
+
+        private void buttonStart_Click(object sender, RoutedEventArgs e)
+        {
+            EQ.p_eState = EQ.eState.Run;
+        }
+
+        private void buttonPause_Click(object sender, RoutedEventArgs e)
+        {
+            EQ.p_eState = EQ.eState.Ready;
+        }
+
+        private void buttonReset_Click(object sender, RoutedEventArgs e)
+        {
+            EQ.p_eState = EQ.eState.Ready;
+        }
+
+        private void buttonPickerSet_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.StartPickerSet();
+        }
+        #endregion
+
+        #region PickerSet Control Function
+        private void buttonPickerSetUp_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_loader.RunPickerDown(false); 
+        }
+
+        private void buttonPickerSetDown_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_loader.RunPickerDown(true);
+        }
+
+        private void buttonPickerSetVacOn_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_loader.RunVacuum(true); 
+        }
+
+        private void buttonPickerSetVacOff_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_loader.RunVacuum(false);
+        }
+        #endregion
     }
 }

@@ -85,9 +85,11 @@ namespace Root_Rinse_Loader.Module
             return "OK";
         }
 
+        public bool m_bPickerDown = false;
         DIO_I2O2 m_dioPickerDown;
         public string RunPickerDown(bool bDown)
         {
+            m_bPickerDown = bDown;
             m_dioPickerDown.Write(bDown);
             return m_dioPickerDown.WaitDone();
         }
@@ -113,6 +115,7 @@ namespace Root_Rinse_Loader.Module
                 {
                     if (picker.m_dioVacuum.p_bIn == false) picker.m_dioVacuum.Write(false); 
                 }
+                Thread.Sleep(100); 
             }
         }
 
@@ -137,6 +140,7 @@ namespace Root_Rinse_Loader.Module
         public enum ePos
         {
             Stotage,
+            Rail,
             Roller
         }
         void InitPos()
@@ -153,37 +157,28 @@ namespace Root_Rinse_Loader.Module
 
         #region PickerSet
         public bool m_bPickersetMode = false;
-        public string StartPickerSet()
-        {
-            StartRun(m_runPickerSet.Clone());
-            return "OK";
-        }
-
         string RunPickerSet()
         {
             try
             {
                 if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
-                bool bDown = false;
-                bool bVacuum = false;
                 while (true)
                 {
                     switch (CheckPickerSet())
                     {
                         case ePickerSet.Stop: return "OK";
                         case ePickerSet.UpDown:
-                            bDown = !bDown;
-                            if (Run(RunPickerDown(bDown))) return p_sInfo;
+                            if (Run(RunPickerDown(!m_bPickerDown))) return p_sInfo;
                             break;
                         case ePickerSet.Vacuum:
-                            bVacuum = !bVacuum;
-                            if (Run(RunVacuum(bVacuum))) return p_sInfo;
+                            if (Run(RunVacuum(!p_bVacuum))) return p_sInfo;
                             break;
                     }
                 }
             }
             finally
             {
+                m_storage.StartStackDown(); 
                 RunPickerDown(false);
                 MoveLoader(ePos.Roller);
                 m_bPickersetMode = false;
@@ -215,27 +210,28 @@ namespace Root_Rinse_Loader.Module
             }
             return (m_swPickerSet.ElapsedMilliseconds < 1000) ? ePickerSet.UpDown : ePickerSet.Vacuum;
         }
+
+        public string m_sFilePickerSet = "";
+        void RunTreePickerSet(Tree tree)
+        {
+            m_sFilePickerSet = tree.SetFile(m_sFilePickerSet, m_sFilePickerSet, "RunRinse_Loader", "ModuleRun", "PickerSet ModuleRun File"); 
+        }
         #endregion
 
         #region Run Load & Unload
         public string RunLoad()
         {
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack"; 
-            if (Run(RunPickerDown(false))) return p_sInfo; 
+            if (Run(RunPickerDown(false))) return p_sInfo;
+            if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
             if (m_storage.p_bIsEnablePick == false)
             {
-                if (Run(m_storage.StartMoveStackReady())) return p_sInfo;
-                while (m_storage.IsBusy())
-                {
-                    Thread.Sleep(10);
-                    if (EQ.IsStop()) return "EQ Stop";
-                }
+                if (Run(m_storage.MoveStackReady())) return p_sInfo;
             }
-            if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
             if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
+            m_storage.StartStackDown();
             if (Run(RunShakeUp())) return p_sInfo;
-            if (Run(m_storage.StartMoveStackReady())) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             return "OK";
         }
@@ -245,13 +241,13 @@ namespace Root_Rinse_Loader.Module
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack";
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
-            //forget Check Stip Exist -> Error ??
             if (Run(m_roller.RunRotate(false))) return p_sInfo;
-            Thread.Sleep(100); //forget Delete
+            Thread.Sleep(100); 
             if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(m_roller.RunRotate(true))) return p_sInfo;
+            if (Run(MoveLoader(ePos.Rail))) return p_sInfo;
             return "OK";
         }
 
@@ -287,7 +283,8 @@ namespace Root_Rinse_Loader.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreePicker(tree.GetTree("Picker", false));
+            RunTreePicker(tree.GetTree("Picker"));
+            RunTreePickerSet(tree.GetTree("PickerSet")); 
         }
         #endregion
 
@@ -331,10 +328,39 @@ namespace Root_Rinse_Loader.Module
         ModuleRunBase m_runPickerSet;
         protected override void InitModuleRuns()
         {
+            AddModuleRunList(new Run_Move(this), false, "Move Axis");
             AddModuleRunList(new Run_Load(this), false, "Load Strip");
             AddModuleRunList(new Run_Unload(this), false, "Unload Strip");
             m_runRun = AddModuleRunList(new Run_Run(this), true, "Run");
             m_runPickerSet = AddModuleRunList(new Run_PickerSet(this), false, "PickerSet");
+        }
+
+        public class Run_Move : ModuleRunBase
+        {
+            Loader m_module;
+            public Run_Move(Loader module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            ePos m_ePos = ePos.Roller; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Move run = new Run_Move(m_module);
+                run.m_ePos = m_ePos; 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_ePos = (ePos)tree.Set(m_ePos, m_ePos, "Pos", "Axis Position", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.MoveLoader(m_ePos); 
+            }
         }
 
         public class Run_Load : ModuleRunBase
