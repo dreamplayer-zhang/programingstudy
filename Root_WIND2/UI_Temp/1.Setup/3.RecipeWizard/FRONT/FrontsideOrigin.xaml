@@ -38,7 +38,8 @@
                     <Button Content="Ruler"/>
                     <Button Content="AA"/>
                 </StackPanel>
-                <tools:RootViewer  Grid.Row="1"/>
+                <tools:RootViewer Grid.Row="1" >
+                </tools:RootViewer>
             </Grid>
         </GroupBox>
             
