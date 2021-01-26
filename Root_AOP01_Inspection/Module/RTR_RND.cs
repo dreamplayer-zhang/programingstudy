@@ -867,20 +867,20 @@ namespace Root_AOP01_Inspection.Module
                     return "OK";
                 }
                 int posWTR = 0;
-                if (m_bDoflip == true && child.p_id == "MainVision")
-                {
-                    posWTR = m_module.m_teachReticleFlip;
-                    m_bDoflip = false;
-                }
-                else
-                {
+                //if (m_bDoflip == true && child.p_id == "MainVision")
+                //{
+                //    posWTR = m_module.m_teachReticleFlip;
+                //    m_bDoflip = false;
+                //}
+                //else
+                //{
                     if (child.p_id == "MainVision") 
                     {
                         MainVision vision = ((AOP01_Handler)m_module.m_engineer.ClassHandler()).m_mainVision;
                         posWTR = vision.GetTeachWTR(vision.p_eSide, child.GetInfoWafer(m_nChildID)); 
                     }
                     else posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
-                }
+                //}
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (child.p_eState != eState.Ready)
                 {
