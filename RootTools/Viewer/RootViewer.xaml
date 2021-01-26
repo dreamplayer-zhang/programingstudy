@@ -14,7 +14,8 @@
         <convert:ZoomConverter x:Key="ZoomConverters" />
     </UserControl.Resources>
     <DockPanel>
-        <Grid DockPanel.Dock="Top" Background="{StaticResource ControlBackGround}"
+        <Grid Name="MenuBarGrid"
+              DockPanel.Dock="Top" Background="{StaticResource ControlBackGround}"
               Focusable="False"
               Visibility="{Binding p_VisibleMenu}">
             <Menu Background="{StaticResource ControlBackGround}" VerticalAlignment="Center">
