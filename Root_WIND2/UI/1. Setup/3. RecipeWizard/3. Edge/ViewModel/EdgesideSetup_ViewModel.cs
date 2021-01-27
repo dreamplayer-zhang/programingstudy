@@ -233,7 +233,6 @@ namespace Root_WIND2
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm;
 		}
 
-
 		private void ProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs e)
 		{
 			Workplace workplace = obj as Workplace;
