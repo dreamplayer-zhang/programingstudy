@@ -173,7 +173,12 @@ namespace Root_WIND2.Module
 
                     MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
 
-                    m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_nYOffset, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                    GrabData gd = new GrabData();
+                    gd.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.BackWard;
+                    gd.nScanOffsetY = 0;
+                    gd.ReverseOffsetY = 0;
+
+                    m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px,gd);
                     //m_grabMode.StartGrabColor(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
 
                     if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))

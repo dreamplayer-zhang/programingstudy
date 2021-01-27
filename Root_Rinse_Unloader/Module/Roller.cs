@@ -154,7 +154,8 @@ namespace Root_Rinse_Unloader.Module
                 switch (p_eSensor)
                 {
                     case eSensor.Empty:
-                        if (m_diCheck[0].p_bIn || m_diCheck[1].p_bIn) p_eSensor = eSensor.Exist;
+                        //if (m_diCheck[0].p_bIn || m_diCheck[1].p_bIn) p_eSensor = eSensor.Exist;
+                        if (m_diCheck[0].p_bIn) p_eSensor = eSensor.Exist;
                         break;
                     case eSensor.Exist:
                         if (m_diCheck[2].p_bIn) p_eSensor = eSensor.Arrived;
@@ -268,17 +269,19 @@ namespace Root_Rinse_Unloader.Module
         public List<bool> m_bExist = new List<bool>();
         public string RunAlign()
         {
-            while (m_bExist.Count < 4) m_bExist.Add(false); 
             try
-                {
+            {
+                Thread.Sleep(1000); //forget Tree
                 if (Run(RunRotate(false))) return p_sInfo;
-                if (Run(RunMoveAlign(false))) return p_sInfo;
-                if (Run(RunAlignerUp(true))) return p_sInfo;
-                if (Run(RunMoveAlign(true))) return p_sInfo;
-                if (Run(RunMoveAlign(false))) return p_sInfo;
-                if (Run(RunAlignerUp(false))) return p_sInfo;
-                m_bExist.Clear();
-                foreach (Line line in m_aLine) m_bExist.Add(line.p_eSensor != Line.eSensor.Empty);
+                if (m_rinse.p_eMode == RinseU.eRunMode.Magazine)
+                {
+                    if (Run(RunMoveAlign(false))) return p_sInfo;
+                    if (Run(RunAlignerUp(true))) return p_sInfo;
+                    if (Run(RunMoveAlign(true))) return p_sInfo;
+                    if (Run(RunMoveAlign(false))) return p_sInfo;
+                    if (Run(RunAlignerUp(false))) return p_sInfo;
+                }
+                for (int n = 0; n < 4; n++) m_bExist[n] = m_aLine[n].p_eSensor != Line.eSensor.Empty;
                 switch (m_rinse.p_eMode)
                 {
                     case RinseU.eRunMode.Magazine:
@@ -286,17 +289,17 @@ namespace Root_Rinse_Unloader.Module
                         while (m_rail.p_eState != eState.Ready)
                         {
                             Thread.Sleep(10);
-                            if (EQ.IsStop()) return "EQ Stop"; 
+                            if (EQ.IsStop()) return "EQ Stop";
                         }
-                        m_rail.StartRun(m_bExist); 
+                        m_rail.StartRun(m_bExist);
                         RunRotate(true);
                         Thread.Sleep(100);
                         p_eStep = eStep.Send;
-                        foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty; 
-                            break;
+                        foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
+                        break;
                     case RinseU.eRunMode.Stack:
                         p_eStep = eStep.Picker;
-                        break; 
+                        break;
                 }
                 return "OK";
             }
@@ -339,6 +342,7 @@ namespace Root_Rinse_Unloader.Module
         Rail m_rail;
         public Roller(string id, IEngineer engineer, RinseU rinse, Rail rail)
         {
+            while (m_bExist.Count < 4) m_bExist.Add(false);
             p_id = id;
             m_rinse = rinse;
             m_rail = rail; 

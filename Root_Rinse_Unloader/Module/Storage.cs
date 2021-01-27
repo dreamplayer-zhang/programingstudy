@@ -234,6 +234,7 @@ namespace Root_Rinse_Unloader.Module
             while (m_bThreadCheck)
             {
                 Thread.Sleep(10);
+                m_stack.CheckSensor(); 
                 foreach (Magazine magazine in m_aMagazine) magazine.CheckSensor();
             }
         }

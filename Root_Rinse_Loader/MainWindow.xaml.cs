@@ -113,7 +113,7 @@ namespace Root_Rinse_Loader
             buttonHome.IsEnabled = EQ.p_eState != EQ.eState.Run;
             buttonStart.IsEnabled = EQ.p_eState == EQ.eState.Ready;
             buttonPause.IsEnabled = EQ.p_eState == EQ.eState.Run;
-            buttonReset.IsEnabled = EQ.p_eState == EQ.eState.Error;
+            buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Error) || (EQ.p_eState == EQ.eState.Ready);
             buttonPickerSet.IsEnabled = EQ.p_eState == EQ.eState.Ready;
 
             m_nBlink = (m_nBlink + 1) % 100;
@@ -148,6 +148,7 @@ namespace Root_Rinse_Loader
 
         private void buttonReset_Click(object sender, RoutedEventArgs e)
         {
+            m_handler.m_rinse.RunBuzzerOff(); 
             EQ.p_eState = EQ.eState.Ready;
         }
 

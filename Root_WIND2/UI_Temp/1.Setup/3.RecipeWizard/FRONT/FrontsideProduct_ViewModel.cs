@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_WIND2.Module;
+using RootTools;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
@@ -82,6 +83,51 @@ namespace Root_WIND2.UI_Temp
             set;
         }
 
+        public List<string> GrabModeList
+        {
+            get
+            {
+                return ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision.p_asGrabMode;
+            } 
+            set
+            {
+
+            }
+        }
+
+        private double camResolutionX;
+        public double CamResolutionX
+        {
+            get => camResolutionX;
+            set
+            {
+                SetProperty<double>(ref this.camResolutionX, value);
+            }
+        }
+
+        private double camResolutionY;
+        public double CamResolutionY
+        {
+            get => camResolutionY;
+            set
+            {
+                SetProperty<double>(ref this.camResolutionY, value);
+            }
+        }
+
+        private int selectedGrabModeIndex = 0;
+        public int SelectedGrabModeIndex
+        {
+            get => this.selectedGrabModeIndex;
+            set
+            {
+                GrabMode mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision.m_aGrabMode[value];
+                this.CamResolutionX = mode.m_dResX_um;
+                this.CamResolutionY = mode.m_dResY_um;
+                this.WaferSize = mode.m_nWaferSize_mm;
+                SetProperty<int>(ref this.selectedGrabModeIndex, value);
+            }
+        }
 
         #endregion
 

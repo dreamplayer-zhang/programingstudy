@@ -42,12 +42,20 @@ namespace Root_AOP01_Inspection.Module
 
         public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false)
         {
-            m_camera.GrabLineScan(memory, cpScanOffset, nLine, nScanOffsetY, bInvY, m_nReverseOffsetY);
+            GrabData gd = new GrabData();
+            gd.bInvY = bInvY;
+            gd.ReverseOffsetY = m_nReverseOffsetY;
+            gd.nScanOffsetY = nScanOffsetY;
+            m_camera.GrabLineScan(memory, cpScanOffset, nLine, gd);
             m_camera.Grabed += m_camera_Grabed;
         }
         public void StartGrabColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false)
         {
-            m_camera.GrabLineScanColor(memory, cpScanOffset, nLine, nScanOffsetY, bInvY, m_nReverseOffsetY);
+            GrabData gd = new GrabData();
+            gd.bInvY = bInvY;
+            gd.ReverseOffsetY = m_nReverseOffsetY;
+            gd.nScanOffsetY = nScanOffsetY;
+            m_camera.GrabLineScanColor(memory, cpScanOffset, nLine, gd);
             m_camera.Grabed += m_camera_Grabed;
         }
         void m_camera_Grabed(object sender, System.EventArgs e)

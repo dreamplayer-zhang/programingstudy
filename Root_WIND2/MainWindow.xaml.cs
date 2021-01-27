@@ -218,6 +218,7 @@ namespace Root_WIND2
                     // Inspection Manager
                     InspectionManagerFrontside inspectionFront = GlobalObjects.Instance.Register<InspectionManagerFrontside>
                         (
+                        ((WIND2_Handler)engineer.ClassHandler()).p_Vision,
                         recipeFront,
                         new SharedBufferInfo(frontImage.GetPtr(0), frontImage.p_Size.X, frontImage.p_Size.Y, frontImage.p_nByte, frontImage.GetPtr(1), frontImage.GetPtr(2))
                         );
