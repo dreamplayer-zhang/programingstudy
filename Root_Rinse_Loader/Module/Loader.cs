@@ -68,8 +68,8 @@ namespace Root_Rinse_Loader.Module
         double m_secBlow = 0.5;
         public string RunVacuum(bool bOn)
         {
+            p_bVacuum = bOn;
             foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(bOn);
-            p_bVacuum = bOn; 
             if (bOn)
             {
                 Thread.Sleep((int)(1000 * m_secVac));
