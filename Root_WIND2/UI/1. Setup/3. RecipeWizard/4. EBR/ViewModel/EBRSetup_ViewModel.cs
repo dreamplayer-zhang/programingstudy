@@ -22,16 +22,7 @@ namespace Root_WIND2
 		private Setup_ViewModel setupVM;
 		private RootViewer_ViewModel drawToolVM;
 
-		private int roiWidth = 1500;
-		private int roiHeight = 500;
-		private int notchY = 0;
-		private int stepDegree = 10;
-		private int xRange = 10;
-		private int diffEdge = 20;
-		private int diffBevel = 20;
-		private int diffEBR = 10;
-		private int offsetBevel = 0;
-		private int offsetEBR = 0;
+		private EBRParameter parameter;
 
 		private DataTable measurementDataTable;
 		private SeriesCollection measurementGraph;
@@ -47,127 +38,16 @@ namespace Root_WIND2
 			get { return drawToolVM; }
 			set { SetProperty(ref drawToolVM, value); }
 		}
-		public int ROIWidth
-		{
-			get
-			{
-				return roiWidth;
-			}
-			set
-			{
-				SetProperty(ref roiWidth, value);
-                SetParameter();
-            }
-		}
-		public int ROIHeight
-		{
-			get
-			{
-				return roiHeight;
-			}
-			set
-			{
-				SetProperty(ref roiHeight, value);
-                SetParameter();
-            }
-		}
-		public int NotchY
-		{
-			get
-			{
-				return notchY;
-			}
-			set
-			{
-				SetProperty(ref notchY, value);
-                SetParameter();
-            }
-		}
-		public int StepDegree
-		{
-			get
-			{
-				return stepDegree;
-			}
-			set
-			{
-				SetProperty(ref stepDegree, value);
-                SetParameter();
-            }
-		}
-		public int XRange
-		{
-			get
-			{
-				return xRange;
-			}
-			set
-			{
-				SetProperty(ref xRange, value);
-                SetParameter();
-            }
-		}
-		public int DiffEdge
-		{
-			get
-			{
-				return diffEdge;
-			}
-			set
-			{
-				SetProperty(ref diffEdge, value);
-				SetParameter();
-			}
-		}
-		public int DiffBevel
-		{
-			get
-			{
-				return diffBevel;
-			}
-			set
-			{
-				SetProperty(ref diffBevel, value);
-				SetParameter();
-			}
-		}
-		public int DiffEBR
-		{
-			get
-			{
-				return diffEBR;
-			}
-			set
-			{
-				SetProperty(ref diffEBR, value);
-				SetParameter();
-			}
-		}
-		public int OffsetBevel
-		{
-			get
-			{
-				return offsetBevel;
-			}
-			set
-			{
-				SetProperty(ref offsetBevel, value);
-				SetParameter();
-			}
-		}
-		public int OffsetEBR
-		{
-			get
-			{
-				return offsetEBR;
-			}
-			set
-			{
-				SetProperty(ref offsetEBR, value);
-				SetParameter();
-			}
-		}
 
+		public EBRParameter Parameter
+		{
+			get => parameter;
+			set
+			{
+				SetProperty(ref parameter, value);
+			}
+		}
+		
 		public DataTable MeasurementDataTable
 		{
 			get => measurementDataTable;
@@ -176,10 +56,7 @@ namespace Root_WIND2
 
 		public SeriesCollection MeasurementGraph
 		{
-			get
-			{
-				return measurementGraph;
-			}
+			get => measurementGraph;
 			set
 			{
 				measurementGraph = value;
@@ -189,10 +66,7 @@ namespace Root_WIND2
 
 		public string[] XLabels
 		{
-			get
-			{
-				return xLabels;
-			}
+			get => xLabels;
 			set
 			{
 				xLabels = value;
@@ -202,25 +76,27 @@ namespace Root_WIND2
 
 		public int SizeYMaxVal
 		{
-			get { return sizeYMaxVal; }
+			get => sizeYMaxVal;
 			set
 			{
 				sizeYMaxVal = value;
 				RaisePropertyChanged("SizeYMaxVal");
 			}
 		}
+
 		public double SizeFrom
 		{
-			get { return sizeFrom; }
+			get => sizeFrom;
 			set
 			{
 				sizeFrom = value;
 				RaisePropertyChanged("SizeFrom");
 			}
 		}
+
 		public double SizeTo
 		{
-			get { return sizeTo; }
+			get => sizeTo;
 			set
 			{
 				sizeTo = value;
@@ -244,8 +120,10 @@ namespace Root_WIND2
 
 			DrawToolVM = new RootViewer_ViewModel();
 			DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EBRImage"), GlobalObjects.Instance.Get<DialogService>());
+			
+			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+			parameter = recipe.GetItem<EBRParameter>();
 
-			WIND2EventManager.BeforeRecipeSave += BeforeRecipeSave_Callback;
 			WorkEventManager.InspectionDone += InspectionDone_Callback;
 			WorkEventManager.ProcessMeasurementDone += ProcessMeasurementDone_Callback;
 		}
@@ -276,41 +154,7 @@ namespace Root_WIND2
 			if (recipe.GetItem<EBRParameter>() == null)
 				return;
 
-			ROIWidth = recipe.GetItem<EBRParameter>().RoiWidth;
-			ROIHeight = recipe.GetItem<EBRParameter>().RoiHeight;
-			NotchY = recipe.GetItem<EBRParameter>().NotchY;
-			StepDegree = recipe.GetItem<EBRParameter>().StepDegree;
-			XRange = recipe.GetItem<EBRParameter>().XRange;
-			DiffEdge = recipe.GetItem<EBRParameter>().DiffEdge;
-			DiffBevel = recipe.GetItem<EBRParameter>().DiffBevel;
-			DiffEBR = recipe.GetItem<EBRParameter>().DiffEBR;
-			OffsetBevel = recipe.GetItem<EBRParameter>().OffsetBevel;
-			OffsetEBR = recipe.GetItem<EBRParameter>().OffsetEBR;
-		}
-
-		public void SetParameter()
-		{
-			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
-
-			EBRParameter param = new EBRParameter();
-			param.RoiWidth = roiWidth;
-			param.RoiHeight = roiHeight;
-			param.NotchY = notchY;
-			param.StepDegree = stepDegree;
-			param.XRange = xRange;
-			param.DiffEdge = diffEdge;
-			param.DiffBevel = diffBevel;
-			param.DiffEBR = diffEBR;
-			param.OffsetBevel = offsetBevel;
-			param.OffsetEBR = offsetEBR;
-
-			recipe.ParameterItemList.Clear();
-			recipe.ParameterItemList.Add(param);
-		}
-
-		private void BeforeRecipeSave_Callback(object obj, RecipeEventArgs args)
-		{
-			SetParameter();
+			Parameter = recipe.GetItem<EBRParameter>();
 		}
 
 		private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
@@ -376,7 +220,7 @@ namespace Root_WIND2
 			XLabels = new string[binCount];
 			for (int i = 1; i <= binCount; i++)
 			{
-				XLabels[i - 1] = (StepDegree * i).ToString();
+				XLabels[i - 1] = (parameter.StepDegree * i).ToString();
 			}
 			YLabel = value => value.ToString("N");
 
