@@ -67,6 +67,10 @@ namespace Root_Rinse_Unloader
             textBlockLoadState.DataContext = m_handler.m_rinse;
             TextBlockMode.DataContext = m_handler.m_rinse;
             textBoxWidth.DataContext = m_handler.m_rinse;
+            textBlockStripState0.DataContext = m_handler.m_roller.m_aLine[0];
+            textBlockStripState1.DataContext = m_handler.m_roller.m_aLine[1];
+            textBlockStripState2.DataContext = m_handler.m_roller.m_aLine[2];
+            textBlockStripState3.DataContext = m_handler.m_roller.m_aLine[3];
         }
         #endregion
 

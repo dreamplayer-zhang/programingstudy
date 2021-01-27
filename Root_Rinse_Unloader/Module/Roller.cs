@@ -172,7 +172,7 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
-        List<Line> m_aLine = new List<Line>();
+        public List<Line> m_aLine = new List<Line>();
         void InitILines()
         {
             for (int n = 0; n < 4; n++) m_aLine.Add(new Line("Line" + n.ToString(), this));
