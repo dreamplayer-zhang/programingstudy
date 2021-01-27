@@ -145,10 +145,10 @@ namespace Root_Rinse_Unloader.Module
                 {
                     if (_eSensor == value) return;
                     _eSensor = value;
-                    OnPropertyChanged(); 
-
+                    OnPropertyChanged();
                 }
             }
+
             public void CheckSensor()
             {
                 switch (p_eSensor)
@@ -266,12 +266,13 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region Align
+        double m_secArrived = 1;
         public List<bool> m_bExist = new List<bool>();
         public string RunAlign()
         {
             try
             {
-                Thread.Sleep(1000); //forget Tree
+                Thread.Sleep((int)(1000 * m_secArrived)); 
                 if (Run(RunRotate(false))) return p_sInfo;
                 if (m_rinse.p_eMode == RinseU.eRunMode.Magazine)
                 {
@@ -305,6 +306,11 @@ namespace Root_Rinse_Unloader.Module
             }
             finally { RunAlignerUp(false); }
         }
+
+        void RunTreeAlign(Tree tree)
+        {
+            m_secArrived = tree.Set(m_secArrived, m_secArrived, "Arrived", "Arrived Delay (sec)");
+        }
         #endregion
 
         #region State Home
@@ -334,7 +340,8 @@ namespace Root_Rinse_Unloader.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeRotate(tree.GetTree("Rotate", false));
+            RunTreeRotate(tree.GetTree("Rotate"));
+            RunTreeAlign(tree.GetTree("Align")); 
         }
         #endregion
 

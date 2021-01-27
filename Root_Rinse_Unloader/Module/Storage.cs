@@ -101,14 +101,9 @@ namespace Root_Rinse_Unloader.Module
         public class Stack : NotifyProperty
         {
             DIO_I m_diLevel;
-            //DIO_I[] m_diCheck = new DIO_I[4];
             public void GetTools(ToolBox toolBox)
             {
                 m_storage.p_sInfo = toolBox.Get(ref m_diLevel, m_storage, m_id + ".Level");
-                //m_storage.p_sInfo = toolBox.Get(ref m_diCheck[0], m_storage, m_id + ".Check0");
-                //m_storage.p_sInfo = toolBox.Get(ref m_diCheck[1], m_storage, m_id + ".Check1");
-                //m_storage.p_sInfo = toolBox.Get(ref m_diCheck[2], m_storage, m_id + ".Check2");
-                //m_storage.p_sInfo = toolBox.Get(ref m_diCheck[3], m_storage, m_id + ".Check3");
             }
 
             bool _bLevel = false;
@@ -121,24 +116,6 @@ namespace Root_Rinse_Unloader.Module
                     _bLevel = value;
                     OnPropertyChanged();
                 }
-            }
-
-            bool _bCheck = false;
-            public bool p_bCheck
-            {
-                get { return _bCheck; }
-                set
-                {
-                    if (_bCheck == value) return;
-                    _bCheck = value;
-                    OnPropertyChanged();
-                }
-            }
-
-            public void CheckSensor()
-            {
-                p_bLevel = m_diLevel.p_bIn;
-                //p_bCheck = m_diCheck[0].p_bIn || m_diCheck[1].p_bIn || m_diCheck[2].p_bIn || m_diCheck[3].p_bIn;
             }
 
             string m_id;
@@ -185,11 +162,11 @@ namespace Root_Rinse_Unloader.Module
             return m_axis.WaitReady();
         }
 
-        double m_posStackReady = 0;
+        double m_posStackReady = -100000;
         double m_fJogScale = 1;
         public string MoveStackReady()
         {
-            if (m_axis.p_posCommand > m_posStackReady) MoveStack();
+            if (m_axis.p_posCommand > m_posStackReady - 1000) MoveStack();
             if (m_stack.p_bLevel)
             {
                 m_axis.Jog(-m_fJogScale);
@@ -234,7 +211,6 @@ namespace Root_Rinse_Unloader.Module
             while (m_bThreadCheck)
             {
                 Thread.Sleep(10);
-                m_stack.CheckSensor(); 
                 foreach (Magazine magazine in m_aMagazine) magazine.CheckSensor();
             }
         }

@@ -81,7 +81,7 @@ namespace Root_Rinse_Unloader.Module
             p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
             if (bInit) 
             {
-                EQ.m_EQ.OnChanged += M_EQ_OnChanged; //forget
+                EQ.m_EQ.OnChanged += M_EQ_OnChanged; 
                 m_tcpip.EventReciveData += M_tcpip_EventReciveData;
             }
         }
@@ -125,6 +125,7 @@ namespace Root_Rinse_Unloader.Module
         DIO_I m_diEMG;
         DIO_I m_diAir;
         DIO_I m_diDoorLock;
+        DIO_I m_diBuzzerOff;
         DIO_Os m_doLamp;
         DIO_Os m_doBuzzer;
         void GetToolsDIO()
@@ -136,6 +137,7 @@ namespace Root_Rinse_Unloader.Module
             p_sInfo = m_toolBox.Get(ref m_diEMG, this, "Emergency");
             p_sInfo = m_toolBox.Get(ref m_diAir, this, "Air Pressure");
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
             p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
         }
@@ -243,6 +245,19 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
+        bool _bBuzzerOff = false;
+        public bool p_bBuzzerOff
+        {
+            get { return _bBuzzerOff; }
+            set
+            {
+                if (_bBuzzerOff == value) return;
+                _bBuzzerOff = value;
+                OnPropertyChanged();
+                if (value) RunBuzzerOff();
+            }
+        }
+
         public void RunBuzzer(eBuzzer eBuzzer)
         {
             m_doBuzzer.Write(eBuzzer);
@@ -264,6 +279,7 @@ namespace Root_Rinse_Unloader.Module
             p_bEMG = m_diEMG.p_bIn;
             p_bAir = m_diAir.p_bIn;
             p_bDoorLock = m_diDoorLock.p_bIn;
+            p_bBuzzerOff = m_diBuzzerOff.p_bIn;
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();
             m_bBlink = !m_bBlink;

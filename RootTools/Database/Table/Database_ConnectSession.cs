@@ -43,7 +43,7 @@ namespace RootTools.Database
                     m_bConnected = true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // LOG
                 m_bConnected = false;
