@@ -1206,7 +1206,7 @@ namespace RootTools
                 }
             }
         }
-        void _saveImage()
+        public void _saveImage()
         {
             if (p_ImageData == null)
             {
@@ -1229,7 +1229,7 @@ namespace RootTools
             //m_ImageData.SaveRectImage(new CRect(left, top, right, bot));
             ////}
         }
-        void _clearImage()
+        public void _clearImage()
         {
             if (p_ImageData != null)
                 p_ImageData.ClearImage();

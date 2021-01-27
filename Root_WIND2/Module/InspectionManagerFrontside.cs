@@ -22,6 +22,8 @@ namespace Root_WIND2
         #region [Members]
         private readonly RecipeFront recipe;
         private readonly SharedBufferInfo sharedBufferInfo;
+
+        private readonly Module.Vision vision;
         #endregion
 
         #region [Properties]
@@ -37,8 +39,9 @@ namespace Root_WIND2
         }
         #endregion
 
-        public InspectionManagerFrontside(RecipeFront recipe, SharedBufferInfo bufferInfo)
+        public InspectionManagerFrontside(Module.Vision vision, RecipeFront recipe, SharedBufferInfo bufferInfo)
         {
+            this.vision = vision;
             this.recipe = recipe;
             this.sharedBufferInfo = bufferInfo;
         }

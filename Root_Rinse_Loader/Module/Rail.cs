@@ -78,7 +78,8 @@ namespace Root_Rinse_Loader.Module
 
         public string RunRotate(bool bRotate)
         {
-            m_axisRotate.Jog(m_fJogScale);
+            if (bRotate) m_axisRotate.Jog(m_fJogScale);
+            else m_axisRotate.StopAxis(); 
             return "OK"; 
         }
 

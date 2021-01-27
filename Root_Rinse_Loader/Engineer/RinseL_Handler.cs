@@ -201,8 +201,7 @@ namespace Root_Rinse_Loader.Engineer
             if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist";
             m_loader.m_bPickersetMode = true; 
             p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
-            EQ.p_bStop = false;
-            EQ.p_eState = EQ.eState.Run; 
+            p_moduleList.StartModuleRuns(); 
             return "OK";
         }
         #endregion

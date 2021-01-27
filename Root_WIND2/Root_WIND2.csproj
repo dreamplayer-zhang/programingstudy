@@ -279,6 +279,7 @@
     <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideOrigin.xaml.cs">
       <DependentUpon>FrontsideOrigin.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideOrigin_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideOrigin_ViewModel.cs" />
     <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideProduct.xaml.cs">
       <DependentUpon>FrontsideProduct.xaml</DependentUpon>
