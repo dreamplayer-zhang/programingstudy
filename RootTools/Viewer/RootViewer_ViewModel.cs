@@ -1170,7 +1170,7 @@ namespace RootTools
                 Vertical.Y2 = p_CanvasHeight;
                 Horizon.X2 = p_CanvasWidth;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return;
             }

@@ -256,7 +256,7 @@ namespace RootTools
                     dValue = nValue * ((m_aTK4S[nAddress - 1]. p_nDecimalPoint));
                 m_aTK4S[nAddress-1].p_dValue = dValue;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }

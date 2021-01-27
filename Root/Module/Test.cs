@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
+using RootTools.Lens.LinearTurret;
 using RootTools.Light;
 using RootTools.Module;
 using RootTools.ToolBoxs;
@@ -40,6 +41,7 @@ namespace Root.Module
         TCPIPServer m_socketServer;
         TCPIPClient m_socketClient;
         LightSet m_light;
+        LensLinearTurret m_lens; 
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_dioStart, this, "Start");
@@ -53,6 +55,7 @@ namespace Root.Module
             p_sInfo = m_toolBox.Get(ref m_socketServer, this, "SocketServer");
             p_sInfo = m_toolBox.Get(ref m_socketClient, this, "SocketClient");
             p_sInfo = m_toolBox.Get(ref m_light, this);
+            p_sInfo = m_toolBox.Get(ref m_lens, this, "LinearTurret"); 
         }
         #endregion
 
