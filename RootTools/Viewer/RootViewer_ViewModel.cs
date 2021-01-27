@@ -52,9 +52,9 @@ namespace RootTools
 
         public System.Windows.Input.KeyEventArgs m_KeyEvent;
 
-        Key m_keyMove = Key.LeftCtrl;
-        Key m_keyZoom = Key.LeftCtrl;
-        Key m_keyDrawBasic = Key.LeftShift;
+        //Key m_keyMove = Key.LeftCtrl;
+        //Key m_keyZoom = Key.LeftCtrl;
+        //Key m_keyDrawBasic = Key.LeftShift;
         public enum eColorViewMode
         {
             All,

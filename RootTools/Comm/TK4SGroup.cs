@@ -88,7 +88,7 @@ namespace RootTools
         int m_nTimeout = 3000;
         Log m_log;
         string m_sFilePath = @"C:\WIND2\Init\FDCSetting.ini";
-        int nCount;
+        //int nCount;
 
         private readonly IDialogService m_DialogService;
 
