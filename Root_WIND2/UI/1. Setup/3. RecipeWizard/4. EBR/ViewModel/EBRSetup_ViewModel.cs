@@ -276,16 +276,16 @@ namespace Root_WIND2
 			if (recipe.GetItem<EBRParameter>() == null)
 				return;
 
-			roiWidth = recipe.GetItem<EBRParameter>().RoiWidth;
-			roiHeight = recipe.GetItem<EBRParameter>().RoiHeight;
-			notchY = recipe.GetItem<EBRParameter>().NotchY;
-			stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
-			xRange = recipe.GetItem<EBRParameter>().XRange;
-			diffEdge = recipe.GetItem<EBRParameter>().DiffEdge;
-			diffBevel = recipe.GetItem<EBRParameter>().DiffBevel;
-			diffEBR = recipe.GetItem<EBRParameter>().DiffEBR;
-			offsetBevel = recipe.GetItem<EBRParameter>().OffsetBevel;
-			offsetEBR = recipe.GetItem<EBRParameter>().OffsetEBR;
+			ROIWidth = recipe.GetItem<EBRParameter>().RoiWidth;
+			ROIHeight = recipe.GetItem<EBRParameter>().RoiHeight;
+			NotchY = recipe.GetItem<EBRParameter>().NotchY;
+			StepDegree = recipe.GetItem<EBRParameter>().StepDegree;
+			XRange = recipe.GetItem<EBRParameter>().XRange;
+			DiffEdge = recipe.GetItem<EBRParameter>().DiffEdge;
+			DiffBevel = recipe.GetItem<EBRParameter>().DiffBevel;
+			DiffEBR = recipe.GetItem<EBRParameter>().DiffEBR;
+			OffsetBevel = recipe.GetItem<EBRParameter>().OffsetBevel;
+			OffsetEBR = recipe.GetItem<EBRParameter>().OffsetEBR;
 		}
 
 		public void SetParameter()
@@ -362,6 +362,7 @@ namespace Root_WIND2
 					{
 						Title = "Bevel",
 						Fill = Brushes.Transparent,
+						
 					},
 					new LineSeries
 					{
@@ -379,29 +380,25 @@ namespace Root_WIND2
 			}
 			YLabel = value => value.ToString("N");
 
-			DataRow[] dataBevels;
-			string expressionBevel = "m_fWidth >= 0";
-			dataBevels = measurementDataTable.Select(expressionBevel);
-
+			DataRow[] datas;
+			datas = measurementDataTable.Select();
 			ChartValues<float> bevels = new ChartValues<float>();
-			foreach (DataRow table in dataBevels)
+			foreach (DataRow table in datas)
 			{
 				string data = table[5].ToString();
 				bevels.Add(float.Parse(data));
 			}
 			MeasurementGraph[0].Values = bevels;
 
-			DataRow[] dataEBR;
-			string expressionEBR = "m_fHeight >= 0";
-			dataEBR = measurementDataTable.Select(expressionEBR);
-
 			ChartValues<float> ebrs = new ChartValues<float>();
-			foreach (DataRow table in dataEBR)
+			foreach (DataRow table in datas)
 			{
 				string data = table[6].ToString();
 				ebrs.Add(float.Parse(data));
 			}
 			MeasurementGraph[1].Values = ebrs;
+
+			SizeYMaxVal = (int)ebrs.Max();
 		}
 	}
 }

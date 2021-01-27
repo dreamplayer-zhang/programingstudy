@@ -25,7 +25,7 @@
                         <local:AOP01_Recipe_UI x:Name="recipeUI"/>
                     </TabItem>
                     <TabItem Header="Process" Background="{Binding p_brushHandler}">
-                        <EFEM:EFEM_Process_UI x:Name="processUI"/>
+                        <local:AOP01_Process_UI x:Name="processUI"/>
                     </TabItem>
                     <TabItem Header="GAF" Background="{Binding p_brushHandler}">
                         <gaf:GAF_UI x:Name="gafUI"/>

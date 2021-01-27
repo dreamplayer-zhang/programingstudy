@@ -113,7 +113,7 @@ namespace Root_Rinse_Loader.Module
                 m_storage.p_sInfo = toolBox.Get(ref m_diCheck[3], m_storage, m_id + ".Check3");
             }
 
-            bool _bLevel = false; 
+            bool _bLevel = false;
             public bool p_bLevel
             {
                 get { return _bLevel; }
@@ -151,7 +151,7 @@ namespace Root_Rinse_Loader.Module
                 m_storage = storage; 
             }
         }
-        Stack m_stack; 
+        public Stack m_stack; 
         void InitStack()
         {
             m_stack = new Stack("Stack", this); 
@@ -216,20 +216,31 @@ namespace Root_Rinse_Loader.Module
             return m_axis.WaitReady();
         }
 
-        double m_posStackReady = 0; 
-        double m_fJogScale = 1; 
+        double m_pulseDown = 10000; 
+        double m_posStackReady = -100000; 
+        double m_fJogScale = 0.5; 
         public string MoveStackReady()
         {
-            if (m_posStackReady != m_axis.p_posCommand) MoveStack();
+            if (m_axis.p_posCommand > m_posStackReady - m_pulseDown) MoveStack();
             if (m_stack.p_bLevel)
             {
-                m_axis.Jog(-m_fJogScale); 
+                m_axis.Jog(-m_fJogScale);
                 while (m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
+                m_axis.StopAxis();
+                Thread.Sleep(500);
             }
             m_axis.Jog(m_fJogScale);
             while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
-            m_posStackReady = m_axis.p_posCommand; 
-            return "OK"; 
+            m_posStackReady = m_axis.p_posCommand;
+            m_axis.StopAxis();
+            m_axis.WaitReady();
+            Thread.Sleep(500);
+            return "OK";
+        }
+
+        public void StartStackDown()
+        {
+            m_axis.StartMove(m_posStackReady - m_pulseDown); 
         }
 
         public bool p_bIsEnablePick
@@ -240,7 +251,8 @@ namespace Root_Rinse_Loader.Module
         void RunTreeElevator(Tree tree)
         {
             m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Magazine Slot Pitch (pulse)");
-            m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Jog Scale", "Jog Move Scale (0 ~ 1)"); 
+            m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Jog Scale", "Jog Move Scale (0 ~ 1)");
+            m_pulseDown = tree.Set(m_pulseDown, m_pulseDown, "Stack Down", "Stack Down (pulse)"); 
         }
         #endregion
 
@@ -296,6 +308,7 @@ namespace Root_Rinse_Loader.Module
             while (m_bThreadCheck)
             {
                 Thread.Sleep(10);
+                m_stack.CheckSensor(); 
                 foreach (Magazine magazine in m_aMagazine) magazine.CheckSensor(); 
             }
         }

@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Root_AOP01_Inspection.Module
 {
-    public class WTRCleanUnit : RTR_RND
+    public class RTRCleanUnit : RTR_RND
     {
         #region ToolBox
         public DIO_I m_diExistRTR;
@@ -45,7 +45,7 @@ namespace Root_AOP01_Inspection.Module
         public int m_teachCleanBottom = -1;
         public string m_extentionlength = "0";
         public string m_CleanSpeed = "7";
-        public string m_OriginSpeed = "30";
+        
         void RunTreeClean(Tree tree)
         {
             m_teachCleanTop = tree.Set(m_teachCleanTop, m_teachCleanTop, "Top Clean Teach", "RTR Top Clean Index");
@@ -57,18 +57,10 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
-        public WTRCleanUnit(string id, IEngineer engineer) : base(id, engineer)
+        public RTRCleanUnit(string id, IEngineer engineer) : base(id, engineer)
         {
         }
 
-        #region Flip
-        public string StartFlip()
-        {
-            Run_Flip run = (Run_Flip)m_runFlip.Clone();
-            StartRun(run); 
-            return "OK"; 
-        }
-        #endregion
 
         #region ModuleRun
         ModuleRunBase m_runFlip; 
@@ -76,13 +68,12 @@ namespace Root_AOP01_Inspection.Module
         {
             base.InitModuleRuns();
             AddModuleRunList(new Run_Clean(this), true, "RTR Run Clean");
-            m_runFlip = AddModuleRunList(new Run_Flip(this), true, "Vision Reticle Flip Top to Bottom");
         }
 
         public class Run_Clean : ModuleRunBase
         {
-            WTRCleanUnit m_module;
-            public Run_Clean(WTRCleanUnit module)
+            RTRCleanUnit m_module;
+            public Run_Clean(RTRCleanUnit module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -103,7 +94,6 @@ namespace Root_AOP01_Inspection.Module
                 m_sCleanPlane = tree.Set(m_sCleanPlane, m_sCleanPlane, m_asCleanPlane, "Clean Plane", "Clean Plane", bVisible);
                 m_sCleanCount = tree.Set(m_sCleanCount, m_sCleanCount, "Clean Count", "Clean Count", bVisible);
             }
-
             public override string Run()
             {
                 if (EQ.p_bSimulate) return "OK";
@@ -158,7 +148,7 @@ namespace Root_AOP01_Inspection.Module
                         for (int i = 0; i < nClenaCount; i++)
                         {
                             if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0"))) return p_sInfo; //Claen Move Front
-                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo; //Claen Move Front
                             sRMove = "-" + sRMove;
                             if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0"))) return p_sInfo; //Clean Move Back
                             if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
@@ -168,53 +158,6 @@ namespace Root_AOP01_Inspection.Module
                         m_module.m_doBottomBlow.Write(false); //Blow off
                     }
                 }
-                return "OK";
-            }
-        }
-
-        public MainVision p_mainvision
-        {
-            get
-            {
-                AOP01_Handler handler = (AOP01_Handler)m_engineer.ClassHandler();
-                return (MainVision)handler.m_mainVision;
-            }
-        }
-
-        public class Run_Flip : ModuleRunBase
-        {
-            public WTRCleanUnit m_module;
-            public Run_Flip(WTRCleanUnit module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-            string m_sFlip = "Flip";
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_sFlip = tree.Set(m_sFlip, m_sFlip, "Flip", "Reticle Flip Glass to Bottom", bVisible, true);
-            }
-            public override ModuleRunBase Clone()
-            {
-                Run_Flip run = new Run_Flip(m_module);
-                return run;
-            }
-            public override string Run()
-            {
-                m_bDoflip = true;
-                int sReticleFlip = m_module.m_teachReticleFlip;
-                if (EQ.p_bSimulate) return "OK";
-                while (m_module.p_mainvision.IsBusy()) Thread.Sleep(10);
-                IWTRChild child = m_module.GetChild("MainVision");
-                if (m_module.p_mainvision.Run(child.BeforeGet(0))) return p_sInfo;
-                while (m_module.p_mainvision.IsBusy()) Thread.Sleep(10);
-                int posWTR = child.GetTeachWTR(m_module.m_dicArm[0].p_infoWafer);
-                if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, 1))) return p_sInfo;
-                if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
-                m_module.m_dicArm[0].p_infoWafer = child.GetInfoWafer(0);
-                if (m_module.Run(m_module.WriteCmd(eCmd.Put, sReticleFlip, 1))) return p_sInfo;
-                if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
-                child.SetInfoWafer(0, m_module.m_dicArm[0].p_infoWafer);
                 return "OK";
             }
         }

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Root_AOP01_Inspection"
+             xmlns:module="clr-namespace:Root_AOP01_Inspection.Module"
              xmlns:lp="clr-namespace:Root_AOP01_Inspection.UI_UserControl"
              mc:Ignorable="d"
              d:DesignHeight="866"
@@ -80,25 +81,25 @@
                               Header="Loaction">
                         <Grid Margin="10,0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
+                                <!--<ColumnDefinition />-->
                                 <ColumnDefinition />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0" x:Name ="ExistLoadport"
+                            <!--<Grid Grid.Column="0" x:Name ="ExistLoadport"
                                   Margin="5"
                                   Background="LightGray">
                                 <TextBlock Text="Loadport"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
-                            </Grid>
-                            <Grid Grid.Column="1" x:Name ="ExistRTR"
+                            </Grid>-->
+                            <Grid Grid.Column="0" x:Name ="ExistRTR"
                                   Margin="5"
                                   Background="LightGray">
                                 <TextBlock Text="RTR" 
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
-                            <Grid Grid.Column="2" x:Name = "ExistVision"
+                            <Grid Grid.Column="1" x:Name = "ExistVision"
                                   Margin="5"
                                   Background="LightGray">
                                 <TextBlock Text="Vision" 
@@ -659,11 +660,11 @@
                                 Margin="0,0,0,10"
                                 Name="PauseResume"
                                 Click="ButtonPause_Click" />
-                            <Button Content="Initialize"
+                            <Button Content="Initialize" Name="ButtonInitialize"
                                 Style="{StaticResource SetupPanelBtn}"
                                 Margin="0,0,0,10"
                                 Click="ButtonInitialize_Click" />
-                            <Button Content="Recovery"
+                            <Button Content="Recovery" Name="ButtonRecovery"
                                 Style="{StaticResource SetupPanelBtn}"
                                 Margin="0,0,0,10"
                                 Click="ButtonRecovery_Click" />
@@ -673,178 +674,203 @@
                                 Click="ButtonBuzzerOff_Click" />
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Grid.Row="1"
-                        Header="Module State">
+                    <GroupBox Grid.Row="1">
                         <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <Grid Margin="10,5"
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Grid.Column="0" Header="Module State">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid Margin="10,5"
                                   Grid.Row="0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20" />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="LoadPort A"
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="LoadPort A"
                                            VerticalAlignment="Bottom"
                                            FontSize="13"
                                            FontWeight="Bold" />
-                                <Border Grid.Row="1"
+                                        <Border Grid.Row="1"
                                         CornerRadius="2"
                                         Margin="0,0,0,0"
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
                                         Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="{Binding p_eState}" Name ="LoadportA_State"
+                                            <TextBlock Text="{Binding p_eState}" Name ="LoadportA_State"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Border>
+                                        </Border>
 
-                            </Grid>
-                            <Grid Margin="10,5"
+                                    </Grid>
+                                    <Grid Margin="10,5"
                                   Grid.Row="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20" />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="LoadPort B"
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="LoadPort B"
                                            VerticalAlignment="Bottom"
                                            FontSize="13"
                                            FontWeight="Bold" />
-                                <Border Grid.Row="1"
+                                        <Border Grid.Row="1"
                                         CornerRadius="2"
                                         Margin="0,0,0,0"
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
                                         Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="{Binding p_eState}" Name ="LoadportB_State"
+                                            <TextBlock Text="{Binding p_eState}" Name ="LoadportB_State"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Border>
+                                        </Border>
 
-                            </Grid>
-                            <Grid Margin="10,5"
+                                    </Grid>
+                                    <Grid Margin="10,5"
                                   Grid.Row="2">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20" />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="RTR"
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="RTR"
                                            VerticalAlignment="Bottom"
                                            FontSize="13"
                                            FontWeight="Bold" />
-                                <Border Grid.Row="1"
+                                        <Border Grid.Row="1"
                                         CornerRadius="2"
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
                                         Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="{Binding p_eState}" Name ="RTR_State"
+                                            <TextBlock Text="{Binding p_eState}" Name ="RTR_State"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Border>
-                            </Grid>
-                            <Grid Margin="10,5"
+                                        </Border>
+                                    </Grid>
+                                    <Grid Margin="10,5"
                                   Grid.Row="3">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20" />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="MainVision"
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="MainVision"
                                            VerticalAlignment="Bottom"
                                            FontSize="13"
                                            FontWeight="Bold" />
-                                <Border Grid.Row="1"
+                                        <Border Grid.Row="1"
                                         CornerRadius="2"
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
                                         Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="{Binding p_eState}" Name ="MainVision_State"
+                                            <TextBlock Text="{Binding p_eState}" Name ="MainVision_State"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Border>
-                            </Grid>
-                            <Grid Margin="10,5"
+                                        </Border>
+                                    </Grid>
+                                    <Grid Margin="10,5"
                                   Grid.Row="4">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20" />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Margin="0,0,2,0"  Text="Pattern"
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Margin="0,0,2,0"  Text="Pattern"
                                            VerticalAlignment="Bottom"
                                            FontSize="13"
                                            FontWeight="Bold" />
-                                <Border Margin="0,0,2,0"  Grid.Row="1"
+                                        <Border Margin="0,0,2,0"  Grid.Row="1"
                                         CornerRadius="2"
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
                                         Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="Ready"
+                                            <TextBlock Text="Ready"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Border>
-                                <TextBlock Margin="2,0,0,0" Grid.Row="0" Grid.Column="1" Text="Pellicle"
+                                        </Border>
+                                        <TextBlock Margin="2,0,0,0" Grid.Row="0" Grid.Column="1" Text="Pellicle"
                                            VerticalAlignment="Bottom"
                                            FontSize="13"
                                            FontWeight="Bold" />
-                                <Border Margin="2,0,0,0" Grid.Row="1" Grid.Column="1"
+                                        <Border Margin="2,0,0,0" Grid.Row="1" Grid.Column="1"
                                         CornerRadius="2"
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
                                         Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="Ready"
+                                            <TextBlock Text="Ready"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Border>
-                            </Grid>
-                            <Grid Margin="10,5"
+                                        </Border>
+                                    </Grid>
+                                    <Grid Margin="10,5"
                                   Grid.Row="5">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20" />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Margin="0,0,2,0" Text="LADS"
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Margin="0,0,2,0" Text="LADS"
                                            VerticalAlignment="Bottom"
                                            FontSize="13"
                                            FontWeight="Bold" />
-                                <Border Margin="0,0,2,0" Grid.Row="1"
+                                        <Border Margin="0,0,2,0" Grid.Row="1"
                                         CornerRadius="2"
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
                                         Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="Ready"
+                                            <TextBlock Text="Ready"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Border>
-                                <TextBlock Margin="2,0,0,0" Grid.Column="1" Text="Side"
+                                        </Border>
+                                        <TextBlock Margin="2,0,0,0" Grid.Column="1" Text="Side"
                                            VerticalAlignment="Bottom"
                                            FontSize="13"
                                            FontWeight="Bold" />
-                                <Border Margin="2,0,0,0" Grid.Row="1" Grid.Column="1"
+                                        <Border Margin="2,0,0,0" Grid.Row="1" Grid.Column="1"
                                         CornerRadius="2"
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
                                         Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="Ready"
+                                            <TextBlock Text="Ready"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
-                                </Border>
-                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Grid.Column="1" Header="FFU">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <module:FFU_Fan_UI Grid.Row="0" x:Name="FanUI0"/>
+                                    <module:FFU_Fan_UI Grid.Row="1" x:Name="FanUI1"/>
+                                    <module:FFU_Fan_UI Grid.Row="2" x:Name="FanUI2"/>
+                                    <module:FFU_Fan_UI Grid.Row="3" x:Name="FanUI3"/>
+                                    <module:FFU_Fan_UI Grid.Row="4" x:Name="FanUI4"/>
+                                    <module:FFU_Fan_UI Grid.Row="5" x:Name="FanUI5"/>
+                                </Grid>
+                            </GroupBox>
                         </Grid>
                     </GroupBox>
-                <GroupBox Grid.Row="2">
+                    <GroupBox Grid.Row="2">
                         <StackPanel VerticalAlignment="Bottom">
                             <Button x:Name="buttonOHT" Content="OHT"  VerticalAlignment="Bottom" Style="{StaticResource SetupPanelBtn}" 
                     Margin="0,0,0,10" Click="ButtonOHT_Click"/>

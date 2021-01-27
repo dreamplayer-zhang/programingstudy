@@ -169,7 +169,7 @@ namespace RootTools
             }
             #endregion
 
-            string m_id;
+            public string m_id;
             public bool m_bUseEnable = false;
             public bool m_bUseCount = false;
             public WaferSize(string id, bool bUseEnable, bool bUseCount)
