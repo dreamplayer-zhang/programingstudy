@@ -58,6 +58,21 @@ namespace Root_Rinse_Unloader.Module
         }
         #endregion
 
+        #region Loader EQ State
+        EQ.eState _eStateLoader = EQ.eState.Init;
+        public EQ.eState p_eStateLoader 
+        {
+            get { return _eStateLoader; }
+            set
+            {
+                if (_eStateLoader == value) return;
+                _eStateLoader = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
         #region ToolBox
         TCPIPServer m_tcpip; 
         public override void GetTools(bool bInit)
@@ -367,7 +382,9 @@ namespace Root_Rinse_Unloader.Module
                             RunTree(Tree.eMode.Init);
                             break;
                         case eCmd.EQLeState:
-                            switch (GetEQeState(asRead[2]))
+                            p_eStateLoader = GetEQeState(asRead[2]);
+                            //switch (GetEQeState(asRead[2]))
+                            switch(p_eStateLoader)
                             {
                                 case EQ.eState.Home: 
                                     if (EQ.p_eState != EQ.eState.Run) EQ.p_eState = EQ.eState.Home; //forget
