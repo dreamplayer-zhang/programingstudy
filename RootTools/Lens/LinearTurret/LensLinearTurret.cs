@@ -91,6 +91,7 @@ namespace RootTools.Lens.LinearTurret
             RunTree(Tree.eMode.Update);
             RunTree(Tree.eMode.RegWrite);
             RunTree(Tree.eMode.Init);
+            m_axis.AddPos(p_asPos.ToArray());
         }
 
         public void RunTree(Tree.eMode mode)
