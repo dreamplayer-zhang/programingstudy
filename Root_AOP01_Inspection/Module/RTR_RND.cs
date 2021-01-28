@@ -867,31 +867,7 @@ namespace Root_AOP01_Inspection.Module
                     child.SetInfoWafer(m_nChildID, null);
                     return "OK";
                 }
-                int posWTR = 0;
-                //if (m_bDoflip == true && child.p_id == "MainVision")
-                //{
-                //    posWTR = m_module.m_teachReticleFlip;
-                //    m_bDoflip = false;
-                //}
-                //else
-                //{
-                if(m_module.m_bRecovery == false)
-                {
-                    if (child.p_id == "MainVision")
-                    {
-                        MainVision vision = ((AOP01_Handler)m_module.m_engineer.ClassHandler()).m_mainVision;
-                        posWTR = vision.GetTeachWTR(vision.p_eSide, child.GetInfoWafer(m_nChildID));
-                    }
-                    else posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
-                }
-                else if(m_module.m_bRecovery ==true)
-                {
-                    MainVision vision = ((AOP01_Handler)m_module.m_engineer.ClassHandler()).m_mainVision;
-                    if(m_module.m_bDoflip ==true)
-                        posWTR = vision.GetTeachWTR(MainVision.eSide.Top, child.GetInfoWafer(m_nChildID));
-                    else if(m_module.m_bDoflip == false)
-                        posWTR = vision.GetTeachWTR(MainVision.eSide.Bottom, child.GetInfoWafer(m_nChildID));
-                }
+                int posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
                 //}
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (child.p_eState != eState.Ready)
@@ -948,14 +924,12 @@ namespace Root_AOP01_Inspection.Module
             public string p_sChild { get; set; }
             public eArm m_eArm = eArm.Upper;
             public int m_nChildID = 0;
-            public MainVision.eSide m_eSide = MainVision.eSide.Top; 
             public override ModuleRunBase Clone()
             {
                 Run_Put run = new Run_Put(m_module);
                 run.m_eArm = m_eArm;
                 run.p_sChild = p_sChild;
                 run.m_nChildID = m_nChildID;
-                run.m_eSide = m_eSide;
                 return run;
             }
 
@@ -996,13 +970,7 @@ namespace Root_AOP01_Inspection.Module
                     if (EQ.IsStop()) return "Stop";
                     Thread.Sleep(100);
                 }
-                int posWTR = 0;
-                if (child.p_id == "MainVision")
-                {
-                    MainVision vision = ((AOP01_Handler)m_module.m_engineer.ClassHandler()).m_mainVision;
-                    posWTR = vision.GetTeachWTR(m_eSide, m_module.m_dicArm[m_eArm].p_infoWafer); 
-                }
-                else posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
+                int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (p_sChild == "MainVision")
                 {
@@ -1019,14 +987,6 @@ namespace Root_AOP01_Inspection.Module
                 {
                     child.p_bLock = true;
                     if (m_module.Run(m_module.WriteCmd(eCmd.Put, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
-                    if (child.p_id == "MainVision" && m_eSide == MainVision.eSide.Top)
-                    {
-                        m_module.m_bDoflip = true;
-                    }
-                    else if (child.p_id == "MainVision" && m_eSide == MainVision.eSide.Bottom)
-                    {
-                        m_module.m_bDoflip = false;
-                    }
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                     child.p_bLock = false;
                     child.AfterPut(m_nChildID);

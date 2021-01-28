@@ -167,7 +167,6 @@ namespace Root_AOP01_Inspection.Module
             m_reg = new Registry(p_id + ".InfoWafer");
             m_sInfoWafer = m_reg.Read("sInfoWafer", m_sInfoWafer);
             p_infoWafer = m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
-            p_eSide = (eSide)m_reg.Read("p_eSide", p_eSide); 
         }
         #endregion
 
@@ -241,7 +240,7 @@ namespace Root_AOP01_Inspection.Module
                 return p_id + " eState not Ready";
             if (p_infoWafer != null)
                 return p_id + " IsPutOK - InfoWafer Exist";
-            if (m_waferSize[(int)p_eSide].GetData(infoWafer.p_eSize).m_bEnable == false)
+            if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false)
                 return p_id + " not Enable Wafer Size";
             return "OK";
         }
@@ -250,15 +249,7 @@ namespace Root_AOP01_Inspection.Module
         {
             if (infoWafer == null)
                 infoWafer = p_infoWafer;
-            return m_waferSize[0].GetData(infoWafer.p_eSize).m_teachWTR;
-        }
-
-        public int GetTeachWTR(eSide eSide, InfoWafer infoWafer = null)
-        {
-            if (infoWafer == null)
-                infoWafer = p_infoWafer;
-            //return m_waferSize[(int)p_eSide].GetData(infoWafer.p_eSize).m_teachWTR;
-            return m_waferSize[(int)eSide].GetData(infoWafer.p_eSize).m_teachWTR;
+            return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
         }
 
         private string MoveReadyPos()
@@ -322,11 +313,10 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
-        InfoWafer.WaferSize[] m_waferSize = new InfoWafer.WaferSize[2];
+        InfoWafer.WaferSize m_waferSize;
         public void RunTreeTeach(Tree tree)
         {
-            m_waferSize[0].RunTreeTeach(tree.GetTree(m_waferSize[0].m_id, false));
-            m_waferSize[1].RunTreeTeach(tree.GetTree(m_waferSize[1].m_id, false));
+            m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
         }
         #endregion
 
@@ -657,22 +647,7 @@ namespace Root_AOP01_Inspection.Module
         #endregion
 
         #region ModuleRun
-        public enum eSide
-        {
-            Top,
-            Bottom,
-        }
-        eSide _eSide = eSide.Top;
-        public eSide p_eSide
-        {
-            get { return _eSide; }
-            set
-            {
-                if (_eSide == value) return;
-                _eSide = value;
-                m_reg.Write("p_eSide", (int)p_eSide); 
-            }
-        }
+       
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Grab(this), true, "Run Grab");
@@ -702,8 +677,7 @@ namespace Root_AOP01_Inspection.Module
         public MainVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
-            m_waferSize[0] = new InfoWafer.WaferSize(id + "." + eSide.Top.ToString(), false, false);
-            m_waferSize[1] = new InfoWafer.WaferSize(id + "." + eSide.Bottom.ToString(), false, false);
+            m_waferSize = new InfoWafer.WaferSize(id, false, false);
             ladsinfos = new List<LADSInfo>();
             InitMemorys();
             InitPosAlign();
@@ -719,7 +693,6 @@ namespace Root_AOP01_Inspection.Module
             public RPoint m_rpAxisCenter = new RPoint();    // Side Center Position
             public Run_Test(MainVision module)
             {
-                m_valueGeneral = eSide.Bottom; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
 
@@ -738,7 +711,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 Thread.Sleep(1000);
                 AxisXY axisXY = m_module.m_axisXY;
                 double dStartPosY = m_rpAxisCenter.Y;
@@ -804,7 +776,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public Run_GrabSideScan(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -850,7 +821,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 if (m_grabMode == null) return "Grab Mode == null";
 
                 try
@@ -955,7 +925,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public Run_Grab(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -987,7 +956,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 if (m_grabMode == null) return "Grab Mode == null";
 
                 try
@@ -1100,7 +1068,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_GrabBacksideScan(MainVision module)
             {
-                m_valueGeneral = eSide.Bottom; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -1150,7 +1117,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 if (m_grabMode == null) return "Grab Mode == null";
 
                 try
@@ -1273,7 +1239,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public Run_Grab45(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -1305,7 +1270,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 if (m_grabMode == null) return "Grab Mode == null";
 
                 try
@@ -1499,7 +1463,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public Run_LADS(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -1536,7 +1499,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 if (m_grabMode == null) return "Grab Mode == null";
 
                 try
@@ -1759,7 +1721,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_BarcodeInspection(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -1788,7 +1749,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 CPoint cptStartROIPoint = m_cptBarcodeLTPoint;
                 CPoint cptEndROIPoint = new CPoint(cptStartROIPoint.X + m_nROIWidth, cptStartROIPoint.Y + m_nROIHeight);
@@ -2141,7 +2101,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_MakeAlignTemplateImage(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -2256,7 +2215,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 // variable
                 Mat matTopTemplateImage = new Mat();
                 Mat matBottomTemplateImage = new Mat();
@@ -2366,7 +2324,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_PatternAlign(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -2391,7 +2348,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 // variable
                 Image<Gray, byte> imgTop = new Image<Gray, byte>(m_strTopTemplateImageFilePath);
                 Image<Gray, byte> imgBottom = new Image<Gray, byte>(m_strBottomTemplateImageFilePath);
@@ -2468,7 +2424,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_PatternShiftAndRotation(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -2501,7 +2456,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 // variable
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
@@ -2703,7 +2657,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_AlignKeyInspection(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -2728,7 +2681,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 // variable
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
@@ -3064,7 +3016,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_PellicleShiftAndRotation(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -3133,7 +3084,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 VectorOfPoint contour = new VectorOfPoint();
                 double dReticleAngle = 0;
