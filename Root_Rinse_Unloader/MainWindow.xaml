@@ -415,7 +415,7 @@
                                     <Border Margin="5"
                                             CornerRadius="5"
                                             Background="#FFDDDDDD">
-                                        <TextBlock x:Name="textBlockStripState0"
+                                        <TextBlock x:Name="textBlockStripState0" Text="{Binding p_eSensor}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
@@ -430,7 +430,7 @@
                                     <Border Margin="5"
                                             CornerRadius="5"
                                             Background="#FFDDDDDD">
-                                        <TextBlock x:Name="textBlockStripState1"
+                                        <TextBlock x:Name="textBlockStripState1" Text="{Binding p_eSensor}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
@@ -445,7 +445,7 @@
                                     <Border Margin="5"
                                             CornerRadius="5"
                                             Background="#FFDDDDDD">
-                                        <TextBlock x:Name="textBlockStripState2"
+                                        <TextBlock x:Name="textBlockStripState2" Text="{Binding p_eSensor}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
@@ -460,7 +460,7 @@
                                     <Border Margin="5"
                                             CornerRadius="5"
                                             Background="#FFDDDDDD">
-                                        <TextBlock x:Name="textBlockStripState3"
+                                        <TextBlock x:Name="textBlockStripState3" Text="{Binding p_eSensor}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"

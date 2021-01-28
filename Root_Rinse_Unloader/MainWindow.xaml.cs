@@ -1,4 +1,5 @@
 ﻿using Root_Rinse_Unloader.Engineer;
+using Root_Rinse_Unloader.Module;
 using RootTools;
 using System;
 using System.ComponentModel;
@@ -29,7 +30,6 @@ namespace Root_Rinse_Unloader
             m_timer.Start();
         }
 
-        int m_nBlink = 0;
         private void M_timer_Tick(object sender, EventArgs e)
         {
             buttonHome.IsEnabled = EQ.p_eState != EQ.eState.Run;
@@ -41,8 +41,7 @@ namespace Root_Rinse_Unloader
             borderState.Background = (EQ.p_eState == EQ.eState.Ready || EQ.p_eState == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
             borderLoadState.Background = (m_handler.m_rinse.p_eStateLoader == EQ.eState.Ready || m_handler.m_rinse.p_eStateLoader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
 
-            m_nBlink = (m_nBlink + 1) % 100;
-            bool bBlink = m_nBlink < 50;
+            bool bBlink = m_handler.m_rinse.m_bBlink; 
             gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
             gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Run)) ? Brushes.Gold : Brushes.YellowGreen;
             gridGreen.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.SeaGreen : Brushes.DarkGreen;
@@ -67,6 +66,10 @@ namespace Root_Rinse_Unloader
             textBlockLoadState.DataContext = m_handler.m_rinse;
             TextBlockMode.DataContext = m_handler.m_rinse;
             textBoxWidth.DataContext = m_handler.m_rinse;
+            textBlockStripState0.DataContext = m_handler.m_roller.m_aLine[0];
+            textBlockStripState1.DataContext = m_handler.m_roller.m_aLine[1];
+            textBlockStripState2.DataContext = m_handler.m_roller.m_aLine[2];
+            textBlockStripState3.DataContext = m_handler.m_roller.m_aLine[3];
         }
         #endregion
 
@@ -76,7 +79,6 @@ namespace Root_Rinse_Unloader
             m_engineer.ThreadStop();
         }
         #endregion
-
 
         #region TitleBar
         private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -130,6 +132,7 @@ namespace Root_Rinse_Unloader
         #region Control Function
         private void buttonHome_Click(object sender, RoutedEventArgs e)
         {
+            foreach (Roller.Line line in m_handler.m_roller.m_aLine) line.p_eSensor = Roller.Line.eSensor.Empty; 
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Home;
         }
@@ -146,6 +149,7 @@ namespace Root_Rinse_Unloader
 
         private void buttonReset_Click(object sender, RoutedEventArgs e)
         {
+            foreach (Roller.Line line in m_handler.m_roller.m_aLine) line.p_eSensor = Roller.Line.eSensor.Empty;
             m_handler.m_rinse.RunBuzzerOff();
             EQ.p_eState = EQ.eState.Ready;
         }
@@ -155,7 +159,6 @@ namespace Root_Rinse_Unloader
             m_handler.StartPickerSet();
         }
         #endregion
-
 
         #region PickerSet Control Function
         private void buttonPickerSetUp_Click(object sender, RoutedEventArgs e)

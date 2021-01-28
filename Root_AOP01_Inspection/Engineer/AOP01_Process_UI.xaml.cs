@@ -35,7 +35,7 @@ namespace Root_AOP01_Inspection
             process.RunTree(Tree.eMode.Init);
 
             buttonSetRecover.IsEnabled = false;
-            InitTimer();
+            //InitTimer();
         }
 
         #region Button
@@ -56,19 +56,19 @@ namespace Root_AOP01_Inspection
         #endregion
 
         #region Timer
-        DispatcherTimer m_timer = new DispatcherTimer();
+        //DispatcherTimer m_timer = new DispatcherTimer();
 
-        void InitTimer()
-        {
-            m_timer.Interval = TimeSpan.FromSeconds(1); //forget ??
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Start();
-        }
+        //void InitTimer()
+        //{
+        //    m_timer.Interval = TimeSpan.FromSeconds(1); //forget ??
+        //    m_timer.Tick += M_timer_Tick;
+        //    m_timer.Start();
+        //}
 
-        private void M_timer_Tick(object sender, EventArgs e)
-        {
-            m_process.RunTree(Tree.eMode.Init);
-        }
+        //private void M_timer_Tick(object sender, EventArgs e)
+        //{
+        //    m_process.RunTree(Tree.eMode.Init);
+        //}
         #endregion
 
     }

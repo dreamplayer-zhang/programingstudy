@@ -38,8 +38,8 @@ namespace Root.Module
         AxisXY m_axisXY;
         Axis m_axisZ;
         NamedPipe m_namePipe;
-        TCPIPServer m_socketServer;
-        TCPIPClient m_socketClient;
+        //TCPIPServer m_socketServer;
+        //TCPIPClient m_socketClient;
         LightSet m_light;
         LensLinearTurret m_lens; 
         public override void GetTools(bool bInit)
@@ -52,8 +52,8 @@ namespace Root.Module
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Loader");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "CamZ");
             p_sInfo = m_toolBox.Get(ref m_namePipe, this, "Pipe");
-            p_sInfo = m_toolBox.Get(ref m_socketServer, this, "SocketServer");
-            p_sInfo = m_toolBox.Get(ref m_socketClient, this, "SocketClient");
+            //p_sInfo = m_toolBox.Get(ref m_socketServer, this, "SocketServer");
+            //p_sInfo = m_toolBox.Get(ref m_socketClient, this, "SocketClient");
             p_sInfo = m_toolBox.Get(ref m_light, this);
             p_sInfo = m_toolBox.Get(ref m_lens, this, "LinearTurret"); 
         }

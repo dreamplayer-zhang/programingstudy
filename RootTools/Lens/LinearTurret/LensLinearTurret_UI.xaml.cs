@@ -22,7 +22,8 @@ namespace RootTools.Lens.LinearTurret
             treeUI.Init(lens.p_treeRoot);
             lens.RunTree(Tree.eMode.Init); 
             comboBoxPos.ItemsSource = lens.p_asPos; 
-            tabItemAxis.Content = lens.m_axis.p_ui; 
+            tabItemAxis.Content = lens.m_axis.p_ui;
+            tabItemComm.Content = lens.m_axis.p_commUI; 
         }
 
         private void buttonChange_Click(object sender, RoutedEventArgs e)

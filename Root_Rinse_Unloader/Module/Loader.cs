@@ -16,7 +16,8 @@ namespace Root_Rinse_Unloader.Module
         {
             p_sInfo = m_toolBox.Get(ref m_axis, this, "Loader");
             p_sInfo = m_toolBox.Get(ref m_dioPickerDown, this, "PickerDown", "Up", "Down");
-            foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox);
+            p_sInfo = m_toolBox.Get(ref m_diPickerSet, this, "PickerSet");
+            foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox, bInit);
             if (bInit)
             {
                 InitPos();
@@ -29,10 +30,15 @@ namespace Root_Rinse_Unloader.Module
         {
             public DIO_IO m_dioVacuum;
             public DIO_O m_doBlow;
-            public void GetTools(ToolBox toolBox)
+            public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_loader.p_sInfo = toolBox.Get(ref m_dioVacuum, m_loader, m_id + ".Vacuum");
                 m_loader.p_sInfo = toolBox.Get(ref m_doBlow, m_loader, m_id + ".Blow");
+                if (bInit)
+                {
+                    m_dioVacuum.Write(false);
+                    m_doBlow.Write(false); 
+                }
             }
 
             string m_id;
@@ -70,8 +76,8 @@ namespace Root_Rinse_Unloader.Module
             for (int n = 0; n < 4; n++)
             {
                 if (m_roller.m_bExist[n]) m_aPicker[n].m_dioVacuum.Write(bOn);
-                Thread.Sleep(200); 
             }
+            Thread.Sleep(200);
             if (bOn)
             {
                 StopWatch sw = new StopWatch();
@@ -91,7 +97,7 @@ namespace Root_Rinse_Unloader.Module
                             if (m_aPicker[n].m_dioVacuum.p_bIn) nVac++; 
                         }
                     }
-                    if (sw.ElapsedMilliseconds > msVac) return "Run Vacuum Timeout"; 
+                    if (sw.ElapsedMilliseconds > msVac) return m_bPickersetMode ? "OK" : "Run Vacuum Timeout"; 
                 }
             }
             else
@@ -175,8 +181,8 @@ namespace Root_Rinse_Unloader.Module
                 if (Run(RunPickerDown(true))) return p_sInfo;
                 if (Run(RunVacuum(false))) return p_sInfo;
                 if (Run(RunPickerDown(false))) return p_sInfo;
-                m_storage.StartMoveStackReady();
                 if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
+                m_storage.StartMoveStackReady();
                 return "OK";
             }
             finally
@@ -218,6 +224,7 @@ namespace Root_Rinse_Unloader.Module
         public bool m_bPickersetMode = false;
         string RunPickerSet()
         {
+            m_bPickersetMode = true; 
             try
             {
                 if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
@@ -237,6 +244,7 @@ namespace Root_Rinse_Unloader.Module
             }
             finally
             {
+                RunVacuum(false);
                 RunPickerDown(false);
                 MoveLoader(ePos.Roller);
                 m_bPickersetMode = false;
@@ -264,15 +272,15 @@ namespace Root_Rinse_Unloader.Module
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return ePickerSet.Stop;
-                if (m_swPickerSet.ElapsedMilliseconds > 5000) return ePickerSet.Stop;
+                if (m_swPickerSet.ElapsedMilliseconds > 3000) return ePickerSet.Stop;
             }
-            return (m_swPickerSet.ElapsedMilliseconds < 1000) ? ePickerSet.UpDown : ePickerSet.Vacuum;
+            return (m_swPickerSet.ElapsedMilliseconds < 600) ? ePickerSet.UpDown : ePickerSet.Vacuum;
         }
 
         public string m_sFilePickerSet = "";
         void RunTreePickerSet(Tree tree)
         {
-            m_sFilePickerSet = tree.SetFile(m_sFilePickerSet, m_sFilePickerSet, "RunRinse_Loader", "ModuleRun", "PickerSet ModuleRun File");
+            m_sFilePickerSet = tree.SetFile(m_sFilePickerSet, m_sFilePickerSet, "RunRinse_Unloader", "ModuleRun", "PickerSet ModuleRun File");
         }
         #endregion
 

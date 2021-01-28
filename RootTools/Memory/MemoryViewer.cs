@@ -83,6 +83,23 @@ namespace RootTools.Memory
                 OnPropertyChanged();
             }
         }
+
+        public int p_nProgress
+        {
+            get
+            {
+                return m_nProgress;
+            }
+            set
+            {
+                if (m_nProgress== value)
+                    return;
+                m_nProgress = value;
+                OnPropertyChanged();
+                //SetProperty(ref m_nProgress, value);
+            }
+        }
+        private int m_nProgress = 0;
         #endregion
 
         #region MemoryData
