@@ -16,7 +16,7 @@ namespace Root_AOP01_Inspection
     /// </summary>
     public partial class Run_Panel : UserControl
     {
-        ManualJobSchedule m_manualjob;
+        //ManualJobSchedule m_manualjob;
         AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
         MainVision m_mainvision;
