@@ -368,7 +368,9 @@ namespace Root_AOP01_Inspection
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
+                    case EQ.eState.Ready: break;  //LYJ add 210128
                     case EQ.eState.Run:
+                    case EQ.eState.Recovery:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             //CheckLoad();
