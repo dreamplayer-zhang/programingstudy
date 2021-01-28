@@ -142,7 +142,7 @@ namespace RootTools
             {
                 _execute();
             }
-            catch(Exception e)
+            catch(Exception)
             {
             }
         }

@@ -68,8 +68,8 @@ namespace Root_Rinse_Loader.Module
         double m_secBlow = 0.5;
         public string RunVacuum(bool bOn)
         {
+            p_bVacuum = bOn;
             foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(bOn);
-            p_bVacuum = bOn; 
             if (bOn)
             {
                 Thread.Sleep((int)(1000 * m_secVac));
@@ -206,9 +206,9 @@ namespace Root_Rinse_Loader.Module
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return ePickerSet.Stop;
-                if (m_swPickerSet.ElapsedMilliseconds > 5000) return ePickerSet.Stop;
+                if (m_swPickerSet.ElapsedMilliseconds > 3000) return ePickerSet.Stop;
             }
-            return (m_swPickerSet.ElapsedMilliseconds < 1000) ? ePickerSet.UpDown : ePickerSet.Vacuum;
+            return (m_swPickerSet.ElapsedMilliseconds < 600) ? ePickerSet.UpDown : ePickerSet.Vacuum;
         }
 
         public string m_sFilePickerSet = "";

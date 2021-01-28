@@ -894,8 +894,8 @@ namespace RootTools
             }
 
 			//
-			int a = 0;
-			UInt32 b = 0;
+			//int a = 0;
+			//UInt32 b = 0;
 			BinaryReader br = new BinaryReader(fss);
 			ushort bfType = br.ReadUInt16();  //2 4 2 2 4 4 4 4 2  2 4 4 4 4 4 4 256*4 1024  54 
 			uint bfSize = br.ReadUInt32();

@@ -51,8 +51,8 @@ namespace Root_WIND2
 			int imageHeight = 270000;
 			int imageHeightPerDegree = imageHeight / 360; // 1도 당 Image Height
 
-			int width = recipe.GetItem<EBRParameter>().RoiWidth;
-			int height = recipe.GetItem<EBRParameter>().RoiHeight;
+			int width = recipe.GetItem<EBRParameter>().ROIWidth;
+			int height = recipe.GetItem<EBRParameter>().ROIHeight;
 
 			int index = 0;
 			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, index++));
@@ -93,14 +93,11 @@ namespace Root_WIND2
 		{
 			List<ParameterBase> paramList = recipe.ParameterItemList;
 			WorkBundle workBundle = new WorkBundle();
-
 			EBR ebr = new EBR();
-			foreach (ParameterBase param in paramList)
-			{
-				ebr.SetParameter(param);
-			}
-
 			ProcessMeasurement processMeasurement = new ProcessMeasurement();
+
+			foreach (ParameterBase param in paramList)
+				ebr.SetParameter(param);
 
 			workBundle.Add(ebr);
 			workBundle.Add(processMeasurement);

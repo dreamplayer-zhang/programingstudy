@@ -116,6 +116,9 @@ namespace Root_Rinse_Loader
             buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Error) || (EQ.p_eState == EQ.eState.Ready);
             buttonPickerSet.IsEnabled = EQ.p_eState == EQ.eState.Ready;
 
+            borderState.Background = (EQ.p_eState == EQ.eState.Ready || EQ.p_eState == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
+            borderUnloadState.Background = (m_handler.m_rinse.p_eStateUnloader == EQ.eState.Ready || m_handler.m_rinse.p_eStateUnloader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
+
             m_nBlink = (m_nBlink + 1) % 100;
             bool bBlink = m_nBlink < 50;
             gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;

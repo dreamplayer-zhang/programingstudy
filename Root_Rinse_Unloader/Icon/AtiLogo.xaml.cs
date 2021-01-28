@@ -13,16 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_WIND2
+namespace Root_Rinse_Unloader.Icon
 {
     /// <summary>
-    /// EBRSetupPage.xaml에 대한 상호 작용 논리
+    /// AtiLogo.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class EBRSetupPage : UserControl
+    public partial class AtiLogo : UserControl
     {
-        public EBRSetupPage()
+        public AtiLogo()
         {
             InitializeComponent();
         }
-	}
+    }
 }
