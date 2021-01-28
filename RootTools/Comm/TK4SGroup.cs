@@ -53,7 +53,7 @@ namespace RootTools
         int m_nBaudrate = 9600;
         Parity m_eParity = Parity.None;
         StopBits m_eStopBit = StopBits.Two;
-        int m_nTryConnect = 3;
+        //int m_nTryConnect = 3;
         int m_nInterval = 1000;
 
         ObservableCollection<TK4S> m_aTK4S = new ObservableCollection<TK4S>();
