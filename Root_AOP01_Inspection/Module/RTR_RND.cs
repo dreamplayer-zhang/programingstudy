@@ -810,7 +810,8 @@ namespace Root_AOP01_Inspection.Module
                 return m_module.m_dicArm[m_eArm].RunGrip(m_bGrip);
             }
         }
-        public static bool m_bDoflip = false;
+        public bool m_bDoflip = false;
+        public bool m_bRecovery = false;
 
         public class Run_Get : ModuleRunBase, IWTRRun
         {
@@ -874,12 +875,23 @@ namespace Root_AOP01_Inspection.Module
                 //}
                 //else
                 //{
-                    if (child.p_id == "MainVision") 
+                if(m_module.m_bRecovery == false)
+                {
+                    if (child.p_id == "MainVision")
                     {
                         MainVision vision = ((AOP01_Handler)m_module.m_engineer.ClassHandler()).m_mainVision;
-                        posWTR = vision.GetTeachWTR(vision.p_eSide, child.GetInfoWafer(m_nChildID)); 
+                        posWTR = vision.GetTeachWTR(vision.p_eSide, child.GetInfoWafer(m_nChildID));
                     }
                     else posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
+                }
+                else if(m_module.m_bRecovery ==true)
+                {
+                    MainVision vision = ((AOP01_Handler)m_module.m_engineer.ClassHandler()).m_mainVision;
+                    if(m_module.m_bDoflip ==true)
+                        posWTR = vision.GetTeachWTR(MainVision.eSide.Top, child.GetInfoWafer(m_nChildID));
+                    else if(m_module.m_bDoflip == false)
+                        posWTR = vision.GetTeachWTR(MainVision.eSide.Bottom, child.GetInfoWafer(m_nChildID));
+                }
                 //}
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (child.p_eState != eState.Ready)
@@ -1007,6 +1019,14 @@ namespace Root_AOP01_Inspection.Module
                 {
                     child.p_bLock = true;
                     if (m_module.Run(m_module.WriteCmd(eCmd.Put, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
+                    if (child.p_id == "MainVision" && m_eSide == MainVision.eSide.Top)
+                    {
+                        m_module.m_bDoflip = true;
+                    }
+                    else if (child.p_id == "MainVision" && m_eSide == MainVision.eSide.Bottom)
+                    {
+                        m_module.m_bDoflip = false;
+                    }
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                     child.p_bLock = false;
                     child.AfterPut(m_nChildID);

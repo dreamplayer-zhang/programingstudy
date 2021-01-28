@@ -152,6 +152,7 @@ namespace Root_AOP01_Inspection.Module
                             m_doLamp.Write(eLamp.Red);
                             break;
                         case EQ.eState.Run:
+                        case EQ.eState.Recovery:
                             m_doDoorLock_Use.Write(true);
                             //m_doBuzzer.Write(eBuzzer.Buzzer4);
                             m_doLamp.Write(eLamp.Green);
