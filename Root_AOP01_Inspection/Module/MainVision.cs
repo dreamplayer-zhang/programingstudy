@@ -1014,14 +1014,15 @@ namespace Root_AOP01_Inspection.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                     int nReticleSizeY_px = Convert.ToInt32(m_nReticleSize_mm * nMMPerUM / m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
-                    int nScanOffset_pulse = 100000; //가속버퍼구간
+                    int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
+                    int nScanOffset_pulse = Convert.ToInt32(nScanSpeed * 0.3); //가속버퍼구간
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
                         if (EQ.IsStop())
                             return "OK";
 
-                        double dStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
+                        double dStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse ;
                         double dEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
@@ -1047,7 +1048,7 @@ namespace Root_AOP01_Inspection.Module
                         string strMemory = m_grabMode.m_memoryData.p_id;
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
-                        int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
+                        
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
