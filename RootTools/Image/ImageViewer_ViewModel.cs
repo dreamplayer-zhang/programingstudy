@@ -685,20 +685,33 @@ namespace RootTools
 						IntPtr ptrMem = m_ImageData.GetPtr();
 						if (ptrMem == IntPtr.Zero)
 							return;
-						int pix_x = 0;
-						int pix_y = 0;
+                        int pix_x = 0;
+                        int pix_y = 0;
 
-						for (int yy = 0; yy < p_CanvasHeight; yy++)
-						{
-							for (int xx = 0; xx < p_CanvasWidth; xx++)
-							{
-								pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
-								pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
-								view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
-							}
-						}
+                        for (int yy = 0; yy < p_CanvasHeight; yy++)
+                        {
+                            for (int xx = 0; xx < p_CanvasWidth; xx++)
+                            {
+                                pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
+                                pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
+                                view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                            }
+                        }
 
-						p_ImgSource = ImageHelper.ToBitmapSource(view);
+//                         Parallel.For(0, p_CanvasHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (yy) =>
+//                         {
+//                             {
+//                                 long pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
+// 
+//                                 for (int xx = 0; xx < p_CanvasWidth; xx++)
+//                                 {
+//                                     long pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
+// 									view.Data[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * p_ImageData.p_Size.X];
+//                                 }
+//                             }
+//                         });
+
+                        p_ImgSource = ImageHelper.ToBitmapSource(view);
 
 						p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / m_ImageData.p_Size.Y), 0, 0);
 						if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y) == 0)
@@ -757,6 +770,110 @@ namespace RootTools
 
 			RedrawingElement();
 		}
+
+		static object objLock = new object();
+
+		public unsafe Image<Gray, byte> GetSamplingGrayImage()
+        {
+            IntPtr ptrMem = m_ImageData.GetPtr();
+            if (ptrMem == IntPtr.Zero)
+                return null;
+
+            Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+
+            Parallel.For(0, p_CanvasHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (yy) =>
+            {
+                {
+                    long pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
+
+                    for (int xx = 0; xx < p_CanvasWidth; xx++)
+                    {
+                        long pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
+                        view.Data[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                    }
+                }
+            });
+
+			return view;
+        }
+        public unsafe Image<Rgb, byte> GetSamplingRgbImage()
+        {
+            IntPtr ptrMem = m_ImageData.GetPtr();
+            if (ptrMem == IntPtr.Zero)
+                return null;
+
+            Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
+
+            byte[,,] viewPtr = view.Data;
+            byte* imageptr = (byte*)p_ImageData.GetPtr();
+
+            int viewrectY = p_View_Rect.Y;
+            int viewrectX = p_View_Rect.X;
+            int viewrectHeight = p_View_Rect.Height;
+            int viewrectWidth = p_View_Rect.Width;
+            int sizeX = p_ImageData.p_Size.X;
+
+            Parallel.For(0, p_CanvasHeight, (yy) =>
+            {
+                {
+                    long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+                    for (int xx = 0; xx < p_CanvasWidth; xx++)
+                    {
+                        long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+
+                        viewPtr[yy, xx, 0] = imageptr[(pix_x * this.p_ImageData.p_nByte + 0) + (long)pix_y * (sizeX * 3)];
+                        viewPtr[yy, xx, 1] = imageptr[(pix_x * this.p_ImageData.p_nByte + 1) + (long)pix_y * (sizeX * 3)];
+                        viewPtr[yy, xx, 2] = imageptr[(pix_x * this.p_ImageData.p_nByte + 2) + (long)pix_y * (sizeX * 3)];
+                    }
+                }
+            });
+
+            return view;
+        }
+        public void SetImageSource(Image<Gray, byte> img)
+        {
+            try
+			{
+				if(img != null)
+                {
+                    p_ImgSource = ImageHelper.ToBitmapSource(img);
+
+                    p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / m_ImageData.p_Size.Y), 0, 0);
+                    if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y) == 0)
+                        p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), 2);
+                    else
+                        p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y));
+                }
+			}
+            catch (Exception ee)
+            {
+                System.Windows.MessageBox.Show(ee.ToString());
+            }
+
+            RedrawingElement();
+        }
+        public void SetImageSource(Image<Rgb, byte> img)
+        {
+            try
+            {
+                if (img != null)
+                {
+                    p_ImgSource = ImageHelper.ToBitmapSource(img);
+
+                    p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / m_ImageData.p_Size.Y), 0, 0);
+                    if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y) == 0)
+                        p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), 2);
+                    else
+                        p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y));
+                }
+            }
+            catch (Exception ee)
+            {
+                System.Windows.MessageBox.Show(ee.ToString());
+            }
+
+            RedrawingElement();
+        }
 		void TumbNailMove()
 		{
 			if (MouseEvent.LeftButton == MouseButtonState.Pressed)
