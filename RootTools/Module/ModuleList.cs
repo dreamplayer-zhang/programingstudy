@@ -107,6 +107,7 @@ namespace RootTools.Module
                     case EQ.eState.Home: p_sRun = "Stop"; break;
                     case EQ.eState.Ready: p_sRun = "Run"; break;
                     case EQ.eState.Run:
+                    case EQ.eState.Recovery:
                         p_sRun = "Stop";
                         if (m_qModuleRun.Count > 0)
                         {
@@ -156,6 +157,7 @@ namespace RootTools.Module
                     }
                     break;
                 case EQ.eState.Run:
+                case EQ.eState.Recovery:
                     m_qModuleRun.Clear();
                     p_iRun = m_qModuleRun.Count;
                     EQ.p_bStop = true;
