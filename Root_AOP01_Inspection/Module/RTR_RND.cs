@@ -949,7 +949,7 @@ namespace Root_AOP01_Inspection.Module
                     Thread.Sleep(100);
                 }
 
-                if (p_sChild == "MainVision")
+                if (p_sChild == "MainVision" || p_sChild == "BacksideVision")
                 {
                     while (child_module.IsBusy()) Thread.Sleep(10);
                 }

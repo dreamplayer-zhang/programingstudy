@@ -97,7 +97,7 @@
                                 </ComboBox>
                             </Grid>
                         </GroupBox>
-                        <GroupBox Grid.Row="1" Header="Light" Height="140" VerticalAlignment="Top">
+                        <GroupBox Grid.Row="1" Header="Light">
                             <Grid Margin="10,5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="10*"/>
@@ -117,7 +117,7 @@
                                 <TextBox Grid.Column="3" Grid.Row="1" Style="{StaticResource BasicTbox}" Margin="18,11,0,10"/>
                             </Grid>
                         </GroupBox>
-                        <GroupBox Grid.Row="2" Header="Spec">
+                        <GroupBox Grid.Row="2" Header="Spec" DataContext="{Binding Parameter}">
                             <Grid Margin="10,5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="2*"/>
@@ -134,25 +134,28 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                     <RowDefinition/>
+                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
                                 <TextBlock FontSize="12" Text="ROI Width" Style="{StaticResource BasicTb}" Grid.Row="0" Grid.Column="1" Margin="18,11,0,11"/>
                                 <TextBlock FontSize="12" Text="ROI Height" Style="{StaticResource BasicTb}" Grid.Row="1" Grid.Column="1" Margin="18,11,0,11"/>
-                                <TextBlock FontSize="12" Text="Step Degree" Style="{StaticResource BasicTb}" Grid.Row="2" Grid.Column="1" Margin="18,11,0,11"/>
-                                <TextBlock FontSize="12" Text="X Range (Equalization)" Style="{StaticResource BasicTb}" Grid.Row="3" Grid.Column="1" Margin="18,11,0,11"/>
-                                <TextBlock FontSize="12" Text="Standard GV Diff (EDGE)" Style="{StaticResource BasicTb}" Grid.Row="4" Grid.Column="1" Margin="18,11,0,11"/>
-                                <TextBlock FontSize="12" Text="Standard GV Diff (BEVEL)" Style="{StaticResource BasicTb}" Grid.Row="5" Grid.Column="1" Margin="18,11,0,10"/>
-                                <TextBlock FontSize="12" Text="Standard GV Diff (EBR)" Style="{StaticResource BasicTb}" Grid.Row="6" Grid.Column="1" Margin="18,11,0,11"/>
-                                <TextBlock FontSize="12" Text="Offset (BEVEL)" Style="{StaticResource BasicTb}" Grid.Row="7" Grid.Column="1" Margin="18,11,0,10"/>
-                                <TextBlock FontSize="12" Text="Offset (EBR)" Style="{StaticResource BasicTb}" Grid.Row="8" Grid.Column="1" Margin="18,11,0,10"/>
+                                <TextBlock FontSize="12" Text="Notch Y " Style="{StaticResource BasicTb}" Grid.Row="2" Grid.Column="1" Margin="18,11,0,11"/>
+                                <TextBlock FontSize="12" Text="Step Degree" Style="{StaticResource BasicTb}" Grid.Row="3" Grid.Column="1" Margin="18,11,0,11"/>
+                                <TextBlock FontSize="12" Text="X Range (Equalization)" Style="{StaticResource BasicTb}" Grid.Row="4" Grid.Column="1" Margin="18,11,0,11"/>
+                                <TextBlock FontSize="12" Text="Standard GV Diff (EDGE)" Style="{StaticResource BasicTb}" Grid.Row="5" Grid.Column="1" Margin="18,11,0,11"/>
+                                <TextBlock FontSize="12" Text="Standard GV Diff (BEVEL)" Style="{StaticResource BasicTb}" Grid.Row="6" Grid.Column="1" Margin="18,11,0,10"/>
+                                <TextBlock FontSize="12" Text="Standard GV Diff (EBR)" Style="{StaticResource BasicTb}" Grid.Row="7" Grid.Column="1" Margin="18,11,0,11"/>
+                                <TextBlock FontSize="12" Text="Offset (BEVEL)" Style="{StaticResource BasicTb}" Grid.Row="8" Grid.Column="1" Margin="18,11,0,10"/>
+                                <TextBlock FontSize="12" Text="Offset (EBR)" Style="{StaticResource BasicTb}" Grid.Row="9" Grid.Column="1" Margin="18,11,0,10"/>
                                 <TextBox Text="{Binding ROIWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
                                 <TextBox Text="{Binding ROIHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                                <TextBox Text="{Binding StepDegree, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                                <TextBox Text="{Binding XRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                                <TextBox Text="{Binding DiffEdge, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                                <TextBox Text="{Binding DiffBevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="5" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                                <TextBox Text="{Binding DiffEBR, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="6" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                                <TextBox Text="{Binding OffsetBevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="7" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                                <TextBox Text="{Binding OffsetEBR, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="8" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding NotchY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding StepDegree, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding XRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding DiffEdge, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="5" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding DiffBevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="6" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding DiffEBR, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="7" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding OffsetBevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="8" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
+                                <TextBox Text="{Binding OffsetEBR, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="9" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
                             </Grid>
                             <!--Intensity, USL/LSL, Step Degree(Count), Offset Bevel, Offset EBR, Others(X Ave/Y Ave)-->
                         </GroupBox>
@@ -177,7 +180,7 @@
                                 <lvc:CartesianChart.AxisY>
                                         <lvc:Axis Title="{Binding YTitle}"
                                                   MinValue="0"
-                                                  MaxValue="1000"
+                                                  MaxValue="{Binding SizeYMaxVal}"
                                                   LabelFormatter="{Binding SizeYLabel}">
                                     </lvc:Axis>
                                 </lvc:CartesianChart.AxisY>
@@ -186,27 +189,7 @@
                             </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="1" Grid.Column="1" Header="Measurement Data"
-                                  Background="{StaticResource GroupBoxBackground}">
-                            <DataGrid ItemsSource="{Binding MeasurementDataTable}"
-                                      SelectedItem="{Binding SelectedMeasurement, Mode=TwoWay}"
-                                      SelectionMode="Single"
-                                      EnableColumnVirtualization="True"
-                                      EnableRowVirtualization="True"
-                                      VirtualizingPanel.VirtualizationMode="Recycling"
-                                      ScrollViewer.CanContentScroll="True"
-                                      IsReadOnly="True"
-                                      AutoGenerateColumns="True"
-                                      Grid.Row="1">
-                                <DataGrid.Resources>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalAlignment"
-                                                        Value="Stretch" />
-                                        <Setter Property="HorizontalContentAlignment"
-                                                        Value="Center" />
-                                    </Style>
-                                </DataGrid.Resources>
-                            </DataGrid>
-                        </GroupBox>
+                                  Background="{StaticResource GroupBoxBackground}"/>
                     </Grid>
 
                 </Grid>

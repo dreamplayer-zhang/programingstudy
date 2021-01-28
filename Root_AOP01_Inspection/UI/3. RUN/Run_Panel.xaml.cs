@@ -16,10 +16,11 @@ namespace Root_AOP01_Inspection
     /// </summary>
     public partial class Run_Panel : UserControl
     {
-        ManualJobSchedule m_manualjob;
+        //ManualJobSchedule m_manualjob;
         AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
         MainVision m_mainvision;
+        BacksideVision m_backsidevision;
         RTRCleanUnit m_rtrcleanunit;
         WTRArm m_wtr;
         RTR_RND.Arm m_arm;
@@ -31,7 +32,7 @@ namespace Root_AOP01_Inspection
             InitializeComponent();
         }
 
-        public void Init(MainVision mainvision, RTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
+        public void Init(MainVision mainvision, BacksideVision backsidevision, RTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
             Loadport_Cymechs loadport2, AOP01_Engineer engineer, RFID_Brooks rfid1, RFID_Brooks rfid2)
         {
             m_engineer = engineer;
@@ -42,6 +43,7 @@ namespace Root_AOP01_Inspection
             m_loadport[0] = loadport1;
             m_loadport[1] = loadport2;
             m_mainvision = mainvision;
+            m_backsidevision = backsidevision;
             m_rfid[0] = rfid1;
             m_rfid[1] = rfid2;
             loadportA.Init(m_handler.m_aLoadport[0], m_engineer, m_rfid[0]);
@@ -75,7 +77,8 @@ namespace Root_AOP01_Inspection
         private void M_timer_Tick(object sender, EventArgs e)
         {
             ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_wtr.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
-            ExistVision.Background = m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
+            ExistVision.Background = (m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null)||
+                (m_backsidevision.m_diExistVision.p_bIn == true && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
             //ExistLoadport.Background = (m_loadport[0].p_infoWafer != null) || (m_loadport[1].p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
             ButtonInitialize.IsEnabled = IsEnableInitialization();
             ButtonRecovery.IsEnabled = IsEnableRecovery();
@@ -126,6 +129,7 @@ namespace Root_AOP01_Inspection
             if (IsRunModule(m_loadport[1])) return true;
             if (IsRunModule(m_rtrcleanunit)) return true;
             if (IsRunModule(m_handler.m_mainVision)) return true;
+            if (IsRunModule(m_handler.m_backsideVision)) return true;
             return false;
         }
         bool IsRunModule(ModuleBase module)

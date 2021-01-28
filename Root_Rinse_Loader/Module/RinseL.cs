@@ -21,7 +21,7 @@ namespace Root_Rinse_Loader.Module
         }
         string[] m_asRunMode = Enum.GetNames(typeof(eRunMode));
 
-        eRunMode _eMode = eRunMode.Magazine;
+        eRunMode _eMode = eRunMode.Stack;
         public eRunMode p_eMode
         {
             get { return _eMode; }
@@ -141,84 +141,22 @@ namespace Root_Rinse_Loader.Module
         }
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
 
-        DIO_IO m_dioStart;
-        DIO_IO m_dioStop;
-        DIO_IO m_dioReset;
-        DIO_IO m_dioHome;
         DIO_I m_diEMG;
         DIO_I m_diAir;
         DIO_I m_diDoorLock;
+        DIO_I m_diBuzzerOff; 
         DIO_Os m_doLamp;
         DIO_Os m_doBuzzer;
         DIO_I m_diLightCurtain;
         void GetToolsDIO()
         {
-            p_sInfo = m_toolBox.Get(ref m_dioStart, this, "Start");
-            p_sInfo = m_toolBox.Get(ref m_dioStop, this, "Stop");
-            p_sInfo = m_toolBox.Get(ref m_dioReset, this, "Reset");
-            p_sInfo = m_toolBox.Get(ref m_dioHome, this, "Home");
             p_sInfo = m_toolBox.Get(ref m_diEMG, this, "Emergency");
             p_sInfo = m_toolBox.Get(ref m_diAir, this, "Air Pressure");
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
             p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
             p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
-        }
-
-        bool _bStart = false; 
-        public bool p_bStart
-        {
-            get { return _bStart; }
-            set
-            {
-                if (_bStart == value) return;
-                _bStart = value;
-                OnPropertyChanged();
-                if (value && (EQ.p_eState == EQ.eState.Ready)) EQ.p_eState = EQ.eState.Run; 
-            }
-        }
-
-        bool _bStop = false;
-        public bool p_bStop
-        {
-            get { return _bStop; }
-            set
-            {
-                if (_bStop == value) return;
-                _bStop = value;
-                OnPropertyChanged();
-                if (value && (EQ.p_eState == EQ.eState.Run)) EQ.p_eState = EQ.eState.Ready;
-            }
-        }
-
-        bool _bReset = false;
-        public bool p_bReset
-        {
-            get { return _bReset; }
-            set
-            {
-                if (_bReset == value) return;
-                _bReset = value;
-                OnPropertyChanged();
-                if (value)
-                {
-                    RunBuzzerOff(); 
-                    if (EQ.p_eState == EQ.eState.Error) EQ.p_eState = EQ.eState.Ready;
-                }
-            }
-        }
-
-        bool _bHome = false;
-        public bool p_bHome
-        {
-            get { return _bHome; }
-            set
-            {
-                if (_bHome == value) return;
-                _bHome = value;
-                OnPropertyChanged();
-                if (value && ((EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init))) EQ.p_eState = EQ.eState.Home;
-            }
         }
 
         bool _bEMG = false;
@@ -268,6 +206,19 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
+        bool _bBuzzerOff = false;
+        public bool p_bBuzzerOff
+        {
+            get { return _bBuzzerOff; }
+            set
+            {
+                if (_bBuzzerOff == value) return;
+                _bBuzzerOff = value;
+                OnPropertyChanged();
+                if (value) RunBuzzerOff(); 
+            }
+        }
+
         public void RunBuzzer(eBuzzer eBuzzer)
         {
             m_doBuzzer.Write(eBuzzer); 
@@ -278,30 +229,27 @@ namespace Root_Rinse_Loader.Module
             m_doBuzzer.AllOff(); 
         }
 
-        bool m_bBlink = false; 
+        public bool m_bBlink = false; 
         StopWatch m_swBlick = new StopWatch(); 
         void RunThreadDIO()
         {
-            p_bStart = m_dioStart.p_bIn;
-            p_bStop = m_dioStop.p_bIn;
-            p_bReset = m_dioReset.p_bIn;
-            p_bHome = m_dioHome.p_bIn;
             p_bEMG = m_diEMG.p_bIn;
             p_bAir = m_diAir.p_bIn;
-            p_bDoorLock = m_diDoorLock.p_bIn; 
+            p_bDoorLock = m_diDoorLock.p_bIn;
+            p_bBuzzerOff = m_diBuzzerOff.p_bIn; 
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();
             m_bBlink = !m_bBlink; 
-            m_dioStart.Write(m_bBlink && (EQ.p_eState == EQ.eState.Ready)); 
-            m_dioStop.Write(m_bBlink && (EQ.p_eState == EQ.eState.Run));
-            m_dioReset.Write(m_bBlink && (EQ.p_eState == EQ.eState.Error));
-            m_dioHome.Write(m_bBlink && ((EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Ready)));
-            switch (EQ.p_eState)
+            if (m_bBlink == false) m_doLamp.AllOff();
+            else
             {
-                case EQ.eState.Ready: m_doLamp.Write(eLamp.Green); break;
-                case EQ.eState.Run: m_doLamp.Write(eLamp.Yellow); break;
-                case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
-                default: m_doLamp.AllOff(); break; 
+                switch (EQ.p_eState)
+                {
+                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Green); break;
+                    case EQ.eState.Run: m_doLamp.Write(eLamp.Yellow); break;
+                    case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
+                    default: m_doLamp.AllOff(); break;
+                }
             }
         }
         #endregion
@@ -351,7 +299,7 @@ namespace Root_Rinse_Loader.Module
         void RunThreadSend()
         {
             m_bRunSend = true;
-            Thread.Sleep(1000);
+            Thread.Sleep(5000);
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
@@ -442,6 +390,8 @@ namespace Root_Rinse_Loader.Module
             InitBase(id, engineer);
 
             InitThread();
+            AddProtocol(p_id, eCmd.SetMode, p_eMode);
+            AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
         }
 
         public override void ThreadStop()

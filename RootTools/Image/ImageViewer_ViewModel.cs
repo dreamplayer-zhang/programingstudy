@@ -629,7 +629,7 @@ namespace RootTools
 		public unsafe void SetThumNailIamge()
 		{
 			return;
-			if (p_ImageData.p_nByte == 1)
+/*			if (p_ImageData.p_nByte == 1)
 			{
 				Image<Gray, byte> view = new Image<Gray, byte>(p_ThumbWidth, p_ThumbHeight);
 				IntPtr ptrMem = m_ImageData.GetPtr();
@@ -671,7 +671,7 @@ namespace RootTools
 				if (view.Width != 0 && view.Height != 0)
 					p_ThumNailImgSource = ImageHelper.ToBitmapSource(view);
 			}
-
+*/
 		}
 		public unsafe void SetImageSource()
 		{

@@ -21,7 +21,7 @@ namespace Root_Rinse_Unloader.Module
         }
         string[] m_asRunMode = Enum.GetNames(typeof(eRunMode)); 
 
-        eRunMode _eMode = eRunMode.Magazine;
+        eRunMode _eMode = eRunMode.Stack;
         public eRunMode p_eMode
         {
             get { return _eMode; }
@@ -58,6 +58,21 @@ namespace Root_Rinse_Unloader.Module
         }
         #endregion
 
+        #region Loader EQ State
+        EQ.eState _eStateLoader = EQ.eState.Init;
+        public EQ.eState p_eStateLoader 
+        {
+            get { return _eStateLoader; }
+            set
+            {
+                if (_eStateLoader == value) return;
+                _eStateLoader = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
         #region ToolBox
         TCPIPServer m_tcpip; 
         public override void GetTools(bool bInit)
@@ -66,7 +81,7 @@ namespace Root_Rinse_Unloader.Module
             p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
             if (bInit) 
             {
-                EQ.m_EQ.OnChanged += M_EQ_OnChanged; //forget
+                EQ.m_EQ.OnChanged += M_EQ_OnChanged; 
                 m_tcpip.EventReciveData += M_tcpip_EventReciveData;
             }
         }
@@ -103,82 +118,20 @@ namespace Root_Rinse_Unloader.Module
         }
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
 
-        DIO_IO m_dioStart;
-        DIO_IO m_dioStop;
-        DIO_IO m_dioReset;
-        DIO_IO m_dioHome;
         DIO_I m_diEMG;
         DIO_I m_diAir;
         DIO_I m_diDoorLock;
+        DIO_I m_diBuzzerOff;
         DIO_Os m_doLamp;
         DIO_Os m_doBuzzer;
         void GetToolsDIO()
         {
-            p_sInfo = m_toolBox.Get(ref m_dioStart, this, "Start");
-            p_sInfo = m_toolBox.Get(ref m_dioStop, this, "Stop");
-            p_sInfo = m_toolBox.Get(ref m_dioReset, this, "Reset");
-            p_sInfo = m_toolBox.Get(ref m_dioHome, this, "Home");
             p_sInfo = m_toolBox.Get(ref m_diEMG, this, "Emergency");
             p_sInfo = m_toolBox.Get(ref m_diAir, this, "Air Pressure");
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
             p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
-        }
-
-        bool _bStart = false;
-        public bool p_bStart
-        {
-            get { return _bStart; }
-            set
-            {
-                if (_bStart == value) return;
-                _bStart = value;
-                OnPropertyChanged();
-                if (value && (EQ.p_eState == EQ.eState.Ready)) EQ.p_eState = EQ.eState.Run;
-            }
-        }
-
-        bool _bStop = false;
-        public bool p_bStop
-        {
-            get { return _bStop; }
-            set
-            {
-                if (_bStop == value) return;
-                _bStop = value;
-                OnPropertyChanged();
-                if (value && (EQ.p_eState == EQ.eState.Run)) EQ.p_eState = EQ.eState.Ready;
-            }
-        }
-
-        bool _bReset = false;
-        public bool p_bReset
-        {
-            get { return _bReset; }
-            set
-            {
-                if (_bReset == value) return;
-                _bReset = value;
-                OnPropertyChanged();
-                if (value)
-                {
-                    RunBuzzerOff();
-                    if (EQ.p_eState == EQ.eState.Error) EQ.p_eState = EQ.eState.Ready;
-                }
-            }
-        }
-
-        bool _bHome = false;
-        public bool p_bHome
-        {
-            get { return _bHome; }
-            set
-            {
-                if (_bHome == value) return;
-                _bHome = value;
-                OnPropertyChanged();
-                if (value && ((EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init))) EQ.p_eState = EQ.eState.Home;
-            }
         }
 
         bool _bEMG = false;
@@ -228,6 +181,19 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
+        bool _bBuzzerOff = false;
+        public bool p_bBuzzerOff
+        {
+            get { return _bBuzzerOff; }
+            set
+            {
+                if (_bBuzzerOff == value) return;
+                _bBuzzerOff = value;
+                OnPropertyChanged();
+                if (value) RunBuzzerOff();
+            }
+        }
+
         public void RunBuzzer(eBuzzer eBuzzer)
         {
             m_doBuzzer.Write(eBuzzer);
@@ -238,24 +204,17 @@ namespace Root_Rinse_Unloader.Module
             m_doBuzzer.AllOff();
         }
 
-        bool m_bBlink = false;
+        public bool m_bBlink = false;
         StopWatch m_swBlick = new StopWatch();
         void RunThreadDIO()
         {
-            p_bStart = m_dioStart.p_bIn;
-            p_bStop = m_dioStop.p_bIn;
-            p_bReset = m_dioReset.p_bIn;
-            p_bHome = m_dioHome.p_bIn;
             p_bEMG = m_diEMG.p_bIn;
             p_bAir = m_diAir.p_bIn;
             p_bDoorLock = m_diDoorLock.p_bIn;
+            p_bBuzzerOff = m_diBuzzerOff.p_bIn;
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();
             m_bBlink = !m_bBlink;
-            m_dioStart.Write(m_bBlink && (EQ.p_eState == EQ.eState.Ready));
-            m_dioStop.Write(m_bBlink && (EQ.p_eState == EQ.eState.Run));
-            m_dioReset.Write(m_bBlink && (EQ.p_eState == EQ.eState.Error));
-            m_dioHome.Write(m_bBlink && ((EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Ready)));
             switch (EQ.p_eState)
             {
                 case EQ.eState.Ready: m_doLamp.Write(eLamp.Green); break;
@@ -311,7 +270,7 @@ namespace Root_Rinse_Unloader.Module
         void RunThreadSend()
         {
             m_bRunSend = true;
-            Thread.Sleep(1000);
+            Thread.Sleep(5000);
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
@@ -367,7 +326,9 @@ namespace Root_Rinse_Unloader.Module
                             RunTree(Tree.eMode.Init);
                             break;
                         case eCmd.EQLeState:
-                            switch (GetEQeState(asRead[2]))
+                            p_eStateLoader = GetEQeState(asRead[2]);
+                            //switch (GetEQeState(asRead[2]))
+                            switch(p_eStateLoader)
                             {
                                 case EQ.eState.Home: 
                                     if (EQ.p_eState != EQ.eState.Run) EQ.p_eState = EQ.eState.Home; //forget

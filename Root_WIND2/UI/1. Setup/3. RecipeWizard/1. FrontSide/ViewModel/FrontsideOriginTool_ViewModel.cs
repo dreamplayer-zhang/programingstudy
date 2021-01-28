@@ -318,6 +318,8 @@ namespace Root_WIND2
             CPoint viewOriginPt = OriginPoint - Offset;
             CPoint viewPitchPt = PitchPoint - Offset;
 
+            if (p_View_Rect.Width == 0) return;
+            if (p_View_Rect.Height == 0) return;
             double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
             double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
 

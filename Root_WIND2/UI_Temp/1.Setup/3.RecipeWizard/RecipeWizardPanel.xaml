@@ -14,7 +14,7 @@
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
                     <RadioButton Content="Summary" IsChecked="True" Command="{Binding btnFrontSummary}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Product"  Command="{Binding btnFrontProduct}" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <RadioButton Content="Origin" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Origin" Command="{Binding btnFrontOrigin}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Alignment"  Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Mask"  Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Spec"  Style="{StaticResource sidetap_child_radiobutton}"/>

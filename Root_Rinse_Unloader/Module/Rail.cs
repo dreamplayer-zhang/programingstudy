@@ -22,6 +22,7 @@ namespace Root_Rinse_Unloader.Module
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit)
             {
+                m_dioPusherDown.Write(true); 
                 InitPosWidth();
             }
         }
@@ -123,7 +124,8 @@ namespace Root_Rinse_Unloader.Module
 
         public string RunRotate(bool bRotate)
         {
-            m_axisRotate.Jog(m_fJogScale);
+            if (bRotate) m_axisRotate.Jog(m_fJogScale);
+            else m_axisRotate.StopAxis(); 
             return "OK";
         }
 
@@ -291,9 +293,11 @@ namespace Root_Rinse_Unloader.Module
             {
                 case RinseU.eRunMode.Magazine:
                     RunMoveWidth(m_rinse.p_widthStrip);
+                    RunPusherDown(false);
                     RunRotate(true);
                     break;
                 case RinseU.eRunMode.Stack:
+                    RunPusherDown(true); 
                     RunRotate(false);
                     break;
             }

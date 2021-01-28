@@ -1,5 +1,6 @@
 ﻿using RootTools.Trees;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 
 namespace RootTools.Control
@@ -38,10 +39,7 @@ namespace RootTools.Control
             return WaitDone();
         }
 
-        public bool p_bOut
-        {
-            get { return m_bitDO.p_bOn ^ m_bReverse; }
-        }
+        public bool p_bOut { get; set; }
 
         ListDIO m_listDI;
         ListDIO m_listDO;
@@ -59,6 +57,8 @@ namespace RootTools.Control
             m_aBitDI.Add(new BitDI());
             m_aBitDI.Add(new BitDI());
             tool.p_listIDIO.Add(this);
+
+            InitBackgroundWorker(); 
         }
 
         public string RunTree(Tree tree)
@@ -69,10 +69,8 @@ namespace RootTools.Control
             if (sDI0 != "OK") return sDI0;
             if (sDI1 != "OK") return sDI1;
             if (sDO != "OK") return sDO;
-            m_bReverse = tree.Set(m_bReverse, m_bReverse, "Reverse", "Reverse DO Output");
             m_secTimeout = tree.Set(m_secTimeout, m_secTimeout, "Timeout", "DIO WaitDone Timeout (sec)");
             m_eRun = (eRun)tree.Set(m_eRun, eRun.Nothing, "Run", "DIO Run Mode", p_bEnableRun);
-            m_msRepeat = tree.Set(m_msRepeat, 1000, "Repeat", "Repeat Toggle Period (ms)", m_eRun == eRun.Repeat);
             return "OK";
         }
 
@@ -125,10 +123,10 @@ namespace RootTools.Control
         }
 
         public StopWatch m_swWrite = new StopWatch(); 
-        bool m_bReverse = false; 
         public void Write(bool bOn)
         {
-            m_bitDO.Write(bOn ^ m_bReverse);
+            p_bOut = bOn;
+            m_bitDO.Write(bOn);
             m_swWrite.Start(); 
         }
 
@@ -143,19 +141,33 @@ namespace RootTools.Control
         public void RunDIO()
         {
             if (m_eRun == eRun.Nothing) return;
-            switch (m_eRun)
+            p_bRepeat = (m_eRun == eRun.Repeat);
+        }
+
+        #region Repeat
+        bool _bRepeat = false;
+        bool p_bRepeat
+        {
+            get { return _bRepeat; }
+            set
             {
-                case eRun.Repeat: Repeat(); break;
+                if (_bRepeat == value) return;
+                if (value && !m_bgwRepeat.IsBusy) m_bgwRepeat.RunWorkerAsync();
             }
         }
 
-        StopWatch m_swRepeat = new StopWatch();
-        int m_msRepeat = 1000;
-        void Repeat()
+        BackgroundWorker m_bgwRepeat = new BackgroundWorker();
+        void InitBackgroundWorker()
         {
-            if (m_swRepeat.ElapsedMilliseconds < m_msRepeat) return;
-            m_swRepeat.Restart();
-            Write(!p_bOut);
-       }
+            m_bgwRepeat.DoWork += M_bgwRepeat_DoWork;
+        }
+
+        private void M_bgwRepeat_DoWork(object sender, DoWorkEventArgs e)
+        {
+            RunSol(true);
+            RunSol(false);
+            if (p_bRepeat == false) return;
+        }
+        #endregion
     }
 }
