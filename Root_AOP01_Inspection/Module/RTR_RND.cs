@@ -880,13 +880,13 @@ namespace Root_AOP01_Inspection.Module
                     Thread.Sleep(100);
                 }
 
-                if (p_sChild == "MainVision")
+                if (p_sChild == "MainVision" || p_sChild == "BacksideVision")
                 {
                     while (child_module.IsBusy()) Thread.Sleep(10);
                 }
 
                 if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
-                if (p_sChild == "MainVision")
+                if (p_sChild == "MainVision" || p_sChild == "BacksideVision")
                 {
                     while (child_module.IsBusy()) Thread.Sleep(10);
                 }
@@ -972,12 +972,12 @@ namespace Root_AOP01_Inspection.Module
                 }
                 int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
-                if (p_sChild == "MainVision")
+                if (p_sChild == "MainVision" || p_sChild == "BacksideVision")
                 {
                     while (child_module.IsBusy()) Thread.Sleep(10);
                 }
                 if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
-                if (p_sChild == "MainVision")
+                if (p_sChild == "MainVision" || p_sChild == "BacksideVision")
                 {
                     while (child_module.IsBusy()) Thread.Sleep(10);
                 }
