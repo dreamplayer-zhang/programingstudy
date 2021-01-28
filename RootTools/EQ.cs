@@ -12,6 +12,7 @@ namespace RootTools
             Home,
             Ready,
             Run,
+            Recovery,  //LYJ 210128 add
             Error,
             Null
         }

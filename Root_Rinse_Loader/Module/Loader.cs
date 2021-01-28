@@ -206,9 +206,9 @@ namespace Root_Rinse_Loader.Module
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return ePickerSet.Stop;
-                if (m_swPickerSet.ElapsedMilliseconds > 5000) return ePickerSet.Stop;
+                if (m_swPickerSet.ElapsedMilliseconds > 3000) return ePickerSet.Stop;
             }
-            return (m_swPickerSet.ElapsedMilliseconds < 1000) ? ePickerSet.UpDown : ePickerSet.Vacuum;
+            return (m_swPickerSet.ElapsedMilliseconds < 600) ? ePickerSet.UpDown : ePickerSet.Vacuum;
         }
 
         public string m_sFilePickerSet = "";

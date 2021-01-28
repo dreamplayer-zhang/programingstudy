@@ -1,4 +1,5 @@
 ﻿using Root_Rinse_Unloader.Engineer;
+using Root_Rinse_Unloader.Module;
 using RootTools;
 using System;
 using System.ComponentModel;
@@ -131,6 +132,7 @@ namespace Root_Rinse_Unloader
         #region Control Function
         private void buttonHome_Click(object sender, RoutedEventArgs e)
         {
+            foreach (Roller.Line line in m_handler.m_roller.m_aLine) line.p_eSensor = Roller.Line.eSensor.Empty; 
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Home;
         }
@@ -147,6 +149,7 @@ namespace Root_Rinse_Unloader
 
         private void buttonReset_Click(object sender, RoutedEventArgs e)
         {
+            foreach (Roller.Line line in m_handler.m_roller.m_aLine) line.p_eSensor = Roller.Line.eSensor.Empty;
             m_handler.m_rinse.RunBuzzerOff();
             EQ.p_eState = EQ.eState.Ready;
         }

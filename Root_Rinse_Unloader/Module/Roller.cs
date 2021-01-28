@@ -277,7 +277,7 @@ namespace Root_Rinse_Unloader.Module
                 RunThreadCheck_Sensor();
                 if (EQ.IsStop()) return "EQ Stop";
             }
-            return "OK";
+            return RunAlign();
         }
         #endregion
 

@@ -20,7 +20,8 @@ namespace Root_AOP01_Inspection
         AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
         MainVision m_mainvision;
-        RTRCleanUnit m_wtrcleanunit;
+        BacksideVision m_backsidevision;
+        RTRCleanUnit m_rtrcleanunit;
         WTRArm m_wtr;
         RTR_RND.Arm m_arm;
         Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
@@ -31,17 +32,18 @@ namespace Root_AOP01_Inspection
             InitializeComponent();
         }
 
-        public void Init(MainVision mainvision, RTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
+        public void Init(MainVision mainvision, BacksideVision backsidevision, RTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
             Loadport_Cymechs loadport2, AOP01_Engineer engineer, RFID_Brooks rfid1, RFID_Brooks rfid2)
         {
             m_engineer = engineer;
             m_handler = engineer.m_handler;
-            m_wtrcleanunit = wtrcleanunit;
-            m_wtr = m_wtrcleanunit.p_aArm[0];
-            m_arm = m_wtrcleanunit.m_dicArm[0];
+            m_rtrcleanunit = wtrcleanunit;
+            m_wtr = m_rtrcleanunit.p_aArm[0];
+            m_arm = m_rtrcleanunit.m_dicArm[0];
             m_loadport[0] = loadport1;
             m_loadport[1] = loadport2;
             m_mainvision = mainvision;
+            m_backsidevision = backsidevision;
             m_rfid[0] = rfid1;
             m_rfid[1] = rfid2;
             loadportA.Init(m_handler.m_aLoadport[0], m_engineer, m_rfid[0]);
@@ -55,12 +57,12 @@ namespace Root_AOP01_Inspection
         }
         void InitFFU()
         {
-            FanUI0.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[0];
-            FanUI1.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[1];
-            FanUI2.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[2];
-            FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
-            FanUI4.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[4];
-            FanUI5.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[5];
+            //FanUI0.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[0];
+            //FanUI1.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[1];
+            //FanUI2.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[2];
+            //FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
+            //FanUI4.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[4];
+            //FanUI5.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[5];
         }
 
         #region Timer
@@ -75,10 +77,13 @@ namespace Root_AOP01_Inspection
         private void M_timer_Tick(object sender, EventArgs e)
         {
             ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_wtr.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
-            ExistVision.Background = m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
+            ExistVision.Background = (m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null)||
+                (m_backsidevision.m_diExistVision.p_bIn == true && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
             //ExistLoadport.Background = (m_loadport[0].p_infoWafer != null) || (m_loadport[1].p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
             ButtonInitialize.IsEnabled = IsEnableInitialization();
             ButtonRecovery.IsEnabled = IsEnableRecovery();
+            if(EQ.p_eState != EQ.eState.Recovery)
+                m_rtrcleanunit.m_bRecovery = false;
         }
         #endregion
         #region Button Recovery
@@ -91,15 +96,15 @@ namespace Root_AOP01_Inspection
             if (EQ.p_bStop == true) return false;
             return m_handler.IsEnableRecovery();
         }
-        public bool m_bRecovery = false;
+
         private void ButtonRecovery_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableRecovery() == false) return;
             m_handler.m_bIsPossible_Recovery = false;
             m_handler.CalcRecover();
             EQ.p_bStop = false;
-            EQ.p_eState = EQ.eState.Run;
-            m_bRecovery = true;
+            EQ.p_eState = EQ.eState.Recovery;
+            m_rtrcleanunit.m_bRecovery = true;
         }
         #endregion
 
@@ -107,10 +112,12 @@ namespace Root_AOP01_Inspection
 
         bool IsEnableInitialization()
         {
-            if (IsRunModule()) return false;
+            if (!IsRunModule()) return true;
+
             switch (EQ.p_eState)
             {
                 case EQ.eState.Run: return false;
+                case EQ.eState.Recovery: return false;
                 case EQ.eState.Home: return false;
             }
             return true;
@@ -120,8 +127,9 @@ namespace Root_AOP01_Inspection
         {
             if (IsRunModule(m_loadport[0])) return true;
             if (IsRunModule(m_loadport[1])) return true;
-            if (IsRunModule(m_wtrcleanunit)) return true;
+            if (IsRunModule(m_rtrcleanunit)) return true;
             if (IsRunModule(m_handler.m_mainVision)) return true;
+            if (IsRunModule(m_handler.m_backsideVision)) return true;
             return false;
         }
         bool IsRunModule(ModuleBase module)
@@ -146,6 +154,7 @@ namespace Root_AOP01_Inspection
         bool IsEnablePause()
         {
             if (EQ.p_eState != EQ.eState.Run) return false;
+            if (EQ.p_eState != EQ.eState.Recovery) return false;
             return true;
         }
         bool IsEnableResume()
@@ -210,7 +219,7 @@ namespace Root_AOP01_Inspection
 
         private void ButtonStop_Click(object sender, RoutedEventArgs e)
         {
-            EQ.p_bStop = true;
+            EQ.p_bStop = true; //수정 필요
         }
     }
 }

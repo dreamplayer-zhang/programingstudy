@@ -463,7 +463,8 @@ namespace RootTools.Camera.Dalsa
             m_pSapBuf = new IntPtr[p_nBuf];
             for (int n = 0; n < p_nBuf; n++)
                 m_sapBuf.GetAddress(n, out m_pSapBuf[n]);
-          
+
+            //m_sapBuf.Clear();
             //m_iBlock = -1;
             m_sapBuf.Index = (int)(0);
             m_nGrabTrigger = 0;

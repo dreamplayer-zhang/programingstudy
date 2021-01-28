@@ -137,15 +137,7 @@ namespace Root_AOP01_Inspection.Engineer
                 string sChild = moduleRun.m_moduleBase.p_id;
                 bool bGetPut = (sChild != m_wtr.p_id);
                 bool bPut = !IsSameModule(infoWafer.m_moduleRunList, n - 1, n);
-                if (bPut && bGetPut)
-                {
-                    ModuleRunBase run = m_wtr.CloneRunPut(sChild, -1);
-                    if (sChild == "MainVision")
-                    {
-                            ((RTR_RND.Run_Put)run).m_eSide = moduleRun.m_valueGeneral;
-                    }
-                    qProcess.Enqueue(run);
-                }
+                if (bPut && bGetPut) qProcess.Enqueue(m_wtr.CloneRunPut(sChild, -1));
                 qProcess.Enqueue(moduleRun);
                 bool bGet = !IsSameModule(infoWafer.m_moduleRunList, n, n + 1);
                 if (bGet && bGetPut) qProcess.Enqueue(m_wtr.CloneRunGet(sChild, -1));
@@ -158,9 +150,7 @@ namespace Root_AOP01_Inspection.Engineer
         {
             if (i0 < 0) return false;
             if (i1 >= moduleRunList.p_aModuleRun.Count) return false;
-            if (moduleRunList.p_aModuleRun[i0].m_moduleBase.p_id != moduleRunList.p_aModuleRun[i1].m_moduleBase.p_id) return false;
-            if (moduleRunList.p_aModuleRun[i0].m_moduleBase.p_id != "MainVision") return true;
-            return moduleRunList.p_aModuleRun[i0].m_valueGeneral == moduleRunList.p_aModuleRun[i1].m_valueGeneral; 
+            return (moduleRunList.p_aModuleRun[i0].m_moduleBase.p_id == moduleRunList.p_aModuleRun[i1].m_moduleBase.p_id);
         }
 
         public void ClearInfoWafer()
