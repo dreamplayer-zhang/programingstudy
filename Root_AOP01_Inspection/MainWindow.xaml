@@ -319,7 +319,7 @@
                                 <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="80,0">
                                     <TextBlock Text="CDA" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                     <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="0.000(Mpa)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Blue"/>
+                                    <TextBlock x:Name="textBoxCDA" Text="{Binding p_aData[0].p_sValue}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Blue"/>
                                 </UniformGrid>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
