@@ -225,43 +225,59 @@ namespace Root_Rinse_Unloader.Module
                 foreach (Line line in m_aLine) line.CheckSensor(); 
                 if ((EQ.p_eState == EQ.eState.Run) && (m_qModuleRun.Count == 0))
                 {
-                    switch (p_eStep)
-                    {
-                        case eStep.Empty:
-                            foreach (Line line in m_aLine)
-                            {
-                                if (line.p_eSensor != Line.eSensor.Empty)
-                                {
-                                    p_eStep = eStep.Exist;
-                                    RunStopperUp(true);
-                                }
-                            }
-                            break;
-                        case eStep.Exist:
-                            int nExist = 0;
-                            foreach (Line line in m_aLine)
-                            {
-                                if (line.p_eSensor == Line.eSensor.Exist) nExist++;
-                            }
-                            if (nExist == 0) p_eStep = eStep.Arrived;
-                            break;
-                        case eStep.Arrived:
-                            p_eStep = eStep.Align;
-                            break;
-                        case eStep.Align:
-                            p_sInfo = RunAlign();
-                            break;
-                        case eStep.Send:
-                            int nArrived = 0;
-                            foreach (Line line in m_aLine)
-                            {
-                                if (line.p_eSensor == Line.eSensor.Arrived) nArrived++;
-                            }
-                            if (nArrived == 0) p_eStep = eStep.Empty;
-                            break;
-                    }
+                    RunThreadCheck_Sensor(); 
                 }
             }
+        }
+
+        void RunThreadCheck_Sensor()
+        {
+            switch (p_eStep)
+            {
+                case eStep.Empty:
+                    foreach (Line line in m_aLine)
+                    {
+                        if (line.p_eSensor != Line.eSensor.Empty)
+                        {
+                            p_eStep = eStep.Exist;
+                            RunStopperUp(true);
+                        }
+                    }
+                    break;
+                case eStep.Exist:
+                    int nExist = 0;
+                    foreach (Line line in m_aLine)
+                    {
+                        if (line.p_eSensor == Line.eSensor.Exist) nExist++;
+                    }
+                    if (nExist == 0) p_eStep = eStep.Arrived;
+                    break;
+                case eStep.Arrived:
+                    p_eStep = eStep.Align;
+                    break;
+                case eStep.Align:
+                    p_sInfo = RunAlign();
+                    break;
+                case eStep.Send:
+                    int nArrived = 0;
+                    foreach (Line line in m_aLine)
+                    {
+                        if (line.p_eSensor == Line.eSensor.Arrived) nArrived++;
+                    }
+                    if (nArrived == 0) p_eStep = eStep.Empty;
+                    break;
+            }
+        }
+
+        public string RunWaitArrived()
+        {
+            while ((p_eStep != eStep.Picker) && (p_eStep != eStep.Send))
+            {
+                Thread.Sleep(10);
+                RunThreadCheck_Sensor();
+                if (EQ.IsStop()) return "EQ Stop";
+            }
+            return "OK";
         }
         #endregion
 
@@ -387,6 +403,7 @@ namespace Root_Rinse_Unloader.Module
             AddModuleRunList(new Run_StopperUp(this), false, "Roller StopperUp");
             AddModuleRunList(new Run_AlignerUp(this), false, "Roller AlignerUp");
             AddModuleRunList(new Run_Align(this), false, "Roller Align");
+            AddModuleRunList(new Run_WaitArrive(this), false, "Wait Strip Arrived");
         }
 
         public class Run_Rotate : ModuleRunBase
@@ -496,6 +513,31 @@ namespace Root_Rinse_Unloader.Module
             {
                 m_module.RunMoveAlign(true);
                 return m_module.RunMoveAlign(false);
+            }
+        }
+
+        public class Run_WaitArrive : ModuleRunBase
+        {
+            Roller m_module;
+            public Run_WaitArrive(Roller module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_WaitArrive run = new Run_WaitArrive(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunWaitArrived();
             }
         }
         #endregion
