@@ -117,7 +117,7 @@
                                 <TextBox Grid.Column="3" Grid.Row="1" Style="{StaticResource BasicTbox}" Margin="18,11,0,10"/>
                             </Grid>
                         </GroupBox>
-                        <GroupBox Grid.Row="2" Header="Spec">
+                        <GroupBox Grid.Row="2" Header="Spec" DataContext="{Binding Parameter}">
                             <Grid Margin="10,5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="2*"/>
@@ -189,27 +189,7 @@
                             </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="1" Grid.Column="1" Header="Measurement Data"
-                                  Background="{StaticResource GroupBoxBackground}">
-                            <DataGrid ItemsSource="{Binding MeasurementDataTable}"
-                                      SelectedItem="{Binding SelectedMeasurement, Mode=TwoWay}"
-                                      SelectionMode="Single"
-                                      EnableColumnVirtualization="True"
-                                      EnableRowVirtualization="True"
-                                      VirtualizingPanel.VirtualizationMode="Recycling"
-                                      ScrollViewer.CanContentScroll="True"
-                                      IsReadOnly="True"
-                                      AutoGenerateColumns="True"
-                                      Grid.Row="1">
-                                <DataGrid.Resources>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalAlignment"
-                                                        Value="Stretch" />
-                                        <Setter Property="HorizontalContentAlignment"
-                                                        Value="Center" />
-                                    </Style>
-                                </DataGrid.Resources>
-                            </DataGrid>
-                        </GroupBox>
+                                  Background="{StaticResource GroupBoxBackground}"/>
                     </Grid>
 
                 </Grid>

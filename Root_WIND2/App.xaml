@@ -17,7 +17,7 @@
         <SolidColorBrush x:Key="main_background" Color="#080820"/>
         <SolidColorBrush x:Key="sidetap_parent_background" Color="#080820"/>
         <SolidColorBrush x:Key="sidetap_child_background" Color="#151540"/>
-        <SolidColorBrush x:Key="main_view_background" Color="AliceBlue"/>
+        <SolidColorBrush x:Key="main_view_background" Color="#505050"/>
 
         <!-- sidetap -->
         <SolidColorBrush x:Key="sidetap_parent_menu_normal" Color="#202040"/>

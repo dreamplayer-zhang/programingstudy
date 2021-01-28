@@ -2011,7 +2011,7 @@ namespace Root_AOP01_Inspection.Module
                         }
                         return 0;
 
-                        break;
+                        //break;
                     case eSearchDirection.RightToLeft:
 
                         for (int x = img.p_Size.X - 1; x >= 0; x--)
@@ -2041,13 +2041,13 @@ namespace Root_AOP01_Inspection.Module
                         }
                         return 0;
 
-                        break;
+                        //break;
                     default:
                         return 0;
-                        break;
+                        //break;
                 }
 
-                return 0;
+                //return 0;
             }
 
             unsafe Mat GetRowProfileMat(Mat matSrc)

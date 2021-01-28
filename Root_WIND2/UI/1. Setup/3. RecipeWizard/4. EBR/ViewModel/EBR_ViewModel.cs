@@ -13,7 +13,6 @@ namespace Root_WIND2
     class EBR_ViewModel : ObservableObject
     {
         Setup_ViewModel setupVM;
-        RecipeBase recipe;
 
         public EBR_Panel Main;
         public EBRSetup_ViewModel SetupVM;
@@ -49,6 +48,7 @@ namespace Root_WIND2
                 return new RelayCommand(() => SetPage(SetupPage));
             }
         }
+
         public ICommand btnEBRSnap
         {
             get
@@ -72,7 +72,6 @@ namespace Root_WIND2
                 return new RelayCommand(() => setupVM.SetRecipeWizard());
             }
         }
-
 
         public ICommand btnEBRNewRecipe
         {

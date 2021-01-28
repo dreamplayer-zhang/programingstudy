@@ -697,7 +697,7 @@ namespace RootTools.Camera.BaslerPylon
         int m_nFrameTotal;
         MemoryData m_Memory;
         CPoint m_cpScanOffset;
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReverseOffsetY = 0)
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
         {
             try
             {
@@ -731,6 +731,6 @@ namespace RootTools.Camera.BaslerPylon
             GrabStop();
             return "OK"; 
         }
-        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReserveOffsetY = 0) { }
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null) { }
     }
 }

@@ -68,11 +68,11 @@ namespace Root_Rinse_Loader.Module
         double m_secBlow = 0.5;
         public string RunVacuum(bool bOn)
         {
+            p_bVacuum = bOn;
             foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(bOn);
             if (bOn)
             {
                 Thread.Sleep((int)(1000 * m_secVac));
-                p_bVacuum = true; 
                 return "OK";
             }
             else
@@ -80,7 +80,6 @@ namespace Root_Rinse_Loader.Module
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
                 Thread.Sleep((int)(1000 * m_secBlow));
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
-                p_bVacuum = false; 
             }
             return "OK";
         }

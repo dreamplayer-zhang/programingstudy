@@ -44,7 +44,7 @@ namespace Root_WIND2.UI_Temp
             get => frontsideProductVM;
         }
 
-        private UI_Temp.FrontsideOrigin_ViewModel frontsideOriginVM = new FrontsideOrigin_ViewModel();
+        private UI_Temp.FrontsideOrigin_ViewModel frontsideOriginVM = new UI_Temp.FrontsideOrigin_ViewModel();
         public UI_Temp.FrontsideOrigin_ViewModel FrontsideOriginVM
         {
             get => frontsideOriginVM;
