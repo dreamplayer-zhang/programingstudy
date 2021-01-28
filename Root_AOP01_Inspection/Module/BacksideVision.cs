@@ -28,6 +28,8 @@ namespace Root_AOP01_Inspection.Module
 {
     public class BacksideVision : ModuleBase, IWTRChild
     {
+        MainVision m_mainVision;
+
         #region ToolBox
         Axis m_axisRotate;
         Axis m_axisZ;
@@ -54,20 +56,19 @@ namespace Root_AOP01_Inspection.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diExistVision, this, "Reticle Exist on Vision");
-            p_sInfo = m_toolBox.Get(ref m_diReticleTiltCheck, this, "Reticle Tilt Check");
-            p_sInfo = m_toolBox.Get(ref m_diReticleFrameCheck, this, "Reticle Frame Check");
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
-            p_sInfo = m_toolBox.Get(ref m_axisSideZ, this, "Axis Side Z");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
+            //p_sInfo = m_toolBox.Get(ref m_diExistVision, this, "Reticle Exist on Vision");
+            //p_sInfo = m_toolBox.Get(ref m_diReticleTiltCheck, this, "Reticle Tilt Check");
+            //p_sInfo = m_toolBox.Get(ref m_diReticleFrameCheck, this, "Reticle Frame Check");
+            //p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
+            //p_sInfo = m_toolBox.Get(ref m_axisSideZ, this, "Axis Side Z");
+            //p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
+            //p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Vision Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_CamTDI90, this, "TDI 90");
             p_sInfo = m_toolBox.Get(ref m_CamTDI45, this, "TDI 45");
             p_sInfo = m_toolBox.Get(ref m_CamTDISide, this, "TDI Side");
             p_sInfo = m_toolBox.Get(ref m_CamLADS, this, "LADS");
-            m_axisRotate.StartMove(1000);
         }
         #endregion
 
@@ -117,10 +118,10 @@ namespace Root_AOP01_Inspection.Module
 
         void InitPosAlign()
         {
-            m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
-            m_axisRotate.AddPos(Enum.GetNames(typeof(eAxisPos)));
-            m_axisSideZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
-            m_axisXY.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            //m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            //m_axisRotate.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            //m_axisSideZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            //m_axisXY.AddPos(Enum.GetNames(typeof(eAxisPos)));
         }
         #endregion
 
@@ -306,16 +307,16 @@ namespace Root_AOP01_Inspection.Module
         public override void InitMemorys()
         {
             //BacksideVision.Main.
-            m_memoryGroup = m_memoryPool.GetGroup(p_id);
-            m_memoryMain = m_memoryGroup.CreateMemory(App.mMainMem, 1, 1, 1000, 1000);
+            //m_memoryGroup = m_memoryPool.GetGroup(p_id);
+            //m_memoryMain = m_memoryGroup.CreateMemory(App.mMainMem, 1, 1, 1000, 1000);
 
-            m_memorySideLeft = m_memoryGroup.CreateMemory(App.mSideLeftMem, 1, 1, 1000, 1000);
-            m_memorySideBottom = m_memoryGroup.CreateMemory(App.mSideBotMem, 1, 1, 1000, 1000);
-            m_memorySideRight = m_memoryGroup.CreateMemory(App.mSideRightMem, 1, 1, 1000, 1000);
-            m_memorySideTop = m_memoryGroup.CreateMemory(App.mSideTopMem, 1, 1, 1000, 1000);
+            //m_memorySideLeft = m_memoryGroup.CreateMemory(App.mSideLeftMem, 1, 1, 1000, 1000);
+            //m_memorySideBottom = m_memoryGroup.CreateMemory(App.mSideBotMem, 1, 1, 1000, 1000);
+            //m_memorySideRight = m_memoryGroup.CreateMemory(App.mSideRightMem, 1, 1, 1000, 1000);
+            //m_memorySideTop = m_memoryGroup.CreateMemory(App.mSideTopMem, 1, 1, 1000, 1000);
 
-            m_memoryTDI45 = m_memoryGroup.CreateMemory("TDI45", 1, 1, 1000, 1000);
-            m_memoryLADS = m_memoryGroup.CreateMemory("LADS", 1, 1, 1000, 1000);
+            //m_memoryTDI45 = m_memoryGroup.CreateMemory("TDI45", 1, 1, 1000, 1000);
+            //m_memoryLADS = m_memoryGroup.CreateMemory("LADS", 1, 1, 1000, 1000);
         }
         #endregion
 
@@ -676,7 +677,7 @@ namespace Root_AOP01_Inspection.Module
                 set
                 {
                     m_sGrabMode = value;
-                    m_grabMode = m_module.GetGrabMode(value);
+                    m_grabMode = m_module.m_mainVision.GetGrabMode(value);
                 }
             }
             public Run_GrabSideScan(BacksideVision module)
@@ -717,7 +718,7 @@ namespace Root_AOP01_Inspection.Module
                 m_nReticleSize_mm = tree.Set(m_nReticleSize_mm, m_nReticleSize_mm, "Reticle Size Y", "Reticle Size Y", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
-                p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+                p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.m_mainVision.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
 
                 m_nLeftOffsetX = (tree.GetTree("Scan Offset", false, bVisible)).Set(m_nLeftOffsetX, m_nLeftOffsetX, "Left Offset X", "Left Offset X", bVisible);
                 m_nTopOffsetX = (tree.GetTree("Scan Offset", false, bVisible)).Set(m_nTopOffsetX, m_nTopOffsetX, "Top Offset X", "Top Offset X", bVisible);
@@ -826,7 +827,7 @@ namespace Root_AOP01_Inspection.Module
                 set
                 {
                     m_sGrabMode = value;
-                    m_grabMode = m_module.GetGrabMode(value);
+                    m_grabMode = m_module.m_mainVision.GetGrabMode(value);
                 }
             }
 
@@ -876,7 +877,7 @@ namespace Root_AOP01_Inspection.Module
                 m_nReticleSize_mm = tree.Set(m_nReticleSize_mm, m_nReticleSize_mm, "Reticle Size Y", "Reticle Size Y", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
-                p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+                p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.m_mainVision.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
 
                 m_cpLeftEdgeCenterPos = (tree.GetTree("Edge Position", false, bVisible)).Set(m_cpLeftEdgeCenterPos, m_cpLeftEdgeCenterPos, "Left Edge Position", "Left Edge Position", bVisible);
                 m_cpTopEdgeCenterPos = (tree.GetTree("Edge Position", false, bVisible)).Set(m_cpTopEdgeCenterPos, m_cpTopEdgeCenterPos, "Top Edge Position", "Top Edge Position", bVisible);
@@ -954,43 +955,6 @@ namespace Root_AOP01_Inspection.Module
                     }
                     m_grabMode.m_camera.StopGrab();
 
-                    // SideScan용 Edge Offset 구하기
-                    if (m_cpLeftEdgeCenterPos.X == 0 || m_cpLeftEdgeCenterPos.Y == 0) return "Fail";
-                    if (m_cpTopEdgeCenterPos.X == 0 || m_cpTopEdgeCenterPos.Y == 0) return "Fail";
-                    if (m_cpRightEdgeCenterPos.X == 0 || m_cpRightEdgeCenterPos.Y == 0) return "Fail";
-                    if (m_cpBottomEdgeCenterPos.X == 0 || m_cpBottomEdgeCenterPos.Y == 0) return "Fail";
-
-                    CRect crtLeftROI = new CRect(m_cpLeftEdgeCenterPos.X, m_cpLeftEdgeCenterPos.Y, m_nSearchArea);
-                    CRect crtTopROI = new CRect(m_cpTopEdgeCenterPos.X, m_cpTopEdgeCenterPos.Y, m_nSearchArea);
-                    CRect crtRightROI = new CRect(m_cpRightEdgeCenterPos.X, m_cpRightEdgeCenterPos.Y, m_nSearchArea);
-                    CRect crtBottomROI = new CRect(m_cpBottomEdgeCenterPos.X, m_cpBottomEdgeCenterPos.Y, m_nSearchArea);
-
-                    //int nLeftEdge = crtLeftROI.Left + m_module.GetEdge(mem, crtLeftROI, 100, eSearchDirection.LeftToRight, m_nEdgeThreshold, true);
-                    //int nTopEdge = crtTopROI.Top + m_module.GetEdge(mem, crtTopROI, 100, eSearchDirection.TopToBottom, m_nEdgeThreshold, true);
-                    //int nRightEdge = crtRightROI.Left + m_module.GetEdge(mem, crtRightROI, 100, eSearchDirection.RightToLeft, m_nEdgeThreshold, true);
-                    //int nBottomEdge = crtBottomROI.Top + m_module.GetEdge(mem, crtBottomROI, 100, eSearchDirection.BottomToTop, m_nEdgeThreshold, true);
-
-                    int nLeftStandardFocusPos = 2266;
-                    int nTopStandardFocusPos = 1751;
-                    int nRightStandardFocusPos = 32370;
-                    int nBottomStandardFocusPos = 31957;
-
-                    m_module.m_narrSideEdgeOffset[0] = nLeftStandardFocusPos - crtLeftROI.Left + m_module.GetEdge(mem, crtLeftROI, 100, eSearchDirection.LeftToRight, m_nEdgeThreshold, true);
-                    m_module.m_narrSideEdgeOffset[1] = nTopStandardFocusPos - crtTopROI.Top + m_module.GetEdge(mem, crtTopROI, 100, eSearchDirection.TopToBottom, m_nEdgeThreshold, true);
-                    m_module.m_narrSideEdgeOffset[2] = nRightStandardFocusPos - crtRightROI.Left + m_module.GetEdge(mem, crtRightROI, 100, eSearchDirection.RightToLeft, m_nEdgeThreshold, true);
-                    m_module.m_narrSideEdgeOffset[3] = nBottomStandardFocusPos - crtBottomROI.Top + m_module.GetEdge(mem, crtBottomROI, 100, eSearchDirection.BottomToTop, m_nEdgeThreshold, true);
-
-
-                    //int nLeftStandardFocusPos = 2454;
-                    //int nBottomStandardFocusPos = 31982;
-                    //int nRightStandardFocusPos = 32382;
-                    //int nTopStandardFocusPos = 1663;
-
-                    //m_module.m_narrSideEdgeOffset[0] = nLeftStandardFocusPos - (crtLeftROI.Left + m_module.GetEdge(mem, crtLeftROI, crtLeftROI.Height / 2, eSearchDirection.LeftToRight, m_nEdgeThreshold, true));
-                    //m_module.m_narrSideEdgeOffset[1] = nBottomStandardFocusPos - (crtBottomROI.Top + m_module.GetEdge(mem, crtBottomROI, crtBottomROI.Width / 2, eSearchDirection.BottomToTop, m_nEdgeThreshold, true));
-                    //m_module.m_narrSideEdgeOffset[2] = nRightStandardFocusPos - (crtRightROI.Left + m_module.GetEdge(mem, crtRightROI, crtRightROI.Height / 2, eSearchDirection.RightToLeft, m_nEdgeThreshold, true));
-                    //m_module.m_narrSideEdgeOffset[3] = nTopStandardFocusPos - (crtTopROI.Top + m_module.GetEdge(mem, crtTopROI, crtTopROI.Width / 2, eSearchDirection.TopToBottom, m_nEdgeThreshold, true));
-
                     return "OK";
                 }
                 finally
@@ -1012,12 +976,28 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
-        public BacksideVision(string id, IEngineer engineer)
+        public BacksideVision(string id, IEngineer engineer, MainVision mainvision)
         {
+            m_mainVision = mainvision;
             base.InitBase(id, engineer);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
-            InitMemorys();
-            InitPosAlign();
+
+            m_diExistVision = mainvision.m_diExistVision;
+            m_diReticleTiltCheck = mainvision.m_diReticleTiltCheck;
+            m_diReticleFrameCheck = mainvision.m_diReticleFrameCheck;
+            m_axisRotate = mainvision.m_axisRotate;
+            m_axisSideZ = mainvision.m_axisSideZ;
+            m_axisZ = mainvision.m_axisZ;
+            m_axisXY = mainvision.m_axisXY;
+            m_memoryPool = mainvision.m_memoryPool;
+            m_lightSet = mainvision.m_lightSet;
+            m_CamTDI90 = mainvision.m_CamTDI90;
+            m_CamTDI45 = mainvision.m_CamTDI45;
+            m_CamTDISide = mainvision.m_CamTDISide;
+            m_CamLADS = mainvision.m_CamLADS;
+
+            //InitMemorys();
+            //InitPosAlign();
         }
 
         public override void ThreadStop()
