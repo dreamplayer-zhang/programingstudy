@@ -118,6 +118,11 @@ namespace Root_Rinse_Unloader.Module
                 }
             }
 
+            public void CheckSensor()
+            {
+                p_bLevel = m_diLevel.p_bIn; 
+            }
+
             string m_id;
             Storage m_storage;
             public Stack(string id, Storage storage)
@@ -211,6 +216,7 @@ namespace Root_Rinse_Unloader.Module
             while (m_bThreadCheck)
             {
                 Thread.Sleep(10);
+                m_stack.CheckSensor(); 
                 foreach (Magazine magazine in m_aMagazine) magazine.CheckSensor();
             }
         }
@@ -263,6 +269,18 @@ namespace Root_Rinse_Unloader.Module
                 m_threadCheck.Join();
             }
         }
+
+        #region StartRun
+        public void StartRun()
+        {
+            switch (m_rinse.p_eMode)
+            {
+                case RinseU.eRunMode.Stack:
+                    StartMoveStackReady();
+                    break;
+            }
+        }
+        #endregion
 
         #region ModuleRun
         public string StartMoveStackReady()

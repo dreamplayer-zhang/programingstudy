@@ -190,7 +190,7 @@ namespace Root_Rinse_Loader.Engineer
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run: break;
                 }
-                p_bRun = (EQ.p_eState == EQ.eState.Run);
+                p_bRun = (EQ.p_eState == EQ.eState.Run) && (m_loader.m_bPickersetMode == false);
             }
         }
         #endregion

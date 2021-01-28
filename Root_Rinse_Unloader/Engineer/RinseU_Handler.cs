@@ -170,6 +170,7 @@ namespace Root_Rinse_Unloader.Engineer
                 m_rail.StartRun();
                 m_roller.StartRun();
                 m_loader.StartRun();
+                m_storage.StartRun(); 
             }
             else
             {
@@ -191,7 +192,7 @@ namespace Root_Rinse_Unloader.Engineer
                         //forget
                         break;
                 }
-                p_bRun = (EQ.p_eState == EQ.eState.Run);
+                p_bRun = (EQ.p_eState == EQ.eState.Run) && (m_loader.m_bPickersetMode == false);
             }
         }
         #endregion
