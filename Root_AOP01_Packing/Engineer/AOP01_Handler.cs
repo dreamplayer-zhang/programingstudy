@@ -46,8 +46,8 @@ namespace Root_AOP01_Packing
             InitLoadport();
 
 
-            m_RNR = new Certification("Certification", m_engineer);
-            InitModule(m_RNR);
+            //m_RNR = new Certification("Certification", m_engineer);
+            //InitModule(m_RNR);
 
             m_visionAOP = new Vision_AOP("Vision", m_engineer);
             InitModule(m_visionAOP);
@@ -61,13 +61,13 @@ namespace Root_AOP01_Packing
             //InitModule(m_vacuumPacker);
             //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_vacuumPacker);
 
-            //m_elevator = new IndividualElevator("IndividualElevator", m_engineer);
-            //InitModule(m_elevator);
-            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_elevator);
+            m_elevator = new IndividualElevator("IndividualElevator", m_engineer);
+            InitModule(m_elevator);
+            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_elevator);
 
-            //m_unloadport = new Unloadport_AOP("Unloadport", m_engineer);
-            //InitModule(m_unloadport);
-            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_unloadport);
+            m_unloadport = new Unloadport_AOP("Unloadport", m_engineer);
+            InitModule(m_unloadport);
+            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_unloadport);
 
             m_aWTR[0].RunTree(Tree.eMode.RegRead);
             m_aWTR[0].RunTree(Tree.eMode.Init);
@@ -116,10 +116,10 @@ namespace Root_AOP01_Packing
         public List<ILoadport> m_aLoadport = new List<ILoadport>();
         void InitLoadport()
         {
-            Loadport_Cymechs loadportA = new Loadport_Cymechs("LoadportA", m_engineer, false, false);
-            InitModule(loadportA);
-            m_aLoadport.Add(loadportA);
-            ((IWTR)m_aWTR[0]).AddChild((IWTRChild)loadportA);
+            //Loadport_Cymechs loadportA = new Loadport_Cymechs("LoadportA", m_engineer, false, false);
+            //InitModule(loadportA);
+            //m_aLoadport.Add(loadportA);
+            //((IWTR)m_aWTR[0]).AddChild((IWTRChild)loadportA);
 
             Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, false, false);
             InitModule(loadportAOP);

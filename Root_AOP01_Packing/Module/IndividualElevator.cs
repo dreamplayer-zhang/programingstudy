@@ -1,6 +1,7 @@
 ﻿using Root_EFEM.Module;
 using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -11,6 +12,14 @@ namespace Root_AOP01_Packing.Module
 {
     public class IndividualElevator : ModuleBase, IWTRChild
     {
+        public IndividualElevator(string id, IEngineer engineer)
+        {
+            m_waferSize = new InfoWafer.WaferSize(id, false, false);
+            base.InitBase(id, engineer);
+            InitThreadCheck();
+            InitALID();
+        }
+
         #region ToolBox
         Axis m_axis;
         DIO_I[] m_diCheck = new DIO_I[3];
@@ -30,8 +39,15 @@ namespace Root_AOP01_Packing.Module
         }
         #endregion
 
+        #region ALID
+        ALID m_alidElevator;
+        void InitALID() 
+        {
+            m_alidElevator = m_gaf.GetALID(this, "Elevator Module", "Elevator Module Error");
+        }
+        #endregion
+
         #region Sensor
-        bool _bCheck = false; 
         public bool p_bCheck
         {
             get { return _bCheck; }
@@ -42,8 +58,8 @@ namespace Root_AOP01_Packing.Module
                 OnPropertyChanged(); 
             }
         }
+        bool _bCheck = false; 
 
-        bool _bProtection = false; 
         public bool p_bProtection
         {
             get { return _bProtection; }
@@ -56,6 +72,7 @@ namespace Root_AOP01_Packing.Module
                 OnPropertyChanged(); 
             }
         }
+        bool _bProtection = false; 
 
         bool m_bThreadCheck = false;
         Thread m_threadCheck; 
@@ -64,16 +81,24 @@ namespace Root_AOP01_Packing.Module
             m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
             m_threadCheck.Start(); 
         }
-
         void RunThreadCheck()
         {
             m_bThreadCheck = true;
-            Thread.Sleep(1000);
+            Thread.Sleep(3000);
             while (m_bThreadCheck)
             {
                 Thread.Sleep(10);
                 p_bCheck = (m_diCheck[0].p_bIn && m_diCheck[1].p_bIn && m_diCheck[2].p_bIn);
                 p_bProtection = (m_diProtection[0].p_bIn || m_diProtection[1].p_bIn); 
+
+                if(p_bProtection)
+                {
+                    this.p_eState = eState.Error;
+                    EQ.p_bStop = true;
+                    m_alidElevator.Run(p_bProtection, "Please Check The Individual Elevator");
+
+                }
+
             }
         }
         #endregion
@@ -107,37 +132,30 @@ namespace Root_AOP01_Packing.Module
         #endregion
 
         #region Mapping
+        
+        
         public string RunMapping()
         {
             p_infoWafer = null;
+            // State Home에 프로텍션 체크넣어야됨
+            
             if (Run(m_axis.StartMove(ePos.Bottom))) return p_sInfo;
             if (Run(m_axis.WaitReady())) return p_sInfo;
-            if (Run(m_axis.StartMove(ePos.Top))) return p_sInfo;
-            for (int n = 0; n < 8; n++)
+            for(int n=0; n<8; n++)
             {
-                double pos = GetPos(n);
-                while (m_axis.p_posCommand < pos)
+                Thread.Sleep(200);
+                if (p_bCheck) 
                 {
-                    Thread.Sleep(10);
-                    if (p_bProtection)
-                    {
-                        m_axis.StopAxis();
-                        return "Protection Detected"; 
-                    }
+                    if(Run(m_axis.StartShift(65000))) return p_sInfo;
+                    if(Run(m_axis.WaitReady())) return p_sInfo;
+                    p_infoWafer = new InfoWafer(p_id, 0, m_engineer);
+                    return "OK";
                 }
-                if (p_bCheck)
-                {
-                    m_axis.StopAxis();
-                    if (Run(MoveElevator(n))) return p_sInfo;
-                    if (p_bCheck)
-                    {
-                        p_infoWafer = new InfoWafer(p_id, 0, m_engineer);
-                        return "OK";
-                    }
-                    else return "Check Case";
-                }
+                Run(m_axis.StartShift(65000));
+                Run(m_axis.WaitReady());
+                //m_axis.StartMove()
             }
-            return "No Case"; 
+            return "No Case";          
         }
         #endregion
 
@@ -286,12 +304,7 @@ namespace Root_AOP01_Packing.Module
         }
         #endregion
 
-        public IndividualElevator(string id, IEngineer engineer)
-        {
-            m_waferSize = new InfoWafer.WaferSize(id, false, false);
-            base.InitBase(id, engineer);
-            InitThreadCheck(); 
-        }
+       
 
         public override void ThreadStop()
         {

@@ -14,7 +14,7 @@ namespace Root_AOP01_Packing.Module
 {
     public class TapePacker : ModuleBase, IWTRChild
     {
-        
+
         public TapePacker(string id, IEngineer engineer)
         {
             InitChildSlot();
@@ -22,6 +22,7 @@ namespace Root_AOP01_Packing.Module
             m_roller = new Roller("Roller", this);
             m_head = new Head("Head", this);
             m_stage = new Stage("Stage", this);
+            m_camera = new Camera("Camera", this);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             base.InitBase(id, engineer);
             InitALID();
@@ -33,11 +34,12 @@ namespace Root_AOP01_Packing.Module
             m_cartridge.GetTools(m_toolBox, bInit);
             m_roller.GetTools(m_toolBox, bInit);
             m_head.GetTools(m_toolBox, bInit);
-            m_stage.GetTools(m_toolBox, bInit); 
+            m_stage.GetTools(m_toolBox, bInit);
+            m_camera.GetTools(m_toolBox, bInit);
         }
         #endregion
 
-        #region GAF
+        #region ALID
         ALID m_alidTape;
 
         void InitALID()
@@ -49,26 +51,24 @@ namespace Root_AOP01_Packing.Module
         #region Camera
         public class Camera
         {
-            Camera_Basler m_ChecktapeVRS;
-            Camera_Basler m_CheckEndVRS;
             Camera_Basler m_reticleVRS;
+            Camera_Basler m_CheckRemainVRS;
+            Camera_Basler m_CheckEndVRS;
 
-            string m_id;
             TapePacker m_packer;
             public Camera(string id, TapePacker packer)
             {
-                m_id = id;
                 m_packer = packer;
             }
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_ChecktapeVRS, m_packer, m_id);
-                m_packer.p_sInfo = toolBox.Get(ref m_reticleVRS, m_packer, m_id);
-                m_packer.p_sInfo = toolBox.Get(ref m_CheckEndVRS, m_packer, m_id);
+                m_packer.p_sInfo = toolBox.Get(ref m_reticleVRS, m_packer, "Check Reticle");
+                m_packer.p_sInfo = toolBox.Get(ref m_CheckRemainVRS, m_packer, "Check Remain Tape");
+                m_packer.p_sInfo = toolBox.Get(ref m_CheckEndVRS, m_packer, "Check End Tape");
             }
             public string RunCheckTapeVRS()
             {
-                if (m_ChecktapeVRS.Grab() == "OK")
+                if (m_CheckRemainVRS.Grab() == "OK")
                 {
                     //검사?
                 }
@@ -91,7 +91,7 @@ namespace Root_AOP01_Packing.Module
                 return "OK";
             }
         }
-        public Camera m_Camera;
+        public Camera m_camera;
         #endregion
 
         #region Cartridge
@@ -115,7 +115,7 @@ namespace Root_AOP01_Packing.Module
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_axis, m_packer, m_id);
-                m_packer.p_sInfo = toolBox.Get(ref m_doCutter, m_packer, m_id + ".Cutter On/Off");
+                m_packer.p_sInfo = toolBox.Get(ref m_doCutter, m_packer, m_id + ".Cutter Off");
                 m_packer.p_sInfo = toolBox.Get(ref m_diCheckCutter[0], m_packer, m_id + ".Cutter ON");
                 m_packer.p_sInfo = toolBox.Get(ref m_diCheckCutter[1], m_packer, m_id + ".Cutter OFF");
                 m_packer.p_sInfo = toolBox.Get(ref m_solLock, m_packer, m_id + ".Lock", "Unlock", "Lock");
@@ -127,14 +127,14 @@ namespace Root_AOP01_Packing.Module
                 {
                     m_packer.InitSolvalve(m_solLock);
                     m_packer.InitSolvalve(m_solTapeStoper);
-                    InitPos(); 
+                    InitPos();
                 }
             }
 
             public string RunMove(ePos ePos)
             {
                 m_axis.StartMove(ePos);
-                return m_axis.WaitReady(); 
+                return m_axis.WaitReady();
             }
             public string RunCutter()
             {
@@ -150,18 +150,18 @@ namespace Root_AOP01_Packing.Module
                 return "OK";
             }
             public string RunLock(bool bLock)
-            {               
-                if (bLock && IsCheck() == false) return "Cartridge Not Placed"; 
-                return m_solLock.RunSol(bLock); 
+            {
+                if (bLock && IsCheck() == false) return "Cartridge Not Placed";
+                return m_solLock.RunSol(bLock);
             }
             public string RunStopper(bool bStop)
             {
                 //true면 지금 release인데..
-                return m_solTapeStoper.RunSol(bStop); 
+                return m_solTapeStoper.RunSol(!bStop);
             }
             public bool IsCheck()
             {
-                return m_diCheckPlaced[0].p_bIn && m_diCheckPlaced[1].p_bIn; 
+                return m_diCheckPlaced[0].p_bIn && m_diCheckPlaced[1].p_bIn;
             }
             void InitPos()
             {
@@ -178,7 +178,7 @@ namespace Root_AOP01_Packing.Module
             }
 
         }
-        public Cartridge m_cartridge; 
+        public Cartridge m_cartridge;
         #endregion
 
         #region Roller
@@ -218,11 +218,11 @@ namespace Root_AOP01_Packing.Module
                 }
                 else
                 {
-                    return m_solRollerUp.RunSol(false); 
+                    return m_solRollerUp.RunSol(false);
                 }
             }
         }
-        public Roller m_roller; 
+        public Roller m_roller;
         #endregion
 
         #region Head
@@ -230,10 +230,10 @@ namespace Root_AOP01_Packing.Module
         {
             DIO_I2O2 m_solHead; // Y13:up / Y14:down / X13:up / X14:down
             DIO_I2O2 m_solPicker; // Y15:up / Y16:down / X15:up / X16:down
-            DIO_I m_diCheckCase; // X19 (false:none / true:checked )
             DIO_IO m_dioVacuum; // Y66 (true:ON/false:OFF) / X96
             DIO_O m_doBlow; // Y67 (true:ON/false:OFF)
-            DIO_I m_diOverload; // Y13,14에 대한 Overload ///////////////이게모지 X17, X18 확인좀요
+            DIO_I m_diOverload; // X17 // 케이스 틀어짐확인 센서
+            DIO_I m_diTopCheck; // X18 (false:none / true:checked )
 
             string m_id;
             TapePacker m_packer;
@@ -248,7 +248,7 @@ namespace Root_AOP01_Packing.Module
                 m_packer.p_sInfo = toolBox.Get(ref m_solHead, m_packer, m_id + ".Head", "Up", "Down");
                 m_packer.p_sInfo = toolBox.Get(ref m_solPicker, m_packer, m_id + ".Picker", "Up", "Down");
                 m_packer.p_sInfo = toolBox.Get(ref m_diOverload, m_packer, m_id + ".Overload");
-                m_packer.p_sInfo = toolBox.Get(ref m_diCheckCase, m_packer, m_id + ".Check Cover");
+                m_packer.p_sInfo = toolBox.Get(ref m_diTopCheck, m_packer, m_id + ".Check Case Top");
                 m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum, m_packer, m_id + ".Vacuum");
                 m_packer.p_sInfo = toolBox.Get(ref m_doBlow, m_packer, m_id + ".Blow");
                 if (bInit)
@@ -273,10 +273,10 @@ namespace Root_AOP01_Packing.Module
                 if (sRun != "OK")
                 {
                     m_solPicker.Write(false);
-                    RunHeadDown(false); 
+                    RunHeadDown(false);
                     return sRun;
                 }
-                return m_solPicker.WaitDone(); 
+                return m_solPicker.WaitDone();
             }
             public string RunHeadDown(bool bDown)
             {
@@ -288,12 +288,12 @@ namespace Root_AOP01_Packing.Module
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return m_id + " EQ Stop";
-                    if (m_diOverload.p_bIn)
-                    {
-                        m_solHead.Write(false);
-                        return "Overload Sensor Checked"; 
-                    }
                     if (m_solHead.m_swWrite.ElapsedMilliseconds > msWait) return m_solHead.m_id + " Solvalve Move Timeout";
+                }
+                if (m_diOverload.p_bIn)
+                {
+                    m_solHead.Write(false);
+                    return "Overload Sensor Checked";
                 }
                 return "OK";
             }
@@ -303,7 +303,7 @@ namespace Root_AOP01_Packing.Module
                 if (bOn == false)
                 {
                     m_doBlow.Write(true);
-                    Thread.Sleep((int)(1000 * m_secBlow));
+                    Thread.Sleep((int)(500 * m_secBlow));
                     m_doBlow.Write(false);
                     return "OK";
                 }
@@ -317,13 +317,14 @@ namespace Root_AOP01_Packing.Module
                 return "OK";
             }
         }
-        public Head m_head; 
+        public Head m_head;
         #endregion
 
         #region Stage
         public class Stage
         {
             public Axis m_axis; // Axis 0
+
             DIO_I m_diCheck; // X19 (false:none / true:checked)
 
             string m_id;
@@ -343,21 +344,21 @@ namespace Root_AOP01_Packing.Module
 
             public bool IsCheck()
             {
-                return m_diCheck.p_bIn; 
+                return m_diCheck.p_bIn;
             }
 
             const double c_fPpR = 2621440;
             public double m_degReady = 0;
-            public double m_degAttach = 13; 
+            //public double m_degAttach = 13; 
             int m_nRound = 2;
-            public double m_degCut = 10; 
+            public double m_degCut = 10;
             double m_vDeg = 90;
             double m_secAcc = 0.7;
             public void RunTree(Tree tree)
             {
                 m_nRound = tree.Set(m_nRound, m_nRound, "Round", "Taping Rotate Round");
                 m_degReady = tree.Set(m_degReady, m_degReady, "Ready", "Ready Position (Deg)");
-                m_degAttach = tree.Set(m_degAttach, m_degAttach, "Attach", "Attach Position (Deg)");
+                //m_degAttach = tree.Set(m_degAttach, m_degAttach, "Attach", "Attach Position (Deg)");
                 m_degCut = tree.Set(m_degCut, m_degCut, "Cut", "Cut Position (Deg)");
                 m_vDeg = tree.Set(m_vDeg, m_vDeg, "Speed", "Taping Rotate Speed (Deg / sec)");
                 m_secAcc = tree.Set(m_secAcc, m_secAcc, "Acc", "Taping Rotate Acceleration Time (sec)");
@@ -389,16 +390,16 @@ namespace Root_AOP01_Packing.Module
                 m_axis.StartMove(fPulse + c_fPpR * m_nRound, vPulse, m_secAcc, m_secAcc);
                 string sRun = m_axis.WaitReady();
                 m_axis.SetCommandPosition(fPulse);
-                return sRun; 
+                return sRun;
             }
             public string RunRotate(double fDeg)
             {
                 double fPulse = fDeg * c_fPpR / 360;
                 double vPulse = m_vDeg * c_fPpR / 360;
                 double fNow = m_axis.p_posCommand;
-                m_axis.StartMove(fPulse + fNow, vPulse, m_secAcc, m_secAcc);
+                m_axis.StartMove(fNow - fPulse, vPulse, m_secAcc, m_secAcc);
                 return m_axis.WaitReady();
-            }   
+            }
             public string BeforeHome()
             {
                 m_axis.ServoOn(true);
@@ -407,7 +408,7 @@ namespace Root_AOP01_Packing.Module
                 Thread.Sleep(1200);
                 m_axis.StopAxis();
                 Thread.Sleep(100);
-                return "OK"; 
+                return "OK";
             }
         }
         public Stage m_stage;
@@ -419,7 +420,7 @@ namespace Root_AOP01_Packing.Module
         {
             if (sol == null) return;
             m_aSolvalve.Add(sol);
-            sol.Write(false); 
+            sol.Write(false);
         }
 
         public List<string> p_asSol
@@ -428,7 +429,7 @@ namespace Root_AOP01_Packing.Module
             {
                 List<string> asSol = new List<string>();
                 foreach (DIO_I2O2 sol in m_aSolvalve) asSol.Add(sol.m_id);
-                return asSol; 
+                return asSol;
             }
         }
 
@@ -436,9 +437,9 @@ namespace Root_AOP01_Packing.Module
         {
             foreach (DIO_I2O2 sol in m_aSolvalve)
             {
-                if (sol.m_id == sSol) return sol; 
+                if (sol.m_id == sSol) return sol;
             }
-            return null; 
+            return null;
         }
         #endregion
 
@@ -462,11 +463,11 @@ namespace Root_AOP01_Packing.Module
         {
             m_reg = new Registry(p_id + ".InfoWafer");
             m_sInfoWafer = m_reg.Read("sInfoWafer", m_sInfoWafer);
-            p_eProcess = (eProcess)m_reg.Read("Process", (int)p_eProcess); 
+            p_eProcess = (eProcess)m_reg.Read("Process", (int)p_eProcess);
             p_infoWafer = m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
         }
         #endregion
-        
+
         #region IWTRChild
         bool _bLock = false;
         public bool p_bLock
@@ -524,10 +525,14 @@ namespace Root_AOP01_Packing.Module
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
             if (p_infoWafer != null) return p_id + " IsPutOK - InfoWafer Exist";
+            return "OK";
             switch (p_eProcess)
             {
-                case eProcess.Empty: if (nID == 0) return "OK"; break;
-                case eProcess.Opened: if (nID == 1) return "OK"; break; 
+                case eProcess.Empty:
+                    if (nID == 0) 
+                        return "OK"; break;
+                case eProcess.Opened: if (nID == 1) 
+                        return "OK"; break;
             }
             return p_id + " IsPutOK - Process " + p_eProcess.ToString();
         }
@@ -540,33 +545,37 @@ namespace Root_AOP01_Packing.Module
 
         public string BeforeGet(int nID)
         {
+            if (Run(m_stage.RunRotate(30))) return p_sInfo;
             //if (p_infoWafer == null) return m_id + " BeforeGet : InfoWafer = null";
             return CheckGetPut();
         }
 
         public string BeforePut(int nID)
         {
+            if (Run(m_stage.RunRotate(30))) return p_sInfo;
             if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
             return CheckGetPut();
         }
 
         public string AfterGet(int nID)
         {
+            if (Run(m_stage.RunRotate(-30))) return p_sInfo;
             switch (p_eProcess)
             {
                 case eProcess.Case: if (nID == 0) p_eProcess = eProcess.Empty; break;
                 case eProcess.Done: if (nID == 0) p_eProcess = eProcess.Empty; break;
-                case eProcess.Reticle: if (nID == 1) p_eProcess = eProcess.Opened; break; 
+                case eProcess.Reticle: if (nID == 1) p_eProcess = eProcess.Opened; break;
             }
             return CheckGetPut();
         }
 
         public string AfterPut(int nID)
         {
+            if (Run(m_stage.RunRotate(-30))) return p_sInfo;
             switch (p_eProcess)
             {
                 case eProcess.Empty: if (nID == 0) p_eProcess = eProcess.Case; break;
-                case eProcess.Opened: if (nID == 1) p_eProcess = eProcess.Reticle; break; 
+                case eProcess.Opened: if (nID == 1) p_eProcess = eProcess.Reticle; break;
             }
             return "OK";
         }
@@ -603,7 +612,7 @@ namespace Root_AOP01_Packing.Module
             Done, // RungTaping Done
             Error
         }
-        eProcess _eProcess = eProcess.Empty; 
+        eProcess _eProcess = eProcess.Empty;
         public eProcess p_eProcess
         {
             get { return _eProcess; }
@@ -612,7 +621,7 @@ namespace Root_AOP01_Packing.Module
                 if (_eProcess == value) return;
                 _eProcess = value;
                 if (m_reg != null) m_reg.Write("Process", (int)value);
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -620,6 +629,7 @@ namespace Root_AOP01_Packing.Module
         #region Functions
         public string RunCoverOpen()
         {
+            p_eProcess = eProcess.Case;
             if (p_eProcess != eProcess.Case) return "Process not Case : " + p_eProcess.ToString();
             p_eProcess = eProcess.Opening;
             if (Run(m_head.RunVacuum(false))) return p_sInfo;
@@ -632,6 +642,7 @@ namespace Root_AOP01_Packing.Module
         }
         public string RunCoverClose()
         {
+            p_eProcess = eProcess.Reticle;
             if (p_eProcess != eProcess.Reticle) return "Process not Reticle : " + p_eProcess.ToString();
             p_eProcess = eProcess.Closing;
             if (Run(m_head.RunSol(true, true))) return p_sInfo;
@@ -640,48 +651,47 @@ namespace Root_AOP01_Packing.Module
             p_eProcess = eProcess.Closed;
             return "OK";
         }
-        public string RunTaping()
-        {
-            if (p_eProcess != eProcess.Closed) return "Process not Closed : " + p_eProcess.ToString();
-            p_eProcess = eProcess.Taping;
-            if (Run(m_head.RunHeadDown(true))) return p_sInfo;
-            if (Run(m_roller.RunRollerPushUp(true))) return p_sInfo;
-
-            if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo; 
-            if (Run(m_cartridge.RunMove(Cartridge.ePos.Attach))) return p_sInfo;
-            if (Run(m_cartridge.RunStopper(false))) return p_sInfo;
-            if (Run(m_stage.RunRotate(m_stage.m_degAttach))) return p_sInfo;
-
-            if (Run(m_cartridge.RunMove(Cartridge.ePos.Taping))) return p_sInfo;
-            if (Run(m_stage.RunTaping())) return p_sInfo;
-
-            if (Run(m_cartridge.RunMove(Cartridge.ePos.Cutting))) return p_sInfo;
-            if (Run(m_stage.RunRotate(m_stage.m_degCut))) return p_sInfo;
-            if (Run(m_cartridge.RunCutter())) return p_sInfo;
-
-            if (Run(m_cartridge.RunMove(Cartridge.ePos.CheckTape))) return p_sInfo;
-            if (Run(m_Camera.RunCheckEndVRS())) return p_sInfo;
-
-            if (Run(m_stage.RunRotate(180))) return p_sInfo;
-            if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo;
-
-
-
-
-
-            if (Run(RunCoverClose())) return p_sInfo;
-            // Cartridge Attach가 필요
-            Thread.Sleep(1000);
-            if (Run(RunHeadUp())) return p_sInfo;
-            p_eProcess = eProcess.Done;
-            return "OK";
-        }
         public string RunHeadUp()
         {
             if (Run(m_head.RunVacuum(false)))
                 return p_sInfo;
             if (Run(m_head.RunSol(false, false)))
                 return p_sInfo;
+            return "OK";
+        }
+        
+        public string RunTaping()
+        {
+            Thread.Sleep(10);
+            ////if (p_eProcess != eProcess.Closed) return "Process not Closed : " + p_eProcess.ToString();
+            ////p_eProcess = eProcess.Taping;
+            if (Run(m_head.RunSol(true, true))) return p_sInfo; // Overload는 여기서 체크
+            if (Run(m_roller.RunRollerPushUp(true))) return p_sInfo;
+            //여기서 Check Top Sensor 체크해야될듯 근데 안들어오네
+
+            if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo;
+            if (Run(m_cartridge.RunMove(Cartridge.ePos.Attach))) return p_sInfo;
+            if (Run(m_stage.RunRotate(15))) return p_sInfo;
+            if (Run(m_cartridge.RunStopper(false))) return p_sInfo;
+
+            if (Run(m_cartridge.RunMove(Cartridge.ePos.Taping))) return p_sInfo;
+            if (Run(m_stage.RunRotate(705))) return p_sInfo;
+            //if (Run(m_stage.RunTaping())) return p_sInfo;
+
+            if (Run(m_stage.RunRotate(33))) return p_sInfo;
+            if (Run(m_cartridge.RunMove(Cartridge.ePos.Cutting))) return p_sInfo;
+            //if (Run(m_stage.RunRotate(m_stage.m_degCut))) return p_sInfo; //33도
+            if (Run(m_cartridge.RunCutter())) return p_sInfo;
+
+            if (Run(m_cartridge.RunMove(Cartridge.ePos.CheckTape))) return p_sInfo;
+            //if (Run(m_camera.RunCheckEndVRS())) return p_sInfo;
+
+            if (Run(m_stage.RunRotate(327))) return p_sInfo;
+            if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo;
+
+            if (Run(m_head.RunHeadDown(false))) return p_sInfo;
+            if (Run(m_roller.RunRollerPushUp(false))) return p_sInfo;
+            //p_eProcess = eProcess.Done;
             return "OK";
         }
         #endregion
@@ -716,12 +726,17 @@ namespace Root_AOP01_Packing.Module
             }
             if (Run(m_head.RunSol(true, true)))
                 return p_sInfo;
+            if (Run(m_roller.RunRollerPushUp(false)))
+                return p_sInfo;
+            Thread.Sleep(1000);
             if (Run(m_head.RunVacuum(false)))
                 return p_sInfo;
             if (Run(m_head.RunSol(false, false)))
                 return p_sInfo;
+            if (Run(m_roller.RunRollerPushUp(false)))
+                return p_sInfo;
 
-            m_stage.BeforeHome(); 
+            //m_stage.BeforeHome(); 
             p_sInfo = base.StateHome();
 
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
@@ -730,7 +745,7 @@ namespace Root_AOP01_Packing.Module
             return p_sInfo;
         }
         #endregion
-      
+
         public override void ThreadStop()
         {
             base.ThreadStop();
@@ -784,8 +799,8 @@ namespace Root_AOP01_Packing.Module
                 InitModuleRun(module);
             }
 
-            string m_sSol = ""; 
-            bool m_bOn = false; 
+            string m_sSol = "";
+            bool m_bOn = false;
             public override ModuleRunBase Clone()
             {
                 Run_Solvalve run = new Run_Solvalve(m_module);
@@ -797,14 +812,14 @@ namespace Root_AOP01_Packing.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_sSol = tree.Set(m_sSol, m_sSol, m_module.p_asSol, "SolValve", "Run SolValve", bVisible);
-                m_bOn = tree.Set(m_bOn, m_bOn, "On", "Run SolValue On/Off", bVisible); 
+                m_bOn = tree.Set(m_bOn, m_bOn, "On", "Run SolValue On/Off", bVisible);
             }
 
             public override string Run()
             {
                 DIO_I2O2 sol = m_module.GetSolvalve(m_sSol);
                 if (sol == null) return "Invalid Solvalve Name";
-                sol.Write(m_bOn); 
+                sol.Write(m_bOn);
                 return sol.WaitDone();
             }
         }
@@ -833,7 +848,8 @@ namespace Root_AOP01_Packing.Module
 
             public override string Run()
             {
-                return m_module.m_stage.RunMove(m_fDeg); 
+                return m_module.m_stage.RunRotate(m_fDeg);
+                //return m_module.m_stage.RunMove(m_fDeg); 
             }
         }
 
@@ -847,12 +863,12 @@ namespace Root_AOP01_Packing.Module
             }
 
             enum eCover
-            { 
+            {
                 Open,
                 Close,
                 HeadUp
             }
-            eCover m_eCover = eCover.Open; 
+            eCover m_eCover = eCover.Open;
             public override ModuleRunBase Clone()
             {
                 Run_Cover run = new Run_Cover(m_module);
