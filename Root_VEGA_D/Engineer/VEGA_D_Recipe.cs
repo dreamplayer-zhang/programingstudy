@@ -2,9 +2,9 @@
 using RootTools.Module;
 using System.Collections.Generic;
 
-namespace Root_AOP01_Inspection
+namespace Root_VEGA_D.Engineer
 {
-    public class AOP01_Recipe : AOP01_Recipe_UI
+    public class VEGA_D_Recipe
     {
         #region ModuleBase
         /// <summary> Recipe 편집에 필요한 Module 이름 List </summary>
@@ -15,8 +15,11 @@ namespace Root_AOP01_Inspection
         {
             foreach (ModuleBase module in modules)
             {
-                m_asModule.Add(module.p_id);
-                m_aModule.Add(module);
+                if (module.m_asRecipe.Count > 0)
+                {
+                    m_asModule.Add(module.p_id);
+                    m_aModule.Add(module);
+                }
             }
         }
         #endregion
@@ -26,7 +29,7 @@ namespace Root_AOP01_Inspection
         public string m_id;
         IEngineer m_engineer;
         Log m_log;
-        public AOP01_Recipe(string id, IEngineer engineer)
+        public VEGA_D_Recipe(string id, IEngineer engineer)
         {
             m_id = id;
             m_engineer = engineer;
