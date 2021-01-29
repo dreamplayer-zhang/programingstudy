@@ -47,7 +47,7 @@ namespace RootTools_Vision
 			int roiLeft = this.currentWorkplace.PositionX;
 			int roiTop = this.currentWorkplace.PositionY;
 
-			int[] arrDiff = new int[roiWidth];
+			int[] arrDiff;// = new int[roiWidth];
 
 			arrDiff = GetDiffArr(ptrMem, roiLeft, roiTop, roiWidth, roiHeight);
 			FindEdge(arrDiff);

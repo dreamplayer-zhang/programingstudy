@@ -10,22 +10,22 @@ using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 
-namespace Root_EFEM
+namespace Root_VEGA_D.Engineer
 {
-    public class EFEM_Engineer : IEngineer
+    public class VEGA_D_Engineer : IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
         public Login.User p_user { get { return m_login.p_user; } }
 
-        public IControl ClassControl() 
+        public IControl ClassControl()
         {
             switch (m_eControl)
             {
                 case eControl.Ajin: return m_ajin;
                 case eControl.ACS: return m_ACS;
             }
-            return m_ajin; 
+            return m_ajin;
         }
 
         public GAF m_gaf = new GAF();
@@ -55,7 +55,7 @@ namespace Root_EFEM
             Ajin,
             ACS
         };
-        eControl m_eControl = eControl.Ajin; 
+        eControl m_eControl = eControl.Ajin;
         void InitControl()
         {
             switch (m_eControl)
@@ -67,7 +67,7 @@ namespace Root_EFEM
 
         void RunTreeControl(Tree tree)
         {
-            m_eControl = (eControl)tree.Set(m_eControl, m_eControl, "Control", "Select Control"); 
+            m_eControl = (eControl)tree.Set(m_eControl, m_eControl, "Control", "Select Control");
         }
         #endregion
 
@@ -96,12 +96,12 @@ namespace Root_EFEM
         #endregion
 
         #region XGem
-        bool m_bUseXGem = true; 
+        bool m_bUseXGem = true;
         XGem m_xGem = null;
         XGem_UI m_xGemUI = new XGem_UI();
         void InitXGem()
         {
-            if (m_bUseXGem == false) return; 
+            if (m_bUseXGem == false) return;
             m_xGem = new XGem();
             m_xGem.Init("XGem", this);
             m_xGemUI.Init(m_xGem);
@@ -110,7 +110,7 @@ namespace Root_EFEM
 
         void RunTreeXGem(Tree tree)
         {
-            m_bUseXGem = tree.Set(m_bUseXGem, m_bUseXGem, "Use", "Use XGem"); 
+            m_bUseXGem = tree.Set(m_bUseXGem, m_bUseXGem, "Use", "Use XGem");
         }
         #endregion
 
@@ -151,12 +151,13 @@ namespace Root_EFEM
         }
         #endregion
 
-        public EFEM_Handler m_handler = new EFEM_Handler();
+
+        public VEGA_D_Handler m_handler = new VEGA_D_Handler();
         public void Init(string id)
         {
             EQ.m_sModel = id;
             LogView.Init();
-            InitTree(); 
+            InitTree();
             m_login.Init();
             m_toolBox.Init(id, this);
             InitControl();
