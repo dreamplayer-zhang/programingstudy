@@ -36,17 +36,22 @@ namespace Root_AOP01_Inspection.Module
 					get { return _nRPM; }
 					set
 					{
-						if (_nRPM == value) return;
-						if (m_nSet == 0)
+						if (_nRPM == value)
 						{
 							m_alidSetted_RPMLow.Run(m_mmLimit.X > _nRPM, "FFU RPM Lower than Low Limit.");
 							m_alidSetted_RPMHigh.Run(m_mmLimit.Y < _nRPM, "FFU RPM Higher than High Limit.");
+							return;
 						}
-						else if (m_nSet == 1)
-						{
-							m_alidSetted_PreLow.Run(m_mmLimit.X > _nRPM, "FFU Pressure Lower than Low Limit.");
-							m_alidSetted_PreHigh.Run(m_mmLimit.Y < _nRPM, "FFU Pressure Higher than High Limit.");
-						}
+						//if (m_nSet == 0)
+						//{
+						//	m_alidSetted_RPMLow.Run(m_mmLimit.X > _nRPM, "FFU RPM Lower than Low Limit.");
+						//	m_alidSetted_RPMHigh.Run(m_mmLimit.Y < _nRPM, "FFU RPM Higher than High Limit.");
+						//}
+						//else if (m_nSet == 1)
+						//{
+						//	m_alidSetted_PreLow.Run(m_mmLimit.X > _nRPM, "FFU Pressure Lower than Low Limit.");
+						//	m_alidSetted_PreHigh.Run(m_mmLimit.Y < _nRPM, "FFU Pressure Higher than High Limit.");
+						//}
 
 						_nRPM = value;
 						OnPropertyChanged();

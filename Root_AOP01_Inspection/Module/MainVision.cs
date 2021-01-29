@@ -666,7 +666,7 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_PatternShiftAndRotation(this), true, "Run PatternShiftAndRotation");
             AddModuleRunList(new Run_AlignKeyInspection(this), true, "Run AlignKeyInspection");
             AddModuleRunList(new Run_PellicleShiftAndRotation(this), true, "Run PellicleShiftAndRotation");
-            AddModuleRunList(new Run_Test(this), true, "Run Delay");
+            AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
         }
         #endregion
 
@@ -692,11 +692,11 @@ namespace Root_AOP01_Inspection.Module
         {
             base.ThreadStop();
         }
-        public class Run_Test : ModuleRunBase
+        public class Run_TestPellicle : ModuleRunBase
         {
             MainVision m_module;
             public RPoint m_rpAxisCenter = new RPoint();    // Side Center Position
-            public Run_Test(MainVision module)
+            public Run_TestPellicle(MainVision module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -704,7 +704,7 @@ namespace Root_AOP01_Inspection.Module
             }
             public override ModuleRunBase Clone()
             {
-                Run_Test run = new Run_Test(m_module);
+                Run_TestPellicle run = new Run_TestPellicle(m_module);
                 run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
                 return run;
             }
