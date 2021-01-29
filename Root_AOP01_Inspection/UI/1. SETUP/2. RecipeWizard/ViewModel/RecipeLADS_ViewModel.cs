@@ -6,10 +6,17 @@ namespace Root_AOP01_Inspection
     {
         Setup_ViewModel m_Setup;
         AOP01_Engineer m_Engineer;
+        MainVision m_mainVision;
+        public MainVision p_mainVision
+        {
+            get { return m_mainVision; }
+            set { SetProperty(ref m_mainVision, value); }
+        }
         public RecipeLADS_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
             m_Engineer = setup.m_MainWindow.m_engineer;
+            m_mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
         }
 
         public ICommand btnBack
@@ -22,6 +29,16 @@ namespace Root_AOP01_Inspection
                 });
             }
         }
+
+        #region Property
+        bool m_bEnablePellicleExpanding = false;
+        public bool p_bEnablePellicleExpanding
+        {
+            get { return m_bEnablePellicleExpanding; }
+            set { SetProperty(ref m_bEnablePellicleExpanding, value); }
+        }
+        #endregion
+
         public ICommand btnSnap
         {
             get

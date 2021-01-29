@@ -587,17 +587,17 @@ namespace Root_AOP01_Inspection.Module
 
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Test(this), true, "Run Delay");
+            AddModuleRunList(new Run_TestGlass(this), true, "Run Delay");
             AddModuleRunList(new Run_GrabSideScan(this), true, "Run Side Scan");
             AddModuleRunList(new Run_GrabBacksideScan(this), true, "Run Backside Scan");            
         }
 
         #region Run_Test
-        public class Run_Test : ModuleRunBase
+        public class Run_TestGlass : ModuleRunBase
         {
             BacksideVision m_module;
             public RPoint m_rpAxisCenter = new RPoint();    // Side Center Position
-            public Run_Test(BacksideVision module)
+            public Run_TestGlass(BacksideVision module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -605,7 +605,7 @@ namespace Root_AOP01_Inspection.Module
             }
             public override ModuleRunBase Clone()
             {
-                Run_Test run = new Run_Test(m_module);
+                Run_TestGlass run = new Run_TestGlass(m_module);
                 run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
                 return run;
             }

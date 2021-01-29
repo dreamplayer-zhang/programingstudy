@@ -57,12 +57,12 @@ namespace Root_AOP01_Inspection
         }
         void InitFFU()
         {
-            //FanUI0.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[0];
-            //FanUI1.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[1];
-            //FanUI2.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[2];
-            //FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
-            //FanUI4.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[4];
-            //FanUI5.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[5];
+            FanUI0.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[0];
+            FanUI1.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[1];
+            FanUI2.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[2];
+            FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
+            FanUI4.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[4];
+            FanUI5.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[5];
         }
 
         #region Timer
@@ -79,7 +79,6 @@ namespace Root_AOP01_Inspection
             ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_wtr.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
             ExistVision.Background = (m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null)||
                 (m_backsidevision.m_diExistVision.p_bIn == true && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
-            //ExistLoadport.Background = (m_loadport[0].p_infoWafer != null) || (m_loadport[1].p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
             ButtonInitialize.IsEnabled = IsEnableInitialization();
             ButtonRecovery.IsEnabled = IsEnableRecovery();
             if(EQ.p_eState != EQ.eState.Recovery)
@@ -136,7 +135,7 @@ namespace Root_AOP01_Inspection
         {
             if (module.p_eState == ModuleBase.eState.Run) return true;
             if (module.p_eState == ModuleBase.eState.Home) return true;
-            if (module.p_eState == ModuleBase.eState.Error) return false;
+            //if (module.p_eState == ModuleBase.eState.Error) return false;
             return (module.m_qModuleRun.Count > 0);
         }
         private void ButtonInitialize_Click(object sender, RoutedEventArgs e)

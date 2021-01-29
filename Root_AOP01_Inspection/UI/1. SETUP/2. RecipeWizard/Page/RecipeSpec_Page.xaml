@@ -230,6 +230,10 @@
                     </GroupBox>
                         <Button Content="Run" Style="{StaticResource SetupPanelBtn}" Grid.Column="2" Height="50" Command="{Binding btnRun}"/>
                     </StackPanel>
+                    <StackPanel Grid.Column="2" Margin="10">
+                        <Button Content="Recipe Load" Style="{StaticResource SetupPanelBtn}" Height="50"/>
+                        <Button Content="Recipe Save" Style="{StaticResource SetupPanelBtn}" Height="50"/>
+                    </StackPanel>
                 </Grid>
             </Grid>
         </StackPanel>
