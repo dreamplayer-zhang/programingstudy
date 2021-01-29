@@ -303,9 +303,19 @@
                     </TabItem.Header>
                     <Grid  Visibility="{Binding ElementName=viewAlarm, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                         <StackPanel>
-                            <TextBlock Text="Alaram 001 - Vision Module Disconnected" FontSize="12" Margin="1" Foreground="Red" Background="LightGray"/>
-                            <TextBlock Text="Alaram 002 - " FontSize="12" Margin="1" Background="LightGray"/>
-                            <TextBlock Text="Alaram 003 -" FontSize="12" Margin="1" Background="LightGray"/>
+                            <ListView x:Name="listviewAlarm">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn>
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock x:Name="textBlockALID" Text="{Binding p_sALValue}"/>
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
                         </StackPanel>
                     </Grid>
                 </TabItem>
