@@ -16,7 +16,7 @@ using Emgu.CV.Structure;
 
 namespace RootTools.Camera.BaslerPylon
 {
-    public class Camera_Basler : ObservableObject, RootTools.Camera.ICamera
+    public class Camera_Basler : ObservableObject, ICamera
     {
         public Dispatcher _dispatcher;
 
@@ -867,6 +867,11 @@ namespace RootTools.Camera.BaslerPylon
                     }));
                 }
             }
+        }
+
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
+        {
+            throw new NotImplementedException();
         }
     }
 }
