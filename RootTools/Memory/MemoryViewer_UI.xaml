@@ -38,15 +38,16 @@
             <Label Content="{Binding p_sGV}" ToolTip="GV or RGB" VerticalAlignment="Center" />
         </StackPanel>
         <ProgressBar Grid.Row="1" Value="{Binding p_nProgress}" Width="300" Height="35"
+                     Panel.ZIndex="1"
                 Visibility="{Binding Path=p_nProgress, Converter= {StaticResource ConverterVisibleProgresss}}" />
-        <Border Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Width="200" Height="35"
+        <Border Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Width="200" Height="35" Panel.ZIndex="1"
                 Visibility="{Binding Path=p_nProgress, Converter= {StaticResource ConverterVisibleProgresss}}">
             <TextBlock TextElement.Foreground="Black"
                        VerticalAlignment="Center"
                     Text="{Binding Path = p_nProgress, StringFormat={}{0:0}%}"
                     TextAlignment="Center" FontSize="30"></TextBlock>
         </Border>
-        <Canvas Grid.Row="1" x:Name="gridBitmapSource" Background="Gray"
+        <Canvas Grid.Row="1" x:Name="gridBitmapSource" Background="Gray" Panel.ZIndex="0"
                 SizeChanged="gridBitmapSource_SizeChanged"
                 PreviewMouseMove="gridBitmapSource_PreviewMouseMove"
                 PreviewMouseWheel="gridBitmapSource_PreviewMouseWheel"
