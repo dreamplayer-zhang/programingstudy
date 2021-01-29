@@ -58,7 +58,7 @@ namespace Root_AOP01_Inspection
             InitLoadport();
             InitRFID();
             m_mainVision = new MainVision("MainVision", m_engineer);
-            m_backsideVision = new BacksideVision("BacksideVision", m_engineer);
+            m_backsideVision = new BacksideVision("BacksideVision", m_engineer, m_mainVision);
             InitModule(m_mainVision);
             InitModule(m_backsideVision);
             IWTR iWTR = (IWTR)m_wtr;

@@ -29,28 +29,28 @@ namespace Root_AOP01_Inspection.Module
     public class MainVision : ModuleBase, IWTRChild
     {
         #region ToolBox
-        Axis m_axisRotate;
-        Axis m_axisZ;
-        Axis m_axisSideZ;
-        AxisXY m_axisXY;
+        public Axis m_axisRotate;
+        public Axis m_axisZ;
+        public Axis m_axisSideZ;
+        public AxisXY m_axisXY;
         public DIO_I m_diExistVision;
         public DIO_I m_diReticleTiltCheck;
         public DIO_I m_diReticleFrameCheck;
-        MemoryPool m_memoryPool;
-        MemoryGroup m_memoryGroup;
-        MemoryData m_memoryMain;
-        MemoryData m_memorySideLeft;
-        MemoryData m_memorySideRight;
-        MemoryData m_memorySideTop;
-        MemoryData m_memorySideBottom;
-        MemoryData m_memoryTDI45;
-        MemoryData m_memoryLADS;
+        public MemoryPool m_memoryPool;
+        public MemoryGroup m_memoryGroup;
+        public MemoryData m_memoryMain;
+        public MemoryData m_memorySideLeft;
+        public MemoryData m_memorySideRight;
+        public MemoryData m_memorySideTop;
+        public MemoryData m_memorySideBottom;
+        public MemoryData m_memoryTDI45;
+        public MemoryData m_memoryLADS;
 
-        LightSet m_lightSet;
-        Camera_Dalsa m_CamTDI90;
-        Camera_Dalsa m_CamTDI45;
-        Camera_Dalsa m_CamTDISide;
-        Camera_Basler m_CamLADS;
+        public LightSet m_lightSet;
+        public Camera_Dalsa m_CamTDI90;
+        public Camera_Dalsa m_CamTDI45;
+        public Camera_Dalsa m_CamTDISide;
+        public Camera_Basler m_CamLADS;
 
         class LADSInfo//한 줄에 대한 정보
         {

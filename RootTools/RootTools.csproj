@@ -245,6 +245,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera\BaslerPylon\ChannelGraph.xaml.cs">
+      <DependentUpon>ChannelGraph.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Camera\BaslerPylon\GraphWindowTest.xaml.cs">
+      <DependentUpon>GraphWindowTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Comm\Modbus.cs" />
     <Compile Include="Comm\Modbus_UI.xaml.cs">
       <DependentUpon>Modbus_UI.xaml</DependentUpon>
@@ -759,6 +765,14 @@
     <Page Include="Camera\BaslerPylon\Camera_Basler_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Camera\BaslerPylon\ChannelGraph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Camera\BaslerPylon\GraphWindowTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Camera\CameraSet_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
