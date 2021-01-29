@@ -152,6 +152,7 @@ namespace Root_AOP01_Inspection.Module
                             m_doLamp.Write(eLamp.Red);
                             break;
                         case EQ.eState.Run:
+                        case EQ.eState.Recovery:
                             m_doDoorLock_Use.Write(true);
                             //m_doBuzzer.Write(eBuzzer.Buzzer4);
                             m_doLamp.Write(eLamp.Green);
@@ -198,9 +199,9 @@ namespace Root_AOP01_Inspection.Module
                     if (m_bDoorAlarm)
                     {
                         m_alidELECPNLDoor.Run(m_diELECPNLDoor.p_bIn, "Please Check ELEC PNL Door Open");
-                        m_alidETCDoor.Run(m_diETCDoor.p_bIn, "Please Check ETC Door Open");
+                        m_alidETCDoor.Run(!m_diETCDoor.p_bIn, "Please Check ETC Door Open");
                         m_alidPCDoor.Run(m_diPCDoor.p_bIn, "Please Check PC Door Open");
-                        m_alidsideDoor.Run(m_disideDoor.p_bIn, "Please Check Side Door Open");
+                        m_alidsideDoor.Run(!m_disideDoor.p_bIn, "Please Check Side Door Open");
                     }
                     if (m_diInterlock_Key.p_bIn)
                     {

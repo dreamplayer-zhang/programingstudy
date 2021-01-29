@@ -102,12 +102,11 @@ namespace Root_Rinse_Loader
         DispatcherTimer m_timer = new DispatcherTimer();
         void InitTimer()
         {
-            m_timer.Interval = TimeSpan.FromSeconds(0.01);
+            m_timer.Interval = TimeSpan.FromMilliseconds(10);
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();
         }
 
-        int m_nBlink = 0;
         private void M_timer_Tick(object sender, EventArgs e)
         {
             buttonHome.IsEnabled = EQ.p_eState != EQ.eState.Run;
@@ -119,11 +118,10 @@ namespace Root_Rinse_Loader
             borderState.Background = (EQ.p_eState == EQ.eState.Ready || EQ.p_eState == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
             borderUnloadState.Background = (m_handler.m_rinse.p_eStateUnloader == EQ.eState.Ready || m_handler.m_rinse.p_eStateUnloader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
 
-            m_nBlink = (m_nBlink + 1) % 100;
-            bool bBlink = m_nBlink < 50;
-            gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
-            gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Run)) ? Brushes.Gold : Brushes.YellowGreen;
-            gridGreen.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.SeaGreen : Brushes.DarkGreen; 
+            RinseL rinse = m_handler.m_rinse; 
+            gridRed.Background = (rinse.m_bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
+            gridYellow.Background = (rinse.m_bBlink && (EQ.p_eState == EQ.eState.Run)) ? Brushes.Gold : Brushes.YellowGreen;
+            gridGreen.Background = (rinse.m_bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.SeaGreen : Brushes.DarkGreen; 
         }
         #endregion
 
