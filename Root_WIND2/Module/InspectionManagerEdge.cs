@@ -96,7 +96,7 @@ namespace Root_WIND2
 			Workplace tempPlace = new Workplace(-1, -1, 0, 0, 0, 0, workplaceBundle.Count);
 			tempPlace.SetSharedBuffer(this.SharedBufferInfoArray[0]);
 			workplaceBundle.Add(tempPlace);
-			
+						
 			// top
 			int memoryHeightTop = this.SharedBufferInfoArray[0].Height;
 			int roiWidthTop = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.ROIWidth;

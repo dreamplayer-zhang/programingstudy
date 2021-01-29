@@ -1,4 +1,5 @@
-﻿using RootTools.Database;
+﻿using Root_WIND2.Module;
+using RootTools.Database;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,14 @@ namespace Root_WIND2
 
 		protected override WorkplaceBundle CreateWorkplaceBundle()
 		{
+			EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
+			Run_GrabEBR grabEBR = (Run_GrabEBR)module.CloneModuleRun("GrabEBR");
+			GrabMode grabMode = grabEBR.GetGrabMode();
+
+			int cameraEmptyBufferHeight = 0;
+			if (grabMode.m_camera != null)
+				cameraEmptyBufferHeight = grabMode.m_camera.GetRoiSize().Y;
+
 			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
 			int notchY = recipe.GetItem<EBRParameter>().NotchY; // notch memory Y 좌표
 			int stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
@@ -54,15 +63,13 @@ namespace Root_WIND2
 			int width = recipe.GetItem<EBRParameter>().ROIWidth;
 			int height = recipe.GetItem<EBRParameter>().ROIHeight;
 
-			int index = 0;
-			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, index++));
-			
+			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, workplaceBundle.Count));			
 			for (int i = 0; i < workplaceCnt; i++)
 			{
 				int posY = (imageHeightPerDegree * i) - (height / 2);
 				if (posY <= 0)
 					posY = 0;
-				Workplace workplace = new Workplace(0, 0, 0, posY, width, height, index++);
+				Workplace workplace = new Workplace(0, 0, 0, posY + cameraEmptyBufferHeight, width, height, workplaceBundle.Count);
 				workplaceBundle.Add(workplace);
 			}
 
