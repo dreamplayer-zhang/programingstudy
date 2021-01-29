@@ -1,4 +1,5 @@
 ﻿using Root_VEGA_D.Engineer;
+using System.ComponentModel;
 using System.IO;
 using System.Windows;
 
@@ -21,7 +22,7 @@ namespace Root_VEGA_D
             Init();
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             ThreadStop();
         }

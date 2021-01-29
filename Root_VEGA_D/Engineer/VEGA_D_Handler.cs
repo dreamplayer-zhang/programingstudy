@@ -74,7 +74,7 @@ namespace Root_VEGA_D.Engineer
             RND,
             Cymechs,
         }
-        eWTR m_eWTR = eWTR.RND;
+        eWTR m_eWTR = eWTR.Cymechs;
         ModuleBase m_wtr;
         void InitWTR()
         {
@@ -123,7 +123,7 @@ namespace Root_VEGA_D.Engineer
         public void RunTreeLoadport(Tree tree)
         {
             m_lLoadport = tree.Set(m_lLoadport, m_lLoadport, "Count", "Loadport Count");
-            while (m_aLoadportType.Count < m_lLoadport) m_aLoadportType.Add(eLoadport.RND);
+            while (m_aLoadportType.Count < m_lLoadport) m_aLoadportType.Add(eLoadport.Cymechs);
             Tree treeType = tree.GetTree("Type");
             for (int n = 0; n < m_lLoadport; n++)
             {
@@ -139,7 +139,7 @@ namespace Root_VEGA_D.Engineer
             ATI,
             RND
         }
-        eAligner m_eAligner = eAligner.ATI;
+        eAligner m_eAligner = eAligner.None;
         void InitAligner()
         {
             ModuleBase module = null;
