@@ -133,7 +133,9 @@ namespace Root_Rinse_Unloader.Module
         {
             m_bPickerDown = bDown;
             m_dioPickerDown.Write(bDown);
-            return m_dioPickerDown.WaitDone();
+            string sRun = m_dioPickerDown.WaitDone();
+            m_alidPickerDown.p_bSet = (sRun != "OK");
+            return sRun;
         }
         #endregion
 

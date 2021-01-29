@@ -245,7 +245,7 @@ namespace Root_Rinse_Unloader.Module
                 }
             }
             string sRun = RunPusher();
-            m_alidArrived.p_bSet = (sRun != "OK"); 
+            m_alidPusher.p_bSet = (sRun != "OK"); 
             return sRun; 
         }
 

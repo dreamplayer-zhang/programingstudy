@@ -291,7 +291,9 @@
                                             Margin="5,0"
                                             FontSize="30"
                                             FontWeight="Bold"
-                                            FontFamily="Arial"/>    
+                                            FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>    
                                     </Border>
                                     
                                 </GroupBox>

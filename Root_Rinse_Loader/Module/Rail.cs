@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -15,10 +16,10 @@ namespace Root_Rinse_Loader.Module
         {
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Rotate");
             p_sInfo = m_toolBox.Get(ref m_axisWidth, this, "Width");
-            foreach (Line line in m_aLine) line.GetTools(m_toolBox); 
-            if (bInit) 
+            foreach (Line line in m_aLine) line.GetTools(m_toolBox);
+            if (bInit)
             {
-                InitPosWidth(); 
+                InitPosWidth();
             }
         }
         #endregion
