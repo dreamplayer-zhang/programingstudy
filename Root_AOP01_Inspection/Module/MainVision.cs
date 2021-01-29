@@ -1755,7 +1755,7 @@ namespace Root_AOP01_Inspection.Module
                     for (int y = 0; y < nY; y++)
                     {
                         Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 3);
-                        MCvScalar color = HeatColor(ladsinfos[x].m_Heightinfo[y], nMin, nMax);
+                        MCvScalar color = HeatColor(ladsinfos[x].m_Heightinfo[y], nMin-25, nMax+25);
                         ColorImg.SetTo(color);
 
                         if (y == 0)
@@ -1772,6 +1772,9 @@ namespace Root_AOP01_Inspection.Module
 
                 }
                 CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
+
+                m_module.p_dPellicleExpandingMax = nMax;
+                m_module.p_dPellicleExpandingMin = nMin;
             }
 
             MCvScalar HeatColor(double dValue, double dMin, double dMax)
@@ -1907,7 +1910,9 @@ namespace Root_AOP01_Inspection.Module
                     if (blob.BoundingBox.Width * 5/*TDI90 Resolution = 5*/ > m_dNGSpecScratchLength_mm * nMMPerUM || blob.BoundingBox.Height * 5/*TDI90 Resolution = 5*/ > m_dNGSpecScratchLength_mm * nMMPerUM)
                     {
                         m_module.p_bBarcodePass = false;
+                        break;
                     }
+                    else m_module.p_bBarcodePass = true;
                 }
 
                 return "OK";
@@ -2674,14 +2679,15 @@ namespace Root_AOP01_Inspection.Module
                 if (m_dNGSpecDistance_um < (dResultDistance * moduleRunGrab.m_dResY_um))
                 {
                     m_module.p_bPatternShiftPass = false;
-                    return "Fail";
+                    //return "Fail";
                 }
+                else m_module.p_bPatternShiftPass = true;
                 if (m_dNGSpecDegree < m_module.p_dPatternShiftAngle)
                 {
                     m_module.p_bPatternShiftPass = false;
-                    return "Fail";
+                    //return "Fail";
                 }
-                m_module.p_bPatternShiftPass = true;
+                else m_module.p_bPatternShiftPass = true;
                 return "OK";
             }
 
@@ -3303,7 +3309,12 @@ namespace Root_AOP01_Inspection.Module
 
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
                 if (m_dNGSpecDistance_um < (dResultDistance * moduleRunGrab.m_dResY_um)) m_module.p_bPellicleShiftPass = false;
+                else m_module.p_bPellicleShiftPass = true;
                 if (m_dNGSpecDegree < m_module.p_dPatternShiftAngle) m_module.p_bPellicleShiftPass = false;
+                else m_module.p_bPellicleShiftPass = true;
+
+                m_module.p_dPellicleShiftDistance = dResultDistance;
+                m_module.p_dPellicleShiftAngle = dResultAngle;
                 
                 return "OK";
             }
