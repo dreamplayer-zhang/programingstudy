@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -20,8 +21,17 @@ namespace Root_Rinse_Unloader.Module
             foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox, bInit);
             if (bInit)
             {
+                InitALID();
                 InitPos();
             }
+        }
+        #endregion
+
+        #region GAF
+        ALID m_alidPickerDown;
+        void InitALID()
+        {
+            m_alidPickerDown = m_gaf.GetALID(this, "PickerDown", "Picker Up & Down Error");
         }
         #endregion
 
@@ -97,7 +107,7 @@ namespace Root_Rinse_Unloader.Module
                             if (m_aPicker[n].m_dioVacuum.p_bIn) nVac++; 
                         }
                     }
-                    if (sw.ElapsedMilliseconds > msVac) return m_bPickersetMode ? "OK" : "Run Vacuum Timeout"; 
+                    if (sw.ElapsedMilliseconds > msVac) return EQ.p_bPickerSet ? "OK" : "Run Vacuum Timeout"; 
                 }
             }
             else
@@ -193,7 +203,7 @@ namespace Root_Rinse_Unloader.Module
 
         public string RunRun()
         {
-            if (m_bPickersetMode) return "OK";
+            if (EQ.p_bPickerSet) return "OK";
             return p_bVacuum ? RunUnload() : RunLoad();
         }
         #endregion
@@ -221,10 +231,9 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region PickerSet
-        public bool m_bPickersetMode = false;
         string RunPickerSet()
         {
-            m_bPickersetMode = true; 
+            EQ.p_bPickerSet = true; 
             try
             {
                 if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
@@ -247,7 +256,7 @@ namespace Root_Rinse_Unloader.Module
                 RunVacuum(false);
                 RunPickerDown(false);
                 MoveLoader(ePos.Roller);
-                m_bPickersetMode = false;
+                EQ.p_bPickerSet = false;
             }
         }
 

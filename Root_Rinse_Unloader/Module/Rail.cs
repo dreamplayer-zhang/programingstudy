@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -22,9 +23,20 @@ namespace Root_Rinse_Unloader.Module
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit)
             {
+                InitALID(); 
                 m_dioPusherDown.Write(true); 
                 InitPosWidth();
             }
+        }
+        #endregion
+
+        #region GAF
+        ALID m_alidArrived;
+        ALID m_alidPusher; 
+        void InitALID()
+        {
+            m_alidArrived = m_gaf.GetALID(this, "Arrived", "Arrived Sensor Timeout");
+            m_alidPusher = m_gaf.GetALID(this, "Pusher", "Pusher Error");
         }
         #endregion
 
@@ -226,9 +238,15 @@ namespace Root_Rinse_Unloader.Module
             Thread.Sleep((int)(1000 * secArrive));
             foreach (Line line in m_aLine)
             {
-                if (line.IsArriveDone() == false) return "Arrive Done Error"; 
+                if (line.IsArriveDone() == false)
+                {
+                    m_alidArrived.p_bSet = true; 
+                    return "Arrive Done Error";
+                }
             }
-            return RunPusher(); 
+            string sRun = RunPusher();
+            m_alidArrived.p_bSet = (sRun != "OK"); 
+            return sRun; 
         }
 
         bool IsExist()

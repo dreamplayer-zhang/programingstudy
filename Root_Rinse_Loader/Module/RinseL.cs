@@ -111,15 +111,20 @@ namespace Root_Rinse_Loader.Module
 
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
-            if (eEQ == _EQ.eEQ.State)
+            switch (eEQ)
             {
-                AddProtocol(p_id, eCmd.EQLeState, value);
-                switch ((EQ.eState)value)
-                {
-                    case EQ.eState.Error: RunBuzzer(eBuzzer.Error); break;
-                    case EQ.eState.Home: RunBuzzer(eBuzzer.Home); break;
-                    case EQ.eState.Ready: RunBuzzerOff(); break; 
-                }
+                case _EQ.eEQ.State:
+                    AddProtocol(p_id, eCmd.EQLeState, value);
+                    switch ((EQ.eState)value)
+                    {
+                        case EQ.eState.Error: RunBuzzer(eBuzzer.Error); break;
+                        case EQ.eState.Home: RunBuzzer(eBuzzer.Home); break;
+                        case EQ.eState.Ready: RunBuzzerOff(); break;
+                    }
+                    break;
+                case _EQ.eEQ.PickerSet:
+                    AddProtocol(p_id, eCmd.PickerSet, value);
+                    break; 
             }
         }
         #endregion
@@ -262,6 +267,7 @@ namespace Root_Rinse_Loader.Module
             SetWidth,
             EQLeState,
             EQUeState,
+            PickerSet,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
@@ -348,8 +354,8 @@ namespace Root_Rinse_Loader.Module
                     switch (eCmd)
                     {
                         case eCmd.EQUeState:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
                             p_eStateUnloader = GetEQeState(asRead[2]);
-                            AddProtocol(asRead[0], eCmd, asRead[2]); 
                             break; 
                     }
                 }
