@@ -33,11 +33,9 @@ namespace Root_WIND2
 		{
 			this.recipe = _recipe;
 			this.sharedBufferInfo = _bufferInfo;
-
 		}
 
 		#region [Overrides]
-
 		protected override void Initialize()
 		{
 			CreateWorkManager(WORK_TYPE.INSPECTION, 5);
@@ -53,11 +51,12 @@ namespace Root_WIND2
 			int imageHeight = 270000;
 			int imageHeightPerDegree = imageHeight / 360; // 1도 당 Image Height
 
-			int width = recipe.GetItem<EBRParameter>().RoiWidth;
-			int height = recipe.GetItem<EBRParameter>().RoiHeight;
+			int width = recipe.GetItem<EBRParameter>().ROIWidth;
+			int height = recipe.GetItem<EBRParameter>().ROIHeight;
 
 			int index = 0;
 			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, index++));
+			
 			for (int i = 0; i < workplaceCnt; i++)
 			{
 				int posY = (imageHeightPerDegree * i) - (height / 2);
@@ -67,14 +66,38 @@ namespace Root_WIND2
 				workplaceBundle.Add(workplace);
 			}
 
+			// TO-DO test
+			/*
+			for (int i = 0; i < workplaceCnt; i++)
+			{
+				int posY = (imageHeightPerDegree * i);
+				if (posY - (height / 2) <= 0)
+				{
+					posY = 0;
+				}
+				if (posY + (height / 2) > imageHeight)
+				{
+					posY = 0;
+				}
+
+				Workplace workplace = new Workplace(0, 0, 0, posY, width, height, index++);
+				workplaceBundle.Add(workplace);
+			}
+			*/
+
+			workplaceBundle.SetSharedBuffer(this.sharedBufferInfo);
 			return workplaceBundle;
 		}
 
 		protected override WorkBundle CreateWorkBundle()
 		{
+			List<ParameterBase> paramList = recipe.ParameterItemList;
 			WorkBundle workBundle = new WorkBundle();
 			EBR ebr = new EBR();
 			ProcessMeasurement processMeasurement = new ProcessMeasurement();
+
+			foreach (ParameterBase param in paramList)
+				ebr.SetParameter(param);
 
 			workBundle.Add(ebr);
 			workBundle.Add(processMeasurement);

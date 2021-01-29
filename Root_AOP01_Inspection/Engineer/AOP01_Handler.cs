@@ -1,4 +1,5 @@
-﻿using Root_AOP01_Inspection.Module;
+﻿using Root_AOP01_Inspection.Engineer;
+using Root_AOP01_Inspection.Module;
 using Root_EFEM;
 using Root_EFEM.Module;
 using RootTools;
@@ -14,7 +15,7 @@ using System.Windows.Media;
 
 namespace Root_AOP01_Inspection
 {
-    public class AOP01_Handler : IHandler
+    public class AOP01_Handler : ObservableObject,IHandler
     {
         public bool bInit=false;
         #region UI Binding
@@ -29,14 +30,24 @@ namespace Root_AOP01_Inspection
             get { return Brushes.BurlyWood; }
             set { }
         }
+        public FFU p_FFU
+        {
+            get { return m_FFU; }
+            set
+            {
+                SetProperty(ref m_FFU, value);
+            }
+        }
         #endregion 
 
         #region Module
         public ModuleList p_moduleList { get; set; }
         public AOP01 m_aop01; 
         public AOP01_Recipe m_recipe;
-        public EFEM_Process m_process;
+        public AOP01_Process m_process;
         public MainVision m_mainVision;
+        public BacksideVision m_backsideVision;
+        public FFU m_FFU;
 
         void InitModule()
         {
@@ -45,18 +56,23 @@ namespace Root_AOP01_Inspection
             InitModule(m_aop01); 
             InitWTR();
             InitLoadport();
+            InitRFID();
             m_mainVision = new MainVision("MainVision", m_engineer);
+            m_backsideVision = new BacksideVision("BacksideVision", m_engineer, m_mainVision);
             InitModule(m_mainVision);
-
+            InitModule(m_backsideVision);
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_mainVision);
+            iWTR.AddChild(m_backsideVision);
+            m_FFU = new FFU("FFU", m_engineer);
+            InitModule(m_FFU);
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
             iWTR.ReadInfoReticle_Registry();
 
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR);
+            m_process = new AOP01_Process("Process", m_engineer, iWTR);
         }
 
         void InitModule(ModuleBase module)
@@ -91,7 +107,7 @@ namespace Root_AOP01_Inspection
             switch (m_eWTR)
             {
                 case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer); break;
-                default: m_wtr = new WTRCleanUnit("WTR&CleanUnit", m_engineer); break;
+                default: m_wtr = new RTRCleanUnit("RTR", m_engineer); break;
             }
             InitModule(m_wtr);
         }
@@ -137,6 +153,22 @@ namespace Root_AOP01_Inspection
             }
         }
 
+        #region Module RFID
+        public List<IRFID> m_aRFID = new List<IRFID>();
+        void InitRFID()
+        {
+            ModuleBase module;
+            char cID = 'A';
+            for (int n = 0; n < m_lLoadport; n++, cID++)
+            {
+                string sID = "Rfid" + cID;
+                module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]);
+                InitModule(module);
+                m_aRFID.Add((IRFID)module);
+            }
+        }
+        #endregion
+
         public void RunTreeLoadport(Tree tree)
         {
             m_lLoadport = tree.Set(m_lLoadport, m_lLoadport, "Count", "Loadport Count");
@@ -160,7 +192,7 @@ namespace Root_AOP01_Inspection
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
-            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision);
+            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision, m_backsideVision, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1]);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             if (sInfo == "OK") m_bIsPossible_Recovery = true;
             return sInfo;
@@ -222,6 +254,7 @@ namespace Root_AOP01_Inspection
 
         #region Calc Sequence
         public int m_nRnR = 1;
+        public int p_nRnRCount = 0;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
@@ -244,7 +277,7 @@ namespace Root_AOP01_Inspection
 
         void CalcDockingUndocking()
         {
-            List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
+            List<AOP01_Process.Sequence> aSequence = new List<AOP01_Process.Sequence>();
             while (m_process.m_qSequence.Count > 0) aSequence.Add(m_process.m_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
             foreach (ILoadport loadport in m_aLoadport)
@@ -253,7 +286,7 @@ namespace Root_AOP01_Inspection
             }
             while (aSequence.Count > 0)
             {
-                EFEM_Process.Sequence sequence = aSequence[0];
+                AOP01_Process.Sequence sequence = aSequence[0];
                 m_process.m_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
@@ -261,7 +294,7 @@ namespace Root_AOP01_Inspection
                     if (CalcUnload(aDock[n], aSequence))
                     {
                         ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
-                        EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
+                        AOP01_Process.Sequence sequenceUndock = new AOP01_Process.Sequence(runUndocking, sequence.m_infoWafer);
                         m_process.m_qSequence.Enqueue(sequenceUndock);
                         aDock.RemoveAt(n);
                     }
@@ -270,14 +303,14 @@ namespace Root_AOP01_Inspection
             m_process.RunTree(Tree.eMode.Init);
         }
 
-        bool CalcDocking(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcDocking(ILoadport loadport, List<AOP01_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (AOP01_Process.Sequence sequence in aSequence)
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule)
                 {
                     ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
-                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    AOP01_Process.Sequence sequenceDock = new AOP01_Process.Sequence(runDocking, sequence.m_infoWafer);
                     m_process.m_qSequence.Enqueue(sequenceDock);
                     return true;
                 }
@@ -285,9 +318,9 @@ namespace Root_AOP01_Inspection
             return false;
         }
 
-        bool CalcUnload(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcUnload(ILoadport loadport, List<AOP01_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (AOP01_Process.Sequence sequence in aSequence)
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) return false;
             }
@@ -339,7 +372,9 @@ namespace Root_AOP01_Inspection
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
+                    case EQ.eState.Ready: break;  //LYJ add 210128
                     case EQ.eState.Run:
+                    case EQ.eState.Recovery:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             //CheckLoad();
@@ -347,9 +382,11 @@ namespace Root_AOP01_Inspection
                             //CheckUnload();
                             if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
+                                while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
                                 m_nRnR--;
+                                p_nRnRCount++;
                                 EQ.p_eState = EQ.eState.Run;
                             }
                         }

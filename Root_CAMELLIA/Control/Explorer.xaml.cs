@@ -51,7 +51,7 @@ namespace Root_CAMELLIA
                     GetSubDirectories(item);
                 }
 
-                catch (Exception except)
+                catch (Exception)
                 {
                     // MessageBox.Show(except.Message);   // 접근 거부 폴더로 인해 주석처리
                 }
@@ -93,7 +93,7 @@ namespace Root_CAMELLIA
                 }
             }
 
-            catch (Exception except)
+            catch (Exception)
             {
                 // MessageBox.Show(except.Message);   // 접근 거부 폴더로 인해 주석처리
             }

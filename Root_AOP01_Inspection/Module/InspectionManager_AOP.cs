@@ -26,7 +26,7 @@ namespace Root_AOP01_Inspection.Module
 
 		#region [Member Variables]
 		WorkBundle workBundle;
-		WorkplaceBundle workplaceBundle;
+		WorkplaceBundle workplaceBundle = null;
 
 		#endregion
 

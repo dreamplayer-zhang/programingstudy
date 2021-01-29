@@ -22,6 +22,7 @@ namespace Root_Rinse_Unloader.Module
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit)
             {
+                m_dioPusherDown.Write(true); 
                 InitPosWidth();
             }
         }
@@ -99,8 +100,8 @@ namespace Root_Rinse_Unloader.Module
         Axis m_axisWidth;
         public enum ePos
         {
-            W70,
-            W100
+            W75,
+            W85
         }
         void InitPosWidth()
         {
@@ -109,9 +110,9 @@ namespace Root_Rinse_Unloader.Module
 
         public string RunMoveWidth(double fWidth)
         {
-            double fW70 = m_axisWidth.GetPosValue(ePos.W70);
-            double fW100 = m_axisWidth.GetPosValue(ePos.W100);
-            double dPos = (fW100 - fW70) * (fWidth - 70) / 30;
+            double fW75 = m_axisWidth.GetPosValue(ePos.W75);
+            double fW85 = m_axisWidth.GetPosValue(ePos.W85);
+            double dPos = (fW85 - fW75) * (fWidth - 75) / 10;
             m_axisWidth.StartMove(dPos);
             return m_axisWidth.WaitReady();
         }
@@ -123,7 +124,8 @@ namespace Root_Rinse_Unloader.Module
 
         public string RunRotate(bool bRotate)
         {
-            m_axisRotate.Jog(m_fJogScale);
+            if (bRotate) m_axisRotate.Jog(m_fJogScale);
+            else m_axisRotate.StopAxis(); 
             return "OK";
         }
 
@@ -291,9 +293,11 @@ namespace Root_Rinse_Unloader.Module
             {
                 case RinseU.eRunMode.Magazine:
                     RunMoveWidth(m_rinse.p_widthStrip);
+                    RunPusherDown(false);
                     RunRotate(true);
                     break;
                 case RinseU.eRunMode.Stack:
+                    RunPusherDown(true); 
                     RunRotate(false);
                     break;
             }

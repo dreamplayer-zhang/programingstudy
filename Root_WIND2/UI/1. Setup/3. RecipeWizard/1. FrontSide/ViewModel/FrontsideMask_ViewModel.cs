@@ -418,6 +418,8 @@ namespace Root_WIND2
         #endregion
 
         #region Draw Method
+
+        #region Line
         private void StartDrawLine(Brush color, double thickness, double opacity, CPoint startMemPt, CPoint startCanvasPt)
         {
             CurrentShape = new TLine(color, thickness, opacity);
@@ -446,7 +448,9 @@ namespace Root_WIND2
             }
             base.SetLayerSource();
         }
+        #endregion
 
+        #region Rect
         private void StartDrawRect(Brush color, double thickness, double opacity, CPoint startMemPt, CPoint startCanvasPt)
         {
             CurrentShape = new TRect(color, thickness, opacity);
@@ -519,7 +523,9 @@ namespace Root_WIND2
 
             rect.CanvasRect.ContextMenu = cMenu;
         }
+        #endregion
 
+        #region Polygon
         private void StartDrawPolygon(Brush color, double thickness, double opacity, CPoint startMemPt, CPoint startCanvasPt)
         {
             CurrentShape = new TPolygon(color, thickness, opacity);
@@ -563,7 +569,9 @@ namespace Root_WIND2
 
             CreateModifyTool_Polygon(polygon);
         }
+        #endregion
 
+        #region Crop
         private void StartDrawCropTool(Brush color, double thickness, double opacity, CPoint startMemPt, CPoint startCanvasPt)
         {
             CropShape = new TCropTool(color, thickness, opacity);
@@ -625,24 +633,13 @@ namespace Root_WIND2
             width = crop.CanvasRect.Width;
             height = crop.CanvasRect.Height;
 
-            CRect nowRect = new CRect(crop.MemoryRect.Left-BoxOffset.X, crop.MemoryRect.Top - BoxOffset.Y, crop.MemoryRect.Right - BoxOffset.X, crop.MemoryRect.Bottom- BoxOffset.Y);
+            CRect nowRect = new CRect(crop.MemoryRect.Left-BoxOffset.X, crop.MemoryRect.Top - BoxOffset.Y, crop.MemoryRect.Right+1 - BoxOffset.X, crop.MemoryRect.Bottom+1- BoxOffset.Y);
             ImageData rectImageData = new ImageData(nowRect.Width, nowRect.Height, 4);
             rectImageData.SetData(p_ROILayer.GetPtr(), nowRect, (int)p_ROILayer.p_Stride, 4);
+            
 
-            for (int i = 0; i < rectImageData.m_aBuf.Length / 4; i++)
-            {
-               // rectImageData.m_aBuf[3 + (4 * i)] = 255;
-            }
-            ////CropImage 
-            //Grid CropArea = new Grid();
-            //Canvas.SetLeft(CropArea, left);
-            //Canvas.SetTop(CropArea, top);
-            //CropArea.Width = width;
-            //CropArea.Height = height;
-
-            //CropImage UI
             Image CropImage = new Image();
-            CropImage.Opacity = 0.7;            
+            CropImage.Opacity = 1;            
             CropImage.Source = rectImageData.GetBitMapSource(4);
             Canvas.SetLeft(CropImage, left);
             Canvas.SetTop(CropImage, top);
@@ -655,6 +652,7 @@ namespace Root_WIND2
             crop.CropImageData = rectImageData;
             p_UIElements.Add(CropImage);
         }
+        #endregion
 
         private void MenuAdd_Click(object sender, RoutedEventArgs e)
         {
@@ -707,15 +705,24 @@ namespace Root_WIND2
             ModifyPointBuffer = currentMemPt - BoxOffset;
             eToolProcess = ToolProcess.Modifying;
             if (CropShape != null)
+            {
                 if (m_KeyEvent == null)
+                {
+                    DrawRectBitmap((CropShape as TCropTool).MemoryRect, 0, 0, 0, 0, BoxOffset);
+                    SetLayerSource();
                     return;
+                }
                 if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
                 {
                 }
                 else
                 {
+                    CRect rect = (CropShape as TCropTool).MemoryRect;
+                    CRect cropRect = new CRect(rect.Left, rect.Top, rect.Right + 1, rect.Bottom + 1);
                     DrawRectBitmap((CropShape as TCropTool).MemoryRect, 0, 0, 0, 0, BoxOffset);
                 }
+
+            }
             SetLayerSource();
         }
         private void ModifyingShape(CPoint currentMemPt)
@@ -755,12 +762,13 @@ namespace Root_WIND2
                     {
                         case TCropTool:
                             TCropTool crop = shape as TCropTool;
+                            CRect selectRect = new CRect(crop.MemoryRect.Left, crop.MemoryRect.Top, crop.MemoryRect.Right + 1, crop.MemoryRect.Bottom + 1);
                             byte r = p_SelectedROI.p_Color.R;
                             byte g = p_SelectedROI.p_Color.G;
                             byte b = p_SelectedROI.p_Color.B;
                             byte a = p_SelectedROI.p_Color.A;
                             //현재 memoryRect의 시작주소를 p_roilayer에서 가져와서 cropshape의 imagedata만큼 복사?
-                            CropRectSetData(crop.CropImageData, crop.MemoryRect, BoxOffset);
+                            CropRectSetData(crop.CropImageData, selectRect, BoxOffset);
                             //p_UIElements.Clear();
                             SetLayerSource();
                             break;
@@ -973,6 +981,7 @@ namespace Root_WIND2
             p_UIElements.Add(polygon.ModifyTool);
         }
 
+      
         private void LineModifyPointLeft_MouseEnter(object sender, MouseEventArgs e)
         {
             Ellipse ModifyPoint = sender as Ellipse;

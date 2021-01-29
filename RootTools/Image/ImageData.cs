@@ -174,12 +174,17 @@ namespace RootTools
 
 		public unsafe void SetData(IntPtr ptr, CRect rect, int stride, int nByte = 1)
 		{
+			for (int i = 0; i < rect.Height; i++)
+			{
+				Marshal.Copy((IntPtr)((long)ptr +  rect.Left * nByte + ((long)i + (long)rect.Top) * stride), m_aBuf, i * rect.Width*nByte, rect.Width * nByte);
+			}
+			var asdf = m_aBuf;
             // 병렬처리
-            Parallel.For(0, rect.Height - 1, (i) =>
-                 {
-                     Marshal.Copy((IntPtr)((long)ptr + rect.Left * nByte + ((long)i + (long)rect.Top) * stride * nByte), m_aBuf, i * rect.Width * nByte, rect.Width * nByte);
-                 }
-            );
+            //Parallel.For(rect.Height-1, 0, (i) =>
+            //     {
+            //         Marshal.Copy((In tPtr)((long)ptr + rect.Left * nByte + ((long)i + (long)rect.Top) * stride * nByte), m_aBuf, i * rect.Width * nByte, rect.Width * nByte);
+            //     }
+            //);
         }
 
 		public unsafe void SetData(ImageData imgData, CRect rect, int stride, int nByte = 1)
@@ -188,7 +193,10 @@ namespace RootTools
 			{
 				IntPtr ptr = imgData.GetPtr();
 				for (int i = rect.Height - 1; i >= 0; i--)
+				{
+					
 					Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * stride), m_aBuf, i * rect.Width, rect.Width);
+				}
 			}
 
 			else if (nByte == 3)
@@ -650,22 +658,24 @@ namespace RootTools
 
 		void Worker_MemoryClear_DoWork(object sender, DoWorkEventArgs e)
 		{
-			byte[] pBuf = new byte[p_Size.X];
+			CPoint sz = p_Size;
+			int np = sz.Y / 100;
+			byte[] pBuf = new byte[sz.X];
 			int nProgress = 0;
-			//for (int y = 0; y < p_Size.Y; y++)
-			//{
-			Parallel.For(0, p_Size.Y, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (y) =>
+		
+			Parallel.For(0, sz.Y, new ParallelOptions { MaxDegreeOfParallelism = 20 }, (y) =>
 			{
 				if (Worker_MemoryClear.CancellationPending)
 					return;
-				Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + (long)p_Size.X * y), p_Size.X);
+				Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + (long)sz.X * y), sz.X);
 				if (p_nByte == 3)
 				{
-					Marshal.Copy(pBuf, 0, (IntPtr)((long)m_MemData.GetPtr(1) + (long)p_Size.X * y), p_Size.X);
-					Marshal.Copy(pBuf, 0, (IntPtr)((long)m_MemData.GetPtr(2) + (long)p_Size.X * y), p_Size.X);
+					Marshal.Copy(pBuf, 0, (IntPtr)((long)m_MemData.GetPtr(1) + (long)sz.X * y), sz.X);
+					Marshal.Copy(pBuf, 0, (IntPtr)((long)m_MemData.GetPtr(2) + (long)sz.X * y), sz.X);
 				}
 				nProgress++;
-				p_nProgress = Convert.ToInt32(((double)nProgress / p_Size.Y) * 100);
+				if(nProgress % np == 0)
+				p_nProgress = Convert.ToInt32(((double)nProgress / sz.Y) * 100); ; 
 			});
 		}
 
@@ -884,8 +894,8 @@ namespace RootTools
             }
 
 			//
-			int a = 0;
-			UInt32 b = 0;
+			//int a = 0;
+			//UInt32 b = 0;
 			BinaryReader br = new BinaryReader(fss);
 			ushort bfType = br.ReadUInt16();  //2 4 2 2 4 4 4 4 2  2 4 4 4 4 4 4 256*4 1024  54 
 			uint bfSize = br.ReadUInt32();

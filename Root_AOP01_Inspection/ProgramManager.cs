@@ -48,7 +48,7 @@ namespace Root_AOP01_Inspection
 		#endregion
 
 		#region [Members]
-		private IDialogService dialogService;
+		private new IDialogService dialogService;
 
 		private AOP01_Engineer engineer = new AOP01_Engineer();
 		private MemoryTool memoryTool;
@@ -105,7 +105,7 @@ namespace Root_AOP01_Inspection
 					}
 				}
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				IsInitilized = false;
 				result = false;

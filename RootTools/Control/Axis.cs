@@ -426,6 +426,7 @@ namespace RootTools.Control
             while (p_eState == eState.Move || p_eState == eState.Home)
             {
                 Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop"; 
                 //if (m_swMove.ElapsedMilliseconds > m_msMoveTime)
                 //{
                 //    p_eState = eState.Init;
@@ -519,12 +520,12 @@ namespace RootTools.Control
             string sStartHome = ResetAlarm();
             ServoOn(true);
             Thread.Sleep(10); 
-            if (p_bSeroOn == false) return p_id + " ServoOn Error";
+            if (p_bServoOn == false) return p_id + " ServoOn Error";
             return "OK";
         }
 
         bool _bServoOn = false; 
-        public bool p_bSeroOn 
+        public bool p_bServoOn 
         { 
             get { return _bServoOn; }
             set

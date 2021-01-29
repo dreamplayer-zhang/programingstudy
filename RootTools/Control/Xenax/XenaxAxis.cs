@@ -1,6 +1,9 @@
-﻿using RootTools.Trees;
+﻿using RootTools.Comm;
+using RootTools.Trees;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Windows.Controls;
 
@@ -28,16 +31,252 @@ namespace RootTools.Control.Xenax
             }
         }
 
-        public int m_nAxis = -1;
         bool m_bAbsoluteEncoder = false;
         void RunTreeSettingProperty(Tree tree)
         {
-            int nAxis = m_nAxis;
-            m_nAxis = tree.Set(m_nAxis, m_nAxis, "Axis Number", "Xenax Axis Number");
             m_sUnit = tree.Set(m_sUnit, m_sUnit, "Unit", "Xenax Axis Unit");
             double pulseUnit = tree.Set(p_pulsepUnit, p_pulsepUnit, "Pulse/Unit", "Pulse / Unit");
             if (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead) p_pulsepUnit = pulseUnit;
             m_bAbsoluteEncoder = tree.Set(m_bAbsoluteEncoder, m_bAbsoluteEncoder, "Absolute Encoder", "Absolute Encoder");
+        }
+        #endregion
+
+        #region Serial Comm
+        public enum eComm
+        {
+            Disable,
+            RS232,
+            TCPIP,
+        }
+        eComm _eComm = eComm.Disable; 
+        public eComm p_eComm
+        {
+            get { return _eComm; }
+            set
+            {
+                if (_eComm == value) return;
+                _eComm = value;
+                OnPropertyChanged();
+                InitComm(); 
+            }
+        }
+
+        UserControl _commUI = null;
+        public UserControl p_commUI
+        {
+            get { return _commUI; }
+            set
+            {
+                _commUI = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        IComm m_comm = null;
+        void InitComm()
+        {
+            switch (p_eComm)
+            {
+                case eComm.RS232:
+                    RS232 rs232 = new RS232(p_id + ".RS232", p_log);
+                    m_comm = rs232;
+                    p_commUI = rs232.p_ui;
+                    rs232.OnReceive += Rs232_OnReceive;
+                    break;
+                case eComm.TCPIP:
+                    TCPIPClient tcpip = new TCPIPClient(p_id + ".TCPIP", p_log);
+                    m_comm = tcpip;
+                    p_commUI = tcpip.p_ui; 
+                    tcpip.EventReciveData += Tcpip_EventReciveData;
+                    break;
+                default: 
+                    m_comm = null;
+                    p_commUI = null; 
+                    break; 
+            }
+        }
+
+        private void Rs232_OnReceive(string sRead)
+        {
+            p_sInfo = OnReceive(sRead); 
+        }
+
+        private void Tcpip_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        {
+            string sRead = Encoding.Default.GetString(aBuf, 0, nSize);
+            p_sInfo = OnReceive(sRead);
+        }
+
+        void RunTreeSettingComm(Tree tree)
+        {
+            p_eComm = (eComm)tree.Set(p_eComm, p_eComm, "Type", "Communication Type");
+        }
+        #endregion
+
+        #region Protocol
+        public enum eCmd
+        {
+            None,
+            HomeDir,
+            Home,
+            Move,
+            JogPlus,
+            JogMius,
+            JogStop,
+            GetPos,
+            GetState,
+            SetSpeed,
+            ServoOn,
+            ServoOff,
+            Event,
+            GetErrorCode,
+            GetErrorString,
+            SoftLimitLeft,
+            SoftLimitRight,
+        }
+        public Dictionary<eCmd, string> m_aCmd = new Dictionary<eCmd, string>();
+        void InitCmd()
+        {
+            m_aCmd.Add(eCmd.None, "None");
+            m_aCmd.Add(eCmd.HomeDir, "DRHR"); 
+            m_aCmd.Add(eCmd.Home, "REF"); 
+            m_aCmd.Add(eCmd.Move, "G"); 
+            m_aCmd.Add(eCmd.JogPlus, "JP");
+            m_aCmd.Add(eCmd.JogMius, "JM");
+            m_aCmd.Add(eCmd.JogStop, "SM");
+            m_aCmd.Add(eCmd.GetPos, "TP");
+            m_aCmd.Add(eCmd.GetState, "TS");
+            m_aCmd.Add(eCmd.SetSpeed, "SP");
+            m_aCmd.Add(eCmd.ServoOn, "PWC");
+            m_aCmd.Add(eCmd.ServoOff, "PQ");
+            m_aCmd.Add(eCmd.Event, "EVT1");
+            m_aCmd.Add(eCmd.GetErrorCode, "TE");
+            m_aCmd.Add(eCmd.GetErrorString, "TES");
+            m_aCmd.Add(eCmd.SoftLimitLeft, "LL");
+            m_aCmd.Add(eCmd.SoftLimitRight, "LR");
+        }
+
+        eCmd GetCmd(string sRead, ref string sData)
+        {
+            foreach (eCmd eCmd in m_aCmd.Keys)
+            {
+                string sCmd = m_aCmd[eCmd]; 
+                if (sRead.Length >= sCmd.Length)
+                {
+                    if (sCmd == sRead.Substring(0, sCmd.Length))
+                    {
+                        sData = sRead.Substring(sCmd.Length, sRead.Length - sCmd.Length);
+                        sData = sData.Replace("\n", "");
+                        sData = sData.Replace("\r", "");
+                        return eCmd;
+                    }
+                }
+            }
+            return eCmd.None; 
+        }
+
+        public enum eEvent
+        {
+            None,
+            PowerOff,
+            Inposition,
+            InMotion,
+            Error,
+            HomeDone
+        }
+        public Dictionary<eEvent, string> m_aEvent = new Dictionary<eEvent, string>();
+        void InitEvent()
+        {
+            m_aEvent.Add(eEvent.None, "@N");
+            m_aEvent.Add(eEvent.PowerOff, "@S0");
+            m_aEvent.Add(eEvent.Inposition, "@S1");
+            m_aEvent.Add(eEvent.InMotion, "@S2");
+            m_aEvent.Add(eEvent.Error, "@S9");
+            m_aEvent.Add(eEvent.HomeDone, "@H");
+        }
+
+        eEvent GetEvent(string sRead)
+        {
+            foreach (eEvent eEvent in m_aEvent.Keys)
+            {
+                if (sRead.Contains(m_aEvent[eEvent])) return eEvent; 
+            }
+            return eEvent.None; 
+        }
+
+        public class Protocol
+        {
+            public string m_sSend = "";
+            public string m_sCmd = "";
+            public Protocol(string sCmd)
+            {
+                m_sCmd = sCmd;
+                m_sSend = sCmd + "\r";
+            }
+
+            public Protocol(string sCmd, int nValue)
+            {
+                m_sCmd = sCmd; 
+                m_sSend = sCmd + nValue.ToString() + "\r";
+            }
+        }
+        Protocol m_protocolSend = null;
+        Queue<Protocol> m_qProtocol = new Queue<Protocol>();
+
+        string m_sErrorCode = ""; 
+        string OnReceive(string sRead)
+        {
+            sRead = sRead.ToUpper();
+            if (sRead[0] == '@') return OnReceiveEvent(sRead); 
+            if (m_protocolSend != null)
+            {
+                string sData = "";
+                eCmd eCmd = GetCmd(sRead, ref sData);
+                switch (eCmd)
+                {
+                    case eCmd.GetPos: OnRecieveGetPos(ConvInt(sData)); break;
+                    case eCmd.GetErrorCode: m_sErrorCode = sData; break;
+                    case eCmd.GetErrorString: p_sInfo = "Xenax Error : " + sData + " (" + m_sErrorCode + ")"; break; 
+                }
+                m_protocolSend = null;
+            }
+            return "OK";
+        }
+
+        int ConvInt(string sData)
+        {
+            try { return Convert.ToInt32(sData); }
+            catch (Exception e) { p_sInfo = "GetInt32 Error : " + sData + ", " + e.Message; }
+            return 0; 
+        }
+
+        string OnReceiveEvent(string sRead)
+        {
+            switch (GetEvent(sRead))
+            {
+                case eEvent.PowerOff: 
+                    p_bServoOn = false; 
+                    break;
+                case eEvent.Inposition:
+                    p_bServoOn = true;
+                    p_sensorInPos = true; 
+                    if ((p_eState == eState.Jog) || (p_eState == eState.Move)) p_eState = eState.Ready; 
+                    break;
+                case eEvent.InMotion:
+                    p_sensorInPos = false; 
+                    break;
+                case eEvent.HomeDone:
+                    if (p_eState == eState.Home) p_eState = eState.Ready;
+                    break;
+                case eEvent.Error:
+                    p_eState = eState.Error;
+                    m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.GetErrorCode]));
+                    m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.GetErrorString]));
+                    p_sensorAlarm = true;
+                    p_sensorEmergency = true; 
+                    break; 
+            }
+            return "OK"; 
         }
         #endregion
 
@@ -46,15 +285,24 @@ namespace RootTools.Control.Xenax
         public override void SetActualPosition(double fPos) { }
         public override void OverrideVelocity(double v) { }
 
-        void RunThreadCheck_Position()
+        void AddGetPos()
         {
-            double dRead = 0;
-            AXM("AxmStatusGetCmdPos", CAXM.AxmStatusGetCmdPos(m_nAxis, ref dRead));
-            p_posCommand = dRead / p_pulsepUnit;
-            AXM("AxmStatusGetCmdPos", CAXM.AxmStatusGetActPos(m_nAxis, ref dRead));
-            p_posActual = dRead / p_pulsepUnit;
-            AXM("AxmStatusReadVel", CAXM.AxmStatusReadVel(m_nAxis, ref dRead));
-            p_vNow = dRead / p_pulsepUnit;
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.GetPos]));
+        }
+
+        void OnRecieveGetPos(int nPos)
+        {
+            p_posActual = nPos;
+            p_posCommand = nPos;
+        }
+
+        int m_nSpeed = 0; 
+        void AddSpeed(double fSpeed)
+        {
+            int nSpeed = (int)Math.Abs(fSpeed); 
+            if (nSpeed == m_nSpeed) return;
+            m_nSpeed = nSpeed; 
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.SetSpeed], nSpeed)); 
         }
         #endregion
 
@@ -63,25 +311,17 @@ namespace RootTools.Control.Xenax
         {
             p_log.Info(p_id + " Jog Start : " + fScale.ToString());
             if (IsInterlock()) return p_id + m_sCheckInterlock;
-
             p_sInfo = base.Jog(fScale, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
-            if (m_nAxis < 0) return p_id + " Axis not Assigned";
-            if (AXM("AxmMoveVel", CAXM.AxmMoveVel(m_nAxis, fScale * m_speedNow.m_v * p_pulsepUnit, m_speedNow.m_acc, m_speedNow.m_dec)) != 0)
-            {
-                p_eState = eState.Init;
-                p_sInfo = p_id + " Axis Jog Start Error";
-                return p_sInfo;
-            }
-            p_eState = eState.Jog;
+            AddSpeed(fScale * m_speedNow.m_v * p_pulsepUnit);
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[(fScale > 0) ? eCmd.JogPlus : eCmd.JogMius]));
+            p_eState = eState.Jog; 
             return "OK";
         }
 
         public override void StopAxis(bool bSlowStop = true)
         {
-            if (m_nAxis < 0) return;
-            if (bSlowStop) AXM("AxmMoveSStop", CAXM.AxmMoveSStop(m_nAxis));
-            else AXM("AxmMoveEStop", CAXM.AxmMoveEStop(m_nAxis));
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.JogStop]));
         }
         #endregion
 
@@ -91,14 +331,9 @@ namespace RootTools.Control.Xenax
             if (IsInterlock()) return p_id + m_sCheckInterlock;
             p_sInfo = base.StartMove(fPos, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
-            if (m_nAxis < 0) return p_id + " Axis not Assigned";
-            if (AXM("AxmMoveStartPos", CAXM.AxmMoveStartPos(m_nAxis, fPos * p_pulsepUnit, m_speedNow.m_v * p_pulsepUnit, m_speedNow.m_acc, m_speedNow.m_dec)) != 0)
-            {
-                p_eState = eState.Init;
-                p_sInfo = p_id + " Axis MoveStartPos Error";
-                return p_sInfo;
-            }
-            p_eState = eState.Move;
+            AddSpeed(m_speedNow.m_v * p_pulsepUnit);
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.Move], (int)(fPos * p_pulsepUnit)));
+            p_eState = eState.Move; 
             Thread.Sleep(10);
             return "OK";
         }
@@ -110,14 +345,9 @@ namespace RootTools.Control.Xenax
             dec = (dec < 0) ? GetSpeedValue(eSpeed.Move).m_dec : dec;
             p_sInfo = base.StartMove(fPos, v, acc, dec);
             if (p_sInfo != "OK") return p_sInfo;
-            if (m_nAxis < 0) return p_id + " Axis not Assigned";
-            if (AXM("AxmMoveStartPos", CAXM.AxmMoveStartPos(m_nAxis, fPos * p_pulsepUnit, v * p_pulsepUnit, acc, dec)) != 0)
-            {
-                p_eState = eState.Init;
-                p_sInfo = p_id + " Axis MoveStartPos Error";
-                return p_sInfo;
-            }
-            p_eState = eState.Move;
+            AddSpeed(v * p_pulsepUnit);
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.Move], (int)(fPos * p_pulsepUnit)));
+            p_eState = eState.Move; 
             Thread.Sleep(10);
             return "OK";
         }
@@ -129,14 +359,9 @@ namespace RootTools.Control.Xenax
             dec = (dec < 0) ? GetSpeedValue(eSpeed.Move).m_dec : dec;
             p_sInfo = base.StartMoveV(vStart, posAt, vChange, posTo, acc, dec);
             if (p_sInfo != "OK") return p_sInfo;
-            if (m_nAxis < 0) return p_id + " Axis not Assigned";
-            if (AXM("AxmOverrideVelAtPos", CAXM.AxmOverrideVelAtPos(m_nAxis, posTo, vStart, acc, dec, posAt, vChange, 0)) != 0)
-            {
-                p_eState = eState.Init;
-                p_sInfo = p_id + " Axis AxmOverrideVelAtPos Error";
-                return p_sInfo;
-            }
-            p_eState = eState.Move;
+            AddSpeed(vStart * p_pulsepUnit);
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.Move], (int)posTo));
+            p_eState = eState.Move; 
             Thread.Sleep(10);
             return "OK";
         }
@@ -146,89 +371,53 @@ namespace RootTools.Control.Xenax
         public override string StartShift(double dfPos, string sSpeed = null)
         {
             double fPos = p_posCommand + dfPos;
-            if (IsInterlock()) return p_id + m_sCheckInterlock;
-
-            p_sInfo = base.StartShift(dfPos, sSpeed);
-            if (p_sInfo != "OK") return p_sInfo;
-            if (m_nAxis < 0) return p_id + " Axis not Assigned";
-            if (AXM("AxmMoveStartPos", CAXM.AxmMoveStartPos(m_nAxis, fPos * p_pulsepUnit, m_speedNow.m_v * p_pulsepUnit, m_speedNow.m_acc, m_speedNow.m_dec)) != 0)
-            {
-                p_eState = eState.Init;
-                p_sInfo = p_id + " Axis MoveStartPos Error";
-                return p_sInfo;
-            }
-            p_eState = eState.Move;
-            Thread.Sleep(10);
-            return "OK";
+            return StartMove(fPos, sSpeed);
         }
 
         public override string StartShift(double dfPos, double v, double acc = -1, double dec = -1)
         {
             double fPos = p_posCommand + dfPos;
-            if (IsInterlock()) return p_id + m_sCheckInterlock;
+            return StartMove(fPos, v, acc, dec);
+        }
+        #endregion
 
-            acc = (acc < 0) ? GetSpeedValue(eSpeed.Move).m_acc : acc;
-            dec = (dec < 0) ? GetSpeedValue(eSpeed.Move).m_dec : dec;
-            p_sInfo = base.StartShift(dfPos, v, acc, dec);
-            if (p_sInfo != "OK") return p_sInfo;
-            if (m_nAxis < 0) return p_id + " Axis not Assigned";
-            if (AXM("AxmMoveStartPos", CAXM.AxmMoveStartPos(m_nAxis, fPos * p_pulsepUnit, v * p_pulsepUnit, acc, dec)) != 0)
-            {
-                p_eState = eState.Init;
-                p_sInfo = p_id + " Axis MoveStartPos Error";
-                return p_sInfo;
-            }
-            p_eState = eState.Move;
-            Thread.Sleep(10);
+        #region ServoOn & Reset
+        public override void ServoOn(bool bOn)
+        {
+            if (EQ.p_bSimulate) return;
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[bOn ? eCmd.ServoOn : eCmd.ServoOff]));
+        }
+
+        public override string ResetAlarm()
+        {
+            p_sensorAlarm = false;
+            p_sensorEmergency = false; 
+            if (p_eState == eState.Error) p_eState = eState.Init; 
             return "OK";
         }
         #endregion
 
         #region Home
+        public enum eHomeDir
+        {
+            Positive,
+            Negative
+        }
+        eHomeDir m_eHomeDir = eHomeDir.Negative;
+
         public override string StartHome()
         {
-            p_eState = eState.Ready;
-            Thread.Sleep(10);
-            return "OK";
-        }
-
-        const uint c_nAlarmReset = 0x02;
-        public override string ResetAlarm()
-        {
-            uint nOutput = 0;
-            if (p_sensorAlarm == false) return "OK";
-            p_sInfo = "Reset Alarm";
-            if (AXM("AxmSignalReadOutput", CAXM.AxmSignalReadOutput(m_nAxis, ref nOutput)) != 0) return p_sInfo;
-            nOutput |= c_nAlarmReset;
-            if (AXM("AxmSignalWriteOutput", CAXM.AxmSignalWriteOutput(m_nAxis, nOutput)) != 0) return p_sInfo;
-            Thread.Sleep(50);
-            nOutput -= c_nAlarmReset;
-            if (AXM("AxmSignalWriteOutput", CAXM.AxmSignalWriteOutput(m_nAxis, nOutput)) != 0) return p_sInfo;
-            p_eState = eState.Init;
-            Thread.Sleep(100);
-            return "OK";
-        }
-
-        public override void ServoOn(bool bOn)
-        {
-            if (EQ.p_bSimulate) return;
-            if (bOn && m_bAbsoluteEncoder) AXM("AxmM3ServoSensOn", CAXM.AxmM3ServoSensOn(m_nAxis));
-            uint uOn = (uint)(bOn ? 1 : 0);
-            if (AXM("AxmSignalServoOn", CAXM.AxmSignalServoOn(m_nAxis, uOn)) != 0) return;
-            if (m_nBrakeSignalBit >= 0)
+            if (IsInterlock()) return p_id + m_sCheckInterlock;
+            if (m_bAbsoluteEncoder)
             {
-                if (AXM("AxmSignalWriteOutputBit", CAXM.AxmSignalWriteOutputBit(m_nAxis, m_nBrakeSignalBit, uOn)) != 0) return;
+                p_eState = eState.Ready;
+                return "OK";
             }
-            if (bOn == false) p_eState = eState.Init;
-            for (int n = 0; n < 200; n++)
-            {
-                Thread.Sleep(10);
-                if (bOn == p_bSeroOn)
-                {
-                    Thread.Sleep(10);
-                    return;
-                }
-            }
+            p_sInfo = base.StartHome();
+            if (p_sInfo != "OK") return p_sInfo;
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.HomeDir], (int)m_eHomeDir));
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.Home]));
+            return "OK";
         }
 
         int _progressHome = 0;
@@ -243,152 +432,15 @@ namespace RootTools.Control.Xenax
             }
         }
 
-        enum eMoveDir
-        {
-            DIR_CCW,
-            DIR_CW
-        }
-        eMoveDir m_eHomeDir = eMoveDir.DIR_CCW;
-
-        void GetAxisStatusHome() { }
-
         void RunTreeSettingHome(Tree tree)
         {
-            m_eHomeDir = (eMoveDir)tree.Set(m_eHomeDir, m_eHomeDir, "Dir", "Search Home Direction");
-        }
-        #endregion
-
-        #region Setting Pulse & Encoder Mode
-        enum ePulseOutMethod
-        {
-            One_High_Low_High,
-            One_High_High_Low,
-            One_Low_Low_High,
-            One_Low_High_Low,
-            Two_Ccw_Cw_High,
-            Two_Ccw_Cw_Low,
-            Two_Cw_Ccw_High,
-            Two_Cw_Ccw_Low,
-            Two_Phase,
-            Two_Phase_Reverse
-        }
-        ePulseOutMethod m_ePulse = ePulseOutMethod.One_High_Low_High;
-
-        enum eEncoderMethod
-        {
-            Obverse_UpDown,
-            Obverse_Sqr1,
-            Obverse_Sqr2,
-            Obverse_Sqr4,
-            Reverse_UpDown,
-            Reverse_Sqr1,
-            Reverse_Sqr2,
-            Reverse_Sqr4
-        }
-        eEncoderMethod m_eEncoder = eEncoderMethod.Obverse_UpDown;
-
-        enum eProfile
-        {
-            SYM_TRAPEZOIDE_MODE,
-            ASYM_TRAPEZOIDE_MODE,
-            QUASI_S_CURVE_MODE,
-            SYM_S_CURVE_MODE,
-            ASYM_S_CURVE_MODE,
-            SYM_TRAP_M3_SW_MODE,
-            ASYM_TRAP_M3_SW_MODE,
-            SYM_S_M3_SW_MODE,
-            ASYM_S_M3_SW_MODE
-        };
-        eProfile m_eProfile = eProfile.SYM_S_CURVE_MODE;
-
-        void GetAxisStatusMode()
-        {
-            uint u = 0;
-            AXM("AxmMotGetPulseOutMethod", CAXM.AxmMotGetPulseOutMethod(m_nAxis, ref u));
-            m_ePulse = (ePulseOutMethod)u;
-            AXM("AxmMotGetEncInputMethod", CAXM.AxmMotGetEncInputMethod(m_nAxis, ref u));
-            m_eEncoder = (eEncoderMethod)u;
-            AXM("", CAXM.AxmMotGetProfileMode(m_nAxis, ref u));
-            m_eProfile = (eProfile)u;
-            AXM("AxmMotGetMaxVel", CAXM.AxmMotGetMaxVel(m_nAxis, ref m_maxV));
-        }
-
-        int m_nBrakeSignalBit = -1;
-        int m_nServoOnLevel = 1;
-        double m_maxV = 4000000.0;
-        void RunTreeSettingMode(Tree tree, bool bVisible = true, bool bReadOnly = false)
-        {
-            m_ePulse = (ePulseOutMethod)tree.Set(m_ePulse, m_ePulse, "Pulse", "Pulse Mode", bVisible, bReadOnly);
-            m_eEncoder = (eEncoderMethod)tree.Set(m_eEncoder, m_eEncoder, "Encoder", "Encoder Mode", bVisible, bReadOnly);
-            m_eProfile = (eProfile)tree.Set(m_eProfile, m_eProfile, "Profile", "Axis Velocity Profile", bVisible, bReadOnly);
-            m_nBrakeSignalBit = tree.Set(m_nBrakeSignalBit, m_nBrakeSignalBit, "BrakeBit", "UNUSED(-1) USED(0~4)", bVisible, bReadOnly);
-            m_nServoOnLevel = tree.Set(m_nServoOnLevel, m_nServoOnLevel, "ServoOnLevel", "LOW(0) HIGH(1)", bVisible, bReadOnly);
-            m_maxV = tree.Set(m_maxV, m_maxV, "Max Velocity", "Max Velocity (pulse/sec)", bVisible, bReadOnly);
-        }
-        #endregion
-
-        #region Setting Sensors
-        enum eSensorMethod
-        {
-            LOW,
-            HIGH,
-            UNUSED,
-            USED
-        }
-        eSensorMethod m_eLimitP = eSensorMethod.UNUSED;
-        eSensorMethod m_eLimitM = eSensorMethod.UNUSED;
-        eSensorMethod m_eInPos = eSensorMethod.UNUSED;
-        eSensorMethod m_eAlarm = eSensorMethod.UNUSED;
-        eSensorMethod m_eEmergency = eSensorMethod.UNUSED;
-        eSensorMethod m_eHome = eSensorMethod.UNUSED;
-
-        void GetAxisStatusSensor()
-        {
-            uint u0 = 0, u1 = 0, u2 = 0;
-            AXM("AxmSignalGetLimit", CAXM.AxmSignalGetLimit(m_nAxis, ref u0, ref u1, ref u2));
-            m_eLimitP = (eSensorMethod)u1;
-            m_eLimitM = (eSensorMethod)u2;
-            AXM("AxmSignalGetInpos", CAXM.AxmSignalGetInpos(m_nAxis, ref u0));
-            m_eInPos = (eSensorMethod)u0;
-            AXM("AxmSignalGetServoAlarm", CAXM.AxmSignalGetServoAlarm(m_nAxis, ref u0));
-            m_eAlarm = (eSensorMethod)u0;
-            AXM("AxmSignalGetStop", CAXM.AxmSignalGetStop(m_nAxis, ref u0, ref u1));
-            m_eEmergency = (eSensorMethod)u1;
-            AXM("AxmHomeGetSignalLevel", CAXM.AxmHomeGetSignalLevel(m_nAxis, ref u0));
-            m_eHome = (eSensorMethod)u0;
-        }
-
-        void RunTreeSettingSensor(Tree tree, bool bVisible = true, bool bReadOnly = false)
-        {
-            m_eHome = (eSensorMethod)tree.Set(m_eHome, m_eHome, "Home", "Home Sensor", bVisible, bReadOnly);
-            m_eLimitM = (eSensorMethod)tree.Set(m_eLimitM, m_eLimitM, "Limit-", "Limit- Sensor", bVisible, bReadOnly);
-            m_eLimitP = (eSensorMethod)tree.Set(m_eLimitP, m_eLimitP, "Limit+", "Limit+ Sensor", bVisible, bReadOnly);
-            m_eInPos = (eSensorMethod)tree.Set(m_eInPos, m_eInPos, "InPos", "In Position Sensor", bVisible, bReadOnly);
-            m_eAlarm = (eSensorMethod)tree.Set(m_eAlarm, m_eAlarm, "Alarm", "Alarm Sensor", bVisible, bReadOnly);
-            m_eEmergency = (eSensorMethod)tree.Set(m_eEmergency, m_eEmergency, "Emergency", "Emergency Sensor", bVisible, bReadOnly);
+            m_eHomeDir = (eHomeDir)tree.Set(m_eHomeDir, m_eHomeDir, "Dir", "Search Home Direction");
         }
         #endregion
 
         #region Trigger
-        bool m_bLevel = true;
-        double m_dTrigTime = 2;
         public override void RunTrigger(bool bOn, Trigger trigger = null)
         {
-            if (trigger == null) trigger = m_trigger;
-            double dUpTime = (trigger.m_dUpTime < 0) ? m_dTrigTime : trigger.m_dUpTime;
-            if (m_nAxis < 0) return;
-            AXM("AxmTriggerSetReset", CAXM.AxmTriggerSetReset(m_nAxis));
-            if (bOn == false) return;
-            uint nLevel = (uint)(m_bLevel ? 1 : 0);
-            uint nEncoder = (uint)(trigger.m_bCmd ? 1 : 0);
-            AXM("AxmTriggerSetTimeLevel", CAXM.AxmTriggerSetTimeLevel(m_nAxis, dUpTime, nLevel, nEncoder, 0));
-            AXM("AxmTriggerSetBlock", CAXM.AxmTriggerSetBlock(m_nAxis, trigger.m_aPos[0] * p_pulsepUnit, trigger.m_aPos[1] * p_pulsepUnit, trigger.m_dPos * p_pulsepUnit));
-        }
-
-        public void RunTreeSettingTrigger(Tree tree)
-        {
-            m_bLevel = tree.Set(m_bLevel, m_bLevel, "Level", "Trigger Level, true = Active High");
-            m_dTrigTime = tree.Set(m_dTrigTime, m_dTrigTime, "Time", "Trigger Out Time (us)");
         }
         #endregion
 
@@ -400,180 +452,6 @@ namespace RootTools.Control.Xenax
                 XenaxAxis_UI ui = new XenaxAxis_UI();
                 ui.Init(this);
                 return ui;
-            }
-        }
-        #endregion
-
-        #region Initialize Functions
-        public void GetAxisStatus()
-        {
-            if (m_nAxis < 0) return;
-            GetAxisStatusHome();
-            GetAxisStatusMode();
-            GetAxisStatusSensor();
-            RunTreeSetting(Tree.eMode.Init);
-        }
-
-        public void SetAxisStatus()
-        {
-            if (m_nAxis < 0) return;
-            AXM("AxmMotSetPulseOutMethod", CAXM.AxmMotSetPulseOutMethod(m_nAxis, (uint)m_ePulse));
-            AXM("AxmMotSetEncInputMethod", CAXM.AxmMotSetEncInputMethod(m_nAxis, (uint)m_eEncoder));
-            AXM("AxmSignalSetServoOnLevel", CAXM.AxmSignalSetServoOnLevel(m_nAxis, (uint)m_nServoOnLevel));
-            AXM("AxmSignalSetLimit", CAXM.AxmSignalSetLimit(m_nAxis, 0, (uint)m_eLimitP, (uint)m_eLimitM));
-            AXM("AxmSignalSetInpos", CAXM.AxmSignalSetInpos(m_nAxis, (uint)m_eInPos));
-            AXM("AxmSignalSetServoAlarm", CAXM.AxmSignalSetServoAlarm(m_nAxis, (uint)m_eAlarm));
-            AXM("AxmSignalSetStop", CAXM.AxmSignalSetStop(m_nAxis, 0, (uint)m_eEmergency));
-            AXM("AxmHomeSetSignalLevel", CAXM.AxmHomeSetSignalLevel(m_nAxis, (uint)m_eHome));
-        }
-
-        void InitAxis()
-        {
-            if (m_nAxis < 0) return;
-            AXM("AxmMotSetAbsRelMode", CAXM.AxmMotSetAbsRelMode(m_nAxis, 0));
-            AXM("AxmMotSetAccelUnit", CAXM.AxmMotSetAccelUnit(m_nAxis, 1)); // [00h]unit/sec2 - [01h] sec 
-            AXM("AxmMotSetProfileMode", CAXM.AxmMotSetProfileMode(m_nAxis, (uint)m_eProfile));
-            AXM("AxmMotSetMaxVel", CAXM.AxmMotSetMaxVel(m_nAxis, m_maxV));
-        }
-        #endregion
-
-        #region Xenax Functions
-        public string SetPosTypeBound(double fPositivePos, double fNegativePos)
-        {
-            if (m_nAxis < 0) return "Axis not Assigned";
-            if (AXM("AxmStatusSetPosType", CAXM.AxmStatusSetPosType(m_nAxis, 1, fPositivePos * p_pulsepUnit, fNegativePos * p_pulsepUnit)) != 0) return p_sInfo;
-            return "OK";
-        }
-
-        public string SetGantry(XenaxAxis axisSlave)
-        {
-            if (m_nAxis < 0) return "Axis not Assigned";
-            if (axisSlave == null) return p_id + " SetGentry Slave Axis is null";
-            if (axisSlave.m_nAxis < 0) return "Axis Slave not Assigned";
-            if (AXM("AxmLinkResetMode", CAXM.AxmLinkResetMode(0)) != 0) return p_sInfo;
-            if (AXM("AxmGantrySetDisable", CAXM.AxmGantrySetDisable(m_nAxis, axisSlave.m_nAxis)) != 0) return p_sInfo;
-            if (AXM("AxmGantrySetEnable", CAXM.AxmGantrySetEnable(m_nAxis, axisSlave.m_nAxis, 0, 0, 0)) != 0) return p_sInfo;
-            uint nOn = 0, nHome = 0;
-            double fOffset = 0, fRange = 0;
-            if (AXM("AxmGantryGetEnable", CAXM.AxmGantryGetEnable(m_nAxis, ref nHome, ref fOffset, ref fRange, ref nOn)) != 0) return p_sInfo;
-            return "OK";
-        }
-
-        public void SetLoadRatio()
-        {
-            if (m_nAxis < 0) return;
-            AXM("AxmStatusSetReadServoLoadRatio", CAXM.AxmStatusSetReadServoLoadRatio(m_nAxis, (uint)2));
-        }
-
-        public void ReadLoadRatio(ref double fLoadRatio)
-        {
-            if (m_nAxis < 0) return;
-            AXM("AxmStatusReadServoLoadRatio", CAXM.AxmStatusReadServoLoadRatio(m_nAxis, ref fLoadRatio));
-        }
-        #endregion
-
-        #region Thread
-        bool m_bThread = false;
-        Thread m_threadRun;
-        Thread m_threadCheck;
-        void InitThread()
-        {
-            if (m_bThread) return;
-            m_bThread = true;
-            m_threadRun = new Thread(new ThreadStart(RunThread));
-            m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
-            m_threadRun.Start();
-            m_threadCheck.Start();
-        }
-
-        void RunThread()
-        {
-            uint nStat = 0;
-            Thread.Sleep(2000);
-            while (m_bThread)
-            {
-                Thread.Sleep(100);
-                switch (p_eState)
-                {
-                    case eState.Home:
-                        uint uMainStep = 0, uStep = 0;
-                        CAXM.AxmHomeGetRate(m_nAxis, ref uMainStep, ref uStep);
-                        p_progressHome = (int)uStep;
-                        if (EQ.IsStop())
-                        {
-                            StopAxis();
-                            ServoOn(false);
-                            p_eState = eState.Init;
-                        }
-                        else
-                        {
-                            AXM("AxmHomeGetResult", CAXM.AxmHomeGetResult(m_nAxis, ref nStat));
-                            if (nStat == 1)
-                            {
-                                p_sInfo = p_id + " -> Home Finished " + (m_swMove.ElapsedMilliseconds / 1000).ToString("0.0 sec");
-                                p_eState = eState.Ready;
-                            }
-                        }
-                        break;
-                    case eState.Move:
-                        AXM("AxmStatusReadInMotion", CAXM.AxmStatusReadInMotion(m_nAxis, ref nStat));
-                        if (nStat == 0) p_eState = eState.Ready;
-                        break;
-                    case eState.Jog:
-                        AXM("AxmStatusReadInMotion", CAXM.AxmStatusReadInMotion(m_nAxis, ref nStat));
-                        if (nStat == 0) p_eState = eState.Ready;
-                        if (EQ.IsStop())
-                        {
-                            StopAxis();
-                            p_eState = eState.Ready;
-                        }
-                        break;
-                    default: break;
-                }
-            }
-        }
-
-        void RunThreadCheck()
-        {
-            AXM("AxmSignalWriteOutput", CAXM.AxmSignalWriteOutput(m_nAxis, 0));
-            Thread.Sleep(2000);
-            while (m_bThread)
-            {
-                Thread.Sleep(1);
-                if (m_nAxis >= 0)
-                {
-                    RunThreadCheck_Sensor();
-                    RunThreadCheck_Position();
-                }
-            }
-        }
-        #endregion
-
-        #region Thread Sensor
-        void RunThreadCheck_Sensor()
-        {
-            uint uRead = 0;
-            uint uReadM = 0;
-            AXM("AxmSignalIsServoOn", CAXM.AxmSignalIsServoOn(m_nAxis, ref uRead));
-            p_bSeroOn = (uRead > 0);
-            AXM("AxmHomeReadSignal", CAXM.AxmHomeReadSignal(m_nAxis, ref uRead));
-            p_sensorHome = (uRead > 0);
-            AXM("AxmSignalReadLimit", CAXM.AxmSignalReadLimit(m_nAxis, ref uRead, ref uReadM));
-            p_sensorMinusLimit = (uReadM > 0);
-            p_sensorPlusLimit = (uRead > 0);
-            AXM("AxmSignalReadInpos", CAXM.AxmSignalReadInpos(m_nAxis, ref uRead));
-            p_sensorInPos = (uRead > 0);
-            AXM("AxmSignalReadServoAlarm", CAXM.AxmSignalReadServoAlarm(m_nAxis, ref uRead));
-            p_sensorAlarm = (uRead > 0);
-            if (m_eEmergency != eSensorMethod.UNUSED)
-            {
-                AXM("AxmSignalReadStop", CAXM.AxmSignalReadStop(m_nAxis, ref uRead));
-                p_sensorEmergency = (uRead > 0);
-            }
-            if (p_sensorEmergency || p_sensorEmergency)
-            {
-                p_eState = eState.Init;
-                Thread.Sleep(100);
             }
         }
         #endregion
@@ -621,76 +499,51 @@ namespace RootTools.Control.Xenax
                     return " : " + id[1] + "Interlock Error";
                 }
             }
-            // IOList for true
-            for (int i = 0; i < m_aSensors.Count; i++)
-            {
-                if (m_aSensors[i].m_bHome == true)
-                {
-                    if (!m_listAxis.m_aAxis[i].p_sensorHome) return " : HomeSensor Interlock Error";
-                }
-                if (m_aSensors[i].m_bPlus == true)
-                {
-                    if (!m_listAxis.m_aAxis[i].p_sensorPlusLimit) return " : Plus Limit Interlock Error";
-                }
-                if (m_aSensors[i].m_bMinus == true)
-                {
-                    if (!m_listAxis.m_aAxis[i].p_sensorMinusLimit) return " : Minus Limit Interlock Error";
-                }
-            }
             return "OK";
-        }
-
-        public override void RunTreeInterlock(Tree.eMode mode)
-        {
-            m_treeRootInterlock.p_eMode = mode;
-            RunTreeInterlockAxis(m_treeRootInterlock.GetTree("Axis"));
-        }
-
-        void RunTreeInterlockAxis(Tree tree)
-        {
-            for (int i = 0; i < m_listAxis.m_aAxis.Count; i++)
-            {
-                CSensor sensor = new CSensor(m_listAxis.m_aAxis[i].p_id);
-                int iIndex = m_aSensors.FindIndex(x => x.m_strAxisName == m_listAxis.m_aAxis[i].p_id);
-                if (iIndex < 0) m_aSensors.Add(sensor);
-                RunTreeSensor(m_treeRootInterlock.GetTree(m_aSensors[i].m_strAxisName), i);
-            }
-        }
-
-        void RunTreeSensor(Tree tree, int iIndex)
-        {
-            m_aSensors[iIndex].m_bHome = tree.Set(m_aSensors[iIndex].m_bHome, m_aSensors[iIndex].m_bHome, "Home", "Home Sensor");
-            m_aSensors[iIndex].m_bPlus = tree.Set(m_aSensors[iIndex].m_bPlus, m_aSensors[iIndex].m_bPlus, "Plus", "Plus Sensor");
-            m_aSensors[iIndex].m_bMinus = tree.Set(m_aSensors[iIndex].m_bMinus, m_aSensors[iIndex].m_bMinus, "Minus", "Minus Sensor");
         }
         #endregion
 
-        #region correction
-        public void SetCorrection(bool bSet, double[] aPos, double[] adPos)
+        #region Thread
+        bool m_bThread = false;
+        Thread m_threadRun;
+        void InitThread()
         {
-            AXM("AxmCompensationEnable", CAXM.AxmCompensationEnable(m_nAxis, 0));
-            if (bSet == false) return;
-            if ((aPos == null) || (adPos == null)) return;
-            if (aPos.Length != adPos.Length) return;
-            int nL = aPos.Length + 2;
-            double[] aP = new double[nL - 1];
-            double[] adP = new double[nL];
-            for (int n = 0; n < nL; n++) adP[n] = 0;
-            aP[0] = 0;
+            if (m_bThread) return;
+            m_bThread = true;
+            m_threadRun = new Thread(new ThreadStart(RunThread));
+            m_threadRun.Start();
+        }
 
-            for (int n = nL - 1, nIdx = 1; n > 1; n--, nIdx++)
+        void RunThread()
+        {
+            Thread.Sleep(2000);
+            while (m_bThread)
             {
-                //aP[n] = aPos[n - 1];
-                adP[nIdx] = adPos[n - 2];
+                Thread.Sleep(20);
+                if (m_qProtocol.Count == 0) AddGetPos();
+                else if (m_protocolSend == null)
+                {
+                    m_protocolSend = m_qProtocol.Dequeue();
+                    if (m_comm != null) m_comm.Send(m_protocolSend.m_sSend);
+                }
+                switch (p_eState)
+                {
+                    case eState.Home:
+                        if (EQ.IsStop())
+                        {
+                            StopAxis();
+                            ServoOn(false);
+                            p_eState = eState.Init;
+                        }
+                        break;
+                    case eState.Move:
+                        break;
+                    case eState.Jog:
+                        if (EQ.IsStop()) StopAxis();
+                        break;
+                    default: break;
+                }
             }
-            for (int n = nL - 2, nIdx = 1; n > 0; n--, nIdx++)
-            {
-                aP[nIdx] = aPos[n - 1];
-                //adP[n] = adPos[n - 1];
-            }
-            //aP[nL - 2] = aP[nL - 2] + aP[1]; 
-            AXM("AxmCompensationSet", CAXM.AxmCompensationSet(m_nAxis, nL - 1, 0, aP, adP, 1));
-            AXM("AxmCompensationEnable", CAXM.AxmCompensationEnable(m_nAxis, 1));
         }
         #endregion
 
@@ -709,34 +562,9 @@ namespace RootTools.Control.Xenax
         public override void RunTreeSetting(Tree.eMode mode)
         {
             m_treeRootSetting.p_eMode = mode;
+            RunTreeSettingComm(m_treeRootSetting.GetTree("Communication"));
             RunTreeSettingProperty(m_treeRootSetting.GetTree("Property"));
             RunTreeSettingHome(m_treeRootSetting.GetTree("Home"));
-            RunTreeSettingMode(m_treeRootSetting.GetTree("Mode"));
-            RunTreeSettingSensor(m_treeRootSetting.GetTree("Sensor"));
-            RunTreeSettingTrigger(m_treeRootSetting.GetTree("Trigger"));
-            if (mode == Tree.eMode.RegRead) InitAxis();
-            if (mode == Tree.eMode.Update) SetAxisStatus();
-        }
-        #endregion
-
-        #region Compensation
-
-        public override bool CompensationSet(double dstartpos, double[] dpPosition, double[] dpCorrection)
-        {
-            uint res = AXM("AxmCompensationSet", CAXM.AxmCompensationSet(m_nAxis, dpPosition.Length, dstartpos, dpPosition, dpCorrection, 0));
-            if (res == 0)
-                return true;
-            else
-                return false;
-        }
-
-        public override bool EnableCompensation(int isenable)
-        {
-            uint res = AXM("AxmCompensationEnable", CAXM.AxmCompensationEnable(m_nAxis, (uint)isenable));
-            if (res == 0)
-                return true;
-            else
-                return false;
         }
         #endregion
 
@@ -744,6 +572,8 @@ namespace RootTools.Control.Xenax
         public void Init(XenaxListAxis listAxis, string id, Log log)
         {
             m_listAxis = listAxis;
+            InitCmd();
+            InitEvent(); 
             InitBase(id, log);
             InitThread();
         }
@@ -755,32 +585,7 @@ namespace RootTools.Control.Xenax
             {
                 m_bThread = false;
                 m_threadRun.Join();
-                m_threadCheck.Join();
             }
-        }
-
-        List<string> m_aAXM = new List<string>();
-        uint AXM(string sFunc, uint uResult)
-        {
-            if (uResult == 0)
-            {
-                for (int n = 0; n < m_aAXM.Count; n++)
-                {
-                    if (sFunc == m_aAXM[n])
-                    {
-                        m_aAXM.RemoveAt(n);
-                        return uResult;
-                    }
-                }
-                return uResult;
-            }
-            foreach (string sAXM in m_aAXM)
-            {
-                if (sAXM == sFunc) return uResult;
-            }
-            m_aAXM.Add(sFunc);
-            p_sInfo = sFunc + ", Error # = " + uResult.ToString();
-            return uResult;
         }
     }
 }

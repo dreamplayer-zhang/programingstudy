@@ -124,7 +124,6 @@ namespace Root_WIND2
         {
             CreateGlobalPaths();
 
-
             if (RegisterGlobalObjects() == false)
             {
                 MessageBox.Show("Program Initialization fail");
@@ -146,6 +145,7 @@ namespace Root_WIND2
             DatabaseManager.Instance.SetDatabase(1);
             //////
             logView.Init(LogView.m_logView);
+            WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
             InitTimer();
 
         }
@@ -171,7 +171,8 @@ namespace Root_WIND2
         private string memoryEdgeTop = "EdgeTop";
         private string memoryEdgeSide = "EdgeSide";
         private string memoryEdgeBottom = "EdgeBottom";
-        private string memoryEdgeEBR = "EdgeEBR";
+        private string memoryEdgeEBR = "EBR";
+        
 
 
         public bool RegisterGlobalObjects()
@@ -180,6 +181,8 @@ namespace Root_WIND2
             {
                 // Engineer
                 WIND2_Engineer engineer = GlobalObjects.Instance.Register<WIND2_Engineer>();
+                DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
+                WIND2_Warning warning = GlobalObjects.Instance.Register<WIND2_Warning>();
                 engineer.Init("WIND2");
 
                 MemoryTool memoryTool = engineer.ClassMemoryTool();
@@ -191,12 +194,12 @@ namespace Root_WIND2
                 ImageData edgeBottomImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeBottomImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeBottom));
                 ImageData ebrImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EBRImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR));
 
-                frontImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nCount;
-                maskLayer.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nByte;
-                edgeTopImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nCount;
-                edgeSideImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nCount;
-                edgeBottomImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nCount;
-                ebrImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nCount;
+                if (frontImage.m_MemData != null) frontImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nCount;
+                if (maskLayer.m_MemData != null) maskLayer.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nByte;
+                if (edgeTopImage.m_MemData != null) edgeTopImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop).p_nCount;
+                if (edgeSideImage.m_MemData != null) edgeSideImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeSide).p_nCount;
+                if (edgeBottomImage.m_MemData != null) edgeBottomImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeBottom).p_nCount;
+                if (ebrImage.m_MemData != null) ebrImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR).p_nCount;
 
 
                 // Recipe
@@ -215,6 +218,7 @@ namespace Root_WIND2
                     // Inspection Manager
                     InspectionManagerFrontside inspectionFront = GlobalObjects.Instance.Register<InspectionManagerFrontside>
                         (
+                        ((WIND2_Handler)engineer.ClassHandler()).p_Vision,
                         recipeFront,
                         new SharedBufferInfo(frontImage.GetPtr(0), frontImage.p_Size.X, frontImage.p_Size.Y, frontImage.p_nByte, frontImage.GetPtr(1), frontImage.GetPtr(2))
                         );
@@ -269,10 +273,11 @@ namespace Root_WIND2
 
 
                 // DialogService
-                DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
+               
                 dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
                 dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
                 dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
+                dialogService.Register<TK4S, TK4SModuleUI>();
 
 
 

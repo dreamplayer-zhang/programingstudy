@@ -52,9 +52,9 @@ namespace RootTools
 
         public System.Windows.Input.KeyEventArgs m_KeyEvent;
 
-        Key m_keyMove = Key.LeftCtrl;
-        Key m_keyZoom = Key.LeftCtrl;
-        Key m_keyDrawBasic = Key.LeftShift;
+        //Key m_keyMove = Key.LeftCtrl;
+        //Key m_keyZoom = Key.LeftCtrl;
+        //Key m_keyDrawBasic = Key.LeftShift;
         public enum eColorViewMode
         {
             All,
@@ -980,9 +980,9 @@ namespace RootTools
         }
         public virtual unsafe void DrawRectBitmap(CRect rect, byte r, byte g, byte b, byte a, CPoint offset = null)
         {
-            Parallel.For(rect.Left, rect.Right + 1, x =>
+            Parallel.For(rect.Left, rect.Right , x =>
               {
-                  Parallel.For(rect.Top, rect.Bottom + 1, y =>
+                  Parallel.For(rect.Top, rect.Bottom , y =>
                   {
                       CPoint pixelPt = new CPoint(x - offset.X, y - offset.Y);
                       DrawPixelBitmap(pixelPt, r, g, b, a);
@@ -1170,7 +1170,7 @@ namespace RootTools
                 Vertical.Y2 = p_CanvasHeight;
                 Horizon.X2 = p_CanvasWidth;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return;
             }
@@ -1206,7 +1206,7 @@ namespace RootTools
                 }
             }
         }
-        void _saveImage()
+        public void _saveImage()
         {
             if (p_ImageData == null)
             {
@@ -1229,7 +1229,7 @@ namespace RootTools
             //m_ImageData.SaveRectImage(new CRect(left, top, right, bot));
             ////}
         }
-        void _clearImage()
+        public void _clearImage()
         {
             if (p_ImageData != null)
                 p_ImageData.ClearImage();

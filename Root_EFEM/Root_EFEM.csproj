@@ -240,7 +240,6 @@
     <Compile Include="Module\Loadport_Cymechs.cs" />
     <Compile Include="Module\RFID_Brooks.cs" />
     <Compile Include="Module\RFID_Ceyon.cs" />
-    <Compile Include="Module\RTR_RND.cs" />
     <Compile Include="Module\Vision_AOP.cs" />
     <Compile Include="Module\Vision_Backside.cs" />
     <Compile Include="Module\Vision_EBR.cs" />
@@ -282,6 +281,5 @@
       <Name>RootTools</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

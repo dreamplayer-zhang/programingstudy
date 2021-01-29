@@ -8,6 +8,13 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
+
+    public enum POSITION_METHOD
+    {
+        Dependent = 0,
+        Independent
+    }
+
     public class PositionParameter : ParameterBase, IMaskInspection, IColorInspection
     {
         public PositionParameter() : base(typeof(Position))
@@ -16,6 +23,7 @@ namespace RootTools_Vision
         }
 
         #region [Parameter]
+        private POSITION_METHOD method = POSITION_METHOD.Dependent;
         private int chipSearchRangeX = 100;
         private int chipSearchRangeY = 100;
         private int chipMinScoreLimit = 60;
@@ -26,6 +34,16 @@ namespace RootTools_Vision
 
 
         #region [Getter Setter]
+
+        [DisplayName("Method")]
+        public POSITION_METHOD Method
+        {
+            get => this.method;
+            set
+            {
+                SetProperty<POSITION_METHOD>(ref this.method, value);
+            }
+        }
 
         [DisplayName("Chip Search Range X")]
         public int ChipSearchRangeX

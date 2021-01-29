@@ -441,7 +441,7 @@
                                                                 Height="40"></packicon:PackIconIonicons>
                                                         <TextBlock Text="CDA"
                                                                 Style="{StaticResource tbFDCName}"></TextBlock>
-                                                        <TextBlock Text="0.525"
+                                                        <TextBlock Text="{Binding p_aTK4S[2].p_dValue}"
                                                                 Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="MPa"
                                                                 Style="{StaticResource tbFDCUnit}" />
@@ -457,7 +457,7 @@
                                                                 Height="40"></packicon:PackIconIonicons>
                                                         <TextBlock Text="VAC"
                                                                 Style="{StaticResource tbFDCName}"></TextBlock>
-                                                        <TextBlock Text="-73.2"
+                                                        <TextBlock Text="{Binding p_aTK4S[0].p_dValue}"
                                                                 Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="kPa"
                                                                 Style="{StaticResource tbFDCUnit}" />
@@ -473,7 +473,7 @@
                                                                 Height="40"></packicon:PackIconIonicons>
                                                         <TextBlock Text="Static"
                                                                 Style="{StaticResource tbFDCName}"></TextBlock>
-                                                        <TextBlock Text="10.2"
+                                                        <TextBlock Text="{Binding p_aTK4S[3].p_dValue}"
                                                                 Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="V"
                                                                 Style="{StaticResource tbFDCUnit}" />
@@ -489,7 +489,7 @@
                                                                 Height="40"></packicon:PackIconBootstrapIcons>
                                                         <TextBlock Text="Temp"
                                                                 Style="{StaticResource tbFDCName}"></TextBlock>
-                                                        <TextBlock Text="24"
+                                                        <TextBlock Text="{Binding p_aTK4S[4].p_dValue}"
                                                                 Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="'C"
                                                                 Style="{StaticResource tbFDCUnit}" />
@@ -586,7 +586,7 @@
                             </TabItem>
                         </TabControl>
                     </Grid>
-                        
+
                 </Grid>
             </StackPanel>
         </ScrollViewer>

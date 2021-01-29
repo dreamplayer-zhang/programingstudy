@@ -59,6 +59,7 @@ namespace RootTools_Vision
         private int subState;
 
         private List<Defect> defectList = new List<Defect>();
+        private List<Measurement> measure = new List<Measurement>();
 
         #endregion
 
@@ -143,7 +144,7 @@ namespace RootTools_Vision
 
         public int TransY
         {
-            get => this.transX;
+            get => this.transY;
         }
 
         public int OffsetX
@@ -213,7 +214,7 @@ namespace RootTools_Vision
             set => this.isOccupied = value;
         }
 
-        
+
 
         public List<Defect> DefectList
         {
@@ -246,13 +247,13 @@ namespace RootTools_Vision
         /// <param name="sharedBufferG">G채널 버퍼 포인터(없을 경우 IntPtr.Zero로 셋팅)</param>
         /// <param name="sharedBufferB">B채널 버퍼 포인터(없을 경우 IntPtr.Zero로 셋팅)</param>
         public void SetSharedBuffer(IntPtr sharedBufferR_GRAY, int sharedBufferWidth, int sharedBufferHeight, int sharedBufferByteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB)
-        {         
+        {
             this.sharedBufferR_GRAY = sharedBufferR_GRAY;
             this.sharedBufferWidth = sharedBufferWidth;
             this.sharedBufferHeight = sharedBufferHeight;
             this.sharedBufferByteCnt = sharedBufferByteCnt;
 
-            if(sharedBufferByteCnt != 1)
+            if (sharedBufferByteCnt != 1)
             {
                 if (sharedBufferB == IntPtr.Zero)
                     throw new ArgumentException("SharedBufferB가 설정되지 않았습니다(ByteCnt == 3).", nameof(sharedBufferB));
@@ -302,6 +303,12 @@ namespace RootTools_Vision
             this.offsetY = _offsetY;
         }
 
+        public void AddOffset(int _offsetX, int _offsetY)
+        {
+            this.offsetX += _offsetX;
+            this.offsetY += _offsetY;
+        }
+
         public void SetTrans(int _transX, int _transY)
         {
             this.transX = _transX;
@@ -347,6 +354,13 @@ namespace RootTools_Vision
                 chipIdxY);
 
             defectList.Add(defect);
+        }
+
+        public void AddMeasure()
+        {
+            Measurement measure = new Measurement();
+
+            //defectList.Add(measure);
         }
 
         public object GetPreworkData(PREWORKDATA_KEY key)

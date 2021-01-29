@@ -12,6 +12,7 @@ namespace RootTools
             Home,
             Ready,
             Run,
+            Recovery,  //LYJ 210128 add
             Error,
             Null
         }
@@ -198,7 +199,7 @@ namespace RootTools
             }
         }
 
-        int _nRunLP = -1;
+        int _nRunLP = 0;
         public int p_nRunLP
         {
             get { return _nRunLP; }
