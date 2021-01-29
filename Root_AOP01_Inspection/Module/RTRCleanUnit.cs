@@ -1,6 +1,7 @@
 using Root_EFEM.Module;
 using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -108,53 +109,157 @@ namespace Root_AOP01_Inspection.Module
                 {
                     if (m_sCleanPlane == "Top")
                     {
-                        if (m_module.Run(m_module.WriteCmd(eCmd.PutReady, teachTopClean, 1, 1))) return p_sInfo; //Move to Ready of Teach
-                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
-                        if (m_module.Run(m_module.WriteCmd(eCmd.Extend, teachTopClean, 1))) return p_sInfo; //Move to Teach
-                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                        if (m_module.Run(m_module.WriteCmd(eCmd.PutReady, teachTopClean, 1, 1)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo; //Move to Ready of Teach
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo;
+                        }
+                        if (m_module.Run(m_module.WriteCmd(eCmd.Extend, teachTopClean, 1)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo; //Move to Teach
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo;
+                        }
                         if(m_sThickness =="3mm")
                         {
-                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, "0", "0", "2", "0", "0"))) return p_sInfo; //3mm Reticle Move
-                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, "0", "0", "2", "0", "0")))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo; //3mm Reticle Move
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo;
+                            }
                         }
                         else if(m_sThickness == "5mm")
                         {
 
                         }
                         m_module.m_doTopBlow.Write(true); //Blow On
-                        if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sCleanSpeed))) return p_sInfo; //Clean Speed Set
-                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                        if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sCleanSpeed)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo; //Clean Speed Set
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo;
+                        }
                         for (int i = 0; i < nClenaCount; i++)
                         {
-                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0"))) return p_sInfo; //Claen Move Front
-                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0")))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo; //Claen Move Front
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo;
+                            }
                             sRMove = "-" + sRMove;
-                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0"))) return p_sInfo; //Clean Move Back
-                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0")))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo; //Clean Move Back
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo;
+                            }
                         }
-                        if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sOriginSpeed))) return p_sInfo; //Origin Speed Set
-                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                        if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sOriginSpeed)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo; //Origin Speed Set
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo;
+                        }
                         m_module.m_doTopBlow.Write(false); //Blow off
                     }
                     else if (m_sCleanPlane == "Bottom")
                     {
-                        if (m_module.Run(m_module.WriteCmd(eCmd.PutReady, teachBottomClean, 1, 1))) return p_sInfo; //Move to Ready of Teach
-                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
-                        if (m_module.Run(m_module.WriteCmd(eCmd.Extend, teachBottomClean, 1))) return p_sInfo; //Move to Teach
-                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                        if (m_module.Run(m_module.WriteCmd(eCmd.PutReady, teachBottomClean, 1, 1)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo; //Move to Ready of Teach
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo;
+                        }
+                        if (m_module.Run(m_module.WriteCmd(eCmd.Extend, teachBottomClean, 1)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo; //Move to Teach
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo;
+                        }
                         m_module.m_doBottomBlow.Write(true); //Blow On
-                        if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sCleanSpeed))) return p_sInfo; //Clean Speed Set
-                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                        if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sCleanSpeed)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo; //Clean Speed Set
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo;
+                        }
                         for (int i = 0; i < nClenaCount; i++)
                         {
-                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0"))) return p_sInfo; //Claen Move Front
-                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo; //Claen Move Front
+                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0")))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo; //Claen Move Front
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo; //Claen Move Front
+                            }
                             sRMove = "-" + sRMove;
-                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0"))) return p_sInfo; //Clean Move Back
-                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0")))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo; //Clean Move Back
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo;
+                            }
                         }
-                        if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sOriginSpeed))) return p_sInfo; //Origin Speed Set
-                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                        if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sOriginSpeed)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo; //Origin Speed Set
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo;
+                        }
                         m_module.m_doBottomBlow.Write(false); //Blow off
                     }
                 }

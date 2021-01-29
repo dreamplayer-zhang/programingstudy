@@ -37,6 +37,7 @@ namespace Root_AOP01_Inspection.Module
         public ALID m_alidGet;
         public ALID m_alidPut;
         public ALID m_alidClean;
+        public ALID m_alidHome;
         public ALID m_alidCMD;
 
 
@@ -45,6 +46,7 @@ namespace Root_AOP01_Inspection.Module
             m_alidGet = m_gaf.GetALID(this, "Get", "Get Motion Error");
             m_alidPut = m_gaf.GetALID(this, "Put", "Put Motion Error");
             m_alidClean = m_gaf.GetALID(this, "Clean", "Clean Motion Error");
+            m_alidHome = m_gaf.GetALID(this, "Home_RTR", "Home Motion Error");
             m_alidCMD = m_gaf.GetALID(this, "CMD_RTR", "CMD Error");
         }
         #endregion
@@ -587,17 +589,21 @@ namespace Root_AOP01_Inspection.Module
                     Thread.Sleep(100);
                 }
                 foreach (IWTRChild child in p_aChild) child.p_bLock = true;
-                if (Run(WriteCmdSetSpeed(eCmd.SetSpeed, m_OriginSpeed))) return p_sInfo; //Origin Speed Set 하드 코딩수정필요
+                if (Run(WriteCmdSetSpeed(eCmd.SetSpeed, m_OriginSpeed)))
+                {
+                    m_alidHome.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
                 if (Run(WaitReply(m_secMotion)))
                 {
-                    m_alidCMD.Run(true, p_sInfo);
+                    m_alidHome.Run(true, p_sInfo);
                     return p_sInfo;
                 }
                 if (m_bNeedHome)
                 {
                     if (Run(WriteCmd(eCmd.FindHome)))
                     {
-                        m_alidCMD.Run(true, p_sInfo);
+                        m_alidHome.Run(true, p_sInfo);
                         return p_sInfo;
                     }
                 }
@@ -605,14 +611,14 @@ namespace Root_AOP01_Inspection.Module
                 {
                     if (Run(WriteCmd(eCmd.FindHome)))
                     {
-                        m_alidCMD.Run(true, p_sInfo);
+                        m_alidHome.Run(true, p_sInfo);
                         return p_sInfo;
                     }
                 }
                 m_bNeedHome = false;
                 if (Run(WaitReply(m_secHome)))
                 {
-                    m_alidCMD.Run(true, p_sInfo);
+                    m_alidHome.Run(true, p_sInfo);
                     return p_sInfo;
                 }
                 p_eState = eState.Ready;
