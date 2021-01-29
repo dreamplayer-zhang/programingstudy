@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Root_WIND2.Module;
 using RootTools.Database;
 using RootTools.OHT;
 using RootTools_Vision;
@@ -73,10 +74,26 @@ namespace Root_WIND2
 
 		private WorkplaceBundle CreateWorkplace_Edge()
 		{
-			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
-			int index = 0;
+			EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
+			Run_GrabEdge grab = (Run_GrabEdge)module.CloneModuleRun("GrabEdge");
+			GrabMode top = grab.GetGrabMode(grab.p_sGrabModeTop);
+			GrabMode side = grab.GetGrabMode(grab.p_sGrabModeSide);
+			GrabMode btm = grab.GetGrabMode(grab.p_sGrabModeBtm);
 
-			Workplace tempPlace = new Workplace(-1, -1, 0, 0, 0, 0, index++);
+			int cameraEmptyBufferHeight_Top = 0;
+			int cameraEmptyBufferHeight_Side = 0;
+			int cameraEmptyBufferHeight_Btm = 0;
+
+			if (top.m_camera != null)
+				cameraEmptyBufferHeight_Top = top.m_camera.GetRoiSize().Y;
+			if (side.m_camera != null)
+				cameraEmptyBufferHeight_Side = side.m_camera.GetRoiSize().Y;
+			if (btm.m_camera != null)
+				cameraEmptyBufferHeight_Btm = btm.m_camera.GetRoiSize().Y;
+
+			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
+
+			Workplace tempPlace = new Workplace(-1, -1, 0, 0, 0, 0, workplaceBundle.Count);
 			tempPlace.SetSharedBuffer(this.SharedBufferInfoArray[0]);
 			workplaceBundle.Add(tempPlace);
 			
@@ -86,7 +103,7 @@ namespace Root_WIND2
 			int roiHeightTop = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.ROIHeight;
 			for (int i = 0; i < memoryHeightTop / roiHeightTop; i++)
 			{
-				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Top, i, 0, roiHeightTop * i, roiWidthTop, roiHeightTop, index++);
+				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Top, i, 0, (roiHeightTop * i) + cameraEmptyBufferHeight_Top, roiWidthTop, roiHeightTop, workplaceBundle.Count);
 				workplace.SetSharedBuffer(this.SharedBufferInfoArray[0]);
 
 				workplaceBundle.Add(workplace);
@@ -98,7 +115,7 @@ namespace Root_WIND2
 			int roiHeightSide = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide.ROIHeight;
 			for (int i = 0; i < memoryHeightSide / roiHeightSide; i++)
 			{
-				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Side, i, 0, roiHeightSide * i, roiWidthSide, roiHeightSide, index++);
+				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Side, i, 0, (roiHeightSide * i) + cameraEmptyBufferHeight_Side, roiWidthSide, roiHeightSide, workplaceBundle.Count);
 				workplace.SetSharedBuffer(this.SharedBufferInfoArray[1]);
 
 				workplaceBundle.Add(workplace);
@@ -110,7 +127,7 @@ namespace Root_WIND2
 			int roiHeightBtm = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.ROIHeight;
 			for (int i = 0; i < memoryHeightBtm / roiHeightBtm; i++)
 			{
-				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Btm, i, 0, roiHeightBtm * i, roiWidthBtm, roiHeightBtm, index++);
+				Workplace workplace = new Workplace((int)EdgeSurface.EdgeMapPositionX.Btm, i, 0, (roiHeightBtm * i) + cameraEmptyBufferHeight_Btm, roiWidthBtm, roiHeightBtm, workplaceBundle.Count);
 				workplace.SetSharedBuffer(this.SharedBufferInfoArray[2]);
 
 				workplaceBundle.Add(workplace);

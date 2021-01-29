@@ -37,11 +37,11 @@ namespace RootTools_Vision
 
 		protected override bool Preparation()
 		{
-			if(this.parameterEdge == null || this.recipeEdge == null)
-            {
+			if (this.parameterEdge == null || this.recipeEdge == null)
+			{
 				this.parameterEdge = this.parameter as EdgeSurfaceParameter;
 				this.recipeEdge = recipe.GetItem<EdgeSurfaceRecipe>();
-            }
+			}
 			return true;
 		}
 
@@ -55,7 +55,6 @@ namespace RootTools_Vision
 		{
 			if (this.currentWorkplace.Index == 0)
 				return;
-
 
 			//byte[] arrSrc = this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY);
 			//Emgu.CV.Mat mat = new Emgu.CV.Mat((int)(parameterEdge.EdgeParamBaseTop.ROIHeight), (int)(parameterEdge.EdgeParamBaseTop.ROIWidth), Emgu.CV.CvEnum.DepthType.Cv8U, 1);
@@ -75,6 +74,7 @@ namespace RootTools_Vision
 			int roiWidth;
 			int threshold;
 			int defectSize;
+			int searchLevel;
 
 			// parameter
 			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
@@ -83,6 +83,7 @@ namespace RootTools_Vision
 				roiWidth = parameterEdge.EdgeParamBaseTop.ROIWidth;
 				threshold = parameterEdge.EdgeParamBaseTop.Threshold;
 				defectSize = parameterEdge.EdgeParamBaseTop.DefectSizeMin;
+				searchLevel = parameterEdge.EdgeParamBaseTop.EdgeSearchLevel;
 			}
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Side)
 			{
@@ -90,6 +91,7 @@ namespace RootTools_Vision
 				roiWidth = parameterEdge.EdgeParamBaseSide.ROIWidth;
 				threshold = parameterEdge.EdgeParamBaseSide.Threshold;
 				defectSize = parameterEdge.EdgeParamBaseSide.DefectSizeMin;
+				searchLevel = parameterEdge.EdgeParamBaseSide.EdgeSearchLevel;
 			}
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
 			{
@@ -97,6 +99,7 @@ namespace RootTools_Vision
 				roiWidth = parameterEdge.EdgeParamBaseBtm.ROIWidth;
 				threshold = parameterEdge.EdgeParamBaseBtm.Threshold;
 				defectSize = parameterEdge.EdgeParamBaseBtm.DefectSizeMin;
+				searchLevel = parameterEdge.EdgeParamBaseBtm.EdgeSearchLevel;
 			}
 			else
 			{
@@ -104,6 +107,10 @@ namespace RootTools_Vision
 			}
 
 			int roiSize = roiWidth * roiHeight;
+
+			// Search Wafer Edge
+			int lastEdge = FindEdge(arrSrc, roiWidth, roiHeight, searchLevel);
+			int startPtX = lastEdge;	// Edge부터 검사 시작
 
 			// profile 생성
 			List<int> temp = new List<int>();
@@ -123,17 +130,17 @@ namespace RootTools_Vision
 			byte[] diff = new byte[roiSize];
 			for (int j = 0; j < roiHeight; j++)
 			{
-				for (int i = 0; i < roiWidth; i++)
+				for (int i = startPtX; i < roiWidth; i++)
 				{
 					diff[(j * roiWidth) + i] = (byte)(Math.Abs(arrSrc[(j * roiWidth) + i] - profile[i]));
 				}
 			}
 
-			// Threshold
+			// Threshold and Labeling
 			byte[] thresh = new byte[roiSize];
 			CLR_IP.Cpp_Threshold(diff, thresh, roiWidth, roiHeight, false, threshold);
 			var label = CLR_IP.Cpp_Labeling(diff, thresh, roiWidth, roiHeight, true);
-
+			
 			// Add defect
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 			for (int i = 0; i < label.Length; i++)
@@ -153,6 +160,50 @@ namespace RootTools_Vision
 						);
 				}
 			}
+		}
+
+		public int FindEdge(byte[] arrSrc, int width, int height, int searchLevel = 70)
+		{
+			int min = 256;
+			int max = 0;
+			int prox = min + (int)((max - min) * searchLevel * 0.01);
+
+			if (searchLevel >= 100)
+				prox = max;
+			else if (searchLevel <= 0)
+				prox = min;
+
+			int startPtX = 0;
+			int startPtY = 0;
+			int avg, avgNext;
+			int edge = width;
+			
+			avgNext = MeanForYCoordinates(arrSrc, startPtY, startPtX, width, height);
+			for (int x = startPtX + 1; x < width; x++)
+			{
+				avg = avgNext;
+				avgNext = MeanForYCoordinates(arrSrc, startPtY, x, width, height);
+
+				if ((avg >= prox && prox > avgNext) || (avg <= prox && prox < avgNext))
+				{
+					edge = x;
+					x = width + 1;
+				}
+			}
+			return edge;
+		}
+
+		public int MeanForYCoordinates(byte[] arrSrc, int startPtY, int findPtX, int width, int height)
+		{
+			int avg = 0;
+
+			for (int y = startPtY; y < width*height; y += width)
+				avg += arrSrc[y + findPtX];
+			
+			if (avg != 0)
+				avg /= (height - startPtY + 1);
+
+			return avg;
 		}
 	}
 }

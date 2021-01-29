@@ -71,6 +71,11 @@ namespace Root_WIND2.Module
 			InitModuleRun(module);
 		}
 
+		public GrabMode GetGrabMode(string grabModeName)
+		{
+			return module.GetGrabMode(grabModeName);
+		}
+
 		public override ModuleRunBase Clone()
 		{
 			Run_GrabEdge run = new Run_GrabEdge(module);
