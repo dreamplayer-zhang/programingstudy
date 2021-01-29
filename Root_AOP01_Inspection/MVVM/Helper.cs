@@ -71,4 +71,24 @@ namespace Root_AOP01_Inspection
             return true;
         }
     }
+
+    public class BooleanToPassFailStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value)
+            {
+                return "Pass";
+            }
+            else
+            {
+                return "Fail";
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

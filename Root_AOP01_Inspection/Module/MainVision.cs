@@ -438,6 +438,17 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
+        bool m_bPellicleShiftPass = true;
+        public bool p_bPellicleShiftPass
+        {
+            get { return m_bPellicleShiftPass; }
+            set
+            {
+                m_bPellicleShiftPass = value;
+                OnPropertyChanged();
+            }
+        }
+
         double m_dPatternShiftDistance = 0.0;
         public double p_dPatternShiftDistance
         {
@@ -460,6 +471,28 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
+        double m_dPellicleShiftDistance = 0.0;
+        public double p_dPellicleShiftDistance
+        {
+            get { return m_dPellicleShiftDistance; }
+            set
+            {
+                m_dPellicleShiftDistance = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double m_dPellicleShiftAngle = 0.0;
+        public double p_dPellicleShiftAngle
+        {
+            get { return m_dPellicleShiftAngle; }
+            set
+            {
+                m_dPellicleShiftAngle = value;
+                OnPropertyChanged();
+            }
+        }
+
         bool m_bBarcodePass = true;
         public bool p_bBarcodePass
         {
@@ -467,6 +500,39 @@ namespace Root_AOP01_Inspection.Module
             set
             {
                 m_bBarcodePass = value;
+                OnPropertyChanged();
+            }
+        }
+
+        bool m_bPellicleExpandingPass = true;
+        public bool p_bPellicleExpandingPass
+        {
+            get { return m_bPellicleExpandingPass; }
+            set
+            {
+                m_bPellicleExpandingPass = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double m_dPellicleExpandingMax = 0.0;
+        public double p_dPellicleExpandingMax
+        {
+            get { return m_dPellicleExpandingMax; }
+            set
+            {
+                m_dPellicleExpandingMax = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double m_dPellicleExpandingMin = 0.0;
+        public double p_dPellicleExpandingMin
+        {
+            get { return m_dPellicleExpandingMin; }
+            set
+            {
+                m_dPellicleExpandingMin = value;
                 OnPropertyChanged();
             }
         }
@@ -1739,6 +1805,7 @@ namespace Root_AOP01_Inspection.Module
             public bool m_bDarkBackground = true;
             public int m_nThreshold = 70;
             public int m_nSubImageThreshold = 70;
+            public double m_dNGSpecScratchLength_mm = 1;
 
             public Run_BarcodeInspection(MainVision module)
             {
@@ -1755,6 +1822,7 @@ namespace Root_AOP01_Inspection.Module
                 run.m_bDarkBackground = m_bDarkBackground;
                 run.m_nThreshold = m_nThreshold;
                 run.m_nSubImageThreshold = m_nSubImageThreshold;
+                run.m_dNGSpecScratchLength_mm = m_dNGSpecScratchLength_mm;
                 return run;
             }
 
@@ -1766,6 +1834,7 @@ namespace Root_AOP01_Inspection.Module
                 m_bDarkBackground = tree.Set(m_bDarkBackground, m_bDarkBackground, "Dark Background", "Dark Background", bVisible);
                 m_nThreshold = tree.Set(m_nThreshold, m_nThreshold, "Find Edge Threshold", "Find Edge Threshold", bVisible);
                 m_nSubImageThreshold = tree.Set(m_nSubImageThreshold, m_nSubImageThreshold, "Sub Image Threshold", "Sub Image Threshold", bVisible);
+                m_dNGSpecScratchLength_mm = tree.Set(m_dNGSpecScratchLength_mm, m_dNGSpecScratchLength_mm, "Scratch Spec [mm]", "Scratch Spec [mm]", bVisible);
             }
 
             public override string Run()
@@ -1832,14 +1901,13 @@ namespace Root_AOP01_Inspection.Module
                 Image<Gray, byte> img = matBinary.ToImage<Gray, byte>();
                 blobDetector.Detect(img, blobs);
 
+                int nMMPerUM = 1000;
                 foreach (CvBlob blob in blobs.Values)
                 {
-                    if (blob.BoundingBox.Width > 10/*Spec*/ || blob.BoundingBox.Height > 10/*Spec*/)
+                    if (blob.BoundingBox.Width * 5/*TDI90 Resolution = 5*/ > m_dNGSpecScratchLength_mm * nMMPerUM || blob.BoundingBox.Height * 5/*TDI90 Resolution = 5*/ > m_dNGSpecScratchLength_mm * nMMPerUM)
                     {
                         m_module.p_bBarcodePass = false;
-                        return "Fail";
                     }
-                    //Console.WriteLine("Width:" + blob.BoundingBox.Width + ", Height:" + blob.BoundingBox.Height);
                 }
 
                 return "OK";
@@ -3017,6 +3085,9 @@ namespace Root_AOP01_Inspection.Module
             public int m_nFrameEdgeThreshold = 40;
             public int m_nSearchArea = 100;
 
+            public double m_dNGSpecDistance_um = 100.0;
+            public double m_dNGSpecDegree = 0.5;
+
             public CPoint m_cptReticleEdgeTLROI = new CPoint();
             public CPoint m_cptReticleEdgeTRROI = new CPoint();
             public CPoint m_cptReticleEdgeRTROI = new CPoint();
@@ -3047,11 +3118,13 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nLeftFrameScanLine = m_nLeftFrameScanLine;
                 run.m_nRightFrameScanLine = m_nRightFrameScanLine;
                 run.m_nFrameheight = m_nFrameheight;
-                run.m_nSearchArea = m_nSearchArea;
-
+                
                 run.m_nReticleEdgeThreshold = m_nReticleEdgeThreshold;
                 run.m_nFrameEdgeThreshold = m_nFrameEdgeThreshold;
+                run.m_nSearchArea = m_nSearchArea;
 
+                run.m_dNGSpecDistance_um = m_dNGSpecDistance_um;
+                run.m_dNGSpecDegree = m_dNGSpecDegree;
 
                 run.m_cptReticleEdgeTLROI = m_cptReticleEdgeTLROI;
                 run.m_cptReticleEdgeTRROI = m_cptReticleEdgeTRROI;
@@ -3083,6 +3156,9 @@ namespace Root_AOP01_Inspection.Module
                 m_nReticleEdgeThreshold = tree.Set(m_nReticleEdgeThreshold, m_nReticleEdgeThreshold, "Reticle Edge Threshold", "Reticle Edge Threshold", bVisible);
                 m_nFrameEdgeThreshold = tree.Set(m_nFrameEdgeThreshold, m_nFrameEdgeThreshold, "Frame Edge Threshold", "Frame Edge Threshold", bVisible);
                 m_nSearchArea = tree.Set(m_nSearchArea, m_nSearchArea, "Search Area", "Search Area", bVisible);
+
+                m_dNGSpecDistance_um = tree.Set(m_dNGSpecDistance_um, m_dNGSpecDistance_um, "Distance NG Spec [um]", "Distance NG Spec [um]", bVisible);
+                m_dNGSpecDegree = tree.Set(m_dNGSpecDegree, m_dNGSpecDegree, "Degree NG Spec", "Degree NG Spec", bVisible);
 
                 m_cptReticleEdgeTLROI = tree.Set(m_cptReticleEdgeTLROI, m_cptReticleEdgeTLROI, "TL Reticle Edge", "TL Reticle Edge", bVisible);
                 m_cptReticleEdgeTRROI = tree.Set(m_cptReticleEdgeTRROI, m_cptReticleEdgeTRROI, "TR Reticle Edge", "TR Reticle Edge", bVisible);
@@ -3225,83 +3301,11 @@ namespace Root_AOP01_Inspection.Module
                 double dResultDistance = m_module.GetDistanceOfTwoPoint(new CPoint((int)rtReticleEdge.Center.X, (int)rtReticleEdge.Center.Y), new CPoint((int)rtFrameEdge.Center.X, (int)rtFrameEdge.Center.Y));
                 double dResultAngle = Math.Abs(dFrameAngle - dReticleAngle);
 
+                Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
+                if (m_dNGSpecDistance_um < (dResultDistance * moduleRunGrab.m_dResY_um)) m_module.p_bPellicleShiftPass = false;
+                if (m_dNGSpecDegree < m_module.p_dPatternShiftAngle) m_module.p_bPellicleShiftPass = false;
+                
                 return "OK";
-
-                //Run_Grab grab = (Run_Grab)m_module.CloneModuleRun("Grab");
-
-                //if (grab.m_grabMode == null) return "Grab Mode == null";
-
-                //try
-                //{
-                //    grab.m_grabMode.SetLight(true);
-
-                //    AxisXY axisXY = m_module.m_axisXY;
-                //    Axis axisZ = m_module.m_axisZ;
-                //    CPoint cptMemoryOffset = new CPoint(grab.m_cpMemoryOffset);
-                //    int nScanLine = 0;
-                //    int nMMPerUM = 1000;
-                //    int nCamWidth = grab.m_grabMode.m_camera.GetRoiSize().X;
-                //    int nCamHeight = grab.m_grabMode.m_camera.GetRoiSize().Y;
-
-                //    double dXScale = grab.m_dResX_um * 10;
-                //    cptMemoryOffset.X += (m_nLeftFrameScanLine + grab.m_grabMode.m_ScanStartLine) * nCamWidth;
-                //    grab.m_grabMode.m_dTrigger = Convert.ToInt32(10 * grab.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
-                //    int nReticleSizeY_px = Convert.ToInt32(grab.m_nReticleSize_mm * nMMPerUM / grab.m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
-                //    int nTotalTriggerCount = Convert.ToInt32(grab.m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
-                //    int nScanOffset_pulse = 100000; //가속버퍼구간
-
-                //    for (int i = 0; i<2; i++)
-                //    {
-                //        if (EQ.IsStop()) return "OK";
-
-                //        double dStartPosY = grab.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
-                //        double dEndPosY = grab.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
-
-                //        grab.m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
-
-                //        double dPosX = 0;
-                //        if (i == 0) // Left Frame Scan
-                //            dPosX = grab.m_rpAxisCenter.X + nReticleSizeY_px * (double)grab.m_grabMode.m_dTrigger / 2 - (m_nLeftFrameScanLine/*nScanLine*/ + grab.m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
-                //        else // Right Frame Scan
-                //            dPosX = grab.m_rpAxisCenter.X + nReticleSizeY_px * (double)grab.m_grabMode.m_dTrigger / 2 - (m_nRightFrameScanLine/*nScanLine*/ + grab.m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
-
-                //        if (m_module.Run(axisZ.StartMove(grab.m_nFocusPosZ - (m_nFrameheight * nMMPerUM * 10))))   // 기존높이 - 프레임높이
-                //            return p_sInfo;
-                //        if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
-                //            return p_sInfo;
-                //        if (m_module.Run(axisXY.WaitReady()))
-                //            return p_sInfo;
-                //        if (m_module.Run(axisZ.WaitReady()))
-                //            return p_sInfo;
-
-                //        double dTriggerStartPosY = grab.m_rpAxisCenter.Y - nTotalTriggerCount / 2;
-                //        double dTriggerEndPosY = grab.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
-                //        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, grab.m_grabMode.m_dTrigger, true);
-
-                //        string strPool = grab.m_grabMode.m_memoryPool.p_id;
-                //        string strGroup = grab.m_grabMode.m_memoryGroup.p_id;
-                //        string strMemory = grab.m_grabMode.m_memoryData.p_id;
-
-                //        MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
-                //        int nScanSpeed = Convert.ToInt32((double)grab.m_nMaxFrame * grab.m_grabMode.m_dTrigger * nCamHeight * grab.m_nScanRate / 100);
-                //        grab.m_grabMode.StartGrab(mem, cptMemoryOffset, nReticleSizeY_px, 0, grab.m_grabMode.m_bUseBiDirectionScan);
-
-                //        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
-                //            return p_sInfo;
-                //        if (m_module.Run(axisXY.WaitReady()))
-                //            return p_sInfo;
-                //        axisXY.p_axisY.RunTrigger(false);
-
-                //        cptMemoryOffset.X = (m_nRightFrameScanLine + grab.m_grabMode.m_ScanStartLine) * nCamWidth;
-                //    }
-                //    grab.m_grabMode.m_camera.StopGrab();
-                //}
-                //finally
-                //{
-                //    grab.m_grabMode.SetLight(false);
-                //}
-
-                //return "OK";
             }
         }
         #endregion
