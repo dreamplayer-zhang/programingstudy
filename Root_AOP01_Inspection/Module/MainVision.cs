@@ -845,7 +845,7 @@ namespace Root_AOP01_Inspection.Module
                     int nReticleSizeY_px = Convert.ToInt32(m_nReticleSize_mm * nMMPerUM / m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
                     int nScanOffset_pulse = 100000; //가속버퍼구간
-                    int nDirection = 1;
+                    int nDirection = 4;
                     while (nDirection > nScanLine)
                     {
                         if (EQ.IsStop())
