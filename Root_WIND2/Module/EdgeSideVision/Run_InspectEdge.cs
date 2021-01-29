@@ -26,6 +26,21 @@ namespace Root_WIND2.Module
 			get => recipeName;
 			set => recipeName = value;
 		}
+		public int TopOffset
+		{
+			get => topOffset;
+			set => topOffset = value;
+		}
+		public int SideOffset
+		{
+			get => sideOffset;
+			set => sideOffset = value;
+		}
+		public int BtmOffset
+		{
+			get => btmOffset;
+			set => btmOffset = value;
+		}
 		#endregion
 
 		public Run_InspectEdge(EdgeSideVision module)
