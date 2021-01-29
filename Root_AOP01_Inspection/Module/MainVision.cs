@@ -22,12 +22,17 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using static RootTools.Control.Axis;
 
 namespace Root_AOP01_Inspection.Module
 {
     public class MainVision : ModuleBase, IWTRChild
     {
+        public Dispatcher dispatcher;   // RecipeLADS_ViewModel 페이지에서 LADS Heatmap 바인딩을 하려면 Dispatcher 필요
+
         #region ToolBox
         public Axis m_axisRotate;
         public Axis m_axisZ;
@@ -124,7 +129,6 @@ namespace Root_AOP01_Inspection.Module
             foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTree(tree.GetTree(grabMode.p_sName, false), true, false);
         }
         #endregion
-
 
         #region Axis Position
         public enum eAxisPos
@@ -533,6 +537,17 @@ namespace Root_AOP01_Inspection.Module
             set
             {
                 m_dPellicleExpandingMin = value;
+                OnPropertyChanged();
+            }
+        }
+
+        BitmapImage m_bmpImgPellicleHeatmap = new BitmapImage();
+        public BitmapImage p_bmpImgPellicleHeatmap
+        {
+            get { return m_bmpImgPellicleHeatmap; }
+            set
+            {
+                m_bmpImgPellicleHeatmap = value;
                 OnPropertyChanged();
             }
         }
@@ -1773,8 +1788,35 @@ namespace Root_AOP01_Inspection.Module
                 }
                 CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
 
+                // Image Binding
+                System.Drawing.Bitmap bmp = ResultMat.Bitmap;
+                if (m_module.dispatcher != null)
+                {
+                    m_module.dispatcher.Invoke(new Action(delegate ()
+                    {
+                        m_module.p_bmpImgPellicleHeatmap = GetBitmapImageFromBitmap(bmp);
+                    }));
+                }
+
                 m_module.p_dPellicleExpandingMax = nMax;
                 m_module.p_dPellicleExpandingMin = nMin;
+            }
+
+            BitmapImage GetBitmapImageFromBitmap(System.Drawing.Bitmap bmp)
+            {
+                // Memory Stream 준비
+                MemoryStream ms = new MemoryStream();
+                bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                ms.Position = 0;
+
+                // BitmapImage로 변환
+                var bmpImg = new BitmapImage();
+                bmpImg.BeginInit();
+                bmpImg.StreamSource = ms;
+                bmpImg.CacheOption = BitmapCacheOption.OnLoad;
+                bmpImg.EndInit();
+
+                return bmpImg;
             }
 
             MCvScalar HeatColor(double dValue, double dMin, double dMax)
