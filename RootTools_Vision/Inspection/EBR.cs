@@ -22,6 +22,7 @@ namespace RootTools_Vision
 			m_sName = this.GetType().Name;
 		}
 
+		StreamWriter sw;
 		protected override bool Preparation()
 		{
 			this.parameterEBR = this.parameter as EBRParameter;
@@ -48,6 +49,11 @@ namespace RootTools_Vision
 			int roiTop = this.currentWorkplace.PositionY;
 
 			int[] arrDiff;// = new int[roiWidth];
+
+			// raw data 저장
+			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			string folderPath = @"D:\EBRRawData\" + sInspectionID.ToString() + "\\";
+			sw = new StreamWriter(folderPath + this.currentWorkplace.Index.ToString() + ".csv");
 
 			arrDiff = GetDiffArr(ptrMem, roiLeft, roiTop, roiWidth, roiHeight);
 			FindEdge(arrDiff);
@@ -103,12 +109,11 @@ namespace RootTools_Vision
 				arrDiff[x] = arrEqual[x + xRange] - arrEqual[x - xRange];
 			}
 
-			/*StreamWriter sw = new StreamWriter(@"D:\EBR" + this.currentWorkplace.Index.ToString() + ".csv");
 			for (int i = 0;  i < arrDiff.Length; i++)
             {
 				sw.WriteLine(arrAvg[i] + "," + arrEqual[i] + "," + arrDiff[i]);
             }
-			sw.Close();*/
+			sw.Close();
 
 			return arrDiff;
 		}
@@ -132,9 +137,11 @@ namespace RootTools_Vision
 			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX), diffBevel + this.parameterEBR.OffsetBevel);
 			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX), diffEBR + this.parameterEBR.OffsetEBR);
 
-			/*StreamWriter sw = new StreamWriter(@"D:\EBRInsp" + this.currentWorkplace.Index.ToString() + ".csv");
-			sw.WriteLine(waferEdgeX + "," + bevelX + "," + ebrX);
-			sw.Close();*/
+			//string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			//string folderPath = @"D:\EBRRawData\" + sInspectionID.ToString() + "\\";
+			//StreamWriter swResult = new StreamWriter(folderPath + "Result.csv");
+			//swResult.WriteLine(this.currentWorkplace.Index * this.parameterEBR.StepDegree + "," +waferEdgeX + "," + (waferEdgeX-bevelX) + "," + (waferEdgeX - ebrX));
+			//swResult.Close();
 
 			// Add measurement
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
