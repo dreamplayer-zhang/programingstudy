@@ -747,6 +747,7 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_PatternShiftAndRotation(this), true, "Run PatternShiftAndRotation");
             AddModuleRunList(new Run_AlignKeyInspection(this), true, "Run AlignKeyInspection");
             AddModuleRunList(new Run_PellicleShiftAndRotation(this), true, "Run PellicleShiftAndRotation");
+            AddModuleRunList(new Run_PellicleExpandingInspection(this), true, "Run PellicleExpandingInspection");
             AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
         }
         #endregion
@@ -1550,7 +1551,6 @@ namespace Root_AOP01_Inspection.Module
         {
             MainVision m_module;
 
-            public int m_nLaserThreshold = 70;              // Laser Threshold
             public int m_nUptime = 40;                      // Trigger Uptime
             public RPoint m_rpAxisCenter = new RPoint();    // Reticle Center Position
             public CPoint m_cpMemoryOffset = new CPoint();  // Memory Offset
@@ -1580,7 +1580,6 @@ namespace Root_AOP01_Inspection.Module
             public override ModuleRunBase Clone()
             {
                 Run_LADS run = new Run_LADS(m_module);
-                run.m_nLaserThreshold = m_nLaserThreshold;
                 run.m_nUptime = m_nUptime;
                 run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
                 run.m_cpMemoryOffset = new CPoint(m_cpMemoryOffset);
@@ -1595,7 +1594,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_nLaserThreshold = tree.Set(m_nLaserThreshold, m_nLaserThreshold, "Laser Threshold", "Laser Threshold", bVisible);
                 m_nUptime = tree.Set(m_nUptime, m_nUptime, "Trigger Uptime", "Trigger Uptime", bVisible);
                 m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
                 m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
@@ -1671,14 +1669,11 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
                         m_grabMode.m_camera.StopGrab();
-                        //CalculateHeight(nScanLine, mem, nReticleSizeY_px, new RPoint(dPosX, dStartPosY), dEndPosY);
-                        CalculateHeight_ESCHO(mem, m_grabMode.m_ScanStartLine + nScanLine, nReticleSizeY_px);
-
+                        
                         nScanLine++;
                         cpMemoryOffset.X += nCamWidth;
                     }
                     m_grabMode.m_camera.StopGrab();
-                    SaveFocusMapImage(nScanLine, nReticleSizeY_px / nCamHeight);
                     return "OK";
                 }
                 finally
@@ -1686,159 +1681,6 @@ namespace Root_AOP01_Inspection.Module
                     m_grabMode.SetLight(false);
                 }
             }
-
-            unsafe void CalculateHeight_ESCHO(MemoryData mem, int nCurrentLine, int nReticleHeight_px)
-            {
-                IntPtr p = mem.GetPtr();
-                int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
-                int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
-                int nCount = nReticleHeight_px / nCamHeight;
-                LADSInfo ladsinfo = new LADSInfo(new RPoint(), 0, nCount);
-
-                for (int i = 0; i < nCount; i++)
-                {
-                    int nLeft = nCurrentLine * nCamWidth;
-                    int nTop = i * nCamHeight;
-                    int nRight = nLeft + nCamWidth;
-                    int nBottom = nTop + nCamHeight;
-                    CRect crtROI = new CRect(nLeft, nTop, nRight, nBottom);
-                    ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
-                    img.SetData(p, crtROI, (int)mem.W);
-                    ladsinfo.m_Heightinfo[i] = CalculatingHeight(img);
-                }
-                ladsinfos.Add(ladsinfo);
-            }
-
-            #region VEGA LADS
-            unsafe double CalculatingHeight(ImageData img)
-            {
-                // variable
-                int nImgWidth = m_grabMode.m_camera.GetRoiSize().X;
-                int nImgHeight = m_grabMode.m_camera.GetRoiSize().Y;
-                double[] daHeight = new double[nImgWidth];
-
-                // implement
-                byte* pSrc = (byte*)img.GetPtr().ToPointer();
-                for (int x = 0; x < nImgWidth; x++, pSrc++)
-                {
-                    byte* pSrcY = pSrc;
-                    int nSum = 0;
-                    int nYSum = 0;
-                    for (int y = 0; y < nImgHeight; y++, pSrcY += nImgWidth)
-                    {
-                        if (*pSrcY < m_nLaserThreshold) continue;
-                        nSum += *pSrcY;
-                        nYSum += *pSrcY * y;
-                    }
-                    int iIndex = x;
-                    daHeight[iIndex] = (nSum != 0) ? ((double)nYSum / (double)nSum) : 0.0;
-                }
-
-                return GetHeightAverage(daHeight);
-            }
-
-            double GetHeightAverage(double[] daHeight)
-            {
-                // variable
-                double dSum = 0.0;
-                int nHitCount = 0;
-
-                // implement
-                for (int i = 0; i < daHeight.Length; i++)
-                {
-                    if (daHeight[i] < double.Epsilon) continue;
-                    nHitCount++;
-                    dSum += daHeight[i];
-                }
-                if (nHitCount == 0) return -1;
-                return dSum / nHitCount;
-            }
-            #endregion
-            #region 이지혜 LADS
-            private void SaveFocusMapImage(int nX, int nY)
-            {
-                int thumsize = 30;
-                int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
-                Mat ResultMat = new Mat();
-
-                // Min-Max 값 알아내기
-                int nMin = 480;
-                int nMax = 0;
-                for (int x = 0; x < nX; x++)
-                {
-                    for (int y = 0; y < nY; y++)
-                    {
-                        if (ladsinfos[x].m_Heightinfo[y] < nMin && ladsinfos[x].m_Heightinfo[y] > -1) nMin = (int)ladsinfos[x].m_Heightinfo[y];
-                        if (ladsinfos[x].m_Heightinfo[y] > nMax) nMax = (int)ladsinfos[x].m_Heightinfo[y];
-                    }
-                }
-
-                for (int x = 0; x < nX; x++)
-                {
-                    Mat Vmat = new Mat();
-                    for (int y = 0; y < nY; y++)
-                    {
-                        Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 3);
-                        MCvScalar color = HeatColor(ladsinfos[x].m_Heightinfo[y], nMin, nMax);
-                        ColorImg.SetTo(color);
-
-                        if (y == 0)
-                            Vmat = ColorImg;
-                        else
-                            CvInvoke.VConcat(ColorImg, Vmat, Vmat);
-                    }
-                    if (x == 0)
-                        ResultMat = Vmat;
-                    else
-                        CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
-
-                    CvInvoke.Imwrite(@"D:\Test\" + x + ".bmp", ResultMat);
-
-                }
-                CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
-
-                // Image Binding
-                System.Drawing.Bitmap bmp = ResultMat.Bitmap;
-                if (m_module.dispatcher != null)
-                {
-                    m_module.dispatcher.Invoke(new Action(delegate ()
-                    {
-                        m_module.p_bmpImgPellicleHeatmap = GetBitmapImageFromBitmap(bmp);
-                    }));
-                }
-
-                m_module.p_dPellicleExpandingMax = nMax;
-                m_module.p_dPellicleExpandingMin = nMin;
-            }
-
-            BitmapImage GetBitmapImageFromBitmap(System.Drawing.Bitmap bmp)
-            {
-                // Memory Stream 준비
-                MemoryStream ms = new MemoryStream();
-                bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-                ms.Position = 0;
-
-                // BitmapImage로 변환
-                var bmpImg = new BitmapImage();
-                bmpImg.BeginInit();
-                bmpImg.StreamSource = ms;
-                bmpImg.CacheOption = BitmapCacheOption.OnLoad;
-                bmpImg.EndInit();
-
-                return bmpImg;
-            }
-
-            MCvScalar HeatColor(double dValue, double dMin, double dMax)
-            {
-                double r = 0, g = 0, b = 0;
-                double x = (dValue - dMin) / (dMax - dMin);
-                r = 255 * (-4 * Math.Abs(x - 0.75) + 2);
-                g = 255 * (-4 * Math.Abs(x - 0.50) + 2);
-                b = 255 * (-4 * Math.Abs(x) + 2);
-
-                return new MCvScalar(b, g, r);
-            }
-            #endregion
         }
 
         #region Barcode Inspection
@@ -3437,6 +3279,216 @@ namespace Root_AOP01_Inspection.Module
             }
         }
         #endregion
+
+        public class Run_PellicleExpandingInspection : ModuleRunBase
+        {
+            MainVision m_module;
+            int m_nLaserThreshold = 70;
+            public int m_nNGSpec_um = 100;
+
+            public Run_PellicleExpandingInspection(MainVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_PellicleExpandingInspection run = new Run_PellicleExpandingInspection(m_module);
+                run.m_nLaserThreshold = m_nLaserThreshold;
+                run.m_nNGSpec_um = m_nNGSpec_um;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_nLaserThreshold = tree.Set(m_nLaserThreshold, m_nLaserThreshold, "Laser Threshold [GV]", "Laser Threshold [GV]", bVisible);
+                m_nNGSpec_um = tree.Set(m_nNGSpec_um, m_nNGSpec_um, "Pellicle Expanding NG Spec [um]", "Pellicle Expanding NG Spec [um]", bVisible);
+            }
+
+            public override string Run()
+            {
+                // variable
+                //Run_MakeAlignTemplateImage moduleRun = (Run_MakeAlignTemplateImage)m_module.CloneModuleRun("MakeAlignTemplateImage");
+                Run_LADS moduleRunLADS = (Run_LADS)m_module.CloneModuleRun("LADS");
+                GrabMode grabMode = m_module.GetGrabMode("LADS");
+                string strPool = grabMode.m_memoryPool.p_id;
+                string strGroup = grabMode.m_memoryGroup.p_id;
+                string strMemory = grabMode.m_memoryData.p_id;
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                int nMMPerUM = 1000;
+                int nReticleSizeY_px = Convert.ToInt32(moduleRunLADS.m_nReticleSize_mm * nMMPerUM / moduleRunLADS.m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
+                int nCamHeight = 480;//grabMode.m_camera.GetRoiSize().Y;
+
+                // implement
+                ladsinfos.Clear();
+                for (int i = 0; i<grabMode.m_ScanLineNum; i++)
+                {
+                    CalculateHeight_ESCHO(mem, grabMode.m_ScanStartLine + i, nReticleSizeY_px);
+                }
+                SaveFocusMapImage(grabMode.m_ScanLineNum, nReticleSizeY_px / nCamHeight);
+
+                return "OK";
+            }
+
+            unsafe void CalculateHeight_ESCHO(MemoryData mem, int nCurrentLine, int nReticleHeight_px)
+            {
+                GrabMode grabMode = m_module.GetGrabMode("LADS");
+                IntPtr p = mem.GetPtr();
+                int nCamWidth = 640; //grabMode.m_camera.GetRoiSize().X;
+                int nCamHeight = 480; //grabMode.m_camera.GetRoiSize().Y;
+                int nCount = nReticleHeight_px / nCamHeight;
+                LADSInfo ladsinfo = new LADSInfo(new RPoint(), 0, nCount);
+
+                for (int i = 0; i < nCount; i++)
+                {
+                    int nLeft = nCurrentLine * nCamWidth;
+                    int nTop = i * nCamHeight;
+                    int nRight = nLeft + nCamWidth;
+                    int nBottom = nTop + nCamHeight;
+                    CRect crtROI = new CRect(nLeft, nTop, nRight, nBottom);
+                    ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+                    img.SetData(p, crtROI, (int)mem.W);
+                    ladsinfo.m_Heightinfo[i] = CalculatingHeight(img);
+                }
+                ladsinfos.Add(ladsinfo);
+            }
+
+            #region VEGA LADS
+            unsafe double CalculatingHeight(ImageData img)
+            {
+                // variable
+                GrabMode grabMode = m_module.GetGrabMode("LADS");
+                int nImgWidth = 640; //grabMode.m_camera.GetRoiSize().X;
+                int nImgHeight = 480; //grabMode.m_camera.GetRoiSize().Y;
+                double[] daHeight = new double[nImgWidth];
+
+                // implement
+                byte* pSrc = (byte*)img.GetPtr().ToPointer();
+                for (int x = 0; x < nImgWidth; x++, pSrc++)
+                {
+                    byte* pSrcY = pSrc;
+                    int nSum = 0;
+                    int nYSum = 0;
+                    for (int y = 0; y < nImgHeight; y++, pSrcY += nImgWidth)
+                    {
+                        if (*pSrcY < m_nLaserThreshold) continue;
+                        nSum += *pSrcY;
+                        nYSum += *pSrcY * y;
+                    }
+                    int iIndex = x;
+                    daHeight[iIndex] = (nSum != 0) ? ((double)nYSum / (double)nSum) : 0.0;
+                }
+
+                return GetHeightAverage(daHeight);
+            }
+
+            double GetHeightAverage(double[] daHeight)
+            {
+                // variable
+                double dSum = 0.0;
+                int nHitCount = 0;
+
+                // implement
+                for (int i = 0; i < daHeight.Length; i++)
+                {
+                    if (daHeight[i] < double.Epsilon) continue;
+                    nHitCount++;
+                    dSum += daHeight[i];
+                }
+                if (nHitCount == 0) return -1;
+                return dSum / nHitCount;
+            }
+            #endregion
+            #region 이지혜 LADS
+            private void SaveFocusMapImage(int nX, int nY)
+            {
+                GrabMode grabMode = m_module.GetGrabMode("LADS");
+                int thumsize = 30;
+                int nCamHeight = grabMode.m_camera.GetRoiSize().Y;
+                Mat ResultMat = new Mat();
+
+                // Min-Max 값 알아내기
+                int nMin = 480;
+                int nMax = 0;
+                for (int x = 0; x < nX; x++)
+                {
+                    for (int y = 0; y < nY; y++)
+                    {
+                        if (ladsinfos[x].m_Heightinfo[y] < nMin && ladsinfos[x].m_Heightinfo[y] > -1) nMin = (int)ladsinfos[x].m_Heightinfo[y];
+                        if (ladsinfos[x].m_Heightinfo[y] > nMax) nMax = (int)ladsinfos[x].m_Heightinfo[y];
+                    }
+                }
+
+                for (int x = 0; x < nX; x++)
+                {
+                    Mat Vmat = new Mat();
+                    for (int y = 0; y < nY; y++)
+                    {
+                        Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 3);
+                        MCvScalar color = HeatColor(ladsinfos[x].m_Heightinfo[y], nMin, nMax);
+                        ColorImg.SetTo(color);
+
+                        if (y == 0)
+                            Vmat = ColorImg;
+                        else
+                            CvInvoke.VConcat(ColorImg, Vmat, Vmat);
+                    }
+                    if (x == 0)
+                        ResultMat = Vmat;
+                    else
+                        CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
+
+                    CvInvoke.Imwrite(@"D:\Test\" + x + ".bmp", ResultMat);
+
+                }
+                CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
+
+                // Image Binding
+                System.Drawing.Bitmap bmp = ResultMat.Bitmap;
+                if (m_module.dispatcher != null)
+                {
+                    m_module.dispatcher.Invoke(new Action(delegate ()
+                    {
+                        m_module.p_bmpImgPellicleHeatmap = GetBitmapImageFromBitmap(bmp);
+                    }));
+                }
+
+                m_module.p_dPellicleExpandingMax = nMax;
+                m_module.p_dPellicleExpandingMin = nMin;
+                if ((nMax - nMin) * 400 / 10/*1px당 Pulse = 400*/ > m_nNGSpec_um) m_module.p_bPellicleExpandingPass = false;
+                else m_module.p_bPellicleExpandingPass = true;
+            }
+
+            BitmapImage GetBitmapImageFromBitmap(System.Drawing.Bitmap bmp)
+            {
+                // Memory Stream 준비
+                MemoryStream ms = new MemoryStream();
+                bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                ms.Position = 0;
+
+                // BitmapImage로 변환
+                var bmpImg = new BitmapImage();
+                bmpImg.BeginInit();
+                bmpImg.StreamSource = ms;
+                bmpImg.CacheOption = BitmapCacheOption.OnLoad;
+                bmpImg.EndInit();
+
+                return bmpImg;
+            }
+
+            MCvScalar HeatColor(double dValue, double dMin, double dMax)
+            {
+                double r = 0, g = 0, b = 0;
+                double x = (dValue - dMin) / (dMax - dMin);
+                r = 255 * (-4 * Math.Abs(x - 0.75) + 2);
+                g = 255 * (-4 * Math.Abs(x - 0.50) + 2);
+                b = 255 * (-4 * Math.Abs(x) + 2);
+
+                return new MCvScalar(b, g, r);
+            }
+            #endregion
+        }
     }
 }
 

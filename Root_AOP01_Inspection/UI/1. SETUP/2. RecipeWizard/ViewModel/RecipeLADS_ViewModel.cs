@@ -39,6 +39,16 @@ namespace Root_AOP01_Inspection
             get { return m_bEnablePellicleExpanding; }
             set { SetProperty(ref m_bEnablePellicleExpanding, value); }
         }
+
+        #region PellicleExpanding Parameter
+        int m_nPellicleExpandingSpec = 100;
+        public int p_nPellicleExpandingSpec
+        {
+            get { return m_nPellicleExpandingSpec; }
+            set { SetProperty(ref m_nPellicleExpandingSpec, value); }
+        }
+        #endregion
+
         #endregion
 
         public ICommand btnSnap
@@ -49,6 +59,22 @@ namespace Root_AOP01_Inspection
                     MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
                     MainVision.Run_LADS lads = (MainVision.Run_LADS)mainVision.CloneModuleRun("LADS");
                     mainVision.StartRun(lads);
+                });
+            }
+        }
+
+        public ICommand btnInspection
+        {
+            get
+            {
+                return new RelayCommand(() => {
+                    MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
+                    if (p_bEnablePellicleExpanding)
+                    {
+                        MainVision.Run_PellicleExpandingInspection pellicleExpandingInspection = (MainVision.Run_PellicleExpandingInspection)mainVision.CloneModuleRun("PellicleExpandingInspection");
+                        pellicleExpandingInspection.m_nNGSpec_um = p_nPellicleExpandingSpec;
+                        mainVision.StartRun(pellicleExpandingInspection);
+                    }
                 });
             }
         }
