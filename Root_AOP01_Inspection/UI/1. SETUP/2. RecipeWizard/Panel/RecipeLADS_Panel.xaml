@@ -53,7 +53,7 @@
                             </GroupBox>
                             <GroupBox Grid.Row="1" Header="LADS Map">
                                 <Grid Background="White" Margin="5">
-                                    <Image Source="/Root_AOP01_Inspection;component/Resource/LADSMAP.PNG" Margin="100,10" Stretch="Fill"/>
+                                    <Image Source="{Binding p_mainVision.p_bmpImgPellicleHeatmap}" Margin="100,10" Stretch="Fill"/>
                                 </Grid>
                             </GroupBox>
                             <GroupBox Grid.Row="2" Header="2D Graph">

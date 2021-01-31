@@ -1,4 +1,5 @@
 ﻿using System.Windows.Input;
+using System.Windows.Threading;
 using Root_AOP01_Inspection.Module;
 namespace Root_AOP01_Inspection
 {
@@ -17,6 +18,7 @@ namespace Root_AOP01_Inspection
             m_Setup = setup;
             m_Engineer = setup.m_MainWindow.m_engineer;
             m_mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
+            m_mainVision.dispatcher = Dispatcher.CurrentDispatcher;
         }
 
         public ICommand btnBack
@@ -45,8 +47,8 @@ namespace Root_AOP01_Inspection
             {
                 return new RelayCommand(() => {
                     MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
-                    MainVision.Run_GrabSideScan grab = (MainVision.Run_GrabSideScan)mainVision.CloneModuleRun("Run LADS");
-                    mainVision.StartRun(grab);
+                    MainVision.Run_LADS lads = (MainVision.Run_LADS)mainVision.CloneModuleRun("LADS");
+                    mainVision.StartRun(lads);
                 });
             }
         }

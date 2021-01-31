@@ -597,7 +597,7 @@ namespace RootTools.Camera.BaslerPylon
                 // Check if the image can be displayed.
                 if (grabResult.IsValid)
                 {
-                    if (stopWatch.IsRunning)
+                    if (!stopWatch.IsRunning)
                     {  
                         if (m_bLive)
                         {
