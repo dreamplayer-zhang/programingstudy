@@ -499,51 +499,9 @@ namespace RootTools.Control.Xenax
                     return " : " + id[1] + "Interlock Error";
                 }
             }
-            // IOList for true
-            for (int i = 0; i < m_aSensors.Count; i++)
-            {
-                if (m_aSensors[i].m_bHome == true)
-                {
-                    if (!m_listAxis.m_aAxis[i].p_sensorHome) return " : HomeSensor Interlock Error";
-                }
-                if (m_aSensors[i].m_bPlus == true)
-                {
-                    if (!m_listAxis.m_aAxis[i].p_sensorPlusLimit) return " : Plus Limit Interlock Error";
-                }
-                if (m_aSensors[i].m_bMinus == true)
-                {
-                    if (!m_listAxis.m_aAxis[i].p_sensorMinusLimit) return " : Minus Limit Interlock Error";
-                }
-            }
             return "OK";
         }
-
-        public override void RunTreeInterlock(Tree.eMode mode)
-        {
-            m_treeRootInterlock.p_eMode = mode;
-            RunTreeInterlockAxis(m_treeRootInterlock.GetTree("Axis"));
-        }
-
-        void RunTreeInterlockAxis(Tree tree)
-        {
-            for (int i = 0; i < m_listAxis.m_aAxis.Count; i++)
-            {
-                CSensor sensor = new CSensor(m_listAxis.m_aAxis[i].p_id);
-                int iIndex = m_aSensors.FindIndex(x => x.m_strAxisName == m_listAxis.m_aAxis[i].p_id);
-                if (iIndex < 0) m_aSensors.Add(sensor);
-                RunTreeSensor(m_treeRootInterlock.GetTree(m_aSensors[i].m_strAxisName), i);
-            }
-        }
-
-        void RunTreeSensor(Tree tree, int iIndex)
-        {
-            m_aSensors[iIndex].m_bHome = tree.Set(m_aSensors[iIndex].m_bHome, m_aSensors[iIndex].m_bHome, "Home", "Home Sensor");
-            m_aSensors[iIndex].m_bPlus = tree.Set(m_aSensors[iIndex].m_bPlus, m_aSensors[iIndex].m_bPlus, "Plus", "Plus Sensor");
-            m_aSensors[iIndex].m_bMinus = tree.Set(m_aSensors[iIndex].m_bMinus, m_aSensors[iIndex].m_bMinus, "Minus", "Minus Sensor");
-        }
         #endregion
-
-        //===============================================
 
         #region Thread
         bool m_bThread = false;

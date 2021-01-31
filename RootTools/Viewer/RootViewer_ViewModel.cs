@@ -52,9 +52,9 @@ namespace RootTools
 
         public System.Windows.Input.KeyEventArgs m_KeyEvent;
 
-        Key m_keyMove = Key.LeftCtrl;
-        Key m_keyZoom = Key.LeftCtrl;
-        Key m_keyDrawBasic = Key.LeftShift;
+        //Key m_keyMove = Key.LeftCtrl;
+        //Key m_keyZoom = Key.LeftCtrl;
+        //Key m_keyDrawBasic = Key.LeftShift;
         public enum eColorViewMode
         {
             All,
@@ -1203,7 +1203,7 @@ namespace RootTools
                 Vertical.Y2 = p_CanvasHeight;
                 Horizon.X2 = p_CanvasWidth;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return;
             }

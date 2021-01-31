@@ -2,7 +2,7 @@
 
 namespace RootTools.Control.Xenax
 {
-    public class XenaxListAxis : NotifyProperty
+    public class XenaxListAxis : NotifyProperty //forget Delete
     {
         #region List Axis
         public delegate void dgOnChangeAxisList();

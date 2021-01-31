@@ -8,6 +8,9 @@ using Root_EFEM.Module;
 using Root_AOP01_Inspection.Module;
 using RootTools.GAFs;
 using static Root_AOP01_Inspection.AOP01_Handler;
+using System.Windows.Threading;
+using System;
+using System.Windows.Media;
 
 namespace Root_AOP01_Inspection
 {
@@ -155,13 +158,49 @@ namespace Root_AOP01_Inspection
                 MessageBox.Show("Program Initialization fail");
                 return;
             }
-
-            
             Init_ViewModel();
             Init_UI();
             if (m_engineer.m_handler.m_aLoadportType[0] == eLoadport.Cymechs && m_engineer.m_handler.m_aLoadportType[1] == eLoadport.Cymechs)
             {
-                Run.Init(m_engineer.m_handler.m_mainVision, (RTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer, (RFID_Brooks)m_engineer.m_handler.m_aRFID[0], (RFID_Brooks)m_engineer.m_handler.m_aRFID[1]);
+                Run.Init(m_engineer.m_handler.m_mainVision, m_engineer.m_handler.m_backsideVision, (RTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer, (RFID_Brooks)m_engineer.m_handler.m_aRFID[0], (RFID_Brooks)m_engineer.m_handler.m_aRFID[1]);
+            }
+            if (m_engineer.m_handler.m_FDC.m_aData.Count > 0)
+            {
+                try
+                {
+                    FDCName1.DataContext = m_engineer.m_handler.m_FDC.m_aData[0];
+                    FDCValue1.DataContext = m_engineer.m_handler.m_FDC.m_aData[0];
+                    FDCName2.DataContext = m_engineer.m_handler.m_FDC.m_aData[1];
+                    FDCValue2.DataContext = m_engineer.m_handler.m_FDC.m_aData[1];
+                    FDCName3.DataContext = m_engineer.m_handler.m_FDC.m_aData[2];
+                    FDCValue3.DataContext = m_engineer.m_handler.m_FDC.m_aData[2];
+                    FDCName4.DataContext = m_engineer.m_handler.m_FDC.m_aData[3];
+                    FDCValue4.DataContext = m_engineer.m_handler.m_FDC.m_aData[3];
+                }
+                catch { }
+            }
+            InitTimer();
+        }
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(20);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            if (m_engineer.m_handler.m_FDC.m_aData.Count > 0)
+            {
+                try
+                {
+                    FDC1.Background = m_engineer.m_handler.m_FDC.m_aData[0].p_bAlarm == true ? Brushes.Red : Brushes.AliceBlue;
+                    FDC2.Background = m_engineer.m_handler.m_FDC.m_aData[1].p_bAlarm == true ? Brushes.Red : Brushes.AliceBlue;
+                    FDC3.Background = m_engineer.m_handler.m_FDC.m_aData[2].p_bAlarm == true ? Brushes.Red : Brushes.AliceBlue;
+                    FDC4.Background = m_engineer.m_handler.m_FDC.m_aData[3].p_bAlarm == true ? Brushes.Red : Brushes.AliceBlue;
+                }
+                catch { }
             }
         }
         void Init_ViewModel()

@@ -75,7 +75,7 @@ namespace RootTools.Inspects
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
-		public event ChangeDefectInfoEventHanlder AddD2DDefect;
+		//public event ChangeDefectInfoEventHanlder AddD2DDefect;
 		/// <summary>
 		/// UI Defect을 지우기 위해 발생하는 Event
 		/// </summary>
@@ -350,7 +350,7 @@ namespace RootTools.Inspects
 
 		public void InspectionDone(string inspIndexFilePath)
 		{
-			bool testFlag = false;
+			//bool testFlag = false;
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
 			//여기서 DB관련동작 이하생략!

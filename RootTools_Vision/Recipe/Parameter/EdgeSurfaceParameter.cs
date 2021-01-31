@@ -81,6 +81,7 @@ namespace RootTools_Vision
 		private int mergeDist = 0;
 		private int illumWhite = 0;
 		private int illumSide = 0;
+		private int edgeSearchLevel = 20;
 		#endregion
 
 		#region [Getter/Setter]
@@ -145,6 +146,15 @@ namespace RootTools_Vision
 			set
 			{
 				SetProperty<int>(ref this.illumSide, value);
+			}
+		}
+		[Category("Parameter")]
+		public int EdgeSearchLevel
+		{
+			get => this.edgeSearchLevel;
+			set
+			{
+				SetProperty<int>(ref this.edgeSearchLevel, value);
 			}
 		}
 		#endregion

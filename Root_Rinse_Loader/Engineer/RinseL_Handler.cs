@@ -190,7 +190,7 @@ namespace Root_Rinse_Loader.Engineer
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run: break;
                 }
-                p_bRun = (EQ.p_eState == EQ.eState.Run);
+                p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
             }
         }
         #endregion
@@ -198,11 +198,20 @@ namespace Root_Rinse_Loader.Engineer
         #region PickerSet
         public string StartPickerSet()
         {
-            if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist";
-            m_loader.m_bPickersetMode = true; 
-            p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
-            p_moduleList.StartModuleRuns(); 
-            return "OK";
+            if (EQ.p_bPickerSet)
+            {
+                EQ.p_eState = EQ.eState.Ready;
+                p_moduleList.m_qModuleRun.Clear(); 
+                return "OK"; 
+            }
+            else
+            {
+                if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist";
+                EQ.p_bPickerSet = true;
+                p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
+                p_moduleList.StartModuleRuns();
+                return "OK";
+            }
         }
         #endregion
 

@@ -111,15 +111,20 @@ namespace Root_Rinse_Loader.Module
 
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
-            if (eEQ == _EQ.eEQ.State)
+            switch (eEQ)
             {
-                AddProtocol(p_id, eCmd.EQLeState, value);
-                switch ((EQ.eState)value)
-                {
-                    case EQ.eState.Error: RunBuzzer(eBuzzer.Error); break;
-                    case EQ.eState.Home: RunBuzzer(eBuzzer.Home); break;
-                    case EQ.eState.Ready: RunBuzzerOff(); break; 
-                }
+                case _EQ.eEQ.State:
+                    AddProtocol(p_id, eCmd.EQLeState, value);
+                    switch ((EQ.eState)value)
+                    {
+                        case EQ.eState.Error: RunBuzzer(eBuzzer.Error); break;
+                        case EQ.eState.Home: RunBuzzer(eBuzzer.Home); break;
+                        case EQ.eState.Ready: RunBuzzerOff(); break;
+                    }
+                    break;
+                case _EQ.eEQ.PickerSet:
+                    AddProtocol(p_id, eCmd.PickerSet, value);
+                    break; 
             }
         }
         #endregion
@@ -141,10 +146,6 @@ namespace Root_Rinse_Loader.Module
         }
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
 
-        DIO_IO m_dioStart;
-        DIO_IO m_dioStop;
-        DIO_IO m_dioReset;
-        DIO_IO m_dioHome;
         DIO_I m_diEMG;
         DIO_I m_diAir;
         DIO_I m_diDoorLock;
@@ -154,10 +155,6 @@ namespace Root_Rinse_Loader.Module
         DIO_I m_diLightCurtain;
         void GetToolsDIO()
         {
-            p_sInfo = m_toolBox.Get(ref m_dioStart, this, "Start");
-            p_sInfo = m_toolBox.Get(ref m_dioStop, this, "Stop");
-            p_sInfo = m_toolBox.Get(ref m_dioReset, this, "Reset");
-            p_sInfo = m_toolBox.Get(ref m_dioHome, this, "Home");
             p_sInfo = m_toolBox.Get(ref m_diEMG, this, "Emergency");
             p_sInfo = m_toolBox.Get(ref m_diAir, this, "Air Pressure");
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
@@ -165,62 +162,6 @@ namespace Root_Rinse_Loader.Module
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
             p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
             p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
-        }
-
-        bool _bStart = false; 
-        public bool p_bStart
-        {
-            get { return _bStart; }
-            set
-            {
-                if (_bStart == value) return;
-                _bStart = value;
-                OnPropertyChanged();
-                if (value && (EQ.p_eState == EQ.eState.Ready)) EQ.p_eState = EQ.eState.Run; 
-            }
-        }
-
-        bool _bStop = false;
-        public bool p_bStop
-        {
-            get { return _bStop; }
-            set
-            {
-                if (_bStop == value) return;
-                _bStop = value;
-                OnPropertyChanged();
-                if (value && (EQ.p_eState == EQ.eState.Run)) EQ.p_eState = EQ.eState.Ready;
-            }
-        }
-
-        bool _bReset = false;
-        public bool p_bReset
-        {
-            get { return _bReset; }
-            set
-            {
-                if (_bReset == value) return;
-                _bReset = value;
-                OnPropertyChanged();
-                if (value)
-                {
-                    RunBuzzerOff(); 
-                    if (EQ.p_eState == EQ.eState.Error) EQ.p_eState = EQ.eState.Ready;
-                }
-            }
-        }
-
-        bool _bHome = false;
-        public bool p_bHome
-        {
-            get { return _bHome; }
-            set
-            {
-                if (_bHome == value) return;
-                _bHome = value;
-                OnPropertyChanged();
-                if (value && ((EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init))) EQ.p_eState = EQ.eState.Home;
-            }
         }
 
         bool _bEMG = false;
@@ -293,14 +234,10 @@ namespace Root_Rinse_Loader.Module
             m_doBuzzer.AllOff(); 
         }
 
-        bool m_bBlink = false; 
+        public bool m_bBlink = false; 
         StopWatch m_swBlick = new StopWatch(); 
         void RunThreadDIO()
         {
-            p_bStart = m_dioStart.p_bIn;
-            p_bStop = m_dioStop.p_bIn;
-            p_bReset = m_dioReset.p_bIn;
-            p_bHome = m_dioHome.p_bIn;
             p_bEMG = m_diEMG.p_bIn;
             p_bAir = m_diAir.p_bIn;
             p_bDoorLock = m_diDoorLock.p_bIn;
@@ -308,16 +245,16 @@ namespace Root_Rinse_Loader.Module
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();
             m_bBlink = !m_bBlink; 
-            m_dioStart.Write(m_bBlink && (EQ.p_eState == EQ.eState.Ready)); 
-            m_dioStop.Write(m_bBlink && (EQ.p_eState == EQ.eState.Run));
-            m_dioReset.Write(m_bBlink && (EQ.p_eState == EQ.eState.Error));
-            m_dioHome.Write(m_bBlink && ((EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Ready)));
-            switch (EQ.p_eState)
+            if (m_bBlink == false) m_doLamp.AllOff();
+            else
             {
-                case EQ.eState.Ready: m_doLamp.Write(eLamp.Green); break;
-                case EQ.eState.Run: m_doLamp.Write(eLamp.Yellow); break;
-                case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
-                default: m_doLamp.AllOff(); break; 
+                switch (EQ.p_eState)
+                {
+                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Green); break;
+                    case EQ.eState.Run: m_doLamp.Write(eLamp.Yellow); break;
+                    case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
+                    default: m_doLamp.AllOff(); break;
+                }
             }
         }
         #endregion
@@ -330,6 +267,7 @@ namespace Root_Rinse_Loader.Module
             SetWidth,
             EQLeState,
             EQUeState,
+            PickerSet,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
@@ -377,11 +315,13 @@ namespace Root_Rinse_Loader.Module
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();
                     m_tcpip.Send(protocol.p_sCmd);
+                    Thread.Sleep(10);
                 }
                 else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
                 {
                     m_protocolSend = m_qProtocolSend.Dequeue();
                     m_tcpip.Send(m_protocolSend.p_sCmd);
+                    Thread.Sleep(10);
                 }
             }
         }
@@ -414,8 +354,8 @@ namespace Root_Rinse_Loader.Module
                     switch (eCmd)
                     {
                         case eCmd.EQUeState:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
                             p_eStateUnloader = GetEQeState(asRead[2]);
-                            AddProtocol(asRead[0], eCmd, asRead[2]); 
                             break; 
                     }
                 }

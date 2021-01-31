@@ -30,6 +30,14 @@ namespace Root_AOP01_Inspection
             get { return Brushes.BurlyWood; }
             set { }
         }
+        public FDC p_FDC
+        {
+            get { return m_FDC; }
+            set
+            {
+                SetProperty(ref m_FDC, value);
+            }
+        }
         public FFU p_FFU
         {
             get { return m_FFU; }
@@ -46,6 +54,8 @@ namespace Root_AOP01_Inspection
         public AOP01_Recipe m_recipe;
         public AOP01_Process m_process;
         public MainVision m_mainVision;
+        public BacksideVision m_backsideVision;
+        public FDC m_FDC;
         public FFU m_FFU;
 
         void InitModule()
@@ -57,9 +67,14 @@ namespace Root_AOP01_Inspection
             InitLoadport();
             InitRFID();
             m_mainVision = new MainVision("MainVision", m_engineer);
+            m_backsideVision = new BacksideVision("BacksideVision", m_engineer, m_mainVision);
             InitModule(m_mainVision);
+            InitModule(m_backsideVision);
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_mainVision);
+            iWTR.AddChild(m_backsideVision);
+            m_FDC = new FDC("FDC", m_engineer);
+            InitModule(m_FDC);
             m_FFU = new FFU("FFU", m_engineer);
             InitModule(m_FFU);
             m_wtr.RunTree(Tree.eMode.RegRead);
@@ -188,7 +203,7 @@ namespace Root_AOP01_Inspection
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
-            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1]);
+            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision, m_backsideVision, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1], m_FDC);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             if (sInfo == "OK") m_bIsPossible_Recovery = true;
             return sInfo;
@@ -368,7 +383,9 @@ namespace Root_AOP01_Inspection
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
+                    case EQ.eState.Ready: break;  //LYJ add 210128
                     case EQ.eState.Run:
+                    case EQ.eState.Recovery:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             //CheckLoad();

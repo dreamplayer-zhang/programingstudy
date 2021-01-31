@@ -22,35 +22,40 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using static RootTools.Control.Axis;
 
 namespace Root_AOP01_Inspection.Module
 {
     public class MainVision : ModuleBase, IWTRChild
     {
+        public Dispatcher dispatcher;   // RecipeLADS_ViewModel 페이지에서 LADS Heatmap 바인딩을 하려면 Dispatcher 필요
+
         #region ToolBox
-        Axis m_axisRotate;
-        Axis m_axisZ;
-        Axis m_axisSideZ;
-        AxisXY m_axisXY;
+        public Axis m_axisRotate;
+        public Axis m_axisZ;
+        public Axis m_axisSideZ;
+        public AxisXY m_axisXY;
         public DIO_I m_diExistVision;
         public DIO_I m_diReticleTiltCheck;
         public DIO_I m_diReticleFrameCheck;
-        MemoryPool m_memoryPool;
-        MemoryGroup m_memoryGroup;
-        MemoryData m_memoryMain;
-        MemoryData m_memorySideLeft;
-        MemoryData m_memorySideRight;
-        MemoryData m_memorySideTop;
-        MemoryData m_memorySideBottom;
-        MemoryData m_memoryTDI45;
-        MemoryData m_memoryLADS;
+        public MemoryPool m_memoryPool;
+        public MemoryGroup m_memoryGroup;
+        public MemoryData m_memoryMain;
+        public MemoryData m_memorySideLeft;
+        public MemoryData m_memorySideRight;
+        public MemoryData m_memorySideTop;
+        public MemoryData m_memorySideBottom;
+        public MemoryData m_memoryTDI45;
+        public MemoryData m_memoryLADS;
 
-        LightSet m_lightSet;
-        Camera_Dalsa m_CamTDI90;
-        Camera_Dalsa m_CamTDI45;
-        Camera_Dalsa m_CamTDISide;
-        Camera_Basler m_CamLADS;
+        public LightSet m_lightSet;
+        public Camera_Dalsa m_CamTDI90;
+        public Camera_Dalsa m_CamTDI45;
+        public Camera_Dalsa m_CamTDISide;
+        public Camera_Basler m_CamLADS;
 
         class LADSInfo//한 줄에 대한 정보
         {
@@ -125,7 +130,6 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
-
         #region Axis Position
         public enum eAxisPos
         {
@@ -167,7 +171,6 @@ namespace Root_AOP01_Inspection.Module
             m_reg = new Registry(p_id + ".InfoWafer");
             m_sInfoWafer = m_reg.Read("sInfoWafer", m_sInfoWafer);
             p_infoWafer = m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
-            p_eSide = (eSide)m_reg.Read("p_eSide", p_eSide); 
         }
         #endregion
 
@@ -241,7 +244,7 @@ namespace Root_AOP01_Inspection.Module
                 return p_id + " eState not Ready";
             if (p_infoWafer != null)
                 return p_id + " IsPutOK - InfoWafer Exist";
-            if (m_waferSize[(int)p_eSide].GetData(infoWafer.p_eSize).m_bEnable == false)
+            if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false)
                 return p_id + " not Enable Wafer Size";
             return "OK";
         }
@@ -250,15 +253,7 @@ namespace Root_AOP01_Inspection.Module
         {
             if (infoWafer == null)
                 infoWafer = p_infoWafer;
-            return m_waferSize[0].GetData(infoWafer.p_eSize).m_teachWTR;
-        }
-
-        public int GetTeachWTR(eSide eSide, InfoWafer infoWafer = null)
-        {
-            if (infoWafer == null)
-                infoWafer = p_infoWafer;
-            //return m_waferSize[(int)p_eSide].GetData(infoWafer.p_eSize).m_teachWTR;
-            return m_waferSize[(int)eSide].GetData(infoWafer.p_eSize).m_teachWTR;
+            return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
         }
 
         private string MoveReadyPos()
@@ -322,11 +317,10 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
-        InfoWafer.WaferSize[] m_waferSize = new InfoWafer.WaferSize[2];
+        InfoWafer.WaferSize m_waferSize;
         public void RunTreeTeach(Tree tree)
         {
-            m_waferSize[0].RunTreeTeach(tree.GetTree(m_waferSize[0].m_id, false));
-            m_waferSize[1].RunTreeTeach(tree.GetTree(m_waferSize[1].m_id, false));
+            m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
         }
         #endregion
 
@@ -402,6 +396,11 @@ namespace Root_AOP01_Inspection.Module
 
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             //p_bStageVac = false;
+
+            m_axisRotate.StartMove(eAxisPos.ReadyPos);
+            if (m_axisRotate.WaitReady() != "OK")
+                return "Error";
+
             return "OK";
         }
         #endregion
@@ -443,6 +442,17 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
+        bool m_bPellicleShiftPass = true;
+        public bool p_bPellicleShiftPass
+        {
+            get { return m_bPellicleShiftPass; }
+            set
+            {
+                m_bPellicleShiftPass = value;
+                OnPropertyChanged();
+            }
+        }
+
         double m_dPatternShiftDistance = 0.0;
         public double p_dPatternShiftDistance
         {
@@ -465,6 +475,28 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
+        double m_dPellicleShiftDistance = 0.0;
+        public double p_dPellicleShiftDistance
+        {
+            get { return m_dPellicleShiftDistance; }
+            set
+            {
+                m_dPellicleShiftDistance = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double m_dPellicleShiftAngle = 0.0;
+        public double p_dPellicleShiftAngle
+        {
+            get { return m_dPellicleShiftAngle; }
+            set
+            {
+                m_dPellicleShiftAngle = value;
+                OnPropertyChanged();
+            }
+        }
+
         bool m_bBarcodePass = true;
         public bool p_bBarcodePass
         {
@@ -472,6 +504,50 @@ namespace Root_AOP01_Inspection.Module
             set
             {
                 m_bBarcodePass = value;
+                OnPropertyChanged();
+            }
+        }
+
+        bool m_bPellicleExpandingPass = true;
+        public bool p_bPellicleExpandingPass
+        {
+            get { return m_bPellicleExpandingPass; }
+            set
+            {
+                m_bPellicleExpandingPass = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double m_dPellicleExpandingMax = 0.0;
+        public double p_dPellicleExpandingMax
+        {
+            get { return m_dPellicleExpandingMax; }
+            set
+            {
+                m_dPellicleExpandingMax = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double m_dPellicleExpandingMin = 0.0;
+        public double p_dPellicleExpandingMin
+        {
+            get { return m_dPellicleExpandingMin; }
+            set
+            {
+                m_dPellicleExpandingMin = value;
+                OnPropertyChanged();
+            }
+        }
+
+        BitmapImage m_bmpImgPellicleHeatmap = new BitmapImage();
+        public BitmapImage p_bmpImgPellicleHeatmap
+        {
+            get { return m_bmpImgPellicleHeatmap; }
+            set
+            {
+                m_bmpImgPellicleHeatmap = value;
                 OnPropertyChanged();
             }
         }
@@ -657,22 +733,7 @@ namespace Root_AOP01_Inspection.Module
         #endregion
 
         #region ModuleRun
-        public enum eSide
-        {
-            Top,
-            Bottom,
-        }
-        eSide _eSide = eSide.Top;
-        public eSide p_eSide
-        {
-            get { return _eSide; }
-            set
-            {
-                if (_eSide == value) return;
-                _eSide = value;
-                m_reg.Write("p_eSide", (int)p_eSide); 
-            }
-        }
+       
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Grab(this), true, "Run Grab");
@@ -686,7 +747,7 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_PatternShiftAndRotation(this), true, "Run PatternShiftAndRotation");
             AddModuleRunList(new Run_AlignKeyInspection(this), true, "Run AlignKeyInspection");
             AddModuleRunList(new Run_PellicleShiftAndRotation(this), true, "Run PellicleShiftAndRotation");
-            AddModuleRunList(new Run_Test(this), true, "Run Delay");
+            AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
         }
         #endregion
 
@@ -702,8 +763,7 @@ namespace Root_AOP01_Inspection.Module
         public MainVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
-            m_waferSize[0] = new InfoWafer.WaferSize(id + "." + eSide.Top.ToString(), false, false);
-            m_waferSize[1] = new InfoWafer.WaferSize(id + "." + eSide.Bottom.ToString(), false, false);
+            m_waferSize = new InfoWafer.WaferSize(id, false, false);
             ladsinfos = new List<LADSInfo>();
             InitMemorys();
             InitPosAlign();
@@ -713,20 +773,19 @@ namespace Root_AOP01_Inspection.Module
         {
             base.ThreadStop();
         }
-        public class Run_Test : ModuleRunBase
+        public class Run_TestPellicle : ModuleRunBase
         {
             MainVision m_module;
             public RPoint m_rpAxisCenter = new RPoint();    // Side Center Position
-            public Run_Test(MainVision module)
+            public Run_TestPellicle(MainVision module)
             {
-                m_valueGeneral = eSide.Bottom; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
 
             }
             public override ModuleRunBase Clone()
             {
-                Run_Test run = new Run_Test(m_module);
+                Run_TestPellicle run = new Run_TestPellicle(m_module);
                 run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
                 return run;
             }
@@ -738,7 +797,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 Thread.Sleep(1000);
                 AxisXY axisXY = m_module.m_axisXY;
                 double dStartPosY = m_rpAxisCenter.Y;
@@ -804,7 +862,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public Run_GrabSideScan(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -850,7 +907,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 if (m_grabMode == null) return "Grab Mode == null";
 
                 try
@@ -875,8 +931,7 @@ namespace Root_AOP01_Inspection.Module
                     {
                         if (EQ.IsStop())
                             return "OK";
-
-                        double nRotate = m_nRotatePulse * (p_dDegree * nScanLine) + m_module.m_dThetaAlignOffset;
+                        double nRotate = m_nRotatePulse * (p_dDegree * nScanLine) + m_module.m_dThetaAlignOffset - 2500;
                         if (m_module.Run(axisRotate.StartMove(nRotate)))
                             return p_sInfo;
                         if (m_module.Run(axisRotate.WaitReady()))
@@ -887,7 +942,7 @@ namespace Root_AOP01_Inspection.Module
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
-                        double dPosX = m_rpAxisCenter.X + (m_module.m_narrSideEdgeOffset[nScanLine] * 5);
+                        double dPosX = m_rpAxisCenter.X;// + (m_module.m_narrSideEdgeOffset[nScanLine] * 5);
 
                         if (m_module.Run(axisSizeZ.StartMove(m_nFocusPosZ)))
                             return p_sInfo;
@@ -955,7 +1010,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public Run_Grab(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -987,15 +1041,14 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 if (m_grabMode == null) return "Grab Mode == null";
 
                 try
                 {
                     m_grabMode.SetLight(true);
 
-                    ((Camera_Dalsa)m_grabMode.m_camera).p_CamParam.p_eDir = DalsaParameterSet.eDir.Reverse;
-                    ((Camera_Dalsa)m_grabMode.m_camera).p_CamParam.p_eTriggerMode = DalsaParameterSet.eTriggerMode.External;
+                    //((Camera_Dalsa)m_grabMode.m_camera).p_CamParam.p_eDir = DalsaParameterSet.eDir.Reverse;
+                    //((Camera_Dalsa)m_grabMode.m_camera).p_CamParam.p_eTriggerMode = DalsaParameterSet.eTriggerMode.External;
 
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
@@ -1010,14 +1063,15 @@ namespace Root_AOP01_Inspection.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                     int nReticleSizeY_px = Convert.ToInt32(m_nReticleSize_mm * nMMPerUM / m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
-                    int nScanOffset_pulse = 100000; //가속버퍼구간
+                    int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
+                    int nScanOffset_pulse = Convert.ToInt32(nScanSpeed * 0.3); //가속버퍼구간
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
                         if (EQ.IsStop())
                             return "OK";
 
-                        double dStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
+                        double dStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse ;
                         double dEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
@@ -1043,7 +1097,7 @@ namespace Root_AOP01_Inspection.Module
                         string strMemory = m_grabMode.m_memoryData.p_id;
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
-                        int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
+                        
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
@@ -1100,7 +1154,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_GrabBacksideScan(MainVision module)
             {
-                m_valueGeneral = eSide.Bottom; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -1150,7 +1203,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 if (m_grabMode == null) return "Grab Mode == null";
 
                 try
@@ -1228,15 +1280,31 @@ namespace Root_AOP01_Inspection.Module
                     CRect crtRightROI = new CRect(m_cpRightEdgeCenterPos.X, m_cpRightEdgeCenterPos.Y, m_nSearchArea);
                     CRect crtBottomROI = new CRect(m_cpBottomEdgeCenterPos.X, m_cpBottomEdgeCenterPos.Y, m_nSearchArea);
 
-                    int nLeftStandardFocusPos = 2454;
-                    int nBottomStandardFocusPos = 31982;
-                    int nRightStandardFocusPos = 32382;
-                    int nTopStandardFocusPos = 1663;
+                    //int nLeftEdge = crtLeftROI.Left + m_module.GetEdge(mem, crtLeftROI, 100, eSearchDirection.LeftToRight, m_nEdgeThreshold, true);
+                    //int nTopEdge = crtTopROI.Top + m_module.GetEdge(mem, crtTopROI, 100, eSearchDirection.TopToBottom, m_nEdgeThreshold, true);
+                    //int nRightEdge = crtRightROI.Left + m_module.GetEdge(mem, crtRightROI, 100, eSearchDirection.RightToLeft, m_nEdgeThreshold, true);
+                    //int nBottomEdge = crtBottomROI.Top + m_module.GetEdge(mem, crtBottomROI, 100, eSearchDirection.BottomToTop, m_nEdgeThreshold, true);
 
-                    m_module.m_narrSideEdgeOffset[0] = nLeftStandardFocusPos - (crtLeftROI.Left + m_module.GetEdge(mem, crtLeftROI, crtLeftROI.Height / 2, eSearchDirection.LeftToRight, m_nEdgeThreshold, true));
-                    m_module.m_narrSideEdgeOffset[1] = nBottomStandardFocusPos - (crtBottomROI.Top + m_module.GetEdge(mem, crtBottomROI, crtBottomROI.Width / 2, eSearchDirection.BottomToTop, m_nEdgeThreshold, true));
-                    m_module.m_narrSideEdgeOffset[2] = nRightStandardFocusPos - (crtRightROI.Left + m_module.GetEdge(mem, crtRightROI, crtRightROI.Height / 2, eSearchDirection.RightToLeft, m_nEdgeThreshold, true));
-                    m_module.m_narrSideEdgeOffset[3] = nTopStandardFocusPos - (crtTopROI.Top + m_module.GetEdge(mem, crtTopROI, crtTopROI.Width / 2, eSearchDirection.TopToBottom, m_nEdgeThreshold, true));
+                    int nLeftStandardFocusPos = 2266;
+                    int nTopStandardFocusPos = 1751;
+                    int nRightStandardFocusPos = 32370;
+                    int nBottomStandardFocusPos = 31957;
+
+                    m_module.m_narrSideEdgeOffset[0] = nLeftStandardFocusPos - crtLeftROI.Left + m_module.GetEdge(mem, crtLeftROI, 100, eSearchDirection.LeftToRight, m_nEdgeThreshold, true);
+                    m_module.m_narrSideEdgeOffset[1] = nTopStandardFocusPos - crtTopROI.Top + m_module.GetEdge(mem, crtTopROI, 100, eSearchDirection.TopToBottom, m_nEdgeThreshold, true);
+                    m_module.m_narrSideEdgeOffset[2] = nRightStandardFocusPos - crtRightROI.Left + m_module.GetEdge(mem, crtRightROI, 100, eSearchDirection.RightToLeft, m_nEdgeThreshold, true);
+                    m_module.m_narrSideEdgeOffset[3] = nBottomStandardFocusPos - crtBottomROI.Top + m_module.GetEdge(mem, crtBottomROI, 100, eSearchDirection.BottomToTop, m_nEdgeThreshold, true);
+
+
+                    //int nLeftStandardFocusPos = 2454;
+                    //int nBottomStandardFocusPos = 31982;
+                    //int nRightStandardFocusPos = 32382;
+                    //int nTopStandardFocusPos = 1663;
+
+                    //m_module.m_narrSideEdgeOffset[0] = nLeftStandardFocusPos - (crtLeftROI.Left + m_module.GetEdge(mem, crtLeftROI, crtLeftROI.Height / 2, eSearchDirection.LeftToRight, m_nEdgeThreshold, true));
+                    //m_module.m_narrSideEdgeOffset[1] = nBottomStandardFocusPos - (crtBottomROI.Top + m_module.GetEdge(mem, crtBottomROI, crtBottomROI.Width / 2, eSearchDirection.BottomToTop, m_nEdgeThreshold, true));
+                    //m_module.m_narrSideEdgeOffset[2] = nRightStandardFocusPos - (crtRightROI.Left + m_module.GetEdge(mem, crtRightROI, crtRightROI.Height / 2, eSearchDirection.RightToLeft, m_nEdgeThreshold, true));
+                    //m_module.m_narrSideEdgeOffset[3] = nTopStandardFocusPos - (crtTopROI.Top + m_module.GetEdge(mem, crtTopROI, crtTopROI.Width / 2, eSearchDirection.TopToBottom, m_nEdgeThreshold, true));
 
                     return "OK";
                 }
@@ -1273,7 +1341,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public Run_Grab45(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -1305,7 +1372,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 if (m_grabMode == null) return "Grab Mode == null";
 
                 try
@@ -1499,7 +1565,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public Run_LADS(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -1536,7 +1601,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 if (m_grabMode == null) return "Grab Mode == null";
 
                 try
@@ -1723,6 +1787,36 @@ namespace Root_AOP01_Inspection.Module
 
                 }
                 CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
+
+                // Image Binding
+                System.Drawing.Bitmap bmp = ResultMat.Bitmap;
+                if (m_module.dispatcher != null)
+                {
+                    m_module.dispatcher.Invoke(new Action(delegate ()
+                    {
+                        m_module.p_bmpImgPellicleHeatmap = GetBitmapImageFromBitmap(bmp);
+                    }));
+                }
+
+                m_module.p_dPellicleExpandingMax = nMax;
+                m_module.p_dPellicleExpandingMin = nMin;
+            }
+
+            BitmapImage GetBitmapImageFromBitmap(System.Drawing.Bitmap bmp)
+            {
+                // Memory Stream 준비
+                MemoryStream ms = new MemoryStream();
+                bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                ms.Position = 0;
+
+                // BitmapImage로 변환
+                var bmpImg = new BitmapImage();
+                bmpImg.BeginInit();
+                bmpImg.StreamSource = ms;
+                bmpImg.CacheOption = BitmapCacheOption.OnLoad;
+                bmpImg.EndInit();
+
+                return bmpImg;
             }
 
             MCvScalar HeatColor(double dValue, double dMin, double dMax)
@@ -1756,10 +1850,10 @@ namespace Root_AOP01_Inspection.Module
             public bool m_bDarkBackground = true;
             public int m_nThreshold = 70;
             public int m_nSubImageThreshold = 70;
+            public double m_dNGSpecScratchLength_mm = 1;
 
             public Run_BarcodeInspection(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -1773,6 +1867,7 @@ namespace Root_AOP01_Inspection.Module
                 run.m_bDarkBackground = m_bDarkBackground;
                 run.m_nThreshold = m_nThreshold;
                 run.m_nSubImageThreshold = m_nSubImageThreshold;
+                run.m_dNGSpecScratchLength_mm = m_dNGSpecScratchLength_mm;
                 return run;
             }
 
@@ -1784,11 +1879,11 @@ namespace Root_AOP01_Inspection.Module
                 m_bDarkBackground = tree.Set(m_bDarkBackground, m_bDarkBackground, "Dark Background", "Dark Background", bVisible);
                 m_nThreshold = tree.Set(m_nThreshold, m_nThreshold, "Find Edge Threshold", "Find Edge Threshold", bVisible);
                 m_nSubImageThreshold = tree.Set(m_nSubImageThreshold, m_nSubImageThreshold, "Sub Image Threshold", "Sub Image Threshold", bVisible);
+                m_dNGSpecScratchLength_mm = tree.Set(m_dNGSpecScratchLength_mm, m_dNGSpecScratchLength_mm, "Scratch Spec [mm]", "Scratch Spec [mm]", bVisible);
             }
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 CPoint cptStartROIPoint = m_cptBarcodeLTPoint;
                 CPoint cptEndROIPoint = new CPoint(cptStartROIPoint.X + m_nROIWidth, cptStartROIPoint.Y + m_nROIHeight);
@@ -1803,7 +1898,7 @@ namespace Root_AOP01_Inspection.Module
                 int nRight = GetBarcodeSideEdge(mem, crtROI, 10, eSearchDirection.RightToLeft, m_nThreshold, m_bDarkBackground);
                 CRect crtBarcode = new CRect(m_cptBarcodeLTPoint.X + nLeft, m_cptBarcodeLTPoint.Y + nTop, m_cptBarcodeLTPoint.X + nRight, m_cptBarcodeLTPoint.Y + nBottom);
                 Mat matBarcode = m_module.GetMatImage(mem, crtBarcode);
-                matBarcode.Save("D:\\BeforeRotation.bmp");
+                matBarcode.Save("D:\\AOP01\\BarcodeInspection\\BeforeRotation.bmp");
 
                 // 회전각도 알아내기
                 int nLeftTop = GetEdge(mem, crtHalfLeft, 10, eSearchDirection.TopToBottom, m_nThreshold, m_bDarkBackground);
@@ -1818,7 +1913,7 @@ namespace Root_AOP01_Inspection.Module
                 Mat matRotation = new Mat();
                 CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
                 CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
-                matRotation.Save("D:\\AfterRotation.bmp");
+                matRotation.Save("D:\\AOP01\\BarcodeInspection\\AfterRotation.bmp");
 
                 // 회전 후 외곽영역 Cutting
                 int y1 = 100;
@@ -1826,7 +1921,7 @@ namespace Root_AOP01_Inspection.Module
                 int x1 = 100;
                 int x2 = matRotation.Cols - 100;
                 Mat matCutting = new Mat(matRotation, new Range(y1, y2), new Range(x1, x2));
-                matCutting.Save("D:\\Cutting.bmp");
+                matCutting.Save("D:\\AOP01\\BarcodeInspection\\Cutting.bmp");
 
                 // Profile 구하기
                 Mat matSub = GetRowProfileMat(matCutting);
@@ -1840,25 +1935,26 @@ namespace Root_AOP01_Inspection.Module
                 matResult3 = matSub - matCutting;
                 matResult = matResult2 + matResult3;
 
-                matResult.Save("D:\\Result.bmp");
+                matResult.Save("D:\\AOP01\\BarcodeInspection\\Result.bmp");
 
                 // 차영상에서 Blob Labeling
                 Mat matBinary = new Mat();
                 CvInvoke.Threshold(matResult, matBinary, m_nSubImageThreshold, 255, ThresholdType.Binary);
-                matBinary.Save("D:\\BinaryResult.bmp");
+                matBinary.Save("D:\\AOP01\\BarcodeInspection\\BinaryResult.bmp");
                 CvBlobs blobs = new CvBlobs();
                 CvBlobDetector blobDetector = new CvBlobDetector();
                 Image<Gray, byte> img = matBinary.ToImage<Gray, byte>();
                 blobDetector.Detect(img, blobs);
 
+                int nMMPerUM = 1000;
                 foreach (CvBlob blob in blobs.Values)
                 {
-                    if (blob.BoundingBox.Width > 10/*Spec*/ || blob.BoundingBox.Height > 10/*Spec*/)
+                    if (blob.BoundingBox.Width * 5/*TDI90 Resolution = 5*/ > m_dNGSpecScratchLength_mm * nMMPerUM || blob.BoundingBox.Height * 5/*TDI90 Resolution = 5*/ > m_dNGSpecScratchLength_mm * nMMPerUM)
                     {
                         m_module.p_bBarcodePass = false;
-                        return "Fail";
+                        break;
                     }
-                    //Console.WriteLine("Width:" + blob.BoundingBox.Width + ", Height:" + blob.BoundingBox.Height);
+                    else m_module.p_bBarcodePass = true;
                 }
 
                 return "OK";
@@ -2011,7 +2107,7 @@ namespace Root_AOP01_Inspection.Module
                         }
                         return 0;
 
-                        break;
+                        //break;
                     case eSearchDirection.RightToLeft:
 
                         for (int x = img.p_Size.X - 1; x >= 0; x--)
@@ -2037,17 +2133,17 @@ namespace Root_AOP01_Inspection.Module
                                     }
                                 }
                             }
-                            if (nFlipCount > 10) return x;
+                            if (nFlipCount > 30) return x;
                         }
                         return 0;
 
-                        break;
+                        //break;
                     default:
                         return 0;
-                        break;
+                        //break;
                 }
 
-                return 0;
+                //return 0;
             }
 
             unsafe Mat GetRowProfileMat(Mat matSrc)
@@ -2141,7 +2237,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_MakeAlignTemplateImage(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -2256,7 +2351,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 // variable
                 Mat matTopTemplateImage = new Mat();
                 Mat matBottomTemplateImage = new Mat();
@@ -2366,7 +2460,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_PatternAlign(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -2391,7 +2484,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 // variable
                 Image<Gray, byte> imgTop = new Image<Gray, byte>(m_strTopTemplateImageFilePath);
                 Image<Gray, byte> imgBottom = new Image<Gray, byte>(m_strBottomTemplateImageFilePath);
@@ -2468,7 +2560,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_PatternShiftAndRotation(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -2501,7 +2592,6 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 // variable
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
@@ -2631,14 +2721,15 @@ namespace Root_AOP01_Inspection.Module
                 if (m_dNGSpecDistance_um < (dResultDistance * moduleRunGrab.m_dResY_um))
                 {
                     m_module.p_bPatternShiftPass = false;
-                    return "Fail";
+                    //return "Fail";
                 }
+                else m_module.p_bPatternShiftPass = true;
                 if (m_dNGSpecDegree < m_module.p_dPatternShiftAngle)
                 {
                     m_module.p_bPatternShiftPass = false;
-                    return "Fail";
+                    //return "Fail";
                 }
-                m_module.p_bPatternShiftPass = true;
+                else m_module.p_bPatternShiftPass = true;
                 return "OK";
             }
 
@@ -2703,7 +2794,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_AlignKeyInspection(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -2728,7 +2818,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 // variable
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
@@ -2882,7 +2971,7 @@ namespace Root_AOP01_Inspection.Module
                             else if (j == (int)eSearchPoint.RB) strName += eSearchPoint.RB;
                             else strName += eSearchPoint.LB;
 
-                            imgSub.Save("D:\\ESCHO_" + strName + ".BMP");
+                            imgSub.Save("D:\\AOP01\\AlignKeyInspection\\ESCHO_" + strName + ".BMP");
 
                             //if (bResult == false)
                             //{
@@ -3044,6 +3133,9 @@ namespace Root_AOP01_Inspection.Module
             public int m_nFrameEdgeThreshold = 40;
             public int m_nSearchArea = 100;
 
+            public double m_dNGSpecDistance_um = 100.0;
+            public double m_dNGSpecDegree = 0.5;
+
             public CPoint m_cptReticleEdgeTLROI = new CPoint();
             public CPoint m_cptReticleEdgeTRROI = new CPoint();
             public CPoint m_cptReticleEdgeRTROI = new CPoint();
@@ -3064,7 +3156,6 @@ namespace Root_AOP01_Inspection.Module
 
             public Run_PellicleShiftAndRotation(MainVision module)
             {
-                m_valueGeneral = eSide.Top; //LYJ add 210125
                 m_module = module;
                 InitModuleRun(module);
             }
@@ -3075,11 +3166,13 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nLeftFrameScanLine = m_nLeftFrameScanLine;
                 run.m_nRightFrameScanLine = m_nRightFrameScanLine;
                 run.m_nFrameheight = m_nFrameheight;
-                run.m_nSearchArea = m_nSearchArea;
-
+                
                 run.m_nReticleEdgeThreshold = m_nReticleEdgeThreshold;
                 run.m_nFrameEdgeThreshold = m_nFrameEdgeThreshold;
+                run.m_nSearchArea = m_nSearchArea;
 
+                run.m_dNGSpecDistance_um = m_dNGSpecDistance_um;
+                run.m_dNGSpecDegree = m_dNGSpecDegree;
 
                 run.m_cptReticleEdgeTLROI = m_cptReticleEdgeTLROI;
                 run.m_cptReticleEdgeTRROI = m_cptReticleEdgeTRROI;
@@ -3112,6 +3205,9 @@ namespace Root_AOP01_Inspection.Module
                 m_nFrameEdgeThreshold = tree.Set(m_nFrameEdgeThreshold, m_nFrameEdgeThreshold, "Frame Edge Threshold", "Frame Edge Threshold", bVisible);
                 m_nSearchArea = tree.Set(m_nSearchArea, m_nSearchArea, "Search Area", "Search Area", bVisible);
 
+                m_dNGSpecDistance_um = tree.Set(m_dNGSpecDistance_um, m_dNGSpecDistance_um, "Distance NG Spec [um]", "Distance NG Spec [um]", bVisible);
+                m_dNGSpecDegree = tree.Set(m_dNGSpecDegree, m_dNGSpecDegree, "Degree NG Spec", "Degree NG Spec", bVisible);
+
                 m_cptReticleEdgeTLROI = tree.Set(m_cptReticleEdgeTLROI, m_cptReticleEdgeTLROI, "TL Reticle Edge", "TL Reticle Edge", bVisible);
                 m_cptReticleEdgeTRROI = tree.Set(m_cptReticleEdgeTRROI, m_cptReticleEdgeTRROI, "TR Reticle Edge", "TR Reticle Edge", bVisible);
                 m_cptReticleEdgeRTROI = tree.Set(m_cptReticleEdgeRTROI, m_cptReticleEdgeRTROI, "RT Reticle Edge", "RT Reticle Edge", bVisible);
@@ -3133,7 +3229,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                m_module.p_eSide = m_valueGeneral; //forget
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 VectorOfPoint contour = new VectorOfPoint();
                 double dReticleAngle = 0;
@@ -3254,83 +3349,16 @@ namespace Root_AOP01_Inspection.Module
                 double dResultDistance = m_module.GetDistanceOfTwoPoint(new CPoint((int)rtReticleEdge.Center.X, (int)rtReticleEdge.Center.Y), new CPoint((int)rtFrameEdge.Center.X, (int)rtFrameEdge.Center.Y));
                 double dResultAngle = Math.Abs(dFrameAngle - dReticleAngle);
 
+                Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
+                if (m_dNGSpecDistance_um < (dResultDistance * moduleRunGrab.m_dResY_um)) m_module.p_bPellicleShiftPass = false;
+                else m_module.p_bPellicleShiftPass = true;
+                if (m_dNGSpecDegree < m_module.p_dPatternShiftAngle) m_module.p_bPellicleShiftPass = false;
+                else m_module.p_bPellicleShiftPass = true;
+
+                m_module.p_dPellicleShiftDistance = dResultDistance;
+                m_module.p_dPellicleShiftAngle = dResultAngle;
+                
                 return "OK";
-
-                //Run_Grab grab = (Run_Grab)m_module.CloneModuleRun("Grab");
-
-                //if (grab.m_grabMode == null) return "Grab Mode == null";
-
-                //try
-                //{
-                //    grab.m_grabMode.SetLight(true);
-
-                //    AxisXY axisXY = m_module.m_axisXY;
-                //    Axis axisZ = m_module.m_axisZ;
-                //    CPoint cptMemoryOffset = new CPoint(grab.m_cpMemoryOffset);
-                //    int nScanLine = 0;
-                //    int nMMPerUM = 1000;
-                //    int nCamWidth = grab.m_grabMode.m_camera.GetRoiSize().X;
-                //    int nCamHeight = grab.m_grabMode.m_camera.GetRoiSize().Y;
-
-                //    double dXScale = grab.m_dResX_um * 10;
-                //    cptMemoryOffset.X += (m_nLeftFrameScanLine + grab.m_grabMode.m_ScanStartLine) * nCamWidth;
-                //    grab.m_grabMode.m_dTrigger = Convert.ToInt32(10 * grab.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
-                //    int nReticleSizeY_px = Convert.ToInt32(grab.m_nReticleSize_mm * nMMPerUM / grab.m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
-                //    int nTotalTriggerCount = Convert.ToInt32(grab.m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
-                //    int nScanOffset_pulse = 100000; //가속버퍼구간
-
-                //    for (int i = 0; i<2; i++)
-                //    {
-                //        if (EQ.IsStop()) return "OK";
-
-                //        double dStartPosY = grab.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
-                //        double dEndPosY = grab.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
-
-                //        grab.m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
-
-                //        double dPosX = 0;
-                //        if (i == 0) // Left Frame Scan
-                //            dPosX = grab.m_rpAxisCenter.X + nReticleSizeY_px * (double)grab.m_grabMode.m_dTrigger / 2 - (m_nLeftFrameScanLine/*nScanLine*/ + grab.m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
-                //        else // Right Frame Scan
-                //            dPosX = grab.m_rpAxisCenter.X + nReticleSizeY_px * (double)grab.m_grabMode.m_dTrigger / 2 - (m_nRightFrameScanLine/*nScanLine*/ + grab.m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
-
-                //        if (m_module.Run(axisZ.StartMove(grab.m_nFocusPosZ - (m_nFrameheight * nMMPerUM * 10))))   // 기존높이 - 프레임높이
-                //            return p_sInfo;
-                //        if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
-                //            return p_sInfo;
-                //        if (m_module.Run(axisXY.WaitReady()))
-                //            return p_sInfo;
-                //        if (m_module.Run(axisZ.WaitReady()))
-                //            return p_sInfo;
-
-                //        double dTriggerStartPosY = grab.m_rpAxisCenter.Y - nTotalTriggerCount / 2;
-                //        double dTriggerEndPosY = grab.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
-                //        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, grab.m_grabMode.m_dTrigger, true);
-
-                //        string strPool = grab.m_grabMode.m_memoryPool.p_id;
-                //        string strGroup = grab.m_grabMode.m_memoryGroup.p_id;
-                //        string strMemory = grab.m_grabMode.m_memoryData.p_id;
-
-                //        MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
-                //        int nScanSpeed = Convert.ToInt32((double)grab.m_nMaxFrame * grab.m_grabMode.m_dTrigger * nCamHeight * grab.m_nScanRate / 100);
-                //        grab.m_grabMode.StartGrab(mem, cptMemoryOffset, nReticleSizeY_px, 0, grab.m_grabMode.m_bUseBiDirectionScan);
-
-                //        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
-                //            return p_sInfo;
-                //        if (m_module.Run(axisXY.WaitReady()))
-                //            return p_sInfo;
-                //        axisXY.p_axisY.RunTrigger(false);
-
-                //        cptMemoryOffset.X = (m_nRightFrameScanLine + grab.m_grabMode.m_ScanStartLine) * nCamWidth;
-                //    }
-                //    grab.m_grabMode.m_camera.StopGrab();
-                //}
-                //finally
-                //{
-                //    grab.m_grabMode.SetLight(false);
-                //}
-
-                //return "OK";
             }
         }
         #endregion

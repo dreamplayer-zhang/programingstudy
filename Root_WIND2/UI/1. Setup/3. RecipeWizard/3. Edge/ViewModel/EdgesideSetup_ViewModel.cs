@@ -173,7 +173,28 @@ namespace Root_WIND2
 			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
 			parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 
-			WorkEventManager.ProcessDefectWaferDone += ProcessDefectWaferDone;
+			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
+			WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
+		}
+
+		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
+		{
+			Workplace workplace = sender as Workplace;
+
+			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+			{
+				UpdateProgress();
+			}));
+		}
+
+		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
+		{
+			Workplace workplace = sender as Workplace;
+
+			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+			{
+				UpdateDefectData();
+			}));
 		}
 
 		public void Scan()
@@ -233,15 +254,9 @@ namespace Root_WIND2
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm;
 		}
 
-
-		private void ProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs e)
+		private void UpdateProgress()
 		{
-			Workplace workplace = obj as Workplace;
 
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				UpdateDefectData();
-			}));
 		}
 
 		private void UpdateDefectData()
@@ -256,7 +271,7 @@ namespace Root_WIND2
 			DefectDataTable = DatabaseManager.Instance.SelectTablewithInspectionID(sDefect, sInspectionID);
 		}
 
-		public object GetDataGridItem(DataTable table, DataRowView selectedRow, string sColumnName)
+		private object GetDataGridItem(DataTable table, DataRowView selectedRow, string sColumnName)
 		{
 			object result;
 			for (int i = 0; i < table.Columns.Count; i++)
@@ -270,7 +285,7 @@ namespace Root_WIND2
 			return null;
 		}
 
-		public void DisplayDefectImage(string sInspectionID, string sDefectImageName)
+		private void DisplayDefectImage(string sInspectionID, string sDefectImageName)
 		{
 			string sDefectimagePath = @"D:\DefectImage";
 			sDefectimagePath = Path.Combine(sDefectimagePath, sInspectionID, sDefectImageName);

@@ -245,6 +245,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera\BaslerPylon\ChannelGraph.xaml.cs">
+      <DependentUpon>ChannelGraph.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Camera\BaslerPylon\GraphWindowTest.xaml.cs">
+      <DependentUpon>GraphWindowTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Comm\Modbus.cs" />
     <Compile Include="Comm\Modbus_UI.xaml.cs">
       <DependentUpon>Modbus_UI.xaml</DependentUpon>
@@ -385,6 +391,19 @@
       <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="InfoWafer.cs" />
+    <Compile Include="Lens\ILens.cs" />
+    <Compile Include="Lens\LensSet.cs" />
+    <Compile Include="Lens\LensSet_UI.xaml.cs">
+      <DependentUpon>LensSet_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Lens\LinearTurret\LensLinearTurret.cs" />
+    <Compile Include="Lens\LinearTurret\LensLinearTurret_UI.xaml.cs">
+      <DependentUpon>LensLinearTurret_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Lens\ToolSetLens.cs" />
+    <Compile Include="Lens\ToolSetLens_UI.xaml.cs">
+      <DependentUpon>ToolSetLens_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Light\LightTool_DAWOO.cs" />
     <Compile Include="Light\LightTool_DAWOO_UI.xaml.cs">
       <DependentUpon>LightTool_DAWOO_UI.xaml</DependentUpon>
@@ -747,6 +766,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Camera\BaslerPylon\ChannelGraph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Camera\BaslerPylon\GraphWindowTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Camera\CameraSet_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -884,6 +911,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Inspects\InspectTool_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Lens\LensSet_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Lens\LinearTurret\LensLinearTurret_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Lens\ToolSetLens_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
@@ -38,17 +39,17 @@ namespace RootTools.Camera.Dalsa
         #endregion
 
         #region Grab
-        private void buttonGrab_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonGrab_Click(object sender, RoutedEventArgs e)
         {
             m_cameraDalsa.p_sInfo = m_cameraDalsa.StartGrab(); 
         }
 
-        private void buttonLive_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonLive_Click(object sender, RoutedEventArgs e)
         {
             m_cameraDalsa.p_sInfo = m_cameraDalsa.StartLive(); 
         }
 
-        private void buttonStop_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonStop_Click(object sender, RoutedEventArgs e)
         {
             m_cameraDalsa.p_sInfo = m_cameraDalsa.StopGrab(); 
         }

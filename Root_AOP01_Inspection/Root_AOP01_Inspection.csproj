@@ -202,6 +202,8 @@
     <Compile Include="Engineer\AOP01_Process_UI.xaml.cs">
       <DependentUpon>AOP01_Process_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\BacksideVision.cs" />
+    <Compile Include="Module\FDC.cs" />
     <Compile Include="Module\FFU_Fan_UI.xaml.cs">
       <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>
     </Compile>

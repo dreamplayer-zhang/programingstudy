@@ -3,6 +3,7 @@ using Root_EFEM.Module;
 using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -28,9 +29,27 @@ namespace Root_AOP01_Inspection.Module
                 m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
             }
+            if (bInit) InitALID();
         }
         #endregion
+        #region GAF
+        //ALID 생성
+        public ALID m_alidGet;
+        public ALID m_alidPut;
+        public ALID m_alidClean;
+        public ALID m_alidHome;
+        public ALID m_alidCMD;
 
+
+        void InitALID()
+        {
+            m_alidGet = m_gaf.GetALID(this, "Get", "Get Motion Error");
+            m_alidPut = m_gaf.GetALID(this, "Put", "Put Motion Error");
+            m_alidClean = m_gaf.GetALID(this, "Clean", "Clean Motion Error");
+            m_alidHome = m_gaf.GetALID(this, "Home_RTR", "Home Motion Error");
+            m_alidCMD = m_gaf.GetALID(this, "CMD_RTR", "CMD Error");
+        }
+        #endregion
         #region Arm
         public enum eArm
         {
@@ -428,7 +447,11 @@ namespace Root_AOP01_Inspection.Module
             if (sReads[0] == "ERR") m_log.Error(GetErrorString(sReads[1]));
             else m_log.Info(sRead + " <-- Recv] ");
             Run(ReplyCmd(sReads));
-            if (p_sInfo != "OK") p_eState = eState.Error;
+            if (p_sInfo != "OK")
+            {
+                m_alidCMD.Run(true, "Please Check RTR Connect");
+                p_eState = eState.Error;
+            }
             m_eSendCmd = eCmd.None;
         }
 
@@ -441,7 +464,11 @@ namespace Root_AOP01_Inspection.Module
             {
                 if (EQ.IsStop()) return "EQ Stop";
                 Thread.Sleep(200);
-                if (m_eSendCmd != eCmd.None) return "RS232 Communication Error !!";
+                if (m_eSendCmd != eCmd.None)
+                {
+                    m_alidCMD.Run(true, "Please Check RTR Connect");
+                    return "RS232 Communication Error !!";
+                }
             }
             if (EQ.IsStop()) return "EQ Stop";
             string str = m_dicCmd[cmd];
@@ -470,7 +497,11 @@ namespace Root_AOP01_Inspection.Module
             {
                 if (EQ.IsStop()) return "EQ Stop";
                 Thread.Sleep(200);
-                if (m_eSendCmd != eCmd.None) return "RS232 Communication Error !!";
+                if (m_eSendCmd != eCmd.None)
+                {
+                    m_alidCMD.Run(true, "Please Check RTR Connect");
+                    return "RS232 Communication Error !!";
+                }
             }
             if (EQ.IsStop()) return "EQ Stop";
 
@@ -490,7 +521,11 @@ namespace Root_AOP01_Inspection.Module
             {
                 if (EQ.IsStop()) return "EQ Stop";
                 Thread.Sleep(200);
-                if (m_eSendCmd != eCmd.None) return "RS232 Communication Error !!";
+                if (m_eSendCmd != eCmd.None)
+                {
+                    m_alidCMD.Run(true, "Please Check RTR Connect");
+                    return "RS232 Communication Error !!";
+                }
             }
             if (EQ.IsStop()) return "EQ Stop";
 
@@ -511,13 +546,21 @@ namespace Root_AOP01_Inspection.Module
                 if (EQ.IsStop()) return "EQ Stop";
                 int msDelay = 1000 * secTimeout;
                 int ms10 = 0;
-                if (m_rs232.p_bConnect == false) return m_eSendCmd.ToString() + " RS232 not Connect !!";
+                if (m_rs232.p_bConnect == false)
+                {
+                    m_alidCMD.Run(true, "Please Check RTR Connect");
+                    return m_eSendCmd.ToString() + " RS232 not Connect !!";
+                }
                 while (m_eSendCmd != eCmd.None)
                 {
                     if (EQ.IsStop()) return "EQ Stop";
                     Thread.Sleep(10);
                     ms10 += 10;
-                    if (ms10 > msDelay) return m_eSendCmd.ToString() + " Has no Answer !!";
+                    if (ms10 > msDelay)
+                    {
+                        m_alidCMD.Run(true, "Please Check RTR Connect");
+                        return m_eSendCmd.ToString() + " Has no Answer !!";
+                    }
                 }
                 return "OK";
             }
@@ -546,18 +589,38 @@ namespace Root_AOP01_Inspection.Module
                     Thread.Sleep(100);
                 }
                 foreach (IWTRChild child in p_aChild) child.p_bLock = true;
-                if (Run(WriteCmdSetSpeed(eCmd.SetSpeed, m_OriginSpeed))) return p_sInfo; //Origin Speed Set 하드 코딩수정필요
-                if (Run(WaitReply(m_secMotion))) return p_sInfo;
+                if (Run(WriteCmdSetSpeed(eCmd.SetSpeed, m_OriginSpeed)))
+                {
+                    m_alidHome.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
+                if (Run(WaitReply(m_secMotion)))
+                {
+                    m_alidHome.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
                 if (m_bNeedHome)
                 {
-                    if (Run(WriteCmd(eCmd.FindHome))) return p_sInfo;
+                    if (Run(WriteCmd(eCmd.FindHome)))
+                    {
+                        m_alidHome.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
                 }
                 else
                 {
-                    if (Run(WriteCmd(eCmd.FindHome))) return p_sInfo;
+                    if (Run(WriteCmd(eCmd.FindHome)))
+                    {
+                        m_alidHome.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
                 }
                 m_bNeedHome = false;
-                if (Run(WaitReply(m_secHome))) return p_sInfo;
+                if (Run(WaitReply(m_secHome)))
+                {
+                    m_alidHome.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
                 p_eState = eState.Ready;
                 foreach (IWTRChild child in p_aChild) child.p_bLock = false;
                 return "OK";
@@ -810,7 +873,8 @@ namespace Root_AOP01_Inspection.Module
                 return m_module.m_dicArm[m_eArm].RunGrip(m_bGrip);
             }
         }
-        public static bool m_bDoflip = false;
+        public bool m_bDoflip = false;
+        public bool m_bRecovery = false;
 
         public class Run_Get : ModuleRunBase, IWTRRun
         {
@@ -859,32 +923,31 @@ namespace Root_AOP01_Inspection.Module
 
                 IWTRChild child = m_module.GetChild(p_sChild);
                 ModuleBase child_module = m_module.GetChild_Module(p_sChild);
-                if (child == null) return "WTR Child not Found : " + p_sChild;
+                if (child == null)
+                {
+                    m_module.m_alidGet.Run(true, "WTR Child not Found : " + p_sChild);
+                    return "WTR Child not Found : " + p_sChild;
+                }
                 if (EQ.p_bSimulate)
                 {
                     m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
                     child.SetInfoWafer(m_nChildID, null);
                     return "OK";
                 }
-                int posWTR = 0;
-                //if (m_bDoflip == true && child.p_id == "MainVision")
-                //{
-                //    posWTR = m_module.m_teachReticleFlip;
-                //    m_bDoflip = false;
+                int posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
                 //}
-                //else
-                //{
-                    if (child.p_id == "MainVision") 
-                    {
-                        MainVision vision = ((AOP01_Handler)m_module.m_engineer.ClassHandler()).m_mainVision;
-                        posWTR = vision.GetTeachWTR(vision.p_eSide, child.GetInfoWafer(m_nChildID)); 
-                    }
-                    else posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
-                //}
-                if (posWTR < 0) return "WTR Teach Position Not Defined";
+                if (posWTR < 0)
+                {
+                    m_module.m_alidGet.Run(true, "WTR Teach Position Not Defined");
+                    return "WTR Teach Position Not Defined";
+                }
                 if (child.p_eState != eState.Ready)
                 {
-                    if (m_module.Run(m_module.WriteCmd(eCmd.GetReady, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
+                    if (m_module.Run(m_module.WriteCmd(eCmd.GetReady, posWTR, m_nChildID + 1, (int)m_eArm + 1)))
+                    {
+                        m_module.m_alidGet.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
                 }
                 while (child.p_eState != eState.Ready)
                 {
@@ -892,23 +955,39 @@ namespace Root_AOP01_Inspection.Module
                     Thread.Sleep(100);
                 }
 
-                if (p_sChild == "MainVision")
+                if (p_sChild == "MainVision" || p_sChild == "BacksideVision")
                 {
                     while (child_module.IsBusy()) Thread.Sleep(10);
                 }
 
-                if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
+                if (m_module.Run(child.BeforeGet(m_nChildID)))
+                {
+                    m_module.m_alidGet.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
                 if (p_sChild == "MainVision")
                 {
                     while (child_module.IsBusy()) Thread.Sleep(10);
                 }
-                if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
+                if (m_module.Run(child.IsGetOK(m_nChildID)))
+                {
+                    m_module.m_alidGet.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
                 m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
                 try
                 {
                     child.p_bLock = true;
-                    if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
-                    if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                    if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1)))
+                    {
+                        m_module.m_alidGet.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
+                    if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                    {
+                        m_module.m_alidGet.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
                     child.p_bLock = false;
                     child.AfterGet(m_nChildID);
                 }
@@ -918,6 +997,7 @@ namespace Root_AOP01_Inspection.Module
                     else m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
                 if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
+                m_module.m_alidGet.Run(true, "WTR Get Error : Wafer Check Sensor not Detected at Arm = " + m_eArm.ToString());
                 return "WTR Get Error : Wafer Check Sensor not Detected at Arm = " + m_eArm.ToString();
             }
         }
@@ -936,14 +1016,12 @@ namespace Root_AOP01_Inspection.Module
             public string p_sChild { get; set; }
             public eArm m_eArm = eArm.Upper;
             public int m_nChildID = 0;
-            public MainVision.eSide m_eSide = MainVision.eSide.Top; 
             public override ModuleRunBase Clone()
             {
                 Run_Put run = new Run_Put(m_module);
                 run.m_eArm = m_eArm;
                 run.p_sChild = p_sChild;
                 run.m_nChildID = m_nChildID;
-                run.m_eSide = m_eSide;
                 return run;
             }
 
@@ -972,7 +1050,11 @@ namespace Root_AOP01_Inspection.Module
 
                 IWTRChild child = m_module.GetChild(p_sChild);
                 ModuleBase child_module = m_module.GetChild_Module(p_sChild);
-                if (child == null) return "WTR Child not Found : " + p_sChild;
+                if (child == null)
+                {
+                    m_module.m_alidPut.Run(true, "WTR Child not Found : " + p_sChild);
+                    return "WTR Child not Found : " + p_sChild;
+                }
                 if (EQ.p_bSimulate)
                 {
                     child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
@@ -984,30 +1066,44 @@ namespace Root_AOP01_Inspection.Module
                     if (EQ.IsStop()) return "Stop";
                     Thread.Sleep(100);
                 }
-                int posWTR = 0;
-                if (child.p_id == "MainVision")
+                int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
+                if (posWTR < 0)
                 {
-                    MainVision vision = ((AOP01_Handler)m_module.m_engineer.ClassHandler()).m_mainVision;
-                    posWTR = vision.GetTeachWTR(m_eSide, m_module.m_dicArm[m_eArm].p_infoWafer); 
+                    m_module.m_alidPut.Run(true, "WTR Teach Position Not Defined");
+                    return "WTR Teach Position Not Defined";
                 }
-                else posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
-                if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (p_sChild == "MainVision")
                 {
                     while (child_module.IsBusy()) Thread.Sleep(10);
                 }
-                if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
+                if (m_module.Run(child.BeforePut(m_nChildID)))
+                {
+                    m_module.m_alidPut.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
                 if (p_sChild == "MainVision")
                 {
                     while (child_module.IsBusy()) Thread.Sleep(10);
                 }
-                if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
+                if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID)))
+                {
+                    m_module.m_alidPut.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
                 child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
                 try
                 {
                     child.p_bLock = true;
-                    if (m_module.Run(m_module.WriteCmd(eCmd.Put, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
-                    if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                    if (m_module.Run(m_module.WriteCmd(eCmd.Put, posWTR, m_nChildID + 1, (int)m_eArm + 1)))
+                    {
+                        m_module.m_alidPut.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
+                    if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                    {
+                        m_module.m_alidPut.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
                     child.p_bLock = false;
                     child.AfterPut(m_nChildID);
                 }
@@ -1016,6 +1112,7 @@ namespace Root_AOP01_Inspection.Module
                     m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
                 if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";
+                m_module.m_alidPut.Run(true, "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id);
                 return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;
             }
         }
