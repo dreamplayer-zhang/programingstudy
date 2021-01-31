@@ -124,18 +124,20 @@ namespace Root_AOP01_Inspection
 
         bool IsRunModule()
         {
-            if (IsRunModule(m_loadport[0])) return true;
-            if (IsRunModule(m_loadport[1])) return true;
-            if (IsRunModule(m_rtrcleanunit)) return true;
-            if (IsRunModule(m_handler.m_mainVision)) return true;
-            if (IsRunModule(m_handler.m_backsideVision)) return true;
+            if (IsRunModule(m_loadport[0]) || IsRunModule(m_loadport[1]) || IsRunModule(m_rtrcleanunit) || IsRunModule(m_handler.m_mainVision) || IsRunModule(m_handler.m_backsideVision))
+                return true;
+            //if (IsRunModule(m_loadport[0])) return true;
+            //if (IsRunModule(m_loadport[1])) return true;
+            //if (IsRunModule(m_rtrcleanunit)) return true;
+            //if (IsRunModule(m_handler.m_mainVision)) return true;
+            //if (IsRunModule(m_handler.m_backsideVision)) return true;
             return false;
         }
         bool IsRunModule(ModuleBase module)
         {
             if (module.p_eState == ModuleBase.eState.Run) return true;
             if (module.p_eState == ModuleBase.eState.Home) return true;
-            //if (module.p_eState == ModuleBase.eState.Error) return false;
+            if (module.p_eState == ModuleBase.eState.Error) return false;
             return (module.m_qModuleRun.Count > 0);
         }
         private void ButtonInitialize_Click(object sender, RoutedEventArgs e)

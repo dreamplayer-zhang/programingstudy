@@ -164,14 +164,21 @@ namespace Root_AOP01_Inspection
             {
                 Run.Init(m_engineer.m_handler.m_mainVision, m_engineer.m_handler.m_backsideVision, (RTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer, (RFID_Brooks)m_engineer.m_handler.m_aRFID[0], (RFID_Brooks)m_engineer.m_handler.m_aRFID[1]);
             }
-            FDCName1.DataContext = m_engineer.m_handler.m_FDC.m_aData[0];
-            FDCValue1.DataContext = m_engineer.m_handler.m_FDC.m_aData[0];
-            FDCName2.DataContext = m_engineer.m_handler.m_FDC.m_aData[1];
-            FDCValue2.DataContext = m_engineer.m_handler.m_FDC.m_aData[1];
-            FDCName3.DataContext = m_engineer.m_handler.m_FDC.m_aData[2];
-            FDCValue3.DataContext = m_engineer.m_handler.m_FDC.m_aData[2];
-            FDCName4.DataContext = m_engineer.m_handler.m_FDC.m_aData[3];
-            FDCValue4.DataContext = m_engineer.m_handler.m_FDC.m_aData[3];
+            if (m_engineer.m_handler.m_FDC.m_aData.Count > 0)
+            {
+                try
+                {
+                    FDCName1.DataContext = m_engineer.m_handler.m_FDC.m_aData[0];
+                    FDCValue1.DataContext = m_engineer.m_handler.m_FDC.m_aData[0];
+                    FDCName2.DataContext = m_engineer.m_handler.m_FDC.m_aData[1];
+                    FDCValue2.DataContext = m_engineer.m_handler.m_FDC.m_aData[1];
+                    FDCName3.DataContext = m_engineer.m_handler.m_FDC.m_aData[2];
+                    FDCValue3.DataContext = m_engineer.m_handler.m_FDC.m_aData[2];
+                    FDCName4.DataContext = m_engineer.m_handler.m_FDC.m_aData[3];
+                    FDCValue4.DataContext = m_engineer.m_handler.m_FDC.m_aData[3];
+                }
+                catch { }
+            }
             InitTimer();
         }
         DispatcherTimer m_timer = new DispatcherTimer();
