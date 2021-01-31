@@ -18,7 +18,17 @@ namespace Root_AOP01_Inspection
         public Run_ViewModel(MainWindow main)
         {
             m_Mainwindow = main;
+            m_mainVision = ((AOP01_Handler)main.m_engineer.ClassHandler()).m_mainVision;
         }
+
+        #region Property
+        MainVision m_mainVision;
+        public MainVision p_mainVision
+        {
+            get { return m_mainVision; }
+            set { SetProperty(ref m_mainVision, value); }
+        }
+        #endregion
 
         public ICommand cmdStart
         {

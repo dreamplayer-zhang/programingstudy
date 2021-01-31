@@ -553,6 +553,96 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
+        #region ProgressBar
+        int m_nPellicleExpandingProgressValue = 0;
+        public int p_nPellicleExpandingProgressValue
+        {
+            get { return m_nPellicleExpandingProgressValue; }
+            set
+            {
+                m_nPellicleExpandingProgressValue = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nPellicleExpandingProgressMin = 0;
+        public int p_nPellicleExpandingProgressMin
+        {
+            get { return m_nPellicleExpandingProgressMin; }
+            set
+            {
+                m_nPellicleExpandingProgressMin = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nPellicleExpandingProgressMax = 100;
+        public int p_nPellicleExpandingProgressMax
+        {
+            get { return m_nPellicleExpandingProgressMax; }
+            set
+            {
+                m_nPellicleExpandingProgressMax = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double m_dPellicleExpandingProgressPercent = 0.0;
+        public double p_dPellicleExpandingProgressPercent
+        {
+            get { return m_dPellicleExpandingProgressPercent; }
+            set
+            {
+                m_dPellicleExpandingProgressPercent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nBarcodeInspectionProgressValue = 0;
+        public int p_nBarcodeInspectionProgressValue
+        {
+            get { return m_nBarcodeInspectionProgressValue; }
+            set
+            {
+                m_nBarcodeInspectionProgressValue = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nBarcodeInspectionProgressMin = 0;
+        public int p_nBarcodeInspectionProgressMin
+        {
+            get { return m_nBarcodeInspectionProgressMin; }
+            set
+            {
+                m_nBarcodeInspectionProgressMin = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nBarcodeInspectionProgressMax = 100;
+        public int p_nBarcodeInspectionProgressMax
+        {
+            get { return m_nBarcodeInspectionProgressMax; }
+            set
+            {
+                m_nBarcodeInspectionProgressMax = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double m_dBarcodeInspectionProgressPercent = 0.0;
+        public double p_dBarcodeInspectionProgressPercent
+        {
+            get { return m_dBarcodeInspectionProgressPercent; }
+            set
+            {
+                m_dBarcodeInspectionProgressPercent = value;
+                OnPropertyChanged();
+            }
+        }
+        #endregion
+
         #region Public Variable
         public int[] m_narrSideEdgeOffset = new int[4];
         public double m_dThetaAlignOffset = 0;
@@ -2005,6 +2095,11 @@ namespace Root_AOP01_Inspection.Module
                 Mat matReturn = new Mat(matSrc.Size, matSrc.Depth, matSrc.NumberOfChannels);
                 Image<Gray, byte> img = matReturn.ToImage<Gray, byte>();
                 // implement
+                m_module.p_nBarcodeInspectionProgressValue = 0;
+                m_module.p_nBarcodeInspectionProgressMin = 0;
+                m_module.p_nBarcodeInspectionProgressMax = matSrc.Rows - 1;
+                if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
+                    m_module.p_dBarcodeInspectionProgressPercent = m_module.p_nBarcodeInspectionProgressValue / (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100;
                 for (int y = 0; y < matSrc.Rows; y++)
                 {
                     lSum = 0;
@@ -2017,6 +2112,9 @@ namespace Root_AOP01_Inspection.Module
                     {
                         img.Data[y, x, 0] = (byte)(lSum / matSrc.Cols);
                     }
+                    m_module.p_nBarcodeInspectionProgressValue = y;
+                    if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
+                        m_module.p_dBarcodeInspectionProgressPercent = m_module.p_nBarcodeInspectionProgressValue / (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100;
                 }
                 matReturn = img.Mat;
 
@@ -3309,7 +3407,6 @@ namespace Root_AOP01_Inspection.Module
             public override string Run()
             {
                 // variable
-                //Run_MakeAlignTemplateImage moduleRun = (Run_MakeAlignTemplateImage)m_module.CloneModuleRun("MakeAlignTemplateImage");
                 Run_LADS moduleRunLADS = (Run_LADS)m_module.CloneModuleRun("LADS");
                 GrabMode grabMode = m_module.GetGrabMode("LADS");
                 string strPool = grabMode.m_memoryPool.p_id;
@@ -3319,18 +3416,26 @@ namespace Root_AOP01_Inspection.Module
                 int nMMPerUM = 1000;
                 int nReticleSizeY_px = Convert.ToInt32(moduleRunLADS.m_nReticleSize_mm * nMMPerUM / moduleRunLADS.m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
                 int nCamHeight = 480;//grabMode.m_camera.GetRoiSize().Y;
-
+                
                 // implement
                 ladsinfos.Clear();
+                m_module.p_nPellicleExpandingProgressValue = 0;
+                m_module.p_nPellicleExpandingProgressMin = 0;
+                m_module.p_nPellicleExpandingProgressMax = grabMode.m_ScanLineNum - 1;
+                if (m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin > 0)
+                    m_module.p_dPellicleExpandingProgressPercent = m_module.p_nPellicleExpandingProgressValue / (m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin) * 100;
                 for (int i = 0; i<grabMode.m_ScanLineNum; i++)
                 {
                     CalculateHeight_ESCHO(mem, grabMode.m_ScanStartLine + i, nReticleSizeY_px);
+                    m_module.p_nPellicleExpandingProgressValue = i;
+                    if (m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin > 0)
+                        m_module.p_dPellicleExpandingProgressPercent = m_module.p_nPellicleExpandingProgressValue / (m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin) * 100;
                 }
                 SaveFocusMapImage(grabMode.m_ScanLineNum, nReticleSizeY_px / nCamHeight);
 
                 return "OK";
             }
-
+            #region Sub Function
             unsafe void CalculateHeight_ESCHO(MemoryData mem, int nCurrentLine, int nReticleHeight_px)
             {
                 GrabMode grabMode = m_module.GetGrabMode("LADS");
@@ -3354,7 +3459,6 @@ namespace Root_AOP01_Inspection.Module
                 ladsinfos.Add(ladsinfo);
             }
 
-            #region VEGA LADS
             unsafe double CalculatingHeight(ImageData img)
             {
                 // variable
@@ -3399,8 +3503,6 @@ namespace Root_AOP01_Inspection.Module
                 if (nHitCount == 0) return -1;
                 return dSum / nHitCount;
             }
-            #endregion
-            #region 이지혜 LADS
             private void SaveFocusMapImage(int nX, int nY)
             {
                 GrabMode grabMode = m_module.GetGrabMode("LADS");

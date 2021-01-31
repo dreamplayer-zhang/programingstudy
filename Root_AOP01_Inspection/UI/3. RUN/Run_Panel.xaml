@@ -10,6 +10,10 @@
              d:DesignHeight="866"
              d:DesignWidth="1912"
              Background="{StaticResource PanelBackGround}">
+    <UserControl.Resources>
+        <local:BooleanToPassFailStringConverter x:Key="BooleanToPassFailString"/>
+        <local:BooleanToPassFailColorConverter x:Key="BooleanToPassFailColor"/>
+    </UserControl.Resources>
     <ScrollViewer>
         <StackPanel>
             <Grid Height="866">
@@ -179,23 +183,25 @@
                                          Columns="2">
                                 <TextBlock Text="Result"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="Pass"
-                                           Foreground="Green"
+                                <TextBlock Text="{Binding p_mainVision.p_bPellicleExpandingPass, Converter={StaticResource BooleanToPassFailString}}"
+                                           Foreground="{Binding p_mainVision.p_bPellicleExpandingPass, Converter={StaticResource BooleanToPassFailColor}}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Min"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_dPellicleExpandingMin}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Max"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_dPellicleExpandingMax}"
                                            VerticalAlignment="Center" />
                             </UniformGrid>
                             <Grid Grid.Row="1"
                                   Margin="5,3">
-                                <ProgressBar Value="100"
+                                <ProgressBar Value="{Binding p_mainVision.p_nPellicleExpandingProgressValue}"
+                                             Maximum="{Binding p_mainVision.p_nPellicleExpandingProgressMax}"
+                                             Minimum="{Binding p_mainVision.p_nPellicleExpandingProgressMin}"
                                              Foreground="SteelBlue" />
-                                <TextBlock Text="100%"
+                                <TextBlock Text="{Binding p_mainVision.p_dPellicleExpandingProgressPercent}"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
@@ -264,8 +270,8 @@
                                          Columns="2">
                                 <TextBlock Text="Result"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="-"
-                                           Foreground="Green"
+                                <TextBlock Text="{Binding p_mainVision.p_bAlignKeyPass, Converter={StaticResource BooleanToPassFailString}}"
+                                           Foreground="{Binding p_mainVision.p_bAlignKeyPass, Converter={StaticResource BooleanToPassFailColor}}"
                                            VerticalAlignment="Center" />
                             </UniformGrid>
                             <Grid Grid.Row="1"
@@ -290,16 +296,16 @@
                                          Columns="2">
                                 <TextBlock Text="Result"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="-"
-                                           Foreground="Green"
+                                <TextBlock Text="{Binding p_mainVision.p_bPatternShiftPass, Converter={StaticResource BooleanToPassFailString}}"
+                                           Foreground="{Binding p_mainVision.p_bPatternShiftPass, Converter={StaticResource BooleanToPassFailColor}}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Center"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_dPatternShiftDistance}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Angle"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_dPatternShiftAngle}"
                                            VerticalAlignment="Center" />
                             </UniformGrid>
                             <Grid Grid.Row="1"
@@ -324,16 +330,16 @@
                                          Columns="2">
                                 <TextBlock Text="Result"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="-"
-                                           Foreground="Green"
+                                <TextBlock Text="{Binding p_mainVision.p_bPellicleShiftPass, Converter={StaticResource BooleanToPassFailString}}"
+                                           Foreground="{Binding p_mainVision.p_bPellicleShiftPass, Converter={StaticResource BooleanToPassFailColor}}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Center"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_dPellicleShiftDistance}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Angle"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_dPellicleShiftAngle}"
                                            VerticalAlignment="Center" />
                             </UniformGrid>
                             <Grid Grid.Row="1"
@@ -381,16 +387,19 @@
                             <UniformGrid Margin="10,5"
                                          Rows="1"
                                          Columns="2">
-                                <TextBlock Text="Defect Count"
+                                <TextBlock Text="Result"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_bBarcodePass, Converter={StaticResource BooleanToPassFailString}}"
+                                           Foreground="{Binding p_mainVision.p_bBarcodePass, Converter={StaticResource BooleanToPassFailColor}}"
                                            VerticalAlignment="Center" />
                             </UniformGrid>
                             <Grid Grid.Row="1"
                                   Margin="5,3">
-                                <ProgressBar Value="0"
+                                <ProgressBar Value="{Binding p_mainVision.p_nBarcodeInspectionProgressValue}"
+                                             Maximum="{Binding p_mainVision.p_nBarcodeInspectionProgressMax}"
+                                             Minimum="{Binding p_mainVision.p_nBarcodeInspectionProgressMin}"
                                              Foreground="SteelBlue" />
-                                <TextBlock Text="0%"
+                                <TextBlock Text="{Binding p_mainVision.p_dBarcodeInspectionProgressPercent}"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
