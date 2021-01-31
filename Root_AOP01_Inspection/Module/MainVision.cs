@@ -133,7 +133,7 @@ namespace Root_AOP01_Inspection.Module
         #region Axis Position
         public enum eAxisPos
         {
-            ReadyPos,
+            ReadyPos,   // RTR 티칭포인트
             ScanPos,
         }
 
@@ -1052,6 +1052,7 @@ namespace Root_AOP01_Inspection.Module
 
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
+                    Axis axisRotate = m_module.m_axisRotate;
                     CPoint cpMemoryOffset = new CPoint(m_cpMemoryOffset);
                     int nScanLine = 0;
                     int nMMPerUM = 1000;
@@ -1071,7 +1072,7 @@ namespace Root_AOP01_Inspection.Module
                         if (EQ.IsStop())
                             return "OK";
 
-                        double dStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse ;
+                        double dStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
                         double dEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
@@ -1079,6 +1080,14 @@ namespace Root_AOP01_Inspection.Module
 
                         double dPosX = m_rpAxisCenter.X + nReticleSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
 
+                        // Theta축 0으로
+                        double dTheta = axisRotate.GetPosValue(eAxisPos.ScanPos.ToString());
+                        dTheta += m_module.m_dThetaAlignOffset;
+                        if (m_module.Run(axisRotate.StartMove(dTheta)))
+                            return p_sInfo;
+                        if (m_module.Run(axisRotate.WaitReady()))
+                            return p_sInfo;
+                        //
                         if (m_module.Run(axisZ.StartMove(m_nFocusPosZ)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
@@ -1097,7 +1106,7 @@ namespace Root_AOP01_Inspection.Module
                         string strMemory = m_grabMode.m_memoryData.p_id;
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
-                        
+
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
@@ -1423,17 +1432,17 @@ namespace Root_AOP01_Inspection.Module
                         double dTriggerEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
                         axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
-                        double dTriggerDistance = Math.Abs(dTriggerEndPosY - dTriggerStartPosY);
-                        double dSection = dTriggerDistance / ladsinfos[nScanLine].m_Heightinfo.Length;
-                        double[] darrScanAxisPos = new double[ladsinfos[nScanLine].m_Heightinfo.Length];
-                        for (int i = 0; i < darrScanAxisPos.Length; i++)
-                        {
-                            if (dTriggerStartPosY > dTriggerEndPosY)
-                                darrScanAxisPos[i] = dTriggerStartPosY - (dSection * i);
-                            else
-                                darrScanAxisPos[i] = dTriggerStartPosY + (dSection * i);
-                        }
-                        SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, darrScanAxisPos, ladsinfos[nScanLine].m_Heightinfo, ladsinfos[nScanLine].m_Heightinfo.Length, false);
+                        //double dTriggerDistance = Math.Abs(dTriggerEndPosY - dTriggerStartPosY);
+                        //double dSection = dTriggerDistance / ladsinfos[nScanLine].m_Heightinfo.Length;
+                        //double[] darrScanAxisPos = new double[ladsinfos[nScanLine].m_Heightinfo.Length];
+                        //for (int i = 0; i < darrScanAxisPos.Length; i++)
+                        //{
+                        //    if (dTriggerStartPosY > dTriggerEndPosY)
+                        //        darrScanAxisPos[i] = dTriggerStartPosY - (dSection * i);
+                        //    else
+                        //        darrScanAxisPos[i] = dTriggerStartPosY + (dSection * i);
+                        //}
+                        //SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, darrScanAxisPos, ladsinfos[nScanLine].m_Heightinfo, ladsinfos[nScanLine].m_Heightinfo.Length, false);
 
                         string strPool = m_grabMode.m_memoryPool.p_id;
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
@@ -1443,20 +1452,20 @@ namespace Root_AOP01_Inspection.Module
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
-                        CAXM.AxmContiStart(((AjinAxis)axisXY.p_axisY).m_nAxis, 0, 0);
-                        Thread.Sleep(10);
-                        uint unRunning = 0;
-                        while (true)
-                        {
-                            CAXM.AxmContiIsMotion(((AjinAxis)axisXY.p_axisY).m_nAxis, ref unRunning);
-                            if (unRunning == 0) break;
-                            Thread.Sleep(100);
-                        }
+                        //CAXM.AxmContiStart(((AjinAxis)axisXY.p_axisY).m_nAxis, 0, 0);
+                        //Thread.Sleep(10);
+                        //uint unRunning = 0;
+                        //while (true)
+                        //{
+                        //    CAXM.AxmContiIsMotion(((AjinAxis)axisXY.p_axisY).m_nAxis, ref unRunning);
+                        //    if (unRunning == 0) break;
+                        //    Thread.Sleep(100);
+                        //}
 
-                        //if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
-                        //    return p_sInfo;
-                        //if (m_module.Run(axisXY.WaitReady()))
-                        //    return p_sInfo;
+                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
+                            return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady()))
+                            return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
                         nScanLine++;
@@ -2489,13 +2498,77 @@ namespace Root_AOP01_Inspection.Module
                 Image<Gray, byte> imgBottom = new Image<Gray, byte>(m_strBottomTemplateImageFilePath);
                 CPoint cptTopCenter = new CPoint();
                 CPoint cptBottomCenter = new CPoint();
-                MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 bool bFoundTop = false;
                 bool bFoundBottom = false;
                 CPoint cptTopResultCenter;
                 CPoint cptBottomResultCenter;
 
                 // implement
+                // Align Mark 1Line Scan
+                Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
+                AxisXY axisXY = m_module.m_axisXY;
+                Axis axisZ = m_module.m_axisZ;
+                Axis axisRotate = m_module.m_axisRotate;
+                CPoint cpMemoryOffset = new CPoint(moduleRunGrab.m_cpMemoryOffset);
+                int nScanLine = 0;
+                int nMMPerUM = 1000;
+                int nCamWidth = moduleRunGrab.m_grabMode.m_camera.GetRoiSize().X;
+                int nCamHeight = moduleRunGrab.m_grabMode.m_camera.GetRoiSize().Y;
+                double dXScale = moduleRunGrab.m_dResX_um * 10;
+                cpMemoryOffset.X += (nScanLine + moduleRunGrab.m_grabMode.m_ScanStartLine) * nCamWidth;
+                moduleRunGrab.m_grabMode.m_dTrigger = Convert.ToInt32(10 * moduleRunGrab.m_dResY_um);
+                int nReticleSizeY_px = Convert.ToInt32(moduleRunGrab.m_nReticleSize_mm * nMMPerUM / moduleRunGrab.m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
+                int nTotalTriggerCount = Convert.ToInt32(moduleRunGrab.m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
+                int nScanSpeed = Convert.ToInt32((double)moduleRunGrab.m_nMaxFrame * moduleRunGrab.m_grabMode.m_dTrigger * nCamHeight * moduleRunGrab.m_nScanRate / 100);
+                int nScanOffset_pulse = Convert.ToInt32(nScanSpeed * 0.3); //가속버퍼구간
+
+                if (EQ.IsStop())
+                    return "OK";
+
+                moduleRunGrab.m_grabMode.SetLight(true);
+
+                double dStartPosY = moduleRunGrab.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
+                double dEndPosY = moduleRunGrab.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
+
+                moduleRunGrab.m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
+
+
+                double dPosX = moduleRunGrab.m_rpAxisCenter.X + nReticleSizeY_px * (double)moduleRunGrab.m_grabMode.m_dTrigger / 2 - (nScanLine + moduleRunGrab.m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
+
+                if (m_module.Run(axisRotate.StartMove(eAxisPos.ScanPos)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.StartMove(moduleRunGrab.m_nFocusPosZ)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
+                    return p_sInfo;
+                if (m_module.Run(axisRotate.WaitReady()))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+                
+
+                double dTriggerStartPosY = moduleRunGrab.m_rpAxisCenter.Y - nTotalTriggerCount / 2;
+                double dTriggerEndPosY = moduleRunGrab.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
+                axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, moduleRunGrab.m_grabMode.m_dTrigger, true);
+
+                string strPool = moduleRunGrab.m_grabMode.m_memoryPool.p_id;
+                string strGroup = moduleRunGrab.m_grabMode.m_memoryGroup.p_id;
+                string strMemory = moduleRunGrab.m_grabMode.m_memoryData.p_id;
+
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+
+                moduleRunGrab.m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, moduleRunGrab.m_grabMode.m_bUseBiDirectionScan);
+
+                if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+                axisXY.p_axisY.RunTrigger(false);
+                moduleRunGrab.m_grabMode.SetLight(false);
+                //
+
                 Run_MakeAlignTemplateImage moduleRun = (Run_MakeAlignTemplateImage)m_module.CloneModuleRun("MakeAlignTemplateImage");
                 cptTopCenter.X = moduleRun.m_cptTopAlignMarkCenterPos.X;
                 cptTopCenter.Y = moduleRun.m_cptTopAlignMarkCenterPos.Y;
@@ -2528,9 +2601,11 @@ namespace Root_AOP01_Inspection.Module
                     double dThetaPulse = dThetaDegree * 1000;
 
                     //Theta축 회전
-                    Axis axisRotate = m_module.m_axisRotate;
                     double dActualPos = axisRotate.p_posActual;
-                    axisRotate.StartMove(dActualPos + dThetaPulse);
+                    if (m_module.Run(axisRotate.StartMove(dActualPos + dThetaPulse)))
+                        return p_sInfo;
+                    if (m_module.Run(axisRotate.WaitReady()))
+                        return p_sInfo;
                     m_module.m_dThetaAlignOffset = dThetaPulse;
 
                     //// 회전이미지 
