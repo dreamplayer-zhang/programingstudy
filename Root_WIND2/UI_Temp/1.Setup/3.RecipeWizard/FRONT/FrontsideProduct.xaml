@@ -62,7 +62,7 @@
             <GroupBox Header="Create Map"
                   Margin="4"
                   Style="{StaticResource main_view_groupbox}">
-            <StackPanel Orientation="Vertical" Margin="4">
+                <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
                 <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                     <Grid.ColumnDefinitions >
                         <ColumnDefinition Width="120"/>
@@ -131,7 +131,7 @@
                   Header="Product Info"
                   Margin="4"
                   Style="{StaticResource main_view_groupbox}">
-            <Grid Margin="4" IsEnabled="False">
+                <Grid  Margin="12, 12, 12, 12" IsEnabled="False">
                 <!-- StackPanel로 수정하자 카메라 레졸루션도 넣어야함 -->
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/> <!-- 0 -->
@@ -218,7 +218,7 @@
             <GroupBox Header="Scan Information"
                   Margin="0,4,4,4"
                   Style="{StaticResource main_view_groupbox}">
-                <StackPanel Orientation="Vertical" Margin="4">
+                <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
                     <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="120"/>

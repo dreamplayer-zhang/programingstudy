@@ -6,100 +6,15 @@
              xmlns:local="clr-namespace:Root_WIND2.UI_Temp"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <!-- checkbox -->
-        <Style x:Key="imageViewer_toolbar_checkbox" TargetType="CheckBox">
-            <Setter Property="OverridesDefaultStyle" Value="False"/>
-            <Setter Property="Background" Value="#444480"/>
-            <Setter Property="Foreground" Value="{StaticResource sidetap_parent_menu_text}"/>
-            <Setter Property="Margin" Value="4,0,0,0"/>
-            <Setter Property="FontSize" Value="9"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type CheckBox}">
-                        <Border x:Name="bd"
-                                BorderThickness="2" 
-                                CornerRadius="4, 4, 4, 4"
-                                Padding="4"
-                                Width="36"
-                                Height="36"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{StaticResource sidetap_parent_menu_text}">
-                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"/>
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger  Property="IsChecked" Value="True">
-                                <Setter Property="Background" Value="#222244"/>
-                                <Setter TargetName="bd" Property="BorderBrush" Value="#77EEEE"/>
-                            </Trigger>
-                            <Trigger  Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#555599"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Button -->
-        <Style x:Key="imageViewer_toolbar_button" TargetType="Button">
-            <Setter Property="OverridesDefaultStyle" Value="False"/>
-            <Setter Property="Background" Value="#444480"/>
-            <Setter Property="Foreground" Value="{StaticResource sidetap_parent_menu_text}"/>
-            <Setter Property="Margin" Value="4,0,0,0"/>
-            <Setter Property="FontSize" Value="9"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="bd"
-                                BorderThickness="0" 
-                                CornerRadius="4, 4, 4, 4"
-                                Padding="4"
-                                Width="36"
-                                Height="36"
-                                Background="{TemplateBinding Background}">
-                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"/>
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger  Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#555599"/>
-                            </Trigger>
-                            <Trigger  Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#222244"/>
-                                <Setter Property="Foreground" Value="#888888"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
+             d:DesignHeight="600" d:DesignWidth="1200">
 
     <Grid Background="{StaticResource main_view_background}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50*"/>
-            <RowDefinition Height="50*"/>
-        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50*"/>
-            <ColumnDefinition Width="25*"/>
-            <ColumnDefinition Width="25*"/>
+            <ColumnDefinition Width="70*"/>
+            <ColumnDefinition Width="30*"/>
         </Grid.ColumnDefinitions>
         
-        <GroupBox Grid.Row="0"
-                  Grid.RowSpan="2"
-                  Margin="4"
+        <GroupBox Margin="4"
                   Header="Image VIew" Style="{StaticResource main_view_groupbox}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -108,21 +23,108 @@
                 </Grid.RowDefinitions>
                 
                 <StackPanel Grid.Column="1"  Orientation="Horizontal">
-                    <TextBox  Margin="4" IsReadOnly="True" Text="{Binding DisplayViewerState}" Width ="60" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="12" FontWeight="Bold"/>
-                    <CheckBox Content="Origin" IsChecked="{Binding IsOriginChecked, Mode=TwoWay}" Command="{Binding btnOriginCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
-                    <CheckBox Content="Pitch" IsChecked="{Binding IsPitchChecked, Mode=TwoWay}" Command="{Binding btnPitchCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
-                    <CheckBox Content="Rular" IsChecked="{Binding IsRularChecked, Mode=TwoWay}" Command="{Binding btnRularCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <!--<TextBox  Margin="4" IsReadOnly="True" Text="{Binding DisplayViewerState}" Width ="60" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="12" FontWeight="Bold"/>-->
+                    <TextBlock Text="Image" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <Button Content="Open" Command="{Binding btnOpenCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Save" Command="{Binding btnSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Clear" Command="{Binding btnClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>
+
+                    <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <CheckBox Content="Orgin" IsChecked="{Binding IsOriginChecked, Mode=TwoWay}" Command="{Binding btnOriginCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Pitch" IsChecked="{Binding IsPitchChecked, Mode=TwoWay}" IsEnabled="{Binding IsPitchEnable}" Command="{Binding btnPitchCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Rular" IsChecked="{Binding IsRularChecked, Mode=TwoWay}" Command="{Binding btnRularCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+
+                    <TextBlock Text="View" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Button Content="FULL" Command="{Binding btnViewFullCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="BOX" Command="{Binding btnViewBoxCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                 </StackPanel>
                 <!--<Border Grid.Row="1" Background="Black"/>-->
                 <Grid Grid.Row="1" >
+
+                    <!--<local:ImageViewer DataContext="{Binding ImageViewerVM}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>-->
                     <tools:RootViewer DataContext="{Binding ImageViewerVM}"/>
                 </Grid>
             </Grid>
         </GroupBox>
+        <StackPanel Grid.Column="1">
+            <GroupBox Header="Origin Information"
+                      Margin="4"
+                      Style="{StaticResource main_view_groupbox}">
+                <StackPanel Orientation="Vertical" Margin="12, 12, 12, 12">
+                    <!-- Origin Row -->
+                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Origin" Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamResolutionY}" HorizontalContentAlignment="Center"/>
+                    </Grid>
+                
+                    <!-- Origin Row Right Top -->
+                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Origin[Right/Top]" Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamResolutionY}" HorizontalContentAlignment="Center"/>
+                    </Grid>
+
+                    <!-- Pitch Row Right Top -->
+                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Pitch" Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamResolutionY}" HorizontalContentAlignment="Center"/>
+                    </Grid>
+
+                    <!-- Image Offset -->
+                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Image Offset" Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamResolutionY}" HorizontalContentAlignment="Center"/>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Save" Width ="120" Style="{StaticResource groupbox_button}"/>
+                        <Button Content="Reload" Width ="120" Style="{StaticResource groupbox_button}"/>
+                        <Button Content="Clear" Width ="120" Style="{StaticResource groupbox_button}"/>
+                    </StackPanel>
+                </StackPanel>
             
+            </GroupBox>
+        </StackPanel>
+
     </Grid>
 </UserControl>

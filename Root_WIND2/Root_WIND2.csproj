@@ -276,6 +276,15 @@
     </Compile>
     <Compile Include="UI\Interfaces\IRecipeUILoadable.cs" />
     <Compile Include="Module\WIND2.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment.xaml.cs">
+      <DependentUpon>FrontsideAlignment.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideMask.xaml.cs">
+      <DependentUpon>FrontsideMask.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideMask_ViewModel.cs" />
     <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideOrigin.xaml.cs">
       <DependentUpon>FrontsideOrigin.xaml</DependentUpon>
     </Compile>
@@ -656,6 +665,14 @@
     <Page Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideMask.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Warning_UI.xaml">
       <SubType>Designer</SubType>
