@@ -1770,7 +1770,7 @@ namespace Root_AOP01_Inspection.Module
                     for (int y = 0; y < nY; y++)
                     {
                         Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 3);
-                        MCvScalar color = HeatColor(ladsinfos[x].m_Heightinfo[y], nMin-25, nMax+25);
+                        MCvScalar color = HeatColor(ladsinfos[x].m_Heightinfo[y], nMin, nMax);
                         ColorImg.SetTo(color);
 
                         if (y == 0)
@@ -1898,7 +1898,7 @@ namespace Root_AOP01_Inspection.Module
                 int nRight = GetBarcodeSideEdge(mem, crtROI, 10, eSearchDirection.RightToLeft, m_nThreshold, m_bDarkBackground);
                 CRect crtBarcode = new CRect(m_cptBarcodeLTPoint.X + nLeft, m_cptBarcodeLTPoint.Y + nTop, m_cptBarcodeLTPoint.X + nRight, m_cptBarcodeLTPoint.Y + nBottom);
                 Mat matBarcode = m_module.GetMatImage(mem, crtBarcode);
-                matBarcode.Save("D:\\BeforeRotation.bmp");
+                matBarcode.Save("D:\\AOP01\\BarcodeInspection\\BeforeRotation.bmp");
 
                 // 회전각도 알아내기
                 int nLeftTop = GetEdge(mem, crtHalfLeft, 10, eSearchDirection.TopToBottom, m_nThreshold, m_bDarkBackground);
@@ -1913,7 +1913,7 @@ namespace Root_AOP01_Inspection.Module
                 Mat matRotation = new Mat();
                 CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
                 CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
-                matRotation.Save("D:\\AfterRotation.bmp");
+                matRotation.Save("D:\\AOP01\\BarcodeInspection\\AfterRotation.bmp");
 
                 // 회전 후 외곽영역 Cutting
                 int y1 = 100;
@@ -1921,7 +1921,7 @@ namespace Root_AOP01_Inspection.Module
                 int x1 = 100;
                 int x2 = matRotation.Cols - 100;
                 Mat matCutting = new Mat(matRotation, new Range(y1, y2), new Range(x1, x2));
-                matCutting.Save("D:\\Cutting.bmp");
+                matCutting.Save("D:\\AOP01\\BarcodeInspection\\Cutting.bmp");
 
                 // Profile 구하기
                 Mat matSub = GetRowProfileMat(matCutting);
@@ -1935,12 +1935,12 @@ namespace Root_AOP01_Inspection.Module
                 matResult3 = matSub - matCutting;
                 matResult = matResult2 + matResult3;
 
-                matResult.Save("D:\\Result.bmp");
+                matResult.Save("D:\\AOP01\\BarcodeInspection\\Result.bmp");
 
                 // 차영상에서 Blob Labeling
                 Mat matBinary = new Mat();
                 CvInvoke.Threshold(matResult, matBinary, m_nSubImageThreshold, 255, ThresholdType.Binary);
-                matBinary.Save("D:\\BinaryResult.bmp");
+                matBinary.Save("D:\\AOP01\\BarcodeInspection\\BinaryResult.bmp");
                 CvBlobs blobs = new CvBlobs();
                 CvBlobDetector blobDetector = new CvBlobDetector();
                 Image<Gray, byte> img = matBinary.ToImage<Gray, byte>();
@@ -2133,7 +2133,7 @@ namespace Root_AOP01_Inspection.Module
                                     }
                                 }
                             }
-                            if (nFlipCount > 10) return x;
+                            if (nFlipCount > 30) return x;
                         }
                         return 0;
 
@@ -2971,7 +2971,7 @@ namespace Root_AOP01_Inspection.Module
                             else if (j == (int)eSearchPoint.RB) strName += eSearchPoint.RB;
                             else strName += eSearchPoint.LB;
 
-                            imgSub.Save("D:\\ESCHO_" + strName + ".BMP");
+                            imgSub.Save("D:\\AOP01\\AlignKeyInspection\\ESCHO_" + strName + ".BMP");
 
                             //if (bResult == false)
                             //{
