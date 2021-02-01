@@ -2114,7 +2114,7 @@ namespace Root_AOP01_Inspection.Module
                     }
                     m_module.p_nBarcodeInspectionProgressValue = y;
                     if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
-                        m_module.p_dBarcodeInspectionProgressPercent = m_module.p_nBarcodeInspectionProgressValue / (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100;
+                        m_module.p_dBarcodeInspectionProgressPercent = (double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100;
                 }
                 matReturn = img.Mat;
 
@@ -3528,7 +3528,7 @@ namespace Root_AOP01_Inspection.Module
                     for (int y = 0; y < nY; y++)
                     {
                         Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 3);
-                        MCvScalar color = HeatColor(ladsinfos[x].m_Heightinfo[y], nMin, nMax);
+                        MCvScalar color = HeatColor(ladsinfos[x].m_Heightinfo[y], nMin-1, nMax+1);
                         ColorImg.SetTo(color);
 
                         if (y == 0)
