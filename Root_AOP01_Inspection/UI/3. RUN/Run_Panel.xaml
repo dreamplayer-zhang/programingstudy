@@ -201,7 +201,7 @@
                                              Maximum="{Binding p_mainVision.p_nPellicleExpandingProgressMax}"
                                              Minimum="{Binding p_mainVision.p_nPellicleExpandingProgressMin}"
                                              Foreground="SteelBlue" />
-                                <TextBlock Text="{Binding p_mainVision.p_dPellicleExpandingProgressPercent}"
+                                <TextBlock Text="{Binding p_mainVision.p_nPellicleExpandingProgressPercent}"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
@@ -310,7 +310,9 @@
                             </UniformGrid>
                             <Grid Grid.Row="1"
                                   Margin="5,3">
-                                <ProgressBar Value="0"
+                                <ProgressBar Value="{Binding p_mainVision.p_nPatternShiftProgressValue}"
+                                             Minimum="{Binding p_mainVision.p_nPatternShiftProgressMin}"
+                                             Maximum="{Binding p_mainVision.p_nPatternShiftProgressMax}"
                                              Foreground="SteelBlue" />
                                 <TextBlock Text="0%"
                                            VerticalAlignment="Center"

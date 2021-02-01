@@ -587,13 +587,13 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
-        double m_dPellicleExpandingProgressPercent = 0.0;
-        public double p_dPellicleExpandingProgressPercent
+        int m_nPellicleExpandingProgressPercent = 0;
+        public int p_nPellicleExpandingProgressPercent
         {
-            get { return m_dPellicleExpandingProgressPercent; }
+            get { return m_nPellicleExpandingProgressPercent; }
             set
             {
-                m_dPellicleExpandingProgressPercent = value;
+                m_nPellicleExpandingProgressPercent = value;
                 OnPropertyChanged();
             }
         }
@@ -631,13 +631,57 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
-        double m_dBarcodeInspectionProgressPercent = 0.0;
-        public double p_dBarcodeInspectionProgressPercent
+        int m_nBarcodeInspectionProgressPercent = 0;
+        public int p_nBarcodeInspectionProgressPercent
         {
-            get { return m_dBarcodeInspectionProgressPercent; }
+            get { return m_nBarcodeInspectionProgressPercent; }
             set
             {
-                m_dBarcodeInspectionProgressPercent = value;
+                m_nBarcodeInspectionProgressPercent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nPatternShiftProgressValue = 0;
+        public int p_nPatternShiftProgressValue
+        {
+            get { return m_nPatternShiftProgressValue; }
+            set
+            {
+                m_nPatternShiftProgressValue = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nPatternShiftProgressMin = 0;
+        public int p_nPatternShiftProgressMin
+        {
+            get { return m_nPatternShiftProgressMin; }
+            set
+            {
+                m_nPatternShiftProgressMin = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nPatternShiftProgressMax = 100;
+        public int p_nPatternShiftProgressMax
+        {
+            get { return m_nPatternShiftProgressMax; }
+            set
+            {
+                m_nPatternShiftProgressMax = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nPatternShiftProgressPercent = 0;
+        public int p_nPatternShiftProgressPercent
+        {
+            get { return m_nPatternShiftProgressPercent; }
+            set
+            {
+                m_nPatternShiftProgressPercent = value;
                 OnPropertyChanged();
             }
         }
@@ -2099,7 +2143,8 @@ namespace Root_AOP01_Inspection.Module
                 m_module.p_nBarcodeInspectionProgressMin = 0;
                 m_module.p_nBarcodeInspectionProgressMax = matSrc.Rows - 1;
                 if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
-                    m_module.p_dBarcodeInspectionProgressPercent = m_module.p_nBarcodeInspectionProgressValue / (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100;
+                    m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
+
                 for (int y = 0; y < matSrc.Rows; y++)
                 {
                     lSum = 0;
@@ -2114,7 +2159,7 @@ namespace Root_AOP01_Inspection.Module
                     }
                     m_module.p_nBarcodeInspectionProgressValue = y;
                     if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
-                        m_module.p_dBarcodeInspectionProgressPercent = (double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100;
+                        m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);       
                 }
                 matReturn = img.Mat;
 
@@ -2627,6 +2672,12 @@ namespace Root_AOP01_Inspection.Module
                 CPoint cptInFeatureCentroid;
 
                 // implement
+                m_module.p_nPatternShiftProgressValue = 0;
+                m_module.p_nPatternShiftProgressMin = 0;
+                m_module.p_nPatternShiftProgressMax = (int)eSearchPoint.Count * 2;
+                if (m_module.p_nPatternShiftProgressMax - m_module.p_nPatternShiftProgressMin > 0)
+                    m_module.p_nPatternShiftProgressPercent = (int)((double)m_module.p_nPatternShiftProgressValue / (double)(m_module.p_nPatternShiftProgressMax - m_module.p_nPatternShiftProgressMin) * 100);
+
                 // 1. Outside Feature(LT, RT, RB, LB) TemplateMatching
                 for (int i = 0; i < (int)eSearchPoint.Count; i++)
                 {
@@ -2662,6 +2713,8 @@ namespace Root_AOP01_Inspection.Module
                     CPoint cptFoundCenter;
                     bFound = m_module.TemplateMatching(mem, crtSearchArea, imgSearchArea, imgTemplate, out cptFoundCenter, m_dMatchScore);
                     if (bFound) cptarrOutResultCenterPositions[i] = new CPoint(cptFoundCenter);
+
+                    m_module.p_nPatternShiftProgressValue++;
                 }
                 cptOutFeatureCentroid = GetCentroidFromPolygonPointArray(cptarrOutResultCenterPositions);
 
@@ -2700,6 +2753,8 @@ namespace Root_AOP01_Inspection.Module
                     CPoint cptFoundCenter;
                     bFound = m_module.TemplateMatching(mem, crtSearchArea, imgSearchArea, imgTemplate, out cptFoundCenter, m_dMatchScore);
                     if (bFound) cptarrInResultCenterPositions[i] = new CPoint(cptFoundCenter);
+
+                    m_module.p_nPatternShiftProgressValue++;
                 }
                 cptInFeatureCentroid = GetCentroidFromPolygonPointArray(cptarrInResultCenterPositions);
 
@@ -3423,13 +3478,13 @@ namespace Root_AOP01_Inspection.Module
                 m_module.p_nPellicleExpandingProgressMin = 0;
                 m_module.p_nPellicleExpandingProgressMax = grabMode.m_ScanLineNum - 1;
                 if (m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin > 0)
-                    m_module.p_dPellicleExpandingProgressPercent = m_module.p_nPellicleExpandingProgressValue / (m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin) * 100;
+                    m_module.p_nPellicleExpandingProgressPercent = (int)((double)m_module.p_nPellicleExpandingProgressValue / (double)(m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin) * 100);
                 for (int i = 0; i<grabMode.m_ScanLineNum; i++)
                 {
                     CalculateHeight_ESCHO(mem, grabMode.m_ScanStartLine + i, nReticleSizeY_px);
                     m_module.p_nPellicleExpandingProgressValue = i;
                     if (m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin > 0)
-                        m_module.p_dPellicleExpandingProgressPercent = m_module.p_nPellicleExpandingProgressValue / (m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin) * 100;
+                        m_module.p_nPellicleExpandingProgressPercent = (int)((double)m_module.p_nPellicleExpandingProgressValue / (double)(m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin) * 100);
                 }
                 SaveFocusMapImage(grabMode.m_ScanLineNum, nReticleSizeY_px / nCamHeight);
 
