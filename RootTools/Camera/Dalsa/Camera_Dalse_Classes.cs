@@ -277,7 +277,8 @@ namespace RootTools.Camera.Dalsa
         }
         public void SetGrabDirection(eDir dir)
         {
-            m_sapCam.SetFeatureValue("sensorScanDirection", dir.ToString());
+            if (m_sapCam != null)
+                m_sapCam.SetFeatureValue("sensorScanDirection", dir.ToString());
         }
 
         public DalsaParameterSet(Log log)
