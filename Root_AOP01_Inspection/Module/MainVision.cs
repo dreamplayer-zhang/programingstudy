@@ -21,6 +21,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -682,6 +683,94 @@ namespace Root_AOP01_Inspection.Module
             set
             {
                 m_nPatternShiftProgressPercent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nPellicleShiftProgressValue = 0;
+        public int p_nPellicleShiftProgressValue
+        {
+            get { return m_nPellicleShiftProgressValue; }
+            set
+            {
+                m_nPellicleShiftProgressValue = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nPellicleShiftProgressMin = 0;
+        public int p_nPellicleShiftProgressMin
+        {
+            get { return m_nPellicleShiftProgressMin; }
+            set
+            {
+                m_nPellicleShiftProgressMin = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nPellicleShiftProgressMax = 100;
+        public int p_nPellicleShiftProgressMax
+        {
+            get { return m_nPellicleShiftProgressMax; }
+            set
+            {
+                m_nPellicleShiftProgressMax = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nPellicleShiftProgressPercent = 0;
+        public int p_nPellicleShiftProgressPercent
+        {
+            get { return m_nPellicleShiftProgressPercent; }
+            set
+            {
+                m_nPellicleShiftProgressPercent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nAlignKeyProgressValue = 0;
+        public int p_nAlignKeyProgressValue
+        {
+            get { return m_nAlignKeyProgressValue; }
+            set
+            {
+                m_nAlignKeyProgressValue = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nAlignKeyProgressMin = 0;
+        public int p_nAlignKeyProgressMin
+        {
+            get { return m_nAlignKeyProgressMin; }
+            set
+            {
+                m_nAlignKeyProgressMin = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nAlignKeyProgressMax = 100;
+        public int p_nAlignKeyProgressMax
+        {
+            get { return m_nAlignKeyProgressMax; }
+            set
+            {
+                m_nAlignKeyProgressMax = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int m_nAlignKeyProgressPercent = 0;
+        public int p_nAlignKeyProgressPercent
+        {
+            get { return m_nAlignKeyProgressPercent; }
+            set
+            {
+                m_nAlignKeyProgressPercent = value;
                 OnPropertyChanged();
             }
         }
@@ -2134,20 +2223,21 @@ namespace Root_AOP01_Inspection.Module
             unsafe Mat GetRowProfileMat(Mat matSrc)
             {
                 // variable
-                long lSum = 0;
                 byte* bp = null;
                 Mat matReturn = new Mat(matSrc.Size, matSrc.Depth, matSrc.NumberOfChannels);
                 Image<Gray, byte> img = matReturn.ToImage<Gray, byte>();
+
                 // implement
                 m_module.p_nBarcodeInspectionProgressValue = 0;
                 m_module.p_nBarcodeInspectionProgressMin = 0;
-                m_module.p_nBarcodeInspectionProgressMax = matSrc.Rows - 1;
+                m_module.p_nBarcodeInspectionProgressMax = matSrc.Rows;
                 if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
                     m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
 
-                for (int y = 0; y < matSrc.Rows; y++)
+                int nProgress = 0;
+                Parallel.For(0, matSrc.Rows, (y) =>
                 {
-                    lSum = 0;
+                    long lSum = 0;
                     for (int x = 0; x < matSrc.Cols; x++)
                     {
                         bp = (byte*)matSrc.DataPointer + y * matSrc.Step + x;
@@ -2157,10 +2247,10 @@ namespace Root_AOP01_Inspection.Module
                     {
                         img.Data[y, x, 0] = (byte)(lSum / matSrc.Cols);
                     }
-                    m_module.p_nBarcodeInspectionProgressValue = y;
+                    m_module.p_nBarcodeInspectionProgressValue = ++nProgress;
                     if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
-                        m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);       
-                }
+                        m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
+                });
                 matReturn = img.Mat;
 
                 return matReturn;
@@ -2672,6 +2762,8 @@ namespace Root_AOP01_Inspection.Module
                 CPoint cptInFeatureCentroid;
 
                 // implement
+                m_module.p_bPatternShiftPass = true;
+
                 m_module.p_nPatternShiftProgressValue = 0;
                 m_module.p_nPatternShiftProgressMin = 0;
                 m_module.p_nPatternShiftProgressMax = (int)eSearchPoint.Count * 2;
@@ -2759,9 +2851,9 @@ namespace Root_AOP01_Inspection.Module
                 cptInFeatureCentroid = GetCentroidFromPolygonPointArray(cptarrInResultCenterPositions);
 
                 // Get distance From InFeatureCentroid & OutFeatureCentroid
+                Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
                 double dResultDistance = m_module.GetDistanceOfTwoPoint(cptInFeatureCentroid, cptOutFeatureCentroid);
-                m_module.p_dPatternShiftDistance = dResultDistance;
-
+                m_module.p_dPatternShiftDistance = dResultDistance * moduleRunGrab.m_dResY_um;
 
                 // Get Degree
                 CPoint cptOutLeftCenter = new CPoint((cptarrOutResultCenterPositions[(int)eSearchPoint.LT].X + cptarrOutResultCenterPositions[(int)eSearchPoint.LB].X) / 2,
@@ -2787,19 +2879,15 @@ namespace Root_AOP01_Inspection.Module
                 //m_module.p_dPatternShiftAngle = dThetaDegree;
 
                 // Judgement
-                Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
                 if (m_dNGSpecDistance_um < (dResultDistance * moduleRunGrab.m_dResY_um))
                 {
                     m_module.p_bPatternShiftPass = false;
-                    //return "Fail";
                 }
-                else m_module.p_bPatternShiftPass = true;
                 if (m_dNGSpecDegree < m_module.p_dPatternShiftAngle)
                 {
                     m_module.p_bPatternShiftPass = false;
-                    //return "Fail";
                 }
-                else m_module.p_bPatternShiftPass = true;
+
                 return "OK";
             }
 
@@ -2905,6 +2993,12 @@ namespace Root_AOP01_Inspection.Module
                 Mat[] matarr = new Mat[4];
 
                 // implement
+                m_module.p_nAlignKeyProgressValue = 0;
+                m_module.p_nAlignKeyProgressMin = 0;
+                m_module.p_nAlignKeyProgressMax = 7;
+                if (m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin > 0)
+                    m_module.p_nAlignKeyProgressPercent = (int)((double)m_module.p_nAlignKeyProgressValue / (double)(m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin) * 100);
+
                 for (int i = 0; i < (int)eSearchPoint.Count; i++)
                 {
                     switch (i)
@@ -2980,6 +3074,10 @@ namespace Root_AOP01_Inspection.Module
                         matarr[i] = matResult.Clone();
                         //matResult.Save("D:\\TEST" + i + ".bmp");
                     }
+
+                    m_module.p_nAlignKeyProgressValue++;
+                    if (m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin > 0)
+                        m_module.p_nAlignKeyProgressPercent = (int)((double)m_module.p_nAlignKeyProgressValue / (double)(m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin) * 100);
                 }
 
                 // Compare All Image
@@ -3050,6 +3148,10 @@ namespace Root_AOP01_Inspection.Module
                             //}
                         }
                     }
+
+                    m_module.p_nAlignKeyProgressValue++;
+                    if (m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin > 0)
+                        m_module.p_nAlignKeyProgressPercent = (int)((double)m_module.p_nAlignKeyProgressValue / (double)(m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin) * 100);
                 }
                 m_module.p_bAlignKeyPass = true;
                 return "OK";
@@ -3304,6 +3406,12 @@ namespace Root_AOP01_Inspection.Module
                 double dReticleAngle = 0;
                 double dFrameAngle = 0;
 
+                m_module.p_nPellicleShiftProgressValue = 0;
+                m_module.p_nPellicleShiftProgressMin = 0;
+                m_module.p_nPellicleShiftProgressMax = 16;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
+
                 // Reticle Edge
                 CRect crtReticleEdgeTL = new CRect(new CPoint(m_cptReticleEdgeTLROI.X - (m_nSearchArea / 2), m_cptReticleEdgeTLROI.Y - (m_nSearchArea / 2)),
                                                    new CPoint(m_cptReticleEdgeTLROI.X + (m_nSearchArea / 2), m_cptReticleEdgeTLROI.Y + (m_nSearchArea / 2)));
@@ -3325,20 +3433,45 @@ namespace Root_AOP01_Inspection.Module
                 System.Drawing.Point[] ptsReticleEdge = new System.Drawing.Point[8];
                 int nTL = m_module.GetEdge(mem, crtReticleEdgeTL, m_nSearchArea / 2, eSearchDirection.TopToBottom, m_nReticleEdgeThreshold, true);
                 ptsReticleEdge[0] = new System.Drawing.Point(m_cptReticleEdgeTLROI.X, m_cptReticleEdgeTLROI.Y - (m_nSearchArea / 2) + nTL);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 int nTR = m_module.GetEdge(mem, crtReticleEdgeTR, m_nSearchArea / 2, eSearchDirection.TopToBottom, m_nReticleEdgeThreshold, true);
                 ptsReticleEdge[1] = new System.Drawing.Point(m_cptReticleEdgeTRROI.X, m_cptReticleEdgeTRROI.Y - (m_nSearchArea / 2) + nTR);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 int nRT = m_module.GetEdge(mem, crtReticleEdgeRT, m_nSearchArea / 2, eSearchDirection.RightToLeft, m_nReticleEdgeThreshold, true);
                 ptsReticleEdge[2] = new System.Drawing.Point(m_cptReticleEdgeRTROI.X - (m_nSearchArea / 2) + nRT, m_cptReticleEdgeRTROI.Y);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 int nRB = m_module.GetEdge(mem, crtReticleEdgeRB, m_nSearchArea / 2, eSearchDirection.RightToLeft, m_nReticleEdgeThreshold, true);
                 ptsReticleEdge[3] = new System.Drawing.Point(m_cptReticleEdgeRBROI.X - (m_nSearchArea / 2) + nRB, m_cptReticleEdgeRBROI.Y);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 int nBR = m_module.GetEdge(mem, crtReticleEdgeBR, m_nSearchArea / 2, eSearchDirection.BottomToTop, m_nReticleEdgeThreshold, true);
                 ptsReticleEdge[4] = new System.Drawing.Point(m_cptReticleEdgeBRROI.X, m_cptReticleEdgeBRROI.Y - (m_nSearchArea / 2) + nBR);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 int nBL = m_module.GetEdge(mem, crtReticleEdgeBL, m_nSearchArea / 2, eSearchDirection.BottomToTop, m_nReticleEdgeThreshold, true);
                 ptsReticleEdge[5] = new System.Drawing.Point(m_cptReticleEdgeBLROI.X, m_cptReticleEdgeBLROI.Y - (m_nSearchArea / 2) + nBL);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 int nLB = m_module.GetEdge(mem, crtReticleEdgeLB, m_nSearchArea / 2, eSearchDirection.LeftToRight, m_nReticleEdgeThreshold, true);
                 ptsReticleEdge[6] = new System.Drawing.Point(m_cptReticleEdgeLBROI.X - (m_nSearchArea / 2) + nLB, m_cptReticleEdgeLBROI.Y);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 int nLT = m_module.GetEdge(mem, crtReticleEdgeLT, m_nSearchArea / 2, eSearchDirection.LeftToRight, m_nReticleEdgeThreshold, true);
                 ptsReticleEdge[7] = new System.Drawing.Point(m_cptReticleEdgeLTROI.X - (m_nSearchArea / 2) + nLT, m_cptReticleEdgeLTROI.Y);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
+
                 contour.Push(ptsReticleEdge);
                 RotatedRect rtReticleEdge = CvInvoke.MinAreaRect(contour);
                 dReticleAngle = rtReticleEdge.Angle;
@@ -3381,20 +3514,45 @@ namespace Root_AOP01_Inspection.Module
                 System.Drawing.Point[] ptsFrameEdge = new System.Drawing.Point[8];
                 nTL = m_module.GetEdge(mem, crtFrameEdgeTL, m_nSearchArea / 2, eSearchDirection.BottomToTop, m_nFrameEdgeThreshold, false);
                 ptsFrameEdge[0] = new System.Drawing.Point(m_cptFrameEdgeTLROI.X, m_cptFrameEdgeTLROI.Y - (m_nSearchArea / 2) + nTL);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 nTR = m_module.GetEdge(mem, crtFrameEdgeTR, m_nSearchArea / 2, eSearchDirection.BottomToTop, m_nFrameEdgeThreshold, false);
                 ptsFrameEdge[1] = new System.Drawing.Point(m_cptFrameEdgeTRROI.X, m_cptFrameEdgeTRROI.Y - (m_nSearchArea / 2) + nTR);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 nRT = m_module.GetEdge(mem, crtFrameEdgeRT, m_nSearchArea / 2, eSearchDirection.LeftToRight, m_nFrameEdgeThreshold, false);
                 ptsFrameEdge[2] = new System.Drawing.Point(m_cptFrameEdgeRTROI.X - (m_nSearchArea / 2) + nRT, m_cptFrameEdgeRTROI.Y);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 nRB = m_module.GetEdge(mem, crtFrameEdgeRB, m_nSearchArea / 2, eSearchDirection.LeftToRight, m_nFrameEdgeThreshold, false);
                 ptsFrameEdge[3] = new System.Drawing.Point(m_cptFrameEdgeRBROI.X - (m_nSearchArea / 2) + nRB, m_cptFrameEdgeRBROI.Y);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 nBR = m_module.GetEdge(mem, crtFrameEdgeBR, m_nSearchArea / 2, eSearchDirection.TopToBottom, m_nFrameEdgeThreshold, false);
                 ptsFrameEdge[4] = new System.Drawing.Point(m_cptFrameEdgeBRROI.X, m_cptFrameEdgeBRROI.Y - (m_nSearchArea / 2) + nBR);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 nBL = m_module.GetEdge(mem, crtFrameEdgeBL, m_nSearchArea / 2, eSearchDirection.TopToBottom, m_nFrameEdgeThreshold, false);
                 ptsFrameEdge[5] = new System.Drawing.Point(m_cptFrameEdgeBLROI.X, m_cptFrameEdgeBLROI.Y - (m_nSearchArea / 2) + nBL);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 nLB = m_module.GetEdge(mem, crtFrameEdgeLB, m_nSearchArea / 2, eSearchDirection.RightToLeft, m_nFrameEdgeThreshold, false);
                 ptsFrameEdge[6] = new System.Drawing.Point(m_cptFrameEdgeLBROI.X - (m_nSearchArea / 2) + nLB, m_cptFrameEdgeLBROI.Y);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                 nLT = m_module.GetEdge(mem, crtFrameEdgeLT, m_nSearchArea / 2, eSearchDirection.RightToLeft, m_nFrameEdgeThreshold, false);
                 ptsFrameEdge[7] = new System.Drawing.Point(m_cptFrameEdgeLTROI.X - (m_nSearchArea / 2) + nLT, m_cptFrameEdgeLTROI.Y);
+                m_module.p_nPellicleShiftProgressValue++;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
+
                 contour.Push(ptsFrameEdge);
                 RotatedRect rtFrameEdge = CvInvoke.MinAreaRect(contour);
                 dFrameAngle = rtFrameEdge.Angle;
