@@ -22,11 +22,11 @@ namespace Root_WIND2.UI_Temp
 
             int left = originRecipe.OriginX;
             int bottom = originRecipe.OriginY;
-            int right = originRecipe.OriginX + originRecipe.ChipWidth;
-            int top = originRecipe.OriginY - originRecipe.ChipHeight;
+            int right = originRecipe.OriginX + originRecipe.OriginWidth;
+            int top = originRecipe.OriginY - originRecipe.OriginHeight;
 
-            int width = originRecipe.ChipWidth;
-            int height = originRecipe.ChipHeight;
+            int width = originRecipe.OriginWidth;
+            int height = originRecipe.OriginHeight;
 
             double full_ratio = 1;
             double ratio = 1;

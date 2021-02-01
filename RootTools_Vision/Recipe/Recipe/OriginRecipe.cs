@@ -12,8 +12,8 @@ namespace RootTools_Vision
         #region [Parameter]
         private int originX; // Left
         private int originY; // Bottom
-        private int chipWidth;
-        private int chipHeight;
+        private int originWidth;
+        private int originHeight;
         private int diePitchX;
         private int diePitchY;
         private int inspectionBufferOffsetX;
@@ -41,21 +41,21 @@ namespace RootTools_Vision
             }
         }
 
-        public int ChipWidth
+        public int OriginWidth
         {
-            get => this.chipWidth;
+            get => this.originWidth;
             set
             {
-                SetProperty<int>(ref this.chipWidth, value);
+                SetProperty<int>(ref this.originWidth, value);
             }
         }
 
-        public int ChipHeight
+        public int OriginHeight
         {
-            get => this.chipHeight;
+            get => this.originHeight;
             set
             {
-                SetProperty<int>(ref this.chipHeight, value);
+                SetProperty<int>(ref this.originHeight, value);
             }
         }
 
@@ -128,8 +128,8 @@ namespace RootTools_Vision
         {
             this.OriginX = 0;
             this.OriginY = 0;
-            this.ChipWidth = 0;
-            this.ChipHeight = 0;
+            this.OriginWidth = 0;
+            this.OriginHeight = 0;
             this.DiePitchX = 0;
             this.DiePitchY = 0;
             this.InspectionBufferOffsetX = 0;

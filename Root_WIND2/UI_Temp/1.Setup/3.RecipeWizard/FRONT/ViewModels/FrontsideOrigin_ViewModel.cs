@@ -25,7 +25,9 @@ namespace Root_WIND2.UI_Temp
 
             this.imageViewerVM.ViewerStateChanged += ViewerStateChanged_Callback;
             this.imageViewerVM.OriginBoxReset += OriginBoxReset_Callback;
+            this.imageViewerVM.OriginPointDone += OriginPointDone_Callback;
             this.imageViewerVM.OriginBoxDone += OriginBoxDone_Callback;
+            
         }
 
         public void  ViewerStateChanged_Callback()
@@ -42,14 +44,109 @@ namespace Root_WIND2.UI_Temp
         public void OriginBoxReset_Callback()
         {
             this.IsPitchEnable = false;
+            Clear();
+        }
+
+        public void OriginPointDone_Callback()
+        {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+            this.OriginX = originRecipe.OriginX;
+            this.OriginY = originRecipe.OriginY;
         }
 
         public void OriginBoxDone_Callback()
         {
             this.IsPitchEnable = true;
+
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+            this.OriginX = originRecipe.OriginX;
+            this.OriginY = originRecipe.OriginY;
+
+            this.OriginWidth = originRecipe.OriginWidth;
+            this.OriginHeight = originRecipe.OriginHeight;
+
+            this.PitchX = originRecipe.DiePitchX;
+            this.PitchY = originRecipe.DiePitchY;
+        }
+
+        public void Clear()
+        {
+            this.ImageViewerVM.ClearUIElements();
+
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+            originRecipe.Clear();
+
+            this.OriginX = 0;
+            this.OriginY = 0;
+            this.OriginWidth = 0;
+            this.OriginHeight = 0;
+            this.PitchX = 0;
+            this.PitchY = 0;
         }
 
         #region [Properties]
+        private int originX = 0;
+        public int OriginX
+        {
+            get => this.originX;
+            set
+            {
+                SetProperty<int>(ref this.originX, value);
+            }
+        }
+
+        private int originY = 0;
+        public int OriginY
+        {
+            get => this.originY;
+            set
+            {
+                SetProperty<int>(ref this.originY, value);
+            }
+        }
+
+        private int originWidth = 0;
+        public int OriginWidth
+        {
+            get => this.originWidth;
+            set
+            {
+                SetProperty<int>(ref this.originWidth, value);
+            }
+        }
+
+        private int originHeight = 0;
+        public int OriginHeight
+        {
+            get => this.originHeight;
+            set
+            {
+                SetProperty<int>(ref this.originHeight, value);
+            }
+        }
+
+        private int pitchX = 0;
+        public int PitchX
+        {
+            get => this.pitchX;
+            set
+            {
+                SetProperty<int>(ref this.pitchX, value);
+            }
+        }
+
+        private int pitchY = 0;
+        public int PitchY
+        {
+            get => this.pitchY;
+            set
+            {
+                SetProperty<int>(ref this.pitchY, value);
+            }
+        }
+
         private string displayViewerState = FRONT_ORIGIN_VIEWER_STATE.Normal.ToString();
         public string DisplayViewerState
         {
@@ -235,7 +332,16 @@ namespace Root_WIND2.UI_Temp
             }
         }
 
-
+        public RelayCommand btnOriginClearCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.Clear();
+                });
+            }
+        }
         #endregion
 
 

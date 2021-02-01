@@ -20,6 +20,7 @@ namespace Root_WIND2.UI_Temp
 
     public delegate void EventViewerStateChagned();
     public delegate void EventOriginBoxDone();
+    public delegate void EventOriginPointDone();
     public delegate void EventOriginBoxReset();
 
     class FrontsideOrigin_ImageViewer_ViewModel : RootViewer_ViewModel
@@ -39,8 +40,10 @@ namespace Root_WIND2.UI_Temp
 
         #region [Event]
         public event EventViewerStateChagned ViewerStateChanged;
+        public event EventOriginPointDone OriginPointDone;
         public event EventOriginBoxDone OriginBoxDone;
         public event EventOriginBoxReset OriginBoxReset;
+        
 
 
         #endregion
@@ -220,12 +223,15 @@ namespace Root_WIND2.UI_Temp
                     // Origin 
                     p_UIElement.Clear();
 
-                    p_Cursor = Cursors.Arrow;
-                    originLeftBottom = memPt;
-                    DrawOriginLeftBottomPoint(originLeftBottom);                    
-
                     if (this.OriginBoxReset != null)
                         this.OriginBoxReset();
+
+                    p_Cursor = Cursors.Arrow;
+                    originLeftBottom = memPt;
+                    DrawOriginLeftBottomPoint(originLeftBottom);
+
+                    if (this.OriginPointDone != null)
+                        this.OriginPointDone();
 
                     originState = PROCESS_ORIGIN_STATE.OriginRightTop;
                     break;
@@ -400,8 +406,8 @@ namespace Root_WIND2.UI_Temp
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
             OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 
-            originRecipe.ChipWidth = memPt.X - originRecipe.OriginX;
-            originRecipe.ChipHeight = originRecipe.OriginY - memPt.Y;
+            originRecipe.OriginWidth = memPt.X - originRecipe.OriginX;
+            originRecipe.OriginHeight = originRecipe.OriginY - memPt.Y;
 
             originRecipe.DiePitchX = memPt.X - originRecipe.OriginX;
             originRecipe.DiePitchY = originRecipe.OriginY - memPt.Y;
@@ -677,6 +683,11 @@ namespace Root_WIND2.UI_Temp
             }
             p_UIElement.Add(InspArea.CanvasRect);
 
+        }
+
+        public void ClearUIElements()
+        {
+            this.p_UIElement.Clear();
         }
 
         #endregion

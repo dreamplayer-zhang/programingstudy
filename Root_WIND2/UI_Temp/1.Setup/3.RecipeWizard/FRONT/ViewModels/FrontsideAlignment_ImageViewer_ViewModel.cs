@@ -47,16 +47,16 @@ namespace Root_WIND2.UI_Temp
         {
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
 
-            int offsetX = originRecipe.DiePitchX - originRecipe.ChipWidth;
-            int offsetY = originRecipe.DiePitchY - originRecipe.ChipHeight;
+            int offsetX = originRecipe.DiePitchX - originRecipe.OriginWidth;
+            int offsetY = originRecipe.DiePitchY - originRecipe.OriginHeight;
 
             int left = originRecipe.OriginX - offsetX;
             int bottom = originRecipe.OriginY + offsetY;
-            int right = originRecipe.OriginX + originRecipe.ChipWidth + offsetX;
-            int top = originRecipe.OriginY - originRecipe.ChipHeight - offsetY;
+            int right = originRecipe.OriginX + originRecipe.OriginWidth + offsetX;
+            int top = originRecipe.OriginY - originRecipe.OriginHeight - offsetY;
 
-            int width = originRecipe.ChipWidth + offsetX * 2;
-            int height = originRecipe.ChipHeight + offsetY * 2;
+            int width = originRecipe.OriginWidth + offsetX * 2;
+            int height = originRecipe.OriginHeight + offsetY * 2;
 
             double full_ratio = 1;
             double ratio = 1;

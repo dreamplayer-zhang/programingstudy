@@ -58,11 +58,11 @@
                             <ColumnDefinition Width="24"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Origin" Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="Origin"  Style="{StaticResource group_box_item_name_text}"/>
                         <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="2" Text="{Binding OriginX}" IsEnabled="False" HorizontalContentAlignment="Center"/>
                         <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamResolutionY}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="4" Text="{Binding OriginY}" IsEnabled="False" HorizontalContentAlignment="Center"/>
                     </Grid>
                 
                     <!-- Origin Row Right Top -->
@@ -74,11 +74,11 @@
                             <ColumnDefinition Width="24"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Origin[Right/Top]" Style="{StaticResource group_box_item_name_text}"/>
-                        <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
-                        <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamResolutionY}" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="Origin Size" Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="W" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding OriginWidth}" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="H" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding OriginHeight}" HorizontalContentAlignment="Center"/>
                     </Grid>
 
                     <!-- Pitch Row Right Top -->
@@ -92,9 +92,9 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Pitch" Style="{StaticResource group_box_item_name_text}"/>
                         <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding PitchX}" HorizontalContentAlignment="Center"/>
                         <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamResolutionY}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding PitchY}" HorizontalContentAlignment="Center"/>
                     </Grid>
 
                     <!-- Image Offset -->
@@ -116,7 +116,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="Save" Width ="120" Style="{StaticResource groupbox_button}"/>
                         <Button Content="Reload" Width ="120" Style="{StaticResource groupbox_button}"/>
-                        <Button Content="Clear" Width ="120" Style="{StaticResource groupbox_button}"/>
+                        <Button Content="Clear" Command="{Binding btnOriginClearCommand}" Width ="120" Style="{StaticResource groupbox_button}"/>
                     </StackPanel>
                 </StackPanel>
             
