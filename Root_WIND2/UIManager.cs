@@ -45,7 +45,7 @@ namespace Root_WIND2
         private SelectMode modeWindow;
         private Setup setupWindow;
 
-        private Root_WIND2.UI_Temp.Setup setupWindow2;
+        //private Root_WIND2.UI_Temp.Setup setupWindow2;
         private Review reviewWindow;
         private Run runWindow;
 

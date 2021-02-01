@@ -4,38 +4,58 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RootTools.Memory"
+             xmlns:convert="clr-namespace:ViewConverter"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <convert:ConverterVisibleProgress x:Key="ConverterVisibleProgresss" />
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Background="AliceBlue">
-            <ComboBox x:Name="comboBoxGroup" SelectedValue="{Binding p_sGroup}" Margin="2" MinWidth="80" SelectionChanged="comboBoxGroup_SelectionChanged"/>
-            <ComboBox x:Name="comboBoxMemory" SelectedValue="{Binding p_sMemory}" Margin="2" MinWidth="80" SelectionChanged="comboBoxMemory_SelectionChanged"/>
-            <ComboBox x:Name="comboBoxIndex" SelectedValue="{Binding p_nMemoryIndex}" Margin="2" MinWidth="40"/>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center"
+                Background="AliceBlue">
+            <ComboBox x:Name="comboBoxGroup" SelectedValue="{Binding p_sGroup}" Margin="2"
+                    MinWidth="80" SelectionChanged="comboBoxGroup_SelectionChanged" />
+            <ComboBox x:Name="comboBoxMemory" SelectedValue="{Binding p_sMemory}" Margin="2"
+                    MinWidth="80" SelectionChanged="comboBoxMemory_SelectionChanged" />
+            <ComboBox x:Name="comboBoxIndex" SelectedValue="{Binding p_nMemoryIndex}" Margin="2"
+                    MinWidth="40" />
             <Menu VerticalAlignment="Center">
                 <MenuItem Header="File">
-                    <MenuItem x:Name="menuOpen" Header="Open" Click="menuOpen_Click"/>
-                    <MenuItem x:Name="memuSave" Header="Save" Click="memuSave_Click"/>
-                    <MenuItem x:Name="memuClear" Header="Clear" Click="memuClear_Click"/>
+                    <MenuItem x:Name="menuOpen" Header="Open" Click="menuOpen_Click" />
+                    <MenuItem x:Name="memuSave" Header="Save" Click="memuSave_Click" />
+                    <MenuItem x:Name="memuClear" Header="Clear" Click="memuClear_Click" />
                 </MenuItem>
             </Menu>
-            <Label Content="{Binding p_sZoom}" ToolTip="Zoom" VerticalAlignment="Center"/>
-            <Label Content="{Binding p_cpWindow}" MinWidth="50" ToolTip="Window Position" VerticalAlignment="Center"/>
-            <Label Content="{Binding p_cpImage}" MinWidth="50" ToolTip="Image Position" VerticalAlignment="Center"/>
-            <Label Content="{Binding p_sGV}" ToolTip="GV or RGB" VerticalAlignment="Center"/>
+            <Label Content="{Binding p_sZoom}" ToolTip="Zoom" VerticalAlignment="Center" />
+            <Label Content="{Binding p_cpWindow}" MinWidth="50" ToolTip="Window Position"
+                    VerticalAlignment="Center" />
+            <Label Content="{Binding p_cpImage}" MinWidth="50" ToolTip="Image Position"
+                    VerticalAlignment="Center" />
+            <Label Content="{Binding p_sGV}" ToolTip="GV or RGB" VerticalAlignment="Center" />
         </StackPanel>
-        <Canvas Grid.Row="1" x:Name="gridBitmapSource" Background="Gray"
+        <ProgressBar Grid.Row="1" Value="{Binding p_nProgress}" Width="300" Height="35"
+                     Panel.ZIndex="1"
+                Visibility="{Binding Path=p_nProgress, Converter= {StaticResource ConverterVisibleProgresss}}" />
+        <Border Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Width="200" Height="35" Panel.ZIndex="1"
+                Visibility="{Binding Path=p_nProgress, Converter= {StaticResource ConverterVisibleProgresss}}">
+            <TextBlock TextElement.Foreground="Black"
+                       VerticalAlignment="Center"
+                    Text="{Binding Path = p_nProgress, StringFormat={}{0:0}%}"
+                    TextAlignment="Center" FontSize="30"></TextBlock>
+        </Border>
+        <Canvas Grid.Row="1" x:Name="gridBitmapSource" Background="Gray" Panel.ZIndex="0"
                 SizeChanged="gridBitmapSource_SizeChanged"
                 PreviewMouseMove="gridBitmapSource_PreviewMouseMove"
                 PreviewMouseWheel="gridBitmapSource_PreviewMouseWheel"
                 PreviewMouseLeftButtonDown="gridBitmapSource_PreviewMouseLeftButtonDown"
                 PreviewMouseLeftButtonUp="gridBitmapSource_PreviewMouseLeftButtonUp"
                 MouseLeave="gridBitmapSource_MouseLeave">
-            <Image x:Name="imageBitmapSource" Source="{Binding p_bitmapSrc}"/>
-            <Grid x:Name="gridDrawing"/>
+            <Image x:Name="imageBitmapSource" Source="{Binding p_bitmapSrc}" />
+            <Grid x:Name="gridDrawing" />
         </Canvas>
     </Grid>
 </UserControl>

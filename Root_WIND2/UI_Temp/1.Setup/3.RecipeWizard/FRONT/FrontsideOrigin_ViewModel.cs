@@ -22,11 +22,34 @@ namespace Root_WIND2.UI_Temp
         {
             this.imageViewerVM = new FrontsideOrigin_ImageViewer_ViewModel();
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
+
+            this.imageViewerVM.ViewerStateChanged += ViewerStateChanged_Callback;
+            this.imageViewerVM.OriginBoxReset += OriginBoxReset_Callback;
+            this.imageViewerVM.OriginBoxDone += OriginBoxDone_Callback;
         }
 
+        public void  ViewerStateChanged_Callback()
+        {
+            this.DisplayViewerState = this.imageViewerVM.ViewerState.ToString();
+            if(this.ImageViewerVM.ViewerState == FRONT_ORIGIN_VIEWER_STATE.Normal)
+            {
+                this.IsOriginChecked = false;
+                this.IsPitchChecked = false;
+                this.IsRularChecked = false;
+            }
+        }
+
+        public void OriginBoxReset_Callback()
+        {
+            this.IsPitchEnable = false;
+        }
+
+        public void OriginBoxDone_Callback()
+        {
+            this.IsPitchEnable = true;
+        }
 
         #region [Properties]
-
         private string displayViewerState = FRONT_ORIGIN_VIEWER_STATE.Normal.ToString();
         public string DisplayViewerState
         {
@@ -64,6 +87,17 @@ namespace Root_WIND2.UI_Temp
                     this.IsRularChecked = false;
                 }
                 SetProperty<bool>(ref this.isPitchChecked, value);
+            }
+        }
+
+
+        private bool isPitchEnable = false;
+        public bool IsPitchEnable
+        {
+            get => this.isPitchEnable;
+            set
+            {
+                SetProperty<bool>(ref this.isPitchEnable, value);
             }
         }
 
@@ -120,7 +154,7 @@ namespace Root_WIND2.UI_Temp
                     else
                     {
                         this.ImageViewerVM.ViewerState = FRONT_ORIGIN_VIEWER_STATE.Normal;
-                        this.DisplayViewerState = this.ImageViewerVM.ViewerState.ToString();
+                        this.DisplayViewerState = this.ImageViewerVM.ViewerState.ToString(); 
                     }
                 });
             }
@@ -179,6 +213,35 @@ namespace Root_WIND2.UI_Temp
             }
         }
 
+        public RelayCommand btnViewFullCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.ImageViewerVM.DisplayFull();
+                });
+            }
+        }
+
+        public RelayCommand btnViewBoxCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.ImageViewerVM.DisplayBox();
+                });
+            }
+        }
+
+
         #endregion
+
+
+
+
+
+
     }
 }

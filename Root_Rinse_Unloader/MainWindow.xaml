@@ -237,6 +237,7 @@
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
                                 <GroupBox Header="Unloader State"
+                                          Style="{StaticResource group}"
                                           Margin="5,10"
                                           Grid.Column="0"
                                           BorderThickness="0">
@@ -253,6 +254,7 @@
                                     </Border>
                                 </GroupBox>
                                 <GroupBox Header="Loader State"
+                                          Style="{StaticResource group}"
                                           Margin="5,10"
                                           Grid.Column="1"
                                           BorderThickness="0">
@@ -279,6 +281,7 @@
                                 </Grid.ColumnDefinitions>
                                 <GroupBox Header="Mode"
                                           Margin="5,10"
+                                          Style="{StaticResource group}"
                                           BorderThickness="0">
                                     <Border Margin="5"
                                             CornerRadius="5"
@@ -288,12 +291,15 @@
                                             Margin="5,0"
                                             FontSize="30"
                                             FontWeight="Bold"
-                                            FontFamily="Arial"/>    
+                                            FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>    
                                     </Border>
                                     
                                 </GroupBox>
                                 <GroupBox Header="Strip Width"
                                           Grid.Column="1"
+                                          Style="{StaticResource group}"
                                           BorderThickness="0"
                                           Margin="5,10">
                                     <Grid Background="#FFDDDDDD"
@@ -334,6 +340,7 @@
                                 </Grid.ColumnDefinitions>
                                 <GroupBox Header="Jog Move"
                                           Grid.Column="0"
+                                          Style="{StaticResource group}"
                                           Grid.Row="0"
                                           Margin="5,10"
                                           BorderThickness="0">
@@ -346,6 +353,7 @@
                                 </GroupBox>
                                 <GroupBox Grid.Column="1"
                                           Grid.Row="0"
+                                          Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
                                     <Button Content="LIFT DOWN"
@@ -357,6 +365,7 @@
                                 </GroupBox>
                                 <GroupBox Header="Move Level"
                                           Grid.Column="0"
+                                          Style="{StaticResource group}"
                                           Grid.Row="1"
                                           Margin="5,10"
                                           BorderThickness="0">
@@ -369,6 +378,7 @@
                                 </GroupBox>
                                 <GroupBox Grid.Column="1"
                                           Grid.Row="1"
+                                          Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
                                     <Button Content="Move - 2"
@@ -380,6 +390,7 @@
                                 </GroupBox>
                                 <GroupBox Grid.Column="2"
                                           Grid.Row="1"
+                                          Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
                                     <Button Content="Move - 3"
@@ -391,6 +402,7 @@
                                 </GroupBox>
                                 <GroupBox Grid.Column="3"
                                           Grid.Row="1"
+                                          Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
                                     <Button Content="Move - 4"
@@ -410,6 +422,7 @@
                                 </Grid.ColumnDefinitions>
                                 <GroupBox Header="Strip State 1"
                                           Grid.Column="0"
+                                          Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
                                     <Border Margin="5"
@@ -425,6 +438,7 @@
                                 </GroupBox>
                                 <GroupBox Header="Strip State 2"
                                           Grid.Column="1"
+                                          Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
                                     <Border Margin="5"
@@ -440,6 +454,7 @@
                                 </GroupBox>
                                 <GroupBox Header="Strip State 3"
                                           Grid.Column="2"
+                                          Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
                                     <Border Margin="5"
@@ -455,6 +470,7 @@
                                 </GroupBox>
                                 <GroupBox Header="Strip State 4"
                                           Grid.Column="3"
+                                          Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
                                     <Border Margin="5"
@@ -479,6 +495,7 @@
                                 </Grid.ColumnDefinitions>
                                 <GroupBox Header="Z Move"
                                           Grid.Column="0"
+                                          Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
                                     <Button x:Name="buttonPickerSetUp" Content="Up"
@@ -490,6 +507,7 @@
                                 </GroupBox>
                                 <GroupBox Grid.Column="1"
                                           Margin="5,10"
+                                          Style="{StaticResource group}"
                                           BorderThickness="0">
                                     <Button x:Name="buttonPickerSetDown" Content="Down"
                                             Margin="5,0"
@@ -501,6 +519,7 @@
                                 <GroupBox Grid.Column="2"
                                           Header="Vacuum"
                                           Margin="5,10"
+                                          Style="{StaticResource group}"
                                           BorderThickness="0">
                                     <Button x:Name="buttonPickerSetVacOn" Content="On"
                                             Margin="5,0"
@@ -511,6 +530,7 @@
                                 </GroupBox>
                                 <GroupBox Grid.Column="3"
                                           Margin="5,10"
+                                          Style="{StaticResource group}"
                                           BorderThickness="0">
                                     <Button x:Name="buttonPickerSetVacOff" Content="Off"
                                             Margin="5,0"

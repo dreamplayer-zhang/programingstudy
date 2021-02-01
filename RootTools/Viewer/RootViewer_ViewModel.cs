@@ -92,6 +92,39 @@ namespace RootTools
             }
         }
         private ObservableCollection<UIElement> m_ViewElement = new ObservableCollection<UIElement>();
+
+        /// <summary>
+        /// Global UI Shapes
+        /// </summary>
+        public ObservableCollection<UIElement> p_UIElement
+        {
+            get
+            {
+                return m_UIElement;
+            }
+            set
+            {
+                m_UIElement = value;
+            }
+        }
+        private ObservableCollection<UIElement> m_UIElement = new ObservableCollection<UIElement>();
+
+        /// <summary>
+        /// Global UI Shapes
+        /// </summary>
+        public ObservableCollection<UIElement> p_DrawElement
+        {
+            get
+            {
+                return m_DrawElement;
+            }
+            set
+            {
+                m_DrawElement = value;
+            }
+        }
+        private ObservableCollection<UIElement> m_DrawElement = new ObservableCollection<UIElement>();
+
         /// <summary>
         /// Main Image Data in Viewer
         /// </summary>
@@ -607,15 +640,15 @@ namespace RootTools
                                     Parallel.For(0, p_CanvasHeight, (yy) =>
                                 {
                                     //lock (o)
-                                    {
-                                        long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-                                        for (int xx = 0; xx < p_CanvasWidth; xx++)
                                         {
-                                            long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                                            long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+                                            for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                            {
+                                                long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
-                                                viewPtr[yy, xx, 0] = imageptrR[pix_x + (long)pix_y * sizeX];
-                                                viewPtr[yy, xx, 1] = imageptrG[pix_x + (long)pix_y * sizeX];
-                                                viewPtr[yy, xx, 2] = imageptrB[pix_x + (long)pix_y * sizeX];
+                                                    viewPtr[yy, xx, 0] = imageptrR[pix_x + (long)pix_y * sizeX];
+                                                    viewPtr[yy, xx, 1] = imageptrG[pix_x + (long)pix_y * sizeX];
+                                                    viewPtr[yy, xx, 2] = imageptrB[pix_x + (long)pix_y * sizeX];
                                             }
                                         }
                                     });

@@ -27,6 +27,8 @@ namespace Root_WIND2.UI_Temp
         public readonly UI_Temp.FrontsideSummary frontsideSummary = new UI_Temp.FrontsideSummary();
         public readonly UI_Temp.FrontsideProduct frontsideProduct = new UI_Temp.FrontsideProduct();
         public readonly UI_Temp.FrontsideOrigin frontsideOrigin = new UI_Temp.FrontsideOrigin();
+        public readonly UI_Temp.FrontsideAlignment frontsideAlignment = new UI_Temp.FrontsideAlignment();
+        public readonly UI_Temp.FrontsideMask frontsideMask = new UI_Temp.FrontsideMask();
 
 
         // BACK
@@ -37,6 +39,11 @@ namespace Root_WIND2.UI_Temp
         #endregion
 
         #region [ViewModels]
+        private UI_Temp.FrontsideProduct_ViewModel frontsideSummaryVM = new FrontsideProduct_ViewModel();
+        public UI_Temp.FrontsideProduct_ViewModel FrontsideSummaryVM
+        {
+            get => frontsideSummaryVM;
+        }
 
         private UI_Temp.FrontsideProduct_ViewModel frontsideProductVM = new FrontsideProduct_ViewModel();
         public UI_Temp.FrontsideProduct_ViewModel FrontsideProductVM
@@ -50,13 +57,23 @@ namespace Root_WIND2.UI_Temp
             get => frontsideOriginVM;
         }
 
+        private UI_Temp.FrontsideAlignment_ViewModel frontsideAlignmentVM = new UI_Temp.FrontsideAlignment_ViewModel();
+        public UI_Temp.FrontsideAlignment_ViewModel FrontsideAlignmentVM
+        {
+            get => frontsideAlignmentVM;
+        }
+
+        private UI_Temp.FrontsideMask_ViewModel frontsideMaskVM = new UI_Temp.FrontsideMask_ViewModel();
+        public UI_Temp.FrontsideMask_ViewModel FrontsideMaskVM
+        {
+            get => frontsideMaskVM;
+        }
+
 
         #endregion
         public RecipeWizardPanel_ViewModel()
         {
             Initialize();
-
-
         }
 
         public void Initialize()
@@ -72,7 +89,7 @@ namespace Root_WIND2.UI_Temp
                 return new RelayCommand(() =>
                 {
                     SetPage(frontsideSummary);
-                    //p_Summary_VM.SetPage();
+                    frontsideSummary.DataContext = frontsideSummaryVM;
                 });
             }
         }
@@ -85,7 +102,6 @@ namespace Root_WIND2.UI_Temp
                 {
                     SetPage(frontsideProduct);
                     frontsideProduct.DataContext = frontsideProductVM;
-                    //p_Summary_VM.SetPage();
                 });
             }
         }
@@ -98,7 +114,30 @@ namespace Root_WIND2.UI_Temp
                 {
                     SetPage(frontsideOrigin);
                     frontsideOrigin.DataContext = frontsideOriginVM;
-                    //p_Summary_VM.SetPage();
+                });
+            }
+        }
+
+        public ICommand btnFrontAlignment
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(frontsideAlignment);
+                    frontsideAlignment.DataContext = frontsideAlignmentVM;
+                });
+            }
+        }
+
+        public ICommand btnFrontMask
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(frontsideMask);
+                    frontsideMask.DataContext = frontsideMaskVM;
                 });
             }
         }

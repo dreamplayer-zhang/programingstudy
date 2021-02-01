@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -123,6 +124,22 @@ namespace Root_WIND2
                 parent = VisualTreeHelper.GetParent(parent);
             }
             return parent as TreeViewItem;
+        }
+    }
+
+    public class CollectionCountToVisibilityConverter : IValueConverter
+    {
+
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return ((int)value == 0) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            Visibility result = (Visibility)Enum.Parse(typeof(Visibility), value.ToString(), true);
+
+            return result == Visibility.Visible ? true : false;
         }
     }
 }

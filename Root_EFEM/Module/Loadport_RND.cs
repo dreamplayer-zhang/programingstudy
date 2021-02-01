@@ -654,9 +654,8 @@ namespace Root_EFEM.Module
                 string sResult = "OK";
                 if (EQ.p_bSimulate)
                 {
-                    //m_infoCarrier.p_bCarrierOn = true;
                     m_infoCarrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
-                    m_infoCarrier.p_sCarrierID = m_sSimulCarrierID;
+                    //m_infoCarrier.p_sCarrierID = m_sSimulCarrierID;
                 }
                 else
                 {
@@ -681,6 +680,7 @@ namespace Root_EFEM.Module
                 while (m_infoCarrier.p_eStateCarrierID != GemCarrierBase.eGemState.VerificationOK)
                 {
                     Thread.Sleep(10);
+                    if (EQ.p_bStop) return p_sInfo + "EQ Stop";
                     if (m_infoCarrier.p_eStateCarrierID == GemCarrierBase.eGemState.VerificationFailed)
                         return p_sInfo + " infoCarrier.p_eStateCarrierID = " + m_infoCarrier.p_eStateCarrierID.ToString();
                 }
@@ -727,6 +727,7 @@ namespace Root_EFEM.Module
                 while (m_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
                 {
                     Thread.Sleep(10);
+                    if (EQ.p_bStop) return p_sInfo + "EQ Stop";
                     if (m_infoCarrier.p_eStateSlotMap == GemCarrierBase.eGemState.VerificationFailed)
                         return p_sInfo + " infoCarrier.p_eStateSlotMap = " + m_infoCarrier.p_eStateSlotMap.ToString();
                 }

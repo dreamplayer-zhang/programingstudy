@@ -215,12 +215,16 @@ namespace Root_Rinse_Unloader.Module
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();
             m_bBlink = !m_bBlink;
-            switch (EQ.p_eState)
+            if (m_bBlink == false) m_doLamp.AllOff();
+            else
             {
-                case EQ.eState.Ready: m_doLamp.Write(eLamp.Green); break;
-                case EQ.eState.Run: m_doLamp.Write(eLamp.Yellow); break;
-                case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
-                default: m_doLamp.AllOff(); break;
+                switch (EQ.p_eState)
+                {
+                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Green); break;
+                    case EQ.eState.Run: m_doLamp.Write(eLamp.Yellow); break;
+                    case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
+                    default: m_doLamp.AllOff(); break;
+                }
             }
         }
         #endregion
@@ -233,6 +237,7 @@ namespace Root_Rinse_Unloader.Module
             SetWidth,
             EQLeState,
             EQUeState,
+            PickerSet,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd)); 
 
@@ -279,11 +284,13 @@ namespace Root_Rinse_Unloader.Module
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();
                     m_tcpip.Send(protocol.p_sCmd);
+                    Thread.Sleep(10); 
                 }
                 else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
                 {
                     m_protocolSend = m_qProtocolSend.Dequeue();
                     m_tcpip.Send(m_protocolSend.p_sCmd);
+                    Thread.Sleep(10);
                 }
             }
         }
@@ -316,16 +323,17 @@ namespace Root_Rinse_Unloader.Module
                     switch (eCmd)
                     {
                         case eCmd.SetMode:
-                            SetMode(asRead[2]);
                             AddProtocol(asRead[0], eCmd, asRead[2]);
+                            SetMode(asRead[2]);
                             RunTree(Tree.eMode.Init); 
                             break;
                         case eCmd.SetWidth:
-                            p_widthStrip = Convert.ToDouble(asRead[2]);
                             AddProtocol(asRead[0], eCmd, asRead[2]);
+                            p_widthStrip = Convert.ToDouble(asRead[2]);
                             RunTree(Tree.eMode.Init);
                             break;
                         case eCmd.EQLeState:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
                             p_eStateLoader = GetEQeState(asRead[2]);
                             //switch (GetEQeState(asRead[2]))
                             switch(p_eStateLoader)
@@ -337,8 +345,11 @@ namespace Root_Rinse_Unloader.Module
                                     EQ.p_eState = EQ.eState.Run; 
                                     break;
                             }
-                            AddProtocol(asRead[0], eCmd, asRead[2]);
                             break;
+                        case eCmd.PickerSet:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            EQ.p_bPickerSet = Convert.ToBoolean(asRead[2]);
+                            break; 
                     }
                 }
             }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Root_AOP01_Inspection
 {
-    public class AOP01_Recipe :AOP01_Recipe_UI
+    public class AOP01_Recipe : AOP01_Recipe_UI
     {
         #region ModuleBase
         /// <summary> Recipe 편집에 필요한 Module 이름 List </summary>

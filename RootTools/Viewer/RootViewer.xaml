@@ -102,7 +102,7 @@
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl> 
-                <ItemsControl ItemsSource="{Binding p_UIElements}"
+                <ItemsControl ItemsSource="{Binding p_UIElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
                     <ItemsControl.ItemsPanel>
