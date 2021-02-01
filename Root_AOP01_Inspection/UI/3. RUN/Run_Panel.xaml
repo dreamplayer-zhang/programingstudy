@@ -768,8 +768,8 @@
                                         CornerRadius="2"
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
-                                        Background="{StaticResource PanelBackGround}">
-                                            <TextBlock Text="{Binding p_eState}" Name ="MainVision_State"
+                                        Background="{StaticResource PanelBackGround}" Margin="4,0,-4,0">
+                                            <TextBlock Text="" Name ="MainVision_State"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                         </Border>

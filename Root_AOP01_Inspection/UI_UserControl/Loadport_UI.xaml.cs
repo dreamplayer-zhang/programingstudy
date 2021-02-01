@@ -116,6 +116,12 @@ namespace Root_AOP01_Inspection.UI_UserControl
             m_rfid.StartRun(moduleRun);
             while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
             m_loadport.RunDocking();
+            if (m_loadport.p_infoCarrier.m_aInfoWafer[0] == null)
+            {
+                m_loadport.m_alidLoad.Run(true, "Pod Empty");
+                m_loadport.RunUndocking();
+                return;
+            }
             if (m_manualjob.ShowPopup(m_handler) == false) return;
             m_bgwLoad.RunWorkerAsync();
         }
