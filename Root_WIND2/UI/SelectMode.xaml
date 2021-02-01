@@ -30,6 +30,15 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
+                    <Button Grid.Column="0" Width="500" Height="100" Click="ButtonRecipeWizard_Clicked" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                        <Button.Content>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="RecipeWizard" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Admin으로 로그인 했을 때만 Setup 보여주고 아닐 경우 RecipeWizard만 보여준다." HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+
                     <GroupBox Grid.Column="0"
                               Margin="40,120"
                               Background="{StaticResource ControlBackGround}"

@@ -194,8 +194,6 @@ namespace Root_WIND2.UI_Temp
         }
         #endregion
 
-
-
         #region [Process Origin]
         private enum PROCESS_ORIGIN_STATE
         {
@@ -354,6 +352,8 @@ namespace Root_WIND2.UI_Temp
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
             OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 
+            originRecipe.Clear();
+
             originRecipe.OriginX = memPt.X;
             originRecipe.OriginY = memPt.Y;
         }
@@ -399,6 +399,12 @@ namespace Root_WIND2.UI_Temp
             // Recipe
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
             OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+
+            originRecipe.ChipWidth = memPt.X - originRecipe.OriginX;
+            originRecipe.ChipHeight = originRecipe.OriginY - memPt.Y;
+
+            originRecipe.DiePitchX = memPt.X - originRecipe.OriginX;
+            originRecipe.DiePitchY = originRecipe.OriginY - memPt.Y;
         }
 
         private void DrawPitchPoint(CPoint memPt)
@@ -441,6 +447,9 @@ namespace Root_WIND2.UI_Temp
             // Recipe
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
             OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+
+            originRecipe.DiePitchX = memPt.X - originRecipe.OriginX;
+            originRecipe.DiePitchY = originRecipe.OriginY - memPt.Y;
         }
 
         private void DrawOriginBox()
@@ -694,20 +703,31 @@ namespace Root_WIND2.UI_Temp
                 int width = right - left;
                 int height = bottom - top;
 
-
-                double full_ratio = full_ratio = (double)this.p_ImageData.p_Size.X / (double)this.p_CanvasWidth;
+                double full_ratio = 1;
                 double ratio = 1;
 
-                if(this.p_CanvasHeight > this.p_CanvasWidth)
+                if (this.p_CanvasHeight > this.p_CanvasWidth)
                 {
-                    ratio = (double)width / (double)this.p_CanvasWidth;
-                   
+                    full_ratio = full_ratio = (double)this.p_ImageData.p_Size.Y / (double)this.p_CanvasHeight;
                 }
                 else
                 {
-                    ratio = (double)height / (double)this.p_CanvasHeight;
-                    
+                    full_ratio = full_ratio = (double)this.p_ImageData.p_Size.X / (double)this.p_CanvasWidth;
                 }
+
+
+                double canvas_w_h_ratio = (double)(this.p_CanvasHeight) / (double)(p_CanvasWidth); // 가로가 더 길 경우 1 이하
+                double box_w_h_ratio = (double)height / (double)width;
+
+                if (box_w_h_ratio > canvas_w_h_ratio) // Canvas보다 가로 비율이 더 높을 경우,  box의 세로에 맞춰야함.
+                {
+                    ratio = (double)height / (double)this.p_CanvasHeight;
+                }
+                else
+                {
+                    ratio = (double)width / (double)this.p_CanvasWidth;
+                }
+
 
                 this.p_Zoom = ratio / full_ratio;
 
@@ -715,11 +735,6 @@ namespace Root_WIND2.UI_Temp
 
                 this.SetRoiRect();
 
-                //DrawOriginBox();
-                //if(this.p_UIElement.Contains(PitchBox_UI))
-                //{
-                //    DrawPitchBox();
-                //}
             }
             else
             {

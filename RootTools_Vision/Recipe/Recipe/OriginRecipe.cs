@@ -10,8 +10,10 @@ namespace RootTools_Vision
     public class OriginRecipe : RecipeItemBase
     {
         #region [Parameter]
-        private int originX;
-        private int originY;
+        private int originX; // Left
+        private int originY; // Bottom
+        private int chipWidth;
+        private int chipHeight;
         private int diePitchX;
         private int diePitchY;
         private int inspectionBufferOffsetX;
@@ -36,6 +38,24 @@ namespace RootTools_Vision
             set
             {
                 SetProperty<int>(ref this.originY, value);
+            }
+        }
+
+        public int ChipWidth
+        {
+            get => this.chipWidth;
+            set
+            {
+                SetProperty<int>(ref this.chipWidth, value);
+            }
+        }
+
+        public int ChipHeight
+        {
+            get => this.chipHeight;
+            set
+            {
+                SetProperty<int>(ref this.chipHeight, value);
             }
         }
 
@@ -108,6 +128,8 @@ namespace RootTools_Vision
         {
             this.OriginX = 0;
             this.OriginY = 0;
+            this.ChipWidth = 0;
+            this.ChipHeight = 0;
             this.DiePitchX = 0;
             this.DiePitchY = 0;
             this.InspectionBufferOffsetX = 0;

@@ -19,10 +19,16 @@ namespace Root_WIND2.UI_Temp
 {
     class FrontsideMask_ViewModel : RootViewer_ViewModel
     {
+        private class DefineColors
+        {
+            public static SolidColorBrush OriginBoxColor = Brushes.Blue;
+        }
         /// <summary>
         /// 전체 Memory의 좌표와 ROI Memory 좌표의 Offset
         /// </summary>
         CPoint BoxOffset = new CPoint();
+
+        Grid OriginBox;
 
         TShape CurrentShape;
         TShape CropShape;
@@ -42,6 +48,66 @@ namespace Root_WIND2.UI_Temp
             SetBackGroundWorker();
 
             p_ROILayer = GlobalObjects.Instance.GetNamed<ImageData>("MaskImage");
+
+            InitializeUIlements();
+        }
+
+        public void InitializeUIlements()
+        {
+            OriginBox = new Grid();
+            OriginBox.Children.Add(new Line()); // Left
+            OriginBox.Children.Add(new Line()); // Top
+            OriginBox.Children.Add(new Line()); // Right
+            OriginBox.Children.Add(new Line()); // Bottom
+
+            p_ViewElement.Add(OriginBox);
+        }
+
+        public void SetViewRect()
+        {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+            int offsetX = originRecipe.DiePitchX - originRecipe.ChipWidth;
+            int offsetY = originRecipe.DiePitchY - originRecipe.ChipHeight;
+
+            int left = originRecipe.OriginX - offsetX;
+            int bottom = originRecipe.OriginY + offsetY;
+            int right = originRecipe.OriginX + originRecipe.ChipWidth + offsetX;
+            int top = originRecipe.OriginY - originRecipe.ChipHeight - offsetY;
+
+            int width = originRecipe.ChipWidth + offsetX * 2;
+            int height = originRecipe.ChipHeight + offsetY * 2;
+
+            double full_ratio = 1;
+            double ratio = 1;
+
+            if (this.p_CanvasHeight > this.p_CanvasWidth)
+            {
+                full_ratio = full_ratio = (double)this.p_ImageData.p_Size.Y / (double)this.p_CanvasHeight;
+            }
+            else
+            {
+                full_ratio = full_ratio = (double)this.p_ImageData.p_Size.X / (double)this.p_CanvasWidth;
+            }
+
+
+            double canvas_w_h_ratio = (double)(this.p_CanvasHeight) / (double)(p_CanvasWidth); // 가로가 더 길 경우 1 이하
+            double box_w_h_ratio = (double)height / (double)width;
+
+            if (box_w_h_ratio > canvas_w_h_ratio) // Canvas보다 가로 비율이 더 높을 경우,  box의 세로에 맞춰야함.
+            {
+                ratio = (double)height / (double)this.p_CanvasHeight;
+            }
+            else
+            {
+                ratio = (double)width / (double)this.p_CanvasWidth;
+            }
+
+            this.p_Zoom = ratio / full_ratio;
+
+            this.p_View_Rect = new System.Drawing.Rectangle(new System.Drawing.Point(left, top), new System.Drawing.Size(width, height));
+
+            this.SetRoiRect();
         }
 
         public void SetOrigin(object e)
@@ -1313,6 +1379,8 @@ namespace Root_WIND2.UI_Temp
                         shape.ModifyTool.Visibility = Visibility.Visible;
                 }
             }
+
+            RedrawOriginBox();
         }
         private void RedrawLine(TLine line)
         {
@@ -1380,6 +1448,76 @@ namespace Root_WIND2.UI_Temp
             {
                 CPoint canvasPt = GetCanvasPoint(memoryPt - BoxOffset);
                 polygon.CanvasPolygon.Points.Add(new Point(canvasPt.X, canvasPt.Y));
+            }
+        }
+
+        private void RedrawOriginBox()
+        {
+
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+            if (originRecipe.ChipWidth == 0 || originRecipe.ChipHeight == 0) return;
+
+            int left = originRecipe.OriginX;
+            int top = originRecipe.OriginY - originRecipe.ChipHeight;
+
+            int right = originRecipe.OriginX - originRecipe.ChipWidth;
+            int bottom = originRecipe.OriginY;
+
+            CPoint canvasLeftTop = GetCanvasPoint(new CPoint(left, top));
+            CPoint canvasLeftBottom = GetCanvasPoint(new CPoint(left, bottom));
+            CPoint canvasRightTop = GetCanvasPoint(new CPoint(right, top));
+            CPoint canvasRightBottom = GetCanvasPoint(new CPoint(right, bottom));
+
+            OriginBox.Width = Math.Abs(canvasRightTop.X - canvasLeftTop.X);
+            OriginBox.Height = Math.Abs(canvasLeftBottom.Y - canvasLeftTop.Y);
+
+            // Left
+            Line leftLine = OriginBox.Children[0] as Line;
+            leftLine.X1 = 0;
+            leftLine.Y1 = 0;
+            leftLine.X2 = 0;
+            leftLine.Y2 = OriginBox.Height;
+            leftLine.Stroke = DefineColors.OriginBoxColor;
+            leftLine.StrokeThickness = 2;
+            leftLine.Opacity = 1;
+
+            // Top
+            Line topLine = OriginBox.Children[1] as Line;
+            topLine.X1 = 0;
+            topLine.Y1 = 0;
+            topLine.X2 = OriginBox.Width;
+            topLine.Y2 = 0;
+            topLine.Stroke = DefineColors.OriginBoxColor;
+            topLine.StrokeThickness = 2;
+            topLine.Opacity = 1;
+
+            // Right
+            Line rightLine = OriginBox.Children[2] as Line;
+            rightLine.X1 = OriginBox.Width;
+            rightLine.Y1 = 0;
+            rightLine.X2 = OriginBox.Width;
+            rightLine.Y2 = OriginBox.Height;
+            rightLine.Stroke = DefineColors.OriginBoxColor;
+            rightLine.StrokeThickness = 2;
+            rightLine.Opacity = 1;
+
+            // bottom
+            Line bottomLine = OriginBox.Children[3] as Line;
+            bottomLine.X1 = 0;
+            bottomLine.Y1 = OriginBox.Height;
+            bottomLine.X2 = OriginBox.Width;
+            bottomLine.Y2 = OriginBox.Height;
+            bottomLine.Stroke = DefineColors.OriginBoxColor;
+            bottomLine.StrokeThickness = 2;
+            bottomLine.Opacity = 1;
+
+            Canvas.SetLeft(OriginBox, canvasLeftTop.X);
+            Canvas.SetTop(OriginBox, canvasLeftTop.Y);
+
+            if (!p_UIElement.Contains(OriginBox))
+            {
+                p_UIElement.Add(OriginBox);
             }
         }
         #endregion

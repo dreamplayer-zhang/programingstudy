@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_WIND2.UI_Temp._1.Setup._3.RecipeWizard
+namespace Root_WIND2.UI_Temp
 {
     /// <summary>
-    /// RecipeWizard.xaml에 대한 상호 작용 논리
+    /// FrontsideInspect.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class RecipeWizard : Page
+    public partial class FrontsideInspect : UserControl
     {
-        public RecipeWizard()
+        public FrontsideInspect()
         {
             InitializeComponent();
         }
