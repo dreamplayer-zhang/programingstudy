@@ -296,9 +296,17 @@ namespace RootTools.Camera.Dalsa
             //m_Height = Convert.ToInt32(buff);
             //m_SapGrabber.GetParameter(SapAcquisition.Prm.HACTIVE, out nBuff);
             //m_Height = nBuff;
+            
             m_SapGrabber.GetCapability(SapAcquisition.Cap.HACTIVE_MAX, out nBuff);
             m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_WIDTH, out m_Width);
             m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_HEIGHT, out m_Height);
+            string strTriggerMode = "";
+            if (m_sapCam != null)
+            {
+                m_sapCam.GetFeatureValue("TriggerMode", out strTriggerMode);
+                if (strTriggerMode == "Internal")
+                    m_sapCam.SetFeatureValue("TriggerMode", "External");
+            }
         }
         
         public void SetCamHandle(SapAcqDevice device, SapAcquisition acquisition)

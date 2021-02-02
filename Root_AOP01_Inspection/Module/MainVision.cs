@@ -42,6 +42,9 @@ namespace Root_AOP01_Inspection.Module
         public DIO_I m_diExistVision;
         public DIO_I m_diReticleTiltCheck;
         public DIO_I m_diReticleFrameCheck;
+
+        public DIO_O m_do45DTrigger;
+
         public MemoryPool m_memoryPool;
         public MemoryGroup m_memoryGroup;
         public MemoryData m_memoryMain;
@@ -80,6 +83,7 @@ namespace Root_AOP01_Inspection.Module
             p_sInfo = m_toolBox.Get(ref m_diExistVision, this, "Reticle Exist on Vision");
             p_sInfo = m_toolBox.Get(ref m_diReticleTiltCheck, this, "Reticle Tilt Check");
             p_sInfo = m_toolBox.Get(ref m_diReticleFrameCheck, this, "Reticle Frame Check");
+            p_sInfo = m_toolBox.Get(ref m_do45DTrigger, this, "45D Trigger");
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
             p_sInfo = m_toolBox.Get(ref m_axisSideZ, this, "Axis Side Z");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
@@ -1611,7 +1615,9 @@ namespace Root_AOP01_Inspection.Module
                 {
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
+                    Axis axisRotate = m_module.m_axisRotate;
                     m_grabMode.SetLight(true);
+                    m_module.m_do45DTrigger.Write(true);
                     if (m_grabMode.pUseRADS)
                     {
                         if (!axisZ.EnableCompensation(1))
@@ -1642,6 +1648,15 @@ namespace Root_AOP01_Inspection.Module
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
                         double dPosX = m_rpAxisCenter.X/*중심축값*/ + (nReticleSizeY_px * (double)m_grabMode.m_dTrigger / 2 /*레티클 절반*/) - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
+
+                        // Theta축 0으로
+                        double dTheta = axisRotate.GetPosValue(eAxisPos.ScanPos.ToString());
+                        dTheta += m_module.m_dThetaAlignOffset;
+                        if (m_module.Run(axisRotate.StartMove(dTheta)))
+                            return p_sInfo;
+                        if (m_module.Run(axisRotate.WaitReady()))
+                            return p_sInfo;
+                        //
 
                         if (m_module.Run(axisZ.StartMove(m_nFocusPosZ)))
                             return p_sInfo;
@@ -1840,6 +1855,7 @@ namespace Root_AOP01_Inspection.Module
 
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
+                    Axis axisRotate = m_module.m_axisRotate;
                     CPoint cpMemoryOffset = new CPoint(m_cpMemoryOffset);
                     int nScanLine = 0;
                     int nMMPerUM = 1000;
@@ -1864,6 +1880,15 @@ namespace Root_AOP01_Inspection.Module
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
                         double dPosX = m_rpAxisCenter.X + nReticleSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
+
+                        // Theta축 0으로
+                        double dTheta = axisRotate.GetPosValue(eAxisPos.ScanPos.ToString());
+                        dTheta += m_module.m_dThetaAlignOffset;
+                        if (m_module.Run(axisRotate.StartMove(dTheta)))
+                            return p_sInfo;
+                        if (m_module.Run(axisRotate.WaitReady()))
+                            return p_sInfo;
+                        //
 
                         if (m_module.Run(axisZ.StartMove(m_nFocusPosZ)))
                             return p_sInfo;
@@ -2807,6 +2832,8 @@ namespace Root_AOP01_Inspection.Module
                     if (bFound) cptarrOutResultCenterPositions[i] = new CPoint(cptFoundCenter);
 
                     m_module.p_nPatternShiftProgressValue++;
+                    if (m_module.p_nPatternShiftProgressMax - m_module.p_nPatternShiftProgressMin > 0)
+                        m_module.p_nPatternShiftProgressPercent = (int)((double)m_module.p_nPatternShiftProgressValue / (double)(m_module.p_nPatternShiftProgressMax - m_module.p_nPatternShiftProgressMin) * 100);
                 }
                 cptOutFeatureCentroid = GetCentroidFromPolygonPointArray(cptarrOutResultCenterPositions);
 
@@ -2847,6 +2874,8 @@ namespace Root_AOP01_Inspection.Module
                     if (bFound) cptarrInResultCenterPositions[i] = new CPoint(cptFoundCenter);
 
                     m_module.p_nPatternShiftProgressValue++;
+                    if (m_module.p_nPatternShiftProgressMax - m_module.p_nPatternShiftProgressMin > 0)
+                        m_module.p_nPatternShiftProgressPercent = (int)((double)m_module.p_nPatternShiftProgressValue / (double)(m_module.p_nPatternShiftProgressMax - m_module.p_nPatternShiftProgressMin) * 100);
                 }
                 cptInFeatureCentroid = GetCentroidFromPolygonPointArray(cptarrInResultCenterPositions);
 
