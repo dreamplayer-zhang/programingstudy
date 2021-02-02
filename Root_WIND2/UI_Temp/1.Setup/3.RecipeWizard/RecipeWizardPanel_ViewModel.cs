@@ -29,6 +29,8 @@ namespace Root_WIND2.UI_Temp
         public readonly UI_Temp.FrontsideOrigin frontsideOrigin = new UI_Temp.FrontsideOrigin();
         public readonly UI_Temp.FrontsideAlignment frontsideAlignment = new UI_Temp.FrontsideAlignment();
         public readonly UI_Temp.FrontsideMask frontsideMask = new UI_Temp.FrontsideMask();
+        public readonly UI_Temp.FrontsideSpec frontsideSpec = new UI_Temp.FrontsideSpec();
+        public readonly UI_Temp.FrontsideInspect frontsideInspect = new UI_Temp.FrontsideInspect();
 
 
         // BACK
@@ -67,6 +69,18 @@ namespace Root_WIND2.UI_Temp
         public UI_Temp.FrontsideMask_ViewModel FrontsideMaskVM
         {
             get => frontsideMaskVM;
+        }
+
+        private UI_Temp.FrontsideSpec_ViewModel frontsideSpecVM = new UI_Temp.FrontsideSpec_ViewModel();
+        public UI_Temp.FrontsideSpec_ViewModel FrontsideSpecVM
+        {
+            get => frontsideSpecVM;
+        }
+
+        private UI_Temp.FrontsideInspect_ViewModel frontsideInspectVM = new UI_Temp.FrontsideInspect_ViewModel();
+        public UI_Temp.FrontsideInspect_ViewModel FrontsideInspectVM
+        {
+            get => frontsideInspectVM;
         }
 
 
@@ -126,6 +140,7 @@ namespace Root_WIND2.UI_Temp
                 {
                     SetPage(frontsideAlignment);
                     frontsideAlignment.DataContext = frontsideAlignmentVM;
+                    frontsideAlignmentVM.SetPage();
                 });
             }
         }
@@ -138,6 +153,32 @@ namespace Root_WIND2.UI_Temp
                 {
                     SetPage(frontsideMask);
                     frontsideMask.DataContext = frontsideMaskVM;
+                    frontsideMaskVM.SetViewRect(); // 이거 제거하자 아닌가
+                });
+            }
+        }
+
+        public ICommand btnFrontSpec
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(frontsideSpec);
+                    frontsideSpec.DataContext = frontsideSpecVM;
+                    frontsideSpecVM.SetPage();
+                });
+            }
+        }
+
+        public ICommand btnFrontInspect
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(frontsideInspect);
+                    frontsideInspect.DataContext = frontsideInspectVM;
                 });
             }
         }

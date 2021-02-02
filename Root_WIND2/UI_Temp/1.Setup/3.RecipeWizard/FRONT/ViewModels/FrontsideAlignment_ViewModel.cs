@@ -24,6 +24,11 @@ namespace Root_WIND2.UI_Temp
             this.ImageViewerVM.FeatureBoxDone += FeatureBoxDone_Callback;
         }
 
+        public void SetPage()
+        {
+            this.ImageViewerVM.SetViewRect();
+        }
+
         #region [Members]
         ImageData boxImage;
 

@@ -51,7 +51,6 @@ namespace Root_AOP01_Inspection
             LoadportA_State.DataContext = loadport1;
             LoadportB_State.DataContext = loadport2;
             RTR_State.DataContext = wtrcleanunit;
-            MainVision_State.DataContext = mainvision;
             InitFFU();
             InitTimer();
         }
@@ -76,12 +75,14 @@ namespace Root_AOP01_Inspection
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
+            CheckMainVisionState();
             ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_wtr.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
             ExistVision.Background = (m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null)||
                 (m_backsidevision.m_diExistVision.p_bIn == true && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
             ButtonInitialize.IsEnabled = IsEnableInitialization();
             ButtonRecovery.IsEnabled = IsEnableRecovery();
-            if(EQ.p_eState != EQ.eState.Recovery)
+            TimerLamp();
+            if (EQ.p_eState != EQ.eState.Recovery)
                 m_rtrcleanunit.m_bRecovery = false;
         }
         #endregion
@@ -146,6 +147,7 @@ namespace Root_AOP01_Inspection
             EQ.p_bStop = false;
             m_handler.m_process.ClearInfoWafer();
             m_handler.m_nRnR = 0; //Init 할때 RNR 카운트초기화
+            m_handler.m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState = InfoCarrier.eState.Placed;  //210201 모니터링필요 EQ.Stop 되고 이닛누르면 간헐적으로 Loadport Docking 상태로 무언정지 생김
             EQ.p_eState = EQ.eState.Home;
         }
         #endregion
@@ -199,6 +201,7 @@ namespace Root_AOP01_Inspection
         }
         #endregion
 
+        #region Button Buzzer, Door, Stop
         private void ButtonBuzzerOff_Click(object sender, RoutedEventArgs e)
         {
             m_engineer.m_handler.m_aop01.BuzzerOff();
@@ -221,6 +224,28 @@ namespace Root_AOP01_Inspection
         private void ButtonStop_Click(object sender, RoutedEventArgs e)
         {
             EQ.p_bStop = true; //수정 필요
+        }
+        #endregion
+        void TimerLamp()
+        {
+            AOP01 aop01 = m_engineer.m_handler.m_aop01;
+            gridLampR.Background = aop01.m_doLamp.ReadDO(AOP01.eLamp.Red) ? Brushes.OrangeRed : Brushes.LightGray;
+            gridLampY.Background = aop01.m_doLamp.ReadDO(AOP01.eLamp.Yellow) ? Brushes.Gold : Brushes.LightGray;
+            gridLampG.Background = aop01.m_doLamp.ReadDO(AOP01.eLamp.Green) ? Brushes.LightGreen : Brushes.LightGray;
+        }
+
+        public void CheckMainVisionState()
+        {
+            if (m_mainvision.p_eState == ModuleBase.eState.Error || m_backsidevision.p_eState == ModuleBase.eState.Error)
+                MainVision_State.Text = "Error";
+            else if (m_mainvision.p_eState == ModuleBase.eState.Run || m_backsidevision.p_eState == ModuleBase.eState.Run)
+                MainVision_State.Text = "Run";
+            else if (m_mainvision.p_eState == ModuleBase.eState.Home || m_backsidevision.p_eState == ModuleBase.eState.Home)
+                MainVision_State.Text = "Home";
+            else if (m_mainvision.p_eState == ModuleBase.eState.Init && m_backsidevision.p_eState == ModuleBase.eState.Init)
+                MainVision_State.Text = "Init";
+            else if (m_mainvision.p_eState == ModuleBase.eState.Ready && m_backsidevision.p_eState == ModuleBase.eState.Ready)
+                MainVision_State.Text = "Ready";
         }
     }
 }

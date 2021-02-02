@@ -895,8 +895,12 @@ namespace Root_AOP01_Inspection.Module
                 {
                     m_grabMode.SetLight(true);
 
+                    //((Camera_Dalsa)m_grabMode.m_camera).p_CamParam.p_eDir = DalsaParameterSet.eDir.Reverse;
+                    //((Camera_Dalsa)m_grabMode.m_camera).p_CamParam.p_eTriggerMode = DalsaParameterSet.eTriggerMode.External;
+
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
+                    Axis axisRotate = m_module.m_axisRotate;
                     CPoint cpMemoryOffset = new CPoint(m_cpMemoryOffset);
                     int nScanLine = 0;
                     int nMMPerUM = 1000;
@@ -908,12 +912,8 @@ namespace Root_AOP01_Inspection.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                     int nReticleSizeY_px = Convert.ToInt32(m_nReticleSize_mm * nMMPerUM / m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleSizeY_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
-                    int nScanOffset_pulse = 100000; //가속버퍼구간
-
-                    string strPool = m_grabMode.m_memoryPool.p_id;
-                    string strGroup = m_grabMode.m_memoryGroup.p_id;
-                    string strMemory = m_grabMode.m_memoryData.p_id;
-                    MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                    int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
+                    int nScanOffset_pulse = Convert.ToInt32(nScanSpeed * 0.3); //가속버퍼구간
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
@@ -928,6 +928,14 @@ namespace Root_AOP01_Inspection.Module
 
                         double dPosX = m_rpAxisCenter.X + nReticleSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
 
+                        // Theta축 0으로
+                        double dTheta = axisRotate.GetPosValue(eAxisPos.ScanPos.ToString());
+                        dTheta += m_module.m_dThetaAlignOffset;
+                        if (m_module.Run(axisRotate.StartMove(dTheta)))
+                            return p_sInfo;
+                        if (m_module.Run(axisRotate.WaitReady()))
+                            return p_sInfo;
+                        //
                         if (m_module.Run(axisZ.StartMove(m_nFocusPosZ)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
@@ -941,7 +949,12 @@ namespace Root_AOP01_Inspection.Module
                         double dTriggerEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
                         axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
-                        int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
+                        string strPool = m_grabMode.m_memoryPool.p_id;
+                        string strGroup = m_grabMode.m_memoryGroup.p_id;
+                        string strMemory = m_grabMode.m_memoryData.p_id;
+
+                        MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nReticleSizeY_px, 0, m_grabMode.m_bUseBiDirectionScan);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))

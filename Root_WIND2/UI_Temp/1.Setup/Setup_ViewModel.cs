@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Root_WIND2.UI_Temp
 {
@@ -62,6 +63,20 @@ namespace Root_WIND2.UI_Temp
         public void SetMaintance()
         {
 
+        }
+        #endregion
+
+        #region [Command]
+        public ICommand btnMode
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetHome();
+                    UIManager.Instance.ChangeUIMode();
+                });
+            }
         }
         #endregion
     }

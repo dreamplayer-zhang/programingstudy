@@ -305,7 +305,18 @@ namespace Root_EFEM.Module
 
         #region Timeout
         int m_secRS232 = 2;
-        int m_secHome = 40;
+        //public int m_secHome = 40;
+        int _secHome = 40;
+        public int m_secHome
+        {
+            get { return _secHome; }
+            set
+            {
+                if (_secHome == value) return;
+                _secHome = value;
+                OnPropertyChanged();
+            }
+        }
         int m_secMotion = 20;
         void RunTimeoutTree(Tree tree)
         {

@@ -15,34 +15,31 @@
         </Grid.ColumnDefinitions>
         
         <GroupBox Margin="4"
-                  Header="Image VIew" Style="{StaticResource main_view_groupbox}">
+                  Header="Image VIewer" Style="{StaticResource main_view_groupbox}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                
+
                 <StackPanel Grid.Column="1"  Orientation="Horizontal">
-                    <!--<TextBox  Margin="4" IsReadOnly="True" Text="{Binding DisplayViewerState}" Width ="60" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="12" FontWeight="Bold"/>-->
                     <TextBlock Text="Image" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <Button Content="Open" Command="{Binding btnOpenCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Save" Command="{Binding btnSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Clear" Command="{Binding btnClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
-                    <Button Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button IsEnabled="False" Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>
 
                     <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <CheckBox Content="Orgin" IsChecked="{Binding IsOriginChecked, Mode=TwoWay}" Command="{Binding btnOriginCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                     <CheckBox Content="Pitch" IsChecked="{Binding IsPitchChecked, Mode=TwoWay}" IsEnabled="{Binding IsPitchEnable}" Command="{Binding btnPitchCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
-                    <CheckBox Content="Rular" IsChecked="{Binding IsRularChecked, Mode=TwoWay}" Command="{Binding btnRularCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox IsEnabled="False" Content="Rular" IsChecked="{Binding IsRularChecked, Mode=TwoWay}" Command="{Binding btnRularCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
 
                     <TextBlock Text="View" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <Button Content="FULL" Command="{Binding btnViewFullCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="BOX" Command="{Binding btnViewBoxCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                 </StackPanel>
-                <!--<Border Grid.Row="1" Background="Black"/>-->
                 <Grid Grid.Row="1" >
 
-                    <!--<local:ImageViewer DataContext="{Binding ImageViewerVM}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>-->
                     <tools:RootViewer DataContext="{Binding ImageViewerVM}"/>
                 </Grid>
             </Grid>
@@ -61,11 +58,11 @@
                             <ColumnDefinition Width="24"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Origin" Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="Origin"  Style="{StaticResource group_box_item_name_text}"/>
                         <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="2" Text="{Binding OriginX}" IsEnabled="False" HorizontalContentAlignment="Center"/>
                         <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamResolutionY}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="4" Text="{Binding OriginY}" IsEnabled="False" HorizontalContentAlignment="Center"/>
                     </Grid>
                 
                     <!-- Origin Row Right Top -->
@@ -77,11 +74,11 @@
                             <ColumnDefinition Width="24"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Origin[Right/Top]" Style="{StaticResource group_box_item_name_text}"/>
-                        <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
-                        <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamResolutionY}" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="Origin Size" Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="W" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding OriginWidth}" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="H" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding OriginHeight}" HorizontalContentAlignment="Center"/>
                     </Grid>
 
                     <!-- Pitch Row Right Top -->
@@ -95,9 +92,9 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Pitch" Style="{StaticResource group_box_item_name_text}"/>
                         <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding PitchX}" HorizontalContentAlignment="Center"/>
                         <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamResolutionY}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding PitchY}" HorizontalContentAlignment="Center"/>
                     </Grid>
 
                     <!-- Image Offset -->
@@ -119,7 +116,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="Save" Width ="120" Style="{StaticResource groupbox_button}"/>
                         <Button Content="Reload" Width ="120" Style="{StaticResource groupbox_button}"/>
-                        <Button Content="Clear" Width ="120" Style="{StaticResource groupbox_button}"/>
+                        <Button Content="Clear" Command="{Binding btnOriginClearCommand}" Width ="120" Style="{StaticResource groupbox_button}"/>
                     </StackPanel>
                 </StackPanel>
             

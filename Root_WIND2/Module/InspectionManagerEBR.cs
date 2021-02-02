@@ -46,51 +46,31 @@ namespace Root_WIND2
 		protected override WorkplaceBundle CreateWorkplaceBundle()
 		{
 			EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
-			Run_GrabEBR grabEBR = (Run_GrabEBR)module.CloneModuleRun("GrabEBR");
-			GrabMode grabMode = grabEBR.GetGrabMode();
+			Run_InspectEBR inspect = (Run_InspectEBR)module.CloneModuleRun("InspectEBR");
+			Run_GrabEBR grab = (Run_GrabEBR)module.CloneModuleRun("GrabEBR");
+			GrabMode grabMode = grab.GetGrabMode();
 
 			int cameraEmptyBufferHeight = 0;
 			if (grabMode.m_camera != null)
 				cameraEmptyBufferHeight = grabMode.m_camera.GetRoiSize().Y;
-
-			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
-			int notchY = recipe.GetItem<EBRParameter>().NotchY; // notch memory Y 좌표
-			int stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
-			int workplaceCnt = 360 / stepDegree;
-			int imageHeight = 270000;
-			int imageHeightPerDegree = imageHeight / 360; // 1도 당 Image Height
+			
+			int inspBufferY = (int)(module.Pulse360 / module.EbrCamTriggerRatio);
+			int bufferYPerDegree = inspBufferY / 360; // 1도 당 Image Height
 
 			int width = recipe.GetItem<EBRParameter>().ROIWidth;
 			int height = recipe.GetItem<EBRParameter>().ROIHeight;
+			int stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
+			int workplaceCnt = 360 / stepDegree;
 
-			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, workplaceBundle.Count));			
+			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
+			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, workplaceBundle.Count));
+			
 			for (int i = 0; i < workplaceCnt; i++)
 			{
-				int posY = (imageHeightPerDegree * i) - (height / 2);
-				if (posY <= 0)
-					posY = 0;
+				int posY = (bufferYPerDegree * i) - (height / 2);
 				Workplace workplace = new Workplace(0, 0, 0, posY + cameraEmptyBufferHeight, width, height, workplaceBundle.Count);
 				workplaceBundle.Add(workplace);
 			}
-
-			// TO-DO test
-			/*
-			for (int i = 0; i < workplaceCnt; i++)
-			{
-				int posY = (imageHeightPerDegree * i);
-				if (posY - (height / 2) <= 0)
-				{
-					posY = 0;
-				}
-				if (posY + (height / 2) > imageHeight)
-				{
-					posY = 0;
-				}
-
-				Workplace workplace = new Workplace(0, 0, 0, posY, width, height, index++);
-				workplaceBundle.Add(workplace);
-			}
-			*/
 
 			workplaceBundle.SetSharedBuffer(this.sharedBufferInfo);
 			return workplaceBundle;

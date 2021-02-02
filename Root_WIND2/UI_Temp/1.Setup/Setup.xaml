@@ -17,16 +17,21 @@
             <ColumnDefinition Width="215"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Border Grid.Row="0"
-                Grid.RowSpan="2" Background="{StaticResource main_background}">
-            <TextBlock Text="WIND2" 
+        <Button Grid.Row="0"
+                Grid.RowSpan="2"
+                BorderThickness="0"
+                Command="{Binding btnMode}"
+                Background="{StaticResource main_background}">
+            <Button.Content>
+                <TextBlock Text="WIND2" 
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"
                        FontSize="32"
                        FontStyle="Italic"
                        FontWeight="Bold"
                        Foreground="White"/>
-        </Border>
+            </Button.Content>
+        </Button>
         <!-- Menubar -->
         <Border Grid.Row="0"
                 Grid.Column="1"
@@ -45,10 +50,10 @@
                                            HorizontalAlignment="Center" />
                             </Grid>
                         </MenuItem.Header>
-                        <MenuItem Header="New"/>
-                        <MenuItem Header="Load"/>
-                        <MenuItem Header="Save"/>
-                        <MenuItem Header="Save As"/>
+                        <MenuItem Header="New" Foreground="Black"/>
+                        <MenuItem Header="Load" Foreground="Black"/>
+                        <MenuItem Header="Save"  Foreground="Black"/>
+                        <MenuItem Header="Save As"  Foreground="Black"/>
                     </MenuItem>
                     <MenuItem>
                         <MenuItem.Header>
@@ -61,13 +66,13 @@
                                            HorizontalAlignment="Center" />
                             </Grid>
                         </MenuItem.Header>
-                        <MenuItem Header="Log">
+                        <MenuItem Header="Log"  Foreground="Black">
 
                         </MenuItem>
-                        <MenuItem Header="Alarm">
+                        <MenuItem Header="Alarm"  Foreground="Black">
 
                         </MenuItem>
-                        <MenuItem Header="FDC">
+                        <MenuItem Header="FDC"  Foreground="Black">
 
                         </MenuItem>
                     </MenuItem>
@@ -82,16 +87,16 @@
                                            HorizontalAlignment="Center" />
                             </Grid>
                         </MenuItem.Header>
-                        <MenuItem Header="Login">
+                        <MenuItem Header="Login"  Foreground="Black">
 
                         </MenuItem>
-                        <MenuItem Header="RTR">
+                        <MenuItem Header="RTR"  Foreground="Black">
 
                         </MenuItem>
-                        <MenuItem Header="Loadport">
+                        <MenuItem Header="Loadport"  Foreground="Black">
 
                         </MenuItem>
-                        <MenuItem Header="Setting">
+                        <MenuItem Header="Setting"  Foreground="Black">
 
                         </MenuItem>
                     </MenuItem>
@@ -106,13 +111,13 @@
                                            HorizontalAlignment="Center" />
                             </Grid>
                         </MenuItem.Header>
-                        <MenuItem Header="Online">
+                        <MenuItem Header="Online"  Foreground="Black">
 
                         </MenuItem>
-                        <MenuItem Header="Offline">
+                        <MenuItem Header="Offline"  Foreground="Black">
 
                         </MenuItem>
-                        <MenuItem Header="GEM">
+                        <MenuItem Header="GEM"  Foreground="Black">
 
                         </MenuItem>
                     </MenuItem>
@@ -127,22 +132,22 @@
                                            HorizontalAlignment="Center" />
                             </Grid>
                         </MenuItem.Header>
-                        <MenuItem Header="Setup Home" />
-                        <MenuItem Header="Inspction" />
-                        <MenuItem Header="Recipe Wizard">
-                            <MenuItem Header="Recipe Summary" />
-                            <MenuItem Header="PreAlign" />
-                            <MenuItem Header="FrontSide">
-                                <MenuItem Header="Front Summary" />
-                                <MenuItem Header="Alignment" />
-                                <MenuItem Header="General" />
+                        <MenuItem Header="Setup Home"  Foreground="Black"/>
+                        <MenuItem Header="Inspction"  Foreground="Black"/>
+                        <MenuItem Header="Recipe Wizard" Foreground="Black">
+                            <MenuItem Header="Recipe Summary"  Foreground="Black"/>
+                            <MenuItem Header="PreAlign"  Foreground="Black" />
+                            <MenuItem Header="FrontSide"  Foreground="Black">
+                                <MenuItem Header="Front Summary"  Foreground="Black" />
+                                <MenuItem Header="Alignment"  Foreground="Black" />
+                                <MenuItem Header="General"   Foreground="Black"/>
                             </MenuItem>
-                            <MenuItem Header="BackSide" />
-                            <MenuItem Header="EBR" />
-                            <MenuItem Header="Edge" />
+                            <MenuItem Header="BackSide"  Foreground="Black"/>
+                            <MenuItem Header="EBR"  Foreground="Black"/>
+                            <MenuItem Header="Edge" Foreground="Black" />
                         </MenuItem>
-                        <MenuItem Header="Matienance" />
-                        <MenuItem Header="GEM" />
+                        <MenuItem Header="Matienance"  Foreground="Black"/>
+                        <MenuItem Header="GEM"  Foreground="Black"/>
                     </MenuItem>
                     <MenuItem Command="{Binding btnMode}">
                         <MenuItem.Header>
