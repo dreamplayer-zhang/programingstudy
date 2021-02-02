@@ -802,6 +802,12 @@ namespace Root_AOP01_Inspection.Module
         {
             if (crtROI.Width < 1 || crtROI.Height < 1) return null;
             if (crtROI.Left < 0 || crtROI.Top < 0) return null;
+            if (crtROI.Width % 4 != 0)
+            {
+                int nSpare = 0;
+                while (((crtROI.Width + nSpare) % 4) != 0) nSpare++;
+                crtROI = new CRect(crtROI.Left, crtROI.Top, crtROI.Right + nSpare, crtROI.Bottom);
+            }
             ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
             IntPtr p = mem.GetPtr();
             img.SetData(p, crtROI, (int)mem.W);
@@ -2011,7 +2017,8 @@ namespace Root_AOP01_Inspection.Module
                 int nLeft = GetBarcodeSideEdge(mem, crtROI, 10, eSearchDirection.LeftToRight, m_nThreshold, m_bDarkBackground);
                 int nRight = GetBarcodeSideEdge(mem, crtROI, 10, eSearchDirection.RightToLeft, m_nThreshold, m_bDarkBackground);
                 CRect crtBarcode = new CRect(m_cptBarcodeLTPoint.X + nLeft, m_cptBarcodeLTPoint.Y + nTop, m_cptBarcodeLTPoint.X + nRight, m_cptBarcodeLTPoint.Y + nBottom);
-                Mat matBarcode = m_module.GetMatImage(mem, crtBarcode);
+                Image<Gray, byte> imgBarcode = m_module.GetGrayByteImageFromMemory(mem, crtBarcode);
+                Mat matBarcode = imgBarcode.Mat;
                 matBarcode.Save("D:\\AOP01\\BarcodeInspection\\BeforeRotation.bmp");
 
                 // 회전각도 알아내기
@@ -2023,12 +2030,10 @@ namespace Root_AOP01_Inspection.Module
                 double dThetaDegree = dThetaRadian * (180 / Math.PI);
 
                 // Barcode 회전
+                Mat matAffine = new Mat();
                 Mat matRotation = new Mat();
-                using (Mat matAffine = new Mat())
-                {
-                    CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
-                    CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
-                }
+                CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
+                CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
                 matRotation.Save("D:\\AOP01\\BarcodeInspection\\AfterRotation.bmp");
 
                 // 회전 후 외곽영역 Cutting
