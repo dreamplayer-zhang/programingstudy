@@ -794,8 +794,23 @@ namespace Root_AOP01_Inspection.Module
             IntPtr p = mem.GetPtr();
             img.SetData(p, crtROI, (int)mem.W);
             Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
-
+            
             return matReturn;
+        }
+
+        Image<Gray, byte> GetGrayByteImageFromMemory(MemoryData mem, CRect crtROI)
+        {
+            if (crtROI.Width < 1 || crtROI.Height < 1) return null;
+            if (crtROI.Left < 0 || crtROI.Top < 0) return null;
+            ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+            IntPtr p = mem.GetPtr();
+            img.SetData(p, crtROI, (int)mem.W);
+
+            byte[] barr = img.GetByteArray();
+            System.Drawing.Bitmap bmp = img.GetBitmapToArray(crtROI.Width, crtROI.Height, barr);
+            Image<Gray, byte> imgReturn = new Image<Gray, byte>(bmp);
+
+            return imgReturn;
         }
 
         bool TemplateMatching(MemoryData mem, CRect crtSearchArea, Image<Gray, byte> imgSrc, Image<Gray, byte> imgTemplate, out CPoint cptCenter, double dMatchScore)
@@ -2008,10 +2023,12 @@ namespace Root_AOP01_Inspection.Module
                 double dThetaDegree = dThetaRadian * (180 / Math.PI);
 
                 // Barcode 회전
-                Mat matAffine = new Mat();
                 Mat matRotation = new Mat();
-                CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
-                CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
+                using (Mat matAffine = new Mat())
+                {
+                    CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
+                    CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
+                }
                 matRotation.Save("D:\\AOP01\\BarcodeInspection\\AfterRotation.bmp");
 
                 // 회전 후 외곽영역 Cutting
@@ -2679,16 +2696,18 @@ namespace Root_AOP01_Inspection.Module
                 Point ptStart = new Point(cptTopCenter.X - (m_nSearchAreaSize / 2), cptTopCenter.Y - (m_nSearchAreaSize / 2));
                 Point ptEnd = new Point(cptTopCenter.X + (m_nSearchAreaSize / 2), cptTopCenter.Y + (m_nSearchAreaSize / 2));
                 CRect crtSearchArea = new CRect(ptStart, ptEnd);
-                Mat matSearchArea = m_module.GetMatImage(mem, crtSearchArea);
-                Image<Gray, byte> imgSrc = matSearchArea.ToImage<Gray, byte>();
+                //Mat matSearchArea = m_module.GetMatImage(mem, crtSearchArea);
+                //Image<Gray, byte> imgSrc = matSearchArea.ToImage<Gray, byte>();
+                Image<Gray, byte> imgSrc = m_module.GetGrayByteImageFromMemory(mem, crtSearchArea);
                 bFoundTop = m_module.TemplateMatching(mem, crtSearchArea, imgSrc, imgTop, out cptTopResultCenter, m_dMatchScore);
 
                 // Bottom Template Image Processing
                 ptStart = new Point(cptBottomCenter.X - (m_nSearchAreaSize / 2), cptBottomCenter.Y - (m_nSearchAreaSize / 2));
                 ptEnd = new Point(cptBottomCenter.X + (m_nSearchAreaSize / 2), cptBottomCenter.Y + (m_nSearchAreaSize / 2));
                 crtSearchArea = new CRect(ptStart, ptEnd);
-                matSearchArea = m_module.GetMatImage(mem, crtSearchArea);
-                imgSrc = matSearchArea.ToImage<Gray, byte>();
+                //matSearchArea = m_module.GetMatImage(mem, crtSearchArea);
+                //imgSrc = matSearchArea.ToImage<Gray, byte>();
+                imgSrc = m_module.GetGrayByteImageFromMemory(mem, crtSearchArea);
                 bFoundBottom = m_module.TemplateMatching(mem, crtSearchArea, imgSrc, imgTop, out cptBottomResultCenter, m_dMatchScore);
 
                 // Calculate Theta
@@ -2825,8 +2844,9 @@ namespace Root_AOP01_Inspection.Module
                     ptStart = new Point(cptSearchAreaCenter.X - (m_nSearchArea / 2), cptSearchAreaCenter.Y - (m_nSearchArea / 2));
                     ptEnd = new Point(cptSearchAreaCenter.X + (m_nSearchArea / 2), cptSearchAreaCenter.Y + (m_nSearchArea / 2));
                     crtSearchArea = new CRect(ptStart, ptEnd);
-                    matSearchArea = m_module.GetMatImage(mem, crtSearchArea);
-                    imgSearchArea = matSearchArea.ToImage<Gray, byte>();
+                    //matSearchArea = m_module.GetMatImage(mem, crtSearchArea);
+                    //imgSearchArea = matSearchArea.ToImage<Gray, byte>();
+                    imgSearchArea = m_module.GetGrayByteImageFromMemory(mem, crtSearchArea);
                     CPoint cptFoundCenter;
                     bFound = m_module.TemplateMatching(mem, crtSearchArea, imgSearchArea, imgTemplate, out cptFoundCenter, m_dMatchScore);
                     if (bFound) cptarrOutResultCenterPositions[i] = new CPoint(cptFoundCenter);
@@ -2867,8 +2887,9 @@ namespace Root_AOP01_Inspection.Module
                     ptStart = new Point(cptSearchAreaCenter.X - (m_nSearchArea / 2), cptSearchAreaCenter.Y - (m_nSearchArea / 2));
                     ptEnd = new Point(cptSearchAreaCenter.X + (m_nSearchArea / 2), cptSearchAreaCenter.Y + (m_nSearchArea / 2));
                     crtSearchArea = new CRect(ptStart, ptEnd);
-                    matSearchArea = m_module.GetMatImage(mem, crtSearchArea);
-                    imgSearchArea = matSearchArea.ToImage<Gray, byte>();
+                    //matSearchArea = m_module.GetMatImage(mem, crtSearchArea);
+                    //imgSearchArea = matSearchArea.ToImage<Gray, byte>();
+                    imgSearchArea = m_module.GetGrayByteImageFromMemory(mem, crtSearchArea);
                     CPoint cptFoundCenter;
                     bFound = m_module.TemplateMatching(mem, crtSearchArea, imgSearchArea, imgTemplate, out cptFoundCenter, m_dMatchScore);
                     if (bFound) cptarrInResultCenterPositions[i] = new CPoint(cptFoundCenter);
