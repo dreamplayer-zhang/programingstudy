@@ -57,6 +57,7 @@ namespace Root_WIND2.Module
 
             try
             {
+                m_grabMode.SetLens();
                 m_grabMode.SetLight(true);
 
                 AxisXY axisXY = m_module.AxisXY;

@@ -13,11 +13,11 @@
                 Background="{StaticResource sidetap_child_background}">
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
                     <RadioButton Content="Summary" IsChecked="True" Command="{Binding btnFrontSummary}" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <RadioButton Content="Product" Command="{Binding btnFrontProduct}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Product"  Command="{Binding btnFrontProduct}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Origin" Command="{Binding btnFrontOrigin}" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <RadioButton Content="Alignment" Command="{Binding btnFrontAlignment}" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <RadioButton Content="Mask" Command="{Binding btnFrontMask}" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <RadioButton Content="Spec" Command="{Binding btnFrontSpec}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Alignment" IsEnabled = "{Binding IsEnabledAlignment}" Command="{Binding btnFrontAlignment}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Mask" IsEnabled = "{Binding IsEnabledMask}" Command="{Binding btnFrontMask}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Spec" IsEnabled ="{Binding IsEnabledSpec}" Command="{Binding btnFrontSpec}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Inspect" Command="{Binding btnFrontInspect}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Remote" Command="{Binding btnFrontRemote}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <Button Content="NEW" Style="{StaticResource sidetap_child_button}"/>

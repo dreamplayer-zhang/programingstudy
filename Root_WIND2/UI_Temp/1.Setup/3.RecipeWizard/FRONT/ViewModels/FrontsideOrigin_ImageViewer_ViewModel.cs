@@ -22,6 +22,7 @@ namespace Root_WIND2.UI_Temp
     public delegate void EventOriginBoxDone();
     public delegate void EventOriginPointDone();
     public delegate void EventOriginBoxReset();
+    public delegate void EventPitchPointDone();
 
     class FrontsideOrigin_ImageViewer_ViewModel : RootViewer_ViewModel
     {
@@ -43,9 +44,7 @@ namespace Root_WIND2.UI_Temp
         public event EventOriginPointDone OriginPointDone;
         public event EventOriginBoxDone OriginBoxDone;
         public event EventOriginBoxReset OriginBoxReset;
-        
-
-
+        public event EventPitchPointDone PitchPointDone;
         #endregion
 
         #region [ViewerState]
@@ -55,6 +54,7 @@ namespace Root_WIND2.UI_Temp
             p_VisibleMenu = System.Windows.Visibility.Collapsed;
 
             this.ViewerState = FRONT_ORIGIN_VIEWER_STATE.Normal;
+            this.ViewerStateChanged += ViewerStateChanged_Callback;
 
             InitializeUIElement();
         }
@@ -86,6 +86,203 @@ namespace Root_WIND2.UI_Temp
             }
         }
 
+        public void ViewerStateChanged_Callback()
+        {
+            this.DisplayViewerState = this.ViewerState.ToString();
+            if (this.ViewerState == FRONT_ORIGIN_VIEWER_STATE.Normal)
+            {
+                this.IsOriginChecked = false;
+                this.IsPitchChecked = false;
+                this.IsRularChecked = false;
+            }
+        }
+
+        #endregion
+
+        #region [Properties]
+        private bool isOriginChecked = false;
+        public bool IsOriginChecked
+        {
+            get => this.isOriginChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsPitchChecked = false;
+                    this.IsRularChecked = false;
+                }
+                SetProperty<bool>(ref this.isOriginChecked, value);
+            }
+        }
+
+        private bool isPitchChecked = false;
+        public bool IsPitchChecked
+        {
+            get => this.isPitchChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsOriginChecked = false;
+                    this.IsRularChecked = false;
+                }
+                SetProperty<bool>(ref this.isPitchChecked, value);
+            }
+        }
+
+
+        private bool isPitchEnable = false;
+        public bool IsPitchEnable
+        {
+            get => this.isPitchEnable;
+            set
+            {
+                SetProperty<bool>(ref this.isPitchEnable, value);
+            }
+        }
+
+        private bool isRularChecked = false;
+        public bool IsRularChecked
+        {
+            get => this.isRularChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsPitchChecked = false;
+                    this.IsOriginChecked = false;
+                }
+                SetProperty<bool>(ref this.isRularChecked, value);
+            }
+        }
+
+        private string displayViewerState = FRONT_ORIGIN_VIEWER_STATE.Normal.ToString();
+        public string DisplayViewerState
+        {
+            get => this.displayViewerState;
+            set
+            {
+                SetProperty<string>(ref this.displayViewerState, value);
+            }
+        }
+        #endregion
+
+        #region [Command]
+        public RelayCommand btnOriginCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (this.IsOriginChecked == true)
+                    {
+                        this.ViewerState = FRONT_ORIGIN_VIEWER_STATE.Origin;
+                        this.DisplayViewerState = this.ViewerState.ToString();
+                    }
+                    else
+                    {
+                        this.ViewerState = FRONT_ORIGIN_VIEWER_STATE.Normal;
+                        this.DisplayViewerState = this.ViewerState.ToString();
+
+                    }
+                });
+            }
+        }
+
+        public RelayCommand btnPitchCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (this.IsPitchChecked == true)
+                    {
+                        this.ViewerState = FRONT_ORIGIN_VIEWER_STATE.Pitch;
+                        this.DisplayViewerState = this.ViewerState.ToString();
+                    }
+                    else
+                    {
+                        this.ViewerState = FRONT_ORIGIN_VIEWER_STATE.Normal;
+                        this.DisplayViewerState = this.ViewerState.ToString();
+                    }
+                });
+            }
+        }
+
+        public RelayCommand btnRularCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (this.IsRularChecked == true)
+                    {
+                        this.ViewerState = FRONT_ORIGIN_VIEWER_STATE.Rular;
+                        this.DisplayViewerState = this.ViewerState.ToString();
+                    }
+                    else
+                    {
+                        this.ViewerState = FRONT_ORIGIN_VIEWER_STATE.Normal;
+                        this.DisplayViewerState = this.ViewerState.ToString();
+                    }
+                });
+            }
+        }
+
+        public RelayCommand btnOpenCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this._openImage();
+                });
+            }
+        }
+
+        public RelayCommand btnSaveCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this._saveImage();
+                });
+            }
+        }
+
+        public RelayCommand btnClearCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this._clearImage();
+                });
+            }
+        }
+
+        public RelayCommand btnViewFullCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.DisplayFull();
+                });
+            }
+        }
+
+        public RelayCommand btnViewBoxCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.DisplayBox();
+                });
+            }
+        }
         #endregion
 
         #region [Draw 관련 멤버]
@@ -133,7 +330,6 @@ namespace Root_WIND2.UI_Temp
             PitchBox_UI.Children.Add(new Line()); // Bottom
         }
         #endregion
-
 
         #region [Mouse Event Overrides]
         public override void PreviewMouseDown(object sender, MouseEventArgs e)
@@ -221,10 +417,7 @@ namespace Root_WIND2.UI_Temp
                 case PROCESS_ORIGIN_STATE.OriginLeftBottom:
 
                     // Origin 
-                    p_UIElement.Clear();
-
-                    if (this.OriginBoxReset != null)
-                        this.OriginBoxReset();
+                    ClearOrigin();
 
                     p_Cursor = Cursors.Arrow;
                     originLeftBottom = memPt;
@@ -244,17 +437,21 @@ namespace Root_WIND2.UI_Temp
                         MessageBox.Show("원점(Origin) 위치보다 오른쪽(또는 위쪽)에 위치해야합니다.");
                         return;
                     }
+
+                    if( (originRightTop.X - originLeftBottom.X) > 30000 || (originLeftBottom.Y - originRightTop.Y) > 30000)
+                    {
+                        MessageBox.Show("Origin(혹은 검사) 영역의 크기는 높이 30000(혹은 너비 30000)을 넘을 수 없습니다.");
+                        return;
+                    }
                     
                     originRightTop = memPt;
                     pitchRightTop = memPt;
 
                     DrawOriginRightTopPoint(originRightTop);
                     DrawPitchPoint(pitchRightTop);
-
                     DrawOriginBox();
 
-                    if (this.OriginBoxDone != null) 
-                        this.OriginBoxDone();
+                    SetOrigin();
 
                     originState = PROCESS_ORIGIN_STATE.None;
                     ViewerState = FRONT_ORIGIN_VIEWER_STATE.Normal;
@@ -300,6 +497,9 @@ namespace Root_WIND2.UI_Temp
 
                     DrawPitchPoint(pitchRightTop);
                     DrawPitchBox();
+
+                    if (this.PitchPointDone != null)
+                        this.PitchPointDone();
 
                     ViewerState = FRONT_ORIGIN_VIEWER_STATE.Normal;
                     break;
@@ -685,11 +885,6 @@ namespace Root_WIND2.UI_Temp
 
         }
 
-        public void ClearUIElements()
-        {
-            this.p_UIElement.Clear();
-        }
-
         #endregion
 
         #region [Viewer Method]
@@ -751,6 +946,29 @@ namespace Root_WIND2.UI_Temp
             {
                 MessageBox.Show("Origin 영역이 설정되지 않았습니다");
             }
+        }
+
+
+        /// <summary>
+        /// 양방향에서 Origin을 Clear할 수 있으므로
+        /// Parent에서 Origin Clear를 요청한 경우 OriginBoxReset을 발생 시키지 않는다.
+        /// </summary>
+        /// <param name="isFromParent"></param>
+        public void ClearOrigin(bool isFromParent = false)
+        {
+            this.IsPitchEnable = false;
+            this.p_UIElement.Clear();
+
+            if (this.OriginBoxReset != null && isFromParent == false)
+                this.OriginBoxReset();
+        }
+
+        public void SetOrigin()
+        {
+            this.IsPitchEnable = true;
+
+            if (this.OriginBoxDone != null)
+                this.OriginBoxDone();
         }
 
         #endregion

@@ -14,6 +14,13 @@ namespace Root_WIND2.UI_Temp
 
     class FrontsideAlignment_ImageViewer_ViewModel : RootViewer_ViewModel
     {
+        #region [Color]
+        private class DefineColors
+        {
+            public static SolidColorBrush OriginBoxColor = Brushes.Blue;
+        }
+        #endregion
+
         public event FeatureBoxDoneEvent FeatureBoxDone;
 
         public FrontsideAlignment_ImageViewer_ViewModel()
@@ -35,15 +42,64 @@ namespace Root_WIND2.UI_Temp
 
         CPoint mousePointBuffer;
 
+        Grid OriginBox;
+
         TShape BOX;
 
 
         private void InitializeUIElements()
         {
             BOX = new TShape();
+
+            OriginBox = new Grid();
+            OriginBox.Children.Add(new Line()); // Left
+            OriginBox.Children.Add(new Line()); // Top
+            OriginBox.Children.Add(new Line()); // Right
+            OriginBox.Children.Add(new Line()); // Bottom
+
+            p_ViewElement.Add(OriginBox);
         }
 
         public void SetViewRect()
+        {
+            DisplayBox();
+        }
+
+
+        #region [Command]
+        public RelayCommand btnViewFullCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.DisplayFull();
+                });
+            }
+        }
+
+        public RelayCommand btnViewBoxCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.DisplayBox();
+                });
+            }
+        }
+        #endregion
+
+        #region [Viewer Method]
+        public void DisplayFull()
+        {
+            this.p_Zoom = 1;
+
+            this.SetImageSource();
+            this.RedrawShapes();
+        }
+
+        public void DisplayBox()
         {
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
 
@@ -87,8 +143,13 @@ namespace Root_WIND2.UI_Temp
 
             this.p_View_Rect = new System.Drawing.Rectangle(new System.Drawing.Point(left, top), new System.Drawing.Size(width, height));
 
-            this.SetRoiRect();
+
+            this.SetImageSource();
+            this.RedrawShapes();
+
         }
+
+        #endregion
 
         #region [Overrides]
         public override void PreviewMouseDown(object sender, MouseEventArgs e)
@@ -486,11 +547,6 @@ namespace Root_WIND2.UI_Temp
         #region [Draw Method]
         private void RedrawShapes()
         {
-            //if (InspArea != null)
-            //{
-            //    AddInspArea();
-            //}
-
             if (p_UIElement.Contains(BOX.UIElement))
             {
                 TRect rect = BOX as TRect;
@@ -512,11 +568,78 @@ namespace Root_WIND2.UI_Temp
                 if (BOX.isSelected)
                     BOX.ModifyTool.Visibility = Visibility.Visible;
             }
+
+            RedrawOriginBox();
         }
 
-        private void OriginArea()
+        private void RedrawOriginBox()
         {
-            // 레시피에서 데이터 가져와서 그리기
+
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+            if (originRecipe.OriginWidth == 0 || originRecipe.OriginHeight == 0) return;
+
+            int left = originRecipe.OriginX;
+            int top = originRecipe.OriginY - originRecipe.OriginHeight;
+
+            int right = originRecipe.OriginX - originRecipe.OriginWidth;
+            int bottom = originRecipe.OriginY;
+
+            CPoint canvasLeftTop = GetCanvasPoint(new CPoint(left, top));
+            CPoint canvasLeftBottom = GetCanvasPoint(new CPoint(left, bottom));
+            CPoint canvasRightTop = GetCanvasPoint(new CPoint(right, top));
+            CPoint canvasRightBottom = GetCanvasPoint(new CPoint(right, bottom));
+
+            OriginBox.Width = Math.Abs(canvasRightTop.X - canvasLeftTop.X);
+            OriginBox.Height = Math.Abs(canvasLeftBottom.Y - canvasLeftTop.Y);
+
+            // Left
+            Line leftLine = OriginBox.Children[0] as Line;
+            leftLine.X1 = 0;
+            leftLine.Y1 = 0;
+            leftLine.X2 = 0;
+            leftLine.Y2 = OriginBox.Height;
+            leftLine.Stroke = DefineColors.OriginBoxColor;
+            leftLine.StrokeThickness = 2;
+            leftLine.Opacity = 1;
+
+            // Top
+            Line topLine = OriginBox.Children[1] as Line;
+            topLine.X1 = 0;
+            topLine.Y1 = 0;
+            topLine.X2 = OriginBox.Width;
+            topLine.Y2 = 0;
+            topLine.Stroke = DefineColors.OriginBoxColor;
+            topLine.StrokeThickness = 2;
+            topLine.Opacity = 1;
+
+            // Right
+            Line rightLine = OriginBox.Children[2] as Line;
+            rightLine.X1 = OriginBox.Width;
+            rightLine.Y1 = 0;
+            rightLine.X2 = OriginBox.Width;
+            rightLine.Y2 = OriginBox.Height;
+            rightLine.Stroke = DefineColors.OriginBoxColor;
+            rightLine.StrokeThickness = 2;
+            rightLine.Opacity = 1;
+
+            // bottom
+            Line bottomLine = OriginBox.Children[3] as Line;
+            bottomLine.X1 = 0;
+            bottomLine.Y1 = OriginBox.Height;
+            bottomLine.X2 = OriginBox.Width;
+            bottomLine.Y2 = OriginBox.Height;
+            bottomLine.Stroke = DefineColors.OriginBoxColor;
+            bottomLine.StrokeThickness = 2;
+            bottomLine.Opacity = 1;
+
+            Canvas.SetLeft(OriginBox, canvasLeftTop.X);
+            Canvas.SetTop(OriginBox, canvasLeftTop.Y);
+
+            if (!p_ViewElement.Contains(OriginBox))
+            {
+                p_ViewElement.Add(OriginBox);
+            }
         }
 
         public void FeatureBoxClear()
