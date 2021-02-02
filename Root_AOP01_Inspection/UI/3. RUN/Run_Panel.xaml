@@ -48,9 +48,9 @@
                                     <RowDefinition Height="1*"/>
                                     <RowDefinition Height="1*"/>
                                 </Grid.RowDefinitions>
-                                <Border Grid.Row="0" Margin="1,5,10,0" x:Name="gridLampR" BorderBrush="Black" BorderThickness="1" Background="Red"/>
+                                <Border Grid.Row="0" Margin="1,5,10,0" x:Name="gridLampR" BorderBrush="Black" BorderThickness="1" Background="OrangeRed"/>
                                 <Border Grid.Row="1" Margin="1,0,10,0" x:Name="gridLampY" BorderBrush="Black" BorderThickness="1" Background="Gold"/>
-                                <Border Grid.Row="2" Margin="1,0,10,0" x:Name="gridLampG" BorderBrush="Black" BorderThickness="1" Background="LimeGreen"/>
+                                <Border Grid.Row="2" Margin="1,0,10,0" x:Name="gridLampG" BorderBrush="Black" BorderThickness="1" Background="LightGreen"/>
                             </Grid>
 
                             <StackPanel Grid.Row="0" Grid.Column="1"
