@@ -155,7 +155,7 @@ namespace Root_Rinse_Loader.Module
             }
 
             string m_id;
-            Storage m_storage; 
+            public Storage m_storage; 
             public Stack(string id, Storage storage)
             {
                 m_id = id;

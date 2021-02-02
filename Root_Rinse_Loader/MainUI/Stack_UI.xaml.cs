@@ -19,11 +19,13 @@ namespace Root_Rinse_Loader.MainUI
             InitializeComponent();
         }
 
+        Storage m_storage; 
         Storage.Stack m_stack;
         Loader m_loader; 
         public void Init(Storage.Stack stack, Loader loader)
         {
             m_stack = stack;
+            m_storage = stack.m_storage; 
             m_loader = loader;
             InitCheckSensor(); 
             InitTimer(); 
@@ -108,6 +110,16 @@ namespace Root_Rinse_Loader.MainUI
         private void buttonVacuumOff_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             m_loader.RunVacuum(false);
+        }
+
+        private void buttonElevetorDown_Click(object sender, RoutedEventArgs e)
+        {
+            m_storage.MoveStack(); 
+        }
+
+        private void buttonElevatorReady_Click(object sender, RoutedEventArgs e)
+        {
+            m_storage.MoveStackReady(); 
         }
     }
 }
