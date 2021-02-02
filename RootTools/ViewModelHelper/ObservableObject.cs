@@ -36,8 +36,6 @@ namespace RootTools
             OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
         }
 
-        
-
         protected virtual bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
             if (Object.Equals(storage, value))

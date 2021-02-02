@@ -27,11 +27,12 @@ namespace Root_AOP01_Inspection
 		List<CPoint> PolygonPt = new List<CPoint>();
 		public ObservableCollection<TShape> Shapes = new ObservableCollection<TShape>();
 		private ObservableCollection<UIElement> m_UIElements = new ObservableCollection<UIElement>();
-		Recipe recipe
+		RecipeBase recipe
 		{
 			get
 			{
-				return m_Setup.InspectionManager.Recipe;
+				//return m_Setup.InspectionManager.Recipe;
+				return recipe;
 			}
 		}
 
@@ -149,7 +150,7 @@ namespace Root_AOP01_Inspection
 		{
 			get
 			{
-				return recipe.GetRecipe<BacksideRecipe>();
+				return recipe.GetItem<BacksideRecipe>();
 			}
 		}
 		RecipeType_WaferMap mapInfo;
@@ -209,14 +210,14 @@ namespace Root_AOP01_Inspection
 			foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
 			{
 				string text = "";
-
+				/*
 				if (false) // Display Option : Rel Position
 					text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
 				if (false) // Display Option : Defect Size
 					text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
 				if (false) // Display Option : GV Value
 					text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
-
+				*/
 				rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
 				textList.Add(text);
 			}
@@ -387,7 +388,7 @@ namespace Root_AOP01_Inspection
 			backsideRecipe.DiePitchX = chipSzX;
 			backsideRecipe.DiePitchY = chipSzY;
 
-			OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
+			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 			originRecipe.DiePitchX = chipSzX;
 			originRecipe.DiePitchY = chipSzY;
 			originRecipe.OriginX = originX;
@@ -609,8 +610,8 @@ namespace Root_AOP01_Inspection
 		private void startTestInsp()
 		{
 			p_ImageViewer_VM.Clear();
-			var temp = m_Setup.InspectionManager.Recipe.GetRecipe<BacksideRecipe>();
-			temp = backsideRecipe;
+			//var temp = m_Setup.InspectionManager.Recipe.GetItem<BacksideRecipe>();
+			//temp = backsideRecipe;
 
 			IntPtr SharedBuf = new IntPtr();
 			if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
@@ -630,11 +631,11 @@ namespace Root_AOP01_Inspection
 
 			m_Setup.InspectionManager.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
 
-			if (m_Setup.InspectionManager.CreateInspection() == false)
-			{
-				return;
-			}
-			m_Setup.InspectionManager.Start(false);
+			//if (m_Setup.InspectionManager.CreateInspection() == false)  //Del Temp LYJ
+			//{
+			//	return;
+			//}
+			//m_Setup.InspectionManager.Start(false);
 		}
 
 		public ICommand btnBack

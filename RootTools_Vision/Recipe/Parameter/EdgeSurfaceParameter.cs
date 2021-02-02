@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -11,225 +12,41 @@ namespace RootTools_Vision
 	{
 		public EdgeSurfaceParameter() : base(typeof(EdgeSurface))
 		{
-
+			edgeParamBaseTop = new EdgeSurfaceParameterBase();
+			edgeParamBaseSide = new EdgeSurfaceParameterBase();
+			edgeParamBaseBtm = new EdgeSurfaceParameterBase();
 		}
 
-		#region [Parameter]
-		private int roiHeightTop = 0;
-		private int roiWidthTop = 0;
-		private int thresholdTop = 0;
-		private int sizeMinTop = 0;
-		private int mergeDistTop = 0;
-		private int illumWhiteTop = 0;
-		private int illumSideTop = 0;
-
-		private int roiHeightSide = 0;
-		private int roiWidthSide = 0;
-		private int thresholdSide = 0;
-		private int sizeMinSide = 0;
-		private int mergeDistSide = 0;
-		private int illumWhiteSide = 0;
-		private int illumSideSide = 0;
-
-		private int roiHeightBtm = 0;
-		private int roiWidthBtm = 0;
-		private int thresholdBtm = 0;
-		private int sizeMinBtm = 0;
-		private int mergeDistBtm = 0;
-		private int illumWhiteBtm = 0;
-		private int illumSideBtm = 0;
-		#endregion
+		private EdgeSurfaceParameterBase edgeParamBaseTop;
+		private EdgeSurfaceParameterBase edgeParamBaseSide;
+		private EdgeSurfaceParameterBase edgeParamBaseBtm;
 
 		#region [Getter/Setter]
 		[Category("Parameter")]
-		public int RoiHeightTop
+		public EdgeSurfaceParameterBase EdgeParamBaseTop
 		{
-			get => this.roiHeightTop;
+			get => this.edgeParamBaseTop;
 			set
 			{
-				SetProperty<int>(ref this.roiHeightTop, value);
+				SetProperty(ref edgeParamBaseTop, value);
 			}
 		}
 		[Category("Parameter")]
-		public int RoiWidthTop
+		public EdgeSurfaceParameterBase EdgeParamBaseSide
 		{
-			get => this.roiWidthTop;
+			get => this.edgeParamBaseSide;
 			set
 			{
-				SetProperty<int>(ref this.roiWidthTop, value);
+				SetProperty(ref edgeParamBaseSide, value);
 			}
 		}
 		[Category("Parameter")]
-		public int ThesholdTop
+		public EdgeSurfaceParameterBase EdgeParamBaseBtm
 		{
-			get => this.thresholdTop;
+			get => this.edgeParamBaseBtm;
 			set
 			{
-				SetProperty<int>(ref this.thresholdTop, value);
-			}
-		}
-		[Category("Parameter")]
-		public int SizeMinTop
-		{
-			get => this.sizeMinTop;
-			set
-			{
-				SetProperty<int>(ref this.sizeMinTop, value);
-			}
-		}
-		[Category("Parameter")]
-		public int MergeDistTop
-		{
-			get => this.mergeDistTop;
-			set
-			{
-				SetProperty<int>(ref this.mergeDistTop, value);
-			}
-		}
-		[Category("Parameter")]
-		public int IllumWhiteTop
-		{
-			get => this.illumWhiteTop;
-			set
-			{
-				SetProperty<int>(ref this.illumWhiteTop, value);
-			}
-		}
-		[Category("Parameter")]
-		public int IllumSideTop
-		{
-			get => this.illumSideTop;
-			set
-			{
-				SetProperty<int>(ref this.illumSideTop, value);
-			}
-		}
-
-		[Category("Parameter")]
-		public int RoiHeightSide
-		{
-			get => this.roiHeightSide;
-			set
-			{
-				SetProperty<int>(ref this.roiHeightSide, value);
-			}
-		}
-		[Category("Parameter")]
-		public int RoiWidthSide
-		{
-			get => this.roiWidthSide;
-			set
-			{
-				SetProperty<int>(ref this.roiWidthSide, value);
-			}
-		}
-		[Category("Parameter")]
-		public int ThesholdSide
-		{
-			get => this.thresholdSide;
-			set
-			{
-				SetProperty<int>(ref this.thresholdSide, value);
-			}
-		}
-		[Category("Parameter")]
-		public int SizeMinSide
-		{
-			get => this.sizeMinSide;
-			set
-			{
-				SetProperty<int>(ref this.sizeMinSide, value);
-			}
-		}
-		[Category("Parameter")]
-		public int MergeDistSide
-		{
-			get => this.mergeDistSide;
-			set
-			{
-				SetProperty<int>(ref this.mergeDistSide, value);
-			}
-		}
-		[Category("Parameter")]
-		public int IllumWhiteSide
-		{
-			get => this.illumWhiteSide;
-			set
-			{
-				SetProperty<int>(ref this.illumWhiteSide, value);
-			}
-		}
-		[Category("Parameter")]
-		public int IllumSideSide
-		{
-			get => this.illumSideSide;
-			set
-			{
-				SetProperty<int>(ref this.illumSideSide, value);
-			}
-		}
-
-		[Category("Parameter")]
-		public int RoiHeightBtm
-		{
-			get => this.roiHeightBtm;
-			set
-			{
-				SetProperty<int>(ref this.roiHeightBtm, value);
-			}
-		}
-		[Category("Parameter")]
-		public int RoiWidthBtm
-		{
-			get => this.roiWidthBtm;
-			set
-			{
-				SetProperty<int>(ref this.roiWidthBtm, value);
-			}
-		}
-		[Category("Parameter")]
-		public int ThesholdBtm
-		{
-			get => this.thresholdBtm;
-			set
-			{
-				SetProperty<int>(ref this.thresholdBtm, value);
-			}
-		}
-		[Category("Parameter")]
-		public int SizeMinBtm
-		{
-			get => this.sizeMinBtm;
-			set
-			{
-				SetProperty<int>(ref this.sizeMinBtm, value);
-			}
-		}
-		[Category("Parameter")]
-		public int MergeDistBtm
-		{
-			get => this.mergeDistBtm;
-			set
-			{
-				SetProperty<int>(ref this.mergeDistBtm, value);
-			}
-		}
-		[Category("Parameter")]
-		public int IllumWhiteBtm
-		{
-			get => this.illumWhiteBtm;
-			set
-			{
-				SetProperty<int>(ref this.illumWhiteBtm, value);
-			}
-		}
-		[Category("Parameter")]
-		public int IllumSideBtm
-		{
-			get => this.illumSideBtm;
-			set
-			{
-				SetProperty<int>(ref this.illumSideBtm, value);
+				SetProperty(ref edgeParamBaseBtm, value);
 			}
 		}
 
@@ -248,10 +65,98 @@ namespace RootTools_Vision
 		}
 		#endregion
 
-		public override object Clone()
+		//public override object Clone()
+		//{
+		//	return this.MemberwiseClone();
+		//}
+	}
+	
+	public class EdgeSurfaceParameterBase : ObservableObject
+	{
+		#region [Parameter]
+		private int roiHeight = 0;
+		private int roiWidth = 0;
+		private int threshold = 0;
+		private int defectSizeMin = 0;
+		private int mergeDist = 0;
+		private int illumWhite = 0;
+		private int illumSide = 0;
+		private int edgeSearchLevel = 20;
+		#endregion
+
+		#region [Getter/Setter]
+		[Category("Parameter")]
+		public int ROIHeight
 		{
-			return this.MemberwiseClone();
+			get => this.roiHeight;
+			set
+			{
+				SetProperty<int>(ref this.roiHeight, value);
+			}
 		}
-		
+		[Category("Parameter")]
+		public int ROIWidth
+		{
+			get => this.roiWidth;
+			set
+			{
+				SetProperty<int>(ref this.roiWidth, value);
+			}
+		}
+		[Category("Parameter")]
+		public int Threshold
+		{
+			get => this.threshold;
+			set
+			{
+				SetProperty<int>(ref this.threshold, value);
+			}
+		}
+		[Category("Parameter")]
+		public int DefectSizeMin
+		{
+			get => this.defectSizeMin;
+			set
+			{
+				SetProperty<int>(ref this.defectSizeMin, value);
+			}
+		}
+		[Category("Parameter")]
+		public int MergeDist
+		{
+			get => this.mergeDist;
+			set
+			{
+				SetProperty<int>(ref this.mergeDist, value);
+			}
+		}
+		[Category("Parameter")]
+		public int IllumWhite
+		{
+			get => this.illumWhite;
+			set
+			{
+				SetProperty<int>(ref this.illumWhite, value);
+			}
+		}
+		[Category("Parameter")]
+		public int IllumSide
+		{
+			get => this.illumSide;
+			set
+			{
+				SetProperty<int>(ref this.illumSide, value);
+			}
+		}
+		[Category("Parameter")]
+		public int EdgeSearchLevel
+		{
+			get => this.edgeSearchLevel;
+			set
+			{
+				SetProperty<int>(ref this.edgeSearchLevel, value);
+			}
+		}
+		#endregion
 	}
 }

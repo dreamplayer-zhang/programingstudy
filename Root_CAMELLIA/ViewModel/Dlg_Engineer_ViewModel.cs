@@ -366,8 +366,8 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    SelectedAxis.ServoOn(!AxisX.p_bSeroOn);
-                    SelectedAxis.ServoOn(!AxisY.p_bSeroOn);
+                    SelectedAxis.ServoOn(!AxisX.p_bServoOn);
+                    SelectedAxis.ServoOn(!AxisY.p_bServoOn);
                 });
             }
         }

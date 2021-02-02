@@ -1,5 +1,6 @@
 ﻿using RootTools.Module;
 using RootTools.Trees;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,6 @@ namespace Root_WIND2.Module
 	{
 		EdgeSideVision module;
 
-		InspectionManagerEdge inspectionEdge;
 		string recipeName = string.Empty;
 
 		// degree, 카메라 위치 각도 offset
@@ -21,29 +21,37 @@ namespace Root_WIND2.Module
 		int btmOffset = 90;
 
 		#region [Getter/Setter]
-		public InspectionManagerEdge InspectionEdge
-		{
-			get => inspectionEdge;
-			set => inspectionEdge = value;
-		}
 		public string RecipeName
 		{
 			get => recipeName;
 			set => recipeName = value;
+		}
+		public int TopOffset
+		{
+			get => topOffset;
+			set => topOffset = value;
+		}
+		public int SideOffset
+		{
+			get => sideOffset;
+			set => sideOffset = value;
+		}
+		public int BtmOffset
+		{
+			get => btmOffset;
+			set => btmOffset = value;
 		}
 		#endregion
 
 		public Run_InspectEdge(EdgeSideVision module)
 		{
 			this.module = module;
-			inspectionEdge = ((WIND2_Engineer)module.m_engineer).InspectionEdge;
 			InitModuleRun(module);
 		}
 
 		public override ModuleRunBase Clone()
 		{
 			Run_InspectEdge run = new Run_InspectEdge(module);
-			run.inspectionEdge = ProgramManager.Instance.InspectionEdge;
 			run.recipeName = recipeName;
 
 			run.topOffset = topOffset;
@@ -65,11 +73,13 @@ namespace Root_WIND2.Module
 		{
 			try
 			{
-				if (this.inspectionEdge.Recipe.Read(recipeName, true) == false)
+				InspectionManagerEdge inspectionEdge = GlobalObjects.Instance.Get<InspectionManagerEdge>();
+
+				if (inspectionEdge.Recipe.Read(recipeName, true) == false)
 					return "Recipe Open Fail";
 
-				if (this.inspectionEdge.SetCameraInfo() == false)
-					return "Set Camera Info Fail";
+				//if (inspectionEdge.SetCameraInfo() == false)
+				//	return "Set Camera Info Fail";
 
 				inspectionEdge.Start();
 				return "OK";

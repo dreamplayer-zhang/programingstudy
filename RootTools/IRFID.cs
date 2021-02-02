@@ -12,8 +12,10 @@ namespace RootTools
         string p_id { get; set; }
         //string ReadRFID(ref string sID);
         string ReadRFID();
+        string ReadRFID(byte nCh, out string sRFID);
         string m_sReadID { get; set; }
         bool m_bReadID { get; set; }
         ModuleRunBase m_runReadID { get; set; }
+
     }
 }

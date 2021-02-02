@@ -120,12 +120,23 @@ namespace Root_AOP01_Inspection.UI._3._RUN
             
             if (Dlg_Start.m_bShow) return false;
             Dlg_Start dlg_Start = new Dlg_Start(m_infoCarrier);
-            dlg_Start.Init(m_engineer);
-            dlg_Start.Init(this);
+            dlg_Start.Init(this, m_engineer, m_loadport);
+            //dlg_Start.Init(this);
             p_bRnR = false;
             Dlg_Start.m_bShow = true;
             dlg_Start.ShowDialog();
-            m_handler.m_nRnR = p_bRnR ? p_nRnR : 1;
+            if (p_bRnR)
+            {
+                m_handler.m_nRnR = p_nRnR;
+                RNR_UI rnr_ui = new RNR_UI();
+                rnr_ui.Init(m_engineer);
+                rnr_ui.Show();
+            }
+            else if (!p_bRnR)
+            {
+                m_handler.m_nRnR = 1;
+            }
+            p_nRnR = 1;
             return dlg_Start.DialogResult == true;
         }
     }

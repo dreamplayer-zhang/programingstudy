@@ -1,4 +1,4 @@
-﻿//#define WORKMANAGER_DEBUG
+﻿#define WORKMANAGER_DEBUG
 
 using System;
 using System.Collections.Generic;
@@ -61,7 +61,7 @@ namespace RootTools_Vision
                 this.state = value;
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                DebugOutput.PrintWorkManagerInfo(this);
+                //DebugOutput.PrintWorkManagerInfo(this);
 #endif
 #endif
             }
@@ -162,11 +162,15 @@ namespace RootTools_Vision
             {
                 if (isStop == true)
                 {
+#if WORKMANAGER_DEBUG
+#if DEBUG
+                    DebugOutput.PrintWorkManagerInfo(this, "STOP");
+#endif
+#endif
                     Reset();
                     this.State = WORKMANAGER_STATE.STOP;
                     _waitSignal.Reset();
                     _waitSignal.WaitOne();
-                    continue;
                 }
                 else
                 {
@@ -176,7 +180,7 @@ namespace RootTools_Vision
 
                 this.State = WORKMANAGER_STATE.CHECK;
                 // 아직 일이 남아있는지 체크
-                if (this.workplaceBundle.CheckStateCompleted(this.workType) == true) // 모두 완료되었다면,
+                if (this.workplaceBundle != null && this.workplaceBundle.CheckStateCompleted(this.workType) == true) // 모두 완료되었다면,
                 {
                     Stop();
                     continue;
@@ -189,25 +193,30 @@ namespace RootTools_Vision
                 }
 
                 this.State = WORKMANAGER_STATE.ASSIGN;
-                Task.Run(() =>
+                if(this.workplaceBundle != null)
                 {
-                    if (AssignWorkToWorker() == false)
+                    //Task.Run(() =>
                     {
+                        if (AssignWorkToWorker() == false)
+                        {
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                        DebugOutput.PrintWorkManagerInfo(this, "False");
+                            //DebugOutput.PrintWorkManagerInfo(this, "False");
 #endif
 #endif
-                    }
-                    else
-                    {
+                        }
+                        else
+                        {
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                        DebugOutput.PrintWorkManagerInfo(this, "True");
+                            //DebugOutput.PrintWorkManagerInfo(this, "True");
 #endif
 #endif
+                        }
                     }
-                });
+                    //);
+                }
+
 
                 this.State = WORKMANAGER_STATE.DONE;
 
@@ -248,7 +257,7 @@ namespace RootTools_Vision
                     }
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                    Debug.WriteLine(this.workType + " : " + workplace.MapIndexX + ", " + workplace.MapIndexY + " : " + "할당");
+                    //Debug.WriteLine(this.workType + " : " + workplace.MapIndexX + ", " + workplace.MapIndexY + " : " + "할당");
 #endif
 #endif
 

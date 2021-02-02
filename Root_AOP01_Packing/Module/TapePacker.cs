@@ -280,7 +280,8 @@ namespace Root_AOP01_Packing.Module
             }
             public string RunHeadDown(bool bDown)
             {
-                if (bDown == false) return m_solHead.RunSol(bDown);
+                if (bDown == false)
+                    return m_solHead.RunSol(bDown);
                 m_solHead.Write(bDown);
                 Thread.Sleep(100);
                 int msWait = (int)(1000 * m_solHead.m_secTimeout);
@@ -311,8 +312,10 @@ namespace Root_AOP01_Packing.Module
                 while (m_dioVacuum.p_bIn != bOn)
                 {
                     Thread.Sleep(10);
-                    if (EQ.IsStop()) return m_id + " EQ Stop";
-                    if (m_dioVacuum.m_swWrite.ElapsedMilliseconds > msVac) return "Vacuum Sensor Timeout";
+                    if (EQ.IsStop())
+                        return m_id + " EQ Stop";
+                    if (m_dioVacuum.m_swWrite.ElapsedMilliseconds > msVac)
+                        return "Vacuum Sensor Timeout";
                 }
                 return "OK";
             }
@@ -339,7 +342,9 @@ namespace Root_AOP01_Packing.Module
             {
                 m_packer.p_sInfo = toolBox.Get(ref m_axis, m_packer, m_id + ".Rotate");
                 m_packer.p_sInfo = toolBox.Get(ref m_diCheck, m_packer, m_id + ".Check");
-                if (bInit) { }
+                if (bInit)
+                {
+                }
             }
 
             public bool IsCheck()
@@ -418,7 +423,8 @@ namespace Root_AOP01_Packing.Module
         public List<DIO_I2O2> m_aSolvalve = new List<DIO_I2O2>();
         public void InitSolvalve(DIO_I2O2 sol)
         {
-            if (sol == null) return;
+            if (sol == null)
+                return;
             m_aSolvalve.Add(sol);
             sol.Write(false);
         }
@@ -448,12 +454,16 @@ namespace Root_AOP01_Packing.Module
         InfoWafer _infoWafer = null;
         public InfoWafer p_infoWafer
         {
-            get { return _infoWafer; }
+            get
+            {
+                return _infoWafer;
+            }
             set
             {
                 m_sInfoWafer = (value == null) ? "" : value.p_id;
                 _infoWafer = value;
-                if (m_reg != null) m_reg.Write("sInfoWafer", m_sInfoWafer);
+                if (m_reg != null)
+                    m_reg.Write("sInfoWafer", m_sInfoWafer);
                 OnPropertyChanged();
             }
         }
@@ -472,10 +482,14 @@ namespace Root_AOP01_Packing.Module
         bool _bLock = false;
         public bool p_bLock
         {
-            get { return _bLock; }
+            get
+            {
+                return _bLock;
+            }
             set
             {
-                if (_bLock == value) return;
+                if (_bLock == value)
+                    return;
                 _bLock = value;
             }
         }
@@ -484,7 +498,8 @@ namespace Root_AOP01_Packing.Module
         {
             for (int n = 0; n < 10; n++)
             {
-                if (p_bLock == false) return false;
+                if (p_bLock == false)
+                    return false;
                 Thread.Sleep(100);
             }
             return true;
@@ -496,7 +511,13 @@ namespace Root_AOP01_Packing.Module
             _asChildSlot.Add("Case");
             _asChildSlot.Add("Reticle");
         }
-        public List<string> p_asChildSlot { get { return _asChildSlot; } }
+        public List<string> p_asChildSlot
+        {
+            get
+            {
+                return _asChildSlot;
+            }
+        }
 
         public InfoWafer GetInfoWafer(int nID)
         {
@@ -510,13 +531,24 @@ namespace Root_AOP01_Packing.Module
 
         public string IsGetOK(int nID)
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            if (p_infoWafer == null) return p_id + " IsGetOK - InfoWafer not Exist";
+            if (p_eState != eState.Ready)
+                return p_id + " eState not Ready";
+            if (p_infoWafer == null)
+                return p_id + " IsGetOK - InfoWafer not Exist";
             switch (p_eProcess)
             {
-                case eProcess.Case: if (nID == 0) return "OK"; break;
-                case eProcess.Reticle: if (nID == 1) return "OK"; break;
-                case eProcess.Done: if (nID == 0) return "OK"; break;
+                case eProcess.Case:
+                    if (nID == 0)
+                        return "OK";
+                    break;
+                case eProcess.Reticle:
+                    if (nID == 1)
+                        return "OK";
+                    break;
+                case eProcess.Done:
+                    if (nID == 0)
+                        return "OK";
+                    break;
             }
             return p_id + " IsGetOK - Process " + p_eProcess.ToString();
         }
@@ -539,7 +571,8 @@ namespace Root_AOP01_Packing.Module
 
         public int GetTeachWTR(InfoWafer infoWafer = null)
         {
-            if (infoWafer == null) infoWafer = p_infoWafer;
+            if (infoWafer == null)
+                infoWafer = p_infoWafer;
             return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
         }
 
@@ -582,7 +615,8 @@ namespace Root_AOP01_Packing.Module
 
         string CheckGetPut()
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            if (p_eState != eState.Ready)
+                return p_id + " eState not Ready";
             return "OK";
         }
 
@@ -615,10 +649,14 @@ namespace Root_AOP01_Packing.Module
         eProcess _eProcess = eProcess.Empty;
         public eProcess p_eProcess
         {
-            get { return _eProcess; }
+            get
+            {
+                return _eProcess;
+            }
             set
             {
-                if (_eProcess == value) return;
+                if (_eProcess == value)
+                    return;
                 _eProcess = value;
                 if (m_reg != null) m_reg.Write("Process", (int)value);
                 OnPropertyChanged();
@@ -632,11 +670,16 @@ namespace Root_AOP01_Packing.Module
             p_eProcess = eProcess.Case;
             if (p_eProcess != eProcess.Case) return "Process not Case : " + p_eProcess.ToString();
             p_eProcess = eProcess.Opening;
-            if (Run(m_head.RunVacuum(false))) return p_sInfo;
-            if (Run(m_head.RunSol(false, false))) return p_sInfo;
-            if (Run(m_head.RunSol(true, true))) return p_sInfo;
-            if (Run(m_head.RunVacuum(true))) return p_sInfo;
-            if (Run(m_head.RunSol(false, true))) return p_sInfo;
+            if (Run(m_head.RunVacuum(false)))
+                return p_sInfo;
+            if (Run(m_head.RunSol(false, false)))
+                return p_sInfo;
+            if (Run(m_head.RunSol(true, true)))
+                return p_sInfo;
+            if (Run(m_head.RunVacuum(true)))
+                return p_sInfo;
+            if (Run(m_head.RunSol(false, true)))
+                return p_sInfo;
             p_eProcess = eProcess.Opened;
             return "OK";
         }
@@ -645,9 +688,12 @@ namespace Root_AOP01_Packing.Module
             p_eProcess = eProcess.Reticle;
             if (p_eProcess != eProcess.Reticle) return "Process not Reticle : " + p_eProcess.ToString();
             p_eProcess = eProcess.Closing;
-            if (Run(m_head.RunSol(true, true))) return p_sInfo;
-            if (Run(m_head.RunVacuum(false))) return p_sInfo;
-            if (Run(m_head.RunSol(true, false))) return p_sInfo;
+            if (Run(m_head.RunSol(true, true)))
+                return p_sInfo;
+            if (Run(m_head.RunVacuum(false)))
+                return p_sInfo;
+            if (Run(m_head.RunSol(true, false)))
+                return p_sInfo;
             p_eProcess = eProcess.Closed;
             return "OK";
         }
@@ -741,7 +787,8 @@ namespace Root_AOP01_Packing.Module
 
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             p_eProcess = (p_sInfo == "OK") ? p_eProcess : eProcess.Error;
-            if (p_eState == eState.Ready) m_stage.RunMove(m_stage.m_degReady);
+            if (p_eState == eState.Ready)
+                m_stage.RunMove(m_stage.m_degReady);
             return p_sInfo;
         }
         #endregion
@@ -885,9 +932,12 @@ namespace Root_AOP01_Packing.Module
             {
                 switch (m_eCover)
                 {
-                    case eCover.Open: return m_module.RunCoverOpen();
-                    case eCover.Close: return m_module.RunCoverClose();
-                    case eCover.HeadUp: return m_module.RunHeadUp();
+                    case eCover.Open:
+                        return m_module.RunCoverOpen();
+                    case eCover.Close:
+                        return m_module.RunCoverClose();
+                    case eCover.HeadUp:
+                        return m_module.RunHeadUp();
                 }
                 return "OK";
             }
@@ -920,3 +970,4 @@ namespace Root_AOP01_Packing.Module
         #endregion
     }
 }
+

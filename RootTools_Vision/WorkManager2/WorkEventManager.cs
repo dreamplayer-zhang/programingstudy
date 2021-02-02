@@ -79,5 +79,14 @@ namespace RootTools_Vision
             WorkplaceStateChanged?.Invoke(obj, args);
         }
         #endregion
+
+        #region [RequestStop]
+        public static event EventHandler<RequestStopEventArgs> RequestStop;
+
+        public static void OnRequestStop(object obj, RequestStopEventArgs args)
+        {
+            RequestStop?.Invoke(obj, args);
+        }
+        #endregion
     }
 }

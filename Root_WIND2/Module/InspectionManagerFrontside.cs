@@ -12,45 +12,52 @@ using System.Windows.Threading;
 using RootTools;
 using RootTools.Database;
 using RootTools_Vision;
+using RootTools_Vision.Utility;
 
 
 namespace Root_WIND2
 {
     public class InspectionManagerFrontside : WorkFactory
     {
-        private readonly Recipe recipe;
-        public Recipe Recipe { get => recipe; }
+        #region [Members]
+        private readonly RecipeFront recipe;
+        private readonly SharedBufferInfo sharedBufferInfo;
 
-        private readonly SharedBufferInfo bufferInfo;
-        public SharedBufferInfo BufferInfo
-        {
-            get => this.bufferInfo;
+        private readonly Module.Vision vision;
+        #endregion
+
+        #region [Properties]
+        public RecipeFront Recipe 
+        { 
+            get => recipe; 
         }
 
-        public InspectionManagerFrontside(Recipe recipe, SharedBufferInfo bufferInfo)
+        
+        public SharedBufferInfo SharedBufferInfo
         {
+            get => this.sharedBufferInfo;
+        }
+        #endregion
+
+        public InspectionManagerFrontside(Module.Vision vision, RecipeFront recipe, SharedBufferInfo bufferInfo)
+        {
+            this.vision = vision;
             this.recipe = recipe;
-            this.bufferInfo = bufferInfo;
+            this.sharedBufferInfo = bufferInfo;
         }
-
-
-
 
 
         #region [Override]
         protected override void Initialize()
         {
             CreateWorkManager(WORK_TYPE.SNAP);
-            CreateWorkManager(WORK_TYPE.ALIGNMENT, 8);
-            CreateWorkManager(WORK_TYPE.INSPECTION, 4);
-            CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 8);
+            CreateWorkManager(WORK_TYPE.ALIGNMENT);
+            CreateWorkManager(WORK_TYPE.INSPECTION, 6);
+            CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 6);
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS_ALL, 1, true);
 
             WIND2EventManager.SnapDone += SnapDone_Callback;
         }
-
-        
-
 
         /// <summary>
         /// 다음 함수에서 생성한 WorkplaceBundle로 검사를 진행합니다.
@@ -58,6 +65,14 @@ namespace Root_WIND2
         /// <returns></returns>
         protected override WorkplaceBundle CreateWorkplaceBundle()
         {
+            RecipeType_WaferMap waferMap = recipe.WaferMap;
+
+            if (waferMap == null || waferMap.MapSizeX == 0 || waferMap.MapSizeY == 0)
+            {
+                MessageBox.Show("Map 정보가 없습니다.");
+                return null;
+            }
+
             return CreateWorkplaceBundle_WaferMap();
         }
 
@@ -70,10 +85,12 @@ namespace Root_WIND2
             List<ParameterBase> paramList = recipe.ParameterItemList;
             WorkBundle bundle = new WorkBundle();
 
+            bundle.Add(new Snap());
             foreach (ParameterBase param in paramList)
             {
                 WorkBase work = (WorkBase)Tools.CreateInstance(param.InspectionType);
                 work.SetRecipe(recipe);
+                work.SetParameter(param); // 같은 class를 사용하는 parameter 객체가 존재할 수 있으므로 반드시 work를 생성할 때 parameter를 셋팅
 
                 bundle.Add(work);
             }
@@ -125,9 +142,9 @@ namespace Root_WIND2
         public WorkplaceBundle CreateWorkplaceBundle_WaferMap()
         {
             RecipeType_WaferMap mapInfo = recipe.WaferMap;
-            OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
-            PositionRecipe positionRecipe = recipe.GetRecipe<PositionRecipe>();
-
+            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+            PositionRecipe positionRecipe = recipe.GetItem<PositionRecipe>();
+            PositionParameter positionParameter = recipe.GetItem<PositionParameter>();
             WorkplaceBundle bundle = new WorkplaceBundle();
             try
             {
@@ -150,8 +167,8 @@ namespace Root_WIND2
                     }
                 }
 
-                //bundle.Add(new Workplace(-1, -1, maxMasterFeaturePositionX + originRecipe.OriginX + maxMasterFeatureWidth, maxMasterFeaturePositionY + originRecipe.OriginY + maxMasterFeatureHeight, 0, 0, bundle.Count));
-                bundle.Add(new Workplace(-1, -1, 0, 0, 0, 0, bundle.Count));
+                bundle.Add(new Workplace(-1, -1, maxMasterFeaturePositionX + originRecipe.OriginX + maxMasterFeatureWidth + positionParameter.WaferSearchRangeX, maxMasterFeaturePositionY + originRecipe.OriginY + maxMasterFeatureHeight + positionParameter.WaferSearchRangeY, 0, 0, bundle.Count));
+                //bundle.Add(new Workplace(-1, -1, 0, 0, 0, 0, bundle.Count));
 
                 var wafermap = mapInfo.Data;
                 int nSizeX = mapInfo.MapSizeX;
@@ -249,7 +266,7 @@ namespace Root_WIND2
                     }
                 }
 
-                bundle.SetSharedBuffer(this.bufferInfo);
+                bundle.SetSharedBuffer(this.sharedBufferInfo);
                 this.workplaceBundle = bundle;
                 return bundle;
             }
@@ -264,6 +281,7 @@ namespace Root_WIND2
         {
             if (this.workplaceBundle == null || this.IsStop == true) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
 
+            //Task.Delay(1000);
             Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
 
             foreach (Workplace wp in this.workplaceBundle)
@@ -277,6 +295,11 @@ namespace Root_WIND2
                     wp.WorkState = WORK_TYPE.SNAP;
                 }
             }
+        }
+
+        ~InspectionManagerFrontside()
+        {
+
         }
     }
 }

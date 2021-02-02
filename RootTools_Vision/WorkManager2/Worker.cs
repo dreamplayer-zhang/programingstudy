@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿#define WORKER_DEBUG
+using RootTools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,13 +14,16 @@ namespace RootTools_Vision
     internal enum WORKER_STATE
     {
         NONE = 0,
-        WORK_ASSIGNED = 1,
-        WORKING = 2,
-        WORK_COMPLETED = 3,
-        WORK_STOP = 4,
+        WORK_ASSIGNED,
+        WORKING,
+        WORK_COMPLETED,
+        WORK_STOP,
+        WORK_EXIT,
     }
 
     public delegate void EventWorkCompleted(Workplace obj);
+
+    public delegate void EventRequestStop();
 
     sealed internal class Worker : IWorkStartable
     {
@@ -38,6 +42,7 @@ namespace RootTools_Vision
 
         public event EventWorkCompleted WorkCompleted;
         public event EventWorkCompleted WorkIncompleted;
+        public event EventRequestStop RequestStop;
 
         private byte[] workplaceBufferR_GRAY;
         private byte[] workplaceBufferG;
@@ -81,11 +86,6 @@ namespace RootTools_Vision
             this.workerIndex = index;
             this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current); // 짧은 작업이 아닌 경우 LongRunning 옵션을 반드시 사용해야함. 자세한 것은 검색
             this.isStop = true;
-        }
-
-        ~Worker()
-        {
-
         }
 
 
@@ -142,73 +142,98 @@ namespace RootTools_Vision
                     {
                         Reset();
                         this.workerState = WORKER_STATE.WORK_STOP;
+#if WORKER_DEBUG
+#if DEBUG
+                        DebugOutput.PrintWorker(this, this.workerState.ToString());
+#endif
+#endif
                         _waitSignal.Reset();
                         _waitSignal.WaitOne();
                     }
                     else
                     {
                         if (this.workerState != WORKER_STATE.WORK_ASSIGNED)
+                        {
+#if WORKER_DEBUG
+#if DEBUG
+                            DebugOutput.PrintWorker(this);
+#endif
+#endif
                             _waitSignal.WaitOne();
+                        }
+      
                     }
 
                     if (token.IsCancellationRequested)
                     {
+                        this.workerState = WORKER_STATE.WORK_EXIT;
+                        this.task = null;
                         return;
                     }
 
-                    // Workplace Copy
-                    if (this.workType == WORK_TYPE.INSPECTION && this.workerState != WORKER_STATE.WORKING) // 이미 Working State면 Copy가 되어 있는 상태
+                    if ( this.isStop == false)
                     {
-                        CopyWorkplaceBuffer();
-
-                        this.works.SetWorkplaceBuffer(this.workplaceBufferR_GRAY, this.workplaceBufferG, this.workplaceBufferB);
-                    }
-
-                    //// Work Start ////
-                    this.workerState = WORKER_STATE.WORKING;
-
-                    bool workDone = false;
-
-                    foreach (WorkBase work in this.works)
-                    {
-                        if(work.IsPreworkDone == false)
-                            work.DoPrework();
-
-                        if (work.IsPreworkDone == true) // Prework Done(0)
+                        // Workplace Copy
+                        if (this.workType == WORK_TYPE.INSPECTION && this.workerState != WORKER_STATE.WORKING) // 이미 Working State면 Copy가 되어 있는 상태
                         {
-                            if (work.IsWorkDone == true)  // 이미 작업을 한 경우 다음 work올 넘어감
-                                continue;
+                            CopyWorkplaceBuffer();
+
+                            this.works.SetWorkplaceBuffer(this.workplaceBufferR_GRAY, this.workplaceBufferG, this.workplaceBufferB);
+                        }
+
+                        //// Work Start ////
+                        this.workerState = WORKER_STATE.WORKING;
+
+                        bool workDone = false;
+
+                        foreach (WorkBase work in this.works)
+                        {
+                            if (work.IsPreworkDone == false)
+                                work.DoPrework();
+
+                            if (work.IsPreworkDone == true) // Prework Done(0)
+                            {
+                                if (work.IsWorkDone == true)  // 이미 작업을 한 경우 다음 work올 넘어감
+                                    continue;
+                                else
+                                {
+#if WORKER_DEBUG
+#if DEBUG
+                                //DebugOutput.PrintWork(work);
+#endif
+#endif
+                                    workDone = work.DoWork();
+                                }
+                            }
                             else
                             {
-#if DEBUG
-                                DebugOutput.PrintWork(work);
-#endif
-                                work.DoWork();
-                                workDone = true;
+                                workDone = false;
+                                break;
                             }
+                        }
+
+                        _waitSignal.Reset();
+
+                        if (workDone == false && this.works.Count != 0)
+                        {
+#if WORKER_DEBUG
+#if DEBUG
+                            if(this.WorkType  == WORK_TYPE.DEFECTPROCESS)
+                                DebugOutput.PrintWorker(this, "Incomplete");                        
+#endif
+#endif
+                            Incomplete();
                         }
                         else
                         {
-                            workDone = false;
-                            break;
+#if WORKER_DEBUG
+#if DEBUG
+                            if (this.WorkType == WORK_TYPE.DEFECTPROCESS)
+                                DebugOutput.PrintWorker(this, "Complete");
+#endif
+#endif
+                            Complete();
                         }
-                    }
-
-                    _waitSignal.Reset();
-
-                    if (workDone == false && this.works.Count != 0)
-                    {
-#if DEBUG
-                        DebugOutput.PrintWorker(this, "Incomplete");                        
-#endif
-                        Incomplete();
-                    }
-                    else
-                    {
-#if DEBUG
-                        DebugOutput.PrintWorker(this, "Complete");
-#endif
-                        Complete();
                     }
                 }
             }
@@ -216,13 +241,16 @@ namespace RootTools_Vision
             {
                 exception = true;
                 //쓰레드 하나라도 죽으면 WorkFactory Thread 다시 생성하고, WorkFactory Reset
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("예기치 못한 상황 발생으로 검사를 중단합니다.\n" + ex.Message);
             }
             finally
             {
                 if(exception == true)
                 {
+                    this.task = null;
+                    this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
+                    WorkEventManager.OnRequestStop(this, new RequestStopEventArgs());
                 }
             }
         }

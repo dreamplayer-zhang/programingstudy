@@ -177,15 +177,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainUI\Main_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainUI\Rinse_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainUI\RunUI.xaml">
+    <Page Include="Icon\AtiLogo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -205,14 +197,8 @@
     <Compile Include="Engineer\RinseL_Handler_UI.xaml.cs">
       <DependentUpon>RinseL_Handler_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainUI\Main_UI.xaml.cs">
-      <DependentUpon>Main_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainUI\Rinse_UI.xaml.cs">
-      <DependentUpon>Rinse_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainUI\RunUI.xaml.cs">
-      <DependentUpon>RunUI.xaml</DependentUpon>
+    <Compile Include="Icon\AtiLogo.xaml.cs">
+      <DependentUpon>AtiLogo.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

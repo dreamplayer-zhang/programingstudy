@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Memory;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,7 +35,7 @@ namespace Root_WIND2
 
         public FrontsideInspection_ImageViewer_ViewModel()
         {
-            base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
+            base.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
             p_VisibleMenu = Visibility.Visible;
             //Shapes.CollectionChanged += Shapes_CollectionChanged;
             //InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;
@@ -74,20 +75,6 @@ namespace Root_WIND2
 
         }
 
-        #region Property
-        private ObservableCollection<UIElement> m_DrawElement = new ObservableCollection<UIElement>();
-        public ObservableCollection<UIElement> p_DrawElement
-        {
-            get
-            {
-                return m_DrawElement;
-            }
-            set
-            {
-                m_DrawElement = value;
-            }
-        }
-        #endregion
 
         #region Command
         public void DrawRect(CPoint LT, CPoint RB, ColorType color, String text = null, int FontSz = 15)
@@ -394,11 +381,11 @@ namespace Root_WIND2
 
         public void DefectClear()
         {
-            foreach (TShape shape in Shapes)
-            {
+            //foreach (TShape shape in Shapes)
+            //{
                 
 
-            }
+            //}
             Shapes.Clear();
             InfoTextBolcks.Clear();
             p_DrawElement.Clear();

@@ -175,6 +175,7 @@
     <ClInclude Include="IP.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PitSizer.h" />
+    <ClInclude Include="ResizeSSE.h" />
     <ClInclude Include="TypeDefines.h" />
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +191,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PitSizer.cpp" />
+    <ClCompile Include="ResizeSSE.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

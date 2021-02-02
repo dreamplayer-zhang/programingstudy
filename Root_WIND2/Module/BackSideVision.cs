@@ -435,7 +435,11 @@ namespace Root_WIND2.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_grabMode.m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_grabMode.m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        GrabData gd = new GrabData();
+                        gd.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.BackWard;
+                        gd.nScanOffsetY = 0;
+                        gd.ReverseOffsetY = 0;
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, gd);
                         m_grabMode.Grabed += M_grabMode_Grabed;
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
@@ -559,7 +563,13 @@ namespace Root_WIND2.Module
 
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_grabMode.m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_grabMode.m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+
+                        GrabData gd = new GrabData();
+                        gd.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.BackWard;
+                        gd.nScanOffsetY = 0;
+                        gd.ReverseOffsetY = 0;
+
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px,gd);
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;

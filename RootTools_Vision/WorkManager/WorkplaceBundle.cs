@@ -198,12 +198,12 @@ namespace RootTools_Vision.delete
             }
         }
 
-        public static WorkplaceBundle CreateWaferMap(Recipe _recipe)
+        public static WorkplaceBundle CreateWaferMap(RecipeBase _recipe)
         {
 
             RecipeType_WaferMap mapInfo = _recipe.WaferMap;
-            OriginRecipe originRecipe = _recipe.GetRecipe<OriginRecipe>();
-            PositionRecipe positionRecipe = _recipe.GetRecipe<PositionRecipe>();
+            OriginRecipe originRecipe = _recipe.GetItem<OriginRecipe>();
+            PositionRecipe positionRecipe = _recipe.GetItem<PositionRecipe>();
 
             WorkplaceBundle bundle = new WorkplaceBundle();
 

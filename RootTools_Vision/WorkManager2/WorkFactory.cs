@@ -36,6 +36,13 @@ namespace RootTools_Vision
             workManagers = new List<WorkManager>();
 
             Initialize();
+
+            WorkEventManager.RequestStop += OnRequestStop_Callback;
+        }
+
+        public void OnRequestStop_Callback(object obj, RequestStopEventArgs args)
+        {
+            Stop();
         }
 
         /// <summary>

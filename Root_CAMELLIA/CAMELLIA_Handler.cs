@@ -71,6 +71,7 @@ namespace Root_CAMELLIA
             InitAligner();
             m_camellia = new Module_Camellia("Camellia", m_engineer);
             InitModule(m_camellia);
+            //InitXGem();
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_camellia);
             m_wtr.RunTree(Tree.eMode.RegRead);
@@ -156,20 +157,6 @@ namespace Root_CAMELLIA
             }
         }
 
-        public List<IRFID> m_aRFID = new List<IRFID>();
-        void InitRFID()
-        {
-            ModuleBase module;
-            char cID = 'A';
-            for(int n=0; n<m_lLoadport; n++, cID++)
-            {
-                string sID = "Rfid" + cID;
-                module = new RFID_Brooks(sID, m_engineer);
-                InitModule(module);
-                m_aRFID.Add((IRFID)module);
-            }
-        }
-
         public void RunTreeLoadport(Tree tree)
         {
             m_lLoadport = tree.Set(m_lLoadport, m_lLoadport, "Count", "Loadport Count");
@@ -179,6 +166,31 @@ namespace Root_CAMELLIA
             {
                 m_aLoadportType[n] = (eLoadport)treeType.Set(m_aLoadportType[n], m_aLoadportType[n], n.ToString("00"), "Loadport Type");
             }
+        }
+        #endregion
+
+        #region Module RFID
+        public List<IRFID> m_aRFID = new List<IRFID>();
+        void InitRFID()
+        {
+            ModuleBase module;
+            char cID = 'A';
+            for (int n = 0; n < m_lLoadport; n++, cID++)
+            {
+                string sID = "Rfid" + cID;
+                module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]);
+                InitModule(module);
+                m_aRFID.Add((IRFID)module);
+            }
+        }
+        #endregion
+
+        #region Module Gem
+        public ModuleBase m_XGem = null;
+        void InitXGem()
+        {
+            m_XGem = new Gem_XGem300Pro("Gem300", m_engineer, m_gem, m_aLoadport);
+            InitModule(m_XGem);
         }
         #endregion
 
@@ -237,6 +249,11 @@ namespace Root_CAMELLIA
             }
             sInfo = StateHome((Loadport_RND)m_aLoadport[0], (Loadport_RND)m_aLoadport[1], m_Aligner, m_camellia, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1]);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
+
+            if (m_gem != null)
+            {
+                m_gem.DeleteAllJobInfo();
+            }
             return sInfo;
         }
 
@@ -338,6 +355,7 @@ namespace Root_CAMELLIA
                 m_process.m_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
+                //for (int n = m_process.m_qSequence.Count - 1; n >= 0; n--)
                 {
                     if (CalcUnload(aDock[n], aSequence))
                     {
@@ -355,13 +373,7 @@ namespace Root_CAMELLIA
         {
             foreach (EFEM_Process.Sequence sequence in aSequence)
             {
-                if (loadport.p_id == sequence.m_infoWafer.m_sModule)
-                {
-                    ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
-                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
-                    m_process.m_qSequence.Enqueue(sequenceDock);
-                    return true;
-                }
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
             }
             return false;
         }
@@ -445,12 +457,14 @@ namespace Root_CAMELLIA
                             //if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
+                                while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
+                                Thread.Sleep(1000);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
                                 //m_nRnR--;
                                 EQ.p_nRnR--;
                                 EQ.p_eState = EQ.eState.Run;
-                            } 
+                            }
                         }
                         break;
                 }

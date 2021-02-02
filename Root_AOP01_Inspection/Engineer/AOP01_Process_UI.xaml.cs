@@ -1,11 +1,15 @@
-﻿using RootTools;
+﻿using Root_AOP01_Inspection.Engineer;
+using RootTools;
+using RootTools.Trees;
+using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace Root_AOP01_Inspection
 {
     /// <summary>
-    /// AUP01_Process_UI.xaml에 대한 상호 작용 논리
+    /// AOP01_Process_UI.xaml에 대한 상호 작용 논리
     /// </summary>
     public partial class AOP01_Process_UI : UserControl
     {
@@ -25,25 +29,47 @@ namespace Root_AOP01_Inspection
             checkBoxPause.DataContext = EQ.m_EQ;
             checkBoxSimulate.DataContext = EQ.m_EQ;
 
-            //            treeReticleUI.Init(process.m_treeReticle);
-            //            treeLocateUI.Init(process.m_treeLocate);
-            //            treeSequenceUI.Init(process.m_treeSequence);
-            //            process.RunTree(Tree.eMode.Init);
+            treeInfoWaferUI.Init(process.m_treeWafer);
+            treeLocateUI.Init(process.m_treeLocate);
+            treeSequenceUI.Init(process.m_treeSequence);
+            process.RunTree(Tree.eMode.Init);
+
+            buttonSetRecover.IsEnabled = false;
+            //InitTimer();
         }
 
+        #region Button
         private void buttonClearInfoReticle_Click(object sender, RoutedEventArgs e)
         {
-            //            m_process.ClearInfoReticle();
+            m_process.ClearInfoWafer();
         }
 
         private void buttonSetRecover_Click(object sender, RoutedEventArgs e)
         {
-            //            m_process.CalcRecover();
+            m_process.CalcRecover(); //forget Delete Button
         }
 
         private void buttonRunStep_Click(object sender, RoutedEventArgs e)
         {
-            //            m_process.p_sInfo = m_process.RunNextSequence();
+            m_process.p_sInfo = m_process.RunNextSequence();
         }
+        #endregion
+
+        #region Timer
+        //DispatcherTimer m_timer = new DispatcherTimer();
+
+        //void InitTimer()
+        //{
+        //    m_timer.Interval = TimeSpan.FromSeconds(1); //forget ??
+        //    m_timer.Tick += M_timer_Tick;
+        //    m_timer.Start();
+        //}
+
+        //private void M_timer_Tick(object sender, EventArgs e)
+        //{
+        //    m_process.RunTree(Tree.eMode.Init);
+        //}
+        #endregion
+
     }
 }

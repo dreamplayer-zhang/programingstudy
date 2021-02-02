@@ -19,21 +19,10 @@ namespace Root_WIND2
 {
 	class EBRSetup_ViewModel : ObservableObject
 	{
-		Recipe recipe;
-		private WIND2_Engineer engineer;
 		private Setup_ViewModel setupVM;
 		private RootViewer_ViewModel drawToolVM;
 
-		private int roiWidth = 1500;
-		private int roiHeight = 500;
-		private int notchY = 0;
-		private int stepDegree = 10;
-		private int xRange = 10;
-		private int diffEdge = 20;
-		private int diffBevel = 20;
-		private int diffEBR = 10;
-		private int offsetBevel = 0;
-		private int offsetEBR = 0;
+		private EBRParameter parameter;
 
 		private DataTable measurementDataTable;
 		private SeriesCollection measurementGraph;
@@ -49,127 +38,16 @@ namespace Root_WIND2
 			get { return drawToolVM; }
 			set { SetProperty(ref drawToolVM, value); }
 		}
-		public int ROIWidth
-		{
-			get
-			{
-				return roiWidth;
-			}
-			set
-			{
-				SetProperty(ref roiWidth, value);
-				//SetParameter();
-			}
-		}
-		public int ROIHeight
-		{
-			get
-			{
-				return roiHeight;
-			}
-			set
-			{
-				SetProperty(ref roiHeight, value);
-				//SetParameter();
-			}
-		}
-		public int NotchY
-		{
-			get
-			{
-				return notchY;
-			}
-			set
-			{
-				SetProperty(ref notchY, value);
-				//SetParameter();
-			}
-		}
-		public int StepDegree
-		{
-			get
-			{
-				return stepDegree;
-			}
-			set
-			{
-				SetProperty(ref stepDegree, value);
-				//SetParameter();
-			}
-		}
-		public int XRange
-		{
-			get
-			{
-				return xRange;
-			}
-			set
-			{
-				SetProperty(ref xRange, value);
-				//SetParameter();
-			}
-		}
-		public int DiffEdge
-		{
-			get
-			{
-				return diffEdge;
-			}
-			set
-			{
-				SetProperty(ref diffEdge, value);
-				//SetParameter();
-			}
-		}
-		public int DiffBevel
-		{
-			get
-			{
-				return diffBevel;
-			}
-			set
-			{
-				SetProperty(ref diffBevel, value);
-				//SetParameter();
-			}
-		}
-		public int DiffEBR
-		{
-			get
-			{
-				return diffEBR;
-			}
-			set
-			{
-				SetProperty(ref diffEBR, value);
-				//SetParameter();
-			}
-		}
-		public int OffsetBevel
-		{
-			get
-			{
-				return offsetBevel;
-			}
-			set
-			{
-				SetProperty(ref offsetBevel, value);
-				//SetParameter();
-			}
-		}
-		public int OffsetEBR
-		{
-			get
-			{
-				return offsetEBR;
-			}
-			set
-			{
-				SetProperty(ref offsetEBR, value);
-				//SetParameter();
-			}
-		}
 
+		public EBRParameter Parameter
+		{
+			get => parameter;
+			set
+			{
+				SetProperty(ref parameter, value);
+			}
+		}
+		
 		public DataTable MeasurementDataTable
 		{
 			get => measurementDataTable;
@@ -178,10 +56,7 @@ namespace Root_WIND2
 
 		public SeriesCollection MeasurementGraph
 		{
-			get
-			{
-				return measurementGraph;
-			}
+			get => measurementGraph;
 			set
 			{
 				measurementGraph = value;
@@ -191,10 +66,7 @@ namespace Root_WIND2
 
 		public string[] XLabels
 		{
-			get
-			{
-				return xLabels;
-			}
+			get => xLabels;
 			set
 			{
 				xLabels = value;
@@ -204,25 +76,27 @@ namespace Root_WIND2
 
 		public int SizeYMaxVal
 		{
-			get { return sizeYMaxVal; }
+			get => sizeYMaxVal;
 			set
 			{
 				sizeYMaxVal = value;
 				RaisePropertyChanged("SizeYMaxVal");
 			}
 		}
+
 		public double SizeFrom
 		{
-			get { return sizeFrom; }
+			get => sizeFrom;
 			set
 			{
 				sizeFrom = value;
 				RaisePropertyChanged("SizeFrom");
 			}
 		}
+
 		public double SizeTo
 		{
-			get { return sizeTo; }
+			get => sizeTo;
 			set
 			{
 				sizeTo = value;
@@ -237,26 +111,48 @@ namespace Root_WIND2
 
 		public EBRSetup_ViewModel()
 		{
-			engineer = ProgramManager.Instance.Engineer;
+			
 		}
 
 		public void Init(Setup_ViewModel _setup)
 		{
 			this.setupVM = _setup;
-			this.recipe = _setup.Recipe;
 
 			DrawToolVM = new RootViewer_ViewModel();
-			DrawToolVM.init(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EBR), ProgramManager.Instance.DialogService);
+			DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EBRImage"), GlobalObjects.Instance.Get<DialogService>());
+			
+			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+			parameter = recipe.GetItem<EBRParameter>();
 
-			WIND2EventManager.BeforeRecipeSave += BeforeRecipeSave_Callback;
-			WorkEventManager.InspectionDone += InspectionDone_Callback;
-			WorkEventManager.ProcessMeasurementDone += ProcessMeasurementDone_Callback;
+			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
+			WorkEventManager.ProcessMeasurementDone += WorkEventManager_ProcessMeasurementDone;
+		}
+
+		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
+		{
+			Workplace workplace = sender as Workplace;
+
+			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+			{
+				UpdateProgress();
+			}));
+		}
+
+		private void WorkEventManager_ProcessMeasurementDone(object sender, ProcessMeasurementDoneEventArgs e)
+		{
+			Workplace workplace = sender as Workplace;
+
+			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+			{
+				UpdateDataGrid();
+				DrawGraph();
+			}));
 		}
 
 		public void Scan()
 		{
 			EQ.p_bStop = false;
-			EdgeSideVision edgeSideVision = ((WIND2_Handler)engineer.ClassHandler()).p_EdgeSideVision;
+			EdgeSideVision edgeSideVision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
 			if (edgeSideVision.p_eState != ModuleBase.eState.Ready)
 			{
 				MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
@@ -269,68 +165,17 @@ namespace Root_WIND2
 
 		public void Inspect()
 		{
-			ProgramManager.Instance.InspectionEBR.Start();
+			GlobalObjects.Instance.Get<InspectionManagerEBR>().Start();			
 		}
 
 		public void LoadParameter()
 		{
-			if (recipe.GetRecipe<EBRParameter>() == null)
+			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+
+			if (recipe.GetItem<EBRParameter>() == null)
 				return;
 
-			roiWidth = recipe.GetRecipe<EBRParameter>().RoiWidth;
-			roiHeight = recipe.GetRecipe<EBRParameter>().RoiHeight;
-			notchY = recipe.GetRecipe<EBRParameter>().NotchY;
-			stepDegree = recipe.GetRecipe<EBRParameter>().StepDegree;
-			xRange = recipe.GetRecipe<EBRParameter>().XRange;
-			diffEdge = recipe.GetRecipe<EBRParameter>().DiffEdge;
-			diffBevel = recipe.GetRecipe<EBRParameter>().DiffBevel;
-			diffEBR = recipe.GetRecipe<EBRParameter>().DiffEBR;
-			offsetBevel = recipe.GetRecipe<EBRParameter>().OffsetBevel;
-			offsetEBR = recipe.GetRecipe<EBRParameter>().OffsetEBR;
-		}
-
-		public void SetParameter()
-		{
-			EBRParameter param = new EBRParameter();
-			param.RoiWidth = roiWidth;
-			param.RoiHeight = roiHeight;
-			param.NotchY = notchY;
-			param.StepDegree = stepDegree;
-			param.XRange = xRange;
-			param.DiffEdge = diffEdge;
-			param.DiffBevel = diffBevel;
-			param.DiffEBR = diffEBR;
-			param.OffsetBevel = offsetBevel;
-			param.OffsetEBR = offsetEBR;
-
-			//recipe.ParameterItemList.Clear();
-			recipe.ParameterItemList.Add(param);
-		}
-
-		private void BeforeRecipeSave_Callback(object obj, RecipeEventArgs args)
-		{
-			SetParameter();
-		}
-
-		private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
-		{
-			Workplace workplace = obj as Workplace;
-
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				UpdateProgress();
-			}));
-		}
-
-		private void ProcessMeasurementDone_Callback(object obj, ProcessMeasurementDoneEventArgs e)
-		{
-			Workplace workplace = obj as Workplace;
-
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				UpdateDataGrid();
-				DrawGraph();
-			}));
+			Parameter = recipe.GetItem<EBRParameter>();
 		}
 
 		private void UpdateProgress()
@@ -340,6 +185,8 @@ namespace Root_WIND2
 
 		private void UpdateDataGrid()
 		{
+			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 			string sRecipeID = recipe.Name;
 			string sReicpeFileName = sRecipeID + ".rcp";
@@ -359,6 +206,7 @@ namespace Root_WIND2
 					{
 						Title = "Bevel",
 						Fill = Brushes.Transparent,
+						
 					},
 					new LineSeries
 					{
@@ -372,34 +220,29 @@ namespace Root_WIND2
 			XLabels = new string[binCount];
 			for (int i = 1; i <= binCount; i++)
 			{
-				XLabels[i - 1] = (StepDegree * i).ToString();
+				XLabels[i - 1] = (parameter.StepDegree * i).ToString();
 			}
 			YLabel = value => value.ToString("N");
 
-			DataRow[] dataBevels;
-			string expressionBevel = "m_fWidth >= 0";
-			dataBevels = measurementDataTable.Select(expressionBevel);
-
+			DataRow[] datas;
+			datas = measurementDataTable.Select();
 			ChartValues<float> bevels = new ChartValues<float>();
-			foreach (DataRow table in dataBevels)
+			foreach (DataRow table in datas)
 			{
 				string data = table[5].ToString();
 				bevels.Add(float.Parse(data));
 			}
 			MeasurementGraph[0].Values = bevels;
 
-			DataRow[] dataEBR;
-			string expressionEBR = "m_fHeight >= 0";
-			dataEBR = measurementDataTable.Select(expressionEBR);
-
 			ChartValues<float> ebrs = new ChartValues<float>();
-			foreach (DataRow table in dataEBR)
+			foreach (DataRow table in datas)
 			{
 				string data = table[6].ToString();
 				ebrs.Add(float.Parse(data));
 			}
 			MeasurementGraph[1].Values = ebrs;
+
+			SizeYMaxVal = (int)ebrs.Max();
 		}
 	}
-
 }

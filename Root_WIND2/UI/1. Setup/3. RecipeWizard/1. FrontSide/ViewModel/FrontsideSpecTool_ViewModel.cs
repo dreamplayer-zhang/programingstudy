@@ -11,27 +11,14 @@ namespace Root_WIND2
 {
     class FrontsideSpecTool_ViewModel: RootViewer_ViewModel
     {
-        Recipe m_Recipe;
-
-        public Recipe Recipe 
-        { 
-            get => m_Recipe;
-            set
-            {
-                SetProperty(ref m_Recipe, value);
-            }
-        }
-
         public FrontsideSpecTool_ViewModel()
         {
         }
 
-        public void init(Setup_ViewModel setup, Recipe recipe)
+        public void init(Setup_ViewModel setup, RecipeBase recipe)
         {
-            base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
+            base.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
             p_VisibleMenu = System.Windows.Visibility.Visible;
-
-            m_Recipe = recipe;
         }
 
         public override void PreviewMouseDown(object sender, MouseEventArgs e)

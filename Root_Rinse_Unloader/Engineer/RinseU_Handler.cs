@@ -5,6 +5,7 @@ using RootTools.Gem;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -150,6 +151,33 @@ namespace Root_Rinse_Unloader.Engineer
             m_thread.Start();
         }
 
+        bool _bRun = false;
+        public bool p_bRun
+        {
+            get { return _bRun; }
+            set
+            {
+                if (_bRun == value) return;
+                _bRun = value;
+                StartRun(value);
+            }
+        }
+
+        void StartRun(bool bRun)
+        {
+            if (bRun)
+            {
+                m_rail.StartRun();
+                m_roller.StartRun();
+                m_loader.StartRun();
+                m_storage.StartRun(); 
+            }
+            else
+            {
+
+            }
+        }
+
         void RunThread()
         {
             m_bThread = true;
@@ -164,7 +192,19 @@ namespace Root_Rinse_Unloader.Engineer
                         //forget
                         break;
                 }
+                p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
             }
+        }
+        #endregion
+
+        #region PickerSet
+        public string StartPickerSet()
+        {
+            if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist";
+            EQ.p_bPickerSet = true;
+            p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
+            p_moduleList.StartModuleRuns();
+            return "OK";
         }
         #endregion
 

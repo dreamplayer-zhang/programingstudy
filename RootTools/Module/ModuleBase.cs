@@ -3,6 +3,7 @@ using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
+using RootTools.Lens;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
@@ -264,6 +265,7 @@ namespace RootTools.Module
         public List<ITool> m_aTool = new List<ITool>();
 
         public CameraSet m_cameraSet = null;
+        public LensSet m_lensSet = null; 
         #endregion
 
         #region Home
@@ -274,7 +276,7 @@ namespace RootTools.Module
             return StateHome(listAxis);
         }
 
-        string StateHome(List<Axis> aAxis)
+        public string StateHome(List<Axis> aAxis)
         {
             if (aAxis.Count == 0) return "OK";
             if (p_eState == eState.Run) return "Invalid State : Run";
