@@ -31,14 +31,29 @@
                         <RowDefinition Height="40*" />
                         <RowDefinition Height="40*" />
                     </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="0"
-                              Header="Progress">
+                    <GroupBox Grid.Row="0">
                         <Grid Margin="10,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.2*"/>
+                                <ColumnDefinition Width="1*"/>
+
+                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="1*" />
                                 <RowDefinition Height="1*" />
                             </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0"
+                            <Grid  Grid.Row="0" Grid.RowSpan="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0" Margin="0,5,10,0" x:Name="gridLampR" Background="#FFDE3A3A"/>
+                                <Grid Grid.Row="1" Margin="0,0,10,0" x:Name="gridLampY" Background="#FFF3CD6E"/>
+                                <Grid Grid.Row="2" Margin="0,0,10,0" x:Name="gridLampG" Background="#FF57AE7D"/>
+                            </Grid>
+
+                            <StackPanel Grid.Row="0" Grid.Column="1"
                                         VerticalAlignment="Center">
                                 <TextBlock Text="Total Progress"
                                            FontSize="15"
@@ -55,7 +70,7 @@
                                                FontSize="15" />
                                 </Grid>
                             </StackPanel>
-                            <UniformGrid Grid.Row="2"
+                            <UniformGrid Grid.Row="2" Grid.Column="1"
                                          Columns="2">
                                 <TextBlock Text="Need"
                                            VerticalAlignment="Center" />
@@ -789,8 +804,8 @@
                                         CornerRadius="2"
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
-                                        Background="{StaticResource PanelBackGround}">
-                                            <TextBlock Text="{Binding p_eState}" Name ="MainVision_State"
+                                        Background="{StaticResource PanelBackGround}" Margin="4,0,-4,0">
+                                            <TextBlock Text="" Name ="MainVision_State"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                         </Border>

@@ -974,7 +974,7 @@ namespace Root_AOP01_Inspection.Module
                     m_module.m_alidGet.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
+                //m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
                 try
                 {
                     child.p_bLock = true;
@@ -983,6 +983,7 @@ namespace Root_AOP01_Inspection.Module
                         m_module.m_alidGet.Run(true, p_sInfo);
                         return p_sInfo;
                     }
+                    m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                     {
                         m_module.m_alidGet.Run(true, p_sInfo);
@@ -1090,7 +1091,7 @@ namespace Root_AOP01_Inspection.Module
                     m_module.m_alidPut.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
+                //child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
                 try
                 {
                     child.p_bLock = true;
@@ -1099,6 +1100,7 @@ namespace Root_AOP01_Inspection.Module
                         m_module.m_alidPut.Run(true, p_sInfo);
                         return p_sInfo;
                     }
+                    child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                     {
                         m_module.m_alidPut.Run(true, p_sInfo);
