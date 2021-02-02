@@ -51,6 +51,11 @@ namespace Root_WIND2
             UIManager.Instance.ChangUIRun();
         }
 
+        private void ButtonRecipeWizard_Clicked(object sender, RoutedEventArgs e)
+        {
+            UIManager.Instance.ChangUISetup2();
+        }
+
         private void button_Click(object sender, RoutedEventArgs e)
         {
             Tune tune = new Tune();

@@ -4,12 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Root_AOP01_Inspection"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:module="clr-namespace:Root_AOP01_Inspection.Module"
              xmlns:lp="clr-namespace:Root_AOP01_Inspection.UI_UserControl"
              mc:Ignorable="d"
              d:DesignHeight="866"
              d:DesignWidth="1912"
              Background="{StaticResource PanelBackGround}">
+    <UserControl.Resources>
+        <local:BooleanToPassFailStringConverter x:Key="BooleanToPassFailString"/>
+        <local:BooleanToPassFailColorConverter x:Key="BooleanToPassFailColor"/>
+    </UserControl.Resources>
     <ScrollViewer>
         <StackPanel>
             <Grid Height="866">
@@ -26,14 +31,29 @@
                         <RowDefinition Height="40*" />
                         <RowDefinition Height="40*" />
                     </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="0"
-                              Header="Progress">
+                    <GroupBox Grid.Row="0">
                         <Grid Margin="10,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.2*"/>
+                                <ColumnDefinition Width="1*"/>
+
+                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="1*" />
                                 <RowDefinition Height="1*" />
                             </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0"
+                            <Grid  Grid.Row="0" Grid.RowSpan="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" Margin="1,5,10,0" x:Name="gridLampR" BorderBrush="Black" BorderThickness="1" Background="OrangeRed"/>
+                                <Border Grid.Row="1" Margin="1,0,10,0" x:Name="gridLampY" BorderBrush="Black" BorderThickness="1" Background="Gold"/>
+                                <Border Grid.Row="2" Margin="1,0,10,0" x:Name="gridLampG" BorderBrush="Black" BorderThickness="1" Background="LightGreen"/>
+                            </Grid>
+
+                            <StackPanel Grid.Row="0" Grid.Column="1"
                                         VerticalAlignment="Center">
                                 <TextBlock Text="Total Progress"
                                            FontSize="15"
@@ -50,7 +70,7 @@
                                                FontSize="15" />
                                 </Grid>
                             </StackPanel>
-                            <UniformGrid Grid.Row="2"
+                            <UniformGrid Grid.Row="2" Grid.Column="1"
                                          Columns="2">
                                 <TextBlock Text="Need"
                                            VerticalAlignment="Center" />
@@ -126,31 +146,36 @@
                                   Grid.Row="0"
                                   Background="Black"
                                   Margin="5">
-                                <Image Source="/Root_AOP01_Inspection;component/Resource/top.PNG" />
+                                <!--<Image Source="/Root_AOP01_Inspection;component/Resource/top.PNG" />-->
+                                <tools:MiniViewer DataContext="{Binding p_miniViewerTop}"/>
                             </Grid>
                             <Grid Grid.Column="2"
                                   Grid.Row="1"
                                   Background="Black"
                                   Margin="5">
-                                <Image Source="/Root_AOP01_Inspection;component/Resource/Right.PNG" />
+                                <!--<Image Source="/Root_AOP01_Inspection;component/Resource/Right.PNG" />-->
+                                <tools:MiniViewer DataContext="{Binding p_miniViewerRight}"/>
                             </Grid>
                             <Grid Grid.Column="0"
                                   Grid.Row="1"
                                   Background="Black"
                                   Margin="5">
-                                <Image Source="/Root_AOP01_Inspection;component/Resource/Left.PNG" />
+                                <!--<Image Source="/Root_AOP01_Inspection;component/Resource/Left.PNG" />-->
+                                <tools:MiniViewer DataContext="{Binding p_miniViewerLeft}"/>
                             </Grid>
                             <Grid Grid.Column="1"
                                   Grid.Row="2"
                                   Background="Black"
                                   Margin="5">
-                                <Image Source="/Root_AOP01_Inspection;component/Resource/bottom.PNG" />
+                                <!--<Image Source="/Root_AOP01_Inspection;component/Resource/bottom.PNG" />-->
+                                <tools:MiniViewer DataContext="{Binding p_miniViewerBottom}"/>
                             </Grid>
                             <Grid Grid.Column="1"
                                   Grid.Row="1"
                                   Background="Black"
                                   Margin="5">
-                                <Image Source="/Root_AOP01_Inspection;component/Resource/ReticlDefect.PNG" />
+                                <!--<Image Source="/Root_AOP01_Inspection;component/Resource/ReticlDefect.PNG" />-->
+                                <tools:MiniViewer DataContext="{Binding p_miniViewerMain}"/>
                             </Grid>
                         </Grid>
                     </GroupBox>
@@ -179,23 +204,25 @@
                                          Columns="2">
                                 <TextBlock Text="Result"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="Pass"
-                                           Foreground="Green"
+                                <TextBlock Text="{Binding p_mainVision.p_bPellicleExpandingPass, Converter={StaticResource BooleanToPassFailString}}"
+                                           Foreground="{Binding p_mainVision.p_bPellicleExpandingPass, Converter={StaticResource BooleanToPassFailColor}}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Min"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_dPellicleExpandingMin}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Max"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_dPellicleExpandingMax}"
                                            VerticalAlignment="Center" />
                             </UniformGrid>
                             <Grid Grid.Row="1"
                                   Margin="5,3">
-                                <ProgressBar Value="100"
+                                <ProgressBar Value="{Binding p_mainVision.p_nPellicleExpandingProgressValue}"
+                                             Maximum="{Binding p_mainVision.p_nPellicleExpandingProgressMax}"
+                                             Minimum="{Binding p_mainVision.p_nPellicleExpandingProgressMin}"
                                              Foreground="SteelBlue" />
-                                <TextBlock Text="100%"
+                                <TextBlock Text="{Binding p_mainVision.p_nPellicleExpandingProgressPercent, StringFormat={}{0}%}"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
@@ -218,9 +245,9 @@
                             </UniformGrid>
                             <Grid Grid.Row="1"
                                   Margin="5,3">
-                                <ProgressBar Value="55"
+                                <ProgressBar Value="0"
                                              Foreground="SteelBlue" />
-                                <TextBlock Text="55%"
+                                <TextBlock Text="0%"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
@@ -264,15 +291,17 @@
                                          Columns="2">
                                 <TextBlock Text="Result"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="-"
-                                           Foreground="Green"
+                                <TextBlock Text="{Binding p_mainVision.p_bAlignKeyPass, Converter={StaticResource BooleanToPassFailString}}"
+                                           Foreground="{Binding p_mainVision.p_bAlignKeyPass, Converter={StaticResource BooleanToPassFailColor}}"
                                            VerticalAlignment="Center" />
                             </UniformGrid>
                             <Grid Grid.Row="1"
                                   Margin="5,3">
-                                <ProgressBar Value="0"
+                                <ProgressBar Value="{Binding p_mainVision.p_nAlignKeyProgressValue}"
+                                             Minimum="{Binding p_mainVision.p_nAlignKeyProgressMin}"
+                                             Maximum="{Binding p_mainVision.p_nAlignKeyProgressMax}"
                                              Foreground="SteelBlue" />
-                                <TextBlock Text="0%"
+                                <TextBlock Text="{Binding p_mainVision.p_nAlignKeyProgressPercent, StringFormat={}{0}%}"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
@@ -290,23 +319,25 @@
                                          Columns="2">
                                 <TextBlock Text="Result"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="-"
-                                           Foreground="Green"
+                                <TextBlock Text="{Binding p_mainVision.p_bPatternShiftPass, Converter={StaticResource BooleanToPassFailString}}"
+                                           Foreground="{Binding p_mainVision.p_bPatternShiftPass, Converter={StaticResource BooleanToPassFailColor}}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Center"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_dPatternShiftDistance}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Angle"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_dPatternShiftAngle}"
                                            VerticalAlignment="Center" />
                             </UniformGrid>
                             <Grid Grid.Row="1"
                                   Margin="5,3">
-                                <ProgressBar Value="0"
+                                <ProgressBar Value="{Binding p_mainVision.p_nPatternShiftProgressValue}"
+                                             Minimum="{Binding p_mainVision.p_nPatternShiftProgressMin}"
+                                             Maximum="{Binding p_mainVision.p_nPatternShiftProgressMax}"
                                              Foreground="SteelBlue" />
-                                <TextBlock Text="0%"
+                                <TextBlock Text="{Binding p_mainVision.p_nPatternShiftProgressPercent, StringFormat={}{0}%}"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
@@ -324,23 +355,25 @@
                                          Columns="2">
                                 <TextBlock Text="Result"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="-"
-                                           Foreground="Green"
+                                <TextBlock Text="{Binding p_mainVision.p_bPellicleShiftPass, Converter={StaticResource BooleanToPassFailString}}"
+                                           Foreground="{Binding p_mainVision.p_bPellicleShiftPass, Converter={StaticResource BooleanToPassFailColor}}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Center"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_dPellicleShiftDistance}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Angle"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_dPellicleShiftAngle}"
                                            VerticalAlignment="Center" />
                             </UniformGrid>
                             <Grid Grid.Row="1"
                                   Margin="5,3">
-                                <ProgressBar Value="0"
+                                <ProgressBar Value="{Binding p_mainVision.p_nPellicleShiftProgressValue}"
+                                             Minimum="{Binding p_mainVision.p_nPellicleShiftProgressMin}"
+                                             Maximum="{Binding p_mainVision.p_nPellicleShiftProgressMax}"
                                              Foreground="SteelBlue" />
-                                <TextBlock Text="0%"
+                                <TextBlock Text="{Binding p_mainVision.p_nPellicleShiftProgressPercent, StringFormat={}{0}%}"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
@@ -381,16 +414,19 @@
                             <UniformGrid Margin="10,5"
                                          Rows="1"
                                          Columns="2">
-                                <TextBlock Text="Defect Count"
+                                <TextBlock Text="Result"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="0"
+                                <TextBlock Text="{Binding p_mainVision.p_bBarcodePass, Converter={StaticResource BooleanToPassFailString}}"
+                                           Foreground="{Binding p_mainVision.p_bBarcodePass, Converter={StaticResource BooleanToPassFailColor}}"
                                            VerticalAlignment="Center" />
                             </UniformGrid>
                             <Grid Grid.Row="1"
                                   Margin="5,3">
-                                <ProgressBar Value="0"
+                                <ProgressBar Value="{Binding p_mainVision.p_nBarcodeInspectionProgressValue}"
+                                             Maximum="{Binding p_mainVision.p_nBarcodeInspectionProgressMax}"
+                                             Minimum="{Binding p_mainVision.p_nBarcodeInspectionProgressMin}"
                                              Foreground="SteelBlue" />
-                                <TextBlock Text="0%"
+                                <TextBlock Text="{Binding p_mainVision.p_nBarcodeInspectionProgressPercent, StringFormat={}{0}%}"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
                             </Grid>
@@ -768,8 +804,8 @@
                                         CornerRadius="2"
                                         BorderBrush="DimGray"
                                         BorderThickness="1"
-                                        Background="{StaticResource PanelBackGround}">
-                                            <TextBlock Text="{Binding p_eState}" Name ="MainVision_State"
+                                        Background="{StaticResource PanelBackGround}" Margin="4,0,-4,0">
+                                            <TextBlock Text="" Name ="MainVision_State"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center" />
                                         </Border>

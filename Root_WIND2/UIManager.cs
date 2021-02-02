@@ -45,7 +45,7 @@ namespace Root_WIND2
         private SelectMode modeWindow;
         private Setup setupWindow;
 
-        //private Root_WIND2.UI_Temp.Setup setupWindow2;
+        private Root_WIND2.UI_Temp.Setup setupWindow2;
         private Review reviewWindow;
         private Run runWindow;
 
@@ -87,9 +87,9 @@ namespace Root_WIND2
             setupViewModel = new Setup_ViewModel();
             setupWindow.DataContext = SetupViewModel;
 
-            //setupWindow2 = new UI_Temp.Setup();
-            //setupViewModel2 = new UI_Temp.Setup_ViewModel();
-            //setupWindow2.DataContext = setupViewModel2;
+            setupWindow2 = new UI_Temp.Setup();
+            setupViewModel2 = new UI_Temp.Setup_ViewModel();
+            setupWindow2.DataContext = setupViewModel2;
 
         }
         void InitReviewMode()
@@ -140,6 +140,11 @@ namespace Root_WIND2
         public void ChangUIRun()
         {
             ChangeMainUI((UIElement)runWindow);
+        }
+
+        public void ChangUISetup2()
+        {
+            ChangeMainUI((UIElement)setupWindow2);
         }
     }
 }

@@ -279,28 +279,35 @@
     <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment.xaml.cs">
       <DependentUpon>FrontsideAlignment.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideInspect.xaml.cs">
+      <DependentUpon>FrontsideInspect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideAlignment_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideAlignment_ViewModel.cs" />
     <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideMask.xaml.cs">
       <DependentUpon>FrontsideMask.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideMask_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideInspect_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideInspect_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideMask_ViewModel.cs" />
     <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideOrigin.xaml.cs">
       <DependentUpon>FrontsideOrigin.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideOrigin_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideOrigin_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideOrigin_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideOrigin_ViewModel.cs" />
     <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideProduct.xaml.cs">
       <DependentUpon>FrontsideProduct.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideProduct_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideProduct_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideSpec.xaml.cs">
+      <DependentUpon>FrontsideSpec.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideSpec_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideSpec_ViewModel.cs" />
     <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideSummary.xaml.cs">
       <DependentUpon>FrontsideSummary.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideSummary_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\RecipeWizard.xaml.cs">
-      <DependentUpon>RecipeWizard.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideSummary_ViewModel.cs" />
     <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\RecipeWizardPanel.xaml.cs">
       <DependentUpon>RecipeWizardPanel.xaml</DependentUpon>
     </Compile>
@@ -670,7 +677,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideInspect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideMask.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideSpec.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -695,10 +710,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_Temp\1.Setup\Setup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\RecipeWizard.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
