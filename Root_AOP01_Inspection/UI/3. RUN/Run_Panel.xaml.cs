@@ -229,9 +229,9 @@ namespace Root_AOP01_Inspection
         void TimerLamp()
         {
             AOP01 aop01 = m_engineer.m_handler.m_aop01;
-            gridLampR.Background = aop01.m_doLamp.ReadDO(AOP01.eLamp.Red) ? Brushes.Red : Brushes.Black;
-            gridLampY.Background = aop01.m_doLamp.ReadDO(AOP01.eLamp.Yellow) ? Brushes.LightYellow : Brushes.Black;
-            gridLampG.Background = aop01.m_doLamp.ReadDO(AOP01.eLamp.Green) ? Brushes.LightGreen : Brushes.Black;
+            gridLampR.Background = aop01.m_doLamp.ReadDO(AOP01.eLamp.Red) ? Brushes.Red : Brushes.LightGray;
+            gridLampY.Background = aop01.m_doLamp.ReadDO(AOP01.eLamp.Yellow) ? Brushes.Gold : Brushes.LightGray;
+            gridLampG.Background = aop01.m_doLamp.ReadDO(AOP01.eLamp.Green) ? Brushes.LimeGreen : Brushes.LightGray;
         }
 
         public void CheckMainVisionState()
