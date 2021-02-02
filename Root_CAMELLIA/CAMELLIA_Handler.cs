@@ -91,7 +91,7 @@ namespace Root_CAMELLIA
         void InitModule(ModuleBase module)
         {
             ModuleBase_UI ui = new ModuleBase_UI();
-            ui.Init(module);
+            ui.Init(module); 
             m_moduleList.AddModule(module, ui);
         }
 
