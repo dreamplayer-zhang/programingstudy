@@ -302,6 +302,7 @@ namespace Root_Rinse_Unloader.Module
             else
             {
                 m_rinse.p_iMagazine = 0;
+                //forget
                 if (m_rinse.p_eMagazine >= eMagazine.Magazine4) return "Cassette Full";
                 m_rinse.p_eMagazine = m_rinse.p_eMagazine + 1; 
             }

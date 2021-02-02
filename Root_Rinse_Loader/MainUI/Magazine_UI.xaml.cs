@@ -1,4 +1,5 @@
 ﻿using Root_Rinse_Loader.Module;
+using RootTools;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -61,7 +62,8 @@ namespace Root_Rinse_Loader.MainUI
         private void M_timer_Tick(object sender, EventArgs e)
         {
             m_bBlink = !m_bBlink;
-            foreach (MagazineClamp_UI ui in m_aMagazine) ui.OnTimer(m_bBlink); 
+            foreach (MagazineClamp_UI ui in m_aMagazine) ui.OnTimer(m_bBlink);
+            groupBoxMagazine.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
         }
 
         private void buttonNew_Click(object sender, RoutedEventArgs e)

@@ -5,9 +5,11 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Threading;
 
 namespace Root_Rinse_Unloader.Module
 {
@@ -67,6 +69,59 @@ namespace Root_Rinse_Unloader.Module
                 _iMagazine = value;
                 OnPropertyChanged();
             }
+        }
+        #endregion
+
+        #region Strips
+        public enum eStrip
+        {
+            O,
+            X
+        }
+        public class Strips
+        {
+            public eStrip p_eStrip0 { get; set; }
+            public eStrip p_eStrip1 { get; set; }
+            public eStrip p_eStrip2 { get; set; }
+            public eStrip p_eStrip3 { get; set; }
+
+            public string p_sStrip
+            {
+                get { return p_eStrip0.ToString() + p_eStrip1.ToString() + p_eStrip2.ToString() + p_eStrip3.ToString(); }
+            }
+
+            public Strips(bool[] abStrip)
+            {
+                p_eStrip0 = abStrip[0] ? eStrip.O : eStrip.X;
+                p_eStrip1 = abStrip[1] ? eStrip.O : eStrip.X;
+                p_eStrip2 = abStrip[2] ? eStrip.O : eStrip.X;
+                p_eStrip3 = abStrip[3] ? eStrip.O : eStrip.X;
+            }
+        }
+        Queue<Strips> m_qStrips = new Queue<Strips>();
+        public void AddStrips(string sStrip)
+        {
+            bool[] abStrip = new bool[4];
+            int n = 0;
+            foreach (char c in sStrip) abStrip[n++] = (c == 'O'); 
+            Strips strips = new Strips(abStrip);
+            m_qStrips.Enqueue(strips);
+        }
+
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+
+        public ObservableCollection<Strips> p_aStrips = new ObservableCollection<Strips>();
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            if (m_qStrips.Count == 0) return;
+            Strips strips = m_qStrips.Dequeue();
+            p_aStrips.Add(strips);
         }
         #endregion
 
@@ -250,6 +305,7 @@ namespace Root_Rinse_Unloader.Module
             EQLeState,
             EQUeState,
             PickerSet,
+            StripSend,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd)); 
 
@@ -361,6 +417,10 @@ namespace Root_Rinse_Unloader.Module
                         case eCmd.PickerSet:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             EQ.p_bPickerSet = Convert.ToBoolean(asRead[2]);
+                            break;
+                        case eCmd.StripSend:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            AddStrips(asRead[2]); 
                             break; 
                     }
                 }
@@ -410,7 +470,8 @@ namespace Root_Rinse_Unloader.Module
             p_id = id;
             InitBase(id, engineer);
 
-            InitThread(); 
+            InitThread();
+            InitTimer(); 
         }
 
         public override void ThreadStop()

@@ -1,18 +1,11 @@
 ﻿using Root_Rinse_Unloader.Module;
+using RootTools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace Root_Rinse_Unloader.MainUI
@@ -70,6 +63,7 @@ namespace Root_Rinse_Unloader.MainUI
         {
             m_bBlink = !m_bBlink;
             foreach (MagazineClamp_UI ui in m_aMagazine) ui.OnTimer(m_bBlink);
+            groupBoxMagazine.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
         }
 
         private void buttonNew_Click(object sender, RoutedEventArgs e)
