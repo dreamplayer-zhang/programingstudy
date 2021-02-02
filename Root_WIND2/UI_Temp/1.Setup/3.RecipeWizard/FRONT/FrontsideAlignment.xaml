@@ -54,7 +54,9 @@
             <ColumnDefinition Width="40*"/>
         </Grid.ColumnDefinitions>
         <GroupBox Margin="4"
-                  Header="Image VIew" Style="{StaticResource main_view_groupbox}">
+                  Header="Image VIew" 
+                  DataContext="{Binding ImageViewerVM}"
+                  Style="{StaticResource main_view_groupbox}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
@@ -70,7 +72,7 @@
                 <Grid Grid.Row="1" >
 
                     <!--<local:ImageViewer DataContext="{Binding ImageViewerVM}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>-->
-                    <tools:RootViewer DataContext="{Binding ImageViewerVM}"/>
+                    <tools:RootViewer/>
                 </Grid>
             </Grid>
         </GroupBox>
@@ -105,13 +107,13 @@
                                 Orientation="Vertical">
                         <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                             <Grid.ColumnDefinitions >
-                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="80"/>
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Position" Style="{StaticResource group_box_item_name_text}"/>
+                            <TextBlock Text="Pos [Abs]" Style="{StaticResource group_box_item_name_text}"/>
                             <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding p_PointXY.X}" HorizontalContentAlignment="Center"/>
                             <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -119,7 +121,21 @@
                         </Grid>
                         <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                             <Grid.ColumnDefinitions >
-                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Pos [Rel]" Style="{StaticResource group_box_item_name_text}"/>
+                            <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding p_Offset.X}" HorizontalContentAlignment="Center"/>
+                            <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding p_Offset.Y}" HorizontalContentAlignment="Center"/>
+                        </Grid>
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions >
+                                <ColumnDefinition Width="80"/>
                                 <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="20"/>

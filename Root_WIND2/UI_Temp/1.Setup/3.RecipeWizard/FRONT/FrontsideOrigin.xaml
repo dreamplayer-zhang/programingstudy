@@ -15,7 +15,7 @@
         </Grid.ColumnDefinitions>
         
         <GroupBox Margin="4"
-                  Header="Image VIewer" Style="{StaticResource main_view_groupbox}">
+                  Header="Image VIewer" Style="{StaticResource main_view_groupbox}" DataContext="{Binding ImageViewerVM}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
@@ -40,7 +40,7 @@
                 </StackPanel>
                 <Grid Grid.Row="1" >
 
-                    <tools:RootViewer DataContext="{Binding ImageViewerVM}"/>
+                    <tools:RootViewer />
                 </Grid>
             </Grid>
         </GroupBox>
