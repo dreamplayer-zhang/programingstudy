@@ -1,11 +1,12 @@
-﻿using System.Windows.Controls;
+﻿using RootTools_Vision;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Root_WIND2.UI_Temp
 {
     class RecipeWizardPanel_ViewModel : ObservableObject
     {
-        #region [Bindings Objects]
+        #region [Properties]
         private UserControl m_CurrentPanel;
         public UserControl p_CurrentPanel
         {
@@ -18,6 +19,40 @@ namespace Root_WIND2.UI_Temp
                 SetProperty(ref m_CurrentPanel, value);
             }
         }
+
+
+        private bool isEnableAlignment = false;
+        public bool IsEnabledAlignment
+        { 
+            get => this.isEnableAlignment;
+            set 
+            {
+                SetProperty<bool>(ref this.isEnableAlignment, value);   
+            } 
+        }
+
+        private bool isEnableMask = false;
+        public bool IsEnabledMask
+        {
+            get => this.isEnableMask;
+            set
+            {
+                SetProperty<bool>(ref this.isEnableMask, value);
+            }
+        }
+
+        private bool isEnableSpec = false;
+        public bool IsEnabledSpec
+        {
+            get => this.isEnableSpec;
+            set
+            {
+                SetProperty<bool>(ref this.isEnableSpec, value);
+            }
+        }
+
+
+
         #endregion
 
         #region [Views]
@@ -82,18 +117,61 @@ namespace Root_WIND2.UI_Temp
         {
             get => frontsideInspectVM;
         }
-
-
         #endregion
+
+
+        
+
         public RecipeWizardPanel_ViewModel()
         {
             Initialize();
+
+            WIND2EventManager.RecipeUpdated += RecipeUpdated_Callback;
         }
 
         public void Initialize()
         {
-
+            SetButtonEnable();
         }
+
+        private void RecipeUpdated_Callback(object obj, RecipeEventArgs args)
+        {
+            SetButtonEnable();
+        }
+
+        public void SetButtonEnable()
+        {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+            if(originRecipe.OriginWidth == 0 || originRecipe.OriginHeight == 0)
+            {
+                this.IsEnabledAlignment = false;
+            }
+            else
+            {
+                this.IsEnabledAlignment = true;
+            }
+
+            if (originRecipe.OriginWidth == 0 || originRecipe.OriginHeight == 0)
+            {
+                this.IsEnabledMask = false;
+            }
+            else
+            {
+                this.IsEnabledMask = true;
+            }
+
+            // Mask는 Default로 전체 영역 추가
+            if (originRecipe.OriginWidth == 0 || originRecipe.OriginHeight == 0)
+            {
+                this.IsEnabledSpec = false;
+            }
+            else
+            {
+                this.IsEnabledSpec = true;
+            }
+        }
+
 
         #region [Command]
         public ICommand btnFrontSummary
@@ -153,7 +231,7 @@ namespace Root_WIND2.UI_Temp
                 {
                     SetPage(frontsideMask);
                     frontsideMask.DataContext = frontsideMaskVM;
-                    frontsideMaskVM.SetViewRect(); // 이거 제거하자 아닌가
+                    frontsideMaskVM.SetPage(); // 이거 제거하자 아닌가
                 });
             }
         }

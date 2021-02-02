@@ -341,77 +341,12 @@ namespace Root_WIND2.UI_Temp
 
             p_PointXY = new CPoint(Box.MemoryRect.Left, Box.MemoryRect.Top);
             p_SizeWH = new CPoint(Box.MemoryRect.Width, Box.MemoryRect.Height);
-            //p_Offset = m_PointXY - m_Origin;
+
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+            CPoint origin = new CPoint(originRecipe.OriginX, originRecipe.OriginY);
+
+            p_Offset = m_PointXY - origin;
         }
-        #endregion
-
-        #region [Feature List Method]
-        private void _addMasterMark()
-        {
-            if (boxImage == null)
-                return;
-
-            PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
-            //RecipeType_FeatureData rtf = new RecipeType_FeatureData(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.GetByteArray());
-            postionRecipe.AddMasterFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, boxImage.p_nByte, boxImage.GetByteArray());
-
-            FeatureControl fc = new FeatureControl();
-            fc.p_Offset = m_Offset;
-            fc.p_ImageSource = p_BoxImgSource;
-            fc.DataContext = this;
-
-            p_WaferFeatureList.Add(fc);
-        }
-        private void _addShotMark()
-        {
-            if (boxImage == null)
-                return;
-
-            PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
-            postionRecipe.AddShotFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, boxImage.p_nByte, boxImage.GetByteArray());
-
-            FeatureControl fc = new FeatureControl();
-            fc.p_Offset = m_Offset;
-            fc.p_ImageSource = p_BoxImgSource;
-            fc.DataContext = this;
-
-            p_ShotFeatureList.Add(fc);
-        }
-        private void _addChipMark()
-        {
-            if (boxImage == null)
-                return;
-
-            PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
-            postionRecipe.AddChipFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, boxImage.p_nByte, boxImage.GetByteArray());
-
-            FeatureControl fc = new FeatureControl();
-            fc.p_Offset = m_Offset;
-            fc.p_ImageSource = p_BoxImgSource;
-            fc.DataContext = this;
-
-            p_ChipFeatureList.Add(fc);
-        }
-
-        //private void _deleteMasterMark()
-        //{
-        //    PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
-        //    postionRecipe.RemoveMasterFeature(p_nMarkIndex[0]);
-        //    p_MasterMark.RemoveAt(p_nMarkIndex[0]);
-        //}
-        //private void _deleteShotMark()
-        //{
-        //    PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
-        //    postionRecipe.RemoveShotFeature(p_nMarkIndex[1]);
-        //    p_ShotMark.RemoveAt(p_nMarkIndex[1]);
-        //}
-        //private void _deleteChipMark()
-        //{
-        //    PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
-        //    postionRecipe.RemoveChipFeature(p_nMarkIndex[2]);
-        //    p_ChipMark.RemoveAt(p_nMarkIndex[2]);
-        //}
-
         #endregion
     }
 }

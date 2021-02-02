@@ -193,6 +193,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition />
                                     <RowDefinition Height="Auto" />
+
                                 </Grid.RowDefinitions>
 
                                 <Grid Grid.Row="0"
@@ -344,7 +345,7 @@
                                     </GroupBox>
                                 </Grid>
                             </Grid>
-                            <Grid Grid.Row="1" Margin="30,0,30,20">
+                            <Grid Grid.Row="1" Margin="30,20">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="3*"/>
                                     <ColumnDefinition Width="2*"/>

@@ -237,6 +237,8 @@ namespace Root_WIND2
                     return;
 
             CPoint memPt = new CPoint(p_MouseMemX, p_MouseMemY);
+
+
             CPoint canvasPt = GetCanvasPoint(memPt - BoxOffset);
             switch (eToolProcess)
             {
@@ -581,6 +583,27 @@ namespace Root_WIND2
             crop.MemoryRect.Left = startMemPt.X;
             crop.MemoryRect.Top = startMemPt.Y;
         }
+
+        private CPoint CheckOriginBox(CPoint memPt)
+        {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+            int left = originRecipe.OriginX;
+            int right = originRecipe.OriginX + originRecipe.OriginWidth;
+            int top = originRecipe.OriginY - originRecipe.OriginHeight;
+            int bottom = originRecipe.OriginY;
+
+            CPoint checkedPt = new CPoint();
+            
+            checkedPt.X = (memPt.X < left)?left : memPt.X;
+            checkedPt.Y = (memPt.Y < top) ? top : memPt.Y;
+
+            checkedPt.X = (memPt.X > right) ? right : memPt.X;
+            checkedPt.Y = (memPt.Y > bottom) ? bottom : memPt.Y;
+
+            return checkedPt;
+        }
+
         private void DrawingSelectRect(CPoint currentMemPt, CPoint currentCanvasPt)
         {
             TCropTool crop = CropShape as TCropTool;

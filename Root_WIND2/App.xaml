@@ -27,9 +27,11 @@
         <SolidColorBrush x:Key="sidetap_child_menu_normal" Color="#151540"/>
         <SolidColorBrush x:Key="sidetap_child_menu_mouseover" Color="#404080"/>
         <SolidColorBrush x:Key="sidetap_child_menu_selected" Color="#5070DD"/>
+        <SolidColorBrush x:Key="sidetap_child_menu_disable" Color="#333333"/>
 
         <SolidColorBrush x:Key="sidetap_parent_menu_text" Color="White"/>
         <SolidColorBrush x:Key="sidetap_child_menu_text" Color="White"/>
+        <SolidColorBrush x:Key="sidetap_child_menu_text_disable" Color="#888888"/>
 
 
         <SolidColorBrush x:Key="main_view_groupbox_background" Color="#202035"/>
@@ -115,6 +117,10 @@
                             </Trigger>
                             <Trigger  Property="IsMouseOver" Value="True">
                                 <Setter Property="Background" Value="{StaticResource sidetap_child_menu_mouseover}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_menu_disable}"/>
+                                <Setter Property="Foreground" Value="{StaticResource sidetap_child_menu_text_disable}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

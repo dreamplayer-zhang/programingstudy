@@ -180,18 +180,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainUI\MagazineClamp_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainUI\Magazine_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainUI\Stack_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -210,15 +198,6 @@
     </Compile>
     <Compile Include="Icon\AtiLogo.xaml.cs">
       <DependentUpon>AtiLogo.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainUI\MagazineClamp_UI.xaml.cs">
-      <DependentUpon>MagazineClamp_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainUI\Magazine_UI.xaml.cs">
-      <DependentUpon>Magazine_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainUI\Stack_UI.xaml.cs">
-      <DependentUpon>Stack_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -263,6 +242,8 @@
       <Name>RootTools</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="MainUI\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

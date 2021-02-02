@@ -47,26 +47,14 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
-        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1;
-        public Storage.eMagazine p_eMagazine
-        {
-            get { return _eMagazine; }
-            set
-            {
-                if (_eMagazine == value) return;
-                _eMagazine = value;
-                OnPropertyChanged();
-            }
-        }
-
-        int _iMagazine = 0;
+        int _iMagazin = 0;
         public int p_iMagazine
         {
-            get { return _iMagazine; }
+            get { return _iMagazin; }
             set
             {
-                if (_iMagazine == value) return;
-                _iMagazine = value;
+                if (_iMagazin == value) return;
+                _iMagazin = value;
                 OnPropertyChanged();
             }
         }
