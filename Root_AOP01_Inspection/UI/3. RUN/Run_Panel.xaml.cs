@@ -81,7 +81,8 @@ namespace Root_AOP01_Inspection
                 (m_backsidevision.m_diExistVision.p_bIn == true && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
             ButtonInitialize.IsEnabled = IsEnableInitialization();
             ButtonRecovery.IsEnabled = IsEnableRecovery();
-            if(EQ.p_eState != EQ.eState.Recovery)
+            TimerLamp();
+            if (EQ.p_eState != EQ.eState.Recovery)
                 m_rtrcleanunit.m_bRecovery = false;
         }
         #endregion
@@ -225,6 +226,14 @@ namespace Root_AOP01_Inspection
             EQ.p_bStop = true; //수정 필요
         }
         #endregion
+        void TimerLamp()
+        {
+            AOP01 aop01 = m_engineer.m_handler.m_aop01;
+            gridLampR.Background = aop01.m_doLamp.ReadDO(AOP01.eLamp.Red) ? Brushes.Red : Brushes.Black;
+            gridLampY.Background = aop01.m_doLamp.ReadDO(AOP01.eLamp.Yellow) ? Brushes.LightYellow : Brushes.Black;
+            gridLampG.Background = aop01.m_doLamp.ReadDO(AOP01.eLamp.Green) ? Brushes.LightGreen : Brushes.Black;
+        }
+
         public void CheckMainVisionState()
         {
             if (m_mainvision.p_eState == ModuleBase.eState.Error || m_backsidevision.p_eState == ModuleBase.eState.Error)
