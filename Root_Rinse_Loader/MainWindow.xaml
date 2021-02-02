@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_Rinse_Loader"
         xmlns:icon="clr-namespace:Root_Rinse_Loader.Icon"
-        xmlns:mainUI="clr-namespace:Root_Rinse_Loader.MainUI"
         xmlns:engineer="clr-namespace:Root_Rinse_Loader.Engineer"
         mc:Ignorable="d"
         WindowStyle="None"
@@ -24,10 +23,10 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="25" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="8*" />
-                <RowDefinition Height="2*" />
+                <RowDefinition Height="8.4*" />
+                <RowDefinition Height="1.6*" />
             </Grid.RowDefinitions>
-            
+
             <!--Title Bar-->
             <Grid Grid.Row="0"
                   Name="TitleBar"
@@ -115,10 +114,13 @@
                             <RowDefinition />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Grid Background="Crimson" />
-                        <Grid Background="Gold"
+                        <Grid x:Name="gridRed"
+                              Background="Crimson" />
+                        <Grid x:Name="gridYellow"
+                              Background="Gold"
                               Grid.Row="1" />
-                        <Grid Background="SeaGreen"
+                        <Grid x:Name="gridGreen"
+                              Background="SeaGreen"
                               Grid.Row="2" />
                     </Grid>
                 </Border>
@@ -148,28 +150,18 @@
                                FontWeight="Bold" />
                 </Border>
                 <Grid Grid.Column="3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
-                               Text="State :  "
+                               Text="Last Log"
                                FontSize="15"
                                FontWeight="Bold"
                                VerticalAlignment="Center"
-                               HorizontalAlignment="Right" />
-                    <TextBlock Grid.Column="1"
-                               Text=" "
-                               x:Name="textState"
-                               FontSize="15"
-                               FontWeight="Bold"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Left" />
+                               HorizontalAlignment="Center" />
                 </Grid>
                 <StackPanel Grid.Column="4"
                             Orientation="Horizontal"
                             HorizontalAlignment="Right">
                     <Button Content="Exit"
+                            Click="CloseButton_Click"
                             VerticalAlignment="Center"
                             Height="40"
                             Width="60"
@@ -177,74 +169,431 @@
                             Command="{Binding CmdExit}" />
                 </StackPanel>
             </Grid>
-            <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition Height="4*"/>
-                    </Grid.RowDefinitions>
-                    <GroupBox Header="Mode" Grid.Row="0">
-                        <Button Content="Magazine / Stack"
-                                Margin="3"
-                                FontSize="35"
-                                FontWeight="Bold"
-                                FontFamily="Arial"
-                                BorderBrush="{x:Null}" />
-                    </GroupBox>
-                    <GroupBox Header="Strip Width" Grid.Row="1">
-                        <Grid>
+            <Border Grid.Row="2"
+                    BorderThickness="0,1,0,1"
+                    BorderBrush="Black">
+                <TabControl Background="Transparent">
+                    <TabItem Header="UI"
+                             Width="100"
+                             Height="20">
+                        <Grid Margin="30,20"
+                              Visibility="Visible">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="9*" />
+                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="2*" />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition />
+                                <RowDefinition Height="Auto" />
+
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <ToggleButton Content="77"
-                                    Grid.Row="0"
-                                    Margin="3"
-                                    FontSize="35"
-                                    FontWeight="Bold"
-                                    FontFamily="Arial"
-                                    BorderBrush="{x:Null}" />
-                            <ToggleButton Content="77"
-                                    Grid.Row="1"
-                                    Margin="3"
-                                    FontSize="35"
-                                    FontWeight="Bold"
-                                    FontFamily="Arial"
-                                    BorderBrush="{x:Null}" />
-                            <ToggleButton Content="77"
-                                    Grid.Row="2"
-                                    Margin="3"
-                                    FontSize="35"
-                                    FontWeight="Bold"
-                                    FontFamily="Arial"
-                                    BorderBrush="{x:Null}" />
-                            <ToggleButton Grid.Row="3"
-                                          Margin="3"
-                                          Background="#FFDDDDDD"
-                                          BorderBrush="{x:Null}">
-                                <TextBox Text="77"
-                                         HorizontalAlignment="Center"
-                                         VerticalAlignment="Center"
-                                         Width="560"
-                                         Height="100"
-                                         FontSize="35"
-                                         FontWeight="Bold"
-                                         FontFamily="Arial"
-                                         HorizontalContentAlignment="Center"
-                                         VerticalContentAlignment="Center" />
-                            </ToggleButton>
 
+                            <Grid Grid.Row="0"
+                                  Grid.ColumnSpan="2"
+                                  Height="1"
+                                  VerticalAlignment="Top"
+                                  Background="Black" />
+                            <Grid Grid.Row="1"
+                                  Grid.ColumnSpan="2"
+                                  Height="1"
+                                  Margin="0,0"
+                                  Background="Black" />
+                            <Grid Grid.Row="3"
+                                  Grid.ColumnSpan="2"
+                                  Height="1"
+                                  Margin="0,0"
+                                  Background="Black" />
+                            <Grid Grid.Row="5"
+                                  Grid.ColumnSpan="2"
+                                  Height="1"
+                                  Margin="0,0"
+                                  Background="Black" />
+                            <Grid Grid.Row="6"
+                                  Grid.ColumnSpan="2"
+                                  Height="1"
+                                  VerticalAlignment="Bottom"
+                                  Background="Black" />
+                            <Grid Grid.Row="7"
+                                  Grid.ColumnSpan="2"
+                                  Height="1"
+                                  VerticalAlignment="Bottom"
+                                  Background="Black" />
+                            <TextBlock Text="State"
+                                       Grid.Row="0"
+                                       FontSize="35"
+                                       FontWeight="Bold"
+                                       FontFamily="Arial"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="Option"
+                                       Grid.Row="2"
+                                       FontSize="35"
+                                       FontWeight="Bold"
+                                       FontFamily="Arial"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="Move"
+                                       Grid.Row="4"
+                                       FontSize="35"
+                                       FontWeight="Bold"
+                                       FontFamily="Arial"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="Clamp"
+                                       Grid.Row="6"
+                                       FontSize="35"
+                                       FontWeight="Bold"
+                                       FontFamily="Arial"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="Picker"
+                                       Grid.Row="8"
+                                       FontSize="35"
+                                       FontWeight="Bold"
+                                       FontFamily="Arial"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
+                            <Grid Grid.Row="0"
+                                  Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <GroupBox Header="Loader State"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          Grid.Column="0"
+                                          BorderThickness="0">
+                                    <Border Margin="5"
+                                            x:Name="borderState"
+                                            CornerRadius="10"
+                                            Background="SeaGreen">
+                                        <TextBlock x:Name="textBlockState"
+                                                   Text="{Binding p_eState}"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                </GroupBox>
+                                <GroupBox Header="Unloader State"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          Grid.Column="1"
+                                          BorderThickness="0">
+                                    <Border Margin="5"
+                                            x:Name="borderUnloadState"
+                                            CornerRadius="10"
+                                            Background="SeaGreen">
+                                        <TextBlock x:Name="textBolckUnloadState"
+                                                   Text="{Binding p_eStateUnloader}"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                </GroupBox>
+                                <GroupBox Header="Rinse State"
+                                          Style="{StaticResource group}"
+                                          Grid.Column="2"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Border Margin="5"
+                                            CornerRadius="10"
+                                            Background="SteelBlue">
+                                        <TextBlock x:Name="textBlockRinseState"
+                                                   Text="{Binding p_eStateRinse}"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                </GroupBox>
+                            </Grid>
+                            <Grid Grid.Row="2"
+                                  Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <GroupBox Header="Mode"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button x:Name="buttonMode"
+                                            Content="{Binding p_eMode}"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}"
+                                            Click="buttonMode_Click" />
+                                </GroupBox>
+                                <GroupBox Header="Strip Width"
+                                          Grid.Column="1"
+                                          Style="{StaticResource group}"
+                                          BorderThickness="0"
+                                          Margin="5,10">
+                                    <Grid Background="#FFDDDDDD"
+                                          Margin="5,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="45*" />
+                                            <ColumnDefinition Width="338*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="textBoxWidth"
+                                                 Text="{Binding p_widthStrip}"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 Margin="12,12,71,12"
+                                                 Width="300"
+                                                 Height="60"
+                                                 FontSize="30"
+                                                 FontWeight="Bold"
+                                                 FontFamily="Arial"
+                                                 HorizontalContentAlignment="Center"
+                                                 VerticalContentAlignment="Center"
+                                                 PreviewKeyDown="textBoxWidth_PreviewKeyDown"
+                                                 Grid.ColumnSpan="2" />
+                                        <TextBlock Text="mm"
+                                                   Margin="0,35,9,14"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Right"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   Grid.Column="1" />
+                                    </Grid>
+                                </GroupBox>
+                            </Grid>
+                            <Grid Grid.Row="4"
+                                  Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <GroupBox Header="Jog Move"
+                                          Grid.Column="0"
+                                          Style="{StaticResource group}"
+                                          Grid.Row="0"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="LIFT UP"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="1"
+                                          Grid.Row="0"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="LIFT DOWN"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Header="Move Level"
+                                          Grid.Column="0"
+                                          Style="{StaticResource group}"
+                                          Grid.Row="1"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Move - 1"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="1"
+                                          Grid.Row="1"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Move - 2"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="2"
+                                          Grid.Row="1"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Move - 3"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="3"
+                                          Grid.Row="1"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Move - 4"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+
+                            </Grid>
+                            <Grid Grid.Row="6"
+                                  Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <GroupBox Header="Clamp Level"
+                                          Grid.Column="0"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button Content="Clamp - 1"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="1"
+                                          Margin="5,10"
+                                          Style="{StaticResource group}"
+                                          BorderThickness="0">
+                                    <Button Content="Clamp - 2"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="2"
+                                          Margin="5,10"
+                                          Style="{StaticResource group}"
+                                          BorderThickness="0">
+                                    <Button Content="Clamp - 3"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="3"
+                                          Margin="5,10"
+                                          Style="{StaticResource group}"
+                                          BorderThickness="0">
+                                    <Button Content="Clamp - 4"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}" />
+                                </GroupBox>
+
+                            </Grid>
+                            <Grid Grid.Row="8"
+                                  Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <GroupBox Header="Z Move"
+                                          Style="{StaticResource group}"
+                                          Grid.Column="0"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button x:Name="buttonPickerSetUp"
+                                            Content="Up"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}"
+                                            Click="buttonPickerSetUp_Click" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="1"
+                                          Margin="5,10"
+                                          Style="{StaticResource group}"
+                                          BorderThickness="0">
+                                    <Button x:Name="buttonPickerSetDown"
+                                            Content="Down"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}"
+                                            Click="buttonPickerSetDown_Click" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="2"
+                                          Style="{StaticResource group}"
+                                          Header="Vacuum"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button x:Name="buttonPickerSetVacOn"
+                                            Content="On"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}"
+                                            Click="buttonPickerSetVacOn_Click" />
+                                </GroupBox>
+                                <GroupBox Grid.Column="3"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                    <Button x:Name="buttonPickerSetVacOff"
+                                            Content="Off"
+                                            Margin="5,0"
+                                            FontSize="30"
+                                            FontWeight="Bold"
+                                            FontFamily="Arial"
+                                            BorderBrush="{x:Null}"
+                                            Click="buttonPickerSetVacOff_Click" />
+                                </GroupBox>
+
+                            </Grid>
                         </Grid>
-                    </GroupBox>
-                </Grid>
-            </Grid>
+                    </TabItem>
+                    <TabItem Header="Engineer"
+                             Width="100">
+                        <engineer:RinseL_Engineer_UI x:Name="engineerUI" />
+                    </TabItem>
+                </TabControl>
+            </Border>
             <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
@@ -253,64 +602,52 @@
                     <ColumnDefinition />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Button Content="Initialize" 
+                <Button x:Name="buttonHome"
+                        Content="Initialize"
                         Grid.Column="0"
                         Margin="10"
                         FontSize="40"
                         FontWeight="Bold"
                         FontFamily="Arial"
-                        BorderBrush="{x:Null}"/>
-                <Button Content="Start"
+                        BorderBrush="{x:Null}"
+                        Click="buttonHome_Click" />
+                <Button x:Name="buttonStart"
+                        Content="Start"
                         Grid.Column="1"
                         Margin="10"
                         FontSize="40"
                         FontWeight="Bold"
                         FontFamily="Arial"
-                        BorderBrush="{x:Null}" />
-                <Button Content="Pause"
+                        BorderBrush="{x:Null}"
+                        Click="buttonStart_Click" />
+                <Button x:Name="buttonPause"
+                        Content="Pause"
                         Grid.Column="2"
                         Margin="10"
                         FontSize="40"
                         FontWeight="Bold"
                         FontFamily="Arial"
-                        BorderBrush="{x:Null}" />
-                <Button Content="Reset"
+                        BorderBrush="{x:Null}"
+                        Click="buttonPause_Click" />
+                <Button x:Name="buttonReset"
+                        Content="Reset"
                         Grid.Column="3"
                         Margin="10"
                         FontSize="40"
                         FontWeight="Bold"
                         FontFamily="Arial"
-                        BorderBrush="{x:Null}" />
-                <Button Content="Picker Set"
+                        BorderBrush="{x:Null}"
+                        Click="buttonReset_Click" />
+                <Button x:Name="buttonPickerSet"
+                        Content="Picker Set"
                         Grid.Column="4"
                         Margin="10"
                         FontSize="40"
                         FontWeight="Bold"
                         FontFamily="Arial"
-                        BorderBrush="{x:Null}" />
-            </Grid>
-            <Grid Grid.Row="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition  Height="25"/>
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <ComboBox Grid.Row="0"
-                          x:Name="comboMain"
-                          SelectionChanged="comboMain_SelectionChanged" />
-                <TabControl Grid.Row="1"
-                            x:Name="tabMain">
-                    <TabItem Header="MainUI"
-                             Height="0">
-                        <mainUI:Main_UI x:Name="mainUI" />
-                    </TabItem>
-                    <TabItem Header="Engineer"
-                             Height="0">
-                        <engineer:RinseL_Engineer_UI x:Name="engineerUI" />
-                    </TabItem>
-                </TabControl>
+                        BorderBrush="{x:Null}"
+                        Click="buttonPickerSet_Click" />
             </Grid>
         </Grid>
-
-
     </Grid>
 </Window>

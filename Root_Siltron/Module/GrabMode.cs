@@ -28,7 +28,10 @@ namespace Root_Siltron.Module
 
         public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false)
         {
-            m_camera.GrabLineScan(memory, cpScanOffset, nLine, bInvY, m_nReverseOffsetY);
+            GrabData gd = new GrabData();
+            gd.bInvY = bInvY;
+            gd.ReverseOffsetY = m_nReverseOffsetY;
+            m_camera.GrabLineScan(memory, cpScanOffset, nLine, gd);
             m_camera.Grabed += m_camera_Grabed;
         }
 

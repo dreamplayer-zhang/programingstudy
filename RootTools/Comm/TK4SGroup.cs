@@ -53,7 +53,7 @@ namespace RootTools
         int m_nBaudrate = 9600;
         Parity m_eParity = Parity.None;
         StopBits m_eStopBit = StopBits.Two;
-        int m_nTryConnect = 3;
+        //int m_nTryConnect = 3;
         int m_nInterval = 1000;
 
         ObservableCollection<TK4S> m_aTK4S = new ObservableCollection<TK4S>();
@@ -88,7 +88,7 @@ namespace RootTools
         int m_nTimeout = 3000;
         Log m_log;
         string m_sFilePath = @"C:\WIND2\Init\FDCSetting.ini";
-        int nCount;
+        //int nCount;
 
         private readonly IDialogService m_DialogService;
 
@@ -256,7 +256,7 @@ namespace RootTools
                     dValue = nValue * ((m_aTK4S[nAddress - 1]. p_nDecimalPoint));
                 m_aTK4S[nAddress-1].p_dValue = dValue;
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }

@@ -73,6 +73,7 @@ namespace Root
             //InitAjin();
             InitACS();
             m_handler.Init(id, this);
+
         }
 
         public void ThreadStop()

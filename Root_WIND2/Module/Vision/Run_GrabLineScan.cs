@@ -67,7 +67,7 @@ namespace Root_WIND2.Module
                 int nMMPerUM = 1000;
 
                 double dXScale = m_grabMode.m_dResX_um * 10;
-                cpMemoryOffset.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
+                cpMemoryOffset.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize;
                 m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                 int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
@@ -99,9 +99,9 @@ namespace Root_WIND2.Module
                         m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
                     }
                     System.Diagnostics.Debug.Print("s:" + dStartPosY.ToString() + "e: " + dEndPosY.ToString());
-                    double dfovum = m_grabMode.m_camera.GetRoiSize().X * dXScale;
-                    double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * dXScale;
-                    double dNextPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + 1 + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * dXScale;
+                    double dfovum = m_grabMode.m_GD.m_nFovSize * dXScale;
+                    double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
+                    double dNextPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + 1 + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
 
                     double dPosZ = m_grabMode.m_nFocusPosZ;
                     if(m_grabMode.m_dVRSFocusPos != 0)
@@ -142,7 +142,11 @@ namespace Root_WIND2.Module
 
                     MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
 
-                    m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px , (nScanLine + m_grabMode.m_ScanStartLine)* m_grabMode.m_nYOffset, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                    GrabData gd = m_grabMode.m_GD;
+                    gd.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.BackWard;
+                    gd.nScanOffsetY = (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_nYOffset;
+
+                    m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px , m_grabMode.m_GD);
                     //m_grabMode.StartGrabColor(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
 
                     if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
@@ -165,11 +169,16 @@ namespace Root_WIND2.Module
                                        
                     axisXY.p_axisY.RunTrigger(false);
 
-                    WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_camera.GetRoiSize().X, nWaferSizeY_px)));
+                    while (m_grabMode.m_camera.p_nGrabProgress != 100)
+                    {
+                        System.Threading.Thread.Sleep(10);
+                        m_log.Info("Wait Camera GrabProcess");
+                    }
+                    WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
 
                    
                     nScanLine++;
-                    cpMemoryOffset.X += m_grabMode.m_camera.GetRoiSize().X;
+                    cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
                 }
                 m_grabMode.m_camera.StopGrab();
                 return "OK";

@@ -426,6 +426,7 @@ namespace RootTools.Control
             while (p_eState == eState.Move || p_eState == eState.Home)
             {
                 Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop"; 
                 //if (m_swMove.ElapsedMilliseconds > m_msMoveTime)
                 //{
                 //    p_eState = eState.Init;

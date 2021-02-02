@@ -104,7 +104,7 @@ namespace RootTools.Control.Ajin
 
         #region MOT
         Registry m_reg = new Registry("AjinListAxis"); 
-        string _sMotFile = @"C:\VEGA\Init\VEGA.mot";
+        string _sMotFile = @"C:\Init\Motor.mot";
         string p_sMotFile
         {
             get { return _sMotFile; }

@@ -52,9 +52,9 @@ namespace RootTools
 
         public System.Windows.Input.KeyEventArgs m_KeyEvent;
 
-        Key m_keyMove = Key.LeftCtrl;
-        Key m_keyZoom = Key.LeftCtrl;
-        Key m_keyDrawBasic = Key.LeftShift;
+        //Key m_keyMove = Key.LeftCtrl;
+        //Key m_keyZoom = Key.LeftCtrl;
+        //Key m_keyDrawBasic = Key.LeftShift;
         public enum eColorViewMode
         {
             All,
@@ -92,6 +92,39 @@ namespace RootTools
             }
         }
         private ObservableCollection<UIElement> m_ViewElement = new ObservableCollection<UIElement>();
+
+        /// <summary>
+        /// Global UI Shapes
+        /// </summary>
+        public ObservableCollection<UIElement> p_UIElement
+        {
+            get
+            {
+                return m_UIElement;
+            }
+            set
+            {
+                m_UIElement = value;
+            }
+        }
+        private ObservableCollection<UIElement> m_UIElement = new ObservableCollection<UIElement>();
+
+        /// <summary>
+        /// Global UI Shapes
+        /// </summary>
+        public ObservableCollection<UIElement> p_DrawElement
+        {
+            get
+            {
+                return m_DrawElement;
+            }
+            set
+            {
+                m_DrawElement = value;
+            }
+        }
+        private ObservableCollection<UIElement> m_DrawElement = new ObservableCollection<UIElement>();
+
         /// <summary>
         /// Main Image Data in Viewer
         /// </summary>
@@ -607,15 +640,15 @@ namespace RootTools
                                     Parallel.For(0, p_CanvasHeight, (yy) =>
                                 {
                                     //lock (o)
-                                    {
-                                        long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-                                        for (int xx = 0; xx < p_CanvasWidth; xx++)
                                         {
-                                            long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                                            long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+                                            for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                            {
+                                                long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
-                                                viewPtr[yy, xx, 0] = imageptrR[pix_x + (long)pix_y * sizeX];
-                                                viewPtr[yy, xx, 1] = imageptrG[pix_x + (long)pix_y * sizeX];
-                                                viewPtr[yy, xx, 2] = imageptrB[pix_x + (long)pix_y * sizeX];
+                                                    viewPtr[yy, xx, 0] = imageptrR[pix_x + (long)pix_y * sizeX];
+                                                    viewPtr[yy, xx, 1] = imageptrG[pix_x + (long)pix_y * sizeX];
+                                                    viewPtr[yy, xx, 2] = imageptrB[pix_x + (long)pix_y * sizeX];
                                             }
                                         }
                                     });
@@ -1170,7 +1203,7 @@ namespace RootTools
                 Vertical.Y2 = p_CanvasHeight;
                 Horizon.X2 = p_CanvasWidth;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return;
             }
@@ -1206,7 +1239,7 @@ namespace RootTools
                 }
             }
         }
-        void _saveImage()
+        public void _saveImage()
         {
             if (p_ImageData == null)
             {
@@ -1229,7 +1262,7 @@ namespace RootTools
             //m_ImageData.SaveRectImage(new CRect(left, top, right, bot));
             ////}
         }
-        void _clearImage()
+        public void _clearImage()
         {
             if (p_ImageData != null)
                 p_ImageData.ClearImage();

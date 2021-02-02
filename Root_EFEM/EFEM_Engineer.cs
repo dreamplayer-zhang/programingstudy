@@ -22,7 +22,8 @@ namespace Root_EFEM
         {
             switch (m_eControl)
             {
-                case eControl.Ajin: return m_ajin; 
+                case eControl.Ajin: return m_ajin;
+                case eControl.ACS: return m_ACS;
             }
             return m_ajin; 
         }

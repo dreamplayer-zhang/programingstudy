@@ -66,9 +66,9 @@
     <Reference Include="CyUSB">
       <HintPath>CyUSB\CyUSB.dll</HintPath>
     </Reference>
-    <Reference Include="DALSA.SaperaLT.SapClassBasic, Version=8.40.0.1937, Culture=neutral, PublicKeyToken=4d8604101dcb6b58, processorArchitecture=AMD64">
+    <Reference Include="DALSA.SaperaLT.SapClassBasic, Version=8.0.0.1509, Culture=neutral, PublicKeyToken=4d8604101dcb6b58, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Camera\Dalsa\DLL\DALSA.SaperaLT.SapClassBasic.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Teledyne DALSA\Sapera\Components\NET\Bin\DALSA.SaperaLT.SapClassBasic.dll</HintPath>
     </Reference>
     <Reference Include="DataMatrix.net">
       <HintPath>RTC5s\DLL\DataMatrix.net.dll</HintPath>
@@ -246,6 +246,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera\BaslerPylon\ChannelGraph.xaml.cs">
+      <DependentUpon>ChannelGraph.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Camera\BaslerPylon\GraphWindowTest.xaml.cs">
+      <DependentUpon>GraphWindowTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Comm\Modbus.cs" />
     <Compile Include="Comm\Modbus_UI.xaml.cs">
       <DependentUpon>Modbus_UI.xaml</DependentUpon>
@@ -272,6 +278,7 @@
     <Compile Include="Database\Table\Defect\Defect.cs" />
     <Compile Include="Database\Table\Defect\DefectManager.cs" />
     <Compile Include="Database\Table\Lotinfo.cs" />
+    <Compile Include="Database\Table\Measurement\EBRMeasurement.cs" />
     <Compile Include="Database\Table\Measurement\Measurement.cs" />
     <Compile Include="Database\Table\Measurement\MeasurementManager.cs" />
     <Compile Include="Camera\Matrox\Camera_Matrox.cs" />
@@ -385,6 +392,19 @@
       <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="InfoWafer.cs" />
+    <Compile Include="Lens\ILens.cs" />
+    <Compile Include="Lens\LensSet.cs" />
+    <Compile Include="Lens\LensSet_UI.xaml.cs">
+      <DependentUpon>LensSet_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Lens\LinearTurret\LensLinearTurret.cs" />
+    <Compile Include="Lens\LinearTurret\LensLinearTurret_UI.xaml.cs">
+      <DependentUpon>LensLinearTurret_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Lens\ToolSetLens.cs" />
+    <Compile Include="Lens\ToolSetLens_UI.xaml.cs">
+      <DependentUpon>ToolSetLens_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Light\LightTool_DAWOO.cs" />
     <Compile Include="Light\LightTool_DAWOO_UI.xaml.cs">
       <DependentUpon>LightTool_DAWOO_UI.xaml</DependentUpon>
@@ -747,6 +767,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Camera\BaslerPylon\ChannelGraph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Camera\BaslerPylon\GraphWindowTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Camera\CameraSet_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -884,6 +912,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Inspects\InspectTool_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Lens\LensSet_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Lens\LinearTurret\LensLinearTurret_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Lens\ToolSetLens_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

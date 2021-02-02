@@ -6,6 +6,7 @@
 #include <list>
 #include "CLR_IP_ParamStruct.h"
 #include "..\RootTools_Cpp\\IP.h"
+#include "..\RootTools_Cpp\\ResizeSSE.h"
 #include <iostream>
 
 using namespace System::Collections::Generic; // List
@@ -96,5 +97,9 @@ namespace RootTools_CLR
 
 		static void Cpp_Histogram(array<byte>^ pSrcImg, array<byte>^ pDstImg, int nW, int nH, int channels, int dims, int histSize, array<float>^ histRanges);
 		static void Cpp_FilEllipse(array<byte>^ pSrcImg, array<byte>^ pDstImg, int nW, int nH);
+
+		void Cpp_CreatInterpolationData(int i,double dXScale, double dXShift, int nWidth);
+		void Cpp_ProcessInterpolation(int i,int thid, BYTE* pSrc, int nSrcHeight, int nSrcWidth, int nFovWidth, LPBYTE* ppTarget, int nXOffset, int nYOffset, int nDir, int nSy, int nEy);
+		void Cpp_ProcessInterpolation(int i,int  thid, BYTE* pSrcImg, int nSrcHeight, int nSrcWidth, int nFovWidth, LPBYTE pTarget);
 	};
 }

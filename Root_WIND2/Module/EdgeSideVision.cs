@@ -349,13 +349,13 @@ namespace Root_WIND2.Module
 		#region State Home
 		public string OpenCamera()
 		{
-			if (camEdgeTop.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
+			if (camEdgeTop != null && camEdgeTop.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
 				camEdgeTop.Connect();
-			if (camEdgeSide.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
+			if (camEdgeSide != null && camEdgeSide.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
 				camEdgeSide.Connect();
-			if (camEdgeBtm.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
+			if (camEdgeBtm != null && camEdgeBtm.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
 				camEdgeBtm.Connect();
-			if (camEBR.p_CamInfo.p_eState == RootTools.Camera.Matrox.eCamState.Init)
+			if (camEBR != null && camEBR.p_CamInfo.p_eState == RootTools.Camera.Matrox.eCamState.Init)
 				camEBR.Connect();
 			return "OK";
 		}

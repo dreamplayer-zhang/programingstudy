@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:local="clr-namespace:Root_AOP01_Inspection"
         xmlns:icon="clr-namespace:Root_AOP01_Inspection.Icon"
         mc:Ignorable="d"
@@ -34,7 +35,7 @@
                 <Viewbox Margin="3" VerticalAlignment="Center">
                     <icon:AtiLogo/>
                 </Viewbox>
-                <TextBlock Text="AOP01  -  Ver. 0.0.1"
+                <TextBlock Text="AOP01  -  Ver. 1.0.01"
                            Foreground="White"
                            VerticalAlignment="Center"
                            FontSize="12"
@@ -142,7 +143,7 @@
                                 </Grid>
                             </MenuItem.Header>
                             <MenuItem Header="Log" IsCheckable="True" x:Name="viewLog" Click="ViewMenuItem_Click"/>
-                            <MenuItem Header="Alarm" IsCheckable="True" x:Name="viewAlarm" Click="ViewMenuItem_Click"/>
+                            <!--<MenuItem Header="Alarm" IsCheckable="True" x:Name="viewAlarm" Click="ViewMenuItem_Click"/>-->
                             <MenuItem Header="FDC" IsCheckable="True" x:Name="viewFDC" Click="ViewMenuItem_Click"/>
 
 
@@ -163,14 +164,14 @@
                             <MenuItem Header="Login">
 
                             </MenuItem>
-                            <MenuItem Header="RTR">
+                            <!--<MenuItem Header="RTR">
 
                             </MenuItem>
                             <MenuItem Header="LoadPort">
 
-                            </MenuItem>
+                            </MenuItem>-->
                             <MenuItem Header="Setting">
-                                
+
                             </MenuItem>
                         </MenuItem>
                         <MenuItem Background="{StaticResource ControlBackGround}"
@@ -195,7 +196,7 @@
                             <MenuItem Header="GEM" IsEnabled="False">
 
                             </MenuItem>
-                            
+
                         </MenuItem>
                         <MenuItem Background="{StaticResource ControlBackGround}"
                                   BorderBrush="#FF707070"
@@ -278,85 +279,75 @@
                       x:Name="splitter"
                       Background="{StaticResource Splitter}"
                       ShowsPreview="True" Grid.ColumnSpan="2"/>
-        
+
         <!--Log-->
         <Border Grid.Row="4" Grid.ColumnSpan="2" Panel.ZIndex="99">
             <TabControl x:Name="viewTab">
-                <TabItem Width="50" Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                <TabItem Width="50"  Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                     <TabItem.Header>
                         <TextBlock Text="Log" FontWeight="Bold"/>
                     </TabItem.Header>
                     <TabControl Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
-                        <TabItem Header="ALL" FontSize="10">
-                            <TextBlock Text="Log Area" Margin="5"/>
-                        </TabItem>
-                        <TabItem Header="System" FontSize="10"/>
-                        <TabItem Header="Inspection" FontSize="10"/>
-                        <TabItem Header="I/O" FontSize="10"/>
-                        <TabItem Header="Network" FontSize="10"/>
-                        <TabItem Header="Result" FontSize="10"/>
-                    </TabControl>
+                        <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
+                    </TabControl> 
                 </TabItem>
-                <TabItem Width="50" Visibility="{Binding ElementName=viewAlarm, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                <!--<TabItem Width="50" Visibility="{Binding ElementName=viewAlarm, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                     <TabItem.Header>
                         <TextBlock Text="Alarm" FontWeight="Bold"/>
                     </TabItem.Header>
                     <Grid  Visibility="{Binding ElementName=viewAlarm, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                         <StackPanel>
-                            <TextBlock Text="Alaram 001 - Vision Module Disconnected" FontSize="12" Margin="1" Foreground="Red" Background="LightGray"/>
-                            <TextBlock Text="Alaram 002 - " FontSize="12" Margin="1" Background="LightGray"/>
-                            <TextBlock Text="Alaram 003 -" FontSize="12" Margin="1" Background="LightGray"/>
+                            <ListView x:Name="listviewAlarm">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn>
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock x:Name="textBlockALID" Text="{Binding p_sALValue}"/>
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
                         </StackPanel>
                     </Grid>
-                </TabItem>
+                </TabItem>-->
                 <TabItem Width="50" Visibility="{Binding ElementName=viewFDC, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                     <TabItem.Header>
                         <TextBlock Text="FDC" FontWeight="Bold"/>
                     </TabItem.Header>
                     <Grid Visibility="{Binding ElementName=viewFDC, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
-                        <UniformGrid Rows="2" Columns="3" Margin="10" TextElement.FontSize="14" TextElement.FontFamily="Arial" Background="AliceBlue">
-                            <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
+                        <UniformGrid Rows="2" Columns="2" Margin="10" TextElement.FontSize="14" TextElement.FontFamily="Arial" Background="AliceBlue">
+                            <Border Name="FDC1" Background="AliceBlue" BorderBrush="Gray" BorderThickness="1,1,0,1">
                                 <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="80,0">
-                                    <TextBlock Text="CDA" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="FDCName1" Text="{Binding p_id}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
                                     <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="0.000(Mpa)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Blue"/>
+                                    <TextBlock x:Name="FDCValue1" Text="{Binding p_sValue}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
                                 </UniformGrid>
                             </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
+                            <Border Name="FDC2" Background="AliceBlue" BorderBrush="Gray" BorderThickness="1,1,1,1">
+                                <UniformGrid  Rows="1" Grid.Column="0" Grid.Row="0" Margin="80,0">
+                                    <TextBlock x:Name="FDCName2" Text="{Binding p_id}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="FDCValue2" Text="{Binding p_sValue}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                </UniformGrid>
+                            </Border>
+                            <Border  Name="FDC3" Background="AliceBlue" BorderBrush="Gray" BorderThickness="1,1,0,1">
                                 <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="80,0">
-                                    <TextBlock Text="Vaccum" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="FDCName3" Text="{Binding p_id}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
                                     <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="0.000(Mpa)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Red"/>
+                                    <TextBlock x:Name="FDCValue3" Text="{Binding p_sValue}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
                                 </UniformGrid>
                             </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
+                            <Border  Name="FDC4" Background="AliceBlue" BorderBrush="Gray" BorderThickness="1,1,1,1">
                                 <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="80,0">
-                                    <TextBlock Text="EFEM Pressure" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="FDCName4" Text="{Binding p_id}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
                                     <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="0.000(inWG)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Red"/>
+                                    <TextBlock x:Name="FDCValue4" Text="{Binding p_sValue}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
                                 </UniformGrid>
                             </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
-                                <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="50,0,80,0">
-                                    <TextBlock Text="Vision Module Pressure" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="0.000(inWG)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Blue"/>
-                                </UniformGrid>
-                            </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
-                                <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="80,0">
-                                    <TextBlock Text="Electrostatic" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="0.000(%)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Blue"/>
-                                </UniformGrid>
-                            </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1,1,1,1">
-                                <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="80,0">
-                                    <TextBlock Text="Temp" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="0.000(℃)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Blue"/>
-                                </UniformGrid>
-                            </Border>
+
                         </UniformGrid>
                     </Grid>
                 </TabItem>

@@ -190,39 +190,28 @@ namespace Root_Rinse_Loader.Engineer
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run: break;
                 }
-                p_bRun = (EQ.p_eState == EQ.eState.Run);
+                p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
             }
         }
         #endregion
 
         #region PickerSet
-        BackgroundWorker m_bgwPickerSet = new BackgroundWorker(); 
-        void InitBackgroundWorker()
-        {
-            m_bgwPickerSet.DoWork += M_bgwPickerSet_DoWork;
-        }
-
-        private void M_bgwPickerSet_DoWork(object sender, DoWorkEventArgs e)
-        {
-            RunPickerSet(); 
-        }
-
-        string RunPickerSet()
-        {
-            m_loader.m_bPickersetMode = true; 
-            m_storage.StartMoveStackReady();
-            EQ.p_eState = EQ.eState.Run;
-            while (m_storage.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
-            if (EQ.IsStop()) return "EQ Stop";
-            m_loader.StartPickerSet();
-            EQ.p_eState = EQ.eState.Run;
-            return "OK";  
-        }
-
         public string StartPickerSet()
         {
-            m_bgwPickerSet.RunWorkerAsync();
-            return "OK";
+            if (EQ.p_bPickerSet)
+            {
+                EQ.p_eState = EQ.eState.Ready;
+                p_moduleList.m_qModuleRun.Clear(); 
+                return "OK"; 
+            }
+            else
+            {
+                if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist";
+                EQ.p_bPickerSet = true;
+                p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
+                p_moduleList.StartModuleRuns();
+                return "OK";
+            }
         }
         #endregion
 
@@ -238,7 +227,6 @@ namespace Root_Rinse_Loader.Engineer
             m_gaf = engineer.ClassGAF();
             m_gem = engineer.ClassGem();
             InitModule();
-            InitBackgroundWorker(); 
             InitThread();
             m_engineer.ClassMemoryTool().InitThreadProcess();
         }
