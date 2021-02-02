@@ -300,9 +300,9 @@ namespace RootTools.Camera.Dalsa
             m_SapGrabber.GetCapability(SapAcquisition.Cap.HACTIVE_MAX, out nBuff);
             m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_WIDTH, out m_Width);
             m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_HEIGHT, out m_Height);
-            string strTriggerMode = "";
             if (m_sapCam != null)
             {
+                string strTriggerMode = "";
                 m_sapCam.GetFeatureValue("TriggerMode", out strTriggerMode);
                 if (strTriggerMode == "Internal")
                     m_sapCam.SetFeatureValue("TriggerMode", "External");
