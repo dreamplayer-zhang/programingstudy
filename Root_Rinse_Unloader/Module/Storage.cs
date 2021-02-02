@@ -25,14 +25,6 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region Magazine
-        public enum eMagazine
-        {
-            Magazine1,
-            Magazine2,
-            Magazine3,
-            Magazine4,
-        }
-        public string[] m_asMagazine = Enum.GetNames(typeof(eMagazine));
         public class Magazine : NotifyProperty
         {
             DIO_I m_diCheck;
@@ -78,8 +70,8 @@ namespace Root_Rinse_Unloader.Module
                 m_dioClamp.Write(bClamp && p_bCheck);
             }
 
-            public string m_id;
-            public Storage m_storage;
+            string m_id;
+            Storage m_storage;
             public Magazine(string id, Storage storage)
             {
                 m_id = id;
@@ -87,7 +79,7 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
-        public List<Magazine> m_aMagazine = new List<Magazine>();
+        List<Magazine> m_aMagazine = new List<Magazine>();
         void InitMagazine()
         {
             for (int n = 0; n < 4; n++) m_aMagazine.Add(new Magazine("Magazine" + n.ToString(), this));
@@ -148,23 +140,30 @@ namespace Root_Rinse_Unloader.Module
 
         #region Elevator
         Axis m_axis;
+        public enum ePos
+        {
+            Magazine0,
+            Magazine1,
+            Magazine2,
+            Magazine3,
+            Stack
+        }
         void InitPosElevator()
         {
-            m_axis.AddPos(Enum.GetNames(typeof(eMagazine)));
-            m_axis.AddPos("Stack");
+            m_axis.AddPos(Enum.GetNames(typeof(ePos)));
         }
 
         int m_dZ = 6;
-        public string MoveMagazine(eMagazine eMagazine, int iIndex)
+        public string MoveMagazine(ePos ePos, int iIndex)
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
-            m_axis.StartMove(eMagazine, iIndex * m_dZ);
+            m_axis.StartMove(ePos, iIndex * m_dZ);
             return m_axis.WaitReady();
         }
 
         public string MoveStack()
         {
-            m_axis.StartMove("Stack");
+            m_axis.StartMove(ePos.Stack);
             return m_axis.WaitReady();
         }
 
@@ -296,82 +295,53 @@ namespace Root_Rinse_Unloader.Module
             return StartRun(run); //forget
         }
 
-        public string MoveNextMagazine()
+        public string RunNextMagazine()
         {
-            if (m_rinse.p_iMagazine < 19) m_rinse.p_iMagazine++;
-            else
-            {
-                m_rinse.p_iMagazine = 0;
-                if (m_rinse.p_eMagazine >= eMagazine.Magazine4) return "Cassette Full";
-                m_rinse.p_eMagazine = m_rinse.p_eMagazine + 1; 
-            }
-            return MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine); 
+            m_rinse.p_iMagazine++; //forget Check Magagine
+            ePos eMGZ = (ePos)(m_rinse.p_iMagazine / 20);
+            int iMGZ = m_rinse.p_iMagazine % 20;
+            return MoveMagazine(eMGZ, iMGZ); 
         }
 
         ModuleRunBase m_runReady;
         ModuleRunBase m_runNextMagazine;
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_MoveStack(this), false, "Move Elevator Stack Position");
-            AddModuleRunList(new Run_MoveMagazine(this), false, "Move Elevator Magazine Position");
+            AddModuleRunList(new Run_MovePos(this), false, "Move Elevator Position");
             AddModuleRunList(new Run_Clamp(this), false, "Run Clamp");
             m_runReady = AddModuleRunList(new Run_StackReady(this), false, "Run Stack Move Ready Position");
             m_runNextMagazine = AddModuleRunList(new Run_RunNextMagazine(this), false, "Run Magazine");
         }
 
-        public class Run_MoveStack : ModuleRunBase
+        public class Run_MovePos : ModuleRunBase
         {
             Storage m_module;
-            public Run_MoveStack(Storage module)
+            public Run_MovePos(Storage module)
             {
                 m_module = module;
                 InitModuleRun(module);
             }
 
-            public override ModuleRunBase Clone()
-            {
-                Run_MoveStack run = new Run_MoveStack(m_module);
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-            }
-
-            public override string Run()
-            {
-                return m_module.MoveStack();
-            }
-        }
-
-        public class Run_MoveMagazine : ModuleRunBase
-        {
-            Storage m_module;
-            public Run_MoveMagazine(Storage module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            eMagazine m_eMagazine = eMagazine.Magazine1;
+            ePos m_ePos = ePos.Stack;
             int m_iIndex = 0;
             public override ModuleRunBase Clone()
             {
-                Run_MoveMagazine run = new Run_MoveMagazine(m_module);
-                run.m_eMagazine = m_eMagazine;
+                Run_MovePos run = new Run_MovePos(m_module);
+                run.m_ePos = m_ePos;
                 run.m_iIndex = m_iIndex;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eMagazine = (eMagazine)tree.Set(m_eMagazine, m_eMagazine, "Pos", "Elevator Position", bVisible);
-                m_iIndex = tree.Set(m_iIndex, m_iIndex, "Index", "Magazine Index", bVisible);
+                m_ePos = (ePos)tree.Set(m_ePos, m_ePos, "Pos", "Elevator Position", bVisible);
+                m_iIndex = tree.Set(m_iIndex, m_iIndex, "Index", "Magazine Index", bVisible && (m_ePos != ePos.Stack));
             }
 
             public override string Run()
             {
-                return m_module.MoveMagazine(m_eMagazine, m_iIndex);
+                if (m_ePos == ePos.Stack) return m_module.MoveStack();
+                return m_module.MoveMagazine(m_ePos, m_iIndex);
             }
         }
 
@@ -452,7 +422,7 @@ namespace Root_Rinse_Unloader.Module
 
             public override string Run()
             {
-                return m_module.MoveNextMagazine();
+                return m_module.RunNextMagazine();
             }
         }
         #endregion

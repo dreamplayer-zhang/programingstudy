@@ -33,7 +33,7 @@ namespace Root_Rinse_Loader.MainUI
             InitTimer(); 
         }
 
-        List<MagazineClamp_UI> m_aMagazine = new List<MagazineClamp_UI>(); 
+        List<MagazineLevel_UI> m_aMagazine = new List<MagazineLevel_UI>(); 
         void InitMagazine()
         {
             gridMagazineLevels.Children.Clear();
@@ -41,7 +41,7 @@ namespace Root_Rinse_Loader.MainUI
             foreach (Storage.Magazine magazine in m_storage.m_aMagazine)
             {
                 gridMagazineLevels.RowDefinitions.Add(new RowDefinition());
-                MagazineClamp_UI ui = new MagazineClamp_UI();
+                MagazineLevel_UI ui = new MagazineLevel_UI();
                 ui.Init(magazine);
                 Grid.SetRow(ui, 3 - gridMagazineLevels.Children.Count);
                 gridMagazineLevels.Children.Add(ui);
@@ -61,7 +61,7 @@ namespace Root_Rinse_Loader.MainUI
         private void M_timer_Tick(object sender, EventArgs e)
         {
             m_bBlink = !m_bBlink;
-            foreach (MagazineClamp_UI ui in m_aMagazine) ui.OnTimer(m_bBlink); 
+            foreach (MagazineLevel_UI ui in m_aMagazine) ui.OnTimer(m_bBlink); 
         }
 
         private void buttonNew_Click(object sender, RoutedEventArgs e)

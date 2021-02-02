@@ -89,11 +89,7 @@ namespace Root_Rinse_Loader.MainUI
         private void M_timer_Tick(object sender, EventArgs e)
         {
             m_bBlink = !m_bBlink; 
-            foreach (CheckSensor check in m_aCheckSensor) check.OnTimer(m_bBlink);
-            buttonPickerSetUp.Foreground = (m_bBlink && (m_loader.m_bPickerDown == false)) ? Brushes.Red : Brushes.Black;
-            buttonPickerSetDown.Foreground = (m_bBlink && m_loader.m_bPickerDown) ? Brushes.Red : Brushes.Black;
-            buttonVacuumOn.Foreground = (m_bBlink && m_loader.p_bVacuum) ? Brushes.Red : Brushes.Black;
-            buttonVacuumOff.Foreground = (m_bBlink && (m_loader.p_bVacuum == false)) ? Brushes.Red : Brushes.Black;
+            foreach (CheckSensor check in m_aCheckSensor) check.OnTimer(m_bBlink); 
         }
 
         private void buttonPickerSetUp_Click(object sender, System.Windows.RoutedEventArgs e)

@@ -69,15 +69,12 @@ namespace Root_Rinse_Unloader
         {
             textBlockState.DataContext = EQ.m_EQ;
             textBlockLoadState.DataContext = m_handler.m_rinse;
-            buttonMode.DataContext = m_handler.m_rinse;
+            TextBlockMode.DataContext = m_handler.m_rinse;
             textBoxWidth.DataContext = m_handler.m_rinse;
             textBlockStripState0.DataContext = m_handler.m_roller.m_aLine[0];
             textBlockStripState1.DataContext = m_handler.m_roller.m_aLine[1];
             textBlockStripState2.DataContext = m_handler.m_roller.m_aLine[2];
             textBlockStripState3.DataContext = m_handler.m_roller.m_aLine[3];
-            magazineUI.Init(m_handler.m_rinse, m_handler.m_storage);
-            stackUI.Init(m_handler.m_storage, m_handler.m_loader);
-            tabControlStorage.SelectedIndex = (int)m_handler.m_rinse.p_eMode;
         }
         #endregion
 
@@ -166,13 +163,28 @@ namespace Root_Rinse_Unloader
         {
             m_handler.StartPickerSet();
         }
-
-        private void buttonMode_Click(object sender, RoutedEventArgs e)
-        {
-            m_handler.m_rinse.p_eMode = (RinseU.eRunMode)(1 - (int)m_handler.m_rinse.p_eMode);
-            tabControlStorage.SelectedIndex = (int)m_handler.m_rinse.p_eMode;
-        }
         #endregion
 
+        #region PickerSet Control Function
+        private void buttonPickerSetUp_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_loader.RunPickerDown(false);
+        }
+
+        private void buttonPickerSetDown_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_loader.RunPickerDown(true);
+        }
+
+        private void buttonPickerSetVacOn_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_loader.RunVacuum(true);
+        }
+
+        private void buttonPickerSetVacOff_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_loader.RunVacuum(false);
+        }
+        #endregion
     }
 }
