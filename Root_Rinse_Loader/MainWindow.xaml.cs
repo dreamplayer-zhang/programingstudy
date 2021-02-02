@@ -42,7 +42,10 @@ namespace Root_Rinse_Loader
             textBolckUnloadState.DataContext = m_handler.m_rinse;
             textBlockRinseState.DataContext = m_handler.m_rinse;
             buttonMode.DataContext = m_handler.m_rinse;
-            textBoxWidth.DataContext = m_handler.m_rinse; 
+            textBoxWidth.DataContext = m_handler.m_rinse;
+            magazineUI.Init(m_handler.m_rinse, m_handler.m_storage);
+            stackUI.Init(m_handler.m_storage.m_stack, m_handler.m_loader);
+            tabControlStorage.SelectedIndex = (int)m_handler.m_rinse.p_eMode;
         }
         #endregion
 
@@ -135,6 +138,7 @@ namespace Root_Rinse_Loader
         private void buttonMode_Click(object sender, RoutedEventArgs e)
         {
             m_handler.m_rinse.p_eMode = (RinseL.eRunMode)(1 - (int)m_handler.m_rinse.p_eMode);
+            tabControlStorage.SelectedIndex = (int)m_handler.m_rinse.p_eMode; 
         }
 
         private void buttonHome_Click(object sender, RoutedEventArgs e)
@@ -170,28 +174,6 @@ namespace Root_Rinse_Loader
             DependencyProperty property = TextBox.TextProperty;
             BindingExpression binding = BindingOperations.GetBindingExpression((TextBox)sender, property);
             if (binding != null) binding.UpdateSource();
-        }
-        #endregion
-
-        #region PickerSet Control Function
-        private void buttonPickerSetUp_Click(object sender, RoutedEventArgs e)
-        {
-            m_handler.m_loader.RunPickerDown(false); 
-        }
-
-        private void buttonPickerSetDown_Click(object sender, RoutedEventArgs e)
-        {
-            m_handler.m_loader.RunPickerDown(true);
-        }
-
-        private void buttonPickerSetVacOn_Click(object sender, RoutedEventArgs e)
-        {
-            m_handler.m_loader.RunVacuum(true); 
-        }
-
-        private void buttonPickerSetVacOff_Click(object sender, RoutedEventArgs e)
-        {
-            m_handler.m_loader.RunVacuum(false);
         }
         #endregion
 
