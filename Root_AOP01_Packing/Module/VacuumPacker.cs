@@ -272,11 +272,6 @@ namespace Root_AOP01_Packing.Module
             {
                 m_doVacuum[0].Write(bCenter);
                 m_doVacuum[1].Write(bSide);
-                m_doBlow[0].Write(!bCenter);
-                m_doBlow[1].Write(!bSide);
-                Thread.Sleep((int)(1000 * m_secVac));
-                m_doBlow[0].Write(false);
-                m_doBlow[1].Write(false);
                 return "OK";
             }
 
@@ -653,7 +648,7 @@ namespace Root_AOP01_Packing.Module
                 //7번축
                 Ready, //맨뒤
                 Vacuum, // Vac키는위치
-                //Heating // 히팅할때 회피할 위치
+                Heating // 히팅할때 회피할 위치
             }
             public enum ePosBridge
             {
@@ -939,12 +934,12 @@ namespace Root_AOP01_Packing.Module
                 case eStep.CloseWrapper:
                     if (Run(m_loader.RunMoveArmWidth(Loader.ePosArmWidth.Vacuum))) return p_sInfo;
                     if (Run(m_heater.RunSpongeSol(true))) return p_sInfo;
+                    Thread.Sleep(500);
                     return "OK";
                 case eStep.VacuumPump:
                     if (Run(m_loader.RunVacPump())) return p_sInfo;
-                    if (Run(m_loader.RunMoveArmX(Loader.ePosArmX.Ready, Loader.eSpeed.Fast))) return p_sInfo;
+                    if (Run(m_loader.RunMoveArmX(Loader.ePosArmX.Heating, Loader.eSpeed.Fast))) return p_sInfo;
                     if (Run(m_loader.RunVacPumpOff())) return p_sInfo;
-                    if (Run(m_loader.RunMoveArmWidth(Loader.ePosArmWidth.Ready))) return p_sInfo;
                     return "OK";
                 case eStep.Heating:
                     if (Run(m_heater.RunSpongeSol(true))) return p_sInfo;
@@ -952,13 +947,15 @@ namespace Root_AOP01_Packing.Module
                     if (Run(m_heater.RunHeat())) return p_sInfo;
                     if (Run(m_heater.RunHeaterSol(false))) return p_sInfo;
                     if (Run(m_heater.RunSpongeSol(false))) return p_sInfo;
-                    //if (Run(m_loader.RunMoveArmX(Loader.ePosMove.Ready, Loader.eSpeed.Slow))) return p_sInfo;
+                    if (Run(m_loader.RunMoveArmX(Loader.ePosArmX.Ready, Loader.eSpeed.Slow))) return p_sInfo;
+                    if (Run(m_loader.RunMoveArmWidth(Loader.ePosArmWidth.Ready))) return p_sInfo;
                     return "OK";
                 case eStep.Rotate:
-                    if (Run(m_stage.RunVac(true, false))) return p_sInfo;
+                        if (Run(m_stage.RunVac(true, false))) return p_sInfo;
                     if (Run(m_stage.RunUp(true))) return p_sInfo;
                     if (Run(m_stage.RunRotate(true))) return p_sInfo;
                     //if (Run(m_stage.RunUp(false))) return p_sInfo;
+                    Thread.Sleep(4000);
                     if (Run(m_stage.RunVac(false, false))) return p_sInfo;
                     return "OK";
                 case eStep.PushToLoader:
@@ -1106,7 +1103,7 @@ namespace Root_AOP01_Packing.Module
 
         public string BeforePut(int nID)
         {
-            if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
+            //if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
             return CheckGetPut();
         }
 

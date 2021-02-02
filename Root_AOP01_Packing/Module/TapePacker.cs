@@ -533,6 +533,8 @@ namespace Root_AOP01_Packing.Module
         {
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
+            return "OK";
+
             if (p_infoWafer == null)
                 return p_id + " IsGetOK - InfoWafer not Exist";
             switch (p_eProcess)
@@ -556,8 +558,8 @@ namespace Root_AOP01_Packing.Module
         public string IsPutOK(InfoWafer infoWafer, int nID)
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            if (p_infoWafer != null) return p_id + " IsPutOK - InfoWafer Exist";
             return "OK";
+            if (p_infoWafer != null) return p_id + " IsPutOK - InfoWafer Exist";
             switch (p_eProcess)
             {
                 case eProcess.Empty:
@@ -578,21 +580,22 @@ namespace Root_AOP01_Packing.Module
 
         public string BeforeGet(int nID)
         {
-            if (Run(m_stage.RunRotate(30))) return p_sInfo;
+            //if (Run(m_stage.RunRotate(30))) return p_sInfo;
             //if (p_infoWafer == null) return m_id + " BeforeGet : InfoWafer = null";
             return CheckGetPut();
         }
 
         public string BeforePut(int nID)
         {
-            if (Run(m_stage.RunRotate(30))) return p_sInfo;
-            if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
+            //if (Run(m_stage.RunRotate(30))) return p_sInfo;
+            //if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
             return CheckGetPut();
         }
 
         public string AfterGet(int nID)
         {
-            if (Run(m_stage.RunRotate(-30))) return p_sInfo;
+            return "OK";
+            //if (Run(m_stage.RunRotate(-30))) return p_sInfo;
             switch (p_eProcess)
             {
                 case eProcess.Case: if (nID == 0) p_eProcess = eProcess.Empty; break;
@@ -604,7 +607,9 @@ namespace Root_AOP01_Packing.Module
 
         public string AfterPut(int nID)
         {
-            if (Run(m_stage.RunRotate(-30))) return p_sInfo;
+
+            return "OK";
+            //if (Run(m_stage.RunRotate(-30))) return p_sInfo;
             switch (p_eProcess)
             {
                 case eProcess.Empty: if (nID == 0) p_eProcess = eProcess.Case; break;
@@ -622,6 +627,8 @@ namespace Root_AOP01_Packing.Module
 
         public bool IsWaferExist(int nID)
         {
+
+            
             return (p_infoWafer != null);
         }
 
@@ -711,7 +718,7 @@ namespace Root_AOP01_Packing.Module
             Thread.Sleep(10);
             ////if (p_eProcess != eProcess.Closed) return "Process not Closed : " + p_eProcess.ToString();
             ////p_eProcess = eProcess.Taping;
-            if (Run(m_head.RunSol(true, true))) return p_sInfo; // Overload는 여기서 체크
+            if (Run(m_head.RunSol(true, false))) return p_sInfo; // Overload는 여기서 체크
             if (Run(m_roller.RunRollerPushUp(true))) return p_sInfo;
             //여기서 Check Top Sensor 체크해야될듯 근데 안들어오네
 
