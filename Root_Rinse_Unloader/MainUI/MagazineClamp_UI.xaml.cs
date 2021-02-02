@@ -1,33 +1,33 @@
-﻿using Root_Rinse_Loader.Module;
+﻿using Root_Rinse_Unloader.Module;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Root_Rinse_Loader.MainUI
+namespace Root_Rinse_Unloader.MainUI
 {
     /// <summary>
-    /// MagazineLevel_UI.xaml에 대한 상호 작용 논리
+    /// MagazieClamp_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class MagazineLevel_UI : UserControl
+    public partial class MagazineClamp_UI : UserControl
     {
-        public MagazineLevel_UI()
+        public MagazineClamp_UI()
         {
             InitializeComponent();
         }
 
         Storage m_storage;
-        Storage.Magazine m_magazine; 
+        Storage.Magazine m_magazine;
         public void Init(Storage.Magazine magazine)
         {
             m_magazine = magazine;
             m_storage = magazine.m_storage;
-            groupBox.Header = magazine.m_id; 
+            groupBox.Header = magazine.m_id;
             DataContext = magazine;
         }
 
         private void buttonClamp_Click(object sender, RoutedEventArgs e)
         {
-            m_magazine.RunClamp(!m_magazine.p_bClamp); 
+            m_magazine.RunClamp(!m_magazine.p_bClamp);
         }
 
         public void OnTimer(bool bBlink)
