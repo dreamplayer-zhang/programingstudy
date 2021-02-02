@@ -540,7 +540,7 @@ namespace Root_EFEM.Module
         #region Timeout
         int m_secRS232 = 2;
         int _secHome = 40;
-        public int m_secHome 
+        public int p_secHome 
         {
             get { return _secHome; }
             set
@@ -556,7 +556,7 @@ namespace Root_EFEM.Module
         void RunTimeoutTree(Tree tree)
         {
             m_secRS232 = tree.Set(m_secRS232, m_secRS232, "RS232", "Timeout (sec)");
-            m_secHome = tree.Set(m_secHome, m_secHome, "Home", "Timeout (sec)");
+            p_secHome = tree.Set(p_secHome, p_secHome, "Home", "Timeout (sec)");
             m_secLoad = tree.Set(m_secLoad, m_secLoad, "Load", "Timeout (sec)");
             m_secUnload = tree.Set(m_secUnload, m_secUnload, "Unload", "Timeout (sec)");
         }
@@ -568,7 +568,7 @@ namespace Root_EFEM.Module
         {
             Protocol protocol = new Protocol(eCmd.Home, this);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitDone(m_secHome);
+            return protocol.WaitDone(p_secHome);
         }
 
         string CmdResetCPU()

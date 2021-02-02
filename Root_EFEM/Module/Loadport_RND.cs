@@ -307,7 +307,7 @@ namespace Root_EFEM.Module
         int m_secRS232 = 2;
         //public int m_secHome = 40;
         int _secHome = 40;
-        public int m_secHome
+        public int p_secHome
         {
             get { return _secHome; }
             set
@@ -321,7 +321,7 @@ namespace Root_EFEM.Module
         void RunTimeoutTree(Tree tree)
         {
             m_secRS232 = tree.Set(m_secRS232, m_secRS232, "RS232", "Timeout (sec)");
-            m_secHome = tree.Set(m_secHome, m_secHome, "Home", "Timeout (sec)");
+            p_secHome = tree.Set(p_secHome, p_secHome, "Home", "Timeout (sec)");
             m_secMotion = tree.Set(m_secMotion, m_secMotion, "Motion", "Timeout (sec)");
         }
         #endregion
@@ -331,7 +331,7 @@ namespace Root_EFEM.Module
         {
             if (Run(WriteCmd(eCmd.Home)))
                 return p_sInfo;
-            if (Run(WaitReply(m_secHome)))
+            if (Run(WaitReply(p_secHome)))
                 return p_sInfo;
             return "OK";
         }

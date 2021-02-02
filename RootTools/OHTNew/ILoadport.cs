@@ -21,6 +21,6 @@ namespace RootTools.OHTNew
 
         ModuleRunBase GetModuleRunUndocking();
 
-        int m_secHome { get; set; }
+        int p_secHome { get; set; }
     }
 }
