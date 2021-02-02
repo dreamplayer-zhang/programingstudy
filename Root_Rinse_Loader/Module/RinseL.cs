@@ -47,14 +47,26 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
-        int _iMagazin = 0;
-        public int p_iMagazine
+        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1; 
+        public Storage.eMagazine p_eMagazine
         {
-            get { return _iMagazin; }
+            get { return _eMagazine; }
             set
             {
-                if (_iMagazin == value) return;
-                _iMagazin = value;
+                if (_eMagazine == value) return;
+                _eMagazine = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        int _iMagazine = 0;
+        public int p_iMagazine
+        {
+            get { return _iMagazine; }
+            set
+            {
+                if (_iMagazine == value) return;
+                _iMagazine = value;
                 OnPropertyChanged();
             }
         }

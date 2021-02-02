@@ -160,6 +160,7 @@ namespace Root_AOP01_Inspection
             }
             Init_ViewModel();
             Init_UI();
+            logViewUI.Init(LogView.m_logView);
             if (m_engineer.m_handler.m_aLoadportType[0] == eLoadport.Cymechs && m_engineer.m_handler.m_aLoadportType[1] == eLoadport.Cymechs)
             {
                 Run.Init(m_engineer.m_handler.m_mainVision, m_engineer.m_handler.m_backsideVision, (RTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer, (RFID_Brooks)m_engineer.m_handler.m_aRFID[0], (RFID_Brooks)m_engineer.m_handler.m_aRFID[1]);
@@ -224,7 +225,6 @@ namespace Root_AOP01_Inspection
 
             //Dlg = new Dlg_Start();
             //Dlg.DataContext = m_Dlg;
-
             MainPanel.Children.Clear();
             MainPanel.Children.Add(ModeSelect);
         }
