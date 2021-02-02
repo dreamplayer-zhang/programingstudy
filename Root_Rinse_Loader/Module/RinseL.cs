@@ -5,9 +5,11 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Threading;
 
 namespace Root_Rinse_Loader.Module
 {
@@ -47,16 +49,95 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
-        int _iMagazin = 0;
-        public int p_iMagazine
+        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1; 
+        public Storage.eMagazine p_eMagazine
         {
-            get { return _iMagazin; }
+            get { return _eMagazine; }
             set
             {
-                if (_iMagazin == value) return;
-                _iMagazin = value;
+                if (_eMagazine == value) return;
+                _eMagazine = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        int _iMagazine = 0;
+        public int p_iMagazine
+        {
+            get { return _iMagazine; }
+            set
+            {
+                if (_iMagazine == value) return;
+                _iMagazine = value;
                 OnPropertyChanged();
             }
+        }
+        #endregion
+
+        #region Strips
+        public class Strips : NotifyProperty
+        {
+            string _sSend = "....";
+            public string p_sSend
+            {
+                get { return _sSend; }
+                set
+                {
+                    _sSend = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            string _sReceive = "....";
+            public string p_sReceive
+            {
+                get { return _sReceive; }
+                set
+                {
+                    _sReceive = value;
+                    OnPropertyChanged();
+                    if (p_sSend != p_sReceive) p_sError = "Error"; 
+                }
+            }
+
+            string _sError = ""; 
+            public string p_sError
+            {
+                get { return _sError; }
+                set
+                {
+                    _sError = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            public Strips(string sSend)
+            {
+                p_sSend = sSend; 
+            }
+        }
+        Queue<Strips> m_qSend = new Queue<Strips>();
+        public void AddStripSend(string sStrip)
+        {
+            Strips strips = new Strips(sStrip);
+            m_qSend.Enqueue(strips); 
+        }
+
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            m_timer.Tick += M_timer_Tick; 
+            m_timer.Start();
+        }
+
+        public ObservableCollection<Strips> p_aSend = new ObservableCollection<Strips>();
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            if (m_qSend.Count == 0) return;
+            Strips strips = m_qSend.Dequeue();
+            p_aSend.Add(strips);
+            AddProtocol(p_id, eCmd.StripSend, strips.p_sSend);
         }
         #endregion
 
@@ -268,6 +349,7 @@ namespace Root_Rinse_Loader.Module
             EQLeState,
             EQUeState,
             PickerSet,
+            StripSend,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
@@ -398,6 +480,7 @@ namespace Root_Rinse_Loader.Module
             InitBase(id, engineer);
 
             InitThread();
+            InitTimer(); 
             AddProtocol(p_id, eCmd.SetMode, p_eMode);
             AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
         }

@@ -57,13 +57,14 @@ namespace Root_WIND2.UI_Temp
 
             this.p_View_Rect = new System.Drawing.Rectangle(new System.Drawing.Point(left, top), new System.Drawing.Size(width, height));
 
-            this.SetRoiRect();
+            this.SetImageSource();
         }
 
 
         #region [Overrides]
         public override void MouseMove(object sender, MouseEventArgs e)
         {
+            base.MouseMove(sender, e);
             e.Handled = true;
         }
 

@@ -26,7 +26,7 @@ namespace Root_WIND2.UI_Temp
         /// <summary>
         /// 전체 Memory의 좌표와 ROI Memory 좌표의 Offset
         /// </summary>
-        CPoint BoxOffset = new CPoint();
+        CPoint OriginOffset = new CPoint();
 
         Grid OriginBox;
 
@@ -63,67 +63,17 @@ namespace Root_WIND2.UI_Temp
             p_ViewElement.Add(OriginBox);
         }
 
-        public void SetViewRect()
+        public void SetPage()
         {
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
 
-            int offsetX = originRecipe.DiePitchX - originRecipe.OriginWidth;
-            int offsetY = originRecipe.DiePitchY - originRecipe.OriginHeight;
+            OriginOffset.X = originRecipe.OriginX;
+            OriginOffset.Y = originRecipe.OriginY - originRecipe.OriginHeight;
 
-            int left = originRecipe.OriginX - offsetX;
-            int bottom = originRecipe.OriginY + offsetY;
-            int right = originRecipe.OriginX + originRecipe.OriginWidth + offsetX;
-            int top = originRecipe.OriginY - originRecipe.OriginHeight - offsetY;
+            this.p_LayerMemoryOffsetX = OriginOffset.X;
+            this.p_LayerMemoryOffsetY = OriginOffset.Y;
 
-            int width = originRecipe.OriginWidth + offsetX * 2;
-            int height = originRecipe.OriginHeight + offsetY * 2;
-
-            double full_ratio = 1;
-            double ratio = 1;
-
-            if (this.p_CanvasHeight > this.p_CanvasWidth)
-            {
-                full_ratio = full_ratio = (double)this.p_ImageData.p_Size.Y / (double)this.p_CanvasHeight;
-            }
-            else
-            {
-                full_ratio = full_ratio = (double)this.p_ImageData.p_Size.X / (double)this.p_CanvasWidth;
-            }
-
-
-            double canvas_w_h_ratio = (double)(this.p_CanvasHeight) / (double)(p_CanvasWidth); // 가로가 더 길 경우 1 이하
-            double box_w_h_ratio = (double)height / (double)width;
-
-            if (box_w_h_ratio > canvas_w_h_ratio) // Canvas보다 가로 비율이 더 높을 경우,  box의 세로에 맞춰야함.
-            {
-                ratio = (double)height / (double)this.p_CanvasHeight;
-            }
-            else
-            {
-                ratio = (double)width / (double)this.p_CanvasWidth;
-            }
-
-            this.p_Zoom = ratio / full_ratio;
-
-            this.p_View_Rect = new System.Drawing.Rectangle(new System.Drawing.Point(left, top), new System.Drawing.Size(width, height));
-
-            this.SetRoiRect();
-        }
-
-        public void SetOrigin(object e)
-        {
-            TRect InspAreaBuf = e as TRect;
-            BoxOffset = new CPoint(InspAreaBuf.MemoryRect.Left, InspAreaBuf.MemoryRect.Top);
-            ImageData OriginImageData = InspAreaBuf.Tag as ImageData;
-            if (OriginImageData.p_Size.X == 0 || OriginImageData.p_Size.Y == 0)
-            {
-                p_ImgSource = null;
-            }
-            else
-            {
-                p_ImageData = OriginImageData;
-                base.SetRoiRect();
-            }
+            this.DisplayBox();
         }
 
         #region Property
@@ -258,6 +208,66 @@ namespace Root_WIND2.UI_Temp
         private double m_LoadingOpacity = 0;
         #endregion
 
+        #region [Viewer Method]
+        public void DisplayFull()
+        {
+            this.p_Zoom = 1;
+
+            this.SetImageSource();
+            Redraw();
+        }
+
+        public void DisplayBox()
+        {
+            this.SetRoiRect();
+
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+            int offsetX = originRecipe.DiePitchX - originRecipe.OriginWidth;
+            int offsetY = originRecipe.DiePitchY - originRecipe.OriginHeight;
+
+            int left = originRecipe.OriginX - offsetX;
+            int bottom = originRecipe.OriginY + offsetY;
+            int right = originRecipe.OriginX + originRecipe.OriginWidth + offsetX;
+            int top = originRecipe.OriginY - originRecipe.OriginHeight - offsetY;
+
+            int width = originRecipe.OriginWidth + offsetX * 2;
+            int height = originRecipe.OriginHeight + offsetY * 2;
+
+            double full_ratio = 1;
+            double ratio = 1;
+
+            if (this.p_CanvasHeight > this.p_CanvasWidth)
+            {
+                full_ratio = full_ratio = (double)this.p_ImageData.p_Size.Y / (double)this.p_CanvasHeight;
+            }
+            else
+            {
+                full_ratio = full_ratio = (double)this.p_ImageData.p_Size.X / (double)this.p_CanvasWidth;
+            }
+
+
+            double canvas_w_h_ratio = (double)(this.p_CanvasHeight) / (double)(p_CanvasWidth); // 가로가 더 길 경우 1 이하
+            double box_w_h_ratio = (double)height / (double)width;
+
+            if (box_w_h_ratio > canvas_w_h_ratio) // Canvas보다 가로 비율이 더 높을 경우,  box의 세로에 맞춰야함.
+            {
+                ratio = (double)height / (double)this.p_CanvasHeight;
+            }
+            else
+            {
+                ratio = (double)width / (double)this.p_CanvasWidth;
+            }
+
+            this.p_Zoom = ratio / full_ratio;
+
+            this.p_View_Rect = new System.Drawing.Rectangle(new System.Drawing.Point(left, top), new System.Drawing.Size(width, height));
+
+            this.SetImageSource();
+            Redraw();
+        }
+        #endregion
+
         #region Stack History
         private Stack<TShape[]> History = new Stack<TShape[]>();
         public ObservableCollection<TShape> BufferInspROI = new ObservableCollection<TShape>();
@@ -289,13 +299,16 @@ namespace Root_WIND2.UI_Temp
                     return;
 
             CPoint memPt = new CPoint(p_MouseMemX, p_MouseMemY);
-            CPoint canvasPt = GetCanvasPoint(memPt - BoxOffset);
+            memPt = CheckOriginBox(memPt);
+
+            CPoint canvasPt = GetCanvasPoint(memPt - OriginOffset);
             switch (eToolProcess)
             {
                 case ToolProcess.None:
-                    BufferInspROI.Clear();
+                    
                     if (eToolType != ToolType.None)
                     {
+                        BufferInspROI.Clear();
                         if (eToolType == ToolType.Crop)
                         {
                             if (BufferInspROI.Contains(CropShape))
@@ -348,11 +361,11 @@ namespace Root_WIND2.UI_Temp
         public override void MouseMove(object sender, MouseEventArgs e)
         {
             base.MouseMove(sender, e);
-            p_MouseMemX += BoxOffset.X;
-            p_MouseMemY += BoxOffset.Y;
 
             CPoint memPt = new CPoint(p_MouseMemX, p_MouseMemY);
-            CPoint canvasPt = GetCanvasPoint(memPt - BoxOffset);
+            memPt = CheckOriginBox(memPt);
+
+            CPoint canvasPt = GetCanvasPoint(memPt);
 
             switch (eToolProcess)
             {
@@ -423,6 +436,23 @@ namespace Root_WIND2.UI_Temp
                 CurrentShape.UIElement.MouseLeave += UIElement_MouseLeave;
                 CurrentShape.UIElement.MouseLeftButtonDown += UIElement_MouseLeftButtonDown;
             }
+        }
+
+        private CPoint CheckOriginBox(CPoint memPt)
+        {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+            int left = originRecipe.OriginX + 1;
+            int right = originRecipe.OriginX + originRecipe.OriginWidth;
+            int top = originRecipe.OriginY - originRecipe.OriginHeight + 1;
+            int bottom = originRecipe.OriginY;
+
+            CPoint checkedPt = new CPoint();
+
+            checkedPt.X = (memPt.X < left) ? left : (memPt.X > right) ? right : memPt.X;
+            checkedPt.Y = (memPt.Y < top) ? top : (memPt.Y > bottom) ? bottom : memPt.Y;
+
+            return checkedPt;
         }
         private void Drawing(ToolType type, CPoint startMemPt, CPoint startCanvasPt)
         {
@@ -497,7 +527,7 @@ namespace Root_WIND2.UI_Temp
             CreateModifyTool_Line(line);
             foreach (CPoint pt in line.Data)
             {
-                base.DrawPixelBitmap(pt - BoxOffset, 255, 0, 0, 255);
+                base.DrawPixelBitmap(pt - OriginOffset, 255, 0, 0, 255);
             }
             base.SetLayerSource();
         }
@@ -542,8 +572,8 @@ namespace Root_WIND2.UI_Temp
 
             CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
             CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
-            Point canvasLT = new Point(GetCanvasDoublePoint(LT - BoxOffset).X, GetCanvasDoublePoint(LT - BoxOffset).Y);
-            Point canvasRB = new Point(GetCanvasDoublePoint(RB - BoxOffset).X, GetCanvasDoublePoint(RB - BoxOffset).Y);
+            Point canvasLT = new Point(GetCanvasDoublePoint(LT).X, GetCanvasDoublePoint(LT).Y);
+            Point canvasRB = new Point(GetCanvasDoublePoint(RB).X, GetCanvasDoublePoint(RB).Y);
 
             Canvas.SetLeft(rect.CanvasRect, canvasLT.X - pixSizeX / 2);
             Canvas.SetTop(rect.CanvasRect, canvasLT.Y - pixSizeY / 2);
@@ -661,8 +691,8 @@ namespace Root_WIND2.UI_Temp
             double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
             CPoint LT = new CPoint(crop.MemoryRect.Left, crop.MemoryRect.Top);
             CPoint RB = new CPoint(crop.MemoryRect.Right, crop.MemoryRect.Bottom);
-            CPoint canvasLT = new CPoint(GetCanvasPoint(LT - BoxOffset));
-            CPoint canvasRB = new CPoint(GetCanvasPoint(RB - BoxOffset));
+            CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+            CPoint canvasRB = new CPoint(GetCanvasPoint(RB ));
 
             Canvas.SetLeft(crop.CanvasRect, canvasLT.X - pixSizeX / 2);
             Canvas.SetTop(crop.CanvasRect, canvasLT.Y - pixSizeY / 2);
@@ -685,7 +715,7 @@ namespace Root_WIND2.UI_Temp
             width = crop.CanvasRect.Width;
             height = crop.CanvasRect.Height;
 
-            CRect nowRect = new CRect(crop.MemoryRect.Left - BoxOffset.X, crop.MemoryRect.Top - BoxOffset.Y, crop.MemoryRect.Right + 1 - BoxOffset.X, crop.MemoryRect.Bottom + 1 - BoxOffset.Y);
+            CRect nowRect = new CRect(crop.MemoryRect.Left, crop.MemoryRect.Top, crop.MemoryRect.Right, crop.MemoryRect.Bottom);
             ImageData rectImageData = new ImageData(nowRect.Width, nowRect.Height, 4);
             rectImageData.SetData(p_ROILayer.GetPtr(), nowRect, (int)p_ROILayer.p_Stride, 4);
 
@@ -711,7 +741,7 @@ namespace Root_WIND2.UI_Temp
             byte r = p_SelectedROI.p_Color.R;
             byte g = p_SelectedROI.p_Color.G;
             byte b = p_SelectedROI.p_Color.B;
-            DrawRectBitmap((CurrentShape as TRect).MemoryRect, r, g, b, 255, BoxOffset);
+            DrawRectBitmap((CurrentShape as TRect).MemoryRect, r, g, b, 255, OriginOffset);
             BufferInspROI.Clear();
 
             SetLayerSource();
@@ -719,7 +749,7 @@ namespace Root_WIND2.UI_Temp
         }
         private void MenuDelete_Click(object sender, RoutedEventArgs e)
         {
-            DrawRectBitmap((CurrentShape as TRect).MemoryRect, 0, 0, 0, 0, BoxOffset);
+            DrawRectBitmap((CurrentShape as TRect).MemoryRect, 0, 0, 0, 0, OriginOffset);
 
             BufferInspROI.Clear();
             SetLayerSource();
@@ -762,13 +792,13 @@ namespace Root_WIND2.UI_Temp
 
         private void StartModify(CPoint currentMemPt)
         {
-            ModifyPointBuffer = currentMemPt - BoxOffset;
+            ModifyPointBuffer = currentMemPt;
             eToolProcess = ToolProcess.Modifying;
             if (CropShape != null)
             {
                 if (m_KeyEvent == null)
                 {
-                    DrawRectBitmap((CropShape as TCropTool).MemoryRect, 0, 0, 0, 0, BoxOffset);
+                    DrawRectBitmap((CropShape as TCropTool).MemoryRect, 0, 0, 0, 0, OriginOffset);
                     SetLayerSource();
                     return;
                 }
@@ -779,7 +809,7 @@ namespace Root_WIND2.UI_Temp
                 {
                     CRect rect = (CropShape as TCropTool).MemoryRect;
                     CRect cropRect = new CRect(rect.Left, rect.Top, rect.Right + 1, rect.Bottom + 1);
-                    DrawRectBitmap((CropShape as TCropTool).MemoryRect, 0, 0, 0, 0, BoxOffset);
+                    DrawRectBitmap((CropShape as TCropTool).MemoryRect, 0, 0, 0, 0, OriginOffset);
                 }
 
             }
@@ -792,20 +822,20 @@ namespace Root_WIND2.UI_Temp
                 switch (shape)
                 {
                     case TCropTool:
-                        Modifying_CropTool(CropShape as TCropTool, currentMemPt - BoxOffset);
+                        Modifying_CropTool(CropShape as TCropTool, currentMemPt);
                         break;
                     case TLine:
-                        Modifying_Line(shape as TLine, currentMemPt - BoxOffset);
+                        Modifying_Line(shape as TLine, currentMemPt);
                         break;
                     case TRect:
-                        Modifying_Rect(shape as TRect, currentMemPt - BoxOffset);
+                        Modifying_Rect(shape as TRect, currentMemPt);
                         break;
                     case TPolygon:
-                        Modifying_Polygon(shape as TPolygon, currentMemPt - BoxOffset);
+                        Modifying_Polygon(shape as TPolygon, currentMemPt);
                         break;
                 }
             }
-            ModifyPointBuffer = currentMemPt - BoxOffset;
+            ModifyPointBuffer = currentMemPt;
 
 
         }
@@ -828,7 +858,7 @@ namespace Root_WIND2.UI_Temp
                             byte b = p_SelectedROI.p_Color.B;
                             byte a = p_SelectedROI.p_Color.A;
                             //현재 memoryRect의 시작주소를 p_roilayer에서 가져와서 cropshape의 imagedata만큼 복사?
-                            CropRectSetData(crop.CropImageData, selectRect, BoxOffset);
+                            CropRectSetData(crop.CropImageData, selectRect);
                             //p_UIElement.Clear();
                             SetLayerSource();
                             break;
@@ -856,8 +886,8 @@ namespace Root_WIND2.UI_Temp
         private void CreateModifyTool_Line(TLine line)
         {
             double left, top, width, height;
-            CPoint StartPt = GetCanvasPoint(line.MemoryStartPoint - BoxOffset);
-            CPoint EndPt = GetCanvasPoint(line.MemoryEndPoint - BoxOffset);
+            CPoint StartPt = GetCanvasPoint(line.MemoryStartPoint - OriginOffset);
+            CPoint EndPt = GetCanvasPoint(line.MemoryEndPoint - OriginOffset);
 
             left = (StartPt.X < EndPt.X) ? StartPt.X : EndPt.X;
             top = (StartPt.Y < EndPt.Y) ? StartPt.Y : EndPt.Y;
@@ -1384,8 +1414,8 @@ namespace Root_WIND2.UI_Temp
         }
         private void RedrawLine(TLine line)
         {
-            CPoint startPt = GetCanvasPoint(line.MemoryStartPoint - BoxOffset);
-            CPoint endPt = GetCanvasPoint(line.MemoryEndPoint - BoxOffset);
+            CPoint startPt = GetCanvasPoint(line.MemoryStartPoint);
+            CPoint endPt = GetCanvasPoint(line.MemoryEndPoint);
 
             line.CanvasLine.X1 = startPt.X;
             line.CanvasLine.Y1 = startPt.Y;
@@ -1402,8 +1432,8 @@ namespace Root_WIND2.UI_Temp
             CPoint LT = new CPoint(crop.MemoryRect.Left, crop.MemoryRect.Top);
             CPoint RB = new CPoint(crop.MemoryRect.Right, crop.MemoryRect.Bottom);
 
-            CPoint canvasLT = new CPoint(GetCanvasPoint(LT - BoxOffset));
-            CPoint canvasRB = new CPoint(GetCanvasPoint(RB - BoxOffset));
+            CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+            CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
             int width = Math.Abs(canvasRB.X - canvasLT.X);
             int height = Math.Abs(canvasRB.Y - canvasLT.Y);
             crop.CanvasRect.Width = width + pixSizeX;
@@ -1428,8 +1458,8 @@ namespace Root_WIND2.UI_Temp
             CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
             CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
 
-            CPoint canvasLT = new CPoint(GetCanvasPoint(LT - BoxOffset));
-            CPoint canvasRB = new CPoint(GetCanvasPoint(RB - BoxOffset));
+            CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+            CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
             int width = Math.Abs(canvasRB.X - canvasLT.X);
             int height = Math.Abs(canvasRB.Y - canvasLT.Y);
             rect.CanvasRect.Width = width + pixSizeX;
@@ -1446,7 +1476,7 @@ namespace Root_WIND2.UI_Temp
             polygon.CanvasPolygon.Points.Clear();
             foreach (CPoint memoryPt in polygon.ListMemoryPoint)
             {
-                CPoint canvasPt = GetCanvasPoint(memoryPt - BoxOffset);
+                CPoint canvasPt = GetCanvasPoint(memoryPt);
                 polygon.CanvasPolygon.Points.Add(new Point(canvasPt.X, canvasPt.Y));
             }
         }
@@ -1468,6 +1498,11 @@ namespace Root_WIND2.UI_Temp
             CPoint canvasLeftBottom = GetCanvasPoint(new CPoint(left, bottom));
             CPoint canvasRightTop = GetCanvasPoint(new CPoint(right, top));
             CPoint canvasRightBottom = GetCanvasPoint(new CPoint(right, bottom));
+
+
+            // Canvas 이동
+            this.p_LayerCanvasOffsetX = canvasLeftTop.X;
+            this.p_LayerCanvasOffsetY = canvasLeftTop.Y;
 
             OriginBox.Width = Math.Abs(canvasRightTop.X - canvasLeftTop.X);
             OriginBox.Height = Math.Abs(canvasLeftBottom.Y - canvasLeftTop.Y);
@@ -1515,9 +1550,9 @@ namespace Root_WIND2.UI_Temp
             Canvas.SetLeft(OriginBox, canvasLeftTop.X);
             Canvas.SetTop(OriginBox, canvasLeftTop.Y);
 
-            if (!p_UIElement.Contains(OriginBox))
+            if (!p_ViewElement.Contains(OriginBox))
             {
-                p_UIElement.Add(OriginBox);
+                p_ViewElement.Add(OriginBox);
             }
         }
         #endregion
@@ -1549,12 +1584,16 @@ namespace Root_WIND2.UI_Temp
 
         private unsafe void Worker_ShowAll_DoWork(object sender, DoWorkEventArgs e)
         {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+            int originWidth = originRecipe.OriginWidth;
+            int originHeight = originRecipe.OriginHeight;
+
             IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
-            for (int y = 0; y < p_ROILayer.p_Size.Y; y++)
+            byte[] buf = new byte[originWidth * p_ROILayer.p_nByte];
+            for (int y = 0; y < originHeight; y++)
             {
                 Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * y), buf.Length);
             }
@@ -1592,12 +1631,16 @@ namespace Root_WIND2.UI_Temp
 
         private unsafe void Worker_ReadROI_DoWork(object sender, DoWorkEventArgs e)
         {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+            int originWidth = originRecipe.OriginWidth;
+            int originHeight = originRecipe.OriginHeight;
+
             IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
-            for (int y = 0; y < p_ROILayer.p_Size.Y; y++)
+            byte[] buf = new byte[originWidth * p_ROILayer.p_nByte];
+            for (int y = 0; y < originHeight; y++)
             {
                 Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * y), buf.Length);
             }
@@ -1631,13 +1674,18 @@ namespace Root_WIND2.UI_Temp
         }
         private void Worker_ClearROI_DoWork(object sender, DoWorkEventArgs e)
         {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+            int originWidth = originRecipe.OriginWidth;
+            int originHeight = originRecipe.OriginHeight;
+
+
             IntPtr ptrMem = p_ROILayer.GetPtr();
             IntPtr ptrorigin = p_ImageData.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
-            for (int i = 0; i < p_ROILayer.p_Size.Y; i++)
+            byte[] buf = new byte[originWidth * p_ROILayer.p_nByte];
+            for (int i = 0; i < originHeight; i++)
             {
                 Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * i), buf.Length);
             }
@@ -1657,6 +1705,10 @@ namespace Root_WIND2.UI_Temp
             // 이거 Origin Bounding Box 안에서만 계산하도록 변경 필요?
             // 혹은 ROI Bounding Box
 
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+            int originWidth = originRecipe.OriginWidth;
+            int originHeight = originRecipe.OriginHeight;
+
             IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
@@ -1668,9 +1720,10 @@ namespace Root_WIND2.UI_Temp
             bool bStart = false;
             CPoint size = p_ImageData.p_Size;
             int selectIndex = p_cInspROI.IndexOf(p_SelectedROI);
-            for (int j = 0; j < size.Y; j++)
+
+            for (int j = 0; j < originHeight; j++)
             {
-                for (int i = 0; i < size.X; i++)
+                for (int i = 0; i < originWidth; i++)
                 {
                     byte a = bitmapPtr[(j * p_ROILayer.p_Size.X + i) * 4 + 3];
                     if (a > 0)
@@ -1699,7 +1752,7 @@ namespace Root_WIND2.UI_Temp
         public void SetRecipeData()
         {
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-            recipe.GetItem<MaskRecipe>().OriginPoint = this.BoxOffset;
+            recipe.GetItem<MaskRecipe>().OriginPoint = this.OriginOffset;
             for (int i = 0; i < p_cInspROI.Count; i++)
             {
                 recipe.GetItem<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data);
@@ -1716,6 +1769,28 @@ namespace Root_WIND2.UI_Temp
         #endregion
 
         #region ICommand
+        public RelayCommand btnViewFullCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.DisplayFull();
+                });
+            }
+        }
+
+        public RelayCommand btnViewBoxCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.DisplayBox();
+                });
+            }
+        }
+
         private void _CreateROI()
         {
             InspectionROI roi = new InspectionROI();

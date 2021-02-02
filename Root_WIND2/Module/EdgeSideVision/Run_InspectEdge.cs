@@ -78,9 +78,6 @@ namespace Root_WIND2.Module
 				if (inspectionEdge.Recipe.Read(recipeName, true) == false)
 					return "Recipe Open Fail";
 
-				//if (inspectionEdge.SetCameraInfo() == false)
-				//	return "Set Camera Info Fail";
-
 				inspectionEdge.Start();
 				return "OK";
 			}
