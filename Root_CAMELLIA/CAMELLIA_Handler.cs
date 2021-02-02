@@ -13,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Root_CAMELLIA.ManualJob;
 using RootTools.OHTNew;
+using Root_CAMELLIA.UI_UserControl;
 
 namespace Root_CAMELLIA
 {
@@ -61,6 +62,7 @@ namespace Root_CAMELLIA
         //public CAMELLIA_Process m_process;
         public EFEM_Process m_process;
         public Module_Camellia m_camellia;
+        public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
@@ -71,6 +73,7 @@ namespace Root_CAMELLIA
             InitAligner();
             m_camellia = new Module_Camellia("Camellia", m_engineer);
             InitModule(m_camellia);
+            m_HomeProgress.Init(this);
             //InitXGem();
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_camellia);
@@ -137,6 +140,7 @@ namespace Root_CAMELLIA
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
         public List<ILoadport> m_aLoadport = new List<ILoadport>();
+        public List<ModuleBase> m_loadport = new List<ModuleBase>();
         int m_lLoadport = 2;
         void InitLoadport()
         {
@@ -152,6 +156,7 @@ namespace Root_CAMELLIA
                     default: module = new Loadport_RND(sID, m_engineer, true, true); break;
                 }
                 InitModule(module);
+                m_loadport.Add(module);
                 m_aLoadport.Add((ILoadport)module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
             }
@@ -241,6 +246,7 @@ namespace Root_CAMELLIA
             //if (sInfo == "OK")
             //    EQ.p_eState = EQ.eState.Ready;
             //return sInfo;
+            m_HomeProgress.HomeProgressShow();
             string sInfo = StateHome(m_wtr);
             if(sInfo != "OK")
             {
