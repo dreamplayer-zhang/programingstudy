@@ -66,7 +66,8 @@ namespace Root_EFEM.Module
         {
             for (int n = 0; n < 10; n++)
             {
-                if (p_bLock == false) return false;
+                if (p_bLock == false) 
+                    return false;
                 Thread.Sleep(100);
             }
             return true;
@@ -373,7 +374,8 @@ namespace Root_EFEM.Module
                 int nWait = 100 * secWait;
                 while (nWait > 0)
                 {
-                    if (EQ.IsStop()) return "EQ Stop";
+                    if (EQ.IsStop()) 
+                        return "EQ Stop";
                     Thread.Sleep(10);
                     if (m_eState == eState.Done) return "OK";
                     nWait--; 
@@ -619,19 +621,19 @@ namespace Root_EFEM.Module
                     if (Run(CmdUnload())) return p_sInfo;
                 }
             }
-            if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
-            {
-                p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                m_bPlaced= true;
+            //if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
+            //{
+            //    p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+            //    m_bPlaced= true;
 
-                if (Run(CmdLoad())) return p_sInfo;
-                if (Run(CmdUnload())) return p_sInfo;
-            }
-            else
-            {
+            //    if (Run(CmdLoad())) return p_sInfo;
+            //    if (Run(CmdUnload())) return p_sInfo;
+            //}
+            //else
+            //{
                 p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
                 m_bPlaced = false;
-            }
+            //}
             p_eState = eState.Ready;
             p_infoCarrier.AfterHome();
             return "OK";
