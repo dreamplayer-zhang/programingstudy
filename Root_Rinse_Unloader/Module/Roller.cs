@@ -277,6 +277,9 @@ namespace Root_Rinse_Unloader.Module
                 RunThreadCheck_Sensor();
                 if (EQ.IsStop()) return "EQ Stop";
             }
+            string sReceive = "";
+            foreach (Line line in m_aLine) sReceive += (line.p_eSensor == Line.eSensor.Arrived) ? 'O' : '.';
+            m_rinse.AddStripReceive(sReceive); 
             return RunAlign();
         }
         #endregion

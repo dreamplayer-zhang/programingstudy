@@ -5,9 +5,11 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Threading;
 
 namespace Root_Rinse_Loader.Module
 {
@@ -68,6 +70,89 @@ namespace Root_Rinse_Loader.Module
                 if (_iMagazine == value) return;
                 _iMagazine = value;
                 OnPropertyChanged();
+            }
+        }
+        #endregion
+
+        #region Strips
+        public class Strips : NotifyProperty
+        {
+            string _sSend = "....";
+            public string p_sSend
+            {
+                get { return _sSend; }
+                set
+                {
+                    _sSend = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            string _sReceive = "....";
+            public string p_sReceive
+            {
+                get { return _sReceive; }
+                set
+                {
+                    _sReceive = value;
+                    OnPropertyChanged();
+                    if (p_sSend != p_sReceive) p_sError = "Error"; 
+                }
+            }
+
+            string _sError = ""; 
+            public string p_sError
+            {
+                get { return _sError; }
+                set
+                {
+                    _sError = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            public Strips(string sSend)
+            {
+                p_sSend = sSend; 
+            }
+        }
+        Queue<Strips> m_qSend = new Queue<Strips>();
+        public void AddStripSend(string sStrip)
+        {
+            Strips strips = new Strips(sStrip);
+            m_qSend.Enqueue(strips);
+            AddProtocol(p_id, eCmd.StripSend, sStrip);
+        }
+
+        Queue<string> m_qReceive = new Queue<string>();
+        public void AddStripReceive(string sStrip)
+        {
+            m_qReceive.Enqueue(sStrip);
+        }
+
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            m_timer.Tick += M_timer_Tick; 
+            m_timer.Start();
+        }
+
+        public ObservableCollection<Strips> p_aSend = new ObservableCollection<Strips>();
+        public ObservableCollection<Strips> p_aReceive = new ObservableCollection<Strips>();
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            if (m_qSend.Count > 0) p_aSend.Add(m_qSend.Dequeue());
+            if (m_qReceive.Count > 0)
+            {
+                string sStrip = m_qReceive.Dequeue();
+                if (p_aSend.Count > 0)
+                {
+                    Strips strip = p_aSend[0];
+                    p_aSend.RemoveAt(0);
+                    strip.p_sReceive = sStrip;
+                    p_aReceive.Add(strip);
+                }
             }
         }
         #endregion
@@ -280,6 +365,8 @@ namespace Root_Rinse_Loader.Module
             EQLeState,
             EQUeState,
             PickerSet,
+            StripSend,
+            StripReceive,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
@@ -368,6 +455,10 @@ namespace Root_Rinse_Loader.Module
                         case eCmd.EQUeState:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             p_eStateUnloader = GetEQeState(asRead[2]);
+                            break;
+                        case eCmd.StripReceive:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            AddStripReceive(asRead[2]);
                             break; 
                     }
                 }
@@ -410,6 +501,7 @@ namespace Root_Rinse_Loader.Module
             InitBase(id, engineer);
 
             InitThread();
+            InitTimer(); 
             AddProtocol(p_id, eCmd.SetMode, p_eMode);
             AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
         }

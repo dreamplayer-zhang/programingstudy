@@ -44,7 +44,7 @@ namespace Root_WIND2.Module
         public int m_nYOffset = 0;
 
         public GrabData m_GD = new GrabData();
-        LensLinearTurret m_lens;
+        LensLinearTurret m_lens = null;
         public string m_sLens;
         void RunTreeOption(Tree tree, bool bVisible, bool bReadOnly)
         {

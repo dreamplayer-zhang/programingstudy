@@ -181,7 +181,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainUI\MagazineLevel_UI.xaml">
+    <Page Include="MainUI\MagazineClamp_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -212,8 +212,8 @@
     <Compile Include="Icon\AtiLogo.xaml.cs">
       <DependentUpon>AtiLogo.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainUI\MagazineLevel_UI.xaml.cs">
-      <DependentUpon>MagazineLevel_UI.xaml</DependentUpon>
+    <Compile Include="MainUI\MagazineClamp_UI.xaml.cs">
+      <DependentUpon>MagazineClamp_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainUI\Magazine_UI.xaml.cs">
       <DependentUpon>Magazine_UI.xaml</DependentUpon>

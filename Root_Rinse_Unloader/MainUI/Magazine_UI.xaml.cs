@@ -1,4 +1,4 @@
-﻿using Root_Rinse_Loader.Module;
+﻿using Root_Rinse_Unloader.Module;
 using RootTools;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-namespace Root_Rinse_Loader.MainUI
+namespace Root_Rinse_Unloader.MainUI
 {
     /// <summary>
     /// Magazine_UI.xaml에 대한 상호 작용 논리
@@ -20,21 +20,21 @@ namespace Root_Rinse_Loader.MainUI
             InitializeComponent();
         }
 
-        RinseL m_rinse; 
+        RinseU m_rinse;
         Storage m_storage;
-        public void Init(RinseL rinse, Storage storage)
+        public void Init(RinseU rinse, Storage storage)
         {
-            m_rinse = rinse; 
+            m_rinse = rinse;
             m_storage = storage;
             DataContext = storage;
             textBoxMagazineIndex.DataContext = rinse;
             comboBoxMagazine.DataContext = rinse;
-            comboBoxMagazine.ItemsSource = Enum.GetValues(typeof(Storage.eMagazine)); 
-            InitMagazine(); 
-            InitTimer(); 
+            comboBoxMagazine.ItemsSource = Enum.GetValues(typeof(Storage.eMagazine));
+            InitMagazine();
+            InitTimer();
         }
 
-        List<MagazineClamp_UI> m_aMagazine = new List<MagazineClamp_UI>(); 
+        List<MagazineClamp_UI> m_aMagazine = new List<MagazineClamp_UI>();
         void InitMagazine()
         {
             gridMagazineLevels.Children.Clear();
@@ -46,7 +46,7 @@ namespace Root_Rinse_Loader.MainUI
                 ui.Init(magazine);
                 Grid.SetRow(ui, 3 - gridMagazineLevels.Children.Count);
                 gridMagazineLevels.Children.Add(ui);
-                m_aMagazine.Add(ui); 
+                m_aMagazine.Add(ui);
             }
         }
 
@@ -58,7 +58,7 @@ namespace Root_Rinse_Loader.MainUI
             m_timer.Start();
         }
 
-        bool m_bBlink = false; 
+        bool m_bBlink = false;
         private void M_timer_Tick(object sender, EventArgs e)
         {
             m_bBlink = !m_bBlink;
@@ -68,8 +68,8 @@ namespace Root_Rinse_Loader.MainUI
 
         private void buttonNew_Click(object sender, RoutedEventArgs e)
         {
-            m_rinse.p_eMagazine = Storage.eMagazine.Magazine1; 
-            m_rinse.p_iMagazine = 0; 
+            m_rinse.p_eMagazine = Storage.eMagazine.Magazine1;
+            m_rinse.p_iMagazine = 0;
         }
 
         private void TextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -82,7 +82,7 @@ namespace Root_Rinse_Loader.MainUI
 
         private void buttonMove_Click(object sender, RoutedEventArgs e)
         {
-            m_storage.MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine); 
+            m_storage.MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine);
         }
     }
 }

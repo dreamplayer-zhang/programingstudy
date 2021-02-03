@@ -8,19 +8,17 @@ namespace Root_Rinse_Loader.MainUI
     /// <summary>
     /// MagazineLevel_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class MagazineLevel_UI : UserControl
+    public partial class MagazineClamp_UI : UserControl
     {
-        public MagazineLevel_UI()
+        public MagazineClamp_UI()
         {
             InitializeComponent();
         }
 
-        Storage m_storage;
         Storage.Magazine m_magazine; 
         public void Init(Storage.Magazine magazine)
         {
             m_magazine = magazine;
-            m_storage = magazine.m_storage;
             groupBox.Header = magazine.m_id; 
             DataContext = magazine;
         }

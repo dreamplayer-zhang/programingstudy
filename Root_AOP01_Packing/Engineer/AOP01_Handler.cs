@@ -39,6 +39,8 @@ namespace Root_AOP01_Packing
         public Unloadport_AOP m_unloadport;
         public Vision_AOP m_visionAOP;
         public Certification m_RNR;
+        public RFID_Brooks m_RFID;
+
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -46,24 +48,26 @@ namespace Root_AOP01_Packing
             InitLoadport();
 
 
-            m_RNR = new Certification("Certification", m_engineer);
-            InitModule(m_RNR);
+            //m_RNR = new Certification("Certification", m_engineer);
+            //InitModule(m_RNR);
 
-            m_visionAOP = new Vision_AOP("Vision", m_engineer);
-            InitModule(m_visionAOP);
+            //m_visionAOP = new Vision_AOP("Vision", m_engineer);
+            //InitModule(m_visionAOP);
+            //m_RFID = new RFID_Brooks("RFID", m_engineer, null);
+            //InitModule(m_RFID);
 
             m_tapePacker = new TapePacker("TapePacker", m_engineer);
             InitModule(m_tapePacker);
             ((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);
             ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_tapePacker);
 
-            //m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
-            //InitModule(m_vacuumPacker);
-            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_vacuumPacker);
+            m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
+            InitModule(m_vacuumPacker);
+            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_vacuumPacker);
 
-            //m_elevator = new IndividualElevator("IndividualElevator", m_engineer);
-            //InitModule(m_elevator);
-            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_elevator);
+            m_elevator = new IndividualElevator("IndividualElevator", m_engineer);
+            InitModule(m_elevator);
+            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_elevator);
 
             //m_unloadport = new Unloadport_AOP("Unloadport", m_engineer);
             //InitModule(m_unloadport);
@@ -121,10 +125,10 @@ namespace Root_AOP01_Packing
             m_aLoadport.Add(loadportA);
             ((IWTR)m_aWTR[0]).AddChild((IWTRChild)loadportA);
 
-            Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, false, false);
-            InitModule(loadportAOP);
-            m_aLoadport.Add(loadportAOP);
-            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)loadportAOP);
+            //Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, false, false);
+            //InitModule(loadportAOP);
+            //m_aLoadport.Add(loadportAOP);
+            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)loadportAOP);
         }
         #endregion
 
