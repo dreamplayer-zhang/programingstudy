@@ -2077,7 +2077,6 @@ namespace Root_AOP01_Inspection.Module
                         }
                         else m_module.p_bBarcodePass = true;
                     }
-                }
                 return "OK";
             }
 
