@@ -17,20 +17,20 @@ namespace RootTools.Gem
             VerificationFailed
         }
 
-        eGemState _eGemState = eGemState.NotRead;
-        public eGemState p_eGemState
+        eGemState _eStateCarrierID = eGemState.NotRead;
+        public eGemState p_eStateCarrierID
         {
-            get { return _eGemState; }
+            get { return _eStateCarrierID; }
             set
             {
-                if (_eGemState == value) return;
-                m_log.Info("p_eState " + _eGemState.ToString() + " -> " + value.ToString());
-                _eGemState = value;
+                if (_eStateCarrierID == value) return;
+                m_log.Info("p_eState " + _eStateCarrierID.ToString() + " -> " + value.ToString());
+                _eStateCarrierID = value;
             }
         }
 
         eGemState _eStateSlotMap = eGemState.NotRead;
-        public eGemState p_eSlotMapState
+        public eGemState p_eStateSlotMap
         {
             get { return _eStateSlotMap; }
             set
@@ -71,7 +71,7 @@ namespace RootTools.Gem
 
         #region Carrier
         bool _bCarrierOn = false; 
-        bool p_bCarrierOn
+        public bool p_bCarrierOn
         {
             get { return _bCarrierOn; }
             set
@@ -268,7 +268,12 @@ namespace RootTools.Gem
         #region CarrierID
         public void SendCarrierID(string sCarrierID)
         {
-            if (m_gem == null) return; //jws
+            if (m_gem == null)
+            {
+                p_eStateCarrierID = eGemState.VerificationOK;
+                p_eTransfer = eTransfer.TransferBlocked;
+                return; 
+            }
             m_gem.SendCarrierID(this, sCarrierID);
             p_sCarrierID = sCarrierID; 
             m_log.Info("Send CarrierID : " + sCarrierID);
@@ -294,10 +299,15 @@ namespace RootTools.Gem
 
         public void SendSlotMap()
         {
-            if (m_gem == null) return;
+            if (m_gem == null)
+            {
+                p_eStateSlotMap = eGemState.VerificationOK;
+                return;
+            }
             List<GemSlotBase.eState> aMap = new List<GemSlotBase.eState>();
             foreach (GemSlotBase slot in m_aGemSlot) aMap.Add(slot.p_eState);
-            m_gem.SendSlotMap(this, aMap); 
+            m_gem.SendSlotMap(this, aMap);
+            m_log.Info("Send Carrier Slotmap : " + aMap);
         }
 
         public string SetSlotInfo(int nIndex, GemSlotBase.eState state, string sLotID, string sSlotID) 

@@ -188,7 +188,7 @@
       <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.3\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.31\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="NanoView, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
@@ -289,6 +289,9 @@
     <Compile Include="Control\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_UserControl\HomeProgress_UI.xaml.cs">
+      <DependentUpon>HomeProgress_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_UserControl\Loadport_UI.xaml.cs">
       <DependentUpon>Loadport_UI.xaml</DependentUpon>
     </Compile>
@@ -321,7 +324,6 @@
     <Compile Include="UI_Dialog\Dlg_PM.xaml.cs">
       <DependentUpon>Dlg_PM.xaml</DependentUpon>
     </Compile>
-    <Compile Include="GeneralFunction.cs" />
     <Compile Include="Draw\GeneralTools.cs" />
     <Compile Include="ViewModel\MainWindow_ViewModel.cs" />
     <Compile Include="Measurement\Measurement.cs" />
@@ -426,6 +428,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_Engineer\Camellia_ToolBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_UserControl\HomeProgress_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

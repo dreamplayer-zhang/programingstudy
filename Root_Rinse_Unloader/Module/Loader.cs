@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -16,11 +17,21 @@ namespace Root_Rinse_Unloader.Module
         {
             p_sInfo = m_toolBox.Get(ref m_axis, this, "Loader");
             p_sInfo = m_toolBox.Get(ref m_dioPickerDown, this, "PickerDown", "Up", "Down");
-            foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox);
+            p_sInfo = m_toolBox.Get(ref m_diPickerSet, this, "PickerSet");
+            foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox, bInit);
             if (bInit)
             {
+                InitALID();
                 InitPos();
             }
+        }
+        #endregion
+
+        #region GAF
+        ALID m_alidPickerDown;
+        void InitALID()
+        {
+            m_alidPickerDown = m_gaf.GetALID(this, "PickerDown", "Picker Up & Down Error");
         }
         #endregion
 
@@ -29,10 +40,15 @@ namespace Root_Rinse_Unloader.Module
         {
             public DIO_IO m_dioVacuum;
             public DIO_O m_doBlow;
-            public void GetTools(ToolBox toolBox)
+            public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_loader.p_sInfo = toolBox.Get(ref m_dioVacuum, m_loader, m_id + ".Vacuum");
                 m_loader.p_sInfo = toolBox.Get(ref m_doBlow, m_loader, m_id + ".Blow");
+                if (bInit)
+                {
+                    m_dioVacuum.Write(false);
+                    m_doBlow.Write(false); 
+                }
             }
 
             string m_id;
@@ -50,15 +66,28 @@ namespace Root_Rinse_Unloader.Module
             for (int n = 0; n < 4; n++) m_aPicker.Add(new Picker("Picker" + n.ToString(), this));
         }
 
+        bool _bVacuum = false;
+        public bool p_bVacuum
+        {
+            get { return _bVacuum; }
+            set
+            {
+                if (_bVacuum == value) return;
+                _bVacuum = value;
+                OnPropertyChanged();
+            }
+        }
+
         double m_secVac = 2;
         double m_secBlow = 0.5;
         public string RunVacuum(bool bOn)
         {
+            p_bVacuum = bOn;
             for (int n = 0; n < 4; n++)
             {
                 if (m_roller.m_bExist[n]) m_aPicker[n].m_dioVacuum.Write(bOn);
-                Thread.Sleep(200); 
             }
+            Thread.Sleep(200);
             if (bOn)
             {
                 StopWatch sw = new StopWatch();
@@ -78,7 +107,7 @@ namespace Root_Rinse_Unloader.Module
                             if (m_aPicker[n].m_dioVacuum.p_bIn) nVac++; 
                         }
                     }
-                    if (sw.ElapsedMilliseconds > msVac) return "Run Vacuum Timeout"; 
+                    if (sw.ElapsedMilliseconds > msVac) return EQ.p_bPickerSet ? "OK" : "Run Vacuum Timeout"; 
                 }
             }
             else
@@ -98,11 +127,15 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region Picker Up & Down
+        public bool m_bPickerDown = false;
         DIO_I2O2 m_dioPickerDown;
         public string RunPickerDown(bool bDown)
         {
+            m_bPickerDown = bDown;
             m_dioPickerDown.Write(bDown);
-            return m_dioPickerDown.WaitDone();
+            string sRun = m_dioPickerDown.WaitDone();
+            m_alidPickerDown.p_bSet = (sRun != "OK");
+            return sRun;
         }
         #endregion
 
@@ -142,36 +175,38 @@ namespace Root_Rinse_Unloader.Module
             if (Run(RunPickerDown(false))) return p_sInfo;
             m_roller.p_eStep = Roller.eStep.Empty;
             if (Run(m_roller.RunRotate(true))) return p_sInfo;
-            if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
             return "OK";
         }
 
         public string RunUnload()
         {
-            if (m_rinse.p_eMode != RinseU.eRunMode.Stack) return "Run mode is not Stack";
-            if (Run(RunPickerDown(false))) return p_sInfo;
-            if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
-            while (m_storage.IsBusy())
+            try
             {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return "EQ Stop";
+                if (m_rinse.p_eMode != RinseU.eRunMode.Stack) return "Run mode is not Stack";
+                if (Run(RunPickerDown(false))) return p_sInfo;
+                while (m_storage.IsBusy())
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
+                if (Run(RunPickerDown(true))) return p_sInfo;
+                if (Run(RunVacuum(false))) return p_sInfo;
+                if (Run(RunPickerDown(false))) return p_sInfo;
+                if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
+                m_storage.StartMoveStackReady();
+                return "OK";
             }
-            if (Run(RunPickerDown(true))) return p_sInfo;
-            if (Run(RunVacuum(false))) return p_sInfo;
-            if (Run(RunPickerDown(false))) return p_sInfo;
-            if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
-            m_storage.StartMoveStackReady(); 
-            return "OK";
+            finally
+            {
+                if (RunPickerDown(false) == "OK") MoveLoader(ePos.Roller); 
+            }
         }
 
-        public bool IsLoad()
+        public string RunRun()
         {
-            if (m_aPicker[0].m_dioVacuum.p_bOut == false) return false;
-            foreach (Picker picker in m_aPicker)
-            {
-                if (picker.m_dioVacuum.p_bIn) return true;
-            }
-            return false;
+            if (EQ.p_bPickerSet) return "OK";
+            return p_bVacuum ? RunUnload() : RunLoad();
         }
         #endregion
 
@@ -183,8 +218,11 @@ namespace Root_Rinse_Unloader.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            RunPickerDown(false);
+            RunVacuum(false); 
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            m_axis.StartMove(ePos.Roller); 
             return p_sInfo;
         }
 
@@ -195,41 +233,32 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region PickerSet
-        public bool m_bPickersetMode = false;
-        public string StartPickerSet()
-        {
-            StartRun(m_runPickerSet.Clone());
-            return "OK";
-        }
-
         string RunPickerSet()
         {
+            EQ.p_bPickerSet = true; 
             try
             {
-                if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
-                bool bDown = false;
-                bool bVacuum = false;
+                if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
                 while (true)
                 {
                     switch (CheckPickerSet())
                     {
                         case ePickerSet.Stop: return "OK";
                         case ePickerSet.UpDown:
-                            bDown = !bDown;
-                            if (Run(RunPickerDown(bDown))) return p_sInfo;
+                            if (Run(RunPickerDown(!m_bPickerDown))) return p_sInfo;
                             break;
                         case ePickerSet.Vacuum:
-                            bVacuum = !bVacuum;
-                            if (Run(RunVacuum(bVacuum))) return p_sInfo;
+                            if (Run(RunVacuum(!p_bVacuum))) return p_sInfo;
                             break;
                     }
                 }
             }
             finally
             {
+                RunVacuum(false);
                 RunPickerDown(false);
                 MoveLoader(ePos.Roller);
-                m_bPickersetMode = false;
+                EQ.p_bPickerSet = false;
             }
         }
 
@@ -256,7 +285,13 @@ namespace Root_Rinse_Unloader.Module
                 if (EQ.IsStop()) return ePickerSet.Stop;
                 if (m_swPickerSet.ElapsedMilliseconds > 3000) return ePickerSet.Stop;
             }
-            return (m_swPickerSet.ElapsedMilliseconds < 1000) ? ePickerSet.UpDown : ePickerSet.Vacuum;
+            return (m_swPickerSet.ElapsedMilliseconds < 600) ? ePickerSet.UpDown : ePickerSet.Vacuum;
+        }
+
+        public string m_sFilePickerSet = "";
+        void RunTreePickerSet(Tree tree)
+        {
+            m_sFilePickerSet = tree.SetFile(m_sFilePickerSet, m_sFilePickerSet, "RunRinse_Unloader", "ModuleRun", "PickerSet ModuleRun File");
         }
         #endregion
 
@@ -265,6 +300,7 @@ namespace Root_Rinse_Unloader.Module
         {
             base.RunTree(tree);
             RunTreePicker(tree.GetTree("Picker", false));
+            RunTreePickerSet(tree.GetTree("PickerSet"));
         }
         #endregion
 
@@ -307,10 +343,39 @@ namespace Root_Rinse_Unloader.Module
         ModuleRunBase m_runPickerSet;
         protected override void InitModuleRuns()
         {
+            AddModuleRunList(new Run_Move(this), false, "Move Axis");
             AddModuleRunList(new Run_Load(this), false, "Load Strip");
             AddModuleRunList(new Run_Unload(this), false, "Unload Strip");
             m_runRun = AddModuleRunList(new Run_Run(this), false, "Move Strip");
             m_runPickerSet = AddModuleRunList(new Run_PickerSet(this), false, "PickerSet");
+        }
+
+        public class Run_Move : ModuleRunBase
+        {
+            Loader m_module;
+            public Run_Move(Loader module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            ePos m_ePos = ePos.Roller; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Move run = new Run_Move(m_module);
+                run.m_ePos = m_ePos; 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_ePos = (ePos)tree.Set(m_ePos, m_ePos, "Pos", "Axis Position", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.MoveLoader(m_ePos);
+            }
         }
 
         public class Run_Load : ModuleRunBase
@@ -374,7 +439,7 @@ namespace Root_Rinse_Unloader.Module
 
             public override ModuleRunBase Clone()
             {
-                Run_Unload run = new Run_Unload(m_module);
+                Run_Run run = new Run_Run(m_module);
                 return run;
             }
 
@@ -384,14 +449,10 @@ namespace Root_Rinse_Unloader.Module
 
             public override string Run()
             {
-                if (m_module.IsLoad())
+                while (EQ.p_eState == EQ.eState.Run)
                 {
-                    if (m_module.Run(m_module.RunUnload())) return p_sInfo;
-                }
-                while (EQ.p_eState == EQ.eState.Run) //forget me not
-                {
-                    if (m_module.Run(m_module.RunLoad())) return p_sInfo;
-                    if (m_module.Run(m_module.RunUnload())) return p_sInfo;
+                    Thread.Sleep(10);
+                    if (m_module.Run(m_module.RunRun())) return p_sInfo;
                 }
                 return "OK";
             }

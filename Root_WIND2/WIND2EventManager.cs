@@ -47,5 +47,15 @@ namespace Root_WIND2
         }
 
 
+
+        /// <summary>
+        /// 무분별한 사용 조심해야함
+        /// </summary>
+        public static event EventHandler<RecipeEventArgs> RecipeUpdated;
+
+        public static void OnRecipeUpdated(object obj, RecipeEventArgs args)
+        {
+            RecipeUpdated?.Invoke(obj, args);
+        }
     }
 }

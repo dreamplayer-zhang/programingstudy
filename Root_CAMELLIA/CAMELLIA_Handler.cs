@@ -13,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Root_CAMELLIA.ManualJob;
 using RootTools.OHTNew;
+using Root_CAMELLIA.UI_UserControl;
 
 namespace Root_CAMELLIA
 {
@@ -61,6 +62,7 @@ namespace Root_CAMELLIA
         //public CAMELLIA_Process m_process;
         public EFEM_Process m_process;
         public Module_Camellia m_camellia;
+        public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
@@ -71,6 +73,8 @@ namespace Root_CAMELLIA
             InitAligner();
             m_camellia = new Module_Camellia("Camellia", m_engineer);
             InitModule(m_camellia);
+            m_HomeProgress.Init(this);
+            //InitXGem();
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_camellia);
             m_wtr.RunTree(Tree.eMode.RegRead);
@@ -87,7 +91,7 @@ namespace Root_CAMELLIA
         void InitModule(ModuleBase module)
         {
             ModuleBase_UI ui = new ModuleBase_UI();
-            ui.Init(module);
+            ui.Init(module); 
             m_moduleList.AddModule(module, ui);
         }
 
@@ -136,6 +140,7 @@ namespace Root_CAMELLIA
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
         public List<ILoadport> m_aLoadport = new List<ILoadport>();
+        public List<ModuleBase> m_loadport = new List<ModuleBase>();
         int m_lLoadport = 2;
         void InitLoadport()
         {
@@ -151,6 +156,7 @@ namespace Root_CAMELLIA
                     default: module = new Loadport_RND(sID, m_engineer, true, true); break;
                 }
                 InitModule(module);
+                m_loadport.Add(module);
                 m_aLoadport.Add((ILoadport)module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
             }
@@ -181,6 +187,15 @@ namespace Root_CAMELLIA
                 InitModule(module);
                 m_aRFID.Add((IRFID)module);
             }
+        }
+        #endregion
+
+        #region Module Gem
+        public ModuleBase m_XGem = null;
+        void InitXGem()
+        {
+            m_XGem = new Gem_XGem300Pro("Gem300", m_engineer, m_gem, m_aLoadport);
+            InitModule(m_XGem);
         }
         #endregion
 
@@ -231,6 +246,7 @@ namespace Root_CAMELLIA
             //if (sInfo == "OK")
             //    EQ.p_eState = EQ.eState.Ready;
             //return sInfo;
+            m_HomeProgress.HomeProgressShow();
             string sInfo = StateHome(m_wtr);
             if(sInfo != "OK")
             {
@@ -239,6 +255,11 @@ namespace Root_CAMELLIA
             }
             sInfo = StateHome((Loadport_RND)m_aLoadport[0], (Loadport_RND)m_aLoadport[1], m_Aligner, m_camellia, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1]);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
+
+            if (m_gem != null)
+            {
+                m_gem.DeleteAllJobInfo();
+            }
             return sInfo;
         }
 
@@ -358,14 +379,7 @@ namespace Root_CAMELLIA
         {
             foreach (EFEM_Process.Sequence sequence in aSequence)
             {
-                if (loadport.p_id == sequence.m_infoWafer.m_sModule)
-                {
-                    if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
-                    ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
-                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
-                    m_process.m_qSequence.Enqueue(sequenceDock);
-                    return true;
-                }
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
             }
             return false;
         }

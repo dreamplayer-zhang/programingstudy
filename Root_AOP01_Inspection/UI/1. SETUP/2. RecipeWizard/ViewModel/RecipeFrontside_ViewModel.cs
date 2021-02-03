@@ -43,6 +43,12 @@ namespace Root_AOP01_Inspection
             get { return m_bEnablePatternShift; }
             set { SetProperty(ref m_bEnablePatternShift, value); }
         }
+        bool m_bEnablePellicleShift = false;
+        public bool p_bEnablePellicleShift
+        {
+            get { return m_bEnablePellicleShift; }
+            set { SetProperty(ref m_bEnablePellicleShift, value); }
+        }
 
         #region Align Key Parameter
         double m_dAlignKeyTemplateMatchingScore = 90;
@@ -80,6 +86,22 @@ namespace Root_AOP01_Inspection
         {
             get { return m_dPatternShiftAndRotationRotationSpec; }
             set { SetProperty(ref m_dPatternShiftAndRotationRotationSpec, value); }
+        }
+        #endregion
+
+        #region Pelicle Shift & Rotation Parameter
+        double m_dPellicleShiftAndRotationShiftSpec = 0.5;
+        public double p_dPellicleShiftAndRotationShiftSpec
+        {
+            get { return m_dPellicleShiftAndRotationShiftSpec; }
+            set { SetProperty(ref m_dPellicleShiftAndRotationShiftSpec, value); }
+        }
+
+        double m_dPellicleShiftAndRotationRotationSpec = 0.5;
+        public double p_dPellicleShiftAndRotationRotationSpec
+        {
+            get { return m_dPellicleShiftAndRotationRotationSpec; }
+            set { SetProperty(ref m_dPellicleShiftAndRotationRotationSpec, value); }
         }
         #endregion
 
@@ -154,6 +176,14 @@ namespace Root_AOP01_Inspection
                         patternShiftAndRotation.m_dNGSpecDistance_um = p_dPatternShiftAndRotationShiftSpec;
                         patternShiftAndRotation.m_dNGSpecDegree = p_dPatternShiftAndRotationRotationSpec;
                         mainVision.StartRun(patternShiftAndRotation);
+                    }
+
+                    if (p_bEnablePellicleShift)
+                    {
+                        MainVision.Run_PellicleShiftAndRotation pellicleShiftAndRotation = (MainVision.Run_PellicleShiftAndRotation)mainVision.CloneModuleRun("PellicleShiftAndRotation");
+                        pellicleShiftAndRotation.m_dNGSpecDistance_um = p_dPellicleShiftAndRotationShiftSpec;
+                        pellicleShiftAndRotation.m_dNGSpecDegree = p_dPellicleShiftAndRotationRotationSpec;
+                        mainVision.StartRun(pellicleShiftAndRotation);
                     }
 
                     if (p_bEnableBarcodeInsp)

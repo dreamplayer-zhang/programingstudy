@@ -241,6 +241,7 @@
     <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Maskbk.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />
     <Compile Include="Module\EdgeSideVision\Run_InspectEBR.cs" />
@@ -251,6 +252,7 @@
     <Compile Include="Module\InspectionManagerFrontside.cs" />
     <Compile Include="Module\Vision\Run_AutoFocus.cs" />
     <Compile Include="Module\Vision\Run_VisionAlign.cs" />
+    <Compile Include="MVVM\SizeObserver.cs" />
     <Compile Include="Recipe\RecipeBack.cs" />
     <Compile Include="Recipe\RecipeEBR.cs" />
     <Compile Include="Recipe\RecipeEdge.cs" />
@@ -274,6 +276,57 @@
     </Compile>
     <Compile Include="UI\Interfaces\IRecipeUILoadable.cs" />
     <Compile Include="Module\WIND2.cs" />
+    <Compile Include="UI_User\CAMERA\CameraVRS.xaml.cs">
+      <DependentUpon>CameraVRS.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\CAMERA\CameraVRS_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\CAMERA\CameraVRS_ViewModel.cs" />
+    <Compile Include="UI_User\CAMERA\MotionControlViewer.xaml.cs">
+      <DependentUpon>MotionControlViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\FRONT\FrontsideAlignment.xaml.cs">
+      <DependentUpon>FrontsideAlignment.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\FRONT\FrontsideInspect.xaml.cs">
+      <DependentUpon>FrontsideInspect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideAlignment_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideAlignment_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\FrontsideMask.xaml.cs">
+      <DependentUpon>FrontsideMask.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideInspect_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideInspect_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideMask_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\FrontsideOrigin.xaml.cs">
+      <DependentUpon>FrontsideOrigin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideOrigin_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideOrigin_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\FrontsideProduct.xaml.cs">
+      <DependentUpon>FrontsideProduct.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideProduct_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\FrontsideSpec.xaml.cs">
+      <DependentUpon>FrontsideSpec.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideSpec_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideSpec_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\FrontsideSummary.xaml.cs">
+      <DependentUpon>FrontsideSummary.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideSummary_ViewModel.cs" />
+    <Compile Include="UI_User\RecipeWizardPanel.xaml.cs">
+      <DependentUpon>RecipeWizardPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\RecipeWizardPanel_ViewModel.cs" />
+    <Compile Include="UI_User\Setup.xaml.cs">
+      <DependentUpon>Setup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\Setup_ViewModel.cs" />
+    <Compile Include="Warning_UI.xaml.cs">
+      <DependentUpon>Warning_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WIND2EventArgs.cs" />
     <Compile Include="WIND2EventManager.cs" />
     <Compile Include="Module\BackSideVision.cs" />
@@ -431,6 +484,7 @@
     <Compile Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml.cs">
       <DependentUpon>WIND2_Recipe_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WIND2_Warning.cs" />
     <Page Include="Controls\UserControl\ColorPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -627,6 +681,54 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI_User\CAMERA\CameraVRS.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\CAMERA\MotionControlViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\FRONT\FrontsideAlignment.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\FRONT\FrontsideInspect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\FRONT\FrontsideMask.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\FRONT\FrontsideSpec.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Warning_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\FRONT\FrontsideOrigin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\FRONT\FrontsideProduct.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\FRONT\FrontsideSummary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\RecipeWizardPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_User\Setup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -674,6 +776,9 @@
   <ItemGroup>
     <Folder Include="Module\BacksideVision\" />
     <Folder Include="UI\Tune\" />
+    <Folder Include="UI_User\BACK\" />
+    <Folder Include="UI_User\EBR\" />
+    <Folder Include="UI_User\EDGE\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\ChartEBR.PNG" />

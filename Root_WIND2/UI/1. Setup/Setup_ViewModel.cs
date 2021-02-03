@@ -69,10 +69,12 @@ namespace Root_WIND2
 
         public void UI_Redraw()
         {
+            // 이거 사용하지 말것... 
+
             // 이거 필요없을것같음
-            frontsideVM.UpdateUI();
-            edgeVM.UpdateUI();
-            ebrVM.UpdateUI();
+            //frontsideVM.UpdateUI();
+            //edgeVM.UpdateUI();
+            //ebrVM.UpdateUI();
         }
 
         private void InitAllPanel()

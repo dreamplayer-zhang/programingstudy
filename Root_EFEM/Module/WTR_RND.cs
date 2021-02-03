@@ -876,6 +876,7 @@ namespace Root_EFEM.Module
                     if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
                     else m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
+                return "OK"; //0202
                 if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
                 return "WTR Get Error : Wafer Check Sensor not Detected at Arm = " + m_eArm.ToString();
             }
@@ -957,6 +958,7 @@ namespace Root_EFEM.Module
                     //else m_module.m_dicArm[m_eArm].p_infoWafer = null;
                     m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
+                return "OK"; // 0202
                 if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";
                 return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;
             }

@@ -12,6 +12,7 @@ namespace RootTools
             Home,
             Ready,
             Run,
+            Recovery,  //LYJ 210128 add
             Error,
             Null
         }
@@ -72,6 +73,12 @@ namespace RootTools
             set { m_EQ.p_bRecovery = value; }
         }
 
+        public static bool p_bPickerSet
+        {
+            get { return m_EQ.p_bPickerSet; }
+            set { m_EQ.p_bPickerSet = value; }
+        }
+
         public static int p_nRnR
         {
             get { return m_EQ.p_nRnR; }
@@ -94,7 +101,9 @@ namespace RootTools
             Stop,
             Pause,
             Simulate,
-            DoorOpen
+            DoorOpen,
+            Recovery,
+            PickerSet
         }
         public delegate void dgOnChanged(eEQ eEQ, dynamic value);
         public event dgOnChanged OnChanged;
@@ -184,6 +193,19 @@ namespace RootTools
             {
                 _bRecovery = value;
                 OnPropertyChanged();
+                if (OnChanged != null) OnChanged(eEQ.Recovery, value);
+            }
+        }
+
+        bool _bPickerSet = false;
+        public bool p_bPickerSet
+        {
+            get { return _bPickerSet; }
+            set
+            {
+                _bPickerSet = value;
+                OnPropertyChanged();
+                if (OnChanged != null) OnChanged(eEQ.PickerSet, value);
             }
         }
 
@@ -198,7 +220,7 @@ namespace RootTools
             }
         }
 
-        int _nRunLP = -1;
+        int _nRunLP = 0;
         public int p_nRunLP
         {
             get { return _nRunLP; }

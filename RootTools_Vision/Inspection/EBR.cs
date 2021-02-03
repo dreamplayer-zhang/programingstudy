@@ -22,6 +22,7 @@ namespace RootTools_Vision
 			m_sName = this.GetType().Name;
 		}
 
+		StreamWriter sw;
 		protected override bool Preparation()
 		{
 			this.parameterEBR = this.parameter as EBRParameter;
@@ -47,7 +48,12 @@ namespace RootTools_Vision
 			int roiLeft = this.currentWorkplace.PositionX;
 			int roiTop = this.currentWorkplace.PositionY;
 
-			int[] arrDiff = new int[roiWidth];
+			int[] arrDiff;// = new int[roiWidth];
+
+			// raw data 저장
+			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			string folderPath = @"D:\EBRRawData\" + sInspectionID.ToString() + "\\";
+			sw = new StreamWriter(folderPath + this.currentWorkplace.Index.ToString() + ".csv");
 
 			arrDiff = GetDiffArr(ptrMem, roiLeft, roiTop, roiWidth, roiHeight);
 			FindEdge(arrDiff);
@@ -103,7 +109,6 @@ namespace RootTools_Vision
 				arrDiff[x] = arrEqual[x + xRange] - arrEqual[x - xRange];
 			}
 
-			StreamWriter sw = new StreamWriter(@"D:\EBR" + this.currentWorkplace.Index.ToString() + ".csv");
 			for (int i = 0;  i < arrDiff.Length; i++)
             {
 				sw.WriteLine(arrAvg[i] + "," + arrEqual[i] + "," + arrDiff[i]);
@@ -120,7 +125,7 @@ namespace RootTools_Vision
 			int diffBevel = this.parameterEBR.DiffBevel;
 			int diffEBR = this.parameterEBR.DiffEBR;
 
-			double waferEdgeX, bevelX, ebrX;
+			float waferEdgeX, bevelX, ebrX;
 
 			int[] arrDiffReverse = new int[arrDiff.Length];
 			for (int i = 0; i < arrDiff.Length; i++)
@@ -132,9 +137,11 @@ namespace RootTools_Vision
 			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX), diffBevel + this.parameterEBR.OffsetBevel);
 			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX), diffEBR + this.parameterEBR.OffsetEBR);
 
-			//StreamWriter sw = new StreamWriter(@"D:\EBRInsp" + this.currentWorkplace.Index.ToString() + ".csv");
-			//sw.WriteLine(waferEdgeX + "," + bevelX + "," + ebrX);
-			//sw.Close();
+			//string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			//string folderPath = @"D:\EBRRawData\" + sInspectionID.ToString() + "\\";
+			//StreamWriter swResult = new StreamWriter(folderPath + "Result.csv");
+			//swResult.WriteLine(this.currentWorkplace.Index * this.parameterEBR.StepDegree + "," +waferEdgeX + "," + (waferEdgeX-bevelX) + "," + (waferEdgeX - ebrX));
+			//swResult.Close();
 
 			// Add measurement
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
@@ -142,13 +149,13 @@ namespace RootTools_Vision
 									11111,
 									0, 0,
 									this.currentWorkplace.Index * this.parameterEBR.StepDegree, 0,
-									(float)(waferEdgeX - bevelX),
-									(float)(waferEdgeX - ebrX),
+									waferEdgeX - bevelX,
+									waferEdgeX - ebrX,
 									this.currentWorkplace.MapIndexX,
 									this.currentWorkplace.MapIndexY);
 		}
 
-		private double FindEdge(int[] diff, int searchStartX, int standardDiff)
+		private float FindEdge(int[] diff, int searchStartX, int standardDiff)
 		{
 			int maxValue = 0;
 			int peakX = searchStartX;
@@ -172,13 +179,13 @@ namespace RootTools_Vision
 			return FindEqualizeEdge(diff, peakX);
 		}
 
-		private double FindEqualizeEdge(int[] diff, int peakX)
+		private float FindEqualizeEdge(int[] diff, int peakX)
 		{
 			int xRange = this.parameterEBR.XRange;
 			double[] arrDiffSum = null;
 
 			if (peakX < xRange)
-				return 0.0;
+				return 0;
 			
 			if ((arrDiffSum == null) || (arrDiffSum.Length < 2 * xRange))
 				arrDiffSum = new double[4 * xRange];
@@ -193,8 +200,8 @@ namespace RootTools_Vision
 					if (arrDiffSum[ix - 1] == arrDiffSum[ix])
 						return 1;
 
-					double dx = arrDiffSum[ix - 1] / (arrDiffSum[ix - 1] - arrDiffSum[ix]);
-					double maxX = x - 1 + dx;
+					float dx = (float)(arrDiffSum[ix - 1] / (arrDiffSum[ix - 1] - arrDiffSum[ix]));
+					float maxX = x - 1 + dx;
 					peakX = (int)Math.Round(maxX);
 
 					for (int xp = peakX - 2 * xRange; xp <= peakX + 2 * xRange; xp++)

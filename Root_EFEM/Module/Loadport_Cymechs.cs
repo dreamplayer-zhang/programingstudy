@@ -66,7 +66,8 @@ namespace Root_EFEM.Module
         {
             for (int n = 0; n < 10; n++)
             {
-                if (p_bLock == false) return false;
+                if (p_bLock == false) 
+                    return false;
                 Thread.Sleep(100);
             }
             return true;
@@ -96,25 +97,41 @@ namespace Root_EFEM.Module
 
         public string IsGetOK(int nID)
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            if (p_eState != eState.Ready)
+            {
+                m_alidGetOK.Run(true, p_id + " eState not Ready");
+                return p_id + " eState not Ready";
+            }
             return p_infoCarrier.IsGetOK(nID);
         }
 
         public string IsPutOK(InfoWafer infoWafer, int nID)
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            if (p_eState != eState.Ready)
+            {
+                m_alidPutOK.Run(true, p_id + " eState not Ready");
+                return p_id + " eState not Ready";
+            }
             return p_infoCarrier.IsPutOK(nID);
         }
 
         public string BeforeGet(int nID)
         {
-            if (GetInfoWafer(nID) == null) return p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null";
+            if (GetInfoWafer(nID) == null)
+            {
+                m_alidGetOK.Run(true, p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null");
+                return p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null";
+            }
             return IsRunOK();
         }
 
         public string BeforePut(int nID)
         {
-            if (GetInfoWafer(nID) != null) return p_id + nID.ToString("00") + " BeforePut : InfoWafer != null";
+            if (GetInfoWafer(nID) != null)
+            {
+                m_alidPutOK.Run(true, p_id + nID.ToString("00") + " BeforePut : InfoWafer != null");
+                return p_id + nID.ToString("00") + " BeforePut : InfoWafer != null";
+            }
             return IsRunOK();
         }
 
@@ -140,6 +157,7 @@ namespace Root_EFEM.Module
 
         string IsRunOK()
         {
+            return "OK"; //0202
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
             return p_infoCarrier.IsRunOK();
         }
@@ -369,16 +387,22 @@ namespace Root_EFEM.Module
             public string WaitDone(int secWait)
             {
                 if (EQ.IsStop()) return "EQ Stop";
-                if (m_loadport.m_rs232.p_bConnect == false) return "RS232 Connection Lost !!";
+                if (m_loadport.m_rs232.p_bConnect == false)
+                {
+                    m_loadport.m_alidCMD.Run(true, "RS232 Connection Lost !!");
+                    return "RS232 Connection Lost !!";
+                }
                 int nWait = 100 * secWait;
                 while (nWait > 0)
                 {
-                    if (EQ.IsStop()) return "EQ Stop";
+                    if (EQ.IsStop()) 
+                        return "EQ Stop";
                     Thread.Sleep(10);
                     if (m_eState == eState.Done) return "OK";
                     nWait--; 
                 }
-                m_bValid = false; 
+                m_bValid = false;
+                m_loadport.m_alidCMD.Run(true, m_sCmd + " : WaitDone Timeout !!");
                 return m_sCmd + " : WaitDone Timeout !!"; 
             }
 
@@ -518,13 +542,24 @@ namespace Root_EFEM.Module
 
         #region Timeout
         int m_secRS232 = 2;
-        int m_secHome = 40;
+        int _secHome = 40;
+        public int p_secHome 
+        {
+            get { return _secHome; }
+            set
+            {
+                if (_secHome == value) return;
+                _secHome = value;
+                OnPropertyChanged();
+            }
+        }
+        //public int m_secHome = 40;
         int m_secLoad = 20;
         int m_secUnload = 20;
         void RunTimeoutTree(Tree tree)
         {
             m_secRS232 = tree.Set(m_secRS232, m_secRS232, "RS232", "Timeout (sec)");
-            m_secHome = tree.Set(m_secHome, m_secHome, "Home", "Timeout (sec)");
+            p_secHome = tree.Set(p_secHome, p_secHome, "Home", "Timeout (sec)");
             m_secLoad = tree.Set(m_secLoad, m_secLoad, "Load", "Timeout (sec)");
             m_secUnload = tree.Set(m_secUnload, m_secUnload, "Unload", "Timeout (sec)");
         }
@@ -536,7 +571,7 @@ namespace Root_EFEM.Module
         {
             Protocol protocol = new Protocol(eCmd.Home, this);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitDone(m_secHome);
+            return protocol.WaitDone(p_secHome);
         }
 
         string CmdResetCPU()
@@ -548,7 +583,12 @@ namespace Root_EFEM.Module
 
         string CmdLoad()
         {
-            if (IsLock()) return p_id + " Lock by WTR";
+            //0202
+            //if (IsLock())
+            //{
+            //    m_alidLoad.Run(true, p_id + " Lock by WTR");
+            //    return p_id + " Lock by WTR";
+            //}
             Protocol protocol = new Protocol(eCmd.Load, this);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitDone(m_secLoad);
@@ -556,7 +596,11 @@ namespace Root_EFEM.Module
 
         string CmdUnload()
         {
-            if (IsLock()) return p_id + " Lock by WTR";
+            if (IsLock())
+            {
+                m_alidUnLoad.Run(true, p_id + " Lock by WTR");
+                return p_id + " Lock by WTR";
+            }
             Protocol protocol = new Protocol(eCmd.Unload, this);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitDone(m_secLoad);
@@ -607,10 +651,18 @@ namespace Root_EFEM.Module
 
             if (EQ.p_bSimulate == false)
             {
-                if (Run(CmdResetCPU())) return p_sInfo;
+                if (Run(CmdResetCPU()))
+                {
+                    m_alidHome.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
                 if (m_bNeedHome)
                 {
-                    if (Run(CmdHome())) return p_sInfo;
+                    if (Run(CmdHome()))
+                    {
+                        m_alidHome.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
                     m_bNeedHome = false;
                 }
                 else
@@ -619,19 +671,19 @@ namespace Root_EFEM.Module
                     if (Run(CmdUnload())) return p_sInfo;
                 }
             }
-            if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
-            {
-                p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                m_bPlaced= true;
+            //if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
+            //{
+            //    p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+            //    m_bPlaced= true;
 
-                if (Run(CmdLoad())) return p_sInfo;
-                if (Run(CmdUnload())) return p_sInfo;
-            }
-            else
-            {
+            //    if (Run(CmdLoad())) return p_sInfo;
+            //    if (Run(CmdUnload())) return p_sInfo;
+            //}
+            //else
+            //{
                 p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
                 m_bPlaced = false;
-            }
+            //}
             p_eState = eState.Ready;
             p_infoCarrier.AfterHome();
             return "OK";
@@ -643,11 +695,11 @@ namespace Root_EFEM.Module
         public override string StateReady()
         {
             CheckPlaced();
-/*            if (m_infoCarrier.m_bReqReadCarrierID)
-            {
-                m_infoCarrier.m_bReqReadCarrierID = false;
-                StartRun(m_runReadPodID);
-            } */
+            //if (p_infoCarrier.m_bReqReadCarrierID)
+            //{
+            //    p_infoCarrier.m_bReqReadCarrierID = false;
+            //    StartRun(m_runReadPodID);
+            //}
             if (p_infoCarrier.m_bReqLoad)
             {
                 p_infoCarrier.m_bReqLoad = false;
@@ -667,7 +719,13 @@ namespace Root_EFEM.Module
         CEID m_ceidDocking;
         CEID m_ceidUnDocking;
         ALID m_alidPlaced;
+        public ALID m_alidLoad;
+        public ALID m_alidUnLoad;
+        public ALID m_alidHome;
+        public ALID m_alidCMD;
         public ALID m_alidInforeticle;
+        public ALID m_alidGetOK;
+        public ALID m_alidPutOK;
         public CEID m_ceidUnloadReq;
         void InitGAF() 
         {
@@ -677,6 +735,12 @@ namespace Root_EFEM.Module
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
             m_ceidUnloadReq = m_gaf.GetCEID(this, "Unload Request");
             m_alidInforeticle = m_gaf.GetALID(this, "Info Reticle Error", "Info Reticle Error");
+            m_alidLoad = m_gaf.GetALID(this, "Load", "Loading Motion Error");
+            m_alidUnLoad = m_gaf.GetALID(this, "UnLoad", "UnLoading Motion Error");
+            m_alidHome = m_gaf.GetALID(this, "Home_Loadport", "Home Motion Error");
+            m_alidCMD = m_gaf.GetALID(this, "CMD_Loadport", "CMD Error");
+            m_alidGetOK = m_gaf.GetALID(this, "Get Err to Loadport", "Get Imposible Error");
+            m_alidPutOK = m_gaf.GetALID(this, "Put Err to Loadport", "Put Imposible Error");
         }
         #endregion
 
@@ -779,8 +843,17 @@ namespace Root_EFEM.Module
             public override string Run()
             {
                 m_module.m_bUnLoadCheck = false;
-                if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                if (m_module.Run(m_module.CmdLoad())) return p_sInfo;
+                if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
+                //if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed)
+                //{
+                //    m_module.m_alidLoad.Run(true, p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
+                //    return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                //}//0202
+                if (m_module.Run(m_module.CmdLoad()))
+                {
+                    m_module.m_alidLoad.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
                 m_module.m_ceidDocking.Send();
                 m_module.m_bLoadCheck = true;
@@ -815,9 +888,17 @@ namespace Root_EFEM.Module
             public override string Run()
             {
                 m_module.m_bLoadCheck = false;
-                if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock) return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
+                {
+                    m_module.m_alidUnLoad.Run(true, p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
+                    return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                }
                 //if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
-                if (m_module.Run(m_module.CmdUnload())) return p_sInfo;
+                if (m_module.Run(m_module.CmdUnload()))
+                {
+                    m_module.m_alidUnLoad.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
                 m_module.m_ceidUnDocking.Send();
                 m_module.m_bUnLoadCheck = true;

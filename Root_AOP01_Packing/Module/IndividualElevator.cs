@@ -1,6 +1,7 @@
 ﻿using Root_EFEM.Module;
 using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -11,13 +12,21 @@ namespace Root_AOP01_Packing.Module
 {
     public class IndividualElevator : ModuleBase, IWTRChild
     {
+        public IndividualElevator(string id, IEngineer engineer)
+        {
+            m_waferSize = new InfoWafer.WaferSize(id, false, false);
+            base.InitBase(id, engineer);
+            InitThreadCheck();
+            InitALID();
+        }
+
         #region ToolBox
         Axis m_axis;
         DIO_I[] m_diCheck = new DIO_I[3];
         DIO_I[] m_diProtection = new DIO_I[2];
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Elevator"); 
+            p_sInfo = m_toolBox.Get(ref m_axis, this, "Elevator");
             p_sInfo = m_toolBox.Get(ref m_diCheck[0], this, "Check 0");
             p_sInfo = m_toolBox.Get(ref m_diCheck[1], this, "Check 1");
             p_sInfo = m_toolBox.Get(ref m_diCheck[2], this, "Check 2");
@@ -30,50 +39,74 @@ namespace Root_AOP01_Packing.Module
         }
         #endregion
 
+        #region ALID
+        ALID m_alidElevator;
+        void InitALID() 
+        {
+            m_alidElevator = m_gaf.GetALID(this, "Elevator Module", "Elevator Module Error");
+        }
+        #endregion
+
         #region Sensor
-        bool _bCheck = false; 
         public bool p_bCheck
         {
-            get { return _bCheck; }
+            get
+            {
+                return _bCheck;
+            }
             set
             {
-                if (_bCheck == value) return;
+                if (_bCheck == value)
+                    return;
                 _bCheck = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
+        bool _bCheck = false; 
 
-        bool _bProtection = false; 
         public bool p_bProtection
         {
-            get { return _bProtection; }
+            get
+            {
+                return _bProtection;
+            }
             set
             {
-                if (_bProtection == value) return;
+                if (_bProtection == value)
+                    return;
                 _bProtection = value;
                 m_axis.StopAxis();
                 p_infoWafer = null;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
+        bool _bProtection = false; 
 
         bool m_bThreadCheck = false;
-        Thread m_threadCheck; 
+        Thread m_threadCheck;
         void InitThreadCheck()
         {
             m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
-            m_threadCheck.Start(); 
+            m_threadCheck.Start();
         }
-
         void RunThreadCheck()
         {
             m_bThreadCheck = true;
-            Thread.Sleep(1000);
+            Thread.Sleep(3000);
             while (m_bThreadCheck)
             {
                 Thread.Sleep(10);
                 p_bCheck = (m_diCheck[0].p_bIn && m_diCheck[1].p_bIn && m_diCheck[2].p_bIn);
                 p_bProtection = (m_diProtection[0].p_bIn || m_diProtection[1].p_bIn); 
+
+                if(p_bProtection)
+                {
+                    this.p_eState = eState.Error;
+                    EQ.p_bStop = true;
+                    m_alidElevator.Run(p_bProtection, "Please Check The Individual Elevator");
+
+                }
+
             }
         }
         #endregion
@@ -93,13 +126,15 @@ namespace Root_AOP01_Packing.Module
         {
             p_infoWafer = null;
             m_axis.StartMove(GetPos(nLevel));
-            return m_axis.WaitReady(); 
+            return m_axis.WaitReady();
         }
 
         double GetPos(int nLevel)
         {
-            if (nLevel < 0) nLevel = 0;
-            if (nLevel > 7) nLevel = 7;
+            if (nLevel < 0)
+                nLevel = 0;
+            if (nLevel > 7)
+                nLevel = 7;
             double pos0 = m_axis.GetPosValue(ePos.Bottom);
             double pos7 = m_axis.GetPosValue(ePos.Top);
             return nLevel * (pos7 - pos0) / 7 + pos0;
@@ -107,37 +142,30 @@ namespace Root_AOP01_Packing.Module
         #endregion
 
         #region Mapping
+        
+        
         public string RunMapping()
         {
             p_infoWafer = null;
+            // State Home에 프로텍션 체크넣어야됨
+            
             if (Run(m_axis.StartMove(ePos.Bottom))) return p_sInfo;
             if (Run(m_axis.WaitReady())) return p_sInfo;
-            if (Run(m_axis.StartMove(ePos.Top))) return p_sInfo;
-            for (int n = 0; n < 8; n++)
+            for(int n=0; n<8; n++)
             {
-                double pos = GetPos(n);
-                while (m_axis.p_posCommand < pos)
+                Thread.Sleep(200);
+                if (p_bCheck) 
                 {
-                    Thread.Sleep(10);
-                    if (p_bProtection)
-                    {
-                        m_axis.StopAxis();
-                        return "Protection Detected"; 
-                    }
+                    if(Run(m_axis.StartShift(65000))) return p_sInfo;
+                    if(Run(m_axis.WaitReady())) return p_sInfo;
+                    p_infoWafer = new InfoWafer(p_id, 0, m_engineer);
+                    return "OK";
                 }
-                if (p_bCheck)
-                {
-                    m_axis.StopAxis();
-                    if (Run(MoveElevator(n))) return p_sInfo;
-                    if (p_bCheck)
-                    {
-                        p_infoWafer = new InfoWafer(p_id, 0, m_engineer);
-                        return "OK";
-                    }
-                    else return "Check Case";
-                }
+                Run(m_axis.StartShift(65000));
+                Run(m_axis.WaitReady());
+                //m_axis.StartMove()
             }
-            return "No Case"; 
+            return "No Case";          
         }
         #endregion
 
@@ -145,7 +173,10 @@ namespace Root_AOP01_Packing.Module
         InfoWafer _infoWafer = null;
         public InfoWafer p_infoWafer
         {
-            get { return _infoWafer; }
+            get
+            {
+                return _infoWafer;
+            }
             set
             {
                 _infoWafer = value;
@@ -162,10 +193,14 @@ namespace Root_AOP01_Packing.Module
         bool _bLock = false;
         public bool p_bLock
         {
-            get { return _bLock; }
+            get
+            {
+                return _bLock;
+            }
             set
             {
-                if (_bLock == value) return;
+                if (_bLock == value)
+                    return;
                 _bLock = value;
             }
         }
@@ -174,13 +209,20 @@ namespace Root_AOP01_Packing.Module
         {
             for (int n = 0; n < 10; n++)
             {
-                if (p_bLock == false) return false;
+                if (p_bLock == false)
+                    return false;
                 Thread.Sleep(100);
             }
             return true;
         }
 
-        public List<string> p_asChildSlot { get { return null; } }
+        public List<string> p_asChildSlot
+        {
+            get
+            {
+                return null;
+            }
+        }
 
         public InfoWafer GetInfoWafer(int nID)
         {
@@ -194,34 +236,42 @@ namespace Root_AOP01_Packing.Module
 
         public string IsGetOK(int nID)
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            if (p_infoWafer == null) return p_id + " IsGetOK - InfoWafer not Exist";
+            if (p_eState != eState.Ready)
+                return p_id + " eState not Ready";
+            if (p_infoWafer == null)
+                return p_id + " IsGetOK - InfoWafer not Exist";
             return "OK";
         }
 
         public string IsPutOK(InfoWafer infoWafer, int nID)
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            if (p_infoWafer != null) return p_id + " IsPutOK - InfoWafer Exist";
-            if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false) return p_id + " not Enable Wafer Size";
+            if (p_eState != eState.Ready)
+                return p_id + " eState not Ready";
+            if (p_infoWafer != null)
+                return p_id + " IsPutOK - InfoWafer Exist";
+            if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false)
+                return p_id + " not Enable Wafer Size";
             return "OK";
         }
 
         public int GetTeachWTR(InfoWafer infoWafer = null)
         {
-            if (infoWafer == null) infoWafer = p_infoWafer;
+            if (infoWafer == null)
+                infoWafer = p_infoWafer;
             return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
         }
 
         public string BeforeGet(int nID)
         {
-            if (p_infoWafer == null) return p_id + " BeforeGet : InfoWafer = null";
+            if (p_infoWafer == null)
+                return p_id + " BeforeGet : InfoWafer = null";
             return CheckGetPut();
         }
 
         public string BeforePut(int nID)
         {
-            if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
+            if (p_infoWafer != null)
+                return p_id + " BeforePut : InfoWafer != null";
             return CheckGetPut();
         }
 
@@ -237,7 +287,8 @@ namespace Root_AOP01_Packing.Module
 
         string CheckGetPut()
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            if (p_eState != eState.Ready)
+                return p_id + " eState not Ready";
             return "OK";
         }
 
@@ -280,25 +331,20 @@ namespace Root_AOP01_Packing.Module
                 return "OK";
             }
             p_sInfo = base.StateHome();
-            p_infoWafer = null; 
+            p_infoWafer = null;
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             return p_sInfo;
         }
         #endregion
 
-        public IndividualElevator(string id, IEngineer engineer)
-        {
-            m_waferSize = new InfoWafer.WaferSize(id, false, false);
-            base.InitBase(id, engineer);
-            InitThreadCheck(); 
-        }
+       
 
         public override void ThreadStop()
         {
             if (m_bThreadCheck)
             {
                 m_bThreadCheck = false;
-                m_threadCheck.Join(); 
+                m_threadCheck.Join();
             }
             base.ThreadStop();
         }
@@ -356,14 +402,16 @@ namespace Root_AOP01_Packing.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+
             }
 
             public override string Run()
             {
-                return m_module.RunMapping(); 
+                return m_module.RunMapping();
             }
         }
         #endregion
 
     }
 }
+

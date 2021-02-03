@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Camera;
+using RootTools.Lens.LinearTurret;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.RADS;
@@ -41,24 +42,40 @@ namespace Root_WIND2.Module
         public int m_nMaxFrame = 100;                   // Camera max Frame 스펙
         public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
         public int m_nYOffset = 0;
+
+        public GrabData m_GD = new GrabData();
+        LensLinearTurret m_lens = null;
+        public string m_sLens;
         void RunTreeOption(Tree tree, bool bVisible, bool bReadOnly)
         {
             m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
             m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
+
+            m_GD.m_nFovStart = tree.Set(m_GD.m_nFovStart, m_GD.m_nFovStart, "Cam Fov Star Pxl", "Pixel", bVisible);
+            m_GD.m_nFovSize = tree.Set(m_GD.m_nFovSize, m_GD.m_nFovSize, "Cam Fov Size Pxl", "Pixel", bVisible);
+            m_GD.m_nOverlap = tree.Set(m_GD.m_nOverlap, m_GD.m_nOverlap, "Cam Overlap Size Pxl", "Pixel", bVisible);
             m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam X Resolution", "X Resolution (um)", bVisible);
             m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Cam Y Resolution", "Y Resolution (um)", bVisible);
             m_nYOffset = tree.Set(m_nYOffset, m_nYOffset, "Cam Y Offset", "Y Tilt(pxl)", bVisible);
+
+            //m_sLens = tree.Set(m_sLens, m_sLens, m_lens.p_asPos, "Lens Turret", "Turret", bVisible);
+            
+            m_GD.m_dScaleR = tree.Set(m_GD.m_dScaleR, m_GD.m_dScaleR, "XScaleR", "X Scale R Channel, Default = 1", bVisible);
+            m_GD.m_dScaleG = tree.Set(m_GD.m_dScaleG, m_GD.m_dScaleG, "XScaleG", "X Scale G Channel, Default = 1", bVisible);
+            m_GD.m_dScaleB = tree.Set(m_GD.m_dScaleB,  m_GD.m_dScaleB, "XScaleB", "X Scale B Channel, Default = 1", bVisible);
+
+            m_GD.m_dShiftR = tree.Set(m_GD.m_dShiftR, m_GD.m_dShiftR, "XShiftR", "X Shift R Channel, Default = 0", bVisible);
+            m_GD.m_dShiftG = tree.Set(m_GD.m_dShiftG, m_GD.m_dShiftG, "XShiftG", "X Shift G Channel, Default = 0", bVisible);
+            m_GD.m_dShiftB = tree.Set(m_GD.m_dShiftB, m_GD.m_dShiftB, "XShiftB", "X Shift B Channel, Default = 0", bVisible);
+            
             m_nFocusPosZ = tree.Set(m_nFocusPosZ, m_nFocusPosZ, "Focus Z Position", "Focus Z Position", bVisible);
             m_nWaferSize_mm = tree.Set(m_nWaferSize_mm, m_nWaferSize_mm, "Wafer Size Y", "Wafer Size Y", bVisible);
             m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
             m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
         }
-            
 
         void RunTreeCamera(Tree tree, bool bVisible, bool bReadOnly)
         {
-            
-            m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
             m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
             m_nReverseOffsetY = tree.Set(m_nReverseOffsetY, 800, "ReverseOffsetY", "Reverse Scan 동작시 Y 이미지 Offset 설정");
             m_sCamera = tree.Set(m_sCamera, m_sCamera, m_cameraSet.p_asCamera, "Camera", "Select Camera", bVisible, bReadOnly);
@@ -71,14 +88,14 @@ namespace Root_WIND2.Module
             m_dVRSFocusPos = tree.Set(m_dVRSFocusPos, m_dVRSFocusPos, "VRS Focus Z", "VRS Focus Z", bVisible, true);
         }
 
-        public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine ,int nScanOffsetY =0 , bool bInvY = false)
+        public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine , GrabData m_GrabData = null)
         {
-            m_camera.GrabLineScan(memory, cpScanOffset, nLine, nScanOffsetY, bInvY , m_nReverseOffsetY);
+            m_camera.GrabLineScan(memory, cpScanOffset, nLine, m_GrabData);
             m_camera.Grabed += m_camera_Grabed;
         }
-        public void StartGrabColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY=0, bool bInvY = false)
+        public void StartGrabColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
         {
-            m_camera.GrabLineScanColor(memory, cpScanOffset, nLine, nScanOffsetY, bInvY,  m_nReverseOffsetY);
+            m_camera.GrabLineScanColor(memory, cpScanOffset, nLine, m_GrabData);
             m_camera.Grabed += m_camera_Grabed;
         }
         void m_camera_Grabed(object sender, System.EventArgs e)
@@ -106,7 +123,11 @@ namespace Root_WIND2.Module
                 m_aLightPower[n] = tree.Set(m_aLightPower[n], m_aLightPower[n], m_lightSet.m_aLight[n].m_sName, "Light Power (0 ~ 100 %%)", bVisible, bReadOnly);
             }
         }
-
+        public void SetLens()
+        {
+            m_lens.ChangePos(m_sLens);
+            m_lens.WaitReady();
+        }
         public void SetLight(bool bOn)
         {
             for (int n = 0; n < m_aLightPower.Count; n++)

@@ -91,7 +91,7 @@ namespace Root_WIND2
                     String test = "";
                     if (workplace.Index == 0)
                     {
-                        test += "Trans : {" + workplace.OffsetX.ToString() + ", " + workplace.OffsetY.ToString() + "}" + "\n";
+                        test += "Trans : {" + workplace.OffsetX.ToString() + ", " + workplace.OffsetX.ToString() + "}" + "\n";
                         DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
                     }
                     else
@@ -112,14 +112,14 @@ namespace Root_WIND2
             foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
             {
                 String text = "";
-
+                /*
                 if (false) // Display Option : Rel Position
                     text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
                 if (false) // Display Option : Defect Size
                     text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
                 if (false) // Display Option : GV Value
                     text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
-
+                */
                 rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
                 textList.Add(text);
             }

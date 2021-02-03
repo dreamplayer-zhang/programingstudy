@@ -75,20 +75,6 @@ namespace Root_WIND2
 
         }
 
-        #region Property
-        private ObservableCollection<UIElement> m_DrawElement = new ObservableCollection<UIElement>();
-        public ObservableCollection<UIElement> p_DrawElement
-        {
-            get
-            {
-                return m_DrawElement;
-            }
-            set
-            {
-                m_DrawElement = value;
-            }
-        }
-        #endregion
 
         #region Command
         public void DrawRect(CPoint LT, CPoint RB, ColorType color, String text = null, int FontSz = 15)
@@ -395,11 +381,11 @@ namespace Root_WIND2
 
         public void DefectClear()
         {
-            foreach (TShape shape in Shapes)
-            {
+            //foreach (TShape shape in Shapes)
+            //{
                 
 
-            }
+            //}
             Shapes.Clear();
             InfoTextBolcks.Clear();
             p_DrawElement.Clear();

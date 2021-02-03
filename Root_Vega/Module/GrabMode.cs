@@ -38,9 +38,13 @@ namespace Root_Vega.Module
             m_ScanStartLine = tree.Set(m_ScanStartLine, m_ScanStartLine, "Scan Start Line", "Scan Start Line");
         }
 
-        public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false)
+        public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false)
         {
-            m_camera.GrabLineScan(memory, cpScanOffset, nLine, 0,  bInvY, m_nReverseOffsetY);
+            GrabData gd = new GrabData();
+            gd.bInvY = bInvY;
+            gd.ReverseOffsetY = m_nReverseOffsetY;
+            gd.nScanOffsetY = nScanOffsetY;
+            m_camera.GrabLineScan(memory, cpScanOffset, nLine, gd);
             m_camera.Grabed += m_camera_Grabed;
         }
 

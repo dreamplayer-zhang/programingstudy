@@ -82,7 +82,6 @@ namespace Root_EFEM
             switch (m_eWTR)
             {
                 case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer);break;
-                case eWTR.RTR_RND: m_wtr = new RTR_RND("WTR", m_engineer); break;
                 default: m_wtr = new WTR_RND("WTR", m_engineer); break;
             }
             InitModule(m_wtr); 
@@ -336,14 +335,14 @@ namespace Root_EFEM
         {
             foreach (EFEM_Process.Sequence sequence in aSequence)
             {
-                if (loadport.p_id == sequence.m_infoWafer.m_sModule)
-                {
-                    if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
-                    ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
-                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
-                    m_process.m_qSequence.Enqueue(sequenceDock);
-                    return true;
-                }
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
+                //{
+                    //if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
+                    //ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
+                    //EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    //m_process.m_qSequence.Enqueue(sequenceDock);
+                    //return true;
+                //}
             }
             return false; 
         }

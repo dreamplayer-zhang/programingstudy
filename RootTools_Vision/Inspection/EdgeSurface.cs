@@ -16,7 +16,7 @@ namespace RootTools_Vision
 		public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
 		private EdgeSurfaceParameter parameterEdge;
-		private EdgeSurfaceRecipe recipeEdgeSurface;
+		private EdgeSurfaceRecipe recipeEdge;
 
 		public enum EdgeMapPositionX
 		{
@@ -37,11 +37,11 @@ namespace RootTools_Vision
 
 		protected override bool Preparation()
 		{
-			if(this.parameterEdge == null || this.recipeEdgeSurface == null)
-            {
+			if (this.parameterEdge == null || this.recipeEdge == null)
+			{
 				this.parameterEdge = this.parameter as EdgeSurfaceParameter;
-				this.recipeEdgeSurface = recipe.GetItem<EdgeSurfaceRecipe>();
-            }
+				this.recipeEdge = recipe.GetItem<EdgeSurfaceRecipe>();
+			}
 			return true;
 		}
 
@@ -56,41 +56,50 @@ namespace RootTools_Vision
 			if (this.currentWorkplace.Index == 0)
 				return;
 
-			DoColorInspection(this.currentWorkplace.SharedBufferR_GRAY, parameterEdge);
-			DoColorInspection(this.currentWorkplace.SharedBufferG, parameterEdge);
-			DoColorInspection(this.currentWorkplace.SharedBufferB, parameterEdge);
+			//byte[] arrSrc = this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY);
+			//Emgu.CV.Mat mat = new Emgu.CV.Mat((int)(parameterEdge.EdgeParamBaseTop.ROIHeight), (int)(parameterEdge.EdgeParamBaseTop.ROIWidth), Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+			//Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
+			//mat.Save(@"D:/" + this.currentWorkplace.Index.ToString() + ".bmp");
+
+			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), parameterEdge);
+			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), parameterEdge);
+			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), parameterEdge);
 
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 		}
 
-		private void DoColorInspection(IntPtr sharedBuffer, EdgeSurfaceParameter param)
+		private void DoColorInspection(byte[] arrSrc, EdgeSurfaceParameter param)
 		{
-			int roiHeight; // 2000
-			int roiWidth; // this.workplace.SharedBufferWidth;
-			int threshold;  // 40
-			int defectSize; // 10
+			int roiHeight;
+			int roiWidth;
+			int threshold;
+			int defectSize;
+			int searchLevel;
 
-			// parameter 구분하기
+			// parameter
 			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
 			{
-				roiHeight = parameterEdge.RoiHeightTop;
-				roiWidth = parameterEdge.RoiWidthTop;
-				threshold = parameterEdge.ThesholdTop;
-				defectSize = parameterEdge.SizeMinTop;
+				roiHeight = parameterEdge.EdgeParamBaseTop.ROIHeight;
+				roiWidth = parameterEdge.EdgeParamBaseTop.ROIWidth;
+				threshold = parameterEdge.EdgeParamBaseTop.Threshold;
+				defectSize = parameterEdge.EdgeParamBaseTop.DefectSizeMin;
+				searchLevel = parameterEdge.EdgeParamBaseTop.EdgeSearchLevel;
 			}
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Side)
 			{
-				roiHeight = parameterEdge.RoiHeightSide;
-				roiWidth = parameterEdge.RoiWidthSide;
-				threshold = parameterEdge.ThesholdSide;
-				defectSize = parameterEdge.SizeMinSide;
+				roiHeight = parameterEdge.EdgeParamBaseSide.ROIHeight;
+				roiWidth = parameterEdge.EdgeParamBaseSide.ROIWidth;
+				threshold = parameterEdge.EdgeParamBaseSide.Threshold;
+				defectSize = parameterEdge.EdgeParamBaseSide.DefectSizeMin;
+				searchLevel = parameterEdge.EdgeParamBaseSide.EdgeSearchLevel;
 			}
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
 			{
-				roiHeight = parameterEdge.RoiHeightBtm;
-				roiWidth = parameterEdge.RoiWidthBtm;
-				threshold = parameterEdge.ThesholdBtm;
-				defectSize = parameterEdge.SizeMinBtm;
+				roiHeight = parameterEdge.EdgeParamBaseBtm.ROIHeight;
+				roiWidth = parameterEdge.EdgeParamBaseBtm.ROIWidth;
+				threshold = parameterEdge.EdgeParamBaseBtm.Threshold;
+				defectSize = parameterEdge.EdgeParamBaseBtm.DefectSizeMin;
+				searchLevel = parameterEdge.EdgeParamBaseBtm.EdgeSearchLevel;
 			}
 			else
 			{
@@ -99,29 +108,12 @@ namespace RootTools_Vision
 
 			int roiSize = roiWidth * roiHeight;
 
-			int left = this.currentWorkplace.PositionX;
-			int top = this.currentWorkplace.PositionY;
-			int right = this.currentWorkplace.PositionX + roiWidth;
-			int bottom = this.currentWorkplace.PositionY + roiHeight;
+			// Search Wafer Edge
+			int lastEdge = FindEdge(arrSrc, roiWidth, roiHeight, searchLevel);
+			int startPtX = lastEdge;	// Edge부터 검사 시작
 
-            byte[] arrSrc = new byte[roiSize];
-            for (int cnt = top; cnt < bottom; cnt++)
-            {
-                Marshal.Copy(new IntPtr(sharedBuffer.ToInt64() + (cnt * (Int64)this.currentWorkplace.SharedBufferWidth))
-                            , arrSrc
-                            , this.currentWorkplace.SharedBufferWidth * (cnt - top)
-                            , this.currentWorkplace.SharedBufferWidth);
-            }
-
-            //byte[] arrSrc = new byte[roiSize]; 
-            //arrSrc = this.GetWorkplaceBuffer(IMAGE_CHANNEL.)
-
-            Emgu.CV.Mat mat = new Emgu.CV.Mat((int)roiHeight, (int)roiWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
-            Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
-            mat.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_" + this.currentWorkplace.Index.ToString() + ".bmp");
-
-            // profile 생성
-            List<int> temp = new List<int>();
+			// profile 생성
+			List<int> temp = new List<int>();
 			List<int> profile = new List<int>();
 			for (long j = 0; j < roiWidth; j++)
 			{
@@ -138,39 +130,80 @@ namespace RootTools_Vision
 			byte[] diff = new byte[roiSize];
 			for (int j = 0; j < roiHeight; j++)
 			{
-				for (int i = 0; i < roiWidth; i++)
+				for (int i = startPtX; i < roiWidth; i++)
 				{
 					diff[(j * roiWidth) + i] = (byte)(Math.Abs(arrSrc[(j * roiWidth) + i] - profile[i]));
 				}
 			}
 
-			// Threshold
+			// Threshold and Labeling
 			byte[] thresh = new byte[roiSize];
 			CLR_IP.Cpp_Threshold(diff, thresh, roiWidth, roiHeight, false, threshold);
 			var label = CLR_IP.Cpp_Labeling(diff, thresh, roiWidth, roiHeight, true);
-            //Emgu.CV.Mat mat2 = new Emgu.CV.Mat((int)roiHeight, (int)roiWidth, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
-            //Marshal.Copy(thresh, 0, mat2.DataPointer, arrSrc.Length);
-            //mat2.Save(@"D:/" + sharedBuffer.ToInt64().ToString() + "_thresh_" + this.workplace.Index.ToString() + ".bmp");
+			
+			// Add defect
+			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			for (int i = 0; i < label.Length; i++)
+			{
+				if (label[i].area > defectSize)
+				{
+					this.currentWorkplace.AddDefect(sInspectionID,
+						10001,
+						label[i].area,
+						label[i].value,
+						this.currentWorkplace.PositionX + label[i].boundLeft,
+						this.currentWorkplace.PositionY + label[i].boundTop,
+						Math.Abs(label[i].boundRight - label[i].boundLeft),
+						Math.Abs(label[i].boundBottom - label[i].boundTop),
+						this.currentWorkplace.MapIndexX,
+						this.currentWorkplace.MapIndexY
+						);
+				}
+			}
+		}
 
-            // Add defect
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            for (int i = 0; i < label.Length; i++)
-            {
-                if (label[i].area > defectSize)
-                {
-                    this.currentWorkplace.AddDefect(sInspectionID,
-                        10001,
-                        label[i].area,
-                        label[i].value,
-                        this.currentWorkplace.PositionX + label[i].boundLeft,
-                        this.currentWorkplace.PositionY + label[i].boundTop,
-                        Math.Abs(label[i].boundRight - label[i].boundLeft),
-                        Math.Abs(label[i].boundBottom - label[i].boundTop),
-                        this.currentWorkplace.MapIndexX,
-                        this.currentWorkplace.MapIndexY
-                        );
-                }
-            }
-        }
+		public int FindEdge(byte[] arrSrc, int width, int height, int searchLevel = 70)
+		{
+			int min = 256;
+			int max = 0;
+			int prox = min + (int)((max - min) * searchLevel * 0.01);
+
+			if (searchLevel >= 100)
+				prox = max;
+			else if (searchLevel <= 0)
+				prox = min;
+
+			int startPtX = 0;
+			int startPtY = 0;
+			int avg, avgNext;
+			int edge = width;
+			
+			avgNext = MeanForYCoordinates(arrSrc, startPtY, startPtX, width, height);
+			for (int x = startPtX + 1; x < width; x++)
+			{
+				avg = avgNext;
+				avgNext = MeanForYCoordinates(arrSrc, startPtY, x, width, height);
+
+				if ((avg >= prox && prox > avgNext) || (avg <= prox && prox < avgNext))
+				{
+					edge = x;
+					x = width + 1;
+				}
+			}
+			return edge;
+		}
+
+		public int MeanForYCoordinates(byte[] arrSrc, int startPtY, int findPtX, int width, int height)
+		{
+			int avg = 0;
+
+			for (int y = startPtY; y < width*height; y += width)
+				avg += arrSrc[y + findPtX];
+			
+			if (avg != 0)
+				avg /= (height - startPtY + 1);
+
+			return avg;
+		}
 	}
 }

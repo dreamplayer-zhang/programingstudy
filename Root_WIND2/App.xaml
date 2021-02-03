@@ -10,7 +10,327 @@
         </Style>
         
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
-       
+
+        <!--#region [New Design] -->
+        
+        <!--#region [Color Definition] -->
+        <SolidColorBrush x:Key="main_background" Color="#080820"/>
+        <SolidColorBrush x:Key="sidetap_parent_background" Color="#080820"/>
+        <SolidColorBrush x:Key="sidetap_child_background" Color="#151540"/>
+        <SolidColorBrush x:Key="main_view_background" Color="#505050"/>
+
+        <!-- sidetap -->
+        <SolidColorBrush x:Key="sidetap_parent_menu_normal" Color="#202040"/>
+        <SolidColorBrush x:Key="sidetap_parent_menu_mouseover" Color="#404070"/>
+        <!--<SolidColorBrush x:Key="sidetap_parent_menu_selected" Color="DarkSlateBlue"/>-->
+
+        <SolidColorBrush x:Key="sidetap_child_menu_normal" Color="#151540"/>
+        <SolidColorBrush x:Key="sidetap_child_menu_mouseover" Color="#404080"/>
+        <SolidColorBrush x:Key="sidetap_child_menu_selected" Color="#5070DD"/>
+        <SolidColorBrush x:Key="sidetap_child_menu_disable" Color="#333333"/>
+
+        <SolidColorBrush x:Key="sidetap_parent_menu_text" Color="White"/>
+        <SolidColorBrush x:Key="sidetap_child_menu_text" Color="White"/>
+        <SolidColorBrush x:Key="sidetap_child_menu_text_disable" Color="#888888"/>
+
+
+        <SolidColorBrush x:Key="main_view_groupbox_background" Color="#202035"/>
+
+        <SolidColorBrush x:Key="sidetap_child_button_normal" Color="#5050A0"/>
+        <SolidColorBrush x:Key="sidetap_child_button_mouseover" Color="#7070B0"/>
+        <SolidColorBrush x:Key="sidetap_child_button_press" Color="#3030A0"/>
+        <SolidColorBrush x:Key="sidetap_child_button_text" Color="White"/>
+        <SolidColorBrush x:Key="sidetap_child_button_press_text" Color="#888888"/>
+
+        <SolidColorBrush x:Key="groupbox_button_normal" Color="#5050A0"/>
+        <SolidColorBrush x:Key="groupbox_button_mouseover" Color="#7070B0"/>
+        <SolidColorBrush x:Key="groupbox_button_press" Color="#333356"/>
+        <SolidColorBrush x:Key="groupbox_button_text" Color="White"/>
+        <SolidColorBrush x:Key="groupbox_button_press_text" Color="#888888"/>
+
+        <!--#endregion-->
+        
+        <!--#region [Button Style] -->
+        <Style x:Key="sidetap_parent_radiobutton" TargetType="RadioButton">
+            <Setter Property="OverridesDefaultStyle" Value="False"/>
+            <Setter Property="Background" Value="{StaticResource sidetap_parent_menu_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource sidetap_parent_menu_text}"/>
+            <Setter Property="Margin" Value="4,0,0,4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border BorderThickness="0" 
+                                CornerRadius="4, 0, 0, 4"
+                                Padding="4"
+                                Width="65"
+                                Height="60"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_background}"/>
+                                <!--<Setter Property="Margin" Value="4, 4, 0, 4"/>
+                                <Setter Property="Width" Value="44"/>-->
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_parent_menu_mouseover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="sidetap_child_radiobutton" TargetType="RadioButton">
+            <Setter Property="Background" Value="{StaticResource sidetap_child_menu_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource sidetap_child_menu_text}"/>
+            <Setter Property="Margin" Value="4,0,0,4"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                Height="40"
+                                CornerRadius="4, 0, 0, 4"
+                                Padding="15, 0, 0, 0"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_menu_selected}"/>
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_menu_mouseover}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_menu_disable}"/>
+                                <Setter Property="Foreground" Value="{StaticResource sidetap_child_menu_text_disable}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="sidetap_child_button" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource sidetap_child_button_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource sidetap_child_menu_text}"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                Height="30"
+                                CornerRadius="15"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_button_press}"/>
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource sidetap_child_button_mouseover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="groupbox_button" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource groupbox_button_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource groupbox_button_text}"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                Height="30"
+                                CornerRadius="15"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
+                            </Trigger>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_press}"/>
+                                <Setter Property="Foreground" Value="{StaticResource groupbox_button_press_text}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--#endregion-->
+
+        <!--#region [GroupBox Style] -->
+        <Style x:Key="main_view_groupbox" TargetType="GroupBox">
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type GroupBox}" >
+                        
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="24"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="Header"
+                                    Grid.Row="0"
+                                    Padding="10,0,0,0"
+                                    CornerRadius="2,2,0,0"
+                                    VerticalAlignment="Stretch"
+                                    Background="{StaticResource main_view_groupbox_background}">
+                                <ContentPresenter VerticalAlignment="Center" ContentSource="Header" RecognizesAccessKey="True" />
+                            </Border>
+                            <Border Grid.Row="1" 
+                                    CornerRadius="0,0,2,2"
+                                    Background="{StaticResource main_view_groupbox_background}">
+                                <ContentPresenter />
+                            </Border>
+                            <Grid.Effect>
+                                <DropShadowEffect ShadowDepth="1" Color="Gray"/>
+                            </Grid.Effect>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="group_box_item_name_text" TargetType="TextBlock">
+            <Setter Property="Margin" Value="6,0,0,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="group_box_grid_item" TargetType="Grid">
+            <Setter Property="Margin" Value="0,4,0,4"/>
+        </Style>
+        <!--#endregion-->
+
+        <!--#region ImageViwer Toolbar Style -->
+        <!-- image viewer toolbar button -->
+        <Style x:Key="imageViewer_toolbar_button" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="False"/>
+            <Setter Property="Background" Value="#444480"/>
+            <Setter Property="Foreground" Value="{StaticResource sidetap_parent_menu_text}"/>
+            <Setter Property="Margin" Value="4,0,0,0"/>
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="bd"
+                                BorderThickness="0" 
+                                CornerRadius="4, 4, 4, 4"
+                                Padding="4"
+                                Width="36"
+                                Height="36"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_press}"/>
+                                <Setter Property="Foreground" Value="{StaticResource groupbox_button_press_text}"/>
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        
+        <!-- Imageviwer toolbar checkbox style--> 
+        <Style x:Key="imageViewer_toolbar_checkbox" TargetType="CheckBox">
+            <Setter Property="OverridesDefaultStyle" Value="False"/>
+            <Setter Property="Background" Value="#444480"/>
+            <Setter Property="Foreground" Value="{StaticResource sidetap_parent_menu_text}"/>
+            <Setter Property="Margin" Value="4,0,0,0"/>
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <Border x:Name="bd"
+                                BorderThickness="2" 
+                                CornerRadius="4, 4, 4, 4"
+                                Padding="4"
+                                Width="36"
+                                Height="36"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="#222244"/>
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#77EEEE"/>
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#555599"/>
+                            </Trigger>
+                            <Trigger  Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#111122"/>
+                                <Setter Property="Foreground" Value="#555555"/>
+                                <Setter TargetName="bd" Property="BorderBrush" Value="#555555"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--#endregion-->
+        
+        
+
         <!--Color-->
         <SolidColorBrush x:Key="PanelBackGround" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
         <SolidColorBrush x:Key="ControlBackGround" Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
@@ -205,6 +525,16 @@
                     Value="10" />
             <Setter Property="Data"
                     Value="M48.578243,0 L57.856652,0 71.665367,15.433628 85.779,0 94.404,0 75.760063,19.752212 94.404,39.999999 85.125595,39.999999 71.229759,24.460176 56.98544,39.999999 48.404,39.999999 67.135063,20.141593 z" />
+        </Style>
+
+        <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Height" Value="40"/>
+            <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
+            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
         </Style>
         <!--End Title-->
     </Application.Resources>

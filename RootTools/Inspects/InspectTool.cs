@@ -139,19 +139,20 @@ namespace RootTools.Inspects
 		public static string m_idProcess = "Root_Inspect";
 		string m_sProcessFile = "";
 
-		#region Vision Parameter
-		public int[] nTopLeftXLIst = new int[24];
-		public int[] nTopLeftYLIst = new int[24];
-		public int[] nWidthLIst = new int[24];
-		public int[] nHeighLIst = new int[24];
-		#endregion
-
 		void RunProcessTree(Tree tree, bool bVisible)
 		{
 			m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start Memory Process", bVisible);
 			m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "Inspect Process ID", bVisible && m_bStartProcess);
 			m_sProcessFile = tree.SetFile(m_sProcessFile, m_sProcessFile, "exe", "File", "Process File Name", bVisible && m_bStartProcess);
 		}
+		#endregion
+
+		#region Vision Parameter
+		public int[] nTopLeftXLIst = new int[24];
+		public int[] nTopLeftYLIst = new int[24];
+		public int[] nWidthLIst = new int[24];
+		public int[] nHeighLIst = new int[24];
+
 		public void RunCommonParamTree(Tree tree, bool bVisible)
 		{
 			string[] direction = new string[] { "Top", "Left", "Right", "Bottom" };
@@ -170,8 +171,6 @@ namespace RootTools.Inspects
 				}
 			}
 		}
-
-
 		#endregion
 
 		#region Tree
@@ -330,15 +329,15 @@ namespace RootTools.Inspects
 			{
 				m_log.Info("Inspect Start : " + data.m_id);
 				data.SetStart();
-				data.p_sInfo = ThreadInspect(data.p_sIndex, data.p_sRecipe);
-				m_aData.RemoveAt(0);
+				data.p_sInfo = RunInspect(data.p_sIndex, data.p_sRecipe);
+				m_aData.RemoveAt(0); //forget
 				if (OnInspectDone != null) OnInspectDone(data);
 				if (m_bHost == false) m_namedPipe.Send("Done", data.p_sIndex, data.p_sInfo);
 				m_log.Info("Inspect Done : " + data.m_id);
 			}
 		}
 
-		string ThreadInspect(string sIndex, string sRecipe)
+		string RunInspect(string sIndex, string sRecipe)
 		{
 			Thread.Sleep(7000); //forget Inspect Here
 			return "OK";

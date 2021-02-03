@@ -5,9 +5,11 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Threading;
 
 namespace Root_Rinse_Loader.Module
 {
@@ -21,7 +23,7 @@ namespace Root_Rinse_Loader.Module
         }
         string[] m_asRunMode = Enum.GetNames(typeof(eRunMode));
 
-        eRunMode _eMode = eRunMode.Magazine;
+        eRunMode _eMode = eRunMode.Stack;
         public eRunMode p_eMode
         {
             get { return _eMode; }
@@ -47,15 +49,110 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
-        int _iMagazin = 0;
-        public int p_iMagazine
+        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1; 
+        public Storage.eMagazine p_eMagazine
         {
-            get { return _iMagazin; }
+            get { return _eMagazine; }
             set
             {
-                if (_iMagazin == value) return;
-                _iMagazin = value;
+                if (_eMagazine == value) return;
+                _eMagazine = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        int _iMagazine = 0;
+        public int p_iMagazine
+        {
+            get { return _iMagazine; }
+            set
+            {
+                if (_iMagazine == value) return;
+                _iMagazine = value;
                 OnPropertyChanged();
+            }
+        }
+        #endregion
+
+        #region Strips
+        public class Strips : NotifyProperty
+        {
+            string _sSend = "....";
+            public string p_sSend
+            {
+                get { return _sSend; }
+                set
+                {
+                    _sSend = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            string _sReceive = "....";
+            public string p_sReceive
+            {
+                get { return _sReceive; }
+                set
+                {
+                    _sReceive = value;
+                    OnPropertyChanged();
+                    if (p_sSend != p_sReceive) p_sError = "Error"; 
+                }
+            }
+
+            string _sError = ""; 
+            public string p_sError
+            {
+                get { return _sError; }
+                set
+                {
+                    _sError = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            public Strips(string sSend)
+            {
+                p_sSend = sSend; 
+            }
+        }
+        Queue<Strips> m_qSend = new Queue<Strips>();
+        public void AddStripSend(string sStrip)
+        {
+            Strips strips = new Strips(sStrip);
+            m_qSend.Enqueue(strips);
+            AddProtocol(p_id, eCmd.StripSend, sStrip);
+        }
+
+        Queue<string> m_qReceive = new Queue<string>();
+        public void AddStripReceive(string sStrip)
+        {
+            m_qReceive.Enqueue(sStrip);
+        }
+
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            m_timer.Tick += M_timer_Tick; 
+            m_timer.Start();
+        }
+
+        public ObservableCollection<Strips> p_aSend = new ObservableCollection<Strips>();
+        public ObservableCollection<Strips> p_aReceive = new ObservableCollection<Strips>();
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            if (m_qSend.Count > 0) p_aSend.Add(m_qSend.Dequeue());
+            if (m_qReceive.Count > 0)
+            {
+                string sStrip = m_qReceive.Dequeue();
+                if (p_aSend.Count > 0)
+                {
+                    Strips strip = p_aSend[0];
+                    p_aSend.RemoveAt(0);
+                    strip.p_sReceive = sStrip;
+                    p_aReceive.Add(strip);
+                }
             }
         }
         #endregion
@@ -99,6 +196,7 @@ namespace Root_Rinse_Loader.Module
         TCPIPClient m_tcpip; 
         public override void GetTools(bool bInit)
         {
+            GetToolsDIO(); 
             p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
             p_sInfo = m_toolBox.Get(ref m_diRinseRun, this, "Rinse Run"); 
             if (bInit) 
@@ -110,7 +208,151 @@ namespace Root_Rinse_Loader.Module
 
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
-            if (eEQ == _EQ.eEQ.State) AddProtocol(p_id, eCmd.EQLeState, value);
+            switch (eEQ)
+            {
+                case _EQ.eEQ.State:
+                    AddProtocol(p_id, eCmd.EQLeState, value);
+                    switch ((EQ.eState)value)
+                    {
+                        case EQ.eState.Error: RunBuzzer(eBuzzer.Error); break;
+                        case EQ.eState.Home: RunBuzzer(eBuzzer.Home); break;
+                        case EQ.eState.Ready: RunBuzzerOff(); break;
+                    }
+                    break;
+                case _EQ.eEQ.PickerSet:
+                    AddProtocol(p_id, eCmd.PickerSet, value);
+                    break; 
+            }
+        }
+        #endregion
+
+        #region DIO
+        public enum eLamp
+        {
+            Red,
+            Yellow,
+            Green
+        }
+        string[] m_asLamp = Enum.GetNames(typeof(eLamp));
+        public enum eBuzzer
+        {
+            Error,
+            Warning,
+            Finish,
+            Home,
+        }
+        string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
+
+        DIO_I m_diEMG;
+        DIO_I m_diAir;
+        DIO_I m_diDoorLock;
+        DIO_I m_diBuzzerOff; 
+        DIO_Os m_doLamp;
+        DIO_Os m_doBuzzer;
+        DIO_I m_diLightCurtain;
+        void GetToolsDIO()
+        {
+            p_sInfo = m_toolBox.Get(ref m_diEMG, this, "Emergency");
+            p_sInfo = m_toolBox.Get(ref m_diAir, this, "Air Pressure");
+            p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
+            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
+            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
+            p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
+        }
+
+        bool _bEMG = false;
+        public bool p_bEMG
+        {
+            get { return _bEMG; }
+            set
+            {
+                if (_bEMG == value) return;
+                _bEMG = value;
+                OnPropertyChanged();
+                if (value)
+                {
+                    EQ.p_bStop = true;
+                    EQ.p_eState = EQ.eState.Error;
+                }
+            }
+        }
+
+        bool _bAir = false;
+        public bool p_bAir
+        {
+            get { return _bAir; }
+            set
+            {
+                if (_bAir == value) return;
+                _bAir = value;
+                OnPropertyChanged();
+                if (value)
+                {
+                    EQ.p_bStop = true;
+                    EQ.p_eState = EQ.eState.Error;
+                }
+            }
+        }
+
+        bool _bDoorLock = false;
+        public bool p_bDoorLock
+        {
+            get { return _bDoorLock; }
+            set
+            {
+                if (_bDoorLock == value) return;
+                _bDoorLock = value;
+                OnPropertyChanged();
+                EQ.p_bDoorOpen = value;
+            }
+        }
+
+        bool _bBuzzerOff = false;
+        public bool p_bBuzzerOff
+        {
+            get { return _bBuzzerOff; }
+            set
+            {
+                if (_bBuzzerOff == value) return;
+                _bBuzzerOff = value;
+                OnPropertyChanged();
+                if (value) RunBuzzerOff(); 
+            }
+        }
+
+        public void RunBuzzer(eBuzzer eBuzzer)
+        {
+            m_doBuzzer.Write(eBuzzer); 
+        }
+
+        public void RunBuzzerOff()
+        {
+            m_doBuzzer.AllOff(); 
+        }
+
+        public bool m_bBlink = false; 
+        StopWatch m_swBlick = new StopWatch(); 
+        void RunThreadDIO()
+        {
+            p_bEMG = m_diEMG.p_bIn;
+            p_bAir = m_diAir.p_bIn;
+            p_bDoorLock = m_diDoorLock.p_bIn;
+            p_bBuzzerOff = m_diBuzzerOff.p_bIn; 
+            if (m_swBlick.ElapsedMilliseconds < 500) return;
+            m_swBlick.Start();
+            m_bBlink = !m_bBlink; 
+            if (m_bBlink == false) m_doLamp.AllOff();
+            else
+            {
+                switch (EQ.p_eState)
+                {
+                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Green); break;
+                    case EQ.eState.Run: m_doLamp.Write(eLamp.Yellow); break;
+                    case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
+                    default: m_doLamp.AllOff(); break;
+                }
+            }
         }
         #endregion
 
@@ -122,6 +364,9 @@ namespace Root_Rinse_Loader.Module
             SetWidth,
             EQLeState,
             EQUeState,
+            PickerSet,
+            StripSend,
+            StripReceive,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
@@ -159,20 +404,23 @@ namespace Root_Rinse_Loader.Module
         void RunThreadSend()
         {
             m_bRunSend = true;
-            Thread.Sleep(1000);
+            Thread.Sleep(5000);
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
-                p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready; 
+                p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready;
+                RunThreadDIO(); 
                 if (m_qProtocolReply.Count > 0)
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();
                     m_tcpip.Send(protocol.p_sCmd);
+                    Thread.Sleep(10);
                 }
                 else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
                 {
                     m_protocolSend = m_qProtocolSend.Dequeue();
                     m_tcpip.Send(m_protocolSend.p_sCmd);
+                    Thread.Sleep(10);
                 }
             }
         }
@@ -205,8 +453,12 @@ namespace Root_Rinse_Loader.Module
                     switch (eCmd)
                     {
                         case eCmd.EQUeState:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
                             p_eStateUnloader = GetEQeState(asRead[2]);
-                            AddProtocol(asRead[0], eCmd, asRead[2]); 
+                            break;
+                        case eCmd.StripReceive:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            AddStripReceive(asRead[2]);
                             break; 
                     }
                 }
@@ -249,6 +501,9 @@ namespace Root_Rinse_Loader.Module
             InitBase(id, engineer);
 
             InitThread();
+            InitTimer(); 
+            AddProtocol(p_id, eCmd.SetMode, p_eMode);
+            AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
         }
 
         public override void ThreadStop()

@@ -1,4 +1,5 @@
 ﻿using System.Windows.Input;
+using System.Windows.Threading;
 using Root_AOP01_Inspection.Module;
 namespace Root_AOP01_Inspection
 {
@@ -6,10 +7,18 @@ namespace Root_AOP01_Inspection
     {
         Setup_ViewModel m_Setup;
         AOP01_Engineer m_Engineer;
+        MainVision m_mainVision;
+        public MainVision p_mainVision
+        {
+            get { return m_mainVision; }
+            set { SetProperty(ref m_mainVision, value); }
+        }
         public RecipeLADS_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
             m_Engineer = setup.m_MainWindow.m_engineer;
+            m_mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
+            m_mainVision.dispatcher = Dispatcher.CurrentDispatcher;
         }
 
         public ICommand btnBack
@@ -22,14 +31,50 @@ namespace Root_AOP01_Inspection
                 });
             }
         }
+
+        #region Property
+        bool m_bEnablePellicleExpanding = false;
+        public bool p_bEnablePellicleExpanding
+        {
+            get { return m_bEnablePellicleExpanding; }
+            set { SetProperty(ref m_bEnablePellicleExpanding, value); }
+        }
+
+        #region PellicleExpanding Parameter
+        int m_nPellicleExpandingSpec = 100;
+        public int p_nPellicleExpandingSpec
+        {
+            get { return m_nPellicleExpandingSpec; }
+            set { SetProperty(ref m_nPellicleExpandingSpec, value); }
+        }
+        #endregion
+
+        #endregion
+
         public ICommand btnSnap
         {
             get
             {
                 return new RelayCommand(() => {
                     MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
-                    MainVision.Run_GrabSideScan grab = (MainVision.Run_GrabSideScan)mainVision.CloneModuleRun("Run LADS");
-                    mainVision.StartRun(grab);
+                    MainVision.Run_LADS lads = (MainVision.Run_LADS)mainVision.CloneModuleRun("LADS");
+                    mainVision.StartRun(lads);
+                });
+            }
+        }
+
+        public ICommand btnInspection
+        {
+            get
+            {
+                return new RelayCommand(() => {
+                    MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
+                    if (p_bEnablePellicleExpanding)
+                    {
+                        MainVision.Run_PellicleExpandingInspection pellicleExpandingInspection = (MainVision.Run_PellicleExpandingInspection)mainVision.CloneModuleRun("PellicleExpandingInspection");
+                        pellicleExpandingInspection.m_nNGSpec_um = p_nPellicleExpandingSpec;
+                        mainVision.StartRun(pellicleExpandingInspection);
+                    }
                 });
             }
         }

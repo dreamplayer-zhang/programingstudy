@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿#define WORKER_DEBUG
+using RootTools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -141,13 +142,26 @@ namespace RootTools_Vision
                     {
                         Reset();
                         this.workerState = WORKER_STATE.WORK_STOP;
+#if WORKER_DEBUG
+#if DEBUG
+                        DebugOutput.PrintWorker(this, this.workerState.ToString());
+#endif
+#endif
                         _waitSignal.Reset();
                         _waitSignal.WaitOne();
                     }
                     else
                     {
                         if (this.workerState != WORKER_STATE.WORK_ASSIGNED)
+                        {
+#if WORKER_DEBUG
+#if DEBUG
+                            DebugOutput.PrintWorker(this);
+#endif
+#endif
                             _waitSignal.WaitOne();
+                        }
+      
                     }
 
                     if (token.IsCancellationRequested)
@@ -157,59 +171,69 @@ namespace RootTools_Vision
                         return;
                     }
 
-                    // Workplace Copy
-                    if (this.workType == WORK_TYPE.INSPECTION && this.workerState != WORKER_STATE.WORKING) // 이미 Working State면 Copy가 되어 있는 상태
+                    if ( this.isStop == false)
                     {
-                        CopyWorkplaceBuffer();
-
-                        this.works.SetWorkplaceBuffer(this.workplaceBufferR_GRAY, this.workplaceBufferG, this.workplaceBufferB);
-                    }
-
-                    //// Work Start ////
-                    this.workerState = WORKER_STATE.WORKING;
-
-                    bool workDone = false;
-
-                    foreach (WorkBase work in this.works)
-                    {
-                        if(work.IsPreworkDone == false)
-                            work.DoPrework();
-
-                        if (work.IsPreworkDone == true) // Prework Done(0)
+                        // Workplace Copy
+                        if (this.workType == WORK_TYPE.INSPECTION && this.workerState != WORKER_STATE.WORKING) // 이미 Working State면 Copy가 되어 있는 상태
                         {
-                            if (work.IsWorkDone == true)  // 이미 작업을 한 경우 다음 work올 넘어감
-                                continue;
+                            CopyWorkplaceBuffer();
+
+                            this.works.SetWorkplaceBuffer(this.workplaceBufferR_GRAY, this.workplaceBufferG, this.workplaceBufferB);
+                        }
+
+                        //// Work Start ////
+                        this.workerState = WORKER_STATE.WORKING;
+
+                        bool workDone = false;
+
+                        foreach (WorkBase work in this.works)
+                        {
+                            if (work.IsPreworkDone == false)
+                                work.DoPrework();
+
+                            if (work.IsPreworkDone == true) // Prework Done(0)
+                            {
+                                if (work.IsWorkDone == true)  // 이미 작업을 한 경우 다음 work올 넘어감
+                                    continue;
+                                else
+                                {
+#if WORKER_DEBUG
+#if DEBUG
+                                //DebugOutput.PrintWork(work);
+#endif
+#endif
+                                    workDone = work.DoWork();
+                                }
+                            }
                             else
                             {
-#if DEBUG
-                                DebugOutput.PrintWork(work);
-#endif
-                                work.DoWork();
-                                workDone = true;
+                                workDone = false;
+                                break;
                             }
+                        }
+
+                        _waitSignal.Reset();
+
+                        if (workDone == false && this.works.Count != 0)
+                        {
+#if WORKER_DEBUG
+#if DEBUG
+                            if(this.WorkType  == WORK_TYPE.DEFECTPROCESS)
+                                DebugOutput.PrintWorker(this, "Incomplete");                        
+#endif
+#endif
+                            Incomplete();
                         }
                         else
                         {
-                            workDone = false;
-                            break;
+#if WORKER_DEBUG
+#if DEBUG
+                            if (this.WorkType == WORK_TYPE.DEFECTPROCESS)
+                                DebugOutput.PrintWorker(this, "Complete");
+#endif
+#endif
+                            Complete();
                         }
-                    }
-
-                    _waitSignal.Reset();
-
-                    if (workDone == false && this.works.Count != 0)
-                    {
-#if DEBUG
-                        DebugOutput.PrintWorker(this, "Incomplete");                        
-#endif
-                        Incomplete();
-                    }
-                    else
-                    {
-#if DEBUG
-                        DebugOutput.PrintWorker(this, "Complete");
-#endif
-                        Complete();
                     }
                 }
             }
@@ -333,7 +357,5 @@ namespace RootTools_Vision
                     this.workplaceBufferB);
             }
         }
-
-
     }
 }

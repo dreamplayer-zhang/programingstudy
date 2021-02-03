@@ -153,6 +153,32 @@ namespace RootTools_Vision
             }
         }
 
+        public void Clear()
+        {
+            mapdata = new int[1] { (int)CHIP_TYPE.NORMAL };
+            mapSizeX = 1;
+            mapSizeY = 1;
+            masterDieX = 1;
+            masterDieY = 1;
+        }
+
+        public void CreateWaferMap(int mapSizeX, int mapSizeY, CHIP_TYPE type)
+        {
+            this.mapSizeX = mapSizeX;
+            this.mapSizeY = mapSizeY;
+            this.mapdata = new int[this.mapSizeX * this.mapSizeY];
+
+            this.masterDieX = 0;
+            this.masterDieY = 0;
+            for (int x = 0; x < this.MapSizeX; x++)
+            {
+                for (int y = 0; y < this.MapSizeY; y++)
+                {
+                    this.mapdata[x + y * this.MapSizeX] = (int)type;
+                }
+            }
+        }
+
         public void CreateWaferMap(int mapSizeX, int mapSizeY, int[] waferMap)
         {
             this.mapSizeX = mapSizeX;
