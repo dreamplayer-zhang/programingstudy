@@ -1,4 +1,4 @@
-﻿using Met = LibSR_Met;
+﻿using Met = Root_CAMELLIA.LibSR_Met;
 using Root_CAMELLIA.Data;
 using RootTools;
 using System;
@@ -33,7 +33,7 @@ namespace Root_CAMELLIA
         }
         private Module_Camellia m_Module_Camellia;
 
-        public Module_Camellia.Run_Measure p_Run_Measure
+        public Run_Measure p_Run_Measure
         {
             get
             {
@@ -44,7 +44,7 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_Run_Measure, value);
             }
         }
-        private Module_Camellia.Run_Measure m_Run_Measure;
+        private Run_Measure m_Run_Measure;
 
         Met.RTGraph m_RTGraph = new Met.RTGraph();
         public Met.RTGraph p_RTGraph
@@ -81,7 +81,7 @@ namespace Root_CAMELLIA
             ViewModelInit();
             DialogInit(mainwindow);
 
-            Module_Camellia.Run_Measure measure = (Module_Camellia.Run_Measure)p_Module_Camellia.CloneModuleRun("Measure");
+            Run_Measure measure = (Run_Measure)p_Module_Camellia.CloneModuleRun("Measure");
             this.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
 
 

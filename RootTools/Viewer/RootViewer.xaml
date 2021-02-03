@@ -95,8 +95,8 @@
                         obs:SizeObserver.ObservedWidth="{Binding p_LayerCanvasWidth, Mode=TwoWay}"
                         obs:SizeObserver.ObservedHeight="{Binding p_LayerCanvasHeight, Mode=OneWayToSource}">
                     <Image Source="{Binding p_LayerSource}" 
-                           Canvas.Left="{Binding p_LayerOffsetX}" 
-                           Canvas.Top="{Binding p_LayerOffsetY}"
+                           Canvas.Left="{Binding p_LayerCanvasOffsetX}" 
+                           Canvas.Top="{Binding p_LayerCanvasOffsetY}"
                            Opacity="0.5" 
                            Grid.Column="1"/>
                 </Canvas>

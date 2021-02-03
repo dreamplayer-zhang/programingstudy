@@ -879,7 +879,6 @@ namespace RootTools
 
                         Parallel.For(0, p_CanvasHeight, (yy) =>
                         {
-                           // lock (o)
                             {
                                 long pix_y = rectY + yy * rectHeight / p_CanvasHeight;
 
@@ -890,7 +889,6 @@ namespace RootTools
                                 }
                             }
                         });
-
                         p_LayerSource = ImageHelper.ToBitmapSource(view);
                     }
                     if (p_ROILayer.p_nByte == 4)
@@ -1111,7 +1109,8 @@ namespace RootTools
         #region Draw Method
         public virtual unsafe void CropRectSetData(ImageData imageData, CRect nowRect, CPoint offset = null)
         {
-            if (offset == null) offset = new CPoint(0, 0);
+            if (offset is null) 
+                offset = new CPoint(0, 0);
 
             IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
