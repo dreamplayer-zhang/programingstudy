@@ -82,6 +82,13 @@ namespace RootTools_Vision
 		private int illumWhite = 0;
 		private int illumSide = 0;
 		private int edgeSearchLevel = 20;
+		
+		// 카메라 정보
+		private double camResolution = 0;
+		private double triggerRatio = 1;
+		private int camWidth = 0;
+		private int camHeight = 0;
+		private int offset = 0;
 		#endregion
 
 		#region [Getter/Setter]
@@ -155,6 +162,51 @@ namespace RootTools_Vision
 			set
 			{
 				SetProperty<int>(ref this.edgeSearchLevel, value);
+			}
+		}
+		[Category("Parameter")]
+		public double CamResolution
+		{
+			get => this.camResolution;
+			set
+			{
+				SetProperty<double>(ref this.camResolution, value);
+			}
+		}
+		[Category("Parameter")]
+		public double TriggerRatio
+		{
+			get => this.triggerRatio;
+			set
+			{
+				SetProperty<double>(ref this.triggerRatio, value);
+			}
+		}
+		[Category("Parameter")]
+		public int CamWidth
+		{
+			get => this.camWidth;
+			set
+			{
+				SetProperty<int>(ref this.camWidth, value);
+			}
+		}
+		[Category("Parameter")]
+		public int CamHeight
+		{
+			get => this.camHeight;
+			set
+			{
+				SetProperty<int>(ref this.camHeight, value);
+			}
+		}
+		[Category("Parameter")]
+		public int Offset
+		{
+			get => this.offset;
+			set
+			{
+				SetProperty<int>(ref this.offset, value);
 			}
 		}
 		#endregion
