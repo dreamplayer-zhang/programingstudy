@@ -154,7 +154,7 @@ namespace Root_AOP01_Inspection
                         break;
                     case eLoadport.Cymechs:
                     default:
-                        module = new Loadport_Cymechs(sID, m_engineer, true, true);
+                        module = new Loadport_AOP01(sID, m_engineer, true, true);
                         LoadportType = eLoadport.Cymechs;
                         break;
                 }

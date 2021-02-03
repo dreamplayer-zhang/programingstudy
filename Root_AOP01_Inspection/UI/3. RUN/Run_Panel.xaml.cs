@@ -24,7 +24,7 @@ namespace Root_AOP01_Inspection
         RTRCleanUnit m_rtrcleanunit;
         WTRArm m_wtr;
         RTR_RND.Arm m_arm;
-        Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
+        Loadport_AOP01[] m_loadport = new Loadport_AOP01[2];
         RFID_Brooks[] m_rfid = new RFID_Brooks[2];
         AOP01_Handler.eLoadport LoadportType;
         public Run_Panel()
@@ -32,8 +32,8 @@ namespace Root_AOP01_Inspection
             InitializeComponent();
         }
 
-        public void Init(MainVision mainvision, BacksideVision backsidevision, RTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
-            Loadport_Cymechs loadport2, AOP01_Engineer engineer, RFID_Brooks rfid1, RFID_Brooks rfid2)
+        public void Init(MainVision mainvision, BacksideVision backsidevision, RTRCleanUnit wtrcleanunit, Loadport_AOP01 loadport1,
+            Loadport_AOP01 loadport2, AOP01_Engineer engineer, RFID_Brooks rfid1, RFID_Brooks rfid2)
         {
             m_engineer = engineer;
             m_handler = engineer.m_handler;
