@@ -157,7 +157,8 @@ namespace Root_EFEM.Module
 
         string IsRunOK()
         {
-            return "OK"; //0202
+            return "OK"; 
+            //0202 확인
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
             return p_infoCarrier.IsRunOK();
         }
@@ -583,12 +584,12 @@ namespace Root_EFEM.Module
 
         string CmdLoad()
         {
-            //0202
-            //if (IsLock())
-            //{
-            //    m_alidLoad.Run(true, p_id + " Lock by WTR");
-            //    return p_id + " Lock by WTR";
-            //}
+            if (IsLock())
+            {
+                m_alidLoad.Run(true, p_id + " Lock by WTR");
+                return p_id + " Lock by WTR";
+            }
+            //0202 확인
             Protocol protocol = new Protocol(eCmd.Load, this);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitDone(m_secLoad);

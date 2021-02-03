@@ -802,6 +802,12 @@ namespace Root_AOP01_Inspection.Module
         {
             if (crtROI.Width < 1 || crtROI.Height < 1) return null;
             if (crtROI.Left < 0 || crtROI.Top < 0) return null;
+            if (crtROI.Width % 4 != 0)
+            {
+                int nSpare = 0;
+                while (((crtROI.Width + nSpare) % 4) != 0) nSpare++;
+                crtROI = new CRect(crtROI.Left, crtROI.Top, crtROI.Right + nSpare, crtROI.Bottom);
+            }
             ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
             IntPtr p = mem.GetPtr();
             img.SetData(p, crtROI, (int)mem.W);
@@ -2011,68 +2017,66 @@ namespace Root_AOP01_Inspection.Module
                 int nLeft = GetBarcodeSideEdge(mem, crtROI, 10, eSearchDirection.LeftToRight, m_nThreshold, m_bDarkBackground);
                 int nRight = GetBarcodeSideEdge(mem, crtROI, 10, eSearchDirection.RightToLeft, m_nThreshold, m_bDarkBackground);
                 CRect crtBarcode = new CRect(m_cptBarcodeLTPoint.X + nLeft, m_cptBarcodeLTPoint.Y + nTop, m_cptBarcodeLTPoint.X + nRight, m_cptBarcodeLTPoint.Y + nBottom);
-                Mat matBarcode = m_module.GetMatImage(mem, crtBarcode);
+                Image<Gray, byte> imgBarcode = m_module.GetGrayByteImageFromMemory(mem, crtBarcode);
+                Mat matBarcode = imgBarcode.Mat;
                 matBarcode.Save("D:\\AOP01\\BarcodeInspection\\BeforeRotation.bmp");
 
-                // 회전각도 알아내기
-                int nLeftTop = GetEdge(mem, crtHalfLeft, 10, eSearchDirection.TopToBottom, m_nThreshold, m_bDarkBackground);
-                CPoint cptLeftTop = new CPoint(crtHalfLeft.Center().X, nLeftTop);
-                int nRightTop = GetEdge(mem, crtHalfRight, 10, eSearchDirection.TopToBottom, m_nThreshold, m_bDarkBackground);
-                CPoint cptRightTop = new CPoint(crtHalfRight.Center().X, nRightTop);
-                double dThetaRadian = Math.Atan2((double)(cptRightTop.Y - cptLeftTop.Y), (double)(cptRightTop.X - cptLeftTop.X));
-                double dThetaDegree = dThetaRadian * (180 / Math.PI);
+                    // 회전각도 알아내기
+                    int nLeftTop = GetEdge(mem, crtHalfLeft, 10, eSearchDirection.TopToBottom, m_nThreshold, m_bDarkBackground);
+                    CPoint cptLeftTop = new CPoint(crtHalfLeft.Center().X, nLeftTop);
+                    int nRightTop = GetEdge(mem, crtHalfRight, 10, eSearchDirection.TopToBottom, m_nThreshold, m_bDarkBackground);
+                    CPoint cptRightTop = new CPoint(crtHalfRight.Center().X, nRightTop);
+                    double dThetaRadian = Math.Atan2((double)(cptRightTop.Y - cptLeftTop.Y), (double)(cptRightTop.X - cptLeftTop.X));
+                    double dThetaDegree = dThetaRadian * (180 / Math.PI);
 
                 // Barcode 회전
+                Mat matAffine = new Mat();
                 Mat matRotation = new Mat();
-                using (Mat matAffine = new Mat())
-                {
-                    CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
-                    CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
-                }
+                CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
+                CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
                 matRotation.Save("D:\\AOP01\\BarcodeInspection\\AfterRotation.bmp");
 
-                // 회전 후 외곽영역 Cutting
-                int y1 = 100;
-                int y2 = matRotation.Rows - 100;
-                int x1 = 100;
-                int x2 = matRotation.Cols - 100;
-                Mat matCutting = new Mat(matRotation, new Range(y1, y2), new Range(x1, x2));
-                matCutting.Save("D:\\AOP01\\BarcodeInspection\\Cutting.bmp");
+                    // 회전 후 외곽영역 Cutting
+                    int y1 = 100;
+                    int y2 = matRotation.Rows - 100;
+                    int x1 = 100;
+                    int x2 = matRotation.Cols - 100;
+                    Mat matCutting = new Mat(matRotation, new Range(y1, y2), new Range(x1, x2));
+                    matCutting.Save("D:\\AOP01\\BarcodeInspection\\Cutting.bmp");
 
-                // Profile 구하기
-                Mat matSub = GetRowProfileMat(matCutting);
+                    // Profile 구하기
+                    Mat matSub = GetRowProfileMat(matCutting);
 
-                // 차영상 구하기
-                Mat matResult;// = new Mat(matCutting.Rows, matCutting.Cols, matCutting.Depth, matCutting.NumberOfChannels);
-                Mat matResult2;
-                Mat matResult3;
+                    // 차영상 구하기
+                    Mat matResult;// = new Mat(matCutting.Rows, matCutting.Cols, matCutting.Depth, matCutting.NumberOfChannels);
+                    Mat matResult2;
+                    Mat matResult3;
 
-                matResult2 = matCutting - matSub;
-                matResult3 = matSub - matCutting;
-                matResult = matResult2 + matResult3;
+                    matResult2 = matCutting - matSub;
+                    matResult3 = matSub - matCutting;
+                    matResult = matResult2 + matResult3;
 
-                matResult.Save("D:\\AOP01\\BarcodeInspection\\Result.bmp");
+                    matResult.Save("D:\\AOP01\\BarcodeInspection\\Result.bmp");
 
-                // 차영상에서 Blob Labeling
-                Mat matBinary = new Mat();
-                CvInvoke.Threshold(matResult, matBinary, m_nSubImageThreshold, 255, ThresholdType.Binary);
-                matBinary.Save("D:\\AOP01\\BarcodeInspection\\BinaryResult.bmp");
-                CvBlobs blobs = new CvBlobs();
-                CvBlobDetector blobDetector = new CvBlobDetector();
-                Image<Gray, byte> img = matBinary.ToImage<Gray, byte>();
-                blobDetector.Detect(img, blobs);
+                    // 차영상에서 Blob Labeling
+                    Mat matBinary = new Mat();
+                    CvInvoke.Threshold(matResult, matBinary, m_nSubImageThreshold, 255, ThresholdType.Binary);
+                    matBinary.Save("D:\\AOP01\\BarcodeInspection\\BinaryResult.bmp");
+                    CvBlobs blobs = new CvBlobs();
+                    CvBlobDetector blobDetector = new CvBlobDetector();
+                    Image<Gray, byte> img = matBinary.ToImage<Gray, byte>();
+                    blobDetector.Detect(img, blobs);
 
-                int nMMPerUM = 1000;
-                foreach (CvBlob blob in blobs.Values)
-                {
-                    if (blob.BoundingBox.Width * 5/*TDI90 Resolution = 5*/ > m_dNGSpecScratchLength_mm * nMMPerUM || blob.BoundingBox.Height * 5/*TDI90 Resolution = 5*/ > m_dNGSpecScratchLength_mm * nMMPerUM)
+                    int nMMPerUM = 1000;
+                    foreach (CvBlob blob in blobs.Values)
                     {
-                        m_module.p_bBarcodePass = false;
-                        break;
+                        if (blob.BoundingBox.Width * 5/*TDI90 Resolution = 5*/ > m_dNGSpecScratchLength_mm * nMMPerUM || blob.BoundingBox.Height * 5/*TDI90 Resolution = 5*/ > m_dNGSpecScratchLength_mm * nMMPerUM)
+                        {
+                            m_module.p_bBarcodePass = false;
+                            break;
+                        }
+                        else m_module.p_bBarcodePass = true;
                     }
-                    else m_module.p_bBarcodePass = true;
-                }
-
                 return "OK";
             }
 

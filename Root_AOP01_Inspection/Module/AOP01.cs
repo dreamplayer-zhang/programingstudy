@@ -148,17 +148,17 @@ namespace Root_AOP01_Inspection.Module
                     {
                         case EQ.eState.Error:
                             m_doDoorLock_Use.Write(false);
-                            //m_doBuzzer.Write(eBuzzer.Buzzer2);
+                            m_doBuzzer.Write(eBuzzer.Buzzer2);
                             m_doLamp.Write(eLamp.Red);
                             break;
                         case EQ.eState.Run:
                         case EQ.eState.Recovery:
                             m_doDoorLock_Use.Write(true);
-                            //m_doBuzzer.Write(eBuzzer.Buzzer4);
+                            m_doBuzzer.Write(eBuzzer.Buzzer4);
                             m_doLamp.Write(eLamp.Green);
                             break;
                         case EQ.eState.Home:
-                            //m_doBuzzer.Write(eBuzzer.Buzzer3);
+                            m_doBuzzer.Write(eBuzzer.Buzzer3);
                             m_doLamp.Write(eLamp.Green);
                             break;
                         case EQ.eState.Ready:
