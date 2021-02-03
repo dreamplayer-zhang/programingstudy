@@ -75,7 +75,16 @@ namespace Root_AOP01_Inspection.Module
         private void M_timer_Tick(object sender, EventArgs e)
         {
             if(m_bDoClean)
-                if(m_diReticleCheck.p_bIn == false) m_alidClean.Run(true, "Reticle too close to Door");
+            {
+                if (m_diReticleCheck.p_bIn == false)
+                {
+                    Run(WriteCmd(eCmd.Stop));
+                    Run(WaitReply(m_secMotion));
+                    m_doBottomBlow.Write(false);
+                    m_doTopBlow.Write(false);
+                    m_alidClean.Run(true, "Reticle too close to Door");
+                }
+            }
         }
         #endregion
 
@@ -172,12 +181,14 @@ namespace Root_AOP01_Inspection.Module
                         if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sCleanSpeed)))
                         {
                             m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doTopBlow.Write(false);
                             m_module.m_bDoClean = false;
                             return p_sInfo; //Clean Speed Set
                         }
                         if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                         {
                             m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doTopBlow.Write(false);
                             m_module.m_bDoClean = false;
                             return p_sInfo;
                         }
@@ -186,12 +197,14 @@ namespace Root_AOP01_Inspection.Module
                             if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0")))
                             {
                                 m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doTopBlow.Write(false);
                                 m_module.m_bDoClean = false;
                                 return p_sInfo; //Claen Move Front
                             }
                             if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                             {
                                 m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doTopBlow.Write(false);
                                 m_module.m_bDoClean = false;
                                 return p_sInfo;
                             }
@@ -199,12 +212,14 @@ namespace Root_AOP01_Inspection.Module
                             if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0")))
                             {
                                 m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doTopBlow.Write(false);
                                 m_module.m_bDoClean = false;
                                 return p_sInfo; //Clean Move Back
                             }
                             if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                             {
                                 m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doTopBlow.Write(false);
                                 m_module.m_bDoClean = false;
                                 return p_sInfo;
                             }
@@ -212,12 +227,14 @@ namespace Root_AOP01_Inspection.Module
                         if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sOriginSpeed)))
                         {
                             m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doTopBlow.Write(false);
                             m_module.m_bDoClean = false;
                             return p_sInfo; //Origin Speed Set
                         }
                         if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                         {
                             m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doTopBlow.Write(false);
                             m_module.m_bDoClean = false;
                             return p_sInfo;
                         }
@@ -253,12 +270,14 @@ namespace Root_AOP01_Inspection.Module
                         if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sCleanSpeed)))
                         {
                             m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doBottomBlow.Write(false);
                             m_module.m_bDoClean = false;
                             return p_sInfo; //Clean Speed Set
                         }
                         if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                         {
                             m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doBottomBlow.Write(false);
                             m_module.m_bDoClean = false;
                             return p_sInfo;
                         }
@@ -267,12 +286,14 @@ namespace Root_AOP01_Inspection.Module
                             if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0")))
                             {
                                 m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doBottomBlow.Write(false);
                                 m_module.m_bDoClean = false;
                                 return p_sInfo; //Claen Move Front
                             }
                             if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                             {
                                 m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doBottomBlow.Write(false);
                                 m_module.m_bDoClean = false;
                                 return p_sInfo; //Claen Move Front
                             }
@@ -280,12 +301,14 @@ namespace Root_AOP01_Inspection.Module
                             if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0")))
                             {
                                 m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doBottomBlow.Write(false);
                                 m_module.m_bDoClean = false;
                                 return p_sInfo; //Clean Move Back
                             }
                             if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                             {
                                 m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doBottomBlow.Write(false);
                                 m_module.m_bDoClean = false;
                                 return p_sInfo;
                             }
@@ -293,12 +316,14 @@ namespace Root_AOP01_Inspection.Module
                         if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sOriginSpeed)))
                         {
                             m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doBottomBlow.Write(false);
                             m_module.m_bDoClean = false;
                             return p_sInfo; //Origin Speed Set
                         }
                         if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                         {
                             m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doBottomBlow.Write(false);
                             m_module.m_bDoClean = false;
                             return p_sInfo;
                         }

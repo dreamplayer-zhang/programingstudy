@@ -652,6 +652,11 @@ namespace Root_AOP01_Inspection.Module
                         m_alidHome.Run(true, p_sInfo);
                         return p_sInfo;
                     }
+                    if (Run(CmdResetCPU()))
+                    {
+                        m_alidHome.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
                     if (m_bNeedHome)
                     {
                         if (Run(CmdHome()))

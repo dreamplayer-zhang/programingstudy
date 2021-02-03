@@ -380,6 +380,7 @@ namespace Root_AOP01_Inspection.Module
             Retraction,
             SetSpeed,
             ManualMove,
+            Stop,       //감속 정지
         };
         Dictionary<eCmd, string> m_dicCmd = new Dictionary<eCmd, string>();
         void InitCmd()
@@ -397,6 +398,7 @@ namespace Root_AOP01_Inspection.Module
             m_dicCmd.Add(eCmd.Retraction, "RETA");
             m_dicCmd.Add(eCmd.SetSpeed, "TSPD");
             m_dicCmd.Add(eCmd.ManualMove, "MMI");
+            m_dicCmd.Add(eCmd.Stop, "ASS");  //AES
         }
 
         string ReplyCmd(string[] sMsgs)
