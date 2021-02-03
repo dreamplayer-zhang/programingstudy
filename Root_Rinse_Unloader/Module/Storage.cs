@@ -290,10 +290,20 @@ namespace Root_Rinse_Unloader.Module
             return "OK";
         }
 
+        public string RunMoveMagazine()
+        {
+            if (m_aMagazine[(int)m_rinse.p_eMagazine].p_bClamp == false)
+            {
+                m_rinse.p_iMagazine = 0;
+                if (Run(SetNextMagazine())) return p_sInfo;
+            }
+            return MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine); 
+        }
+
         public string StartMoveNextMagazine()
         {
             Run_RunNextMagazine run = (Run_RunNextMagazine)m_runNextMagazine.Clone();
-            return StartRun(run); //forget
+            return StartRun(run); 
         }
 
         public string MoveNextMagazine()
@@ -302,11 +312,17 @@ namespace Root_Rinse_Unloader.Module
             else
             {
                 m_rinse.p_iMagazine = 0;
-                //forget
-                if (m_rinse.p_eMagazine >= eMagazine.Magazine4) return "Cassette Full";
-                m_rinse.p_eMagazine = m_rinse.p_eMagazine + 1; 
+                if (Run(SetNextMagazine())) return p_sInfo; 
             }
             return MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine); 
+        }
+
+        string SetNextMagazine()
+        {
+            if (m_rinse.p_eMagazine >= eMagazine.Magazine4) return "Cassette Full";
+            m_rinse.p_eMagazine = m_rinse.p_eMagazine + 1;
+            if (m_aMagazine[(int)m_rinse.p_eMagazine].p_bClamp) return "OK";
+            return SetNextMagazine(); 
         }
 
         ModuleRunBase m_runReady;
