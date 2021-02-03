@@ -3344,7 +3344,9 @@ namespace SiSoFramegrabber
                 ApcControl.func = pAPCCallback;
 
                 // user defined data to be passed to the delegate
-                GCHandle hWrapperObject = GCHandle.Alloc(this);
+                GCHandle hWrapperObject = GCHandle.Alloc(Receiver);
+                //GCHandle hWrapperObject = GCHandle.Alloc(this);
+
                 IntPtr pWrapperObject = GCHandle.ToIntPtr(hWrapperObject);
                 APCCallbackPins.Add(hWrapperObject);
 

@@ -316,14 +316,14 @@ namespace RootTools.Camera.Silicon
         {
             unsafe
             {
-                //GCHandle handle = GCHandle.FromIntPtr(ev.userData);
+                GCHandle handle = GCHandle.FromIntPtr(ev.userData);
 
                 ////grabber.GetType();
                 ////System.Diagnostics.Debug.WriteLine(grabber.GetType());
 
-                //Camera_Silicon cam = handle.Target as Camera_Silicon;
-                //if (cam != null)
-                //    cam.m_nGrabTrigger++;
+                Camera_Silicon cam = handle.Target as Camera_Silicon;
+                if (cam != null)
+                    cam.m_nGrabTrigger++;
 
                 //m_nGrab = (int)ev.imageNo;
                 //System.Diagnostics.Debug.WriteLine("m_nGrab : " + cam.m_nGrabTrigger);
