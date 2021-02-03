@@ -154,11 +154,11 @@ namespace Root_AOP01_Inspection.Module
                         case EQ.eState.Run:
                         case EQ.eState.Recovery:
                             m_doDoorLock_Use.Write(true);
-                            m_doBuzzer.Write(eBuzzer.Buzzer4);
+                            //m_doBuzzer.Write(eBuzzer.Buzzer3);
                             m_doLamp.Write(eLamp.Green);
                             break;
                         case EQ.eState.Home:
-                            m_doBuzzer.Write(eBuzzer.Buzzer3);
+                            m_doBuzzer.Write(eBuzzer.Buzzer4);
                             m_doLamp.Write(eLamp.Green);
                             break;
                         case EQ.eState.Ready:
@@ -239,7 +239,7 @@ namespace Root_AOP01_Inspection.Module
                 AOP01_Handler handler = (AOP01_Handler)m_engineer.ClassHandler();
                 foreach (ILoadport loadport in handler.m_aLoadport)
                 {
-                    aOHT.Add(((Loadport_Cymechs)loadport).m_OHT);
+                    aOHT.Add(((Loadport_AOP01)loadport).m_OHT);
                 }
                 return aOHT;
             }
