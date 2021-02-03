@@ -189,6 +189,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MainUI\Progress_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainUI\Stack_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -217,6 +221,9 @@
     </Compile>
     <Compile Include="MainUI\Magazine_UI.xaml.cs">
       <DependentUpon>Magazine_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainUI\Progress_UI.xaml.cs">
+      <DependentUpon>Progress_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainUI\Stack_UI.xaml.cs">
       <DependentUpon>Stack_UI.xaml</DependentUpon>

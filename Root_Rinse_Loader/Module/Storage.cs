@@ -175,7 +175,8 @@ namespace Root_Rinse_Loader.Module
         public string RunPusher()
         {
             int msWait = (int)(1000 * m_dioPusher.m_secTimeout); 
-            StopWatch sw = new StopWatch(); 
+            StopWatch sw = new StopWatch();
+            m_rail.CheckStrip(false); 
             m_dioPusher.Write(true);
             while (m_dioPusher.p_bDone == false)
             {
@@ -194,7 +195,9 @@ namespace Root_Rinse_Loader.Module
                 }
             }
             m_dioPusher.Write(false);
-            return m_dioPusher.WaitDone(); 
+            string sDone = m_dioPusher.WaitDone();
+            m_rail.CheckStrip(true);
+            return sDone;
         }
         #endregion
 
@@ -337,10 +340,12 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         RinseL m_rinse;
-        public Storage(string id, IEngineer engineer, RinseL rinse)
+        Rail m_rail; 
+        public Storage(string id, IEngineer engineer, RinseL rinse, Rail rail)
         {
             p_id = id;
             m_rinse = rinse;
+            m_rail = rail;
             InitMagazine();
             InitStack(); 
             InitBase(id, engineer);
@@ -349,12 +354,12 @@ namespace Root_Rinse_Loader.Module
 
         public override void ThreadStop()
         {
-            base.ThreadStop();
             if (m_bThreadCheck)
             {
                 m_bThreadCheck = false;
-                m_threadCheck.Join(); 
+                m_threadCheck.Join();
             }
+            base.ThreadStop();
         }
 
         #region StartRun
