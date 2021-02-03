@@ -65,6 +65,7 @@ namespace RootTools.Camera.Silicon
         public int m_nGrab = -1; //버퍼에서 몇번째 이미지 가져올건지 
         public int m_lGrab = 0; //그랩 몇번할건지?
         public int m_nImgToGrab = 1;
+        GCHandle userObjectHandle;
 
         public bool IsLIVE = false;
         System.Drawing.Point szBuf = new System.Drawing.Point();
@@ -85,7 +86,18 @@ namespace RootTools.Camera.Silicon
         }
 
         public string p_id { get; set; }
-        public int p_nGrabProgress { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        int m_nGrabProgress=0;
+        public int p_nGrabProgress 
+        {
+            get
+            {
+                return m_nGrabProgress;
+            }
+            set
+            {
+                SetProperty(ref m_nGrabProgress, value);
+            }
+        }
         TreeRoot m_treeRoot = null;
         public TreeRoot p_treeRoot 
         {
@@ -208,12 +220,18 @@ namespace RootTools.Camera.Silicon
             // Basler Camera Connect
             try
             {
+                if(m_hDev.IsValid)
+                {
+                    MessageBox.Show("Device is already connected");
+                    return;
+                }
+
                 PylonC.NET.Pylon.Initialize();
                 uint unNumbDevices = PylonC.NET.Pylon.EnumerateDevices();
                 PylonCreateDevice();
 
                 if (m_hDev == null)
-                {
+                { 
                     MessageBox.Show(p_nDeviceIndex.ToString("DeviceID 0 not Found!!"));
                     return;
                 }
@@ -231,8 +249,6 @@ namespace RootTools.Camera.Silicon
                 szBuf.Y = (int)GenApi.IntegerGetValue(hNode);
                 m_hNode = hNode;
                 m_hNodeMap = hNodeMap;
-
-                SetSisoParam();
             }
             catch (Exception)
             {
@@ -243,7 +259,9 @@ namespace RootTools.Camera.Silicon
             fgErrorType ec = m_fgSiso.FgInitConfig(p_sMCF, (uint)p_nDeviceIndex);
             AllocateGrabberMem(szBuf);
             RegisterAPC();
+            SetSisoParam();
 
+            MessageBox.Show("Camera is Connected!");
         }
 
         void PylonCreateDevice()
@@ -284,18 +302,33 @@ namespace RootTools.Camera.Silicon
 
         void RegisterAPC()
         {
+            userObjectHandle = GCHandle.Alloc(this);
+
+            m_pBufGrab = GCHandle.ToIntPtr(userObjectHandle);
             FgApcControlFlags flags = FgApcControlFlags.FG_APC_CONTROL_BASIC;
             FgApcControlCtrlFlags ctrlFlags = FgApcControlCtrlFlags.FG_APC_IGNORE_STOP | FgApcControlCtrlFlags.FG_APC_IGNORE_TIMEOUTS;
             fgErrorType rc = m_fgSiso.FgRegisterAPCHandler(this, ApcEventHandler, (uint)p_nDeviceIndex, flags, ctrlFlags, m_pBufGrab);
         }
 
-        unsafe public int ApcEventHandler(object sender, APCEvent ev)//xfercallback
+            
+
+        public static int ApcEventHandler(object sender, APCEvent ev)//xfercallback
         {
             unsafe
             {
-                m_nGrab = (int)ev.imageNo;
+                //GCHandle handle = GCHandle.FromIntPtr(ev.userData);
+
+                ////grabber.GetType();
+                ////System.Diagnostics.Debug.WriteLine(grabber.GetType());
+
+                //Camera_Silicon cam = handle.Target as Camera_Silicon;
+                //if (cam != null)
+                //    cam.m_nGrabTrigger++;
+
+                //m_nGrab = (int)ev.imageNo;
+                //System.Diagnostics.Debug.WriteLine("m_nGrab : " + cam.m_nGrabTrigger);
                 //IntPtr pBuf = m_fgSiso.FgGetImagePtrEx(ev.imageNo, (uint)p_nDeviceIndex, m_pBufGrab);
-                //GrabDone((int)ev.imageNo - 1, pBuf); 
+                //GrabDone((int)ev.imageNo - 1, pBuf);
             }
             //m_nFrameCnt = (int)ev.imageNo;
             return 0;
@@ -326,10 +359,11 @@ namespace RootTools.Camera.Silicon
             m_Height = szBuf.Y = (int)GenApi.IntegerGetValue(hNode);
 
             fgErrorType rc = fgErrorType.fgeOK;
-            rc = m_fgSiso.FgSetParameterByName("FG_GEN_WIDTH", m_Width, (uint)p_nDeviceIndex);
+            //rc = m_fgSiso.FgSetParameterByName("FG_GEN_WIDTH", m_Width, (uint)p_nDeviceIndex);
             rc = m_fgSiso.FgSetParameterByName("FG_WIDTH", m_Width, (uint)p_nDeviceIndex);
-            rc = m_fgSiso.FgSetParameterByName("FG_GEN_HEIGHT", m_Height, (uint)p_nDeviceIndex);
+            //rc = m_fgSiso.FgSetParameterByName("FG_GEN_HEIGHT", m_Height, (uint)p_nDeviceIndex);
             rc = m_fgSiso.FgSetParameterByName("FG_HEIGHT", m_Height, (uint)p_nDeviceIndex);
+            rc = m_fgSiso.FgSetParameterByName("FG_TRIGGERSTATE", 0/*TS_ACTIVE*/, (uint)p_nDeviceIndex);
         }
 
         public void StartGrab(long lGrab, bool Trigger = true)
@@ -384,6 +418,7 @@ namespace RootTools.Camera.Silicon
         IntPtr m_MemPtr;
         CPoint m_cpScanOffset;
         int m_nFrameCnt;
+        int m_nGrabTrigger = 0;
         CRect m_LastROI;
         Thread m_GrabThread;
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
@@ -396,7 +431,6 @@ namespace RootTools.Camera.Silicon
             m_cpScanOffset = cpScanOffset;
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
-            //m_nGrab = -1;
             m_lGrab = nLine/m_Height;
             m_LastROI = new CRect();
             fgErrorType rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);
@@ -406,27 +440,34 @@ namespace RootTools.Camera.Silicon
         }
         unsafe void RunGrabLineScanThread()
         {
-            while(m_nFrameCnt < m_nGrab)
+            int iBlock = 0;
+            while(m_nGrab < m_lGrab)
             {
-                int nY = m_nFrameCnt * m_Height;
+                if (iBlock < m_nGrabTrigger)
+                {
+                    int nY = m_nGrab * m_Height;
 
-                IntPtr srcPtr = m_fgSiso.FgGetImagePtrEx(m_nFrameCnt, (uint)p_nDeviceIndex, m_pBufGrab) + m_Height;
-                IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (nY + m_cpScanOffset.Y) * m_Memory.W);
+                    IntPtr srcPtr = m_fgSiso.FgGetImagePtrEx(m_nGrab, (uint)p_nDeviceIndex, m_pBufGrab) + m_Height;
+                    IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (nY + m_cpScanOffset.Y) * m_Memory.W);
 
-                memcpy((byte*)srcPtr.ToPointer(), (byte*)dstPtr.ToPointer(), m_Height * m_Width);
+                    memcpy((byte*)srcPtr.ToPointer(), (byte*)dstPtr.ToPointer(), m_Height * m_Width);
 
-                m_LastROI.Left = m_cpScanOffset.X;
-                m_LastROI.Right = m_cpScanOffset.X + m_Width;
-                m_LastROI.Top = m_cpScanOffset.Y;
-                m_LastROI.Bottom = m_cpScanOffset.Y + m_Height;
+                    m_LastROI.Left = m_cpScanOffset.X;
+                    m_LastROI.Right = m_cpScanOffset.X + m_Width;
+                    m_LastROI.Top = m_cpScanOffset.Y;
+                    m_LastROI.Bottom = m_cpScanOffset.Y + m_Height;
 
-                GrabEvent();
+                    iBlock++;
+
+                    GrabEvent();
+                }
+                //System.Diagnostics.Debug.WriteLine("iBlock = " + iBlock);
             }
         }
         void GrabEvent()
         {
             if (Grabed != null)
-                OnGrabed(new GrabedArgs(m_Memory, m_nFrameCnt, m_LastROI, p_nGrabProgress));
+                OnGrabed(new GrabedArgs(m_Memory, m_nGrab, m_LastROI, p_nGrabProgress));
         }
         protected virtual void OnGrabed(GrabedArgs e)
         {

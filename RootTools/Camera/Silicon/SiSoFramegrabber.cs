@@ -804,6 +804,8 @@ namespace SiSoFramegrabber
             {
                 int fg_rc = 0;
                 int value = 1;
+
+                //Fg_setParameter(pFGHandle,)
                 unsafe
                 {
                     // trace the calls to a log file. 
