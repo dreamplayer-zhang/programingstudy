@@ -44,8 +44,8 @@ namespace Root_WIND2.Module
         public int m_nYOffset = 0;
 
         public GrabData m_GD = new GrabData();
-        LensLinearTurret m_lens;
-        public string m_sLens;
+        LensLinearTurret m_lens = null;
+        public string m_sLens = "";
         void RunTreeOption(Tree tree, bool bVisible, bool bReadOnly)
         {
             m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
@@ -125,8 +125,11 @@ namespace Root_WIND2.Module
         }
         public void SetLens()
         {
-            m_lens.ChangePos(m_sLens);
-            m_lens.WaitReady();
+            if (m_lens != null)
+            {
+                m_lens.ChangePos(m_sLens);
+                m_lens.WaitReady();
+            }
         }
         public void SetLight(bool bOn)
         {
@@ -212,7 +215,7 @@ namespace Root_WIND2.Module
         }
 
         public string p_sName { get; set; }
-        public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, RADSControl radsControl = null)
+        public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, RADSControl radsControl = null, LensLinearTurret lensTurret = null )
         {
             p_id = id;
             p_sName = id;
@@ -220,6 +223,7 @@ namespace Root_WIND2.Module
             m_lightSet = lightSet;
             m_memoryPool = memoryPool;
             m_RADSControl = radsControl;
+            m_lens = lensTurret;
         }
 
         public static GrabMode Copy(GrabMode src)
