@@ -276,6 +276,14 @@
     </Compile>
     <Compile Include="UI\Interfaces\IRecipeUILoadable.cs" />
     <Compile Include="Module\WIND2.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\EBR\EBRSetup.xaml.cs">
+      <DependentUpon>EBRSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\EBR\ViewModel\EBRSetup_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\EDGE\EdgesideSetup.xaml.cs">
+      <DependentUpon>EdgesideSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\EDGE\ViewModel\EdgesideSetup_ViewModel.cs" />
     <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment.xaml.cs">
       <DependentUpon>FrontsideAlignment.xaml</DependentUpon>
     </Compile>
@@ -673,6 +681,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\EBR\EBRSetup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\EDGE\EdgesideSetup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -761,8 +777,6 @@
     <Folder Include="Module\BacksideVision\" />
     <Folder Include="UI\Tune\" />
     <Folder Include="UI_Temp\1.Setup\3.RecipeWizard\BACK\" />
-    <Folder Include="UI_Temp\1.Setup\3.RecipeWizard\EBR\" />
-    <Folder Include="UI_Temp\1.Setup\3.RecipeWizard\EDGE\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\ChartEBR.PNG" />

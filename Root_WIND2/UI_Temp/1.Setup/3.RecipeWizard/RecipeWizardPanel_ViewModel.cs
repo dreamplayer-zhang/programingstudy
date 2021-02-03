@@ -71,8 +71,10 @@ namespace Root_WIND2.UI_Temp
         // BACK
 
         // EDGE
+        public readonly UI_Temp.EdgesideSetup edgesideSetup = new UI_Temp.EdgesideSetup();
 
         // EBR
+        public readonly UI_Temp.EBRSetup ebrSetup = new UI_Temp.EBRSetup();
         #endregion
 
         #region [ViewModels]
@@ -117,10 +119,20 @@ namespace Root_WIND2.UI_Temp
         {
             get => frontsideInspectVM;
         }
+
+        private UI_Temp.EdgesideSetup_ViewModel edgesideSetupVM = new UI_Temp.EdgesideSetup_ViewModel();
+        public UI_Temp.EdgesideSetup_ViewModel EdgesideSetupVM
+		{
+            get => edgesideSetupVM;
+		}
+
+        private UI_Temp.EBRSetup_ViewModel ebrSetupVM = new UI_Temp.EBRSetup_ViewModel();
+        public UI_Temp.EBRSetup_ViewModel EBRSetupVM
+        {
+            get => ebrSetupVM;
+        }
         #endregion
 
-
-        
 
         public RecipeWizardPanel_ViewModel()
         {
@@ -260,6 +272,29 @@ namespace Root_WIND2.UI_Temp
                 });
             }
         }
+
+        public ICommand btnEdgeSetup
+		{
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(edgesideSetup);
+                    edgesideSetup.DataContext = edgesideSetupVM;
+                });
+            }
+        }
+        public ICommand btnEBRSetup
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(ebrSetup);
+                    ebrSetup.DataContext = ebrSetupVM;
+                });
+            }
+        }        
         #endregion
 
         public void SetPage(UserControl page)
