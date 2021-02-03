@@ -71,14 +71,14 @@ namespace Root_WIND2.UI_User
         // BACK
 
         // EDGE
-        public readonly UI_Temp.EdgesideSetup edgesideSetup = new UI_Temp.EdgesideSetup();
+        public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
 
         // EBR
 
 
         // Camera
         public readonly UI_User.Camera_VRS cameraVrs = new UI_User.Camera_VRS();
-        public readonly UI_Temp.EBRSetup ebrSetup = new UI_Temp.EBRSetup();
+        public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
         #endregion
 
         #region [ViewModels]
@@ -139,14 +139,14 @@ namespace Root_WIND2.UI_User
         #endregion
 
 
-        private UI_Temp.EdgesideSetup_ViewModel edgesideSetupVM = new UI_Temp.EdgesideSetup_ViewModel();
-        public UI_Temp.EdgesideSetup_ViewModel EdgesideSetupVM
+        private UI_User.EdgesideSetup_ViewModel edgesideSetupVM = new UI_User.EdgesideSetup_ViewModel();
+        public UI_User.EdgesideSetup_ViewModel EdgesideSetupVM
 		{
             get => edgesideSetupVM;
 		}
 
-        private UI_Temp.EBRSetup_ViewModel ebrSetupVM = new UI_Temp.EBRSetup_ViewModel();
-        public UI_Temp.EBRSetup_ViewModel EBRSetupVM
+        private UI_User.EBRSetup_ViewModel ebrSetupVM = new UI_User.EBRSetup_ViewModel();
+        public UI_User.EBRSetup_ViewModel EBRSetupVM
         {
             get => ebrSetupVM;
         }

@@ -15,7 +15,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace Root_WIND2.UI_Temp
+namespace Root_WIND2.UI_User
 {
 	class EBRSetup_ViewModel : ObservableObject
 	{

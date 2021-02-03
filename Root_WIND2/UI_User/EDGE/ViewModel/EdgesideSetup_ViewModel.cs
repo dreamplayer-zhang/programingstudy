@@ -16,7 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
-namespace Root_WIND2.UI_Temp
+namespace Root_WIND2.UI_User
 {
 	class EdgesideSetup_ViewModel : ObservableObject
 	{
