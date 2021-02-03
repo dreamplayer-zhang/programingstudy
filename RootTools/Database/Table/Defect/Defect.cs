@@ -106,10 +106,16 @@ namespace RootTools.Database
             m_nChipIndexX = nChipIdxX;
             m_nCHipIndexY = nChipIdxY;
         }
+
         public void CalcAbsToRelPos(int nRefX, int nRefY)
         {
             m_fRelX = m_fAbsX - nRefX;
             m_fRelY = m_fAbsY - nRefY;
         }
+
+        public void CalcDegree()
+		{
+
+		}
     }
 }

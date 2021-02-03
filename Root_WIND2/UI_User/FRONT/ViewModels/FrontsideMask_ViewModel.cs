@@ -1759,7 +1759,7 @@ namespace Root_WIND2.UI_User
             recipe.GetItem<MaskRecipe>().OriginPoint = this.OriginOffset;
             for (int i = 0; i < p_cInspROI.Count; i++)
             {
-                recipe.GetItem<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data);
+                recipe.GetItem<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data , p_cInspROI[i].p_Color);
             }
         }
 
@@ -1768,7 +1768,6 @@ namespace Root_WIND2.UI_User
             p_PageEnable = true;
             p_PageOpacity = 1;
             p_LoadingOpacity = 0;
-            MessageBox.Show("Save Done");
         }
         #endregion
 

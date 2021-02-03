@@ -285,6 +285,15 @@
       <DependentUpon>MotionControlViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\FRONT\FrontsideAlignment.xaml.cs">
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\EBR\EBRSetup.xaml.cs">
+      <DependentUpon>EBRSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\EBR\ViewModel\EBRSetup_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\EDGE\EdgesideSetup.xaml.cs">
+      <DependentUpon>EdgesideSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\EDGE\ViewModel\EdgesideSetup_ViewModel.cs" />
+    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment.xaml.cs">
       <DependentUpon>FrontsideAlignment.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\FRONT\FrontsideInspect.xaml.cs">
@@ -690,6 +699,15 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\FRONT\FrontsideAlignment.xaml">
+    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\EBR\EBRSetup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\EDGE\EdgesideSetup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

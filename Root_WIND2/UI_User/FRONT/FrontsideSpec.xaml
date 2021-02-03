@@ -45,7 +45,59 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <GroupBox Header="Mask List" Style="{StaticResource main_view_groupbox}">
-                
+                <Grid Margin="4">
+                    <ScrollViewer>
+                        <DataGrid ItemsSource="{Binding p_MaskList}"
+                                              SelectedItem="{Binding p_SelectedMask}"
+                                              SelectionMode="Single"
+                                              IsReadOnly="True"
+                                              RowHeaderWidth="0"
+                                              AutoGenerateColumns="False">
+                            <DataGrid.Resources>
+                                <CollectionViewSource Source="{Binding p_MaskList}"
+                                                                  x:Key="items" />
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalAlignment"
+                                                        Value="Stretch" />
+                                    <Setter Property="HorizontalContentAlignment"
+                                                        Value="Center" />
+                                </Style>
+                                <Style x:Key="TextInCellCenter"
+                                                   TargetType="{x:Type TextBlock}">
+                                    <Setter Property="TextAlignment"
+                                                        Value="Center" />
+                                    <Setter Property="VerticalAlignment"
+                                                        Value="Center" />
+                                </Style>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                                             Color="Gainsboro" />
+                            </DataGrid.Resources>
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Index"
+                                                                Width="100"
+                                                                ElementStyle="{StaticResource TextInCellCenter}"
+                                                                Binding="{Binding Converter={StaticResource IndexConverter},  
+                                                                ConverterParameter={StaticResource ResourceKey=items}}" />
+
+
+                                <DataGridTemplateColumn Width="100"
+                                                                    Header="Color">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Grid Background="{Binding p_Color, Converter={StaticResource ColorConverter}}" Margin="2"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="Area[pxl]"
+                                                                Width="*"
+                                                                Binding="{Binding Path=p_Size, Converter={StaticResource IndexConverter},  
+                                                                ConverterParameter={StaticResource ResourceKey=items}}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ScrollViewer>
+                </Grid>
             </GroupBox>
             <GroupBox Grid.Row ="1"
                       Margin="0,4,0,4"

@@ -105,9 +105,9 @@ namespace Root_AOP01_Inspection.UI._3._RUN
 
         AOP01_Handler m_handler;
         AOP01_Engineer m_engineer;
-        public Loadport_Cymechs m_loadport;
+        public Loadport_AOP01 m_loadport;
         public InfoCarrier m_infoCarrier = null;
-        public ManualJobSchedule(Loadport_Cymechs loadport, AOP01_Engineer engineer, InfoCarrier infoCarrier)
+        public ManualJobSchedule(Loadport_AOP01 loadport, AOP01_Engineer engineer, InfoCarrier infoCarrier)
         {
             m_infoCarrier = infoCarrier;
             if (m_infoCarrier == null) return;

@@ -23,11 +23,9 @@ namespace Root_WIND2.UI_User
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
 
             m_cInspItem = new ObservableCollection<InspectionItem>();
+            p_MaskList = new ObservableCollection<InspectionROI>();
             p_selectedMethodItem = null;
         }
-
-
-
         #region Property
 
         private ObservableCollection<InspectionItem> m_cInspItem;
@@ -47,10 +45,37 @@ namespace Root_WIND2.UI_User
         {
             this.ImageViewerVM.SetViewRect();
 
+            this.p_MaskList.Clear();
             MaskRecipe maskRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<MaskRecipe>();
-            //maskRecipe.MaskList
+            for(int i = 0;i < maskRecipe.MaskList.Count; i++)
+            {
+                InspectionROI roi = new InspectionROI();
+                roi.p_Index = i;
+                roi.p_Size = maskRecipe.MaskList[i].Area;
+                roi.p_Data = maskRecipe.MaskList[i].ToPointLineList();
+                roi.p_Color = maskRecipe.MaskList[i].ColorIndex;
+                this.p_MaskList.Add(roi);
+            }
+        }
 
+        private InspectionROI m_selectedMask;
+        public InspectionROI p_SelectedMask
+        {
+            get => this.m_selectedMask;
+            set
+            {
+                SetProperty<InspectionROI>(ref m_selectedMask, value);
+            }
+        }
 
+        private ObservableCollection<InspectionROI> m_MaskList;
+        public ObservableCollection<InspectionROI> p_MaskList
+        {
+            get => m_MaskList;
+            set
+            {
+                SetProperty<ObservableCollection<InspectionROI>>(ref m_MaskList, value);
+            }
         }
 
         private InspectionItem m_selectedInspItem;
@@ -62,7 +87,6 @@ namespace Root_WIND2.UI_User
             }
             set
             {
-                //var asdf = p_ROI_Viewer.p_ImgSource;
                 SetProperty(ref m_selectedInspItem, value);
                 if (m_selectedInspItem != null)
                     p_selectedMethodItem = m_selectedInspItem.p_InspMethod;
@@ -118,7 +142,6 @@ namespace Root_WIND2.UI_User
             foreach (ParameterBase parameterBase in recipe.ParameterItemList)
             {
                 InspectionItem item = new InspectionItem();
-                //item.p_cInspROI = p_ROI_Viewer.p_cInspROI;
 
                 int selectMethod = 0;
                 for (int i = 0; i < item.p_cInspMethod.Count; i++)

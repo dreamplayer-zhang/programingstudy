@@ -43,10 +43,11 @@
             <Border
                 Background="{StaticResource sidetap_child_background}">
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
-                    <RadioButton Content="Setup" IsChecked="True" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Setup" IsChecked="True" Command="{Binding btnEdgeSetup}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Inspect" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <Button Content="Save"/>
-                    <Button Content="Load"/>
+                    <Button Content="NEW" Style="{StaticResource sidetap_child_button}"/>
+                    <Button Content="SAVE" Style="{StaticResource sidetap_child_button}"/>
+                    <Button Content="LOAD" Style="{StaticResource sidetap_child_button}"/>
                 </StackPanel>
             </Border>
         </ControlTemplate>
@@ -56,10 +57,11 @@
             <Border
                 Background="{StaticResource sidetap_child_background}">
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
-                    <RadioButton Content="Setup" IsChecked="True" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Setup" IsChecked="True" Command="{Binding btnEBRSetup}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Inspect" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <Button Content="Save"/>
-                    <Button Content="Load"/>
+                    <Button Content="NEW" Style="{StaticResource sidetap_child_button}"/>
+                    <Button Content="SAVE" Style="{StaticResource sidetap_child_button}"/>
+                    <Button Content="LOAD" Style="{StaticResource sidetap_child_button}"/>
                 </StackPanel>
             </Border>
         </ControlTemplate>
