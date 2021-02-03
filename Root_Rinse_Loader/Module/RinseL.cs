@@ -120,7 +120,14 @@ namespace Root_Rinse_Loader.Module
         public void AddStripSend(string sStrip)
         {
             Strips strips = new Strips(sStrip);
-            m_qSend.Enqueue(strips); 
+            m_qSend.Enqueue(strips);
+            AddProtocol(p_id, eCmd.StripSend, sStrip);
+        }
+
+        Queue<string> m_qReceive = new Queue<string>();
+        public void AddStripReceive(string sStrip)
+        {
+            m_qReceive.Enqueue(sStrip);
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -132,12 +139,21 @@ namespace Root_Rinse_Loader.Module
         }
 
         public ObservableCollection<Strips> p_aSend = new ObservableCollection<Strips>();
+        public ObservableCollection<Strips> p_aReceive = new ObservableCollection<Strips>();
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            if (m_qSend.Count == 0) return;
-            Strips strips = m_qSend.Dequeue();
-            p_aSend.Add(strips);
-            AddProtocol(p_id, eCmd.StripSend, strips.p_sSend);
+            if (m_qSend.Count > 0) p_aSend.Add(m_qSend.Dequeue());
+            if (m_qReceive.Count > 0)
+            {
+                string sStrip = m_qReceive.Dequeue();
+                if (p_aSend.Count > 0)
+                {
+                    Strips strip = p_aSend[0];
+                    p_aSend.RemoveAt(0);
+                    strip.p_sReceive = sStrip;
+                    p_aReceive.Add(strip);
+                }
+            }
         }
         #endregion
 
@@ -350,6 +366,7 @@ namespace Root_Rinse_Loader.Module
             EQUeState,
             PickerSet,
             StripSend,
+            StripReceive,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
@@ -438,6 +455,10 @@ namespace Root_Rinse_Loader.Module
                         case eCmd.EQUeState:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             p_eStateUnloader = GetEQeState(asRead[2]);
+                            break;
+                        case eCmd.StripReceive:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            AddStripReceive(asRead[2]);
                             break; 
                     }
                 }

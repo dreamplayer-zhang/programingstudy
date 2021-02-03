@@ -23,18 +23,18 @@ namespace Root_WIND2.UI_Temp
         int mapSizeY = 14;
         int nOriginX = 10;
         int nOriginY = 10;
-        int nShotX = 1;
-        int nShotY = 1;
-        int nChipsizeX = 14;
-        int nChipsizeY = 14;
+        //int nShotX = 1;
+        //int nShotY = 1;
+        //int nChipsizeX = 14;
+        //int nChipsizeY = 14;
 
         // Shot Info
-        float fShotOriginX = 0F;
-        float fShotOriginY = 0F;
-        int nShotMatrixX = 1;
-        int nShotMatrixY = 1;
-        int nShotSizeX = 1;
-        int nShotSizeY = 1;
+        //float fShotOriginX = 0F;
+        //float fShotOriginY = 0F;
+        //int nShotMatrixX = 1;
+        //int nShotMatrixY = 1;
+        //int nShotSizeX = 1;
+        //int nShotSizeY = 1;
         #endregion
 
         #region [Get/Set]

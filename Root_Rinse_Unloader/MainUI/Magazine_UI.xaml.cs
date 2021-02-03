@@ -72,7 +72,7 @@ namespace Root_Rinse_Unloader.MainUI
             m_rinse.p_iMagazine = 0;
         }
 
-        private void textBoxMagazineIndex_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void TextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key != Key.Enter) return;
             DependencyProperty property = TextBox.TextProperty;
