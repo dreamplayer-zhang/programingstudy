@@ -318,6 +318,15 @@ namespace Root_WIND2.Module
             AddModuleRunList(new Run_GrabBackside(this), true, "Run Grab Backside");
             AddModuleRunList(new Run_LADS(this), true, "Run LADS");
         }
+        public ImageData[] GetMemoryData()
+        {
+            ImageData[] res = new ImageData[2];
+
+            res[0] = new ImageData(memoryPool.GetMemory(p_id, Strings.BackSideMem));
+            res[1] = new ImageData(memoryPool.GetMemory(p_id, Strings.LADSMem));
+
+            return res;
+        }
         #endregion
 
         public BackSideVision(string id, IEngineer engineer)

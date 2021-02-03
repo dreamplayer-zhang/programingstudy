@@ -134,52 +134,34 @@ namespace Root_WIND2.Module
                 m_grabMode.SetLight(false);
             }
         }
-        unsafe void CalculateHeight(int nCurLine, MemoryData mem, int ReticleHeight)
+        unsafe void CalculateHeight(int nCurLine, MemoryData mem, int WaferHeight,int gv)
         {
             int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
             int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
-            int nHeight = ReticleHeight / nCamHeight;
-            byte* ptr = (byte*)mem.GetPtr().ToPointer(); //Gray
-            for (int i = 0; i < nHeight; i++)
+
+            int maxLine = 0;
+            int maxpixels = 0;
+
+            byte* ptr = (byte *)mem.GetPtr().ToPointer();
+
+            for(int cnt=0;cnt<(WaferHeight/nCamHeight);cnt++)
             {
-                int s = 0, e = 0, cur = 0; //레이저 시작, 끝위치 정보
-                                           //탐색시작 y지점
-                int nY = i * nCamHeight;
-                for (int j = 0; j < nCamHeight; j++)
+                for (int h = 0; h < nCamHeight; h++)
                 {
-                    if (ptr[(int)((nY + j) * mem.W + nCamWidth * (nCurLine + 0.5))] > 230)
+                    int curpxl = 0;
+                    for (int w = 0; w < nCamWidth; w++)
                     {
-                        e = Math.Max(e, cur);
-                        s = Math.Min(s, cur);
+                        if (ptr[h * nCamWidth + w] >= gv)
+                            curpxl++;
+                    }
+
+                    if (maxpixels < curpxl)
+                    {
+                        maxLine = h;
+                        maxpixels = curpxl;
                     }
                 }
-                m_Heightinfo[i, nCurLine] = (s + e) / 2;
-            }
-        }
-        private void SaveFocusMapImage(int nX, int nY)
-        {
-            int thumsize = 30;
-            int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
-            Mat ResultMat = new Mat();
-            for (int y = 0; y < nY; y++)
-            {
-                Mat Vmat = new Mat();
-                for (int x = 0; x < nX; x++)
-                {
-                    Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1);
-                    int nScalednum = m_Heightinfo[nY, nX] * 255 / nCamHeight;
-                    ColorImg.SetTo(new MCvScalar(nScalednum));
-                    if (y == 0 && x == 0)
-                        Vmat = ColorImg;
-                    else
-                        CvInvoke.VConcat(ColorImg, Vmat, Vmat);
-                }
-                if (y == 0)
-                    ResultMat = Vmat;
-                else
-                    CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
-            }
-            CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
+            }            
         }
     }
 }

@@ -231,6 +231,8 @@ namespace RootTools.Camera.Silicon
                 szBuf.Y = (int)GenApi.IntegerGetValue(hNode);
                 m_hNode = hNode;
                 m_hNodeMap = hNodeMap;
+
+                SetSisoParam();
             }
             catch (Exception)
             {
@@ -289,13 +291,13 @@ namespace RootTools.Camera.Silicon
 
         unsafe public int ApcEventHandler(object sender, APCEvent ev)//xfercallback
         {
-            //unsafe
-            //{
-            //    m_nGrab = (int)ev.imageNo;
-            //    IntPtr pBuf = m_fgSiso.FgGetImagePtrEx(ev.imageNo, (uint)p_nDeviceIndex, m_pBufGrab);
-            //    GrabDone((int)ev.imageNo - 1, pBuf); //forget
-            //}
-            m_nFrameCnt = (int)ev.imageNo;
+            unsafe
+            {
+                m_nGrab = (int)ev.imageNo;
+                //IntPtr pBuf = m_fgSiso.FgGetImagePtrEx(ev.imageNo, (uint)p_nDeviceIndex, m_pBufGrab);
+                //GrabDone((int)ev.imageNo - 1, pBuf); 
+            }
+            //m_nFrameCnt = (int)ev.imageNo;
             return 0;
         }
 
@@ -310,7 +312,7 @@ namespace RootTools.Camera.Silicon
             }
             else //트리거 모드
             {
-                // pool->group->mem
+                memcpy((byte*)m_MemPtr.ToPointer()+(m_Width * m_Height), (byte*)pBuf.ToPointer(), m_Width * m_Height);
                 //memcpy(m_DM.Acquired3DImage + (m_szBuf.X * m_szBuf.Y) * nGrab, (byte*)pBuf.ToPointer(), m_szBuf.X * m_szBuf.Y);
             }
         }
@@ -386,7 +388,7 @@ namespace RootTools.Camera.Silicon
         Thread m_GrabThread;
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
         {
-            SetSisoParam();
+            //SetSisoParam();
             AllocateGrabberMem(szBuf);
 
             PylonC.NET.Pylon.DeviceFeatureFromString(m_hDev, "TriggerMode", "On");
@@ -394,7 +396,7 @@ namespace RootTools.Camera.Silicon
             m_cpScanOffset = cpScanOffset;
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
-            m_nGrab = -1;
+            //m_nGrab = -1;
             m_lGrab = nLine/m_Height;
             m_LastROI = new CRect();
             fgErrorType rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);

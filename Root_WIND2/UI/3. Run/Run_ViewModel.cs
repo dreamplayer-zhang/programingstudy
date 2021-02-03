@@ -163,10 +163,7 @@ namespace Root_WIND2
                 m_Viewer.init(null, GlobalObjects.Instance.Get<DialogService>());
                 m_ToolMemory = engineer.ClassMemoryTool();
 
-                m_imagedata = new ImageData(m_ToolMemory.GetMemory("BackSide Vision.BackSide Memory", "BackSide Vision", "Main"));
-                m_imagedata.p_nByte = 3;
-                p_Viewer.SetImageData(m_imagedata);
-
+                p_Viewer.SetImageData(p_BackSideVision.GetMemoryData()[0]);
                 p_ModuleList = engineer.ClassModuleList();
                 p_aTK4S = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_tk4s.p_aTK4S;
             }
