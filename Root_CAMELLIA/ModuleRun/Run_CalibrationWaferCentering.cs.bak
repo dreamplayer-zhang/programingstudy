@@ -1,5 +1,4 @@
 ﻿using Root_CAMELLIA.Data;
-using Met = Root_CAMELLIA.LibSR_Met;
 using RootTools;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Control;
@@ -12,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Met = LibSR_Met;
 
 namespace Root_CAMELLIA.Module
 {
@@ -24,6 +24,7 @@ namespace Root_CAMELLIA.Module
         RPoint m_WaferRT_pulse = new RPoint(); // Pulse
         RPoint m_WaferRB_pulse = new RPoint(); // Pulse
         int m_EdgeSearchRange = 20;
+        int m_EdgeSearchLength = 1000;
         int m_EdgeSearchLevel = 30;
         double m_dResX_um = 1;
         double m_dResY_um = 1;
@@ -70,6 +71,7 @@ namespace Root_CAMELLIA.Module
             run.m_WaferRT_pulse = m_WaferRT_pulse;
             run.m_WaferRB_pulse = m_WaferRB_pulse;
             run.m_EdgeSearchRange = m_EdgeSearchRange;
+            run.m_EdgeSearchLength = m_EdgeSearchLength;
             run.m_EdgeSearchLevel = m_EdgeSearchLevel;
             run.m_useCal = m_useCal;
             run.m_useCentering = m_useCentering;
@@ -83,6 +85,7 @@ namespace Root_CAMELLIA.Module
             m_WaferRT_pulse = tree.Set(m_WaferRT_pulse, m_WaferRT_pulse, "Wafer Right Top", "Wafer Right Top (Pulse)", bVisible);
             m_WaferRB_pulse = tree.Set(m_WaferRB_pulse, m_WaferRB_pulse, "Wafer Right Bottom", "Wafer Right Bottom (Pulse)", bVisible);
             m_EdgeSearchRange = tree.Set(m_EdgeSearchRange, m_EdgeSearchRange, "Edge Search Range", "Edge Search Range", bVisible);
+            m_EdgeSearchLength = tree.Set(m_EdgeSearchLength, m_EdgeSearchLength, "Edge Search Length", "Edge Search Length", bVisible);
             m_EdgeSearchLevel = tree.Set(m_EdgeSearchLevel, m_EdgeSearchLevel, "Edge Search Level", "Edge Search Level", bVisible);
             m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)", bVisible);
             m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)", bVisible);
@@ -107,25 +110,13 @@ namespace Root_CAMELLIA.Module
                 if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     Met.SettingData setting = m_SettingDataWithErrorCode.Item1;
-                    if (m_useCentering)
-                    {
-                        if (m_DataManager.m_calibration.Run(m_InitialCal) != "OK")
-                        {
-                            return "Calibration Error";
-                        }
-                    }
-                    else
-                    {
-                        App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal);
-                    }
-
+                    m_DataManager.m_calibration.Run(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal);
                 }
             }
 
             if (!m_useCentering)
                 return "OK";
 
-            m_DataManager.m_waferCentering.FindEdgeInit();
             SetLight(true);
 
             Camera_Basler VRS = m_module.m_CamVRS;
@@ -137,11 +128,9 @@ namespace Root_CAMELLIA.Module
                 return p_sInfo;
             }
 
-            m_module.VaccumOnOff(true);
 
 
-
-            if (m_module.Run(axisZ.StartMove(m_dFocusZ)))
+            if (m_module.Run(axisZ.StartMove(47932)))
             {
                 return p_sInfo;
             }
@@ -156,19 +145,16 @@ namespace Root_CAMELLIA.Module
 
 
 
-            
+
             if (VRS.Grab() == "OK")
             {
                 strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 0);
                 img.SaveImageSync(strVRSImageFullPath);
                 //Grab error
             }
-            else
-            {
-                return "Grab Error";
-            }
 
-            CenteringParam param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.LT);
+            //m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.LT);
+            CenteringParam param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.LT);
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
 
             if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
@@ -182,13 +168,8 @@ namespace Root_CAMELLIA.Module
                 img.SaveImageSync(strVRSImageFullPath);
                 //Grab error
             }
-            else
-            {
-                return "Grab Error";
-            }
-
-
-            param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.RT);
+            //m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.RT);
+            param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.RT);
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
             if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
                 return p_sInfo;
@@ -201,38 +182,48 @@ namespace Root_CAMELLIA.Module
                 img.SaveImageSync(strVRSImageFullPath);
                 //Grab error
             }
-            else
-            {
-                return "Grab Error";
-            }
+            //m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.RB);
 
-
-            param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.RB);
+            param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.RB);
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
 
-            while (!m_DataManager.m_waferCentering.FindEdgeDone && m_useCentering)
-            {
-                if (m_DataManager.m_waferCentering.ErrorString != "OK")
-                {
-                    return "Find Edge Error";
-                }
-                if (EQ.IsStop())
-                {
-                    return "EQ Stop";
-                }
-            }
+            while (m_DataManager.m_waferCentering.m_ptLT.Count == 0 || m_DataManager.m_waferCentering.m_ptRB.Count == 0 || m_DataManager.m_waferCentering.m_ptRT.Count == 0) ;
 
 
             m_DataManager.m_waferCentering.CalCenterPoint(VRS.GetRoiSize(), m_dResX_um, m_dResY_um, m_WaferLT_pulse, m_WaferRT_pulse, m_WaferRB_pulse);
 
-            while (!m_DataManager.m_calibration.CalDone && m_useCal)
-            {
-                if (EQ.IsStop())
-                {
-                    return "EQ Stop";
-                }
-            }
 
+            if (m_module.Run(axisXY.StartMove(m_DataManager.m_waferCentering.m_ptCenter)))
+                return p_sInfo;
+            if (m_module.Run(axisXY.WaitReady()))
+                return p_sInfo;
+            //img.p_Stride;
+            //img.GetPtr();
+
+            //if (m_module.Run(axisXY.StartMove(m_WaferLT_pulse)))
+            //    return p_sInfo;
+            //if (m_module.Run(axisXY.WaitReady()))
+            //    return p_sInfo;
+
+            //VRS.GrabOneShot();
+
+            ////? 엣지 따는 함수 추가
+            // m_DataManager.m_waferCentering.FindEdge(img.GetByteArray(), WaferCentering.ePos.LT, VRS.GetRoiSize());
+
+            //if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
+            //    return p_sInfo;
+            //if (m_module.Run(axisXY.WaitReady()))
+            //    return p_sInfo;
+            ////? 엣지 따는 함수 추가
+            //VRS.GrabOneShot();
+            ////m_DataManager.m_waferCentering.FindEdge(img.GetByteArray(), WaferCentering.ePos.RT);
+
+            //if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
+            //    return p_sInfo;
+            //if (m_module.Run(axisXY.WaitReady()))
+            //    return p_sInfo;
+            //VRS.GrabOneShot();
+            //// m_DataManager.m_waferCentering.FindEdge(img.GetByteArray(), WaferCentering.ePos.RB);
             SetLight(false);
 
             return "OK";

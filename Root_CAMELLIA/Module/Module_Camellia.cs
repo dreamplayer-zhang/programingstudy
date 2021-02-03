@@ -7,7 +7,7 @@ using RootTools.Light;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
-using Met = LibSR_Met;
+using Met = Root_CAMELLIA.LibSR_Met;
 using Emgu.CV;
 using Emgu.CV.Cvb;
 using Emgu.CV.Structure;
@@ -453,6 +453,13 @@ namespace Root_CAMELLIA.Module
 
         public string BeforePut(int nID)
         {
+            if (m_DataManager.m_calibration.InItCalDone)
+            {
+                if (m_DataManager.m_calibration.Run(false) != "OK")
+                {
+                    return "Calibration Error";
+                }
+            }
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;

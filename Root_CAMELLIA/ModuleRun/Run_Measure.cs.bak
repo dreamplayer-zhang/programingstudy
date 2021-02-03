@@ -8,11 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using static Root_CAMELLIA.Module.Module_Camellia;
-using Met = Root_CAMELLIA.LibSR_Met;
+using Met = LibSR_Met;
 
 namespace Root_CAMELLIA.Module
 {
@@ -26,7 +25,7 @@ namespace Root_CAMELLIA.Module
         double m_dResX_um = 1;
         double m_dResY_um = 1;
         double m_dFocusZ_pulse = 1; // Pulse
-        bool isSaveDone = false;
+
         public Run_Measure(Module_Camellia module)
         {
             m_module = module;
@@ -110,16 +109,16 @@ namespace Root_CAMELLIA.Module
 
             dm.ClearRawData();
 
+
+            bool isSaveDone = false;
             double x = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[0]].x;
             double y = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[0]].y;
             double dX = centerX - x * 10000;
             double dY = centerY - y * 10000;
-            object obj;
-            //StopWatch sw = new StopWatch();
+
             for (int i = 0; i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count; i++)
             {
-
-                if (i == 0)
+                if(i == 0)
                 {
                     MeasurePoint = new RPoint(dX, dY);
                     if (m_module.Run(axisXY.StartMove(MeasurePoint)))
@@ -137,52 +136,52 @@ namespace Root_CAMELLIA.Module
                         m_mwvm.p_ArrowY2 = -y2 * RatioY;
                         m_mwvm.p_ArrowVisible = Visibility.Visible;
                     }
-                    isSaveDone = true;
                 }
-                //  sw.Start();
-                while (!isSaveDone) ;
-                isSaveDone = false;
+
+
+
                 if (App.m_nanoView.SampleMeasure(i, x, y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, setting.nAverage_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, setting.nAverage_NIR) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     return "Layer Model Not Ready";
                 }
-                //   sw.Stop();
-                //   System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
-                if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
-                {
-                    x = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].x;
-                    y = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].y;
-                    dX = centerX - x * 10000;
-                    dY = centerY - y * 10000;
 
-                    MeasurePoint = new RPoint(dX, dY);
+                x = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].x;
+                y = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].y;
+                dX = centerX - x * 10000;
+                dY = centerY - y * 10000;
 
-                    if (m_module.Run(axisXY.StartMove(MeasurePoint)))
-                        return p_sInfo;
+                MeasurePoint = new RPoint(dX, dY);
 
-
-                    m_mwvm.p_ArrowX1 = x * RatioX;
-                    m_mwvm.p_ArrowY1 = -y * RatioY;
-                    if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 2)
-                    {
-                        double x2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 2]].x;
-                        double y2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 2]].y;
-                        m_mwvm.p_ArrowX2 = x2 * RatioX;
-                        m_mwvm.p_ArrowY2 = -y2 * RatioY;
-                        m_mwvm.p_ArrowVisible = Visibility.Visible;
-                    }
-                }
-                    obj = i;
-                    ThreadPool.QueueUserWorkItem(SaveRawData, obj);
+                if (m_module.Run(axisXY.StartMove(MeasurePoint)))
+                    return p_sInfo;
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
-                //if (VRS.Grab() == "OK")
-                //{
-                //    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", i);
-                //    img.SaveImageSync(strVRSImageFullPath);
-                //    //Grab error
-                //}
-                ////Thread.Sleep(600);
+
+                m_mwvm.p_ArrowX1 = x * RatioX;
+                m_mwvm.p_ArrowY1 = -y * RatioY;
+                if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
+                {
+                    double x2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 2]].x;
+                    double y2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 2]].y;
+                    m_mwvm.p_ArrowX2 = x2 * RatioX;
+                    m_mwvm.p_ArrowY2 = -y2 * RatioY;
+                    m_mwvm.p_ArrowVisible = Visibility.Visible;
+                }
+
+
+                dm.SaveRawData(@"C:\Users\ATI\Desktop\MeasureData\test" + i, i);
+                App.m_nanoView.GetThickness(i);
+                m_mwvm.p_RTGraph.DrawReflectanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
+                m_mwvm.p_RTGraph.DrawTransmittanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
+
+
+                if (VRS.Grab() == "OK")
+                {
+                    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", i);
+                    img.SaveImageSync(strVRSImageFullPath);
+                    //Grab error
+                }
+                //Thread.Sleep(600);
 
                 m_mwvm.p_Progress = (((double)(i + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
             }
@@ -190,30 +189,20 @@ namespace Root_CAMELLIA.Module
 
             //? 세이브?
 
-            //if (m_module.Run(axisXY.StartMove(eAxisPos.Ready)))
-            //{
-            //    return p_sInfo;
-            //}
-            if (m_module.Run(axisZ.StartMove(0)))
+            if (m_module.Run(axisXY.StartMove(eAxisPos.Ready)))
             {
                 return p_sInfo;
             }
-            //if (m_module.Run(axisXY.WaitReady()))
-            //    return p_sInfo;
+            if (m_module.Run(axisZ.StartHome()))
+            {
+                return p_sInfo;
+            }
+            if (m_module.Run(axisXY.WaitReady()))
+                return p_sInfo;
             if (m_module.Run(axisZ.WaitReady()))
                 return p_sInfo;
 
             return "OK";
-        }
-
-        void SaveRawData(object obj)
-        {
-            int i = (int)obj;
-            Met.DataManager.GetInstance().SaveRawData(@"C:\Users\ATI\Desktop\MeasureData\test" + i, i);
-            App.m_nanoView.GetThickness(i);
-            m_mwvm.p_RTGraph.DrawReflectanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
-            m_mwvm.p_RTGraph.DrawTransmittanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
-            isSaveDone = true;
         }
     }
 }

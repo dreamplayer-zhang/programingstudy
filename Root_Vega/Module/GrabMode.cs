@@ -40,7 +40,7 @@ namespace Root_Vega.Module
 
         public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false)
         {
-            m_camera.GrabLineScan(memory, cpScanOffset, nLine, bInvY, m_nReverseOffsetY);
+            m_camera.GrabLineScan(memory, cpScanOffset, nLine, 0,  bInvY, m_nReverseOffsetY);
             m_camera.Grabed += m_camera_Grabed;
         }
 

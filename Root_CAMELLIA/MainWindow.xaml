@@ -7,7 +7,7 @@
         xmlns:lp="clr-namespace:Root_CAMELLIA.UI_UserControl"
         xmlns:Icon ="clr-namespace:Root_CAMELLIA.Control.Icon"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
-        xmlns:met="clr-namespace:LibSR_Met;assembly=LibSR_Met"
+        xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
         xmlns:tools="clr-namespace:RootTools.Control.ACS;assembly=RootTools"
         xmlns:arrow="clr-namespace:Petzold.Media2D"
         mc:Ignorable="d"
