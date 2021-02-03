@@ -11,6 +11,7 @@ using System.ComponentModel;
 using Root_AOP01_Inspection.UI._3._RUN;
 using System.Threading;
 using RootTools.OHTNew;
+using Root_AOP01_Inspection.Module;
 
 namespace Root_AOP01_Inspection.UI_UserControl
 {
@@ -27,13 +28,13 @@ namespace Root_AOP01_Inspection.UI_UserControl
 
         AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
-        Loadport_Cymechs m_loadport;
+        Loadport_AOP01 m_loadport;
         InfoCarrier m_infoCarrier;
         RFID_Brooks m_rfid;
 
         public void Init(ILoadport loadport, AOP01_Engineer engineer, IRFID rfid)
         {
-            m_loadport = (Loadport_Cymechs)loadport;
+            m_loadport = (Loadport_AOP01)loadport;
             m_infoCarrier = m_loadport.p_infoCarrier;
             
             m_engineer = engineer;

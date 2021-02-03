@@ -42,6 +42,7 @@ namespace Root_WIND2.Module
         public int m_nMaxFrame = 100;                   // Camera max Frame 스펙
         public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
         public int m_nYOffset = 0;
+        public double m_dCamTriggerRatio = 1;              // Camera 분주비
 
         public GrabData m_GD = new GrabData();
         LensLinearTurret m_lens = null;
@@ -50,6 +51,7 @@ namespace Root_WIND2.Module
         {
             m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
             m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
+            m_dCamTriggerRatio = tree.Set(m_dCamTriggerRatio, m_dCamTriggerRatio, "Trigger Ratio", "Trigger Ratio", bVisible);
 
             m_GD.m_nFovStart = tree.Set(m_GD.m_nFovStart, m_GD.m_nFovStart, "Cam Fov Star Pxl", "Pixel", bVisible);
             m_GD.m_nFovSize = tree.Set(m_GD.m_nFovSize, m_GD.m_nFovSize, "Cam Fov Size Pxl", "Pixel", bVisible);
@@ -58,7 +60,7 @@ namespace Root_WIND2.Module
             m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Cam Y Resolution", "Y Resolution (um)", bVisible);
             m_nYOffset = tree.Set(m_nYOffset, m_nYOffset, "Cam Y Offset", "Y Tilt(pxl)", bVisible);
 
-            m_sLens = tree.Set(m_sLens, m_sLens, m_lens.p_asPos, "Lens Turret", "Turret", bVisible);
+            //m_sLens = tree.Set(m_sLens, m_sLens, m_lens.p_asPos, "Lens Turret", "Turret", bVisible);
             
             m_GD.m_dScaleR = tree.Set(m_GD.m_dScaleR, m_GD.m_dScaleR, "XScaleR", "X Scale R Channel, Default = 1", bVisible);
             m_GD.m_dScaleG = tree.Set(m_GD.m_dScaleG, m_GD.m_dScaleG, "XScaleG", "X Scale G Channel, Default = 1", bVisible);
@@ -249,6 +251,7 @@ namespace Root_WIND2.Module
             dst.m_sMemoryGroup = src.m_sMemoryGroup;
             dst.m_rpAxisCenter = new RPoint(src.m_rpAxisCenter);
             dst.m_cpMemoryOffset = new CPoint(src.m_cpMemoryOffset);
+            dst.m_dCamTriggerRatio = src.m_dCamTriggerRatio;
             dst.m_dResX_um = src.m_dResX_um;
             dst.m_dResY_um = src.m_dResY_um;
             dst.m_nFocusPosZ = src.m_nFocusPosZ;

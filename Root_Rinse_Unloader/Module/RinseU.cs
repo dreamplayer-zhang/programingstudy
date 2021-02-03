@@ -47,53 +47,93 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
-        int _iMagazin = 0;
-        public int p_iMagazine
+        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1;
+        public Storage.eMagazine p_eMagazine
         {
-            get { return _iMagazin; }
+            get { return _eMagazine; }
             set
             {
-                if (_iMagazin == value) return;
-                _iMagazin = value;
+                if (_eMagazine == value) return;
+                _eMagazine = value;
+                OnPropertyChanged();
+            }
+        }
+
+        int _iMagazine = 0;
+        public int p_iMagazine
+        {
+            get { return _iMagazine; }
+            set
+            {
+                if (_iMagazine == value) return;
+                _iMagazine = value;
                 OnPropertyChanged();
             }
         }
         #endregion
 
         #region Strips
-        public enum eStrip
+        public class Strips : NotifyProperty
         {
-            O,
-            X
-        }
-        public class Strips
-        {
-            public eStrip p_eStrip0 { get; set; }
-            public eStrip p_eStrip1 { get; set; }
-            public eStrip p_eStrip2 { get; set; }
-            public eStrip p_eStrip3 { get; set; }
-
-            public string p_sStrip
+            string _sSend = "....";
+            public string p_sSend
             {
-                get { return p_eStrip0.ToString() + p_eStrip1.ToString() + p_eStrip2.ToString() + p_eStrip3.ToString(); }
+                get { return _sSend; }
+                set
+                {
+                    _sSend = value;
+                    OnPropertyChanged();
+                }
             }
 
-            public Strips(bool[] abStrip)
+            string _sReceive = "....";
+            public string p_sReceive
             {
-                p_eStrip0 = abStrip[0] ? eStrip.O : eStrip.X;
-                p_eStrip1 = abStrip[1] ? eStrip.O : eStrip.X;
-                p_eStrip2 = abStrip[2] ? eStrip.O : eStrip.X;
-                p_eStrip3 = abStrip[3] ? eStrip.O : eStrip.X;
+                get { return _sReceive; }
+                set
+                {
+                    _sReceive = value;
+                    OnPropertyChanged();
+                    if (p_sSend != p_sReceive) p_sError = "Error";
+                }
+            }
+
+            string _sError = "";
+            public string p_sError
+            {
+                get { return _sError; }
+                set
+                {
+                    _sError = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            public Strips(string sSend)
+            {
+                p_sSend = sSend;
             }
         }
-        Queue<Strips> m_qStrips = new Queue<Strips>();
-        public void AddStrips(string sStrip)
+
+        Queue<Strips> m_qSend = new Queue<Strips>();
+        public void AddStripSend(string sStrip)
         {
-            bool[] abStrip = new bool[4];
-            int n = 0;
-            foreach (char c in sStrip) abStrip[n++] = (c == 'O'); 
-            Strips strips = new Strips(abStrip);
-            m_qStrips.Enqueue(strips);
+            Strips strips = new Strips(sStrip);
+            m_qSend.Enqueue(strips);
+        }
+
+        Queue<string> m_qReceive = new Queue<string>();
+        public void AddStripReceive(string sStrip)
+        {
+            m_qReceive.Enqueue(sStrip);
+            AddProtocol(p_id, eCmd.StripReceive, sStrip);
+        }
+
+        public void ClearStripResult()
+        {
+            p_aSend.Clear();
+            p_aReceive.Clear();
+            AddProtocol(p_id, eCmd.ResultClear, 0);
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -104,12 +144,22 @@ namespace Root_Rinse_Unloader.Module
             m_timer.Start();
         }
 
-        public ObservableCollection<Strips> p_aStrips = new ObservableCollection<Strips>();
+        public ObservableCollection<Strips> p_aSend = new ObservableCollection<Strips>();
+        public ObservableCollection<Strips> p_aReceive = new ObservableCollection<Strips>();
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            if (m_qStrips.Count == 0) return;
-            Strips strips = m_qStrips.Dequeue();
-            p_aStrips.Add(strips);
+            if (m_qSend.Count > 0) p_aSend.Add(m_qSend.Dequeue());
+            if (m_qReceive.Count > 0)
+            {
+                string sStrip = m_qReceive.Dequeue(); 
+                if (p_aSend.Count > 0)
+                {
+                    Strips strip = p_aSend[0];
+                    p_aSend.RemoveAt(0);
+                    strip.p_sReceive = sStrip;
+                    p_aReceive.Add(strip);
+                }
+            }
         }
         #endregion
 
@@ -294,6 +344,8 @@ namespace Root_Rinse_Unloader.Module
             EQUeState,
             PickerSet,
             StripSend,
+            StripReceive,
+            ResultClear,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd)); 
 
@@ -408,7 +460,7 @@ namespace Root_Rinse_Unloader.Module
                             break;
                         case eCmd.StripSend:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
-                            AddStrips(asRead[2]); 
+                            AddStripSend(asRead[2]); 
                             break; 
                     }
                 }

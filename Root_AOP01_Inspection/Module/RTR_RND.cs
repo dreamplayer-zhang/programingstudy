@@ -97,7 +97,7 @@ namespace Root_AOP01_Inspection.Module
                 return;
             }
             string sArm = eArm.ToString();
-            sArm = tree.Set(sArm, sArm, p_asArm, "Arm", "Select WTR Arm", bVisible);
+            sArm = tree.Set(sArm, sArm, p_asArm, "Arm", "Select RTR Arm", bVisible);
             foreach (Arm arm in m_dicArm.Values)
             {
                 if (arm.m_eArm.ToString() == sArm) eArm = arm.m_eArm;
@@ -314,12 +314,12 @@ namespace Root_AOP01_Inspection.Module
             { "4", "ERR_EMERGENCY"},
             { "12", "ERR_MOTOR_ERROR"},
             { "194", "ERR_INTERLOCK"},
-            { "202", "ERR_WAFER_BEFORE_GET "},
-            { "203", "ERR_NO_WAFER_BEFORE_PUT"},
-            { "204", "ERR_NO_WAFER_AFTER_GET"},
-            { "205", "ERR_WAFER_AFTER_PUT"},
-            { "206", "ERR_NO_WAFER_DURING_GET"},
-            { "207", "ERR_WAFER_DURING_PUT"},
+            { "202", "ERR_RETICLE_BEFORE_GET "},
+            { "203", "ERR_NO_RETICLE_BEFORE_PUT"},
+            { "204", "ERR_NO_RETICLE_AFTER_GET"},
+            { "205", "ERR_RETICLE_AFTER_PUT"},
+            { "206", "ERR_NO_RETICLE_DURING_GET"},
+            { "207", "ERR_RETICLE_DURING_PUT"},
             { "208", "ERR_NOT_HOMED"},
             { "209", "ERR_NOT_SUPPORTED_FUNC "},
             { "251", "ERR_MAPPING_IS_NOT_PERFORMED"},
@@ -331,8 +331,8 @@ namespace Root_AOP01_Inspection.Module
             { "1014", "ERR_INVALID_SLOT"},
             { "1015", "ERR_INVALID_TEACHING_INDEX"},
             { "1016", "ERR_INVALID_PD_INDEX"},
-            { "1017", "ERR_WAFER_DOUBLE_ERORR"},
-            { "1018", "ERR_WAFER_NOEXIT_ERORR"},
+            { "1017", "ERR_RETICLE_DOUBLE_ERORR"},
+            { "1018", "ERR_RETICLE_NOEXIT_ERORR"},
             { "1021", "ERR_INVALID_COORDINATE_TYPE"},
             { "1031", "ERR_INVALID_ARGUMENT"},
             { "1033", "ERR_INVALID_FORMAT"},
@@ -345,9 +345,9 @@ namespace Root_AOP01_Inspection.Module
             { "1052", "ERR_NOT_HOME"},
             { "1053", "ERR_CANNOT_RETRACT_ARM"},
             { "1054", "ERR_VACUUM_DETECTING_ERORR"},
-            { "1055", "ERR_NO_WAFER"},
+            { "1055", "ERR_NO_RETICLE"},
             { "1056", "ERR_UPGRIP"},
-            { "1057", "ERR_DOUBLEWAFERCHECH"},
+            { "1057", "ERR_DOUBLERETICLECHECH"},
             { "1060", "ERR_NOTSUPPLY_AIR"},
             { "1999", "USER_STOP_REQUEST"},
             { "2000", "ERR_RECEIVEBUF_FULL"},
@@ -372,9 +372,9 @@ namespace Root_AOP01_Inspection.Module
             FindHome,   // Initialize (얼라이너는 이걸로 홈)
             MoveHome,   // 로봇 origin 위치로 이동
             Grip,       // Gripper on off
-            Get,        // Pick up the wafer with the present finger
+            Get,        // Pick up the RETICLE with the present finger
             GetReady,
-            Put,        // Place the wafer with the present finger
+            Put,        // Place the RETICLE with the present finger
             PutReady,
             Extend,
             Retraction,
@@ -449,7 +449,7 @@ namespace Root_AOP01_Inspection.Module
             Run(ReplyCmd(sReads));
             if (p_sInfo != "OK")
             {
-                m_alidCMD.Run(true, "Please Check RTR Connect");
+                m_alidCMD.Run(true, p_sInfo);
                 p_eState = eState.Error;
             }
             m_eSendCmd = eCmd.None;
@@ -558,7 +558,7 @@ namespace Root_AOP01_Inspection.Module
                     ms10 += 10;
                     if (ms10 > msDelay)
                     {
-                        m_alidCMD.Run(true, "Please Check RTR Connect");
+                        m_alidCMD.Run(true, "Please Check RTR Connect Or Delay");
                         return m_eSendCmd.ToString() + " Has no Answer !!";
                     }
                 }
@@ -808,10 +808,10 @@ namespace Root_AOP01_Inspection.Module
         ModuleRunBase m_runPut;
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_ResetCPU(this), false, "Reset WTR CPU");
-            AddModuleRunList(new Run_Grip(this), false, "Run Grip WTR Arm");
-            m_runGet = AddModuleRunList(new Run_Get(this), false, "WTR Run Get Motion");
-            m_runPut = AddModuleRunList(new Run_Put(this), false, "WTR Run Put Motion");
+            AddModuleRunList(new Run_ResetCPU(this), false, "Reset RTR CPU");
+            AddModuleRunList(new Run_Grip(this), false, "Run Grip RTR Arm");
+            m_runGet = AddModuleRunList(new Run_Get(this), false, "RTR Run Get Motion");
+            m_runPut = AddModuleRunList(new Run_Put(this), false, "RTR Run Put Motion");
         }
 
         public class Run_ResetCPU : ModuleRunBase
@@ -901,13 +901,13 @@ namespace Root_AOP01_Inspection.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_module.RunTreeArm(tree, ref m_eArm, bVisible && !bRecipe);
-                p_sChild = tree.Set(p_sChild, p_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
+                p_sChild = tree.Set(p_sChild, p_sChild, m_module.m_asChild, "Child", "RTR Child Name", bVisible);
                 List<string> asChildSlot = m_module.GetChildSlotNames(p_sChild);
                 if ((asChildSlot != null) && (asChildSlot.Count > 0))
                 {
                     if ((m_nChildID < 0) || (m_nChildID >= asChildSlot.Count)) m_nChildID = 0;
                     string sChildSlot = asChildSlot[m_nChildID];
-                    sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
+                    sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "RTR Child Slot", bVisible);
                     m_nChildID = m_module.GetChildSlotID(p_sChild, sChildSlot);
                 }
                 else m_nChildID = 0;
@@ -925,8 +925,8 @@ namespace Root_AOP01_Inspection.Module
                 ModuleBase child_module = m_module.GetChild_Module(p_sChild);
                 if (child == null)
                 {
-                    m_module.m_alidGet.Run(true, "WTR Child not Found : " + p_sChild);
-                    return "WTR Child not Found : " + p_sChild;
+                    m_module.m_alidGet.Run(true, "RTR Child not Found : " + p_sChild);
+                    return "RTR Child not Found : " + p_sChild;
                 }
                 if (EQ.p_bSimulate)
                 {
@@ -938,8 +938,8 @@ namespace Root_AOP01_Inspection.Module
                 //}
                 if (posWTR < 0)
                 {
-                    m_module.m_alidGet.Run(true, "WTR Teach Position Not Defined");
-                    return "WTR Teach Position Not Defined";
+                    m_module.m_alidGet.Run(true, "RTR Teach Position Not Defined");
+                    return "RTR Teach Position Not Defined";
                 }
                 if (child.p_eState != eState.Ready)
                 {
@@ -997,10 +997,9 @@ namespace Root_AOP01_Inspection.Module
                     if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
                     else m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
-                return "OK"; // 0202
                 if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
-                m_module.m_alidGet.Run(true, "WTR Get Error : Wafer Check Sensor not Detected at Arm = " + m_eArm.ToString());
-                return "WTR Get Error : Wafer Check Sensor not Detected at Arm = " + m_eArm.ToString();
+                m_module.m_alidGet.Run(true, "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString());
+                return "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString();
             }
         }
 
@@ -1030,13 +1029,13 @@ namespace Root_AOP01_Inspection.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_module.RunTreeArm(tree, ref m_eArm, bVisible && !bRecipe);
-                p_sChild = tree.Set(p_sChild, p_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
+                p_sChild = tree.Set(p_sChild, p_sChild, m_module.m_asChild, "Child", "RTR Child Name", bVisible);
                 List<string> asChildSlot = m_module.GetChildSlotNames(p_sChild);
                 if ((asChildSlot != null) && (asChildSlot.Count > 0))
                 {
                     if ((m_nChildID < 0) || (m_nChildID >= asChildSlot.Count)) m_nChildID = 0;
                     string sChildSlot = asChildSlot[m_nChildID];
-                    sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
+                    sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "RTR Child Slot", bVisible);
                     m_nChildID = m_module.GetChildSlotID(p_sChild, sChildSlot);
                 }
                 else m_nChildID = 0;
@@ -1054,8 +1053,8 @@ namespace Root_AOP01_Inspection.Module
                 ModuleBase child_module = m_module.GetChild_Module(p_sChild);
                 if (child == null)
                 {
-                    m_module.m_alidPut.Run(true, "WTR Child not Found : " + p_sChild);
-                    return "WTR Child not Found : " + p_sChild;
+                    m_module.m_alidPut.Run(true, "RTR Child not Found : " + p_sChild);
+                    return "RTR Child not Found : " + p_sChild;
                 }
                 if (EQ.p_bSimulate)
                 {
@@ -1071,8 +1070,8 @@ namespace Root_AOP01_Inspection.Module
                 int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
                 if (posWTR < 0)
                 {
-                    m_module.m_alidPut.Run(true, "WTR Teach Position Not Defined");
-                    return "WTR Teach Position Not Defined";
+                    m_module.m_alidPut.Run(true, "RTR Teach Position Not Defined");
+                    return "RTR Teach Position Not Defined";
                 }
                 if (p_sChild == "MainVision")
                 {
@@ -1114,10 +1113,9 @@ namespace Root_AOP01_Inspection.Module
                 {                
                     m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
-                return "OK";//0202
                 if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";
-                m_module.m_alidPut.Run(true, "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id);
-                return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;
+                m_module.m_alidPut.Run(true, "RTR Put Error : Reticle Check Sensor not Detected at Child = " + child.p_id);
+                return "RTR Put Error : Reticle Check Sensor not Detected at Child = " + child.p_id;
             }
         }
         #endregion

@@ -15,8 +15,8 @@ namespace Root_AOP01_Inspection.Module
 
         public void Init(AOP01_Handler handler)
         {
-            manualOHTA.Init((Loadport_Cymechs)handler.m_aLoadport[0]);
-            manualOHTB.Init((Loadport_Cymechs)handler.m_aLoadport[1]);
+            manualOHTA.Init((Loadport_AOP01)handler.m_aLoadport[0]);
+            manualOHTB.Init((Loadport_AOP01)handler.m_aLoadport[1]);
         }
 
     }

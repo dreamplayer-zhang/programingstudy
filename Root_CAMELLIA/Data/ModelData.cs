@@ -1,4 +1,5 @@
 ﻿using NanoView;
+using Met = Root_CAMELLIA.LibSR_Met;
 using RootTools;
 using System;
 using System.Collections.Generic;
@@ -8,29 +9,28 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Met = LibSR_Met;
 namespace Root_CAMELLIA.Data
 {
     public class ModelData
     {
         public ModelData()
         {
-            NanoView = App.m_nanoView;
+            //NanoView = App.m_nanoView;
             MetDataManager = Met.DataManager.GetInstance();
         }
 
-        private Met.Nanoview _nanoView;
-        public Met.Nanoview NanoView
-        {
-            get
-            {
-                return _nanoView;
-            }
-            private set
-            {
-                _nanoView = value;
-            }
-        }
+        //private Met.Nanoview _nanoView;
+        //public Met.Nanoview NanoView
+        //{
+        //    get
+        //    {
+        //        return _nanoView;
+        //    }
+        //    private set
+        //    {
+        //        _nanoView = value;
+        //    }
+        //}
         private Met.DataManager _metDataManager;
         public Met.DataManager MetDataManager
         {

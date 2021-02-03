@@ -27,7 +27,7 @@ namespace Root_WIND2.Module
         RPoint m_ptVRSCamPos = new RPoint();
 
         int m_nStartFocusPosZ = 0;
-        int m_nEndFocusPosZ = 0;
+        //int m_nEndFocusPosZ = 0;
         // 추후 모드 추가
 
         int m_nAFOffset = 0;

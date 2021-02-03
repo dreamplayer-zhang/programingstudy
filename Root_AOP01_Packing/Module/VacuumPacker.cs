@@ -1097,13 +1097,15 @@ namespace Root_AOP01_Packing.Module
 
         public string BeforeGet(int nID)
         {
-            //if (p_infoWafer == null) return m_id + " BeforeGet : InfoWafer = null";
+            //0203
+            if (p_infoWafer == null) return p_id + " BeforeGet : InfoWafer = null";
             return CheckGetPut();
         }
 
         public string BeforePut(int nID)
         {
-            //if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
+            //0203
+            if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
             return CheckGetPut();
         }
 
