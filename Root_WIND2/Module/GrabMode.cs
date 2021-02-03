@@ -44,7 +44,7 @@ namespace Root_WIND2.Module
         public int m_nYOffset = 0;
 
         public GrabData m_GD = new GrabData();
-        LensLinearTurret m_lens;
+        LensLinearTurret m_lens = null;
         public string m_sLens;
         void RunTreeOption(Tree tree, bool bVisible, bool bReadOnly)
         {
@@ -58,7 +58,7 @@ namespace Root_WIND2.Module
             m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Cam Y Resolution", "Y Resolution (um)", bVisible);
             m_nYOffset = tree.Set(m_nYOffset, m_nYOffset, "Cam Y Offset", "Y Tilt(pxl)", bVisible);
 
-            m_sLens = tree.Set(m_sLens, m_sLens, m_lens.p_asPos, "Lens Turret", "Turret", bVisible);
+            //m_sLens = tree.Set(m_sLens, m_sLens, m_lens.p_asPos, "Lens Turret", "Turret", bVisible);
             
             m_GD.m_dScaleR = tree.Set(m_GD.m_dScaleR, m_GD.m_dScaleR, "XScaleR", "X Scale R Channel, Default = 1", bVisible);
             m_GD.m_dScaleG = tree.Set(m_GD.m_dScaleG, m_GD.m_dScaleG, "XScaleG", "X Scale G Channel, Default = 1", bVisible);

@@ -276,46 +276,54 @@
     </Compile>
     <Compile Include="UI\Interfaces\IRecipeUILoadable.cs" />
     <Compile Include="Module\WIND2.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment.xaml.cs">
+    <Compile Include="UI_User\CAMERA\CameraVRS.xaml.cs">
+      <DependentUpon>CameraVRS.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\CAMERA\CameraVRS_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\CAMERA\CameraVRS_ViewModel.cs" />
+    <Compile Include="UI_User\CAMERA\MotionControlViewer.xaml.cs">
+      <DependentUpon>MotionControlViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\FRONT\FrontsideAlignment.xaml.cs">
       <DependentUpon>FrontsideAlignment.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideInspect.xaml.cs">
+    <Compile Include="UI_User\FRONT\FrontsideInspect.xaml.cs">
       <DependentUpon>FrontsideInspect.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideAlignment_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideAlignment_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideMask.xaml.cs">
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideAlignment_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideAlignment_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\FrontsideMask.xaml.cs">
       <DependentUpon>FrontsideMask.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideInspect_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideInspect_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideMask_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideOrigin.xaml.cs">
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideInspect_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideInspect_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideMask_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\FrontsideOrigin.xaml.cs">
       <DependentUpon>FrontsideOrigin.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideOrigin_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideOrigin_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideProduct.xaml.cs">
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideOrigin_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideOrigin_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\FrontsideProduct.xaml.cs">
       <DependentUpon>FrontsideProduct.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideProduct_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideSpec.xaml.cs">
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideProduct_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\FrontsideSpec.xaml.cs">
       <DependentUpon>FrontsideSpec.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideSpec_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideSpec_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideSummary.xaml.cs">
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideSpec_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideSpec_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\FrontsideSummary.xaml.cs">
       <DependentUpon>FrontsideSummary.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\ViewModels\FrontsideSummary_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\RecipeWizardPanel.xaml.cs">
+    <Compile Include="UI_User\FRONT\ViewModels\FrontsideSummary_ViewModel.cs" />
+    <Compile Include="UI_User\RecipeWizardPanel.xaml.cs">
       <DependentUpon>RecipeWizardPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\3.RecipeWizard\RecipeWizardPanel_ViewModel.cs" />
-    <Compile Include="UI_Temp\1.Setup\Setup.xaml.cs">
+    <Compile Include="UI_User\RecipeWizardPanel_ViewModel.cs" />
+    <Compile Include="UI_User\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_Temp\1.Setup\Setup_ViewModel.cs" />
+    <Compile Include="UI_User\Setup_ViewModel.cs" />
     <Compile Include="Warning_UI.xaml.cs">
       <DependentUpon>Warning_UI.xaml</DependentUpon>
     </Compile>
@@ -673,19 +681,27 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideAlignment.xaml">
+    <Page Include="UI_User\CAMERA\CameraVRS.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideInspect.xaml">
+    <Page Include="UI_User\CAMERA\MotionControlViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideMask.xaml">
+    <Page Include="UI_User\FRONT\FrontsideAlignment.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideSpec.xaml">
+    <Page Include="UI_User\FRONT\FrontsideInspect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\FRONT\FrontsideMask.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\FRONT\FrontsideSpec.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -693,23 +709,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideOrigin.xaml">
+    <Page Include="UI_User\FRONT\FrontsideOrigin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideProduct.xaml">
+    <Page Include="UI_User\FRONT\FrontsideProduct.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\FRONT\FrontsideSummary.xaml">
+    <Page Include="UI_User\FRONT\FrontsideSummary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_Temp\1.Setup\3.RecipeWizard\RecipeWizardPanel.xaml">
+    <Page Include="UI_User\RecipeWizardPanel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI_Temp\1.Setup\Setup.xaml">
+    <Page Include="UI_User\Setup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -760,9 +776,9 @@
   <ItemGroup>
     <Folder Include="Module\BacksideVision\" />
     <Folder Include="UI\Tune\" />
-    <Folder Include="UI_Temp\1.Setup\3.RecipeWizard\BACK\" />
-    <Folder Include="UI_Temp\1.Setup\3.RecipeWizard\EBR\" />
-    <Folder Include="UI_Temp\1.Setup\3.RecipeWizard\EDGE\" />
+    <Folder Include="UI_User\BACK\" />
+    <Folder Include="UI_User\EBR\" />
+    <Folder Include="UI_User\EDGE\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\ChartEBR.PNG" />
