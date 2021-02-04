@@ -6,6 +6,7 @@
 #include <list>
 #include "CLR_IP_ParamStruct.h"
 #include "..\RootTools_Cpp\\IP.h"
+#include "..\RootTools_Cpp\\ResizeSSE.h"
 #include <iostream>
 
 using namespace System::Collections::Generic; // List
@@ -36,18 +37,16 @@ namespace RootTools_CLR
 
 		// ********* D2D ******** //
 		static void Cpp_SubtractAbs(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH);
-		static void Cpp_SelectMinDiffinArea(array<byte>^ pSrcImg1, array<array<byte>^>^ pSrcImg2, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, int nAreaSize);
+		static void Cpp_SelectMinDiffinArea(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ RefROILT, Cpp_Point^ CurROILT, int stride, int nROIW, int nROIH);
 		static void Cpp_FindMinDiffLoc(array<byte>^ pSrcImg, array<byte>^ pInOutTarget, int nTransX, int nTransY, int nTargetW, int nTargetH, int nTrigger);
 
 		// Create Golden Image
 		// Memory 낭비가 심함
 		static void Cpp_CreateGoldenImage_Avg(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH);
-		static void Cpp_CreateGoldenImage_NearAvg(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH);
 		static void Cpp_CreateGoldenImage_MedianAvg(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH);
 		static void Cpp_CreateGoldenImage_Median(List<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH);
 		// 전체 이미지 포인터를 받아와 필요한 만큼 잘라서 사용 (추후 SSE 등으로 한번 더 최적화 필요)
 		static void Cpp_CreateGoldenImage_Avg(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH);
-		static void Cpp_CreateGoldenImage_NearAvg(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH);
 		static void Cpp_CreateGoldenImage_MedianAvg(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH);
 		static void Cpp_CreateGoldenImage_Median(byte* pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, List<Cpp_Point^>^ ROILT, int nROIW, int nROIH);
 
@@ -98,5 +97,9 @@ namespace RootTools_CLR
 
 		static void Cpp_Histogram(array<byte>^ pSrcImg, array<byte>^ pDstImg, int nW, int nH, int channels, int dims, int histSize, array<float>^ histRanges);
 		static void Cpp_FilEllipse(array<byte>^ pSrcImg, array<byte>^ pDstImg, int nW, int nH);
+
+		void Cpp_CreatInterpolationData(int i,double dXScale, double dXShift, int nWidth);
+		void Cpp_ProcessInterpolation(int i,int thid, BYTE* pSrc, int nSrcHeight, int nSrcWidth, int nFovWidth, LPBYTE* ppTarget, int nXOffset, int nYOffset, int nDir, int nSy, int nEy);
+		void Cpp_ProcessInterpolation(int i,int  thid, BYTE* pSrcImg, int nSrcHeight, int nSrcWidth, int nFovWidth, LPBYTE pTarget);
 	};
 }

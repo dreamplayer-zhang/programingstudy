@@ -20,6 +20,7 @@ using MBrushes = System.Windows.Media.Brushes;
 using DPoint = System.Drawing.Point;
 using System.Data;
 using MySql.Data.MySqlClient;
+using Root_AOP01_Inspection.Recipe;
 
 namespace Root_AOP01_Inspection
 {
@@ -29,7 +30,7 @@ namespace Root_AOP01_Inspection
 		VRS,
 		Mask,
 	}
-	class Recipe45D_ViewModel : ObservableObject
+	public class Recipe45D_ViewModel : ObservableObject
 	{
 		Setup_ViewModel m_Setup;
 		AOP01_Engineer m_Engineer;
@@ -37,11 +38,11 @@ namespace Root_AOP01_Inspection
 		List<CPoint> PolygonPt = new List<CPoint>();
 		public ObservableCollection<TShape> Shapes = new ObservableCollection<TShape>();
 		private ObservableCollection<UIElement> m_UIElements = new ObservableCollection<UIElement>();
-		Recipe recipe
+		RecipeBase recipe
 		{
 			get
 			{
-				return m_Setup.PellInspectionManager.Recipe;
+				return GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>("Recipe45Manager");//TODO 이름 넣으면 그걸 가져오돍
 			}
 		}
 
@@ -212,7 +213,7 @@ namespace Root_AOP01_Inspection
 		{
 			get
 			{
-				return recipe.GetRecipe<BacksideRecipe>();
+				return recipe.GetItem<BacksideRecipe>();
 			}
 		}
 		RecipeType_WaferMap mapInfo;
@@ -233,10 +234,10 @@ namespace Root_AOP01_Inspection
 		public Recipe45D_ViewModel(Setup_ViewModel setup)
 		{
 			m_Setup = setup;
-			m_Engineer = m_Setup.m_MainWindow.m_engineer;
+			m_Engineer = GlobalObjects.Instance.Get<AOP01_Engineer>(); //m_Setup.m_MainWindow.m_engineer;
 
 			p_ImageViewer_VM = new Recipe45D_ImageViewer_ViewModel();
-			p_ImageViewer_VM.init(ProgramManager.Instance.Image45D);
+			p_ImageViewer_VM.init(GlobalObjects.Instance.GetNamed<ImageData>(App.PellRegName), GlobalObjects.Instance.Get<DialogService>());
 			p_ImageViewer_VM.DrawDone += DrawDone_Callback;
 
 			CenterPoint.X = 66000;//p_ImageViewer_VM.p_ImageData.p_Size.X / 2;
@@ -246,7 +247,7 @@ namespace Root_AOP01_Inspection
 			WorkEventManager.InspectionDone += SurfaceInspDone_Callback;
 			WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
 			WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
-			InspectionManager_AOP.PellInspectionDone += InspectionManager_AOP_PellInspectionDone;
+			//InspectionManager_AOP.PellInspectionDone += InspectionManager_AOP_PellInspectionDone;//이벤트 추가 필요
 
 			SurfaceSize = 5;
 			SurfaceGV = 70;
@@ -313,17 +314,23 @@ namespace Root_AOP01_Inspection
 			{
 				Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
 				{
-					m_Setup.PellInspectionManager.AddDefect(workplace.DefectList);
+					//m_Setup.PellInspectionManager.AddDefect(workplace.DefectList);//이벤트 추가 필요
 				}));
 			}
 		}
 		List<TRect> tempList = new List<TRect>();
 		private void saveEdgeBox()
 		{
-			if (m_ImageViewer_VM.TRectList.Count == 6)
-			{
-				tempList = new List<TRect>(m_ImageViewer_VM.TRectList);
-			}
+			throw new Exception();
+			////현재 ViewModel에 있는 edgebox를 저장한다.
+			//if (m_ImageViewer_VM.TRectList.Count == 6)
+			//{
+			//	MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
+			//	//tempList = new List<TRect>(viewer.TRectList);
+			//	MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun("MainSurfaceInspection");
+			//	surfaceInspection.EdgeList = new List<TRect>(m_ImageViewer_VM.TRectList).ToArray();
+			//	surfaceInspection.UpdateTree();
+			//}
 		}
 		private void SetData(DataRowView selectedDataTable, ImageType type)
 		{
@@ -477,7 +484,7 @@ namespace Root_AOP01_Inspection
 					m_ImageViewer_VM.p_DrawElement.RemoveAt(0);
 				}
 			}
-			m_Setup.PellInspectionManager.RefreshDefect();
+			//m_Setup.PellInspectionManager.RefreshDefect();//이벤트 추가해야 함
 
 		}
 		public ICommand commandSaveEdgeBox
@@ -594,7 +601,7 @@ namespace Root_AOP01_Inspection
 			backsideRecipe.DiePitchX = chipSzX;
 			backsideRecipe.DiePitchY = chipSzY;
 
-			OriginRecipe originRecipe = recipe.GetRecipe<OriginRecipe>();
+			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 			originRecipe.DiePitchX = chipSzX;
 			originRecipe.DiePitchY = chipSzY;
 			originRecipe.OriginX = originX;
@@ -671,7 +678,7 @@ namespace Root_AOP01_Inspection
 
 
 			//m_ImageViewer_VM.DrawRect(rectList, Recipe45D_ImageViewer_ViewModel.ColorType.MapData);
-			m_Setup.PellInspectionManager.AddRect(rectList, null, new Pen(Brushes.Green, 2));
+			//m_Setup.PellInspectionManager.AddRect(rectList, null, new Pen(Brushes.Green, 2));//이벤트 추가해야 함
 		}
 		//private void DrawRect(List<CRect> RectList, ColorType color, List<String> textList = null, int FontSz = 15)
 		//{
@@ -731,25 +738,29 @@ namespace Root_AOP01_Inspection
 
 			return shape;
 		}
+		private System.Windows.Media.SolidColorBrush GetColorBrushType(Recipe45D_ImageViewer_ViewModel.ColorType color)
+		{
+			switch (color) // 색상 정리 다시...
+			{
+				case Recipe45D_ImageViewer_ViewModel.ColorType.Teaching:
+					return Brushes.Blue;
+				case Recipe45D_ImageViewer_ViewModel.ColorType.WaferEdge:
+					return Brushes.Green;
+				case Recipe45D_ImageViewer_ViewModel.ColorType.WaferCenter:
+					return Brushes.Magenta;
+				case Recipe45D_ImageViewer_ViewModel.ColorType.MapData:
+					return Brushes.Yellow;
+				default:
+					return Brushes.Black;
+			}
+		}
 		private void startTestInsp()
 		{
-			ResultDataTable = null;
-			ResultDataTable = new DataTable();
-			SelectedDataTable = null;
-
-			saveEdgeBox();
-
 			p_ImageViewer_VM.Clear();
-			m_Setup.PellInspectionManager.ClearDefect();
-			m_Setup.PellInspectionManager.ResetWorkManager();
-			m_Setup.PatternInspectionManager.InitInspectionInfo();
+			//var temp = m_Setup.InspectionManager.Recipe.GetItem<BacksideRecipe>();
+			//temp = backsideRecipe;
 
-			_StartRecipeTeaching();
-
-			var temp = m_Setup.PellInspectionManager.Recipe.GetRecipe<BacksideRecipe>();
-			temp = backsideRecipe;
-
-			BacksideSurfaceParameter surParam = new BacksideSurfaceParameter();
+			ReticleSurfaceParameter surParam = new ReticleSurfaceParameter();
 			surParam.IsBright = BrightGV;
 			surParam.Intensity = SurfaceGV;
 			surParam.Size = SurfaceSize;
@@ -763,18 +774,16 @@ namespace Root_AOP01_Inspection
 				else // All 일때는 R채널로...
 					SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr(0);
 
-				m_Setup.PellInspectionManager.SetColorSharedBuffer(p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
+				//m_Setup.PellInspectionManager.SetColorSharedBuffer(p_ImageViewer_VM.p_ImageData.GetPtr(0), p_ImageViewer_VM.p_ImageData.GetPtr(1), p_ImageViewer_VM.p_ImageData.GetPtr(2));
 			}
 			else
 			{
 				SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr();
-				m_Setup.PellInspectionManager.SharedBufferR_Gray = SharedBuf;
+				//m_Setup.PellInspectionManager.SharedBufferR_Gray = SharedBuf;
 			}
 
-			m_Setup.PellInspectionManager.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
-
-
-			m_Setup.PellInspectionManager.InspectionStart();
+			//m_Setup.PellInspectionManager.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
+			//버퍼 가져오는 구조가 변경된것으로 보임
 		}
 
 		public ICommand btnBack

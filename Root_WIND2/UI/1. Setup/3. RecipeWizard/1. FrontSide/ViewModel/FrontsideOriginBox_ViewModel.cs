@@ -27,9 +27,9 @@ namespace Root_WIND2
         public delegate void boxDone(object e);
         #endregion
 
-        public void init(Setup_ViewModel setup, Recipe recipe)
+        public void init(Setup_ViewModel setup)
         {
-            base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
+            base.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
             p_VisibleMenu = System.Windows.Visibility.Visible;
         }
 
@@ -83,9 +83,10 @@ namespace Root_WIND2
         public override void MouseMove(object sender, MouseEventArgs e)
         {
             base.MouseMove(sender, e);
-            CPoint test = GetCanvasPoint(new CPoint(p_MouseMemX, p_MouseMemY));
+
             CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
             CPoint MemPt = GetMemPoint(CanvasPt);
+
             switch (eBoxProcess)
             {
                 case BoxProcess.None:
@@ -140,6 +141,9 @@ namespace Root_WIND2
                 return;
 
             TRect rect = BOX as TRect;
+            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
+            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
+
             CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
             CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
 
@@ -147,12 +151,28 @@ namespace Root_WIND2
             CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
             int width = Math.Abs(canvasRB.X - canvasLT.X);
             int height = Math.Abs(canvasRB.Y - canvasLT.Y);
-            rect.CanvasRect.Width = width;
-            rect.CanvasRect.Height = height;
-            Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
-            Canvas.SetTop(rect.CanvasRect, canvasLT.Y);
+            rect.CanvasRect.Width = width + pixSizeX;
+            rect.CanvasRect.Height = height + pixSizeY;
+
+
+            Canvas.SetLeft(rect.CanvasRect, canvasLT.X - pixSizeX / 2);
+            Canvas.SetTop(rect.CanvasRect, canvasLT.Y - pixSizeY / 2);
             Canvas.SetRight(rect.CanvasRect, canvasRB.X);
             Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
+
+            //CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
+            //CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
+
+            //CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+            //CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+            //int width = Math.Abs(canvasRB.X - canvasLT.X);
+            //int height = Math.Abs(canvasRB.Y - canvasLT.Y);
+            //rect.CanvasRect.Width = width;
+            //rect.CanvasRect.Height = height;
+            //Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
+            //Canvas.SetTop(rect.CanvasRect, canvasLT.Y);
+            //Canvas.SetRight(rect.CanvasRect, canvasRB.X);
+            //Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
 
             MakeModifyTool(BOX);
             if (BOX.isSelected)
@@ -183,13 +203,18 @@ namespace Root_WIND2
             rect.MemoryRect.Left = memPt.X;
             rect.MemoryRect.Top = memPt.Y;
 
+            //shape = new TRect(Brushes.Blue, 2, 0.4);
+            //TRect rect = shape as TRect;
+            //rect.MemPointBuffer = memPt;
+            //rect.MemoryRect.Left = memPt.X;
+            //rect.MemoryRect.Top = memPt.Y;
+
             return shape;
         }
         private TShape Drawing(TShape shape, CPoint memPt)
         {
             TRect rect = shape as TRect;
-            // memright가 0인상태로 canvas rect width가 정해져서 버그...
-            // 0이면 min정해줘야되나
+
             if (rect.MemPointBuffer.X > memPt.X)
             {
                 rect.MemoryRect.Left = memPt.X;
@@ -211,19 +236,32 @@ namespace Root_WIND2
                 rect.MemoryRect.Bottom = memPt.Y;
             }
 
+            double pixSizeX = (double)p_CanvasWidth / (double)p_View_Rect.Width;
+            double pixSizeY = (double)p_CanvasHeight / (double)p_View_Rect.Height;
             CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
             CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
-            CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
-            CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+            Point canvasLT = new Point(GetCanvasDoublePoint(LT).X, GetCanvasDoublePoint(LT).Y);
+            Point canvasRB = new Point(GetCanvasDoublePoint(RB).X, GetCanvasDoublePoint(RB).Y);
 
-            int width = Math.Abs(canvasRB.X - canvasLT.X);
-            int height = Math.Abs(canvasRB.Y - canvasLT.Y);
-            Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
-            Canvas.SetTop(rect.CanvasRect, canvasLT.Y);
-            Canvas.SetRight(rect.CanvasRect, canvasRB.X);
-            Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
-            rect.CanvasRect.Width = width;
-            rect.CanvasRect.Height = height;
+            Canvas.SetLeft(rect.CanvasRect, canvasLT.X - pixSizeX / 2);
+            Canvas.SetTop(rect.CanvasRect, canvasLT.Y - pixSizeY / 2);
+
+            rect.CanvasRect.Width = Math.Abs(canvasRB.X - canvasLT.X + pixSizeX);
+            rect.CanvasRect.Height = Math.Abs(canvasRB.Y - canvasLT.Y + pixSizeY);
+
+            //CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
+            //CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
+            //CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+            //CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+
+            //int width = Math.Abs(canvasRB.X - canvasLT.X);
+            //int height = Math.Abs(canvasRB.Y - canvasLT.Y);
+            //Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
+            //Canvas.SetTop(rect.CanvasRect, canvasLT.Y);
+            //Canvas.SetRight(rect.CanvasRect, canvasRB.X);
+            //Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
+            //rect.CanvasRect.Width = width;
+            //rect.CanvasRect.Height = height;
 
             return shape;
         }
@@ -443,17 +481,22 @@ namespace Root_WIND2
                 rect.MemoryRect.Right = right;
                 rect.MemoryRect.Bottom = bottom;
 
+                double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
+                double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
+
                 CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
                 CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
 
                 CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
-                CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+                CPoint canvasRB = new CPoint(GetCanvasPoint(RB ));
                 int width = Math.Abs(canvasRB.X - canvasLT.X);
                 int height = Math.Abs(canvasRB.Y - canvasLT.Y);
-                rect.CanvasRect.Width = width;
-                rect.CanvasRect.Height = height;
-                Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
-                Canvas.SetTop(rect.CanvasRect, canvasLT.Y);
+                rect.CanvasRect.Width = width + pixSizeX;
+                rect.CanvasRect.Height = height + pixSizeY;
+
+
+                Canvas.SetLeft(rect.CanvasRect, canvasLT.X - pixSizeX / 2);
+                Canvas.SetTop(rect.CanvasRect, canvasLT.Y - pixSizeY / 2);
                 Canvas.SetRight(rect.CanvasRect, canvasRB.X);
                 Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
             }
@@ -550,20 +593,18 @@ namespace Root_WIND2
             else
                 rect = InspArea;
 
+            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
+            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
             CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
             CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
             CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
             CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
 
-            int width = Math.Abs(canvasRB.X - canvasLT.X);
-            int height = Math.Abs(canvasRB.Y - canvasLT.Y);
 
-            Canvas.SetLeft(InspArea.CanvasRect, canvasLT.X);
-            Canvas.SetTop(InspArea.CanvasRect, canvasLT.Y);
-            Canvas.SetRight(InspArea.CanvasRect, canvasRB.X);
-            Canvas.SetBottom(InspArea.CanvasRect, canvasRB.Y);
-            InspArea.CanvasRect.Width = width;
-            InspArea.CanvasRect.Height = height;
+            Canvas.SetLeft(InspArea.CanvasRect, canvasLT.X - pixSizeX/2);
+            Canvas.SetTop(InspArea.CanvasRect, canvasLT.Y - pixSizeY/2);
+            InspArea.CanvasRect.Width = Math.Abs(canvasRB.X - canvasLT.X + pixSizeX);
+            InspArea.CanvasRect.Height = Math.Abs(canvasRB.Y - canvasLT.Y + pixSizeY);
 
             p_ViewElement.Add(InspArea.CanvasRect);
         }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools.Database.Measurement
+namespace RootTools.Database
 {
     class MeasurementManager
     {

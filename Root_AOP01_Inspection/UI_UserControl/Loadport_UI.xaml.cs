@@ -25,16 +25,22 @@ namespace Root_AOP01_Inspection.UI_UserControl
             InitializeComponent();
         }
 
+        AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
         Loadport_Cymechs m_loadport;
         InfoCarrier m_infoCarrier;
+        RFID_Brooks m_rfid;
 
-        public void Init(ILoadport loadport, AOP01_Handler handler)
+        public void Init(ILoadport loadport, AOP01_Engineer engineer, IRFID rfid)
         {
             m_loadport = (Loadport_Cymechs)loadport;
             m_infoCarrier = m_loadport.p_infoCarrier;
-            m_handler = handler;
+            
+            m_engineer = engineer;
+            m_handler = engineer.m_handler;
+            m_rfid = (RFID_Brooks)rfid;
             this.DataContext = loadport;
+
             textBoxPodID.DataContext = loadport.p_infoCarrier;
             textBoxLotID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
             textBoxSlotID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
@@ -42,7 +48,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
             InitButtonLoad();
             InitTimer();
 
-            m_manualjob = new ManualJobSchedule(m_loadport, m_handler, m_infoCarrier);
+            m_manualjob = new ManualJobSchedule(m_loadport, m_engineer, m_infoCarrier);
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -56,11 +62,11 @@ namespace Root_AOP01_Inspection.UI_UserControl
         {
             Placed.Background = m_loadport.m_diPlaced.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
             Present.Background = m_loadport.m_diPresent.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
-            //Load.Background = m_loadport.m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
-            //UnLoad.Background = m_loadport.m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
+            Load.Background = m_loadport.m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
+            UnLoad.Background = m_loadport.m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
             Alarm.Background = m_loadport.p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
-            //ButtonLoad.IsEnabled = IsEnableLoad();            
-            //ButtonUnLoadReq.IsEnabled = IsEnableUnloadReq();  
+            ButtonLoad.IsEnabled = IsEnableLoad();            
+            ButtonUnLoadReq.IsEnabled = IsEnableUnloadReq();  
         }
 
 
@@ -72,7 +78,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
         }
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-                //RFID
+
         }
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -92,16 +98,24 @@ namespace Root_AOP01_Inspection.UI_UserControl
             bReadyToLoad = true;
             bool bReadyState = (m_loadport.m_qModuleRun.Count == 0);
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
-            //if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
+            if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
             bool bPlaced = m_loadport.CheckPlaced();
 
             if (m_handler.IsEnableRecovery() == true) return false;
             return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && bPlaced;
         }
 
+        public static string sLoadportNum;
         private void ButtonLoad_Click(object sender, RoutedEventArgs e)
         {
-            //if (IsEnableLoad() == false) return;
+            sLoadportNum = m_loadport.p_id;
+            if (IsEnableLoad() == false) return;
+            if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;
+            else if (m_loadport.p_id == "LoadportB") EQ.p_nRunLP = 1;
+            ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
+            m_rfid.StartRun(moduleRun);
+            while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
+            m_loadport.RunDocking();
             if (m_manualjob.ShowPopup(m_handler) == false) return;
             m_bgwLoad.RunWorkerAsync();
         }

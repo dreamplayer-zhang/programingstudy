@@ -5,6 +5,7 @@ using RootTools.Gem;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -29,7 +30,7 @@ namespace Root_Rinse_Loader.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
-        RinseL m_rinse; 
+        public RinseL m_rinse;
         public Storage m_storage;
         public Rail m_rail;
         public Roller m_roller;
@@ -38,7 +39,7 @@ namespace Root_Rinse_Loader.Engineer
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            m_rinse = new RinseL("Rinse", m_engineer);
+            m_rinse = new RinseL("RinseL", m_engineer);
             InitModule(m_rinse);
             m_storage = new Storage("Storage", m_engineer, m_rinse);
             InitModule(m_storage);
@@ -187,9 +188,29 @@ namespace Root_Rinse_Loader.Engineer
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
-                    case EQ.eState.Run:break;
+                    case EQ.eState.Run: break;
                 }
-                p_bRun = (EQ.p_eState == EQ.eState.Run); 
+                p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
+            }
+        }
+        #endregion
+
+        #region PickerSet
+        public string StartPickerSet()
+        {
+            if (EQ.p_bPickerSet)
+            {
+                EQ.p_eState = EQ.eState.Ready;
+                p_moduleList.m_qModuleRun.Clear(); 
+                return "OK"; 
+            }
+            else
+            {
+                if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist";
+                EQ.p_bPickerSet = true;
+                p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
+                p_moduleList.StartModuleRuns();
+                return "OK";
             }
         }
         #endregion

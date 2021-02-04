@@ -416,7 +416,7 @@ namespace RootTools.Camera.Matrox
         private const int BUFFERING_SIZE_MAX = 20;
         MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(LineScanArchiveFunction);
         UserDataObject userObject = new UserDataObject();
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0)
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
         {
             m_nGrabCount = (int)Math.Truncate(1.0 * nLine / p_nHeight);
             m_nGrabTrigger = 0;
@@ -555,7 +555,7 @@ namespace RootTools.Camera.Matrox
             return;
         }
 
-        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null) { }
 
         #region RelayCommand
         public RelayCommand ConnectCommand

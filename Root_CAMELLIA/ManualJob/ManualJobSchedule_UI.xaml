@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_CAMELLIA.ManualJob"
         mc:Ignorable="d"
-        WindowStyle="SingleBorderWindow"
+        WindowStyle="ToolWindow"
         Closing="Window_Closing"
-        Title="ManualJobSchedule" Height="740" Width="930.5" Background="#FF406859" Topmost="True" WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Title="ManualJobSchedule" Height="740" Width="930.5" Background="#FF406859" Topmost="True">
     <!--Title="ManualJobSchedule_UI" Height="600" Width="700" Background="#FF2D2D30" Topmost="True">-->
     <Window.Resources>
         <LinearGradientBrush x:Key="BtnGradientBrush" StartPoint="0,0" EndPoint="1,1">
@@ -210,7 +211,36 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Grid>
+    <Grid Background="BurlyWood">
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <SolidColorBrush Color="Transparent"/>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding p_ManualJobBlink}" Value="True">
+                        <DataTrigger.EnterActions>
+                            <BeginStoryboard Name="sbBlink">
+                                <Storyboard RepeatBehavior="Forever">
+                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                    AutoReverse="True"
+                                                    From="Transparent" To="#FF406859" FillBehavior="Stop"
+                                                    BeginTime="0:0:0" Duration="0:0:2"/>
+                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                    From="#FF406859" To="Transparent"
+                                                    BeginTime="0:0:2" Duration="0:0:2"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.EnterActions>
+                        <DataTrigger.ExitActions>
+                            <RemoveStoryboard BeginStoryboardName="sbBlink"/>
+                        </DataTrigger.ExitActions>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*"/>
             <ColumnDefinition Width="6*"/>

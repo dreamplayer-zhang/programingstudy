@@ -604,8 +604,6 @@ namespace Root_Vega.Module
 
             m_axisZ.p_eState = Axis.eState.Ready;
             m_axisTheta.p_eState = Axis.eState.Ready;
-
-            m_vega.m_doIonizerOnOff.Write(false);//check
         }
 
         public override void ThreadStop()
@@ -710,7 +708,7 @@ namespace Root_Vega.Module
                 {
                     m_module.m_infoPod.SetInfoReticleExist();
                 }
-                m_module.m_infoPod.SendSlotMap();
+                //m_module.m_infoPod.SendSlotMap();
                 return "OK";
             }
         }

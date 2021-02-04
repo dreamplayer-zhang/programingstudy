@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
-namespace RootTools.Database.DataFormat
+namespace RootTools.Database
 {
-    /// <summary>
-    /// Measurement Data 타입
-    /// </summary>
-    class Measurement
+    public class Measurement
     {
-
-        
+        public Measurement()
+        { 
+        }
     }
 }

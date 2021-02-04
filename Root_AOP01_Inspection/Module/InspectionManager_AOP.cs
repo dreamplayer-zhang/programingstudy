@@ -63,6 +63,26 @@ namespace Root_AOP01_Inspection.Module
 			sharedBufferByteCnt = 1;
 		}
 		private Recipe recipe;
+		{
+			//this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP));
+			this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP, 10));
+			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.CHIP));
+			this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.DEFECTPROCESS_ALL, WORK_TYPE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
+
+			AOPEventManager.SnapDone += SnapDone_Callback;
+		}
+
+		private Recipe recipe;
+		{
+			//this.Add(new WorkManager("Position", WORK_TYPE.ALIGNMENT, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP));
+			this.Add(new WorkManager("Inspection", WORK_TYPE.INSPECTION, WORK_TYPE.SNAP, STATE_CHECK_TYPE.CHIP, 10));
+			this.Add(new WorkManager("ProcessDefect", WORK_TYPE.DEFECTPROCESS, WORK_TYPE.INSPECTION, STATE_CHECK_TYPE.CHIP));
+			this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.DEFECTPROCESS_ALL, WORK_TYPE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
+
+			AOPEventManager.SnapDone += SnapDone_Callback;
+		}
+
+		private Recipe recipe;
 		private IntPtr sharedBuffer;
 
 		private IntPtr sharedBufferR_Gray;
@@ -74,7 +94,7 @@ namespace Root_AOP01_Inspection.Module
 		private int sharedBufferHeight;
 		private int sharedBufferByteCnt;
 
-		public Recipe Recipe { get => recipe; set => recipe = value; }
+		public RecipeBase Recipe { get => recipe; set => recipe = value; }
 		public IntPtr SharedBufferR_Gray { get => sharedBufferR_Gray; set => sharedBufferR_Gray = value; }
 		public IntPtr SharedBufferR { get => sharedBufferR; set => sharedBufferR = value; }
 		public IntPtr SharedBufferG { get => sharedBufferG; set => sharedBufferG = value; }
@@ -231,26 +251,6 @@ namespace Root_AOP01_Inspection.Module
 						{
 							if (dAverage < nThreshold)
 							{
-								nEdgeY = (int)rcROI.Top + i;
-								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
-								break;
-							}
-						}
-						else
-						{
-							if (dAverage > nThreshold)
-							{
-								nEdgeY = (int)rcROI.Bottom - i;
-								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
-								break;
-							}
-						}
-
-						nSum = 0;
-					}
-					break;
-			}
-
 			return new System.Drawing.Point(nEdgeX, nEdgeY);
 		}
 		/// <summary>
@@ -260,18 +260,18 @@ namespace Root_AOP01_Inspection.Module
 		/// <param name="rcROI"></param>
 		/// <returns></returns>
 		public static unsafe RootTools.Inspects.eEdgeFindDirection GetDirection(ImageData img, System.Windows.Rect rcROI)
-		{
-			// variable
-			double dRatio = 0.0;
-			int nSum = 0;
-			double dAverageTemp = 0.0;
-			Dictionary<RootTools.Inspects.eBrightSide, double> dic = new Dictionary<RootTools.Inspects.eBrightSide, double>();
+								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
+								break;
+							}
+						}
+						else
+						{
+							if (dAverage > nThreshold)
+							{
+								nEdgeY = (int)rcROI.Bottom - i;
+		public override bool CreateInspection(Recipe _recipe)
 
-			// implement
-			// Left
-			dRatio = rcROI.Width * 0.1;
-			for (int i = 0; i < (int)dRatio; i++)
-			{
+			return new System.Drawing.Point(nEdgeX, nEdgeY);
 				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
 				for (int j = 0; j < rcROI.Height; j++)
 				{
@@ -282,7 +282,7 @@ namespace Root_AOP01_Inspection.Module
 			dAverageTemp = nSum / (rcROI.Height * (int)dRatio);
 			dic.Add(RootTools.Inspects.eBrightSide.LEFT, dAverageTemp);
 			nSum = 0;
-
+		/// <summary>
 			// Top
 			dRatio = rcROI.Height * 0.1;
 			for (int i = 0; i < (int)dRatio; i++)
@@ -297,7 +297,7 @@ namespace Root_AOP01_Inspection.Module
 			dAverageTemp = nSum / (rcROI.Width * (int)dRatio);
 			dic.Add(RootTools.Inspects.eBrightSide.TOP, dAverageTemp);
 			nSum = 0;
-
+		public static unsafe RootTools.Inspects.eEdgeFindDirection GetDirection(ImageData img, System.Windows.Rect rcROI)
 			// Right
 			dRatio = rcROI.Width * 0.1;
 			for (int i = 0; i < (int)dRatio; i++)
@@ -312,7 +312,7 @@ namespace Root_AOP01_Inspection.Module
 			dAverageTemp = nSum / (rcROI.Height * (int)dRatio);
 			dic.Add(RootTools.Inspects.eBrightSide.RIGHT, dAverageTemp);
 			nSum = 0;
-
+			// variable
 			// Bottom
 			dRatio = rcROI.Height * 0.1;
 			for (int i = 0; i < (int)dRatio; i++)
@@ -327,27 +327,27 @@ namespace Root_AOP01_Inspection.Module
 			dAverageTemp = nSum / (rcROI.Width * (int)dRatio);
 			dic.Add(RootTools.Inspects.eBrightSide.BOTTOM, dAverageTemp);
 			nSum = 0;
-
+					return false;
 			var maxKey = dic.Keys.Max();
 			var maxValue = dic.Values.Max();
 			// Value값이 가장 큰 Key값 찾기
 			var keyOfMaxValue = dic.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
-
+				//position.SetRecipe(_recipe);
 			if (keyOfMaxValue == RootTools.Inspects.eBrightSide.TOP) return RootTools.Inspects.eEdgeFindDirection.BOTTOM;
 			else if (keyOfMaxValue == RootTools.Inspects.eBrightSide.BOTTOM) return RootTools.Inspects.eEdgeFindDirection.TOP;
 			else if (keyOfMaxValue == RootTools.Inspects.eBrightSide.LEFT) return RootTools.Inspects.eEdgeFindDirection.RIGHT;
 			else return RootTools.Inspects.eEdgeFindDirection.LEFT;
 		}
-
-
+			}
+				surParam.Intensity = 80;
 		static unsafe int GetThresholdAverage(ImageData img, System.Windows.Rect rcROI, RootTools.Inspects.eEdgeFindDirection eDirection)
 		{
 			// variable
 			int nSum = 0;
 			int nThreshold = 40;
-
+				//Position position = new Position();
 			// implement
-
+				workBundle.Add(processDefect);
 			if (eDirection == RootTools.Inspects.eEdgeFindDirection.TOP || eDirection == RootTools.Inspects.eEdgeFindDirection.BOTTOM)
 			{
 				double dRatio = rcROI.Height * 0.1;
@@ -377,7 +377,7 @@ namespace Root_AOP01_Inspection.Module
 				nSum = 0;
 				////////////////////////////////////////////////
 				nThreshold = (int)(dAverage1 + dAverage2) / 2;
-			}
+			else if (keyOfMaxValue == RootTools.Inspects.eBrightSide.LEFT) return RootTools.Inspects.eEdgeFindDirection.RIGHT;
 			else
 			{
 				double dRatio = rcROI.Width * 0.1;
@@ -408,10 +408,10 @@ namespace Root_AOP01_Inspection.Module
 				////////////////////////////////////////////////
 				nThreshold = (int)(dAverage1 + dAverage2) / 2;
 			}
-
+			{
 			return nThreshold;
 		}
-
+				return false;
 		internal void AddDefect(List<Defect> defectList)
 		{
 			if (AddDefectEvent != null)
@@ -426,7 +426,7 @@ namespace Root_AOP01_Inspection.Module
 				AddDefectEvent(defectList, brush, pen);
 			}
 		}
-
+						bp += img.p_Stride;
 		public void SnapDone_Callback(object obj, SnapDoneArgs args)
 		{
 			//if (this.workplaceBundle == null) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
@@ -444,22 +444,22 @@ namespace Root_AOP01_Inspection.Module
 			//}
 		}
 		public void InitInspectionInfo()
-		{
-			string lotId = "Lotid";
-			string partId = "Partid";
-			string setupId = "SetupID";
-			string cstId = "CSTid";
-			string waferId = "WaferID";
-			//string sRecipe = "RecipeID";
-			string recipeName = recipe.Name;
-			var temp = DatabaseManager.Instance.GetConnectionStatus();
-			DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
+
+				if (snapArea.Contains(checkArea) == true)
+				{
+					wp.STATE = WORK_TYPE.SNAP;
+				}
+			}
+
 		}
 
-		public void InspectionStart()
-		{
-			base.Start(WORK_TYPE.NONE);
-		}
+		private new void Start()
+
+				if (snapArea.Contains(checkArea) == true)
+				{
+					wp.STATE = WORK_TYPE.SNAP;
+				}
+			}
 
 		internal void RefreshDefect()
 		{
@@ -467,21 +467,21 @@ namespace Root_AOP01_Inspection.Module
 			if (RefreshDefectEvent != null)
 			{
 				RefreshDefectEvent();
-			}
+			string setupId = "SetupID";
+			string cstId = "CSTid";
+			string waferId = "WaferID";
+			//string sRecipe = "RecipeID";
+			if (Snap == false)
+			{
+				foreach (Workplace wp in this.workplaceBundle)
+				{
+					wp.STATE = WORK_TYPE.SNAP;
+				}
+		{
+			base.Start(WORK_TYPE.NONE);
 		}
 
-		public new void Stop()
-		{
-			base.Stop();
-		}
-
-		public void SetColorSharedBuffer(IntPtr ptrR, IntPtr ptrG, IntPtr ptrB)
-		{
-			this.SharedBufferR_Gray = ptrR;
-			this.SharedBufferG = ptrG;
-			this.SharedBufferB = ptrB;
-			this.SharedBufferByteCnt = 3;
-		}
+			if (Snap == false)
 
 		internal void ClearDefect()
 		{
@@ -675,5 +675,25 @@ namespace Root_AOP01_Inspection.Module
 			}
 		}
 
+			{
+				foreach (Workplace wp in this.workplaceBundle)
+				{
+					wp.STATE = WORK_TYPE.SNAP;
+				}
+			}
+		}
+
+		public new void Stop()
+		{
+			base.Stop();
+		}
+
+		public void SetColorSharedBuffer(IntPtr ptrR, IntPtr ptrG, IntPtr ptrB)
+		{
+			this.SharedBufferR_Gray = ptrR;
+			this.SharedBufferG = ptrG;
+			this.SharedBufferB = ptrB;
+			this.SharedBufferByteCnt = 3;
+		}
 	}
 }

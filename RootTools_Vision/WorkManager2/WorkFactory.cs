@@ -18,12 +18,31 @@ namespace RootTools_Vision
         //private WorkplaceBundle workplaces; // WorkplaceBundle은 유지하고 WorkBundle만 새로 생성하게...
 
         //List<SharedBufferInfo> bufferInfoList;
+        public bool IsStop
+        {
+            get
+            {                 
+               foreach(WorkManager wm in this.workManagers)
+               {
+                    if (wm.IsStop == false)
+                        return false;
+               }
+               return true;
+            }
+        }
 
         public WorkFactory()
         {
             workManagers = new List<WorkManager>();
 
             Initialize();
+
+            WorkEventManager.RequestStop += OnRequestStop_Callback;
+        }
+
+        public void OnRequestStop_Callback(object obj, RequestStopEventArgs args)
+        {
+            Stop();
         }
 
         /// <summary>
@@ -110,8 +129,9 @@ namespace RootTools_Vision
         /// <param name="type">검사 시작 전 Workplace 상태(Default : NONE)</param>
         public void Start(WORK_TYPE type = WORK_TYPE.NONE)
         {
-            Stop();
-            //GC.Collect(2, GCCollectionMode.Optimized);
+            WaitStop(); /// 타임 아웃 걸어야함
+
+            GC.Collect(2, GCCollectionMode.Optimized);
 
             WorkplaceBundle workplaces = CreateWorkplaceBundle();
             WorkBundle works = CreateWorkBundle();
@@ -139,9 +159,20 @@ namespace RootTools_Vision
             }
         }
 
+        private bool WaitStop() // 구현해야함.
+        {
+            Stop();
+
+            Task.Delay(100);
+
+            return true;
+        }
+
         public void Start()
         {
-            //GC.Collect() 이거 해야하나
+            WaitStop(); /// 타임 아웃 걸어야함
+
+            GC.Collect(2, GCCollectionMode.Optimized);
 
             WorkplaceBundle workplaces = CreateWorkplaceBundle();
             WorkBundle works = CreateWorkBundle();
@@ -152,6 +183,14 @@ namespace RootTools_Vision
                 MessageBox.Show("검사 정보 생성에 실패하였습니다");
                 return;
             }
+
+            // Workplace State 초기화
+            workplaces.SetWorkState(WORK_TYPE.NONE);
+
+#if DEBUG
+            Debug.WriteLine("[Start]");
+            DebugOutput.PrintWorkplaceBundle(workplaces);
+#endif
 
             foreach (WorkManager wm in this.workManagers)
             {

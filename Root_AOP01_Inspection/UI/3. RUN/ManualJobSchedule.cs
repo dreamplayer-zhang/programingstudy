@@ -107,24 +107,36 @@ namespace Root_AOP01_Inspection.UI._3._RUN
         AOP01_Engineer m_engineer;
         public Loadport_Cymechs m_loadport;
         public InfoCarrier m_infoCarrier = null;
-        public ManualJobSchedule(Loadport_Cymechs loadport, AOP01_Handler handler, InfoCarrier infoCarrier)
+        public ManualJobSchedule(Loadport_Cymechs loadport, AOP01_Engineer engineer, InfoCarrier infoCarrier)
         {
             m_infoCarrier = infoCarrier;
             if (m_infoCarrier == null) return;
             m_loadport = loadport;
-            m_handler = handler;
+            m_engineer = engineer;
+            m_handler = engineer.m_handler;
         }
         public bool ShowPopup(AOP01_Handler handler)
         {
             
             if (Dlg_Start.m_bShow) return false;
             Dlg_Start dlg_Start = new Dlg_Start(m_infoCarrier);
-            dlg_Start.Init(m_handler);
-            dlg_Start.Init(this);
+            dlg_Start.Init(this, m_engineer, m_loadport);
+            //dlg_Start.Init(this);
             p_bRnR = false;
             Dlg_Start.m_bShow = true;
             dlg_Start.ShowDialog();
-            m_handler.m_nRnR = p_bRnR ? p_nRnR : 1;
+            if (p_bRnR)
+            {
+                m_handler.m_nRnR = p_nRnR;
+                RNR_UI rnr_ui = new RNR_UI();
+                rnr_ui.Init(m_engineer);
+                rnr_ui.Show();
+            }
+            else if (!p_bRnR)
+            {
+                m_handler.m_nRnR = 1;
+            }
+            p_nRnR = 1;
             return dlg_Start.DialogResult == true;
         }
     }

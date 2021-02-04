@@ -25,7 +25,6 @@ namespace Root_WIND2
     class FronsideInspection_ViewModel : ObservableObject, IRecipeUILoadable
     {
         Setup_ViewModel m_Setup;
-        Recipe m_Recipe;
 
         private MapControl_ViewModel m_MapControl_VM;
         public MapControl_ViewModel p_MapControl_VM
@@ -66,7 +65,6 @@ namespace Root_WIND2
         public void init(Setup_ViewModel setup)
         {
             m_Setup = setup;
-            m_Recipe = setup.Recipe;
 
             p_MapControl_VM = new MapControl_ViewModel();
             p_ImageViewer_VM = new FrontsideInspection_ImageViewer_ViewModel();
@@ -91,14 +89,16 @@ namespace Root_WIND2
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
                 {
                     String test = "";
-                    if (true) // Display Option : Position Trans
+                    if (workplace.Index == 0)
+                    {
+                        test += "Trans : {" + workplace.OffsetX.ToString() + ", " + workplace.OffsetX.ToString() + "}" + "\n";
+                        DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
+                    }
+                    else
                     {
                         test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
-                    }
-                    if (workplace.Index == 0)
-                        DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
-                    else
                         DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
+                    }
                 }));
             }
         }
@@ -112,14 +112,14 @@ namespace Root_WIND2
             foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
             {
                 String text = "";
-
+                /*
                 if (false) // Display Option : Rel Position
                     text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
                 if (false) // Display Option : Defect Size
                     text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
                 if (false) // Display Option : GV Value
                     text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
-
+                */
                 rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
                 textList.Add(text);
             }
@@ -154,24 +154,10 @@ namespace Root_WIND2
 
         public void SetPage(UserControl page)
         {
-            RecipeType_WaferMap waferMap = m_Recipe.WaferMap;
 
-            if (waferMap.Data != null)
-            {
-                int nMapX = waferMap.MapSizeX;
-                int nMapY = waferMap.MapSizeY;
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
 
-                p_MapControl_VM.SetMap(waferMap.Data, new CPoint(nMapX, nMapY));
-            }
-            else
-            {
-                p_MapControl_VM.SetMap(m_Setup.Recipe.WaferMap.Data, new CPoint(14, 14));
-            }
-
-
-            //Main.SubPanel.Children.Clear();
-            //Main.SubPanel.Children.Add(page);
-
+            p_MapControl_VM.SetMap();
             p_ImageViewer_VM.Clear();
         }
 
@@ -238,7 +224,7 @@ namespace Root_WIND2
         private void _btnStop()
         {
             timer.Stop();
-            ProgramManager.Instance.InspectionFront.Stop();
+            GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
             DatabaseManager.Instance.SelectData();
             m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
         }
@@ -371,8 +357,9 @@ namespace Root_WIND2
 
         public void _btnSnap()
         {
+            
             EQ.p_bStop = false;
-            Vision vision = ((WIND2_Handler)ProgramManager.Instance.Engineer.ClassHandler()).p_Vision;
+            Vision vision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision;
             if (vision.p_eState != ModuleBase.eState.Ready)
             {
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
@@ -380,7 +367,7 @@ namespace Root_WIND2
             }
             Run_GrabLineScan Grab = (Run_GrabLineScan)vision.CloneModuleRun("GrabLineScan");
             var viewModel = new Dialog_Scan_ViewModel(vision, Grab);
-            Nullable<bool> result = ProgramManager.Instance.DialogService.ShowDialog(viewModel);
+            Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
             if (result.HasValue)
             {
                 if (result.Value)
@@ -400,22 +387,14 @@ namespace Root_WIND2
             timer.Start();
 
             p_ImageViewer_VM.Clear();
-
-            ProgramManager.Instance.InspectionFront.Start(WORK_TYPE.SNAP);
+            GlobalObjects.Instance.Get<InspectionManagerFrontside>().Start(WORK_TYPE.SNAP);
         }
 
 
         public void LoadInspTestData()
         {
-            RecipeType_WaferMap mapdata = m_Recipe.WaferMap;
-            if (mapdata.Data != null)
-            {
-                int nMapX = mapdata.MapSizeX;
-                int nMapY = mapdata.MapSizeY;
-
-                p_MapControl_VM.SetMap(mapdata.Data, new CPoint(nMapX, nMapY));
-                p_MapControl_VM.CreateMapUI();
-            }
+            p_MapControl_VM.SetMap();
+            p_MapControl_VM.CreateMapUI();
         }
 
         public void Load()

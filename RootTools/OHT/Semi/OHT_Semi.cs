@@ -53,6 +53,18 @@ namespace RootTools.OHT.Semi
             }
         }
 
+        bool _bProtectionBar = false;
+        public bool P_bProtectionBar
+        {
+            get { return _bProtectionBar; }
+            set
+            {
+                if (_bProtectionBar == value) return;
+                _bProtectionBar = value;
+                OnPropertyChanged();
+            }
+        }
+
         #region ITool
         List<OHT_Semi_UI> m_aUI = new List<OHT_Semi_UI>(); 
         public UserControl p_ui
@@ -283,6 +295,7 @@ namespace RootTools.OHT.Semi
         public bool m_bPODExist = false;
         public bool m_bAuto = false;
         bool m_bAuto_p = false;
+        public bool m_bProtectError = false;
         Thread m_thread;
         void InitThread()
         {
@@ -294,15 +307,15 @@ namespace RootTools.OHT.Semi
         void RunThread()                                          //KHD 201130 Modify
         {
             m_bThread = true;
-            Thread.Sleep(2000);
+            Thread.Sleep(10);
             while (m_bThread)
             {
                 
                 if(EQ.p_eState == EQ.eState.Error)
                 {
-                    //p_sInfo = "System Error";
-                    //m_bOHTErr = true;
-                    //return;
+                    p_sInfo = "System Error";
+                    m_bOHTErr = true;
+                    return;
                 }
 
                 Thread.Sleep(20);
@@ -329,7 +342,49 @@ namespace RootTools.OHT.Semi
                 p_bModuyleReady = true;
 
                 //p_bES = m_diLightCurtain.p_bOn || (m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual);
-                p_bES = m_bOHTErr || p_bLightCurtain || m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual;
+                if (m_bOHTErr != true || m_bProtectError == true)
+                {
+                    if (IsCS(true))
+                    {
+                        if (P_bProtectionBar || p_bLightCurtain)
+                        {
+                            m_bOHTErr = true;
+                            if (P_bProtectionBar)
+                            {
+                                p_sInfo = "ProtectionBar detect Error";
+                            }
+                            else
+                            {
+                                p_sInfo = "LightCurtain detect Error";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (P_bProtectionBar || p_bLightCurtain)
+                        {
+                            m_bProtectError = true;
+                            m_bOHTErr = true;
+                            if (P_bProtectionBar)
+                            {
+                                p_sInfo = "ProtectionBar detect Error";
+                            }
+                            else
+                            {
+                                p_sInfo = "LightCurtain detect Error";
+                            }
+                        }
+                        else
+                        {
+                            m_bProtectError = false;
+                            m_bOHTErr = false;
+                            p_sInfo = "OK";
+                        }
+                    }
+                }
+
+
+                p_bES = m_bOHTErr || m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual;
                 p_bHoAvailable = (p_bES || p_bModuyleReady == false) || m_carrier.p_eTransfer == GemCarrierBase.eTransfer.TransferBlocked;
                 //p_bES = m_diLightCurtain.p_bOn 
                 //p_bHoAvailable = p_bES
@@ -494,20 +549,40 @@ namespace RootTools.OHT.Semi
 
         void CheckPresent(bool bDone)
         {
+            bool bDoneOld = bDone;
+            //bool bpresent= false;
             if (m_module.p_eState == ModuleBase.eState.Error) return;
-            GemCarrierBase.ePresent present;
+            GemCarrierBase.ePresent present;            
             switch (m_carrier.p_eTransfer)
             {
                 case GemCarrierBase.eTransfer.ReadyToLoad:
                     present = bDone ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+                    //if (m_carrier.p_ePresentSensor == GemCarrierBase.ePresent.Exist)
+                    //{
+                    //    bpresent = false;
+                    //}
+                    //else if( m_carrier.p_ePresentSensor == GemCarrierBase.ePresent.Empty)
+                    //{
+                    //    bpresent = true;
+                    //}
                     break;
+                    
                 case GemCarrierBase.eTransfer.ReadyToUnload:
-                    present = bDone ? GemCarrierBase.ePresent.Empty : GemCarrierBase.ePresent.Exist;
+                    present = bDone ? GemCarrierBase.ePresent.Empty : GemCarrierBase.ePresent.Exist;  
+                    //if (m_carrier.p_ePresentSensor == GemCarrierBase.ePresent.Empty)
+                    //{
+                    //    bpresent = false;
+                    //}
+                    //else if (m_carrier.p_ePresentSensor == GemCarrierBase.ePresent.Exist)
+                    //{
+                    //    bpresent = true;
+                    //}
                     break;
                 default: return;
             }
             if (m_carrier.p_ePresentSensor == present) return;
-            p_sInfo = p_id + " Illegal Present Sensor";
+            //if (bDoneOld == bpresent) return;
+              p_sInfo = p_id + " Illegal Present Sensor";
             m_bOHTErr = true;
         }
 

@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Emgu.CV.Stitching;
-using System.Data;
 
 // DB
 using MySql.Data.MySqlClient;
@@ -245,7 +244,7 @@ namespace RootTools.Database
 
 		public void AddDefectData(Defect _defect)
 		{
-			string sError;
+			//string sError;
 #if !DEBUG
 			try
 			{

@@ -9,6 +9,7 @@ using Root_WIND2.UI;
 using RootTools;
 using RootTools.Module;
 using RootTools.ToolBoxs;
+using RootTools_Vision;
 
 namespace Root_WIND2
 {
@@ -27,12 +28,12 @@ namespace Root_WIND2
             HandlerUI = new WIND2_Hander_UI();
             ToolBoxUI= new ToolBox_UI();
             ToolViewerTest_VM = new ViewerTest_ViewModel();
-            ToolViewerTest_VM.Init(ProgramManager.Instance.Engineer.ClassMemoryTool());
+            ToolViewerTest_VM.Init(GlobalObjects.Instance.Get<WIND2_Engineer>().ClassMemoryTool());
             ToolViewerTest = new ViewerTest();
             ToolViewerTest.DataContext = ToolViewerTest_VM;
 
-            HandlerUI.Init(ProgramManager.Instance.Engineer.m_handler);
-            ToolBoxUI.Init(ProgramManager.Instance.Engineer.ClassToolBox());
+            HandlerUI.Init(GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler);
+            ToolBoxUI.Init(GlobalObjects.Instance.Get<WIND2_Engineer>().ClassToolBox());
 
             init();
         }

@@ -48,11 +48,11 @@ namespace Root_AOP01_Inspection
 		#endregion
 
 		#region [Members]
-		private IDialogService dialogService;
+		private new IDialogService dialogService;
 
 		private AOP01_Engineer engineer = new AOP01_Engineer();
 		private MemoryTool memoryTool;
-		private Recipe recipe;
+		//private RecipeBase recipe;
 
 		private ImageData imageMain;
 		private ImageData image45D;
@@ -69,7 +69,7 @@ namespace Root_AOP01_Inspection
 		#region [Getter Setter]
 		public AOP01_Engineer Engineer { get => engineer; private set => engineer = value; }
 		public MemoryTool MemoryTool { get => memoryTool; private set => memoryTool = value; }
-		public Recipe Recipe { get => recipe; private set => recipe = value; }
+		//public RecipeBase Recipe { get => recipe; private set => recipe = value; }
 		public ImageData ImageMain { get => imageMain; private set => imageMain = value; }
 		public ImageData Image45D { get => image45D; private set => image45D = value; }
 		public ImageData ImageSideLeft { get => imageSideLeft; private set => imageSideLeft = value; }
@@ -107,7 +107,7 @@ namespace Root_AOP01_Inspection
 					}
 				}
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				IsInitilized = false;
 				result = false;
@@ -150,7 +150,7 @@ namespace Root_AOP01_Inspection
 
 		private bool InitMember()
 		{
-			recipe = new Recipe();
+			//recipe=
 
 			if (!Directory.Exists(recipeFolderPath))
 				Directory.CreateDirectory(recipeFolderPath);
@@ -170,29 +170,29 @@ namespace Root_AOP01_Inspection
 		#region [Recipe Method]
 		public void NewRecipe()
 		{
-			try
-			{
-				if (MessageBox.Show("작성 중인 레시피(Recipe)를 저장하시겠습니까?", "YesOrNo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-				{
-					if (this.Recipe.RecipePath == "")
-					{
-						ShowDialogSaveRecipe();
-					}
-					else
-					{
-						this.Recipe.Save(this.Recipe.RecipePath);
-					}
-				}
+			//try
+			//{
+			//	if (MessageBox.Show("작성 중인 레시피(Recipe)를 저장하시겠습니까?", "YesOrNo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+			//	{
+			//		if (this.Recipe.RecipePath == "")
+			//		{
+			//			ShowDialogSaveRecipe();
+			//		}
+			//		else
+			//		{
+			//			this.Recipe.Save(this.Recipe.RecipePath);
+			//		}
+			//	}
 
-				this.Recipe.Clear();
-				ShowDialogSaveRecipe();
+			//	this.Recipe.Clear();
+			//	ShowDialogSaveRecipe();
 
-				WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show("Save Recipe : " + ex.Message);
-			}
+			//	WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
+			//}
+			//catch (Exception ex)
+			//{
+			//	MessageBox.Show("Save Recipe : " + ex.Message);
+			//}
 		}
 
 		public void ShowDialogSaveRecipe()
@@ -234,12 +234,12 @@ namespace Root_AOP01_Inspection
 			}
 
 
-			AOPEventManager.OnBeforeRecipeSave(recipe, new RecipeEventArgs());
+			//AOPEventManager.OnBeforeRecipeSave(recipe, new RecipeEventArgs());
 
 			if (recipePath.IndexOf(".rcp") == -1) recipePath += ".rcp";
-			recipe.Save(recipePath);
+			//recipe.Save(recipePath);
 
-			AOPEventManager.OnAfterRecipeSave(recipe, new RecipeEventArgs());
+			//AOPEventManager.OnAfterRecipeSave(recipe, new RecipeEventArgs());
 			//this.Load(sFilePath); //?
 			//WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
 		}
@@ -254,12 +254,12 @@ namespace Root_AOP01_Inspection
 				{
 
 					// 레시피 전/후처리 이벤트 Recipe 클래스 안쪽에 넣어야할 수 도?
-					AOPEventManager.OnBeforeRecipeRead(recipe, new RecipeEventArgs());
+					//AOPEventManager.OnBeforeRecipeRead(recipe, new RecipeEventArgs());
 
 					this.LoadRecipe(dlg.FileName);
 					WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
 
-					AOPEventManager.OnAfterRecipeRead(recipe, new RecipeEventArgs());
+					//AOPEventManager.OnAfterRecipeRead(recipe, new RecipeEventArgs());
 
 				}
 			}
@@ -270,14 +270,14 @@ namespace Root_AOP01_Inspection
 		}
 		public void LoadRecipe(string recipePath)
 		{
-			string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+			//string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-			using (StreamWriter writer = new StreamWriter(recipePath, true))
-			{
-				writer.WriteLine(time + " - LoadRecipe()");
-			}
+			//using (StreamWriter writer = new StreamWriter(recipePath, true))
+			//{
+			//	writer.WriteLine(time + " - LoadRecipe()");
+			//}
 
-			this.recipe.Read(recipePath);
+			//this.recipe.Read(recipePath);
 		}
 
 		#endregion

@@ -1,4 +1,5 @@
-﻿using RootTools.Database;
+﻿using Root_WIND2.Module;
+using RootTools.Database;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
@@ -12,41 +13,30 @@ namespace Root_WIND2
 {
 	public class InspectionManagerEBR : WorkFactory
 	{
-		#region [Member Variables]
-		WorkBundle workBundle;
-		WorkplaceBundle workplaceBundle;
+		#region [Members]
+		private readonly RecipeEBR recipe;
+		private readonly SharedBufferInfo sharedBufferInfo;
 		#endregion
 
-		public InspectionManagerEBR(IntPtr _sharedBuffer, int _width, int _height, int _byteCnt = 1)
+		#region [Properties]
+		public RecipeEBR Recipe
 		{
-			this.sharedBufferR_Gray = _sharedBuffer;
-			this.sharedBufferWidth = _width;
-			this.sharedBufferHeight = _height;
-			this.sharedBufferByteCnt = _byteCnt;
+			get => this.recipe;
 		}
 
-		public enum InsepectionMode
+		public SharedBufferInfo SharedBufferInfo
 		{
-			EBR,
+			get => this.sharedBufferInfo;
 		}
+		#endregion
 
-		private InsepectionMode inspectionMode = InsepectionMode.EBR;
-		public InsepectionMode InspectionMode { get => inspectionMode; set => inspectionMode = value; }
-
-		private Recipe recipe;
-		private IntPtr sharedBufferR_Gray;
-		private int sharedBufferWidth;
-		private int sharedBufferHeight;
-		private int sharedBufferByteCnt;
-
-		public Recipe Recipe { get => recipe; set => recipe = value; }
-		public IntPtr SharedBufferR_Gray { get => sharedBufferR_Gray; set => sharedBufferR_Gray = value; }
-		public int SharedBufferWidth { get => sharedBufferWidth; set => sharedBufferWidth = value; }
-		public int SharedBufferHeight { get => sharedBufferHeight; set => sharedBufferHeight = value; }
-		public int SharedBufferByteCnt { get => sharedBufferByteCnt; set => sharedBufferByteCnt = value; }
+		public InspectionManagerEBR(RecipeEBR _recipe, SharedBufferInfo _bufferInfo)
+		{
+			this.recipe = _recipe;
+			this.sharedBufferInfo = _bufferInfo;
+		}
 
 		#region [Overrides]
-
 		protected override void Initialize()
 		{
 			CreateWorkManager(WORK_TYPE.INSPECTION, 5);
@@ -55,37 +45,66 @@ namespace Root_WIND2
 
 		protected override WorkplaceBundle CreateWorkplaceBundle()
 		{
+			EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
+			Run_GrabEBR grabEBR = (Run_GrabEBR)module.CloneModuleRun("GrabEBR");
+			GrabMode grabMode = grabEBR.GetGrabMode();
+
+			int cameraEmptyBufferHeight = 0;
+			if (grabMode.m_camera != null)
+				cameraEmptyBufferHeight = grabMode.m_camera.GetRoiSize().Y;
+
 			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
-			int notchY = recipe.GetRecipe<EBRParameter>().NotchY; // notch memory Y 좌표
-			int stepDegree = recipe.GetRecipe<EBRParameter>().StepDegree;
+			int notchY = recipe.GetItem<EBRParameter>().NotchY; // notch memory Y 좌표
+			int stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
 			int workplaceCnt = 360 / stepDegree;
 			int imageHeight = 270000;
 			int imageHeightPerDegree = imageHeight / 360; // 1도 당 Image Height
 
-			int width = recipe.GetRecipe<EBRParameter>().RoiWidth;
-			int height = recipe.GetRecipe<EBRParameter>().RoiHeight;
+			int width = recipe.GetItem<EBRParameter>().ROIWidth;
+			int height = recipe.GetItem<EBRParameter>().ROIHeight;
 
-			int index = 0;
-			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, index++));
-			for (int i = 0; i < 5/*workplaceCnt*/; i++)
+			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, workplaceBundle.Count));			
+			for (int i = 0; i < workplaceCnt; i++)
 			{
 				int posY = (imageHeightPerDegree * i) - (height / 2);
 				if (posY <= 0)
 					posY = 0;
+				Workplace workplace = new Workplace(0, 0, 0, posY + cameraEmptyBufferHeight, width, height, workplaceBundle.Count);
+				workplaceBundle.Add(workplace);
+			}
+
+			// TO-DO test
+			/*
+			for (int i = 0; i < workplaceCnt; i++)
+			{
+				int posY = (imageHeightPerDegree * i);
+				if (posY - (height / 2) <= 0)
+				{
+					posY = 0;
+				}
+				if (posY + (height / 2) > imageHeight)
+				{
+					posY = 0;
+				}
+
 				Workplace workplace = new Workplace(0, 0, 0, posY, width, height, index++);
 				workplaceBundle.Add(workplace);
 			}
-			workplaceBundle.SetSharedBuffer(this.sharedBufferR_Gray, this.sharedBufferWidth, this.sharedBufferHeight, this.sharedBufferByteCnt, IntPtr.Zero, IntPtr.Zero);
+			*/
 
+			workplaceBundle.SetSharedBuffer(this.sharedBufferInfo);
 			return workplaceBundle;
 		}
 
 		protected override WorkBundle CreateWorkBundle()
 		{
+			List<ParameterBase> paramList = recipe.ParameterItemList;
 			WorkBundle workBundle = new WorkBundle();
 			EBR ebr = new EBR();
-
 			ProcessMeasurement processMeasurement = new ProcessMeasurement();
+
+			foreach (ParameterBase param in paramList)
+				ebr.SetParameter(param);
 
 			workBundle.Add(ebr);
 			workBundle.Add(processMeasurement);

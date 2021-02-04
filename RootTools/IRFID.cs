@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools.Module;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,13 @@ namespace RootTools
 {
     public interface IRFID
     {
-        bool ReadID(ref string sID);
+        string p_id { get; set; }
+        //string ReadRFID(ref string sID);
+        string ReadRFID();
+        string ReadRFID(byte nCh, out string sRFID);
+        string m_sReadID { get; set; }
+        bool m_bReadID { get; set; }
+        ModuleRunBase m_runReadID { get; set; }
+
     }
 }

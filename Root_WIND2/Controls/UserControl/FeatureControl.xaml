@@ -9,12 +9,12 @@
     <UserControl.Resources>
         <local:StringConverter x:Key="StringConverter"/>
     </UserControl.Resources>
-    <Grid Width="180" Height="200" Margin="10">
+    <Grid Width="120" Height="140" Margin="10,0,0,0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="9*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="86*"/>
+            <RowDefinition Height="14*"/>
         </Grid.RowDefinitions>
-        <Grid Background="Black" Grid.Row="0">
+        <Grid Background="Transparent" Grid.Row="0">
             <Image x:Name="image"/>
         </Grid>
         <Grid Grid.Row="1">
@@ -24,10 +24,12 @@
             </Grid.ColumnDefinitions>
             <TextBlock Text="Offset" HorizontalAlignment="Center" Grid.Column="0"
                        VerticalAlignment="Center"
-                       FontSize="12" FontFamily="Arial"/>
+                       FontSize="12" FontFamily="Arial"
+                       Foreground="White"/>
             <TextBlock x:Name="offset" HorizontalAlignment="Center" Grid.Column="1"
                        VerticalAlignment="Center"
-                       FontSize="12" FontFamily="Arial"/>
+                       FontSize="12" FontFamily="Arial"
+                       Foreground="White"/>
         </Grid>
     </Grid>
 </UserControl>

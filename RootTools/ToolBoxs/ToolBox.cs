@@ -7,7 +7,10 @@ using RootTools.Camera.Silicon;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Gem;
+using RootTools.Gem.XGem;
 using RootTools.Inspects;
+using RootTools.Lens;
+using RootTools.Lens.LinearTurret;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
@@ -335,6 +338,36 @@ namespace RootTools.ToolBoxs
         }
         #endregion
 
+        #region ITool Lens
+        ToolSetLens m_toolSetLens = null;
+        ToolSetLens_UI m_toolSetLensUI = null;
+        void InitLensTool()
+        {
+            m_toolSetLens = new ToolSetLens("Lens");
+            m_toolSetLensUI = new ToolSetLens_UI();
+            m_toolSetLensUI.Init(m_toolSetLens);
+            AddToolSet(m_toolSetLens, m_toolSetLensUI);
+        }
+
+        void InitLensSet(ModuleBase module)
+        {
+            if (module.m_lensSet != null) return;
+            module.m_lensSet = new LensSet(m_toolSetLens, module.p_id, module.m_log);
+            module.m_aTool.Add(module.m_lensSet);
+        }
+
+        public string Get(ref LensLinearTurret value, ModuleBase module, string id)
+        {
+            if (value == null)
+            {
+                InitLensSet(module);
+                value = new LensLinearTurret(module.p_id + "." + id, module.m_log);
+                module.m_lensSet.Add(value);
+            }
+            return "OK";
+        }
+        #endregion
+
         #region ITool Comm
         ToolSet m_toolSetComm = null;
         public string Get(ref NamedPipe value, ModuleBase module, string id)
@@ -509,6 +542,22 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
         #endregion
+        #region ITool TK4S
+        ToolSet m_toolTK4S = null;
+        public string Get(ref TK4SGroup value, ModuleBase module, string id , IDialogService dialogService = null)
+        {
+            if (m_toolTK4S == null)
+                m_toolTK4S = InitToolSet("TK4S");
+            if (value == null)
+            {
+                value = new TK4SGroup(module.p_id + "." + id, module.m_log, dialogService);
+                m_toolTK4S.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            return "OK";
+        }
+        #endregion
+
 
         #region IToolSet
         public Dictionary<IToolSet, UserControl> m_aToolSet = new Dictionary<IToolSet, UserControl>();
@@ -553,6 +602,7 @@ namespace RootTools.ToolBoxs
             InitInspectTool();
             InitLightTool();
             InitCameraTool();
+            InitLensTool(); 
         }
 
         public void ThreadStop()

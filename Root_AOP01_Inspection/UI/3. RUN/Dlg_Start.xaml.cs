@@ -5,6 +5,13 @@ using System.Collections.ObjectModel;
 using System.IO;
 using Root_AOP01_Inspection.UI._3._RUN;
 using System.ComponentModel;
+using Root_AOP01_Inspection.UI_UserControl;
+using Root_EFEM.Module;
+using RootTools.Module;
+using System.Threading;
+using System.Windows.Threading;
+using System;
+using System.Linq;
 
 namespace Root_AOP01_Inspection
 {
@@ -14,9 +21,9 @@ namespace Root_AOP01_Inspection
     public partial class Dlg_Start : Window
     {
         static public bool m_bShow = false;
+        AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
         AOP01_Recipe m_recipe;
-        RNR m_aRnR;
         InfoCarrier m_infoCarrier = null;
         public Dlg_Start(InfoCarrier infoCarrier)
         {
@@ -27,35 +34,51 @@ namespace Root_AOP01_Inspection
         {
             this.DragMove();
         }
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-            //m_bShow = false;
-        }
+
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             m_bShow = false;
         }
-        public void Init(AOP01_Handler handler)
-        {
-            //m_aRnR = new RNR();
-            //m_aRecipe = new ObservableCollection<Recipe>();
-            m_handler = handler;
-            m_recipe = m_handler.m_recipe;
-            //listviewRCP.ItemsSource = m_aRecipe;
-            //RNRset.DataContext = m_aRnR;
-        }
         ManualJobSchedule m_JobSchedule;
-        public void Init(ManualJobSchedule jobschdule)
+        Loadport_Cymechs m_loadport;
+        public void Init(ManualJobSchedule jobschdule, AOP01_Engineer engineer, Loadport_Cymechs loadport)
         {
-            m_aRnR = new RNR();
+            m_engineer = engineer;
+            m_handler = engineer.m_handler;
+            m_recipe = m_handler.m_recipe;
+            m_loadport = loadport;
             m_aRecipe = new ObservableCollection<Recipe>();
             listviewRCP.ItemsSource = m_aRecipe;
-            RNRset.DataContext = m_aRnR;
             m_JobSchedule = jobschdule;
             this.DataContext = jobschdule;
-        }   
-        #region Recipe List
+            UserSetBox.DataContext = loadport.p_infoCarrier;
+            LoadportNum.Text = Loadport_UI.sLoadportNum;
+            InitTimer();
+            if (m_loadport.p_infoCarrier.p_sCarrierID != "")
+                textBoxPodID.IsEnabled = false;
+        }
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(20);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            if(textBoxPodID.Text=="")
+            {
+                Start.IsEnabled = false;
+                Start.Content="Put Pod ID";
+            }
+            else
+            {
+                Start.IsEnabled = true;
+                Start.Content = "Start";
+            }
+        }
+ 
+        #region Recipe
         public class Recipe : NotifyProperty
         {
             int _nNumber = 1;
@@ -96,66 +119,67 @@ namespace Root_AOP01_Inspection
             string[] Getfiles = Directory.GetFiles(m_recipe.m_sPath, "*.AOP01");
             foreach (string files in Getfiles)
             {
+
                 FileInfo file = new FileInfo(files);
                 string rcpname = file.Name;
-                AddRecipe(rcpname, file.LastWriteTime.ToString());
+                string temprcpname = Path.GetFileNameWithoutExtension(rcpname).ToLower();
+                DateTime rcpdate = file.LastWriteTime.Date;
+                if (cbRecipe.IsChecked == true)
+                {
+                    string TempRcpText = TextBoxRecipe.Text.ToLower();
+                    if (temprcpname.Contains(TempRcpText))
+                        AddRecipe(rcpname, file.LastWriteTime.ToString());
+                }
+                else if (cbDate.IsChecked == true)
+                {
+                    if(DatePicker.SelectedDate == rcpdate)
+                        AddRecipe(rcpname, file.LastWriteTime.ToString());
+                }
+                else if(cbRecipe.IsChecked == true && cbDate.IsChecked == true)
+                {
+                    string TempRcpText = TextBoxRecipe.Text.ToLower();
+                    if (temprcpname.Contains(TempRcpText) && DatePicker.SelectedDate == rcpdate)
+                        AddRecipe(rcpname, file.LastWriteTime.ToString());
+                }
+                else
+                    AddRecipe(rcpname, file.LastWriteTime.ToString());
             }
         }
+        public string sRecipeName = "";
         public string sRecipe = "";
         void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {  
             Recipe typeItem = (Recipe)listviewRCP.SelectedItem;
-            string sRecipeName = typeItem.p_sRecipeName.ToString();
+            sRecipeName = typeItem.p_sRecipeName.ToString();
+            RecipeID.Text = sRecipeName;
             sRecipe = m_recipe.m_sPath + sRecipeName;
-
-            ////////////////////////////////////////////////////////
-
-
-            //m_recipe.m_moduleRunList.OpenJob(sRecipe);
-            //m_recipe.m_moduleRunList.RunTree(Tree.eMode.Init);
         }
         #endregion
 
-        #region RnR Property
-        public class RNR : NotifyProperty
-        {
-
-            bool _bRnR = false;
-            public bool p_bRnR
-            {
-                get { return _bRnR; }
-                set
-                {
-                    _bRnR = value;
-                    OnPropertyChanged();
-                }
-            }
-
-            int _nRnR = 1;
-            public int p_nRnR
-            {
-                get { return _nRnR; }
-                set
-                {
-                    _nRnR = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        #endregion
-
+        #region Button Start
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
+            m_handler.bInit = true;
             InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(0);
             if (infoWafer != null)
             {
                 infoWafer.RecipeOpen(sRecipe);
                 m_handler.AddSequence(infoWafer);
                 m_handler.CalcSequence();
-                //m_infoCarrier.StartProcess(infoWafer.p_id);
             }
             this.DialogResult = true;
         }
+        #endregion
+
+        #region Button Close
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            m_loadport.RunUndocking();
+            m_infoCarrier.p_sCarrierID = "";
+            //while ((EQ.IsStop() != true) && m_loadport.IsBusy()) Thread.Sleep(10);
+            this.Close();
+        }
+        #endregion
     }
 
 }

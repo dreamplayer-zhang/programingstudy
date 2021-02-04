@@ -80,356 +80,31 @@ namespace Root_AOP01_Inspection
 			EdgeDrawMode = false;
 		}
 
-		private void InspectionManager_AOP_PatternInspectionDone()
-		{
-			ResultDataTable = null;
-			ResultDataTable = new DataTable();
-
-			MySqlConnection _conn = new MySqlConnection();
-			string query = "SELECT * FROM inspections.defect;";
-			try
-			{
-				_conn = new MySqlConnection(App.connection);
-				_conn.Open();
-				var _cmd = new MySqlCommand
-				{
-					Connection = _conn,
-					CommandText = query
-				};
-				_cmd.ExecuteNonQuery();
-
-				var _da = new MySqlDataAdapter(_cmd);
-				_da.Fill(ResultDataTable);
-
-				var _cb = new MySqlCommandBuilder(_da);
-
-				_conn.Close();
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(ex.Message);
-			}
-			finally
-			{
-				if (_conn != null) _conn.Close();
-			}
-			MessageBox.Show("Inspection Done");
-
-		}
-
-		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
-		{
-			
-		}
-
-		private void ProcessDefectDone_Callback(object obj, ProcessDefectDoneEventArgs e)
-		{
-			Workplace workplace = obj as Workplace;
-
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				//UpdateDataGrid();
-			}));
-		}
-
-		private void SurfaceInspDone_Callback(object obj, InspectionDoneEventArgs e)
-		{
-			Workplace workplace = obj as Workplace;
-			//List<string> textList = new List<string>();
-			//List<CRect> rectList = new List<CRect>();
-
-			if (workplace.DefectList.Count > 0)
-			{
-				Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-				{
-					m_Setup.PatternInspectionManager.AddDefect(workplace.DefectList);
-				}));
-			}
-		}
-
-		object lockObj = new object();
-		private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
-		{
-			Workplace workplace = obj as Workplace;
-			lock (this.lockObj)
-			{
-				Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-				{
-					String test = "";
-					if (true) // Display Option : Position Trans
-					{
-						test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
-					}
-					DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
-					//else
-					//	DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
-				}));
-			}
-		}
-		public void DrawRectMasterFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text, bool bSuccess)
-		{
-			p_ImageViewer_VM.DrawRect(ptOldStart, ptOldEnd, RecipeFrontside_Viewer_ViewModel.ColorType.MasterFeature);
-			p_ImageViewer_VM.DrawRect(ptNewStart, ptNewEnd, bSuccess ? RecipeFrontside_Viewer_ViewModel.ColorType.FeatureMatching : RecipeFrontside_Viewer_ViewModel.ColorType.FeatureMatchingFail, text);
-		}
-
-		#region Property
-
-
-		#region CenterPoint
-
-		private CPoint centerPoint = new CPoint();
-		public CPoint CenterPoint
-		{
-			get
-			{
-				return centerPoint;
-			}
-			set
-			{
-				SetProperty(ref centerPoint, value);
-			}
-		}
-		#endregion
-
-		#region InspectionOffsetX_Left
-
-		private int _InspectionOffsetX_Left;
-		public int InspectionOffsetX_Left
-		{
-			get
-			{
-				return _InspectionOffsetX_Left;
-			}
-			set
-			{
-				SetProperty(ref _InspectionOffsetX_Left, value);
-			}
-		}
-		#endregion
-
-		#region InspectionOffsetX_Right
-
-		private int _InspectionOffsetX_Right;
-		public int InspectionOffsetX_Right
-		{
-			get
-			{
-				return _InspectionOffsetX_Right;
-			}
-			set
-			{
-				SetProperty(ref _InspectionOffsetX_Right, value);
-			}
-		}
-		#endregion
-
-		#region InspectionOffsetY
-
-		private int _InspectionOffsetY;
-		public int InspectionOffsetY
-		{
-			get
-			{
-				return _InspectionOffsetY;
-			}
-			set
-			{
-				SetProperty(ref _InspectionOffsetY, value);
-			}
-		}
-		#endregion
-
-		#region OutmapX
-
-		private int _OutmapX;
-		public int OutmapX
-		{
-			get
-			{
-				return _OutmapX;
-			}
-			set
-			{
-				SetProperty(ref _OutmapX, value);
-			}
-		}
-		#endregion
-
-		#region OutmapY
-
-		private int _OutmapY;
-		public int OutmapY
-		{
-			get
-			{
-				return _OutmapY;
-			}
-			set
-			{
-				SetProperty(ref _OutmapY, value);
-			}
-		}
-		#endregion
-
-		#region p_eColorViewMode
-		public eColorViewMode m_eColorViewMode = eColorViewMode.All;
-		public eColorViewMode p_eColorViewMode
-		{
-			get
-			{
-				return m_eColorViewMode;
-			}
-			set
-			{
-				SetProperty(ref m_eColorViewMode, value);
-				//SetImageSource();
-			}
-		}
-		#endregion
-
-		#region BrightGV
-		private bool _BrightGV;
-		public bool BrightGV
-		{
-			get
-			{
-				return _BrightGV;
-			}
-			set
-			{
-				SetProperty(ref _BrightGV, value);
-			}
-		}
-
-		#endregion
-
-		#region SurfaceGV
-		private int _SurfaceGV;
-		public int SurfaceGV
-		{
-			get
-			{
-				return _SurfaceGV;
-			}
-			set
-			{
-				SetProperty(ref _SurfaceGV, value);
-			}
-		}
-
-		#endregion
-
-		#region SurfaceSize
-		private int _SurfaceSize;
-		public int SurfaceSize
-		{
-			get
-			{
-				return _SurfaceSize;
-			}
-			set
-			{
-				SetProperty(ref _SurfaceSize, value);
-			}
-		}
-
-		#endregion
-
-		#region EdgeDrawMode
-		private bool _EdgeDrawMode;
-		public bool EdgeDrawMode
-		{
-			get
-			{
-				return _EdgeDrawMode;
-			}
-			set
-			{
-				if (_EdgeDrawMode == value)
-					return;
-
-				if (m_ImageViewer_VM != null)
-				{
-					m_ImageViewer_VM.EdgeDrawMode = value;
-					if (value)
-					{
-						m_ImageViewer_VM.Clear();
-						tempList.Clear();
-					}
-				}
-				SetProperty(ref _EdgeDrawMode, value);
-			}
-		}
-
-		#endregion
-
-		#region ResultDataTable
-		//DataTable _OriginResultDataTable;
-		DataTable _ResultDataTable;
-		public DataTable ResultDataTable
-		{
-			get { return this._ResultDataTable; }
-			set
-			{
-				this._ResultDataTable = value;
-				this.RaisePropertyChanged();
-			}
-		}
-
-		#endregion
-
-		#region SelectedDataTable
-		DataRowView _SelectedDataTable;
-		public DataRowView SelectedDataTable
-		{
-			get { return this._SelectedDataTable; }
-			set
-			{
-				if (value != null)
-				{
-					this._SelectedDataTable = value;
-					SetData(this.SelectedDataTable, ImageType.TDI);
-				}
-			}
-		}
-		#endregion
-
-		#region SelectedTDIImage
-		private ImageSource _SelectedTDIImage;
-		public ImageSource SelectedTDIImage
-		{
-			get { return this._SelectedTDIImage; }
-			set
-			{
-				this._SelectedTDIImage = value;
-				this.RaisePropertyChanged();
-			}
-		}
-		#endregion
-		bool m_bEnablePatternDiscolor = false;
-		public bool p_bEnablePatternDiscolor
-		{
-			get { return m_bEnablePatternDiscolor; }
-			set { SetProperty(ref m_bEnablePatternDiscolor, value); }
-		}
-		bool m_bEnableAlignKeyInsp = false;
-		public bool p_bEnableAlignKeyInsp
-		{
-			get { return m_bEnableAlignKeyInsp; }
-			set { SetProperty(ref m_bEnableAlignKeyInsp, value); }
-		}
-		bool m_bEnableBarcodeInsp = false;
-		public bool p_bEnableBarcodeInsp
-		{
-			get { return m_bEnableBarcodeInsp; }
-			set { SetProperty(ref m_bEnableBarcodeInsp, value); }
-		}
-		bool m_bEnablePatternShift = false;
-		public bool p_bEnablePatternShift
-		{
-			get { return m_bEnablePatternShift; }
-			set { SetProperty(ref m_bEnablePatternShift, value); }
-		}
+        #region Property
+        bool m_bEnableAlignKeyInsp = false;
+        public bool p_bEnableAlignKeyInsp
+        {
+            get { return m_bEnableAlignKeyInsp; }
+            set { SetProperty(ref m_bEnableAlignKeyInsp, value); }
+        }
+        bool m_bEnableBarcodeInsp = false;
+        public bool p_bEnableBarcodeInsp
+        {
+            get { return m_bEnableBarcodeInsp; }
+            set { SetProperty(ref m_bEnableBarcodeInsp, value); }
+        }
+        bool m_bEnablePatternShift = false;
+        public bool p_bEnablePatternShift
+        {
+            get { return m_bEnablePatternShift; }
+            set { SetProperty(ref m_bEnablePatternShift, value); }
+        }
+        bool m_bEnablePellicleShift = false;
+        public bool p_bEnablePellicleShift
+        {
+            get { return m_bEnablePellicleShift; }
+            set { SetProperty(ref m_bEnablePellicleShift, value); }
+        }
 
 		#region Align Key Parameter
 		double m_dAlignKeyTemplateMatchingScore = 90;
@@ -462,13 +137,29 @@ namespace Root_AOP01_Inspection
 			set { SetProperty(ref m_dPatternShiftAndRotationShiftSpec, value); }
 		}
 
-		double m_dPatternShiftAndRotationRotationSpec = 0.5;
-		public double p_dPatternShiftAndRotationRotationSpec
-		{
-			get { return m_dPatternShiftAndRotationRotationSpec; }
-			set { SetProperty(ref m_dPatternShiftAndRotationRotationSpec, value); }
-		}
-		#endregion
+        double m_dPatternShiftAndRotationRotationSpec = 0.5;
+        public double p_dPatternShiftAndRotationRotationSpec
+        {
+            get { return m_dPatternShiftAndRotationRotationSpec; }
+            set { SetProperty(ref m_dPatternShiftAndRotationRotationSpec, value); }
+        }
+        #endregion
+
+        #region Pelicle Shift & Rotation Parameter
+        double m_dPellicleShiftAndRotationShiftSpec = 0.5;
+        public double p_dPellicleShiftAndRotationShiftSpec
+        {
+            get { return m_dPellicleShiftAndRotationShiftSpec; }
+            set { SetProperty(ref m_dPellicleShiftAndRotationShiftSpec, value); }
+        }
+
+        double m_dPellicleShiftAndRotationRotationSpec = 0.5;
+        public double p_dPellicleShiftAndRotationRotationSpec
+        {
+            get { return m_dPellicleShiftAndRotationRotationSpec; }
+            set { SetProperty(ref m_dPellicleShiftAndRotationRotationSpec, value); }
+        }
+        #endregion
 
 		#region Barcode Inspection Parameter
 		int m_nBarcodeThreshold = 70;
@@ -896,99 +587,23 @@ namespace Root_AOP01_Inspection
 						mainVision.StartRun(patternShiftAndRotation);
 					}
 
-					if (p_bEnableBarcodeInsp)
-					{
-						MainVision.Run_BarcodeInspection barcodeInspection = (MainVision.Run_BarcodeInspection)mainVision.CloneModuleRun("BarcodeInspection");
-						barcodeInspection.m_nThreshold = p_nBarcodeThreshold;
-						mainVision.StartRun(barcodeInspection);
-					}
-					if (p_bEnablePatternDiscolor)
-					{
-						startTestInsp();
-					}
-				});
-			}
-		}
-		#endregion
+                    if (p_bEnablePellicleShift)
+                    {
+                        MainVision.Run_PellicleShiftAndRotation pellicleShiftAndRotation = (MainVision.Run_PellicleShiftAndRotation)mainVision.CloneModuleRun("PellicleShiftAndRotation");
+                        pellicleShiftAndRotation.m_dNGSpecDistance_um = p_dPellicleShiftAndRotationShiftSpec;
+                        pellicleShiftAndRotation.m_dNGSpecDegree = p_dPellicleShiftAndRotationRotationSpec;
+                        mainVision.StartRun(pellicleShiftAndRotation);
+                    }
 
-		List<CPoint> PolygonPt = new List<CPoint>();
-		public ObservableCollection<TShape> Shapes = new ObservableCollection<TShape>();
-		private ObservableCollection<UIElement> m_UIElements = new ObservableCollection<UIElement>();
-
-
-		TShape rectInfo;
-
-		public void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
-		{
-			if (reDraw)
-				p_ImageViewer_VM.Clear();
-
-			p_ImageViewer_VM.DrawRect(rectList, RecipeFrontside_Viewer_ViewModel.ColorType.Defect, text);
-		}
-
-		private void DrawDone_Callback(CPoint leftTop, CPoint rightBottom)
-		{
-			if (!EdgeDrawMode)
-			{
-				p_ImageViewer_VM.Clear();
-				this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
-			}
-			else
-			{
-				//edge box draw mode. 최대개수는 6개로 고정한다
-				this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, RecipeFrontside_Viewer_ViewModel.ColorType.FeatureMatching);
-
-				if (this.m_ImageViewer_VM.Shapes.Count > 7)
-				{
-					m_ImageViewer_VM.Shapes.RemoveAt(0);
-					m_ImageViewer_VM.p_DrawElement.RemoveAt(0);
-				}
-			}
-			m_Setup.PatternInspectionManager.RefreshDefect();
-
-		}
-
-		private TShape Drawing(TShape shape, CPoint memPt)
-		{
-			TRect rect = shape as TRect;
-			// memright가 0인상태로 canvas rect width가 정해져서 버그...
-			// 0이면 min정해줘야되나
-			if (rect.MemPointBuffer.X > memPt.X)
-			{
-				rect.MemoryRect.Left = memPt.X;
-				rect.MemoryRect.Right = rect.MemPointBuffer.X;
-			}
-			else
-			{
-				rect.MemoryRect.Left = rect.MemPointBuffer.X;
-				rect.MemoryRect.Right = memPt.X;
-			}
-			if (rect.MemPointBuffer.Y > memPt.Y)
-			{
-				rect.MemoryRect.Top = memPt.Y;
-				rect.MemoryRect.Bottom = rect.MemPointBuffer.Y;
-			}
-			else
-			{
-				rect.MemoryRect.Top = rect.MemPointBuffer.Y;
-				rect.MemoryRect.Bottom = memPt.Y;
-			}
-
-			CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
-			CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
-			CPoint canvasLT = new CPoint(m_ImageViewer_VM.GetCanvasPoint(LT));
-			CPoint canvasRB = new CPoint(m_ImageViewer_VM.GetCanvasPoint(RB));
-
-			int width = Math.Abs(canvasRB.X - canvasLT.X);
-			int height = Math.Abs(canvasRB.Y - canvasLT.Y);
-			Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
-			Canvas.SetTop(rect.CanvasRect, canvasLT.Y);
-			Canvas.SetRight(rect.CanvasRect, canvasRB.X);
-			Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
-			rect.CanvasRect.Width = width;
-			rect.CanvasRect.Height = height;
-
-			return shape;
-		}
-	}
+                    if (p_bEnableBarcodeInsp)
+                    {
+                        MainVision.Run_BarcodeInspection barcodeInspection = (MainVision.Run_BarcodeInspection)mainVision.CloneModuleRun("BarcodeInspection");
+                        barcodeInspection.m_nThreshold = p_nBarcodeThreshold;
+                        mainVision.StartRun(barcodeInspection);
+                    }
+                });
+            }
+        }
+        #endregion
+    }
 }

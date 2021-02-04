@@ -215,6 +215,7 @@ namespace RootTools
         {
             if (nID < 0) return null;
             if (nID >= p_lWafer) return null;
+            //if (m_aInfoWafer[nID] == null) m_aInfoWafer[nID] = (InfoWafer)m_aGemSlot[nID]; //lyj del
             return m_aInfoWafer[nID];
         }
 
@@ -273,6 +274,7 @@ namespace RootTools
             if (p_lWafer > aSlotState.Count) return "SetMapData Lendth Error";
             for (int n = 0; n < p_lWafer; n++)
             {
+                m_aGemSlot[n].p_eState = aSlotState[n];
                 if (aSlotState[n] == GemSlotBase.eState.Exist) SetInfoWafer(n);
                 else SetInfoWafer(n, null);
             }
@@ -344,7 +346,7 @@ namespace RootTools
             m_module = module;
             p_sModule = module.p_id;
             p_id = p_sModule + ".InfoCarrier";
-            p_sCarrierID = p_sModule;
+            //p_sCarrierID = p_sModule; //LYJ Carrier ID Loadport 들어가는거 삭제
             p_sLocID = sLocID;
             m_engineer = engineer;
             m_gem = m_engineer.ClassGem();

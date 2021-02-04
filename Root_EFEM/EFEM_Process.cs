@@ -79,7 +79,6 @@ namespace Root_EFEM
             m_aLocate.Clear();
             foreach (WTRArm arm in m_wtr.p_aArm) InitLocateArm(arm);
             foreach (IWTRChild child in m_wtr.p_aChild) InitLocateChild(child);
-            CalcRecover();
         }
 
         void InitLocateArm(WTRArm arm)
@@ -204,7 +203,7 @@ namespace Root_EFEM
             }
         }
 
-        void InitCalc()
+        public void InitCalc()
         {
             m_qSequence.Clear();
             m_aCalcWafer.Clear();
@@ -293,7 +292,6 @@ namespace Root_EFEM
             }
             return false;
         }
-
         bool GetNextInfoWafer(int iArm, InfoWafer infoWaferGet)
         {
             WTRArm armGet = m_wtr.p_aArm[iArm];
@@ -382,13 +380,15 @@ namespace Root_EFEM
         public string RunNextSequence()
         {
             ModuleBase wtr = (ModuleBase)m_wtr;
-            if (m_qSequence.Count == 0)
+            if (m_qSequence.Count == 0 || EQ.IsStop())
             {
                 EQ.p_eState = EQ.eState.Ready;
-                return "OK";
+                ClearInfoWafer();
+                return EQ.IsStop()? "EQ Stop" : "OK";
             }
             Sequence sequence = m_qSequence.Peek();
-            if (sequence.m_moduleRun.m_moduleBase == wtr)
+            bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport; 
+            if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport) 
             {
                 sequence.m_moduleRun.StartRun();
                 while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
@@ -397,6 +397,7 @@ namespace Root_EFEM
             m_qSequence.Dequeue();
             InfoWafer infoWafer = sequence.m_infoWafer;
             if (infoWafer.m_qProcess.Count > 0) infoWafer.m_qProcess.Dequeue();
+            if (m_qSequence.Count == 0) ClearInfoWafer();
             RunTree(Tree.eMode.Init);
             return "OK";
         }

@@ -44,6 +44,8 @@ namespace Root_WIND2
         #region UI
         private SelectMode modeWindow;
         private Setup setupWindow;
+
+        //private Root_WIND2.UI_Temp.Setup setupWindow2;
         private Review reviewWindow;
         private Run runWindow;
 
@@ -51,6 +53,8 @@ namespace Root_WIND2
         #endregion
 
         #region ViewModel
+        private Root_WIND2.UI_Temp.Setup_ViewModel setupViewModel2;
+
         private Setup_ViewModel setupViewModel;
         private Review_ViewModel reviewViewModel;
         private Run_ViewModel runViewModel;
@@ -58,12 +62,12 @@ namespace Root_WIND2
         private SettingDialog_ViewModel settingDialogViewModel;
         #endregion
 
-        public bool Initialize(ProgramManager program)
+        public bool Initialize()
         {
             // Main UI
             InitModeSelect();
-            InitSetupMode(program);
-            InitReviewMode(program);
+            InitSetupMode();
+            InitReviewMode();
             InitRunMode();
 
             // 기타 UI
@@ -77,13 +81,18 @@ namespace Root_WIND2
             modeWindow = new SelectMode();
             modeWindow.Init();
         }
-        void InitSetupMode(ProgramManager program)
+        void InitSetupMode()
         {
             setupWindow = new Setup();
-            setupViewModel = new Setup_ViewModel(program.Recipe);
+            setupViewModel = new Setup_ViewModel();
             setupWindow.DataContext = SetupViewModel;
+
+            //setupWindow2 = new UI_Temp.Setup();
+            //setupViewModel2 = new UI_Temp.Setup_ViewModel();
+            //setupWindow2.DataContext = setupViewModel2;
+
         }
-        void InitReviewMode(ProgramManager program)
+        void InitReviewMode()
         {
             reviewWindow = new Review();
             reviewViewModel = new Review_ViewModel(reviewWindow);
@@ -94,8 +103,6 @@ namespace Root_WIND2
             runWindow = new Run();
             runViewModel = new Run_ViewModel(setupViewModel);
             runWindow.DataContext = runViewModel;
-
-
         }
 
         void InitSettingDialog()
@@ -121,6 +128,8 @@ namespace Root_WIND2
         public void ChangUISetup()
         {
             ChangeMainUI((UIElement)setupWindow);
+            //ChangeMainUI((UIElement)setupWindow2);
+
         }
 
         public void ChangUIReview()

@@ -27,14 +27,10 @@ namespace Root_WIND2
         CPoint OriginPoint = new CPoint();
         CPoint PitchPoint = new CPoint();
 
-        Recipe m_Recipe;
-        OriginRecipe m_OriginRecipe;
 
-        public FrontsideOriginTool_ViewModel(Recipe _recipe)
+        public FrontsideOriginTool_ViewModel()
         {
             base.init();
-            m_Recipe = _recipe;
-            m_OriginRecipe = _recipe.GetRecipe<OriginRecipe>();
             p_VisibleMenu = System.Windows.Visibility.Collapsed;
         }
 
@@ -107,14 +103,16 @@ namespace Root_WIND2
                     DrawOriginArea(m_Padding);
                 }
 
-                m_OriginRecipe.OriginX = m_OriginPoint.X;
-                m_OriginRecipe.OriginY = m_OriginPoint.Y;
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+                originRecipe.OriginX = m_OriginPoint.X;
+                originRecipe.OriginY = m_OriginPoint.Y;
                 return m_OriginPoint;
             }
             set
             {
-                m_OriginRecipe.OriginX = value.X;
-                m_OriginRecipe.OriginY = value.Y;
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+                originRecipe.OriginX = value.X;
+                originRecipe.OriginY = value.Y;
 
                 SetProperty(ref m_OriginPoint, value);
             }
@@ -123,7 +121,7 @@ namespace Root_WIND2
         public CPoint p_PitchSize
         {
             get
-            {                
+            {
                 //if (m_PitchSize.X != 0 || m_PitchSize.Y != 0)
                 //{
                 //    int x = OriginPoint.X + m_PitchSize.X;
@@ -132,15 +130,20 @@ namespace Root_WIND2
                 //    DrawPitchPoint(PitchPoint);
                 //    DrawOriginArea(m_Padding);
                 //}
-                m_OriginRecipe.DiePitchX = m_PitchSize.X;
-                m_OriginRecipe.DiePitchY = m_PitchSize.Y;
+
+                // Recipe
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+                originRecipe.DiePitchX = m_PitchSize.X;
+                originRecipe.DiePitchY = m_PitchSize.Y;
 
                 return m_PitchSize;
             }
             set
             {
-                m_OriginRecipe.DiePitchX = value.X;
-                m_OriginRecipe.DiePitchY = value.Y;
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+                originRecipe.DiePitchX = value.X;
+                originRecipe.DiePitchY = value.Y;
 
                 SetProperty(ref m_PitchSize, value);
             }
@@ -151,16 +154,20 @@ namespace Root_WIND2
             get
             {
                 DrawOriginArea(m_Padding);
-                m_OriginRecipe.InspectionBufferOffsetX = m_Padding.X;
-                m_OriginRecipe.InspectionBufferOffsetY = m_Padding.Y;
+
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+                originRecipe.InspectionBufferOffsetX = m_Padding.X;
+                originRecipe.InspectionBufferOffsetY = m_Padding.Y;
 
                 return m_Padding;
             }
             set
             {
                 DrawOriginArea(value);
-                m_OriginRecipe.InspectionBufferOffsetX = value.X;
-                m_OriginRecipe.InspectionBufferOffsetY = value.Y;
+
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+                originRecipe.InspectionBufferOffsetX = value.X;
+                originRecipe.InspectionBufferOffsetY = value.Y;
 
                 SetProperty(ref m_Padding, value);
             }
@@ -179,14 +186,17 @@ namespace Root_WIND2
             if (memPt.X == 0 || memPt.Y == 0)
                 return;
 
+            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
+            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
             CPoint viewPt = memPt - Offset;
             CPoint canvasPt = GetCanvasPoint(viewPt);
-
+            
             if (Origin_UI == null)
             {
                 Origin_UI = new Grid();
                 Origin_UI.Width = 20;
                 Origin_UI.Height = 20;
+
                 #region Line
                 Line line1 = new Line();
                 line1.X1 = 0;
@@ -194,7 +204,7 @@ namespace Root_WIND2
                 line1.X2 = 1;
                 line1.Y2 = 1;
                 line1.Stroke = Brushes.Red;
-                line1.StrokeThickness = 2;
+                line1.StrokeThickness = 3;
                 line1.Stretch = Stretch.Fill;
 
                 Line line2 = new Line();
@@ -203,7 +213,7 @@ namespace Root_WIND2
                 line2.X2 = 1;
                 line2.Y2 = 0;
                 line2.Stroke = Brushes.Red;
-                line2.StrokeThickness = 2;
+                line2.StrokeThickness = 3;
                 line2.Stretch = Stretch.Fill;
 
                 Origin_UI.Children.Add(line1);
@@ -211,10 +221,9 @@ namespace Root_WIND2
                 #endregion
             }
 
-            Canvas.SetLeft(Origin_UI, canvasPt.X - 10);
-            Canvas.SetTop(Origin_UI, canvasPt.Y - 10);
+            Canvas.SetLeft(Origin_UI, canvasPt.X - pixSizeX/2 - 10);
+            Canvas.SetTop(Origin_UI, canvasPt.Y + pixSizeY/2 - 10);
 
-            var aa = Origin_UI.Children;
 
             if (p_ViewElement.Contains(Origin_UI))
                 p_ViewElement.Remove(Origin_UI);
@@ -223,14 +232,21 @@ namespace Root_WIND2
             p_ViewElement.Add(Origin_UI); // UI
 
             // Recipe
-            m_OriginRecipe.OriginX = memPt.X; 
-            m_OriginRecipe.OriginY = memPt.Y;
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+
+            //recipe.LoadMasterImage();
+
+            originRecipe.OriginX = memPt.X;
+            originRecipe.OriginY = memPt.Y;
         }
         private void DrawPitchPoint(CPoint memPt)
         {
             if (memPt.X == 0 || memPt.Y == 0)
                 return;
 
+            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
+            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
             CPoint viewPt = memPt - Offset;
             CPoint canvasPt = GetCanvasPoint(viewPt);
 
@@ -239,6 +255,7 @@ namespace Root_WIND2
                 Pitch_UI = new Grid();
                 Pitch_UI.Width = 20;
                 Pitch_UI.Height = 20;
+
                 #region Line
                 Line line1 = new Line();
                 line1.X1 = 0;
@@ -246,7 +263,7 @@ namespace Root_WIND2
                 line1.X2 = 1;
                 line1.Y2 = 1;
                 line1.Stroke = Brushes.Green;
-                line1.StrokeThickness = 2;
+                line1.StrokeThickness = 3;
                 line1.Stretch = Stretch.Fill;
                 Line line2 = new Line();
                 line2.X1 = 0;
@@ -254,14 +271,14 @@ namespace Root_WIND2
                 line2.X2 = 1;
                 line2.Y2 = 0;
                 line2.Stroke = Brushes.Green;
-                line2.StrokeThickness = 2;
+                line2.StrokeThickness = 3;
                 line2.Stretch = Stretch.Fill;
                 Pitch_UI.Children.Add(line1);
                 Pitch_UI.Children.Add(line2);
                 #endregion
             }
-            Canvas.SetLeft(Pitch_UI, canvasPt.X - 10);
-            Canvas.SetTop(Pitch_UI, canvasPt.Y - 10);
+            Canvas.SetLeft(Pitch_UI, canvasPt.X + pixSizeX/2 - 10);
+            Canvas.SetTop(Pitch_UI, canvasPt.Y - pixSizeY/2 - 10);
 
             if (p_ViewElement.Contains(Pitch_UI))
                 p_ViewElement.Remove(Pitch_UI);
@@ -301,19 +318,24 @@ namespace Root_WIND2
             CPoint viewOriginPt = OriginPoint - Offset;
             CPoint viewPitchPt = PitchPoint - Offset;
 
+            if (p_View_Rect.Width == 0) return;
+            if (p_View_Rect.Height == 0) return;
+            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
+            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
+
             CPoint LT = new CPoint(viewOriginPt.X - padding.X, viewPitchPt.Y - padding.Y);
             CPoint RB = new CPoint(viewPitchPt.X + padding.X, viewOriginPt.Y + padding.Y);
+
             CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
             CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
 
-            int width = Math.Abs(canvasRB.X - canvasLT.X);
-            int height = Math.Abs(canvasRB.Y - canvasLT.Y);
 
-            Canvas.SetLeft(InspArea.CanvasRect, canvasLT.X);
-            Canvas.SetTop(InspArea.CanvasRect, canvasLT.Y);
 
-            InspArea.CanvasRect.Width = width;
-            InspArea.CanvasRect.Height = height;
+            Canvas.SetLeft(InspArea.CanvasRect, canvasLT.X - pixSizeX/2);
+            Canvas.SetTop(InspArea.CanvasRect, canvasLT.Y - pixSizeY/2);
+
+            InspArea.CanvasRect.Width = Math.Abs(canvasRB.X - canvasLT.X + pixSizeX);
+            InspArea.CanvasRect.Height = Math.Abs(canvasRB.Y - canvasLT.Y + pixSizeY);
 
             if (p_ViewElement.Contains(InspArea.CanvasRect))
             {
@@ -449,13 +471,17 @@ namespace Root_WIND2
             int byteCount = this.p_ImageData.p_nByte;
             byte[] rawdata = this.p_ImageData.GetByteArray();
 
-            this.m_Recipe.SaveMasterImage(posX, posY, width, height, byteCount, rawdata);
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+
+            recipe.SaveMasterImage(posX, posY, width, height, byteCount, rawdata);
         }
         public void _loadMasterImage()
         {
-            this.m_Recipe.LoadMasterImage();
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
 
-            OriginRecipe originRecipe = this.m_Recipe.GetRecipe<OriginRecipe>();
+            recipe.LoadMasterImage();
+
+            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 
             ImageData BoxImageData = new ImageData(originRecipe.MasterImage.Width, originRecipe.MasterImage.Height, originRecipe.MasterImage.ByteCnt);
 

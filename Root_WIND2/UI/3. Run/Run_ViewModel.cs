@@ -4,8 +4,10 @@ using RootTools;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.OHTNew;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -112,6 +114,19 @@ namespace Root_WIND2
         RootViewer_ViewModel m_Viewer = new RootViewer_ViewModel();
         MemoryTool m_ToolMemory;
         ImageData m_imagedata;
+        ObservableCollection<TK4S> m_aTK4S = new ObservableCollection<TK4S>();
+        public ObservableCollection<TK4S> p_aTK4S
+        {
+            get
+            {
+                return m_aTK4S;
+            }
+            set
+            {
+                SetProperty(ref m_aTK4S, value);
+            }
+        }
+
 
         public RootViewer_ViewModel p_Viewer
         {
@@ -134,24 +149,26 @@ namespace Root_WIND2
         }
         public void init()
         {
-            if (ProgramManager.Instance.Engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+            WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+            if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
             {
-                  p_LoadPort1 = (Loadport_RND)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_aLoadport[0];
-            p_LoadPort2 = (Loadport_RND)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_aLoadport[1];
-            p_Aligner = (Aligner_RND)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_Aligner;
-            p_WTR = (WTR_RND)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_WTR;
-            p_EdgeVision = (EdgeSideVision)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_EdgeSideVision;
-            p_BackSideVision  = (BackSideVision)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_BackSideVision;
-            p_Vision = (Vision)((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_Vision;
+                p_LoadPort1 = (Loadport_RND)((WIND2_Handler)(engineer.ClassHandler())).p_aLoadport[0];
+                p_LoadPort2 = (Loadport_RND)((WIND2_Handler)(engineer.ClassHandler())).p_aLoadport[1];
+                p_Aligner = (Aligner_RND)((WIND2_Handler)(engineer.ClassHandler())).p_Aligner;
+                p_WTR = (WTR_RND)((WIND2_Handler)(engineer.ClassHandler())).p_WTR;
+                p_EdgeVision = (EdgeSideVision)((WIND2_Handler)(engineer.ClassHandler())).p_EdgeSideVision;
+                p_BackSideVision  = (BackSideVision)((WIND2_Handler)(engineer.ClassHandler())).p_BackSideVision;
+                p_Vision = (Vision)((WIND2_Handler)(engineer.ClassHandler())).p_Vision;
             
-            m_Viewer.init(null, ProgramManager.Instance.DialogService);
-            m_ToolMemory = ProgramManager.Instance.Engineer.ClassMemoryTool();
+                m_Viewer.init(null, GlobalObjects.Instance.Get<DialogService>());
+                m_ToolMemory = engineer.ClassMemoryTool();
 
-            m_imagedata = new ImageData(m_ToolMemory.GetMemory("BackSide Vision.BackSide Memory", "BackSide Vision", "Main"));
-            m_imagedata.p_nByte = 3;
-            p_Viewer.SetImageData(m_imagedata);
+                m_imagedata = new ImageData(m_ToolMemory.GetMemory("BackSide Vision.BackSide Memory", "BackSide Vision", "Main"));
+                m_imagedata.p_nByte = 3;
+                p_Viewer.SetImageData(m_imagedata);
 
-            p_ModuleList = ProgramManager.Instance.Engineer.ClassModuleList();
+                p_ModuleList = engineer.ClassModuleList();
+                p_aTK4S = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_tk4s.p_aTK4S;
             }
         }
 
@@ -176,9 +193,10 @@ namespace Root_WIND2
 
         public void LoadLoadport1CST()
         {
+            WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
             //m_SetupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRunOpen();
             //m_SetupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRun();
-            ((WIND2_Handler)(ProgramManager.Instance.Engineer.ClassHandler())).p_aLoadport[0].StartRunDocking();
+            ((WIND2_Handler)(engineer.ClassHandler())).p_aLoadport[0].RunDocking();
             //m_moduleRunList.OpenJob("C:\\Recipe\\RNR_ALL.RunWIND2");
         }
 

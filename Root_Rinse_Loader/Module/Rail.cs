@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -15,10 +16,10 @@ namespace Root_Rinse_Loader.Module
         {
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Rotate");
             p_sInfo = m_toolBox.Get(ref m_axisWidth, this, "Width");
-            foreach (Line line in m_aLine) line.GetTools(m_toolBox); 
-            if (bInit) 
+            foreach (Line line in m_aLine) line.GetTools(m_toolBox);
+            if (bInit)
             {
-                InitPosWidth(); 
+                InitPosWidth();
             }
         }
         #endregion
@@ -54,8 +55,8 @@ namespace Root_Rinse_Loader.Module
         Axis m_axisWidth;
         public enum ePos
         {
-            W70,
-            W100
+            W75,
+            W85
         }
         void InitPosWidth()
         {
@@ -64,9 +65,9 @@ namespace Root_Rinse_Loader.Module
 
         public string RunMoveWidth(double fWidth)
         {
-            double fW70 = m_axisWidth.GetPosValue(ePos.W70);
-            double fW100 = m_axisWidth.GetPosValue(ePos.W100);
-            double dPos = (fW100 - fW70) * (fWidth - 70) / 30;
+            double fW75 = m_axisWidth.GetPosValue(ePos.W75);
+            double fW85 = m_axisWidth.GetPosValue(ePos.W85);
+            double dPos = (fW85 - fW75) * (fWidth - 75) / 10;
             m_axisWidth.StartMove(dPos);
             return m_axisWidth.WaitReady(); 
         }
@@ -78,7 +79,8 @@ namespace Root_Rinse_Loader.Module
 
         public string RunRotate(bool bRotate)
         {
-            m_axisRotate.Jog(m_fJogScale);
+            if (bRotate) m_axisRotate.Jog(m_fJogScale);
+            else m_axisRotate.StopAxis(); 
             return "OK"; 
         }
 

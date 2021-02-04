@@ -6,6 +6,9 @@
              xmlns:local="clr-namespace:Root_AOP01_Inspection"
              mc:Ignorable="d" 
              d:DesignHeight="836" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
+    <UserControl.Resources>
+        <local:BooleanToPassFailStringConverter x:Key="BooleanToPassFailString"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="12*"/>
@@ -50,7 +53,7 @@
                             </GroupBox>
                             <GroupBox Grid.Row="1" Header="LADS Map">
                                 <Grid Background="White" Margin="5">
-                                    <Image Source="/Root_AOP01_Inspection;component/Resource/LADSMAP.PNG" Margin="100,10" Stretch="Fill"/>
+                                    <Image Source="{Binding p_mainVision.p_bmpImgPellicleHeatmap}" Margin="100,10" Stretch="Fill"/>
                                 </Grid>
                             </GroupBox>
                             <GroupBox Grid.Row="2" Header="2D Graph">
@@ -93,8 +96,9 @@
                                         <TextBlock FontSize="12" Text="Frame Width" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                         <TextBlock FontSize="12" Text="Frame Height" Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                         <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
-                                              VerticalAlignment="Center"
-                                              HorizontalAlignment="Center" Width="85"/>
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Center" Width="85"
+                                                      IsChecked="{Binding p_bEnablePellicleExpanding}"/>
                                         <ComboBox Grid.Row="1" Grid.Column="1" SelectedIndex="0" Width="85" VerticalAlignment="Center" HorizontalAlignment="Center">
                                             <ComboBoxItem Content="113mm"/>
                                             <ComboBoxItem Content="115mm"/>
@@ -153,9 +157,9 @@
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock FontSize="12" Text="Min" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                         <TextBlock FontSize="12" Text="Max" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                        <TextBlock FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
-                                        <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="1" />
-                                        <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
+                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_bPellicleExpandingPass, Converter={StaticResource BooleanToPassFailString}}" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPellicleExpandingMin}" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="1" />
+                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPellicleExpandingMax}" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="2"  Header="Insepction Info" Background="{StaticResource GroupBoxBackground}">

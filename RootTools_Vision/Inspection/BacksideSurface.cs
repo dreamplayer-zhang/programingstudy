@@ -15,7 +15,7 @@ namespace RootTools_Vision
         public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
         private IntPtr inspectionSharedBuffer;
-        private BacksideSurfaceParameter parameter;
+        private BacksideSurfaceParameter parameterBackside;
         private BacksideRecipe recipeBackside;
 
         public BacksideSurface() : base()
@@ -24,10 +24,10 @@ namespace RootTools_Vision
         }
         protected override bool Preparation()
         {
-            if(this.parameter == null || this.recipeBackside == null)
+            if(this.parameterBackside == null || this.recipeBackside == null)
             {
-                this.parameter = recipe.GetRecipe<BacksideSurfaceParameter>();
-                this.recipeBackside = recipe.GetRecipe<BacksideRecipe>();
+                this.parameterBackside = this.parameter as BacksideSurfaceParameter;
+                this.recipeBackside = recipe.GetItem<BacksideRecipe>();
             }
             return true;
         }
@@ -46,8 +46,8 @@ namespace RootTools_Vision
 
 
 
-            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameter.IndexChannel);
-            byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameter.IndexChannel);
+            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterBackside.IndexChannel);
+            byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameterBackside.IndexChannel);
 
             bool isBackside = false;
 
@@ -58,9 +58,9 @@ namespace RootTools_Vision
             //}
 
             // Inspection Param
-            bool isDarkInsp = !parameter.IsBright; // Option
-            int nGrayLevel = parameter.Intensity; // Option
-            int nDefectSz = parameter.Size; // Option     
+            bool isDarkInsp = !parameterBackside.IsBright; // Option
+            int nGrayLevel = parameterBackside.Intensity; // Option
+            int nDefectSz = parameterBackside.Size; // Option     
 
             int chipH = this.currentWorkplace.Width; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
             int chipW = this.currentWorkplace.Height;
@@ -72,7 +72,7 @@ namespace RootTools_Vision
             CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
 
             // Filter
-            switch (parameter.DiffFilter)
+            switch (parameterBackside.DiffFilter)
             {
                 case DiffFilterMethod.Average:
                     CLR_IP.Cpp_AverageBlur(arrBinImg, arrBinImg, chipW, chipH);//문제 있음. ipp exception발생중

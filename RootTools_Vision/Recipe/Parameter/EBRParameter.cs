@@ -29,7 +29,7 @@ namespace RootTools_Vision
 
 		#region [Getter/Setter]
 		[Category("Parameter")]
-		public int RoiWidth
+		public int ROIWidth
 		{
 			get => this.roiWidth;
 			set
@@ -38,7 +38,7 @@ namespace RootTools_Vision
 			}
 		}
 		[Category("Parameter")]
-		public int RoiHeight
+		public int ROIHeight
 		{
 			get => this.roiHeight;
 			set
@@ -128,9 +128,9 @@ namespace RootTools_Vision
 		#endregion
 
 
-		public override object Clone()
-		{
-			return this.MemberwiseClone();
-		}
+		//public override object Clone()
+		//{
+		//	return this.MemberwiseClone();
+		//}
 	}
 }

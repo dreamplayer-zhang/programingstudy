@@ -35,19 +35,15 @@ namespace Root_WIND2
 
         CPoint PointBuffer;
 
-        Recipe m_Recipe;
-        OriginRecipe m_OriginRecipe;
-        PositionRecipe m_PositionRecipe;
-
-        public void init(Setup_ViewModel setup, Recipe recipe)
+        public void init(Setup_ViewModel setup)
         {
-            base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
+            base.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
             p_VisibleMenu = System.Windows.Visibility.Visible;
 
-            m_Recipe = recipe;
-            m_OriginRecipe = recipe.GetRecipe<OriginRecipe>();
-            m_PositionRecipe = recipe.GetRecipe<PositionRecipe>();
-            p_Origin = new CPoint(m_OriginRecipe.OriginX, m_OriginRecipe.OriginY);
+
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+            p_Origin = new CPoint(originRecipe.OriginX, originRecipe.OriginY);
             CheckEmpty();
         }
 
@@ -80,15 +76,17 @@ namespace Root_WIND2
             get
             {
                 SetRoiRect();
-                m_Origin = new CPoint(m_OriginRecipe.OriginX, m_OriginRecipe.OriginY);
+
+                OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+                m_Origin = new CPoint(originRecipe.OriginX, originRecipe.OriginY);
 
                 if (InspArea == null)
                     InspArea = new TRect(Brushes.Yellow, 1, 1);
 
-                InspArea.MemoryRect.Left = m_Origin.X - m_OriginRecipe.InspectionBufferOffsetX;
-                InspArea.MemoryRect.Bottom = m_Origin.Y + m_OriginRecipe.InspectionBufferOffsetY;
-                InspArea.MemoryRect.Right = m_Origin.X + m_OriginRecipe.DiePitchX + m_OriginRecipe.InspectionBufferOffsetX;
-                InspArea.MemoryRect.Top = m_Origin.Y - m_OriginRecipe.DiePitchY - m_OriginRecipe.InspectionBufferOffsetY;
+                InspArea.MemoryRect.Left = m_Origin.X - originRecipe.InspectionBufferOffsetX;
+                InspArea.MemoryRect.Bottom = m_Origin.Y + originRecipe.InspectionBufferOffsetY;
+                InspArea.MemoryRect.Right = m_Origin.X + originRecipe.DiePitchX + originRecipe.InspectionBufferOffsetX;
+                InspArea.MemoryRect.Top = m_Origin.Y - originRecipe.DiePitchY - originRecipe.InspectionBufferOffsetY;
                 AddInspArea(InspArea);
                 return m_Origin;
             }
@@ -619,20 +617,18 @@ namespace Root_WIND2
             }
             else
                 rect = InspArea;
+
+            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
+            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
             CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
             CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
             CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
             CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
 
-            int width = Math.Abs(canvasRB.X - canvasLT.X);
-            int height = Math.Abs(canvasRB.Y - canvasLT.Y);
-
-            Canvas.SetLeft(InspArea.CanvasRect, canvasLT.X);
-            Canvas.SetTop(InspArea.CanvasRect, canvasLT.Y);
-            Canvas.SetRight(InspArea.CanvasRect, canvasRB.X);
-            Canvas.SetBottom(InspArea.CanvasRect, canvasRB.Y);
-            InspArea.CanvasRect.Width = width;
-            InspArea.CanvasRect.Height = height;
+            Canvas.SetLeft(InspArea.CanvasRect, canvasLT.X - pixSizeX/2);
+            Canvas.SetTop(InspArea.CanvasRect, canvasLT.Y - pixSizeY/2);
+            InspArea.CanvasRect.Width = Math.Abs(canvasRB.X - canvasLT.X + pixSizeX);
+            InspArea.CanvasRect.Height = Math.Abs(canvasRB.Y - canvasLT.Y + pixSizeY);
 
             p_ViewElement.Add(InspArea.CanvasRect);
         }
@@ -686,16 +682,18 @@ namespace Root_WIND2
                 p_VisibleEmpty[2] = Visibility.Collapsed;
         }
 
-        private void _saveImage()
-        {
-        }
+        //private void _saveImage()
+        //{
+        //}
         private void _addMasterMark()
         {
-            var asdf = p_nMarkIndex;
+
             if (BoxImage == null)
                 return;
+
+            PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
             //RecipeType_FeatureData rtf = new RecipeType_FeatureData(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.GetByteArray());
-            m_PositionRecipe.AddMasterFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
+            postionRecipe.AddMasterFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
@@ -710,7 +708,8 @@ namespace Root_WIND2
             if (BoxImage == null)
                 return;
 
-            m_PositionRecipe.AddShotFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
+            PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
+            postionRecipe.AddShotFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
@@ -725,7 +724,8 @@ namespace Root_WIND2
             if (BoxImage == null)
                 return;
 
-            m_PositionRecipe.AddChipFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
+            PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
+            postionRecipe.AddChipFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
@@ -738,17 +738,20 @@ namespace Root_WIND2
 
         private void _deleteMasterMark()
         {
-            m_PositionRecipe.RemoveMasterFeature(p_nMarkIndex[0]);
+            PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
+            postionRecipe.RemoveMasterFeature(p_nMarkIndex[0]);
             p_MasterMark.RemoveAt(p_nMarkIndex[0]);
         }
         private void _deleteShotMark()
         {
-            m_PositionRecipe.RemoveShotFeature(p_nMarkIndex[1]);
+            PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
+            postionRecipe.RemoveShotFeature(p_nMarkIndex[1]);
             p_ShotMark.RemoveAt(p_nMarkIndex[1]);
         }
         private void _deleteChipMark()
         {
-            m_PositionRecipe.RemoveChipFeature(p_nMarkIndex[2]);
+            PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
+            postionRecipe.RemoveChipFeature(p_nMarkIndex[2]);
             p_ChipMark.RemoveAt(p_nMarkIndex[2]);
         }
 
@@ -756,10 +759,10 @@ namespace Root_WIND2
         {
             p_MasterMark.Clear();
             p_ChipMark.Clear();
-            m_PositionRecipe = m_Recipe.GetRecipe<PositionRecipe>();
 
-            //List<ImageData> listMasterFeautreimage = m_PositionRecipe.ListMasterImageFeatures;
-            List<RecipeType_ImageData> listMasterFeature = m_PositionRecipe.ListMasterFeature;
+            PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
+            
+            List<RecipeType_ImageData> listMasterFeature = postionRecipe.ListMasterFeature;
             for(int i = 0; i < listMasterFeature.Count; i ++)
             {
                 FeatureControl fc = new FeatureControl();
@@ -774,7 +777,7 @@ namespace Root_WIND2
             }
 
             //List<ImageData> listShotFeautreimage = m_PositionRecipe.ListShotImageFeatures;
-            List<RecipeType_ImageData> listShotFeature = m_PositionRecipe.ListShotFeature;
+            List<RecipeType_ImageData> listShotFeature = postionRecipe.ListShotFeature;
             for (int i = 0; i < listShotFeature.Count; i++)
             {
                 FeatureControl fc = new FeatureControl();
@@ -789,7 +792,7 @@ namespace Root_WIND2
             }
 
             //List<ImageData> listDieFeautreimage = m_PositionRecipe.ListDieImageFeatures;
-            List<RecipeType_ImageData> listDieFeature = m_PositionRecipe.ListDieFeature;
+            List<RecipeType_ImageData> listDieFeature = postionRecipe.ListDieFeature;
             for (int i = 0; i < listDieFeature.Count; i++)
             {
                 FeatureControl fc = new FeatureControl();

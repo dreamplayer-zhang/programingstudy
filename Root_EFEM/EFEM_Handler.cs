@@ -47,6 +47,7 @@ namespace Root_EFEM
             m_recipe = new EFEM_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
             m_process = new EFEM_Process("Process", m_engineer, iWTR);
+            CalcRecover(); 
         }
 
         void InitModule(ModuleBase module)
@@ -71,7 +72,8 @@ namespace Root_EFEM
         enum eWTR
         {
             RND,
-            Cymechs
+            Cymechs,
+            RTR_RND
         }
         eWTR m_eWTR = eWTR.RND;
         ModuleBase m_wtr;
@@ -79,7 +81,7 @@ namespace Root_EFEM
         {
             switch (m_eWTR)
             {
-                case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer);break; 
+                case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer);break;
                 default: m_wtr = new WTR_RND("WTR", m_engineer); break;
             }
             InitModule(m_wtr); 
@@ -292,6 +294,66 @@ namespace Root_EFEM
         public void CalcSequence()
         {
             m_process.ReCalcSequence();
+            CalcDockingUndocking(); 
+        }
+
+        public void CalcRecover()
+        {
+            m_process.CalcRecover();
+            CalcDockingUndocking();
+        }
+
+        void CalcDockingUndocking()
+        {
+            List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
+            while (m_process.m_qSequence.Count > 0) aSequence.Add(m_process.m_qSequence.Dequeue());
+            List<ILoadport> aDock = new List<ILoadport>();
+            foreach (ILoadport loadport in m_aLoadport)
+            {
+                if (CalcDocking(loadport, aSequence)) aDock.Add(loadport);
+            }
+            while (aSequence.Count > 0)
+            {
+                EFEM_Process.Sequence sequence = aSequence[0];
+                m_process.m_qSequence.Enqueue(sequence);
+                aSequence.RemoveAt(0);
+                for (int n = aDock.Count - 1; n >= 0; n--)
+                {
+                    if (CalcUnload(aDock[n], aSequence))
+                    {
+                        ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
+                        EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
+                        m_process.m_qSequence.Enqueue(sequenceUndock);
+                        aDock.RemoveAt(n);
+                    }
+                }
+            }
+            m_process.RunTree(Tree.eMode.Init);
+        }
+
+        bool CalcDocking(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        {
+            foreach (EFEM_Process.Sequence sequence in aSequence)
+            {
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
+                //{
+                    //if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
+                    //ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
+                    //EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    //m_process.m_qSequence.Enqueue(sequenceDock);
+                    //return true;
+                //}
+            }
+            return false; 
+        }
+
+        bool CalcUnload(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        {
+            foreach (EFEM_Process.Sequence sequence in aSequence)
+            {
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return false; 
+            }
+            return true; 
         }
         #endregion
 
@@ -342,46 +404,16 @@ namespace Root_EFEM
                     case EQ.eState.Run:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
-                            CheckLoad(); 
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            CheckUnload(); 
                             if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
-                                m_process.ReCalcSequence();
+                                CalcSequence();
                                 m_nRnR--;
                                 EQ.p_eState = EQ.eState.Run;
                             }
                         }
                         break;
-                }
-            }
-        }
-
-        void CheckLoad()
-        {
-            EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
-            string sLoadport = sequence.m_infoWafer.m_sModule; 
-            foreach (ILoadport loadport in m_aLoadport)
-            {
-                if (loadport.p_id == sLoadport) loadport.StartRunDocking(); 
-            }
-        }
-
-        void CheckUnload()
-        {
-            EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();
-            foreach (ILoadport loadport in m_aLoadport)
-            {
-                if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
-                {
-                    string sLoadport = loadport.p_id;
-                    bool bUndock = true; 
-                    foreach (EFEM_Process.Sequence sequence in aSequence)
-                    {
-                        if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false; 
-                    }
-                    if (bUndock) loadport.StartRunUndocking(); 
                 }
             }
         }

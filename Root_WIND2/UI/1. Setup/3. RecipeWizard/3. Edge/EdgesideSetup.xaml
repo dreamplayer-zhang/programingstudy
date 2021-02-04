@@ -99,7 +99,6 @@
                             <RowDefinition Height="73*"/>
                             <RowDefinition Height="161*"/>
                             <RowDefinition Height="242*"/>
-                            <RowDefinition Height="242*"/>
                         </Grid.RowDefinitions>
                         <Grid Margin="2,-2,2,4" Grid.Row="1">
                             <Grid.ColumnDefinitions>
@@ -177,7 +176,7 @@
                             </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="5" Header="Spec">
-                            <Grid Margin="10,5">
+                            <Grid Margin="10,5" DataContext="{Binding Parameter}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="3*"/>
                                     <ColumnDefinition Width="1*"/>
@@ -188,17 +187,20 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                     <RowDefinition/>
+                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock FontSize="12" Text="Inspection ROI Height" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                <TextBlock FontSize="12" Text="Inspection ROI Width" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+                                <TextBlock FontSize="12" Text="Inspection ROI Width" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                <TextBlock FontSize="12" Text="Inspection ROI Height" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                 <TextBlock FontSize="12" Text="Threshold" Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                 <TextBlock FontSize="12" Text="Size Minimum (um)" Style="{StaticResource BasicTb}" Grid.Row="3"/>
                                 <TextBlock FontSize="12" Text="Merge Distance " Style="{StaticResource BasicTb}" Grid.Row="4"/>
-                                <TextBox Text="{Binding ROIHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Text="{Binding ROIWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBlock FontSize="12" Text="Edge Search Level (%) " Style="{StaticResource BasicTb}" Grid.Row="5"/>
+                                <TextBox Text="{Binding ROIWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding ROIHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                                 <TextBox Text="{Binding Threshold, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                                 <TextBox Text="{Binding DefectSizeMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                                 <TextBox Text="{Binding MergeDist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding EdgeSearchLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="5" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                             </Grid>
                         </GroupBox>
                     </Grid>
@@ -210,24 +212,31 @@
                         <GroupBox Grid.Row="0" Grid.Column="1" Header="Defect Image"
                                   Background="{StaticResource GroupBoxBackground}">
                             <Grid Background="Black">
+                                <Image Source="{Binding DefectImage}">
+                                </Image>
                             </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="1" Grid.Column="1" Header="Insepction Info"
                                   Background="{StaticResource GroupBoxBackground}">
-                            <DataGrid IsReadOnly="True" Grid.Row="1">
+                            <DataGrid Name="Defect_Viewer"
+                                              ItemsSource="{Binding DefectDataTable}"
+                                              SelectedItem="{Binding SelectedDefect, Mode=TwoWay}"
+                                              SelectionMode="Single"
+                                              EnableColumnVirtualization="True"
+                                              EnableRowVirtualization="True"
+                                              VirtualizingPanel.VirtualizationMode="Recycling"
+                                              ScrollViewer.CanContentScroll="True"
+                                              IsReadOnly="True"
+                                              AutoGenerateColumns="True"
+                                              Grid.Row="1">
                                 <DataGrid.Resources>
                                     <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalAlignment"
+                                                        Value="Stretch" />
+                                        <Setter Property="HorizontalContentAlignment"
+                                                        Value="Center" />
                                     </Style>
                                 </DataGrid.Resources>
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="No." Binding="{Binding Path=no}" Width="0.5*"/>
-                                    <DataGridTextColumn Header="Location" Binding="{Binding Path=xy}" Width="1.5*"/>
-                                    <DataGridTextColumn Header="Size" Binding="{Binding Path=size}" Width="*"/>
-                                    <DataGridTextColumn Header="Gv" Binding="{Binding Path=gv}" Width="0.5*"/>
-                                    <DataGridTextColumn Header="Code" Binding="{Binding Path=dc}" Width="*"/>
-                                </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
                     </Grid>

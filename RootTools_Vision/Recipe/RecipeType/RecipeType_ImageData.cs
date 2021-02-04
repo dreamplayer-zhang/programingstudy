@@ -15,6 +15,10 @@ namespace RootTools_Vision
     public class RecipeType_ImageData
     {
         byte[] rawData = new byte[0];
+        byte[] rawDataR = new byte[0];
+        byte[] rawDataG = new byte[0];
+        byte[] rawDataB = new byte[0];
+
         int positionX;
         int positionY;
         int centerPositionX;
@@ -49,6 +53,21 @@ namespace RootTools_Vision
             this.centerPositionY = positionY + this.height / 2;
             this.rawData = rawData;
             this.FileName = string.Empty;
+
+
+            if(this.byteCnt == 3)
+            {
+                this.rawDataR = new byte[this.Width * this.Height];
+                this.rawDataG = new byte[this.Width * this.Height];
+                this.rawDataB = new byte[this.Width * this.Height];
+
+                Tools.SpliteColor(this.rawData, this.rawDataR, this.rawDataG, this.rawDataB);
+
+                Tools.SaveRawdataToBitmap("D:\\Image.bmp", this.rawData, this.width, this.height, this.byteCnt);
+                Tools.SaveRawdataToBitmap("D:\\ImageR.bmp", this.rawDataR, this.width, this.height, 1);
+                Tools.SaveRawdataToBitmap("D:\\ImageG.bmp", this.rawDataG, this.width, this.height, 1);
+                Tools.SaveRawdataToBitmap("D:\\ImageB.bmp", this.rawDataB, this.width, this.height, 1);
+            }
         }
 
         public void SetRawData(byte[] rawData)
@@ -74,23 +93,52 @@ namespace RootTools_Vision
             this.Width = bmp.Width;
             this.Height = bmp.Height;
 
+            this.rawData = new byte[this.Width * this.Height * this.byteCnt];
+            Tools.LoadBitmapToRawdata(recipeFolderPath + this.FileName, this.rawData, this.Width, this.Height, this.ByteCnt);
             if (bmp.PixelFormat == PixelFormat.Format8bppIndexed)
             {
                 this.ByteCnt = 1;
+                this.rawDataR = new byte[this.Width * this.Height];
+
+                Array.Copy(this.rawData, this.rawDataR, rawData.Length);
             }
             else
             {
                 this.ByteCnt = 3;
+               
+                this.rawDataR = new byte[this.Width * this.Height];
+                this.rawDataG = new byte[this.Width * this.Height];
+                this.rawDataB = new byte[this.Width * this.Height];
+
+                Tools.SpliteColor(this.rawData, this.rawDataR, this.rawDataG, this.rawDataB);
             }
+            
+            //Tools.SaveRawdataToBitmap("D:\\Image.bmp", this.rawData, this.width, this.height, this.byteCnt);
+            //Tools.SaveRawdataToBitmap("D:\\ImageR.bmp", this.rawDataR, this.width, this.height, 1);
+            //Tools.SaveRawdataToBitmap("D:\\ImageG.bmp", this.rawDataG, this.width, this.height, 1);
+            //Tools.SaveRawdataToBitmap("D:\\ImageB.bmp", this.rawDataB, this.width, this.height, 1);
 
-            this.RawData = new byte[this.Width * this.Height * this.byteCnt];
+            return true;
+        }
 
-            return Tools.LoadBitmapToRawdata(recipeFolderPath + this.FileName, this.rawData, this.Width, this.Height, this.ByteCnt);
+        public byte[] GetColorRowData(IMAGE_CHANNEL channel)
+        {
+            switch (channel)
+            {
+                case IMAGE_CHANNEL.R_GRAY:
+                    return this.rawDataR;
+                case IMAGE_CHANNEL.G:
+                    return this.rawDataG;
+                case IMAGE_CHANNEL.B:
+                    return this.rawDataB;
+            }
+            return this.rawDataR;
         }
 
         public Bitmap GetFeatureBitmap()
         {
             return Tools.CovertArrayToBitmap(this.rawData, this.width, this.height, this.byteCnt);
         }
+        
     }
 }
