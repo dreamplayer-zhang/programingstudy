@@ -2194,7 +2194,7 @@ namespace Root_AOP01_Inspection.Module
                 img.SetData(p, crtROI, (int)mem.W);
                 int nFlipCount = 0;
                 bool bCurrentDark = false;
-                if (bDarkBackground) bCurrentDark = true;
+                bool bPreDark = true;
 
                 switch (eDirection)
                 {
@@ -2206,21 +2206,12 @@ namespace Root_AOP01_Inspection.Module
                             for (int y = 0; y < img.p_Size.Y; y++)
                             {
                                 bp = (byte*)img.GetPtr() + y * img.p_Stride + x;
-                                if (bDarkBackground)
+                                if (*bp > nThreshold) bCurrentDark = false;
+                                else bCurrentDark = true;
+                                if (bPreDark != bCurrentDark)
                                 {
-                                    if (*bp > nThreshold)
-                                    {
-                                        bCurrentDark = !bCurrentDark;
-                                        nFlipCount++;
-                                    }
-                                }
-                                else
-                                {
-                                    if (*bp < nThreshold)
-                                    {
-                                        bCurrentDark = !bCurrentDark;
-                                        nFlipCount++;
-                                    }
+                                    nFlipCount++;
+                                    bPreDark = bCurrentDark;
                                 }
                             }
                             if (nFlipCount > 30) return x;
@@ -2236,21 +2227,12 @@ namespace Root_AOP01_Inspection.Module
                             for (int y = 0; y < img.p_Size.Y; y++)
                             {
                                 bp = (byte*)img.GetPtr() + y * img.p_Stride + x;
-                                if (bDarkBackground)
+                                if (*bp > nThreshold) bCurrentDark = false;
+                                else bCurrentDark = true;
+                                if (bPreDark != bCurrentDark)
                                 {
-                                    if (*bp > nThreshold)
-                                    {
-                                        bCurrentDark = !bCurrentDark;
-                                        nFlipCount++;
-                                    }
-                                }
-                                else
-                                {
-                                    if (*bp < nThreshold)
-                                    {
-                                        bCurrentDark = !bCurrentDark;
-                                        nFlipCount++;
-                                    }
+                                    nFlipCount++;
+                                    bPreDark = bCurrentDark;
                                 }
                             }
                             if (nFlipCount > 30) return x;
@@ -2298,6 +2280,8 @@ namespace Root_AOP01_Inspection.Module
                         m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
                 });
                 matReturn = img.Mat;
+
+                m_module.p_nBarcodeInspectionProgressPercent = 100;
 
                 return matReturn;
             }
@@ -2753,7 +2737,7 @@ namespace Root_AOP01_Inspection.Module
             MainVision m_module;
             public int m_nSearchArea = 2000;
             public double m_dMatchScore = 0.95;
-            public double m_dNGSpecDistance_um = 100.0;
+            public double m_dNGSpecDistance_mm = 500.0;
             public double m_dNGSpecDegree = 0.5;
 
             public Run_PatternShiftAndRotation(MainVision module)
@@ -2767,7 +2751,7 @@ namespace Root_AOP01_Inspection.Module
                 Run_PatternShiftAndRotation run = new Run_PatternShiftAndRotation(m_module);
                 run.m_nSearchArea = m_nSearchArea;
                 run.m_dMatchScore = m_dMatchScore;
-                run.m_dNGSpecDistance_um = m_dNGSpecDistance_um;
+                run.m_dNGSpecDistance_mm = m_dNGSpecDistance_mm;
                 run.m_dNGSpecDegree = m_dNGSpecDegree;
                 return run;
             }
@@ -2776,7 +2760,7 @@ namespace Root_AOP01_Inspection.Module
             {
                 m_nSearchArea = tree.Set(m_nSearchArea, m_nSearchArea, "Search Area Size [px]", "Search Area Size [px]", bVisible);
                 m_dMatchScore = tree.Set(m_dMatchScore, m_dMatchScore, "Template Matching Score [0.0~1.0]", "Template Matching Score [0.0~1.0]", bVisible);
-                m_dNGSpecDistance_um = tree.GetTree("NG Spec", false, bVisible).Set(m_dNGSpecDistance_um, m_dNGSpecDistance_um, "Distance NG Spec [um]", "Distance NG Spec [um]", bVisible);
+                m_dNGSpecDistance_mm = tree.GetTree("NG Spec", false, bVisible).Set(m_dNGSpecDistance_mm, m_dNGSpecDistance_mm, "Distance NG Spec [mm]", "Distance NG Spec [mm]", bVisible);
                 m_dNGSpecDegree = tree.GetTree("NG Spec", false, bVisible).Set(m_dNGSpecDegree, m_dNGSpecDegree, "Degree NG Spec", "Degree NG Spec", bVisible);
             }
 
@@ -2907,7 +2891,7 @@ namespace Root_AOP01_Inspection.Module
                 // Get distance From InFeatureCentroid & OutFeatureCentroid
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
                 double dResultDistance = m_module.GetDistanceOfTwoPoint(cptInFeatureCentroid, cptOutFeatureCentroid);
-                m_module.p_dPatternShiftDistance = dResultDistance * moduleRunGrab.m_dResY_um;
+                m_module.p_dPatternShiftDistance = dResultDistance * moduleRunGrab.m_dResY_um / 1000;
 
                 // Get Degree
                 CPoint cptOutLeftCenter = new CPoint((cptarrOutResultCenterPositions[(int)eSearchPoint.LT].X + cptarrOutResultCenterPositions[(int)eSearchPoint.LB].X) / 2,
@@ -2933,7 +2917,7 @@ namespace Root_AOP01_Inspection.Module
                 //m_module.p_dPatternShiftAngle = dThetaDegree;
 
                 // Judgement
-                if (m_dNGSpecDistance_um < (dResultDistance * moduleRunGrab.m_dResY_um))
+                if (m_dNGSpecDistance_mm < (dResultDistance * moduleRunGrab.m_dResY_um / 1000))
                 {
                     m_module.p_bPatternShiftPass = false;
                 }
@@ -3112,19 +3096,19 @@ namespace Root_AOP01_Inspection.Module
                         CRect crtBoundingBox;
                         Mat matResult = FloodFill(matBinary, ptsContour[0], 255, out crtBoundingBox, Connectivity.EightConnected);
                         matResult = matResult - matBinary;
-                        //if (i == (int)eSearchPoint.RT)  // Flip Horizontal
-                        //{
-                        //    CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
-                        //}
-                        //else if (i == (int)eSearchPoint.RB) // Flip Horizontal & Vertical
-                        //{
-                        //    CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
-                        //    CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
-                        //}
-                        //else if (i == (int)eSearchPoint.LB) // Flip Vertical
-                        //{
-                        //    CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
-                        //}
+                        if (i == (int)eSearchPoint.RT)  // Flip Horizontal
+                        {
+                            CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
+                        }
+                        else if (i == (int)eSearchPoint.RB) // Flip Horizontal & Vertical
+                        {
+                            CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
+                            CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
+                        }
+                        else if (i == (int)eSearchPoint.LB) // Flip Vertical
+                        {
+                            CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
+                        }
                         matarr[i] = matResult.Clone();
                         //matResult.Save("D:\\TEST" + i + ".bmp");
                     }

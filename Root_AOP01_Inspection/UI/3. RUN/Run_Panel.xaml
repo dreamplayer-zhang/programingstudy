@@ -322,13 +322,13 @@
                                 <TextBlock Text="{Binding p_mainVision.p_bPatternShiftPass, Converter={StaticResource BooleanToPassFailString}}"
                                            Foreground="{Binding p_mainVision.p_bPatternShiftPass, Converter={StaticResource BooleanToPassFailColor}}"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="Center"
+                                <TextBlock Text="Shift"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding p_mainVision.p_dPatternShiftDistance}"
+                                <TextBlock Text="{Binding p_mainVision.p_dPatternShiftDistance, StringFormat={}\{0:n4\} mm}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Angle"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding p_mainVision.p_dPatternShiftAngle}"
+                                <TextBlock Text="{Binding p_mainVision.p_dPatternShiftAngle, StringFormat={}\{0:n4\} º}"
                                            VerticalAlignment="Center" />
                             </UniformGrid>
                             <Grid Grid.Row="1"
