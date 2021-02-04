@@ -316,7 +316,7 @@ namespace SiSoFramegrabber
         /**
         * \brief	GarbageCollection of event callbacks
         */
-        protected List<GCHandle> APCCallbackPins;
+        public List<GCHandle> APCCallbackPins;
 
         /**
         * \brief	GarbageCollection for marshalled data
@@ -648,7 +648,7 @@ namespace SiSoFramegrabber
             hSiSoHal = IntPtr.Zero;
 
            //SiSoDllDirectory = ""; // use the default DLL
-            SiSoDllDirectory = @"C:\Program Files\SiliconSoftware\Runtime5.4.3";
+            SiSoDllDirectory = @"C:\Program Files\SiliconSoftware\Runtime5.7.0";
 
             maxSISOStringSize = MAXSISOSTRINGLEN;
 
@@ -3344,14 +3344,14 @@ namespace SiSoFramegrabber
                 ApcControl.func = pAPCCallback;
 
                 // user defined data to be passed to the delegate
-                GCHandle hWrapperObject = GCHandle.Alloc(Receiver);
+                GCHandle hWrapperObject = GCHandle.Alloc(this);
                 //GCHandle hWrapperObject = GCHandle.Alloc(this);
 
                 IntPtr pWrapperObject = GCHandle.ToIntPtr(hWrapperObject);
                 APCCallbackPins.Add(hWrapperObject);
 
                 // pinning of Client object
-                IntPtr pReceiver = IntPtr.Zero;
+                IntPtr pReceiver = GCHandle.ToIntPtr(GCHandle.Alloc(Receiver));
 
                 // Create Transfer Object for user data, wrapper object and additional information
                 FgAPCTransferData APCData = new FgAPCTransferData(pWrapperObject, UserData, pReceiver, DMAIndex);

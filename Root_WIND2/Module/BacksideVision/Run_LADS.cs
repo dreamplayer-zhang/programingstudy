@@ -11,17 +11,19 @@ using RootTools.Trees;
 
 namespace Root_WIND2.Module
 {
-    class Run_LADS:ModuleRunBase
+    class Run_LADS : ModuleRunBase
     {
         // Member
         BackSideVision m_module;
         GrabMode m_grabMode = null;
         string m_sGrabMode = "";
-        int[,] m_Heightinfo;
 
         public string p_sGrabMode
         {
-            get { return m_sGrabMode; }
+            get
+            {
+                return m_sGrabMode;
+            }
             set
             {
                 m_sGrabMode = value;
@@ -50,7 +52,8 @@ namespace Root_WIND2.Module
 
         public override string Run()
         {
-            if (m_grabMode == null) return "Grab Mode == null";
+            if (m_grabMode == null)
+                return "Grab Mode == null";
 
             try
             {
@@ -70,8 +73,8 @@ namespace Root_WIND2.Module
                 int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
                 int nScanOffset_pulse = 10000;
-                m_Heightinfo = new int[nWaferSizeY_px / nCamHeight, nWaferSizeY_px / nCamWidth];
 
+                m_module.m_Heightinfo = new int[nWaferSizeY_px / nCamHeight, nWaferSizeY_px / nCamWidth];
 
                 while (m_grabMode.m_ScanLineNum > nScanLine)
                 {
@@ -118,15 +121,16 @@ namespace Root_WIND2.Module
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
+
                     axisXY.p_axisY.RunTrigger(false);
 
-                    //CalculateHeight(nScanSpeed, mem, nWaferSizeY_px);
+                    CalculateHeight(nScanLine, mem, nWaferSizeY_px, 230);
+
                     nScanLine++;
                     cpMemoryOffset.X += nCamWidth;
                 }
                 m_grabMode.m_camera.StopGrab();
 
-                //SaveFocusMapImage(nWaferSizeY_px / nCamWidth, nWaferSizeY_px / nCamHeight);
                 return "OK";
             }
             finally
@@ -134,24 +138,28 @@ namespace Root_WIND2.Module
                 m_grabMode.SetLight(false);
             }
         }
-        unsafe void CalculateHeight(int nCurLine, MemoryData mem, int WaferHeight,int gv)
+
+        unsafe void CalculateHeight(int nCurLine, MemoryData mem, int WaferHeight, int gv)
         {
             int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
             int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
 
-            int maxLine = 0;
-            int maxpixels = 0;
+            byte* ptr = (byte*)mem.GetPtr().ToPointer();
 
-            byte* ptr = (byte *)mem.GetPtr().ToPointer();
+            int hCnt = WaferHeight / nCamHeight;
 
-            for(int cnt=0;cnt<(WaferHeight/nCamHeight);cnt++)
+            for (int cnt = 0; cnt < hCnt; cnt++)
             {
+                int maxLine = 0;
+                int maxpixels = 0;
+
                 for (int h = 0; h < nCamHeight; h++)
                 {
                     int curpxl = 0;
                     for (int w = 0; w < nCamWidth; w++)
                     {
-                        if (ptr[h * nCamWidth + w] >= gv)
+                        /*arr[cnt*camheight][w]*/
+                        if (ptr[w + (cnt * nCamHeight) * nCamWidth] >= gv)
                             curpxl++;
                     }
 
@@ -161,7 +169,9 @@ namespace Root_WIND2.Module
                         maxpixels = curpxl;
                     }
                 }
-            }            
+
+                m_module.m_Heightinfo[cnt, nCurLine] = maxLine;
+            }
         }
     }
 }

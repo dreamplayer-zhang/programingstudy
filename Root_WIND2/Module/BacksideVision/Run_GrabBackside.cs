@@ -114,6 +114,12 @@ namespace Root_WIND2.Module
                     {
                         dTriggerStartPosY -= nScanOffset_pulse;
                     }
+
+                    if (m_grabMode.GetUseRADS())
+                    {
+                        //m_module.
+                    }
+
                     axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
                     string strPool = m_grabMode.m_memoryPool.p_id;
@@ -121,11 +127,15 @@ namespace Root_WIND2.Module
                     string strMemory = m_grabMode.m_memoryData.p_id;
 
                     MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+
                     int nScanSpeed = Convert.ToInt32((double)m_grabMode.m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_grabMode.m_nScanRate / 100);
                     GrabData gd = new GrabData();
                     gd.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.BackWard;
                     gd.nScanOffsetY = 0;
                     gd.ReverseOffsetY = 0;
+
+                    
+
                     m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, gd);
                     m_grabMode.Grabed += M_grabMode_Grabed;
 
@@ -151,6 +161,11 @@ namespace Root_WIND2.Module
         {
             GrabedArgs ga = (GrabedArgs)e;
             m_module.p_nProgress = ga.nProgress;
+        }
+
+        private void SetFocus(int[,] focusinfo, int axisNum,int curLine)
+        {
+        
         }
     }
 }

@@ -58,7 +58,7 @@ namespace RootTools.Camera.Silicon
                 SetProperty(ref m_sMCF, value);
             }
         }
-        public int m_lBufGrab = 10;
+        public int m_nByte = 1;
         public IntPtr m_pBufGrab = IntPtr.Zero; //여기로 이미지 버퍼 땡겨오는거
         public System.Drawing.Point m_szBuf = new System.Drawing.Point(0, 0);
 
@@ -190,7 +190,18 @@ namespace RootTools.Camera.Silicon
 
         void ConnectCamera()
         {
-            Initialize();
+            //if (m_hDev != null)
+            //{
+            //    if (!PylonC.NET.Pylon.DeviceIsOpen(m_hDev)) //disconnect
+                {
+                    Initialize();
+                }
+            //    else
+            //    {
+            //        MessageBox.Show("Device is open");
+            //    }
+            //}
+            
         }
 
         void DisconnectCamera()
@@ -279,8 +290,8 @@ namespace RootTools.Camera.Silicon
             if (m_szBuf == szBuf)
                 return;
             DeleteGrabberMem();
-            ulong lSize = (ulong)(szBuf.X * szBuf.Y * m_lBufGrab);
-            m_pBufGrab = m_fgSiso.FgAllocMemEx(lSize, m_lBufGrab);
+            ulong lSize = (ulong)(szBuf.X * szBuf.Y * m_nByte);
+            m_pBufGrab = m_fgSiso.FgAllocMemEx(lSize, m_nByte);
             m_szBuf = szBuf;
 
             if (m_pBufGrab == IntPtr.Zero)
@@ -302,35 +313,27 @@ namespace RootTools.Camera.Silicon
 
         void RegisterAPC()
         {
-            userObjectHandle = GCHandle.Alloc(this);
-
-            m_pBufGrab = GCHandle.ToIntPtr(userObjectHandle);
             FgApcControlFlags flags = FgApcControlFlags.FG_APC_CONTROL_BASIC;
             FgApcControlCtrlFlags ctrlFlags = FgApcControlCtrlFlags.FG_APC_IGNORE_STOP | FgApcControlCtrlFlags.FG_APC_IGNORE_TIMEOUTS;
             fgErrorType rc = m_fgSiso.FgRegisterAPCHandler(this, ApcEventHandler, (uint)p_nDeviceIndex, flags, ctrlFlags, m_pBufGrab);
         }
 
-            
+
 
         public static int ApcEventHandler(object sender, APCEvent ev)//xfercallback
         {
             unsafe
             {
-                GCHandle handle = GCHandle.FromIntPtr(ev.userData);
-
-                ////grabber.GetType();
-                ////System.Diagnostics.Debug.WriteLine(grabber.GetType());
+                Framegrabber grabber = sender as Framegrabber;
+                FgAPCTransferData data = grabber.APCCallbackPins[2].Target as FgAPCTransferData;
+                GCHandle handle = GCHandle.FromIntPtr(data.mReceiverObject);
 
                 Camera_Silicon cam = handle.Target as Camera_Silicon;
                 if (cam != null)
                     cam.m_nGrabTrigger++;
 
-                //m_nGrab = (int)ev.imageNo;
-                //System.Diagnostics.Debug.WriteLine("m_nGrab : " + cam.m_nGrabTrigger);
-                //IntPtr pBuf = m_fgSiso.FgGetImagePtrEx(ev.imageNo, (uint)p_nDeviceIndex, m_pBufGrab);
-                //GrabDone((int)ev.imageNo - 1, pBuf);
+                //System.Diagnostics.Debug.WriteLine("m_nTrigger : " + cam.m_nGrabTrigger);
             }
-            //m_nFrameCnt = (int)ev.imageNo;
             return 0;
         }
 
@@ -345,7 +348,7 @@ namespace RootTools.Camera.Silicon
             }
             else //트리거 모드
             {
-                memcpy((byte*)m_MemPtr.ToPointer()+(m_Width * m_Height), (byte*)pBuf.ToPointer(), m_Width * m_Height);
+                memcpy((byte*)m_MemPtr.ToPointer()+(m_Width * nGrab), (byte*)pBuf.ToPointer(), m_Width * m_Height);
                 //memcpy(m_DM.Acquired3DImage + (m_szBuf.X * m_szBuf.Y) * nGrab, (byte*)pBuf.ToPointer(), m_szBuf.X * m_szBuf.Y);
             }
         }
@@ -429,6 +432,7 @@ namespace RootTools.Camera.Silicon
             PylonC.NET.Pylon.DeviceFeatureFromString(m_hDev, "TriggerMode", "On");
 
             m_cpScanOffset = cpScanOffset;
+            m_cpScanOffset.Y = 0;
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
             m_lGrab = nLine/m_Height;
@@ -436,26 +440,48 @@ namespace RootTools.Camera.Silicon
             fgErrorType rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);
 
             m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));
-            m_GrabThread.Start();
+           m_GrabThread.Start();
         }
         unsafe void RunGrabLineScanThread()
         {
             int iBlock = 0;
-            while(m_nGrab < m_lGrab)
+            while(iBlock <= m_lGrab)
             {
                 if (iBlock < m_nGrabTrigger)
                 {
-                    int nY = m_nGrab * m_Height;
+                    int nY = iBlock * m_Height;
 
-                    IntPtr srcPtr = m_fgSiso.FgGetImagePtrEx(m_nGrab, (uint)p_nDeviceIndex, m_pBufGrab) + m_Height;
-                    IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (nY + m_cpScanOffset.Y) * m_Memory.W);
+                    bool Scandir = true;
+                    IntPtr ipSrc = m_fgSiso.FgGetImagePtrEx(iBlock+1, (uint)p_nDeviceIndex, m_pBufGrab);
+                    System.Diagnostics.Debug.WriteLine("mem y : " + nY);
+                    /*Parallel.For(0, m_Height, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
+                    {
+                        int yp;
+                  //      if (!Scandir)
+                   //         yp = lY - (y + (iBlock) * m_Height) + m_nInverseYOffset;
+                  //      else
+                            yp = y + (iBlock) * m_Height;
 
-                    memcpy((byte*)srcPtr.ToPointer(), (byte*)dstPtr.ToPointer(), m_Height * m_Width);
+                        IntPtr srcPtr = ipSrc + m_Width * y;
+                        //memptr[yp+m_scanoffset.y][m_cpScanOffset.x]
+                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * m_Memory.W);
+                        Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, m_Width, m_Width);                      
+                    });*/
 
-                    m_LastROI.Left = m_cpScanOffset.X;
-                    m_LastROI.Right = m_cpScanOffset.X + m_Width;
-                    m_LastROI.Top = m_cpScanOffset.Y;
-                    m_LastROI.Bottom = m_cpScanOffset.Y + m_Height;
+                    for (int y = 0; y < m_Height; y++)
+                    {
+                        int yp = y + (iBlock) * m_Height;
+                        
+                        IntPtr srcPtr = ipSrc + m_Width * y;
+                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * m_Memory.W);
+
+                        Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, m_Width, m_Width);
+                    }
+
+                    //m_LastROI.Left = m_cpScanOffset.X;
+                    //m_LastROI.Right = m_cpScanOffset.X + m_Width;
+                    //m_LastROI.Top = m_cpScanOffset.Y;
+                    //m_LastROI.Bottom = m_cpScanOffset.Y + m_Height;
 
                     iBlock++;
 
@@ -467,7 +493,7 @@ namespace RootTools.Camera.Silicon
         void GrabEvent()
         {
             if (Grabed != null)
-                OnGrabed(new GrabedArgs(m_Memory, m_nGrab, m_LastROI, p_nGrabProgress));
+                OnGrabed(new GrabedArgs(m_Memory, m_nGrabTrigger, m_LastROI, p_nGrabProgress));
         }
         protected virtual void OnGrabed(GrabedArgs e)
         {
@@ -484,7 +510,7 @@ namespace RootTools.Camera.Silicon
                     return "Stop Grab Error : " + rc.ToString();
                 }
 
-                m_nGrab = -1;
+                m_nGrabTrigger = -1;
                 m_lGrab = 0;
                 //m_DM.StartGrab[0] = (byte)StopGrabCheck;
                 return "OK";

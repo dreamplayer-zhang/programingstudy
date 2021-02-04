@@ -329,6 +329,8 @@ namespace Root_WIND2.Module
         }
         #endregion
 
+        public int[,] m_Heightinfo;//LADS용; 
+
         public BackSideVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
