@@ -420,10 +420,11 @@ namespace RootTools.Camera.Silicon
         MemoryData m_Memory;
         IntPtr m_MemPtr;
         CPoint m_cpScanOffset;
-        int m_nFrameCnt;
+        int m_nYEnd;
         int m_nGrabTrigger = 0;
         CRect m_LastROI;
         Thread m_GrabThread;
+        int m_nInverseYOffset;
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
         {
             //SetSisoParam();
@@ -436,6 +437,8 @@ namespace RootTools.Camera.Silicon
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
             m_lGrab = nLine/m_Height;
+            m_nInverseYOffset = m_GrabData.ReverseOffsetY;
+            m_nYEnd = ((int)Math.Truncate(1.0 * nLine / m_Height) - 1)*m_Height;
             m_LastROI = new CRect();
             fgErrorType rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);
 
@@ -451,43 +454,31 @@ namespace RootTools.Camera.Silicon
                 {
                     int nY = iBlock * m_Height;
 
-                    bool Scandir = true;
+                    bool Scandir = false;
                     IntPtr ipSrc = m_fgSiso.FgGetImagePtrEx(iBlock+1, (uint)p_nDeviceIndex, m_pBufGrab);
                     System.Diagnostics.Debug.WriteLine("mem y : " + nY);
-                    /*Parallel.For(0, m_Height, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
+                    Parallel.For(0, m_Height, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
                     {
                         int yp;
-                  //      if (!Scandir)
-                   //         yp = lY - (y + (iBlock) * m_Height) + m_nInverseYOffset;
-                  //      else
+                        if (!Scandir)
+                            yp = m_nYEnd - (y + (iBlock) * m_Height) + m_nInverseYOffset; //backside 진행 방향이 거꾸로임
+                        else
                             yp = y + (iBlock) * m_Height;
 
                         IntPtr srcPtr = ipSrc + m_Width * y;
-                        //memptr[yp+m_scanoffset.y][m_cpScanOffset.x]
                         IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * m_Memory.W);
                         Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, m_Width, m_Width);                      
-                    });*/
+                    });
 
-                    for (int y = 0; y < m_Height; y++)
-                    {
-                        int yp = y + (iBlock) * m_Height;
-                        
-                        IntPtr srcPtr = ipSrc + m_Width * y;
-                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * m_Memory.W);
-
-                        Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, m_Width, m_Width);
-                    }
-
-                    //m_LastROI.Left = m_cpScanOffset.X;
-                    //m_LastROI.Right = m_cpScanOffset.X + m_Width;
-                    //m_LastROI.Top = m_cpScanOffset.Y;
-                    //m_LastROI.Bottom = m_cpScanOffset.Y + m_Height;
+                    m_LastROI.Left = m_cpScanOffset.X;
+                    m_LastROI.Right = m_cpScanOffset.X + m_Width;
+                    m_LastROI.Top = m_cpScanOffset.Y;
+                    m_LastROI.Bottom = m_cpScanOffset.Y + m_Height;
 
                     iBlock++;
 
                     GrabEvent();
                 }
-                //System.Diagnostics.Debug.WriteLine("iBlock = " + iBlock);
             }
         }
         void GrabEvent()

@@ -57,6 +57,7 @@ namespace Root_WIND2.Module
 
             try
             {
+                m_module.ladsinfos.Clear();
                 m_grabMode.SetLight(true);
 
                 AxisXY axisXY = m_module.AxisXY;
@@ -73,8 +74,6 @@ namespace Root_WIND2.Module
                 int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
                 int nScanOffset_pulse = 10000;
-
-                m_module.m_Heightinfo = new int[nWaferSizeY_px / nCamHeight, nWaferSizeY_px / nCamWidth];
 
                 while (m_grabMode.m_ScanLineNum > nScanLine)
                 {
@@ -147,6 +146,7 @@ namespace Root_WIND2.Module
             byte* ptr = (byte*)mem.GetPtr().ToPointer();
 
             int hCnt = WaferHeight / nCamHeight;
+            BackSideVision.LADSInfo ladsinfo = new BackSideVision.LADSInfo(new RPoint(), 0, hCnt);
 
             for (int cnt = 0; cnt < hCnt; cnt++)
             {
@@ -169,9 +169,9 @@ namespace Root_WIND2.Module
                         maxpixels = curpxl;
                     }
                 }
-
-                m_module.m_Heightinfo[cnt, nCurLine] = maxLine;
+                ladsinfo.m_Heightinfo[cnt] = maxLine / nCamHeight;
             }
+            m_module.ladsinfos.Add(ladsinfo);
         }
     }
 }

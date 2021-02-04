@@ -34,6 +34,24 @@ namespace Root_WIND2.Module
         Camera_Dalsa camMain;
         Camera_Silicon camLADS;
 
+        public class LADSInfo//한 줄에 대한 정보
+        {
+            public double[] m_Heightinfo;
+            public RPoint axisPos;//시작점의 x,y
+            public double endYPos;//끝점의 y 정보
+
+            LADSInfo() { }
+            public LADSInfo(RPoint _axisPos, double _endYPos, int arrcap/*heightinfo capacity*/)
+            {
+                axisPos = _axisPos;
+                endYPos = _endYPos;
+                m_Heightinfo = new double[arrcap];
+            }
+        }
+
+        public List<LADSInfo> ladsinfos;
+
+
         #region Getter/Setter
         public Axis AxisZ { get => axisZ; private set => axisZ = value; }
         public AxisXY AxisXY { get => axisXY; private set => axisXY = value; }
@@ -329,12 +347,11 @@ namespace Root_WIND2.Module
         }
         #endregion
 
-        public int[,] m_Heightinfo;//LADS용; 
-
         public BackSideVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
+            ladsinfos = new List<LADSInfo>();
             //InitMemorys();
         }
 
