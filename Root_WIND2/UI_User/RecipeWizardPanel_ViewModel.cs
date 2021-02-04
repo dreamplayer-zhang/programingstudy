@@ -72,12 +72,14 @@ namespace Root_WIND2.UI_User
         // BACK
 
         // EDGE
+        public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
 
         // EBR
 
 
         // Camera
         public readonly UI_User.Camera_VRS cameraVrs = new UI_User.Camera_VRS();
+        public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
         #endregion
 
         #region [ViewModels]
@@ -124,7 +126,6 @@ namespace Root_WIND2.UI_User
         {
             get => frontsideInspectVM;
         }
-        #endregion
 
         #region [Camera ViewModes]
         private UI_User.CameraVRS_ViewModel cameraVrsVM = new UI_User.CameraVRS_ViewModel();
@@ -139,6 +140,18 @@ namespace Root_WIND2.UI_User
         #endregion
 
 
+        private UI_User.EdgesideSetup_ViewModel edgesideSetupVM = new UI_User.EdgesideSetup_ViewModel();
+        public UI_User.EdgesideSetup_ViewModel EdgesideSetupVM
+		{
+            get => edgesideSetupVM;
+		}
+
+        private UI_User.EBRSetup_ViewModel ebrSetupVM = new UI_User.EBRSetup_ViewModel();
+        public UI_User.EBRSetup_ViewModel EBRSetupVM
+        {
+            get => ebrSetupVM;
+        }
+        #endregion
 
 
         public RecipeWizardPanel_ViewModel()
@@ -391,6 +404,28 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        public ICommand btnEdgeSetup
+		{
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(edgesideSetup);
+                    edgesideSetup.DataContext = edgesideSetupVM;
+                });
+            }
+        }
+        public ICommand btnEBRSetup
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(ebrSetup);
+                    ebrSetup.DataContext = ebrSetupVM;
+                });
+            }
+        }        
         #endregion
 
         #region [Command Camera]

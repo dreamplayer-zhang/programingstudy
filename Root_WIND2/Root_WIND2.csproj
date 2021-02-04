@@ -284,9 +284,15 @@
     <Compile Include="UI_User\CAMERA\MotionControlViewer.xaml.cs">
       <DependentUpon>MotionControlViewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_User\FRONT\FrontsideAlignment.xaml.cs">
-      <DependentUpon>FrontsideAlignment.xaml</DependentUpon>
+    <Compile Include="UI_User\EBR\EBRSetup.xaml.cs">
+      <DependentUpon>EBRSetup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_User\EBR\ViewModel\EBRSetup_ViewModel.cs" />
+    <Compile Include="UI_User\EDGE\EdgesideSetup.xaml.cs">
+      <DependentUpon>EdgesideSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\EDGE\ViewModel\EdgesideSetup_ViewModel.cs" />
+    <Compile Include="UI_User\FRONT\FrontsideAlignment.xaml.cs" />
     <Compile Include="UI_User\FRONT\FrontsideInspect.xaml.cs">
       <DependentUpon>FrontsideInspect.xaml</DependentUpon>
     </Compile>
@@ -690,10 +696,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_User\FRONT\FrontsideAlignment.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="UI_User\EBR\EBRSetup.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI_User\EDGE\EdgesideSetup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_User\FRONT\FrontsideAlignment.xaml" />
     <Page Include="UI_User\FRONT\FrontsideInspect.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -778,8 +789,6 @@
     <Folder Include="Module\BacksideVision\" />
     <Folder Include="UI\Tune\" />
     <Folder Include="UI_User\BACK\" />
-    <Folder Include="UI_User\EBR\" />
-    <Folder Include="UI_User\EDGE\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\ChartEBR.PNG" />
