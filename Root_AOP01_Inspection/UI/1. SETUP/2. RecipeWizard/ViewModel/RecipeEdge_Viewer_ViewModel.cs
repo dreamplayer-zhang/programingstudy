@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_AOP01_Inspection.Module;
+using RootTools;
 using RootTools.Memory;
 using RootTools_Vision;
 using System;
@@ -16,19 +17,40 @@ using System.Windows.Threading;
 
 namespace Root_AOP01_Inspection
 {
-	public class RecipeFrontside_Viewer_ViewModel : RootViewer_ViewModel
+	public class RecipeEdge_Viewer_ViewModel : RootViewer_ViewModel
 	{
 		public event EventDrawDone DrawDone;
-		public Dispatcher currectDispatcher { get; private set; }
 
-		public RecipeFrontside_Viewer_ViewModel(Dispatcher dispatcher)
+		public RecipeEdge_Viewer_ViewModel(string name)
 		{
-			base.init(GlobalObjects.Instance.GetNamed<ImageData>(App.MainRegName), GlobalObjects.Instance.Get<DialogService>());
+			base.init(GlobalObjects.Instance.GetNamed<ImageData>(name), GlobalObjects.Instance.Get<DialogService>());
 			p_VisibleMenu = Visibility.Visible;
-			currectDispatcher = dispatcher;
-			
 			//Shapes.CollectionChanged += Shapes_CollectionChanged;
 			//InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;
+			DrawDone += DrawDone_Callback;
+		}
+		private void DrawDone_Callback(CPoint leftTop, CPoint rightBottom)
+		{
+			if (!EdgeDrawMode)
+			{
+				this.Clear();
+			}
+			else
+			{
+				//edge box draw mode. 최대개수는 6개로 고정한다
+				this.DrawRect(leftTop, rightBottom, ColorType.FeatureMatching);
+
+				if (this.Shapes.Count > 7)
+				{
+					Shapes.RemoveAt(0);
+					TRectList.RemoveAt(0);
+					p_DrawElement.RemoveAt(0);
+				}
+			}
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.SideBotInspMgRegName).RefreshDefect();
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.SideLeftInspMgRegName).RefreshDefect();
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.SideRightInspMgRegName).RefreshDefect();
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.SideTopInspMgRegName).RefreshDefect();
 		}
 		public override void PreviewMouseUp(object sender, MouseEventArgs e)
 		{

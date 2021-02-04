@@ -25,10 +25,15 @@ namespace RootTools
             Y = 0;
         }
 
+        /// <summary>
+        /// Left/Top Point 생성
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public CPoint(System.Windows.Rect rect)
         {
-            X = (int)(rect.X + rect.Width / 2);
-            Y = (int)(rect.Y + rect.Height / 2);
+            X = (int)(rect.Left);
+            Y = (int)(rect.Top);
         }
 
         public CPoint(int x, int y)

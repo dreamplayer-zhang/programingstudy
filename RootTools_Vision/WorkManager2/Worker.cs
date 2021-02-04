@@ -134,126 +134,133 @@ namespace RootTools_Vision
         private void Run()
         {
             bool exception = false;
-            try
-            {
-                while (!token.IsCancellationRequested)
-                {
-                    if (this.isStop == true)
-                    {
-                        Reset();
-                        this.workerState = WORKER_STATE.WORK_STOP;
+#if !DEBUG
+			try
+			{
+#endif
+				while (!token.IsCancellationRequested)
+				{
+					if (this.isStop == true)
+					{
+						Reset();
+						this.workerState = WORKER_STATE.WORK_STOP;
 #if WORKER_DEBUG
 #if DEBUG
-                        DebugOutput.PrintWorker(this, this.workerState.ToString());
+						DebugOutput.PrintWorker(this, this.workerState.ToString());
 #endif
 #endif
-                        _waitSignal.Reset();
-                        _waitSignal.WaitOne();
-                    }
-                    else
-                    {
-                        if (this.workerState != WORKER_STATE.WORK_ASSIGNED)
-                        {
+						_waitSignal.Reset();
+						_waitSignal.WaitOne();
+					}
+					else
+					{
+						if (this.workerState != WORKER_STATE.WORK_ASSIGNED)
+						{
 #if WORKER_DEBUG
 #if DEBUG
-                            DebugOutput.PrintWorker(this);
+							DebugOutput.PrintWorker(this);
 #endif
 #endif
-                            _waitSignal.WaitOne();
-                        }
-      
-                    }
+							_waitSignal.WaitOne();
+						}
 
-                    if (token.IsCancellationRequested)
-                    {
-                        this.workerState = WORKER_STATE.WORK_EXIT;
-                        this.task = null;
-                        return;
-                    }
+					}
 
-                    if ( this.isStop == false)
-                    {
-                        // Workplace Copy
-                        if (this.workType == WORK_TYPE.INSPECTION && this.workerState != WORKER_STATE.WORKING) // 이미 Working State면 Copy가 되어 있는 상태
-                        {
-                            CopyWorkplaceBuffer();
+					if (token.IsCancellationRequested)
+					{
+						this.workerState = WORKER_STATE.WORK_EXIT;
+						this.task = null;
+						return;
+					}
 
-                            this.works.SetWorkplaceBuffer(this.workplaceBufferR_GRAY, this.workplaceBufferG, this.workplaceBufferB);
-                        }
+					if (this.isStop == false)
+					{
+						// Workplace Copy
+						if (this.workType == WORK_TYPE.INSPECTION && this.workerState != WORKER_STATE.WORKING) // 이미 Working State면 Copy가 되어 있는 상태
+						{
+							CopyWorkplaceBuffer();
 
-                        //// Work Start ////
-                        this.workerState = WORKER_STATE.WORKING;
+							this.works.SetWorkplaceBuffer(this.workplaceBufferR_GRAY, this.workplaceBufferG, this.workplaceBufferB);
+						}
 
-                        bool workDone = false;
+						//// Work Start ////
+						this.workerState = WORKER_STATE.WORKING;
 
-                        foreach (WorkBase work in this.works)
-                        {
-                            if (work.IsPreworkDone == false)
-                                work.DoPrework();
+						bool workDone = false;
 
-                            if (work.IsPreworkDone == true) // Prework Done(0)
-                            {
-                                if (work.IsWorkDone == true)  // 이미 작업을 한 경우 다음 work올 넘어감
-                                    continue;
-                                else
-                                {
+						foreach (WorkBase work in this.works)
+						{
+							if (work.IsPreworkDone == false)
+								work.DoPrework();
+
+							if (work.IsPreworkDone == true) // Prework Done(0)
+							{
+								if (work.IsWorkDone == true)  // 이미 작업을 한 경우 다음 work올 넘어감
+									continue;
+								else
+								{
 #if WORKER_DEBUG
 #if DEBUG
-                                //DebugOutput.PrintWork(work);
+									//DebugOutput.PrintWork(work);
 #endif
 #endif
-                                    workDone = work.DoWork();
-                                }
-                            }
-                            else
-                            {
-                                workDone = false;
-                                break;
-                            }
-                        }
+									workDone = work.DoWork();
+								}
+							}
+							else
+							{
+								workDone = false;
+								break;
+							}
+						}
 
-                        _waitSignal.Reset();
+						_waitSignal.Reset();
 
-                        if (workDone == false && this.works.Count != 0)
-                        {
+						if (workDone == false && this.works.Count != 0)
+						{
 #if WORKER_DEBUG
 #if DEBUG
-                            if(this.WorkType  == WORK_TYPE.DEFECTPROCESS)
-                                DebugOutput.PrintWorker(this, "Incomplete");                        
+							if (this.WorkType == WORK_TYPE.DEFECTPROCESS)
+								DebugOutput.PrintWorker(this, "Incomplete");
 #endif
 #endif
-                            Incomplete();
-                        }
-                        else
-                        {
+							Incomplete();
+						}
+						else
+						{
 #if WORKER_DEBUG
 #if DEBUG
-                            if (this.WorkType == WORK_TYPE.DEFECTPROCESS)
-                                DebugOutput.PrintWorker(this, "Complete");
+							if (this.WorkType == WORK_TYPE.DEFECTPROCESS)
+								DebugOutput.PrintWorker(this, "Complete");
 #endif
 #endif
-                            Complete();
-                        }
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                exception = true;
-                //쓰레드 하나라도 죽으면 WorkFactory Thread 다시 생성하고, WorkFactory Reset
-                MessageBox.Show("예기치 못한 상황 발생으로 검사를 중단합니다.\n" + ex.Message);
-            }
-            finally
-            {
-                if(exception == true)
-                {
-                    this.task = null;
-                    this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+							Complete();
+						}
+					}
+				}
+#if !DEBUG
+			}
+			catch (Exception ex)
+			{
+				exception = true;
+				//쓰레드 하나라도 죽으면 WorkFactory Thread 다시 생성하고, WorkFactory Reset
+				MessageBox.Show("예기치 못한 상황 발생으로 검사를 중단합니다.\n" + ex.Message);
+			}
+			finally
+			{
+				if (exception == true)
+				{
 
-                    WorkEventManager.OnRequestStop(this, new RequestStopEventArgs());
-                }
-            }
-        }
+					this.task = null;
+
+					this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+
+
+					WorkEventManager.OnRequestStop(this, new RequestStopEventArgs());
+				}
+			}
+#endif
+		}
 
         private void Incomplete()
         {

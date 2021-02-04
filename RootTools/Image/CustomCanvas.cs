@@ -40,10 +40,8 @@ namespace RootTools
 					var point = GetCanvasPoint(new CPoint(Rect));
 					//temp.Width = Rect.Width / ;//이건 맞음
 					//temp.Height = Rect.Height / Scale;//이것도 맞음
-					temp.Width = 10;
-					temp.Height = 10;
-					temp.X = point.X;
-					temp.Y = point.Y;
+					temp.X = point.X;//left
+					temp.Y = point.Y;//top
 					temp.Width = Rect.Width * RenderSize.Width / MemorySize.Width;
 					temp.Height = Rect.Height * RenderSize.Width / MemorySize.Width;
 

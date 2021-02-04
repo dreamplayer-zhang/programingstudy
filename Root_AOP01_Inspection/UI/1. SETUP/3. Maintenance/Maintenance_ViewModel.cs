@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using RootTools_Vision;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Root_AOP01_Inspection
@@ -16,9 +17,9 @@ namespace Root_AOP01_Inspection
         {
             m_Setup = setup;
             Engineer_UI = new AOP01_Engineer_UI();
-            Engineer_UI.Init(m_Setup.m_MainWindow.m_engineer);
+            Engineer_UI.Init(GlobalObjects.Instance.Get<AOP01_Engineer>());
             ToolViewerTest_VM = new ViewerTest_ViewModel();
-            ToolViewerTest_VM.Init(setup.m_MainWindow.m_engineer.ClassMemoryTool());
+            ToolViewerTest_VM.Init(GlobalObjects.Instance.Get<AOP01_Engineer>().ClassMemoryTool());
             ToolViewerTest = new ViewerTest();
             ToolViewerTest.DataContext = ToolViewerTest_VM;
         }

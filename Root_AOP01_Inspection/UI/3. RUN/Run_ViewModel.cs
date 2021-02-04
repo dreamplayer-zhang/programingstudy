@@ -14,10 +14,10 @@ namespace Root_AOP01_Inspection
 {
     class Run_ViewModel : ObservableObject
     {
-        MainWindow m_Mainwindow;
-        public Run_ViewModel(MainWindow main)
+        //MainWindow m_Mainwindow;
+        public Run_ViewModel()
         {
-            m_Mainwindow = main;
+            //m_Mainwindow = main;
         }
 
         public ICommand cmdStart

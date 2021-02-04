@@ -1,6 +1,8 @@
 ﻿using System.Windows.Input;
 using System.Windows.Threading;
 using Root_AOP01_Inspection.Module;
+using RootTools_Vision;
+
 namespace Root_AOP01_Inspection
 {
     class RecipeLADS_ViewModel : ObservableObject
@@ -16,7 +18,7 @@ namespace Root_AOP01_Inspection
         public RecipeLADS_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
-            m_Engineer = setup.m_MainWindow.m_engineer;
+            m_Engineer = GlobalObjects.Instance.Get<AOP01_Engineer>();
             m_mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
             m_mainVision.dispatcher = Dispatcher.CurrentDispatcher;
         }

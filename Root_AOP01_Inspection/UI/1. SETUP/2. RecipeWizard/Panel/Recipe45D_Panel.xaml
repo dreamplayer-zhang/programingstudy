@@ -31,12 +31,9 @@
 					<ToggleButton Content="Draw Edge Box" 
 								  Style="{StaticResource SetupPanelToggleBtn}"
 								  IsChecked="{Binding EdgeDrawMode}"/>
-					<Button Content="Show Edge Box"
-                            Command="{Binding commandShowEdgeBox}"
-                            Style="{StaticResource SetupPanelBtn}"/>
-					<!--<Button Content="Save Edge Box"
+					<Button Content="Save Edge Box"
                             Command="{Binding commandSaveEdgeBox}"
-                            Style="{StaticResource SetupPanelBtn}"/>-->
+                            Style="{StaticResource SetupPanelBtn}"/>
 				</StackPanel>
 				<Button Content="Back"
                         Command="{Binding btnBack}"

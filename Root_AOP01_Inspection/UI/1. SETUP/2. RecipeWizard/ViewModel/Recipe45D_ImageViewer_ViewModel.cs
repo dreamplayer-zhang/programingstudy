@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Memory;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,7 +39,7 @@ namespace Root_AOP01_Inspection
 
 		public Recipe45D_ImageViewer_ViewModel()
 		{
-			base.init(ProgramManager.Instance.Image45D, ProgramManager.Instance.DialogService);
+			base.init(GlobalObjects.Instance.GetNamed<ImageData>(App.PellRegName), GlobalObjects.Instance.Get<DialogService>());
 			p_VisibleMenu = Visibility.Visible;
 			//Shapes.CollectionChanged += Shapes_CollectionChanged;
 			//InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;

@@ -15,27 +15,27 @@ namespace RootTools_Vision
 
         public static void PrintWorkplaceBundle(WorkplaceBundle wb)
         {
-            int w = wb.SizeX;
-            int h = wb.SizeY;
+            //int w = wb.SizeX;
+            //int h = wb.SizeY;
 
-            int[,] map = new int[w, h];
-            foreach(Workplace wp in wb)
-            {
-                if (wp.MapIndexX == -1 && wp.MapIndexY == -1) continue;
-                map[wp.MapIndexX, wp.MapIndexY] = (int)wp.WorkState;
-            }
-            StringBuilder builder = new StringBuilder();
+            //int[,] map = new int[w, h];
+            //foreach(Workplace wp in wb)
+            //{
+            //    if (wp.MapIndexX == -1 && wp.MapIndexY == -1) continue;
+            //    map[wp.MapIndexX - 1, wp.MapIndexY - 1] = (int)wp.WorkState;
+            //}
+            //StringBuilder builder = new StringBuilder();
             
-            for(int i = 0; i < h; i++)
-            {
-                for(int j =0; j < w; j++)
-                {
-                    builder.Append(map[j, i]);
-                }
-                builder.Append("\n");
-            }
+            //for(int i = 0; i < h; i++)
+            //{
+            //    for(int j =0; j < w; j++)
+            //    {
+            //        builder.Append(map[j, i]);
+            //    }
+            //    builder.Append("\n");
+            //}
 
-            Debug.Write(builder.ToString());
+            //Debug.Write(builder.ToString());
         }
 
 
@@ -82,12 +82,12 @@ namespace RootTools_Vision
 
         public static void PrintWorker(Worker wk, string append = "")
         {
-            if(wk.Workplace == null)
-            {
-                Debug.WriteLine("[Worker]" + LL + wk.WorkType + "[" + wk.WorkerIndex + "]" + LL + "Workplace == null" + LL + append);
-            }
-            else
-                Debug.WriteLine("[Worker]" + LL + wk.WorkType + "[" + wk.WorkerIndex + "]" + LL + wk.Workplace.MapIndexX + "," + wk.Workplace.MapIndexY + LL + append);
+            //if(wk.Workplace == null)
+            //{
+            //    Debug.WriteLine("[Worker]" + LL + wk.WorkType + "[" + wk.WorkerIndex + "]" + LL + "Workplace == null" + LL + append);
+            //}
+            //else
+            //    Debug.WriteLine("[Worker]" + LL + wk.WorkType + "[" + wk.WorkerIndex + "]" + LL + wk.Workplace.MapIndexX + "," + wk.Workplace.MapIndexY + LL + append);
         }
 
         public static void PrintWork(WorkBase wk, string append = "")

@@ -43,7 +43,10 @@ namespace RootTools_Vision
         {
             if (this.currentWorkplace.Index == 0)
                 return;
-
+            if(this.currentWorkplace.MapIndexX == -1 && this.currentWorkplace.MapIndexY == -1)
+			{
+                return;
+			}
 
 
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterBackside.IndexChannel);
@@ -62,8 +65,8 @@ namespace RootTools_Vision
             int nGrayLevel = parameterBackside.Intensity; // Option
             int nDefectSz = parameterBackside.Size; // Option     
 
-            int chipH = this.currentWorkplace.Width; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
-            int chipW = this.currentWorkplace.Height;
+            int chipW = this.currentWorkplace.Width; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
+            int chipH = this.currentWorkplace.Height;
 
             byte[] arrBinImg = new byte[chipW * chipH]; // Threashold 결과 array
             

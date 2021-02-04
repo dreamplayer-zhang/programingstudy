@@ -139,10 +139,6 @@ namespace Root_AOP01_Inspection
 
         public AOP01_Handler m_handler = new AOP01_Handler();
 
-        private InspectionManager_AOP pellInspectionManager;
-        public InspectionManager_AOP PellInspectionManager { get => pellInspectionManager; set => pellInspectionManager = value; }
-        private InspectionManager_AOP patternInspectionManager;
-        public InspectionManager_AOP PatternInspectionManager { get => patternInspectionManager; set => patternInspectionManager = value; }
         public void Init(string id)
         {
             EQ.m_sModel = id;

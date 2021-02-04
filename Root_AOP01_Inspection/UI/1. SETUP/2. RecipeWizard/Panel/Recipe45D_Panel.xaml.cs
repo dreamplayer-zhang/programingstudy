@@ -1,5 +1,6 @@
 ﻿using Root_AOP01_Inspection.Module;
 using RootTools;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,16 +26,16 @@ namespace Root_AOP01_Inspection
 		public Recipe45D_Panel()
 		{
 			InitializeComponent();
-			//AddDefectEvent
-			ProgramManager.Instance.PellInspectionManager.AddDefectEvent += InspectionManager_AddDefectEvent;
-			ProgramManager.Instance.PellInspectionManager.ClearDefectEvent += InspectionManager_ClearDefect;
-			ProgramManager.Instance.PellInspectionManager.RefreshDefectEvent += InspectionManager_AOP_RefreshDefect;
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.PellInspMgRegName).AddUIEvent += InspectionManager_AddDefectEvent;
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.PellInspMgRegName).ClearDefectEvent += InspectionManager_ClearDefect;
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.PellInspMgRegName).RefreshDefectEvent += InspectionManager_AOP_RefreshDefect;
 		}
+
 		~Recipe45D_Panel()
 		{
-			ProgramManager.Instance.PellInspectionManager.AddDefectEvent -= InspectionManager_AddDefectEvent;
-			ProgramManager.Instance.PellInspectionManager.ClearDefectEvent -= InspectionManager_ClearDefect;
-			ProgramManager.Instance.PellInspectionManager.RefreshDefectEvent -= InspectionManager_AOP_RefreshDefect;
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.PellInspMgRegName).AddUIEvent -= InspectionManager_AddDefectEvent;
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.PellInspMgRegName).ClearDefectEvent -= InspectionManager_ClearDefect;
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.PellInspMgRegName).RefreshDefectEvent -= InspectionManager_AOP_RefreshDefect;
 		}
 
 		private void InspectionManager_AOP_RefreshDefect()
@@ -51,7 +52,7 @@ namespace Root_AOP01_Inspection
 			{
 				RootTools.Database.Defect defectInfo = item as RootTools.Database.Defect;
 				var temp = new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom);
-				canvas.AddBlock(temp.Left, temp.Top, temp.Width, temp.Height, brush, pen);
+				canvas.AddBlock(item.m_fAbsX, item.m_fAbsY, temp.Width, temp.Height, brush, pen);//Defect fAbsX정보로
 			}
 		}
 
