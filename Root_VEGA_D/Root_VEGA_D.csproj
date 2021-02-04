@@ -206,6 +206,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\Vision.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -246,8 +247,6 @@
       <Name>Root_VEGA_D_IPU</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Module\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
