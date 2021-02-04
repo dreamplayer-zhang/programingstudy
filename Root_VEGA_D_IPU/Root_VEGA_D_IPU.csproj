@@ -86,6 +86,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\Vision_IPU.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -115,6 +116,10 @@
     <ProjectReference Include="..\RootTools\RootTools.csproj">
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Root_EFEM\Root_EFEM.csproj">
+      <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
+      <Name>Root_EFEM</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

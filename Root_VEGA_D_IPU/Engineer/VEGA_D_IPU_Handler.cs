@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_VEGA_D_IPU.Module;
+using RootTools;
 using RootTools.GAFs;
 using RootTools.Module;
 using System.Collections.Generic;
@@ -26,11 +27,13 @@ namespace Root_VEGA_D_IPU.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
+        public Vision_IPU m_vision;
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            //forget
+            m_vision = new Vision_IPU("Vision", m_engineer, ModuleBase.eRemote.Server);
+            InitModule(m_vision);
         }
 
         void InitModule(ModuleBase module)
