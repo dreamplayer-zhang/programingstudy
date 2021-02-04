@@ -51,7 +51,7 @@ namespace Root_AOP01_Inspection
             LoadportA_State.DataContext = loadport1;
             LoadportB_State.DataContext = loadport2;
             RTR_State.DataContext = wtrcleanunit;
-            Machine_State.DataContext = EQ.p_eState;
+            Machine_State.DataContext = EQ.m_EQ;
             InitFFU();
             InitTimer();
         }
