@@ -16,7 +16,7 @@ namespace Root_WIND2.UI_User
             this.p_VisibleMenu = System.Windows.Visibility.Collapsed;
         }
 
-        public void SetViewRect()
+        public void DisplayBox()
         {
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
 

@@ -617,7 +617,7 @@ namespace RootTools.Camera.BaslerPylon
                             }
                             GrabEvent();
 
-                            if(stopWatch.ElapsedMilliseconds > 33)
+                           // if(stopWatch.ElapsedMilliseconds > 33)
                             {
                                 // 샘플링 스레드에서 사용할 이미지 데이터 복사
                                 int imgSize = m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y;
@@ -645,6 +645,7 @@ namespace RootTools.Camera.BaslerPylon
                                     stopWatch.Restart();
                                 }
                             }
+                            stopWatch.Reset();
                         }
                         else
                         {

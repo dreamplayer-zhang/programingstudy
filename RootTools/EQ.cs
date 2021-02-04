@@ -11,6 +11,7 @@ namespace RootTools
             Init,
             Home,
             Ready,
+            Idle,//LYJ 210203 add
             Run,
             Recovery,  //LYJ 210128 add
             Error,

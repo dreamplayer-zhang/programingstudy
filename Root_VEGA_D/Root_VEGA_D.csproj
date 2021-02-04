@@ -206,6 +206,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\Vision.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -241,9 +242,11 @@
       <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
       <Name>Root_EFEM</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Root_VEGA_D_IPU\Root_VEGA_D_IPU.csproj">
+      <Project>{4d850dee-fd1b-43ce-99fa-737a86047114}</Project>
+      <Name>Root_VEGA_D_IPU</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Module\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

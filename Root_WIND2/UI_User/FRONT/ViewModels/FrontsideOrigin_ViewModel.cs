@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace Root_WIND2.UI_User
 {
-    class FrontsideOrigin_ViewModel : ObservableObject
+    class FrontsideOrigin_ViewModel : ObservableObject, IPage
     {
         private readonly FrontsideOrigin_ImageViewer_ViewModel imageViewerVM;
         public FrontsideOrigin_ImageViewer_ViewModel ImageViewerVM
@@ -30,6 +30,30 @@ namespace Root_WIND2.UI_User
 
         }
 
+        public void SetPage()
+        {
+            LoadRecipe();
+        }
+
+        public void LoadRecipe()
+        {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+            this.OriginX = originRecipe.OriginX;
+            this.OriginY =  originRecipe.OriginY;
+
+            this.OriginWidth = originRecipe.OriginWidth;
+            this.OriginHeight = originRecipe.OriginHeight;
+
+            this.PitchX = originRecipe.DiePitchX;
+            this.PitchY = originRecipe.DiePitchY;
+
+            ImageViewerVM.SetOriginBox(new CPoint(this.OriginX, this.OriginY), this.OriginWidth, this.OriginHeight, this.PitchX, this.PitchY);
+
+            WIND2EventManager.OnRecipeUpdated(this, new RecipeEventArgs());
+        }
+
+
         public void OriginBoxReset_Callback()
         {
             Clear();
@@ -49,6 +73,8 @@ namespace Root_WIND2.UI_User
 
             this.PitchX = originRecipe.DiePitchX;
             this.PitchY = originRecipe.DiePitchY;
+
+            WIND2EventManager.OnRecipeUpdated(this, new RecipeEventArgs());
         }
 
         public void OriginBoxDone_Callback()
@@ -56,7 +82,7 @@ namespace Root_WIND2.UI_User
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
 
             this.OriginX = originRecipe.OriginX;
-            this.OriginY = originRecipe.OriginY;
+            this.OriginY = originRecipe.OriginX;
 
             this.OriginWidth = originRecipe.OriginWidth;
             this.OriginHeight = originRecipe.OriginHeight;
@@ -83,6 +109,8 @@ namespace Root_WIND2.UI_User
 
             WIND2EventManager.OnRecipeUpdated(this, new RecipeEventArgs());
         }
+
+
 
         #region [Properties]
         private int originX = 0;
@@ -158,11 +186,6 @@ namespace Root_WIND2.UI_User
             }
         }
         #endregion
-
-
-
-
-
 
     }
 }

@@ -8,7 +8,7 @@ using System.Windows.Threading;
 
 namespace Root_WIND2.UI_User
 {
-    class FrontsideAlignment_ViewModel : ObservableObject
+    class FrontsideAlignment_ViewModel : ObservableObject, IPage
     {
         private readonly FrontsideAlignment_ImageViewer_ViewModel imageViewerVM;
         public FrontsideAlignment_ImageViewer_ViewModel ImageViewerVM
@@ -24,10 +24,56 @@ namespace Root_WIND2.UI_User
             this.ImageViewerVM.FeatureBoxDone += FeatureBoxDone_Callback;
         }
 
+        #region [IPage Interfaces]
         public void SetPage()
         {
             this.ImageViewerVM.SetViewRect();
+
+            LoadRecipe();
         }
+
+        public void LoadRecipe()
+        {
+            PositionRecipe positionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
+
+            p_WaferFeatureList.Clear();
+            p_ShotFeatureList.Clear();
+            p_ChipFeatureList.Clear();
+
+            // Master
+            foreach (RecipeType_ImageData feature in positionRecipe.ListMasterFeature)
+            {
+                FeatureControl fc = new FeatureControl();
+                fc.p_Offset = new CPoint(feature.PositionX, feature.PositionY);
+                fc.p_ImageSource = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt));
+                fc.DataContext = this;
+
+                p_WaferFeatureList.Add(fc);
+            }
+
+            // Shot
+            foreach (RecipeType_ImageData feature in positionRecipe.ListShotFeature)
+            {
+                FeatureControl fc = new FeatureControl();
+                fc.p_Offset = new CPoint(feature.PositionX, feature.PositionY);
+                fc.p_ImageSource = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt));
+                fc.DataContext = this;
+
+                p_ShotFeatureList.Add(fc);
+            }
+
+            // Chip
+            foreach (RecipeType_ImageData feature in positionRecipe.ListDieFeature)
+            {
+                FeatureControl fc = new FeatureControl();
+                fc.p_Offset = new CPoint(feature.PositionX, feature.PositionY);
+                fc.p_ImageSource = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt));
+                fc.DataContext = this;
+
+                p_ChipFeatureList.Add(fc);
+            }
+        }
+        #endregion
 
         #region [Members]
         ImageData boxImage;

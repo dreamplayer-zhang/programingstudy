@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2.UI_User
 {
-    class FrontsideProduct_ViewModel : ObservableObject
+    class FrontsideProduct_ViewModel : ObservableObject, IPage
     {
         #region [Members]
         int nWaferSize = 300;
@@ -201,6 +201,20 @@ namespace Root_WIND2.UI_User
             chipItems = new ObservableCollection<Rectangle>();
         }
 
+        public void SetPage()
+        {
+            LoadRecipe();
+        }
+
+        public void LoadRecipe()
+        {
+            RecipeType_WaferMap wafermap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+
+            CreateRecipeWaferMap(wafermap.MapSizeX, wafermap.MapSizeY, wafermap.Data);
+            DrawMap();
+        }
+
+        #region [Properties]
         private ObservableCollection<Rectangle> chipItems;
 
         public ObservableCollection<Rectangle> ChipItems
@@ -227,6 +241,8 @@ namespace Root_WIND2.UI_User
             public double Width { get; set; }
             public double Height { get; set; }
         }
+
+        #endregion
 
 
         #region [Method]
@@ -285,9 +301,9 @@ namespace Root_WIND2.UI_User
                         rect.Fill = Brushes.Green;
 
                     Canvas.SetZIndex(rect, 99);
-
-                    chipItems.Add(rect);
                     rect.MouseLeftButtonDown += ChipMouseLeftButtonDown;
+
+                    ChipItems.Add(rect);
                 }
             }
         }
@@ -357,5 +373,7 @@ namespace Root_WIND2.UI_User
             return Brushes.DimGray;
             #endregion
         }
+
+
     }
 }

@@ -210,6 +210,7 @@ namespace Root_WIND2.Module
                 while (pos.Count != nFrameDone)
                 {
                     Thread.Sleep(10);
+                    if (EQ.IsStop()) return "OK";
                 }
 
                 axisZ.WaitReady();
