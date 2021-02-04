@@ -125,8 +125,8 @@ namespace Root_WIND2.Module
         }
         public void SetLens()
         {
-            m_lens.ChangePos(m_sLens);
-            m_lens.WaitReady();
+            //m_lens.ChangePos(m_sLens);
+            //m_lens.WaitReady();
         }
         public void SetLight(bool bOn)
         {
