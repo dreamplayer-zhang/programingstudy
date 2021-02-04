@@ -205,7 +205,7 @@ namespace Root_AOP01_Inspection.Module
                     }
                     if (m_diInterlock_Key.p_bIn)
                     {
-                        m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
+                        m_alidDoorLock.Run(! m_diDoorLock.p_bIn, "Please Check the Doors");
                     }
                     m_alidLightCurtain.Run(m_diLightCurtain.p_bIn, "Please Check LightCurtain");
                     foreach (OHT_Semi OHT in p_aOHT)
