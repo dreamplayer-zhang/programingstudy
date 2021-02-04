@@ -8,6 +8,7 @@
              d:DesignHeight="836" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
     <UserControl.Resources>
         <local:BooleanToPassFailStringConverter x:Key="BooleanToPassFailString"/>
+        <local:BooleanToPassFailColorConverter x:Key="BooleanToPassFailColor"/>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -21,6 +22,7 @@
                             Command="{Binding btnSnap}"
                             Style="{StaticResource SetupPanelBtn}"/>
                     <Button Content="Inspection"
+                            Command="{Binding btnInspection}"
                             Style="{StaticResource SetupPanelBtn}"/>
                 </StackPanel>
                 <Button Content="Back"
@@ -132,7 +134,7 @@
                                         </Grid.RowDefinitions>
                                         <TextBlock FontSize="12" Text="Distance" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0"/>
-                                        <TextBox Style="{StaticResource BasicTbox}" Text="100" Width="80" Height="20" Grid.Column="1" Grid.Row="0"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_nPellicleExpandingSpec}" Width="80" Height="20" Grid.Column="1" Grid.Row="0"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text="um" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0"/>
                                     </Grid>
                                 </GroupBox>
@@ -157,7 +159,9 @@
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock FontSize="12" Text="Min" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                         <TextBlock FontSize="12" Text="Max" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_bPellicleExpandingPass, Converter={StaticResource BooleanToPassFailString}}" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_bPellicleExpandingPass, Converter={StaticResource BooleanToPassFailString}}" 
+                                                   Foreground="{Binding p_mainVision.p_bPellicleExpandingPass, Converter={StaticResource BooleanToPassFailColor}}" 
+                                                   Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
                                         <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPellicleExpandingMin}" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="1" />
                                         <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPellicleExpandingMax}" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
                                     </Grid>

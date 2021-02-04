@@ -79,6 +79,8 @@ namespace RootTools
         #region Property
         /// <summary>
         /// Global UI Shapes
+        /// 이거는 RootViewer !!!자체 기능!!! 마우스 따라다니는 점선같은 것들 추가할 때 사용하고
+        /// 외부에서 수정하거나 초기화하지 않도록 하자.
         /// </summary>
         public ObservableCollection<UIElement> p_ViewElement
         {
@@ -95,6 +97,7 @@ namespace RootTools
 
         /// <summary>
         /// Global UI Shapes
+        /// 이거는 레시피 티칭과 같이 사용자가 커스터마이징할 수 있는 UI Element
         /// </summary>
         public ObservableCollection<UIElement> p_UIElement
         {
@@ -110,7 +113,8 @@ namespace RootTools
         private ObservableCollection<UIElement> m_UIElement = new ObservableCollection<UIElement>();
 
         /// <summary>
-        /// Global UI Shapes
+        /// 이것도 마찬가지 인데.... 사용자와 Interaction(상호작용)하는 경우(레시피 티칭 등)를 제외한
+        /// 그리기를 사용할 때 사용하자
         /// </summary>
         public ObservableCollection<UIElement> p_DrawElement
         {
@@ -155,6 +159,78 @@ namespace RootTools
             }
         }
         private ImageData m_ROILayer;
+
+        
+        public int p_LayerCanvasOffsetX
+        {
+            get => this.m_LayerCanvasOffsetX;
+            set
+            {
+                if (value < 0)
+                {
+                    SetProperty<int>(ref m_LayerCanvasOffsetX, 0);
+                }
+                else
+                {
+                    SetProperty<int>(ref m_LayerCanvasOffsetX, value);
+                }
+               
+            }
+        }
+        private int m_LayerCanvasOffsetX;
+
+        public int p_LayerCanvasOffsetY
+        {
+            get => this.m_LayerCanvasOffsetY;
+            set
+            {
+                if (value < 0)
+                {
+                    SetProperty<int>(ref m_LayerCanvasOffsetY, 0);
+                }
+                else
+                {
+                    SetProperty<int>(ref m_LayerCanvasOffsetY, value);
+                }
+            }
+        }
+        private int m_LayerCanvasOffsetY;
+
+
+        public int p_LayerMemoryOffsetX
+        {
+            get => this.m_LayerMemoryOffsetX;
+            set
+            {
+                if (value < 0)
+                {
+                    SetProperty<int>(ref m_LayerMemoryOffsetX, 0);
+                }
+                else
+                {
+                    SetProperty<int>(ref m_LayerMemoryOffsetX, value);
+                }
+            }
+        }
+        private int m_LayerMemoryOffsetX;
+
+        public int p_LayerMemoryOffsetY
+        {
+            get => this.m_LayerMemoryOffsetY;
+            set
+            {
+                if (value < 0)
+                {
+                    SetProperty<int>(ref m_LayerMemoryOffsetY, 0);
+                }
+                else
+                {
+                    SetProperty<int>(ref m_LayerMemoryOffsetY, value);
+                }
+            }
+        }
+        private int m_LayerMemoryOffsetY;
+
         /// <summary>
         /// Image Offset in Memory
         /// </summary>
@@ -252,6 +328,41 @@ namespace RootTools
                 if (value == 0)
                     return;
                 SetProperty(ref m_CanvasHeight, value);
+                SetRoiRect();
+            }
+        }
+
+
+        private int m_LayerCanvasWidth = 100;
+        public int p_LayerCanvasWidth
+        {
+            get
+            {
+                return m_LayerCanvasWidth;
+            }
+            set
+            {
+                if (value == 0)
+                    return;
+
+                SetProperty(ref m_LayerCanvasWidth, value);
+                SetRoiRect();
+            }
+        }
+
+        private int m_LayerCanvasHeight = 100;
+        public int p_LayerCanvasHeight
+        {
+            get
+            {
+                return m_LayerCanvasHeight;
+            }
+            set
+            {
+                if (value == 0)
+                    return;
+
+                SetProperty(ref m_LayerCanvasHeight, value);
                 SetRoiRect();
             }
         }
@@ -638,8 +749,7 @@ namespace RootTools
                                     if (imageptrB == null)
                                         return;
                                     Parallel.For(0, p_CanvasHeight, (yy) =>
-                                {
-                                    //lock (o)
+                                    {
                                         {
                                             long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
                                             for (int xx = 0; xx < p_CanvasWidth; xx++)
@@ -673,7 +783,6 @@ namespace RootTools
 
                                     Parallel.For(0, p_CanvasHeight, (yy) =>
                                     {
-                                        //lock (o)
                                         {
                                             long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
                                             for (int xx = 0; xx < p_CanvasWidth; xx++)
@@ -774,7 +883,6 @@ namespace RootTools
 
                         Parallel.For(0, p_CanvasHeight, (yy) =>
                         {
-                           // lock (o)
                             {
                                 long pix_y = rectY + yy * rectHeight / p_CanvasHeight;
 
@@ -785,57 +893,73 @@ namespace RootTools
                                 }
                             }
                         });
-
                         p_LayerSource = ImageHelper.ToBitmapSource(view);
                     }
                     if (p_ROILayer.p_nByte == 4)
                     {
-                        Image<Rgba, byte> view = new Image<Rgba, byte>(p_CanvasWidth, p_CanvasHeight);
+                        int CanvasWidth = p_LayerCanvasWidth;
+                        int CanvasHeight = p_LayerCanvasHeight;
+
+                        Image<Rgba, byte> view = new Image<Rgba, byte>(CanvasWidth, CanvasHeight);
                         byte[,,] viewPtr = view.Data;
 
                         IntPtr ptrMem = p_ROILayer.GetPtr();
 
                         if (ptrMem == IntPtr.Zero)
-
                             return;
 
                         byte* imageptr = (byte*)ptrMem.ToPointer();
 
-                        int viewrectY = p_View_Rect.Y;
-                        int viewrectX = p_View_Rect.X;
-                        int viewrectHeight = p_View_Rect.Height;
+                        CPoint memOffset = new CPoint(p_LayerMemoryOffsetX, p_LayerMemoryOffsetY);
+                        int viewrectX = ((p_View_Rect.X - memOffset.X) <= 0)?0:(p_View_Rect.X - memOffset.X);
+                        int viewrectY = ((p_View_Rect.Y - memOffset.Y) <= 0)?0:(p_View_Rect.Y - memOffset.Y);
+
+                        int layerMemWidth = p_ROILayer.p_Size.X;
+                        int layerMemHeight = p_ROILayer.p_Size.Y;
+                        
                         int viewrectWidth = p_View_Rect.Width;
-                        int sizeX = p_ROILayer.p_Size.X;
+                        int viewrectHeight = p_View_Rect.Height;
 
-                        Parallel.For(1, p_CanvasHeight, (yy) =>
+
+
+                        Parallel.For(0, CanvasHeight, (yy) =>
                         {
-                            {
-                                long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-                                long pix_rect = pix_y * sizeX;
-                                for (int xx = 0; xx < p_CanvasWidth; xx++)
-                                {
-                                    long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                            long pix_y = viewrectY + yy * viewrectHeight / CanvasHeight;
+                            long pix_rect = pix_y * layerMemWidth;
 
-                                    viewPtr[yy, xx, 3] = imageptr[3 + 4 * (pix_x + pix_rect)]; //0;
-                                    viewPtr[yy, xx, 2] = imageptr[2 + 4 * (pix_x + pix_rect)]; //0;//imageptr[0 + 3 * (pix_x + pix_rect)];
-                                    viewPtr[yy, xx, 1] = imageptr[1 + 4 * (pix_x + pix_rect)]; //0;//imageptr[1 + 3 * (pix_x + pix_rect)];
-                                    viewPtr[yy, xx, 0] = imageptr[0 + 4 * (pix_x + pix_rect)]; //0;//imageptr[2 + 3 * (pix_x + pix_rect)];
+                            if(pix_y < layerMemHeight)
+                            {
+                                for (int xx = 0; xx < CanvasWidth; xx++)
+                                {
+                                    long pix_x = viewrectX + xx * viewrectWidth / CanvasWidth;
+                                    if (pix_x < layerMemWidth)
+                                    {
+                                        viewPtr[yy, xx, 3] = imageptr[3 + 4 * (pix_x + pix_rect)]; //0;
+                                        viewPtr[yy, xx, 2] = imageptr[2 + 4 * (pix_x + pix_rect)]; //0;//imageptr[0 + 3 * (pix_x + pix_rect)];
+                                        viewPtr[yy, xx, 1] = imageptr[1 + 4 * (pix_x + pix_rect)]; //0;//imageptr[1 + 3 * (pix_x + pix_rect)];
+                                        viewPtr[yy, xx, 0] = imageptr[0 + 4 * (pix_x + pix_rect)]; //0;//imageptr[2 + 3 * (pix_x + pix_rect)];
+                                    }
                                 }
                             }
                         });
-                        byte[] pixels1d = new byte[p_CanvasHeight * p_CanvasWidth * 4];
-                        WriteableBitmap wbitmap = new WriteableBitmap(p_CanvasWidth, p_CanvasHeight, 96, 96, PixelFormats.Bgra32, null);
-                        int index = 0;
-                        for (int row = 0; row < p_CanvasHeight; row++)
+
+                        byte[] pixels1d = new byte[CanvasHeight * CanvasWidth * 4];
+                        WriteableBitmap wbitmap = new WriteableBitmap(CanvasWidth, CanvasHeight, 96, 96, PixelFormats.Bgra32, null);
+
+                        Parallel.For(0, CanvasHeight, (row) =>
                         {
-                            for (int col = 0; col < p_CanvasWidth; col++)
+                            for (int col = 0; col < CanvasWidth; col++)
                             {
-                                for (int i = 0; i < 4; i++)
-                                    pixels1d[index++] = viewPtr[row, col, i];
+                                int index = col * 4 + row * CanvasWidth * 4;
+                                pixels1d[index] = viewPtr[row, col, 0];
+                                pixels1d[index + 1] = viewPtr[row, col, 1];
+                                pixels1d[index + 2] = viewPtr[row, col, 2];
+                                pixels1d[index + 3] = viewPtr[row, col, 3];
                             }
-                        }
-                        Int32Rect rect = new Int32Rect(0, 0, p_CanvasWidth, p_CanvasHeight);
-                        int stride = 4 * p_CanvasWidth;
+                        });
+
+                        Int32Rect rect = new Int32Rect(0, 0, CanvasWidth, CanvasHeight);
+                        int stride = 4 * CanvasWidth;
                         wbitmap.WritePixels(rect, pixels1d, stride, 0);
                         p_LayerSource = wbitmap;
                         //p_LayerSource = ImageHelper.ToBitmapSource(view);
@@ -848,6 +972,22 @@ namespace RootTools
                 System.Windows.MessageBox.Show(ee.ToString());
             }
         }
+
+        public void ClearViewElement()
+        {
+            this.p_ViewElement.Clear();
+        }
+
+        public void ClearUIElement()
+        {
+            this.p_UIElement.Clear();
+        }
+
+        public void ClearDrawElement()
+        {
+            this.p_UIElement.Clear();
+        }
+
         public void InitRoiRect(int nWidth, int nHeight)
         {
             if (p_ImageData == null)
@@ -998,6 +1138,9 @@ namespace RootTools
         #region Draw Method
         public virtual unsafe void CropRectSetData(ImageData imageData, CRect nowRect, CPoint offset = null)
         {
+            if (offset is null) 
+                offset = new CPoint(0, 0);
+
             IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
@@ -1013,15 +1156,23 @@ namespace RootTools
         }
         public virtual unsafe void DrawRectBitmap(CRect rect, byte r, byte g, byte b, byte a, CPoint offset = null)
         {
-            Parallel.For(rect.Left, rect.Right , x =>
-              {
-                  Parallel.For(rect.Top, rect.Bottom , y =>
-                  {
-                      CPoint pixelPt = new CPoint(x - offset.X, y - offset.Y);
-                      DrawPixelBitmap(pixelPt, r, g, b, a);
-                  });
-              });
+            if (offset == null) offset = new CPoint(0, 0);
+
+            rect.Left = rect.Left - offset.X;
+            rect.Right = rect.Right - offset.X;
+            rect.Top = rect.Top - offset.Y;
+            rect.Bottom = rect.Bottom - offset.Y;
+
+            Parallel.For(rect.Top, rect.Bottom , y =>
+            {
+                for (int x = rect.Left; x < rect.Right; x++)
+                {
+                    CPoint pixelPt = new CPoint(x, y);
+                    DrawPixelBitmap(pixelPt, r, g, b, a);
+                }
+            });
         }
+
         public virtual unsafe void DrawPixelBitmap(CPoint memPt, byte r, byte g, byte b, byte a)
         {
             IntPtr ptrMem = p_ROILayer.GetPtr();
@@ -1036,6 +1187,8 @@ namespace RootTools
         }
         public virtual unsafe void DrawPixelBitmap(CPoint memPt, byte value, CPoint offset = null)
         {
+            if (offset == null) offset = new CPoint(0, 0);
+
             IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
@@ -1048,14 +1201,12 @@ namespace RootTools
         #region Mouse Method
         public virtual void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
         {
-            //CPoint StartPt = GetCurrentPoint();
             if (p_ImageData == null) return;
 
             CPoint MovePoint = new CPoint();
             MovePoint.X = point.X + p_View_Rect.Width * nX / p_CanvasWidth;
             MovePoint.Y = point.Y + p_View_Rect.Height * nY / p_CanvasHeight;
-            //if (p_ImageData.p_nByte == 1)
-            //{
+
                 if (MovePoint.X < 0)
                     MovePoint.X = 0;
                 else if (MovePoint.X > p_ImageData.p_Size.X - p_View_Rect.Width)
@@ -1064,18 +1215,7 @@ namespace RootTools
                     MovePoint.Y = 0;
                 else if (MovePoint.Y > p_ImageData.p_Size.Y - p_View_Rect.Height)
                     MovePoint.Y = p_ImageData.p_Size.Y - p_View_Rect.Height;
-            //}
-            //else
-            //{
-            //    if (MovePoint.X < 0)
-            //        MovePoint.X = 0;
-            //    else if (MovePoint.X > p_ImageData.p_Size.X - p_View_Rect.Width)
-            //        MovePoint.X = p_ImageData.p_Size.X - p_View_Rect.Width;
-            //    if (MovePoint.Y < 0)
-            //        MovePoint.Y = 0;
-            //    else if (MovePoint.Y > p_ImageData.p_Size.Y - p_View_Rect.Height)
-            //        MovePoint.Y = p_ImageData.p_Size.Y - p_View_Rect.Height;
-            //}
+
             SetViewRect(MovePoint);
             SetImageSource();
         }

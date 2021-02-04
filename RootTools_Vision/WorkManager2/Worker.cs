@@ -158,7 +158,7 @@ namespace RootTools_Vision
 						{
 #if WORKER_DEBUG
 #if DEBUG
-							DebugOutput.PrintWorker(this);
+                            //DebugOutput.PrintWorker(this);
 #endif
 #endif
 							_waitSignal.WaitOne();

@@ -10,6 +10,7 @@
 
     <UserControl.Resources>
         <local:BooleanToPassFailStringConverter x:Key="BooleanToPassFailString"/>
+        <local:BooleanToPassFailColorConverter x:Key="BooleanToPassFailColor"/>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -373,7 +374,8 @@
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock FontWeight="Bold" FontSize="12"
                                                    Text="{Binding p_mainVision.p_bAlignKeyPass, Converter={StaticResource BooleanToPassFailString}}" 
-                                                   Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                                   Foreground="{Binding p_mainVision.p_bAlignKeyPass, Converter={StaticResource BooleanToPassFailColor}}" 
+                                                   Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Header="Pattern Shift" Grid.Row="2">
@@ -392,7 +394,8 @@
                                         <TextBlock FontSize="12" Text="Angle" Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                         <TextBlock FontWeight="Bold" FontSize="12" 
                                                    Text="{Binding p_mainVision.p_bPatternShiftPass, Converter={StaticResource BooleanToPassFailString}}" 
-                                                   Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                                   Foreground="{Binding p_mainVision.p_bPatternShiftPass, Converter={StaticResource BooleanToPassFailColor}}"
+                                                   Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
                                         <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPatternShiftDistance}" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="1" />
                                         <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPatternShiftAngle}" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
                                     </Grid>
@@ -414,7 +417,8 @@
                                         <TextBlock FontSize="12" Text="Angle" Style="{StaticResource BasicTb}" Grid.Row="2" Grid.ColumnSpan="2" Margin="10,5,10,4"/>
                                         <TextBlock FontWeight="Bold" FontSize="12" 
                                                    Text="{Binding p_mainVision.p_bPellicleShiftPass, Converter={StaticResource BooleanToPassFailString}}" 
-                                                   Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="0" Margin="10,5,10,4" />
+                                                   Foreground="{Binding p_mainVision.p_bPellicleShiftPass, Converter={StaticResource BooleanToPassFailColor}}" 
+                                                   Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="0" Margin="10,5,10,4" />
                                         <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPellicleShiftDistance}" Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="1" Margin="10,5,10,4" />
                                         <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPellicleShiftAngle}" Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="2" Margin="10,5,10,4" />
                                     </Grid>
@@ -428,7 +432,8 @@
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock FontWeight="Bold" FontSize="12" 
                                                    Text="{Binding p_mainVision.p_bBarcodePass, Converter={StaticResource BooleanToPassFailString}}" 
-                                                   Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                                   Foreground="{Binding p_mainVision.p_bBarcodePass, Converter={StaticResource BooleanToPassFailColor}}"
+                                                   Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="5" Grid.Column="1" Header="Defect Image"

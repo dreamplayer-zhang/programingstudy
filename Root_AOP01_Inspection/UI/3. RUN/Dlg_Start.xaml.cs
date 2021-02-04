@@ -12,6 +12,7 @@ using System.Threading;
 using System.Windows.Threading;
 using System;
 using System.Linq;
+using Root_AOP01_Inspection.Module;
 
 namespace Root_AOP01_Inspection
 {
@@ -40,8 +41,8 @@ namespace Root_AOP01_Inspection
             m_bShow = false;
         }
         ManualJobSchedule m_JobSchedule;
-        Loadport_Cymechs m_loadport;
-        public void Init(ManualJobSchedule jobschdule, AOP01_Engineer engineer, Loadport_Cymechs loadport)
+        Loadport_AOP01 m_loadport;
+        public void Init(ManualJobSchedule jobschdule, AOP01_Engineer engineer, Loadport_AOP01 loadport)
         {
             m_engineer = engineer;
             m_handler = engineer.m_handler;

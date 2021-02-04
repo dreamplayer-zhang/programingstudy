@@ -4,6 +4,7 @@ using RootTools;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
+using RootTools.Lens.LinearTurret;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
@@ -37,7 +38,7 @@ namespace Root_WIND2.Module
         Camera_Basler m_CamAutoFocus;
 
         KlarfData_Lot m_KlarfData_Lot;
-
+        LensLinearTurret m_LensLinearTurret;
         #region [Getter Setter]
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
         public Axis AxisZ { get => m_axisZ; private set => m_axisZ = value; }
@@ -72,6 +73,7 @@ namespace Root_WIND2.Module
                 p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.Get(ref m_CamAlign, this, "AlignCam");
                 p_sInfo = m_toolBox.Get(ref m_CamAutoFocus, this, "AutoFocusCam");
+                p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
             }
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
@@ -118,7 +120,7 @@ namespace Root_WIND2.Module
             while (m_aGrabMode.Count < m_lGrabMode)
             {
                 string id = "Mode." + m_aGrabMode.Count.ToString("00");
-                GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool, m_RADSControl);
+                GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool, m_RADSControl, m_LensLinearTurret);
                 m_aGrabMode.Add(grabMode);
             }
             while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);

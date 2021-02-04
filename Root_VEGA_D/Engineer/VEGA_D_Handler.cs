@@ -1,5 +1,7 @@
 ﻿using Root_EFEM;
 using Root_EFEM.Module;
+using Root_VEGA_D.Module;
+using Root_VEGA_D_IPU.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -33,16 +35,23 @@ namespace Root_VEGA_D.Engineer
         public ModuleList p_moduleList { get; set; }
         public VEGA_D_Recipe m_recipe;
         public EFEM_Process m_process;
+        public Vision m_vision;
+        public Vision_IPU m_visionIPU; 
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             InitWTR();
+            IWTR iWTR = (IWTR)m_wtr;
             InitLoadport();
             InitAligner();
+            m_vision = new Vision("Vision", m_engineer);
+            InitModule(m_vision);
+            iWTR.AddChild(m_vision); 
+            m_visionIPU = new Vision_IPU("Vision_IPU", m_engineer, ModuleBase.eRemote.Client);
+            InitModule(m_visionIPU);
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
-            IWTR iWTR = (IWTR)m_wtr;
             iWTR.ReadInfoReticle_Registry();
             m_recipe = new VEGA_D_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);

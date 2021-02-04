@@ -154,7 +154,7 @@ namespace Root_AOP01_Inspection
                         break;
                     case eLoadport.Cymechs:
                     default:
-                        module = new Loadport_Cymechs(sID, m_engineer, true, true);
+                        module = new Loadport_AOP01(sID, m_engineer, true, true);
                         LoadportType = eLoadport.Cymechs;
                         break;
                 }
@@ -172,7 +172,7 @@ namespace Root_AOP01_Inspection
             char cID = 'A';
             for (int n = 0; n < m_lLoadport; n++, cID++)
             {
-                string sID = "Rfid" + cID;
+                string sID = "RFID" + cID;
                 module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]);
                 InitModule(module);
                 m_aRFID.Add((IRFID)module);
@@ -383,7 +383,8 @@ namespace Root_AOP01_Inspection
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
-                    case EQ.eState.Ready: break;  //LYJ add 210128
+                    case EQ.eState.Ready: EQ.p_eState = EQ.eState.Idle; break;  //LYJ add 210128
+                    case EQ.eState.Idle: break;
                     case EQ.eState.Run:
                     case EQ.eState.Recovery:
                         if (p_moduleList.m_qModuleRun.Count == 0)

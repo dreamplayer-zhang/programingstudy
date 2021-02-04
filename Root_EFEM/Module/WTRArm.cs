@@ -29,7 +29,7 @@ namespace Root_EFEM.Module
             {
                 m_sInfoWafer = (value == null) ? "" : value.p_id;
                 _infoWafer = value;
-                m_reg.Write("sInfoWafer", m_sInfoWafer);
+               // m_reg.Write("sInfoWafer", m_sInfoWafer);
                 OnPropertyChanged();
             }
         }

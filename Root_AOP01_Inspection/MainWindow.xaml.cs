@@ -126,14 +126,6 @@ namespace Root_AOP01_Inspection
 		}
 		#endregion
 
-		//#region Mode UI
-		//public SelectMode ModeSelect;
-		//public Setup_Panel Setup;
-		//public Review_Panel Review;
-		//public Run_Panel Run;
-		////public Dlg_Start Dlg;
-		//#endregion
-
 		#region ViewModel
 		//private Dlg_ViewModel m_Dlg;
 		#endregion
@@ -317,9 +309,8 @@ namespace Root_AOP01_Inspection
 
 			if (m_engineer.m_handler.m_aLoadportType[0] == eLoadport.Cymechs && m_engineer.m_handler.m_aLoadportType[1] == eLoadport.Cymechs)
 			{
-				UIManager.Instance.RunWindow.Init(m_engineer.m_handler.m_mainVision, m_engineer.m_handler.m_backsideVision, (RTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[0], (Loadport_Cymechs)m_engineer.m_handler.m_aLoadport[1], m_engineer, (RFID_Brooks)m_engineer.m_handler.m_aRFID[0], (RFID_Brooks)m_engineer.m_handler.m_aRFID[1]);
+				UIManager.Instance.RunWindow.Init(m_engineer.m_handler.m_mainVision, m_engineer.m_handler.m_backsideVision, (RTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_AOP01)m_engineer.m_handler.m_aLoadport[0], (Loadport_AOP01)m_engineer.m_handler.m_aLoadport[1], m_engineer, (RFID_Brooks)m_engineer.m_handler.m_aRFID[0], (RFID_Brooks)m_engineer.m_handler.m_aRFID[1]);
 			}
-
 			if (m_engineer.m_handler.m_FDC.m_aData.Count > 0)
 			{
 				try
@@ -335,20 +326,7 @@ namespace Root_AOP01_Inspection
 				}
 				catch { }
 			}
-
-			///////시연용 임시코드
-			//DatabaseManager.Instance.SetDatabase(1);
-			//////
-			//logView.Init(LogView.m_logView);
-			//WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
 			InitTimer();
-			//dialogService = new DialogService(this);
-			//dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
-
-			//Init_ViewModel();
-			//Init_UI();
-			
-			//InitTimer();
 		}
 		DispatcherTimer m_timer = new DispatcherTimer();
 		void InitTimer()

@@ -74,7 +74,8 @@ namespace Root_AOP01_Inspection.Module
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-           if(m_diReticleCheck.p_bIn == false) m_alidClean.Run(true, "Reticle too close to Door");
+            if(m_bDoClean)
+                if(m_diReticleCheck.p_bIn == false) m_alidClean.Run(true, "Reticle too close to Door");
         }
         #endregion
 

@@ -6,7 +6,111 @@
              xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="883" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
-    <ScrollViewer>
+    <UserControl.Resources>
+        <Style x:Key="groupbox_selectmode" TargetType="GroupBox">
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type GroupBox}" >
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="100"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="Header"
+                                    Grid.Row="0"
+                                    Padding="40,0,0,0"
+                                    CornerRadius="4,4,0,0"
+                                    VerticalAlignment="Stretch"
+                                    Background="#334466">
+                                <ContentPresenter VerticalAlignment="Center" ContentSource="Header" RecognizesAccessKey="True" />
+                            </Border>
+                            <Border Grid.Row="1" 
+                                    CornerRadius="0,0,2,2"
+                                    Background="#334466">
+                                <ContentPresenter />
+                            </Border>
+                            <Grid.Effect>
+                                <DropShadowEffect ShadowDepth="5" Color="Gray"/>
+                            </Grid.Effect>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="button_selectmode" TargetType="Button">
+            <Setter Property="Background" Value="#333366"/>
+            <Setter Property="Foreground" Value="{StaticResource groupbox_button_text}"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                CornerRadius="6"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+                            <ContentPresenter  VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
+                            </Trigger>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_press}"/>
+                                <Setter Property="Foreground" Value="{StaticResource groupbox_button_press_text}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="button_loggin" TargetType="Button">
+            <Setter Property="Background" Value="#333366"/>
+            <Setter Property="Foreground" Value="{StaticResource groupbox_button_text}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                CornerRadius="4"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+                            <ContentPresenter  VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
+                            </Trigger>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_press}"/>
+                                <Setter Property="Foreground" Value="{StaticResource groupbox_button_press_text}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <ScrollViewer Background="{StaticResource main_view_groupbox_background}">
         <StackPanel>
             <Grid Height="883">
                 <!--<material:MaterialDateDisplay Margin="20,20" FontFamily="Arial"/>-->
@@ -14,7 +118,8 @@
                        VerticalAlignment="Top"
                        HorizontalAlignment="Right"
                        FontSize="30"
-                       FontWeight="Bold"/>
+                       FontWeight="Bold"
+                       Foreground="{StaticResource groupbox_button_text}"/>
                 <!--<TextBlock Text="00:00:00" Margin="203,37"
                        VerticalAlignment="Top"
                        HorizontalAlignment="Left"
@@ -30,16 +135,53 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
+                    <Grid Grid.Column="0"
+                          Margin="40, 0, 40, 0"
+                          VerticalAlignment="Bottom"
+                          HorizontalAlignment="Stretch"
+                          Height="100">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Button Style="{StaticResource button_selectmode}"
+                                Margin="4,4,4,4"
+                                Grid.RowSpan="2"
+                                Click="ButtonEngineer_Clicked">
+                            <Button.Content>
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="Engineer" 
+                                               HorizontalAlignment="Center" 
+                                               FontSize="25"
+                                                FontWeight="Bold"
+                                               />
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <TextBox Grid.Column="1" Margin="4" Text="admin" VerticalContentAlignment="Center" Padding="10,0,0,0" FontSize="22"/>
+
+                        <TextBox Grid.Column="1" Grid.Row="1" Margin="4" Text="********" VerticalContentAlignment="Center" Padding="10,0,0,0" FontSize="22"/>
+                        <Button Grid.Column="2" 
+                                Grid.RowSpan="2" 
+                                Content="Login"
+                                Style="{StaticResource button_loggin}"/>
+                    </Grid>
                     <GroupBox Grid.Column="0"
                               Margin="40,120"
-                              Background="{StaticResource ControlBackGround}"
+                              Style="{StaticResource groupbox_selectmode}"
                               MouseEnter="GroupBox_MouseEnter"
                               MouseLeave="GroupBox_MouseLeave"
                               MouseLeftButtonDown="Setup_MouseLeftButtonDown" 
                               Cursor="Hand">
                         <GroupBox.Header>
                             <Grid>
-                                <TextBlock Text="Setup" 
+                                <TextBlock Text="SETUP" 
                                        FontSize="35"
                                        FontWeight="Bold"/>
                             </Grid>
@@ -126,14 +268,14 @@
                       Y2="1"/>
                     <GroupBox Grid.Column="2"
                               Margin="40,120"
-                              Background="{StaticResource ControlBackGround}"
+                              Style="{StaticResource groupbox_selectmode}"
                               MouseEnter="GroupBox_MouseEnter"
                               MouseLeave="GroupBox_MouseLeave"
                               MouseLeftButtonDown="Review_MouseLeftButtonDown"
                               Cursor="Hand">
                         <GroupBox.Header>
                             <Grid>
-                                <TextBlock Text="Review" FontSize="35"
+                                <TextBlock Text="REVIEW" FontSize="35"
                                    FontWeight="Bold"/>
 
                             </Grid>
@@ -213,14 +355,14 @@
                       Y2="1"/>
                     <GroupBox Grid.Column="4"
                               Margin="40,120"
-                              Background="{StaticResource ControlBackGround}"
+                              Style="{StaticResource groupbox_selectmode}"
                               MouseEnter="GroupBox_MouseEnter"
                               MouseLeave="GroupBox_MouseLeave"
                               MouseLeftButtonDown="Run_MouseLeftButtonDown"
                               Cursor="Hand">
                         <GroupBox.Header>
                             <Grid>
-                                <TextBlock Text="Operation" FontSize="35"
+                                <TextBlock Text="OPERATION" FontSize="35"
                                    FontWeight="Bold"/>
                             </Grid>
                         </GroupBox.Header>

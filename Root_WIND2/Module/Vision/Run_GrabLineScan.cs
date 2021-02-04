@@ -57,6 +57,7 @@ namespace Root_WIND2.Module
 
             try
             {
+                m_grabMode.SetLens();
                 m_grabMode.SetLight(true);
 
                 AxisXY axisXY = m_module.AxisXY;
@@ -108,7 +109,7 @@ namespace Root_WIND2.Module
                     {
                         dPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
                     }
-                    if (m_module.Run(axisZ.StartMove(m_grabMode.m_nFocusPosZ)))
+                    if (m_module.Run(axisZ.StartMove(dPosZ)))
                         return p_sInfo;
   
                     //if (nScanLine == 0)

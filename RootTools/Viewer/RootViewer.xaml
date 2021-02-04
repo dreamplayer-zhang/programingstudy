@@ -98,11 +98,17 @@
 					<Image Source="{Binding Path=p_ImgSource}" Stretch="UniformToFill"  />
 				</Canvas>
 				
-				<tools:CustomCanvas x:Name="canvas" obs:SizeObserver.Observe="true" Focusable="True"
+				<tools:CustomCanvas x:Name="canvas" 
+                    obs:SizeObserver.Observe="true" 
+                    Focusable="True"
 					obs:SizeObserver.ObservedWidth="{Binding p_CanvasWidth, Mode=OneWayToSource}"
-					obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}"/>
-				
-				<Image Source="{Binding p_LayerSource}" Opacity="0.5" Grid.Column="1"/>
+					obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}">
+                    <Image Source="{Binding p_LayerSource}" 
+                           Canvas.Left="{Binding p_LayerCanvasOffsetX}" 
+                           Canvas.Top="{Binding p_LayerCanvasOffsetY}"
+                           Opacity="0.5" 
+                           Grid.Column="1"/>
+                </tools:CustomCanvas>
 
                 <ItemsControl ItemsSource="{Binding p_ViewElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"

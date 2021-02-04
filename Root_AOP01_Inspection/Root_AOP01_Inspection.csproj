@@ -213,6 +213,7 @@
     <Compile Include="Module\FFU_Fan_UI.xaml.cs">
       <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\Loadport_AOP01.cs" />
     <Compile Include="Module\RTR_RND.cs" />
     <Compile Include="Module\FFU.cs" />
     <Compile Include="UI\3. RUN\ManualJobSchedule.cs" />
