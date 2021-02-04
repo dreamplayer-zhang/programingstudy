@@ -322,6 +322,7 @@
       <DependentUpon>FrontsideSummary.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\FRONT\ViewModels\FrontsideSummary_ViewModel.cs" />
+    <Compile Include="UI_User\Interfaces\IPage.cs" />
     <Compile Include="UI_User\RecipeWizardPanel.xaml.cs">
       <DependentUpon>RecipeWizardPanel.xaml</DependentUpon>
     </Compile>

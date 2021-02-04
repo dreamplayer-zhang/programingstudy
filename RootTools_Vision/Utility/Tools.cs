@@ -436,7 +436,7 @@ namespace RootTools_Vision
             }
         }
 
-        public static System.Windows.Media.Imaging.BitmapSource BitmapFromSource(System.Drawing.Bitmap bitmap)
+        public static System.Windows.Media.Imaging.BitmapSource ConvertBitmapToSource(System.Drawing.Bitmap bitmap)
         {
             var bitmapData = bitmap.LockBits(
                 new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),

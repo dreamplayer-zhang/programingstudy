@@ -211,7 +211,7 @@ namespace Root_WIND2
 
                 if(frontImage.GetPtr() == IntPtr.Zero)
                 {
-                    MessageBox.Show("Front Inspection 생성 실패, 메모리 할당 없음");
+                    //MessageBox.Show("Front Inspection 생성 실패, 메모리 할당 없음");
                 }
                 else
                 {
@@ -226,7 +226,7 @@ namespace Root_WIND2
 
                 if (frontImage.GetPtr() == IntPtr.Zero)
                 {
-                    MessageBox.Show("Back Inspection 생성 실패, 메모리 할당 없음");
+                    //MessageBox.Show("Back Inspection 생성 실패, 메모리 할당 없음");
                 }
                 else
                 {
@@ -239,7 +239,7 @@ namespace Root_WIND2
 
                 if (edgeTopImage.GetPtr() == IntPtr.Zero || edgeSideImage.GetPtr() == IntPtr.Zero || edgeBottomImage.GetPtr() == IntPtr.Zero)
                 {
-                    MessageBox.Show("Edge Inspection 생성 실패, 메모리 할당 없음");
+                    //MessageBox.Show("Edge Inspection 생성 실패, 메모리 할당 없음");
                 }
                 else
                 {
@@ -259,7 +259,7 @@ namespace Root_WIND2
 
                 if (ebrImage.GetPtr() == IntPtr.Zero)
                 {
-                    MessageBox.Show("EBR Inspection 생성 실패, 메모리 할당 없음");
+                    //MessageBox.Show("EBR Inspection 생성 실패, 메모리 할당 없음");
                 }
                 else
                 {
