@@ -177,7 +177,8 @@ namespace Root_AOP01_Inspection.Engineer
         List<InfoWafer> m_aCalcWafer = new List<InfoWafer>();
         /// <summary> RunThread에서 실행 될 ModuleRun List (from Handler when EQ.p_eState == Run) </summary>
         public Queue<Sequence> m_qSequence = new Queue<Sequence>();
-        public int m_nSequencePersent = 0;
+        public int m_nSequencePercent = 0;
+        public int m_nOneSequencePercent = 0;
         public string ReCalcSequence()
         {
             try
@@ -376,7 +377,7 @@ namespace Root_AOP01_Inspection.Engineer
         #endregion
 
         #region RunSequence
-        public int p_nSequencePersent = 0;
+
         /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
         public string RunNextSequence()
         {

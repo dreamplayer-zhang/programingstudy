@@ -61,12 +61,13 @@
                                 <Grid Margin="1">
                                     <ProgressBar x:Name="progressBarSequence" Height="40"
                                                  Margin="0,2"
-                                                 Value="{Binding p_nSequencePersent}"
+                                                 Value="{Binding p_nSequencePercent}"
                                                  Foreground="SeaGreen" />
-                                    <TextBlock x:Name="textblockSequence" Text="{Binding p_nSequencePersent}"
+                                    <TextBlock x:Name="textblockSequence" Text="{Binding p_nSequencePercent}"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
                                                FontWeight="Bold"
+                                               Foreground="Black"
                                                FontSize="15" />
                                 </Grid>
                             </StackPanel>

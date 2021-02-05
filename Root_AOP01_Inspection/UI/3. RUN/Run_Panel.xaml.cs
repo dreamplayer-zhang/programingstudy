@@ -52,8 +52,8 @@ namespace Root_AOP01_Inspection
             LoadportA_State.DataContext = loadport1;
             LoadportB_State.DataContext = loadport2;
             RTR_State.DataContext = m_rndrtr;
-            progressBarSequence.DataContext = m_handler.m_process;
-            textblockSequence.DataContext = m_handler.m_process;
+            //progressBarSequence.DataContext = m_handler.m_process;
+            //textblockSequence.DataContext = m_handler.m_process;
             Machine_State.DataContext = EQ.m_EQ;
             InitFFU();
             InitTimer();
@@ -166,7 +166,7 @@ namespace Root_AOP01_Inspection
         {
             if (IsEnableInitialization() == false) return;
             EQ.p_bStop = false;
-            m_handler.m_process.p_nSequencePersent = 0;
+            m_handler.m_process.m_nSequencePercent = 0;
             m_handler.m_process.ClearInfoWafer();
             m_handler.m_nRnR = 0; //Init 할때 RNR 카운트초기화
             m_handler.m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState = InfoCarrier.eState.Placed;  //210201 모니터링필요 EQ.Stop 되고 이닛누르면 간헐적으로 Loadport Docking 상태로 무언정지 생김
