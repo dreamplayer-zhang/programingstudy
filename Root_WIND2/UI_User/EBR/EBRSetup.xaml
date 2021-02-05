@@ -5,48 +5,47 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2.UI_User" xmlns:tools="clr-namespace:RootTools;assembly=RootTools" xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="838" d:DesignWidth="1683" 
+             d:DesignHeight="800" d:DesignWidth="1600" 
              Background="{StaticResource PanelBackGround}">
-    <StackPanel>
-        <Grid Height="838"
-              Background="{StaticResource main_view_background}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="4*"/>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                </Grid.RowDefinitions>
-                <WrapPanel/>
-                <Grid Grid.Column="0" Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80*"/>
-                        <ColumnDefinition Width="173"/>
-                    </Grid.ColumnDefinitions>
-                    <GroupBox Grid.Column="0" Margin="4,0,4,4"
+    
+    <Grid Background="{StaticResource main_view_background}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <WrapPanel/>
+            <Grid Grid.Column="0" Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80*"/>
+                    <ColumnDefinition Width="173"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Grid.Column="0" Margin="4,0,4,4"
                                Style="{StaticResource main_view_groupbox}"
                                Header="Image Viewer" >
-                        <tools:RootViewer DataContext="{Binding DrawToolVM}"/>
-                    </GroupBox>
-                    <Grid Grid.Column="1">
-                        <GroupBox Grid.Row="0" Margin="4,0,4,4"
+                    <tools:RootViewer DataContext="{Binding DrawToolVM}"/>
+                </GroupBox>
+                <Grid Grid.Column="1">
+                    <GroupBox Grid.Row="0" Margin="4,0,4,4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Header="Thumbnail">
-                        </GroupBox>
-                    </Grid>
+                    </GroupBox>
                 </Grid>
             </Grid>
-            <!--<GridSplitter Grid.Column="2" 
+        </Grid>
+        <!--<GridSplitter Grid.Column="2" 
                               HorizontalAlignment="Stretch" 
                               VerticalAlignment="Stretch" 
                               Background="{StaticResource Splitter}" 
                               Width="3"
                               ShowsPreview="True"/>-->
-            
-            <Grid Grid.Column="1"
-                  Background="{StaticResource main_view_background}">
+
+        <StackPanel Grid.Column="1">
+            <Grid Background="{StaticResource main_view_background}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
@@ -60,7 +59,7 @@
                               Style="{StaticResource main_view_groupbox}"
                               Header="Scan Information">
                         <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
-                            
+
                             <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                                 <Grid.ColumnDefinitions >
                                     <ColumnDefinition Width="120"/>
@@ -131,83 +130,135 @@
 
                     <GroupBox Grid.Row="2" Margin="4,0,4,4" Style="{StaticResource main_view_groupbox}" 
                               Header="Spec" DataContext="{Binding Parameter}">
-                        <Grid Margin="10,5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="345*"/>
-                                <ColumnDefinition Width="116*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <TextBlock FontSize="12" Text="ROI Width" Style="{StaticResource BasicTb}" Grid.Row="0" Grid.Column="1" Margin="18,11,0,11"/>
-                            <TextBlock FontSize="12" Text="ROI Height" Style="{StaticResource BasicTb}" Grid.Row="1" Grid.Column="1" Margin="18,11,0,11"/>
-                            <TextBlock FontSize="12" Text="Notch Y " Style="{StaticResource BasicTb}" Grid.Row="2" Grid.Column="1" Margin="18,11,0,11"/>
-                            <TextBlock FontSize="12" Text="Step Degree" Style="{StaticResource BasicTb}" Grid.Row="3" Grid.Column="1" Margin="18,11,0,11"/>
-                            <TextBlock FontSize="12" Text="X Range (Equalization)" Style="{StaticResource BasicTb}" Grid.Row="4" Grid.Column="1" Margin="18,11,0,11"/>
-                            <TextBlock FontSize="12" Text="Standard GV Diff (EDGE)" Style="{StaticResource BasicTb}" Grid.Row="5" Grid.Column="1" Margin="18,11,0,11"/>
-                            <TextBlock FontSize="12" Text="Standard GV Diff (BEVEL)" Style="{StaticResource BasicTb}" Grid.Row="6" Grid.Column="1" Margin="18,11,0,10"/>
-                            <TextBlock FontSize="12" Text="Standard GV Diff (EBR)" Style="{StaticResource BasicTb}" Grid.Row="7" Grid.Column="1" Margin="18,11,0,11"/>
-                            <TextBlock FontSize="12" Text="Offset (BEVEL)" Style="{StaticResource BasicTb}" Grid.Row="8" Grid.Column="1" Margin="18,11,0,10"/>
-                            <TextBlock FontSize="12" Text="Offset (EBR)" Style="{StaticResource BasicTb}" Grid.Row="9" Grid.Column="1" Margin="18,11,0,10"/>
-                            <TextBox Text="{Binding ROIWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                            <TextBox Text="{Binding ROIHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                            <TextBox Text="{Binding NotchY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                            <TextBox Text="{Binding StepDegree, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                            <TextBox Text="{Binding XRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                            <TextBox Text="{Binding DiffEdge, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="5" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                            <TextBox Text="{Binding DiffBevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="6" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                            <TextBox Text="{Binding DiffEBR, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="7" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                            <TextBox Text="{Binding OffsetBevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="8" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                            <TextBox Text="{Binding OffsetEBR, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="9" Style="{StaticResource BasicTbox}" Width="80" Height="20" Margin="18,8"/>
-                        </Grid>
-                        <!--Intensity, USL/LSL, Step Degree(Count), Offset Bevel, Offset EBR, Others(X Ave/Y Ave)-->
+                        <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
+                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Inspection ROI Width" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding ROIWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                            </Grid>
+
+                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Inspection ROI Height" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding ROIHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                            </Grid>
+
+                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Notch Y" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding NotchY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                            </Grid>
+
+                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Step Degree" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding StepDegree, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                            </Grid>
+
+                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="X Range (Equalization)" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding XRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                            </Grid>
+                            
+                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Standard GV Diff (EDGE)" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding DiffEdge, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                            </Grid>
+
+                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Standard GV Diff (BEVEL)" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding DiffBevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                            </Grid>
+
+                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Standard GV Diff (EBR)" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding DiffEBR, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                            </Grid>
+
+                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Offset (BEVEL)" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding OffsetBevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                            </Grid>
+
+                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Offset (EBR)" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding OffsetEBR, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                            </Grid>
+                        </StackPanel>
                     </GroupBox>
                 </Grid>
             </Grid>
-
-            <Grid Grid.Column="2"
+        </StackPanel>
+        
+        <Grid Grid.Column="2"
                   Background="{StaticResource main_view_background}">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition Height="2*"/>
-                </Grid.RowDefinitions>
-                <GroupBox Grid.Row="0" Grid.Column="1" Header="Graph" Margin="4,0,4,4"
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Grid.Column="1" Header="Graph" Margin="4,0,4,4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Background="{StaticResource GroupBoxBackground}">
-                    <Grid Background="White">
-                        <lvc:CartesianChart Series="{Binding MeasurementGraph}"
+                <Grid Background="White">
+                    <lvc:CartesianChart Series="{Binding MeasurementGraph}"
                                                     LegendLocation="Top"
                                                     DisableAnimations="true">
-                            <lvc:CartesianChart.AxisX>
-                                <lvc:Axis Title="{Binding XTitle}"
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Title="{Binding XTitle}"
                                                   Labels="{Binding XLabels}"
                                                   Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
-                                </lvc:Axis>
-                            </lvc:CartesianChart.AxisX>
-                            <lvc:CartesianChart.AxisY>
-                                <lvc:Axis Title="{Binding YTitle}"
+                            </lvc:Axis>
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis Title="{Binding YTitle}"
                                                   MinValue="0"
                                                   MaxValue="{Binding SizeYMaxVal}"
                                                   LabelFormatter="{Binding SizeYLabel}">
-                                </lvc:Axis>
-                            </lvc:CartesianChart.AxisY>
-                        </lvc:CartesianChart>
-                    </Grid>
-                </GroupBox>
-                <GroupBox Grid.Row="1" Grid.Column="1" Header="Measurement Data" Margin="4,0,4,4"
+                            </lvc:Axis>
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Grid.Column="1" Header="Measurement Data" Margin="4,0,4,4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Background="{StaticResource GroupBoxBackground}">
-                    <DataGrid Name="Defect_Viewer"
+                <DataGrid Name="Defect_Viewer"
                                               ItemsSource="{Binding MeasurementDataTable}"
                                               SelectedItem="{Binding SelectedData, Mode=TwoWay}"
                                               SelectionMode="Single"
@@ -218,17 +269,16 @@
                                               IsReadOnly="True"
                                               AutoGenerateColumns="True"
                                               Grid.Row="1">
-                        <DataGrid.Resources>
-                            <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="HorizontalAlignment"
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalAlignment"
                                                         Value="Stretch" />
-                                <Setter Property="HorizontalContentAlignment"
+                            <Setter Property="HorizontalContentAlignment"
                                                         Value="Center" />
-                            </Style>
-                        </DataGrid.Resources>
-                    </DataGrid>
-                </GroupBox>
-            </Grid>
+                        </Style>
+                    </DataGrid.Resources>
+                </DataGrid>
+            </GroupBox>
         </Grid>
-    </StackPanel>
+    </Grid>
 </UserControl>
