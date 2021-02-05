@@ -779,7 +779,7 @@ namespace Root_EFEM.Module
             InitBase(id, engineer);
             InitEvent();
             InitGAF();
-            m_gem?.OnGemRemoteCommand += M_gem_OnRemoteCommand;
+            if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
             InitThread(); 
         }
 

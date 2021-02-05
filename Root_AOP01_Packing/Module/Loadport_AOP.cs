@@ -482,7 +482,7 @@ namespace Root_AOP01_Packing.Module
             m_aTool.Add(p_infoCarrier);
             InitBase(id, engineer);
             InitGAF();
-            m_gem?.OnGemRemoteCommand += M_gem_OnRemoteCommand;
+            if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
             InitThread(); 
         }
 

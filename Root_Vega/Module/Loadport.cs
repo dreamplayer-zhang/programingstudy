@@ -600,7 +600,7 @@ namespace Root_Vega.Module
             m_swLotTime.Stop();
             base.InitBase(id, engineer);
             InitGAF();
-            m_gem?.OnGemRemoteCommand += M_gem_OnRemoteCommand;
+            if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
 
             m_axisZ.p_eState = Axis.eState.Ready;
             m_axisTheta.p_eState = Axis.eState.Ready;
