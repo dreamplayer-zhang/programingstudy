@@ -55,15 +55,15 @@
 
                             <StackPanel Grid.Row="0" Grid.Column="1"
                                         VerticalAlignment="Center">
-                                <TextBlock Text="Total Progress"
+                                <TextBlock Text="Total Progress" Margin="0,10,0,10"
                                            FontSize="15"
                                            FontWeight="Bold" />
-                                <Grid>
-                                    <ProgressBar Height="40"
+                                <Grid Margin="1">
+                                    <ProgressBar x:Name="progressBarSequence" Height="40"
                                                  Margin="0,2"
-                                                 Value="55"
+                                                 Value="{Binding p_nSequencePersent}"
                                                  Foreground="SeaGreen" />
-                                    <TextBlock Text="55%"
+                                    <TextBlock x:Name="textblockSequence" Text="{Binding p_nSequencePersent}"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
                                                FontWeight="Bold"
@@ -71,17 +71,25 @@
                                 </Grid>
                             </StackPanel>
                             <UniformGrid Grid.Row="2" Grid.Column="1"
-                                         Columns="2">
-                                <TextBlock Text="Need"
+                                         Columns="2" Margin="1">
+                                <Border Grid.Row="0" Grid.Column="0" BorderBrush="LightGray" BorderThickness="2,2,0,2">
+                                    <TextBlock Text="LP1 Run Time" FontSize="13"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="00:00:00"
+                                </Border>
+                                <Border Grid.Row="0" Grid.Column="1" BorderBrush="LightGray" BorderThickness="0,2,2,2">
+                                    <TextBlock x:Name="textblockRunTime1" Text="00:00:00" FontSize="15"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Left" />
-                                <TextBlock Text="Run"
+                                </Border>
+                                <Border Grid.Row="1" Grid.Column="0" BorderBrush="LightGray" BorderThickness="2,0,0,2">
+                                    <TextBlock Text="LP2 Run Time" FontSize="13"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="00:00:00"
+                                </Border>
+                                <Border Grid.Row="1" Grid.Column="1" BorderBrush="LightGray" BorderThickness="0,0,2,2">
+                                    <TextBlock x:Name="textblockRunTime2" Text="00:00:00" FontSize="15"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Left" />
+                                </Border>
                             </UniformGrid>
                         </Grid>
                     </GroupBox>

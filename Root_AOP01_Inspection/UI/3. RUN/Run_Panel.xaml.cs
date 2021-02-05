@@ -51,6 +51,8 @@ namespace Root_AOP01_Inspection
             LoadportA_State.DataContext = loadport1;
             LoadportB_State.DataContext = loadport2;
             RTR_State.DataContext = wtrcleanunit;
+            progressBarSequence.DataContext = m_handler.m_process;
+            textblockSequence.DataContext = m_handler.m_process;
             Machine_State.DataContext = EQ.m_EQ;
             InitFFU();
             InitTimer();
@@ -73,13 +75,15 @@ namespace Root_AOP01_Inspection
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();
         }
-
+        public string p_sLotElapsedTime = "";
         private void M_timer_Tick(object sender, EventArgs e)
         {
             CheckMainVisionState();
             ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_wtr.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
             ExistVision.Background = (m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null)||
                 (m_backsidevision.m_diExistVision.p_bIn == true && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
+            if (m_loadport[0].m_swLotTime.IsRunning) textblockRunTime1.Text = m_loadport[0].m_swLotTime.ElapsedMilliseconds.ToString("HH:mm:ss");
+            if (m_loadport[1].m_swLotTime.IsRunning) textblockRunTime2.Text = m_loadport[1].m_swLotTime.ElapsedMilliseconds.ToString("HH:mm:ss");
             ButtonInitialize.IsEnabled = IsEnableInitialization();
             ButtonRecovery.IsEnabled = IsEnableRecovery();
             TimerLamp();
@@ -146,6 +150,7 @@ namespace Root_AOP01_Inspection
         {
             if (IsEnableInitialization() == false) return;
             EQ.p_bStop = false;
+            m_handler.m_process.p_nSequencePersent = 0;
             m_handler.m_process.ClearInfoWafer();
             m_handler.m_nRnR = 0; //Init 할때 RNR 카운트초기화
             m_handler.m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState = InfoCarrier.eState.Placed;  //210201 모니터링필요 EQ.Stop 되고 이닛누르면 간헐적으로 Loadport Docking 상태로 무언정지 생김

@@ -15,166 +15,166 @@ namespace Root_AOP01_Inspection.Module
 {
     public class Loadport_AOP01 : ModuleBase, IWTRChild, ILoadport
     {
-            #region ToolBox
-            RS232 m_rs232;
-            public DIO_I m_diPlaced;
-            public DIO_I m_diPresent;
-            public DIO_I m_diOpen;
-            public DIO_I m_diClose;
-            public DIO_I m_diReady;
-            public DIO_I m_diRun;
-            public OHT_Semi m_OHT;
-            public bool m_bLoadCheck = false;
-            public bool m_bUnLoadCheck = false;
-            public override void GetTools(bool bInit)
+        #region ToolBox
+        RS232 m_rs232;
+        public DIO_I m_diPlaced;
+        public DIO_I m_diPresent;
+        public DIO_I m_diOpen;
+        public DIO_I m_diClose;
+        public DIO_I m_diReady;
+        public DIO_I m_diRun;
+        public OHT_Semi m_OHT;
+        public bool m_bLoadCheck = false;
+        public bool m_bUnLoadCheck = false;
+        public override void GetTools(bool bInit)
+        {
+            p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
+            p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
+            p_sInfo = m_toolBox.Get(ref m_diOpen, this, "Open");
+            p_sInfo = m_toolBox.Get(ref m_diClose, this, "Close");
+            p_sInfo = m_toolBox.Get(ref m_diReady, this, "Ready");
+            p_sInfo = m_toolBox.Get(ref m_diRun, this, "Run");
+            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
+            if (bInit)
             {
-                p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
-                p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
-                p_sInfo = m_toolBox.Get(ref m_diOpen, this, "Open");
-                p_sInfo = m_toolBox.Get(ref m_diClose, this, "Close");
-                p_sInfo = m_toolBox.Get(ref m_diReady, this, "Ready");
-                p_sInfo = m_toolBox.Get(ref m_diRun, this, "Run");
-                p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-                p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
-                if (bInit)
-                {
-                    m_rs232.OnReceive += M_rs232_OnReceive;
-                    m_rs232.p_bConnect = true;
-                }
+                m_rs232.OnReceive += M_rs232_OnReceive;
+                m_rs232.p_bConnect = true;
             }
-            #endregion
+        }
+        #endregion
 
-            //forget
-            #region DIO Function
-            public bool m_bPlaced = false;
-            public bool CheckPlaced()
+        //forget
+        #region DIO Function
+        public bool m_bPlaced = false;
+        public bool CheckPlaced()
+        {
+            GemCarrierBase.ePresent present = m_bPlaced ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            if (p_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + p_infoCarrier.p_eState);
+            switch (p_infoCarrier.p_ePresentSensor)
             {
-                GemCarrierBase.ePresent present = m_bPlaced ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-                if (p_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + p_infoCarrier.p_eState);
-                switch (p_infoCarrier.p_ePresentSensor)
-                {
-                    case GemCarrierBase.ePresent.Empty: m_svidPlaced.p_value = false; break;
-                    case GemCarrierBase.ePresent.Exist: m_svidPlaced.p_value = true; break;
-                }
-                return m_svidPlaced.p_value;
+                case GemCarrierBase.ePresent.Empty: m_svidPlaced.p_value = false; break;
+                case GemCarrierBase.ePresent.Exist: m_svidPlaced.p_value = true; break;
             }
-            #endregion
+            return m_svidPlaced.p_value;
+        }
+        #endregion
 
-            #region IWTRChild
-            public bool p_bLock { get; set; }
+        #region IWTRChild
+        public bool p_bLock { get; set; }
 
-            bool IsLock()
+        bool IsLock()
+        {
+            for (int n = 0; n < 10; n++)
             {
-                for (int n = 0; n < 10; n++)
-                {
-                    if (p_bLock == false) return false;
-                    Thread.Sleep(100);
-                }
-                return true;
+                if (p_bLock == false) return false;
+                Thread.Sleep(100);
             }
+            return true;
+        }
 
-            public List<string> p_asChildSlot
+        public List<string> p_asChildSlot
+        {
+            get { return p_infoCarrier.p_asGemSlot; }
+        }
+
+        public InfoWafer p_infoWafer { get; set; }
+
+        public InfoWafer GetInfoWafer(int nID)
+        {
+            return p_infoCarrier.GetInfoWafer(nID);
+        }
+
+        public void SetInfoWafer(int nID, InfoWafer infoWafer)
+        {
+            p_infoCarrier.SetInfoWafer(nID, infoWafer);
+        }
+
+        public int GetTeachWTR(InfoWafer infoWafer = null)
+        {
+            return p_infoCarrier.GetTeachWTR(infoWafer);
+        }
+
+        public string IsGetOK(int nID)
+        {
+            if (p_eState != eState.Ready)
             {
-                get { return p_infoCarrier.p_asGemSlot; }
+                m_alidGetOK.Run(true, p_id + " eState not Ready");
+                return p_id + " eState not Ready";
             }
+            return p_infoCarrier.IsGetOK(nID);
+        }
 
-            public InfoWafer p_infoWafer { get; set; }
-
-            public InfoWafer GetInfoWafer(int nID)
+        public string IsPutOK(InfoWafer infoWafer, int nID)
+        {
+            if (p_eState != eState.Ready)
             {
-                return p_infoCarrier.GetInfoWafer(nID);
+                m_alidPutOK.Run(true, p_id + " eState not Ready");
+                return p_id + " eState not Ready";
             }
+            return p_infoCarrier.IsPutOK(nID);
+        }
 
-            public void SetInfoWafer(int nID, InfoWafer infoWafer)
+        public string BeforeGet(int nID)
+        {
+            if (GetInfoWafer(nID) == null)
             {
-                p_infoCarrier.SetInfoWafer(nID, infoWafer);
+                m_alidGetOK.Run(true, p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null");
+                return p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null";
             }
+            return IsRunOK();
+        }
 
-            public int GetTeachWTR(InfoWafer infoWafer = null)
+        public string BeforePut(int nID)
+        {
+            if (GetInfoWafer(nID) != null)
             {
-                return p_infoCarrier.GetTeachWTR(infoWafer);
+                m_alidPutOK.Run(true, p_id + nID.ToString("00") + " BeforePut : InfoWafer != null");
+                return p_id + nID.ToString("00") + " BeforePut : InfoWafer != null";
             }
+            return IsRunOK();
+        }
 
-            public string IsGetOK(int nID)
+        public string AfterGet(int nID)
+        {
+            return IsRunOK();
+        }
+
+        public string AfterPut(int nID)
+        {
+            return IsRunOK();
+        }
+
+        public bool IsWaferExist(int nID = 0)
+        {
+            switch (p_infoCarrier.p_eState)
             {
-                if (p_eState != eState.Ready)
-                {
-                    m_alidGetOK.Run(true, p_id + " eState not Ready");
-                    return p_id + " eState not Ready";
-                }
-                return p_infoCarrier.IsGetOK(nID);
+                case InfoCarrier.eState.Empty: return false;
+                case InfoCarrier.eState.Placed: return false;
             }
+            return (p_infoCarrier.GetInfoWafer(nID) != null);
+        }
 
-            public string IsPutOK(InfoWafer infoWafer, int nID)
-            {
-                if (p_eState != eState.Ready)
-                {
-                    m_alidPutOK.Run(true, p_id + " eState not Ready");
-                    return p_id + " eState not Ready";
-                }
-                return p_infoCarrier.IsPutOK(nID);
-            }
+        string IsRunOK()
+        {
+            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            return p_infoCarrier.IsRunOK();
+        }
 
-            public string BeforeGet(int nID)
-            {
-                if (GetInfoWafer(nID) == null)
-                {
-                    m_alidGetOK.Run(true, p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null");
-                    return p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null";
-                }
-                return IsRunOK();
-            }
+        public void RunTreeTeach(Tree tree)
+        {
+            p_infoCarrier.m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
+        }
 
-            public string BeforePut(int nID)
-            {
-                if (GetInfoWafer(nID) != null)
-                {
-                    m_alidPutOK.Run(true, p_id + nID.ToString("00") + " BeforePut : InfoWafer != null");
-                    return p_id + nID.ToString("00") + " BeforePut : InfoWafer != null";
-                }
-                return IsRunOK();
-            }
+        public void ReadInfoWafer_Registry()
+        {
+            p_infoCarrier.ReadInfoWafer_Registry();
+        }
+        #endregion
 
-            public string AfterGet(int nID)
-            {
-                return IsRunOK();
-            }
-
-            public string AfterPut(int nID)
-            {
-                return IsRunOK();
-            }
-
-            public bool IsWaferExist(int nID = 0)
-            {
-                switch (p_infoCarrier.p_eState)
-                {
-                    case InfoCarrier.eState.Empty: return false;
-                    case InfoCarrier.eState.Placed: return false;
-                }
-                return (p_infoCarrier.GetInfoWafer(nID) != null);
-            }
-
-            string IsRunOK()
-            {
-                if (p_eState != eState.Ready) return p_id + " eState not Ready";
-                return p_infoCarrier.IsRunOK();
-            }
-
-            public void RunTreeTeach(Tree tree)
-            {
-                p_infoCarrier.m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
-            }
-
-            public void ReadInfoWafer_Registry()
-            {
-                p_infoCarrier.ReadInfoWafer_Registry();
-            }
-            #endregion
-
-            #region ErrorCode
-            string[,] m_asErrorMsg = new string[,]
-            {
+        #region ErrorCode
+        string[,] m_asErrorMsg = new string[,]
+        {
             { "2", "Axis information is wrong." },
             { "3", "입력 Data가 시스템의 지정된 범위를 초과하였거나 단위, 숫자, 기호 등이 잘못 입력되었을 경우에 발생" },
             { "4", "Stop/EmStop Event가 발생.E-Stop Switch가 눌려져 있거나 Up/Down Limit Sensor가 Sensing되고 있음" },
@@ -256,293 +256,293 @@ namespace Root_AOP01_Inspection.Module
             { "156", "Trans Out중 Obstacle_CHK_SEN 감지시 Foup_Door_Open 되어 있음" },
             { "157", "Mapping Arm Extend 후 Mapping Arm Sensor로 빛이 감지되지 않음." },
             { "158", "Door Close상태에서 MLIFT_DN 명령 함" }
-            };
+        };
 
-            string GetErrorString(string sRead)
+        string GetErrorString(string sRead)
+        {
+            string sCode = sRead.Substring(1, sRead.Length - 1);
+            for (int n = 0; n < m_asErrorMsg.Length / 2; n++)
             {
-                string sCode = sRead.Substring(1, sRead.Length - 1);
-                for (int n = 0; n < m_asErrorMsg.Length / 2; n++)
-                {
-                    if (m_asErrorMsg[n, 0] == sCode) return m_asErrorMsg[n, 1];
-                }
-                return "Can't Find Error Massage !!";
+                if (m_asErrorMsg[n, 0] == sCode) return m_asErrorMsg[n, 1];
             }
-            #endregion
+            return "Can't Find Error Massage !!";
+        }
+        #endregion
 
-            #region Event State
-            public enum eEventState
+        #region Event State
+        public enum eEventState
+        {
+            Connected,
+            DisConnected,
+            LoadButtonPushed,
+            POD_IN,
+            POD_OUT,
+            StartReset,
+            EndReset,
+            FOUP_Started,
+            FOUP_IncorrectPos,
+            EStopPushed,
+        }
+        eEventState _eEvnetState = eEventState.DisConnected;
+        public eEventState p_eEvnetState
+        {
+            get { return _eEvnetState; }
+            set
             {
-                Connected,
-                DisConnected,
-                LoadButtonPushed,
-                POD_IN,
-                POD_OUT,
-                StartReset,
-                EndReset,
-                FOUP_Started,
-                FOUP_IncorrectPos,
-                EStopPushed,
-            }
-            eEventState _eEvnetState = eEventState.DisConnected;
-            public eEventState p_eEvnetState
-            {
-                get { return _eEvnetState; }
-                set
+                if (_eEvnetState == value) return;
+                _eEvnetState = value;
+                OnPropertyChanged();
+                switch (value)
                 {
-                    if (_eEvnetState == value) return;
-                    _eEvnetState = value;
-                    OnPropertyChanged();
-                    switch (value)
-                    {
-                        case eEventState.POD_IN: m_bPlaced = true; break;
-                        case eEventState.POD_OUT: m_bPlaced = false; break;
-                    }
-                }
-            }
-
-            class EventState
-            {
-                public string m_sCode;
-                public eEventState m_eEvent;
-                public EventState(string sCode, eEventState eEvent)
-                {
-                    m_sCode = sCode;
-                    m_eEvent = eEvent;
+                    case eEventState.POD_IN: m_bPlaced = true; break;
+                    case eEventState.POD_OUT: m_bPlaced = false; break;
                 }
             }
-            List<EventState> m_aEventState = new List<EventState>();
-            void InitEvent()
+        }
+
+        class EventState
+        {
+            public string m_sCode;
+            public eEventState m_eEvent;
+            public EventState(string sCode, eEventState eEvent)
             {
-                m_aEventState.Add(new EventState("00000001", eEventState.Connected));
-                m_aEventState.Add(new EventState("00000002", eEventState.DisConnected));
-                m_aEventState.Add(new EventState("00000004", eEventState.LoadButtonPushed));
-                m_aEventState.Add(new EventState("00000010", eEventState.POD_IN));
-                m_aEventState.Add(new EventState("00000020", eEventState.POD_OUT));
-                m_aEventState.Add(new EventState("00000100", eEventState.StartReset));
-                m_aEventState.Add(new EventState("00000200", eEventState.EndReset));
-                m_aEventState.Add(new EventState("00010000", eEventState.FOUP_Started));
-                m_aEventState.Add(new EventState("00020000", eEventState.FOUP_IncorrectPos));
-                m_aEventState.Add(new EventState("01000000", eEventState.EStopPushed));
+                m_sCode = sCode;
+                m_eEvent = eEvent;
             }
+        }
+        List<EventState> m_aEventState = new List<EventState>();
+        void InitEvent()
+        {
+            m_aEventState.Add(new EventState("00000001", eEventState.Connected));
+            m_aEventState.Add(new EventState("00000002", eEventState.DisConnected));
+            m_aEventState.Add(new EventState("00000004", eEventState.LoadButtonPushed));
+            m_aEventState.Add(new EventState("00000010", eEventState.POD_IN));
+            m_aEventState.Add(new EventState("00000020", eEventState.POD_OUT));
+            m_aEventState.Add(new EventState("00000100", eEventState.StartReset));
+            m_aEventState.Add(new EventState("00000200", eEventState.EndReset));
+            m_aEventState.Add(new EventState("00010000", eEventState.FOUP_Started));
+            m_aEventState.Add(new EventState("00020000", eEventState.FOUP_IncorrectPos));
+            m_aEventState.Add(new EventState("01000000", eEventState.EStopPushed));
+        }
 
-            string SetEvent(string sRead)
+        string SetEvent(string sRead)
+        {
+            string sCode = sRead.Substring(1, sRead.Length - 1);
+            foreach (EventState eventState in m_aEventState)
             {
-                string sCode = sRead.Substring(1, sRead.Length - 1);
-                foreach (EventState eventState in m_aEventState)
+                if (eventState.m_sCode == sCode)
                 {
-                    if (eventState.m_sCode == sCode)
-                    {
-                        p_eEvnetState = eventState.m_eEvent;
-                        return "OK";
-                    }
-                }
-                return "Invalid Event Code : " + sRead;
-            }
-            #endregion
-
-            //forget
-            #region Protocol 
-            public enum eCmd
-            {
-                Home,
-                ClearError,
-                Load,
-                Unload,
-                GetMap,
-            };
-
-            Dictionary<eCmd, string> m_dicCmd = new Dictionary<eCmd, string>();
-            void InitCmd()
-            {
-                m_dicCmd.Add(eCmd.Home, "HOM");
-                m_dicCmd.Add(eCmd.ClearError, "RESET");
-                m_dicCmd.Add(eCmd.Load, "LOAD");
-                m_dicCmd.Add(eCmd.Unload, "UNLOAD");
-                m_dicCmd.Add(eCmd.GetMap, "SCAN DN");
-            }
-
-            public class Protocol
-            {
-                public enum eState
-                {
-                    Queue,
-                    Send,
-                    ACK,
-                    NAK,
-                    Done
-                }
-                public eState m_eState = eState.Queue;
-                string m_sCmd = "";
-
-                public string SendCmd()
-                {
-                    if (m_eState != eState.Queue) return "Protocol State != Queue";
-                    m_loadport.SendCmd(m_sCmd);
-                    m_eState = eState.Send;
+                    p_eEvnetState = eventState.m_eEvent;
                     return "OK";
                 }
-
-                public bool m_bValid = true;
-                public string WaitDone(int secWait)
-                {
-                    if (EQ.IsStop()) return "EQ Stop";
-                    if (m_loadport.m_rs232.p_bConnect == false)
-                    {
-                        m_loadport.m_alidCMD.Run(true, "RS232 Connection Lost !!");
-                        return "RS232 Connection Lost !!";
-                    }
-                    int nWait = 100 * secWait;
-                    while (nWait > 0)
-                    {
-                        if (EQ.IsStop()) return "EQ Stop";
-                        Thread.Sleep(10);
-                        if (m_eState == eState.Done) return "OK";
-                        nWait--;
-                    }
-                    m_bValid = false;
-                    m_loadport.m_alidCMD.Run(true, m_sCmd + " : WaitDone Timeout !!");
-                    return m_sCmd + " : WaitDone Timeout !!";
-                }
-
-                public eCmd m_eCmd;
-                Loadport_AOP01 m_loadport;
-                public Protocol(eCmd eCmd, Loadport_AOP01 loadport, params string[] asParam)
-                {
-                    m_eCmd = eCmd;
-                    m_loadport = loadport;
-                    m_sCmd = m_loadport.m_dicCmd[eCmd];
-                    foreach (string sParam in asParam) m_sCmd += " " + sParam;
-                }
             }
-            Protocol m_protocolSend = null;
-            #endregion
+            return "Invalid Event Code : " + sRead;
+        }
+        #endregion
 
-            //forget
-            #region RS232
-            Queue<Protocol> m_qProtocol = new Queue<Protocol>();
-            bool m_bRunSend = false;
-            Thread m_threadSend;
-            void InitThread()
+        //forget
+        #region Protocol 
+        public enum eCmd
+        {
+            Home,
+            ClearError,
+            Load,
+            Unload,
+            GetMap,
+        };
+
+        Dictionary<eCmd, string> m_dicCmd = new Dictionary<eCmd, string>();
+        void InitCmd()
+        {
+            m_dicCmd.Add(eCmd.Home, "HOM");
+            m_dicCmd.Add(eCmd.ClearError, "RESET");
+            m_dicCmd.Add(eCmd.Load, "LOAD");
+            m_dicCmd.Add(eCmd.Unload, "UNLOAD");
+            m_dicCmd.Add(eCmd.GetMap, "SCAN DN");
+        }
+
+        public class Protocol
+        {
+            public enum eState
             {
-                m_threadSend = new Thread(new ThreadStart(RunThreadSend));
-                m_threadSend.Start();
+                Queue,
+                Send,
+                ACK,
+                NAK,
+                Done
             }
+            public eState m_eState = eState.Queue;
+            string m_sCmd = "";
 
-            void RunThreadSend()
+            public string SendCmd()
             {
-                m_bRunSend = true;
-                Thread.Sleep(1000);
-                while (m_bRunSend)
-                {
-                    Thread.Sleep(10);
-                    if ((m_protocolSend != null) && (m_protocolSend.m_bValid == false)) m_protocolSend = null;
-                    if ((m_protocolSend == null) && (m_qProtocol.Count > 0))
-                    {
-                        m_protocolSend = m_qProtocol.Dequeue();
-                        p_sInfo = m_protocolSend.SendCmd();
-                        if (p_sInfo != "OK")
-                        {
-                            m_protocolSend = null;
-                            m_qProtocol.Clear();
-                        }
-                    }
-                }
+                if (m_eState != eState.Queue) return "Protocol State != Queue";
+                m_loadport.SendCmd(m_sCmd);
+                m_eState = eState.Send;
+                return "OK";
             }
 
-            private void M_rs232_OnReceive(string sRead)
-            {
-                m_log.Info(" <-- Recv] " + sRead);
-                if (sRead.Length < 1) return;
-                char cCode = sRead[0];
-                switch (cCode)
-                {
-                    case 'A':
-                        if (m_protocolSend == null) p_sInfo = "Invalid ACK";
-                        else m_protocolSend.m_eState = Protocol.eState.ACK;
-                        break;
-                    case 'N':
-                        if (m_protocolSend == null) p_sInfo = "Invalid NAK";
-                        else
-                        {
-                            m_protocolSend.m_eState = Protocol.eState.NAK;
-                            p_sInfo = "Nak : " + m_protocolSend.m_eCmd.ToString();
-                            p_eState = eState.Error;
-                            m_protocolSend = null;
-                        }
-                        break;
-                    case 'E':
-                        p_eState = eState.Error;
-                        p_sInfo = "Cymech Error " + sRead + " : " + GetErrorString(sRead);
-                        break;
-                    case 'C':
-                        p_sInfo = SetEvent(sRead);
-                        break;
-                    case 'O':
-                        if (m_protocolSend == null) p_sInfo = "Invalid Done";
-                        else
-                        {
-                            if ((m_protocolSend.m_eState == Protocol.eState.ACK) || (m_protocolSend.m_eState == Protocol.eState.NAK))
-                            {
-                                m_protocolSend.m_eState = Protocol.eState.Done;
-                                m_protocolSend = null;
-                            }
-                        }
-                        break;
-                    case 'M':
-                        if (SetLoadportMapData(sRead)) p_sInfo = "Invalid Map Data : " + sRead;
-                        if (m_protocolSend != null)
-                        {
-                            if ((m_protocolSend.m_eState == Protocol.eState.ACK) || (m_protocolSend.m_eState == Protocol.eState.NAK))
-                            {
-                                m_protocolSend.m_eState = Protocol.eState.Done;
-                                m_protocolSend = null;
-                            }
-                        }
-                        break;
-                }
-            }
-
-            bool SetLoadportMapData(string sMap)
-            {
-                sMap = sMap.Substring(1, sMap.Length - 1);
-                string[] asMap = sMap.Split(',');
-                if (asMap.Length < 3) return true;
-                for (int n = 0; n < 3; n++) if (asMap[n].Length < 8) return true;
-                List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
-                for (int n = 0; n < 32; n++) aSlot.Add(GemSlotBase.eState.Empty);
-                SetLoadportMapData(aSlot, asMap[0], GemSlotBase.eState.Exist);
-                SetLoadportMapData(aSlot, asMap[1], GemSlotBase.eState.Cross);
-                SetLoadportMapData(aSlot, asMap[2], GemSlotBase.eState.Double);
-                p_infoCarrier.SetMapData(aSlot);
-                return false;
-            }
-
-            void SetLoadportMapData(List<GemSlotBase.eState> aSlot, string sMap, GemSlotBase.eState eState)
-            {
-                int iSlot = 31;
-                for (int n = 0; n < 8; n++)
-                {
-                    char cMap = sMap[n];
-                    if ((cMap & 0x08) > 0) aSlot[iSlot] = eState; iSlot--;
-                    if ((cMap & 0x04) > 0) aSlot[iSlot] = eState; iSlot--;
-                    if ((cMap & 0x02) > 0) aSlot[iSlot] = eState; iSlot--;
-                    if ((cMap & 0x01) > 0) aSlot[iSlot] = eState; iSlot--;
-                }
-            }
-
-            string SendCmd(string sCmd)
+            public bool m_bValid = true;
+            public string WaitDone(int secWait)
             {
                 if (EQ.IsStop()) return "EQ Stop";
-                m_log.Info(" [ Send --> " + sCmd);
-                return m_rs232.Send(sCmd);
+                if (m_loadport.m_rs232.p_bConnect == false)
+                {
+                    m_loadport.m_alidCMD.Run(true, "RS232 Connection Lost !!");
+                    return "RS232 Connection Lost !!";
+                }
+                int nWait = 100 * secWait;
+                while (nWait > 0)
+                {
+                    if (EQ.IsStop()) return "EQ Stop";
+                    Thread.Sleep(10);
+                    if (m_eState == eState.Done) return "OK";
+                    nWait--;
+                }
+                m_bValid = false;
+                m_loadport.m_alidCMD.Run(true, m_sCmd + " : WaitDone Timeout !!");
+                return m_sCmd + " : WaitDone Timeout !!";
             }
-            #endregion
 
-            #region Timeout
-            int m_secRS232 = 2;
-            int _secHome = 40;
-            int m_secLoad = 20;
-            int m_secUnload = 20;
+            public eCmd m_eCmd;
+            Loadport_AOP01 m_loadport;
+            public Protocol(eCmd eCmd, Loadport_AOP01 loadport, params string[] asParam)
+            {
+                m_eCmd = eCmd;
+                m_loadport = loadport;
+                m_sCmd = m_loadport.m_dicCmd[eCmd];
+                foreach (string sParam in asParam) m_sCmd += " " + sParam;
+            }
+        }
+        Protocol m_protocolSend = null;
+        #endregion
+
+        //forget
+        #region RS232
+        Queue<Protocol> m_qProtocol = new Queue<Protocol>();
+        bool m_bRunSend = false;
+        Thread m_threadSend;
+        void InitThread()
+        {
+            m_threadSend = new Thread(new ThreadStart(RunThreadSend));
+            m_threadSend.Start();
+        }
+
+        void RunThreadSend()
+        {
+            m_bRunSend = true;
+            Thread.Sleep(1000);
+            while (m_bRunSend)
+            {
+                Thread.Sleep(10);
+                if ((m_protocolSend != null) && (m_protocolSend.m_bValid == false)) m_protocolSend = null;
+                if ((m_protocolSend == null) && (m_qProtocol.Count > 0))
+                {
+                    m_protocolSend = m_qProtocol.Dequeue();
+                    p_sInfo = m_protocolSend.SendCmd();
+                    if (p_sInfo != "OK")
+                    {
+                        m_protocolSend = null;
+                        m_qProtocol.Clear();
+                    }
+                }
+            }
+        }
+
+        private void M_rs232_OnReceive(string sRead)
+        {
+            m_log.Info(" <-- Recv] " + sRead);
+            if (sRead.Length < 1) return;
+            char cCode = sRead[0];
+            switch (cCode)
+            {
+                case 'A':
+                    if (m_protocolSend == null) p_sInfo = "Invalid ACK";
+                    else m_protocolSend.m_eState = Protocol.eState.ACK;
+                    break;
+                case 'N':
+                    if (m_protocolSend == null) p_sInfo = "Invalid NAK";
+                    else
+                    {
+                        m_protocolSend.m_eState = Protocol.eState.NAK;
+                        p_sInfo = "Nak : " + m_protocolSend.m_eCmd.ToString();
+                        p_eState = eState.Error;
+                        m_protocolSend = null;
+                    }
+                    break;
+                case 'E':
+                    p_eState = eState.Error;
+                    p_sInfo = "Cymech Error " + sRead + " : " + GetErrorString(sRead);
+                    break;
+                case 'C':
+                    p_sInfo = SetEvent(sRead);
+                    break;
+                case 'O':
+                    if (m_protocolSend == null) p_sInfo = "Invalid Done";
+                    else
+                    {
+                        if ((m_protocolSend.m_eState == Protocol.eState.ACK) || (m_protocolSend.m_eState == Protocol.eState.NAK))
+                        {
+                            m_protocolSend.m_eState = Protocol.eState.Done;
+                            m_protocolSend = null;
+                        }
+                    }
+                    break;
+                case 'M':
+                    if (SetLoadportMapData(sRead)) p_sInfo = "Invalid Map Data : " + sRead;
+                    if (m_protocolSend != null)
+                    {
+                        if ((m_protocolSend.m_eState == Protocol.eState.ACK) || (m_protocolSend.m_eState == Protocol.eState.NAK))
+                        {
+                            m_protocolSend.m_eState = Protocol.eState.Done;
+                            m_protocolSend = null;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        bool SetLoadportMapData(string sMap)
+        {
+            sMap = sMap.Substring(1, sMap.Length - 1);
+            string[] asMap = sMap.Split(',');
+            if (asMap.Length < 3) return true;
+            for (int n = 0; n < 3; n++) if (asMap[n].Length < 8) return true;
+            List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
+            for (int n = 0; n < 32; n++) aSlot.Add(GemSlotBase.eState.Empty);
+            SetLoadportMapData(aSlot, asMap[0], GemSlotBase.eState.Exist);
+            SetLoadportMapData(aSlot, asMap[1], GemSlotBase.eState.Cross);
+            SetLoadportMapData(aSlot, asMap[2], GemSlotBase.eState.Double);
+            p_infoCarrier.SetMapData(aSlot);
+            return false;
+        }
+
+        void SetLoadportMapData(List<GemSlotBase.eState> aSlot, string sMap, GemSlotBase.eState eState)
+        {
+            int iSlot = 31;
+            for (int n = 0; n < 8; n++)
+            {
+                char cMap = sMap[n];
+                if ((cMap & 0x08) > 0) aSlot[iSlot] = eState; iSlot--;
+                if ((cMap & 0x04) > 0) aSlot[iSlot] = eState; iSlot--;
+                if ((cMap & 0x02) > 0) aSlot[iSlot] = eState; iSlot--;
+                if ((cMap & 0x01) > 0) aSlot[iSlot] = eState; iSlot--;
+            }
+        }
+
+        string SendCmd(string sCmd)
+        {
+            if (EQ.IsStop()) return "EQ Stop";
+            m_log.Info(" [ Send --> " + sCmd);
+            return m_rs232.Send(sCmd);
+        }
+        #endregion
+
+        #region Timeout
+        int m_secRS232 = 2;
+        int _secHome = 40;
+        int m_secLoad = 20;
+        int m_secUnload = 20;
         public int p_secHome
         {
             get { return _secHome; }
@@ -554,371 +554,377 @@ namespace Root_AOP01_Inspection.Module
             }
         }
         void RunTimeoutTree(Tree tree)
-            {
-                m_secRS232 = tree.Set(m_secRS232, m_secRS232, "RS232", "Timeout (sec)");
-                p_secHome = tree.Set(p_secHome, p_secHome, "Home", "Timeout (sec)");
-                m_secLoad = tree.Set(m_secLoad, m_secLoad, "Load", "Timeout (sec)");
-                m_secUnload = tree.Set(m_secUnload, m_secUnload, "Unload", "Timeout (sec)");
-            }
-            #endregion
-
-            //forget
-            #region RS232 Commend
-            string CmdHome()
-            {
-                Protocol protocol = new Protocol(eCmd.Home, this);
-                m_qProtocol.Enqueue(protocol);
-                return protocol.WaitDone(p_secHome);
-            }
-
-            string CmdResetCPU()
-            {
-                Protocol protocol = new Protocol(eCmd.ClearError, this);
-                m_qProtocol.Enqueue(protocol);
-                return protocol.WaitDone(m_secRS232);
-            }
-
-            string CmdLoad()
-            {
-                if (IsLock())
-                {
-                    m_alidLoad.Run(true, p_id + " Lock by WTR");
-                    return p_id + " Lock by WTR";
-                }
-                Protocol protocol = new Protocol(eCmd.Load, this);
-                m_qProtocol.Enqueue(protocol);
-                return protocol.WaitDone(m_secLoad);
-            }
-
-            string CmdUnload()
-            {
-                if (IsLock())
-                {
-                    m_alidUnLoad.Run(true, p_id + " Lock by WTR");
-                    return p_id + " Lock by WTR";
-                }
-                Protocol protocol = new Protocol(eCmd.Unload, this);
-                m_qProtocol.Enqueue(protocol);
-                return protocol.WaitDone(m_secLoad);
-            }
-
-            string CmdGetMap()
-            {
-                Protocol protocol = new Protocol(eCmd.GetMap, this);
-                m_qProtocol.Enqueue(protocol);
-                return protocol.WaitDone(m_secLoad);
-            }
-
-            #endregion
-
-            #region override
-            public override void RunTree(Tree tree)
-            {
-                base.RunTree(tree);
-                RunTreeSetup(tree.GetTree("Setup", false));
-            }
-
-            void RunTreeSetup(Tree tree)
-            {
-                RunTimeoutTree(tree.GetTree("Timeout", false));
-                p_infoCarrier.m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
-            }
-
-            public override void Reset()
-            {
-                Run(CmdResetCPU());
-                p_eState = eState.Init;
-                m_bNeedHome = true;
-                base.Reset();
-            }
-
-            public override void ButtonHome()
-            {
-                m_bNeedHome = true;
-                base.ButtonHome();
-            }
-            #endregion
-
-            //forget
-            #region StateHome
-            bool m_bNeedHome = true;
-            public override string StateHome()
-            {
-
-                if (EQ.p_bSimulate == false)
-                {
-                    if (Run(CmdResetCPU()))
-                    {
-                        m_alidHome.Run(true, p_sInfo);
-                        return p_sInfo;
-                    }
-                    if (Run(CmdResetCPU()))
-                    {
-                        m_alidHome.Run(true, p_sInfo);
-                        return p_sInfo;
-                    }
-                    if (m_bNeedHome)
-                    {
-                        if (Run(CmdHome()))
-                        {
-                            m_alidHome.Run(true, p_sInfo);
-                            return p_sInfo;
-                        }
-                        m_bNeedHome = false;
-                    }
-                    else
-                    {
-                        //                    if (m_diDoorOpen.p_bIn) return p_id + " Door Opened";
-                        if (Run(CmdUnload()))
-                        {
-                            m_alidHome.Run(true, p_sInfo);
-                            return p_sInfo;
-                        }
-                    }
-                    if (!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
-                    {
-                        p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                        m_bPlaced = true;
-
-                        if (Run(CmdLoad()))
-                        {
-                            m_alidHome.Run(true, p_sInfo);
-                            return p_sInfo;
-                        }
-                        if (Run(CmdUnload()))
-                        {
-                            m_alidHome.Run(true, p_sInfo);
-                            return p_sInfo;
-                        }
-                    }
-                    else
-                    {
-                        p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
-                        m_bPlaced = false;
-                    }
-                }
-                p_eState = eState.Ready;
-                p_infoCarrier.AfterHome();
-                return "OK";
-            }
-            #endregion
-
-            //forget
-            #region StateReady
-            public override string StateReady()
-            {
-                CheckPlaced();
-                //if (p_infoCarrier.m_bReqReadCarrierID)
-                //{
-                //    p_infoCarrier.m_bReqReadCarrierID = false;
-                //    StartRun(m_runReadPodID);
-                //}
-                if (p_infoCarrier.m_bReqLoad)
-                {
-                    p_infoCarrier.m_bReqLoad = false;
-                    StartRun(m_runDocking);
-                }
-                if (p_infoCarrier.m_bReqUnload)
-                {
-                    p_infoCarrier.m_bReqUnload = false;
-                    StartRun(m_runUndocking);
-                }
-                return "OK";
-            }
-            #endregion
-
-            #region GAF
-            SVID m_svidPlaced;
-            CEID m_ceidDocking;
-            CEID m_ceidUnDocking;
-            ALID m_alidPlaced;
-            public ALID m_alidLoad;
-            public ALID m_alidUnLoad;
-            public ALID m_alidHome;
-            public ALID m_alidCMD;
-            public ALID m_alidInforeticle;
-            public ALID m_alidGetOK;
-            public ALID m_alidPutOK;
-            public CEID m_ceidUnloadReq;
-            void InitGAF()
-            {
-                m_svidPlaced = m_gaf.GetSVID(this, "Placed");
-                m_ceidDocking = m_gaf.GetCEID(this, "Docking");
-                m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
-                m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
-                m_ceidUnloadReq = m_gaf.GetCEID(this, "Unload Request");
-                m_alidInforeticle = m_gaf.GetALID(this, "Info Reticle Error", "Info Reticle Error");
-                m_alidLoad = m_gaf.GetALID(this, "Load", "Loading Motion Error");
-                m_alidUnLoad = m_gaf.GetALID(this, "UnLoad", "UnLoading Motion Error");
-                m_alidHome = m_gaf.GetALID(this, "Home_Loadport", "Home Motion Error");
-                m_alidCMD = m_gaf.GetALID(this, "CMD_Loadport", "CMD Error");
-                m_alidGetOK = m_gaf.GetALID(this, "Get Err to Loadport", "Get Imposible Error");
-                m_alidPutOK = m_gaf.GetALID(this, "Put Err to Loadport", "Put Imposible Error");
-            }
-            #endregion
-
-            #region ILoadport
-            public string RunDocking()
-            {
-                if (p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
-                ModuleRunBase run = m_runDocking.Clone();
-                StartRun(run);
-                while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
-                return EQ.IsStop() ? "EQ Stop" : "OK";
-            }
-
-            public string RunUndocking()
-            {
-                if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "OK";
-                ModuleRunBase run = m_runUndocking.Clone();
-                StartRun(run);
-                while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
-                return EQ.IsStop() ? "EQ Stop" : "OK";
-            }
-
-            public bool p_bPlaced { get { return m_diPlaced.p_bIn; } }
-            public bool p_bPresent { get { return m_diPresent.p_bIn; } }
-            #endregion
-
-            public InfoCarrier p_infoCarrier { get; set; }
-            public Loadport_AOP01(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
-            {
-                p_bLock = false;
-                p_id = id;
-                InitCmd();
-                p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
-                m_aTool.Add(p_infoCarrier);
-                InitBase(id, engineer);
-                InitEvent();
-                InitGAF();
-                if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
-                InitThread();
-            }
-
-            public override void ThreadStop()
-            {
-                if (m_bRunSend)
-                {
-                    m_bRunSend = false;
-                    m_threadSend.Join();
-                }
-                base.ThreadStop();
-            }
-
-            private void M_gem_OnRemoteCommand(string sCmd, Dictionary<string, string> dicParam, long[] pnResult)
-            {
-
-            }
-
-            #region ModuleRun
-            public ModuleRunBase m_runDocking;
-            public ModuleRunBase m_runUndocking;
-
-            public ModuleRunBase GetModuleRunUndocking()
-            {
-                return m_runUndocking;
-            }
-            public ModuleRunBase GetModuleRunDocking()
-            {
-                return m_runDocking;
-            }
-
-            protected override void InitModuleRuns()
-            {
-                m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");
-                m_runUndocking = AddModuleRunList(new Run_Undocking(this), false, "Undocking Carrier from Work Position");
-            }
-
-            public class Run_Docking : ModuleRunBase
-            {
-                Loadport_AOP01 m_module;
-                InfoCarrier m_infoCarrier;
-                public Run_Docking(Loadport_AOP01 module)
-                {
-                    m_module = module;
-                    m_infoCarrier = module.p_infoCarrier;
-                    InitModuleRun(module);
-                }
-
-                bool m_bMapping = true;
-                public override ModuleRunBase Clone()
-                {
-                    Run_Docking run = new Run_Docking(m_module);
-                    run.m_bMapping = m_bMapping;
-                    return run;
-                }
-
-                public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-                {
-                    m_bMapping = tree.Set(m_bMapping, m_bMapping, "Mapping", "Wafer Mapping When Loading", bVisible);
-                }
-
-                public override string Run()
-                {
-                    m_module.m_bUnLoadCheck = false;
-                    if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
-                    if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed)
-                    {
-                        m_module.m_alidLoad.Run(true, p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
-                        return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                    }
-                    if (m_module.Run(m_module.CmdLoad()))
-                    {
-                        m_module.m_alidLoad.Run(true, p_sInfo);
-                        return p_sInfo;
-                    }
-                    m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
-                    m_module.m_ceidDocking.Send();
-                    m_module.m_bLoadCheck = true;
-                    return "OK";
-                }
-            }
-
-            public class Run_Undocking : ModuleRunBase
-            {
-                Loadport_AOP01 m_module;
-                InfoCarrier m_infoCarrier;
-                public Run_Undocking(Loadport_AOP01 module)
-                {
-                    m_module = module;
-                    m_infoCarrier = module.p_infoCarrier;
-                    InitModuleRun(module);
-                }
-
-                string m_sUndocking = "Undocking";
-                public override ModuleRunBase Clone()
-                {
-                    Run_Undocking run = new Run_Undocking(m_module);
-                    run.m_sUndocking = m_sUndocking;
-                    return run;
-                }
-
-                public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-                {
-                    m_sUndocking = tree.Set(m_sUndocking, m_sUndocking, "Undocking", "Carrier Undocking", bVisible, true);
-                }
-
-                public override string Run()
-                {
-                    m_module.m_bLoadCheck = false;
-                    if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
-                    {
-                        m_module.m_alidUnLoad.Run(true, p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
-                        return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                    }
-                    //if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
-                    if (m_module.Run(m_module.CmdUnload()))
-                    {
-                        m_module.m_alidUnLoad.Run(true, p_sInfo);
-                        return p_sInfo;
-                    }
-                    m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                    m_module.m_ceidUnDocking.Send();
-                    m_module.m_bUnLoadCheck = true;
-                    return "OK";
-                }
-            }
-            #endregion
+        {
+            m_secRS232 = tree.Set(m_secRS232, m_secRS232, "RS232", "Timeout (sec)");
+            p_secHome = tree.Set(p_secHome, p_secHome, "Home", "Timeout (sec)");
+            m_secLoad = tree.Set(m_secLoad, m_secLoad, "Load", "Timeout (sec)");
+            m_secUnload = tree.Set(m_secUnload, m_secUnload, "Unload", "Timeout (sec)");
         }
+        #endregion
+
+        //forget
+        #region RS232 Commend
+        string CmdHome()
+        {
+            Protocol protocol = new Protocol(eCmd.Home, this);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitDone(p_secHome);
+        }
+
+        string CmdResetCPU()
+        {
+            Protocol protocol = new Protocol(eCmd.ClearError, this);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitDone(m_secRS232);
+        }
+
+        string CmdLoad()
+        {
+            if (IsLock())
+            {
+                m_alidLoad.Run(true, p_id + " Lock by WTR");
+                return p_id + " Lock by WTR";
+            }
+            Protocol protocol = new Protocol(eCmd.Load, this);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitDone(m_secLoad);
+        }
+
+        string CmdUnload()
+        {
+            if (IsLock())
+            {
+                m_alidUnLoad.Run(true, p_id + " Lock by WTR");
+                return p_id + " Lock by WTR";
+            }
+            Protocol protocol = new Protocol(eCmd.Unload, this);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitDone(m_secLoad);
+        }
+
+        string CmdGetMap()
+        {
+            Protocol protocol = new Protocol(eCmd.GetMap, this);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitDone(m_secLoad);
+        }
+
+        #endregion
+
+        #region override
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            RunTreeSetup(tree.GetTree("Setup", false));
+        }
+
+        void RunTreeSetup(Tree tree)
+        {
+            RunTimeoutTree(tree.GetTree("Timeout", false));
+            p_infoCarrier.m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
+        }
+
+        public override void Reset()
+        {
+            Run(CmdResetCPU());
+            p_eState = eState.Init;
+            m_bNeedHome = true;
+            base.Reset();
+        }
+
+        public override void ButtonHome()
+        {
+            m_bNeedHome = true;
+            base.ButtonHome();
+        }
+        #endregion
+
+        //forget
+        #region StateHome
+        bool m_bNeedHome = true;
+        public override string StateHome()
+        {
+
+            if (EQ.p_bSimulate == false)
+            {
+                if (Run(CmdResetCPU()))
+                {
+                    m_alidHome.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
+                if (Run(CmdResetCPU()))
+                {
+                    m_alidHome.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
+                if (m_bNeedHome)
+                {
+                    if (Run(CmdHome()))
+                    {
+                        m_alidHome.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
+                    m_bNeedHome = false;
+                }
+                else
+                {
+                    //                    if (m_diDoorOpen.p_bIn) return p_id + " Door Opened";
+                    if (Run(CmdUnload()))
+                    {
+                        m_alidHome.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
+                }
+                if (!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
+                {
+                    p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                    m_bPlaced = true;
+
+                    if (Run(CmdLoad()))
+                    {
+                        m_alidHome.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
+                    if (Run(CmdUnload()))
+                    {
+                        m_alidHome.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
+                }
+                else
+                {
+                    p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
+                    m_bPlaced = false;
+                }
+            }
+            p_eState = eState.Ready;
+            p_infoCarrier.AfterHome();
+            return "OK";
+        }
+        #endregion
+
+        //forget
+        #region StateReady
+        public override string StateReady()
+        {
+            CheckPlaced();
+            //if (p_infoCarrier.m_bReqReadCarrierID)
+            //{
+            //    p_infoCarrier.m_bReqReadCarrierID = false;
+            //    StartRun(m_runReadPodID);
+            //}
+            if (p_infoCarrier.m_bReqLoad)
+            {
+                p_infoCarrier.m_bReqLoad = false;
+                StartRun(m_runDocking);
+            }
+            if (p_infoCarrier.m_bReqUnload)
+            {
+                p_infoCarrier.m_bReqUnload = false;
+                StartRun(m_runUndocking);
+            }
+            return "OK";
+        }
+        #endregion
+
+        #region GAF
+        SVID m_svidPlaced;
+        CEID m_ceidDocking;
+        CEID m_ceidUnDocking;
+        ALID m_alidPlaced;
+        public ALID m_alidLoad;
+        public ALID m_alidUnLoad;
+        public ALID m_alidHome;
+        public ALID m_alidCMD;
+        public ALID m_alidInforeticle;
+        public ALID m_alidGetOK;
+        public ALID m_alidPutOK;
+        public CEID m_ceidUnloadReq;
+        void InitGAF()
+        {
+            m_svidPlaced = m_gaf.GetSVID(this, "Placed");
+            m_ceidDocking = m_gaf.GetCEID(this, "Docking");
+            m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
+            m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
+            m_ceidUnloadReq = m_gaf.GetCEID(this, "Unload Request");
+            m_alidInforeticle = m_gaf.GetALID(this, "Info Reticle Error", "Info Reticle Error");
+            m_alidLoad = m_gaf.GetALID(this, "Load", "Loading Motion Error");
+            m_alidUnLoad = m_gaf.GetALID(this, "UnLoad", "UnLoading Motion Error");
+            m_alidHome = m_gaf.GetALID(this, "Home_Loadport", "Home Motion Error");
+            m_alidCMD = m_gaf.GetALID(this, "CMD_Loadport", "CMD Error");
+            m_alidGetOK = m_gaf.GetALID(this, "Get Err to Loadport", "Get Imposible Error");
+            m_alidPutOK = m_gaf.GetALID(this, "Put Err to Loadport", "Put Imposible Error");
+        }
+        #endregion
+
+        #region ILoadport
+        public string RunDocking()
+        {
+            if (p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
+            ModuleRunBase run = m_runDocking.Clone();
+            StartRun(run);
+            while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+            return EQ.IsStop() ? "EQ Stop" : "OK";
+        }
+
+        public string RunUndocking()
+        {
+            if (p_infoCarrier.p_eState != InfoCarrier.eState.Dock) return "OK";
+            ModuleRunBase run = m_runUndocking.Clone();
+            StartRun(run);
+            while (IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+            return EQ.IsStop() ? "EQ Stop" : "OK";
+        }
+
+        public bool p_bPlaced { get { return m_diPlaced.p_bIn; } }
+        public bool p_bPresent { get { return m_diPresent.p_bIn; } }
+        #endregion
+
+        public InfoCarrier p_infoCarrier { get; set; }
+        public StopWatch m_swLotTime;
+        public Loadport_AOP01(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
+        {
+            p_bLock = false;
+            p_id = id;
+            InitCmd();
+            p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
+            m_aTool.Add(p_infoCarrier);
+            m_swLotTime = new StopWatch();
+            m_swLotTime.Stop();
+            InitBase(id, engineer);
+            InitEvent();
+            InitGAF();
+            if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
+            InitThread();
+        }
+
+        public override void ThreadStop()
+        {
+            if (m_bRunSend)
+            {
+                m_bRunSend = false;
+                m_threadSend.Join();
+            }
+            base.ThreadStop();
+        }
+
+        private void M_gem_OnRemoteCommand(string sCmd, Dictionary<string, string> dicParam, long[] pnResult)
+        {
+
+        }
+
+        #region ModuleRun
+        public ModuleRunBase m_runDocking;
+        public ModuleRunBase m_runUndocking;
+
+        public ModuleRunBase GetModuleRunUndocking()
+        {
+            return m_runUndocking;
+        }
+        public ModuleRunBase GetModuleRunDocking()
+        {
+            return m_runDocking;
+        }
+
+        protected override void InitModuleRuns()
+        {
+            m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");
+            m_runUndocking = AddModuleRunList(new Run_Undocking(this), false, "Undocking Carrier from Work Position");
+        }
+
+        public class Run_Docking : ModuleRunBase
+        {
+            Loadport_AOP01 m_module;
+            InfoCarrier m_infoCarrier;
+            public Run_Docking(Loadport_AOP01 module)
+            {
+                m_module = module;
+                m_infoCarrier = module.p_infoCarrier;
+                InitModuleRun(module);
+            }
+
+            bool m_bMapping = true;
+            public override ModuleRunBase Clone()
+            {
+                Run_Docking run = new Run_Docking(m_module);
+                run.m_bMapping = m_bMapping;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bMapping = tree.Set(m_bMapping, m_bMapping, "Mapping", "Wafer Mapping When Loading", bVisible);
+            }
+
+            public override string Run()
+            {
+                m_module.m_bUnLoadCheck = false;
+                if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
+                if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed)
+                {
+                    m_module.m_alidLoad.Run(true, p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
+                    return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                }
+                if (m_module.Run(m_module.CmdLoad()))
+                {
+                    m_module.m_alidLoad.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
+                m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+                m_module.m_ceidDocking.Send();
+                m_module.m_swLotTime.Start();
+                m_module.m_bLoadCheck = true;
+                return "OK";
+            }
+        }
+
+        public class Run_Undocking : ModuleRunBase
+        {
+            Loadport_AOP01 m_module;
+            InfoCarrier m_infoCarrier;
+            public Run_Undocking(Loadport_AOP01 module)
+            {
+                m_module = module;
+                m_infoCarrier = module.p_infoCarrier;
+                InitModuleRun(module);
+            }
+
+            string m_sUndocking = "Undocking";
+            public override ModuleRunBase Clone()
+            {
+                Run_Undocking run = new Run_Undocking(m_module);
+                run.m_sUndocking = m_sUndocking;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_sUndocking = tree.Set(m_sUndocking, m_sUndocking, "Undocking", "Carrier Undocking", bVisible, true);
+            }
+
+            public override string Run()
+            {
+                m_module.m_bLoadCheck = false;
+                if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
+                {
+                    m_module.m_alidUnLoad.Run(true, p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
+                    return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                }
+                //if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
+                if (m_module.Run(m_module.CmdUnload()))
+                {
+                    m_module.m_alidUnLoad.Run(true, p_sInfo);
+                    return p_sInfo;
+                }
+                m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                m_module.m_ceidUnDocking.Send();
+                m_module.m_swLotTime.Stop();
+                m_module.m_swLotTime.Reset();
+                m_module.m_bUnLoadCheck = true;
+                return "OK";
+            }
+        }
+        #endregion
     }
+}
 

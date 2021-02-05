@@ -177,7 +177,7 @@ namespace Root_AOP01_Inspection.Engineer
         List<InfoWafer> m_aCalcWafer = new List<InfoWafer>();
         /// <summary> RunThread에서 실행 될 ModuleRun List (from Handler when EQ.p_eState == Run) </summary>
         public Queue<Sequence> m_qSequence = new Queue<Sequence>();
-
+        public int m_nSequencePersent = 0;
         public string ReCalcSequence()
         {
             try
@@ -195,6 +195,7 @@ namespace Root_AOP01_Inspection.Engineer
                     }
                 }
                 RunTree(Tree.eMode.Init);
+                m_nSequencePersent = 100 / m_qSequence.Count;
                 return "OK";
             }
             catch (Exception e)
@@ -376,6 +377,7 @@ namespace Root_AOP01_Inspection.Engineer
         #endregion
 
         #region RunSequence
+        public int p_nSequencePersent = 0;
         /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
         public string RunNextSequence()
         {
@@ -395,6 +397,7 @@ namespace Root_AOP01_Inspection.Engineer
             }
             else sequence.m_moduleRun.StartRun();
             m_qSequence.Dequeue();
+            p_nSequencePersent += m_nSequencePersent;
             InfoWafer infoWafer = sequence.m_infoWafer;
             if (infoWafer.m_qProcess.Count > 0) infoWafer.m_qProcess.Dequeue();
             if (m_qSequence.Count == 0) ClearInfoWafer();
