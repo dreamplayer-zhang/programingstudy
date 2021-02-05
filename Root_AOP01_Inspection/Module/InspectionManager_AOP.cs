@@ -366,19 +366,19 @@ namespace Root_AOP01_Inspection.Module
 					for (int i = 0; i < rcROI.Height; i++)
 					{
 						byte* bp;
-						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
-						else bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
+						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i * img.p_nByte, (int)rcROI.Left).ToPointer());
+						else bp = (byte*)(img.GetPtr((int)rcROI.Top + i * img.p_nByte, (int)rcROI.Left).ToPointer());
 						for (int j = 0; j < rcROI.Width; j++)
 						{
 							nSum += *bp;
-							bp++;
+							bp += img.p_nByte;
 						}
 						dAverage = nSum / rcROI.Width;
 						if (bUseB2D == true)
 						{
 							if (dAverage < nThreshold)
 							{
-								nEdgeY = (int)rcROI.Bottom - i;
+								nEdgeY = (int)rcROI.Bottom - i * img.p_nByte;
 								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
 								break;
 							}
@@ -387,7 +387,7 @@ namespace Root_AOP01_Inspection.Module
 						{
 							if (dAverage > nThreshold)
 							{
-								nEdgeY = (int)rcROI.Top + i;
+								nEdgeY = (int)rcROI.Top + i * img.p_nByte;
 								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
 								break;
 							}
@@ -399,19 +399,19 @@ namespace Root_AOP01_Inspection.Module
 					for (int i = 0; i < rcROI.Width; i++)
 					{
 						byte* bp;
-						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i));
-						else bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
+						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i * img.p_nByte));
+						else bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i * img.p_nByte));
 						for (int j = 0; j < rcROI.Height; j++)
 						{
 							nSum += *bp;
-							bp += img.p_Stride;
+							bp += (img.p_Stride * img.p_nByte);
 						}
 						dAverage = nSum / rcROI.Height;
 						if (bUseB2D == true)
 						{
 							if (dAverage < nThreshold)
 							{
-								nEdgeX = (int)rcROI.Right - i;
+								nEdgeX = (int)rcROI.Right - i * img.p_nByte;
 								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
 								break;
 							}
@@ -420,7 +420,7 @@ namespace Root_AOP01_Inspection.Module
 						{
 							if (dAverage > nThreshold)
 							{
-								nEdgeX = (int)rcROI.Left + i;
+								nEdgeX = (int)rcROI.Left + i * img.p_nByte;
 								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
 								break;
 							}
@@ -432,19 +432,19 @@ namespace Root_AOP01_Inspection.Module
 					for (int i = 0; i < rcROI.Width; i++)
 					{
 						byte* bp;
-						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
-						else bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i));
+						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i * img.p_nByte));
+						else bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i * img.p_nByte));
 						for (int j = 0; j < rcROI.Height; j++)
 						{
 							nSum += *bp;
-							bp += img.p_Stride;
+							bp += (img.p_Stride * img.p_nByte);
 						}
 						dAverage = nSum / rcROI.Height;
 						if (bUseB2D == true)
 						{
 							if (dAverage < nThreshold)
 							{
-								nEdgeX = (int)rcROI.Left + i;
+								nEdgeX = (int)rcROI.Left + i * img.p_nByte;
 								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
 								break;
 							}
@@ -453,7 +453,7 @@ namespace Root_AOP01_Inspection.Module
 						{
 							if (dAverage > nThreshold)
 							{
-								nEdgeX = (int)rcROI.Right - i;
+								nEdgeX = (int)rcROI.Right - i * img.p_nByte;
 								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
 								break;
 							}
@@ -465,19 +465,19 @@ namespace Root_AOP01_Inspection.Module
 					for (int i = 0; i < rcROI.Height; i++)
 					{
 						byte* bp;
-						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
-						else bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
+						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top + i * img.p_nByte, (int)rcROI.Left).ToPointer());
+						else bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i * img.p_nByte, (int)rcROI.Left).ToPointer());
 						for (int j = 0; j < rcROI.Width; j++)
 						{
 							nSum += *bp;
-							bp++;
+							bp += img.p_nByte;
 						}
 						dAverage = nSum / rcROI.Width;
 						if (bUseB2D == true)
 						{
 							if (dAverage < nThreshold)
 							{
-								nEdgeY = (int)rcROI.Top + i;
+								nEdgeY = (int)rcROI.Top + i * img.p_nByte;
 								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
 								break;
 							}
@@ -486,7 +486,7 @@ namespace Root_AOP01_Inspection.Module
 						{
 							if (dAverage > nThreshold)
 							{
-								nEdgeY = (int)rcROI.Bottom - i;
+								nEdgeY = (int)rcROI.Bottom - i * img.p_nByte;
 								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
 								break;
 							}
@@ -518,11 +518,11 @@ namespace Root_AOP01_Inspection.Module
 			dRatio = rcROI.Width * 0.1;
 			for (int i = 0; i < (int)dRatio; i++)
 			{
-				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
+				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i * img.p_nByte));
 				for (int j = 0; j < rcROI.Height; j++)
 				{
 					nSum += *bp;
-					bp += img.p_Stride;
+					bp += (img.p_Stride * img.p_nByte);
 				}
 			}
 			dAverageTemp = nSum / (rcROI.Height * (int)dRatio);
@@ -533,11 +533,11 @@ namespace Root_AOP01_Inspection.Module
 			dRatio = rcROI.Height * 0.1;
 			for (int i = 0; i < (int)dRatio; i++)
 			{
-				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
+				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top + i * img.p_nByte, (int)rcROI.Left).ToPointer());
 				for (int j = 0; j < rcROI.Width; j++)
 				{
 					nSum += *bp;
-					bp++;
+					bp += img.p_nByte;
 				}
 			}
 			dAverageTemp = nSum / (rcROI.Width * (int)dRatio);
@@ -548,11 +548,11 @@ namespace Root_AOP01_Inspection.Module
 			dRatio = rcROI.Width * 0.1;
 			for (int i = 0; i < (int)dRatio; i++)
 			{
-				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i).ToPointer());
+				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i * img.p_nByte).ToPointer());
 				for (int j = 0; j < rcROI.Height; j++)
 				{
 					nSum += *bp;
-					bp += img.p_Stride;
+					bp += (img.p_Stride * img.p_nByte);
 				}
 			}
 			dAverageTemp = nSum / (rcROI.Height * (int)dRatio);
@@ -563,11 +563,11 @@ namespace Root_AOP01_Inspection.Module
 			dRatio = rcROI.Height * 0.1;
 			for (int i = 0; i < (int)dRatio; i++)
 			{
-				byte* bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
+				byte* bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i * img.p_nByte, (int)rcROI.Left).ToPointer());
 				for (int j = 0; j < rcROI.Width; j++)
 				{
 					nSum += *bp;
-					bp++;
+					bp += img.p_nByte;
 				}
 			}
 			dAverageTemp = nSum / (rcROI.Width * (int)dRatio);
@@ -601,22 +601,22 @@ namespace Root_AOP01_Inspection.Module
 				double dAverage2 = 0.0;
 				for (int i = 0; i < (int)dRatio; i++)
 				{
-					byte* bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
+					byte* bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i * img.p_nByte, (int)rcROI.Left).ToPointer());
 					for (int j = 0; j < rcROI.Width; j++)
 					{
 						nSum += *bp;
-						bp++;
+						bp += img.p_nByte;
 					}
 				}
 				dAverage1 = nSum / (rcROI.Width * (int)dRatio);
 				nSum = 0;
 				for (int i = 0; i < (int)dRatio; i++)
 				{
-					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
+					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top + i * img.p_nByte, (int)rcROI.Left).ToPointer());
 					for (int j = 0; j < rcROI.Width; j++)
 					{
 						nSum += *bp;
-						bp++;
+						bp += img.p_nByte;
 					}
 				}
 				dAverage2 = nSum / (rcROI.Width * (int)dRatio);
@@ -631,22 +631,22 @@ namespace Root_AOP01_Inspection.Module
 				double dAverage2 = 0.0;
 				for (int i = 0; i < (int)dRatio; i++)
 				{
-					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i));
+					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i * img.p_nByte));
 					for (int j = 0; j < rcROI.Height; j++)
 					{
 						nSum += *bp;
-						bp += img.p_Stride;
+						bp += (img.p_Stride * img.p_nByte);
 					}
 				}
 				dAverage1 = nSum / (rcROI.Height * (int)dRatio);
 				nSum = 0;
 				for (int i = 0; i < (int)dRatio; i++)
 				{
-					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
+					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i * img.p_nByte));
 					for (int j = 0; j < rcROI.Height; j++)
 					{
 						nSum += *bp;
-						bp += img.p_Stride;
+						bp += (img.p_Stride * img.p_nByte);
 					}
 				}
 				dAverage2 = nSum / (rcROI.Height * (int)dRatio);

@@ -1159,6 +1159,13 @@ namespace Root_AOP01_Inspection.Module
                 RunTree(localTree, visible, isRecipe);
                 localTree.p_treeRoot.p_eMode = temp;
             }
+            internal void RefreshTree()
+            {
+                var temp = localTree.p_treeRoot.p_eMode;
+                localTree.p_treeRoot.p_eMode = Tree.eMode.RegRead;
+                RunTree(localTree, visible, isRecipe);
+                localTree.p_treeRoot.p_eMode = temp;
+            }
             static Tree localTree;
             static bool visible;
             static bool isRecipe;
@@ -1256,9 +1263,16 @@ namespace Root_AOP01_Inspection.Module
                         outRadius /= DownSample;
                         memW /= DownSample; memH /= DownSample;
 
-                        outmap_x = area.Width / BlockSizeWidth;
-                        outmap_y = area.Height / BlockSizeHeight;
-                        if(outmap_x == 0)
+                        if (BlockSizeWidth != 0)
+                            outmap_x = area.Width / BlockSizeWidth;
+                        else
+                            outmap_x = area.Width / 500;
+                        if (BlockSizeHeight != 0)
+                            outmap_y = area.Height / BlockSizeHeight;
+                        else
+                            outmap_y = area.Height / 500;
+
+                        if (outmap_x == 0)
 						{
                             outmap_x = 40;
                         }
@@ -1454,7 +1468,7 @@ namespace Root_AOP01_Inspection.Module
 
                 GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).WaferMap = mapInfo;
 
-               if (true) // Display Map Data Option화
+               if (false) // Display Map Data Option화
                     DrawMapData(mapInfo, mapData, mapX, mapY, originX, originY, chipSzX, chipSzY);
             }
 			private void DrawMapData(RecipeType_WaferMap mapInfo, int[] mapData, int mapX, int mapY, int OriginX, int OriginY, int ChipSzX, int ChipSzY)

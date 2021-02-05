@@ -326,7 +326,7 @@ namespace RootTools.Database
 					if (i != sbValueList.Count - 1)
 						sbQuery.Append(",");
 				}
-				SendQuery(sbQuery.ToString());
+				 SendQuery(sbQuery.ToString());
 #if !DEBUG
 			}
 			catch (Exception ex)

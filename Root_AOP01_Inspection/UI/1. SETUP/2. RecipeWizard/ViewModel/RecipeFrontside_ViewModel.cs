@@ -476,6 +476,7 @@ namespace Root_AOP01_Inspection
                 MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.MainModuleName);
                 surfaceInspection.EdgeList = new List<TRect>(m_ImageViewer_VM.TRectList).ToArray();
                 surfaceInspection.UpdateTree();
+                surfaceInspection.RefreshTree();
             }
 		}
         //List<TRect> tempList = new List<TRect>();
@@ -583,9 +584,15 @@ namespace Root_AOP01_Inspection
 						ResultDataTable = null;
 						ResultDataTable = new DataTable();
 						SelectedDataTable = null;
-						p_ImageViewer_VM.Clear();
+                        MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.MainModuleName);
+                        //현재 ViewModel에 있는 edgebox를 저장한다.
+                        if (m_ImageViewer_VM.TRectList.Count == 6)
+                        {
+                            //tempList = new List<TRect>(viewer.TRectList);
+                            surfaceInspection.EdgeList = new List<TRect>(m_ImageViewer_VM.TRectList).ToArray();
+                        }
+                        p_ImageViewer_VM.Clear();
 
-						MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.MainModuleName);
                         surfaceInspection.BrightGV = BrightGV;
                         surfaceInspection.SurfaceGV = SurfaceGV;
                         surfaceInspection.SurfaceSize = SurfaceSize;
