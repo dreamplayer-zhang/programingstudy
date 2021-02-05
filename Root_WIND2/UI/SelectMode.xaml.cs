@@ -20,7 +20,7 @@ namespace Root_WIND2
     /// </summary>
     public partial class SelectMode : UserControl
     {
-        MainWindow m_Mainwindow;
+        //MainWindow m_Mainwindow;
         public SelectMode()
         {
             InitializeComponent();

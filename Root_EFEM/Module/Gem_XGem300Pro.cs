@@ -1,15 +1,10 @@
 ﻿using RootTools;
 using RootTools.Gem;
 using RootTools.Module;
-using RootTools.OHT.Semi;
 using RootTools.OHTNew;
 using RootTools.Trees;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Root_EFEM.Module
 {

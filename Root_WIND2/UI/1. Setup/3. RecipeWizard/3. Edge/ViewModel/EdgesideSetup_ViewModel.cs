@@ -30,9 +30,9 @@ namespace Root_WIND2
 		private double camResolution;
 		private double camTriggerRatio;
 
-		private int topOffset;
-		private int sideOffset;
-		private int btmOffset;
+		//private int topOffset;
+		//private int sideOffset;
+		//private int btmOffset;
 
 		private bool _IsTopChecked = true;
 		private bool _IsSideChecked = false;
@@ -41,7 +41,7 @@ namespace Root_WIND2
 		private DataTable defectDataTable;
 		private object selectedDefect;
 		private BitmapSource defectImage;
-		private double triggerRatio;
+		private double triggerRatio = 0;
 
 		#region [Getter / Setter]
 		public RootViewer_ViewModel DrawToolVM

@@ -244,7 +244,7 @@ namespace Root_Vega.Module
 //            if (m_diDoorOpen.p_bIn == false) return m_id + " Door Closed";
             return m_infoPod.IsPutOK(ref posRobot);
         }
-		bool _eIonizerState = false;
+		//bool _eIonizerState = false;
         
       
         public bool m_bIonizerDoorlockCheck = false;
