@@ -123,7 +123,7 @@ namespace Root_WIND2.Module
 
                     axisXY.p_axisY.RunTrigger(false);
 
-                    CalculateHeight(nScanLine, mem, nWaferSizeY_px, 230);
+                    //CalculateHeight(nScanLine, mem, nWaferSizeY_px, 230);
 
                     nScanLine++;
                     cpMemoryOffset.X += nCamWidth;
@@ -136,42 +136,6 @@ namespace Root_WIND2.Module
             {
                 m_grabMode.SetLight(false);
             }
-        }
-
-        unsafe void CalculateHeight(int nCurLine, MemoryData mem, int WaferHeight, int gv)
-        {
-            int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
-            int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
-
-            byte* ptr = (byte*)mem.GetPtr().ToPointer();
-
-            int hCnt = WaferHeight / nCamHeight;
-            BackSideVision.LADSInfo ladsinfo = new BackSideVision.LADSInfo(new RPoint(), 0, hCnt);
-
-            for (int cnt = 0; cnt < hCnt; cnt++)
-            {
-                int maxLine = 0;
-                int maxpixels = 0;
-
-                for (int h = 0; h < nCamHeight; h++)
-                {
-                    int curpxl = 0;
-                    for (int w = 0; w < nCamWidth; w++)
-                    {
-                        /*arr[cnt*camheight][w]*/
-                        if (ptr[w + (cnt * nCamHeight) * nCamWidth] >= gv)
-                            curpxl++;
-                    }
-
-                    if (maxpixels < curpxl)
-                    {
-                        maxLine = h;
-                        maxpixels = curpxl;
-                    }
-                }
-                ladsinfo.m_Heightinfo[cnt] = maxLine / nCamHeight;
-            }
-            m_module.ladsinfos.Add(ladsinfo);
         }
     }
 }

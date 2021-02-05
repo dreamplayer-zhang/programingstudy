@@ -65,7 +65,6 @@ namespace RootTools.Camera.Silicon
         public int m_nGrab = -1; //버퍼에서 몇번째 이미지 가져올건지 
         public int m_lGrab = 0; //그랩 몇번할건지?
         public int m_nImgToGrab = 1;
-        GCHandle userObjectHandle;
 
         public bool IsLIVE = false;
         System.Drawing.Point szBuf = new System.Drawing.Point();
@@ -264,6 +263,7 @@ namespace RootTools.Camera.Silicon
             catch (Exception)
             {
                 MessageBox.Show("Camera Init Fail");
+                return;
             }
 
             // Silicon FrameGrabber Connect
@@ -355,18 +355,25 @@ namespace RootTools.Camera.Silicon
 
         public void SetSisoParam()
         {
-            NODEMAP_HANDLE hNodeMap = PylonC.NET.Pylon.DeviceGetNodeMap(m_hDev);   // Get the node map containing all parameters
-            NODE_HANDLE hNode = GenApi.NodeMapGetNode(hNodeMap, "Width");   // Handle for a camrera parameter
-            m_Width = szBuf.X = (int)GenApi.IntegerGetValue(hNode);
-            hNode = GenApi.NodeMapGetNode(hNodeMap, "Height");
-            m_Height = szBuf.Y = (int)GenApi.IntegerGetValue(hNode);
+            try
+            {
+                NODEMAP_HANDLE hNodeMap = PylonC.NET.Pylon.DeviceGetNodeMap(m_hDev);   // Get the node map containing all parameters
+                NODE_HANDLE hNode = GenApi.NodeMapGetNode(hNodeMap, "Width");   // Handle for a camrera parameter
+                m_Width = szBuf.X = (int)GenApi.IntegerGetValue(hNode);
+                hNode = GenApi.NodeMapGetNode(hNodeMap, "Height");
+                m_Height = szBuf.Y = (int)GenApi.IntegerGetValue(hNode);
 
-            fgErrorType rc = fgErrorType.fgeOK;
-            //rc = m_fgSiso.FgSetParameterByName("FG_GEN_WIDTH", m_Width, (uint)p_nDeviceIndex);
-            rc = m_fgSiso.FgSetParameterByName("FG_WIDTH", m_Width, (uint)p_nDeviceIndex);
-            //rc = m_fgSiso.FgSetParameterByName("FG_GEN_HEIGHT", m_Height, (uint)p_nDeviceIndex);
-            rc = m_fgSiso.FgSetParameterByName("FG_HEIGHT", m_Height, (uint)p_nDeviceIndex);
-            rc = m_fgSiso.FgSetParameterByName("FG_TRIGGERSTATE", 0/*TS_ACTIVE*/, (uint)p_nDeviceIndex);
+                fgErrorType rc = fgErrorType.fgeOK;
+                //rc = m_fgSiso.FgSetParameterByName("FG_GEN_WIDTH", m_Width, (uint)p_nDeviceIndex);
+                rc = m_fgSiso.FgSetParameterByName("FG_WIDTH", m_Width, (uint)p_nDeviceIndex);
+                //rc = m_fgSiso.FgSetParameterByName("FG_GEN_HEIGHT", m_Height, (uint)p_nDeviceIndex);
+                rc = m_fgSiso.FgSetParameterByName("FG_HEIGHT", m_Height, (uint)p_nDeviceIndex);
+                rc = m_fgSiso.FgSetParameterByName("FG_TRIGGERSTATE", 0/*TS_ACTIVE*/, (uint)p_nDeviceIndex);
+            }
+            catch
+            {
+            
+            }            
         }
 
         public void StartGrab(long lGrab, bool Trigger = true)
@@ -440,6 +447,7 @@ namespace RootTools.Camera.Silicon
             m_nInverseYOffset = m_GrabData.ReverseOffsetY;
             m_nYEnd = ((int)Math.Truncate(1.0 * nLine / m_Height) - 1)*m_Height;
             m_LastROI = new CRect();
+            m_nGrabTrigger = 0;
             fgErrorType rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);
 
             m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));
@@ -448,15 +456,15 @@ namespace RootTools.Camera.Silicon
         unsafe void RunGrabLineScanThread()
         {
             int iBlock = 0;
-            while(iBlock <= m_lGrab)
+            while(iBlock < m_lGrab)
             {
                 if (iBlock < m_nGrabTrigger)
                 {
                     int nY = iBlock * m_Height;
 
-                    bool Scandir = false;
+                    bool Scandir = true;
                     IntPtr ipSrc = m_fgSiso.FgGetImagePtrEx(iBlock+1, (uint)p_nDeviceIndex, m_pBufGrab);
-                    System.Diagnostics.Debug.WriteLine("mem y : " + nY);
+                    //System.Diagnostics.Debug.WriteLine("mem y : " + nY);
                     Parallel.For(0, m_Height, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
                     {
                         int yp;
@@ -479,6 +487,8 @@ namespace RootTools.Camera.Silicon
 
                     GrabEvent();
                 }
+
+
             }
         }
         void GrabEvent()
