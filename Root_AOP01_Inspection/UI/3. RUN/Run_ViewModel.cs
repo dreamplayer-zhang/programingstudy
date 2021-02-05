@@ -19,7 +19,7 @@ namespace Root_AOP01_Inspection
         {
             m_Mainwindow = main;
             m_mainVision = ((AOP01_Handler)main.m_engineer.ClassHandler()).m_mainVision;
-            
+            p_nSequencePercent = ((AOP01_Handler)main.m_engineer.ClassHandler()).m_process.m_nSequencePercent;
             // MiniViewer
             p_miniViewerMain = new MiniViewer_ViewModel(ProgramManager.Instance.ImageMain);
             p_miniViewerLeft = new MiniViewer_ViewModel(ProgramManager.Instance.ImageSideLeft);
@@ -43,6 +43,15 @@ namespace Root_AOP01_Inspection
         {
             get { return m_miniViewerMain; }
             set { SetProperty(ref m_miniViewerMain, value); }
+        }
+        public int _nSequencePercent = 30;
+        public int p_nSequencePercent
+        {
+            get { return _nSequencePercent; }
+            set
+            {
+                SetProperty(ref _nSequencePercent, value);
+            }
         }
 
         MiniViewer_ViewModel m_miniViewerLeft;

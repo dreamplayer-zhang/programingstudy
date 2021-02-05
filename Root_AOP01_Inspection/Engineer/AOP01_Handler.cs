@@ -311,6 +311,7 @@ namespace Root_AOP01_Inspection
                     }
                 }
             }
+            m_process.m_nOneSequencePercent = 100 / (m_process.m_qSequence.Count); //LYJ 210205
             m_process.RunTree(Tree.eMode.Init);
         }
 
