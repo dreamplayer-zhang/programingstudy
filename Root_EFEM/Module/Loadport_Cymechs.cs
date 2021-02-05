@@ -157,7 +157,7 @@ namespace Root_EFEM.Module
 
         string IsRunOK()
         {
-            return "OK"; 
+            //return "OK"; 
             //0202 확인
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
             return p_infoCarrier.IsRunOK();
@@ -165,7 +165,7 @@ namespace Root_EFEM.Module
 
         public void RunTreeTeach(Tree tree)
         {
-            p_infoCarrier.m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
+            p_infoCarrier.m_waferSize.RunTreeTeach(tree.GetTree(p_id, true));
         }
 
         public void ReadInfoWafer_Registry()

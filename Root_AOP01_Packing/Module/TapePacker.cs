@@ -388,6 +388,7 @@ namespace Root_AOP01_Packing.Module
                 m_axis.StartMove(fPulse);
                 return m_axis.WaitReady();
             }
+            
             public string RunTaping()
             {
                 double fPulse = m_degCut * c_fPpR / 360;
@@ -529,6 +530,36 @@ namespace Root_AOP01_Packing.Module
             p_infoWafer = infoWafer;
         }
 
+
+
+        public int GetTeachWTR(InfoWafer infoWafer = null)
+        {
+            if (infoWafer == null)
+                infoWafer = p_infoWafer;
+            return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
+        }
+
+        public string BeforeGet(int nID)
+        {
+            //0203 nID로 Rotate 각도 조절할 수 있는지 확인
+
+            //if (Run(m_stage.RunRotate(30))) return p_sInfo;
+            if (nID == 0) // case
+            {
+                if (p_infoWafer == null)
+                    return p_id + " BeforePut : InfoWafer == null";
+                if (Run(m_stage.RunRotate(30)))
+                    return p_sInfo;
+            }
+            if (nID == 1)
+            {
+                if (p_infoWafer == null)
+                    return p_id + " BeforePut : InfoWafer == null, No Reticle";
+                if (Run(m_stage.RunRotate(-32)))
+                    return p_sInfo;
+            }
+            return CheckGetPut();
+        }
         public string IsGetOK(int nID)
         {
             if (p_eState != eState.Ready)
@@ -556,53 +587,6 @@ namespace Root_AOP01_Packing.Module
             }
             return p_id + " IsGetOK - Process " + p_eProcess.ToString();
         }
-
-        public string IsPutOK(InfoWafer infoWafer, int nID)
-        {
-            //0203 디버그 p_infowafer 확인
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            //return "OK"; // 0202
-            if (p_infoWafer != null) return p_id + " IsPutOK - InfoWafer Exist";
-            //p_eProcess 확인
-            
-            switch (p_eProcess)
-            {
-                case eProcess.Empty:
-                    if (nID == 0) 
-                        return "OK"; 
-                    break;
-                case eProcess.Opened: if (nID == 1) 
-                        return "OK"; 
-                    break;
-            }
-            return p_id + " IsPutOK - Process " + p_eProcess.ToString();
-        }
-
-        public int GetTeachWTR(InfoWafer infoWafer = null)
-        {
-            if (infoWafer == null)
-                infoWafer = p_infoWafer;
-            return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
-        }
-
-        public string BeforeGet(int nID)
-        {
-            //0203 nID로 Rotate 각도 조절할 수 있는지 확인
-            
-            //if (Run(m_stage.RunRotate(30))) return p_sInfo;
-            if (p_infoWafer == null) return p_id + " BeforeGet : InfoWafer = null";
-            return CheckGetPut();
-        }
-
-        public string BeforePut(int nID)
-        {
-            //nID따라서 Rotate 각도 조절할 수 있는지 확인
-
-            //if (Run(m_stage.RunRotate(30))) return p_sInfo;
-            if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
-            return CheckGetPut();
-        }
-
         public string AfterGet(int nID)
         {
             //return "OK"; // 0202
@@ -620,6 +604,54 @@ namespace Root_AOP01_Packing.Module
             return CheckGetPut();
         }
 
+        public string BeforePut(int nID)
+        {
+            if (nID == 0) // case
+            {
+                if (p_infoWafer != null)
+                    return p_id + " BeforePut : InfoWafer != null";
+                if (Run(m_stage.RunRotate(30))) 
+                    return p_sInfo;
+            }
+            if (nID == 1)
+            {
+                if (p_infoWafer == null)
+                    return p_id + " BeforePut : InfoWafer == null, No Case";
+                if (Run(m_stage.RunRotate(-32)))
+                    return p_sInfo;
+            }
+
+            return CheckGetPut();
+        }
+        public string IsPutOK(InfoWafer infoWafer, int nID)
+        {
+            //0203 디버그 p_infowafer 확인
+            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            //return "OK"; // 0202
+
+            //p_eProcess 확인
+            switch (p_eProcess)
+            {
+                case eProcess.Empty:
+                    if (nID == 0)
+                    {
+                        if (p_infoWafer != null) 
+                            return p_id + " IsPutOK - InfoWafer != Null";
+
+                        return "OK"; 
+                    }
+                    break;
+                case eProcess.Opened:
+                    if (nID == 1)
+                    {
+                        if (p_infoWafer == null)
+                            return p_id + " BeforePut : InfoWafer == null, No Case";
+                        return "OK"; 
+                    }
+                    break;
+            }
+            return p_id + " IsPutOK - Process " + p_eProcess.ToString();
+        }
         public string AfterPut(int nID)
         {
             //0203 nID로 구분해서 p_eProcess 바꺼? //p_eProcess = eProcess.Case; or p_eProcess = eProcess.Reticle;
@@ -630,8 +662,22 @@ namespace Root_AOP01_Packing.Module
             //if (Run(m_stage.RunRotate(-30))) return p_sInfo;
             switch (p_eProcess)
             {
-                case eProcess.Empty: if (nID == 0) p_eProcess = eProcess.Case; break;
-                case eProcess.Opened: if (nID == 1) p_eProcess = eProcess.Reticle; break;
+                case eProcess.Empty:
+                    if (nID == 0)
+                    {
+                        p_eProcess = eProcess.Case;
+                        if (Run(m_stage.RunRotate(-30)))
+                            return p_sInfo;
+                    }
+                    break;
+                case eProcess.Opened:
+                    if (nID == 1)
+                    {
+                        p_eProcess = eProcess.Reticle;
+                        if (Run(m_stage.RunRotate(32)))
+                            return p_sInfo;
+                    }
+                    break;
             }
             return "OK";
         }
@@ -690,8 +736,9 @@ namespace Root_AOP01_Packing.Module
         #region Functions
         public string RunCoverOpen()
         {
+            //p_eProcess = eProcess.Empty;
             //0203  p_eProcess = eProcess.Case
-            //p_eProcess = eProcess.Case; 0203 삭제
+            //p_eProcess = eProcess.Case; //0203 삭제
             if (p_eProcess != eProcess.Case) return "Process not Case : " + p_eProcess.ToString();
             p_eProcess = eProcess.Opening;
             if (Run(m_head.RunVacuum(false)))
@@ -739,12 +786,16 @@ namespace Root_AOP01_Packing.Module
             //0203 Closed 상태 면 테이핑 ㄱㄱ
             if (p_eProcess != eProcess.Closed) return "Process not Closed : " + p_eProcess.ToString();
             p_eProcess = eProcess.Taping;
+            if (Run(m_stage.m_axis.StartHome()))
+                return p_sInfo;
+            if (Run(m_stage.m_axis.WaitReady()))
+                return p_sInfo;
             if (Run(m_head.RunSol(true, false))) return p_sInfo; // Overload는 여기서 체크
             if (Run(m_roller.RunRollerPushUp(true))) return p_sInfo;
             //여기서 Check Top Sensor 체크해야될듯 근데 안들어오네
             // 0203 Check Case Top Sensor 시퀀스 추가 필요
 
-            if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo;
+            //if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo;
             if (Run(m_cartridge.RunMove(Cartridge.ePos.Attach))) return p_sInfo;
             if (Run(m_stage.RunRotate(15))) return p_sInfo;
             if (Run(m_cartridge.RunStopper(false))) return p_sInfo;
