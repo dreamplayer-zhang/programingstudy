@@ -45,15 +45,16 @@ namespace Root_AOP01_Inspection.Module
 
         public int m_teachCleanTop = -1;
         public int m_teachCleanBottom = -1;
-        public string m_extentionlength = "0";
+        public string m_extentionlength = "21";
         public string m_CleanSpeed = "7";
         
         void RunTreeClean(Tree tree)
         {
             m_teachCleanTop = tree.Set(m_teachCleanTop, m_teachCleanTop, "Top Clean Teach", "RTR Top Clean Index");
             m_teachCleanBottom = tree.Set(m_teachCleanBottom, m_teachCleanBottom, "Bottom Clean Teach", "RTR Bottom Clean Index");
-            m_teachReticleFlip = tree.Set(m_teachReticleFlip, m_teachReticleFlip, "Vision Reticle Flip Top to Bottom", "Vision Reticle Flip Top to Bottom");
-            m_extentionlength = tree.Set(m_extentionlength, m_extentionlength, "Extention length", "Clean Extention Length");
+            m_extentionlength = tree.Set(m_extentionlength, m_extentionlength, "Extention length", "Clean Extention Length (0~30)");
+            if (Convert.ToInt32(m_extentionlength) < 0) m_extentionlength = tree.Set("21", "21", "Extention length", "Clean Extention Length (0~30)");
+            if (Convert.ToInt32(m_extentionlength) > 30) m_extentionlength = tree.Set("21", "21", "Extention length", "Clean Extention Length (0~30)"); 
             m_CleanSpeed = tree.Set(m_CleanSpeed, m_CleanSpeed, "Clean Speed", "RTR Clean Speed");
             m_OriginSpeed = tree.Set(m_OriginSpeed, m_OriginSpeed, "Origin Speed", "RTR Origin Speed");
         }
@@ -61,32 +62,32 @@ namespace Root_AOP01_Inspection.Module
 
         public RTRCleanUnit(string id, IEngineer engineer) : base(id, engineer)
         {
-            InitTimer();
+            //InitTimer();
         }
-        #region Timer
-        DispatcherTimer m_timer = new DispatcherTimer();
-        void InitTimer()
-        {
-            m_timer.Interval = TimeSpan.FromMilliseconds(20);
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Start();
-        }
-
-        private void M_timer_Tick(object sender, EventArgs e)
-        {
-            if(m_bDoClean)
-            {
-                if (m_diReticleCheck.p_bIn == false)
-                {
-                    Run(WriteCmd(eCmd.Stop));
-                    Run(WaitReply(m_secMotion));
-                    m_doBottomBlow.Write(false);
-                    m_doTopBlow.Write(false);
-                    m_alidClean.Run(true, "Reticle too close to Door");
-                }
-            }
-        }
-        #endregion
+        //#region Timer
+        //DispatcherTimer m_timer = new DispatcherTimer();
+        //void InitTimer()
+        //{
+        //    m_timer.Interval = TimeSpan.FromMilliseconds(20);
+        //    m_timer.Tick += M_timer_Tick;
+        //    m_timer.Start();
+        //}
+        //
+        //private void M_timer_Tick(object sender, EventArgs e)
+        //{
+        //    if(m_bDoClean)
+        //    {
+        //        if (m_diReticleCheck.p_bIn == false)
+        //        {
+        //            Run(WriteCmd(eCmd.Stop));
+        //            Run(WaitReply(m_secMotion));
+        //            m_doBottomBlow.Write(false);
+        //            m_doTopBlow.Write(false);
+        //            m_alidClean.Run(true, "Reticle too close to Door");
+        //        }
+        //    }
+        //}
+        //#endregion
 
         #region ModuleRun
         protected override void InitModuleRuns()

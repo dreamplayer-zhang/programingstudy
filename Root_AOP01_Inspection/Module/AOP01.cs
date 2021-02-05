@@ -94,6 +94,7 @@ namespace Root_AOP01_Inspection.Module
         #region GAF
         //ALID 생성
         ALID m_alidEMS;
+        ALID m_alidEMO;
         ALID m_alidProtectionBar;
         ALID m_alidMCReset;
         ALID m_alidCDA1Low;
@@ -114,6 +115,7 @@ namespace Root_AOP01_Inspection.Module
         void InitALID()
         {
             m_alidEMS = m_gaf.GetALID(this, "EMS", "EMS Error");
+            m_alidEMO = m_gaf.GetALID(this, "EMO", "EMO Error");
             m_alidProtectionBar = m_gaf.GetALID(this, "ProtectionBar", "ProtectionBar Error");
             m_alidMCReset = m_gaf.GetALID(this, "MC Reset", "MC Reset Error");
             m_alidCDA1Low = m_gaf.GetALID(this, "CDA1 Low", "CDA1 Low Error");
@@ -162,6 +164,7 @@ namespace Root_AOP01_Inspection.Module
                             m_doLamp.Write(eLamp.Green);
                             break;
                         case EQ.eState.Ready:
+                        case EQ.eState.Idle:
                             m_doDoorLock_Use.Write(false);
                             BuzzerOff();
                             m_doLamp.Write(eLamp.Yellow);
@@ -180,9 +183,9 @@ namespace Root_AOP01_Inspection.Module
                 if (!m_diEMS.p_bIn)
                 {
                     if (!m_diCDA1Low.p_bIn && !m_diCDA2Low.p_bIn)
-                        m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
+                        m_alidEMS.Run(!m_diEMS.p_bIn, "EMS Error");
                     else
-                        m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMO Buttons");
+                        m_alidEMO.Run(!m_diEMS.p_bIn, "EMO Error");
                     m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
                 }
                 else
