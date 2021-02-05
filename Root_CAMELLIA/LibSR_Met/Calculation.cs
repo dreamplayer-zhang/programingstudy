@@ -80,7 +80,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 //다층 박막에서의 반사율
                 return cR.Real * 100.0;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return -1.0;
             }
@@ -140,7 +140,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
                 return cT.Real * 100.0;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return -1.0;
             }

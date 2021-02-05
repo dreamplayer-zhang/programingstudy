@@ -74,7 +74,7 @@ namespace Root_Vega.Module
     }
     public class MaskInfo
     {
-        String MaskSerialNumber;
+        //String MaskSerialNumber;
 
     }
     public class AlignInfo

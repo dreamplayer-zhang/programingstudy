@@ -26,7 +26,7 @@ namespace Root_AOP01_Inspection
         RTR_RND.Arm m_arm;
         Loadport_AOP01[] m_loadport = new Loadport_AOP01[2];
         RFID_Brooks[] m_rfid = new RFID_Brooks[2];
-        AOP01_Handler.eLoadport LoadportType;
+        //AOP01_Handler.eLoadport LoadportType;
         public Run_Panel()
         {
             InitializeComponent();

@@ -50,7 +50,7 @@ namespace Root_WIND2
         private EBR_ViewModel ebrVM;
         private Edgeside_ViewModel edgeVM;
         //private InspTest_ViewModel inspTestVM;  //삭제
-        private BacksideInspection_ViewModel backsideInspTestVM;
+        //private BacksideInspection_ViewModel backsideInspTestVM;
         public Maintenance_ViewModel maintVM;
         private GEM_ViewModel gemVM;
 

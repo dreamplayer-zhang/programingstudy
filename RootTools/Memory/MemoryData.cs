@@ -315,8 +315,6 @@ namespace RootTools.Memory
                     FileOpenJPG(sFile, nMemIndex);
                     break;
             }
-
-            throw new NotImplementedException();
         }
         string GetUpperExt(string sFile)
         {

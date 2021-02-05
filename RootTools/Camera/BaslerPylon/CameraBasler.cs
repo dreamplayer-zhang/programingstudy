@@ -13,6 +13,11 @@ namespace RootTools.Camera.BaslerPylon
     public class CameraBasler : NotifyProperty, RootTools.Camera.ICamera
     {
         public event EventHandler Grabed;
+        void _Dummy()
+        {
+            if (Grabed != null) Grabed(null, null); 
+        }
+
         #region Property
         public string p_id { get; set; }
 
