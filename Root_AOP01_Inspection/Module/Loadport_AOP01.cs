@@ -786,7 +786,7 @@ namespace Root_AOP01_Inspection.Module
                 InitBase(id, engineer);
                 InitEvent();
                 InitGAF();
-                if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
+                m_gem?.OnGemRemoteCommand += M_gem_OnRemoteCommand;
                 InitThread();
             }
 
