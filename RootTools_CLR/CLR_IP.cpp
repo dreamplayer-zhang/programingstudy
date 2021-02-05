@@ -150,7 +150,7 @@ namespace RootTools_CLR
 			for (int i = 0; i < vtLabeled.size(); i++)
 			{
 				local[i] = gcnew Cpp_LabelParam();
-				local[i]->centerX = vtLabeled[i].centerX;
+				local[i]->centerX = (float)vtLabeled[i].centerX;
 				local[i]->centerY = vtLabeled[i].centerY;
 
 				local[i]->width = vtLabeled[i].width;

@@ -291,6 +291,7 @@
     <Compile Include="UI_User\EDGE\EdgesideSetup.xaml.cs">
       <DependentUpon>EdgesideSetup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_User\EDGE\ViewModel\EdgesideSetup_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\EDGE\ViewModel\EdgesideSetup_ViewModel.cs" />
     <Compile Include="UI_User\FRONT\FrontsideAlignment.xaml.cs" />
     <Compile Include="UI_User\FRONT\FrontsideInspect.xaml.cs">

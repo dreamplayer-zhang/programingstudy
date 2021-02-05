@@ -72,7 +72,7 @@ namespace Root_WIND2
 		}
 		#endregion
 
-		private WorkplaceBundle TEST(EdgeSurfaceParameterBase param, SharedBufferInfo sharedBufferInfo, ref WorkplaceBundle workplaceBundle)
+		private void TEST(EdgeSurfaceParameterBase param, EdgeSurface.EdgeMapPositionX mapX, SharedBufferInfo sharedBufferInfo, ref WorkplaceBundle workplaceBundle)
 		{
 			int cameraEmptyBufferHeight = param.CamHeight;
 			// 360도 memory height
@@ -84,10 +84,27 @@ namespace Root_WIND2
 			int roiWidth = param.ROIWidth;
 			int roiHeight = param.ROIHeight;
 
-			CreateWorkplace_Edge(cameraEmptyBufferHeight + startPtY, endPtY, roiWidth, roiHeight, sharedBufferInfo, ref workplaceBundle);
-			
-			return workplaceBundle;
+			//CreateWorkplace_Edge(cameraEmptyBufferHeight + startPtY, endPtY, roiWidth, roiHeight, sharedBufferInfo, ref workplaceBundle);
 
+			for (int i = 0; i < 1/*endY / roiHeight*/; i++)
+			{
+				int calStartY = (roiHeight * i) + (cameraEmptyBufferHeight + startPtY);
+				int height = roiHeight;
+				if ((calStartY + roiHeight) > endPtY)
+					height = endPtY - calStartY;
+
+				if (height <= 0)
+					break;
+
+				Workplace workplace = new Workplace(
+						(int)mapX, i,
+						0, calStartY,
+						roiWidth, height,
+						workplaceBundle.Count);
+				workplace.SetSharedBuffer(sharedBufferInfo);
+
+				workplaceBundle.Add(workplace);
+			}
 		}
 
 		private WorkplaceBundle CreateWorkplace_Edge()
@@ -97,9 +114,9 @@ namespace Root_WIND2
 			tempPlace.SetSharedBuffer(this.SharedBufferInfoArray[0]);
 			workplaceBundle.Add(tempPlace);
 
-			TEST(recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop, this.SharedBufferInfoArray[0], ref workplaceBundle);
-			TEST(recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide, this.SharedBufferInfoArray[1], ref workplaceBundle);
-			TEST(recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm, this.SharedBufferInfoArray[2], ref workplaceBundle);
+			TEST(recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop, EdgeSurface.EdgeMapPositionX.Top, this.SharedBufferInfoArray[0], ref workplaceBundle);
+			//TEST(recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide, EdgeSurface.EdgeMapPositionX.Side, this.SharedBufferInfoArray[1], ref workplaceBundle);
+			//TEST(recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm, EdgeSurface.EdgeMapPositionX.Btm, this.SharedBufferInfoArray[2], ref workplaceBundle);
 																											
 			return workplaceBundle;																			
 			/*

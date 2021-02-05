@@ -1,13 +1,11 @@
-﻿using Root_EFEM.Module;
-using RootTools;
+﻿using RootTools;
 using RootTools.Module;
 using RootTools.Trees;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace Root_VEGA_D_IPU.Module
 {
-    public class Vision_IPU : ModuleBase, IWTRChild
+    public class Vision_IPU : ModuleBase
     {
         #region ToolBox
 
@@ -23,12 +21,10 @@ namespace Root_VEGA_D_IPU.Module
 
         void GetClientTools(bool bInit)
         {
-
         }
 
         void GetServerTools(bool bInit)
         {
-
         }
         #endregion
 
@@ -50,134 +46,7 @@ namespace Root_VEGA_D_IPU.Module
         }
         #endregion
 
-        #region IWTRChild
-        bool _bLock = false;
-        public bool p_bLock
-        {
-            get { return _bLock; }
-            set
-            {
-                if (_bLock == value) return;
-                _bLock = value;
-            }
-        }
-
-        bool IsLock()
-        {
-            for (int n = 0; n < 10; n++)
-            {
-                if (p_bLock == false) return false;
-                Thread.Sleep(100);
-            }
-            return true;
-        }
-
-        public List<string> p_asChildSlot
-        {
-            get { return null; }
-        }
-
-        public InfoWafer GetInfoWafer(int nID)
-        {
-            return p_infoWafer;
-        }
-
-        public void SetInfoWafer(int nID, InfoWafer infoWafer)
-        {
-            p_infoWafer = infoWafer;
-        }
-
-        public string IsGetOK(int nID)
-        {
-            switch (p_eRemote)
-            {
-                case eRemote.Client:
-                    break;
-                case eRemote.Server:
-                    break; 
-            }
-            return "OK";
-        }
-
-        public string IsPutOK(InfoWafer infoWafer, int nID)
-        {
-            switch (p_eRemote)
-            {
-                case eRemote.Client: return "OK"; 
-                case eRemote.Server:
-                    if (p_eState != eState.Ready) return p_id + " eState not Ready";
-                    if (p_infoWafer != null) return p_id + " IsPutOK - InfoWafer Exist";
-                    if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false) return p_id + " not Enable Wafer Size";
-                    break; 
-            }
-            return "OK";
-        }
-
-        public int GetTeachWTR(InfoWafer infoWafer = null)
-        {
-            if (infoWafer == null) infoWafer = p_infoWafer;
-            return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
-        }
-
-        public string BeforeGet(int nID)
-        {
-            switch (p_eRemote)
-            {
-                case eRemote.Client:
-                    return m_remote.RemoteSend(Remote.eProtocol.BeforeGet, "Get", "Get");
-                case eRemote.Server:
-                    //forget
-                    break; 
-            }
-            return "OK";
-        }
-
-        public override string ServerBeforeGet()
-        {
-            return BeforeGet(0);
-        }
-
-        public string BeforePut(int nID)
-        {
-            switch (p_eRemote)
-            {
-                case eRemote.Client:
-                    break;
-                case eRemote.Server:
-                    break; 
-            }
-            return "OK";
-        }
-        public override string ServerBeforePut()
-        {
-            return BeforePut(0);
-        }
-
-        public string AfterGet(int nID)
-        {
-            return "OK";
-        }
-
-        public string AfterPut(int nID)
-        {
-            return "OK";
-        }
-
-        enum eCheckWafer
-        {
-            InfoWafer,
-            Sensor
-        }
-        eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
-        public bool IsWaferExist(int nID)
-        {
-            switch (m_eCheckWafer)
-            {
-                case eCheckWafer.Sensor: return false; // m_diWaferExist.p_bIn;
-                default: return (p_infoWafer != null);
-            }
-        }
-
+        #region InfoWafer ??
         InfoWafer.WaferSize m_waferSize;
         public void RunTreeTeach(Tree tree)
         {
@@ -244,7 +113,7 @@ namespace Root_VEGA_D_IPU.Module
             //            InitLineScan();+
             //            InitAreaScan();
             base.InitBase(id, engineer, eRemote);
-            m_waferSize = new InfoWafer.WaferSize(id, false, false);
+            m_waferSize = new InfoWafer.WaferSize(id, false, false); //forget delete ?
             //            InitMemory();
         }
 

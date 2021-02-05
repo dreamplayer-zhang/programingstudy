@@ -21,7 +21,7 @@ namespace RootTools_Vision.Utility
 			dieOriginX = 0.0f;
 			dieOriginY = 0.0f;
 
-			inspectionTest = 1;
+			//inspectionTest = 1;
 
 			// 초기화
 			inspectionStationVender = "ATI";
@@ -37,9 +37,9 @@ namespace RootTools_Vision.Utility
 			diePitchX = 0.0f;
 			diePitchY = 0.0f;
 			lotID = "";
-			lotNum = "";
+			//lotNum = "";
 			waferID = "";
-			mesLotID = "";
+			//mesLotID = "";
 			deviceID = "";
 			orientationMarkLocation = "DOWN";
 
@@ -53,7 +53,7 @@ namespace RootTools_Vision.Utility
 		}
 		
 		#region [Variables]
-		private List<KlarfData> klarfData;
+		private List<KlarfData> klarfData = null;
 
 		private int fileVer1, fileVer2;               // Klarf Ver : 사실 우린 의미가 없음.. 1 1 넣음됨.
 
@@ -65,7 +65,7 @@ namespace RootTools_Vision.Utility
 		private String setupID;                       // Recipe 관리 명. 사용자가 임의 입력.
 		private String deviceID;                      // Device ID
 		private String lotID;                         // Lot ID
-		private String lotNum;                        // Lot Num	현재 데이터에 안넣음 필요하면 넣지 뭐...
+		//private String lotNum;                        // Lot Num	현재 데이터에 안넣음 필요하면 넣지 뭐...
 		private String waferID;                       // Lot Num	현재 데이터에 안넣음 필요하면 넣지 뭐...
 		private String partID;                        // Part ID
 		private String MEMMAP_FileName;
@@ -97,20 +97,20 @@ namespace RootTools_Vision.Utility
 
 		private int klarfType;
 
-		private String mesLotID;                        // Lot ID : Product ID가 따로 있을 경우 (Tray/PCB경우 실제 LotID와 Prod.ID가 다른경우가 있음)
+		//private String mesLotID;                        // Lot ID : Product ID가 따로 있을 경우 (Tray/PCB경우 실제 LotID와 Prod.ID가 다른경우가 있음)
 
 		private String recipeName;
 		private String tiffSpec;                        // Tiff Spec, 현재 모두 Color로 변환하여 저장. (ex 6.0 G R)
 		private String tiffFileName;                    // Tiff file 명.
-		private String areaPerTest;                      // Area Per Test (사용안함)
+		//private String areaPerTest;                      // Area Per Test (사용안함)
 
 
-		private int inspectionTest;                      // 검사 회수, ATI 검사 Mode가 1가지라서 1회만 검사하지요.
+		//private int inspectionTest;                      // 검사 회수, ATI 검사 Mode가 1가지라서 1회만 검사하지요.
 
-		private int sampleTestCnt;                       // 검사한 Die 수량.
-		private int defectDieCnt;                        // 불량 Die 수량.
-		private String sampleTestPlan;                  // 검사한 Die 좌표들.
-		private int tmpSampleTestCnt;                    // 검사한 Die 수량을 임시로 저장해둠. Density 구하기 위함.
+		//private int sampleTestCnt;                       // 검사한 Die 수량.
+		//private int defectDieCnt;                        // 불량 Die 수량.
+		//private String sampleTestPlan;                  // 검사한 Die 좌표들.
+		//private int tmpSampleTestCnt;                    // 검사한 Die 수량을 임시로 저장해둠. Density 구하기 위함.
 
 		#endregion
 
@@ -125,9 +125,9 @@ namespace RootTools_Vision.Utility
 
             switch (/*_mapdata.GetFlatZone()*/4)
             {
-                case 1: this.orientationMarkLocation = "LEFT"; break;
-                case 2: this.orientationMarkLocation = "RIGHT"; break;
-                case 3: this.orientationMarkLocation = "UP"; break;
+                //case 1: this.orientationMarkLocation = "LEFT"; break;
+                //case 2: this.orientationMarkLocation = "RIGHT"; break;
+                //case 3: this.orientationMarkLocation = "UP"; break;
                 case 4: this.orientationMarkLocation = "DOWN"; break;
             }
 
@@ -157,9 +157,9 @@ namespace RootTools_Vision.Utility
 			this.deviceID = "deviceID";//pMapdata->GetDeviceID();
 			switch (/*_mapdata.GetFlatZone()*/4)
 			{
-				case 1: this.orientationMarkLocation = "LEFT"; break;
-				case 2: this.orientationMarkLocation = "RIGHT"; break;
-				case 3: this.orientationMarkLocation = "UP"; break;
+				//case 1: this.orientationMarkLocation = "LEFT"; break;
+				//case 2: this.orientationMarkLocation = "RIGHT"; break;
+				//case 3: this.orientationMarkLocation = "UP"; break;
 				case 4: this.orientationMarkLocation = "DOWN"; break;
 			}
 			
@@ -356,7 +356,7 @@ namespace RootTools_Vision.Utility
 					klarfData.Clear();
 				}
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 			}
 

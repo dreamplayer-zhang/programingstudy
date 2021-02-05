@@ -33,26 +33,24 @@ namespace Root_AOP01_Packing
         public ModuleList p_moduleList { get; set; }
         public AOP01_Recipe m_recipe;
         public AOP01_Process m_process;
+
+        public AOP01_P m_aop01P;
+        public IndividualElevator m_elevator;
         public TapePacker m_tapePacker;
         public VacuumPacker m_vacuumPacker;
-        public IndividualElevator m_elevator;
         public Unloadport_AOP m_unloadport;
-        public Vision_AOP m_visionAOP;
-        public Certification m_RNR;
+
         public RFID_Brooks m_RFID;
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
+            m_aop01P = new AOP01_P("AOP01_P", m_engineer);
+            InitModule(m_aop01P);
+
             InitWTR(); 
             InitLoadport();
 
-
-            //m_RNR = new Certification("Certification", m_engineer);
-            //InitModule(m_RNR);
-
-            //m_visionAOP = new Vision_AOP("Vision", m_engineer);
-            //InitModule(m_visionAOP);
             //m_RFID = new RFID_Brooks("RFID", m_engineer, null);
             //InitModule(m_RFID);
 
@@ -77,6 +75,7 @@ namespace Root_AOP01_Packing
             m_aWTR[0].RunTree(Tree.eMode.Init);
             m_aWTR[1].RunTree(Tree.eMode.RegRead);
             m_aWTR[1].RunTree(Tree.eMode.Init);
+            ((IWTR)m_aWTR[0]).ReadInfoReticle_Registry();
             ((IWTR)m_aWTR[1]).ReadInfoReticle_Registry();
 
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);

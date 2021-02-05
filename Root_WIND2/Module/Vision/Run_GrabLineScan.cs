@@ -16,7 +16,7 @@ namespace Root_WIND2.Module
     {
         Vision m_module;
         
-        bool m_bInvDir = false;
+        //bool m_bInvDir = false;
         public GrabMode m_grabMode = null;
         double m_dTDIToVRSOffsetZ = 0;
         string m_sGrabMode = "";
@@ -122,7 +122,7 @@ namespace Root_WIND2.Module
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
                     }
-                    else
+                    /*else
                     {
                         if (m_module.Run(axisXY.p_axisY.WaitReady()))
                             return p_sInfo;
@@ -130,7 +130,7 @@ namespace Root_WIND2.Module
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-                    }
+                    }*/
                    if (m_module.Run(axisZ.WaitReady()))
                         return p_sInfo;
                     double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - nTotalTriggerCount / 2;

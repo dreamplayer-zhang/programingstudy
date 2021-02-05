@@ -169,8 +169,8 @@ namespace Root_AOP01_Packing.Module
             double m_secBlow = 0.5;
             public string RunVacOn()
             {
-                m_dioVacuum[0].Write(true);
                 m_dioVacuum[1].Write(true);
+                m_dioVacuum[0].Write(true);
                 int msVac = (int)(1000 * m_secVac);
                 while (m_dioVacuum[0].m_swWrite.ElapsedMilliseconds < msVac)
                 {

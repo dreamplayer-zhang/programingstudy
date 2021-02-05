@@ -337,7 +337,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
                 return true;
             }
-            catch(Exception ex)
+            catch(Exception)
 
             {
                 m_Log.WriteLog(LogType.Error, "Failed to clear RawData.");
@@ -370,7 +370,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 m_Log.WriteLog(LogType.Datas, "Point: " + nPointIndex.ToString() + " Raw data saved.");
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 m_Log.WriteLog(LogType.Error, "Point: " + nPointIndex.ToString() + " Failed to save raw data.");
                 return false;
@@ -572,7 +572,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.Close();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -804,7 +804,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 m_Log.WriteLog(LogType.Datas, " SaveResultFileLot()_Saved");
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 m_Log.WriteLog(LogType.Error, "SaveResultFileLot() - Error" );
                 return false;
@@ -1046,7 +1046,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 m_Log.WriteLog(LogType.Datas, " SaveResultFileLot()_Saved");
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 m_Log.WriteLog(LogType.Error, "SaveResultFileLot() - Error");
                 return false;
