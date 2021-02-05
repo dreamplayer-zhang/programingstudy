@@ -163,7 +163,7 @@ namespace Root_AOP01_Inspection
             logViewUI.Init(LogView.m_logView);
             if (m_engineer.m_handler.m_aLoadportType[0] == eLoadport.Cymechs && m_engineer.m_handler.m_aLoadportType[1] == eLoadport.Cymechs)
             {
-                Run.Init(m_engineer.m_handler.m_mainVision, m_engineer.m_handler.m_backsideVision, (RTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_AOP01)m_engineer.m_handler.m_aLoadport[0], (Loadport_AOP01)m_engineer.m_handler.m_aLoadport[1], m_engineer, (RFID_Brooks)m_engineer.m_handler.m_aRFID[0], (RFID_Brooks)m_engineer.m_handler.m_aRFID[1]);
+                Run.Init(m_engineer.m_handler.m_mainVision, m_engineer.m_handler.m_backsideVision, (RTR_RND)m_engineer.m_handler.m_wtr, (Loadport_AOP01)m_engineer.m_handler.m_aLoadport[0], (Loadport_AOP01)m_engineer.m_handler.m_aLoadport[1], m_engineer, (RFID_Brooks)m_engineer.m_handler.m_aRFID[0], (RFID_Brooks)m_engineer.m_handler.m_aRFID[1]);
             }
             if (m_engineer.m_handler.m_FDC.m_aData.Count > 0)
             {

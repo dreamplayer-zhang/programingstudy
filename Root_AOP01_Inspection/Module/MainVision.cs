@@ -1000,15 +1000,6 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
-        public RTRCleanUnit p_wtr
-        {
-            get
-            {
-                AOP01_Handler handler = (AOP01_Handler)m_engineer.ClassHandler();
-                return (RTRCleanUnit)handler.m_wtr;
-            }
-        }
-
         public MainVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);

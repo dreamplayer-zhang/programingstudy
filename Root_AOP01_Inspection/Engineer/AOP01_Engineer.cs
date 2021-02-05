@@ -128,12 +128,54 @@ namespace Root_AOP01_Inspection
         #region IEngineer Function
         public string BuzzerOff()
         {
+            m_handler.m_aop01.BuzzerOff();
             return "OK";
         }
 
         public string Recovery()
         {
+            if (IsEnableRecovery() == false) return "Recovery is impossible";
+            m_handler.m_bIsPossible_Recovery = false;
+            m_handler.m_process.CalcRecover();
+            EQ.p_eState = EQ.eState.Run;
             return "OK";
+        }
+        bool IsEnableRecovery()
+        {
+            if (IsRunModule()) return false;
+            if (IsErrorModule()) return false;
+            if (m_handler.m_bIsPossible_Recovery == false) return false;
+            // Daniel check
+            if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (EQ.p_bStop == true) return false;
+            return m_handler.IsEnableRecovery();
+        }
+        bool IsRunModule()
+        {
+            if (IsRunModule((ModuleBase)m_handler.m_aLoadport[0]) || IsRunModule((ModuleBase)m_handler.m_aLoadport[1]) || IsRunModule(m_handler.m_wtr) || IsRunModule(m_handler.m_mainVision) || IsRunModule(m_handler.m_backsideVision))
+                return true;
+            return false;
+        }
+        bool IsRunModule(ModuleBase module)
+        {
+            if (module.p_eState == ModuleBase.eState.Run) return true;
+            if (module.p_eState == ModuleBase.eState.Home) return true;
+            if (module.p_eState == ModuleBase.eState.Error) return false;
+            return (module.m_qModuleRun.Count > 0);
+        }
+        bool IsErrorModule()
+        {
+            if (IsErrorModule((ModuleBase)m_handler.m_aLoadport[0]) || IsErrorModule((ModuleBase)m_handler.m_aLoadport[1]) || IsErrorModule(m_handler.m_wtr) || IsErrorModule(m_handler.m_mainVision) || IsErrorModule(m_handler.m_backsideVision))
+                return true;
+            else
+                return false;
+        }
+        bool IsErrorModule(ModuleBase module)
+        {
+            if (module.p_eState == ModuleBase.eState.Error)
+                return true;
+            else
+                return false;
         }
         #endregion
 
