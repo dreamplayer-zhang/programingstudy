@@ -360,11 +360,11 @@
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Center"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding p_mainVision.p_dPellicleShiftDistance}"
+                                <TextBlock Text="{Binding p_mainVision.p_dPellicleShiftDistance, StringFormat={}\{0:n4\} mm}"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="Angle"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding p_mainVision.p_dPellicleShiftAngle}"
+                                <TextBlock Text="{Binding p_mainVision.p_dPellicleShiftAngle, StringFormat={}\{0:n4\} º}"
                                            VerticalAlignment="Center" />
                             </UniformGrid>
                             <Grid Grid.Row="1"

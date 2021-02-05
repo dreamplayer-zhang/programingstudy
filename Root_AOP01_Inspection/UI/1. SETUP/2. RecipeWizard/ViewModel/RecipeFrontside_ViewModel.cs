@@ -181,7 +181,7 @@ namespace Root_AOP01_Inspection
                     if (p_bEnablePellicleShift)
                     {
                         MainVision.Run_PellicleShiftAndRotation pellicleShiftAndRotation = (MainVision.Run_PellicleShiftAndRotation)mainVision.CloneModuleRun("PellicleShiftAndRotation");
-                        pellicleShiftAndRotation.m_dNGSpecDistance_um = p_dPellicleShiftAndRotationShiftSpec;
+                        pellicleShiftAndRotation.m_dNGSpecDistance_mm = p_dPellicleShiftAndRotationShiftSpec;
                         pellicleShiftAndRotation.m_dNGSpecDegree = p_dPellicleShiftAndRotationRotationSpec;
                         mainVision.StartRun(pellicleShiftAndRotation);
                     }
