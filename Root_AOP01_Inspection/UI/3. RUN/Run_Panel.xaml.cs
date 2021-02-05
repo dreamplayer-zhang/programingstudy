@@ -5,9 +5,11 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using RootTools;
 using RootTools.Module;
+using RootTools.Control;
 using Root_AOP01_Inspection.Module;
 using Root_EFEM.Module;
 using Root_AOP01_Inspection.UI._3._RUN;
+using System.Threading;
 
 namespace Root_AOP01_Inspection
 {
@@ -80,9 +82,12 @@ namespace Root_AOP01_Inspection
         private void M_timer_Tick(object sender, EventArgs e)
         {
             CheckMainVisionState();
-            ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_rtrarm.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
-            ExistVision.Background = (m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null)||
-                (m_backsidevision.m_diExistVision.p_bIn == true && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
+            //ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_rtrarm.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
+            ExistRTR.Background = CheckChattering(m_arm.m_diCheckVac,true,500) == false && m_rtrarm.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
+            //ExistVision.Background = (m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null)||
+            //    (m_backsidevision.m_diExistVision.p_bIn == true && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
+            ExistVision.Background = (CheckChattering(m_mainvision.m_diExistVision, true, 500) == false && m_mainvision.p_infoWafer != null) ||
+                (CheckChattering(m_backsidevision.m_diExistVision, true, 500) == false && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
             if (m_loadport[0].m_swLotTime.IsRunning) textblockRunTime1.Text = m_loadport[0].p_swLotTime;
             if (m_loadport[1].m_swLotTime.IsRunning) textblockRunTime2.Text = m_loadport[1].p_swLotTime;
             ButtonInitialize.IsEnabled = IsEnableInitialization();
@@ -166,7 +171,7 @@ namespace Root_AOP01_Inspection
         {
             if (IsEnableInitialization() == false) return;
             EQ.p_bStop = false;
-            m_handler.m_process.m_nSequencePercent = 0;
+            m_handler.m_process.m_dSequencePercent = 0;
             m_handler.m_process.ClearInfoWafer();
             m_handler.m_nRnR = 0; //Init 할때 RNR 카운트초기화
             m_handler.m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState = InfoCarrier.eState.Placed;  //210201 모니터링필요 EQ.Stop 되고 이닛누르면 간헐적으로 Loadport Docking 상태로 무언정지 생김
@@ -269,5 +274,30 @@ namespace Root_AOP01_Inspection
             else if (m_mainvision.p_eState == ModuleBase.eState.Ready && m_backsidevision.p_eState == ModuleBase.eState.Ready)
                 MainVision_State.Text = "Ready";
         }
+        public bool CheckChattering(DIO_I input, bool bType, double dChatteringTime, double dChatteringPercent = 0.5)
+        {
+            int nChattering = 0;
+            for(int i=0;i<dChatteringTime; i++)
+            {
+                if (input.p_bIn == bType)
+                {
+                    Thread.Sleep(1);
+                    nChattering++;
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+            if(nChattering>(int)(dChatteringTime *(1-dChatteringPercent)))
+            {
+                return false;
+            }
+            else
+                return true;
+                
+        }
+
     }
 }
