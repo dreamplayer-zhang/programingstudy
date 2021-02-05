@@ -10,8 +10,6 @@ namespace Root_EFEM.Module
 {
     public class Gem_XGem300Pro : ModuleBase
     {
-        IEngineer m_engineer;
-        IGem m_gem;
         //ILoadport m_loadport;
         List<ILoadport> m_aLoadport = new List<ILoadport>();
         //public OHT_Semi[] m_OHT = new OHT_Semi[3];

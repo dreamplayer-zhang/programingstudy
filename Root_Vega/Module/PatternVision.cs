@@ -1478,7 +1478,7 @@ namespace Root_Vega.Module
                 bool bUseRADS = m_grabMode.GetUseRADS();
 
                 // AutoIllumination variable
-                bool bFeatureScanned = false;
+                //bool bFeatureScanned = false;
                 bool bFoundFeature = false;
                 CPoint cptStandard = new CPoint(0, 0);
                 int nLightCalKeyStartOffsetX = 0;
@@ -1655,7 +1655,7 @@ namespace Root_Vega.Module
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
 
                 }

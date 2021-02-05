@@ -12,6 +12,10 @@ namespace RootTools.Camera.Dalsa
     public class CameraDalsa : NotifyProperty, ICamera
     {
         public event EventHandler Grabed;
+        void _Dummy()
+        {
+            if (Grabed != null) Grabed(null, null);
+        }
 
         #region Property
         public string p_id { get; set; }
