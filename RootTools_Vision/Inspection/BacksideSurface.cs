@@ -49,7 +49,7 @@ namespace RootTools_Vision
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterBackside.IndexChannel);
             byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameterBackside.IndexChannel);
 
-            bool isBackside = false;
+            //bool isBackside = false;
 
             // BACKSIDE
             //if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == false)

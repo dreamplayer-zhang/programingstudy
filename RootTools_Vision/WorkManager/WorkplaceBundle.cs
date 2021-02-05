@@ -13,7 +13,7 @@ namespace RootTools_Vision.delete
 
     public class WorkplaceBundle : Collection<Workplace>
     {
-        public event EventStateChanged WorkplaceStateChanged;
+        //public event EventStateChanged WorkplaceStateChanged;
 
 
         #region [Variables]

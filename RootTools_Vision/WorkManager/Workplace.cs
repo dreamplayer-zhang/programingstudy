@@ -42,8 +42,12 @@ namespace RootTools_Vision.delete
     public class Workplace
     {
         public event EventPositionUpdated PositionUpdated;
-
         public event EventPositionIntialized PositionIntialized;
+        void _Dummy()
+        {
+            if (PositionUpdated != null) PositionUpdated(null);
+            if (PositionIntialized != null) PositionIntialized(null, 0, 0); 
+        }
 
         private WORK_TYPE state;
 

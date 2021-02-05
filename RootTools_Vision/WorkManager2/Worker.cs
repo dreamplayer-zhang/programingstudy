@@ -42,7 +42,7 @@ namespace RootTools_Vision
 
         public event EventWorkCompleted WorkCompleted;
         public event EventWorkCompleted WorkIncompleted;
-        public event EventRequestStop RequestStop;
+        //public event EventRequestStop RequestStop;
 
         private byte[] workplaceBufferR_GRAY;
         private byte[] workplaceBufferG;

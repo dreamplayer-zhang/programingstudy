@@ -31,7 +31,7 @@ namespace RootTools_Vision.delete
     {
 
         public delegate void ChangeMode(object e);
-        public event ChangeMode changeMode;
+        //public event ChangeMode changeMode;
 
         protected string m_sName;
         public string p_sName 

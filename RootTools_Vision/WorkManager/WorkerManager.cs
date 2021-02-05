@@ -30,7 +30,7 @@ namespace RootTools_Vision.delete
         WORK_TYPE excuteCondition = WORK_TYPE.NONE;
 
 
-        private int m_nLine = 0;
+        //private int m_nLine = 0;
 
         public WorkerManager(List<Worker> _workers, WORK_TYPE _resultState, WORK_TYPE _excuteCondition, STATE_CHECK_TYPE _state_check_type = STATE_CHECK_TYPE.CHIP)
         {
