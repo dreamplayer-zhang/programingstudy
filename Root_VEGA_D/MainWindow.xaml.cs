@@ -86,7 +86,7 @@ namespace Root_VEGA_D
         void Init()
         {
             m_engineer.Init("VEGA_D");
-            //engineerUI.Init(m_engineer);
+            engineerUI.Init(m_engineer);
         }
 
         void ThreadStop()
