@@ -63,6 +63,14 @@ namespace RootTools_Vision
         }
     }
 
+    public class ProcessDefectEdgeDoneEventArgs : EventArgs
+    {
+        public ProcessDefectEdgeDoneEventArgs()
+        {
+
+        }
+    }
+
     public class ProcessMeasurementDoneEventArgs : EventArgs
     {
         public ProcessMeasurementDoneEventArgs()

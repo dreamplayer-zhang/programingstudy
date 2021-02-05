@@ -3,6 +3,7 @@ using RootTools_Vision;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -215,7 +216,16 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Command]
-
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.ImageViewerVM.DisplayBox();
+                });
+            }
+        }
         public RelayCommand btnFeatureBoxClearCommand
         {
             get => new RelayCommand(() =>

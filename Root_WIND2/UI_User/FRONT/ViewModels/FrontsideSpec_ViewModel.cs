@@ -207,6 +207,14 @@ namespace Root_WIND2.UI_User
         
 
         #region ICommand
+        public ICommand LoadedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                this.ImageViewerVM.DisplayBox();
+            });
+        }
+
         public ICommand btnAddInspItem
         {
             get

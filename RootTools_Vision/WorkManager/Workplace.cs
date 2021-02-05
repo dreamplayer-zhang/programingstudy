@@ -1,30 +1,19 @@
-﻿using System;
+﻿using RootTools;
+using RootTools.Database;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RootTools.Database;
 
-namespace RootTools_Vision.delete
+namespace RootTools_Vision
 {
-    public enum WORK_TYPE
-    {
-        //32개 가능?
-        NONE                = 0b0000000,
-        SNAP                = 0b0000010,
-        ALIGNMENT           = 0b0000100,
-        INSPECTION          = 0b0001000,
-        DEFECTPROCESS       = 0b0010000,
-        DEFECTPROCESS_WAFER = 0b0100000,
-        MEASUREMENTPROCESS  = 0b1000000,
-    }
-
     public enum WORKPLACE_SUB_STATE
     {
-        WAFER_POSITION_SUCCESS      = 0b00000001,
-        POSITION_SUCCESS            = 0b00000010,
-        LINE_FIRST_CHIP             = 0b00000100,
-        BAD_CHIP                    = 0b10000000,
+        WAFER_POSITION_SUCCESS = 0b00000001,
+        POSITION_SUCCESS = 0b00000010,
+        LINE_FIRST_CHIP = 0b00000100,
+        BAD_CHIP = 0b10000000,
     }
 
     public enum PREWORKDATA_KEY // PreworkdataList의 index로 반드시 0부터 빈틈없이 추가
@@ -33,95 +22,175 @@ namespace RootTools_Vision.delete
         D2D_SCALE_MAP = 1,
     }
 
-    public delegate void EventPositionUpdated(object obj);
-
-    public delegate void EventPositionIntialized(object obj, int transX, int transY);
-
-
-
-    public class Workplace
+    /// <summary>
+    /// - 검사할 영역의 정보를 포함합니다.
+    /// - Image Buffer를 직접할당하지 않습니다.
+    /// - offset과 trans 이외의 값은 처음 생성할 떄 값을 할당받고 변경되지 않습니다.
+    /// </summary>
+    public class Workplace : ObservableObject
     {
-        public event EventPositionUpdated PositionUpdated;
-        public event EventPositionIntialized PositionIntialized;
-        void _Dummy()
-        {
-            if (PositionUpdated != null) PositionUpdated(null);
-            if (PositionIntialized != null) PositionIntialized(null, 0, 0); 
-        }
-
-        private WORK_TYPE state;
-
-        public WORK_TYPE STATE
-        {
-            get { return state; }
-            set 
-            { 
-                state = value;
-
-                WorkEventManager.OnWorkplaceStateChanged(this, new WorkplaceStateChangedEventArgs(this));
-            }
-        }
-
-          
-
-        #region [Variables]
-        private int index;
-        private int mapPositionX;
-        private int mapPositionY;
-        private int positionX;  // 사용 용도에 따라서 Image Position이나 Axis 좌표가 될 수 있음 ex) WIND, CAMELLIA
-        private int positionY;
+        #region [Members]
+        private readonly int index;
+        private readonly int mapIndexX;
+        private readonly int mapIndexY;
+        private readonly int positionX;
+        private readonly int positionY;
+        private int offsetX;
+        private int offsetY;
         private int transX;
         private int transY;
-        private int sizeX;
-        private int sizeY;
-        private byte[] workplaceBufferR_GRAY;
-        private byte[] workplaceBufferG;
-        private byte[] workplaceBufferB;
+        private readonly int width;
+        private readonly int height;
 
         private IntPtr sharedBufferR_GRAY;
         private IntPtr sharedBufferG;
         private IntPtr sharedBufferB;
+
         private int sharedBufferWidth;
         private int sharedBufferHeight;
         private int sharedBufferByteCnt;
 
+        private WORK_TYPE workState;
+
         private bool isOccupied = false;
-        private List<Defect> defectList = new List<Defect>();
-        //private List<object> preworkDataList = new List<object>();  // Prework에서 생성한 데이터를 넣는 곳으로 예를 들어 D2D의 골든 이미지가 있다.
 
         private Dictionary<PREWORKDATA_KEY, object> preworkdataDicitonary = new Dictionary<PREWORKDATA_KEY, object>();
 
         private int subState;
+
+        private List<Defect> defectList = new List<Defect>();
+        private List<Measurement> measure = new List<Measurement>();
+
         #endregion
 
         #region [Getter Setter]
-        public int Index { get => index; set => index = value; }// Index는 Workbundle에서 자동설정
-        public int MapPositionX { get => mapPositionX; private  set => mapPositionX = value; }
-        public int MapPositionY { get => mapPositionY; private  set => mapPositionY = value; }
-        public int PositionX { get => positionX; private set => positionX = value; }
-        public int PositionY { get => positionY; private  set => positionY = value; }
-        public int TransX { get => transX; private  set => transX = value; }
-        public int TransY { get => transY; private  set => transY = value; }
-        public int BufferSizeX { get => sizeX; private set => sizeX = value; }
-        public int BufferSizeY { get => sizeY; private set => sizeY = value; }
-        
-        public byte[] WorkplaceBufferR_GRAY
-        { 
-            get => workplaceBufferR_GRAY; 
-            private set => workplaceBufferR_GRAY = value; 
+        /// <summary>
+        /// WorkplaceBundle 안에서 순서
+        /// </summary>
+        public int Index
+        {
+            get => this.index;
         }
 
-        public byte[] WorkplaceBufferG
+        /// <summary>
+        /// Map에서의 위치 좌표 X
+        /// </summary>
+        public int MapIndexX
         {
-            get => workplaceBufferG;
-            private set => workplaceBufferG = value;
-        }
-        public byte[] WorkplaceBufferB
-        {
-            get => workplaceBufferB;
-            private set => workplaceBufferB = value;
+            get => this.mapIndexX;
         }
 
+        /// <summary>
+        /// Map에서의 위치 좌표 Y
+        /// </summary>
+        public int MapIndexY
+        {
+            get => this.mapIndexY;
+        }
+
+        /// <summary>
+        /// Buffer 상에서 최초에 생성된(티칭된) 좌표 Y
+        /// </summary>
+
+        public int PositionOriginX
+        {
+            get => this.positionX;
+        }
+
+        /// <summary>
+        /// Buffer 상에서 최초에 생성된(티칭된) 좌표 Y
+        /// </summary>
+        public int PositionOriginY
+        {
+            get => this.positionY;
+        }
+
+        /// <summary>
+        /// Buffer 상에서 Master Position에 의해서 변경된 좌표 X
+        /// </summary>
+        public int PositionOffsetX
+        {
+            get => this.positionX + this.offsetX;
+        }
+
+        /// <summary>
+        /// Buffer 상에서 Master Position에 의해서 변경된 좌표 Y
+        /// </summary>
+        public int PositionOffsetY
+        {
+            get => this.positionY + this.offsetY;
+        }
+
+        /// <summary>
+        /// Buffer 상에서 Master Position과 Chip Position에 의해서 변경된 좌표 X
+        /// </summary>
+        public int PositionX
+        {
+            get => this.positionX + this.offsetX + this.transX;
+        }
+
+        /// <summary>
+        /// Buffer 상에서  Master Position에 Chip Position에 의해서 변경된 좌표 Y
+        /// </summary>
+        public int PositionY
+        {
+            get => this.positionY + this.offsetY + this.transY;
+        }
+
+        public int TransX
+        {
+            get => this.transX;
+        }
+
+        public int TransY
+        {
+            get => this.transY;
+        }
+
+        public int OffsetX
+        {
+            get => this.offsetX;
+        }
+
+        public int OffsetY
+        {
+            get => this.offsetY;
+        }
+
+        public int Width
+        {
+            get => this.width;
+        }
+
+        public int Height
+        {
+            get => this.height;
+        }
+
+        public WORK_TYPE WorkState
+        {
+            get => this.workState;
+            set
+            {
+                SetProperty(ref this.workState, value);
+                WorkEventManager.OnWorkplaceStateChanged(this, new WorkplaceStateChangedEventArgs(this));
+            }
+        }
+
+        public int SharedBufferWidth
+        {
+            get => this.sharedBufferWidth;
+        }
+
+        public int SharedBufferHeight
+        {
+            get => this.sharedBufferHeight;
+        }
+
+        public int SharedBufferByteCnt
+        {
+            get => this.sharedBufferByteCnt;
+        }
 
         public IntPtr SharedBufferR_GRAY
         {
@@ -138,46 +207,131 @@ namespace RootTools_Vision.delete
             get => sharedBufferB;
             private set => sharedBufferB = value;
         }
-        public int SharedBufferWidth { get => sharedBufferWidth; private set => sharedBufferWidth = value; }
-        public int SharedBufferHeight { get => sharedBufferHeight; private set => sharedBufferHeight = value; }
-        public int SharedBufferByteCnt { get => sharedBufferByteCnt; private set => sharedBufferByteCnt = value; }
-        public bool IsOccupied { get => isOccupied; set => isOccupied = value; }
-        
-        public List<Defect> DefectList { get => defectList; set => defectList = value; }
 
-
-        // 이 파라매터는 직접 호출하는 것을 지양하고, SetPreworkData()/GetPreworkData()함수를 통해서 호출
-        private Dictionary<PREWORKDATA_KEY, object> PreworkDataDictionary { get => preworkdataDicitonary; set => preworkdataDicitonary = value; }  
-        #endregion
-
-        public Workplace()
+        public bool IsOccupied
         {
-            //Reset();
+            get => this.isOccupied;
+            set => this.isOccupied = value;
         }
 
-        public void Reset()
+
+
+        public List<Defect> DefectList
         {
-            this.STATE = WORK_TYPE.NONE;
+            get => this.defectList;
+            set => this.defectList = value;
+        }
+        private Dictionary<PREWORKDATA_KEY, object> PreworkDataDictionary { get => preworkdataDicitonary; set => preworkdataDicitonary = value; }
 
-            this.PreworkDataDictionary.Clear();
+        #endregion
 
-            foreach(PREWORKDATA_KEY key in Enum.GetValues(typeof(PREWORKDATA_KEY)))
+
+        public Workplace(int mapX, int mapY, int posX, int posY, int width, int height, int index)
+        {
+            this.mapIndexX = mapX;
+            this.mapIndexY = mapY;
+            this.positionX = posX;
+            this.positionY = posY;
+            this.width = width;
+            this.height = height;
+            this.index = index;
+        }
+
+        /// <summary>
+        /// 검사에서 사용할 SharedBuffer를 설정합니다.
+        /// </summary>
+        /// <param name="sharedBufferR_Gray">R채널 혹은 Gray채널 버퍼 포인터</param>
+        /// <param name="sharedBufferWidth">버퍼 너비</param>
+        /// <param name="sharedBufferHeight">버퍼 높이</param>
+        /// <param name="sharedBufferByteCnt">버퍼 채널 수</param>
+        /// <param name="sharedBufferG">G채널 버퍼 포인터(없을 경우 IntPtr.Zero로 셋팅)</param>
+        /// <param name="sharedBufferB">B채널 버퍼 포인터(없을 경우 IntPtr.Zero로 셋팅)</param>
+        public void SetSharedBuffer(IntPtr sharedBufferR_GRAY, int sharedBufferWidth, int sharedBufferHeight, int sharedBufferByteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB)
+        {
+            this.sharedBufferR_GRAY = sharedBufferR_GRAY;
+            this.sharedBufferWidth = sharedBufferWidth;
+            this.sharedBufferHeight = sharedBufferHeight;
+            this.sharedBufferByteCnt = sharedBufferByteCnt;
+
+            if (sharedBufferByteCnt != 1)
             {
-                this.preworkdataDicitonary.Add(key, null);
+                if (sharedBufferB == IntPtr.Zero)
+                    throw new ArgumentException("SharedBufferB가 설정되지 않았습니다(ByteCnt == 3).", nameof(sharedBufferB));
+
+                if (sharedBufferG == IntPtr.Zero)
+                    throw new ArgumentException("SharedBufferG가 설정되지 않았습니다(ByteCnt == 3).", nameof(sharedBufferG));
+
+                this.sharedBufferG = sharedBufferG;
+                this.sharedBufferB = sharedBufferB;
+            }
+            else
+            {
+                sharedBufferB = IntPtr.Zero;
+                sharedBufferG = IntPtr.Zero;
+            }
+        }
+
+        public void SetSharedBuffer(SharedBufferInfo info)
+        {
+            this.sharedBufferR_GRAY = info.PtrR_GRAY;
+            this.SharedBufferG = info.PtrG;
+            this.SharedBufferB = info.PtrB;
+
+            this.sharedBufferWidth = info.Width;
+            this.sharedBufferHeight = info.Height;
+            this.sharedBufferByteCnt = info.ByteCnt;
+        }
+
+        public IntPtr GetSharedBuffer(IMAGE_CHANNEL channel)
+        {
+            switch (channel)
+            {
+                case IMAGE_CHANNEL.R_GRAY:
+                    return sharedBufferR_GRAY;
+                case IMAGE_CHANNEL.G:
+                    return sharedBufferG;
+                case IMAGE_CHANNEL.B:
+                    return sharedBufferB;
             }
 
-            workplaceBufferR_GRAY = null;
-            workplaceBufferG = null;
-            workplaceBufferB = null;
+            return sharedBufferR_GRAY;
+        }
+
+        public void SetOffset(int _offsetX, int _offsetY)
+        {
+            this.offsetX = _offsetX;
+            this.offsetY = _offsetY;
+        }
+
+        public void AddOffset(int _offsetX, int _offsetY)
+        {
+            this.offsetX += _offsetX;
+            this.offsetY += _offsetY;
+        }
+
+        public void SetTrans(int _transX, int _transY)
+        {
+            this.transX = _transX;
+            this.transY = _transY;
+        }
+
+        public bool GetSubState(WORKPLACE_SUB_STATE state) => (subState & (int)state) == (int)state;
+
+        public void SetSubState(WORKPLACE_SUB_STATE state, bool bTrue)
+        {
+            int tempState = GetSubState(state) ? subState - (int)state : subState;
+
+            if (bTrue) subState = tempState + (int)state;
+            else subState = tempState;
         }
 
         public void SetPreworkData(PREWORKDATA_KEY key, object dataObj)
         {
-            if(this.preworkdataDicitonary.Count != Enum.GetValues(typeof(PREWORKDATA_KEY)).Length)
+            if (this.preworkdataDicitonary.Count != Enum.GetValues(typeof(PREWORKDATA_KEY)).Length)
             {
                 foreach (PREWORKDATA_KEY tempkey in Enum.GetValues(typeof(PREWORKDATA_KEY)))
                 {
-                    if(this.preworkdataDicitonary.ContainsKey(tempkey) == false)
+                    if (this.preworkdataDicitonary.ContainsKey(tempkey) == false)
                         this.preworkdataDicitonary.Add(tempkey, null);
                 }
             }
@@ -186,117 +340,6 @@ namespace RootTools_Vision.delete
             //this.preworkDataList.Add(dataObj);
         }
 
-        public object GetPreworkData(PREWORKDATA_KEY key)
-        {
-            if (preworkdataDicitonary.Count == 0) return null;
-
-            return this.preworkdataDicitonary[key];   
-        }
-
-
-
-        public Workplace(int mapX, int mapY, int posX, int posY, int szX, int szY, int idx = 0) // Index는 Workbundle에서 자동설정
-        {
-            this.mapPositionX = mapX;
-            this.mapPositionY = mapY;
-            this.positionX = posX;
-            this.positionY = posY;
-            this.sizeX = szX;
-            this.sizeY = szY;
-            this.index = idx;
-            this.workplaceBufferR_GRAY = null;
-            this.workplaceBufferG = null;
-            this.workplaceBufferB = null;
-
-            this.workplaceBufferR_GRAY = new byte[szX * szY];
-            this.workplaceBufferG = new byte[szX * szY];
-            this.workplaceBufferB = new byte[szX * szY];
-        }
-
-
-        /// <summary>
-        /// WORKPLACE_SUB_STATE 에 해당하는 bit값이 true인 false인지 비교한다. 
-        /// </summary>
-        /// <returns></returns>
-
-        public bool GetSubState(WORKPLACE_SUB_STATE state) => (subState & (int)state) == (int)state;
-
-        public void SetSubState(WORKPLACE_SUB_STATE state, bool bTrue)
-        {
-            int tempState = GetSubState(state)? subState - (int)state : subState;
-
-            if (bTrue) subState = tempState + (int)state;
-            else subState = tempState;
-        }
-
-        public IntPtr GetSharedBuffer(IMAGE_CHANNEL channel)
-        {
-            switch (channel)
-            {
-                case IMAGE_CHANNEL.R_GRAY:
-                    return SharedBufferR_GRAY;
-                case IMAGE_CHANNEL.G:
-                    return SharedBufferG;                    
-                case IMAGE_CHANNEL.B:
-                    return SharedBufferB;
-            }
-
-            return SharedBufferR_GRAY;
-        }
-
-        public byte[] GetWorkplaceBuffer(IMAGE_CHANNEL channel)
-        {
-            switch (channel)
-            {
-                case IMAGE_CHANNEL.R_GRAY:
-                    return workplaceBufferR_GRAY;
-                case IMAGE_CHANNEL.G:
-                    return workplaceBufferG;
-                case IMAGE_CHANNEL.B:
-                    return workplaceBufferB;
-            }
-
-            return workplaceBufferR_GRAY;
-        }
-
-        public void SetSharedBuffer(IntPtr _sharedBuffer, int width, int height, int byteCnt)
-        {
-            this.sharedBufferR_GRAY = _sharedBuffer;
-            this.sharedBufferWidth = width;
-            this.sharedBufferHeight = height;
-            this.sharedBufferByteCnt = byteCnt;
-        }
-        public void SetSharedRGBBuffer(IntPtr _sharedBufferR, IntPtr _sharedBufferG, IntPtr _sharedBufferB)
-        {
-            this.sharedBufferR_GRAY = _sharedBufferR;
-            this.sharedBufferG = _sharedBufferG;
-            this.sharedBufferB = _sharedBufferB;
-        }
-        public void SetImagePosition(int posX, int posY)
-        {
-            this.positionX = posX;
-            this.positionY = posY;
-        }
-
-        public void SetImagePositionByTrans(int transX, int transY, bool bApplyAll = false)
-        {
-            this.positionX += transX;
-            this.positionY += transY;
-
-            this.transX = transX;
-            this.transY = transY;
-        }
-
-        public void MoveImagePosition(int transX, int transY, bool bUpdate = false)
-        {
-            if (transX == 0 && transY == 0) return;
-
-            this.positionX += transX;
-            this.positionY += transY;
-
-            this.transX = transX;
-            this.transY = transY;
-        }
         public void AddDefect(string sInspectionID, int defectCode, float defectSz, float defectVal, float defectAbsLeft, float defectAbsTop, float defectW, float defectH, int chipIdxX, int chipIdxY) // SurfaceDefectParam
         {
             Defect defect = new Defect(sInspectionID,
@@ -311,6 +354,51 @@ namespace RootTools_Vision.delete
                 chipIdxY);
 
             defectList.Add(defect);
+        }
+
+        public void AddMeasure()
+        {
+            Measurement measure = new Measurement();
+
+            //defectList.Add(measure);
+        }
+
+        public object GetPreworkData(PREWORKDATA_KEY key)
+        {
+            if (preworkdataDicitonary.Count == 0) return null;
+
+            return this.preworkdataDicitonary[key];
+        }
+
+        public void Reset()
+        {
+            this.WorkState = WORK_TYPE.NONE;
+
+            this.preworkdataDicitonary.Clear();
+            foreach (PREWORKDATA_KEY key in Enum.GetValues(typeof(PREWORKDATA_KEY)))
+            {
+                this.preworkdataDicitonary.Add(key, null);
+            }
+
+            this.offsetX = 0;
+            this.offsetY = 0;
+            this.transX = 0;
+            this.transY = 0;
+
+            this.isOccupied = false;
+        }
+
+
+        /// <summary>
+        /// 초기 설정값과 SharedBuffer만 카피?
+        /// </summary>
+        public Workplace Clone()
+        {
+            Workplace wp = new Workplace(mapIndexX, mapIndexY, positionX, positionY, Width, Height, Index);
+
+            wp.SetSharedBuffer(this.sharedBufferR_GRAY, this.sharedBufferWidth, this.SharedBufferHeight, this.sharedBufferHeight, this.sharedBufferG, this.sharedBufferB);
+
+            return wp;
         }
     }
 }
