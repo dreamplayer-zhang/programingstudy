@@ -36,13 +36,21 @@ namespace RootTools_Vision.delete
         }
         #endregion
 
-
         #region [ProcessDefectWaferDone]
         public static event EventHandler<ProcessDefectWaferDoneEventArgs> ProcessDefectWaferDone;
 
         public static void OnProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs args)
         {
             ProcessDefectWaferDone?.Invoke(obj, args);
+        }
+        #endregion
+
+        #region [ProcessDefectEdgeDone]
+        public static event EventHandler<ProcessDefectEdgeDoneEventArgs> ProcessDefectEdgeDone;
+
+        public static void OnProcessDefectEdgeDone(object obj, ProcessDefectEdgeDoneEventArgs args)
+        {
+            ProcessDefectEdgeDone?.Invoke(obj, args);
         }
         #endregion
 
