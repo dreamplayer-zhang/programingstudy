@@ -5,73 +5,69 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision.delete
+namespace RootTools_Vision
 {
-    public class WorkBundle : Collection<WorkBase>
+    public class WorkBundle : ObservableCollection<WorkBase>
     {
-        private Workplace workplace;
-        private WorkplaceBundle workplaceBundle;
-
-        public Workplace Workplace 
-        { 
-            get => workplace; 
-            set
-            { 
-                this.workplace = value;
-                foreach (WorkBase work in this)
-                {
-                    work.SetWorkplace(this.workplace);
-                }
-
-            } 
+        public void SetRecipe(RecipeBase recipe)
+        {
+            foreach (WorkBase work in this)
+            {
+                work.SetRecipe(recipe);
+            }
         }
 
-        public WorkplaceBundle WorkplaceBundle
-        { 
-            get => workplaceBundle;
-            set
+        public void SetWorkplace(Workplace workplace)
+        {
+            foreach (WorkBase work in this)
             {
-                this.workplaceBundle = value;
-                foreach (WorkBase work in this)
-                {
-                    work.SetWorkplaceBundle(this.workplaceBundle);
-                }
+                work.SetWorkplace(workplace);
             }
+        }
+
+        public void SetWorkplacBundle(WorkplaceBundle workplaceBundle)
+        {
+            foreach (WorkBase work in this)
+            {
+                work.SetWorkplaceBundle(workplaceBundle);
+            }
+        }
+
+        public void SetWorkplaceBuffer(byte[] bufferR_GRAY, byte[] bufferG, byte[] bufferB)
+        {
+            foreach(WorkBase work in this)
+            {
+                work.SetWorkplaceBuffer(bufferR_GRAY, bufferG, bufferB);
+            }
+        }
+
+        public void Reset()
+        {
+            foreach (WorkBase w in this)
+                w.Reset();
         }
 
         public WorkBundle Clone()
         {
-            WorkBundle bundle = new WorkBundle();
-            foreach(WorkBase work in this)
+            WorkBundle works = new WorkBundle();
+            foreach(WorkBase wb in this)
             {
-                bundle.Add(work.Clone());
+                works.Add(wb.Clone());
             }
-            bundle.Workplace = this.Workplace;
-            bundle.workplaceBundle = this.workplaceBundle;
-
-            return bundle;
+            return works;
         }
 
-        //public static WorkBundle CreateWorkBundle(Recipe _recipe, WorkplaceBundle _workplaceBundle)
+        // 다시 고려
+
+        //public WorkBundle Clone()
         //{
-        //    List<ParameterBase> paramList = _recipe.ParameterItemList;
         //    WorkBundle bundle = new WorkBundle();
-
-        //    foreach(ParameterBase param in paramList)
+        //    foreach(WorkBase work in this)
         //    {
-        //        WorkBase work = (WorkBase)Tools.CreateInstance(param.InspectionType);
-        //        work.SetRecipe(_recipe);
-        //        work.SetWorkplaceBundle(_workplaceBundle);
-
-        //        bundle.Add(work);
+        //        bundle.Add(work.Clone());
         //    }
-
-        //    ProcessDefect processDefect = new ProcessDefect();
-        //    ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-        //    processDefect_Wafer.SetRecipe(_recipe);
-
-        //    bundle.Add(processDefect);
-        //    bundle.Add(processDefect_Wafer);
+        //    bundle.Workplace = this.Workplace;
+        //    bundle.workplaceBundle = this.workplaceBundle;
 
         //    return bundle;
         //}
