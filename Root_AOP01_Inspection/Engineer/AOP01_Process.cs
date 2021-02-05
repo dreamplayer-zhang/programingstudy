@@ -400,7 +400,11 @@ namespace Root_AOP01_Inspection.Engineer
             m_dSequencePercent += m_dOneSequencePercent;
             InfoWafer infoWafer = sequence.m_infoWafer;
             if (infoWafer.m_qProcess.Count > 0) infoWafer.m_qProcess.Dequeue();
-            if (m_qSequence.Count == 0) ClearInfoWafer();
+            if (m_qSequence.Count == 0)
+            {
+                m_dSequencePercent = 100;
+                ClearInfoWafer();
+            }
             RunTree(Tree.eMode.Init);
             return "OK";
         }

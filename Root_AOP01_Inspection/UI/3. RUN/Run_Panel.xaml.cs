@@ -82,12 +82,12 @@ namespace Root_AOP01_Inspection
         private void M_timer_Tick(object sender, EventArgs e)
         {
             CheckMainVisionState();
-            //ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_rtrarm.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
-            ExistRTR.Background = CheckChattering(m_arm.m_diCheckVac,true,500) == false && m_rtrarm.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
-            //ExistVision.Background = (m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null)||
-            //    (m_backsidevision.m_diExistVision.p_bIn == true && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
-            ExistVision.Background = (CheckChattering(m_mainvision.m_diExistVision, true, 500) == false && m_mainvision.p_infoWafer != null) ||
-                (CheckChattering(m_backsidevision.m_diExistVision, true, 500) == false && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
+            ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_rtrarm.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
+            ExistVision.Background = (m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null)||
+                (m_backsidevision.m_diExistVision.p_bIn == true && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
+            //ExistRTR.Background = CheckChattering(m_arm.m_diCheckVac,true,500) == false && m_rtrarm.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
+            //ExistVision.Background = (CheckChattering(m_mainvision.m_diExistVision, true, 500) == false && m_mainvision.p_infoWafer != null) ||
+            //    (CheckChattering(m_backsidevision.m_diExistVision, true, 500) == false && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
             if (m_loadport[0].m_swLotTime.IsRunning) textblockRunTime1.Text = m_loadport[0].p_swLotTime;
             if (m_loadport[1].m_swLotTime.IsRunning) textblockRunTime2.Text = m_loadport[1].p_swLotTime;
             ButtonInitialize.IsEnabled = IsEnableInitialization();
@@ -274,30 +274,30 @@ namespace Root_AOP01_Inspection
             else if (m_mainvision.p_eState == ModuleBase.eState.Ready && m_backsidevision.p_eState == ModuleBase.eState.Ready)
                 MainVision_State.Text = "Ready";
         }
-        public bool CheckChattering(DIO_I input, bool bType, double dChatteringTime, double dChatteringPercent = 0.5)
-        {
-            int nChattering = 0;
-            for(int i=0;i<dChatteringTime; i++)
-            {
-                if (input.p_bIn == bType)
-                {
-                    Thread.Sleep(1);
-                    nChattering++;
-                }
-                else
-                {
-                    break;
-                }
+        //public bool CheckChattering(DIO_I input, bool bType, double dChatteringTime, double dChatteringPercent = 0.5)
+        //{
+        //    int nChattering = 0;
+        //    for(int i=0;i<dChatteringTime; i++)
+        //    {
+        //        if (input.p_bIn == bType)
+        //        {
+        //            Thread.Sleep(1);
+        //            nChattering++;
+        //        }
+        //        else
+        //        {
+        //            break;
+        //        }
 
-            }
-            if(nChattering>(int)(dChatteringTime *(1-dChatteringPercent)))
-            {
-                return false;
-            }
-            else
-                return true;
+        //    }
+        //    if(nChattering>(int)(dChatteringTime *(1-dChatteringPercent)))
+        //    {
+        //        return false;
+        //    }
+        //    else
+        //        return true;
                 
-        }
+        //}
 
     }
 }
