@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Root_WIND2.UI_User
 {
@@ -175,6 +176,17 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Command]
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+
+                });
+            }
+        }
+
         public RelayCommand btnOriginClearCommand
         {
             get
