@@ -9,285 +9,309 @@
              xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
              xmlns:mouse="clr-namespace:mousebehavior;assembly=RootTools"
              mc:Ignorable="d" 
-             d:DesignHeight="838" d:DesignWidth="1683" 
-             Background="{StaticResource PanelBackGround}">
+             d:DesignHeight="800" d:DesignWidth="1600">
+    <Grid Background="{StaticResource main_view_background}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <WrapPanel/>
 
-    <StackPanel>
-        <Grid Height="838"
-              Background="{StaticResource main_view_background}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="4*"/>
-                <ColumnDefinition Width="5*"/>
-            </Grid.ColumnDefinitions>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                </Grid.RowDefinitions>
-                <WrapPanel/>
-                <Grid Grid.Column="0" Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="177*"/>
-                        <ColumnDefinition Width="50*"/>
-                    </Grid.ColumnDefinitions>
-                    <GroupBox Grid.Column="0" Margin="4,0,4,4"
+            <Grid Grid.Column="0" Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="177*"/>
+                    <ColumnDefinition Width="50*"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Grid.Column="0" Margin="4,0,4,4"
                                   Style="{StaticResource main_view_groupbox}"
-                                  Header="Image Viewer">
-                        <tools:RootViewer DataContext="{Binding DrawToolVM}"/>
-                    </GroupBox>
-                    <Grid Grid.Column="2">
+                                  Header="Image Viewer"
+                                  DataContext="{Binding DrawToolVM}">
+                    <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition/>
+                            <RowDefinition Height="40"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <GroupBox Grid.Row="0" Margin="4,0,4,4"
+
+                        <StackPanel Grid.Column="1"  Orientation="Horizontal">
+                            <TextBlock Text="Image" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Button Content="Open" Command="{Binding btnOpen}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                            <Button Content="Save" Command="{Binding btnSave}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                            <Button Content="Clear" Command="{Binding btnClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+
+                            <TextBlock Text="Defect" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Button Content="Clear" Command="{Binding btnClearDefect}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                            <!--<Button IsEnabled="False" Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>-->
+                        </StackPanel>
+                        <Grid Grid.Row="1" >
+
+                            <tools:RootViewer />
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Grid.Row="0" Margin="4,0,4,4"
                                       Style="{StaticResource main_view_groupbox}"
                                       Header="Thumbnail">
-                            <Canvas Grid.Row="0" 
+                        <Canvas Grid.Row="0" 
                             Focusable="True"
                             obs:SizeObserver.Observe="true"
                             obs:SizeObserver.ObservedWidth="{Binding DrawToolVM.p_ThumbWidth, Mode=OneWayToSource}"
                             obs:SizeObserver.ObservedHeight="{Binding DrawToolVM.p_ThumbHeight, Mode=OneWayToSource}"
                             Background="Black">
-                                <Image Source="{Binding Path= DrawToolVM.p_ThumNailImgSource}" />
-                                <Rectangle Margin="{Binding Path = DrawToolVM.p_TumbnailImgMargin}"
+                            <Image Source="{Binding Path= DrawToolVM.p_ThumNailImgSource}" />
+                            <Rectangle Margin="{Binding Path = DrawToolVM.p_TumbnailImgMargin}"
                                    Width="{Binding DrawToolVM.p_TumbnailImg_Rect.Width}"
                                    Height="{Binding DrawToolVM.p_TumbnailImg_Rect.Height}"
                                    Stroke="Blue"
                                    StrokeThickness="4" />
-                                <i:Interaction.Behaviors>
-                                    <mouse:MouseBehaviour MouseEvent="{Binding DrawToolVM.MouseEvent, Mode=OneWayToSource}" />
-                                    <mouse:MouseBehaviour MouseX="{Binding DrawToolVM.p_TumbMouseX, Mode=OneWayToSource}"
+                            <i:Interaction.Behaviors>
+                                <mouse:MouseBehaviour MouseEvent="{Binding DrawToolVM.MouseEvent, Mode=OneWayToSource}" />
+                                <mouse:MouseBehaviour MouseX="{Binding DrawToolVM.p_TumbMouseX, Mode=OneWayToSource}"
                                                   MouseY="{Binding DrawToolVM.p_TumbMouseY, Mode=OneWayToSource}" />
-                                </i:Interaction.Behaviors>
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                                        <i:InvokeCommandAction Command="{Binding DrawToolVM.TumbNailMouseLeftDown}" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseMove">
-                                        <i:InvokeCommandAction Command="{Binding DrawToolVM.TumbNailMouseMove}" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseLeave">
-                                        <i:InvokeCommandAction Command="{Binding DrawToolVM.TumbNailMouseLeave}" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseLeftButtonUp">
-                                        <i:InvokeCommandAction Command="{Binding DrawToolVM.TumbNailMouseLeftUp}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </Canvas>
-                        </GroupBox>
-                    </Grid>
+                            </i:Interaction.Behaviors>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding DrawToolVM.TumbNailMouseLeftDown}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseMove">
+                                    <i:InvokeCommandAction Command="{Binding DrawToolVM.TumbNailMouseMove}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeave">
+                                    <i:InvokeCommandAction Command="{Binding DrawToolVM.TumbNailMouseLeave}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding DrawToolVM.TumbNailMouseLeftUp}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                    </GroupBox>
                 </Grid>
             </Grid>
-            <GridSplitter Grid.Column="1" 
+        </Grid>
+        <GridSplitter Grid.Column="1" 
                               HorizontalAlignment="Stretch" 
                               VerticalAlignment="Stretch" 
                               Background="{StaticResource Splitter}" 
                               Width="0"
                               ShowsPreview="True"/>
 
-            <Grid Grid.Column="2"
-                      Background="{StaticResource main_view_background}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="10*"/>
-                        <RowDefinition Height="26*"/>
-                        <RowDefinition Height="23*"/>
-                        <RowDefinition Height="70*"/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Margin="4,0,4,4" >
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*"/>
-                            <ColumnDefinition Width="1*"/>
-                            <ColumnDefinition Width="1*"/>
-                        </Grid.ColumnDefinitions>
-                        <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
+        <StackPanel Grid.Column="1">
+            <Grid Background="{StaticResource main_view_background}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10*"/>
+                    <RowDefinition Height="26*"/>
+                    <RowDefinition Height="23*"/>
+                    <RowDefinition Height="70*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="4,0,4,4" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
                                     FontWeight="Bold" FontSize="12" 
                                     Content="Top" Grid.Column="0"
                                     Command="{Binding btnTop}"
                                     IsChecked="{Binding IsTopChecked, Mode=TwoWay}"/>
-                        <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
+                    <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
                                     FontWeight="Bold" FontSize="12"
                                     Content="Side" Grid.Column="1"
                                     Command="{Binding btnSide}"
                                     IsChecked="{Binding IsSideChecked, Mode=TwoWay}"/>
-                        <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
+                    <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
                                     FontWeight="Bold" FontSize="12"
                                     Content="Bottom" Grid.Column="2"
                                     Command="{Binding btnBottom}"
                                     IsChecked="{Binding IsBtmChecked, Mode=TwoWay}"/>
-                    </Grid>
-                    <GroupBox Grid.Row="1" Margin="4,0,4,4"
+                </Grid>
+
+                <GroupBox Grid.Row="1" Margin="4,0,4,4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Header="Scan Information">
-                        <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
-                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
-                                <Grid.ColumnDefinitions >
-                                    <ColumnDefinition Width="120"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Grab Mode" Style="{StaticResource group_box_item_name_text}"/>
-                                <ComboBox Grid.Column="2" ItemsSource="{Binding GrabModeList}" SelectedIndex="{Binding SelectedGrabModeIndex}" Margin="0,0,-0.4,0.4">
-                                </ComboBox>
-                            </Grid>
+                    <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions >
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Grab Mode" Style="{StaticResource group_box_item_name_text}"/>
+                            <ComboBox Grid.Column="2" ItemsSource="{Binding GrabModeList}" SelectedIndex="{Binding SelectedGrabModeIndex}" Margin="0,0,-0.4,0.4">
+                            </ComboBox>
+                        </Grid>
 
-                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}"
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}"
                                   DataContext="{Binding Parameter}">
-                                <Grid.ColumnDefinitions >
-                                    <ColumnDefinition Width="120"/>
-                                    <ColumnDefinition Width="33"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="33"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Camera" Style="{StaticResource group_box_item_name_text}"/>
-                                <TextBlock Text="W" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamWidth}" HorizontalContentAlignment="Center"/>
-                                <TextBlock Text="H" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamHeight}" HorizontalContentAlignment="Center"/>
-                            </Grid>
+                            <Grid.ColumnDefinitions >
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="33"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="33"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Camera" Style="{StaticResource group_box_item_name_text}"/>
+                            <TextBlock Text="W" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamWidth}" HorizontalContentAlignment="Center"/>
+                            <TextBlock Text="H" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamHeight}" HorizontalContentAlignment="Center"/>
+                        </Grid>
 
-                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}"
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}"
                                   DataContext="{Binding Parameter}">
-                                <Grid.ColumnDefinitions >
-                                    <ColumnDefinition Width="120"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Resolution[um]" Style="{StaticResource group_box_item_name_text}"/>
-                                <TextBox Grid.Column="1" IsEnabled="False" Text="{Binding CamResolution}" HorizontalContentAlignment="Center"/>
-                            </Grid>
-                            
-                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
-                                <Grid.ColumnDefinitions >
-                                    <ColumnDefinition Width="120"/>
-                                    <ColumnDefinition Width="33"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="33"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="33"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Offset" Style="{StaticResource group_box_item_name_text}" Margin="6,1,0,1" Grid.ColumnSpan="2"/>
-                                <TextBlock Text="Top" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,2"/>
-                                <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding TopOffset}" HorizontalContentAlignment="Center" VerticalAlignment="Top"/>
-                                <TextBlock Text="Side" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding SideOffset}" HorizontalContentAlignment="Center"/>
-                                <TextBlock Text="Btm" Grid.Column="5"  HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                <TextBox Grid.Column="6" IsEnabled="False" Text="{Binding BtmOffset}" HorizontalContentAlignment="Center"/>
-                            </Grid>
-                        </StackPanel>
-                        <!--<Grid Margin="10,5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="0.5*"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <TextBlock FontSize="12" Text="Enable EdgeSide Insp." Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                <TextBlock FontSize="12" Text="Upload Image Size" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                <TextBlock FontSize="12" Text="Upload Image Res." Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
-                                              VerticalAlignment="Center"
-                                              HorizontalAlignment="Center" Width="85"/>
-                                <ComboBox Grid.Row="1" Grid.Column="1" SelectedIndex="0" 
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center">
-                                    <ComboBoxItem Content="1000x1000"/>
-                                    <ComboBoxItem Content="1000x1000"/>
-                                    <ComboBoxItem Content="1000x1000"/>
-                                </ComboBox>
-                                <ComboBox Grid.Row="2" Grid.Column="1" SelectedIndex="0" 
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="Center">
-                                    <ComboBoxItem Content="1000x1000"/>
-                                    <ComboBoxItem Content="1000x1000"/>
-                                    <ComboBoxItem Content="1000x1000"/>
-                                </ComboBox>
-                            </Grid>-->
-                    </GroupBox>
-                    <GroupBox Grid.Row="2" Margin="4,0,4,4"
+                            <Grid.ColumnDefinitions >
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Resolution[um]" Style="{StaticResource group_box_item_name_text}"/>
+                            <TextBox Grid.Column="1" IsEnabled="False" Text="{Binding CamResolution}" HorizontalContentAlignment="Center"/>
+                        </Grid>
+
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions >
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="33"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="33"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="33"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Offset" Style="{StaticResource group_box_item_name_text}" Margin="6,1,0,1" Grid.ColumnSpan="2"/>
+                            <TextBlock Text="Top" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,2"/>
+                            <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding TopOffset}" HorizontalContentAlignment="Center" VerticalAlignment="Top"/>
+                            <TextBlock Text="Side" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding SideOffset}" HorizontalContentAlignment="Center"/>
+                            <TextBlock Text="Btm" Grid.Column="5"  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBox Grid.Column="6" IsEnabled="False" Text="{Binding BtmOffset}" HorizontalContentAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Grid.Row="2" Margin="4,0,4,4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Header="Light">
-                        <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
-                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120*"/>
-                                    <ColumnDefinition Width="172*"/>
-                                    <ColumnDefinition Width="97*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Style="{StaticResource group_box_item_name_text}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"
-                                               Text="White"/>
-                                <Slider Grid.Column="1" VerticalAlignment="Center" Margin="0,14,0,15"/>
-                                <TextBox Grid.Column="2"  Width="80" Height="20" Margin="8,14,9,13"/>
-                            </Grid>
-
-                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120*"/>
-                                    <ColumnDefinition Width="172*"/>
-                                    <ColumnDefinition Width="97*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Style="{StaticResource group_box_item_name_text}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"
-                                               Text="Side"/>
-                                <Slider Grid.Column="1" VerticalAlignment="Center" Margin="0,14,0,15"/>
-                                <TextBox Grid.Column="2"  Width="80" Height="20" Margin="8,14,9,13"/>
-                            </Grid>
-                        </StackPanel>
-                    </GroupBox>
-
-                    <GroupBox Grid.Row="3" Margin="4,0,4,4"
-                                  Style="{StaticResource main_view_groupbox}"
-                                  Header="Spec">
-                        <Grid Margin="10,5" DataContext="{Binding Parameter}">
+                    <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="3*"/>
-                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="120*"/>
+                                <ColumnDefinition Width="172*"/>
+                                <ColumnDefinition Width="97*"/>
                             </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <TextBlock FontSize="12" Text="Inspection ROI Width" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                            <TextBlock FontSize="12" Text="Inspection ROI Height" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                            <TextBlock FontSize="12" Text="Threshold" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                            <TextBlock FontSize="12" Text="Size Minimum (um)" Style="{StaticResource BasicTb}" Grid.Row="3"/>
-                            <TextBlock FontSize="12" Text="Merge Distance " Style="{StaticResource BasicTb}" Grid.Row="4"/>
-                            <TextBlock FontSize="12" Text="Edge Search Level (%) " Style="{StaticResource BasicTb}" Grid.Row="5"/>
-                            <TextBox Text="{Binding ROIWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                            <TextBox Text="{Binding ROIHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                            <TextBox Text="{Binding Threshold, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                            <TextBox Text="{Binding DefectSizeMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                            <TextBox Text="{Binding MergeDist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                            <TextBox Text="{Binding EdgeSearchLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="5" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                            <TextBlock Grid.Column="0" Style="{StaticResource group_box_item_name_text}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"
+                                               Text="White"/>
+                            <Slider Grid.Column="1" VerticalAlignment="Center" Margin="0,14,0,15"/>
+                            <TextBox Grid.Column="2"  Width="80" Height="20" Margin="8,14,9,13"/>
                         </Grid>
-                    </GroupBox>
-                </Grid>
-                <Grid Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition Height="2*"/>
-                    </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="0" Margin="4,0,4,4"
+
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120*"/>
+                                <ColumnDefinition Width="172*"/>
+                                <ColumnDefinition Width="97*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource group_box_item_name_text}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"
+                                               Text="Side"/>
+                            <Slider Grid.Column="1" VerticalAlignment="Center" Margin="0,14,0,15"/>
+                            <TextBox Grid.Column="2"  Width="80" Height="20" Margin="8,14,9,13"/>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Grid.Row="3" Margin="4,0,4,4"
+                                  Style="{StaticResource main_view_groupbox}"
+                                  Header="Spec"
+                              DataContext="{Binding Parameter}">
+                    <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Inspection ROI Width" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                            <TextBox Grid.Column="1" Text="{Binding ROIWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                        </Grid>
+
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Inspection ROI Height" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                            <TextBox Grid.Column="1" Text="{Binding ROIHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                        </Grid>
+
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Threshold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                            <TextBox Grid.Column="1" Text="{Binding Threshold, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                        </Grid>
+
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Size Minimum (um)" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                            <TextBox Grid.Column="1" Text="{Binding DefectSizeMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                        </Grid>
+
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Merge Distance" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                            <TextBox Grid.Column="1" Text="{Binding MergeDist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                        </Grid>
+
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Edge Search Level (%)" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                            <TextBox Grid.Column="1" Text="{Binding EdgeSearchLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+        </StackPanel>
+        
+        <Grid Grid.Column="2"
+                      Background="{StaticResource main_view_background}">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+
+            <GroupBox Grid.Row="0" Margin="4,0,4,4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Header="Defect Image">
-                        <Grid Background="Black">
-                            <Image Source="{Binding DefectImage}">
-                            </Image>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Grid.Row="1"  Margin="4,0,4,4"
+                <Grid Background="Black">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="43*"/>
+                        <ColumnDefinition Width="482*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="{Binding DefectImage}" Grid.ColumnSpan="2">
+                    </Image>
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="1"  Margin="4,0,4,4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Header="Insepction Data">
-                        <DataGrid Name="Defect_Viewer"
+                <DataGrid Name="Defect_Viewer"
                                               ItemsSource="{Binding DefectDataTable}"
                                               SelectedItem="{Binding SelectedDefect, Mode=TwoWay}"
                                               SelectionMode="Single"
@@ -298,19 +322,16 @@
                                               IsReadOnly="True"
                                               AutoGenerateColumns="True"
                                               Grid.Row="1">
-                            <DataGrid.Resources>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="HorizontalAlignment"
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalAlignment"
                                                         Value="Stretch" />
-                                    <Setter Property="HorizontalContentAlignment"
+                            <Setter Property="HorizontalContentAlignment"
                                                         Value="Center" />
-                                </Style>
-                            </DataGrid.Resources>
-                        </DataGrid>
-                    </GroupBox>
-                </Grid>
-
-            </Grid>
+                        </Style>
+                    </DataGrid.Resources>
+                </DataGrid>
+            </GroupBox>
         </Grid>
-    </StackPanel>
+    </Grid>
 </UserControl>

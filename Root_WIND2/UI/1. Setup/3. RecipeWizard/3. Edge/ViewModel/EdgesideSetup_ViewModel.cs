@@ -269,8 +269,8 @@ namespace Root_WIND2
 			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
 			parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 
-			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
-			WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
+			//WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
+			//WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
 		}
 
 		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
@@ -362,13 +362,6 @@ namespace Root_WIND2
 
 		private void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
 		{
-			//if (reDraw)
-			//	drawToolVM.Clear;
-
-			foreach (CRect rect in rectList)
-			{
-				DrawToolVM.DrawRectBitmap(rect, 0, 0, 0, 0, new CPoint());
-			}
 		}
 
 		private void UpdateProgress()
