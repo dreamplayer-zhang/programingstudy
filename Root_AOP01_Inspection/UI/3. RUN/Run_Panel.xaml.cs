@@ -83,8 +83,8 @@ namespace Root_AOP01_Inspection
             ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_rtrarm.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
             ExistVision.Background = (m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null)||
                 (m_backsidevision.m_diExistVision.p_bIn == true && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
-            if (m_loadport[0].m_swLotTime.IsRunning) textblockRunTime1.Text = m_loadport[0].m_swLotTime.ElapsedMilliseconds.ToString("HH:mm:ss");
-            if (m_loadport[1].m_swLotTime.IsRunning) textblockRunTime2.Text = m_loadport[1].m_swLotTime.ElapsedMilliseconds.ToString("HH:mm:ss");
+            if (m_loadport[0].m_swLotTime.IsRunning) textblockRunTime1.Text = m_loadport[0].p_swLotTime;
+            if (m_loadport[1].m_swLotTime.IsRunning) textblockRunTime2.Text = m_loadport[1].p_swLotTime;
             ButtonInitialize.IsEnabled = IsEnableInitialization();
             ButtonRecovery.IsEnabled = IsEnableRecovery();
             TimerLamp();
@@ -99,7 +99,7 @@ namespace Root_AOP01_Inspection
             if (IsErrorModule()) return false;
             if (m_handler.m_bIsPossible_Recovery == false) return false;
             // Daniel check
-            if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (EQ.p_eState != EQ.eState.Ready && EQ.p_eState != EQ.eState.Idle) return false;
             if (EQ.p_bStop == true) return false;
             return m_handler.IsEnableRecovery();
         }
@@ -184,7 +184,7 @@ namespace Root_AOP01_Inspection
         }
         bool IsEnableResume()
         {
-            if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (EQ.p_eState != EQ.eState.Ready && EQ.p_eState != EQ.eState.Idle) return false;
             if (m_handler.m_process.m_qSequence.Count <= 0) return false;
             return true;
         }

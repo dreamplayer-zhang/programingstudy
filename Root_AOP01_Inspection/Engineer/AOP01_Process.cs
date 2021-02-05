@@ -195,7 +195,6 @@ namespace Root_AOP01_Inspection.Engineer
                     }
                 }
                 RunTree(Tree.eMode.Init);
-                m_nSequencePersent = 100 / m_qSequence.Count;
                 return "OK";
             }
             catch (Exception e)
@@ -397,7 +396,6 @@ namespace Root_AOP01_Inspection.Engineer
             }
             else sequence.m_moduleRun.StartRun();
             m_qSequence.Dequeue();
-            p_nSequencePersent += m_nSequencePersent;
             InfoWafer infoWafer = sequence.m_infoWafer;
             if (infoWafer.m_qProcess.Count > 0) infoWafer.m_qProcess.Dequeue();
             if (m_qSequence.Count == 0) ClearInfoWafer();
