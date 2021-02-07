@@ -33,12 +33,13 @@ namespace Root_AOP01_Packing
         public ModuleList p_moduleList { get; set; }
         public AOP01_Recipe m_recipe;
         public AOP01_Process m_process;
+
+        public AOP01_P m_aop01P;
+        public IndividualElevator m_elevator;
         public TapePacker m_tapePacker;
         public VacuumPacker m_vacuumPacker;
-        public IndividualElevator m_elevator;
         public Unloadport_AOP m_unloadport;
-        public Vision_AOP m_visionAOP;
-        public Certification m_RNR;
+
         public RFID_Brooks m_RFID;
 
         void InitModule()
@@ -47,12 +48,6 @@ namespace Root_AOP01_Packing
             //InitWTR(); 
             //InitLoadport();
 
-
-            //m_RNR = new Certification("Certification", m_engineer);
-            //InitModule(m_RNR);
-
-            //m_visionAOP = new Vision_AOP("Vision", m_engineer);
-            //InitModule(m_visionAOP);
             //m_RFID = new RFID_Brooks("RFID", m_engineer, null);
             //InitModule(m_RFID);
 
@@ -189,7 +184,7 @@ namespace Root_AOP01_Packing
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
-            if (gaf != null) gaf.ClearALID();
+            gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
         }
         #endregion
@@ -214,7 +209,7 @@ namespace Root_AOP01_Packing
             //            if (m_process.m_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
-                if (m_gem != null) m_gem.SendPJComplete(pj.m_sPJobID);
+                m_gem?.SendPJComplete(pj.m_sPJobID);
                 Thread.Sleep(100);
             }
         }

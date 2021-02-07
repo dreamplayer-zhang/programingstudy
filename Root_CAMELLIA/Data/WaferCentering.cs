@@ -186,7 +186,7 @@ namespace Root_CAMELLIA.Data
                 //    CvInvoke.Circle(matTest, tempList[i], 5, new MCvScalar(0, 255, 0));
                 //}
                 //Emgu.CV.UI.ImageViewer.Show(matTest);
-            }catch(Exception ex)
+            }catch(Exception)
             {
                 ErrorString = "Error";
                 //System.Windows.Forms.MessageBox.Show(ex.ToString());

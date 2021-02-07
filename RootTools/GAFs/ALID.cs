@@ -54,8 +54,8 @@ namespace RootTools.GAFs
 				OnPropertyChanged();
 				if (value && p_bEQError)
                 {
-						if (m_log != null) m_log.Error(m_sID + "." + p_sMsg + " = " + _bSet.ToString());
-						if (m_gem != null) m_gem.SetAlarm(this, _bSet);
+						m_log?.Error(m_sID + "." + p_sMsg + " = " + _bSet.ToString());
+						m_gem?.SetAlarm(this, _bSet);
 						m_listALID.SetALID(this);
 						m_sqALID.Insert();
 						EQ.p_eState = EQ.eState.Error;
@@ -63,7 +63,7 @@ namespace RootTools.GAFs
 				}
 				else
 				{
-					if (m_log != null) m_log.Info(m_sID + "." + p_sMsg + " = " + _bSet.ToString());
+					m_log?.Info(m_sID + "." + p_sMsg + " = " + _bSet.ToString());
 				}
 			}
 		}

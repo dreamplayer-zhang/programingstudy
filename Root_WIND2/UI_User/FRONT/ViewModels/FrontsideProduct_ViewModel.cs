@@ -132,6 +132,18 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region Command Btn
+
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    DrawMap();
+                });
+            }
+        }
+
         public ICommand CreateMapCommand
         {
             get
@@ -373,7 +385,5 @@ namespace Root_WIND2.UI_User
             return Brushes.DimGray;
             #endregion
         }
-
-
     }
 }

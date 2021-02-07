@@ -10,9 +10,6 @@ using System.IO;
 
 namespace RootTools
 {
-
-    public delegate void delegateString(string str);
-
     public class TK4SGroup : ObservableObject, ITool
     {
 
@@ -425,6 +422,11 @@ namespace RootTools
 
         [field: NonSerialized]
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
+        void _Dummy()
+        {
+            if (CloseRequested != null) CloseRequested(null, null);
+        }
+
     }
 
 }
