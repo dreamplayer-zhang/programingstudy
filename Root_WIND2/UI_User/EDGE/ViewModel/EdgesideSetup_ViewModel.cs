@@ -357,7 +357,7 @@ namespace Root_WIND2.UI_User
 			parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 
 			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
-			WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
+			WorkEventManager.ProcessDefectEdgeDone += WorkEventManager_ProcessDefectEdgeDone;
 		}
 
 		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
@@ -381,7 +381,7 @@ namespace Root_WIND2.UI_User
 			}));
 		}
 
-		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
+		private void WorkEventManager_ProcessDefectEdgeDone(object sender, ProcessDefectEdgeDoneEventArgs e)
 		{
 			Workplace workplace = sender as Workplace;
 			List<String> textList = new List<String>();

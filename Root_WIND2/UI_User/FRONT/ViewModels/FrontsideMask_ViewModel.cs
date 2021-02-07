@@ -1797,6 +1797,16 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region ICommand
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.DisplayBox();
+                });
+            }
+        }
         public RelayCommand btnViewFullCommand
         {
             get

@@ -10,9 +10,6 @@ using System.IO;
 
 namespace RootTools
 {
-
-    public delegate void delegateString(string str);
-
     public class TK4SGroup : ObservableObject, ITool
     {
 

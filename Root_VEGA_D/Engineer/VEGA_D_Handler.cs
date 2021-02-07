@@ -227,7 +227,7 @@ namespace Root_VEGA_D.Engineer
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
-            if (gaf != null) gaf.ClearALID();
+            gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
         }
         #endregion
@@ -315,7 +315,7 @@ namespace Root_VEGA_D.Engineer
             if (m_process.m_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
-                if (m_gem != null) m_gem.SendPJComplete(pj.m_sPJobID);
+                m_gem?.SendPJComplete(pj.m_sPJobID);
                 Thread.Sleep(100);
             }
         }
