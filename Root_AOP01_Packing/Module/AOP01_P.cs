@@ -21,7 +21,7 @@ namespace Root_AOP01_Packing.Module
         #region ToolBox
         public DIO_Os m_doLamp;
         public TK4SGroup m_tk4s; // 온도, 정전기
-        //public FFUGroup m_FFU;
+        public FFU_Group m_FFU;
         DIO_Os do_Buzzer;
         DIO_O do_door_Lock;
        
@@ -94,7 +94,8 @@ namespace Root_AOP01_Packing.Module
             p_sInfo = m_toolBox.Get(ref do_Buzzer, this, "Buzzer", asBuzzer, true, true);
             p_sInfo = m_toolBox.Get(ref do_door_Lock, this, "Door Lock");
 
-            m_toolBox.Get(ref m_tk4s, this, "FDC");
+            m_toolBox.Get(ref m_tk4s, this, "FDC", ((AOP01_Engineer)m_engineer).m_dialogService);
+            m_toolBox.Get(ref m_FFU, this, "FFU", ((AOP01_Engineer)m_engineer).m_dialogService);
             //m_toolBox.Get(ref m_FFU, this, "FFU");
             p_sInfo = m_toolBox.Get(ref di_InterlockKey, this, "Interlock Key");
             p_sInfo = m_toolBox.Get(ref di_LightCurtainKey, this, "Light Curtian Key");

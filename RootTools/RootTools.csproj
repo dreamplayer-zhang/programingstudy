@@ -427,6 +427,9 @@
     <Compile Include="Comm\TK4SModuleUI.xaml.cs">
       <DependentUpon>TK4SModuleUI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Comm\FFUModuleUI.xaml.cs">
+      <DependentUpon>FFUModuleUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
     <Compile Include="Viewer\Root_Viewer.cs" />
     <Compile Include="Comm\TK4SGourpUI.xaml.cs">
@@ -1069,6 +1072,10 @@
     <Page Include="Comm\TK4SModuleUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\FFUModuleUI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Viewer\RootViewer.xaml">
       <SubType>Designer</SubType>
