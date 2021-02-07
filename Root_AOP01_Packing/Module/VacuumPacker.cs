@@ -804,17 +804,19 @@ namespace Root_AOP01_Packing.Module
 
             public string RunHeaterSol(bool bClose)
             {
-                m_solHeater[0].Write(bClose);
+                //m_solHeater[0].Write(true);
                 m_solHeater[1].Write(!bClose);
-                int msTimeout = (int)(1000 * m_solHeater[0].m_secTimeout);
-                StopWatch sw = new StopWatch();
-                while (sw.ElapsedMilliseconds < msTimeout)
-                {
-                    Thread.Sleep(10);
-                    if (EQ.IsStop()) return "EQ Stop";
-                    if (m_solHeater[0].p_bDone && m_solHeater[1].p_bDone) return "OK";
-                }
-                return "HeaterClose Timeout";
+                //m_solHeater[1].Write(!bClose);
+                return "OK";
+                //int msTimeout = (int)(1000 * m_solHeater[0].m_secTimeout);
+                //StopWatch sw = new StopWatch();
+                //while (sw.ElapsedMilliseconds < msTimeout)
+                //{
+                //    Thread.Sleep(10);
+                //    if (EQ.IsStop()) return "EQ Stop";
+                //    if (m_solHeater[0].p_bDone && m_solHeater[1].p_bDone) return "OK";
+                //}
+                //return "HeaterClose Timeout";
             }
 
             public double m_secHeat = 3; 
