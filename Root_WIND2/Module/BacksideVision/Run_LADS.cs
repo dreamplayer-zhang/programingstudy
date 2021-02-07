@@ -100,7 +100,7 @@ namespace Root_WIND2.Module
 
                     double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2;
                     double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2;
-                    axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
+                    axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger* nCamWidth, true);
 
                     string strPool = m_grabMode.m_memoryPool.p_id;
                     string strGroup = m_grabMode.m_memoryGroup.p_id;

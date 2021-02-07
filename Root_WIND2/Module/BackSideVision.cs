@@ -310,6 +310,7 @@ namespace Root_WIND2.Module
                 camMain.Connect();
             if (camLADS != null)
                 camLADS.Connect();
+                
             base.StateHome();
 
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
