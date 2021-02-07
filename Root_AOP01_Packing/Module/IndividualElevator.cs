@@ -41,7 +41,7 @@ namespace Root_AOP01_Packing.Module
 
         #region ALID
         ALID m_alidElevator;
-        void InitALID()
+        void InitALID() 
         {
             m_alidElevator = m_gaf.GetALID(this, "Elevator Module", "Elevator Module Error");
         }
@@ -62,7 +62,7 @@ namespace Root_AOP01_Packing.Module
                 OnPropertyChanged();
             }
         }
-        bool _bCheck = false;
+        bool _bCheck = false; 
 
         public bool p_bProtection
         {
@@ -80,7 +80,7 @@ namespace Root_AOP01_Packing.Module
                 OnPropertyChanged();
             }
         }
-        bool _bProtection = false;
+        bool _bProtection = false; 
 
         bool m_bThreadCheck = false;
         Thread m_threadCheck;
@@ -97,9 +97,9 @@ namespace Root_AOP01_Packing.Module
             {
                 Thread.Sleep(10);
                 p_bCheck = (m_diCheck[0].p_bIn && m_diCheck[1].p_bIn && m_diCheck[2].p_bIn);
-                p_bProtection = (m_diProtection[0].p_bIn || m_diProtection[1].p_bIn);
+                p_bProtection = (m_diProtection[0].p_bIn || m_diProtection[1].p_bIn); 
 
-                if (p_bProtection)
+                if(p_bProtection)
                 {
                     this.p_eState = eState.Error;
                     EQ.p_bStop = true;
@@ -144,24 +144,21 @@ namespace Root_AOP01_Packing.Module
         #region Mapping
 
 
+        
         public string RunMapping()
         {
             p_infoWafer = null;
             // State Home에 프로텍션 체크넣어야됨
-
-            if (Run(m_axis.StartMove(ePos.Bottom)))
-                return p_sInfo;
-            if (Run(m_axis.WaitReady()))
-                return p_sInfo;
-            for (int n = 0; n < 8; n++)
+            
+            if (Run(m_axis.StartMove(ePos.Bottom))) return p_sInfo;
+            if (Run(m_axis.WaitReady())) return p_sInfo;
+            for(int n=0; n<8; n++)
             {
                 Thread.Sleep(200);
-                if (p_bCheck)
+                if (p_bCheck) 
                 {
-                    if (Run(m_axis.StartShift(65000)))
-                        return p_sInfo;
-                    if (Run(m_axis.WaitReady()))
-                        return p_sInfo;
+                    if(Run(m_axis.StartShift(65000))) return p_sInfo;
+                    if(Run(m_axis.WaitReady())) return p_sInfo;
                     p_infoWafer = new InfoWafer(p_id, 0, m_engineer);
                     return "OK";
                 }
@@ -169,7 +166,7 @@ namespace Root_AOP01_Packing.Module
                 Run(m_axis.WaitReady());
                 //m_axis.StartMove()
             }
-            return "No Case";
+            return "No Case";          
         }
         #endregion
 
@@ -341,7 +338,7 @@ namespace Root_AOP01_Packing.Module
         }
         #endregion
 
-
+       
 
         public override void ThreadStop()
         {

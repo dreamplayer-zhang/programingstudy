@@ -24,6 +24,16 @@ namespace Root_WIND2
 		private RootViewer_ViewModel drawToolVM;
 
 		private EdgeSurfaceParameterBase parameter;
+		private int selectedGrabModeIndex = 0;
+		private int camWidth;
+		private int camHeight;
+		private double camResolution;
+		private double camTriggerRatio;
+
+		//private int topOffset;
+		//private int sideOffset;
+		//private int btmOffset;
+
 		private bool _IsTopChecked = true;
 		private bool _IsSideChecked = false;
 		private bool _IsBtmChecked = false;
@@ -31,6 +41,7 @@ namespace Root_WIND2
 		private DataTable defectDataTable;
 		private object selectedDefect;
 		private BitmapSource defectImage;
+		private double triggerRatio = 0;
 
 		#region [Getter / Setter]
 		public RootViewer_ViewModel DrawToolVM
@@ -45,6 +56,90 @@ namespace Root_WIND2
 			set 
 			{
 				SetProperty(ref parameter, value);
+			}
+		}
+
+		public int CamWidth
+		{
+			get => camWidth;
+			set
+			{
+				SetProperty<int>(ref this.camWidth, value);
+				parameter.CamWidth = value;
+			}
+		}
+
+		public int CamHeight
+		{
+			get => camHeight;
+			set
+			{
+				SetProperty<int>(ref this.camHeight, value);
+				parameter.CamHeight = value;
+			}
+		}
+
+		public double CamResolution
+		{
+			get => camResolution;
+			set
+			{
+				SetProperty<double>(ref this.camResolution, value);
+				parameter.CamResolution = value;
+			}
+		}
+
+		public double TriggerRatio
+		{
+			get => triggerRatio;
+			set
+			{
+				SetProperty<double>(ref this.camTriggerRatio, value);
+				parameter.TriggerRatio = value;
+			}
+		}
+
+		public int TopOffset
+		{
+			//get => topOffset;
+			set
+			{
+				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
+				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
+				this.TopOffset = inspect.TopOffset;
+			}
+		}
+
+		public int SideOffset
+		{
+			//get => sideOffset;
+			set
+			{
+				//SetProperty<int>(ref this.sideOffset, value);/
+			}
+		}
+
+		public int BtmOffset
+		{
+			//get => btmOffset;
+			set
+			{
+				//SetProperty<int>(ref this.btmOffset, value);
+			}
+		}
+
+		public int SelectedGrabModeIndex
+		{
+			get => this.selectedGrabModeIndex;
+			set
+			{
+				GrabMode mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
+				this.CamWidth = mode.m_camera.GetRoiSize().X;
+				this.CamHeight = mode.m_camera.GetRoiSize().Y;
+				this.CamResolution = mode.m_dResX_um;
+				this.TriggerRatio = mode.m_dCamTriggerRatio;
+
+				SetProperty<int>(ref this.selectedGrabModeIndex, value);
 			}
 		}
 
@@ -89,7 +184,7 @@ namespace Root_WIND2
 				}
 			}
 		}
-
+		
 		public DataTable DefectDataTable
 		{
 			get => defectDataTable;
@@ -169,20 +264,31 @@ namespace Root_WIND2
 
 			DrawToolVM = new RootViewer_ViewModel();
 			DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
+			DrawToolVM.p_ROILayer = GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage");
 
 			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
 			parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 
-			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
-			WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
+			//WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
+			//WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
 		}
 
 		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
 		{
 			Workplace workplace = sender as Workplace;
+			List<string> textList = new List<string>();
+			List<CRect> rectList = new List<CRect>();
+
+			foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+			{
+				string text = "";
+				rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+				textList.Add(text);
+			}
 
 			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
 			{
+				DrawRectDefect(rectList, textList, e.reDraw);
 				UpdateProgress();
 			}));
 		}
@@ -252,6 +358,10 @@ namespace Root_WIND2
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide;
 			else if (IsBtmChecked)
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm;
+		}
+
+		private void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
+		{
 		}
 
 		private void UpdateProgress()

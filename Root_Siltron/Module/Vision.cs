@@ -673,7 +673,7 @@ namespace Root_Siltron.Module
                 return "OK";
             }
 
-            double dEdgeX = 0;
+            //double dEdgeX = 0;
             private string GrabEdge()
             {
                 Axis axisR = m_module.m_axisRotate;
@@ -719,7 +719,7 @@ namespace Root_Siltron.Module
 
                     gmBevelSide.StopGrab();
                     arr = "_focus_";
-                    k_side = 0;
+                    //k_side = 0;
 
                     //CalcAxisOffset();
                     //RearrangeArray((int)m_fScanDegree);
@@ -778,7 +778,7 @@ namespace Root_Siltron.Module
                 edgeSideInsp.Insp(m_module.m_memoryEdgeTop, 200);
 			}
 
-            int k_bottom = 0;
+            //int k_bottom = 0;
             void gmBevelBottom_Grabed(object sender, EventArgs e)
             {
                 //GrabedArgs ga = (GrabedArgs)e;
@@ -793,7 +793,7 @@ namespace Root_Siltron.Module
             }
 
             string arr = string.Empty;
-            int k_side = 0;
+            //int k_side = 0;
             void gmBevelSide_Grabed(object sender, EventArgs e)
             {
                 //GrabedArgs ga = (GrabedArgs)e;
@@ -807,7 +807,7 @@ namespace Root_Siltron.Module
                 //k_side++;
             }
 
-            int k_top = 0;
+            //int k_top = 0;
             void gmBevelTop_Grabed(object sender, EventArgs e)
             {
                 //GrabedArgs ga = (GrabedArgs)e;

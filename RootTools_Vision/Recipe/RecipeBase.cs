@@ -131,11 +131,10 @@ namespace RootTools_Vision
 
             waferMap = new RecipeType_WaferMap();
 
-            foreach(RecipeItemBase recipe in RecipeItemList)
-            {
-                recipe.Clear();
-            }
-            ParameterItemList.Clear();
+            recipeItemList = new List<RecipeItemBase>();
+            parameterItemList = new List<ParameterBase>();
+
+            Initilize();
 
             WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
         }

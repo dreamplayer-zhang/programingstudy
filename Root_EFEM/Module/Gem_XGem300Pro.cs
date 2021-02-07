@@ -1,22 +1,15 @@
 ﻿using RootTools;
 using RootTools.Gem;
 using RootTools.Module;
-using RootTools.OHT.Semi;
 using RootTools.OHTNew;
 using RootTools.Trees;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Root_EFEM.Module
 {
     public class Gem_XGem300Pro : ModuleBase
     {
-        IEngineer m_engineer;
-        IGem m_gem;
         //ILoadport m_loadport;
         List<ILoadport> m_aLoadport = new List<ILoadport>();
         //public OHT_Semi[] m_OHT = new OHT_Semi[3];

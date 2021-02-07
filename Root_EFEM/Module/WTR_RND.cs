@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -24,6 +25,14 @@ namespace Root_EFEM.Module
                 m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
             }
+        }
+        #endregion
+
+        #region GAF
+        ALID alid_RND;
+        void InitALID()
+        {
+            alid_RND = m_gaf.GetALID(this, "RND", "WTR RND ERROR");
         }
         #endregion
 
@@ -334,7 +343,12 @@ namespace Root_EFEM.Module
         {
             for (int n = 0; n < m_sErrorMsgs.Length / 2; n++)
             {
-                if (m_sErrorMsgs[n, 0] == sCode) return m_sErrorMsgs[n, 1];
+                if (m_sErrorMsgs[n, 0] == sCode)
+                {
+                    alid_RND.Run(true, m_sErrorMsgs[n, 1]);
+                    //alid 0207
+                    return m_sErrorMsgs[n, 1];
+                }
             }
             return "Can't Find Error Massage !!";
         }
@@ -831,6 +845,7 @@ namespace Root_EFEM.Module
                     sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
                     m_nChildID = m_module.GetChildSlotID(p_sChild, sChildSlot);
                 }
+
                 else m_nChildID = 0;
             }
 
@@ -873,10 +888,14 @@ namespace Root_EFEM.Module
                 }
                 finally
                 {
-                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                    //0203 IsWaferExist() 확인 必
+                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) 
+                        child.SetInfoWafer(m_nChildID, null);
                     else m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
-                if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
+                //return "OK"; //0202 
+                if (m_module.m_dicArm[m_eArm].IsWaferExist()) 
+                    return "OK"; // IsWaferExist 디버그 찍어봐야지머
                 return "WTR Get Error : Wafer Check Sensor not Detected at Arm = " + m_eArm.ToString();
             }
         }
@@ -938,6 +957,7 @@ namespace Root_EFEM.Module
                     if (EQ.IsStop()) return "Stop";
                     Thread.Sleep(100);
                 }
+                //0203 디버그 必
                 int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
@@ -953,11 +973,15 @@ namespace Root_EFEM.Module
                 }
                 finally
                 {
-                    //if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
-                    //else m_module.m_dicArm[m_eArm].p_infoWafer = null;
-                    m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    //0203 여기 왜 거꾸로..? // 0204 I/O 잘못 됨
+                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) 
+                        child.SetInfoWafer(m_nChildID, null);
+
+                    else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                        m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
-                if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";
+                if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) 
+                    return "OK";
                 return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;
             }
         }

@@ -39,10 +39,19 @@ namespace Root_EFEM.Module
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
+
+                InitALID();
             }
         }
         #endregion
 
+        #region GAF
+        ALID alid_Cymechs;
+        void InitALID()
+        {
+            alid_Cymechs = m_gaf.GetALID(this, "Cymechs", "LOADPORT CYMECHS ERROR");
+        }
+        #endregion
         //forget
         #region DIO Function
         public bool m_bPlaced = false;
@@ -66,7 +75,8 @@ namespace Root_EFEM.Module
         {
             for (int n = 0; n < 10; n++)
             {
-                if (p_bLock == false) return false;
+                if (p_bLock == false) 
+                    return false;
                 Thread.Sleep(100);
             }
             return true;
@@ -156,13 +166,15 @@ namespace Root_EFEM.Module
 
         string IsRunOK()
         {
+            //return "OK"; 
+            //0202 확인
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
             return p_infoCarrier.IsRunOK();
         }
 
         public void RunTreeTeach(Tree tree)
         {
-            p_infoCarrier.m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
+            p_infoCarrier.m_waferSize.RunTreeTeach(tree.GetTree(p_id, true));
         }
 
         public void ReadInfoWafer_Registry()
@@ -393,7 +405,8 @@ namespace Root_EFEM.Module
                 int nWait = 100 * secWait;
                 while (nWait > 0)
                 {
-                    if (EQ.IsStop()) return "EQ Stop";
+                    if (EQ.IsStop()) 
+                        return "EQ Stop";
                     Thread.Sleep(10);
                     if (m_eState == eState.Done) return "OK";
                     nWait--; 
@@ -472,6 +485,8 @@ namespace Root_EFEM.Module
                 case 'E':
                     p_eState = eState.Error;
                     p_sInfo = "Cymech Error " + sRead + " : " + GetErrorString(sRead);
+                    alid_Cymechs.Run(true, p_sInfo);
+                    //0207 alid run p_sinfo 
                     break;
                 case 'C':
                     p_sInfo = SetEvent(sRead);
@@ -540,7 +555,7 @@ namespace Root_EFEM.Module
         #region Timeout
         int m_secRS232 = 2;
         int _secHome = 40;
-        public int m_secHome 
+        public int p_secHome 
         {
             get { return _secHome; }
             set
@@ -556,7 +571,7 @@ namespace Root_EFEM.Module
         void RunTimeoutTree(Tree tree)
         {
             m_secRS232 = tree.Set(m_secRS232, m_secRS232, "RS232", "Timeout (sec)");
-            m_secHome = tree.Set(m_secHome, m_secHome, "Home", "Timeout (sec)");
+            p_secHome = tree.Set(p_secHome, p_secHome, "Home", "Timeout (sec)");
             m_secLoad = tree.Set(m_secLoad, m_secLoad, "Load", "Timeout (sec)");
             m_secUnload = tree.Set(m_secUnload, m_secUnload, "Unload", "Timeout (sec)");
         }
@@ -568,7 +583,7 @@ namespace Root_EFEM.Module
         {
             Protocol protocol = new Protocol(eCmd.Home, this);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitDone(m_secHome);
+            return protocol.WaitDone(p_secHome);
         }
 
         string CmdResetCPU()
@@ -585,6 +600,7 @@ namespace Root_EFEM.Module
                 m_alidLoad.Run(true, p_id + " Lock by WTR");
                 return p_id + " Lock by WTR";
             }
+            //0202 확인
             Protocol protocol = new Protocol(eCmd.Load, this);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitDone(m_secLoad);
@@ -663,35 +679,23 @@ namespace Root_EFEM.Module
                 }
                 else
                 {
-                    //                    if (m_diDoorOpen.p_bIn) return p_id + " Door Opened";
-                    if (Run(CmdUnload()))
-                    {
-                        m_alidHome.Run(true, p_sInfo);
-                        return p_sInfo;
-                    }
-                }
-                if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
-                {
-                    p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                    m_bPlaced = true;
-
-                    if (Run(CmdLoad()))
-                    {
-                        m_alidHome.Run(true, p_sInfo);
-                        return p_sInfo;
-                    }
-                    if (Run(CmdUnload()))
-                    {
-                        m_alidHome.Run(true, p_sInfo);
-                        return p_sInfo;
-                    }
-                }
-                else
-                {
-                    p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
-                    m_bPlaced = false;
+//                    if (m_diDoorOpen.p_bIn) return p_id + " Door Opened";
+                    if (Run(CmdUnload())) return p_sInfo;
                 }
             }
+            //if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
+            //{
+            //    p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+            //    m_bPlaced= true;
+
+            //    if (Run(CmdLoad())) return p_sInfo;
+            //    if (Run(CmdUnload())) return p_sInfo;
+            //}
+            //else
+            //{
+                p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
+                m_bPlaced = false;
+            //}
             p_eState = eState.Ready;
             p_infoCarrier.AfterHome();
             return "OK";
@@ -852,11 +856,11 @@ namespace Root_EFEM.Module
             {
                 m_module.m_bUnLoadCheck = false;
                 if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
-                if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed)
-                {
-                    m_module.m_alidLoad.Run(true, p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
-                    return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                }
+                //if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed)
+                //{
+                //    m_module.m_alidLoad.Run(true, p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
+                //    return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                //}//0202
                 if (m_module.Run(m_module.CmdLoad()))
                 {
                     m_module.m_alidLoad.Run(true, p_sInfo);

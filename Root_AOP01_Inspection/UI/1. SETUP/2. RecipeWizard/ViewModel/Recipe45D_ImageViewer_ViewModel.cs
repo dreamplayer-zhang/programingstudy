@@ -76,7 +76,7 @@ namespace Root_AOP01_Inspection
 
         #region Property
         private ObservableCollection<UIElement> m_DrawElement = new ObservableCollection<UIElement>();
-        public ObservableCollection<UIElement> p_DrawElement
+        public new ObservableCollection<UIElement> p_DrawElement
         {
             get
             {

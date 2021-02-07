@@ -122,10 +122,13 @@ namespace Root_Rinse_Loader.Module
             }
             finally
             {
+                string sSend = ""; 
                 foreach (Picker picker in m_aPicker)
                 {
-                    if (picker.m_dioVacuum.p_bIn == false) picker.m_dioVacuum.Write(false); 
+                    if (picker.m_dioVacuum.p_bIn == false) picker.m_dioVacuum.Write(false);
+                    sSend += picker.m_dioVacuum.p_bIn ? 'O' : '.'; 
                 }
+                m_rinse.AddStripSend(sSend); 
                 Thread.Sleep(100); 
             }
         }
@@ -319,7 +322,7 @@ namespace Root_Rinse_Loader.Module
             m_storage = storage;
             m_roller = roller;
             InitPickers(); 
-            InitBase(id, engineer); 
+            InitBase(id, engineer);
         }
 
         public override void ThreadStop()

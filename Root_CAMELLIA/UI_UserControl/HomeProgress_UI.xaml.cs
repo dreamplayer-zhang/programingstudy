@@ -103,7 +103,7 @@ namespace Root_CAMELLIA.UI_UserControl
 
             if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Home)
             {
-                progressLP1.Value = (int)(100 * Math.Min((m_swLoadport[0].ElapsedMilliseconds / (m_handler.m_aLoadport[0].m_secHome * 1000)), 1.0));
+                progressLP1.Value = (int)(100 * Math.Min((m_swLoadport[0].ElapsedMilliseconds / (m_handler.m_aLoadport[0].p_secHome * 1000)), 1.0));
             }
             else if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Ready) progressLP1.Value = 100;
             else if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Error) progressLP1.Value = 0;    //working
@@ -111,7 +111,7 @@ namespace Root_CAMELLIA.UI_UserControl
 
             if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Home)
             {
-                progressLP2.Value = (int)(100 * Math.Min((m_swLoadport[1].ElapsedMilliseconds / (m_handler.m_aLoadport[1].m_secHome * 1000)), 1.0));
+                progressLP2.Value = (int)(100 * Math.Min((m_swLoadport[1].ElapsedMilliseconds / (m_handler.m_aLoadport[1].p_secHome * 1000)), 1.0));
             }
             else if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Ready) progressLP2.Value = 100;
             else if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Error) progressLP2.Value = 0;    //working

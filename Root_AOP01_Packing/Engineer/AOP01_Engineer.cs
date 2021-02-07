@@ -123,9 +123,12 @@ namespace Root_AOP01_Packing
         #endregion
 
         public AOP01_Handler m_handler = new AOP01_Handler();
-        public void Init(string id)
+        public IDialogService m_dialogService;
+        
+        public void Init(string id, IDialogService dialogService)
         {
             EQ.m_sModel = id;
+            m_dialogService = dialogService;
             LogView.Init();
             InitTree();
             m_login.Init();

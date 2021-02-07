@@ -161,6 +161,7 @@ namespace Root_Rinse_Unloader.Module
         {
             try
             {
+                if (Run(m_storage.RunMoveMagazine())) return p_sInfo; 
                 if (Run(m_dioPusher.RunSol(false))) return p_sInfo;
                 if (Run(RunPusherDown(true))) return p_sInfo;
                 while (m_storage.IsBusy())

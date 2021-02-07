@@ -1,4 +1,5 @@
-﻿using Root_CAMELLIA.Module;
+﻿using Root_CAMELLIA.Data;
+using Root_CAMELLIA.Module;
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
@@ -59,6 +60,8 @@ namespace Root_CAMELLIA
                         }
                     case TabAxis.Lifter:
                         {
+                            SelectedAxis = AxisLifter;
+                            CurrentAxisWorkPoints = GetWorkPoint(AxisLifter.m_aPos);
                             return;
                         }
                     case TabAxis.StageZ:
@@ -156,23 +159,6 @@ namespace Root_CAMELLIA
         }
         private bool _EnableBtn = false;
 
-        /// <summary>
-        /// Module Camellia
-        /// </summary>
-        //public Module_Camellia ModuleCamellia
-        //{
-        //    get
-        //    {
-        //        return _ModuleCamellia;
-        //    }
-        //    set
-        //    {
-        //        SetProperty(ref _ModuleCamellia, value);
-        //    }
-        //}
-        //private Module_Camellia _ModuleCamellia;
-
-
         public Axis AxisX
         {
             get
@@ -185,6 +171,7 @@ namespace Root_CAMELLIA
             }
         }
         private Axis _AxisX;
+
         public Axis AxisY
         {
             get
@@ -197,6 +184,7 @@ namespace Root_CAMELLIA
             }
         }
         private Axis _AxisY;
+
         public Axis AxisZ
         {
             get
@@ -209,6 +197,7 @@ namespace Root_CAMELLIA
             }
         }
         private Axis _AxisZ;
+
         public Axis AxisLifter
         {
             get
@@ -222,13 +211,45 @@ namespace Root_CAMELLIA
         }
         private Axis _AxisLifter;
 
+        private Visibility _tttt = Visibility.Hidden;
+        public Visibility tttt
+        {
+            get
+            {
+                return _tttt;
+            }
+            set
+            {
+                SetProperty(ref _tttt, value);
+            }
+        }
+
+        public int asdf = 0;
+        public ICommand CmdTest
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    asdf++;
+
+                    if(asdf > 10 && asdf <= 20)
+                    {
+                        tttt = Visibility.Visible;
+                    }
+                    else if(asdf > 20)
+                    {
+                        tttt = Visibility.Hidden;
+                        asdf = 0;
+                    }
+                    
+                });
+            }
+        }
 
         #endregion
 
-        private Module_Camellia ModuleCamellia;
-        //private AxisXY m_AxisXY;
-        //private Axis m_AxisZ;
-        
+        private Module_Camellia ModuleCamellia;    
         private TabAxis eTabAxis = TabAxis.AxisX;
 
         public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
@@ -236,40 +257,13 @@ namespace Root_CAMELLIA
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
             //m_AxisXY = ModuleCamellia.m_axisXY;
             //m_AxisZ = ModuleCamellia.m_axisZ;
-            AxisX = ModuleCamellia.m_axisXY.p_axisX;
-            AxisY = ModuleCamellia.m_axisXY.p_axisY;
-            AxisZ = ModuleCamellia.m_axisZ;
-
-            MotionTabIndex = 1;
-        }
-
-        #region Method
-        public void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
-        {
-            int value = 0;
-            if (Int32.TryParse((e.EditingElement as TextBox).Text, out value))
-            {
-                SelectedAxis.m_aPos[SelectedAxis.m_asPos[e.Row.GetIndex()]] = value;
-                SelectedAxis.RunTree(RootTools.Trees.Tree.eMode.RegWrite);
-                SelectedAxis.RunTree(RootTools.Trees.Tree.eMode.Init);
-            }
-        }
-        private ObservableCollection<WorkPoint> GetWorkPoint(Dictionary<string, double> dic)
-        {
-            ObservableCollection<WorkPoint> data = new ObservableCollection<WorkPoint>();
-            for (int i = 0; i < dic.Count; i++)
-            {
-                WorkPoint wp = new WorkPoint();
-                wp.Name = dic.Keys.ToArray()[i];
-                wp.Value = dic.Values.ToArray()[i];
-                data.Add(wp);
-            }
-            return data;
+            AxisX = ModuleCamellia.p_axisXY.p_axisX;
+            AxisY = ModuleCamellia.p_axisXY.p_axisY;
+            AxisZ = ModuleCamellia.p_axisZ;
+            AxisLifter = ModuleCamellia.p_axisLifter;
         }
 
 
-
-        #endregion
 
         #region Motion Command
         public ICommand CmdAllHome
@@ -281,21 +275,24 @@ namespace Root_CAMELLIA
                     Thread thread = new Thread(()=> 
                     {
                         EnableBtn = false;
+                        ModuleCamellia.StateHome();
                         //m_AxisXY.p_axisX.StartHome();
                         //m_AxisXY.p_axisY.StartHome();
                         //m_AxisZ.StartHome();
                         //m_AxisXY.WaitReady();
                         //m_AxisZ.WaitReady();
-                        AxisX.StartHome();
-                        AxisY.StartHome();
-                        AxisZ.StartHome();
-                        AxisX.WaitReady();
-                        AxisY.WaitReady();
-                        AxisZ.WaitReady();
+                        //AxisX.StartHome();
+                        //AxisY.StartHome();
+                        //AxisZ.StartHome();
+                        //AxisLifter.StartHome();
+                        //AxisX.WaitReady();
+                        //AxisY.WaitReady();
+                        //AxisZ.WaitReady();
+                        //AxisLifter.WaitReady();
+                        EnableBtn = true;
                     });
                     thread.Start();
-                    thread.Join();
-                    EnableBtn = true;
+                   //thread.Join();
                 });
             }
         }
@@ -311,10 +308,9 @@ namespace Root_CAMELLIA
                         EnableBtn = false;
                         SelectedAxis.StartMove(CurrentAxisWorkPoints[SelectedWorkPointIndex].Value);
                         SelectedAxis.WaitReady();
+                        EnableBtn = true;
                     });
                     thread.Start();
-                    thread.Join();
-                    EnableBtn = true;
                 });
             }
         }
@@ -324,9 +320,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    
                     AxisX.StopAxis();
                     AxisY.StopAxis();
                     AxisZ.StopAxis();
+                    AxisLifter.StopAxis();
                 });
             }
         }
@@ -355,7 +353,6 @@ namespace Root_CAMELLIA
                         SelectedAxis.WaitReady();
                     });
                     thread.Start();
-                    thread.Join();
                     EnableBtn = true;
                 });
             }
@@ -474,16 +471,24 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand CmdClose
+        public ICommand CmdCopyCurrentPos
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-                    CloseRequested(this, new DialogCloseRequestedEventArgs(true));
+                    if(SelectedAxis == null)
+                    {
+                        return;
+                    }
+                    double value = SelectedAxis.p_posActual;
+                    Clipboard.SetText(value.ToString());
                 });
             }
         }
+        #endregion
+
+        #region SR Command
         public ICommand CmdCentering
         {
             get
@@ -534,7 +539,22 @@ namespace Root_CAMELLIA
                 });
             }
         }
+        #endregion
 
+        #region General Command
+        public ICommand CmdClose
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+                    ModuleCamellia.mwvm.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
+
+                    CloseRequested(this, new DialogCloseRequestedEventArgs(true));
+                });
+            }
+        }
         #endregion
 
         #region Function
@@ -546,7 +566,7 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Module_Camellia.Run_Measure measure = (Module_Camellia.Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+            Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
             measure.Run();
         }
         private void Calibration()
@@ -557,7 +577,8 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Module_Camellia.Run_Calibration calibration = (Module_Camellia.Run_Calibration)ModuleCamellia.CloneModuleRun("Calibration");
+            Run_CalibrationWaferCentering calibration = (Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("Calibration");
+            calibration.m_useCentering = false;
             calibration.Run();
         }
         private void InitCalibration()
@@ -568,7 +589,7 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Module_Camellia.Run_InitCalWaferCentering initCalibration = (Module_Camellia.Run_InitCalWaferCentering)ModuleCamellia.CloneModuleRun("InitCalWaferCentering");
+            Run_InitCalibration initCalibration = (Run_InitCalibration)ModuleCamellia.CloneModuleRun("InitCalWaferCentering");
             initCalibration.Run();
         }
         private void Centering()
@@ -579,11 +600,37 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Module_Camellia.Run_WaferCentering centering = (Module_Camellia.Run_WaferCentering)ModuleCamellia.CloneModuleRun("WaferCentering");
+            Run_CalibrationWaferCentering centering = (Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("WaferCentering");
+            centering.m_useCal = false;
             centering.Run();
+        }
+        private ObservableCollection<WorkPoint> GetWorkPoint(Dictionary<string, double> dic)
+        {
+            ObservableCollection<WorkPoint> data = new ObservableCollection<WorkPoint>();
+            for (int i = 0; i < dic.Count; i++)
+            {
+                WorkPoint wp = new WorkPoint();
+                wp.Name = dic.Keys.ToArray()[i];
+                wp.Value = dic.Values.ToArray()[i];
+                data.Add(wp);
+            }
+            return data;
         }
         #endregion
 
+        #region Invoke Command
+        public void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            int value = 0;
+            if (Int32.TryParse((e.EditingElement as TextBox).Text, out value))
+            {
+                SelectedAxis.m_aPos[SelectedAxis.m_asPos[e.Row.GetIndex()]] = value;
+                SelectedAxis.RunTree(RootTools.Trees.Tree.eMode.RegWrite);
+                SelectedAxis.RunTree(RootTools.Trees.Tree.eMode.Init);
+            }
+        }
+
+        #endregion
         public class WorkPoint
         {
             private string _Name;

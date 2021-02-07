@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
              xmlns:helper="clr-namespace:Helper"
-             mc:Ignorable="d" Background="White">
+             mc:Ignorable="d" Background="White"
+             d:DesignHeight="1000" d:DesignWidth="1400">
     <Grid>
         <ItemsControl ItemsSource="{Binding p_MapItems}">
             <ItemsControl.ItemsPanel>

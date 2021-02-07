@@ -1,17 +1,25 @@
-﻿using RootTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision.delete
+namespace RootTools_Vision
 {
     public class WorkEventManager
     {
+        #region [WorkDoneAll]
+        public static event EventHandler<WorkDoneAllEventArgs> WorkDoneAll;
+
+        public static void OnPositionDone(object obj, WorkDoneAllEventArgs args)
+        {
+            WorkDoneAll?.Invoke(obj, args);
+        }
+        #endregion
+
         #region [PositionDone]
         public static event EventHandler<PositionDoneEventArgs> PositionDone;
-        
+
         public static void OnPositionDone(object obj, PositionDoneEventArgs args)
         {
             PositionDone?.Invoke(obj, args);
@@ -36,13 +44,21 @@ namespace RootTools_Vision.delete
         }
         #endregion
 
-
         #region [ProcessDefectWaferDone]
         public static event EventHandler<ProcessDefectWaferDoneEventArgs> ProcessDefectWaferDone;
 
         public static void OnProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs args)
         {
             ProcessDefectWaferDone?.Invoke(obj, args);
+        }
+        #endregion
+
+        #region [ProcessDefectEdgeDone]
+        public static event EventHandler<ProcessDefectEdgeDoneEventArgs> ProcessDefectEdgeDone;
+
+        public static void OnProcessDefectEdgeDone(object obj, ProcessDefectEdgeDoneEventArgs args)
+        {
+            ProcessDefectEdgeDone?.Invoke(obj, args);
         }
         #endregion
 
@@ -70,6 +86,15 @@ namespace RootTools_Vision.delete
         public static void OnWorkplaceStateChanged(object obj, WorkplaceStateChangedEventArgs args)
         {
             WorkplaceStateChanged?.Invoke(obj, args);
+        }
+        #endregion
+
+        #region [RequestStop]
+        public static event EventHandler<RequestStopEventArgs> RequestStop;
+
+        public static void OnRequestStop(object obj, RequestStopEventArgs args)
+        {
+            RequestStop?.Invoke(obj, args);
         }
         #endregion
     }

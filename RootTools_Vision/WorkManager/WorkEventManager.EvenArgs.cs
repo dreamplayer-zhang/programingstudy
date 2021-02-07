@@ -39,7 +39,6 @@ namespace RootTools_Vision.delete
         }
     }
 
-
     public class ProcessDefectDoneEventArgs : EventArgs
     {
         public ProcessDefectDoneEventArgs()
@@ -51,6 +50,14 @@ namespace RootTools_Vision.delete
     public class ProcessDefectWaferDoneEventArgs : EventArgs
     {
         public ProcessDefectWaferDoneEventArgs()
+        {
+
+        }
+    }
+
+    public class ProcessDefectEdgeDoneEventArgs : EventArgs
+    {
+        public ProcessDefectEdgeDoneEventArgs()
         {
 
         }
