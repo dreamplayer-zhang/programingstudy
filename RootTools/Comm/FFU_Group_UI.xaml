@@ -93,8 +93,8 @@
                                             FontWeight="Bold" Foreground="White"
                                             TextAlignment="Center">
                                     </TextBlock>
-                                    <lvc:Gauge Grid.Row="1" Margin="0" From="{Binding p_nMaxRPM}"
-                                            To="{Binding p_nMinRPM}" InnerRadius="30"
+                                    <lvc:Gauge Grid.Row="1" Margin="0" From="{Binding p_nMinRPM}"
+                                            To="{Binding p_nMaxRPM}" InnerRadius="30"
                                             LabelsVisibility="Hidden" Background="White"
                                             Foreground="Black" HighFontSize="20"
                                             GaugeActiveFill="#FF3399FF" Value="{Binding p_nRPM}">

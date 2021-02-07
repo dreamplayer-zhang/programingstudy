@@ -120,8 +120,8 @@ namespace RootTools
             for (int i = 0; i < p_aFFU.Count; i++)
             {
                 GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleName, p_aFFU[i].p_sID, m_sFilePath);
-                GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleMax, p_aFFU[i].p_MaxRPM.ToString(), m_sFilePath);
-                GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleMin, p_aFFU[i].p_MinRPM.ToString(), m_sFilePath);
+                GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleMax, p_aFFU[i].p_nMaxRPM.ToString(), m_sFilePath);
+                GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleMin, p_aFFU[i].p_nMinRPM.ToString(), m_sFilePath);
             }
         }
 
@@ -139,8 +139,8 @@ namespace RootTools
                 {
                     FFUModule temp = new FFUModule();
                     temp.p_sID = GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleName, m_sFilePath);
-                    temp.p_MaxRPM = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMax, m_sFilePath));
-                    temp.p_MinRPM = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMin, m_sFilePath));
+                    temp.p_nMaxRPM = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMax, m_sFilePath));
+                    temp.p_nMinRPM = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMin, m_sFilePath));
                     p_aFFU.Add(temp);
                     p_aFFU[p_aFFU.Count - 1].OnDetectLimit += FFUGroup_OnDetectLimit;
                 }
@@ -310,6 +310,10 @@ namespace RootTools
             set
             {
                 SetProperty(ref m_nRPM, value);
+                if (p_nMaxRPM < value || p_nMinRPM > value)
+                {
+                    OnDetectLimit("FDC : " + m_sID + " Value : " + m_nRPM + " Limit ( " + p_nMinRPM + ", " + p_nMaxRPM + " )");
+                }
             }
         }
 
@@ -325,7 +329,7 @@ namespace RootTools
             }
         }
 
-        public int p_MaxRPM
+        public int p_nMaxRPM
         {
             get
             {
@@ -336,7 +340,7 @@ namespace RootTools
                 SetProperty(ref m_nMaxRPM, value);
             }
         }
-        public int p_MinRPM
+        public int p_nMinRPM
         {
             get
             {

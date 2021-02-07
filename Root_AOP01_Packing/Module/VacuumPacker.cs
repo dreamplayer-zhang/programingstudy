@@ -2,6 +2,7 @@
 using Root_EFEM.Module;
 using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -22,6 +23,14 @@ namespace Root_AOP01_Packing.Module
             m_holder.GetTools(m_toolBox, bInit); 
             m_loader.GetTools(m_toolBox, bInit);
             m_heater.GetTools(m_toolBox, bInit);
+        }
+        #endregion
+
+        #region GAF
+        ALID alid_VacuumPacker;
+        void InitALID()
+        {
+            alid_VacuumPacker = m_gaf.GetALID(this, "Vacuum Packer", "VACUUM PACKER ERROR");
         }
         #endregion
 
@@ -778,11 +787,13 @@ namespace Root_AOP01_Packing.Module
                 if (bInit)
                 {
                     m_dioHeat.Write(false);
-                    m_doHeatTimeout.Write(false); 
-                    m_packer.InitSolvalve(m_solSponge[0]);
-                    m_packer.InitSolvalve(m_solSponge[1]);
-                    m_packer.InitSolvalve(m_solHeater[0]);
-                    m_packer.InitSolvalve(m_solHeater[1]);
+                    m_doHeatTimeout.Write(false);
+                    m_packer.m_heater.RunHeaterSol(false);
+                    m_packer.m_heater.RunSpongeSol(false);
+                    //m_packer.InitSolvalve(m_solSponge[0]);
+                    //m_packer.InitSolvalve(m_solSponge[1]);
+                    //m_packer.InitSolvalve(m_solHeater[0]);
+                    //m_packer.InitSolvalve(m_solHeater[1]);
                 }
             }
 
@@ -790,16 +801,18 @@ namespace Root_AOP01_Packing.Module
             {
                 m_solSponge[0].Write(bClose);
                 m_solSponge[1].Write(!bClose);
-                return "OK";
-                //int msTimeout = (int)(1000 * m_solSponge[0].m_secTimeout);
-                //StopWatch sw = new StopWatch();
-                //while (sw.ElapsedMilliseconds < msTimeout)
-                //{
-                //    Thread.Sleep(10);
-                //    if (EQ.IsStop()) return "EQ Stop";
-                //    if (m_solSponge[0].p_bDone && m_solSponge[1].p_bDone) return "OK";
-                //}
-                //return "Sponge Timeout";
+                //return "OK";
+                int msTimeout = (int)(1000 * m_solSponge[0].m_secTimeout);
+                StopWatch sw = new StopWatch();
+                while (sw.ElapsedMilliseconds < msTimeout)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop())
+                        return "EQ Stop";
+                    if (m_solSponge[0].p_bDone && m_solSponge[1].p_bDone)
+                        return "OK";
+                }
+                return "Sponge Timeout";
             }
 
             public string RunHeaterSol(bool bClose)
@@ -807,16 +820,19 @@ namespace Root_AOP01_Packing.Module
                 //m_solHeater[0].Write(true);
                 m_solHeater[1].Write(!bClose);
                 //m_solHeater[1].Write(!bClose);
-                return "OK";
-                //int msTimeout = (int)(1000 * m_solHeater[0].m_secTimeout);
-                //StopWatch sw = new StopWatch();
-                //while (sw.ElapsedMilliseconds < msTimeout)
-                //{
-                //    Thread.Sleep(10);
-                //    if (EQ.IsStop()) return "EQ Stop";
-                //    if (m_solHeater[0].p_bDone && m_solHeater[1].p_bDone) return "OK";
-                //}
-                //return "HeaterClose Timeout";
+                int msTimeout = (int)(1000 * m_solHeater[0].m_secTimeout);
+                StopWatch sw = new StopWatch();
+                while (sw.ElapsedMilliseconds < msTimeout)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop())
+                        return "EQ Stop";
+                    if (m_solHeater[1].p_bDone)
+                        return "OK";
+                    //if (m_solHeater[0].p_bDone && m_solHeater[1].p_bDone)
+                    //    return "OK";
+                }
+                return "HeaterClose Timeout";
             }
 
             public double m_secHeat = 3; 
@@ -874,7 +890,14 @@ namespace Root_AOP01_Packing.Module
                     if (Run(m_wrapper.RunMoveX(Wrapper.ePosMove.Pick))) return p_sInfo;
                     if (Run(m_wrapper.RunMoveZ(Wrapper.ePosPicker.Down))) return p_sInfo;
                     Thread.Sleep(10);
-                    if (Run(m_wrapper.RunVacOn())) return p_sInfo;
+                    if (Run(m_wrapper.RunVacOn()))
+                    {
+                        alid_VacuumPacker.Run(true, p_sInfo);
+                        //0207
+                        //봉투 못잡았따 알람
+                        // Z, X Home으로
+                        return p_sInfo;
+                    }
                     if (Run(m_wrapper.RunMoveZ(Wrapper.ePosPicker.Open))) return p_sInfo;
                     if (Run(m_wrapper.RunMoveX(Wrapper.ePosMove.Place))) return p_sInfo;
                     if (Run(m_wrapper.RunMoveZ(Wrapper.ePosPicker.Down))) return p_sInfo;
