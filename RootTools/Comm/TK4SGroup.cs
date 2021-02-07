@@ -276,6 +276,7 @@ namespace RootTools
 
         private void TK4SGroup_OnDetectLimit(string str)
         {
+            if(OnDetectLimit != null)
             OnDetectLimit(str);
         }
 

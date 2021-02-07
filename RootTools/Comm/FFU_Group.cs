@@ -54,11 +54,11 @@ namespace RootTools
         }
         int m_nBaudrate = 9600;
         Parity m_eParity = Parity.None;
-        StopBits m_eStopBit = StopBits.One;
+        StopBits m_eStopBit = StopBits.Two;
         int m_nInterval = 1000;
 
-        ObservableCollection<FFU> m_aFFU = new ObservableCollection<FFU>();
-        public ObservableCollection<FFU> p_aFFU
+        ObservableCollection<FFUModule> m_aFFU = new ObservableCollection<FFUModule>();
+        public ObservableCollection<FFUModule> p_aFFU
         {
             get
             {
@@ -67,6 +67,19 @@ namespace RootTools
             set
             {
                 SetProperty(ref m_aFFU, value);
+            }
+        }
+
+        FFUModule m_aSelectedModule;
+        public FFUModule p_aSelectedModule
+        {
+            get
+            {
+                return m_aSelectedModule;
+            }
+            set
+            {
+                SetProperty(ref m_aSelectedModule, value);
             }
         }
 
@@ -102,45 +115,42 @@ namespace RootTools
             DirectoryInfo dir = file.Directory;
             if (!dir.Exists)
                 dir.Create();
-            //GeneralFunction.WriteINIFile(sSectionFDC, sSectionPort, p_sSerialPort, m_sFilePath);
-            //GeneralFunction.WriteINIFile(sSectionFDC, sSectionCount, p_aTK4S.Count.ToString(), m_sFilePath);
-            //for (int i = 0; i < p_aTK4S.Count; i++)
-            //{
-            //    GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleName, p_aTK4S[i].p_sID, m_sFilePath);
-            //    GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleAddress, p_aTK4S[i].p_nAddress.ToString(), m_sFilePath);
-            //    GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleDP, p_aTK4S[i].p_nDecimalPoint.ToString(), m_sFilePath);
-            //    GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleMax, p_aTK4S[i].p_dMaxValue.ToString(), m_sFilePath);
-            //    GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleMin, p_aTK4S[i].p_dMinValue.ToString(), m_sFilePath);
-            //}
+            GeneralFunction.WriteINIFile(sSectionFFU, sSectionPort, p_sSerialPort, m_sFilePath);
+            GeneralFunction.WriteINIFile(sSectionFFU, sSectionCount, p_aFFU.Count.ToString(), m_sFilePath);
+            for (int i = 0; i < p_aFFU.Count; i++)
+            {
+                GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleName, p_aFFU[i].p_sID, m_sFilePath);
+                GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleMax, p_aFFU[i].p_nMaxRPM.ToString(), m_sFilePath);
+                GeneralFunction.WriteINIFile(sSectionModule + i, sSectionModuleMin, p_aFFU[i].p_nMinRPM.ToString(), m_sFilePath);
+            }
         }
 
         public void LoadModule()
         {
             if (File.Exists(m_sFilePath))
             {
-                //p_aTK4S.Clear();
-                //p_aTK4S = new ObservableCollection<TK4S>();
-                //p_sSerialPort = GeneralFunction.ReadINIFile(sSectionFDC, sSectionPort, m_sFilePath);
+                p_aFFU.Clear();
+                p_aFFU = new ObservableCollection<FFUModule>();
+                p_sSerialPort = GeneralFunction.ReadINIFile(sSectionFFU, sSectionPort, m_sFilePath);
 
-                //int nCount = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionFDC, sSectionCount, m_sFilePath));
+                int nCount = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionFFU, sSectionCount, m_sFilePath));
 
-                //for (int i = 0; i < nCount; i++)
-                //{
-                //    TK4S temp = new TK4S();
-                //    temp.p_sID = GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleName, m_sFilePath);
-                //    temp.p_nAddress = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleAddress, m_sFilePath));
-                //    temp.p_nDecimalPoint = Convert.ToDouble(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleDP, m_sFilePath));
-                //    temp.p_dMaxValue = Convert.ToDouble(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMax, m_sFilePath));
-                //    temp.p_dMinValue = Convert.ToDouble(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMin, m_sFilePath));
-                //    p_aTK4S.Add(temp);
-                //    p_aTK4S[p_aTK4S.Count - 1].OnDetectLimit += TK4SGroup_OnDetectLimit;
-                //}
+                for (int i = 0; i < nCount; i++)
+                {
+                    FFUModule temp = new FFUModule();
+                    temp.p_sID = GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleName, m_sFilePath);
+                    temp.p_nMaxRPM = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMax, m_sFilePath));
+                    temp.p_nMinRPM = Convert.ToInt32(GeneralFunction.ReadINIFile(sSectionModule + i, sSectionModuleMin, m_sFilePath));
+                    p_aFFU.Add(temp);
+                    p_aFFU[p_aFFU.Count - 1].OnDetectLimit += FFUGroup_OnDetectLimit;
+                }
             }
         }
 
         public bool Init()
         {
 
+            m_Modbus = new Modbus(p_id,m_log);
             m_Modbus.m_client.SerialPort = m_sSerialPort;
             m_Modbus.m_client.Baudrate = m_nBaudrate;
             m_Modbus.m_client.Parity = m_eParity;
@@ -156,8 +166,6 @@ namespace RootTools
             }
             if (m_Modbus.p_bConnect)
             {
-                //m_client.SendDataChanged += m_client_SendDataChanged;
-                //m_client.ReceiveDataChanged += m_client_ReceiveDataChanged;
                 m_threadCommunicate = new Thread(RunThread);
                 m_threadCommunicate.Start();
             }
@@ -176,25 +184,21 @@ namespace RootTools
                     return;
                 try
                 {
-                    for (int num = 0; num < p_aFFU.Count; num++)
-                    {
-                        Thread.Sleep(10);
-                        List<int> aTemp = new List<int>();
-                        for (int i = 0; i < p_aFFU[num].p_nNumUnit; i++)
-                            aTemp.Add(0);
+                    List<int> aTemp = new List<int>();
+                    for (int i = 0; i < p_aFFU.Count; i++)
+                        aTemp.Add(0);
 
-                        Thread.Sleep(10);
-                        m_Modbus.ReadHoldingRegister(Convert.ToByte(num), 0, aTemp);
-                        for (int i = 0; i < p_aFFU[num].p_nNumUnit; i++)
-                            p_aFFU[num].p_aRPM[i] = aTemp[i];
+                    Thread.Sleep(10);
+                    m_Modbus.ReadHoldingRegister(1, 0, aTemp);
+                    for (int i = 0; i < p_aFFU.Count; i++)
+                        p_aFFU[i].p_nRPM = aTemp[i];
 
-                        Thread.Sleep(10);
-                        m_Modbus.ReadHoldingRegister(Convert.ToByte(num), 128, aTemp);
-                        for (int i = 0; i < p_aFFU[num].p_nNumUnit; i++)
-                            p_aFFU[num].p_aPressure[i] = aTemp[i];
-                    }
+                    Thread.Sleep(10);
+                    m_Modbus.ReadHoldingRegister(1, 128, aTemp);
+                    for (int i = 0; i < p_aFFU.Count; i++)
+                        p_aFFU[i].p_nPressure = aTemp[i];
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     // Log추가
                 }
@@ -211,19 +215,20 @@ namespace RootTools
 
         public void AddModule()
         {
-            //p_aTK4S.Add(new TK4S(p_aTK4S.Count + 1));
-            //p_aTK4S[p_aTK4S.Count - 1].OnDetectLimit += TK4SGroup_OnDetectLimit;
-            //SaveModule();
+            p_aFFU.Add(new FFUModule());
+            p_aFFU[p_aFFU.Count - 1].OnDetectLimit += FFUGroup_OnDetectLimit;
+            SaveModule();
         }
 
-        private void TK4SGroup_OnDetectLimit(string str)
+        private void FFUGroup_OnDetectLimit(string str)
         {
-            OnDetectLimit(str);
+            if(OnDetectLimit != null)
+                OnDetectLimit(str);
         }
 
         public void RemoveModule()
         {
-            //p_aTK4S.RemoveAt(p_aTK4S.Count - 1);
+            p_aFFU.RemoveAt(p_aFFU.Count - 1);
             SaveModule();
             LoadModule();
         }
@@ -247,14 +252,8 @@ namespace RootTools
 
         public void DoubleClickAction()
         {
-            //var viewModel = m_SelectedTK4S;
-            //Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
-            //if (result.HasValue)
-            //{
-            //    if (result.Value)
-            //    {
-            //    }
-            //}
+            var viewModel = p_aSelectedModule;
+            Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
         }
 
         public RelayCommand MyDoubleClickCommand
@@ -268,13 +267,14 @@ namespace RootTools
     }
 
     [Serializable]
-    public class FFU : ObservableObject, IDialogRequestClose
+    public class FFUModule : ObservableObject, IDialogRequestClose
     {
         string m_sID = "";
-        int m_nAddress = 0;
-        int m_nNumUnit = 0;
-        ObservableCollection<int> m_nPressure = new ObservableCollection<int>();
-        ObservableCollection<int> m_nRPM = new ObservableCollection<int>();
+        int m_nUnit = 0;
+        int m_nPressure = 0;
+        int m_nRPM = 0;
+        int m_nMaxRPM = 0;
+        int m_nMinRPM = 0;
         public event delegateString OnDetectLimit;
 
         public string p_sID
@@ -289,31 +289,19 @@ namespace RootTools
             }
         }
 
-        public int p_nAddress
+        public int p_nUnit
         {
             get
             {
-                return m_nAddress;
+                return m_nUnit;
             }
             set
             {
-                SetProperty(ref m_nAddress, value);
+                SetProperty(ref m_nUnit, value);
             }
         }
 
-        public int p_nNumUnit
-        {
-            get
-            {
-                return m_nNumUnit;
-            }
-            set
-            {
-                SetProperty(ref m_nNumUnit, value);
-            }
-        }
-
-        public ObservableCollection<int> p_aRPM
+        public int p_nRPM
         {
             get
             {
@@ -322,10 +310,14 @@ namespace RootTools
             set
             {
                 SetProperty(ref m_nRPM, value);
+                if (p_nMaxRPM < value || p_nMinRPM > value)
+                {
+                    OnDetectLimit("FDC : " + m_sID + " Value : " + m_nRPM + " Limit ( " + p_nMinRPM + ", " + p_nMaxRPM + " )");
+                }
             }
         }
 
-        public ObservableCollection<int> p_aPressure
+        public int p_nPressure
         {
             get
             {
@@ -337,16 +329,37 @@ namespace RootTools
             }
         }
 
+        public int p_nMaxRPM
+        {
+            get
+            {
+                return m_nMaxRPM;
+            }
+            set
+            {
+                SetProperty(ref m_nMaxRPM, value);
+            }
+        }
+        public int p_nMinRPM
+        {
+            get
+            {
+                return m_nMinRPM;
+            }
+            set
+            {
+                SetProperty(ref m_nMinRPM, value);
+            }
+        }
 
-        public FFU()
+
+        public FFUModule()
         {
         }
 
-        public FFU(int nAddress, int nUnit)
+        public FFUModule(int nUnit)
         {
-            p_nAddress = nAddress;
-            p_nNumUnit = nUnit;
-            //p_sID = nAddress.ToString();
+            p_nUnit = nUnit;
         }
 
         [field: NonSerialized]
