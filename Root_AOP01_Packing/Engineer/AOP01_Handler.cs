@@ -45,6 +45,8 @@ namespace Root_AOP01_Packing
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
+            m_aop01P = new AOP01_P("AOP01_P", m_engineer);
+            InitModule(m_aop01P);
             //InitWTR(); 
             //InitLoadport();
 
@@ -56,8 +58,8 @@ namespace Root_AOP01_Packing
             //((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);
             //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_tapePacker);
 
-            m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
-            InitModule(m_vacuumPacker);
+            //m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
+            //InitModule(m_vacuumPacker);
             //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_vacuumPacker);
 
             //m_elevator = new IndividualElevator("IndividualElevator", m_engineer);
