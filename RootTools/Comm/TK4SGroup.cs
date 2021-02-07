@@ -422,6 +422,11 @@ namespace RootTools
 
         [field: NonSerialized]
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
+        void _Dummy()
+        {
+            if (CloseRequested != null) CloseRequested(null, null);
+        }
+
     }
 
 }

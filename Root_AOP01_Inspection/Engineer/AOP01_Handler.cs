@@ -118,7 +118,7 @@ namespace Root_AOP01_Inspection
             switch (m_eWTR)
             {
                 case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer); break;
-                default: m_wtr = new RTRCleanUnit("RTR", m_engineer); break;
+                default: m_wtr = new RTR_RND("RTR", m_engineer); break;
             }
             InitModule(m_wtr);
         }
@@ -258,7 +258,7 @@ namespace Root_AOP01_Inspection
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
-            if (gaf != null) gaf.ClearALID();
+            gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
         }
         #endregion
@@ -311,6 +311,8 @@ namespace Root_AOP01_Inspection
                     }
                 }
             }
+            m_process.m_dSequencePercent = 0;
+            m_process.m_dOneSequencePercent = 100 / (m_process.m_qSequence.Count); //LYJ 210205
             m_process.RunTree(Tree.eMode.Init);
         }
 
@@ -346,7 +348,7 @@ namespace Root_AOP01_Inspection
             if (m_process.m_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
-                if (m_gem != null) m_gem.SendPJComplete(pj.m_sPJobID);
+                m_gem?.SendPJComplete(pj.m_sPJobID);
                 Thread.Sleep(100);
             }
         }

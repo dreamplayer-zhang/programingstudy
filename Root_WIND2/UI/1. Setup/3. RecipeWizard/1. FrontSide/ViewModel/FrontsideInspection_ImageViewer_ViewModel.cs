@@ -261,7 +261,7 @@ namespace Root_WIND2
             return grid;
         }
 
-        static long time = 0;
+        //static long time = 0;
         static StopWatch watch = new StopWatch();
         private void RedrawShapes()
         {

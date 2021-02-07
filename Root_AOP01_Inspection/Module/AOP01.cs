@@ -32,7 +32,7 @@ namespace Root_AOP01_Inspection.Module
             Buzzer4,
             BuzzerOff
         }
-        eBuzzer m_eBuzzer = eBuzzer.BuzzerOff;
+        //eBuzzer m_eBuzzer = eBuzzer.BuzzerOff;
         string[] m_asLamp = Enum.GetNames(typeof(eLamp));
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
         public DIO_Os m_doLamp;
@@ -94,6 +94,7 @@ namespace Root_AOP01_Inspection.Module
         #region GAF
         //ALID 생성
         ALID m_alidEMS;
+        ALID m_alidEMO;
         ALID m_alidProtectionBar;
         ALID m_alidMCReset;
         ALID m_alidCDA1Low;
@@ -114,6 +115,7 @@ namespace Root_AOP01_Inspection.Module
         void InitALID()
         {
             m_alidEMS = m_gaf.GetALID(this, "EMS", "EMS Error");
+            m_alidEMO = m_gaf.GetALID(this, "EMO", "EMO Error");
             m_alidProtectionBar = m_gaf.GetALID(this, "ProtectionBar", "ProtectionBar Error");
             m_alidMCReset = m_gaf.GetALID(this, "MC Reset", "MC Reset Error");
             m_alidCDA1Low = m_gaf.GetALID(this, "CDA1 Low", "CDA1 Low Error");
@@ -135,7 +137,7 @@ namespace Root_AOP01_Inspection.Module
 
         #region Thread
         public EQ.eState m_eStatus = EQ.eState.Init;
-        int m_nLamp_count = 0;
+        //int m_nLamp_count = 0;
         public bool m_bDoorAlarm = true;
         protected override void RunThread()
         {
@@ -162,6 +164,7 @@ namespace Root_AOP01_Inspection.Module
                             m_doLamp.Write(eLamp.Green);
                             break;
                         case EQ.eState.Ready:
+                        case EQ.eState.Idle:
                             m_doDoorLock_Use.Write(false);
                             BuzzerOff();
                             m_doLamp.Write(eLamp.Yellow);
@@ -180,9 +183,9 @@ namespace Root_AOP01_Inspection.Module
                 if (!m_diEMS.p_bIn)
                 {
                     if (!m_diCDA1Low.p_bIn && !m_diCDA2Low.p_bIn)
-                        m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
+                        m_alidEMS.Run(!m_diEMS.p_bIn, "EMS Error");
                     else
-                        m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMO Buttons");
+                        m_alidEMO.Run(!m_diEMS.p_bIn, "EMO Error");
                     m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
                 }
                 else
@@ -205,7 +208,7 @@ namespace Root_AOP01_Inspection.Module
                     }
                     if (m_diInterlock_Key.p_bIn)
                     {
-                        m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
+                        m_alidDoorLock.Run(! m_diDoorLock.p_bIn, "Please Check the Doors");
                     }
                     m_alidLightCurtain.Run(m_diLightCurtain.p_bIn, "Please Check LightCurtain");
                     foreach (OHT_Semi OHT in p_aOHT)

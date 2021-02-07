@@ -1,4 +1,5 @@
 ﻿using RootTools_Vision;
+using System.IO;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -157,6 +158,8 @@ namespace Root_WIND2.UI_User
         {
             Initialize();
 
+            frontsideOrigin.DataContext = frontsideOriginVM;
+
             WIND2EventManager.RecipeUpdated += RecipeUpdated_Callback;
         }
 
@@ -215,6 +218,7 @@ namespace Root_WIND2.UI_User
                 {
                     SetPage(frontsideSummary);
                     frontsideSummary.DataContext = frontsideSummaryVM;
+                    frontsideSummaryVM.SetPage();
                 });
             }
         }
@@ -227,6 +231,7 @@ namespace Root_WIND2.UI_User
                 {
                     SetPage(frontsideProduct);
                     frontsideProduct.DataContext = frontsideProductVM;
+                    frontsideProductVM.SetPage();
                 });
             }
         }
@@ -238,7 +243,8 @@ namespace Root_WIND2.UI_User
                 return new RelayCommand(() =>
                 {
                     SetPage(frontsideOrigin);
-                    frontsideOrigin.DataContext = frontsideOriginVM;
+                    //frontsideOrigin.DataContext = frontsideOriginVM;
+                    frontsideOriginVM.SetPage();
                 });
             }
         }
@@ -290,10 +296,116 @@ namespace Root_WIND2.UI_User
                 {
                     SetPage(frontsideInspect);
                     frontsideInspect.DataContext = frontsideInspectVM;
+                    frontsideInspectVM.SetPage();
                 });
             }
         }
 
+        public ICommand btnNewRecipeFront
+        {
+            get => new RelayCommand(() =>
+            {
+                System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+                dlg.InitialDirectory = Constants.Path.RecipeFrontRootPath;
+                dlg.Title = "Save Recipe";
+                dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                    string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                    string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                    string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+                    string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                    DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+                    if (!dir.Exists)
+                        dir.Create();
+
+                    RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                    recipe.Clear();
+
+                    recipe.Name = sFileNameNoExt;
+                    recipe.RecipePath = sFullPath;
+                    recipe.RecipeFolderPath = sRecipeFolderPath;
+
+                    recipe.Save(sFullPath);
+                }
+            });
+        }
+
+        public ICommand btnSaveRecipeFront
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                    if (recipe.RecipePath != "")
+                    {
+                        recipe.Save(recipe.RecipePath);
+                    }
+                    else
+                    {
+                        System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+                        dlg.InitialDirectory = Constants.Path.RecipeFrontRootPath;
+                        dlg.Title = "Save Recipe";
+                        dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                        if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        {
+                            string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                            string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                            string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                            string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+                            string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                            DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+                            if (!dir.Exists)
+                                dir.Create();
+
+                            recipe.Name = sFileNameNoExt;
+                            recipe.RecipePath = sFullPath;
+                            recipe.RecipeFolderPath = sRecipeFolderPath;
+
+                            recipe.Save(sFullPath);
+                        }
+                    }
+                });
+            }
+        }
+
+        public ICommand btnLoadRecipeFront
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+                    dlg.InitialDirectory = Constants.Path.RecipeFrontRootPath;
+                    dlg.Title = "Load Recipe";
+                    dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                        string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                        string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                        string sFullPath = Path.Combine(sFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                        DirectoryInfo dir = new DirectoryInfo(sFolderPath);
+                        if (!dir.Exists)
+                            dir.Create();
+
+                        RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                        recipe.Read(sFullPath);
+
+                        UpdateCurrentPanel();
+                        WIND2EventManager.OnRecipeUpdated(this, new RecipeEventArgs());
+                    }
+                });
+            }
+        }
+        #endregion
+
+        #region [Command Edge]
         public ICommand btnEdgeSetup
 		{
             get
@@ -305,6 +417,124 @@ namespace Root_WIND2.UI_User
                 });
             }
         }
+
+        public ICommand btnEdgeInspect
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    edgesideSetupVM.Inspect();
+                });
+            }
+        }
+        
+
+        public ICommand btnNewRecipeEdge
+        {
+            get => new RelayCommand(() =>
+            {
+                System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+                dlg.InitialDirectory = Constants.Path.RecipeEdgeRootPath;
+                dlg.Title = "Save Recipe";
+                dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                    string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                    string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                    string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+                    string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                    DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+                    if (!dir.Exists)
+                        dir.Create();
+
+                    RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
+                    recipe.Clear();
+
+                    recipe.Name = sFileNameNoExt;
+                    recipe.RecipePath = sFullPath;
+                    recipe.RecipeFolderPath = sRecipeFolderPath;
+
+                    recipe.Save(sFullPath);
+                }
+            });
+        }
+
+        public ICommand btnSaveRecipeEdge
+		{
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
+                    if (recipe.RecipePath != "")
+                    {
+                        recipe.Save(recipe.RecipePath);
+                    }
+                    else
+                    {
+                        System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+                        dlg.InitialDirectory = Constants.Path.RecipeEdgeRootPath;
+                        dlg.Title = "Save Recipe";
+                        dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                        if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        {
+                            string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                            string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                            string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                            string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+                            string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                            DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+                            if (!dir.Exists)
+                                dir.Create();
+
+                            recipe.Name = sFileNameNoExt;
+                            recipe.RecipePath = sFullPath;
+                            recipe.RecipeFolderPath = sRecipeFolderPath;
+
+                            recipe.Save(sFullPath);
+                        }
+                    }
+                });
+            }
+        }
+
+        public ICommand btnLoadRecipeEdge
+		{
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+                    dlg.InitialDirectory = Constants.Path.RecipeEdgeRootPath;
+                    dlg.Title = "Load Recipe";
+                    dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                        string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                        string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                        string sFullPath = Path.Combine(sFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                        DirectoryInfo dir = new DirectoryInfo(sFolderPath);
+                        if (!dir.Exists)
+                            dir.Create();
+
+                        RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
+                        recipe.Read(sFullPath);
+
+                        edgesideSetupVM.LoadParameter();
+                        //UpdateUI();
+                    }
+                });
+            }
+        }
+        #endregion
+
+        #region [Command EBR]
         public ICommand btnEBRSetup
         {
             get
@@ -336,6 +566,13 @@ namespace Root_WIND2.UI_User
         public void SetPage(UserControl page)
         {
             p_CurrentPanel = page;
+        }
+
+        public void UpdateCurrentPanel()
+        {
+            if (p_CurrentPanel == null) return;
+
+            ((IPage)p_CurrentPanel.DataContext).LoadRecipe();
         }
     }
 }

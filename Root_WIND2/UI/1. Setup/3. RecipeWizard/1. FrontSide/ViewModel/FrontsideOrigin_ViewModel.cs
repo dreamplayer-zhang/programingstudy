@@ -12,7 +12,7 @@ namespace Root_WIND2
     class FrontsideOrigin_ViewModel : ObservableObject, IRecipeUILoadable
     {
         ImageData OriginImageData;
-        TRect InspAreaBuf;
+        //TRect InspAreaBuf;
         Setup_ViewModel setup;
 
         public delegate void setOrigin(object e);

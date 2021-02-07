@@ -438,7 +438,7 @@ namespace Root_WIND2.UI_User
                         return;
                     }
 
-                    if( (originRightTop.X - originLeftBottom.X) > 30000 || (originLeftBottom.Y - originRightTop.Y) > 30000)
+                    if( (memPt.X - originLeftBottom.X) > 30000 || (originLeftBottom.Y - memPt.Y) > 30000)
                     {
                         MessageBox.Show("Origin(혹은 검사) 영역의 크기는 높이 30000(혹은 너비 30000)을 넘을 수 없습니다.");
                         return;
@@ -516,6 +516,26 @@ namespace Root_WIND2.UI_User
 
 
         #region [Draw Method]
+
+        public void SetOriginBox(CPoint originPt, int originWidth, int originHeight, int diePitchX, int diePitchY)
+        {
+            this.originLeftBottom.X = originPt.X;
+            this.originLeftBottom.Y = originPt.Y;
+
+            this.originRightTop.X = originPt.X + originWidth;
+            this.originRightTop.Y = originPt.Y - originHeight;
+
+            this.pitchRightTop.X = originPt.X + diePitchX;
+            this.pitchRightTop.Y = originPt.Y - diePitchY;
+
+
+            DrawOriginLeftBottomPoint(this.originLeftBottom);
+            DrawOriginRightTopPoint(this.originRightTop);
+            DrawPitchPoint(this.pitchRightTop);
+
+            DrawOriginBox();
+            DrawPitchBox();
+        }
 
         private void DrawOriginLeftBottomPoint(CPoint memPt)
         {

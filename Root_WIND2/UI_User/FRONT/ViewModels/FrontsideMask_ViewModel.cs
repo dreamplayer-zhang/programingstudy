@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2.UI_User
 {
-    class FrontsideMask_ViewModel : RootViewer_ViewModel
+    class FrontsideMask_ViewModel : RootViewer_ViewModel, IPage
     {
         private class DefineColors
         {
@@ -74,6 +74,30 @@ namespace Root_WIND2.UI_User
             this.p_LayerMemoryOffsetY = OriginOffset.Y;
 
             this.DisplayBox();
+
+
+            LoadRecipe();
+        }
+
+        public void LoadRecipe()
+        {
+            p_cInspROI.Clear();
+
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            foreach (RecipeType_Mask mask in recipe.GetItem<MaskRecipe>().MaskList)
+            {
+                InspectionROI roi = new InspectionROI();
+                roi.p_Color = mask.ColorIndex;
+                roi.p_Index = p_cInspROI.Count();
+                roi.p_Data = mask.ToPointLineList();
+
+                p_cInspROI.Add(roi);
+            }
+
+            if (p_cInspROI.Count > 0)
+            {
+                p_SelectedROI = p_cInspROI.First();
+            }
         }
 
         #region Property
@@ -1761,6 +1785,7 @@ namespace Root_WIND2.UI_User
             {
                 recipe.GetItem<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data , p_cInspROI[i].p_Color);
             }
+            p_LoadingOpacity = 0;
         }
 
         private void Worker_SaveROI_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -1772,6 +1797,16 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region ICommand
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.DisplayBox();
+                });
+            }
+        }
         public RelayCommand btnViewFullCommand
         {
             get

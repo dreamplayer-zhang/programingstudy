@@ -1000,15 +1000,6 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
-        public RTRCleanUnit p_wtr
-        {
-            get
-            {
-                AOP01_Handler handler = (AOP01_Handler)m_engineer.ClassHandler();
-                return (RTRCleanUnit)handler.m_wtr;
-            }
-        }
-
         public MainVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
@@ -2801,7 +2792,7 @@ namespace Root_AOP01_Inspection.Module
                 Image<Gray, byte> imgTemplate;
                 Point ptStart, ptEnd;
                 CRect crtSearchArea;
-                Mat matSearchArea;
+                //Mat matSearchArea;
                 CPoint cptSearchAreaCenter;
                 bool bFound = false;
                 CPoint[] cptarrOutResultCenterPositions = new CPoint[(int)eSearchPoint.Count];

@@ -11,6 +11,7 @@ using static Root_AOP01_Inspection.AOP01_Handler;
 using System.Windows.Threading;
 using System;
 using System.Windows.Media;
+using System.Reflection;
 
 namespace Root_AOP01_Inspection
 {
@@ -38,13 +39,18 @@ namespace Root_AOP01_Inspection
         }
     }
 
+
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리
     /// </summary>
     
     public partial class MainWindow : Window
     {
-
+        public void GetAssemblyVersion()
+        {
+            AssemblyName name = Assembly.GetExecutingAssembly().GetName();
+            this.textblockAssembly.Text = name.Version.ToString();
+        }
 
         #region Title Bar
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
@@ -161,9 +167,10 @@ namespace Root_AOP01_Inspection
             Init_ViewModel();
             Init_UI();
             logViewUI.Init(LogView.m_logView);
+            GetAssemblyVersion();
             if (m_engineer.m_handler.m_aLoadportType[0] == eLoadport.Cymechs && m_engineer.m_handler.m_aLoadportType[1] == eLoadport.Cymechs)
             {
-                Run.Init(m_engineer.m_handler.m_mainVision, m_engineer.m_handler.m_backsideVision, (RTRCleanUnit)m_engineer.m_handler.m_wtr, (Loadport_AOP01)m_engineer.m_handler.m_aLoadport[0], (Loadport_AOP01)m_engineer.m_handler.m_aLoadport[1], m_engineer, (RFID_Brooks)m_engineer.m_handler.m_aRFID[0], (RFID_Brooks)m_engineer.m_handler.m_aRFID[1]);
+                Run.Init(m_engineer.m_handler.m_mainVision, m_engineer.m_handler.m_backsideVision, (RTR_RND)m_engineer.m_handler.m_wtr, (Loadport_AOP01)m_engineer.m_handler.m_aLoadport[0], (Loadport_AOP01)m_engineer.m_handler.m_aLoadport[1], m_engineer, (RFID_Brooks)m_engineer.m_handler.m_aRFID[0], (RFID_Brooks)m_engineer.m_handler.m_aRFID[1]);
             }
             if (m_engineer.m_handler.m_FDC.m_aData.Count > 0)
             {

@@ -38,7 +38,7 @@ namespace Root_AOP01_Packing
 
         public SetupHome_ViewModel m_Home;
 
-        public Setup_ViewModel(MainWindow mainwindow)
+        public Setup_ViewModel(MainWindow mainwindow, AOP01_Engineer engineer)
         {
             m_MainWindow = mainwindow;
 
