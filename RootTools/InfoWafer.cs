@@ -240,7 +240,7 @@ namespace RootTools
         {
             string sRecipe = m_sManualRecipe;
             bool bOffline = (m_gem == null) ? true : m_gem.p_bOffline; 
-            m_sManualRecipe = tree.SetFile(m_sManualRecipe, m_sManualRecipe, EQ.m_sModel, "Recipe", "Recipe Name", bOffline);
+            m_sManualRecipe = tree.SetFile(m_sManualRecipe, m_sManualRecipe, EQ.m_sModel, "Recipe", "Recipe Name", true, !bOffline);
             if (sRecipe != m_sManualRecipe) RecipeOpen(m_sManualRecipe);
             if (m_moduleRunList != null) m_moduleRunList.RunTree(tree);
         }

@@ -192,7 +192,8 @@ namespace RootTools.Gem
         {
             foreach (GemPJ pj in m_aPJ)
             {
-                tree.Set(pj.m_sRecipeID, pj.m_sRecipeID, pj.m_sPJobID, "PJ Recipe ID", true, true); 
+                //tree.Set(pj.m_sRecipeID, pj.m_sRecipeID, pj.m_sPJobID, "PJ Recipe ID", true, true); 
+                tree.Set(pj.m_sPJobID, pj.m_sPJobID, pj.m_sPJobID, "ProcessJob ID", true, true);
             }
         }
         #endregion
