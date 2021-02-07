@@ -11,11 +11,11 @@
             <Grid Height="800">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="15*"/>
-                    <ColumnDefinition Width="10*"/>
-                    <ColumnDefinition Width="55*" />
+                    <ColumnDefinition Width="15*"/>
+                    <ColumnDefinition Width="50*" />
                     <ColumnDefinition Width="20*"/>
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0">
+                <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20*"/>
                         <RowDefinition Height="15*"/>
@@ -500,34 +500,34 @@
                     <GroupBox Header="Process" Grid.Column="1">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="3*" />
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0" Margin="5">
                                 <GroupBox Grid.Row="3" Header="Job List">
                                     <StackPanel Background="Transparent" Margin="0,5">
-                                        <Label Content="Job 1" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 2" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 3" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 4" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 5" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 6" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 7" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
-                                        
-                                            <Label Content="Job 8" Background="LightSteelBlue"        Height="40" VerticalContentAlignment="Center"/>
-                                            <Label Content="Job 9" Background="AliceBlue"        Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 10" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 11" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 12" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 13" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 14" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 15" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 16" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 17" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 18" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 19" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 20" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
-                                        <Label Content="Job 21" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 1" Background="SteelBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 2" Background="SteelBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 3" Background="SteelBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 4" Background="SteelBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 5" Background="SteelBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 6" Background="SteelBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 7" Background="SteelBlue" Height="40" VerticalContentAlignment="Center" />
+
+                                        <Label Content="Job 8" Background="LightSteelBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 9" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 10" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 11" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 12" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 13" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 14" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 15" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 16" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 17" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 18" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 19" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 20" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
+                                        <Label Content="Job 21" Background="AliceBlue" Height="40" VerticalContentAlignment="Center" />
                                     </StackPanel>
                                 </GroupBox>
                             </Grid>
@@ -536,163 +536,163 @@
                                     <GroupBox Header="LOADPORT : RETICLE" Height="200" Margin="0,0,0,5">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition Width="1.2*"/>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="1.2*" />
                                             </Grid.ColumnDefinitions>
-                                            <Image Source="/Root_AOP01_Packing;component/Resource/RETICLE_LOADPORT.png"/>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/RETICLE_LOADPORT.png" />
                                             <Grid Grid.Column="1" Margin="40,50">
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition/>
-                                                    <RowDefinition/>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="Done" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
-                                                <ProgressBar Grid.Row="1" Value="100" Foreground="SteelBlue" Margin="0,5"/>
-                                                <TextBlock Text="100%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Done" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial" />
+                                                <ProgressBar Grid.Row="1" Value="100" Foreground="SteelBlue" Margin="0,5" />
+                                                <TextBlock Text="100%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                             </Grid>
                                         </Grid>
                                     </GroupBox>
                                     <GroupBox Header="RTR : RETICLE" Height="200" Margin="0,5">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition Width="1.2*"/>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="1.2*" />
                                             </Grid.ColumnDefinitions>
-                                            <Image Source="/Root_AOP01_Packing;component/Resource/PTR.png"/>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/PTR.png" />
                                             <Grid Grid.Column="1" Margin="40,50">
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition/>
-                                                    <RowDefinition/>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="Done" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
-                                                <ProgressBar Grid.Row="1" Value="100" Foreground="SteelBlue" Margin="0,5"/>
-                                                <TextBlock Text="100%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Done" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial" />
+                                                <ProgressBar Grid.Row="1" Value="100" Foreground="SteelBlue" Margin="0,5" />
+                                                <TextBlock Text="100%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                             </Grid>
                                         </Grid>
                                     </GroupBox>
                                     <GroupBox Header="TAPING MODULE" Height="200" Margin="0,5">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition Width="1.2*"/>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="1.2*" />
                                             </Grid.ColumnDefinitions>
-                                            <Image Source="/Root_AOP01_Packing;component/Resource/TAPING_MODULE.png" Opacity="0.3"/>
-                                            <local:LoadingControl/>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/TAPING_MODULE.png" Opacity="0.3" />
+                                            <local:LoadingControl />
                                             <Grid Grid.Column="1" Margin="40,50">
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition/>
-                                                    <RowDefinition/>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="Working..." VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
-                                                <ProgressBar Grid.Row="1" Value="55" Foreground="SteelBlue" Margin="0,5"/>
-                                                <TextBlock Text="55%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Working..." VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial" />
+                                                <ProgressBar Grid.Row="1" Value="55" Foreground="SteelBlue" Margin="0,5" />
+                                                <TextBlock Text="55%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                             </Grid>
                                         </Grid>
                                     </GroupBox>
                                     <GroupBox Header="RTR : POD / CASE" Height="200" Margin="0,5">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition Width="1.2*"/>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="1.2*" />
                                             </Grid.ColumnDefinitions>
-                                            <Image Source="/Root_AOP01_Packing;component/Resource/RTR.png"/>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/RTR.png" />
                                             <Grid Grid.Column="1" Margin="40,50">
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition/>
-                                                    <RowDefinition/>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
-                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5"/>
-                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial" />
+                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5" />
+                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                             </Grid>
                                         </Grid>
                                     </GroupBox>
                                     <GroupBox Header="PACKING LOADER" Height="200" Margin="0,5">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition Width="1.2*"/>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="1.2*" />
                                             </Grid.ColumnDefinitions>
-                                            <Image Source="/Root_AOP01_Packing;component/Resource/PACKING_LOADER.png"/>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/PACKING_LOADER.png" />
                                             <Grid Grid.Column="1" Margin="40,50">
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition/>
-                                                    <RowDefinition/>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
-                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5"/>
-                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial" />
+                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5" />
+                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                             </Grid>
                                         </Grid>
                                     </GroupBox>
                                     <GroupBox Header="PACKING Module" Height="200" Margin="0,5">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition Width="1.2*"/>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="1.2*" />
                                             </Grid.ColumnDefinitions>
-                                            <Image Source="/Root_AOP01_Packing;component/Resource/PACKING_STAGE.png"/>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/PACKING_STAGE.png" />
                                             <Grid Grid.Column="1" Margin="40,50">
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition/>
-                                                    <RowDefinition/>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
-                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5"/>
-                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial" />
+                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5" />
+                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                             </Grid>
                                         </Grid>
                                     </GroupBox>
                                     <GroupBox Header="PACKING LOADER" Height="200" Margin="0,5">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition Width="1.2*"/>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="1.2*" />
                                             </Grid.ColumnDefinitions>
-                                            <Image Source="/Root_AOP01_Packing;component/Resource/PACKING_LOADER.png"/>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/PACKING_LOADER.png" />
                                             <Grid Grid.Column="1" Margin="40,50">
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition/>
-                                                    <RowDefinition/>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
-                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5"/>
-                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial" />
+                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5" />
+                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                             </Grid>
                                         </Grid>
                                     </GroupBox>
                                     <GroupBox Header="RTR : POD / CASE" Height="200" Margin="0,5">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition Width="1.2*"/>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="1.2*" />
                                             </Grid.ColumnDefinitions>
-                                            <Image Source="/Root_AOP01_Packing;component/Resource/RTR.png"/>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/RTR.png" />
                                             <Grid Grid.Column="1" Margin="40,50">
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition/>
-                                                    <RowDefinition/>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
-                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5"/>
-                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial" />
+                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5" />
+                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                             </Grid>
                                         </Grid>
                                     </GroupBox>
                                     <GroupBox Header="UNLOADPORT" Height="200" Margin="0,5">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition Width="1.2*"/>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="1.2*" />
                                             </Grid.ColumnDefinitions>
-                                            <Image Source="/Root_AOP01_Packing;component/Resource/UNLOADPORT.png"/>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/UNLOADPORT.png" />
                                             <Grid Grid.Column="1" Margin="40,50">
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition/>
-                                                    <RowDefinition/>
+                                                    <RowDefinition />
+                                                    <RowDefinition />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
-                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5"/>
-                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial" />
+                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5" />
+                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                             </Grid>
                                         </Grid>
                                     </GroupBox>
@@ -701,24 +701,24 @@
                         </Grid>
                     </GroupBox>
                 </Grid>
-                <Grid Grid.Column="1">
+                <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition />
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    <GroupBox Header="FDC"
+                    <GroupBox Header="Loadport A"
                               Grid.Row="0">
                     </GroupBox>
-                    <GroupBox Header="FFU"
+                    <GroupBox Header="Loadport B"
                               Grid.Row="1">
                     </GroupBox>
                 </Grid>
                 <Grid Grid.Column="3">
                     <StackPanel Grid.Row="1" Margin="0,20">
-                        <Button Content="Start / Stop" Style="{StaticResource SetupPanelBtn}"/>
-                        <Button Content="Initialize" Style="{StaticResource SetupPanelBtn}"/>
-                        <Button Content="Recovery" Style="{StaticResource SetupPanelBtn}"/>
-                        <Button Content="Module Run" Style="{StaticResource SetupPanelBtn}"/>
+                        <Button Content="LOAD" Style="{StaticResource SetupPanelBtn}" />
+                        <Button Content="START" Style="{StaticResource SetupPanelBtn}" />
+                        <Button Content="INITIALIZE" Style="{StaticResource SetupPanelBtn}" />
+                        <Button Content="RECOVERY" Style="{StaticResource SetupPanelBtn}" />
                     </StackPanel>
                 </Grid>
             </Grid>
