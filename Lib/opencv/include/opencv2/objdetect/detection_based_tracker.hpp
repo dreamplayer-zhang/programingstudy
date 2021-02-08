@@ -52,6 +52,8 @@
 
 #include <vector>
 
+#pragma warning(disable: 26812)
+
 namespace cv
 {
 

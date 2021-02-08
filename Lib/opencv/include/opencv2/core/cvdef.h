@@ -55,6 +55,9 @@
 // https://github.com/opencv/opencv/pull/9161
 #define CV__DEBUG_NS_BEGIN namespace debug_build_guard {
 #define CV__DEBUG_NS_END }
+
+#pragma warning(disable: 26495)
+
 namespace cv { namespace debug_build_guard { } using namespace debug_build_guard; }
 #endif
 #endif
