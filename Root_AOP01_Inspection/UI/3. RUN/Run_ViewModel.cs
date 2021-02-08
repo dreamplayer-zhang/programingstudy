@@ -28,6 +28,7 @@ namespace Root_AOP01_Inspection
             p_miniViewerTop = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideTopRegName), true);
             p_miniViewerRight = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideRightRegName));
             p_miniViewerBottom = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideBotRegName), true);
+            InitTimer();
         }
         DispatcherTimer m_timer = new DispatcherTimer();
         void InitTimer()
@@ -39,7 +40,8 @@ namespace Root_AOP01_Inspection
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            p_dSequencePercent = Math.Ceiling(((AOP01_Handler)m_Mainwindow.m_engineer.ClassHandler()).m_process.m_dSequencePercent);
+            var temp = (AOP01_Handler)(GlobalObjects.Instance.Get<AOP01_Engineer>().ClassHandler());
+            p_dSequencePercent = Math.Ceiling(temp.m_process.m_dSequencePercent);
         }
         #region Property
         //MainVision m_mainVision;

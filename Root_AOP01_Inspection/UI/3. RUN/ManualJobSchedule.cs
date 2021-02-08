@@ -61,10 +61,10 @@ namespace Root_AOP01_Inspection.UI._3._RUN
         public string m_sRecipe = "";
         public string SetInfoPod()
         {
-            m_loadport.p_infoCarrier.p_sLocID = p_sLocID;
-            m_loadport.p_infoCarrier.m_aGemSlot[0].p_sLotID = p_sLotID;
-            m_loadport.p_infoCarrier.p_sCarrierID = p_sCarrierID;
-            m_loadport.p_infoCarrier.m_aGemSlot[0].p_sSlotID = p_sSlotID;
+            //m_loadport.p_infoCarrier.p_sLocID = p_sLocID;
+            //m_loadport.p_infoCarrier.m_aGemSlot[0].p_sLotID = p_sLotID;
+            //m_loadport.p_infoCarrier.p_sCarrierID = p_sCarrierID;  //210208 LYJ Carrier ID 초기화 함 임시 지움 
+            //m_loadport.p_infoCarrier.m_aGemSlot[0].p_sSlotID = p_sSlotID;
 
             if (m_loadport.p_infoCarrier.m_aInfoWafer == null)
             {
