@@ -24,18 +24,9 @@ namespace Root_WIND2.UI_User
 		private EdgesideSetup_ImageViewer_ViewModel drawToolVM;
 
 		private EdgeSurfaceParameterBase parameter;
-		private int selectedGrabModeIndexTop = 0;
-		private int selectedGrabModeIndexSide = 0;
-		private int selectedGrabModeIndexBtm = 0;
+		private EdgeSurfaceRecipeBase recipe;
 
-		private int camWidth;
-		private int camHeight;
-		private double camResolution;
-		private double camTriggerRatio;
-
-		private int topOffset;
-		private int sideOffset;
-		private int btmOffset;
+		private int selectedGrabModeIndex = 0;
 
 		private bool _IsTopChecked = true;
 		private bool _IsSideChecked = false;
@@ -55,45 +46,13 @@ namespace Root_WIND2.UI_User
 		public EdgeSurfaceParameterBase Parameter
 		{
 			get => parameter;
-			set 
-			{
-				SetProperty(ref parameter, value);
-			}
-		}
-		public int CamWidth
-		{
-			get => camWidth;
-			set => camWidth = value;
-			//{
-			//	SetProperty<int>(ref this.camWidth, value);
-			//}
+			set => SetProperty(ref parameter, value);
 		}
 
-		public int CamHeight
+		public EdgeSurfaceRecipeBase Recipe
 		{
-			get => camHeight;
-			set => camHeight = value;
-			//{
-			//	SetProperty<int>(ref this.camHeight, value);
-			//}
-		}
-
-		public double CamResolution
-		{
-			get => camResolution;
-			set
-			{
-				SetProperty<double>(ref this.camResolution, value);
-			}
-		}
-
-		public double CamTriggerRatio
-		{
-			get => camTriggerRatio;
-			set
-			{
-				SetProperty<double>(ref this.camTriggerRatio, value);
-			}
+			get => recipe;
+			set => SetProperty(ref recipe, value);
 		}
 
 		public int TopOffset
@@ -102,12 +61,8 @@ namespace Root_WIND2.UI_User
 			{
 				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
 				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
-				this.topOffset = inspect.TopOffset;
 
-				RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.Offset = this.topOffset;
-
-				return this.topOffset;
+				return inspect.TopOffset;
 			}
 			set
 			{
@@ -121,12 +76,8 @@ namespace Root_WIND2.UI_User
 			{
 				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
 				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
-				this.sideOffset = inspect.SideOffset;
 
-				RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide.Offset = this.sideOffset;
-
-				return this.sideOffset;
+				return inspect.SideOffset;
 			}
 			set
 			{
@@ -140,12 +91,8 @@ namespace Root_WIND2.UI_User
 			{
 				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
 				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
-				this.btmOffset = inspect.BtmOffset;
-
-				RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.Offset = this.btmOffset;
-
-				return this.btmOffset;
+				
+				return inspect.BtmOffset;
 			}
 			set
 			{
@@ -165,75 +112,35 @@ namespace Root_WIND2.UI_User
 			}
 		}
 
-		public int SelectedGrabModeIndexTop
+		public int SelectedGrabModeIndex
 		{
-			get => this.selectedGrabModeIndexTop;
+			get => this.selectedGrabModeIndex;
 			set
 			{
 				GrabMode mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
+				Run_InspectEdge inspect = ((Run_InspectEdge)((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.CloneModuleRun("InspectEdge"));
+
+				Recipe.GrabModeName = mode.p_sName;
 				if (mode.m_camera != null)
 				{
-					this.CamWidth = mode.m_camera.GetRoiSize().X;
-					this.CamHeight = mode.m_camera.GetRoiSize().Y;
+					Recipe.CameraWidth = mode.m_camera.GetRoiSize().X;
+					Recipe.CameraHeight = mode.m_camera.GetRoiSize().Y;
 				}
-				this.CamResolution = mode.m_dResX_um;
-				this.CamTriggerRatio = mode.m_dCamTriggerRatio;
 
-				RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.CamWidth = this.CamWidth;
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.CamHeight = this.CamHeight;
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.CamResolution = this.CamResolution;
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.TriggerRatio = this.CamTriggerRatio;
-
-				SetProperty<int>(ref this.selectedGrabModeIndexTop, value);
-			}
-		}
-
-		public int SelectedGrabModeIndexSide
-		{
-			get => this.selectedGrabModeIndexSide;
-			set
-			{
-				GrabMode mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
-				if (mode.m_camera != null)
+				if (Recipe.CameraHeight == 0)
 				{
-					this.CamWidth = mode.m_camera.GetRoiSize().X;
-					this.CamHeight = mode.m_camera.GetRoiSize().Y;
+					if (_IsTopChecked)
+						Recipe.CameraHeight = inspect.TopHeight;
+					else if (_IsSideChecked)
+						Recipe.CameraHeight = inspect.SideHeight;
+					else if (_IsBtmChecked)
+						Recipe.CameraHeight = inspect.BtmHeight;
 				}
-				this.CamResolution = mode.m_dResX_um;
-				this.CamTriggerRatio = mode.m_dCamTriggerRatio;
 
-				RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide.CamWidth = this.CamWidth;
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide.CamHeight = this.CamHeight;
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide.CamResolution = this.CamResolution;
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide.TriggerRatio = this.CamTriggerRatio;
+				Recipe.TriggerRatio = mode.m_dCamTriggerRatio;
+				Parameter.CamResolution = mode.m_dResX_um;
 
-				SetProperty<int>(ref this.selectedGrabModeIndexSide, value);
-			}
-		}
-
-		public int SelectedGrabModeIndexBtm
-		{
-			get => this.selectedGrabModeIndexBtm;
-			set
-			{
-				GrabMode mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
-				if (mode.m_camera != null)
-				{
-					this.CamWidth = mode.m_camera.GetRoiSize().X;
-					this.CamHeight = mode.m_camera.GetRoiSize().Y;
-				}
-				this.CamResolution = mode.m_dResX_um;
-				this.CamTriggerRatio = mode.m_dCamTriggerRatio;
-
-				RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.CamWidth = this.CamWidth;
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.CamHeight = this.CamHeight;
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.CamResolution = this.CamResolution;
-				recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.TriggerRatio = this.CamTriggerRatio;
-
-				SetProperty<int>(ref this.selectedGrabModeIndexBtm, value);
+				SetProperty<int>(ref this.selectedGrabModeIndex, value);
 			}
 		}
 
@@ -349,12 +256,12 @@ namespace Root_WIND2.UI_User
 
 		public EdgesideSetup_ViewModel()
 		{
-			//DrawToolVM = new RootViewer_ViewModel();
 			DrawToolVM = new EdgesideSetup_ImageViewer_ViewModel();
 			DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
 
 			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
-			parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
+			Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
+			Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop;
 
 			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
 			WorkEventManager.ProcessDefectEdgeDone += WorkEventManager_ProcessDefectEdgeDone;
@@ -384,8 +291,8 @@ namespace Root_WIND2.UI_User
 		private void WorkEventManager_ProcessDefectEdgeDone(object sender, ProcessDefectEdgeDoneEventArgs e)
 		{
 			Workplace workplace = sender as Workplace;
-			List<String> textList = new List<String>();
 			List<CRect> rectList = new List<CRect>();
+			List<string> textList = new List<string>();
 
 			foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
 			{
@@ -430,16 +337,22 @@ namespace Root_WIND2.UI_User
 			{
 				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
+				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop;
+				Recipe.Offset = this.TopOffset;
 			}
 			else if (dataName == "Side")
 			{
 				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeSideImage"), GlobalObjects.Instance.Get<DialogService>());
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide;
+				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide;
+				Recipe.Offset = this.SideOffset;
 			}
 			else if (dataName == "Bottom")
 			{
 				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeBottomImage"), GlobalObjects.Instance.Get<DialogService>());
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm;
+				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm;
+				Recipe.Offset = this.BtmOffset;
 			}
 			else
 				return;
@@ -448,21 +361,29 @@ namespace Root_WIND2.UI_User
 		public void LoadParameter()
 		{
 			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
-
 			if (recipe.GetItem<EdgeSurfaceParameter>() == null)
 				return;
 
 			if (IsTopChecked)
+			{
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
+				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop;
+			}
 			else if (IsSideChecked)
+			{
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide;
+				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide;
+			}
 			else if (IsBtmChecked)
+			{
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm;
+				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm;
+			}
 		}
 
 		private void DrawRectDefect(List<CRect> rectList, List<String> textList, bool reDraw = false)
 		{
-			drawToolVM.AddDrawRectList(rectList, System.Windows.Media.Brushes.Red);
+			DrawToolVM.AddDrawRectList(rectList, System.Windows.Media.Brushes.Red);
 		}
 
 		private void UpdateProgress()
@@ -472,12 +393,7 @@ namespace Root_WIND2.UI_User
 
 		private void UpdateDefectData()
 		{
-			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
-
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			string sRecipeID = recipe.Name;
-			string sReicpeFileName = sRecipeID + ".rcp";
-
 			string sDefect = "defect";
 			DefectDataTable = DatabaseManager.Instance.SelectTablewithInspectionID(sDefect, sInspectionID);
 		}
