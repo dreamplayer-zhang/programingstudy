@@ -8,6 +8,7 @@ using RootTools.OHTNew;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
+using static RootTools.Gem.XGem.XGem;
 
 namespace Root_EFEM.Module
 {
@@ -622,6 +623,7 @@ namespace Root_EFEM.Module
         protected override void InitModuleRuns()
         {
             m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");
+            AddModuleRunList(new Run_GemProcess(this), false, "Gem Slot Process Start");
             m_runUndocking = AddModuleRunList(new Run_Undocking(this), false, "Undocking Carrier from Work Position");
         }
 
@@ -666,7 +668,7 @@ namespace Root_EFEM.Module
                 if (EQ.p_bSimulate)
                 {
                     m_infoCarrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
-                    //m_infoCarrier.p_sCarrierID = m_sSimulCarrierID;
+                    m_infoCarrier.p_sCarrierID = m_sSimulCarrierID;
                 }
                 else
                 {
@@ -780,6 +782,67 @@ namespace Root_EFEM.Module
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
                 m_module.m_ceidUnDocking.Send();
                 return "OK";
+            }
+        }
+
+        public class Run_GemProcess : ModuleRunBase
+        {
+            Loadport_RND m_module;
+            InfoCarrier m_infoCarrier;
+            public Run_GemProcess(Loadport_RND module)
+            {
+                m_module = module;
+                m_infoCarrier = module.p_infoCarrier;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_GemProcess run = new Run_GemProcess(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                //m_sUndocking = tree.Set(m_sUndocking, m_sUndocking, "Undocking", "Carrier Undocking", bVisible, true);
+            }
+
+            public override string Run()
+            {
+                string sResult = "OK";
+                IGem m_gem = m_module.m_gem;
+                if (m_gem == null || m_gem.p_eControl != eControl.ONLINEREMOTE) return p_id + " is not Gem Ready.";
+                if (!EQ.p_bSimulate)
+                {
+                    if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
+                        return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                }
+
+                GemPJ m_pjob;
+                GemCJ m_cjob;
+                while (m_gem.p_cjRun == null) 
+                { 
+                    Thread.Sleep(10);
+                    if (EQ.p_bStop) return p_sInfo + "EQ Stop";
+                }
+                foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
+                {
+                    while(pj.p_eState != GemPJ.eState.Processing && m_gem.p_cjRun.p_eState != GemCJ.eState.Excuting)
+                    {
+                        Thread.Sleep(10);
+                        if (EQ.p_bStop) return p_sInfo + "EQ Stop";
+                    }
+                    m_pjob = pj;
+                    m_cjob = m_gem.p_cjRun;
+                    break;
+                }
+                for(int i=0; i<m_infoCarrier.m_aGemSlot.Count; i++)
+                {
+                    if (m_infoCarrier.m_aGemSlot[i].p_eState == GemSlotBase.eState.Exist) 
+                        m_infoCarrier.StartProcess(m_infoCarrier.m_aGemSlot[i].p_id);
+                }
+
+                return sResult;
             }
         }
         #endregion

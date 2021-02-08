@@ -5,16 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.delete
 {
-    public class WorkDoneAllEventArgs : EventArgs
-    {
-        public WorkDoneAllEventArgs()
-        {
-            
-        }
-    }
-
     public class PositionDoneEventArgs : EventArgs
     {
         public readonly CPoint ptOldStart;
@@ -72,20 +64,21 @@ namespace RootTools_Vision
     }
 
     public class ProcessMeasurementDoneEventArgs : EventArgs
-    {
+	{
         public ProcessMeasurementDoneEventArgs()
-        {
+		{
 
-        }
+		}
     }
 
     public class UIRedrawEventArgs : EventArgs
-    {
+    { 
         public UIRedrawEventArgs()
         {
 
         }
     }
+
 
     public class WorkplaceStateChangedEventArgs : EventArgs
     {
@@ -97,10 +90,5 @@ namespace RootTools_Vision
         }
     }
 
-    public class RequestStopEventArgs : EventArgs
-    {
-        public RequestStopEventArgs()
-        {
-        }
-    }
+
 }

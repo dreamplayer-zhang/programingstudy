@@ -108,6 +108,7 @@
     <Compile Include="Inspection\D2D.cs" />
     <Compile Include="Inspection\EBR.cs" />
     <Compile Include="Inspection\EdgeSurface.cs" />
+    <Compile Include="Inspection\ProcessDefect_Edge.cs" />
     <Compile Include="Inspection\ProcessDefect_Wafer.cs" />
     <Compile Include="Inspection\ProcessMeasurement.cs" />
     <Compile Include="Inspection\Snap.cs" />

@@ -558,6 +558,22 @@ namespace RootTools.ToolBoxs
         }
         #endregion
 
+        #region ITool FFU
+        ToolSet m_toolFFU = null;
+        public string Get(ref FFU_Group value, ModuleBase module, string id, IDialogService dialogService = null)
+        {
+            if (m_toolTK4S == null)
+                m_toolTK4S = InitToolSet("FFU");
+            if (value == null)
+            {
+                value = new FFU_Group(module.p_id + "." + id, module.m_log, dialogService);
+                m_toolTK4S.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            return "OK";
+        }
+        #endregion
+
 
         #region IToolSet
         public Dictionary<IToolSet, UserControl> m_aToolSet = new Dictionary<IToolSet, UserControl>();

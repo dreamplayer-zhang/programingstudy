@@ -237,8 +237,8 @@ namespace RootTools.Comm
             }
             catch (Exception ex)
             {
-                if (m_log != null) m_log.Error(p_id + " Server Bind & Listen Fail !!");
-                if (m_log != null) m_log.Error(p_id + " Exception : " + ex.Message);
+                m_log?.Error(p_id + " Server Bind & Listen Fail !!");
+                m_log?.Error(p_id + " Exception : " + ex.Message);
                 return;
             }
         }

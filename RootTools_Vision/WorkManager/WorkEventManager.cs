@@ -53,7 +53,16 @@ namespace RootTools_Vision
         }
         #endregion
 
-        #region [ProcessDefectWaferDone]
+        #region [ProcessDefectEdgeDone]
+        public static event EventHandler<ProcessDefectEdgeDoneEventArgs> ProcessDefectEdgeDone;
+
+        public static void OnProcessDefectEdgeDone(object obj, ProcessDefectEdgeDoneEventArgs args)
+        {
+            ProcessDefectEdgeDone?.Invoke(obj, args);
+        }
+        #endregion
+
+        #region [ProcessMeasurementDone]
         public static event EventHandler<ProcessMeasurementDoneEventArgs> ProcessMeasurementDone;
 
         public static void OnProcessMeasurementDone(object obj, ProcessMeasurementDoneEventArgs args)
