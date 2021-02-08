@@ -106,7 +106,9 @@ namespace Root_VEGA_P.Module
             {
                 Thread.Sleep(2000);
                 ReadPressure();
-                if (Math.Abs(p_fPressure - 1) < m_dfPressure) return "OK";
+                double dfPressure = Math.Abs(p_fPressure - 1); 
+                if (dfPressure > 0.1) return "Pressure Range over";
+                if (dfPressure < m_dfPressure) return "OK";
                 p_nPump = (int)Math.Round(p_nPump / p_fPressure); 
             }
             return "Pressure Error"; 
