@@ -146,7 +146,7 @@ namespace Root_AOP01_Inspection
             if (IsErrorModule()) return false;
             if (m_handler.m_bIsPossible_Recovery == false) return false;
             // Daniel check
-            if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (EQ.p_eState != EQ.eState.Ready && EQ.p_eState != EQ.eState.Idle) return false;
             if (EQ.p_bStop == true) return false;
             return m_handler.IsEnableRecovery();
         }

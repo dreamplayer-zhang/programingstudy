@@ -2792,7 +2792,7 @@ namespace Root_AOP01_Inspection.Module
                 Image<Gray, byte> imgTemplate;
                 Point ptStart, ptEnd;
                 CRect crtSearchArea;
-                Mat matSearchArea;
+                //Mat matSearchArea;
                 CPoint cptSearchAreaCenter;
                 bool bFound = false;
                 CPoint[] cptarrOutResultCenterPositions = new CPoint[(int)eSearchPoint.Count];

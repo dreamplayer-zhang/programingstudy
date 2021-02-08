@@ -10,6 +10,8 @@ using RootTools.Control;
 using RootTools.OHT.Semi;
 using RootTools.OHTNew;
 using Root_EFEM.Module;
+using System;
+using System.Windows.Threading;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -796,8 +798,22 @@ namespace Root_AOP01_Inspection.Module
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
             InitThread();
+            InitTimer();
         }
-
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(20);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+        public string p_swLotTime = "";
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            p_swLotTime = String.Format("{0:00}:{1:00}:{2:00}", m_swLotTime.Elapsed.Hours, m_swLotTime.Elapsed.Minutes, m_swLotTime.Elapsed.Seconds);
+        }
+        #endregion
         public override void ThreadStop()
         {
             if (m_bRunSend)

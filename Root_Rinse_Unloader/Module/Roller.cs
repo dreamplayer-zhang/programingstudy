@@ -42,13 +42,13 @@ namespace Root_Rinse_Unloader.Module
 
         #region ToolBox
         Axis m_axisAlign; 
-        DIO_I2O m_dioStopperUP; 
+        DIO_I2O m_dioStopperUp; 
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisRotate[0], this, "Rotate0");
             p_sInfo = m_toolBox.Get(ref m_axisRotate[1], this, "Rotate1");
             p_sInfo = m_toolBox.Get(ref m_axisAlign, this, "Align"); 
-            p_sInfo = m_toolBox.Get(ref m_dioStopperUP, this, "StopperUp", "Down", "Up"); 
+            p_sInfo = m_toolBox.Get(ref m_dioStopperUp, this, "StopperUp", "Down", "Up"); 
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit) 
             {
@@ -113,7 +113,7 @@ namespace Root_Rinse_Unloader.Module
         #region Stopper
         public string RunStopperUp(bool bUp)
         {
-            return m_dioStopperUP.RunSol(bUp); 
+            return m_dioStopperUp.RunSol(bUp); 
         }
         #endregion
 

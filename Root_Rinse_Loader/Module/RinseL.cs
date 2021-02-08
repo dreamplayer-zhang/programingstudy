@@ -130,6 +130,12 @@ namespace Root_Rinse_Loader.Module
             m_qReceive.Enqueue(sStrip);
         }
 
+        public void ClearStripResult()
+        {
+            p_aSend.Clear();
+            p_aReceive.Clear();
+        }
+
         DispatcherTimer m_timer = new DispatcherTimer();
         void InitTimer()
         {
@@ -367,6 +373,7 @@ namespace Root_Rinse_Loader.Module
             PickerSet,
             StripSend,
             StripReceive,
+            ResultClear,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
@@ -459,6 +466,10 @@ namespace Root_Rinse_Loader.Module
                         case eCmd.StripReceive:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             AddStripReceive(asRead[2]);
+                            break;
+                        case eCmd.ResultClear:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            ClearStripResult(); 
                             break; 
                     }
                 }

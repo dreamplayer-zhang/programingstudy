@@ -129,6 +129,13 @@ namespace Root_Rinse_Unloader.Module
             AddProtocol(p_id, eCmd.StripReceive, sStrip);
         }
 
+        public void ClearStripResult()
+        {
+            p_aSend.Clear();
+            p_aReceive.Clear();
+            AddProtocol(p_id, eCmd.ResultClear, 0);
+        }
+
         DispatcherTimer m_timer = new DispatcherTimer();
         void InitTimer()
         {
@@ -338,6 +345,7 @@ namespace Root_Rinse_Unloader.Module
             PickerSet,
             StripSend,
             StripReceive,
+            ResultClear,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd)); 
 

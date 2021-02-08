@@ -100,7 +100,7 @@ namespace RootTools_Vision
 
                 return bmp;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -115,7 +115,7 @@ namespace RootTools_Vision
                 Bitmap bmp = CovertArrayToBitmap(rawdata, _width, _height, _byteCount);
                 bmp.Save(filepath);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 rst = false;
             }
@@ -127,7 +127,7 @@ namespace RootTools_Vision
         public unsafe static byte[] LoadBitmapToRawdata(string filepath, int* _width, int* _height)
         {
             byte[] resData = null;
-            bool res = false;
+            //bool res = false;
             try
             {
                 int byteCount = 1;
@@ -245,7 +245,7 @@ namespace RootTools_Vision
                 }
 
             }
-            catch( Exception ex)
+            catch( Exception)
             {
                 rst = false;
             }
@@ -325,7 +325,7 @@ namespace RootTools_Vision
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 rst = false;
             }
@@ -430,13 +430,13 @@ namespace RootTools_Vision
 
                 });
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 //검사 종료할 경우 buffer 카피하다가 workplace가 reset되서 다운
             }
         }
 
-        public static System.Windows.Media.Imaging.BitmapSource BitmapFromSource(System.Drawing.Bitmap bitmap)
+        public static System.Windows.Media.Imaging.BitmapSource ConvertBitmapToSource(System.Drawing.Bitmap bitmap)
         {
             var bitmapData = bitmap.LockBits(
                 new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),

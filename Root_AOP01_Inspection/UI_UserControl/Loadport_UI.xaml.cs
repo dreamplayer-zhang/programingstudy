@@ -98,7 +98,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
             bool bReadyToLoad = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
             bReadyToLoad = true;
             bool bReadyState = (m_loadport.m_qModuleRun.Count == 0);
-            bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
+            bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready || EQ.p_eState == EQ.eState.Idle);
             if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
             bool bPlaced = m_loadport.CheckPlaced();
 

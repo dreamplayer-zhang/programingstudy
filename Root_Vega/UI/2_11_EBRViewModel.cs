@@ -31,7 +31,7 @@ namespace Root_Vega
 		Vega_Engineer m_Engineer;
 		MemoryTool m_MemoryModule;
 		List<ImageData> m_Image = new List<ImageData>();
-		bool bUsingInspection;
+		//bool bUsingInspection;
 		
 		#region Property
 
@@ -165,7 +165,7 @@ namespace Root_Vega
 			Init(dialogService);
 
 			//m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
-			bUsingInspection = false;
+			//bUsingInspection = false;
 		}
 		void Init(IDialogService dialogService)
 		{

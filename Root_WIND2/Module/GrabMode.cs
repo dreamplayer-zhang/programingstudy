@@ -42,14 +42,16 @@ namespace Root_WIND2.Module
         public int m_nMaxFrame = 100;                   // Camera max Frame 스펙
         public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
         public int m_nYOffset = 0;
+        public double m_dCamTriggerRatio = 1;              // Camera 분주비
 
         public GrabData m_GD = new GrabData();
         LensLinearTurret m_lens = null;
-        public string m_sLens;
+        public string m_sLens = "";
         void RunTreeOption(Tree tree, bool bVisible, bool bReadOnly)
         {
             m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
             m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
+            m_dCamTriggerRatio = tree.Set(m_dCamTriggerRatio, m_dCamTriggerRatio, "Trigger Ratio", "Trigger Ratio", bVisible);
 
             m_GD.m_nFovStart = tree.Set(m_GD.m_nFovStart, m_GD.m_nFovStart, "Cam Fov Star Pxl", "Pixel", bVisible);
             m_GD.m_nFovSize = tree.Set(m_GD.m_nFovSize, m_GD.m_nFovSize, "Cam Fov Size Pxl", "Pixel", bVisible);
@@ -125,8 +127,11 @@ namespace Root_WIND2.Module
         }
         public void SetLens()
         {
-            m_lens.ChangePos(m_sLens);
-            m_lens.WaitReady();
+            if (m_lens != null)
+            {
+                m_lens.ChangePos(m_sLens);
+                m_lens.WaitReady();
+            }
         }
         public void SetLight(bool bOn)
         {
@@ -212,7 +217,7 @@ namespace Root_WIND2.Module
         }
 
         public string p_sName { get; set; }
-        public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, RADSControl radsControl = null)
+        public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, RADSControl radsControl = null, LensLinearTurret lensTurret = null )
         {
             p_id = id;
             p_sName = id;
@@ -220,6 +225,7 @@ namespace Root_WIND2.Module
             m_lightSet = lightSet;
             m_memoryPool = memoryPool;
             m_RADSControl = radsControl;
+            m_lens = lensTurret;
         }
 
         public static GrabMode Copy(GrabMode src)
@@ -245,6 +251,7 @@ namespace Root_WIND2.Module
             dst.m_sMemoryGroup = src.m_sMemoryGroup;
             dst.m_rpAxisCenter = new RPoint(src.m_rpAxisCenter);
             dst.m_cpMemoryOffset = new CPoint(src.m_cpMemoryOffset);
+            dst.m_dCamTriggerRatio = src.m_dCamTriggerRatio;
             dst.m_dResX_um = src.m_dResX_um;
             dst.m_dResY_um = src.m_dResY_um;
             dst.m_nFocusPosZ = src.m_nFocusPosZ;

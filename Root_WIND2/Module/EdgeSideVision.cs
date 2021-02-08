@@ -155,9 +155,9 @@ namespace Root_WIND2.Module
 
 		double pulse360 = 360000;
 		public double Pulse360 { get => pulse360; set => pulse360 = value; }
-		double edgeCamTriggerRatio = 1; //캠익에서 트리거 분주비
-		public double EdgeCamTriggerRatio { get => edgeCamTriggerRatio; set => edgeCamTriggerRatio = value; }
-		double ebrCamTriggerRatio = 3.0/4;
+		//double edgeCamTriggerRatio = 1; //캠익에서 트리거 분주비
+		//public double EdgeCamTriggerRatio { get => edgeCamTriggerRatio; set => edgeCamTriggerRatio = value; }
+		double ebrCamTriggerRatio = 3.0 / 4;
 		public double EbrCamTriggerRatio { get => ebrCamTriggerRatio; set => ebrCamTriggerRatio = value; }
 		double margin = 36000;
 		public double Margin { get => margin; set => margin = value; }
@@ -165,14 +165,14 @@ namespace Root_WIND2.Module
 		public override void InitMemorys()
 		{
 			int nImageX = 1000; //camEdgeTop.GetRoiSize().X;
-			int nImageY = (int)(pulse360 * edgeCamTriggerRatio + margin);
+			int nImageY = 1000; //(int)(pulse360 * edgeCamTriggerRatio + margin);
 			memoryGroup = memoryPool.GetGroup(p_id);
 			memoryEdgeTop = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeTop.ToString(), 3, 1, nImageX, nImageY);
 			memoryEdgeSide = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeSide.ToString(), 3, 1, nImageX, nImageY);
 			memoryEdgeBtm = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeBottom.ToString(), 3, 1, nImageX, nImageY);
 
 			int ebrImageX = 1000; //camEBR.GetRoiSize().X;
-			int ebrImageY = (int)(pulse360 * ebrCamTriggerRatio + margin);
+			int ebrImageY = 1000; //(int)(pulse360 * ebrCamTriggerRatio + margin);
 			memoryEBR = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EBR.ToString(), 1, 1, ebrImageX, ebrImageY);
 		}
 		#endregion

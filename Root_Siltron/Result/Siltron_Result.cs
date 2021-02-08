@@ -10,7 +10,7 @@ namespace Root_Siltron
     class Siltron_Result
     {
         // All Defect or Each Defect List(Front/Back/Side)?
-        public List<Defect> m_listDefect;
+        public List<Defect> m_listDefect = null;
     }
 
     public class Defect

@@ -831,6 +831,7 @@ namespace Root_EFEM.Module
                     sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
                     m_nChildID = m_module.GetChildSlotID(p_sChild, sChildSlot);
                 }
+
                 else m_nChildID = 0;
             }
 
@@ -875,11 +876,13 @@ namespace Root_EFEM.Module
                 finally
                 {
                     //0203 IsWaferExist() 확인 必
-                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) 
+                        child.SetInfoWafer(m_nChildID, null);
                     else m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
                 //return "OK"; //0202 
-                if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK"; // IsWaferExist 디버그 찍어봐야지머
+                if (m_module.m_dicArm[m_eArm].IsWaferExist()) 
+                    return "OK"; // IsWaferExist 디버그 찍어봐야지머
                 return "WTR Get Error : Wafer Check Sensor not Detected at Arm = " + m_eArm.ToString();
             }
         }
@@ -957,13 +960,15 @@ namespace Root_EFEM.Module
                 }
                 finally
                 {
-                    //0203 IsWaferExist() 확인 必
-                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                    //0203 여기 왜 거꾸로..? // 0204 I/O 잘못 됨
+                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) 
+                        child.SetInfoWafer(m_nChildID, null);
+
                     else m_module.m_dicArm[m_eArm].p_infoWafer = null;
-                    m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                        m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
-                //return "OK"; // 0202
-                if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";
+                if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) 
+                    return "OK";
                 return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;
             }
         }

@@ -113,12 +113,11 @@ namespace Root_AOP01_Packing
 
             m_engineer.Init("AOP01");
             m_Setup.m_Home.Engineer.Engineer_UI.Init(m_engineer);
-            //m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
         }
         void Init_ViewModel()
         {
-            m_Setup = new Setup_ViewModel(this);
-            m_Run = new Run_ViewModel(this);
+            m_Setup = new Setup_ViewModel(this, m_engineer);
+            m_Run = new Run_ViewModel(this, m_engineer);
         }
         void Init_UI()
         {
@@ -132,7 +131,7 @@ namespace Root_AOP01_Packing
             //Review.DataContext =;;
 
             Run = new Run_Panel();
-            Run.DataContext = this;
+            Run.DataContext = m_Run;
 
             MainPanel.Children.Clear();
             MainPanel.Children.Add(ModeSelect);

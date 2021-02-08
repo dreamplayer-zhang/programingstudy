@@ -752,15 +752,15 @@ namespace Root_AOP01_Inspection.Module
         }
         public int m_teachCleanTop = -1;
         public int m_teachCleanBottom = -1;
-        public string m_extentionlength = "21";
+        public string m_extentionlength = "23";
         public string m_CleanSpeed = "7";
         void RunTreeClean(Tree tree)   //
         {
             m_teachCleanTop = tree.Set(m_teachCleanTop, m_teachCleanTop, "Top Clean Teach", "RTR Top Clean Index");
             m_teachCleanBottom = tree.Set(m_teachCleanBottom, m_teachCleanBottom, "Bottom Clean Teach", "RTR Bottom Clean Index");
             m_extentionlength = tree.Set(m_extentionlength, m_extentionlength, "Extention length", "Clean Extention Length (0~30)");
-            if (Convert.ToInt32(m_extentionlength) < 0) m_extentionlength = tree.Set("21", "21", "Extention length", "Clean Extention Length (0~30)");
-            if (Convert.ToInt32(m_extentionlength) > 30) m_extentionlength = tree.Set("21", "21", "Extention length", "Clean Extention Length (0~30)");
+            if (Convert.ToInt32(m_extentionlength) < 0) m_extentionlength = tree.Set("23", "23", "Extention length", "Clean Extention Length");
+            if (Convert.ToInt32(m_extentionlength) > 23) m_extentionlength = tree.Set("23", "23", "Extention length", "Clean Extention Length");
             m_CleanSpeed = tree.Set(m_CleanSpeed, m_CleanSpeed, "Clean Speed", "RTR Clean Speed");
             m_OriginSpeed = tree.Set(m_OriginSpeed, m_OriginSpeed, "Origin Speed", "RTR Origin Speed");
         }
@@ -998,7 +998,7 @@ namespace Root_AOP01_Inspection.Module
                     m_module.m_alidGet.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                //m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
+                m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
                 try
                 {
                     child.p_bLock = true;
@@ -1007,7 +1007,6 @@ namespace Root_AOP01_Inspection.Module
                         m_module.m_alidGet.Run(true, p_sInfo);
                         return p_sInfo;
                     }
-                    m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                     {
                         m_module.m_alidGet.Run(true, p_sInfo);
@@ -1115,7 +1114,7 @@ namespace Root_AOP01_Inspection.Module
                     m_module.m_alidPut.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                //child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
+                child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
                 try
                 {
                     child.p_bLock = true;
@@ -1124,7 +1123,6 @@ namespace Root_AOP01_Inspection.Module
                         m_module.m_alidPut.Run(true, p_sInfo);
                         return p_sInfo;
                     }
-                    child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                     {
                         m_module.m_alidPut.Run(true, p_sInfo);

@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace Root_WIND2.UI_User
 {
-    class FrontsideSpec_ViewModel : ObservableObject
+    class FrontsideSpec_ViewModel : ObservableObject, IPage
     {
         private readonly FrontsideSpec_ImageViewer_ViewModel imageViewerVM;
         public FrontsideSpec_ImageViewer_ViewModel ImageViewerVM
@@ -23,10 +23,69 @@ namespace Root_WIND2.UI_User
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
 
             m_cInspItem = new ObservableCollection<InspectionItem>();
+            p_MaskList = new ObservableCollection<InspectionROI>();
             p_selectedMethodItem = null;
         }
 
+        #region [IPage Interfaces]
+        public void SetPage()
+        {
+            this.ImageViewerVM.DisplayBox();
 
+            LoadRecipe();
+        }
+
+        public void LoadRecipe()
+        {
+            // Mask
+            this.p_MaskList.Clear();
+            MaskRecipe maskRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<MaskRecipe>();
+            for (int i = 0; i < maskRecipe.MaskList.Count; i++)
+            {
+                InspectionROI roi = new InspectionROI();
+                roi.p_Index = i;
+                roi.p_Size = maskRecipe.MaskList[i].Area;
+                roi.p_Data = maskRecipe.MaskList[i].ToPointLineList();
+                roi.p_Color = maskRecipe.MaskList[i].ColorIndex;
+                this.p_MaskList.Add(roi);
+            }
+
+
+            // Inspectio Item
+            p_cInspItem.Clear();
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+
+            foreach (ParameterBase parameterBase in recipe.ParameterItemList)
+            {
+                InspectionItem item = new InspectionItem();
+
+                int selectMethod = 0;
+                for (int i = 0; i < item.p_cInspMethod.Count; i++)
+                {
+                    if (item.p_cInspMethod[i].InspectionType.Name == parameterBase.InspectionType.Name)
+                    {
+                        item.p_cInspMethod[i] = (ParameterBase)parameterBase.Clone();
+                        selectMethod = i;
+                        break;
+                    }
+                }
+
+                item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
+                item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
+                item.ButtonClicked_Delete += ButtonClicked_Delete_Callback;
+
+                p_cInspItem.Add(item);
+
+                item.p_InspMethod = item.p_cInspMethod[selectMethod];
+            }
+
+            if (p_cInspItem.Count > 0)
+                p_selectedInspItem = p_cInspItem[0];
+
+            SetParameter();
+        }
+
+         #endregion
 
         #region Property
 
@@ -43,14 +102,26 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        public void SetPage()
+
+
+        private InspectionROI m_selectedMask;
+        public InspectionROI p_SelectedMask
         {
-            this.ImageViewerVM.SetViewRect();
+            get => this.m_selectedMask;
+            set
+            {
+                SetProperty<InspectionROI>(ref m_selectedMask, value);
+            }
+        }
 
-            MaskRecipe maskRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<MaskRecipe>();
-            //maskRecipe.MaskList
-
-
+        private ObservableCollection<InspectionROI> m_MaskList;
+        public ObservableCollection<InspectionROI> p_MaskList
+        {
+            get => m_MaskList;
+            set
+            {
+                SetProperty<ObservableCollection<InspectionROI>>(ref m_MaskList, value);
+            }
         }
 
         private InspectionItem m_selectedInspItem;
@@ -62,7 +133,6 @@ namespace Root_WIND2.UI_User
             }
             set
             {
-                //var asdf = p_ROI_Viewer.p_ImgSource;
                 SetProperty(ref m_selectedInspItem, value);
                 if (m_selectedInspItem != null)
                     p_selectedMethodItem = m_selectedInspItem.p_InspMethod;
@@ -109,43 +179,6 @@ namespace Root_WIND2.UI_User
             SetParameter();
         }
 
-        public void LoadSpec()
-        {
-            p_cInspItem.Clear();
-
-            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-
-            foreach (ParameterBase parameterBase in recipe.ParameterItemList)
-            {
-                InspectionItem item = new InspectionItem();
-                //item.p_cInspROI = p_ROI_Viewer.p_cInspROI;
-
-                int selectMethod = 0;
-                for (int i = 0; i < item.p_cInspMethod.Count; i++)
-                {
-                    if (item.p_cInspMethod[i].InspectionType.Name == parameterBase.InspectionType.Name)
-                    {
-                        item.p_cInspMethod[i] = (ParameterBase)parameterBase.Clone();
-                        selectMethod = i;
-                        break;
-                    }
-                }
-
-                item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
-                item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
-                item.ButtonClicked_Delete += ButtonClicked_Delete_Callback;
-
-                p_cInspItem.Add(item);
-
-                item.p_InspMethod = item.p_cInspMethod[selectMethod];
-            }
-
-            if (p_cInspItem.Count > 0)
-                p_selectedInspItem = p_cInspItem[0];
-
-            SetParameter();
-        }
-
         public void SetParameter()
         {
             List<ParameterBase> paramList = new List<ParameterBase>();
@@ -171,12 +204,17 @@ namespace Root_WIND2.UI_User
             recipe.ParameterItemList = paramList;
         }
 
-        public void Load()
-        {
-            //LoadSpec();
-        }
+        
 
         #region ICommand
+        public ICommand LoadedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                this.ImageViewerVM.DisplayBox();
+            });
+        }
+
         public ICommand btnAddInspItem
         {
             get

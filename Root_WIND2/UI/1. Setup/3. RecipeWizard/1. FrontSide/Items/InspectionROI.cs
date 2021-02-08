@@ -40,7 +40,7 @@ namespace Root_WIND2
         }
         private List<PointLine> m_Data = new List<PointLine>();
 
-        public int p_Size
+        public long p_Size
         {
             get
             {
@@ -51,7 +51,7 @@ namespace Root_WIND2
                 SetProperty(ref m_Size, value);
             }
         }
-        private int m_Size = 0;
+        private long m_Size = 0;
 
         public Color p_Color
         {

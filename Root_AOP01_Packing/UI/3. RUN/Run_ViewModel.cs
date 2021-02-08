@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Root_AOP01_Packing.Module;
+using Root_EFEM.Module;
+using RootTools.Module;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +12,128 @@ namespace Root_AOP01_Packing
     class Run_ViewModel : ObservableObject
     {
         MainWindow m_Mainwindow;
-        public Run_ViewModel(MainWindow main)
+        AOP01_Engineer m_Engineer;
+        public Run_ViewModel(MainWindow main, AOP01_Engineer engineer)
         {
             m_Mainwindow = main;
+            m_Engineer = engineer;
         }
+        private void Init()
+        {
+            p_ModuleList = m_Engineer.ClassModuleList();
+        }
+
+        #region Property Module
+        ModuleList _ModuleList;
+        WTR_RND _RTRA;
+        WTR_RND _RTRB;
+        Loadport_Cymechs _LoadportA;
+        Loadport_AOP _LoadportB;
+        Unloadport_AOP _Unloadport;
+        IndividualElevator _Elevator;
+        TapePacker _TapePacker;
+        VacuumPacker _VacuumPacker;
+
+        public ModuleList p_ModuleList
+        {
+            get
+            {
+                return _ModuleList;
+            }
+            set
+            {
+                SetProperty(ref _ModuleList, value);
+            }
+        }
+        public WTR_RND p_RTRA
+        {
+            get
+            {
+                return _RTRA;
+            }
+            set
+            {
+                SetProperty(ref _RTRA, value);
+            }
+        }
+        public WTR_RND p_RTRB
+        {
+            get
+            {
+                return _RTRB;
+            }
+            set
+            {
+                SetProperty(ref _RTRB, value);
+            }
+        }
+        public Loadport_Cymechs p_LoadportA
+        {
+            get
+            {
+                return _LoadportA;
+            }
+            set
+            {
+                SetProperty(ref _LoadportA, value);
+            }
+        }
+        public Loadport_AOP p_LoadportB
+        {
+            get
+            {
+                return _LoadportB;
+            }
+            set
+            {
+                SetProperty(ref _LoadportB, value);
+            }
+        }
+        public Unloadport_AOP p_Unloadport
+        {
+            get
+            {
+                return _Unloadport;
+            }
+            set
+            {
+                SetProperty(ref _Unloadport, value);
+            }
+        }
+        public IndividualElevator p_Elevator
+        {
+            get
+            {
+                return _Elevator;
+            }
+            set
+            {
+                SetProperty(ref _Elevator, value);
+            }
+        }
+        public TapePacker p_TapePacker
+        {
+            get
+            {
+                return _TapePacker;
+            }
+            set
+            {
+                SetProperty(ref _TapePacker, value);
+            }
+        }
+        public VacuumPacker p_VacuumPacker
+        {
+            get
+            {
+                return _VacuumPacker;
+            }
+            set
+            {
+                SetProperty(ref _VacuumPacker, value);
+            }
+            
+        }
+        #endregion
     }
 }

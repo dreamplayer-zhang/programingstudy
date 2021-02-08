@@ -42,6 +42,12 @@ namespace Root_WIND2
         public delegate void addPitch(object e);
         public event addArea DelegateInspArea;
         public delegate void addArea(object e);
+
+        public void _Dummy() 
+        {
+            if (AddOrigin != null) AddOrigin(null);
+            if (AddPitch != null) AddPitch(null); 
+        }
         #endregion
 
         #region Property

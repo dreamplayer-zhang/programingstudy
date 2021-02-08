@@ -131,7 +131,7 @@ namespace Root_WIND2.Module
 				double triggerDest = triggerStart + scanDegree * pulsePerDegree;
 				double moveStart = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;   //y 축 이동 시작 지점 
 				double moveEnd = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;  // Y 축 이동 끝 지점.
-				int grabCount = Convert.ToInt32(scanDegree * pulsePerDegree * module.EdgeCamTriggerRatio);
+				int grabCount = Convert.ToInt32(scanDegree * pulsePerDegree * gmTop.m_dCamTriggerRatio); //module.EdgeCamTriggerRatio);
 
 				if (module.Run(axisEdgeX.StartMove(sideFocusAxis)))
 					return p_sInfo;

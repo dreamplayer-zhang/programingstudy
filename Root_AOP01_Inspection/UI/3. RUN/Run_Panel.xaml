@@ -61,9 +61,9 @@
                                 <Grid Margin="1">
                                     <ProgressBar x:Name="progressBarSequence" Height="40"
                                                  Margin="0,2"
-                                                 Value="{Binding p_nSequencePercent}"
-                                                 Foreground="SeaGreen" />
-                                    <TextBlock x:Name="textblockSequence" Text="{Binding p_nSequencePercent}"
+                                                 Value="{Binding p_dSequencePercent}"
+                                                 Foreground="SeaGreen" d:IsLocked="True" />
+                                    <TextBlock x:Name="textblockSequence" Text="{Binding p_sSequencePercent}"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
                                                FontWeight="Bold"
@@ -74,22 +74,22 @@
                             <UniformGrid Grid.Row="2" Grid.Column="1"
                                          Columns="2" Margin="1">
                                 <Border Grid.Row="0" Grid.Column="0" BorderBrush="LightGray" BorderThickness="2,2,0,2">
-                                    <TextBlock Text="LP1 Run Time" FontSize="13"
+                                    <TextBlock Text=" LoadportA Run Time :" FontSize="13"
                                            VerticalAlignment="Center" />
                                 </Border>
                                 <Border Grid.Row="0" Grid.Column="1" BorderBrush="LightGray" BorderThickness="0,2,2,2">
                                     <TextBlock x:Name="textblockRunTime1" Text="00:00:00" FontSize="15"
                                            VerticalAlignment="Center"
-                                           HorizontalAlignment="Left" />
+                                           HorizontalAlignment="Center" />
                                 </Border>
                                 <Border Grid.Row="1" Grid.Column="0" BorderBrush="LightGray" BorderThickness="2,0,0,2">
-                                    <TextBlock Text="LP2 Run Time" FontSize="13"
+                                    <TextBlock Text=" LoadportB Run Time :" FontSize="13"
                                            VerticalAlignment="Center" />
                                 </Border>
                                 <Border Grid.Row="1" Grid.Column="1" BorderBrush="LightGray" BorderThickness="0,0,2,2">
                                     <TextBlock x:Name="textblockRunTime2" Text="00:00:00" FontSize="15"
                                            VerticalAlignment="Center"
-                                           HorizontalAlignment="Left" />
+                                           HorizontalAlignment="Center" />
                                 </Border>
                             </UniformGrid>
                         </Grid>

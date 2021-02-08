@@ -91,8 +91,9 @@
                 obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}" Grid.ColumnSpan="2">
                     <Image Source="{Binding Path=p_ImgSource}" Stretch="UniformToFill"/>
                 </Canvas>
-                <Canvas obs:SizeObserver.Observe="true"
-                        obs:SizeObserver.ObservedWidth="{Binding p_LayerCanvasWidth, Mode=TwoWay}"
+                <Canvas ClipToBounds="True"
+                        obs:SizeObserver.Observe="true"
+                        obs:SizeObserver.ObservedWidth="{Binding p_LayerCanvasWidth, Mode=OneWayToSource}"
                         obs:SizeObserver.ObservedHeight="{Binding p_LayerCanvasHeight, Mode=OneWayToSource}">
                     <Image Source="{Binding p_LayerSource}" 
                            Canvas.Left="{Binding p_LayerCanvasOffsetX}" 

@@ -40,16 +40,16 @@ namespace Root_Vega
 		bool refEnabled;
 		bool alignEnabled;
 
-		SqliteDataDB VSDBManager;
-		int currentDefectIdx;
-		System.Data.DataTable VSDataInfoDT;
-		System.Data.DataTable VSDataDT;
+		//SqliteDataDB VSDBManager;
+		//int currentDefectIdx;
+		//System.Data.DataTable VSDataInfoDT;
+		//System.Data.DataTable VSDataDT;
 
-		private string inspDefaultDir;
-		private string inspFileName;
-		bool bUsingInspection;
+		//private string inspDefaultDir;
+		//private string inspFileName;
+		//bool bUsingInspection;
 		D2DInspect m_D2DInspect = new D2DInspect();
-		ImageData DoubleSize;
+		//ImageData DoubleSize;
 
 		
 		public Recipe p_Recipe
@@ -64,10 +64,10 @@ namespace Root_Vega
 			}
 		}
 
-		int tempImageWidth = 640;
-		int tempImageHeight = 480;
+		//int tempImageWidth = 640;
+		//int tempImageHeight = 480;
 
-		int currentSnap;
+		//int currentSnap;
 		int wLimit;
 
 		public _2_8_D2D_InspViewModel(Vega_Engineer engineer, IDialogService dialogService)
@@ -77,7 +77,7 @@ namespace Root_Vega
 			Init(engineer, dialogService);
 
 			//m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
-			bUsingInspection = false;
+			//bUsingInspection = false;
 		}
 		/// <summary>
 		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
@@ -841,12 +841,12 @@ namespace Root_Vega
 		//	currentSnap++;//한줄 추가
 		//	m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
 		//}
-		List<CRect> DrawRectList;
+		List<CRect> DrawRectList = null;
 		private void _btnInspTest()
 		{
 			ClearUI();//재검사 전 UI 정리
-			bUsingInspection = true;
-			currentSnap = 0;
+			//bUsingInspection = true;
+			//currentSnap = 0;
 			wLimit = 0;
 			System.Diagnostics.Debug.WriteLine(string.Format("Set wLimit : {0}", wLimit));
 
@@ -855,10 +855,10 @@ namespace Root_Vega
 
 			m_Engineer.m_InspManager.ClearInspection();
 
-			currentDefectIdx = 0;
+			//currentDefectIdx = 0;
 
 			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
-			int nblocksize = 500;
+			//int nblocksize = 500;
 
 			var memOffset = m_Engineer.GetMemory("pool", "group", "mem").GetMBOffset();
 			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);

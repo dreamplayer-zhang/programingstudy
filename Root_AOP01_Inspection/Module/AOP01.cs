@@ -32,7 +32,7 @@ namespace Root_AOP01_Inspection.Module
             Buzzer4,
             BuzzerOff
         }
-        eBuzzer m_eBuzzer = eBuzzer.BuzzerOff;
+        //eBuzzer m_eBuzzer = eBuzzer.BuzzerOff;
         string[] m_asLamp = Enum.GetNames(typeof(eLamp));
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
         public DIO_Os m_doLamp;
@@ -152,7 +152,7 @@ namespace Root_AOP01_Inspection.Module
 
         #region Thread
         public EQ.eState m_eStatus = EQ.eState.Init;
-        int m_nLamp_count = 0;
+        //int m_nLamp_count = 0;
         public bool m_bDoorAlarm = true;
         protected override void RunThread()
         {
@@ -223,7 +223,7 @@ namespace Root_AOP01_Inspection.Module
                     }
                     if (m_diInterlock_Key.p_bIn)
                     {
-                        m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
+                        m_alidDoorLock.Run(! m_diDoorLock.p_bIn, "Please Check the Doors");
                     }
                     m_alidLightCurtain.Run(m_diLightCurtain.p_bIn, "Please Check LightCurtain");
                     foreach (OHT_Semi OHT in p_aOHT)

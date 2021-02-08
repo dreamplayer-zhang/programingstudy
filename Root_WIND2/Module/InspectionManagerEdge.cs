@@ -54,13 +54,15 @@ namespace Root_WIND2
 			List<ParameterBase> paramList = recipe.ParameterItemList;
 			WorkBundle workBundle = new WorkBundle();
 			EdgeSurface edgeSurface = new EdgeSurface();
-			ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
+			//ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
+			ProcessDefect_Edge processDefect_Edge = new ProcessDefect_Edge();
 
 			foreach (ParameterBase param in paramList)
 				edgeSurface.SetParameter(param);
 
 			workBundle.Add(edgeSurface);
-			workBundle.Add(processDefect_Wafer);
+			//workBundle.Add(processDefect_Wafer);
+			workBundle.Add(processDefect_Edge);
 			workBundle.SetRecipe(this.Recipe);
 
 			return workBundle;
@@ -72,8 +74,54 @@ namespace Root_WIND2
 		}
 		#endregion
 
+		private void TEST(EdgeSurfaceParameterBase param, EdgeSurface.EdgeMapPositionX mapX, SharedBufferInfo sharedBufferInfo, ref WorkplaceBundle workplaceBundle)
+		{
+			int cameraEmptyBufferHeight = param.CamHeight;
+			// 360도 memory height
+			int bufferY = (int)(360000 / param.TriggerRatio) + cameraEmptyBufferHeight;
+			// 검사 시작/끝 Y좌표 설정
+			int startPtY = param.Offset * (bufferY / 360);
+			int endPtY = bufferY + startPtY;
+			// ROI
+			int roiWidth = param.ROIWidth;
+			int roiHeight = param.ROIHeight;
+
+			//CreateWorkplace_Edge(cameraEmptyBufferHeight + startPtY, endPtY, roiWidth, roiHeight, sharedBufferInfo, ref workplaceBundle);
+
+			for (int i = 0; i < 1/*endY / roiHeight*/; i++)
+			{
+				int calStartY = (roiHeight * i) + (cameraEmptyBufferHeight + startPtY);
+				int height = roiHeight;
+				if ((calStartY + roiHeight) > endPtY)
+					height = endPtY - calStartY;
+
+				if (height <= 0)
+					break;
+
+				Workplace workplace = new Workplace(
+						(int)mapX, i,
+						0, calStartY,
+						roiWidth, height,
+						workplaceBundle.Count);
+				workplace.SetSharedBuffer(sharedBufferInfo);
+
+				workplaceBundle.Add(workplace);
+			}
+		}
+
 		private WorkplaceBundle CreateWorkplace_Edge()
 		{
+			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
+			Workplace tempPlace = new Workplace(-1, -1, 0, 0, 0, 0, workplaceBundle.Count);
+			tempPlace.SetSharedBuffer(this.SharedBufferInfoArray[0]);
+			workplaceBundle.Add(tempPlace);
+
+			TEST(recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop, EdgeSurface.EdgeMapPositionX.Top, this.SharedBufferInfoArray[0], ref workplaceBundle);
+			//TEST(recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide, EdgeSurface.EdgeMapPositionX.Side, this.SharedBufferInfoArray[1], ref workplaceBundle);
+			//TEST(recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm, EdgeSurface.EdgeMapPositionX.Btm, this.SharedBufferInfoArray[2], ref workplaceBundle);
+																											
+			return workplaceBundle;																			
+			/*
 			EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
 			Run_GrabEdge grab = (Run_GrabEdge)module.CloneModuleRun("GrabEdge");
 			GrabMode top = grab.GetGrabMode(grab.p_sGrabModeTop);
@@ -91,16 +139,16 @@ namespace Root_WIND2
 			if (btm.m_camera != null)
 				cameraEmptyBufferHeight_Btm = btm.m_camera.GetRoiSize().Y;
 
+			// 360도 memory height
+			int bufferY_Top = (int)(module.Pulse360 / top.m_dCamTriggerRatio) + cameraEmptyBufferHeight_Top;   
+			int bufferY_Side = (int)(module.Pulse360 / side.m_dCamTriggerRatio) + cameraEmptyBufferHeight_Side;
+			int bufferY_Btm = (int)(module.Pulse360 / btm.m_dCamTriggerRatio) + cameraEmptyBufferHeight_Btm;
+
 			// 검사 시작/끝 Y좌표 설정
 			Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
-			int bufferY_Top = (int)(module.Pulse360 / module.EdgeCamTriggerRatio) + cameraEmptyBufferHeight_Top;    // 360도 memory height
-			int bufferY_Side = (int)(module.Pulse360 / module.EdgeCamTriggerRatio) + cameraEmptyBufferHeight_Side;    // 360도 memory height
-			int bufferY_Btm = (int)(module.Pulse360 / module.EdgeCamTriggerRatio) + cameraEmptyBufferHeight_Btm;    // 360도 memory height
-
 			int startPtY_Top = inspect.TopOffset * (bufferY_Top / 360);
 			int startPtY_Side = inspect.SideOffset * (bufferY_Side / 360);
 			int startPtY_Btm = inspect.BtmOffset * (bufferY_Btm / 360);
-
 			int endPtY_Top = bufferY_Top + startPtY_Top;
 			int endPtY_Side = bufferY_Side + startPtY_Side;
 			int endPtY_Btm = bufferY_Btm + startPtY_Btm;
@@ -113,7 +161,6 @@ namespace Root_WIND2
 			int roiWidth_Btm = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.ROIWidth;
 			int roiHeight_Btm = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.ROIHeight;
 
-
 			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
 			Workplace tempPlace = new Workplace(-1, -1, 0, 0, 0, 0, workplaceBundle.Count);
 			tempPlace.SetSharedBuffer(this.SharedBufferInfoArray[0]);
@@ -122,42 +169,32 @@ namespace Root_WIND2
 			CreateWorkplace_Edge(EdgeSurface.EdgeMapPositionX.Top, cameraEmptyBufferHeight_Top + startPtY_Top, endPtY_Top, roiWidth_Top, roiHeight_Top, ref workplaceBundle);
 			CreateWorkplace_Edge(EdgeSurface.EdgeMapPositionX.Side, cameraEmptyBufferHeight_Side + startPtY_Side, endPtY_Side, roiWidth_Side, roiHeight_Side, ref workplaceBundle);
 			CreateWorkplace_Edge(EdgeSurface.EdgeMapPositionX.Btm, cameraEmptyBufferHeight_Btm + startPtY_Btm, endPtY_Btm, roiWidth_Btm, roiHeight_Btm, ref workplaceBundle);
-
+			
 			return workplaceBundle;
+			*/
 		}
 
-		public void CreateWorkplace_Edge(EdgeSurface.EdgeMapPositionX mapX, int startY, int endY, int roiWidth, int roiHeight, ref WorkplaceBundle workplaces)
+		public void CreateWorkplace_Edge(int startY, int endY, int roiWidth, int roiHeight, SharedBufferInfo sharedBufferInfo, ref WorkplaceBundle workplaces)
 		{
-			SharedBufferInfo sharedBufferInfo;
+			//for (int i = 0; i < 1/*endY / roiHeight*/; i++)
+			//{
+			//	int calStartY = (roiHeight * i) + startY;
+			//	int height = roiHeight;
+			//	if ((calStartY + roiHeight) > endY)
+			//		height = endY - calStartY;
 
-			if (mapX == EdgeSurface.EdgeMapPositionX.Top)
-				sharedBufferInfo = this.SharedBufferInfoArray[0];
-			else if (mapX == EdgeSurface.EdgeMapPositionX.Side)
-				sharedBufferInfo = this.SharedBufferInfoArray[1];
-			else if (mapX == EdgeSurface.EdgeMapPositionX.Btm)
-				sharedBufferInfo = this.SharedBufferInfoArray[2];
-			else
-				return;
+			//	if (height <= 0)
+			//		break;
 
-			for (int i = 0; i < endY / roiHeight; i++)
-			{
-				int calStartY = (roiHeight * i) + startY;
-				int height = roiHeight;
-				if ((calStartY + roiHeight) > endY)
-					height = endY - calStartY;
+			//	Workplace workplace = new Workplace(
+			//			(int)mapX, i,
+			//			0, calStartY,
+			//			roiWidth, height,
+			//			workplaces.Count);
+			//	workplace.SetSharedBuffer(sharedBufferInfo);
 
-				if (height <= 0)
-					break;
-
-				Workplace workplace = new Workplace(
-						(int)mapX, i,
-						0, calStartY,
-						roiWidth, height,
-						workplaces.Count);
-				workplace.SetSharedBuffer(sharedBufferInfo);
-
-				workplaces.Add(workplace);
-			}
+			//	workplaces.Add(workplace);
+			//}
 		}
 
 		public new void Start()

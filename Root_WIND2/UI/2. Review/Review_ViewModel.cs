@@ -114,7 +114,7 @@ namespace Root_WIND2
         }
         public void GoldenImagelist_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count > 0) ;
+            //if (e.AddedItems.Count > 0) ;
         }
 
         #endregion
@@ -757,7 +757,7 @@ namespace Root_WIND2
             byte[] dstImg = new byte[goldenImagesData[0].Length];
             CLR_IP.Cpp_GoldenImageReview(goldenImagesData.ToArray(), dstImg, goldenImagesData.Count, goldenImageW, goldenImageH);
 
-            GoldenImage = Tools.BitmapFromSource(Tools.CovertArrayToBitmap(dstImg, goldenImageW, goldenImageH, 3));
+            GoldenImage = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(dstImg, goldenImageW, goldenImageH, 3));
 
         }
         public void SaveTrendImg()
