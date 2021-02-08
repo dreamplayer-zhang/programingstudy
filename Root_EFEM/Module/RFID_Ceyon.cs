@@ -24,10 +24,7 @@ namespace Root_EFEM.Module
             this.InitBase(sID, engineer);
             m_handler = engineer.ClassHandler();
             m_loadport = loadport;
-
         }
-
-        byte nCh = 0;
 
         #region CRC
         ushort[] m_uCRC =

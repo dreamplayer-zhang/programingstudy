@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -21,8 +22,17 @@ namespace Root_Rinse_Loader.Module
             foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox);
             if (bInit)
             {
+                InitALID();
                 InitPos();
             }
+        }
+        #endregion
+
+        #region GAF
+        ALID m_alidPickerDown;
+        void InitALID()
+        {
+            m_alidPickerDown = m_gaf.GetALID(this, "PickerDown", "Picker Up & Down Error");
         }
         #endregion
 
@@ -68,8 +78,8 @@ namespace Root_Rinse_Loader.Module
         double m_secBlow = 0.5;
         public string RunVacuum(bool bOn)
         {
+            p_bVacuum = bOn;
             foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(bOn);
-            p_bVacuum = bOn; 
             if (bOn)
             {
                 Thread.Sleep((int)(1000 * m_secVac));
@@ -90,7 +100,9 @@ namespace Root_Rinse_Loader.Module
         {
             m_bPickerDown = bDown;
             m_dioPickerDown.Write(bDown);
-            return m_dioPickerDown.WaitDone();
+            string sRun = m_dioPickerDown.WaitDone();
+            m_alidPickerDown.p_bSet = (sRun != "OK"); 
+            return sRun; 
         }
 
         int m_nShake = 0;
@@ -110,10 +122,13 @@ namespace Root_Rinse_Loader.Module
             }
             finally
             {
+                string sSend = ""; 
                 foreach (Picker picker in m_aPicker)
                 {
-                    if (picker.m_dioVacuum.p_bIn == false) picker.m_dioVacuum.Write(false); 
+                    if (picker.m_dioVacuum.p_bIn == false) picker.m_dioVacuum.Write(false);
+                    sSend += picker.m_dioVacuum.p_bIn ? 'O' : '.'; 
                 }
+                m_rinse.AddStripSend(sSend); 
                 Thread.Sleep(100); 
             }
         }
@@ -155,7 +170,6 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region PickerSet
-        public bool m_bPickersetMode = false;
         string RunPickerSet()
         {
             try
@@ -181,7 +195,7 @@ namespace Root_Rinse_Loader.Module
                 RunPickerDown(false);
                 Thread.Sleep(200);
                 MoveLoader(ePos.Roller);
-                m_bPickersetMode = false;
+                EQ.p_bPickerSet = false; 
             }
         }
 
@@ -206,9 +220,9 @@ namespace Root_Rinse_Loader.Module
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return ePickerSet.Stop;
-                if (m_swPickerSet.ElapsedMilliseconds > 5000) return ePickerSet.Stop;
+                if (m_swPickerSet.ElapsedMilliseconds > 3000) return ePickerSet.Stop;
             }
-            return (m_swPickerSet.ElapsedMilliseconds < 1000) ? ePickerSet.UpDown : ePickerSet.Vacuum;
+            return (m_swPickerSet.ElapsedMilliseconds < 600) ? ePickerSet.UpDown : ePickerSet.Vacuum;
         }
 
         public string m_sFilePickerSet = "";
@@ -263,7 +277,7 @@ namespace Root_Rinse_Loader.Module
 
         public string RunRun()
         {
-            if (m_bPickersetMode) return "OK";
+            if (EQ.p_bPickerSet) return "OK";
             //if (m_rinse.p_eStateRinse != RinseL.eRinseRun.Run) return "Rinse State not Run";
             //if (m_rinse.p_eStateUnloader != EQ.eState.Run) return "Rinse Unloader State not Run";
             return p_bVacuum ? RunUnload() : RunLoad(); 
@@ -308,7 +322,7 @@ namespace Root_Rinse_Loader.Module
             m_storage = storage;
             m_roller = roller;
             InitPickers(); 
-            InitBase(id, engineer); 
+            InitBase(id, engineer);
         }
 
         public override void ThreadStop()
@@ -319,7 +333,7 @@ namespace Root_Rinse_Loader.Module
         #region StartRun
         public void StartRun()
         {
-            if (m_bPickersetMode) return; 
+            if (EQ.p_bPickerSet) return; 
             switch (m_rinse.p_eMode)
             {
                 case RinseL.eRunMode.Magazine:

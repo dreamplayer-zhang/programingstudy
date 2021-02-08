@@ -202,9 +202,12 @@
     <Compile Include="Engineer\AOP01_Process_UI.xaml.cs">
       <DependentUpon>AOP01_Process_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\BacksideVision.cs" />
+    <Compile Include="Module\FDC.cs" />
     <Compile Include="Module\FFU_Fan_UI.xaml.cs">
       <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\Loadport_AOP01.cs" />
     <Compile Include="Module\RTR_RND.cs" />
     <Compile Include="Module\FFU.cs" />
     <Compile Include="UI\3. RUN\ManualJobSchedule.cs" />
@@ -224,7 +227,6 @@
     <Compile Include="Module\OHT_UI.xaml.cs">
       <DependentUpon>OHT_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Module\RTRCleanUnit.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="ProgramManager.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\Recipe45D_ImageViewer_ViewModel.cs" />

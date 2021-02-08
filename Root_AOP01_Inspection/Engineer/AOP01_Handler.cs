@@ -30,6 +30,14 @@ namespace Root_AOP01_Inspection
             get { return Brushes.BurlyWood; }
             set { }
         }
+        public FDC p_FDC
+        {
+            get { return m_FDC; }
+            set
+            {
+                SetProperty(ref m_FDC, value);
+            }
+        }
         public FFU p_FFU
         {
             get { return m_FFU; }
@@ -46,6 +54,8 @@ namespace Root_AOP01_Inspection
         public AOP01_Recipe m_recipe;
         public AOP01_Process m_process;
         public MainVision m_mainVision;
+        public BacksideVision m_backsideVision;
+        public FDC m_FDC;
         public FFU m_FFU;
 
         void InitModule()
@@ -57,9 +67,14 @@ namespace Root_AOP01_Inspection
             InitLoadport();
             InitRFID();
             m_mainVision = new MainVision("MainVision", m_engineer);
+            m_backsideVision = new BacksideVision("BacksideVision", m_engineer, m_mainVision);
             InitModule(m_mainVision);
+            InitModule(m_backsideVision);
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_mainVision);
+            iWTR.AddChild(m_backsideVision);
+            m_FDC = new FDC("FDC", m_engineer);
+            InitModule(m_FDC);
             m_FFU = new FFU("FFU", m_engineer);
             InitModule(m_FFU);
             m_wtr.RunTree(Tree.eMode.RegRead);
@@ -103,7 +118,7 @@ namespace Root_AOP01_Inspection
             switch (m_eWTR)
             {
                 case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer); break;
-                default: m_wtr = new RTRCleanUnit("RTR", m_engineer); break;
+                default: m_wtr = new RTR_RND("RTR", m_engineer); break;
             }
             InitModule(m_wtr);
         }
@@ -139,7 +154,7 @@ namespace Root_AOP01_Inspection
                         break;
                     case eLoadport.Cymechs:
                     default:
-                        module = new Loadport_Cymechs(sID, m_engineer, true, true);
+                        module = new Loadport_AOP01(sID, m_engineer, true, true);
                         LoadportType = eLoadport.Cymechs;
                         break;
                 }
@@ -157,7 +172,7 @@ namespace Root_AOP01_Inspection
             char cID = 'A';
             for (int n = 0; n < m_lLoadport; n++, cID++)
             {
-                string sID = "Rfid" + cID;
+                string sID = "RFID" + cID;
                 module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]);
                 InitModule(module);
                 m_aRFID.Add((IRFID)module);
@@ -188,7 +203,7 @@ namespace Root_AOP01_Inspection
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
-            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1]);
+            sInfo = StateHome(m_aop01, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_mainVision, m_backsideVision, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1], m_FDC);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             if (sInfo == "OK") m_bIsPossible_Recovery = true;
             return sInfo;
@@ -243,7 +258,7 @@ namespace Root_AOP01_Inspection
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
-            if (gaf != null) gaf.ClearALID();
+            gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
         }
         #endregion
@@ -296,6 +311,8 @@ namespace Root_AOP01_Inspection
                     }
                 }
             }
+            m_process.m_dSequencePercent = 0;
+            m_process.m_dOneSequencePercent = 100 / (m_process.m_qSequence.Count); //LYJ 210205
             m_process.RunTree(Tree.eMode.Init);
         }
 
@@ -331,7 +348,7 @@ namespace Root_AOP01_Inspection
             if (m_process.m_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
-                if (m_gem != null) m_gem.SendPJComplete(pj.m_sPJobID);
+                m_gem?.SendPJComplete(pj.m_sPJobID);
                 Thread.Sleep(100);
             }
         }
@@ -368,7 +385,10 @@ namespace Root_AOP01_Inspection
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
+                    case EQ.eState.Ready: EQ.p_eState = EQ.eState.Idle; break;  //LYJ add 210128
+                    case EQ.eState.Idle: break;
                     case EQ.eState.Run:
+                    case EQ.eState.Recovery:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             //CheckLoad();

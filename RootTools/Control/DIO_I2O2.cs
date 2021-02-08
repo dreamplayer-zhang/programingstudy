@@ -27,7 +27,8 @@ namespace RootTools.Control
             while (m_swWrite.ElapsedMilliseconds < msWait)
             {
                 if (EQ.IsStop()) return m_id + " EQ Stop";
-                if (p_bDone) return "OK";
+                if (p_bDone) 
+                    return "OK";
             }
             return "DIO Timeout : " + m_id;
         }

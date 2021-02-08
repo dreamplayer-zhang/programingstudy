@@ -5,9 +5,11 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Threading;
 
 namespace Root_Rinse_Unloader.Module
 {
@@ -45,17 +47,135 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
-        int _iMagazin = 0;
-        public int p_iMagazine
+        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1;
+        public Storage.eMagazine p_eMagazine
         {
-            get { return _iMagazin; }
+            get { return _eMagazine; }
             set
             {
-                if (_iMagazin == value) return;
-                _iMagazin = value;
+                if (_eMagazine == value) return;
+                _eMagazine = value;
                 OnPropertyChanged();
             }
         }
+
+        int _iMagazine = 0;
+        public int p_iMagazine
+        {
+            get { return _iMagazine; }
+            set
+            {
+                if (_iMagazine == value) return;
+                _iMagazine = value;
+                OnPropertyChanged();
+            }
+        }
+        #endregion
+
+        #region Strips
+        public class Strips : NotifyProperty
+        {
+            string _sSend = "....";
+            public string p_sSend
+            {
+                get { return _sSend; }
+                set
+                {
+                    _sSend = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            string _sReceive = "....";
+            public string p_sReceive
+            {
+                get { return _sReceive; }
+                set
+                {
+                    _sReceive = value;
+                    OnPropertyChanged();
+                    if (p_sSend != p_sReceive) p_sError = "Error";
+                }
+            }
+
+            string _sError = "";
+            public string p_sError
+            {
+                get { return _sError; }
+                set
+                {
+                    _sError = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            public Strips(string sSend)
+            {
+                p_sSend = sSend;
+            }
+        }
+
+        Queue<Strips> m_qSend = new Queue<Strips>();
+        public void AddStripSend(string sStrip)
+        {
+            Strips strips = new Strips(sStrip);
+            m_qSend.Enqueue(strips);
+        }
+
+        Queue<string> m_qReceive = new Queue<string>();
+        public void AddStripReceive(string sStrip)
+        {
+            m_qReceive.Enqueue(sStrip);
+            AddProtocol(p_id, eCmd.StripReceive, sStrip);
+        }
+
+        public void ClearStripResult()
+        {
+            p_aSend.Clear();
+            p_aReceive.Clear();
+            AddProtocol(p_id, eCmd.ResultClear, 0);
+        }
+
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+
+        public ObservableCollection<Strips> p_aSend = new ObservableCollection<Strips>();
+        public ObservableCollection<Strips> p_aReceive = new ObservableCollection<Strips>();
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            if (m_qSend.Count > 0) p_aSend.Add(m_qSend.Dequeue());
+            if (m_qReceive.Count > 0)
+            {
+                string sStrip = m_qReceive.Dequeue(); 
+                if (p_aSend.Count > 0)
+                {
+                    Strips strip = p_aSend[0];
+                    p_aSend.RemoveAt(0);
+                    strip.p_sReceive = sStrip;
+                    p_aReceive.Add(strip);
+                }
+            }
+        }
+        #endregion
+
+        #region Loader EQ State
+        EQ.eState _eStateLoader = EQ.eState.Init;
+        public EQ.eState p_eStateLoader 
+        {
+            get { return _eStateLoader; }
+            set
+            {
+                if (_eStateLoader == value) return;
+                _eStateLoader = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region ToolBox
@@ -66,7 +186,7 @@ namespace Root_Rinse_Unloader.Module
             p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
             if (bInit) 
             {
-                EQ.m_EQ.OnChanged += M_EQ_OnChanged; //forget
+                EQ.m_EQ.OnChanged += M_EQ_OnChanged; 
                 m_tcpip.EventReciveData += M_tcpip_EventReciveData;
             }
         }
@@ -103,82 +223,20 @@ namespace Root_Rinse_Unloader.Module
         }
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
 
-        DIO_IO m_dioStart;
-        DIO_IO m_dioStop;
-        DIO_IO m_dioReset;
-        DIO_IO m_dioHome;
         DIO_I m_diEMG;
         DIO_I m_diAir;
         DIO_I m_diDoorLock;
+        DIO_I m_diBuzzerOff;
         DIO_Os m_doLamp;
         DIO_Os m_doBuzzer;
         void GetToolsDIO()
         {
-            p_sInfo = m_toolBox.Get(ref m_dioStart, this, "Start");
-            p_sInfo = m_toolBox.Get(ref m_dioStop, this, "Stop");
-            p_sInfo = m_toolBox.Get(ref m_dioReset, this, "Reset");
-            p_sInfo = m_toolBox.Get(ref m_dioHome, this, "Home");
             p_sInfo = m_toolBox.Get(ref m_diEMG, this, "Emergency");
             p_sInfo = m_toolBox.Get(ref m_diAir, this, "Air Pressure");
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
             p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
-        }
-
-        bool _bStart = false;
-        public bool p_bStart
-        {
-            get { return _bStart; }
-            set
-            {
-                if (_bStart == value) return;
-                _bStart = value;
-                OnPropertyChanged();
-                if (value && (EQ.p_eState == EQ.eState.Ready)) EQ.p_eState = EQ.eState.Run;
-            }
-        }
-
-        bool _bStop = false;
-        public bool p_bStop
-        {
-            get { return _bStop; }
-            set
-            {
-                if (_bStop == value) return;
-                _bStop = value;
-                OnPropertyChanged();
-                if (value && (EQ.p_eState == EQ.eState.Run)) EQ.p_eState = EQ.eState.Ready;
-            }
-        }
-
-        bool _bReset = false;
-        public bool p_bReset
-        {
-            get { return _bReset; }
-            set
-            {
-                if (_bReset == value) return;
-                _bReset = value;
-                OnPropertyChanged();
-                if (value)
-                {
-                    RunBuzzerOff();
-                    if (EQ.p_eState == EQ.eState.Error) EQ.p_eState = EQ.eState.Ready;
-                }
-            }
-        }
-
-        bool _bHome = false;
-        public bool p_bHome
-        {
-            get { return _bHome; }
-            set
-            {
-                if (_bHome == value) return;
-                _bHome = value;
-                OnPropertyChanged();
-                if (value && ((EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init))) EQ.p_eState = EQ.eState.Home;
-            }
         }
 
         bool _bEMG = false;
@@ -228,6 +286,19 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
+        bool _bBuzzerOff = false;
+        public bool p_bBuzzerOff
+        {
+            get { return _bBuzzerOff; }
+            set
+            {
+                if (_bBuzzerOff == value) return;
+                _bBuzzerOff = value;
+                OnPropertyChanged();
+                if (value) RunBuzzerOff();
+            }
+        }
+
         public void RunBuzzer(eBuzzer eBuzzer)
         {
             m_doBuzzer.Write(eBuzzer);
@@ -238,30 +309,27 @@ namespace Root_Rinse_Unloader.Module
             m_doBuzzer.AllOff();
         }
 
-        bool m_bBlink = false;
+        public bool m_bBlink = false;
         StopWatch m_swBlick = new StopWatch();
         void RunThreadDIO()
         {
-            p_bStart = m_dioStart.p_bIn;
-            p_bStop = m_dioStop.p_bIn;
-            p_bReset = m_dioReset.p_bIn;
-            p_bHome = m_dioHome.p_bIn;
             p_bEMG = m_diEMG.p_bIn;
             p_bAir = m_diAir.p_bIn;
             p_bDoorLock = m_diDoorLock.p_bIn;
+            p_bBuzzerOff = m_diBuzzerOff.p_bIn;
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();
             m_bBlink = !m_bBlink;
-            m_dioStart.Write(m_bBlink && (EQ.p_eState == EQ.eState.Ready));
-            m_dioStop.Write(m_bBlink && (EQ.p_eState == EQ.eState.Run));
-            m_dioReset.Write(m_bBlink && (EQ.p_eState == EQ.eState.Error));
-            m_dioHome.Write(m_bBlink && ((EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Ready)));
-            switch (EQ.p_eState)
+            if (m_bBlink == false) m_doLamp.AllOff();
+            else
             {
-                case EQ.eState.Ready: m_doLamp.Write(eLamp.Green); break;
-                case EQ.eState.Run: m_doLamp.Write(eLamp.Yellow); break;
-                case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
-                default: m_doLamp.AllOff(); break;
+                switch (EQ.p_eState)
+                {
+                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Green); break;
+                    case EQ.eState.Run: m_doLamp.Write(eLamp.Yellow); break;
+                    case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
+                    default: m_doLamp.AllOff(); break;
+                }
             }
         }
         #endregion
@@ -274,6 +342,10 @@ namespace Root_Rinse_Unloader.Module
             SetWidth,
             EQLeState,
             EQUeState,
+            PickerSet,
+            StripSend,
+            StripReceive,
+            ResultClear,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd)); 
 
@@ -320,11 +392,13 @@ namespace Root_Rinse_Unloader.Module
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();
                     m_tcpip.Send(protocol.p_sCmd);
+                    Thread.Sleep(10); 
                 }
                 else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
                 {
                     m_protocolSend = m_qProtocolSend.Dequeue();
                     m_tcpip.Send(m_protocolSend.p_sCmd);
+                    Thread.Sleep(10);
                 }
             }
         }
@@ -357,17 +431,20 @@ namespace Root_Rinse_Unloader.Module
                     switch (eCmd)
                     {
                         case eCmd.SetMode:
-                            SetMode(asRead[2]);
                             AddProtocol(asRead[0], eCmd, asRead[2]);
+                            SetMode(asRead[2]);
                             RunTree(Tree.eMode.Init); 
                             break;
                         case eCmd.SetWidth:
-                            p_widthStrip = Convert.ToDouble(asRead[2]);
                             AddProtocol(asRead[0], eCmd, asRead[2]);
+                            p_widthStrip = Convert.ToDouble(asRead[2]);
                             RunTree(Tree.eMode.Init);
                             break;
                         case eCmd.EQLeState:
-                            switch (GetEQeState(asRead[2]))
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            p_eStateLoader = GetEQeState(asRead[2]);
+                            //switch (GetEQeState(asRead[2]))
+                            switch(p_eStateLoader)
                             {
                                 case EQ.eState.Home: 
                                     if (EQ.p_eState != EQ.eState.Run) EQ.p_eState = EQ.eState.Home; //forget
@@ -376,8 +453,15 @@ namespace Root_Rinse_Unloader.Module
                                     EQ.p_eState = EQ.eState.Run; 
                                     break;
                             }
-                            AddProtocol(asRead[0], eCmd, asRead[2]);
                             break;
+                        case eCmd.PickerSet:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            EQ.p_bPickerSet = Convert.ToBoolean(asRead[2]);
+                            break;
+                        case eCmd.StripSend:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            AddStripSend(asRead[2]); 
+                            break; 
                     }
                 }
             }
@@ -426,7 +510,8 @@ namespace Root_Rinse_Unloader.Module
             p_id = id;
             InitBase(id, engineer);
 
-            InitThread(); 
+            InitThread();
+            InitTimer(); 
         }
 
         public override void ThreadStop()

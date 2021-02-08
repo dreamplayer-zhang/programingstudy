@@ -22,13 +22,15 @@
                         <ColumnDefinition Width="3*"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Vertical">
-                        <Button x:Name="buttonChange" Content="Grab" Margin="2" Click="buttonChange_Click"/>
+                        <ComboBox x:Name="comboBoxPos" Margin="2"/>
+                        <Button x:Name="buttonChange" Content="Change" Margin="2" Click="buttonChange_Click"/>
                     </StackPanel>
                     <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
                     <tree:TreeUI Grid.Column="2" x:Name="treeUI"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="tabItemAxis" Header="Axis"/>
+            <TabItem x:Name="tabItemComm" Header="Comm"/>
         </TabControl>
 
     </Grid>

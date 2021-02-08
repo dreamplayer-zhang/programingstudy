@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <memory>
 
-
+#pragma warning(disable: 4091)
 static class Functions 
 {
 public:

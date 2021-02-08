@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "InspectionBase.h"
 
+#pragma warning(disable: 4244)
+#pragma warning(disable: 6385)
+#pragma warning(disable: 26451)
+#pragma warning(disable: 26495)
+
 DefectDataStruct InspectionBase::GetDefectData(RECT rt, POINT ptDPos, float nArea)
 {
 	DefectDataStruct data;

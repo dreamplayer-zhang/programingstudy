@@ -10,9 +10,6 @@ using System.IO;
 
 namespace RootTools
 {
-
-    public delegate void delegateString(string str);
-
     public class TK4SGroup : ObservableObject, ITool
     {
 
@@ -53,7 +50,7 @@ namespace RootTools
         int m_nBaudrate = 9600;
         Parity m_eParity = Parity.None;
         StopBits m_eStopBit = StopBits.Two;
-        int m_nTryConnect = 3;
+        //int m_nTryConnect = 3;
         int m_nInterval = 1000;
 
         ObservableCollection<TK4S> m_aTK4S = new ObservableCollection<TK4S>();
@@ -88,7 +85,7 @@ namespace RootTools
         int m_nTimeout = 3000;
         Log m_log;
         string m_sFilePath = @"C:\WIND2\Init\FDCSetting.ini";
-        int nCount;
+        //int nCount;
 
         private readonly IDialogService m_DialogService;
 
@@ -279,6 +276,7 @@ namespace RootTools
 
         private void TK4SGroup_OnDetectLimit(string str)
         {
+            if(OnDetectLimit != null)
             OnDetectLimit(str);
         }
 
@@ -425,6 +423,11 @@ namespace RootTools
 
         [field: NonSerialized]
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
+        void _Dummy()
+        {
+            if (CloseRequested != null) CloseRequested(null, null);
+        }
+
     }
 
 }

@@ -133,6 +133,7 @@ namespace RootTools.Control.Xenax
             GetErrorString,
             SoftLimitLeft,
             SoftLimitRight,
+            ML,
         }
         public Dictionary<eCmd, string> m_aCmd = new Dictionary<eCmd, string>();
         void InitCmd()
@@ -154,6 +155,7 @@ namespace RootTools.Control.Xenax
             m_aCmd.Add(eCmd.GetErrorString, "TES");
             m_aCmd.Add(eCmd.SoftLimitLeft, "LL");
             m_aCmd.Add(eCmd.SoftLimitRight, "LR");
+            m_aCmd.Add(eCmd.ML, "ML");
         }
 
         eCmd GetCmd(string sRead, ref string sData)
@@ -415,6 +417,8 @@ namespace RootTools.Control.Xenax
             }
             p_sInfo = base.StartHome();
             if (p_sInfo != "OK") return p_sInfo;
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.Event]));
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.ML], m_nML));
             m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.HomeDir], (int)m_eHomeDir));
             m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.Home]));
             return "OK";
@@ -432,8 +436,10 @@ namespace RootTools.Control.Xenax
             }
         }
 
+        int m_nML = 2000; 
         void RunTreeSettingHome(Tree tree)
         {
+            m_nML = tree.Set(m_nML, m_nML, "ML", "ML"); 
             m_eHomeDir = (eHomeDir)tree.Set(m_eHomeDir, m_eHomeDir, "Dir", "Search Home Direction");
         }
         #endregion

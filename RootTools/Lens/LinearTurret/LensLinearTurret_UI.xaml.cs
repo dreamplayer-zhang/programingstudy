@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using RootTools.Trees;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace RootTools.Lens.LinearTurret
@@ -19,12 +20,18 @@ namespace RootTools.Lens.LinearTurret
             m_lens = lens;
             DataContext = lens;
             treeUI.Init(lens.p_treeRoot);
-            tabItemAxis.Content = lens.m_axis.p_ui; 
+            lens.RunTree(Tree.eMode.Init); 
+            comboBoxPos.ItemsSource = lens.p_asPos; 
+            tabItemAxis.Content = lens.m_axis.p_ui;
+            tabItemComm.Content = lens.m_axis.p_commUI; 
         }
 
         private void buttonChange_Click(object sender, RoutedEventArgs e)
         {
-            //FORGET
+            if (comboBoxPos.SelectedValue is string)
+            {
+                m_lens.ChangePos((string)comboBoxPos.SelectedValue);
+            }
         }
 
     }

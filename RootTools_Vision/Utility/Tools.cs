@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
@@ -100,7 +101,7 @@ namespace RootTools_Vision
 
                 return bmp;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -115,7 +116,7 @@ namespace RootTools_Vision
                 Bitmap bmp = CovertArrayToBitmap(rawdata, _width, _height, _byteCount);
                 bmp.Save(filepath);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 rst = false;
             }
@@ -127,7 +128,7 @@ namespace RootTools_Vision
         public unsafe static byte[] LoadBitmapToRawdata(string filepath, int* _width, int* _height)
         {
             byte[] resData = null;
-            bool res = false;
+            //bool res = false;
             try
             {
                 int byteCount = 1;
@@ -245,7 +246,7 @@ namespace RootTools_Vision
                 }
 
             }
-            catch( Exception ex)
+            catch( Exception)
             {
                 rst = false;
             }
@@ -325,7 +326,7 @@ namespace RootTools_Vision
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 rst = false;
             }
@@ -370,6 +371,23 @@ namespace RootTools_Vision
             MemoryStream ms = new MemoryStream();
             bf.Serialize(ms, obj);
             return ms.ToArray();
+        }
+
+        public static byte[] ObejctToByteArray<T>(T obj)
+        {
+            MemoryStream ms = new MemoryStream();
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(ms, obj);
+            return ms.ToArray();
+        }
+
+        public static T ByteArrayToObject<T>(byte[] byteArr)
+        {
+            MemoryStream ms = new MemoryStream();
+            BinaryFormatter bf = new BinaryFormatter();
+            ms.Write(byteArr, 0, byteArr.Length);
+            ms.Seek(0, SeekOrigin.Begin);
+            return (T)bf.Deserialize(ms);
         }
 
         public static object ByteArrayToObject(byte[] byteArr)
@@ -430,13 +448,13 @@ namespace RootTools_Vision
 
                 });
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 //검사 종료할 경우 buffer 카피하다가 workplace가 reset되서 다운
             }
         }
 
-        public static System.Windows.Media.Imaging.BitmapSource BitmapFromSource(System.Drawing.Bitmap bitmap)
+        public static System.Windows.Media.Imaging.BitmapSource ConvertBitmapToSource(System.Drawing.Bitmap bitmap)
         {
             var bitmapData = bitmap.LockBits(
                 new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),

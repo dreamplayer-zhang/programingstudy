@@ -10,9 +10,10 @@
         <StackPanel>
             <Grid Height="800">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20*"/>
-                    <ColumnDefinition Width="65*"/>
                     <ColumnDefinition Width="15*"/>
+                    <ColumnDefinition Width="10*"/>
+                    <ColumnDefinition Width="55*" />
+                    <ColumnDefinition Width="20*"/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
@@ -21,7 +22,9 @@
                         <RowDefinition Height="20*"/>
                         <RowDefinition Height="45*"/>
                     </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="0" Header="Progress">
+                    <GroupBox Grid.Row="0"
+                              Header="Progress"
+                              DataContext="{Binding p_ModuleList}">
                         <Grid Margin="10,5">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="1*"/>
@@ -30,8 +33,12 @@
                             <StackPanel Grid.Row="0" VerticalAlignment="Center">
                                 <TextBlock Text="Total Progress" FontSize="15" FontWeight="Bold"/>
                                 <Grid>
-                                    <ProgressBar Height="40" Margin="0,2" Value="55" Foreground="SeaGreen"/>
-                                    <TextBlock Text="55%" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    <ProgressBar Height="40"
+                                                 Margin="0,2"
+                                                 Value="{Binding p_iRun}"
+                                                 Maximum="{Binding p_maxRun}"
+                                                 Foreground="SeaGreen"/>
+                                    <TextBlock Text="{Binding p_Percent}" HorizontalAlignment="Center" VerticalAlignment="Center"
                                                    FontWeight="Bold" FontSize="15"/>
                                 </Grid>
                             </StackPanel>
@@ -98,25 +105,23 @@
                         </UniformGrid>
                     </GroupBox>
                     <GroupBox Grid.Row="3" Header="Module State">
-                        <UniformGrid Margin="10,5" Rows="9" Columns="2">
-                            <TextBlock Text="TAPING MODULE" VerticalAlignment="Center"/>
-                            <TextBlock Text="Working" VerticalAlignment="Center" Foreground="Coral"/>
-                            <TextBlock Text="PACKING LOADER" VerticalAlignment="Center"/>
-                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
-                            <TextBlock Text="PACKING MODULE" VerticalAlignment="Center"/>
-                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
-                            <TextBlock Text="RTR : RETICLE" VerticalAlignment="Center"/>
-                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
-                            <TextBlock Text="RTR : POD / CASE" VerticalAlignment="Center"/>
-                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
-                            <TextBlock Text="LOADPORT : RETICLE" VerticalAlignment="Center"/>
-                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
-                            <TextBlock Text="LOADPORT : POD" VerticalAlignment="Center"/>
-                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
-                            <TextBlock Text="INDIVISUAL PORT" VerticalAlignment="Center"/>
-                            <TextBlock Text="Error" VerticalAlignment="Center" Foreground="Red"/>
+                        <UniformGrid Margin="10,5" Rows="8" Columns="2">
+                            <TextBlock Text="ELEVATOR" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding p_Elevator.p_eState}" VerticalAlignment="Center"/>
+                            <TextBlock Text="LOADPORT A" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding p_LoadportA.p_eState}" VerticalAlignment="Center"/>
+                            <TextBlock Text="LOADPORT B" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding p_LoadportB.p_eState}" VerticalAlignment="Center"/>
                             <TextBlock Text="UNLOADPORT" VerticalAlignment="Center"/>
-                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
+                            <TextBlock Text="{Binding p_UnloadPort.p_eState}" VerticalAlignment="Center"/>
+                            <TextBlock Text="RTR A" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding p_RTRA.p_eState}" VerticalAlignment="Center"/>
+                            <TextBlock Text="RTR B" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding p_RTRB.p_eState}" VerticalAlignment="Center"/>
+                            <TextBlock Text="TAPING MODULE" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding p_TapePacker.p_eState}" VerticalAlignment="Center"/>
+                            <TextBlock Text="WRAPING MODULE" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding p_VacuumPacker.p_eState}" VerticalAlignment="Center"/>
                         </UniformGrid>
                     </GroupBox>
                     <!--<GroupBox Grid.Row="3" Header="Module State">
@@ -491,7 +496,7 @@
                         </GroupBox>
                     </Grid>
                 </Grid>
-                <Grid Grid.Column="1" Visibility="Visible">
+                <Grid Grid.Column="2" Visibility="Visible">
                     <GroupBox Header="Process" Grid.Column="1">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -696,7 +701,19 @@
                         </Grid>
                     </GroupBox>
                 </Grid>
-                <Grid Grid.Column="2">
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="FDC"
+                              Grid.Row="0">
+                    </GroupBox>
+                    <GroupBox Header="FFU"
+                              Grid.Row="1">
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Column="3">
                     <StackPanel Grid.Row="1" Margin="0,20">
                         <Button Content="Start / Stop" Style="{StaticResource SetupPanelBtn}"/>
                         <Button Content="Initialize" Style="{StaticResource SetupPanelBtn}"/>
