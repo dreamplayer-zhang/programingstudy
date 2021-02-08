@@ -16,7 +16,7 @@
         public void SetValue(dynamic value)
         {
             if (_value == value) return;
-            if (m_log != null) m_log.Info(p_id + " : " + _value.ToString() + " -> " + value.ToString());
+            m_log?.Info(p_id + " : " + _value.ToString() + " -> " + value.ToString());
             _value = value;
             OnPropertyChanged("p_value");
         }

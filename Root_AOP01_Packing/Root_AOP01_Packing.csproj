@@ -193,6 +193,7 @@
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dummy.cs" />
+    <Compile Include="Module\AOP01_P.cs" />
     <Compile Include="Module\IndividualElevator.cs" />
     <Compile Include="Module\Loadport_AOP.cs" />
     <Compile Include="Module\Unloadport_AOP.cs" />

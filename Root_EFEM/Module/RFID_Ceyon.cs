@@ -26,8 +26,6 @@ namespace Root_EFEM.Module
             m_loadport = loadport;
         }
 
-        byte nCh = 0;
-
         #region CRC
         ushort[] m_uCRC =
         {

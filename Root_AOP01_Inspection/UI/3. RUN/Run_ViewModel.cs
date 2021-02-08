@@ -9,6 +9,7 @@ using System.Windows.Input;
 using RootTools.Trees;
 using RootTools.GAFs;
 using RootTools;
+using System.Windows.Threading;
 using RootTools_Vision;
 
 namespace Root_AOP01_Inspection
@@ -28,7 +29,18 @@ namespace Root_AOP01_Inspection
             p_miniViewerRight = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideRightRegName));
             p_miniViewerBottom = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideBotRegName), true);
         }
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(2000);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
 
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            p_dSequencePercent = Math.Ceiling(((AOP01_Handler)m_Mainwindow.m_engineer.ClassHandler()).m_process.m_dSequencePercent);
+        }
         #region Property
         //MainVision m_mainVision;
         //public MainVision p_mainVision
@@ -44,6 +56,25 @@ namespace Root_AOP01_Inspection
         {
             get { return m_miniViewerMain; }
             set { SetProperty(ref m_miniViewerMain, value); }
+        }
+        public double _dSequencePercent = 0;
+        public double p_dSequencePercent
+        {
+            get { return _dSequencePercent; }
+            set
+            {
+                SetProperty(ref _dSequencePercent, value);
+                p_sSequencePercent = _dSequencePercent.ToString() + "%";
+            }
+        }
+        public string _sSequencePercent = "";
+        public string p_sSequencePercent
+        {
+            get { return _sSequencePercent; }
+            set
+            {
+                SetProperty(ref _sSequencePercent, value);
+            }
         }
 
         MiniViewer_ViewModel m_miniViewerLeft;

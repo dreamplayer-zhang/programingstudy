@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -20,7 +21,7 @@ namespace Root_WIND2.UI_User
 {
 	class EdgesideSetup_ViewModel : ObservableObject
 	{
-		private RootViewer_ViewModel drawToolVM;
+		private EdgesideSetup_ImageViewer_ViewModel drawToolVM;
 
 		private EdgeSurfaceParameterBase parameter;
 		private int selectedGrabModeIndexTop = 0;
@@ -45,7 +46,7 @@ namespace Root_WIND2.UI_User
 		private BitmapSource defectImage;
 
 		#region [Getter / Setter]
-		public RootViewer_ViewModel DrawToolVM
+		public EdgesideSetup_ImageViewer_ViewModel DrawToolVM
 		{
 			get => drawToolVM;
 			set => SetProperty(ref drawToolVM, value);
@@ -348,43 +349,55 @@ namespace Root_WIND2.UI_User
 
 		public EdgesideSetup_ViewModel()
 		{
-			DrawToolVM = new RootViewer_ViewModel();
+			//DrawToolVM = new RootViewer_ViewModel();
+			DrawToolVM = new EdgesideSetup_ImageViewer_ViewModel();
 			DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
-			DrawToolVM.p_ROILayer = GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage");
 
 			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
 			parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 
 			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
-			WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
+			WorkEventManager.ProcessDefectEdgeDone += WorkEventManager_ProcessDefectEdgeDone;
 		}
 
 		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
 		{
 			Workplace workplace = sender as Workplace;
-			List<string> textList = new List<string>();
+			//List<String> textList = new List<String>();
+			//List<CRect> rectList = new List<CRect>();
+
+			//foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+			//{
+			//	String text = "";
+
+			//	rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+			//	textList.Add(text);
+			//}
+
+			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+			{
+				//DrawRectDefect(rectList, textList, e.reDraw);
+				UpdateProgress();
+			}));
+		}
+
+		private void WorkEventManager_ProcessDefectEdgeDone(object sender, ProcessDefectEdgeDoneEventArgs e)
+		{
+			Workplace workplace = sender as Workplace;
+			List<String> textList = new List<String>();
 			List<CRect> rectList = new List<CRect>();
 
 			foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
 			{
-				string text = "";
+				String text = "";
+
 				rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
 				textList.Add(text);
 			}
 
 			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
 			{
-				DrawRectDefect(rectList, textList, e.reDraw);
-				UpdateProgress();
-			}));
-		}
-
-		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
-		{
-			Workplace workplace = sender as Workplace;
-
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
+				DrawRectDefect(rectList, textList);
 				UpdateDefectData();
 			}));
 		}
@@ -405,6 +418,7 @@ namespace Root_WIND2.UI_User
 
 		public void Inspect()
 		{
+			this.DrawToolVM.ClearObjects();
 			GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();			
 		}
 
@@ -446,15 +460,9 @@ namespace Root_WIND2.UI_User
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm;
 		}
 
-		private void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
+		private void DrawRectDefect(List<CRect> rectList, List<String> textList, bool reDraw = false)
 		{
-			//if (reDraw)
-			//	drawToolVM.Clear;
-
-			foreach (CRect rect in rectList)
-			{
-				DrawToolVM.DrawRectBitmap(rect, 0, 0, 0, 0, new CPoint());
-			}
+			drawToolVM.AddDrawRectList(rectList, System.Windows.Media.Brushes.Red);
 		}
 
 		private void UpdateProgress()

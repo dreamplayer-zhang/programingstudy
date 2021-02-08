@@ -276,6 +276,11 @@
     </Compile>
     <Compile Include="UI\Interfaces\IRecipeUILoadable.cs" />
     <Compile Include="Module\WIND2.cs" />
+    <Compile Include="UI_User\BACK\BacksideSetup.xaml.cs">
+      <DependentUpon>BacksideSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ViewModel.cs" />
     <Compile Include="UI_User\CAMERA\CameraVRS.xaml.cs">
       <DependentUpon>CameraVRS.xaml</DependentUpon>
     </Compile>
@@ -291,6 +296,7 @@
     <Compile Include="UI_User\EDGE\EdgesideSetup.xaml.cs">
       <DependentUpon>EdgesideSetup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_User\EDGE\ViewModel\EdgesideSetup_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\EDGE\ViewModel\EdgesideSetup_ViewModel.cs" />
     <Compile Include="UI_User\FRONT\FrontsideAlignment.xaml.cs" />
     <Compile Include="UI_User\FRONT\FrontsideInspect.xaml.cs">
@@ -688,6 +694,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI_User\BACK\BacksideSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI_User\CAMERA\CameraVRS.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -788,7 +798,6 @@
   <ItemGroup>
     <Folder Include="Module\BacksideVision\" />
     <Folder Include="UI\Tune\" />
-    <Folder Include="UI_User\BACK\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\ChartEBR.PNG" />

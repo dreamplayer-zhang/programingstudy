@@ -322,7 +322,7 @@ namespace Root_Rinse_Loader.Module
             m_storage = storage;
             m_roller = roller;
             InitPickers(); 
-            InitBase(id, engineer); 
+            InitBase(id, engineer);
         }
 
         public override void ThreadStop()

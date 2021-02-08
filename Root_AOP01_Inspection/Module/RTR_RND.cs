@@ -18,10 +18,16 @@ namespace Root_AOP01_Inspection.Module
 
         #region ToolBox
         protected RS232 m_rs232;
+        DIO_O m_doTopBlow;                          
+        DIO_O m_doBottomBlow;                       
+        DIO_I m_diReticleCheck;                     
         public int m_teachReticleFlip = -1;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.Get(ref m_doTopBlow, this, "Top Blow");                                         
+            p_sInfo = m_toolBox.Get(ref m_doBottomBlow, this, "Bottom Blow");                                   
+            p_sInfo = m_toolBox.Get(ref m_diReticleCheck, this, "Reticle Check Sensor Door Crush InterLock");   
             m_dicArm[eArm.Upper].GetTools(m_toolBox);
             m_dicArm[eArm.Lower].GetTools(m_toolBox);
             if (bInit)
@@ -310,48 +316,48 @@ namespace Root_AOP01_Inspection.Module
             { "-3143", "General serial bus encoder error"},
             { "-3144", "Amplifier overheating"},
             { "-3145", "Motor overheating"},
-            { "2", "ERR_NOT_HOMED "},
-            { "4", "ERR_EMERGENCY"},
-            { "12", "ERR_MOTOR_ERROR"},
-            { "194", "ERR_INTERLOCK"},
-            { "202", "ERR_RETICLE_BEFORE_GET "},
-            { "203", "ERR_NO_RETICLE_BEFORE_PUT"},
-            { "204", "ERR_NO_RETICLE_AFTER_GET"},
-            { "205", "ERR_RETICLE_AFTER_PUT"},
-            { "206", "ERR_NO_RETICLE_DURING_GET"},
-            { "207", "ERR_RETICLE_DURING_PUT"},
-            { "208", "ERR_NOT_HOMED"},
-            { "209", "ERR_NOT_SUPPORTED_FUNC "},
-            { "251", "ERR_MAPPING_IS_NOT_PERFORMED"},
-            { "252", "ERR_NO_MAPPING_DATA"},
-            { "1001", "ERR_INVALID_COMMAND"},
-            { "1011", "ERR_INVALID_DATA"},
-            { "1012", "ERR_INVALID_STATION"},
-            { "1013", "ERR_INVALID_HAND"},
-            { "1014", "ERR_INVALID_SLOT"},
-            { "1015", "ERR_INVALID_TEACHING_INDEX"},
-            { "1016", "ERR_INVALID_PD_INDEX"},
-            { "1017", "ERR_RETICLE_DOUBLE_ERORR"},
-            { "1018", "ERR_RETICLE_NOEXIT_ERORR"},
-            { "1021", "ERR_INVALID_COORDINATE_TYPE"},
-            { "1031", "ERR_INVALID_ARGUMENT"},
-            { "1033", "ERR_INVALID_FORMAT"},
-            { "1034", "ERR_INVALID_LOCATION_FORMAT"},
-            { "1035", "ERR_INVALID_PROFILE_FORMAT"},
-            { "1041", "ERR_WRONG_PD_COMMAND"},
-            { "1042", "ERR_WRONG_AWC_DATA"},
-            { "1043", "ERR_NO_AWC_STATION"},
-            { "1051", "ERR_NO_DATA"},
-            { "1052", "ERR_NOT_HOME"},
-            { "1053", "ERR_CANNOT_RETRACT_ARM"},
-            { "1054", "ERR_VACUUM_DETECTING_ERORR"},
-            { "1055", "ERR_NO_RETICLE"},
-            { "1056", "ERR_UPGRIP"},
-            { "1057", "ERR_DOUBLERETICLECHECH"},
-            { "1060", "ERR_NOTSUPPLY_AIR"},
-            { "1999", "USER_STOP_REQUEST"},
-            { "2000", "ERR_RECEIVEBUF_FULL"},
-            { "2001", "ERR_SENDBUF_FULL"},
+            { "2", "ERR_ NOT_HOMED "},
+            { "4", "ERR_ EMERGENCY"},
+            { "12", "ERR_ MOTOR_ERROR"},
+            { "194", "ERR_ INTERLOCK"},
+            { "202", "ERR_ RETICLE_BEFORE_GET "},
+            { "203", "ERR_ NO_RETICLE_BEFORE_PUT"},
+            { "204", "ERR_ NO_RETICLE_AFTER_GET"},
+            { "205", "ERR_ RETICLE_AFTER_PUT"},
+            { "206", "ERR_ NO_RETICLE_DURING_GET"},
+            { "207", "ERR_ RETICLE_DURING_PUT"},
+            { "208", "ERR_ NOT_HOMED"},
+            { "209", "ERR_ NOT_SUPPORTED_FUNC "},
+            { "251", "ERR_ MAPPING_IS_NOT_PERFORMED"},
+            { "252", "ERR_ NO_MAPPING_DATA"},
+            { "1001", "ERR_ INVALID_COMMAND"},
+            { "1011", "ERR_ INVALID_DATA"},
+            { "1012", "ERR_ INVALID_STATION"},
+            { "1013", "ERR_ INVALID_HAND"},
+            { "1014", "ERR_ INVALID_SLOT"},
+            { "1015", "ERR_ INVALID_TEACHING_INDEX"},
+            { "1016", "ERR_ INVALID_PD_INDEX"},
+            { "1017", "ERR_ RETICLE_DOUBLE_ERORR"},
+            { "1018", "ERR_ RETICLE_NOEXIT_ERORR"},
+            { "1021", "ERR_ INVALID_COORDINATE_TYPE"},
+            { "1031", "ERR_ INVALID_ARGUMENT"},
+            { "1033", "ERR_ NVALID_FORMAT"},
+            { "1034", "ERR_ INVALID_LOCATION_FORMAT"},
+            { "1035", "ERR_ INVALID_PROFILE_FORMAT"},
+            { "1041", "ERR_ WRONG_PD_COMMAND"},
+            { "1042", "ERR_ WRONG_AWC_DATA"},
+            { "1043", "ERR_ NO_AWC_STATION"},
+            { "1051", "ERR_ NO_DATA"},
+            { "1052", "ERR_ NOT_HOME"},
+            { "1053", "ERR_ CANNOT_RETRACT_ARM"},
+            { "1054", "ERR_ VACUUM_DETECTING_ERORR"},
+            { "1055", "ERR_ NO_RETICLE"},
+            { "1056", "ERR_ UPGRIP"},
+            { "1057", "ERR_ DOUBLERETICLECHECH"},
+            { "1060", "ERR_ NOTSUPPLY_AIR"},
+            { "1999", "USER_ TOP_REQUEST"},
+            { "2000", "ERR_ RECEIVEBUF_FULL"},
+            { "2001", "ERR_ SENDBUF_FULL"},
         };
         string GetErrorString(string sCode)
         {
@@ -380,6 +386,7 @@ namespace Root_AOP01_Inspection.Module
             Retraction,
             SetSpeed,
             ManualMove,
+            Stop,       //감속 정지
         };
         Dictionary<eCmd, string> m_dicCmd = new Dictionary<eCmd, string>();
         void InitCmd()
@@ -397,6 +404,7 @@ namespace Root_AOP01_Inspection.Module
             m_dicCmd.Add(eCmd.Retraction, "RETA");
             m_dicCmd.Add(eCmd.SetSpeed, "TSPD");
             m_dicCmd.Add(eCmd.ManualMove, "MMI");
+            m_dicCmd.Add(eCmd.Stop, "ASS");  //AES
         }
 
         string ReplyCmd(string[] sMsgs)
@@ -732,6 +740,7 @@ namespace Root_AOP01_Inspection.Module
         {
             base.RunTree(tree);
             RunTreeSetup(tree.GetTree("Setup", false));
+            RunTreeClean(tree.GetTree("Setup", false).GetTree("Teach", false).GetTree("Clean Uint", false));   //
         }
 
         void RunTreeSetup(Tree tree)
@@ -740,6 +749,20 @@ namespace Root_AOP01_Inspection.Module
             m_dicArm[eArm.Lower].RunTree(tree.GetTree("Lower Arm", false));
             foreach (IWTRChild child in p_aChild) child.RunTreeTeach(tree.GetTree("Teach", false));
             RunTimeoutTree(tree.GetTree("Timeout", false));
+        }
+        public int m_teachCleanTop = -1;
+        public int m_teachCleanBottom = -1;
+        public string m_extentionlength = "23";
+        public string m_CleanSpeed = "7";
+        void RunTreeClean(Tree tree)
+        {
+            m_teachCleanTop = tree.Set(m_teachCleanTop, m_teachCleanTop, "Top Clean Teach", "RTR Top Clean Index");
+            m_teachCleanBottom = tree.Set(m_teachCleanBottom, m_teachCleanBottom, "Bottom Clean Teach", "RTR Bottom Clean Index");
+            m_extentionlength = tree.Set(m_extentionlength, m_extentionlength, "Extention length", "Clean Extention Length (0~23)");
+            if (Convert.ToInt32(m_extentionlength) < 0) m_extentionlength = tree.Set("23", "23", "Extention length", "Clean Extention Length");
+            if (Convert.ToInt32(m_extentionlength) > 23) m_extentionlength = tree.Set("23", "23", "Extention length", "Clean Extention Length");
+            m_CleanSpeed = tree.Set(m_CleanSpeed, m_CleanSpeed, "Clean Speed", "RTR Clean Speed");
+            m_OriginSpeed = tree.Set(m_OriginSpeed, m_OriginSpeed, "Origin Speed", "RTR Origin Speed");
         }
 
         public override void Reset()
@@ -812,6 +835,7 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_Grip(this), false, "Run Grip RTR Arm");
             m_runGet = AddModuleRunList(new Run_Get(this), false, "RTR Run Get Motion");
             m_runPut = AddModuleRunList(new Run_Put(this), false, "RTR Run Put Motion");
+            AddModuleRunList(new Run_Clean(this), true, "RTR Run Clean");
         }
 
         public class Run_ResetCPU : ModuleRunBase
@@ -920,7 +944,7 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-
+                MainVision mainVision = ((AOP01_Handler)m_module.m_engineer.ClassHandler()).m_mainVision;
                 IWTRChild child = m_module.GetChild(p_sChild);
                 ModuleBase child_module = m_module.GetChild_Module(p_sChild);
                 if (child == null)
@@ -955,51 +979,125 @@ namespace Root_AOP01_Inspection.Module
                     Thread.Sleep(100);
                 }
 
-                if (p_sChild == "MainVision" || p_sChild == "BacksideVision")
-                {
-                    while (child_module.IsBusy()) Thread.Sleep(10);
-                }
+                //if (p_sChild == "MainVision" || p_sChild == "BacksideVision")
+                //{
+                //    while (child_module.IsBusy()) Thread.Sleep(10);
+                //}
 
                 if (m_module.Run(child.BeforeGet(m_nChildID)))
                 {
                     m_module.m_alidGet.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                if (p_sChild == "MainVision")
-                {
-                    while (child_module.IsBusy()) Thread.Sleep(10);
-                }
+                //if (p_sChild == "MainVision")
+                //{
+                //    while (child_module.IsBusy()) Thread.Sleep(10);
+                //}
                 if (m_module.Run(child.IsGetOK(m_nChildID)))
                 {
                     m_module.m_alidGet.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                //m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
-                try
+                if (p_sChild == "MainVision")
                 {
-                    child.p_bLock = true;
-                    if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1)))
+                    if (mainVision.m_diReticleFrameCheck.p_bIn == true)
                     {
-                        m_module.m_alidGet.Run(true, p_sInfo);
-                        return p_sInfo;
+                        m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
+                        try
+                        {
+                            child.p_bLock = true;
+                            if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo;
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo;
+                            }
+                            child.p_bLock = false;
+                            child.AfterGet(m_nChildID);
+                        }
+                        finally
+                        {
+                            if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                            else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                        }
+                        if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
+                        m_module.m_alidGet.Run(true, "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString());
+                        return "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString();
                     }
+                    else
+                    {
+                        m_module.m_alidGet.Run(true, "RTR Pellicle Side Get Error : Reticle is Not Pellicle Side");
+                        return "RTR Pellicle Side Get Error : Reticle is Not Pellicle Side";
+                    }
+                }
+                else if (p_sChild == "BacksideVision")
+                {
+                    if (mainVision.m_diReticleFrameCheck.p_bIn == false)
+                    {
+                        m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
+                        try
+                        {
+                            child.p_bLock = true;
+                            if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo;
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo;
+                            }
+                            child.p_bLock = false;
+                            child.AfterGet(m_nChildID);
+                        }
+                        finally
+                        {
+                            if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                            else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                        }
+                        if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
+                        m_module.m_alidGet.Run(true, "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString());
+                        return "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString();
+                    }
+                    else
+                    {
+                        m_module.m_alidGet.Run(true, "RTR Glass Side Get Error : Reticle is Not Glass Side");
+                        return "RTR Glass Side Get Error : Reticle is Not Glass Side";
+                    }
+                }
+                else
+                {
                     m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
-                    if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                    try
                     {
-                        m_module.m_alidGet.Run(true, p_sInfo);
-                        return p_sInfo;
+                        child.p_bLock = true;
+                        if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo;
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo;
+                        }
+                        child.p_bLock = false;
+                        child.AfterGet(m_nChildID);
                     }
-                    child.p_bLock = false;
-                    child.AfterGet(m_nChildID);
+                    finally
+                    {
+                        if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                        else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    }
+                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
+                    m_module.m_alidGet.Run(true, "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString());
+                    return "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString();
                 }
-                finally
-                {
-                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
-                    else m_module.m_dicArm[m_eArm].p_infoWafer = null;
-                }
-                if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
-                m_module.m_alidGet.Run(true, "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString());
-                return "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString();
             }
         }
 
@@ -1073,25 +1171,25 @@ namespace Root_AOP01_Inspection.Module
                     m_module.m_alidPut.Run(true, "RTR Teach Position Not Defined");
                     return "RTR Teach Position Not Defined";
                 }
-                if (p_sChild == "MainVision")
-                {
-                    while (child_module.IsBusy()) Thread.Sleep(10);
-                }
+                //if (p_sChild == "MainVision")
+                //{
+                //    while (child_module.IsBusy()) Thread.Sleep(10);
+                //}
                 if (m_module.Run(child.BeforePut(m_nChildID)))
                 {
                     m_module.m_alidPut.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                if (p_sChild == "MainVision")
-                {
-                    while (child_module.IsBusy()) Thread.Sleep(10);
-                }
+                //if (p_sChild == "MainVision")
+                //{
+                //    while (child_module.IsBusy()) Thread.Sleep(10);
+                //}
                 if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID)))
                 {
                     m_module.m_alidPut.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                //child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
+                child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
                 try
                 {
                     child.p_bLock = true;
@@ -1100,7 +1198,6 @@ namespace Root_AOP01_Inspection.Module
                         m_module.m_alidPut.Run(true, p_sInfo);
                         return p_sInfo;
                     }
-                    child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
                     {
                         m_module.m_alidPut.Run(true, p_sInfo);
@@ -1116,6 +1213,246 @@ namespace Root_AOP01_Inspection.Module
                 if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";
                 m_module.m_alidPut.Run(true, "RTR Put Error : Reticle Check Sensor not Detected at Child = " + child.p_id);
                 return "RTR Put Error : Reticle Check Sensor not Detected at Child = " + child.p_id;
+            }
+        }
+
+        public bool m_bDoClean = false;
+        public class Run_Clean : ModuleRunBase
+        {
+            RTR_RND m_module;
+            public Run_Clean(RTR_RND module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+            string m_sThickness = "3mm";
+            string m_sCleanPlane = "Top";
+            string m_sCleanCount = "1";
+            public override ModuleRunBase Clone()
+            {
+                Run_Clean run = new Run_Clean(m_module);
+                return run;
+            }
+            public List<string> m_asThicness = new List<string>() { "3mm", "5mm" };
+            public List<string> m_asCleanPlane = new List<string>() { "Top", "Bottom" };
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_sThickness = tree.Set(m_sThickness, m_sThickness, m_asThicness, "Reticle Thickness", "Reticle Thickness", bVisible);
+                m_sCleanPlane = tree.Set(m_sCleanPlane, m_sCleanPlane, m_asCleanPlane, "Clean Plane", "Clean Plane", bVisible);
+                m_sCleanCount = tree.Set(m_sCleanCount, m_sCleanCount, "Clean Count", "Clean Count", bVisible);
+            }
+            public override string Run()
+            {
+                if (EQ.p_bSimulate) return "OK";
+                int teachTopClean = m_module.m_teachCleanTop;
+                int nClenaCount = Int32.Parse(m_sCleanCount);
+                string sRMove = m_module.m_extentionlength;
+                string sCleanSpeed = m_module.m_CleanSpeed;
+                string sOriginSpeed = m_module.m_OriginSpeed;
+                int teachBottomClean = m_module.m_teachCleanBottom;
+                m_module.m_bDoClean = true;
+                if (nClenaCount > 0)
+                {
+                    if (m_sCleanPlane == "Top")
+                    {
+                        if (m_module.Run(m_module.WriteCmd(eCmd.PutReady, teachTopClean, 1, 1)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo; //Move to Ready of Teach
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo;
+                        }
+                        if (m_module.Run(m_module.WriteCmd(eCmd.Extend, teachTopClean, 1)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo; //Move to Teach
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo;
+                        }
+                        if (m_sThickness == "3mm")
+                        {
+                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, "0", "0", "2", "0", "0")))
+                            {
+                                m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_bDoClean = false;
+                                return p_sInfo; //3mm Reticle Move
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_bDoClean = false;
+                                return p_sInfo;
+                            }
+                        }
+                        else if (m_sThickness == "5mm")
+                        {
+
+                        }
+                        m_module.m_doTopBlow.Write(true); //Blow On
+                        if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sCleanSpeed)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doTopBlow.Write(false);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo; //Clean Speed Set
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doTopBlow.Write(false);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo;
+                        }
+                        for (int i = 0; i < nClenaCount; i++)
+                        {
+                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0")))
+                            {
+                                m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doTopBlow.Write(false);
+                                m_module.m_bDoClean = false;
+                                return p_sInfo; //Claen Move Front
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doTopBlow.Write(false);
+                                m_module.m_bDoClean = false;
+                                return p_sInfo;
+                            }
+                            sRMove = "-" + sRMove;
+                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0")))
+                            {
+                                m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doTopBlow.Write(false);
+                                m_module.m_bDoClean = false;
+                                return p_sInfo; //Clean Move Back
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doTopBlow.Write(false);
+                                m_module.m_bDoClean = false;
+                                return p_sInfo;
+                            }
+                        }
+                        if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sOriginSpeed)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doTopBlow.Write(false);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo; //Origin Speed Set
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doTopBlow.Write(false);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo;
+                        }
+                        m_module.m_doTopBlow.Write(false); //Blow off
+                    }
+                    else if (m_sCleanPlane == "Bottom")
+                    {
+                        if (m_module.Run(m_module.WriteCmd(eCmd.PutReady, teachBottomClean, 1, 1)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo; //Move to Ready of Teach
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo;
+                        }
+                        if (m_module.Run(m_module.WriteCmd(eCmd.Extend, teachBottomClean, 1)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo; //Move to Teach
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo;
+                        }
+                        m_module.m_doBottomBlow.Write(true); //Blow On
+                        if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sCleanSpeed)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doBottomBlow.Write(false);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo; //Clean Speed Set
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doBottomBlow.Write(false);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo;
+                        }
+                        for (int i = 0; i < nClenaCount; i++)
+                        {
+                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0")))
+                            {
+                                m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doBottomBlow.Write(false);
+                                m_module.m_bDoClean = false;
+                                return p_sInfo; //Claen Move Front
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doBottomBlow.Write(false);
+                                m_module.m_bDoClean = false;
+                                return p_sInfo; //Claen Move Front
+                            }
+                            sRMove = "-" + sRMove;
+                            if (m_module.Run(m_module.WriteCmdManualMove(eCmd.ManualMove, sRMove, "0", "0", "0", "0")))
+                            {
+                                m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doBottomBlow.Write(false);
+                                m_module.m_bDoClean = false;
+                                return p_sInfo; //Clean Move Back
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidClean.Run(true, p_sInfo);
+                                m_module.m_doBottomBlow.Write(false);
+                                m_module.m_bDoClean = false;
+                                return p_sInfo;
+                            }
+                        }
+                        if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sOriginSpeed)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doBottomBlow.Write(false);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo; //Origin Speed Set
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidClean.Run(true, p_sInfo);
+                            m_module.m_doBottomBlow.Write(false);
+                            m_module.m_bDoClean = false;
+                            return p_sInfo;
+                        }
+                        m_module.m_doBottomBlow.Write(false); //Blow off
+                    }
+                }
+                m_module.m_bDoClean = false;
+                return "OK";
             }
         }
         #endregion

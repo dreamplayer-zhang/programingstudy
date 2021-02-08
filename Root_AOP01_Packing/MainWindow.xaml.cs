@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using RootTools;
+using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -98,7 +99,7 @@ namespace Root_AOP01_Packing
         private Setup_ViewModel m_Setup;
         private Run_ViewModel m_Run;
         #endregion
-
+        public IDialogService dialogService;
         AOP01_Engineer m_engineer = new AOP01_Engineer();
 
         public MainWindow()
@@ -108,17 +109,20 @@ namespace Root_AOP01_Packing
 
         void Init()
         {
+            dialogService = new DialogService(this);
+            dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+            dialogService.Register<TK4S, TK4SModuleUI>();
+            dialogService.Register<FFUModule, FFUModuleUI>();
             Init_ViewModel();
             Init_UI();
 
-            m_engineer.Init("AOP01");
+            m_engineer.Init("AOP01",dialogService);
             m_Setup.m_Home.Engineer.Engineer_UI.Init(m_engineer);
-            //m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
         }
         void Init_ViewModel()
         {
-            m_Setup = new Setup_ViewModel(this);
-            m_Run = new Run_ViewModel(this);
+            m_Setup = new Setup_ViewModel(this, m_engineer);
+            m_Run = new Run_ViewModel(this, m_engineer);
         }
         void Init_UI()
         {
@@ -132,7 +136,7 @@ namespace Root_AOP01_Packing
             //Review.DataContext =;;
 
             Run = new Run_Panel();
-            Run.DataContext = this;
+            Run.DataContext = m_Run;
 
             MainPanel.Children.Clear();
             MainPanel.Children.Add(ModeSelect);

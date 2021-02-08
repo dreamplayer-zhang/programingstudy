@@ -13,16 +13,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RootTools_Vision.UserControls
+namespace RootTools
 {
     /// <summary>
-    /// BasicTreeView.xaml에 대한 상호 작용 논리
+    /// FFU_Group_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class BasicTreeView : UserControl
+    public partial class FFU_Group_UI : UserControl
     {
-        public BasicTreeView()
+        public FFU_Group_UI()
         {
             InitializeComponent();
+        }
+
+        public void Init(FFU_Group ffu)
+        {
+            this.DataContext = ffu;
         }
     }
 }

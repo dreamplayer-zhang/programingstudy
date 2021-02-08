@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools" 
 		xmlns:local="clr-namespace:RootTools_Vision"
-        xmlns:controls="clr-namespace:RootTools_Vision.UserControls"
         Title="MainWindow" Height="800" Width="1400">
 
     <Grid>

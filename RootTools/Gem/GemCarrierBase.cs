@@ -3,6 +3,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Windows.Media;
+using static RootTools.Gem.XGem.XGem;
 
 namespace RootTools.Gem
 {
@@ -106,7 +107,7 @@ namespace RootTools.Gem
 
         void CMSDelCarrierInfo()
         {
-            if (m_gem != null) m_gem.CMSDelCarrierInfo(this);
+            m_gem?.CMSDelCarrierInfo(this);
         }
 
         void RunTreeCarrier(Tree tree)
@@ -198,7 +199,7 @@ namespace RootTools.Gem
                 if (_eReqAccess == value) return;
                 if ((m_gem == null) || m_gem.p_bOffline) return;
                 _eReqAccess = value;
-                if (m_gem != null) m_gem.SendCarrierAccessing(this, _eReqAccess);
+                m_gem?.SendCarrierAccessing(this, _eReqAccess);
             }
         }
         eAccess _eAccess = eAccess.NotAccessed; 
@@ -268,7 +269,7 @@ namespace RootTools.Gem
         #region CarrierID
         public void SendCarrierID(string sCarrierID)
         {
-            if (m_gem == null)
+            if (m_gem == null || m_gem.p_eControl != eControl.ONLINEREMOTE) 
             {
                 p_eStateCarrierID = eGemState.VerificationOK;
                 p_eTransfer = eTransfer.TransferBlocked;
@@ -286,7 +287,7 @@ namespace RootTools.Gem
             set
             {
                 if (_sCarrierID == value) return;
-                if (m_log != null) m_log.Info("p_sCarrierID " + _sCarrierID + " -> " + value);
+                m_log?.Info("p_sCarrierID " + _sCarrierID + " -> " + value);
                 _sCarrierID = value;
                 OnPropertyChanged(); 
             }
@@ -299,7 +300,7 @@ namespace RootTools.Gem
 
         public void SendSlotMap()
         {
-            if (m_gem == null)
+            if (m_gem == null || m_gem.p_eControl != eControl.ONLINEREMOTE)
             {
                 p_eStateSlotMap = eGemState.VerificationOK;
                 return;
@@ -387,7 +388,7 @@ namespace RootTools.Gem
         public IGem m_gem;
         public void InitBase()
         {
-            if (m_gem != null) m_gem.AddGemCarrier(this);
+            m_gem?.AddGemCarrier(this);
             foreach (GemSlotBase slot in m_aGemSlot) slot.RegRead();
             m_treeRoot = new TreeRoot(p_sLocID + ".Gem", m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;

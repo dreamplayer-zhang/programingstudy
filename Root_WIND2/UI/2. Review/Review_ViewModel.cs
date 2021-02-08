@@ -114,7 +114,7 @@ namespace Root_WIND2
         }
         public void GoldenImagelist_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count > 0) ;
+            //if (e.AddedItems.Count > 0) ;
         }
 
         #endregion

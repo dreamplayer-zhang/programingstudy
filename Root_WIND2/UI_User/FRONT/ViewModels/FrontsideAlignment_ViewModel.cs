@@ -3,6 +3,7 @@ using RootTools_Vision;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -22,14 +23,6 @@ namespace Root_WIND2.UI_User
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
 
             this.ImageViewerVM.FeatureBoxDone += FeatureBoxDone_Callback;
-        }
-
-        #region [IPage Interfaces]
-        public void SetPage()
-        {
-            this.ImageViewerVM.SetViewRect();
-
-            LoadRecipe();
         }
 
         public void LoadRecipe()
@@ -73,7 +66,6 @@ namespace Root_WIND2.UI_User
                 p_ChipFeatureList.Add(fc);
             }
         }
-        #endregion
 
         #region [Members]
         ImageData boxImage;
@@ -215,7 +207,18 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Command]
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.ImageViewerVM.DisplayBox();
 
+                    LoadRecipe();
+                });
+            }
+        }
         public RelayCommand btnFeatureBoxClearCommand
         {
             get => new RelayCommand(() =>

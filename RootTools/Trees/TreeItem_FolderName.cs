@@ -20,14 +20,14 @@ namespace RootTools.Trees
         public void SetValue(dynamic value)
         {
             if (_value == value) return;
-            if (m_log != null) m_log.Info(p_id + " : " + _value.ToString() + " -> " + value.ToString());
+            m_log?.Info(p_id + " : " + _value.ToString() + " -> " + value.ToString());
             _value = value;
             OnPropertyChanged("p_value");
         }
 
         public dynamic GetValue() { return p_value; }
 
-        string m_sExt = "";
+        //string m_sExt = "";
         public TreeItem_FolderName(string sName, Tree treeParent, string value, string sDesc, Log log)
         {
             p_sName = sName;

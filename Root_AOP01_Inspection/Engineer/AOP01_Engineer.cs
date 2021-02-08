@@ -13,7 +13,7 @@ using System.Collections.ObjectModel;
 
 namespace Root_AOP01_Inspection
 {
-    public class AOP01_Engineer : IEngineer
+    public class AOP01_Engineer : NotifyProperty, IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
@@ -82,12 +82,23 @@ namespace Root_AOP01_Inspection
         #endregion
 
         #region XGem
-        bool m_bUseXGem = true;
+        //bool m_bUseXGem = true;
+        bool _bUseXGem = false;
+        public bool p_bUseXGem
+        {
+            get { return _bUseXGem; }
+            set
+            {
+                if (_bUseXGem == value) return;
+                _bUseXGem = value;
+                OnPropertyChanged();
+            }
+        }
         XGem m_xGem = null;
         XGem_UI m_xGemUI = new XGem_UI();
         void InitXGem()
         {
-            if (m_bUseXGem == false) return;
+            if (p_bUseXGem == false) return;
             m_xGem = new XGem();
             m_xGem.Init("XGem", this);
             m_xGemUI.Init(m_xGem);
@@ -96,7 +107,7 @@ namespace Root_AOP01_Inspection
 
         void RunTreeXGem(Tree tree)
         {
-            m_bUseXGem = tree.Set(m_bUseXGem, m_bUseXGem, "Use", "Use XGem");
+            p_bUseXGem = tree.Set(p_bUseXGem, p_bUseXGem, "Use", "Use XGem");
         }
         #endregion
 
@@ -128,12 +139,54 @@ namespace Root_AOP01_Inspection
         #region IEngineer Function
         public string BuzzerOff()
         {
+            m_handler.m_aop01.BuzzerOff();
             return "OK";
         }
 
         public string Recovery()
         {
+            if (IsEnableRecovery() == false) return "Recovery is impossible";
+            m_handler.m_bIsPossible_Recovery = false;
+            m_handler.m_process.CalcRecover();
+            EQ.p_eState = EQ.eState.Run;
             return "OK";
+        }
+        bool IsEnableRecovery()
+        {
+            if (IsRunModule()) return false;
+            if (IsErrorModule()) return false;
+            if (m_handler.m_bIsPossible_Recovery == false) return false;
+            // Daniel check
+            if (EQ.p_eState != EQ.eState.Ready && EQ.p_eState != EQ.eState.Idle) return false;
+            if (EQ.p_bStop == true) return false;
+            return m_handler.IsEnableRecovery();
+        }
+        bool IsRunModule()
+        {
+            if (IsRunModule((ModuleBase)m_handler.m_aLoadport[0]) || IsRunModule((ModuleBase)m_handler.m_aLoadport[1]) || IsRunModule(m_handler.m_wtr) || IsRunModule(m_handler.m_mainVision) || IsRunModule(m_handler.m_backsideVision))
+                return true;
+            return false;
+        }
+        bool IsRunModule(ModuleBase module)
+        {
+            if (module.p_eState == ModuleBase.eState.Run) return true;
+            if (module.p_eState == ModuleBase.eState.Home) return true;
+            if (module.p_eState == ModuleBase.eState.Error) return false;
+            return (module.m_qModuleRun.Count > 0);
+        }
+        bool IsErrorModule()
+        {
+            if (IsErrorModule((ModuleBase)m_handler.m_aLoadport[0]) || IsErrorModule((ModuleBase)m_handler.m_aLoadport[1]) || IsErrorModule(m_handler.m_wtr) || IsErrorModule(m_handler.m_mainVision) || IsErrorModule(m_handler.m_backsideVision))
+                return true;
+            else
+                return false;
+        }
+        bool IsErrorModule(ModuleBase module)
+        {
+            if (module.p_eState == ModuleBase.eState.Error)
+                return true;
+            else
+                return false;
         }
         #endregion
 

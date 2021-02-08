@@ -326,6 +326,10 @@
     <Compile Include="Control\Ajin\AjinLib\AXL.cs" />
     <Compile Include="Control\Ajin\AjinLib\AXM.cs" />
     <Compile Include="Control\DIO_I2O.cs" />
+    <Compile Include="Comm\FFU_Group.cs" />
+    <Compile Include="Comm\FFU_Group_UI.xaml.cs">
+      <DependentUpon>FFU_Group_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GeneralFunction.cs" />
     <Compile Include="ImageProcess\AutoFocus.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
@@ -422,6 +426,9 @@
     </Compile>
     <Compile Include="Comm\TK4SModuleUI.xaml.cs">
       <DependentUpon>TK4SModuleUI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Comm\FFUModuleUI.xaml.cs">
+      <DependentUpon>FFUModuleUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
     <Compile Include="Viewer\Root_Viewer.cs" />
@@ -870,6 +877,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Comm\FFU_Group_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GAFs\ALIDList_PopupUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -1061,6 +1072,10 @@
     <Page Include="Comm\TK4SModuleUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\FFUModuleUI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Viewer\RootViewer.xaml">
       <SubType>Designer</SubType>

@@ -3,6 +3,11 @@
 
 #include "IP.h"
 
+#pragma warning(disable: 4244)
+#pragma warning(disable: 4838)
+#pragma warning(disable: 6297)
+#pragma warning(disable: 26451)
+
 void IP::Threshold(BYTE* pSrc, int nW, int nH, int threshold, bool bDark, BYTE* pDst)
 {
     Mat imgSrc = Mat(nW, nH, CV_8UC1, pSrc);

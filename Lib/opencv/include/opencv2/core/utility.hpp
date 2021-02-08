@@ -60,6 +60,9 @@
 #include <functional>
 #endif
 
+#pragma warning(disable: 6297)
+#pragma warning(disable: 26451)
+
 namespace cv
 {
 

@@ -98,7 +98,7 @@ namespace RootTools.ToolBoxs
             }
             finally 
             {
-                if (m_treeRoot.m_job != null) m_treeRoot.m_job.Close(); 
+                m_treeRoot?.m_job?.Close(); 
             }
         }
 
@@ -111,7 +111,7 @@ namespace RootTools.ToolBoxs
             }
             finally
             {
-                if (m_treeRoot.m_job != null) m_treeRoot.m_job.Close();
+                m_treeRoot?.m_job?.Close();
             }
         }
         #endregion

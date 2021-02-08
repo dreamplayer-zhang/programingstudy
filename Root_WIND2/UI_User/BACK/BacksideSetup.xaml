@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="Root_WIND2.UI_User.BacksideSetup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_WIND2"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1200">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid Background="{StaticResource main_view_background}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="70*"/>
+            <ColumnDefinition Width="30*"/>
+        </Grid.ColumnDefinitions>
+
+        <GroupBox Margin="4"
+                  Header="Image VIewer" DataContext="{Binding ImageViewerVM}" Style="{StaticResource main_view_groupbox}" >
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="1"  Orientation="Horizontal">
+                    <TextBlock Text="Image" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Button Content="Open" Command="{Binding btnOpenCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Save" Command="{Binding btnSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Clear" Command="{Binding btnClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button IsEnabled="False" Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>
+
+                    <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <CheckBox Content="ROI" IsChecked="{Binding IsROIChecked, Mode=TwoWay}" Command="{Binding btnROICommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                </StackPanel>
+                <Grid Grid.Row="1" >
+
+                    <tools:RootViewer />
+                </Grid>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>

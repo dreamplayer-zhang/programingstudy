@@ -33,28 +33,25 @@ namespace Root_AOP01_Packing
         public ModuleList p_moduleList { get; set; }
         public AOP01_Recipe m_recipe;
         public AOP01_Process m_process;
+
+        public AOP01_P m_aop01P;
+        public IndividualElevator m_elevator;
         public TapePacker m_tapePacker;
         public VacuumPacker m_vacuumPacker;
-        public IndividualElevator m_elevator;
         public Unloadport_AOP m_unloadport;
-        public Vision_AOP m_visionAOP;
-        public Certification m_RNR;
+
         public RFID_Brooks m_RFID;
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            InitWTR(); 
+            m_aop01P = new AOP01_P("AOP01_P", m_engineer);
+            InitModule(m_aop01P);
+            InitWTR();
             InitLoadport();
 
-
-            //m_RNR = new Certification("Certification", m_engineer);
-            //InitModule(m_RNR);
-
-            //m_visionAOP = new Vision_AOP("Vision", m_engineer);
-            //InitModule(m_visionAOP);
-            //m_RFID = new RFID_Brooks("RFID", m_engineer, null);
-            //InitModule(m_RFID);
+            m_RFID = new RFID_Brooks("RFID", m_engineer, null);
+            InitModule(m_RFID);
 
             m_tapePacker = new TapePacker("TapePacker", m_engineer);
             InitModule(m_tapePacker);
@@ -69,9 +66,9 @@ namespace Root_AOP01_Packing
             InitModule(m_elevator);
             ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_elevator);
 
-            //m_unloadport = new Unloadport_AOP("Unloadport", m_engineer);
-            //InitModule(m_unloadport);
-            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_unloadport);
+            m_unloadport = new Unloadport_AOP("Unloadport", m_engineer);
+            InitModule(m_unloadport);
+            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_unloadport);
 
             m_aWTR[0].RunTree(Tree.eMode.RegRead);
             m_aWTR[0].RunTree(Tree.eMode.Init);
@@ -125,10 +122,10 @@ namespace Root_AOP01_Packing
             m_aLoadport.Add(loadportA);
             ((IWTR)m_aWTR[0]).AddChild((IWTRChild)loadportA);
 
-            //Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, false, false);
-            //InitModule(loadportAOP);
-            //m_aLoadport.Add(loadportAOP);
-            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)loadportAOP);
+            Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, false, false);
+            InitModule(loadportAOP);
+            m_aLoadport.Add(loadportAOP);
+            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)loadportAOP);
         }
         #endregion
 
@@ -189,7 +186,7 @@ namespace Root_AOP01_Packing
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
-            if (gaf != null) gaf.ClearALID();
+            gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
         }
         #endregion
@@ -214,7 +211,7 @@ namespace Root_AOP01_Packing
             //            if (m_process.m_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
-                if (m_gem != null) m_gem.SendPJComplete(pj.m_sPJobID);
+                m_gem?.SendPJComplete(pj.m_sPJobID);
                 Thread.Sleep(100);
             }
         }

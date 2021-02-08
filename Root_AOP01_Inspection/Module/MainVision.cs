@@ -408,9 +408,9 @@ namespace Root_AOP01_Inspection.Module
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             //p_bStageVac = false;
 
-            m_axisRotate.StartMove(eAxisPos.ReadyPos);
-            if (m_axisRotate.WaitReady() != "OK")
-                return "Error";
+            //m_axisRotate.StartMove(eAxisPos.ReadyPos);
+            //if (m_axisRotate.WaitReady() != "OK")
+            //    return "Error";
 
             return "OK";
         }
@@ -1033,16 +1033,6 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
         }
         #endregion
-
-
-        public RTRCleanUnit p_wtr
-        {
-            get
-            {
-                AOP01_Handler handler = (AOP01_Handler)m_engineer.ClassHandler();
-                return (RTRCleanUnit)handler.m_wtr;
-            }
-        }
 
         public MainVision(string id, IEngineer engineer)
         {
@@ -3307,7 +3297,7 @@ namespace Root_AOP01_Inspection.Module
                 Image<Gray, byte> imgTemplate;
                 Point ptStart, ptEnd;
                 CRect crtSearchArea;
-                Mat matSearchArea;
+                //Mat matSearchArea;
                 CPoint cptSearchAreaCenter;
                 bool bFound = false;
                 CPoint[] cptarrOutResultCenterPositions = new CPoint[(int)eSearchPoint.Count];

@@ -15,40 +15,46 @@ using RootTools_Vision;
 using RootTools.Memory;
 using Root_AOP01_Inspection.Recipe;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Root_AOP01_Inspection
 {
-	public class Dummy
-	{
-		public string a
-		{
-			get; set;
-		}
-		public string b
-		{
-			get; set;
-		}
-		public string c
-		{
-			get; set;
-		}
-		public string d
-		{
-			get; set;
-		}
-		public string e
-		{
-			get; set;
-		}
-	}
+    public class Dummy
+    {
+        public string a
+        {
+            get;set;
+        }
+        public string b
+        {
+            get; set;
+        }
+        public string c
+        {
+            get; set;
+        }
+        public string d
+        {
+            get; set;
+        }
+        public string e
+        {
+            get; set;
+        }
+    }
 
-	/// <summary>
-	/// MainWindow.xaml에 대한 상호 작용 논리
-	/// </summary>
 
-	public partial class MainWindow : Window
-	{
-
+    /// <summary>
+    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// </summary>
+    
+    public partial class MainWindow : Window
+    {
+        public void GetAssemblyVersion()
+        {
+            AssemblyName name = Assembly.GetExecutingAssembly().GetName();
+            this.textblockAssembly.Text = name.Version.ToString();
+        }
 
 		#region Title Bar
 		private void MinimizeButton_Click(object sender, RoutedEventArgs e)

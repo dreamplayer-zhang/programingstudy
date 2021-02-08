@@ -46,6 +46,8 @@
 
 //! @cond IGNORED
 
+#pragma warning(disable: 4793)
+
 namespace cv {
 
 template<typename Y>

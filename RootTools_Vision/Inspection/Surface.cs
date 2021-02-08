@@ -16,7 +16,7 @@ namespace RootTools_Vision
 {
     public class Surface : WorkBase
     {
-        Workplace workplace;
+        Workplace workplace = null;
 
         public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 

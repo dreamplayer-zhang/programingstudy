@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Root_WIND2.UI_User
 {
@@ -28,11 +29,6 @@ namespace Root_WIND2.UI_User
             this.imageViewerVM.OriginBoxDone += OriginBoxDone_Callback;
             this.imageViewerVM.PitchPointDone += PitchPointDone_Callback;
 
-        }
-
-        public void SetPage()
-        {
-            LoadRecipe();
         }
 
         public void LoadRecipe()
@@ -175,6 +171,17 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Command]
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    LoadRecipe();
+                });
+            }
+        }
+
         public RelayCommand btnOriginClearCommand
         {
             get

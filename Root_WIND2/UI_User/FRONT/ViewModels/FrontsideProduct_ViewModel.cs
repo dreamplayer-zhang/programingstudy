@@ -132,6 +132,19 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region Command Btn
+
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    LoadRecipe();
+                    DrawMap();
+                });
+            }
+        }
+
         public ICommand CreateMapCommand
         {
             get
@@ -201,17 +214,11 @@ namespace Root_WIND2.UI_User
             chipItems = new ObservableCollection<Rectangle>();
         }
 
-        public void SetPage()
-        {
-            LoadRecipe();
-        }
-
         public void LoadRecipe()
         {
             RecipeType_WaferMap wafermap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
 
             CreateRecipeWaferMap(wafermap.MapSizeX, wafermap.MapSizeY, wafermap.Data);
-            DrawMap();
         }
 
         #region [Properties]
@@ -373,7 +380,5 @@ namespace Root_WIND2.UI_User
             return Brushes.DimGray;
             #endregion
         }
-
-
     }
 }

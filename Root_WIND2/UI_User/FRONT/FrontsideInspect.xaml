@@ -5,8 +5,15 @@
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
+             xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <UserControl.Resources>
         <Style x:Key="inspection_menu_button" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource groupbox_button_normal}"/>
@@ -77,7 +84,7 @@
                       Header="Inspection state"
                       Margin="4"
                       Style="{StaticResource main_view_groupbox}">
-
+                    <vision:MapViewer DataContext="{Binding MapViewerVM}"  Margin="4"/>
                 </GroupBox>
                 <GroupBox Grid.Row="1" 
                       Header="Defect List"
