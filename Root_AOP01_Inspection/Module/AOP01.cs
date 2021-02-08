@@ -57,7 +57,7 @@ namespace Root_AOP01_Inspection.Module
         DIO_I m_disideDoor;
         DIO_I m_diELECPNLDoorFan;
         DIO_I m_diETCDoorFan;
-        DIO_O m_doDoorLock_Use;
+        public DIO_O m_doDoorLock_Use;
 
 
         public override void GetTools(bool bInit)
@@ -94,17 +94,18 @@ namespace Root_AOP01_Inspection.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeSetup(tree.GetTree("Setup", false));
+            RunTreeLamp(tree.GetTree("Lamp", false));
         }
         eLamp m_eLampError = eLamp.Red;
         eLamp m_eLampRun = eLamp.Green;
         eLamp m_eLampReady = eLamp.Yellow;
-        void RunTreeSetup(Tree tree)
+        void RunTreeLamp(Tree tree)
         {
             m_eLampRun = (eLamp)tree.Set(m_eLampRun, m_eLampRun, "Run Lamp Set", "Run Lamp Set");
             m_eLampReady = (eLamp)tree.Set(m_eLampReady, m_eLampReady, "Ready Lamp Set", "Ready Lamp Set");
             m_eLampError = (eLamp)tree.Set(m_eLampError, m_eLampError, "Error Lamp Set", "Error Lamp Set");
         }
+        
         #endregion
         #region GAF
         //ALID 생성
@@ -171,7 +172,6 @@ namespace Root_AOP01_Inspection.Module
                         case EQ.eState.Run:
                         case EQ.eState.Recovery:
                             m_doDoorLock_Use.Write(true);
-                            //m_doBuzzer.Write(eBuzzer.Buzzer3);
                             m_doLamp.Write(m_eLampRun);
                             break;
                         case EQ.eState.Home:
