@@ -1,7 +1,4 @@
 ﻿using System;
-using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
 using RootTools;
 using RootTools.Camera;
 using RootTools.Control;
