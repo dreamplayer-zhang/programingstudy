@@ -90,7 +90,22 @@ namespace Root_AOP01_Inspection.Module
             if (bInit) InitALID();
         }
         #endregion
-
+        #region Tree
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            RunTreeSetup(tree.GetTree("Setup", false));
+        }
+        eLamp m_eLampError = eLamp.Red;
+        eLamp m_eLampRun = eLamp.Green;
+        eLamp m_eLampReady = eLamp.Yellow;
+        void RunTreeSetup(Tree tree)
+        {
+            m_eLampRun = (eLamp)tree.Set(m_eLampRun, m_eLampRun, "Run Lamp Set", "Run Lamp Set");
+            m_eLampReady = (eLamp)tree.Set(m_eLampReady, m_eLampReady, "Ready Lamp Set", "Ready Lamp Set");
+            m_eLampError = (eLamp)tree.Set(m_eLampError, m_eLampError, "Error Lamp Set", "Error Lamp Set");
+        }
+        #endregion
         #region GAF
         //ALID 생성
         ALID m_alidEMS;
@@ -151,28 +166,28 @@ namespace Root_AOP01_Inspection.Module
                         case EQ.eState.Error:
                             m_doDoorLock_Use.Write(false);
                             m_doBuzzer.Write(eBuzzer.Buzzer2);
-                            m_doLamp.Write(eLamp.Red);
+                            m_doLamp.Write(m_eLampError);
                             break;
                         case EQ.eState.Run:
                         case EQ.eState.Recovery:
                             m_doDoorLock_Use.Write(true);
                             //m_doBuzzer.Write(eBuzzer.Buzzer3);
-                            m_doLamp.Write(eLamp.Green);
+                            m_doLamp.Write(m_eLampRun);
                             break;
                         case EQ.eState.Home:
                             m_doBuzzer.Write(eBuzzer.Buzzer4);
-                            m_doLamp.Write(eLamp.Green);
+                            m_doLamp.Write(m_eLampRun);
                             break;
                         case EQ.eState.Ready:
                         case EQ.eState.Idle:
                             m_doDoorLock_Use.Write(false);
                             BuzzerOff();
-                            m_doLamp.Write(eLamp.Yellow);
+                            m_doLamp.Write(m_eLampReady);
                             break;
                         case EQ.eState.Init:
                             m_doDoorLock_Use.Write(false);
                             BuzzerOff();
-                            m_doLamp.Write(eLamp.Yellow);
+                            m_doLamp.Write(m_eLampReady);
                             break;
                     }
                     m_eStatus = EQ.p_eState;
