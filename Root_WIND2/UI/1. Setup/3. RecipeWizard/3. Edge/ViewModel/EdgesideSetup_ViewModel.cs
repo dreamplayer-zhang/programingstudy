@@ -59,46 +59,6 @@ namespace Root_WIND2
 			}
 		}
 
-		public int CamWidth
-		{
-			get => camWidth;
-			set
-			{
-				SetProperty<int>(ref this.camWidth, value);
-				parameter.CamWidth = value;
-			}
-		}
-
-		public int CamHeight
-		{
-			get => camHeight;
-			set
-			{
-				SetProperty<int>(ref this.camHeight, value);
-				parameter.CamHeight = value;
-			}
-		}
-
-		public double CamResolution
-		{
-			get => camResolution;
-			set
-			{
-				SetProperty<double>(ref this.camResolution, value);
-				parameter.CamResolution = value;
-			}
-		}
-
-		public double TriggerRatio
-		{
-			get => triggerRatio;
-			set
-			{
-				SetProperty<double>(ref this.camTriggerRatio, value);
-				parameter.TriggerRatio = value;
-			}
-		}
-
 		public int TopOffset
 		{
 			//get => topOffset;
@@ -133,13 +93,6 @@ namespace Root_WIND2
 			get => this.selectedGrabModeIndex;
 			set
 			{
-				GrabMode mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
-				this.CamWidth = mode.m_camera.GetRoiSize().X;
-				this.CamHeight = mode.m_camera.GetRoiSize().Y;
-				this.CamResolution = mode.m_dResX_um;
-				this.TriggerRatio = mode.m_dCamTriggerRatio;
-
-				SetProperty<int>(ref this.selectedGrabModeIndex, value);
 			}
 		}
 

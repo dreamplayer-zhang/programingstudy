@@ -53,19 +53,104 @@ namespace RootTools_Vision
 
 		public void DoInspection()
 		{
-			if (this.currentWorkplace.Index == 0)
+			//if (this.currentWorkplace.Index == 0)
+			//	return;
+
+			if (this.currentWorkplace.MapIndexY == -1)
 				return;
 
-			byte[] arrSrc = this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY);
-			Emgu.CV.Mat mat = new Emgu.CV.Mat((int)(parameterEdge.EdgeParamBaseTop.ROIHeight), (int)(parameterEdge.EdgeParamBaseTop.ROIWidth), Emgu.CV.CvEnum.DepthType.Cv8U, 1);
-			Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
-			mat.Save(@"D:/" + this.currentWorkplace.Index.ToString() + ".bmp");
+			//byte[] arrSrc = this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY);
+			//Emgu.CV.Mat mat = new Emgu.CV.Mat((int)(parameterEdge.EdgeParamBaseTop.ROIHeight), (int)(parameterEdge.EdgeParamBaseTop.ROIWidth), Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+			//Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
+			//mat.Save(@"D:/" + this.currentWorkplace.Index.ToString() + ".bmp");
 
-			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), parameterEdge);
+			EdgeSurfaceParameterBase param;
+			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
+				param = parameterEdge.EdgeParamBaseTop;
+			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Side)
+				param = parameterEdge.EdgeParamBaseSide;
+			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
+				param = parameterEdge.EdgeParamBaseBtm;
+			else
+				return;
+
+			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), param);
+			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), param);
+			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), param);
+
+			//DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), parameterEdge);
 			//DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), parameterEdge);
 			//DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), parameterEdge);
 
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+		}
+
+		private void DoColorInspection(byte[] arrSrc, EdgeSurfaceParameterBase param)
+		{
+			int roiWidth = param.ROIWidth;
+			int roiHeight = param.ROIHeight;
+			int threshold = param.Threshold;
+			int defectSize = param.DefectSizeMin;
+			int searchLevel = param.EdgeSearchLevel;
+			double resolution = param.CamResolution;
+
+			if (roiHeight < this.currentWorkplace.PositionY)
+				roiHeight = this.currentWorkplace.PositionY;
+
+			int roiSize = roiWidth * roiHeight;
+
+			// Search Wafer Edge
+			int lastEdge = FindEdge(arrSrc, roiWidth, roiHeight, searchLevel);
+			int startPtX = lastEdge;    // Edge부터 검사 시작
+
+			// profile 생성
+			List<int> temp = new List<int>();
+			List<int> profile = new List<int>();
+			for (long j = 0; j < roiWidth; j++)
+			{
+				temp.Clear();
+				for (long i = 0; i < roiSize; i += roiWidth)
+				{
+					temp.Add(arrSrc[j + i]);
+				}
+				temp.Sort();
+				profile.Add(temp[temp.Count / 2]);  // 중앙값
+			}
+
+			// Calculate diff image (original - profile)
+			byte[] diff = new byte[roiSize];
+			for (int j = 0; j < roiHeight; j++)
+			{
+				for (int i = startPtX; i < roiWidth; i++)
+				{
+					diff[(j * roiWidth) + i] = (byte)(Math.Abs(arrSrc[(j * roiWidth) + i] - profile[i]));
+				}
+			}
+
+			// Threshold and Labeling
+			byte[] thresh = new byte[roiSize];
+			CLR_IP.Cpp_Threshold(diff, thresh, roiWidth, roiHeight, false, threshold);
+			var label = CLR_IP.Cpp_Labeling(diff, thresh, roiWidth, roiHeight, true);
+
+			// Add defect
+			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			for (int i = 0; i < label.Length; i++)
+			{
+				if (label[i].area > defectSize)
+				{
+					this.currentWorkplace.AddDefect(sInspectionID,
+						10001,
+						label[i].area,
+						label[i].value,
+						this.currentWorkplace.PositionX + label[i].boundLeft,
+						this.currentWorkplace.PositionY + label[i].boundTop,
+						(float)(Math.Abs(label[i].boundRight - label[i].boundLeft) * resolution),
+						(float)(Math.Abs(label[i].boundBottom - label[i].boundTop) * resolution),
+						this.currentWorkplace.MapIndexX,
+						this.currentWorkplace.MapIndexY
+						);
+				}
+			}
 		}
 
 		private void DoColorInspection(byte[] arrSrc, EdgeSurfaceParameter param)
