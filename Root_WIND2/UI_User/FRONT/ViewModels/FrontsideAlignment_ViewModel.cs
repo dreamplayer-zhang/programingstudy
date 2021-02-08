@@ -25,14 +25,6 @@ namespace Root_WIND2.UI_User
             this.ImageViewerVM.FeatureBoxDone += FeatureBoxDone_Callback;
         }
 
-        #region [IPage Interfaces]
-        public void SetPage()
-        {
-            this.ImageViewerVM.SetViewRect();
-
-            LoadRecipe();
-        }
-
         public void LoadRecipe()
         {
             PositionRecipe positionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
@@ -74,7 +66,6 @@ namespace Root_WIND2.UI_User
                 p_ChipFeatureList.Add(fc);
             }
         }
-        #endregion
 
         #region [Members]
         ImageData boxImage;
@@ -223,6 +214,8 @@ namespace Root_WIND2.UI_User
                 return new RelayCommand(() =>
                 {
                     this.ImageViewerVM.DisplayBox();
+
+                    LoadRecipe();
                 });
             }
         }
