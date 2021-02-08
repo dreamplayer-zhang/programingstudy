@@ -775,13 +775,41 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
-                if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
-                    return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                if (m_module.Run(m_module.CmdUnload()))
-                    return p_sInfo;
+                string sResult = "OK";
+                bool bUseXGem = m_module.m_engineer.p_bUseXGem;
+                IGem m_gem = m_module.m_gem;
+                if (!EQ.p_bSimulate)
+                {
+                    if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
+                        return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                }
+                if(bUseXGem)
+                {
+                    while (m_infoCarrier.p_eAccess != GemCarrierBase.eAccess.InAccessed)
+                    {
+                        Thread.Sleep(10);
+                        if (EQ.p_bStop) return p_sInfo + "EQ Stop";
+                    }
+                    if (m_gem.p_cjRun == null) return p_sInfo;
+                    foreach(GemPJ pj in m_gem.p_cjRun.m_aPJ)
+                    {
+                        m_gem.SendPJComplete(pj.m_sPJobID);
+                        Thread.Sleep(100);
+                    }
+                    while(m_gem.p_cjRun.p_eState != GemCJ.eState.Completed)
+                    {
+                        Thread.Sleep(10);
+                        if (EQ.p_bStop) return p_sInfo + "EQ Stop";
+                    }
+                }
+                if (!EQ.p_bSimulate)
+                {
+                    if (m_module.Run(m_module.CmdUnload()))
+                        return p_sInfo;
+                }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                m_module.m_ceidUnDocking.Send();
-                return "OK";
+                //m_module.m_ceidUnDocking.Send();
+                return sResult;
             }
         }
 
