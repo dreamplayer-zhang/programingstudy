@@ -64,7 +64,7 @@ namespace RootTools.GAFs
             }
         }
         private bool _alarmListBlink = false;
-        public bool p_alarmButtonBlink
+        public bool p_alarmListBlink
         {
             get
             {
@@ -127,7 +127,7 @@ namespace RootTools.GAFs
                 }
             }
             p_brushAlarm = (p_aSetALID.Count > 0) ? Brushes.Red : Brushes.White;
-            p_alarmButtonBlink = (p_aSetALID.Count > 0) ? true : false;
+            p_alarmListBlink = (p_aSetALID.Count > 0) ? true : false;
         }
 
         bool IsExistSetALID(ALID alid)

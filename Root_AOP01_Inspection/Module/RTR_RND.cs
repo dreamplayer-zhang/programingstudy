@@ -754,7 +754,7 @@ namespace Root_AOP01_Inspection.Module
         public int m_teachCleanBottom = -1;
         public string m_extentionlength = "23";
         public string m_CleanSpeed = "7";
-        void RunTreeClean(Tree tree)   //
+        void RunTreeClean(Tree tree)
         {
             m_teachCleanTop = tree.Set(m_teachCleanTop, m_teachCleanTop, "Top Clean Teach", "RTR Top Clean Index");
             m_teachCleanBottom = tree.Set(m_teachCleanBottom, m_teachCleanBottom, "Bottom Clean Teach", "RTR Bottom Clean Index");
@@ -1227,7 +1227,7 @@ namespace Root_AOP01_Inspection.Module
             }
             string m_sThickness = "3mm";
             string m_sCleanPlane = "Top";
-            string m_sCleanCount = "0";
+            string m_sCleanCount = "1";
             public override ModuleRunBase Clone()
             {
                 Run_Clean run = new Run_Clean(m_module);

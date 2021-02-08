@@ -225,10 +225,10 @@ namespace Root_AOP01_Inspection.Module
                     {
                         m_alidDoorLock.Run(! m_diDoorLock.p_bIn, "Please Check the Doors");
                     }
-                    m_alidLightCurtain.Run(m_diLightCurtain.p_bIn, "Please Check LightCurtain");
+                    m_alidLightCurtain.Run(!m_diLightCurtain.p_bIn, "Please Check LightCurtain");
                     foreach (OHT_Semi OHT in p_aOHT)
                     {
-                        OHT.p_bLightCurtain = m_diLightCurtain.p_bIn;
+                        OHT.p_bLightCurtain = !m_diLightCurtain.p_bIn;
                         OHT.P_bProtectionBar = !m_diProtectionBar.p_bIn;
                     }
                 }
