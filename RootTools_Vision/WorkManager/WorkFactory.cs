@@ -8,11 +8,21 @@ using System.Windows;
 
 namespace RootTools_Vision
 {
+    public delegate void WorkManagerAllWorkDoneEvent();
+
     public abstract class WorkFactory : IWorkStartable
     {
         #region [Members]
         private List<WorkManager> workManagers;
         private readonly RemoteProcess remote = null;
+
+        private WorkplaceBundle workplaceBundle;
+        #endregion
+
+
+        #region [Event]
+        public event WorkManagerAllWorkDoneEvent AllWorkDone;
+
         #endregion
 
         //List<WorkplaceBundle> bundleList = new List<WorkplaceBundle>();
@@ -138,6 +148,9 @@ namespace RootTools_Vision
             GC.Collect(2, GCCollectionMode.Optimized);
 
             WorkplaceBundle workplaces = CreateWorkplaceBundle();
+            
+            this.workplaceBundle = workplaces;
+
             WorkBundle works = CreateWorkBundle();
             works.SetWorkplacBundle(workplaces);
 
@@ -182,6 +195,8 @@ namespace RootTools_Vision
             WorkBundle works = CreateWorkBundle();
             works.SetWorkplacBundle(workplaces);
 
+            this.workplaceBundle = workplaces;
+
             if (Ready(workplaces, works) == false)
             {
                 MessageBox.Show("검사 정보 생성에 실패하였습니다");
@@ -202,6 +217,8 @@ namespace RootTools_Vision
                 wm.SetWorkBundle(works);
                 wm.Start();
             }
+
+            //CheckAllWorkDoneAsync();
         }
 
         public void Stop()
@@ -277,61 +294,56 @@ namespace RootTools_Vision
             }
         }
 
-        // Edge쪽 이동예정
-        //public bool CreateWorkplaceBundle_RegionVertical(int imageWidth, int imageHeight, int imageByteCnt, int partitionNumber, IntPtr imageBufferR_GRAY, IntPtr imageBufferG, IntPtr imageBufferB)
-        //{
-        //    //bundleList.Clear();
-        //    int regionWidth = imageWidth;
-        //    int regionHeight = (int)Math.Floor((double)imageHeight / partitionNumber);
-        //    int regionLastHeight = imageHeight - regionHeight * (partitionNumber - 1); // 숫자가 딱 안나눠떨어지는 경우가있으므로
 
+        public async void CheckAllWorkDone()
+        {
+            await CheckAllWorkDoneAsync();
+        }
 
-        //    WorkplaceBundle bundle = new WorkplaceBundle();
-        //    int index = 0;
-        //    for(int i = 0; i < partitionNumber - 1; i++)
-        //    {
-        //        bundle.Add(new Workplace(0, i, 0, regionHeight * i, regionWidth, regionHeight, index++));
-        //    }
+        public void CheckAllWorkDoneSync()
+        {
+            bool isDone = false;
+            while (!isDone)
+            {
+                Task.Delay(1000);
+                isDone = true;
+                foreach (Workplace wp in workplaceBundle)
+                {
+                    if (wp.WorkState != workManagers[workManagers.Count - 1].WorkType)
+                    {
+                        isDone = false;
+                        break;
+                    }
+                }
+            }
 
-        //    // Last Region
-        //    bundle.Add(new Workplace(0, partitionNumber - 1, 0, regionHeight * (partitionNumber - 1), regionWidth, regionLastHeight, index));
+            if (this.AllWorkDone != null)
+                AllWorkDone();
+        }
 
+        public async Task CheckAllWorkDoneAsync()
+        {
+            await Task.Run(() =>
+            {
+                bool isDone = false; 
+                while (!isDone)
+                {
+                    Task.Delay(1000);
+                    isDone = true;
+                    foreach (Workplace wp in workplaceBundle)
+                    {
+                        if (wp.WorkState != workManagers[workManagers.Count - 1].WorkType)
+                        {
+                            isDone = false;
+                            break;
+                        }
+                    }
+                }
 
-        //    //Set SharedBuffer;
-        //    bundle.SetSharedBuffer(imageBufferR_GRAY, imageWidth, imageHeight, imageByteCnt, imageBufferG, imageBufferB);
-
-        //    // Add Bundle
-        //    //bundleList.Add(bundle);
-
-
-        //    return true;            
-        //}
-
-        //public bool CreateWorkplaceBundle_RegionHorizontal(int imageWidth, int imageHeight, int imageByteCnt, int partitionNumber, IntPtr imageBufferR_GRAY, IntPtr imageBufferG, IntPtr imageBufferB)
-        //{
-        //    //bundleList.Clear();
-        //    int regionWidth = (int)Math.Floor((double)imageWidth / partitionNumber);
-        //    int regionLastWidth = imageWidth - regionWidth * (partitionNumber - 1); // 숫자가 딱 안나눠떨어지는 경우가있으므로
-        //    int regionHeight = imageHeight;
-            
-        //    WorkplaceBundle bundle = new WorkplaceBundle();
-        //    int index = 0;
-        //    for (int i = 0; i < partitionNumber - 1; i++)
-        //    {
-        //        bundle.Add(new Workplace(i, 0, regionWidth * i, 0, regionWidth, regionHeight, index++));
-        //    }
-
-        //    // Last Region
-        //    bundle.Add(new Workplace(partitionNumber - 1, 0, regionWidth * (partitionNumber - 1), 0, regionLastWidth, regionHeight, index));
-
-        //    //Set SharedBuffer;
-        //    bundle.SetSharedBuffer(imageBufferR_GRAY, imageWidth, imageHeight, imageByteCnt, imageBufferG, imageBufferB);
-
-        //    // Add Bundle
-        //    //bundleList.Add(bundle);
-
-        //    return true;
-        //}
+                if (this.AllWorkDone != null)
+                    AllWorkDone();
+            });
+        }
 
 
         #region [Remote Process]

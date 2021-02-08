@@ -279,6 +279,11 @@
     <Compile Include="UI_User\BACK\BacksideSetup.xaml.cs">
       <DependentUpon>BacksideSetup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_User\BACK\BacksideInspect.xaml.cs">
+      <DependentUpon>BacksideInspect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\BACK\ViewModels\BacksideInspect_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\BACK\ViewModels\BacksideInspect_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ViewModel.cs" />
     <Compile Include="UI_User\CAMERA\CameraVRS.xaml.cs">
@@ -695,6 +700,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_User\BACK\BacksideSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\BACK\BacksideInspect.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

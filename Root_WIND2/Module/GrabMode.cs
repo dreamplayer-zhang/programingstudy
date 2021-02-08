@@ -80,8 +80,11 @@ namespace Root_WIND2.Module
         {
             m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
             m_nReverseOffsetY = tree.Set(m_nReverseOffsetY, 800, "ReverseOffsetY", "Reverse Scan 동작시 Y 이미지 Offset 설정");
-            m_sCamera = tree.Set(m_sCamera, m_sCamera, m_cameraSet.p_asCamera, "Camera", "Select Camera", bVisible, bReadOnly);
-            m_camera = m_cameraSet.Get(m_sCamera);
+            if(m_cameraSet != null)
+            {
+                m_sCamera = tree.Set(m_sCamera, m_sCamera, m_cameraSet.p_asCamera, "Camera", "Select Camera", bVisible, bReadOnly);
+                m_camera = m_cameraSet.Get(m_sCamera);
+            }
             m_ScanLineNum = tree.Set(m_ScanLineNum, m_ScanLineNum, "Scan Line Number", "Scan Line Number");
             m_ScanStartLine = tree.Set(m_ScanStartLine, m_ScanStartLine, "Scan Start Line", "Scan Start Line");
             m_ptXYAlignData = tree.Set(m_ptXYAlignData, m_ptXYAlignData, "XY Align Data", "XY Align Data", bVisible, true);
@@ -118,6 +121,8 @@ namespace Root_WIND2.Module
         List<double> m_aLightPower = new List<double>();
         void RunTreeLight(Tree tree, bool bVisible, bool bReadOnly)
         {
+            if (m_lightSet == null) return;
+
             while (m_aLightPower.Count < m_lightSet.m_aLight.Count)
                 m_aLightPower.Add(0);
             for (int n = 0; n < m_aLightPower.Count; n++)
