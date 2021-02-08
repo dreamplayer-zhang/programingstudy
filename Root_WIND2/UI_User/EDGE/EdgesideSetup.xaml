@@ -150,7 +150,7 @@
                         </Grid>
 
                         <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}"
-                                  DataContext="{Binding Parameter}">
+                                  DataContext="{Binding Recipe}">
                             <Grid.ColumnDefinitions >
                                 <ColumnDefinition Width="120"/>
                                 <ColumnDefinition Width="33"/>
@@ -160,9 +160,9 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Camera" Style="{StaticResource group_box_item_name_text}"/>
                             <TextBlock Text="W" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamWidth}" HorizontalContentAlignment="Center"/>
+                            <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CameraWidth}" HorizontalContentAlignment="Center"/>
                             <TextBlock Text="H" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamHeight}" HorizontalContentAlignment="Center"/>
+                            <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CameraHeight}" HorizontalContentAlignment="Center"/>
                         </Grid>
 
                         <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}"
@@ -198,7 +198,8 @@
 
                 <GroupBox Grid.Row="2" Margin="4,0,4,4"
                                   Style="{StaticResource main_view_groupbox}"
-                                  Header="Light">
+                                  Header="Light"
+                                  DataContext="{Binding Recipe}">
                     <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
                         <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                             <Grid.ColumnDefinitions>

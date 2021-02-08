@@ -109,8 +109,11 @@ void IP::Labeling(BYTE* pSrc, BYTE* pBin, int nW, int nH, bool bDark, BYTE* pDst
 // ********* Inspection *********
 void IP::Threshold(BYTE* pSrc, BYTE* pDst, int nW, int nH, bool bDark, int thresh)
 {
+   
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
+    imgSrc = imgSrc.reshape(0, nW);
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+    imgDst = imgDst.reshape(0, nW);
 
 
     if (bDark)
@@ -1434,7 +1437,7 @@ void IP::AverageBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH)
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
 
-    cv::boxFilter(imgSrc, imgDst, CV_8UC1, Size(3, 3));
+    cv::boxFilter(imgSrc, imgDst, CV_8UC1, cv::Size(3,3), cv::Point(-1,-1), false, cv::BorderTypes::BORDER_DEFAULT);
 }
 void IP::MedianBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH, int FilterSz)
 {
