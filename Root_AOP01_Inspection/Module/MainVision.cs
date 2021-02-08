@@ -3,6 +3,7 @@ using Emgu.CV.Cvb;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
+using Root_AOP01_Inspection.Recipe;
 using Root_EFEM;
 using Root_EFEM.Module;
 using RootTools;
@@ -15,6 +16,7 @@ using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,6 +29,10 @@ using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using static RootTools.Control.Axis;
+using MBrushes = System.Windows.Media.Brushes;
+using DPoint = System.Drawing.Point;
+using RootTools_CLR;
+using System.Linq;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -984,6 +990,32 @@ namespace Root_AOP01_Inspection.Module
        
         protected override void InitModuleRuns()
         {
+            //switch (currentMgmName)
+            //{
+            //                   case App.SideLeftInspMgRegName:
+            //                       targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerLeft_VM;
+            //                       break;
+            //                   case App.SideTopInspMgRegName:
+            //                       targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerTop_VM;
+            //                       break;
+            //                   case App.SideBotInspMgRegName:
+            //                       targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerBot_VM;
+            //                       break;
+            //                   case App.SideRightInspMgRegName:
+            //                       targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerRight_VM;
+            //                       break;
+            //                   case App.PellInspMgRegName:
+            //                       targetViewModel = UIManager.Instance.SetupViewModel.m_Recipe45D.p_ImageViewer_VM;
+            //                       break;
+            //	//case App.BackInspMgRegName:
+            //	//	targetList = new List<TRect>(mainEdgeList[6]);
+            //	//	targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
+            //	//	break;
+            //	case App.MainInspMgRegName:
+            //                   default:
+            //                       targetViewModel = ;
+            //                       break;
+            //               }
             AddModuleRunList(new Run_Grab(this), true, "Run Grab");
             AddModuleRunList(new Run_GrabBacksideScan(this), true, "Run Backside Scan");
             AddModuleRunList(new Run_Grab45(this), true, "Run Grab 45");
@@ -995,7 +1027,9 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_PatternShiftAndRotation(this), true, "Run PatternShiftAndRotation");
             AddModuleRunList(new Run_AlignKeyInspection(this), true, "Run AlignKeyInspection");
             AddModuleRunList(new Run_PellicleShiftAndRotation(this), true, "Run PellicleShiftAndRotation");
-            AddModuleRunList(new Run_PellicleExpandingInspection(this), true, "Run PellicleExpandingInspection");
+            var main = new Run_SurfaceInspection(this, App.MainRecipeRegName, App.MainInspMgRegName);
+            main.m_sModuleRun = App.MainModuleName;// "MainSurfaceInspection";
+            AddModuleRunList(main, true, "Run MainSurfaceInspection");
             AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
         }
         #endregion
@@ -1053,9 +1087,480 @@ namespace Root_AOP01_Inspection.Module
                 return "OK";
             }
         }
+		public class Run_SurfaceInspection : ModuleRunBase
+		{
+
+			MainVision m_module;
+            string currentRcpName;
+            string currentMgmName;
+
+            public Run_SurfaceInspection(MainVision module, string rcpName, string inspMgmName)
+			{
+                EdgeList = new TRect[6];
+                for (int j = 0; j < 6; j++)
+				{
+					EdgeList[j] = new TRect();
+				}
+				currentRcpName = rcpName;
+                currentMgmName = inspMgmName;
+                m_module = module;
+				InitModuleRun(module);
+			}
+
+            #region Surface Inspection Parameter
+
+            public bool BrightGV;
+            public int SurfaceGV;
+            public int SurfaceSize;
+            CPoint CenterPoint;
+            public int InspectionOffsetX_Left;
+            public int InspectionOffsetX_Right;
+			public int InspectionOffsetY;
+            public int BlockSizeWidth;
+            public int BlockSizeHeight;
+
+            public TRect[] EdgeList = new TRect[6];
+            //List<TRect> sideLeftEdgeList;
+            //List<TRect> sideRightEdgeList;
+            //List<TRect> sideTopEdgeList;
+            //List<TRect> sideBotEdgeList;
+
+            #endregion
+
+            public override ModuleRunBase Clone()
+			{
+				Run_SurfaceInspection run = new Run_SurfaceInspection(m_module, this.currentRcpName, this.currentMgmName);
+                run.EdgeList = EdgeList;
+                run.BrightGV = BrightGV;
+                run.SurfaceGV = SurfaceGV;
+                run.SurfaceSize = SurfaceSize;
+                run.CenterPoint = CenterPoint;
+                run.InspectionOffsetX_Left = InspectionOffsetX_Left;
+                run.InspectionOffsetX_Right = InspectionOffsetX_Right;
+                run.InspectionOffsetY = InspectionOffsetY;
+
+                return run;
+            }
+
+            internal void UpdateTree()
+            {
+                var temp = localTree.p_treeRoot.p_eMode;
+                localTree.p_treeRoot.p_eMode = Tree.eMode.RegWrite;
+                RunTree(localTree, visible, isRecipe);
+                localTree.p_treeRoot.p_eMode = temp;
+            }
+            internal void RefreshTree()
+            {
+                var temp = localTree.p_treeRoot.p_eMode;
+                localTree.p_treeRoot.p_eMode = Tree.eMode.RegRead;
+                RunTree(localTree, visible, isRecipe);
+                localTree.p_treeRoot.p_eMode = temp;
+            }
+            static Tree localTree;
+            static bool visible;
+            static bool isRecipe;
+            //string[] keywords = new string[] { "Main", "SideLeft", "SideTop", "SideBot", "SideRight", "Pellicle"};
+			public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+			{
+                if(tree!=null)
+                {
+                    localTree = tree;
+                    visible = bVisible;
+                    isRecipe = bRecipe;
+                }
+                string defeaultName = currentMgmName + " EdgeBox #{0}";
+				for (int i = 0; i < 6; i++)
+				{
+					defeaultName = currentMgmName + " EdgeBox #{0} Left";
+					EdgeList[i].MemoryRect.Left = tree.Set(EdgeList[i].MemoryRect.Left, EdgeList[i].MemoryRect.Left, string.Format(defeaultName, i), "EdgeBox's Left Position (pixel. MemoryRect)", bVisible);
+					defeaultName = currentMgmName + " EdgeBox #{0} Top";
+					EdgeList[i].MemoryRect.Top = tree.Set(EdgeList[i].MemoryRect.Top, EdgeList[i].MemoryRect.Top, string.Format(defeaultName, i), "EdgeBox's Top Position (pixel. MemoryRect)", bVisible);
+					defeaultName = currentMgmName + " EdgeBox #{0} Width";
+					EdgeList[i].MemoryRect.Width = tree.Set(EdgeList[i].MemoryRect.Width, EdgeList[i].MemoryRect.Width, string.Format(defeaultName, i), "EdgeBox's Width (pixel. MemoryRect)", bVisible);
+					defeaultName = currentMgmName + " EdgeBox #{0} Height";
+					EdgeList[i].MemoryRect.Height = tree.Set(EdgeList[i].MemoryRect.Height, EdgeList[i].MemoryRect.Height, string.Format(defeaultName, i), "EdgeBox's Height (pixel. MemoryRect)", bVisible);
+				}
+				BrightGV = tree.Set(BrightGV, BrightGV, "Use Bright Inspection", "Use Bright Inspection", bVisible);
+                SurfaceGV = tree.Set(SurfaceGV, SurfaceGV, "Target Inspection GV", "Target Inspection GV", bVisible);
+                SurfaceSize = tree.Set(SurfaceSize, SurfaceSize, "Target Inspection Size", "Target Inspection Size", bVisible);
+                InspectionOffsetX_Left = tree.Set(InspectionOffsetX_Left, InspectionOffsetX_Left, "Insepction Area X-Left Offset", "Insepction Area X-Left Offset", bVisible);
+                InspectionOffsetX_Right = tree.Set(InspectionOffsetX_Right, InspectionOffsetX_Right, "Insepction Area X-Right Offset", "Insepction Area X-Right Offset", bVisible);
+                InspectionOffsetY = tree.Set(InspectionOffsetY, InspectionOffsetY, "Inspection Y Offset", "Inspection Y Offset", bVisible);
+                BlockSizeWidth = tree.Set(BlockSizeWidth, BlockSizeWidth, "Insepction BlockSize Width", "Insepction BlockSize Width", bVisible);
+                BlockSizeHeight = tree.Set(BlockSizeHeight, BlockSizeHeight, "Insepction BlockSize Height", "Insepction BlockSize Height", bVisible);
+
+            }
+
+            private bool _StartRecipeTeaching(TRect[] tempList, RootViewer_ViewModel viewer)
+            {
+#if !DEBUG
+			try
+			{
+#endif
+                CenterPoint = new CPoint();
+                int memH = viewer.p_ImageData.p_Size.Y;
+                int memW = viewer.p_ImageData.p_Size.X;
+
+                float centX = CenterPoint.X; // 레시피 티칭 값 가지고오기
+                float centY = CenterPoint.Y;
+
+                float outOriginX, outOriginY;
+                float outChipSzX, outChipSzY;
+                float outRadius = memH/2;
+                if (memH > memW)
+                    outRadius = memW / 2;
+                bool isIncludeMode = true;
+
+                IntPtr MainImage = new IntPtr();
+                if (viewer.p_ImageData.p_nByte == 3)
+                {
+                    if (viewer.m_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
+                        MainImage = viewer.p_ImageData.GetPtr((int)viewer.p_eColorViewMode - 1);
+                    else
+                        MainImage = viewer.p_ImageData.GetPtr(0);
+                }
+                else
+                { // All 일때는 R채널로...
+                    MainImage = viewer.p_ImageData.GetPtr(0);
+                }
+
+                List<Cpp_Point> WaferEdge = new List<Cpp_Point>();
+                int[] mapData = null;
+                unsafe
+                {
+                    int DownSample = 40;
+                    int outmap_x, outmap_y;
+
+                    fixed (byte* pImg = new byte[(long)(memW / DownSample) * (long)(memH / DownSample)]) // 원본 이미지 너무 커서 안열림
+                    {
+                        CLR_IP.Cpp_SubSampling((byte*)MainImage, pImg, memW, memH, 0, 0, memW, memH, DownSample);
+                        var area = searchArea(tempList.ToList(), viewer.p_ImageData, InspectionOffsetX_Left, InspectionOffsetY, InspectionOffsetX_Right, InspectionOffsetY);
 
 
-        public class Run_GrabSideScan : ModuleRunBase
+                        string sInspectionID = RootTools.Database.DatabaseManager.Instance.GetInspectionID();
+                        string outputSize = string.Format("Left:{0} Top:{1} Right:{2} Bottom:{3}", area.Left, area.Top, area.Right, area.Bottom);
+                        if (!System.IO.Directory.Exists(System.IO.Path.Combine(App.AOPImageRootPath, sInspectionID)))
+                        {
+                            System.IO.Directory.CreateDirectory(System.IO.Path.Combine(App.AOPImageRootPath, sInspectionID));
+                        }
+                        System.IO.File.WriteAllText(System.IO.Path.Combine(App.AOPImageRootPath, sInspectionID, currentRcpName + "_TotalSize.txt"), outputSize);
+                        //그다음 이미지 축소 저장
+                        //Image<Gray, byte> mapImage = new Image<Gray, byte>(memW / DownSample, memH / DownSample, memW / DownSample, (IntPtr)pImg);
+                        //mapImage.Save(System.IO.Path.Combine(sDefectimagePath, sInspectionID, idx.ToString() + "mapImage.bmp"));
+
+                        // Param Down Scale
+                        centX /= DownSample; centY /= DownSample;
+                        outRadius /= DownSample;
+                        memW /= DownSample; memH /= DownSample;
+
+                        if (BlockSizeWidth != 0)
+                            outmap_x = area.Width / BlockSizeWidth;
+                        else
+                            outmap_x = area.Width / 500;
+                        if (BlockSizeHeight != 0)
+                            outmap_y = area.Height / BlockSizeHeight;
+                        else
+                            outmap_y = area.Height / 500;
+
+                        if (outmap_x == 0)
+						{
+                            outmap_x = 40;
+                        }
+                        if(outmap_y == 0)
+						{
+                            outmap_y = 40;
+						}
+
+                        WaferEdge.Add(new Cpp_Point(area.Left / DownSample, area.Top / DownSample));
+                        WaferEdge.Add(new Cpp_Point(area.Left / DownSample, area.Bottom / DownSample));
+                        WaferEdge.Add(new Cpp_Point(area.Right / DownSample, area.Bottom / DownSample));
+                        WaferEdge.Add(new Cpp_Point(area.Right / DownSample, area.Top / DownSample));
+
+                        mapData = CLR_IP.Cpp_GenerateMapData(
+                            WaferEdge.ToArray(),
+                            &outOriginX,
+                            &outOriginY,
+                            &outChipSzX,
+                            &outChipSzY,
+                            &outmap_x,
+                            &outmap_y,
+                            memW, memH,
+                            1,
+                            isIncludeMode
+                            );
+                        //OutmapX = outmap_x;
+                        //OutmapY = outmap_y;
+                    }
+
+                    //// Param Up Scale
+                    centX *= DownSample; centY *= DownSample;
+                    outRadius *= DownSample;
+                    outOriginX *= DownSample; outOriginY *= DownSample;
+                    outChipSzX *= DownSample; outChipSzY *= DownSample;
+
+                    // Save Recipe
+                    SetRecipeMapData(mapData, (int)outmap_x, (int)outmap_y, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);
+
+                    //GlobalObjects.Instance.Get<BacksideRecipe>().CenterX = (int)centX;
+                    //GlobalObjects.Instance.Get<BacksideRecipe>().CenterY = (int)centY;
+                    //GlobalObjects.Instance.Get<BacksideRecipe>().Radius = (int)outRadius;
+
+                    //SaveContourMap((int)centX, (int)centY, (int)outRadius);
+                }
+                return true;
+#if !DEBUG
+			}
+			catch (Exception ex)
+			{
+				return false;
+			}
+#endif
+            }
+
+            CRect searchArea(List<TRect> tempList, ImageData data, int x_left_margin, int y_top_margin, int x_right_margin, int y_bot_margin)
+            {
+                // variable
+                List<Rect> arcROIs = new List<Rect>();
+                List<DPoint> aptEdges = new List<DPoint>();
+                //RecipeFrontside_Viewer_ViewModel ivvm = m_ImageViewer_VM;
+                RootTools.Inspects.eEdgeFindDirection eTempDirection = RootTools.Inspects.eEdgeFindDirection.TOP;
+                DPoint ptLeft1, ptLeft2, ptBottom, ptRight1, ptRight2, ptTop;
+                DPoint ptLT, ptRT, ptLB, ptRB;
+
+
+                arcROIs.Clear();
+                aptEdges.Clear();
+                for (int j = 0; j < 6; j++)
+                {
+                    if (tempList.Count < 6) break;
+                    arcROIs.Add(new Rect(
+                        tempList[j].MemoryRect.Left,
+                        tempList[j].MemoryRect.Top,
+                        tempList[j].MemoryRect.Width,
+                        tempList[j].MemoryRect.Height));
+                }
+                if (arcROIs.Count < 6) return new CRect(-1, -1, -1, -1);
+                for (int j = 0; j < arcROIs.Count; j++)
+                {
+                    eTempDirection = InspectionManager_AOP.GetDirection(data, arcROIs[j]);
+                    aptEdges.Add(InspectionManager_AOP.GetEdge(data, arcROIs[j], eTempDirection, true, true, 30));
+                }
+                // aptEeges에 있는 DPoint들을 좌표에 맞게 분배
+                List<DPoint> aSortedByX = aptEdges.OrderBy(x => x.X).ToList();
+                List<DPoint> aSortedByY = aptEdges.OrderBy(x => x.Y).ToList();
+                if (aSortedByX[0].Y < aSortedByX[1].Y)
+                {
+                    ptLeft1 = aSortedByX[0];
+                    ptLeft2 = aSortedByX[1];
+                }
+                else
+                {
+                    ptLeft1 = aSortedByX[1];
+                    ptLeft2 = aSortedByX[0];
+                }
+                if (aSortedByX[4].Y < aSortedByX[5].Y)
+                {
+                    ptRight1 = aSortedByX[4];
+                    ptRight2 = aSortedByX[5];
+                }
+                else
+                {
+                    ptRight1 = aSortedByX[5];
+                    ptRight2 = aSortedByX[4];
+                }
+                ptTop = aSortedByY[0];
+                ptBottom = aSortedByY[5];
+
+                ptLT = new DPoint(ptLeft1.X, ptTop.Y);
+                ptLB = new DPoint(ptLeft2.X, ptBottom.Y);
+                ptRB = new DPoint(ptRight2.X, ptBottom.Y);
+                ptRT = new DPoint(ptRight1.X, ptTop.Y);
+
+                //m_ImageViewer_VM.DrawLine(ptLT, ptLB, MBrushes.Lime);
+                //DrawLine(ptRB, ptRT, MBrushes.Lime);
+                //DrawLine(ptLT, ptRT, MBrushes.Lime);
+                //DrawLine(ptLB, ptRB, MBrushes.Lime);
+
+                //m_ImageViewer_VM.DrawRect(new CPoint(ptLeft1.X - 10, ptLeft1.Y - 10), new CPoint(ptLeft1.X + 10, ptLeft1.Y + 10), RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                //m_ImageViewer_VM.DrawRect(new CPoint(ptLeft2.X - 10, ptLeft2.Y - 10), new CPoint(ptLeft2.X + 10, ptLeft2.Y + 10), RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                //m_ImageViewer_VM.DrawRect(new CPoint(ptBottom.X - 10, ptBottom.Y - 10), new CPoint(ptBottom.X + 10, ptBottom.Y + 10), RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                //m_ImageViewer_VM.DrawRect(new CPoint(ptRight1.X - 10, ptRight1.Y - 10), new CPoint(ptRight1.X + 10, ptRight1.Y + 10), RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                //m_ImageViewer_VM.DrawRect(new CPoint(ptRight2.X - 10, ptRight2.Y - 10), new CPoint(ptRight2.X + 10, ptRight2.Y + 10), RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                //m_ImageViewer_VM.DrawRect(new CPoint(ptTop.X - 100, ptTop.Y - 100), new CPoint(ptTop.X + 100, ptTop.Y + 100), RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+
+                switch (currentMgmName)
+                {
+                    case App.SideLeftInspMgRegName:
+                        var left = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerLeft_VM;
+                        break;
+                    case App.SideTopInspMgRegName:
+                        var top = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerTop_VM;
+                        break;
+                    case App.SideBotInspMgRegName:
+                        var bot = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerBot_VM;
+                        break;
+                    case App.SideRightInspMgRegName:
+                        var right = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerRight_VM;
+                        break;
+                    case App.PellInspMgRegName:
+                        var pell = UIManager.Instance.SetupViewModel.m_Recipe45D.p_ImageViewer_VM;
+                        break;
+                    //case App.BackInspMgRegName:
+                    //	targetList = new List<TRect>(mainEdgeList[6]);
+                    //	targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
+                    //	break;
+                    case App.MainInspMgRegName:
+                    default:
+                        var main = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
+                        main.currectDispatcher.Invoke(new Action(delegate ()
+                        {
+                            main.DrawRect(new CPoint(ptLT.X, ptLT.Y), new CPoint(ptRB.X, ptRB.Y), RecipeFrontside_Viewer_ViewModel.ColorType.ChipFeature);
+                        }));
+                        break;
+                }
+
+                return new CRect(new Point(ptLT.X + x_left_margin, ptLT.Y + y_top_margin), new Point(ptRB.X - x_right_margin, ptRB.Y - y_top_margin));
+            }
+
+            private void SetRecipeMapData(int[] mapData, int mapX, int mapY, int originX, int originY, int chipSzX, int chipSzY)
+            {
+                // Map Data Recipe 생성
+                GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).GetItem<BacksideRecipe>().OriginX = originX;
+                GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).GetItem<BacksideRecipe>().OriginY = originY;
+                GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).GetItem<BacksideRecipe>().DiePitchX = chipSzX;
+                GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).GetItem<BacksideRecipe>().DiePitchY = chipSzY;
+
+                OriginRecipe originRecipe = GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).GetItem<OriginRecipe>();
+                originRecipe.DiePitchX = chipSzX;
+                originRecipe.DiePitchY = chipSzY;
+                originRecipe.OriginX = originX;
+                originRecipe.OriginY = originY;
+
+                RecipeType_WaferMap mapInfo = new RecipeType_WaferMap(mapX, mapY, mapData);
+                int x = 0; int y = 0;
+                for (int i = 0; i < mapX * mapY; i++)
+                {
+                    if (y == 0 || y == mapY - 1)
+                    {
+                        mapInfo.Data[i] = 0;
+                    }
+                    else if (x == 0 || x == mapX - 1)
+                    {
+                        mapInfo.Data[i] = 0;
+                    }
+                    x++;
+                    if (x >= mapX)
+                    {
+                        y++;
+                        x = 0;
+                    }
+                }
+
+                GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).WaferMap = mapInfo;
+
+               if (false) // Display Map Data Option화
+                    DrawMapData(mapInfo, mapData, mapX, mapY, originX, originY, chipSzX, chipSzY);
+            }
+			private void DrawMapData(RecipeType_WaferMap mapInfo, int[] mapData, int mapX, int mapY, int OriginX, int OriginY, int ChipSzX, int ChipSzY)
+			{
+				// Map Display
+				List<RootTools.Database.Defect> rectList = new List<RootTools.Database.Defect>();
+				int offsetY = 0;
+				bool isOrigin = true;
+
+				for (int x = 0; x < mapX; x++)
+					for (int y = 0; y < mapY; y++)
+						if (mapData[y * mapX + x] == 1)
+						{
+							if (isOrigin)
+							{
+								offsetY = OriginY - (y + 1) * ChipSzY;
+								mapInfo.MasterDieX = x;
+								mapInfo.MasterDieY = y;
+								isOrigin = false;
+							}
+							var data = new RootTools.Database.Defect();
+
+							var left = OriginX + x * ChipSzX;
+							var top = offsetY + y * ChipSzY;
+							var right = OriginX + (x + 1) * ChipSzX;
+							var bot = offsetY + (y + 1) * ChipSzY;
+
+							var width = right - left;
+							var height = bot - top;
+							//left = (int)(left - width / 2.0);
+							//top = (int)(top - height / 2.0);
+
+							data.p_rtDefectBox = new Rect(left, top, width, height);
+							rectList.Add(data);
+						}
+
+
+                //m_ImageViewer_VM.DrawRect(rectList, Recipe45D_ImageViewer_ViewModel.ColorType.MapData);
+                var main = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
+                main.currectDispatcher.Invoke(new Action(delegate ()
+                {
+                    GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(currentMgmName).AddRect(rectList, null, new System.Windows.Media.Pen(System.Windows.Media.Brushes.Green, 2));
+                }));
+			}
+			public override string Run()
+			{
+				try
+				{
+                    GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(currentMgmName).ClearDefect();
+                    //m_Setup.PatternInspectionManager.ResetWorkManager();
+                    GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(currentMgmName).InitInspectionInfo();
+                    GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).WaferMap.Clear();
+
+                    RootViewer_ViewModel targetViewModel;
+
+                    switch (currentMgmName)
+                    {
+                        case App.SideLeftInspMgRegName:
+                            targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerLeft_VM;
+                            break;
+                        case App.SideTopInspMgRegName:
+                            targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerTop_VM;
+                            break;
+                        case App.SideBotInspMgRegName:
+                            targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerBot_VM;
+                            break;
+                        case App.SideRightInspMgRegName:
+                            targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerRight_VM;
+                            break;
+                        case App.PellInspMgRegName:
+                            targetViewModel = UIManager.Instance.SetupViewModel.m_Recipe45D.p_ImageViewer_VM;
+                            break;
+                        //case App.BackInspMgRegName:
+                        //	targetList = new List<TRect>(mainEdgeList[6]);
+                        //	targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
+                        //	break;
+                        case App.MainInspMgRegName:
+                        default:
+                            targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
+                            break;
+                    }
+
+                    _StartRecipeTeaching(EdgeList, targetViewModel);
+
+                    ReticleSurfaceParameter surParam = GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).GetItem<ReticleSurfaceParameter>();
+                    surParam.IsBright = BrightGV;
+                    surParam.Intensity = SurfaceGV;
+                    //surParam.DiffFilter = DiffFilterMethod.Gaussian;
+                    surParam.Size = SurfaceSize;
+
+                    GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(currentMgmName).Start();
+
+                    return "OK";
+				}
+				finally
+				{
+
+				}
+			}
+		}
+
+		public class Run_GrabSideScan : ModuleRunBase
         {
             MainVision m_module;
 

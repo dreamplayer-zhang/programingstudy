@@ -23,6 +23,32 @@ namespace RootTools
         public RootViewer()
         {
             InitializeComponent();
+            SetVisual(this);
         }
-    }
+        public void SetVisual(Visual visual)
+        {
+            canvas.visual = visual;
+		}
+		public void AddBlock(double left, double top, double width, double height, Brush color, Pen lineColor)
+		{
+			canvas.rects.Add(new CustomCanvas.CustomRect { Pen = lineColor, Brush = color, Rect = new Rect(left, top, width, height) });
+		}
+
+		public void ClearRect()
+		{
+			canvas.rects.Clear();
+		}
+
+		public void RefreshDraw()
+		{
+			var temp_vm = (RootViewer_ViewModel)this.DataContext;
+			if (temp_vm != null)
+			{
+				canvas.StartPoint = temp_vm.p_View_Rect;//여기에 왼쪽위 메모리 주소같은게 필요함
+				canvas.ImageSize = temp_vm.p_ImageData.p_Size;
+				canvas.Zoom = temp_vm.p_Zoom;
+				canvas.InvalidateVisual();
+			}
+		}
+	}
 }

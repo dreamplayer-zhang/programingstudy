@@ -447,6 +447,7 @@ namespace RootTools_Vision
                     Marshal.Copy(new IntPtr(ptrSrc.ToInt64() + (i * (Int64)srcStride + left)), byteDst, width * (i - top), width);
 
                 });
+
             }
             catch(Exception)
             {

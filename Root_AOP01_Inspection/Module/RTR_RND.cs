@@ -45,6 +45,7 @@ namespace Root_AOP01_Inspection.Module
         public ALID m_alidClean;
         public ALID m_alidHome;
         public ALID m_alidCMD;
+        public ALID m_alidConnect;
 
 
         void InitALID()
@@ -54,6 +55,7 @@ namespace Root_AOP01_Inspection.Module
             m_alidClean = m_gaf.GetALID(this, "Clean", "Clean Motion Error");
             m_alidHome = m_gaf.GetALID(this, "Home_RTR", "Home Motion Error");
             m_alidCMD = m_gaf.GetALID(this, "CMD_RTR", "CMD Error");
+            m_alidConnect = m_gaf.GetALID(this, "Connect_RTR", "Connect Error");
         }
         #endregion
         #region Arm
@@ -474,7 +476,7 @@ namespace Root_AOP01_Inspection.Module
                 Thread.Sleep(200);
                 if (m_eSendCmd != eCmd.None)
                 {
-                    m_alidCMD.Run(true, "Please Check RTR Connect");
+                    m_alidCMD.Run(true, "RS232 Communication Error !!");
                     return "RS232 Communication Error !!";
                 }
             }
@@ -507,8 +509,8 @@ namespace Root_AOP01_Inspection.Module
                 Thread.Sleep(200);
                 if (m_eSendCmd != eCmd.None)
                 {
-                    m_alidCMD.Run(true, "Please Check RTR Connect");
-                    return "RS232 Communication Error !!";
+                    m_alidCMD.Run(true, "RS232 Communication Error !!!");
+                    return "RS232 Communication Error !!!";
                 }
             }
             if (EQ.IsStop()) return "EQ Stop";
@@ -531,7 +533,7 @@ namespace Root_AOP01_Inspection.Module
                 Thread.Sleep(200);
                 if (m_eSendCmd != eCmd.None)
                 {
-                    m_alidCMD.Run(true, "Please Check RTR Connect");
+                    m_alidCMD.Run(true, "RS232 Communication Error !");
                     return "RS232 Communication Error !!";
                 }
             }
@@ -556,7 +558,7 @@ namespace Root_AOP01_Inspection.Module
                 int ms10 = 0;
                 if (m_rs232.p_bConnect == false)
                 {
-                    m_alidCMD.Run(true, "Please Check RTR Connect");
+                    m_alidConnect.Run(true, " RS232 not Connect !!");
                     return m_eSendCmd.ToString() + " RS232 not Connect !!";
                 }
                 while (m_eSendCmd != eCmd.None)
@@ -566,7 +568,7 @@ namespace Root_AOP01_Inspection.Module
                     ms10 += 10;
                     if (ms10 > msDelay)
                     {
-                        m_alidCMD.Run(true, "Please Check RTR Connect Or Delay");
+                        m_alidConnect.Run(true, "Please Check RTR Connect Or Delay");
                         return m_eSendCmd.ToString() + " Has no Answer !!";
                     }
                 }
