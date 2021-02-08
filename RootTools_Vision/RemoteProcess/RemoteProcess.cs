@@ -20,9 +20,9 @@ namespace RootTools_Vision
         #region [Members]
 
         REMOTE_MODE mode;
-        Process process;
+        //Process process;
         private string processName = "RootTools_Vision";
-        private PipeComm pipe;
+        private PipeComm pipe = null;
         private PipeServer pipeServer;
         private PipeClient pipeClient;
 
@@ -97,13 +97,13 @@ namespace RootTools_Vision
             this.pipeServer.Send<T>(obj);
 
             return;
-            if (obj == null) return;
-            if(this.mode == REMOTE_MODE.None)
-            {
-                MessageBox.Show("Remote Mode를 사용할 수 없습니다.\n생성자에서 Remote Mode를 Master로 설정하세요");
-                return;
-            }
-            this.pipe.Write<T>(obj);
+            //if (obj == null) return;
+            //if(this.mode == REMOTE_MODE.None)
+            //{
+                //MessageBox.Show("Remote Mode를 사용할 수 없습니다.\n생성자에서 Remote Mode를 Master로 설정하세요");
+                //return;
+            //}
+            //this.pipe.Write<T>(obj);
         }
 
         public void Send(string msg)

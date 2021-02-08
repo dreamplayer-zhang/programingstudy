@@ -328,7 +328,7 @@ namespace RootTools.Gem
             {
                 if (sSlotInfo[n] == '3')
                 {
-                    if (m_aGemSlot[n].p_eState != GemSlotBase.eState.Exist) return "Reticle state is not Exist";
+                    if (m_aGemSlot[n].p_eState != GemSlotBase.eState.Exist) return "Slot state is not Exist";
                 }
             }
             return "OK";

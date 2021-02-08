@@ -7,6 +7,7 @@
 #include <stdio.h> // for wprintf
 #include <msclr\marshal_cppstd.h>
 
+#pragma warning(disable: 4267)
 
 namespace RootTools_CLR
 {

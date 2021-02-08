@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.IO.Ports;
 using System.Diagnostics;
 using EasyModbus;
-using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -83,9 +82,9 @@ namespace RootTools
             }
         }
 
-        bool m_bBusy = false;
+        //bool m_bBusy = false;
         Stopwatch m_swWaitRecive = new Stopwatch();
-        int m_nTimeout = 3000;
+        //int m_nTimeout = 3000;
         Log m_log;
         string m_sFilePath = @"C:\WIND2\Init\FFUSetting.ini";
         private readonly IDialogService m_DialogService;
@@ -104,8 +103,8 @@ namespace RootTools
         string sSectionCount = "Count";
         string sSectionModule = "FFU ";
         string sSectionModuleName = "Name";
-        string sSectionModuleAddress = "Address";
-        string sSectionModuleDP = "Point";
+        //string sSectionModuleAddress = "Address";
+        //string sSectionModuleDP = "Point";
         string sSectionModuleMax = "Max";
         string sSectionModuleMin = "Min";
 
@@ -198,7 +197,7 @@ namespace RootTools
                     for (int i = 0; i < p_aFFU.Count; i++)
                         p_aFFU[i].p_nPressure = aTemp[i];
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // Log추가
                 }
@@ -364,6 +363,10 @@ namespace RootTools
 
         [field: NonSerialized]
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
+        void _Dummy()
+        {
+            if (CloseRequested != null) CloseRequested(null, null); 
+        }
     }
 
 }

@@ -78,6 +78,15 @@ namespace RootTools.Gem
             }
         }
 
+        public virtual void ClearInfo()
+        {
+            p_eState = eState.Empty; 
+            p_sSlotID = "";
+            p_sLocID = "";
+            p_sCarrierID = "";
+            p_sRecipe = ""; 
+        }
+
         protected virtual void RunTreeProperty(Tree tree)
         {
             _eState = (eState)tree.Set(p_eState, p_eState, "State", "Slot State", true, true); 

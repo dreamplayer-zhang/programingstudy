@@ -31,6 +31,8 @@ namespace RootTools
 
         string BuzzerOff();
 
-        string Recovery(); 
+        string Recovery();
+
+        bool p_bUseXGem { get; set; }
     }
 }

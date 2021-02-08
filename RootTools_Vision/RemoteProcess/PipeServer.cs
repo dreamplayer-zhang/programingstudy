@@ -42,6 +42,10 @@ namespace RootTools_Vision
 
         public event MessageReceivedHandler MessageReceived;
         public const int BUFFER_SIZE = 4096;
+        void _Dummy()
+        {
+            if (MessageReceived != null) MessageReceived(null, "");
+        }
 
         string pipeName;
         Thread listenThread;

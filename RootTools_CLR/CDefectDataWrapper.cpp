@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "CDefectDataWrapper.h"
 
+#pragma warning(disable: 4244)
+
 bool CDefectDataWrapper::IsCluster()
 {
 	if (ClusterItems == nullptr)

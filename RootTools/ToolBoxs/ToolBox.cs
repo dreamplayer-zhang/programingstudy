@@ -559,7 +559,7 @@ namespace RootTools.ToolBoxs
         #endregion
 
         #region ITool FFU
-        ToolSet m_toolFFU = null;
+        //ToolSet m_toolFFU = null;
         public string Get(ref FFU_Group value, ModuleBase module, string id, IDialogService dialogService = null)
         {
             if (m_toolTK4S == null)

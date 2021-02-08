@@ -53,6 +53,7 @@ namespace Root_AOP01_Inspection
             loadportB.Init(m_handler.m_aLoadport[1], m_engineer, m_rfid[1]);
             LoadportA_State.DataContext = loadport1;
             LoadportB_State.DataContext = loadport2;
+            buttonAlarmList.DataContext = m_handler.m_gaf.m_listALID;
             RTR_State.DataContext = m_rndrtr;
             //progressBarSequence.DataContext = m_handler.m_process;
             //textblockSequence.DataContext = m_handler.m_process;
@@ -93,8 +94,6 @@ namespace Root_AOP01_Inspection
             ButtonInitialize.IsEnabled = IsEnableInitialization();
             ButtonRecovery.IsEnabled = IsEnableRecovery();
             TimerLamp();
-            if (EQ.p_eState != EQ.eState.Recovery)
-                m_rndrtr.m_bRecovery = false;
         }
         #endregion
         #region Button Recovery
@@ -116,7 +115,6 @@ namespace Root_AOP01_Inspection
             m_handler.CalcRecover();
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Recovery;
-            m_rndrtr.m_bRecovery = true;
         }
         #endregion
 
@@ -234,23 +232,14 @@ namespace Root_AOP01_Inspection
             m_engineer.m_handler.m_aop01.BuzzerOff();
         }
 
-        private void DoorCheck_Click(object sender, RoutedEventArgs e)
+        private void DoorLock_Click(object sender, RoutedEventArgs e)
         {
-            if ((String)DoorCheck.Content == "DoorAlarm Off")
-            {
-                DoorCheck.Content = "DoorAlarm On";
-                m_engineer.m_handler.m_aop01.m_bDoorAlarm = false;
-            }
-            else
-            {
-                DoorCheck.Content = "DoorAlarm Off";
-                m_engineer.m_handler.m_aop01.m_bDoorAlarm = true;
-            }
+            m_engineer.m_handler.m_aop01.m_doDoorLock_Use.Write(false);
         }
 
         private void ButtonStop_Click(object sender, RoutedEventArgs e)
         {
-            EQ.p_bStop = true; //수정 필요
+            EQ.p_bStop = true;
         }
         #endregion
         void TimerLamp()
@@ -296,7 +285,7 @@ namespace Root_AOP01_Inspection
         //    }
         //    else
         //        return true;
-                
+
         //}
 
     }

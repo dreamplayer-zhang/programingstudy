@@ -338,7 +338,8 @@ namespace Root_EFEM.Module
                 }
                 if (sResult == "OK")
                     m_log.Info(m_module.m_sReadID);
-                    //m_module.m_loadport.p_infoCarrier.p_sCarrierID = m_module.m_sReadID;
+                if(m_module.m_loadport != null)
+                    m_module.m_loadport.p_infoCarrier.p_sCarrierID = m_module.m_sReadID;
                 return sResult;
             }
         }

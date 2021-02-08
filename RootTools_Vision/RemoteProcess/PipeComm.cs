@@ -75,7 +75,7 @@ namespace RootTools_Vision
                         this.pipe.Write(BitConverter.GetBytes(len), 0, sizeof(Int32));
                         this.pipe.WaitForPipeDrain();
                     }
-                    catch(Exception ex)
+                    catch(Exception)
                     {
 
                     }
@@ -123,7 +123,7 @@ namespace RootTools_Vision
 
 
             //clean up resource
-            this.pipe.Close();
+            //this.pipe.Close();
         }
 
         public void Write()

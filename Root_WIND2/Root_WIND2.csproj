@@ -242,6 +242,8 @@
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Maskbk.cs" />
+    <Compile Include="Module\BacksideVision\Run_GrabBackside.cs" />
+    <Compile Include="Module\BacksideVision\Run_LADS.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />
     <Compile Include="Module\EdgeSideVision\Run_InspectEBR.cs" />
@@ -805,7 +807,6 @@
     <Resource Include="Resources\Origin.PNG" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Module\BacksideVision\" />
     <Folder Include="UI\Tune\" />
   </ItemGroup>
   <ItemGroup>
