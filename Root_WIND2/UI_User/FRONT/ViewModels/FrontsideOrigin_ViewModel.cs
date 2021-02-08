@@ -31,11 +31,6 @@ namespace Root_WIND2.UI_User
 
         }
 
-        public void SetPage()
-        {
-            LoadRecipe();
-        }
-
         public void LoadRecipe()
         {
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
@@ -182,7 +177,7 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
-
+                    LoadRecipe();
                 });
             }
         }

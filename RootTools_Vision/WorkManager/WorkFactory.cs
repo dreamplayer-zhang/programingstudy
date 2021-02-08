@@ -10,7 +10,10 @@ namespace RootTools_Vision
 {
     public abstract class WorkFactory : IWorkStartable
     {
+        #region [Members]
         private List<WorkManager> workManagers;
+        private readonly RemoteProcess remote = null;
+        #endregion
 
         //List<WorkplaceBundle> bundleList = new List<WorkplaceBundle>();
         //WorkplaceBundle workplaceBundle;
@@ -31,9 +34,10 @@ namespace RootTools_Vision
             }
         }
 
-        public WorkFactory()
+        public WorkFactory(REMOTE_MODE mode = REMOTE_MODE.None)
         {
             workManagers = new List<WorkManager>();
+            this.remote = new RemoteProcess(mode);
 
             Initialize();
 
@@ -274,59 +278,96 @@ namespace RootTools_Vision
         }
 
         // Edge쪽 이동예정
-        public bool CreateWorkplaceBundle_RegionVertical(int imageWidth, int imageHeight, int imageByteCnt, int partitionNumber, IntPtr imageBufferR_GRAY, IntPtr imageBufferG, IntPtr imageBufferB)
-        {
-            //bundleList.Clear();
-            int regionWidth = imageWidth;
-            int regionHeight = (int)Math.Floor((double)imageHeight / partitionNumber);
-            int regionLastHeight = imageHeight - regionHeight * (partitionNumber - 1); // 숫자가 딱 안나눠떨어지는 경우가있으므로
+        //public bool CreateWorkplaceBundle_RegionVertical(int imageWidth, int imageHeight, int imageByteCnt, int partitionNumber, IntPtr imageBufferR_GRAY, IntPtr imageBufferG, IntPtr imageBufferB)
+        //{
+        //    //bundleList.Clear();
+        //    int regionWidth = imageWidth;
+        //    int regionHeight = (int)Math.Floor((double)imageHeight / partitionNumber);
+        //    int regionLastHeight = imageHeight - regionHeight * (partitionNumber - 1); // 숫자가 딱 안나눠떨어지는 경우가있으므로
 
 
-            WorkplaceBundle bundle = new WorkplaceBundle();
-            int index = 0;
-            for(int i = 0; i < partitionNumber - 1; i++)
-            {
-                bundle.Add(new Workplace(0, i, 0, regionHeight * i, regionWidth, regionHeight, index++));
-            }
+        //    WorkplaceBundle bundle = new WorkplaceBundle();
+        //    int index = 0;
+        //    for(int i = 0; i < partitionNumber - 1; i++)
+        //    {
+        //        bundle.Add(new Workplace(0, i, 0, regionHeight * i, regionWidth, regionHeight, index++));
+        //    }
 
-            // Last Region
-            bundle.Add(new Workplace(0, partitionNumber - 1, 0, regionHeight * (partitionNumber - 1), regionWidth, regionLastHeight, index));
-
-
-            //Set SharedBuffer;
-            bundle.SetSharedBuffer(imageBufferR_GRAY, imageWidth, imageHeight, imageByteCnt, imageBufferG, imageBufferB);
-
-            // Add Bundle
-            //bundleList.Add(bundle);
+        //    // Last Region
+        //    bundle.Add(new Workplace(0, partitionNumber - 1, 0, regionHeight * (partitionNumber - 1), regionWidth, regionLastHeight, index));
 
 
-            return true;            
-        }
+        //    //Set SharedBuffer;
+        //    bundle.SetSharedBuffer(imageBufferR_GRAY, imageWidth, imageHeight, imageByteCnt, imageBufferG, imageBufferB);
 
-        public bool CreateWorkplaceBundle_RegionHorizontal(int imageWidth, int imageHeight, int imageByteCnt, int partitionNumber, IntPtr imageBufferR_GRAY, IntPtr imageBufferG, IntPtr imageBufferB)
-        {
-            //bundleList.Clear();
-            int regionWidth = (int)Math.Floor((double)imageWidth / partitionNumber);
-            int regionLastWidth = imageWidth - regionWidth * (partitionNumber - 1); // 숫자가 딱 안나눠떨어지는 경우가있으므로
-            int regionHeight = imageHeight;
+        //    // Add Bundle
+        //    //bundleList.Add(bundle);
+
+
+        //    return true;            
+        //}
+
+        //public bool CreateWorkplaceBundle_RegionHorizontal(int imageWidth, int imageHeight, int imageByteCnt, int partitionNumber, IntPtr imageBufferR_GRAY, IntPtr imageBufferG, IntPtr imageBufferB)
+        //{
+        //    //bundleList.Clear();
+        //    int regionWidth = (int)Math.Floor((double)imageWidth / partitionNumber);
+        //    int regionLastWidth = imageWidth - regionWidth * (partitionNumber - 1); // 숫자가 딱 안나눠떨어지는 경우가있으므로
+        //    int regionHeight = imageHeight;
             
-            WorkplaceBundle bundle = new WorkplaceBundle();
-            int index = 0;
-            for (int i = 0; i < partitionNumber - 1; i++)
-            {
-                bundle.Add(new Workplace(i, 0, regionWidth * i, 0, regionWidth, regionHeight, index++));
-            }
+        //    WorkplaceBundle bundle = new WorkplaceBundle();
+        //    int index = 0;
+        //    for (int i = 0; i < partitionNumber - 1; i++)
+        //    {
+        //        bundle.Add(new Workplace(i, 0, regionWidth * i, 0, regionWidth, regionHeight, index++));
+        //    }
 
-            // Last Region
-            bundle.Add(new Workplace(partitionNumber - 1, 0, regionWidth * (partitionNumber - 1), 0, regionLastWidth, regionHeight, index));
+        //    // Last Region
+        //    bundle.Add(new Workplace(partitionNumber - 1, 0, regionWidth * (partitionNumber - 1), 0, regionLastWidth, regionHeight, index));
 
-            //Set SharedBuffer;
-            bundle.SetSharedBuffer(imageBufferR_GRAY, imageWidth, imageHeight, imageByteCnt, imageBufferG, imageBufferB);
+        //    //Set SharedBuffer;
+        //    bundle.SetSharedBuffer(imageBufferR_GRAY, imageWidth, imageHeight, imageByteCnt, imageBufferG, imageBufferB);
 
-            // Add Bundle
-            //bundleList.Add(bundle);
+        //    // Add Bundle
+        //    //bundleList.Add(bundle);
 
-            return true;
+        //    return true;
+        //}
+
+
+        #region [Remote Process]
+
+
+
+        public void RemoteStart()
+        {
+            remote.StartProcess();
+
+            //WorkplaceBundle wb = this.CreateWorkplaceBundle();
+            //if (wb == null) return;
+
+            //remote.Send<WorkplaceBundle>(wb);
         }
+
+        public void WriteTest()
+        {
+            WorkplaceBundle wb = this.CreateWorkplaceBundle();
+            if (wb == null) return;
+
+            remote.Send<WorkplaceBundle>(wb);
+            remote.Send("SSIBALL");
+            remote.Send("SSIBALL");
+            remote.Send("SSIBALLSSIBALLSSIBALLSSIBALLSSIBALLSSIBALL SSIBALLSSIBALL");
+        }
+
+        public void ExitRemoteProcess()
+        {
+            remote.ExitProcess();
+        }
+
+        ~WorkFactory()
+        {
+            ExitRemoteProcess();
+        }
+        #endregion
     }
 }

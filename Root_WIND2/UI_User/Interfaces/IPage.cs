@@ -8,7 +8,6 @@ namespace Root_WIND2.UI_User
 {
     public interface IPage
     {
-        public void SetPage();
         public void LoadRecipe();
     }
 }

@@ -88,11 +88,6 @@ namespace Root_WIND2.UI_User
             WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
         }
 
-        public void SetPage()
-        {
-            LoadRecipe();
-        }
-
         private string currentRecipe = "";
         public void LoadRecipe()
         {
@@ -138,6 +133,14 @@ namespace Root_WIND2.UI_User
 
         #region [Command]
 
+        public RelayCommand LoadedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                LoadRecipe();
+            });
+        }
+
         public RelayCommand btnStart
         {
             get => new RelayCommand(() =>
@@ -151,7 +154,7 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
             });
         }
 
@@ -159,7 +162,8 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().WriteTest();
+                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
             });
         }
 
@@ -168,6 +172,14 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 this.ImageViewerVM.ClearObjects();
+            });
+        }
+
+        public RelayCommand btnRemote
+        {
+            get => new RelayCommand(() =>
+            {
+                
             });
         }
         #endregion
