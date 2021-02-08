@@ -13,13 +13,14 @@ using Root_EFEM.Module;
 
 namespace Root_WIND2.Module
 {
-    static class Strings
-    {
-        public const string BackSideMem = "BackSide";
-        public const string LADSMem = "LADS";
-    }
+
     public class BackSideVision : ModuleBase, IWTRChild
-    {
+    { 
+        public enum ScanMemory
+        {
+            BackSide, LADS
+        }
+
         #region ToolBox
         Axis axisZ;
         AxisXY axisXY;
@@ -33,24 +34,6 @@ namespace Root_WIND2.Module
         LightSet lightSet;
         Camera_Dalsa camMain;
         Camera_Silicon camLADS;
-
-        public class LADSInfo//한 줄에 대한 정보
-        {
-            public double[] m_Heightinfo;
-            public RPoint axisPos;//시작점의 x,y
-            public double endYPos;//끝점의 y 정보
-
-            LADSInfo() { }
-            public LADSInfo(RPoint _axisPos, double _endYPos, int arrcap/*heightinfo capacity*/)
-            {
-                axisPos = _axisPos;
-                endYPos = _endYPos;
-                m_Heightinfo = new double[arrcap];
-            }
-        }
-
-        public List<LADSInfo> ladsinfos;
-
 
         #region Getter/Setter
         public Axis AxisZ { get => axisZ; private set => axisZ = value; }
@@ -105,8 +88,14 @@ namespace Root_WIND2.Module
             }
             while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
             foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTreeName(tree.GetTree("Name", false));
-            foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTree(tree.GetTree(grabMode.p_sName, false), true, false);
+            foreach (GrabMode grabMode in m_aGrabMode)
+            {
+                grabMode.RunTree(tree.GetTree(grabMode.p_sName, false), true, false);
+                if(!grabMode.p_sName.Contains("LADS"))
+                    grabMode.RunTreeLADS(tree.GetTree("Name", false));
+            }
         }
+
         #endregion
 
         #region DIO
@@ -148,8 +137,8 @@ namespace Root_WIND2.Module
         public override void InitMemorys()
         {
             memoryGroup = memoryPool.GetGroup(p_id);
-            memoryMain = memoryGroup.CreateMemory(Strings.BackSideMem, 1, 1, 1000, 1000);
-            memoryLADS = memoryGroup.CreateMemory(Strings.LADSMem, 1, 1, 1000, 1000);
+            memoryMain = memoryGroup.CreateMemory(ScanMemory.BackSide.ToString(), 1, 1, 1000, 1000);
+            memoryLADS = memoryGroup.CreateMemory(ScanMemory.LADS.ToString(), 1, 1, 1000, 1000);
         }
         #endregion
 
@@ -337,14 +326,9 @@ namespace Root_WIND2.Module
             AddModuleRunList(new Run_GrabBackside(this), true, "Run Grab Backside");
             AddModuleRunList(new Run_LADS(this), true, "Run LADS");
         }
-        public ImageData[] GetMemoryData()
+        public ImageData GetMemoryData(ScanMemory mem)
         {
-            ImageData[] res = new ImageData[2];
-
-            res[0] = new ImageData(memoryPool.GetMemory(p_id, Strings.BackSideMem));
-            res[1] = new ImageData(memoryPool.GetMemory(p_id, Strings.LADSMem));
-
-            return res;
+            return new ImageData(memoryPool.GetMemory(p_id, mem.ToString()));
         }
         #endregion
 
@@ -352,7 +336,6 @@ namespace Root_WIND2.Module
         {
             base.InitBase(id, engineer);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
-            ladsinfos = new List<LADSInfo>();
             //InitMemorys();
         }
 

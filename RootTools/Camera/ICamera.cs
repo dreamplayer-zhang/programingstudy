@@ -14,7 +14,6 @@ namespace RootTools.Camera
     {
         public int nScanOffsetY = 0;
         public bool bInvY = false;
-        public bool bUseLADS = false;
         public int ReverseOffsetY = 0;
         public double m_dScaleR = 1;
         public double m_dScaleG = 1;
@@ -25,8 +24,8 @@ namespace RootTools.Camera
         public int m_nFovStart = 0;
         public int m_nFovSize = 4000;
         public int m_nOverlap = 0;
-        public double m_dCam1res = 0;
-        public double m_dCam2res = 0;
+
+        public int m_nSkipGrabCount = -1; //LADS 사용시 Trigger Skip용으로 사용
     }
     public interface ICamera
     {

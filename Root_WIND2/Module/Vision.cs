@@ -7,7 +7,6 @@ using RootTools.Control;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
-using RootTools.RADS;
 using RootTools.Trees;
 using RootTools_Vision.Utility;
 using System.Collections.Generic;
@@ -30,7 +29,6 @@ namespace Root_WIND2.Module
         MemoryGroup m_memoryGroup2;
         MemoryData m_memoryMain;
         LightSet m_lightSet;
-        RADSControl m_RADSControl;
 
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
@@ -50,7 +48,6 @@ namespace Root_WIND2.Module
         public MemoryGroup MemoryGroup2 { get => m_memoryGroup2; private set => m_memoryGroup2 = value; }
         public MemoryData MemoryMain { get => m_memoryMain; private set => m_memoryMain = value; }
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
-        public RADSControl RADSControl { get => m_RADSControl; private set => m_RADSControl = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
@@ -68,7 +65,6 @@ namespace Root_WIND2.Module
                 p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
                 p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-                p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
                 p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.Get(ref m_CamAlign, this, "AlignCam");
                 p_sInfo = m_toolBox.Get(ref m_CamAutoFocus, this, "AutoFocusCam");
@@ -118,7 +114,7 @@ namespace Root_WIND2.Module
             while (m_aGrabMode.Count < m_lGrabMode)
             {
                 string id = "Mode." + m_aGrabMode.Count.ToString("00");
-                GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool, m_RADSControl);
+                GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool);
                 m_aGrabMode.Add(grabMode);
             }
             while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);

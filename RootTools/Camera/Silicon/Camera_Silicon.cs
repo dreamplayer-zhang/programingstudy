@@ -4,7 +4,6 @@ using SisoSDKLib;
 using SiSoFramegrabber;
 using PylonC.NET;
 using System;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Runtime.InteropServices;
@@ -19,12 +18,14 @@ namespace RootTools.Camera.Silicon
         Framegrabber m_fgSiso;
         PYLON_DEVICE_HANDLE m_hDev;  // Handle for the pylon device
 
-        BackgroundWorker bgw_Connect;
         Log m_log;
-        MemoryData m_Memory;
-        ImageData m_ImageLive;
-        ImageViewer_ViewModel m_ImageViewer;
         TreeRoot m_treeRoot;
+        ImageData m_ImageLive;
+        MemoryData m_Memory;
+        BackgroundWorker bgw_Connect;
+        ImageViewer_ViewModel m_ImageViewer;
+
+        bool m_bscanDir;
 
         int m_nDeviceIndex;
         int m_nYEnd;
@@ -35,26 +36,20 @@ namespace RootTools.Camera.Silicon
         int m_Width;
         int m_Height;
         int m_nGrabProgress;
-
+        int m_nSkipGrabCount;
         string m_sMCF;
+
         IntPtr m_MemPtr;
         IntPtr m_pBufGrab; //Frame Grabber꺼
+        CRect m_LastROI;
         CPoint m_cpScanOffset;
         CPoint m_szBuf;
-        CRect m_LastROI;
         Thread m_GrabThread;
 
         fgErrorType rc;
-        bool m_bscanDir;
-        bool m_buseLADS;
-        public bool IsLIVE = false;
-
-        double m_dsiliconres;
-        double m_dtdires;
 
         //public delegate void Dele_ProgressBar(int value);
         //public event Dele_ProgressBar ProgressBarUpdate;
-
         #region Property
         public int p_nDeviceIndex
         {
@@ -133,25 +128,29 @@ namespace RootTools.Camera.Silicon
         {
             p_id = id;
             m_log = log;
-            p_treeRoot = new TreeRoot(id, m_log);
-            bgw_Connect.DoWork += bgw_Connect_DoWork;
-            bgw_Connect.RunWorkerCompleted += bgw_Connect_RunWorkerCompleted;
+
+            m_pBufGrab = IntPtr.Zero;
+            m_nByte = 1;
+            m_lGrab = 0;
+            m_Width = 0;
+            m_Height = 0;
+            m_nGrabTrigger = 0;
+            m_nSkipGrabCount = -1;
+            rc = fgErrorType.fgeOK;
+
+            m_szBuf = new CPoint(0, 0);
+            m_fgSiso = new Framegrabber();
+            m_hDev = new PYLON_DEVICE_HANDLE();
             m_ImageLive = new ImageData(640, 480);
+            bgw_Connect = new BackgroundWorker();
             p_ImageViewer = new ImageViewer_ViewModel(m_ImageLive);
+
+            p_treeRoot = new TreeRoot(id, m_log);
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
             p_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
-            m_fgSiso = new Framegrabber();
-            m_hDev = new PYLON_DEVICE_HANDLE();
-            m_pBufGrab = IntPtr.Zero;
-            m_szBuf = new CPoint(0, 0);
-            m_nByte = 1;
-            m_lGrab = 0;
-            m_nGrabTrigger = 0;
-            m_Width = 0;
-            m_Height = 0;
-            rc = fgErrorType.fgeOK;
-            bgw_Connect = new BackgroundWorker();
+            bgw_Connect.DoWork += bgw_Connect_DoWork;
+            bgw_Connect.RunWorkerCompleted += bgw_Connect_RunWorkerCompleted;
         }
 
         public void M_treeRoot_UpdateTree()
@@ -274,7 +273,6 @@ namespace RootTools.Camera.Silicon
             }
 
             // Silicon FrameGrabber Connect
-
             if (m_fgSiso.FgInitConfig(p_sMCF, (uint)p_nDeviceIndex) != fgErrorType.fgeOK)
             {
                 MessageBox.Show("Frame Grabber Init Config Error");
@@ -304,6 +302,7 @@ namespace RootTools.Camera.Silicon
         {
             if (m_szBuf == szBuf)
                 return;
+
             DeleteGrabberMem();
             ulong lSize = (ulong)(szBuf.X * szBuf.Y * m_nByte);
             m_pBufGrab = m_fgSiso.FgAllocMemEx(lSize, m_nByte);
@@ -321,6 +320,7 @@ namespace RootTools.Camera.Silicon
                 if (rc != fgErrorType.fgeOK)
                     MessageBox.Show("Delete Grabber Mem Error : " + rc.ToString());
             }
+
             m_pBufGrab = IntPtr.Zero;
             m_szBuf.X = m_szBuf.Y = 0;
             return fgErrorType.fgeOK;
@@ -351,21 +351,6 @@ namespace RootTools.Camera.Silicon
             return 0;
         }
 
-        [DllImport("msvcrt.dll", SetLastError = false)]
-        unsafe static extern byte* memcpy(byte* dest, byte* src, int count);
-
-        unsafe void GrabDone(int nGrab, IntPtr pBuf)
-        {
-            if (IsLIVE) //라이브 모드
-            {
-                memcpy((byte*)p_ImageViewer.p_ImageData.GetPtr().ToPointer(), (byte*)pBuf.ToPointer(), m_Width * m_Height);
-            }
-            else //트리거 모드
-            {
-                memcpy((byte*)m_MemPtr.ToPointer() + (m_Width * nGrab), (byte*)pBuf.ToPointer(), m_Width * m_Height);
-            }
-        }
-
         public void SetSisoParam()
         {
             rc = m_fgSiso.FgSetParameterByName("FG_WIDTH", m_Width, (uint)p_nDeviceIndex);
@@ -373,47 +358,7 @@ namespace RootTools.Camera.Silicon
             rc = m_fgSiso.FgSetParameterByName("FG_TRIGGERSTATE", 0/*TS_ACTIVE*/, (uint)p_nDeviceIndex);
         }
 
-        public void StartGrab(long lGrab, bool Trigger = true)
-        {
-            unsafe
-            {
-                SetSisoParam();
-                AllocateGrabberMem(m_szBuf);
-
-                if (Trigger == false)
-                {
-                    IsLIVE = true;
-                    PylonC.NET.Pylon.DeviceFeatureFromString(m_hDev, "TriggerMode", "Off");
-                }
-                else
-                {
-                    //m_DM.StartGrab[0] = (byte)StartGrabCheck;
-                    IsLIVE = false;
-                    PylonC.NET.Pylon.DeviceFeatureFromString(m_hDev, "TriggerMode", "On");
-                }
-
-                //m_DM.TotalCnt[0] = (int)lGrab;
-                m_lGrab = (int)lGrab;
-
-                int nFlag = (int)FgAcquisitionFlags.ACQ_STANDARD;
-                rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, nFlag, m_pBufGrab);
-
-                if (rc != fgErrorType.fgeOK)
-                {
-                    rc = m_fgSiso.FgStopAcquireEx((uint)p_nDeviceIndex, m_pBufGrab, 0);
-                    Thread.Sleep(100);
-                    rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, nFlag, m_pBufGrab);
-                    if (rc != fgErrorType.fgeOK)
-                        MessageBox.Show("Start Grab Fail : " + rc.ToString() + m_fgSiso.GetLastError());
-                }
-            }
-        }
-
-        public double GetFps()
-        {
-
-            throw new NotImplementedException();
-        }
+        public double GetFps() => throw new NotImplementedException();
 
         public CPoint GetRoiSize()
         {
@@ -435,9 +380,7 @@ namespace RootTools.Camera.Silicon
             m_cpScanOffset.Y = 0;
             m_nGrabTrigger = 0;
             m_bscanDir = m_GrabData.bInvY;
-            m_buseLADS = m_GrabData.bUseLADS;
-            m_dsiliconres = m_GrabData.m_dCam1res;
-            m_dtdires = m_GrabData.m_dCam2res;
+            m_nSkipGrabCount = m_GrabData.m_nSkipGrabCount;
 
             rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);
 
@@ -449,11 +392,14 @@ namespace RootTools.Camera.Silicon
             int iBlock = 0;
             while (iBlock < m_lGrab)
             {
-                if (m_buseLADS)
-                    if (m_nGrabTrigger % (m_dsiliconres * m_Width / m_dtdires) != 0)
+                if(m_nSkipGrabCount > 0)
+                {
+                    // TDI 카메라와 Silicon Grabber의 해상도가 달라서 트리거 갯수를 다르게 줘야해서 Skip 할 수 있도록 추가
+                    if (m_nGrabTrigger % m_nSkipGrabCount != 0) //LADS를 사용할 땐 m_nGrabTrigger가 TDI 기준으로 카운트가 올라감
                         continue;
+                }
 
-                if ((iBlock < m_nGrabTrigger))
+                if (iBlock < m_nGrabTrigger)
                 {
                     int nY = iBlock * m_Height;
 
@@ -465,12 +411,13 @@ namespace RootTools.Camera.Silicon
                         int yp;
 
                         if (!Scandir)
-                            yp = m_nYEnd - (y + (iBlock) * m_Height) + m_nInverseYOffset; //backside 진행 방향이 거꾸로임
+                            yp = m_nYEnd - (y + iBlock * m_Height) + m_nInverseYOffset;
                         else
-                            yp = y + (iBlock) * m_Height;
+                            yp = y + iBlock * m_Height;
 
                         IntPtr srcPtr = ipSrc + m_Width * y;
                         IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * m_Memory.W);
+
                         Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, m_Width, m_Width);
                     });
 
@@ -483,8 +430,6 @@ namespace RootTools.Camera.Silicon
 
                     GrabEvent();
                 }
-
-
             }
         }
         void GrabEvent()
