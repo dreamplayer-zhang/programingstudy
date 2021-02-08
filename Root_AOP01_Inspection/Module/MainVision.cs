@@ -402,9 +402,9 @@ namespace Root_AOP01_Inspection.Module
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             //p_bStageVac = false;
 
-            m_axisRotate.StartMove(eAxisPos.ReadyPos);
-            if (m_axisRotate.WaitReady() != "OK")
-                return "Error";
+            //m_axisRotate.StartMove(eAxisPos.ReadyPos);
+            //if (m_axisRotate.WaitReady() != "OK")
+            //    return "Error";
 
             return "OK";
         }

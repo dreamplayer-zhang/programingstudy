@@ -18,16 +18,16 @@ namespace Root_AOP01_Inspection.Module
 
         #region ToolBox
         protected RS232 m_rs232;
-        DIO_O m_doTopBlow;                          //
-        DIO_O m_doBottomBlow;                       //
-        DIO_I m_diReticleCheck;                     //
+        DIO_O m_doTopBlow;                          
+        DIO_O m_doBottomBlow;                       
+        DIO_I m_diReticleCheck;                     
         public int m_teachReticleFlip = -1;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.Get(ref m_doTopBlow, this, "Top Blow");                                         //
-            p_sInfo = m_toolBox.Get(ref m_doBottomBlow, this, "Bottom Blow");                                   //
-            p_sInfo = m_toolBox.Get(ref m_diReticleCheck, this, "Reticle Check Sensor Door Crush InterLock");   //
+            p_sInfo = m_toolBox.Get(ref m_doTopBlow, this, "Top Blow");                                         
+            p_sInfo = m_toolBox.Get(ref m_doBottomBlow, this, "Bottom Blow");                                   
+            p_sInfo = m_toolBox.Get(ref m_diReticleCheck, this, "Reticle Check Sensor Door Crush InterLock");   
             m_dicArm[eArm.Upper].GetTools(m_toolBox);
             m_dicArm[eArm.Lower].GetTools(m_toolBox);
             if (bInit)
@@ -758,7 +758,7 @@ namespace Root_AOP01_Inspection.Module
         {
             m_teachCleanTop = tree.Set(m_teachCleanTop, m_teachCleanTop, "Top Clean Teach", "RTR Top Clean Index");
             m_teachCleanBottom = tree.Set(m_teachCleanBottom, m_teachCleanBottom, "Bottom Clean Teach", "RTR Bottom Clean Index");
-            m_extentionlength = tree.Set(m_extentionlength, m_extentionlength, "Extention length", "Clean Extention Length (0~30)");
+            m_extentionlength = tree.Set(m_extentionlength, m_extentionlength, "Extention length", "Clean Extention Length (0~23)");
             if (Convert.ToInt32(m_extentionlength) < 0) m_extentionlength = tree.Set("23", "23", "Extention length", "Clean Extention Length");
             if (Convert.ToInt32(m_extentionlength) > 23) m_extentionlength = tree.Set("23", "23", "Extention length", "Clean Extention Length");
             m_CleanSpeed = tree.Set(m_CleanSpeed, m_CleanSpeed, "Clean Speed", "RTR Clean Speed");
@@ -944,7 +944,7 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-
+                MainVision mainVision = ((AOP01_Handler)m_module.m_engineer.ClassHandler()).m_mainVision;
                 IWTRChild child = m_module.GetChild(p_sChild);
                 ModuleBase child_module = m_module.GetChild_Module(p_sChild);
                 if (child == null)
@@ -979,50 +979,125 @@ namespace Root_AOP01_Inspection.Module
                     Thread.Sleep(100);
                 }
 
-                if (p_sChild == "MainVision" || p_sChild == "BacksideVision")
-                {
-                    while (child_module.IsBusy()) Thread.Sleep(10);
-                }
+                //if (p_sChild == "MainVision" || p_sChild == "BacksideVision")
+                //{
+                //    while (child_module.IsBusy()) Thread.Sleep(10);
+                //}
 
                 if (m_module.Run(child.BeforeGet(m_nChildID)))
                 {
                     m_module.m_alidGet.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                if (p_sChild == "MainVision")
-                {
-                    while (child_module.IsBusy()) Thread.Sleep(10);
-                }
+                //if (p_sChild == "MainVision")
+                //{
+                //    while (child_module.IsBusy()) Thread.Sleep(10);
+                //}
                 if (m_module.Run(child.IsGetOK(m_nChildID)))
                 {
                     m_module.m_alidGet.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
-                try
+                if (p_sChild == "MainVision")
                 {
-                    child.p_bLock = true;
-                    if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1)))
+                    if (mainVision.m_diReticleFrameCheck.p_bIn == true)
                     {
-                        m_module.m_alidGet.Run(true, p_sInfo);
-                        return p_sInfo;
+                        m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
+                        try
+                        {
+                            child.p_bLock = true;
+                            if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo;
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo;
+                            }
+                            child.p_bLock = false;
+                            child.AfterGet(m_nChildID);
+                        }
+                        finally
+                        {
+                            if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                            else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                        }
+                        if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
+                        m_module.m_alidGet.Run(true, "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString());
+                        return "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString();
                     }
-                    if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                    else
                     {
-                        m_module.m_alidGet.Run(true, p_sInfo);
-                        return p_sInfo;
+                        m_module.m_alidGet.Run(true, "RTR Pellicle Side Get Error : Reticle is Not Pellicle Side");
+                        return "RTR Pellicle Side Get Error : Reticle is Not Pellicle Side";
                     }
-                    child.p_bLock = false;
-                    child.AfterGet(m_nChildID);
                 }
-                finally
+                else if (p_sChild == "BacksideVision")
                 {
-                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
-                    else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    if (mainVision.m_diReticleFrameCheck.p_bIn == false)
+                    {
+                        m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
+                        try
+                        {
+                            child.p_bLock = true;
+                            if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo;
+                            }
+                            if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                            {
+                                m_module.m_alidGet.Run(true, p_sInfo);
+                                return p_sInfo;
+                            }
+                            child.p_bLock = false;
+                            child.AfterGet(m_nChildID);
+                        }
+                        finally
+                        {
+                            if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                            else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                        }
+                        if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
+                        m_module.m_alidGet.Run(true, "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString());
+                        return "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString();
+                    }
+                    else
+                    {
+                        m_module.m_alidGet.Run(true, "RTR Glass Side Get Error : Reticle is Not Glass Side");
+                        return "RTR Glass Side Get Error : Reticle is Not Glass Side";
+                    }
                 }
-                if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
-                m_module.m_alidGet.Run(true, "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString());
-                return "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString();
+                else
+                {
+                    m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
+                    try
+                    {
+                        child.p_bLock = true;
+                        if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo;
+                        }
+                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion)))
+                        {
+                            m_module.m_alidGet.Run(true, p_sInfo);
+                            return p_sInfo;
+                        }
+                        child.p_bLock = false;
+                        child.AfterGet(m_nChildID);
+                    }
+                    finally
+                    {
+                        if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                        else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    }
+                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
+                    m_module.m_alidGet.Run(true, "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString());
+                    return "RTR Get Error : Reticle Check Sensor not Detected at Arm = " + m_eArm.ToString();
+                }
             }
         }
 
@@ -1096,19 +1171,19 @@ namespace Root_AOP01_Inspection.Module
                     m_module.m_alidPut.Run(true, "RTR Teach Position Not Defined");
                     return "RTR Teach Position Not Defined";
                 }
-                if (p_sChild == "MainVision")
-                {
-                    while (child_module.IsBusy()) Thread.Sleep(10);
-                }
+                //if (p_sChild == "MainVision")
+                //{
+                //    while (child_module.IsBusy()) Thread.Sleep(10);
+                //}
                 if (m_module.Run(child.BeforePut(m_nChildID)))
                 {
                     m_module.m_alidPut.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                if (p_sChild == "MainVision")
-                {
-                    while (child_module.IsBusy()) Thread.Sleep(10);
-                }
+                //if (p_sChild == "MainVision")
+                //{
+                //    while (child_module.IsBusy()) Thread.Sleep(10);
+                //}
                 if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID)))
                 {
                     m_module.m_alidPut.Run(true, p_sInfo);
