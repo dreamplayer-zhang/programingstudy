@@ -119,7 +119,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
             m_loadport.RunDocking();
             if (m_loadport.p_infoCarrier.m_aInfoWafer[0] == null)
             {
-                m_loadport.m_alidLoad.Run(true, "Pod Empty");
+                m_loadport.m_alidEmpty.Run(true, "Pod Empty");
                 m_loadport.RunUndocking();
                 return;
             }

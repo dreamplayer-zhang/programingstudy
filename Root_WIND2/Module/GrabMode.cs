@@ -1,13 +1,11 @@
-﻿using RootTools;
+using RootTools;
 using RootTools.Camera;
 using RootTools.Lens.LinearTurret;
 using RootTools.Light;
 using RootTools.Memory;
-using RootTools.RADS;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 
 namespace Root_WIND2.Module
 {
@@ -23,6 +21,7 @@ namespace Root_WIND2.Module
         #region Camera
         public event System.EventHandler Grabed;
         public bool m_bUseBiDirectionScan = false;
+        public bool m_bUseLADS = false;
         public eGrabDirection m_eDefaultCamDirection = eGrabDirection.Forward;
         public int m_nReverseOffsetY = 800;
         public eGrabDirection m_eGrabDirection = eGrabDirection.Forward;
@@ -165,20 +164,6 @@ namespace Root_WIND2.Module
         }
         #endregion
 
-        #region RADS
-        public RADSControl m_RADSControl;
-        bool m_bUseRADS = false;
-        void RunTreeRADS(Tree tree, bool bVisible, bool bReadOnly)
-        {
-            m_bUseRADS = tree.Set(m_bUseRADS, m_bUseRADS, "Use", "Using RADS", bVisible, false);
-        }
-
-        public bool GetUseRADS()
-        {
-            return m_bUseRADS;
-        }
-        #endregion
-
         #region Memory
         public MemoryPool m_memoryPool;
         public MemoryGroup m_memoryGroup;
@@ -217,20 +202,20 @@ namespace Root_WIND2.Module
         }
 
         public string p_sName { get; set; }
-        public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, RADSControl radsControl = null, LensLinearTurret lensTurret = null )
+
+        public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, LensLinearTurret lensTurret = null )
         {
             p_id = id;
             p_sName = id;
             m_cameraSet = cameraSet;
             m_lightSet = lightSet;
             m_memoryPool = memoryPool;
-            m_RADSControl = radsControl;
             m_lens = lensTurret;
         }
 
         public static GrabMode Copy(GrabMode src)
         {
-            GrabMode dst = new GrabMode(src.p_id, src.m_cameraSet, src.m_lightSet, src.m_memoryPool, src.m_RADSControl);
+            GrabMode dst = new GrabMode(src.p_id, src.m_cameraSet, src.m_lightSet, src.m_memoryPool);
             dst.Grabed = src.Grabed;
             dst.m_bUseBiDirectionScan = src.m_bUseBiDirectionScan;
             dst.m_camera = src.m_camera;
@@ -242,7 +227,6 @@ namespace Root_WIND2.Module
             dst.m_memoryGroup = src.m_memoryGroup;
             dst.m_nReverseOffsetY = src.m_nReverseOffsetY;
             dst.m_aLightPower = src.m_aLightPower;
-            dst.m_bUseRADS = src.m_bUseRADS;
             dst.m_sCamera = src.m_sCamera;
             dst.p_sName = src.p_sName;
             dst.m_ScanLineNum = src.m_ScanLineNum;
@@ -276,9 +260,12 @@ namespace Root_WIND2.Module
             RunTreeLight(tree.GetTree("LightPower", false), bVisible, bReadOnly);
             RunTreeMemory(tree.GetTree("Memory", false), bVisible, bReadOnly);
             RunTreeScanPos(tree.GetTree("ScanPos", false), bVisible, bReadOnly);
-            RunTreeRADS(tree.GetTree("RADS", false), bVisible, bReadOnly);
         }
 
+        public void RunTreeLADS(Tree tree)
+        {
+            m_bUseLADS = tree.Set(m_bUseLADS, m_bUseLADS, "Use LADS", "LADS 사용 여부");
+        }
         public virtual void RunTree(Tree.eMode mode) { }
     }
 }

@@ -192,8 +192,6 @@ namespace Root_AOP01_Inspection
 
         public AOP01_Handler m_handler = new AOP01_Handler();
 
-        private InspectionManager_AOP inspectionManager;
-        public InspectionManager_AOP InspectionManager { get => inspectionManager; set => inspectionManager = value; }
         public void Init(string id)
         {
             EQ.m_sModel = id;

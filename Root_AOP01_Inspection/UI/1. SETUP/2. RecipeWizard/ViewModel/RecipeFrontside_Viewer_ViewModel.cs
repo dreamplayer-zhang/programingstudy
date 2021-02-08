@@ -16,31 +16,17 @@ using System.Windows.Threading;
 
 namespace Root_AOP01_Inspection
 {
-	public struct InfoTextBolck
-	{
-		public InfoTextBolck(Grid grid, TRect pos)
-		{
-			this.grid = grid;
-			this.pos = pos;
-		}
-		public Grid grid;
-		public TRect pos;
-	}
-
-	public delegate void EventDrawDone(CPoint leftTop, CPoint rightBottom); //임시
-
-	public class Recipe45D_ImageViewer_ViewModel : RootViewer_ViewModel
+	public class RecipeFrontside_Viewer_ViewModel : RootViewer_ViewModel
 	{
 		public event EventDrawDone DrawDone;
+		public Dispatcher currectDispatcher { get; private set; }
 
-		Polygon WAFEREDGE_UI;
-		CPoint canvasPoint;
-		Grid CENTERPOINT_UI;
-
-		public Recipe45D_ImageViewer_ViewModel()
+		public RecipeFrontside_Viewer_ViewModel(Dispatcher dispatcher)
 		{
-			base.init(GlobalObjects.Instance.GetNamed<ImageData>(App.PellRegName), GlobalObjects.Instance.Get<DialogService>());
+			base.init(GlobalObjects.Instance.GetNamed<ImageData>(App.MainRegName), GlobalObjects.Instance.Get<DialogService>());
 			p_VisibleMenu = Visibility.Visible;
+			currectDispatcher = dispatcher;
+			
 			//Shapes.CollectionChanged += Shapes_CollectionChanged;
 			//InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;
 		}

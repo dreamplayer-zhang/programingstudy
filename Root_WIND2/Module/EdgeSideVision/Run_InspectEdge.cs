@@ -20,6 +20,10 @@ namespace Root_WIND2.Module
 		int sideOffset = 45;
 		int btmOffset = 90;
 
+		int topHeight = 2000;
+		int sideHeight = 2000;
+		int btmHeight = 2000;
+
 		#region [Getter/Setter]
 		public string RecipeName
 		{
@@ -41,6 +45,21 @@ namespace Root_WIND2.Module
 			get => btmOffset;
 			set => btmOffset = value;
 		}
+		public int TopHeight
+		{
+			get => topHeight;
+			set => topHeight = value;
+		}
+		public int SideHeight
+		{
+			get => sideHeight;
+			set => sideHeight = value;
+		}
+		public int BtmHeight
+		{
+			get => btmHeight;
+			set => btmHeight = value;
+		}
 		#endregion
 
 		public Run_InspectEdge(EdgeSideVision module)
@@ -57,12 +76,20 @@ namespace Root_WIND2.Module
 			run.topOffset = topOffset;
 			run.sideOffset = sideOffset;
 			run.btmOffset = btmOffset;
+
+			run.topHeight = topHeight;
+			run.sideHeight = sideHeight;
+			run.btmHeight = btmHeight;
+
 			return run;
 		}
 
 		public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
 		{
 			recipeName = tree.SetFile(recipeName, recipeName, "rcp", "Recipe", "Recipe Name", bVisible);
+			topHeight = (tree.GetTree("Camera Height", false, bVisible)).Set(topHeight, topHeight, "Top", "Camera Height", bVisible);
+			sideHeight = (tree.GetTree("Camera Height", false, bVisible)).Set(sideHeight, sideHeight, "Side", "Camera Height", bVisible);
+			btmHeight = (tree.GetTree("Camera Height", false, bVisible)).Set(btmHeight, btmHeight, "Bottom", "Camera Height", bVisible);
 
 			topOffset = (tree.GetTree("Camera Offset", false, bVisible)).Set(topOffset, topOffset, "Top Camera", "카메라 위치 offset (Degree)", bVisible);
 			sideOffset = (tree.GetTree("Camera Offset", false, bVisible)).Set(sideOffset, sideOffset, "Side Camera", "카메라 위치 offset (Degree)", bVisible);
