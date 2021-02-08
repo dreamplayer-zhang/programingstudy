@@ -3,6 +3,8 @@
 #include "../RootTools_Cpp/TypeDefines.h"
 #include <cliext/vector>
 
+#pragma warning(disable: 4677)
+
 public ref class CDefectDataWrapper : DefectData
 {
 public:

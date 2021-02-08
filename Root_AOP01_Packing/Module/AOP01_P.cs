@@ -192,7 +192,7 @@ namespace Root_AOP01_Packing.Module
         {
             if (m_bUseDoorAlarm)
             {
-                string str = "";
+                //string str = "";
                 if (!di_door_Machine.p_bIn)
                     alid_Door.Run(!di_door_Machine.p_bIn, "Please Check " + di_door_Machine.m_id);
                 if (!di_door_Elec.p_bIn)

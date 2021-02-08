@@ -40,6 +40,8 @@
 #endif
 #define FLANN_SIGNATURE_ "FLANN_INDEX"
 
+#pragma warning(disable: 26812)
+
 namespace cvflann
 {
 

@@ -17,6 +17,7 @@
 
 #include "MySQLDBConnector.h"
 
+#pragma warning(disable: 4267)
 
 namespace RootTools_CLR
 {

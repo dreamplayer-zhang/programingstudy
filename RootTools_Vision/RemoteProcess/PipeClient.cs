@@ -36,6 +36,10 @@ namespace RootTools_Vision
 
         public delegate void MessageReceivedHandler(string message);
         public event MessageReceivedHandler MessageReceived;
+        void _Dummy()
+        {
+            if (MessageReceived != null) MessageReceived(""); 
+        }
 
         public const int BUFFER_SIZE = 4096;
 
@@ -148,8 +152,8 @@ namespace RootTools_Vision
 
 
             //clean up resource
-            this.stream.Close();
-            this.handle.Close();
+            //this.stream.Close();
+            //this.handle.Close();
         }
 
         /// <summary>

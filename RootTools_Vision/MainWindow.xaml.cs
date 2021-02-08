@@ -31,7 +31,7 @@ namespace RootTools_Vision
 
     public partial class MainWindow : Window
     {
-        InspectionManager inspectionManager;
+        //InspectionManager inspectionManager;
         public MainWindow()
         {
             InitializeComponent();

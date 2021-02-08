@@ -46,6 +46,8 @@
 #include <cmath>
 #include "opencv2/core.hpp"
 
+#pragma warning(disable: 26812)
+
 namespace cv
 {
 namespace videostab
