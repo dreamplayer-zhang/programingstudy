@@ -408,8 +408,6 @@ namespace Root_WIND2.UI_User
             CPoint canvasPt = new CPoint(p_MouseX, p_MouseY);
             CPoint memPt = GetMemPoint(canvasPt);
 
-            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
-
             switch (originState)
             {
                 case PROCESS_ORIGIN_STATE.None:
@@ -477,8 +475,6 @@ namespace Root_WIND2.UI_User
         {
             CPoint canvasPt = new CPoint(p_MouseX, p_MouseY);
             CPoint memPt = GetMemPoint(canvasPt);
-
-            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
 
             switch (pitchState)
             {

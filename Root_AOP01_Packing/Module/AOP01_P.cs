@@ -3,6 +3,7 @@ using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
+using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace Root_AOP01_Packing.Module
 {
     public class AOP01_P : ModuleBase
     {
-        public bool m_bDoorAlarm = true;
+        public bool m_bUseDoorAlarm = true;
 
         string[] asLamp = Enum.GetNames(typeof(eLamp));
         string[] asBuzzer = Enum.GetNames(typeof(eBuzzer));
@@ -21,7 +22,7 @@ namespace Root_AOP01_Packing.Module
         #region ToolBox
         public DIO_Os m_doLamp;
         public TK4SGroup m_tk4s; // 온도, 정전기
-        //public FFUGroup m_FFU;
+        public FFU_Group m_FFU;
         DIO_Os do_Buzzer;
         DIO_O do_door_Lock;
        
@@ -32,11 +33,11 @@ namespace Root_AOP01_Packing.Module
         DIO_I di_MCReset;
         DIO_I di_Fan_4CH;
         DIO_I di_Fan_PC;
-        DIO_I di_TapeLoad;
-        DIO_I di_TapeUnload;
+        DIO_IO dio_TapeLoad;
+        DIO_IO dio_TapeUnload;
         DIO_I di_door_Machine;
         DIO_I di_door_AirTop;
-        DIO_I di_door_AirBot;
+        DIO_I di_door_IO;
         DIO_I di_door_Elec;
         DIO_I di_ProtectionBar;        
         DIO_I di_LightCurtain_Load;
@@ -50,9 +51,8 @@ namespace Root_AOP01_Packing.Module
         #endregion
 
         #region GAF
-        ALID alid_InterlockKey;
-        ALID alid_LightCurtainKey;
         ALID alid_EMS;
+        ALID alid_MC;
         ALID alid_CDA;
         ALID alid_Fan;
         ALID alid_Tk4s;
@@ -66,10 +66,8 @@ namespace Root_AOP01_Packing.Module
         ALID alid_Wrapper_Check;
         void InitALID()
         {
-            alid_InterlockKey = m_gaf.GetALID(this, "INTERLOCK KEY", "INTERLOCK KEY ERRE");
-            alid_LightCurtainKey = m_gaf.GetALID(this, "LIGHT CURTAIN KEY", "LIGHT CURTAIN KEY ERROR");
-
             alid_EMS = m_gaf.GetALID(this, "EMS", "EMS ERROR");
+            alid_MC = m_gaf.GetALID(this, "M/C Reset", "M/C RESET ERROR");
             alid_CDA = m_gaf.GetALID(this, "CDA", "CDA ERROR");
             alid_Fan = m_gaf.GetALID(this, "FAN", "FAN ERROR");
             alid_Tk4s = m_gaf.GetALID(this, "TK4S", "TK4S ERROR");
@@ -94,8 +92,8 @@ namespace Root_AOP01_Packing.Module
             p_sInfo = m_toolBox.Get(ref do_Buzzer, this, "Buzzer", asBuzzer, true, true);
             p_sInfo = m_toolBox.Get(ref do_door_Lock, this, "Door Lock");
 
-            m_toolBox.Get(ref m_tk4s, this, "FDC");
-            //m_toolBox.Get(ref m_FFU, this, "FFU");
+            m_toolBox.Get(ref m_tk4s, this, "FDC", ((AOP01_Engineer)m_engineer).m_dialogService);
+            m_toolBox.Get(ref m_FFU, this, "FFU", ((AOP01_Engineer)m_engineer).m_dialogService);
             p_sInfo = m_toolBox.Get(ref di_InterlockKey, this, "Interlock Key");
             p_sInfo = m_toolBox.Get(ref di_LightCurtainKey, this, "Light Curtian Key");
             p_sInfo = m_toolBox.Get(ref di_EMO, this, "EMS");
@@ -103,11 +101,11 @@ namespace Root_AOP01_Packing.Module
             p_sInfo = m_toolBox.Get(ref di_MCReset, this, "M/C Reset");
             p_sInfo = m_toolBox.Get(ref di_Fan_4CH, this, "4CH Fan");
             p_sInfo = m_toolBox.Get(ref di_Fan_PC, this, "PC Fan");
-            p_sInfo = m_toolBox.Get(ref di_TapeLoad, this, "Tape Load");
-            p_sInfo = m_toolBox.Get(ref di_TapeUnload, this, "Tape Unload");
+            p_sInfo = m_toolBox.Get(ref dio_TapeLoad, this, "Tape Load");
+            p_sInfo = m_toolBox.Get(ref dio_TapeUnload, this, "Tape Unload");
             p_sInfo = m_toolBox.Get(ref di_door_Machine, this, "Door Machine");
             p_sInfo = m_toolBox.Get(ref di_door_AirTop, this, "Door Air Top");
-            p_sInfo = m_toolBox.Get(ref di_door_AirBot, this, "Door Air Bot");
+            p_sInfo = m_toolBox.Get(ref di_door_IO, this, "Door I/O");
             p_sInfo = m_toolBox.Get(ref di_door_Elec, this, "Door Elec");
             p_sInfo = m_toolBox.Get(ref di_ProtectionBar, this, "Protection Bar Loadport");
             p_sInfo = m_toolBox.Get(ref di_LightCurtain_Load, this, "Light Curtain Loadport");
@@ -123,7 +121,10 @@ namespace Root_AOP01_Packing.Module
             if (bInit)
                 InitALID();
         }
-
+        public override void RunTree(Tree tree)
+        {
+            m_bUseDoorAlarm = tree.Set(m_bUseDoorAlarm, m_bUseDoorAlarm, "Door Alarm", "Use Door Alarm");
+        }
         protected override void RunThread()
         {
             base.RunThread();
@@ -137,6 +138,8 @@ namespace Root_AOP01_Packing.Module
                 case EQ.eState.Home:
                     do_door_Lock.Write(true);
                     m_doLamp.Write(eLamp.Green);
+                    m_doLamp.Write(eLamp.Red);
+                    m_doLamp.Write(eLamp.Yellow);
                     break;
                 case EQ.eState.Ready:
                     m_doLamp.Write(eLamp.Yellow);
@@ -157,35 +160,29 @@ namespace Root_AOP01_Packing.Module
                     break;
             }
 
-            KeyCheck();
             MachineCheck();
             DoorCheck();
-            //TapeloadCheck(); // ??
+            ////TapeloadCheck(); // ??
             InterruptCheck();
             ModuleCheck();
         }
 
-        private void KeyCheck()
-        {
-            if (di_InterlockKey.p_bIn)
-                alid_InterlockKey.Run(!di_InterlockKey.p_bIn, "Please Check " + di_InterlockKey.m_id);
-            if (di_LightCurtainKey.p_bIn)
-                alid_LightCurtainKey.Run(!di_LightCurtainKey.p_bIn, "Please Check " + di_LightCurtainKey.m_id);
-        }
         private void MachineCheck()
         {
             if (di_EMO.p_bIn)
             {
                 if (!di_CDA.p_bIn)
-                    alid_EMS.Run(!di_EMO.p_bIn, "Please Check " + "EMS");
+                    alid_EMS.Run(di_EMO.p_bIn, "Please Check " + "EMS");
                 else
-                    alid_EMS.Run(!di_EMO.p_bIn, "Please Check " + "EMO");
+                    alid_EMS.Run(di_EMO.p_bIn, "Please Check " + "EMO");
             }
-            if (di_CDA.p_bIn)
+            if (di_MCReset.p_bIn)
+                alid_MC.Run(di_MCReset.p_bIn, "Please Check " + di_MCReset.m_id);             
+            if (!di_CDA.p_bIn)
                 alid_CDA.Run(!di_CDA.p_bIn, "Please Check " + di_CDA.m_id);
-            if (di_Fan_4CH.p_bIn)
+            if (!di_Fan_4CH.p_bIn)
                 alid_Fan.Run(!di_Fan_4CH.p_bIn, "Please Check " + di_Fan_4CH.m_id);
-            if (di_Fan_PC.p_bIn)
+            if (!di_Fan_PC.p_bIn)
                 alid_Fan.Run(!di_Fan_PC.p_bIn, "Please Check " + di_Fan_PC.m_id);
             //tk4s
             //FFU
@@ -193,45 +190,50 @@ namespace Root_AOP01_Packing.Module
         }
         private void DoorCheck()
         {
-            if (m_bDoorAlarm)
+            if (m_bUseDoorAlarm)
             {
-                if (di_door_Machine.p_bIn)
+                //string str = "";
+                if (!di_door_Machine.p_bIn)
                     alid_Door.Run(!di_door_Machine.p_bIn, "Please Check " + di_door_Machine.m_id);
-                if (di_door_Elec.p_bIn)
+                if (!di_door_Elec.p_bIn)
                     alid_Door.Run(!di_door_Elec.p_bIn, "Please Check " + di_door_Elec.m_id);
-                if (di_door_AirTop.p_bIn)
+                if (!di_door_AirTop.p_bIn)
                     alid_Door.Run(!di_door_AirTop.p_bIn, "Please Check " + di_door_AirTop.m_id);
-                if (di_door_AirBot.p_bIn)
-                    alid_Door.Run(!di_door_AirBot.p_bIn, "Please Check " + di_door_AirBot.m_id);
+                if (!di_door_IO.p_bIn)
+                    alid_Door.Run(!di_door_IO.p_bIn, "Please Check " + di_door_IO.m_id);
             }
         }
         private void TapeloadCheck()
         {
-            if (di_TapeLoad.p_bIn)
-                alid_Tape.Run(!di_TapeLoad.p_bIn, "Please Check " + di_TapeLoad.m_id);
-            if (di_TapeUnload.p_bIn)
-                alid_Tape.Run(!di_TapeUnload.p_bIn, "Please Check " + di_TapeUnload.m_id);
+            if (dio_TapeLoad.p_bIn)
+                alid_Tape.Run(!dio_TapeLoad.p_bIn, "Please Check " + dio_TapeLoad.m_id);
+            if (dio_TapeUnload.p_bIn)
+                alid_Tape.Run(!dio_TapeUnload.p_bIn, "Please Check " + dio_TapeUnload.m_id);
         }
         private void InterruptCheck()
         {
             if (di_ProtectionBar.p_bIn)
-                alid_ProtectionBar.Run(!di_ProtectionBar.p_bIn, "Please Check " + di_ProtectionBar.m_id);
-            if (di_LightCurtain_Load.p_bIn)
-                alid_LightCurtain.Run(!di_LightCurtain_Load.p_bIn, "Please Check " + di_LightCurtain_Load.m_id);
-            if (di_LightCurtain_Unload.p_bIn)
-                alid_LightCurtain.Run(!di_LightCurtain_Unload.p_bIn, "Please Check " + di_LightCurtain_Unload.m_id);
+                alid_ProtectionBar.Run(di_ProtectionBar.p_bIn, "Please Check " + di_ProtectionBar.m_id);
+
+            if (di_LightCurtainKey.p_bIn)
+            {
+                if (di_LightCurtain_Load.p_bIn)
+                    alid_LightCurtain.Run(di_LightCurtain_Load.p_bIn, "Please Check " + di_LightCurtain_Load.m_id);
+                if (di_LightCurtain_Unload.p_bIn)
+                    alid_LightCurtain.Run(di_LightCurtain_Unload.p_bIn, "Please Check " + di_LightCurtain_Unload.m_id);
+            }
         }
         private void ModuleCheck()
         {
             if (di_Elevator_Protection1.p_bIn)
-                alid_Elevator_Protection.Run(!di_Elevator_Protection1.p_bIn, "Please Check " + di_Elevator_Protection1.m_id);
+                alid_Elevator_Protection.Run(di_Elevator_Protection1.p_bIn, "Please Check " + di_Elevator_Protection1.m_id);
             if (di_Elevator_Protection2.p_bIn)
-                alid_Elevator_Protection.Run(!di_Elevator_Protection2.p_bIn, "Please Check " + di_Elevator_Protection2.m_id);
-            if (di_Cartridge_Check1.p_bIn)
+                alid_Elevator_Protection.Run(di_Elevator_Protection2.p_bIn, "Please Check " + di_Elevator_Protection2.m_id);
+            if (!di_Cartridge_Check1.p_bIn)
                 alid_Cartridge_Check.Run(!di_Cartridge_Check1.p_bIn, "Please Check " + di_Cartridge_Check1.m_id);
-            if (di_Cartridge_Check2.p_bIn)
+            if (!di_Cartridge_Check2.p_bIn)
                 alid_Cartridge_Check.Run(!di_Cartridge_Check2.p_bIn, "Please Check " + di_Cartridge_Check2.m_id);
-            if (di_Wrapper_WrapCheck.p_bIn)
+            if (!di_Wrapper_WrapCheck.p_bIn)
                 alid_Wrapper_Check.Run(!di_Wrapper_WrapCheck.p_bIn, "Please Check " + di_Wrapper_WrapCheck.m_id);
             if (di_Wrapper_WrapLevelCheck.p_bIn)
                 alid_Wrapper_Check.Run(!di_Wrapper_WrapLevelCheck.p_bIn, "Please Check " + di_Wrapper_WrapLevelCheck.m_id);
@@ -241,6 +243,18 @@ namespace Root_AOP01_Packing.Module
         {
             p_id = id;
             base.InitBase(id, engineer);
+            m_tk4s.OnDetectLimit += M_tk4s_OnDetectLimit;
+            m_FFU.OnDetectLimit += M_FFU_OnDetectLimit;
+        }
+
+        private void M_FFU_OnDetectLimit(string str)
+        {
+            alid_FFU.Run(true, str);
+        }
+
+        private void M_tk4s_OnDetectLimit(string str)
+        {
+            alid_Tk4s.Run(true, str);
         }
 
         public enum eLamp
@@ -251,7 +265,6 @@ namespace Root_AOP01_Packing.Module
         }
         enum eBuzzer
         {
-            BuzzerOff,
             Buzzer1,
             Buzzer2,
             Buzzer3,

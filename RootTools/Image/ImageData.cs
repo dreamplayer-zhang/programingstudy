@@ -85,7 +85,6 @@ namespace RootTools
 
 			}
 		}
-		public IntPtr m_ptrByte;
 
 		public long p_Stride
 		{

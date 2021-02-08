@@ -10,9 +10,6 @@ using System.IO;
 
 namespace RootTools
 {
-
-    public delegate void delegateString(string str);
-
     public class TK4SGroup : ObservableObject, ITool
     {
 
@@ -279,6 +276,7 @@ namespace RootTools
 
         private void TK4SGroup_OnDetectLimit(string str)
         {
+            if(OnDetectLimit != null)
             OnDetectLimit(str);
         }
 

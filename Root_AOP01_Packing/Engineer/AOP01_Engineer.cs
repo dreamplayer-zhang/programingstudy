@@ -11,7 +11,7 @@ using RootTools.Trees;
 
 namespace Root_AOP01_Packing
 {
-    public class AOP01_Engineer : IEngineer
+    public class AOP01_Engineer : NotifyProperty, IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
@@ -80,12 +80,23 @@ namespace Root_AOP01_Packing
         #endregion
 
         #region XGem
-        bool m_bUseXGem = true;
+        //bool m_bUseXGem = true;
+        bool _bUseXGem = false;
+        public bool p_bUseXGem
+        {
+            get { return _bUseXGem; }
+            set
+            {
+                if (_bUseXGem == value) return;
+                _bUseXGem = value;
+                OnPropertyChanged();
+            }
+        }
         XGem m_xGem = null;
         XGem_UI m_xGemUI = new XGem_UI();
         void InitXGem()
         {
-            if (m_bUseXGem == false) return;
+            if (p_bUseXGem == false) return;
             m_xGem = new XGem();
             m_xGem.Init("XGem", this);
             m_xGemUI.Init(m_xGem);
@@ -94,7 +105,7 @@ namespace Root_AOP01_Packing
 
         void RunTreeXGem(Tree tree)
         {
-            m_bUseXGem = tree.Set(m_bUseXGem, m_bUseXGem, "Use", "Use XGem");
+            p_bUseXGem = tree.Set(p_bUseXGem, p_bUseXGem, "Use", "Use XGem");
         }
         #endregion
 
@@ -123,9 +134,12 @@ namespace Root_AOP01_Packing
         #endregion
 
         public AOP01_Handler m_handler = new AOP01_Handler();
-        public void Init(string id)
+        public IDialogService m_dialogService;
+        
+        public void Init(string id, IDialogService dialogService)
         {
             EQ.m_sModel = id;
+            m_dialogService = dialogService;
             LogView.Init();
             InitTree();
             m_login.Init();

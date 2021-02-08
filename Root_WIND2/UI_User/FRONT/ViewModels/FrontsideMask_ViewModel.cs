@@ -63,21 +63,6 @@ namespace Root_WIND2.UI_User
             p_ViewElement.Add(OriginBox);
         }
 
-        public void SetPage()
-        {
-            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
-
-            OriginOffset.X = originRecipe.OriginX;
-            OriginOffset.Y = originRecipe.OriginY - originRecipe.OriginHeight;
-
-            this.p_LayerMemoryOffsetX = OriginOffset.X;
-            this.p_LayerMemoryOffsetY = OriginOffset.Y;
-
-            this.DisplayBox();
-
-
-            LoadRecipe();
-        }
 
         public void LoadRecipe()
         {
@@ -1803,7 +1788,17 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
+                    OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+                    OriginOffset.X = originRecipe.OriginX;
+                    OriginOffset.Y = originRecipe.OriginY - originRecipe.OriginHeight;
+
+                    this.p_LayerMemoryOffsetX = OriginOffset.X;
+                    this.p_LayerMemoryOffsetY = OriginOffset.Y;
+
                     this.DisplayBox();
+
+                    LoadRecipe();
                 });
             }
         }

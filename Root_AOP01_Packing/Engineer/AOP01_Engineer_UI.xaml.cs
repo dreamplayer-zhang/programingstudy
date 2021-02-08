@@ -15,6 +15,7 @@ namespace Root_AOP01_Packing
         }
 
         AOP01_Engineer m_engineer = null;
+
         public void Init(AOP01_Engineer engineer)
         {
             m_engineer = engineer;

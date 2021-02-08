@@ -45,6 +45,8 @@
 
 #include "opencv2/core/core_c.h"
 
+#pragma warning(disable: 26495)
+
 #ifdef __cplusplus
 extern "C" {
 #endif

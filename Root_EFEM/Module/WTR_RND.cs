@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -24,6 +25,14 @@ namespace Root_EFEM.Module
                 m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
             }
+        }
+        #endregion
+
+        #region GAF
+        ALID alid_RND;
+        void InitALID()
+        {
+            alid_RND = m_gaf.GetALID(this, "RND", "WTR RND ERROR");
         }
         #endregion
 
@@ -334,7 +343,12 @@ namespace Root_EFEM.Module
         {
             for (int n = 0; n < m_sErrorMsgs.Length / 2; n++)
             {
-                if (m_sErrorMsgs[n, 0] == sCode) return m_sErrorMsgs[n, 1];
+                if (m_sErrorMsgs[n, 0] == sCode)
+                {
+                    alid_RND.Run(true, m_sErrorMsgs[n, 1]);
+                    //alid 0207
+                    return m_sErrorMsgs[n, 1];
+                }
             }
             return "Can't Find Error Massage !!";
         }
@@ -861,7 +875,6 @@ namespace Root_EFEM.Module
                     if (EQ.IsStop()) return "Stop";
                     Thread.Sleep(100);
                 }
-                //0203 디버그 必
                 if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
                 m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);

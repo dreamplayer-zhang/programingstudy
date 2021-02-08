@@ -3,7 +3,7 @@
 #include "math.h"
 #include <immintrin.h>
 
-
+#pragma warning(disable: 4244)
 
 
 int MyClrTest::testInt(int a, int b)

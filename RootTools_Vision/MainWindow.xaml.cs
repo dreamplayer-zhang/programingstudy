@@ -31,16 +31,20 @@ namespace RootTools_Vision
 
     public partial class MainWindow : Window
     {
-        InspectionManager inspectionManager;
+        //InspectionManager inspectionManager;
         public MainWindow()
         {
             InitializeComponent();
 
         }
 
+        public RemoteProcess process = new RemoteProcess(REMOTE_MODE.Slave);
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            inspectionManager = new InspectionManager();
+
+            process.StartProcess();
+            //inspectionManager = new InspectionManager();
         }
     }
 }

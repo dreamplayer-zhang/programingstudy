@@ -39,10 +39,19 @@ namespace Root_EFEM.Module
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
+
+                InitALID();
             }
         }
         #endregion
 
+        #region GAF
+        ALID alid_Cymechs;
+        void InitALID()
+        {
+            alid_Cymechs = m_gaf.GetALID(this, "Cymechs", "LOADPORT CYMECHS ERROR");
+        }
+        #endregion
         //forget
         #region DIO Function
         public bool m_bPlaced = false;
@@ -476,6 +485,8 @@ namespace Root_EFEM.Module
                 case 'E':
                     p_eState = eState.Error;
                     p_sInfo = "Cymech Error " + sRead + " : " + GetErrorString(sRead);
+                    alid_Cymechs.Run(true, p_sInfo);
+                    //0207 alid run p_sinfo 
                     break;
                 case 'C':
                     p_sInfo = SetEvent(sRead);
