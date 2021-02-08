@@ -138,6 +138,11 @@
     <Compile Include="Recipe\Recipe\RecipeItemBase.cs" />
     <Compile Include="Recipe\Recipe\MaskRecipe.cs" />
     <Compile Include="Recipe\Recipe\SurfaceRecipe.cs" />
+    <Compile Include="RemoteProcess\PipeClient.cs" />
+    <Compile Include="RemoteProcess\PipeComm.cs" />
+    <Compile Include="RemoteProcess\PipeProtocol.cs" />
+    <Compile Include="RemoteProcess\PipeServer.cs" />
+    <Compile Include="RemoteProcess\RemoteProcess.cs" />
     <Compile Include="UserControls\MapViewer.xaml.cs">
       <DependentUpon>MapViewer.xaml</DependentUpon>
     </Compile>

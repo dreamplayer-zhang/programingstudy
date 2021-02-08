@@ -139,6 +139,7 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
+                    LoadRecipe();
                     DrawMap();
                 });
             }
@@ -213,17 +214,11 @@ namespace Root_WIND2.UI_User
             chipItems = new ObservableCollection<Rectangle>();
         }
 
-        public void SetPage()
-        {
-            LoadRecipe();
-        }
-
         public void LoadRecipe()
         {
             RecipeType_WaferMap wafermap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
 
             CreateRecipeWaferMap(wafermap.MapSizeX, wafermap.MapSizeY, wafermap.Data);
-            DrawMap();
         }
 
         #region [Properties]

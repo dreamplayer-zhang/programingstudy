@@ -9,7 +9,7 @@ using RootTools.Trees;
 
 namespace Root_VEGA_D_IPU.Engineer
 {
-    public class VEGA_D_IPU_Engineer : IEngineer
+    public class VEGA_D_IPU_Engineer : NotifyProperty, IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
@@ -18,6 +18,18 @@ namespace Root_VEGA_D_IPU.Engineer
         public IControl ClassControl()
         {
             return null;
+        }
+
+        bool _bUseXGem = false;
+        public bool p_bUseXGem
+        {
+            get { return _bUseXGem; }
+            set
+            {
+                if (_bUseXGem == value) return;
+                _bUseXGem = value;
+                OnPropertyChanged();
+            }
         }
 
         public GAF m_gaf = new GAF();

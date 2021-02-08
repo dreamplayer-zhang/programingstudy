@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
@@ -370,6 +371,23 @@ namespace RootTools_Vision
             MemoryStream ms = new MemoryStream();
             bf.Serialize(ms, obj);
             return ms.ToArray();
+        }
+
+        public static byte[] ObejctToByteArray<T>(T obj)
+        {
+            MemoryStream ms = new MemoryStream();
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(ms, obj);
+            return ms.ToArray();
+        }
+
+        public static T ByteArrayToObject<T>(byte[] byteArr)
+        {
+            MemoryStream ms = new MemoryStream();
+            BinaryFormatter bf = new BinaryFormatter();
+            ms.Write(byteArr, 0, byteArr.Length);
+            ms.Seek(0, SeekOrigin.Begin);
+            return (T)bf.Deserialize(ms);
         }
 
         public static object ByteArrayToObject(byte[] byteArr)

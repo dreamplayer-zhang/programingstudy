@@ -38,9 +38,13 @@ namespace RootTools_Vision
 
         }
 
+        public RemoteProcess process = new RemoteProcess(REMOTE_MODE.Slave);
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            inspectionManager = new InspectionManager();
+
+            process.StartProcess();
+            //inspectionManager = new InspectionManager();
         }
     }
 }

@@ -817,9 +817,7 @@ namespace Root_EFEM.Module
                     if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
                         return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 }
-
-                GemPJ m_pjob;
-                GemCJ m_cjob;
+                
                 while (m_gem.p_cjRun == null) 
                 { 
                     Thread.Sleep(10);
@@ -832,8 +830,6 @@ namespace Root_EFEM.Module
                         Thread.Sleep(10);
                         if (EQ.p_bStop) return p_sInfo + "EQ Stop";
                     }
-                    m_pjob = pj;
-                    m_cjob = m_gem.p_cjRun;
                     break;
                 }
                 for(int i=0; i<m_infoCarrier.m_aGemSlot.Count; i++)

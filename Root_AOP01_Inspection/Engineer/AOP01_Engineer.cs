@@ -13,7 +13,7 @@ using System.Collections.ObjectModel;
 
 namespace Root_AOP01_Inspection
 {
-    public class AOP01_Engineer : IEngineer
+    public class AOP01_Engineer : NotifyProperty, IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
@@ -82,12 +82,23 @@ namespace Root_AOP01_Inspection
         #endregion
 
         #region XGem
-        bool m_bUseXGem = true;
+        //bool m_bUseXGem = true;
+        bool _bUseXGem = false;
+        public bool p_bUseXGem
+        {
+            get { return _bUseXGem; }
+            set
+            {
+                if (_bUseXGem == value) return;
+                _bUseXGem = value;
+                OnPropertyChanged();
+            }
+        }
         XGem m_xGem = null;
         XGem_UI m_xGemUI = new XGem_UI();
         void InitXGem()
         {
-            if (m_bUseXGem == false) return;
+            if (p_bUseXGem == false) return;
             m_xGem = new XGem();
             m_xGem.Init("XGem", this);
             m_xGemUI.Init(m_xGem);
@@ -96,7 +107,7 @@ namespace Root_AOP01_Inspection
 
         void RunTreeXGem(Tree tree)
         {
-            m_bUseXGem = tree.Set(m_bUseXGem, m_bUseXGem, "Use", "Use XGem");
+            p_bUseXGem = tree.Set(p_bUseXGem, p_bUseXGem, "Use", "Use XGem");
         }
         #endregion
 
