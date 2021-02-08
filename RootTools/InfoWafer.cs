@@ -269,6 +269,13 @@ namespace RootTools
             ModuleRunBase[] aProcess = m_qProcess.ToArray();
             foreach (ModuleRunBase run in aProcess) m_qCalcProcess.Enqueue(run); 
         }
+
+        public override void ClearInfo()
+        {
+            base.ClearInfo();
+            m_moduleRunList.Clear();
+            m_qCalcProcess.Clear(); 
+        }
         #endregion
 
         #region Tree

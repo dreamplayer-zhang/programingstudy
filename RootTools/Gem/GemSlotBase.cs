@@ -78,7 +78,7 @@ namespace RootTools.Gem
             }
         }
 
-        public void ClearInfo()
+        public virtual void ClearInfo()
         {
             p_eState = eState.Empty; 
             p_sSlotID = "";
