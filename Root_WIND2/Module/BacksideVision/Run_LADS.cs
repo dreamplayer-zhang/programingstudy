@@ -101,7 +101,7 @@ namespace Root_WIND2.Module
                     else
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
-                    grabData.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.BackWard;
+                    grabData.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.Forward;
 
                     if (m_module.Run(axisZ.StartMove(m_grabMode.m_nFocusPosZ)))
                         return p_sInfo;
@@ -118,7 +118,7 @@ namespace Root_WIND2.Module
                     else
                         dTriggerStartPosY -= nScanOffset_pulse;
 
-                    axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger* nCamHeight, true);
+                    axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger*nCamHeight /2,5, true);
 
                     m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, grabData);
 
@@ -129,6 +129,13 @@ namespace Root_WIND2.Module
 
                     axisXY.p_axisY.RunTrigger(false);
 
+
+                    while (m_grabMode.m_camera.p_nGrabProgress != 100)
+                    {
+                        System.Threading.Thread.Sleep(10);
+                        m_log.Info("Wait Camera GrabProcess");
+                    }
+                    m_grabMode.m_camera.StopGrab();
                     nScanLine++;
                     cpMemoryOffset.X += nCamWidth;
                 }

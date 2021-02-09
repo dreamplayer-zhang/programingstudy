@@ -37,7 +37,7 @@ namespace RootTools.Camera.Silicon
         int m_Height;
         int m_nGrabProgress;
         int m_nSkipGrabCount;
-        string m_sMCF;
+        string m_sMCF="";
 
         IntPtr m_MemPtr;
         IntPtr m_pBufGrab; //Frame Grabber꺼
@@ -200,20 +200,13 @@ namespace RootTools.Camera.Silicon
 
         void ConnectCamera()
         {
-            if (m_hDev != null)
+            if (!m_hDev.IsValid) //disconnect
             {
-                if (!PylonC.NET.Pylon.DeviceIsOpen(m_hDev)) //disconnect
-                {
-                    Initialize();
-                }
-                else
-                {
-                    MessageBox.Show("Device is open");
-                }
+                Initialize();
             }
             else
             {
-                Initialize();
+                MessageBox.Show("Device is open");
             }
         }
 
@@ -233,7 +226,7 @@ namespace RootTools.Camera.Silicon
 
                     DeleteGrabberMem();
                     m_fgSiso.FgFreeGrabber();
-
+                    m_hDev.SetInvalid();
                     MessageBox.Show("카메라 연결 종료");
                 }
             }
@@ -300,10 +293,10 @@ namespace RootTools.Camera.Silicon
 
         void AllocateGrabberMem(CPoint szBuf)
         {
-            if (m_szBuf == szBuf)
-                return;
+            //if (m_szBuf == szBuf)
+            //    return;
 
-            DeleteGrabberMem();
+            //DeleteGrabberMem();
             ulong lSize = (ulong)(szBuf.X * szBuf.Y * m_nByte);
             m_pBufGrab = m_fgSiso.FgAllocMemEx(lSize, m_nByte);
             m_szBuf = szBuf;
@@ -333,21 +326,20 @@ namespace RootTools.Camera.Silicon
             rc = m_fgSiso.FgRegisterAPCHandler(this, ApcEventHandler, (uint)p_nDeviceIndex, flags, ctrlFlags, m_pBufGrab);
         }
 
-        public static int ApcEventHandler(object sender, APCEvent ev)//xfercallback
+        unsafe public static int ApcEventHandler(object sender, APCEvent ev)//xfercallback
         {
-            unsafe
-            {
-                Framegrabber grabber = sender as Framegrabber;
-                FgAPCTransferData data = grabber.APCCallbackPins[2].Target as FgAPCTransferData;
-                GCHandle handle = GCHandle.FromIntPtr(data.mReceiverObject);
 
-                Camera_Silicon cam = handle.Target as Camera_Silicon;
+            Framegrabber grabber = sender as Framegrabber;
+            FgAPCTransferData data = grabber.APCCallbackPins[2].Target as FgAPCTransferData;
+            GCHandle handle = GCHandle.FromIntPtr(data.mReceiverObject);
 
-                if (cam != null)
-                    cam.m_nGrabTrigger++;
+            Camera_Silicon cam = handle.Target as Camera_Silicon;
 
-                //System.Diagnostics.Debug.WriteLine("m_nTrigger : " + cam.m_nGrabTrigger);
-            }
+            if (cam != null)
+                cam.m_nGrabTrigger++;
+
+            //System.Diagnostics.Debug.WriteLine("m_nTrigger : " + cam.m_nGrabTrigger);
+
             return 0;
         }
 
@@ -366,6 +358,13 @@ namespace RootTools.Camera.Silicon
         }
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
         {
+            if (!m_hDev.IsValid)
+            {
+                MessageBox.Show("Camera isn't connected");
+            
+                return;
+            }
+
             AllocateGrabberMem(m_szBuf);
 
             PylonC.NET.Pylon.DeviceFeatureFromString(m_hDev, "TriggerMode", "On");
@@ -374,12 +373,12 @@ namespace RootTools.Camera.Silicon
             m_LastROI = new CRect();
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
-            m_lGrab = nLine / m_Height;
+            m_lGrab = nLine / 400 ;/*잠깐하드코딩*/
             m_nInverseYOffset = m_GrabData.ReverseOffsetY;
-            m_nYEnd = ((int)Math.Truncate(1.0 * nLine / m_Height) - 1) * m_Height;
+            m_nYEnd = (m_lGrab - 1) * m_Height;
             m_cpScanOffset.Y = 0;
             m_nGrabTrigger = 0;
-            m_bscanDir = m_GrabData.bInvY;
+            m_bscanDir = !m_GrabData.bInvY;
             m_nSkipGrabCount = m_GrabData.m_nSkipGrabCount;
 
             rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);
@@ -392,12 +391,12 @@ namespace RootTools.Camera.Silicon
             int iBlock = 0;
             while (iBlock < m_lGrab)
             {
-                if(m_nSkipGrabCount > 0)
-                {
-                    // TDI 카메라와 Silicon Grabber의 해상도가 달라서 트리거 갯수를 다르게 줘야해서 Skip 할 수 있도록 추가
-                    if (m_nGrabTrigger % m_nSkipGrabCount != 0) //LADS를 사용할 땐 m_nGrabTrigger가 TDI 기준으로 카운트가 올라감
-                        continue;
-                }
+                //if(m_nSkipGrabCount > 0)
+                //{
+                //    // TDI 카메라와 Silicon Grabber의 해상도가 달라서 트리거 갯수를 다르게 줘야해서 Skip 할 수 있도록 추가
+                //    if (m_nGrabTrigger % m_nSkipGrabCount != 0) //LADS를 사용할 땐 m_nGrabTrigger가 TDI 기준으로 카운트가 올라감
+                //        continue;
+                //}
 
                 if (iBlock < m_nGrabTrigger)
                 {
@@ -428,7 +427,11 @@ namespace RootTools.Camera.Silicon
 
                     iBlock++;
 
+                    if (m_lGrab != 0)
+                        p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_lGrab);
                     GrabEvent();
+
+                    //System.Diagnostics.Debug.WriteLine("iblock : " + iBlock);
                 }
             }
         }

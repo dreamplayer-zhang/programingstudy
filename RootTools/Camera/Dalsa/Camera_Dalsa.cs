@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Threading.Tasks;
 using RootTools_CLR;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace RootTools.Camera.Dalsa
 {
@@ -668,13 +669,15 @@ namespace RootTools.Camera.Dalsa
                 m_nPreWidthB = nFovSize;
                 m_clrip.Cpp_CreatInterpolationData(2,m_dPReXScaleB, m_dPReXShiftB, m_nPreWidthB);
             }
-            while (iBlock < m_nGrabCount)
+              while (iBlock < m_nGrabCount)
             {
                 if (iBlock < m_nGrabTrigger)
                 {   
                     IntPtr ipSrc = m_pSapBuf[iBlock % p_nBuf];
+                   
                     Parallel.For(0, nCamHeight, new ParallelOptions { MaxDegreeOfParallelism = thread }, (y) =>
                     {
+                        
                         int yp;
                         if (Scandir)                            
                             yp = m_nLine - (y + (iBlock) * nCamHeight) + m_nInverseYOffset + m_nOffsetTest;
@@ -687,6 +690,8 @@ namespace RootTools.Camera.Dalsa
                         IntPtr GreenPtr = (IntPtr)((long)m_GreenMemPtr + n);
                         IntPtr BluePtr = (IntPtr)((long)m_BlueMemPtr + n);
                         int nThreadIdx = GetReadyThread();
+                        //int nThreadIdx = 1;
+
 
                         if (m_sapBuf.Format == SapFormat.RGB8888)
                         {
@@ -745,7 +750,6 @@ namespace RootTools.Camera.Dalsa
                         }
                     });
                     iBlock++;
-
                     m_LastROI.Left = nScanOffsetX;
                     m_LastROI.Right = nScanOffsetX + nCamWidth;
                     m_LastROI.Top = nScanOffsetY;
@@ -825,6 +829,7 @@ namespace RootTools.Camera.Dalsa
         {
             Camera_Dalsa cam = args.Context as Camera_Dalsa;
             cam.m_nGrabTrigger++;
+            Debug.Write("XferTrigger : " + cam.m_nGrabTrigger);
         }
         #endregion
 
