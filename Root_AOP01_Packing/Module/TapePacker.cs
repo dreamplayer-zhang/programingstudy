@@ -630,6 +630,7 @@ namespace Root_AOP01_Packing.Module
             //return "OK"; // 0202
 
             //p_eProcess 확인
+            //p_eProcess = eProcess.Empty;
             switch (p_eProcess)
             {
                 case eProcess.Empty:
@@ -784,6 +785,7 @@ namespace Root_AOP01_Packing.Module
         {
             //Thread.Sleep(10);
             //0203 Closed 상태 면 테이핑 ㄱㄱ
+            //p_eProcess = eProcess.Closed;
             if (p_eProcess != eProcess.Closed) return "Process not Closed : " + p_eProcess.ToString();
             p_eProcess = eProcess.Taping;
             if (Run(m_stage.m_axis.StartHome()))
@@ -803,7 +805,7 @@ namespace Root_AOP01_Packing.Module
             if (Run(m_cartridge.RunMove(Cartridge.ePos.Taping))) return p_sInfo;
             if (Run(m_stage.RunRotate(705))) return p_sInfo;
 
-            if (Run(m_stage.RunRotate(33))) return p_sInfo;
+            if (Run(m_stage.RunRotate(34))) return p_sInfo;
             if (Run(m_cartridge.RunMove(Cartridge.ePos.Cutting))) return p_sInfo;
             if (Run(m_cartridge.RunCutter())) return p_sInfo;
 
@@ -811,7 +813,7 @@ namespace Root_AOP01_Packing.Module
             if (Run(m_cartridge.RunMove(Cartridge.ePos.CheckTape))) return p_sInfo;
             //if (Run(m_camera.RunCheckEndVRS())) return p_sInfo;
 
-            if (Run(m_stage.RunRotate(327))) return p_sInfo;
+            if (Run(m_stage.RunRotate(326))) return p_sInfo;
             if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo;
 
             if (Run(m_head.RunHeadDown(false))) return p_sInfo;
@@ -835,6 +837,7 @@ namespace Root_AOP01_Packing.Module
         public override void Reset()
         {
             m_roller.RunRollerPushUp(false);
+            p_eProcess = eProcess.Empty;
             //여기가 프로세스별 Recovery 진행하거나 알람 띄우면 되나
             base.Reset();
         }
@@ -850,6 +853,8 @@ namespace Root_AOP01_Packing.Module
                 return "OK";
             }
             p_sInfo = base.StateHome();
+            if (Run(m_cartridge.RunCutter()))
+                return p_sInfo;
             if (Run(m_head.RunSol(true, true)))
                 return p_sInfo;
             if (Run(m_roller.RunRollerPushUp(false)))
