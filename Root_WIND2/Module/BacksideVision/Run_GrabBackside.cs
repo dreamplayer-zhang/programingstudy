@@ -145,7 +145,7 @@ namespace Root_WIND2.Module
                         axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_MaingrabMode.m_dTrigger, true);
 
                         m_MaingrabMode.StartGrab(Mainmem, cpMemoryOffset, nWaferSizeY_px, grabData);
-                        m_MaingrabMode.Grabed += M_grabMode_Grabed;
+                        m_MaingrabMode.Grabed += GrabMode_Grabed;
 
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
@@ -233,13 +233,13 @@ namespace Root_WIND2.Module
                             SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, SetScanAxisPos(nScanLine, dTriggerStartPosY, dTriggerEndPosY),
                             ladsinfos[nScanLine - 1], ladsinfos[nScanLine - 1].Count, false);
                             m_MaingrabMode.StartGrab(Mainmem, cpMemoryOffset, nWaferSizeY_px, m_MaingrabMode.m_GD);
-                            m_MaingrabMode.Grabed += M_grabMode_Grabed;
+                            m_MaingrabMode.Grabed += GrabMode_Grabed;
                             cpMemoryOffset.X -= nCamWidth;
                         }
 
                         m_LADSgrabMode.StartGrab(LADSmem, cpLADSMemoryOffset, nWaferSizeY_px, grabData);
 
-                        string res = AxisToEndPos(nScanLine > 0, axisXY, dEndPosY, nScanSpeed);
+                        string res = MoveAxisToEndPos(nScanLine > 0, axisXY, dEndPosY, nScanSpeed);
 
                         if (!res.Equals("OK"))
                             return res;
@@ -265,7 +265,7 @@ namespace Root_WIND2.Module
             }
         }
 
-        private void M_grabMode_Grabed(object sender, EventArgs e)
+        private void GrabMode_Grabed(object sender, EventArgs e)
         {
             GrabedArgs ga = (GrabedArgs)e;
             m_module.p_nProgress = ga.nProgress;
@@ -285,7 +285,7 @@ namespace Root_WIND2.Module
             }
             return darrScanAxisPos;
         }
-        private string AxisToEndPos(bool isCompensated, AxisXY axisXY, double dEndPosY, double nScanSpeed)
+        private string MoveAxisToEndPos(bool isCompensated, AxisXY axisXY, double dEndPosY, double nScanSpeed)
         {
             if (isCompensated)
             {
@@ -311,7 +311,6 @@ namespace Root_WIND2.Module
         }
         private void SetFocusMap(int nScanAxisNo, int nZAxisNo, double[] darrScanAxisPos, List<double> darrZAxisPos, int nPointCount, bool bReverse)
         {
-            // variable
             int iIdxScan = 0;
             int iIdxZ = 1;
             int[] narrAxisNo = new int[2];
@@ -320,7 +319,7 @@ namespace Root_WIND2.Module
             double dMaxAccel = m_module.AxisXY.p_axisY.GetSpeedValue(eSpeed.Move).m_acc;
             double dMaxDecel = m_module.AxisXY.p_axisY.GetSpeedValue(eSpeed.Move).m_dec;
 
-            // implement
+            //축번호가 작은게 앞으로 와야됨
             if (nZAxisNo < nScanAxisNo)
             {
                 iIdxZ = 0;
@@ -375,8 +374,8 @@ namespace Root_WIND2.Module
             List<double> ladsinfo = new List<double>();
             List<double> li = new List<double>();// 뭔가 값이 있는곳에 대한 정보
 
-            if(InvY)
-            {
+            if(!InvY)
+            {//정방향 스캔시
                 for (int cnt = 0; cnt < hCnt; cnt++)
                 {
                     li.Clear();
@@ -396,7 +395,7 @@ namespace Root_WIND2.Module
                     }
 
                     if (li.Count > 0)
-                        ladsinfo.Add(((li[li.Count - 1] - li[0]) / 2 - (double)nCamHeight / 2) * Math.Sqrt(2)); //Frame의 가운데가 Focus가 맞는 지점이라고 생각
+                        ladsinfo.Add(((li[li.Count - 1] + li[0]) / 2 - (double)nCamHeight / 2) * Math.Sqrt(2)); //Frame의 가운데가 Focus가 맞는 지점이라고 생각
                     else
                         ladsinfo.Add(0);
                 }
