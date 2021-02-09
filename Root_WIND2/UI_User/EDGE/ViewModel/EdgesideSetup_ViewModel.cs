@@ -1,21 +1,10 @@
 ﻿using Root_WIND2.Module;
 using RootTools;
-using RootTools.Database;
 using RootTools.Module;
 using RootTools_Vision;
-using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 
 namespace Root_WIND2.UI_User
 {
@@ -32,9 +21,9 @@ namespace Root_WIND2.UI_User
 		private bool _IsSideChecked = false;
 		private bool _IsBtmChecked = false;
 
-		private DataTable defectDataTable;
-		private object selectedDefect;
-		private BitmapSource defectImage;
+		//private DataTable defectDataTable;
+		//private object selectedDefect;
+		//private BitmapSource defectImage;
 
 		#region [Getter / Setter]
 		public EdgesideSetup_ImageViewer_ViewModel DrawToolVM
@@ -185,42 +174,43 @@ namespace Root_WIND2.UI_User
 				}
 			}
 		}
-		
-		public DataTable DefectDataTable
-		{
-			get => defectDataTable;
-			set => SetProperty(ref defectDataTable, value);
-		}
 
-		public object SelectedDefect
-		{
-			get => selectedDefect;
-			set
-			{
-				SetProperty(ref selectedDefect, value);
+		//public DataTable DefectDataTable
+		//{
+		//	get => defectDataTable;
+		//	set => SetProperty(ref defectDataTable, value);
+		//}
 
-				DataRowView selectedRow = (DataRowView)SelectedDefect;
-				if (selectedRow != null)
-				{
-					int nIndex = (int)GetDataGridItem(DefectDataTable, selectedRow, "m_nDefectIndex");
-					string sInspectionID = (string)GetDataGridItem(DefectDataTable, selectedRow, "m_strInspectionID");
-					string sFileName = nIndex.ToString() + ".bmp";
-					DisplayDefectImage(sInspectionID, sFileName);
-				}
-			}
-		}
+		//public object SelectedDefect
+		//{
+		//	get => selectedDefect;
+		//	set
+		//	{
+		//		SetProperty(ref selectedDefect, value);
 
-		public BitmapSource DefectImage
-		{
-			get => defectImage;
-			set
-			{
-				SetProperty(ref defectImage, value);
-			}
+		//		DataRowView selectedRow = (DataRowView)SelectedDefect;
+		//		if (selectedRow != null)
+		//		{
+		//			int nIndex = (int)GetDataGridItem(DefectDataTable, selectedRow, "m_nDefectIndex");
+		//			string sInspectionID = (string)GetDataGridItem(DefectDataTable, selectedRow, "m_strInspectionID");
+		//			string sFileName = nIndex.ToString() + ".bmp";
+		//			DisplayDefectImage(sInspectionID, sFileName);
+		//		}
+		//	}
+		//}
 
-		}
+		//public BitmapSource DefectImage
+		//{
+		//	get => defectImage;
+		//	set
+		//	{
+		//		SetProperty(ref defectImage, value);
+		//	}
+
+		//}
 		#endregion
 
+		#region [Command]
 		public ICommand btnTop
 		{
 			get
@@ -253,6 +243,7 @@ namespace Root_WIND2.UI_User
 				});
 			}
 		}
+		#endregion
 
 		public EdgesideSetup_ViewModel()
 		{
@@ -263,51 +254,51 @@ namespace Root_WIND2.UI_User
 			Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 			Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop;
 
-			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
-			WorkEventManager.ProcessDefectEdgeDone += WorkEventManager_ProcessDefectEdgeDone;
+			//WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
+			//WorkEventManager.ProcessDefectEdgeDone += WorkEventManager_ProcessDefectEdgeDone;
 		}
 
-		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
-		{
-			Workplace workplace = sender as Workplace;
-			//List<String> textList = new List<String>();
-			//List<CRect> rectList = new List<CRect>();
+		//private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
+		//{
+		//	Workplace workplace = sender as Workplace;
+		//	//List<String> textList = new List<String>();
+		//	//List<CRect> rectList = new List<CRect>();
 
-			//foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
-			//{
-			//	String text = "";
+		//	//foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+		//	//{
+		//	//	String text = "";
 
-			//	rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
-			//	textList.Add(text);
-			//}
+		//	//	rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+		//	//	textList.Add(text);
+		//	//}
 
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				//DrawRectDefect(rectList, textList, e.reDraw);
-				UpdateProgress();
-			}));
-		}
+		//	Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+		//	{
+		//		//DrawRectDefect(rectList, textList, e.reDraw);
+		//		UpdateProgress();
+		//	}));
+		//}
 
-		private void WorkEventManager_ProcessDefectEdgeDone(object sender, ProcessDefectEdgeDoneEventArgs e)
-		{
-			Workplace workplace = sender as Workplace;
-			List<CRect> rectList = new List<CRect>();
-			List<string> textList = new List<string>();
+		//private void WorkEventManager_ProcessDefectEdgeDone(object sender, ProcessDefectEdgeDoneEventArgs e)
+		//{
+		//	Workplace workplace = sender as Workplace;
+		//	List<CRect> rectList = new List<CRect>();
+		//	List<string> textList = new List<string>();
 
-			foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
-			{
-				String text = "";
+		//	foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+		//	{
+		//		String text = "";
 
-				rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
-				textList.Add(text);
-			}
+		//		rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+		//		textList.Add(text);
+		//	}
 
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				DrawRectDefect(rectList, textList);
-				UpdateDefectData();
-			}));
-		}
+		//	Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+		//	{
+		//		DrawRectDefect(rectList, textList);
+		//		UpdateDefectData();
+		//	}));
+		//}
 
 		public void Scan()
 		{
@@ -381,48 +372,48 @@ namespace Root_WIND2.UI_User
 			}
 		}
 
-		private void DrawRectDefect(List<CRect> rectList, List<String> textList, bool reDraw = false)
-		{
-			DrawToolVM.AddDrawRectList(rectList, System.Windows.Media.Brushes.Red);
-		}
+		//private void DrawRectDefect(List<CRect> rectList, List<String> textList, bool reDraw = false)
+		//{
+		//	DrawToolVM.AddDrawRectList(rectList, System.Windows.Media.Brushes.Red);
+		//}
 
-		private void UpdateProgress()
-		{
+		//private void UpdateProgress()
+		//{
 
-		}
+		//}
 
-		private void UpdateDefectData()
-		{
-			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			string sDefect = "defect";
-			DefectDataTable = DatabaseManager.Instance.SelectTablewithInspectionID(sDefect, sInspectionID);
-		}
+		//private void UpdateDefectData()
+		//{
+		//	string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+		//	string sDefect = "defect";
+		//	DefectDataTable = DatabaseManager.Instance.SelectTablewithInspectionID(sDefect, sInspectionID);
+		//}
 
-		private object GetDataGridItem(DataTable table, DataRowView selectedRow, string sColumnName)
-		{
-			object result;
-			for (int i = 0; i < table.Columns.Count; i++)
-			{
-				if (table.Columns[i].ColumnName == sColumnName)
-				{
-					result = selectedRow.Row.ItemArray[i];
-					return result;
-				}
-			}
-			return null;
-		}
+		//private object GetDataGridItem(DataTable table, DataRowView selectedRow, string sColumnName)
+		//{
+		//	object result;
+		//	for (int i = 0; i < table.Columns.Count; i++)
+		//	{
+		//		if (table.Columns[i].ColumnName == sColumnName)
+		//		{
+		//			result = selectedRow.Row.ItemArray[i];
+		//			return result;
+		//		}
+		//	}
+		//	return null;
+		//}
 
-		private void DisplayDefectImage(string sInspectionID, string sDefectImageName)
-		{
-			string sDefectimagePath = @"D:\DefectImage";
-			sDefectimagePath = Path.Combine(sDefectimagePath, sInspectionID, sDefectImageName);
-			if (File.Exists(sDefectimagePath))
-			{
-				Bitmap defectImage = (Bitmap)Bitmap.FromFile(sDefectimagePath);
-				DefectImage = ImageHelper.GetBitmapSourceFromBitmap(defectImage);
-			}
-			else
-				DefectImage = null;
-		}
+		//private void DisplayDefectImage(string sInspectionID, string sDefectImageName)
+		//{
+		//	string sDefectimagePath = @"D:\DefectImage";
+		//	sDefectimagePath = Path.Combine(sDefectimagePath, sInspectionID, sDefectImageName);
+		//	if (File.Exists(sDefectimagePath))
+		//	{
+		//		Bitmap defectImage = (Bitmap)Bitmap.FromFile(sDefectimagePath);
+		//		DefectImage = ImageHelper.GetBitmapSourceFromBitmap(defectImage);
+		//	}
+		//	else
+		//		DefectImage = null;
+		//}
 	}
 }

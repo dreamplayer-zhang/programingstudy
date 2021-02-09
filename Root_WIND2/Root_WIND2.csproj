@@ -300,9 +300,13 @@
       <DependentUpon>EBRSetup.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\EBR\ViewModel\EBRSetup_ViewModel.cs" />
+    <Compile Include="UI_User\EDGE\EdgesideInspect.xaml.cs">
+      <DependentUpon>EdgesideInspect.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_User\EDGE\EdgesideSetup.xaml.cs">
       <DependentUpon>EdgesideSetup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_User\EDGE\ViewModel\EdgesideInspect_ViewModel.cs" />
     <Compile Include="UI_User\EDGE\ViewModel\EdgesideSetup_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\EDGE\ViewModel\EdgesideSetup_ViewModel.cs" />
     <Compile Include="UI_User\FRONT\FrontsideAlignment.xaml.cs" />
@@ -720,6 +724,10 @@
     <Page Include="UI_User\EBR\EBRSetup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_User\EDGE\EdgesideInspect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\EDGE\EdgesideSetup.xaml">
       <Generator>MSBuild:Compile</Generator>
