@@ -9,12 +9,12 @@
              xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
              xmlns:mouse="clr-namespace:mousebehavior;assembly=RootTools"
              mc:Ignorable="d" 
-             d:DesignHeight="800" d:DesignWidth="1600">
+             d:DesignHeight="800" d:DesignWidth="1400">
     <Grid Background="{StaticResource main_view_background}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*"/>
             <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="3*"/>
+            <!--<ColumnDefinition Width="3*"/>-->
         </Grid.ColumnDefinitions>
         <Grid>
             <Grid.RowDefinitions>
@@ -42,14 +42,9 @@
                             <Button Content="Open" Command="{Binding btnOpen}" Style="{StaticResource imageViewer_toolbar_button}"/>
                             <Button Content="Save" Command="{Binding btnSave}" Style="{StaticResource imageViewer_toolbar_button}"/>
                             <Button Content="Clear" Command="{Binding btnClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
-
-                            <TextBlock Text="Defect" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Button Content="Clear" Command="{Binding btnClearDefect}" Style="{StaticResource imageViewer_toolbar_button}"/>
-                            <!--<Button IsEnabled="False" Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>-->
                         </StackPanel>
                         <Grid Grid.Row="1" >
-
-                            <tools:RootViewer />
+                            <tools:RootViewer/>
                         </Grid>
                     </Grid>
                 </GroupBox>
@@ -290,7 +285,7 @@
             </Grid>
         </StackPanel>
         
-        <Grid Grid.Column="2"
+        <!--<Grid Grid.Column="2"
                       Background="{StaticResource main_view_background}">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -333,6 +328,6 @@
                     </DataGrid.Resources>
                 </DataGrid>
             </GroupBox>
-        </Grid>
+        </Grid>-->
     </Grid>
 </UserControl>

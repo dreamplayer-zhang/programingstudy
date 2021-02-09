@@ -175,17 +175,17 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        public RelayCommand btnClearDefect
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    ClearObjects();
-                });
-            }
-        }
-        
-        #endregion
-    }
+		public RelayCommand btnClearDefect
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					ClearObjects();
+				});
+			}
+		}
+
+		#endregion
+	}
 }
