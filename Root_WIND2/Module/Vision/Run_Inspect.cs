@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Root_WIND2.Module
 {
@@ -81,7 +82,7 @@ namespace Root_WIND2.Module
                 if (inspectionFront.Recipe.Read(m_sRecipeName, true) == false)
                     return "Recipe Open Fail";
 
-                inspectionFront.Start();
+                inspectionFront.Start(WORK_TYPE.SNAP);
 
             }
             else
@@ -89,6 +90,11 @@ namespace Root_WIND2.Module
                 inspectionFront.Stop();
             }
 
+            inspectionFront.CheckAllWorkDoneSync();
+
+            MessageBox.Show("DONE");
+
+            return "OK";
             try
             {
                 m_module.p_bStageVac = true;

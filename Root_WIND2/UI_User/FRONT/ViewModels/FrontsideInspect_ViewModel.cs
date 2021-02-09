@@ -2,6 +2,7 @@
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -23,8 +24,8 @@ namespace Root_WIND2.UI_User
 
         private class MapViewerColorDefines
         {
-            public static SolidColorBrush NoChip = Brushes.DimGray;
-            public static SolidColorBrush Normal = Brushes.LightGray;
+            public static SolidColorBrush NoChip = Brushes.LightGray;
+            public static SolidColorBrush Normal = Brushes.DimGray;
             public static SolidColorBrush Snap = Brushes.LightSkyBlue;
             public static SolidColorBrush Position = Brushes.SkyBlue;
             public static SolidColorBrush Inspection = Brushes.Gold;
@@ -85,7 +86,7 @@ namespace Root_WIND2.UI_User
             // Initialize MapViewer
             this.mapViewerVM = new MapViewer_ViewModel();
 
-            WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+          
         }
 
         private string currentRecipe = "";
@@ -138,8 +139,18 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 LoadRecipe();
+
+                WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
             });
         }
+        public RelayCommand UnloadedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                WorkEventManager.WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
+            });
+        }
+
 
         public RelayCommand btnStart
         {
@@ -163,7 +174,6 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 GlobalObjects.Instance.Get<InspectionManagerFrontside>().WriteTest();
-                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
             });
         }
 
