@@ -8,11 +8,11 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2.UI_User
 {
-	public class EdgesideSetup_ImageViewer_ViewModel : RootViewer_ViewModel
+	public class Edgeside_ImageViewer_ViewModel : RootViewer_ViewModel
 	{
         List<TRect> rectList;
 
-        public EdgesideSetup_ImageViewer_ViewModel()
+        public Edgeside_ImageViewer_ViewModel()
         {
             this.p_VisibleMenu = System.Windows.Visibility.Collapsed;
 
@@ -175,17 +175,17 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        public RelayCommand btnClearDefect
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    ClearObjects();
-                });
-            }
-        }
-        
-        #endregion
-    }
+		public RelayCommand btnClearDefect
+		{
+			get
+			{
+				return new RelayCommand(() =>
+				{
+					ClearObjects();
+				});
+			}
+		}
+
+		#endregion
+	}
 }

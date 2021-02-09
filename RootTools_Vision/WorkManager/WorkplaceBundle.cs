@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
+    [Serializable]
     /// <history>
     /// 21.01.12 LHH
     /// - 기존에 WorkplaceBudnle 0번에 MasterWorkplace(MapIndex가 모두 -1)을 자동으로 생성하게 했으나
@@ -168,7 +169,6 @@ namespace RootTools_Vision
 
             return bundle;
         }
-
 
     }
 }

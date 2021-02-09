@@ -104,6 +104,8 @@ Homography model, as they work with different transformations.
 @}
   */
 
+#pragma warning(disable: 26812)
+
 namespace cv {
 
 //! @addtogroup stitching

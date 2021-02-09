@@ -57,6 +57,8 @@
 #include <initializer_list>
 #endif
 
+#pragma warning(disable: 6385)
+
 namespace cv
 {
 

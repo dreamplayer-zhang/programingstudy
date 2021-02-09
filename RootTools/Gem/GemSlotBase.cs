@@ -78,6 +78,15 @@ namespace RootTools.Gem
             }
         }
 
+        public virtual void ClearInfo()
+        {
+            p_eState = eState.Empty; 
+            p_sSlotID = "";
+            p_sLocID = "";
+            p_sCarrierID = "";
+            p_sRecipe = ""; 
+        }
+
         protected virtual void RunTreeProperty(Tree tree)
         {
             _eState = (eState)tree.Set(p_eState, p_eState, "State", "Slot State", true, true); 
@@ -192,7 +201,8 @@ namespace RootTools.Gem
         {
             foreach (GemPJ pj in m_aPJ)
             {
-                tree.Set(pj.m_sRecipeID, pj.m_sRecipeID, pj.m_sPJobID, "PJ Recipe ID", true, true); 
+                //tree.Set(pj.m_sRecipeID, pj.m_sRecipeID, pj.m_sPJobID, "PJ Recipe ID", true, true); 
+                tree.Set(pj.m_sPJobID, pj.m_sPJobID, pj.m_sPJobID, "ProcessJob ID", true, true);
             }
         }
         #endregion

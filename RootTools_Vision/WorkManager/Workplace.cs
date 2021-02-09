@@ -22,6 +22,7 @@ namespace RootTools_Vision
         D2D_SCALE_MAP = 1,
     }
 
+    [Serializable]
     /// <summary>
     /// - 검사할 영역의 정보를 포함합니다.
     /// - Image Buffer를 직접할당하지 않습니다.
@@ -52,14 +53,14 @@ namespace RootTools_Vision
 
         private WORK_TYPE workState;
 
-        private bool isOccupied = false;
+        [NonSerialized] private bool isOccupied = false;
 
-        private Dictionary<PREWORKDATA_KEY, object> preworkdataDicitonary = new Dictionary<PREWORKDATA_KEY, object>();
+        [NonSerialized] private Dictionary<PREWORKDATA_KEY, object> preworkdataDicitonary = new Dictionary<PREWORKDATA_KEY, object>();
 
-        private int subState;
+        [NonSerialized] private int subState;
 
-        private List<Defect> defectList = new List<Defect>();
-        private List<Measurement> measure = new List<Measurement>();
+        [NonSerialized] private List<Defect> defectList = new List<Defect>();
+        [NonSerialized] private List<Measurement> measure = new List<Measurement>();
 
         #endregion
 
@@ -216,6 +217,9 @@ namespace RootTools_Vision
 
 
 
+
+        
+        
         public List<Defect> DefectList
         {
             get => this.defectList;

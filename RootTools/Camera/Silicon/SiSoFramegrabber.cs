@@ -316,7 +316,7 @@ namespace SiSoFramegrabber
         /**
         * \brief	GarbageCollection of event callbacks
         */
-        protected List<GCHandle> APCCallbackPins;
+        public List<GCHandle> APCCallbackPins;
 
         /**
         * \brief	GarbageCollection for marshalled data
@@ -804,6 +804,8 @@ namespace SiSoFramegrabber
             {
                 int fg_rc = 0;
                 int value = 1;
+
+                //Fg_setParameter(pFGHandle,)
                 unsafe
                 {
                     // trace the calls to a log file. 
@@ -3343,11 +3345,13 @@ namespace SiSoFramegrabber
 
                 // user defined data to be passed to the delegate
                 GCHandle hWrapperObject = GCHandle.Alloc(this);
+                //GCHandle hWrapperObject = GCHandle.Alloc(this);
+
                 IntPtr pWrapperObject = GCHandle.ToIntPtr(hWrapperObject);
                 APCCallbackPins.Add(hWrapperObject);
 
                 // pinning of Client object
-                IntPtr pReceiver = IntPtr.Zero;
+                IntPtr pReceiver = GCHandle.ToIntPtr(GCHandle.Alloc(Receiver));
 
                 // Create Transfer Object for user data, wrapper object and additional information
                 FgAPCTransferData APCData = new FgAPCTransferData(pWrapperObject, UserData, pReceiver, DMAIndex);

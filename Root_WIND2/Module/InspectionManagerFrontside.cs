@@ -39,7 +39,7 @@ namespace Root_WIND2
         }
         #endregion
 
-        public InspectionManagerFrontside(Module.Vision vision, RecipeFront recipe, SharedBufferInfo bufferInfo)
+        public InspectionManagerFrontside(Module.Vision vision, RecipeFront recipe, SharedBufferInfo bufferInfo) : base(REMOTE_MODE.Master)
         {
             this.vision = vision;
             this.recipe = recipe;
@@ -145,6 +145,9 @@ namespace Root_WIND2
             OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
             PositionRecipe positionRecipe = recipe.GetItem<PositionRecipe>();
             PositionParameter positionParameter = recipe.GetItem<PositionParameter>();
+
+            if (positionParameter == null) return null;
+
             WorkplaceBundle bundle = new WorkplaceBundle();
             try
             {

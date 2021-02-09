@@ -3,6 +3,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Windows.Media;
+using static RootTools.Gem.XGem.XGem;
 
 namespace RootTools.Gem
 {
@@ -268,7 +269,7 @@ namespace RootTools.Gem
         #region CarrierID
         public void SendCarrierID(string sCarrierID)
         {
-            if (m_gem == null)
+            if (m_gem == null || m_gem.p_eControl != eControl.ONLINEREMOTE) 
             {
                 p_eStateCarrierID = eGemState.VerificationOK;
                 p_eTransfer = eTransfer.TransferBlocked;
@@ -299,7 +300,7 @@ namespace RootTools.Gem
 
         public void SendSlotMap()
         {
-            if (m_gem == null)
+            if (m_gem == null || m_gem.p_eControl != eControl.ONLINEREMOTE)
             {
                 p_eStateSlotMap = eGemState.VerificationOK;
                 return;
@@ -327,7 +328,7 @@ namespace RootTools.Gem
             {
                 if (sSlotInfo[n] == '3')
                 {
-                    if (m_aGemSlot[n].p_eState != GemSlotBase.eState.Exist) return "Reticle state is not Exist";
+                    if (m_aGemSlot[n].p_eState != GemSlotBase.eState.Exist) return "Slot state is not Exist";
                 }
             }
             return "OK";

@@ -8,13 +8,25 @@ using RootTools.ToolBoxs;
 
 namespace Root_Inspect
 {
-    public class Inspect_Engineer : IEngineer
+    public class Inspect_Engineer : NotifyProperty, IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
         public Login.User p_user { get { return m_login.p_user; } }
 
         public IGem ClassGem() { return null; }
+
+        bool _bUseXGem = false;
+        public bool p_bUseXGem
+        {
+            get { return _bUseXGem; }
+            set
+            {
+                if (_bUseXGem == value) return;
+                _bUseXGem = value;
+                OnPropertyChanged();
+            }
+        }
 
         public IControl ClassControl() { return null; }
 

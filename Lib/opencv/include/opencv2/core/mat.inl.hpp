@@ -54,6 +54,11 @@
 #pragma warning( disable: 4127 )
 #endif
 
+#pragma warning(disable: 4793)
+#pragma warning(disable: 6297)
+#pragma warning(disable: 26451)
+#pragma warning(disable: 26495)
+
 namespace cv
 {
 CV__DEBUG_NS_BEGIN
