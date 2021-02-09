@@ -104,17 +104,16 @@ namespace Root_AOP01_Inspection
                 });
             }
         }
-
-        public ICommand btnRun
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    m_Setup.m_MainWindow.MainPanel.Children.Clear();
-                    m_Setup.m_MainWindow.MainPanel.Children.Add(m_Setup.m_MainWindow.Run);
-                });
-            }
-        }
+        //public ICommand btnRun
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            m_Setup.m_MainWindow.MainPanel.Children.Clear();
+        //            m_Setup.m_MainWindow.MainPanel.Children.Add(m_Setup.m_MainWindow.Run);
+        //        });
+        //    }
+        //}
     }
 }

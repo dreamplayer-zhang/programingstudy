@@ -108,6 +108,8 @@ using a Boosted Cascade of Simple Features. IEEE CVPR, 2001. The paper is availa
 
 typedef struct CvHaarClassifierCascade CvHaarClassifierCascade;
 
+#pragma warning(disable: 26451)
+
 namespace cv
 {
 

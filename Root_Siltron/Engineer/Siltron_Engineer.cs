@@ -10,7 +10,7 @@ using RootTools.ToolBoxs;
 
 namespace Root_Siltron
 {
-    public class Siltron_Engineer : IEngineer
+    public class Siltron_Engineer : NotifyProperty, IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
@@ -52,6 +52,17 @@ namespace Root_Siltron
         #endregion
 
         #region XGem
+        bool _bUseXGem = false;
+        public bool p_bUseXGem
+        {
+            get { return _bUseXGem; }
+            set
+            {
+                if (_bUseXGem == value) return;
+                _bUseXGem = value;
+                OnPropertyChanged();
+            }
+        }
         XGem m_xGem = null;
         XGem_UI m_xGemUI = new XGem_UI();
         void InitXGem()

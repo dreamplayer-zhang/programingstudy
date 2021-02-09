@@ -194,6 +194,8 @@ location of points on the plane, building special graphs (such as NNG,RNG), and 
   @}
 */
 
+#pragma warning(disable: 26451)
+
 namespace cv
 {
 

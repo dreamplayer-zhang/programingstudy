@@ -12,7 +12,7 @@ using static Root_Vega.Module.Vega;
 
 namespace Root_Vega
 {
-    public class Vega_Engineer : IEngineer
+    public class Vega_Engineer : NotifyProperty, IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
@@ -54,6 +54,17 @@ namespace Root_Vega
         #endregion
 
         #region XGem
+        bool _bUseXGem = false;
+        public bool p_bUseXGem
+        {
+            get { return _bUseXGem; }
+            set
+            {
+                if (_bUseXGem == value) return;
+                _bUseXGem = value;
+                OnPropertyChanged();
+            }
+        }
         XGem m_xGem = null;
         XGem_UI m_xGemUI = new XGem_UI(); 
         void InitXGem()

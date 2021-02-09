@@ -35,6 +35,8 @@
 
 #include "general.h"
 
+#pragma warning(disable: 26495)
+
 namespace cvflann
 {
 

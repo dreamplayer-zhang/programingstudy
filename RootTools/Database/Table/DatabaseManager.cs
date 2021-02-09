@@ -60,6 +60,7 @@ namespace RootTools.Database
 
 		protected Lotinfo m_Loftinfo = new Lotinfo(); // 현재 Lot정보
 		protected string m_sInspectionID; // INSPECTION ID(DB PRIMARY KEY)
+		public string InspectionID { get { return m_sInspectionID; } }
 
 		public DataSet m_DataSet = new DataSet();
 		public DataTable m_DefectTable = new DataTable();
@@ -284,6 +285,7 @@ namespace RootTools.Database
 			try
 			{
 #endif
+				SendQuery("TRUNCATE defect;");
 				StringBuilder temp = new StringBuilder();
 				StringBuilder sbQuery = new StringBuilder();
 				StringBuilder sbColumList = new StringBuilder();
@@ -324,7 +326,7 @@ namespace RootTools.Database
 					if (i != sbValueList.Count - 1)
 						sbQuery.Append(",");
 				}
-				SendQuery(sbQuery.ToString());
+				 SendQuery(sbQuery.ToString());
 #if !DEBUG
 			}
 			catch (Exception ex)

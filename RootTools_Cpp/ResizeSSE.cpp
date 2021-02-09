@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "ResizeSSE.h"
 
+#pragma warning(disable: 4244)
+
 ResizeSSEData::ResizeSSEData()
 {
 	memset(m_bimg, 0, sizeof(byte) * MAX_FOV);

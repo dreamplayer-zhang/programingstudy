@@ -46,6 +46,7 @@
 #include "random.h"
 #include "saving.h"
 
+#pragma warning(disable: 26812)
 
 namespace cvflann
 {

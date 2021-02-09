@@ -10,22 +10,24 @@ using RootTools.Trees;
 using RootTools.GAFs;
 using RootTools;
 using System.Windows.Threading;
+using RootTools_Vision;
 
 namespace Root_AOP01_Inspection
 {
     class Run_ViewModel : ObservableObject
     {
-        MainWindow m_Mainwindow;
-        public Run_ViewModel(MainWindow main)
+        //MainWindow m_Mainwindow;
+        public Run_ViewModel()
         {
-            m_Mainwindow = main;
-            m_mainVision = ((AOP01_Handler)main.m_engineer.ClassHandler()).m_mainVision;
+            //m_Mainwindow = main;
+            //m_mainVision = ((AOP01_Handler)main.m_engineer.ClassHandler()).m_mainVision;
+            
             // MiniViewer
-            p_miniViewerMain = new MiniViewer_ViewModel(ProgramManager.Instance.ImageMain);
-            p_miniViewerLeft = new MiniViewer_ViewModel(ProgramManager.Instance.ImageSideLeft);
-            p_miniViewerTop = new MiniViewer_ViewModel(ProgramManager.Instance.ImageSideTop, true);
-            p_miniViewerRight = new MiniViewer_ViewModel(ProgramManager.Instance.ImageSideRight);
-            p_miniViewerBottom = new MiniViewer_ViewModel(ProgramManager.Instance.ImageSideBottom, true);
+            p_miniViewerMain = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.MainRegName));
+            p_miniViewerLeft = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideLeftRegName));
+            p_miniViewerTop = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideTopRegName), true);
+            p_miniViewerRight = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideRightRegName));
+            p_miniViewerBottom = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideBotRegName), true);
             InitTimer();
         }
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -38,15 +40,16 @@ namespace Root_AOP01_Inspection
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            p_dSequencePercent = Math.Ceiling(((AOP01_Handler)m_Mainwindow.m_engineer.ClassHandler()).m_process.m_dSequencePercent);
+            var temp = (AOP01_Handler)(GlobalObjects.Instance.Get<AOP01_Engineer>().ClassHandler());
+            p_dSequencePercent = Math.Ceiling(temp.m_process.m_dSequencePercent);
         }
         #region Property
-        MainVision m_mainVision;
-        public MainVision p_mainVision
-        {
-            get { return m_mainVision; }
-            set { SetProperty(ref m_mainVision, value); }
-        }
+        //MainVision m_mainVision;
+        //public MainVision p_mainVision
+        //{
+        //    get { return m_mainVision; }
+        //    set { SetProperty(ref m_mainVision, value); }
+        //}
         #endregion
 
         #region MiniViewer

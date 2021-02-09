@@ -242,6 +242,8 @@
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Maskbk.cs" />
+    <Compile Include="Module\BacksideVision\Run_GrabBackside.cs" />
+    <Compile Include="Module\BacksideVision\Run_LADS.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />
     <Compile Include="Module\EdgeSideVision\Run_InspectEBR.cs" />
@@ -276,6 +278,16 @@
     </Compile>
     <Compile Include="UI\Interfaces\IRecipeUILoadable.cs" />
     <Compile Include="Module\WIND2.cs" />
+    <Compile Include="UI_User\BACK\BacksideSetup.xaml.cs">
+      <DependentUpon>BacksideSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\BACK\BacksideInspect.xaml.cs">
+      <DependentUpon>BacksideInspect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\BACK\ViewModels\BacksideInspect_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\BACK\ViewModels\BacksideInspect_ViewModel.cs" />
+    <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ViewModel.cs" />
     <Compile Include="UI_User\CAMERA\CameraVRS.xaml.cs">
       <DependentUpon>CameraVRS.xaml</DependentUpon>
     </Compile>
@@ -689,6 +701,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI_User\BACK\BacksideSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\BACK\BacksideInspect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI_User\CAMERA\CameraVRS.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -787,9 +807,7 @@
     <Resource Include="Resources\Origin.PNG" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Module\BacksideVision\" />
     <Folder Include="UI\Tune\" />
-    <Folder Include="UI_User\BACK\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\ChartEBR.PNG" />

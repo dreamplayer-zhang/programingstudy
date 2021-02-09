@@ -28,12 +28,6 @@ namespace Root_WIND2.UI_User
         }
 
         #region [IPage Interfaces]
-        public void SetPage()
-        {
-            this.ImageViewerVM.DisplayBox();
-
-            LoadRecipe();
-        }
 
         public void LoadRecipe()
         {
@@ -212,6 +206,8 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 this.ImageViewerVM.DisplayBox();
+
+                LoadRecipe();
             });
         }
 

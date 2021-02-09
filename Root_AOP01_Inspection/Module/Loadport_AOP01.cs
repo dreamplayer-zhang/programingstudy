@@ -390,7 +390,7 @@ namespace Root_AOP01_Inspection.Module
                 if (EQ.IsStop()) return "EQ Stop";
                 if (m_loadport.m_rs232.p_bConnect == false)
                 {
-                    m_loadport.m_alidCMD.Run(true, "RS232 Connection Lost !!");
+                    m_loadport.m_alidConnect.Run(true, "RS232 Connection Lost !!");
                     return "RS232 Connection Lost !!";
                 }
                 int nWait = 100 * secWait;
@@ -734,10 +734,12 @@ namespace Root_AOP01_Inspection.Module
         CEID m_ceidDocking;
         CEID m_ceidUnDocking;
         ALID m_alidPlaced;
+        public ALID m_alidEmpty;
         public ALID m_alidLoad;
         public ALID m_alidUnLoad;
         public ALID m_alidHome;
         public ALID m_alidCMD;
+        public ALID m_alidConnect;
         public ALID m_alidInforeticle;
         public ALID m_alidGetOK;
         public ALID m_alidPutOK;
@@ -754,8 +756,10 @@ namespace Root_AOP01_Inspection.Module
             m_alidUnLoad = m_gaf.GetALID(this, "UnLoad", "UnLoading Motion Error");
             m_alidHome = m_gaf.GetALID(this, "Home_Loadport", "Home Motion Error");
             m_alidCMD = m_gaf.GetALID(this, "CMD_Loadport", "CMD Error");
+            m_alidConnect = m_gaf.GetALID(this, "Connect_Loadport", "Connect Error");
             m_alidGetOK = m_gaf.GetALID(this, "Get Err to Loadport", "Get Imposible Error");
             m_alidPutOK = m_gaf.GetALID(this, "Put Err to Loadport", "Put Imposible Error");
+            m_alidEmpty = m_gaf.GetALID(this, "Empty", "Pod Empty");
         }
         #endregion
 

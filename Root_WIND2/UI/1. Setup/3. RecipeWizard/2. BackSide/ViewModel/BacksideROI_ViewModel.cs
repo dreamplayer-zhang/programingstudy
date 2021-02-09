@@ -22,8 +22,9 @@ namespace Root_WIND2
         }
         public void init(Setup_ViewModel setup)
         {
-            base.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
-            p_VisibleMenu = System.Windows.Visibility.Visible;
+            return;
+            //base.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
+            //p_VisibleMenu = System.Windows.Visibility.Visible;
         }
         
         #region [Variables]
