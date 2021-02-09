@@ -10,7 +10,7 @@ namespace Root_WIND2.UI_User
 {
 	class EdgesideSetup_ViewModel : ObservableObject
 	{
-		private EdgesideSetup_ImageViewer_ViewModel drawToolVM;
+		private Edgeside_ImageViewer_ViewModel drawToolVM;
 
 		private EdgeSurfaceParameterBase parameter;
 		private EdgeSurfaceRecipeBase recipe;
@@ -26,7 +26,7 @@ namespace Root_WIND2.UI_User
 		//private BitmapSource defectImage;
 
 		#region [Getter / Setter]
-		public EdgesideSetup_ImageViewer_ViewModel DrawToolVM
+		public Edgeside_ImageViewer_ViewModel DrawToolVM
 		{
 			get => drawToolVM;
 			set => SetProperty(ref drawToolVM, value);
@@ -247,7 +247,7 @@ namespace Root_WIND2.UI_User
 
 		public EdgesideSetup_ViewModel()
 		{
-			DrawToolVM = new EdgesideSetup_ImageViewer_ViewModel();
+			DrawToolVM = new Edgeside_ImageViewer_ViewModel();
 			DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
 
 			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();

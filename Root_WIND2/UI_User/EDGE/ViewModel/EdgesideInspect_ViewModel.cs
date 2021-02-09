@@ -17,26 +17,26 @@ namespace Root_WIND2.UI_User
 {
 	public class EdgesideInspect_ViewModel : ObservableObject
 	{
-		private EdgesideSetup_ImageViewer_ViewModel imgeViewerTopVM;
-		private EdgesideSetup_ImageViewer_ViewModel imgeViewerSideVM;
-		private EdgesideSetup_ImageViewer_ViewModel imgeViewerBtmVM;
+		private Edgeside_ImageViewer_ViewModel imgeViewerTopVM;
+		private Edgeside_ImageViewer_ViewModel imgeViewerSideVM;
+		private Edgeside_ImageViewer_ViewModel imgeViewerBtmVM;
 
 		private DataTable defectDataTable;
 		private object selectedDefect;
 		private BitmapSource defectImage;
 
 		#region [Getter / Setter]
-		public EdgesideSetup_ImageViewer_ViewModel ImageViewerTopVM
+		public Edgeside_ImageViewer_ViewModel ImageViewerTopVM
 		{
 			get => imgeViewerTopVM;
 			set => SetProperty(ref imgeViewerTopVM, value);
 		}
-		public EdgesideSetup_ImageViewer_ViewModel ImageViewerSideVM
+		public Edgeside_ImageViewer_ViewModel ImageViewerSideVM
 		{
 			get => imgeViewerSideVM;
 			set => SetProperty(ref imgeViewerSideVM, value);
 		}
-		public EdgesideSetup_ImageViewer_ViewModel ImageViewerBtmVM
+		public Edgeside_ImageViewer_ViewModel ImageViewerBtmVM
 		{
 			get => imgeViewerBtmVM;
 			set => SetProperty(ref imgeViewerBtmVM, value);
@@ -127,11 +127,11 @@ namespace Root_WIND2.UI_User
 
 		public EdgesideInspect_ViewModel()
 		{
-			ImageViewerTopVM = new EdgesideSetup_ImageViewer_ViewModel();
+			ImageViewerTopVM = new Edgeside_ImageViewer_ViewModel();
 			ImageViewerTopVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
-			ImageViewerSideVM = new EdgesideSetup_ImageViewer_ViewModel();
+			ImageViewerSideVM = new Edgeside_ImageViewer_ViewModel();
 			ImageViewerSideVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeSideImage"), GlobalObjects.Instance.Get<DialogService>());
-			ImageViewerBtmVM = new EdgesideSetup_ImageViewer_ViewModel();
+			ImageViewerBtmVM = new Edgeside_ImageViewer_ViewModel();
 			ImageViewerBtmVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeBottomImage"), GlobalObjects.Instance.Get<DialogService>());
 
 			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
@@ -165,7 +165,7 @@ namespace Root_WIND2.UI_User
 			List<CRect> rectList = new List<CRect>();
 			List<string> textList = new List<string>();
 
-			EdgesideSetup_ImageViewer_ViewModel imageViewerVM = new EdgesideSetup_ImageViewer_ViewModel();
+			Edgeside_ImageViewer_ViewModel imageViewerVM = new Edgeside_ImageViewer_ViewModel();
 			if (workplace.MapIndexX == (int)EdgeSurface.EdgeMapPositionX.Top)
 				imageViewerVM = ImageViewerTopVM;
 			else if (workplace.MapIndexX == (int)EdgeSurface.EdgeMapPositionX.Side)
@@ -188,7 +188,7 @@ namespace Root_WIND2.UI_User
 			}));
 		}
 
-		private void DrawRectDefect(EdgesideSetup_ImageViewer_ViewModel imageViewerVM, List<CRect> rectList, List<String> textList, bool reDraw = false)
+		private void DrawRectDefect(Edgeside_ImageViewer_ViewModel imageViewerVM, List<CRect> rectList, List<String> textList, bool reDraw = false)
 		{
 			imageViewerVM.AddDrawRectList(rectList, System.Windows.Media.Brushes.Red);
 		}
