@@ -19,9 +19,10 @@ namespace Root_WIND2.UI_User
 {
 	class EBRSetup_ViewModel : ObservableObject
 	{
-		private RootViewer_ViewModel drawToolVM;
-
+		private EBR_ImageViewer_ViewModel imageViewerVM;
+		private EBRRecipe recipe;
 		private EBRParameter parameter;
+		private int selectedGrabModeIndex = 0;
 
 		private DataTable measurementDataTable;
 		private SeriesCollection measurementGraph;
@@ -32,10 +33,15 @@ namespace Root_WIND2.UI_User
 		private double sizeTo = 50;
 
 		#region [Getter / Setter]
-		public RootViewer_ViewModel DrawToolVM
+		public EBR_ImageViewer_ViewModel ImageViewerVM
 		{
-			get { return drawToolVM; }
-			set { SetProperty(ref drawToolVM, value); }
+			get { return imageViewerVM; }
+			set { SetProperty(ref imageViewerVM, value); }
+		}
+		public EBRRecipe Recipe
+		{
+			get => recipe;
+			set => SetProperty(ref recipe, value);
 		}
 
 		public EBRParameter Parameter
@@ -46,7 +52,39 @@ namespace Root_WIND2.UI_User
 				SetProperty(ref parameter, value);
 			}
 		}
-		
+
+		public List<string> GrabModeList
+		{
+			get
+			{
+				return ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.p_asGrabMode;
+			}
+		}
+
+		public int SelectedGrabModeIndex
+		{
+			get => this.selectedGrabModeIndex;
+			set
+			{
+				GrabMode mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
+				Run_InspectEBR inspect = ((Run_InspectEBR)((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.CloneModuleRun("InspectEBR"));
+
+				if (mode.m_camera != null)
+				{
+					Recipe.CameraWidth = mode.m_camera.GetRoiSize().X;
+					Recipe.CameraHeight = mode.m_camera.GetRoiSize().Y;
+				}
+
+				if (Recipe.CameraHeight == 0)
+					Recipe.CameraHeight = inspect.Height;
+
+				Recipe.TriggerRatio = mode.m_dCamTriggerRatio;
+				Parameter.CamResolution = mode.m_dResX_um;
+
+				SetProperty<int>(ref this.selectedGrabModeIndex, value);
+			}
+		}
+
 		public DataTable MeasurementDataTable
 		{
 			get => measurementDataTable;
@@ -108,13 +146,49 @@ namespace Root_WIND2.UI_User
 		public string YTitle { get; set; }
 		#endregion
 
+		#region [Command]
+		public RelayCommand btnStart
+		{
+			get => new RelayCommand(() =>
+			{
+				this.ImageViewerVM.ClearObjects();
+				Inspect();
+			});
+		}
+
+		public RelayCommand btnSnap
+		{
+			get => new RelayCommand(() =>
+			{
+				Scan();
+			});
+		}
+
+		public RelayCommand btnStop
+		{
+			get => new RelayCommand(() =>
+			{
+
+			});
+		}
+
+		public RelayCommand btnClear
+		{
+			get => new RelayCommand(() =>
+			{
+				this.ImageViewerVM.ClearObjects();
+			});
+		}
+		#endregion
+
 		public EBRSetup_ViewModel()
 		{
-			DrawToolVM = new RootViewer_ViewModel();
-			DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EBRImage"), GlobalObjects.Instance.Get<DialogService>());
+			ImageViewerVM = new EBR_ImageViewer_ViewModel();
+			ImageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EBRImage"), GlobalObjects.Instance.Get<DialogService>());
 
 			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
-			parameter = recipe.GetItem<EBRParameter>();
+			Recipe = recipe.GetItem<EBRRecipe>();
+			Parameter = recipe.GetItem<EBRParameter>();
 
 			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
 			WorkEventManager.ProcessMeasurementDone += WorkEventManager_ProcessMeasurementDone;
@@ -167,6 +241,7 @@ namespace Root_WIND2.UI_User
 			if (recipe.GetItem<EBRParameter>() == null)
 				return;
 
+			Recipe = recipe.GetItem<EBRRecipe>();
 			Parameter = recipe.GetItem<EBRParameter>();
 		}
 

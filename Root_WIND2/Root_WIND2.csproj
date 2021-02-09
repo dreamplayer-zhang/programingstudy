@@ -300,6 +300,7 @@
       <DependentUpon>EBRSetup.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\EBR\ViewModel\EBRSetup_ViewModel.cs" />
+    <Compile Include="UI_User\EBR\ViewModel\EBR_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\EDGE\EdgesideInspect.xaml.cs">
       <DependentUpon>EdgesideInspect.xaml</DependentUpon>
     </Compile>

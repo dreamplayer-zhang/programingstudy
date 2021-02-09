@@ -11,19 +11,13 @@ namespace Root_WIND2.UI_User
 	class EdgesideSetup_ViewModel : ObservableObject
 	{
 		private Edgeside_ImageViewer_ViewModel drawToolVM;
-
-		private EdgeSurfaceParameterBase parameter;
 		private EdgeSurfaceRecipeBase recipe;
-
+		private EdgeSurfaceParameterBase parameter;
 		private int selectedGrabModeIndex = 0;
 
 		private bool _IsTopChecked = true;
 		private bool _IsSideChecked = false;
 		private bool _IsBtmChecked = false;
-
-		//private DataTable defectDataTable;
-		//private object selectedDefect;
-		//private BitmapSource defectImage;
 
 		#region [Getter / Setter]
 		public Edgeside_ImageViewer_ViewModel DrawToolVM
@@ -32,16 +26,16 @@ namespace Root_WIND2.UI_User
 			set => SetProperty(ref drawToolVM, value);
 		}
 
-		public EdgeSurfaceParameterBase Parameter
-		{
-			get => parameter;
-			set => SetProperty(ref parameter, value);
-		}
-
 		public EdgeSurfaceRecipeBase Recipe
 		{
 			get => recipe;
 			set => SetProperty(ref recipe, value);
+		}
+
+		public EdgeSurfaceParameterBase Parameter
+		{
+			get => parameter;
+			set => SetProperty(ref parameter, value);
 		}
 
 		public int TopOffset
@@ -94,10 +88,6 @@ namespace Root_WIND2.UI_User
 			get
 			{
 				return ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.p_asGrabMode;
-			}
-			set
-			{
-
 			}
 		}
 
@@ -174,40 +164,6 @@ namespace Root_WIND2.UI_User
 				}
 			}
 		}
-
-		//public DataTable DefectDataTable
-		//{
-		//	get => defectDataTable;
-		//	set => SetProperty(ref defectDataTable, value);
-		//}
-
-		//public object SelectedDefect
-		//{
-		//	get => selectedDefect;
-		//	set
-		//	{
-		//		SetProperty(ref selectedDefect, value);
-
-		//		DataRowView selectedRow = (DataRowView)SelectedDefect;
-		//		if (selectedRow != null)
-		//		{
-		//			int nIndex = (int)GetDataGridItem(DefectDataTable, selectedRow, "m_nDefectIndex");
-		//			string sInspectionID = (string)GetDataGridItem(DefectDataTable, selectedRow, "m_strInspectionID");
-		//			string sFileName = nIndex.ToString() + ".bmp";
-		//			DisplayDefectImage(sInspectionID, sFileName);
-		//		}
-		//	}
-		//}
-
-		//public BitmapSource DefectImage
-		//{
-		//	get => defectImage;
-		//	set
-		//	{
-		//		SetProperty(ref defectImage, value);
-		//	}
-
-		//}
 		#endregion
 
 		#region [Command]
@@ -251,73 +207,8 @@ namespace Root_WIND2.UI_User
 			DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
 
 			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
-			Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 			Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop;
-
-			//WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
-			//WorkEventManager.ProcessDefectEdgeDone += WorkEventManager_ProcessDefectEdgeDone;
-		}
-
-		//private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
-		//{
-		//	Workplace workplace = sender as Workplace;
-		//	//List<String> textList = new List<String>();
-		//	//List<CRect> rectList = new List<CRect>();
-
-		//	//foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
-		//	//{
-		//	//	String text = "";
-
-		//	//	rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
-		//	//	textList.Add(text);
-		//	//}
-
-		//	Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-		//	{
-		//		//DrawRectDefect(rectList, textList, e.reDraw);
-		//		UpdateProgress();
-		//	}));
-		//}
-
-		//private void WorkEventManager_ProcessDefectEdgeDone(object sender, ProcessDefectEdgeDoneEventArgs e)
-		//{
-		//	Workplace workplace = sender as Workplace;
-		//	List<CRect> rectList = new List<CRect>();
-		//	List<string> textList = new List<string>();
-
-		//	foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
-		//	{
-		//		String text = "";
-
-		//		rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
-		//		textList.Add(text);
-		//	}
-
-		//	Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-		//	{
-		//		DrawRectDefect(rectList, textList);
-		//		UpdateDefectData();
-		//	}));
-		//}
-
-		public void Scan()
-		{
-			EQ.p_bStop = false;
-			EdgeSideVision edgeSideVision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
-			if (edgeSideVision.p_eState != ModuleBase.eState.Ready)
-			{
-				MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
-				return;
-			}
-
-			Run_GrabEdge grab = (Run_GrabEdge)edgeSideVision.CloneModuleRun("GrabEdge");
-			edgeSideVision.StartRun(grab);
-		}
-
-		public void Inspect()
-		{
-			this.DrawToolVM.ClearObjects();
-			GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();			
+			Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 		}
 
 		private void ChangeViewer(string dataName)
@@ -371,49 +262,5 @@ namespace Root_WIND2.UI_User
 				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm;
 			}
 		}
-
-		//private void DrawRectDefect(List<CRect> rectList, List<String> textList, bool reDraw = false)
-		//{
-		//	DrawToolVM.AddDrawRectList(rectList, System.Windows.Media.Brushes.Red);
-		//}
-
-		//private void UpdateProgress()
-		//{
-
-		//}
-
-		//private void UpdateDefectData()
-		//{
-		//	string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-		//	string sDefect = "defect";
-		//	DefectDataTable = DatabaseManager.Instance.SelectTablewithInspectionID(sDefect, sInspectionID);
-		//}
-
-		//private object GetDataGridItem(DataTable table, DataRowView selectedRow, string sColumnName)
-		//{
-		//	object result;
-		//	for (int i = 0; i < table.Columns.Count; i++)
-		//	{
-		//		if (table.Columns[i].ColumnName == sColumnName)
-		//		{
-		//			result = selectedRow.Row.ItemArray[i];
-		//			return result;
-		//		}
-		//	}
-		//	return null;
-		//}
-
-		//private void DisplayDefectImage(string sInspectionID, string sDefectImageName)
-		//{
-		//	string sDefectimagePath = @"D:\DefectImage";
-		//	sDefectimagePath = Path.Combine(sDefectimagePath, sInspectionID, sDefectImageName);
-		//	if (File.Exists(sDefectimagePath))
-		//	{
-		//		Bitmap defectImage = (Bitmap)Bitmap.FromFile(sDefectimagePath);
-		//		DefectImage = ImageHelper.GetBitmapSourceFromBitmap(defectImage);
-		//	}
-		//	else
-		//		DefectImage = null;
-		//}
 	}
 }

@@ -53,7 +53,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
-            <Button Content="Start" Command="{Binding btnStart}" Style="{StaticResource inspection_menu_button}"/>
+            <Button Content="Inspect" Command="{Binding btnStart}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Snap" Command="{Binding btnSnap}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Stop" Command="{Binding btnStop}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource inspection_menu_button}"/>
@@ -95,7 +95,7 @@
                     <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
 
-                <GroupBox Grid.Row="0" Margin="4,0,4,4"
+                <GroupBox Grid.Row="0" Margin="4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Header="Defect Image">
                     <Grid Background="Black">
@@ -107,7 +107,7 @@
                         </Image>
                     </Grid>
                 </GroupBox>
-                <GroupBox Grid.Row="1"  Margin="4,0,4,4"
+                <GroupBox Grid.Row="1"  Margin="4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Header="Insepction Data">
                     <DataGrid Name="Defect_Viewer"

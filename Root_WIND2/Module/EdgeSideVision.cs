@@ -157,10 +157,10 @@ namespace Root_WIND2.Module
 		public double Pulse360 { get => pulse360; set => pulse360 = value; }
 		//double edgeCamTriggerRatio = 1; //캠익에서 트리거 분주비
 		//public double EdgeCamTriggerRatio { get => edgeCamTriggerRatio; set => edgeCamTriggerRatio = value; }
-		double ebrCamTriggerRatio = 3.0 / 4;
-		public double EbrCamTriggerRatio { get => ebrCamTriggerRatio; set => ebrCamTriggerRatio = value; }
-		double margin = 36000;
-		public double Margin { get => margin; set => margin = value; }
+		//double ebrCamTriggerRatio = 3.0 / 4;
+		//public double EbrCamTriggerRatio { get => ebrCamTriggerRatio; set => ebrCamTriggerRatio = value; }
+		//double margin = 36000;
+		//public double Margin { get => margin; set => margin = value; }
 
 		public override void InitMemorys()
 		{

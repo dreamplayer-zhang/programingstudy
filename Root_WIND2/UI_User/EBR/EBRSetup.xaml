@@ -5,8 +5,47 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2.UI_User" xmlns:tools="clr-namespace:RootTools;assembly=RootTools" xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="800" d:DesignWidth="1600" 
-             Background="{StaticResource PanelBackGround}">
+             d:DesignHeight="800" d:DesignWidth="1600">
+    
+    <UserControl.Resources>
+        <Style x:Key="inspection_menu_button" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource groupbox_button_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource groupbox_button_text}"/>
+            <Setter Property="Margin" Value="4,4,0,4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                CornerRadius="6"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
+                            </Trigger>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_press}"/>
+                                <Setter Property="Foreground" Value="{StaticResource groupbox_button_press_text}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
     
     <Grid Background="{StaticResource main_view_background}">
         <Grid.ColumnDefinitions>
@@ -14,7 +53,18 @@
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
-        <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="46"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <Button Content="Inspect" Command="{Binding btnStart}" Style="{StaticResource inspection_menu_button}"/>
+            <Button Content="Snap" Command="{Binding btnSnap}" Style="{StaticResource inspection_menu_button}"/>
+            <Button Content="Stop" Command="{Binding btnStop}" Style="{StaticResource inspection_menu_button}"/>
+            <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource inspection_menu_button}"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
@@ -24,27 +74,38 @@
                     <ColumnDefinition Width="80*"/>
                     <ColumnDefinition Width="173"/>
                 </Grid.ColumnDefinitions>
-                <GroupBox Grid.Column="0" Margin="4,0,4,4"
-                               Style="{StaticResource main_view_groupbox}"
-                               Header="Image Viewer" >
-                    <tools:RootViewer DataContext="{Binding DrawToolVM}"/>
+                
+                <GroupBox Grid.Column="0" Margin="4"
+                                  Style="{StaticResource main_view_groupbox}"
+                                  Header="Image Viewer"
+                                  DataContext="{Binding ImageViewerVM}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="40"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Column="1"  Orientation="Horizontal">
+                            <TextBlock Text="Image" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Button Content="Open" Command="{Binding btnOpen}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                            <Button Content="Save" Command="{Binding btnSave}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                            <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                        </StackPanel>
+                        <Grid Grid.Row="1" >
+                            <tools:RootViewer/>
+                        </Grid>
+                    </Grid>
                 </GroupBox>
                 <Grid Grid.Column="1">
-                    <GroupBox Grid.Row="0" Margin="4,0,4,4"
+                    <GroupBox Grid.Row="0" Margin="4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Header="Thumbnail">
                     </GroupBox>
                 </Grid>
             </Grid>
         </Grid>
-        <!--<GridSplitter Grid.Column="2" 
-                              HorizontalAlignment="Stretch" 
-                              VerticalAlignment="Stretch" 
-                              Background="{StaticResource Splitter}" 
-                              Width="3"
-                              ShowsPreview="True"/>-->
 
-        <StackPanel Grid.Column="1">
+        <StackPanel Grid.Row="1" Grid.Column="1">
             <Grid Background="{StaticResource main_view_background}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -55,7 +116,7 @@
                         <RowDefinition Height="1*"/>
                         <RowDefinition Height="3*"/>
                     </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="0" Margin="4,0,4,4"
+                    <GroupBox Grid.Row="0" Margin="4"
                               Style="{StaticResource main_view_groupbox}"
                               Header="Scan Information">
                         <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
@@ -71,7 +132,7 @@
                             </Grid>
 
                             <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}"
-                                  DataContext="{Binding Parameter}">
+                                  DataContext="{Binding Recipe}">
                                 <Grid.ColumnDefinitions >
                                     <ColumnDefinition Width="120"/>
                                     <ColumnDefinition Width="33"/>
@@ -81,9 +142,9 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Camera" Style="{StaticResource group_box_item_name_text}"/>
                                 <TextBlock Text="W" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamWidth}" HorizontalContentAlignment="Center"/>
+                                <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CameraWidth}" HorizontalContentAlignment="Center"/>
                                 <TextBlock Text="H" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamHeight}" HorizontalContentAlignment="Center"/>
+                                <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CameraHeight}" HorizontalContentAlignment="Center"/>
                             </Grid>
 
                             <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}"
@@ -98,7 +159,7 @@
                         </StackPanel>
                     </GroupBox>
 
-                    <GroupBox Grid.Row="1" Margin="4,0,4,4"
+                    <GroupBox Grid.Row="1" Margin="4"
                               Style="{StaticResource main_view_groupbox}"
                               Header="Light">
                         <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
@@ -128,7 +189,7 @@
                         </StackPanel>
                     </GroupBox>
 
-                    <GroupBox Grid.Row="2" Margin="4,0,4,4" Style="{StaticResource main_view_groupbox}" 
+                    <GroupBox Grid.Row="2" Margin="4" Style="{StaticResource main_view_groupbox}" 
                               Header="Spec" DataContext="{Binding Parameter}">
                         <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
                             <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
@@ -226,13 +287,13 @@
             </Grid>
         </StackPanel>
         
-        <Grid Grid.Column="2"
-                  Background="{StaticResource main_view_background}">
+        <Grid Grid.Row="2" Grid.Column="2"
+              Background="{StaticResource main_view_background}">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition Height="2*"/>
             </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0" Grid.Column="1" Header="Graph" Margin="4,0,4,4"
+            <GroupBox Grid.Row="0" Grid.Column="1" Header="Graph" Margin="4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Background="{StaticResource GroupBoxBackground}">
                 <Grid Background="White">
@@ -255,7 +316,7 @@
                     </lvc:CartesianChart>
                 </Grid>
             </GroupBox>
-            <GroupBox Grid.Row="1" Grid.Column="1" Header="Measurement Data" Margin="4,0,4,4"
+            <GroupBox Grid.Row="1" Grid.Column="1" Header="Measurement Data" Margin="4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Background="{StaticResource GroupBoxBackground}">
                 <DataGrid Name="Defect_Viewer"
