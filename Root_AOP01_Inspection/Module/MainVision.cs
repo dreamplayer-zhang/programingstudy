@@ -3027,7 +3027,6 @@ namespace Root_AOP01_Inspection.Module
                 Image<Gray, byte> imgTemplate;
                 Point ptStart, ptEnd;
                 CRect crtSearchArea;
-                Mat matSearchArea;
                 CPoint cptSearchAreaCenter;
                 bool bFound = false;
                 Mat[] matarr = new Mat[4];
@@ -3068,8 +3067,7 @@ namespace Root_AOP01_Inspection.Module
                     ptStart = new Point(cptSearchAreaCenter.X - (m_nSearchArea / 2), cptSearchAreaCenter.Y - (m_nSearchArea / 2));
                     ptEnd = new Point(cptSearchAreaCenter.X + (m_nSearchArea / 2), cptSearchAreaCenter.Y + (m_nSearchArea / 2));
                     crtSearchArea = new CRect(ptStart, ptEnd);
-                    matSearchArea = m_module.GetMatImage(mem, crtSearchArea);
-                    imgSearchArea = matSearchArea.ToImage<Gray, byte>();
+                    imgSearchArea = m_module.GetGrayByteImageFromMemory(mem, crtSearchArea);
                     CPoint cptFoundCenter;
                     bFound = m_module.TemplateMatching(mem, crtSearchArea, imgSearchArea, imgTemplate, out cptFoundCenter, m_dMatchScore);
 
@@ -3078,10 +3076,9 @@ namespace Root_AOP01_Inspection.Module
                         ptStart = new Point(cptFoundCenter.X - (imgTemplate.Width / 2), cptFoundCenter.Y - (imgTemplate.Height / 2));
                         ptEnd = new Point(cptFoundCenter.X + (imgTemplate.Width / 2), cptFoundCenter.Y + (imgTemplate.Height / 2));
                         CRect crtFoundRect = new CRect(ptStart, ptEnd);
-                        Mat matFound = m_module.GetMatImage(mem, crtFoundRect);
-                        Mat matBinary = new Mat();
-                        CvInvoke.Threshold(matFound, matBinary, m_nThreshold, 128, ThresholdType.BinaryInv);
-                        Image<Gray, byte> imgBinary = matBinary.ToImage<Gray, byte>();
+                        Image<Gray, byte> imgFound = m_module.GetGrayByteImageFromMemory(mem, crtFoundRect);
+                        Image<Gray, byte> imgBinary = imgFound.ThresholdBinaryInv(new Gray(m_nThreshold), new Gray(128));
+                        Mat matBinary = imgBinary.Mat;
                         CvBlobs blobs = new CvBlobs();
                         CvBlobDetector blobDetector = new CvBlobDetector();
                         blobDetector.Detect(imgBinary, blobs);
@@ -3112,7 +3109,6 @@ namespace Root_AOP01_Inspection.Module
                             CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
                         }
                         matarr[i] = matResult.Clone();
-                        //matResult.Save("D:\\TEST" + i + ".bmp");
                     }
 
                     m_module.p_nAlignKeyProgressValue++;
@@ -3163,7 +3159,7 @@ namespace Root_AOP01_Inspection.Module
                                 }
                             }
                             Image<Gray, byte> imgSub = new Image<Gray, byte>(barrMaster);
-                            //imgSub = imgSub.Erode(1);
+                            imgSub = imgSub.Erode(1);
 
                             // 차영상 Blob 결과
                             bool bResult = GetResultFromImage(imgSub);
