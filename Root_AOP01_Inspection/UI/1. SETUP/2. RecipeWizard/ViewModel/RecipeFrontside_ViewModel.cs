@@ -558,7 +558,7 @@ namespace Root_AOP01_Inspection
                     {
                         MainVision.Run_PatternShiftAndRotation patternShiftAndRotation = (MainVision.Run_PatternShiftAndRotation)mainVision.CloneModuleRun("PatternShiftAndRotation");
                         patternShiftAndRotation.m_dMatchScore = p_dPatternShiftAndRotationTemplateMatchingScore / 100;
-                        patternShiftAndRotation.m_dNGSpecDistance_um = p_dPatternShiftAndRotationShiftSpec;
+                        patternShiftAndRotation.m_dNGSpecDistance_mm = p_dPatternShiftAndRotationShiftSpec;
                         patternShiftAndRotation.m_dNGSpecDegree = p_dPatternShiftAndRotationRotationSpec;
                         mainVision.StartRun(patternShiftAndRotation);
                     }
@@ -566,7 +566,7 @@ namespace Root_AOP01_Inspection
                     if (p_bEnablePellicleShift)
                     {
                         MainVision.Run_PellicleShiftAndRotation pellicleShiftAndRotation = (MainVision.Run_PellicleShiftAndRotation)mainVision.CloneModuleRun("PellicleShiftAndRotation");
-                        pellicleShiftAndRotation.m_dNGSpecDistance_um = p_dPellicleShiftAndRotationShiftSpec;
+                        pellicleShiftAndRotation.m_dNGSpecDistance_mm = p_dPellicleShiftAndRotationShiftSpec;
                         pellicleShiftAndRotation.m_dNGSpecDegree = p_dPellicleShiftAndRotationRotationSpec;
                         mainVision.StartRun(pellicleShiftAndRotation);
                     }
