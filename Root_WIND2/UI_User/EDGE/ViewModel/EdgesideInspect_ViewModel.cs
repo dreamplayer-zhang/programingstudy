@@ -84,8 +84,7 @@ namespace Root_WIND2.UI_User
 				this.ImageViewerTopVM.ClearObjects();
 				this.ImageViewerSideVM.ClearObjects();
 				this.ImageViewerBtmVM.ClearObjects();
-
-				GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();
+				Inspect();
 			});
 		}
 
@@ -93,16 +92,7 @@ namespace Root_WIND2.UI_User
 		{
 			get => new RelayCommand(() =>
 			{
-				EQ.p_bStop = false;
-				EdgeSideVision edgeSideVision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
-				if (edgeSideVision.p_eState != ModuleBase.eState.Ready)
-				{
-					MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
-					return;
-				}
-
-				Run_GrabEdge grab = (Run_GrabEdge)edgeSideVision.CloneModuleRun("GrabEdge");
-				edgeSideVision.StartRun(grab);
+				Scan();
 			});
 		}
 
@@ -136,6 +126,25 @@ namespace Root_WIND2.UI_User
 
 			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
 			WorkEventManager.ProcessDefectEdgeDone += WorkEventManager_ProcessDefectEdgeDone;
+		}
+
+		public void Scan()
+		{
+			EQ.p_bStop = false;
+			EdgeSideVision edgeSideVision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
+			if (edgeSideVision.p_eState != ModuleBase.eState.Ready)
+			{
+				MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+				return;
+			}
+
+			Run_GrabEdge grab = (Run_GrabEdge)edgeSideVision.CloneModuleRun("GrabEdge");
+			edgeSideVision.StartRun(grab);
+		}
+
+		public void Inspect()
+		{
+			GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();
 		}
 
 		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)

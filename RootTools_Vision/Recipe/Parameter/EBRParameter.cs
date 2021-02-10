@@ -25,6 +25,9 @@ namespace RootTools_Vision
 		private int diffEBR;
 		private int offsetBevel;
 		private int offsetEBR;
+
+		// 카메라 정보
+		private double camResolution = 0;
 		#endregion
 
 		#region [Getter/Setter]
@@ -116,6 +119,15 @@ namespace RootTools_Vision
 			set
 			{
 				SetProperty<int>(ref this.offsetEBR, value);
+			}
+		}
+		[Category("Parameter")]
+		public double CamResolution
+		{
+			get => this.camResolution;
+			set
+			{
+				SetProperty<double>(ref this.camResolution, value);
 			}
 		}
 
