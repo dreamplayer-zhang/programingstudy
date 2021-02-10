@@ -698,19 +698,6 @@ namespace RootTools
                             }
                         }
 
-//                         Parallel.For(0, p_CanvasHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (yy) =>
-//                         {
-//                             {
-//                                 long pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
-// 
-//                                 for (int xx = 0; xx < p_CanvasWidth; xx++)
-//                                 {
-//                                     long pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
-// 									view.Data[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * p_ImageData.p_Size.X];
-//                                 }
-//                             }
-//                         });
-
                         p_ImgSource = ImageHelper.ToBitmapSource(view);
 
 						p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / m_ImageData.p_Size.Y), 0, 0);
@@ -771,66 +758,81 @@ namespace RootTools
 			RedrawingElement();
 		}
 
-		static object objLock = new object();
-
 		public unsafe Image<Gray, byte> GetSamplingGrayImage()
+		{
+			Rect rect = new Rect(p_View_Rect.X, p_View_Rect.Y, p_View_Rect.Width, p_View_Rect.Height);
+			return GetSamplingGrayImage(m_ImageData, rect, p_CanvasWidth, p_CanvasHeight);
+		}
+		public unsafe Image<Gray, byte> GetSamplingGrayImage(ImageData imgData, Rect rect, int canvasWidth, int canvasHeight)
         {
-            IntPtr ptrMem = m_ImageData.GetPtr();
+			IntPtr ptrMem = imgData.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return null;
 
-            Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
-
-            Parallel.For(0, p_CanvasHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (yy) =>
-            {
-                {
-                    long pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
-
-                    for (int xx = 0; xx < p_CanvasWidth; xx++)
-                    {
-                        long pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
-                        view.Data[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * p_ImageData.p_Size.X];
-                    }
-                }
-            });
-
-			return view;
-        }
-        public unsafe Image<Rgb, byte> GetSamplingRgbImage()
-        {
-            IntPtr ptrMem = m_ImageData.GetPtr();
-            if (ptrMem == IntPtr.Zero)
-                return null;
-
-            Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
+            Image<Gray, byte> view = new Image<Gray, byte>(canvasWidth, canvasHeight);
 
             byte[,,] viewPtr = view.Data;
-            byte* imageptr = (byte*)p_ImageData.GetPtr();
+            byte* imageptr = (byte*)imgData.GetPtr();
 
-            int viewrectY = p_View_Rect.Y;
-            int viewrectX = p_View_Rect.X;
-            int viewrectHeight = p_View_Rect.Height;
-            int viewrectWidth = p_View_Rect.Width;
-            int sizeX = p_ImageData.p_Size.X;
-
-            Parallel.For(0, p_CanvasHeight, (yy) =>
+            Parallel.For(0, canvasHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (yy) =>
             {
                 {
-                    long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-                    for (int xx = 0; xx < p_CanvasWidth; xx++)
-                    {
-                        long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                    long pix_y = (long)(rect.Y + yy * rect.Height / canvasHeight);
 
-                        viewPtr[yy, xx, 0] = imageptr[(pix_x * this.p_ImageData.p_nByte + 0) + (long)pix_y * (sizeX * 3)];
-                        viewPtr[yy, xx, 1] = imageptr[(pix_x * this.p_ImageData.p_nByte + 1) + (long)pix_y * (sizeX * 3)];
-                        viewPtr[yy, xx, 2] = imageptr[(pix_x * this.p_ImageData.p_nByte + 2) + (long)pix_y * (sizeX * 3)];
+                    for (int xx = 0; xx < canvasWidth; xx++)
+                    {
+                        long pix_x = (long)(rect.X + xx * rect.Width / canvasWidth);
+                        view.Data[yy, xx, 0] = imageptr[pix_x + (long)pix_y * imgData.p_Size.X];
                     }
                 }
             });
 
             return view;
         }
-        public void SetImageSource(Image<Gray, byte> img)
+		public unsafe Image<Rgb, byte> GetSamplingRgbImage()
+        {
+			Rect rect = new Rect(p_View_Rect.X, p_View_Rect.Y, p_View_Rect.Width, p_View_Rect.Height);
+			return GetSamplingRgbImage(m_ImageData, rect, p_CanvasWidth, p_CanvasHeight);
+        }
+		public unsafe Image<Rgb, byte> GetSamplingRgbImage(ImageData imgData, Rect rect, int canvasWidth, int canvasHeight, bool isRgbOrder = true)
+        {
+            IntPtr ptrMem = imgData.GetPtr();
+            if (ptrMem == IntPtr.Zero)
+                return null;
+
+            Image<Rgb, byte> view = new Image<Rgb, byte>(canvasWidth, canvasHeight);
+
+			byte[,,] viewPtr = view.Data;
+            byte* imageptr = (byte*)imgData.GetPtr();
+
+            Parallel.For(0, canvasHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (yy) =>
+			{
+                {
+                    long pix_y = (long)(rect.Y + yy * rect.Height / canvasHeight);
+                    for (int xx = 0; xx < canvasWidth; xx++)
+                    {
+                        long pix_x = (long)(rect.X + xx * rect.Width / canvasWidth);
+
+                        if (isRgbOrder)
+                        {
+                            viewPtr[yy, xx, 0] = imageptr[(pix_x * imgData.p_nByte + 0) + (long)pix_y * (imgData.p_Size.X * 3)];
+                            viewPtr[yy, xx, 1] = imageptr[(pix_x * imgData.p_nByte + 1) + (long)pix_y * (imgData.p_Size.X * 3)];
+                            viewPtr[yy, xx, 2] = imageptr[(pix_x * imgData.p_nByte + 2) + (long)pix_y * (imgData.p_Size.X * 3)];
+                        }
+                        else
+						{
+                            viewPtr[yy, xx, 2] = imageptr[(pix_x * imgData.p_nByte + 0) + (long)pix_y * (imgData.p_Size.X * 3)];
+                            viewPtr[yy, xx, 1] = imageptr[(pix_x * imgData.p_nByte + 1) + (long)pix_y * (imgData.p_Size.X * 3)];
+                            viewPtr[yy, xx, 0] = imageptr[(pix_x * imgData.p_nByte + 2) + (long)pix_y * (imgData.p_Size.X * 3)];
+                        }
+                    }
+                }
+            });
+
+            return view;
+        }
+
+		public void SetImageSource(Image<Gray, byte> img)
         {
             try
 			{
