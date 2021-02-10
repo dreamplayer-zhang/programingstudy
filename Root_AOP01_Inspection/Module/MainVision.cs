@@ -1028,6 +1028,7 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_PatternShiftAndRotation(this), true, "Run PatternShiftAndRotation");
             AddModuleRunList(new Run_AlignKeyInspection(this), true, "Run AlignKeyInspection");
             AddModuleRunList(new Run_PellicleShiftAndRotation(this), true, "Run PellicleShiftAndRotation");
+            AddModuleRunList(new Run_PellicleExpandingInspection(this), true, "Run PellicleExpanding");
             var main = new Run_SurfaceInspection(this, App.MainRecipeRegName, App.MainInspMgRegName);
             main.m_sModuleRun = App.MainModuleName;// "MainSurfaceInspection";
             AddModuleRunList(main, true, "Run MainSurfaceInspection");
@@ -4210,7 +4211,6 @@ namespace Root_AOP01_Inspection.Module
                 int nImgWidth = 100; //grabMode.m_camera.GetRoiSize().X;
                 int nImgHeight = 100; //grabMode.m_camera.GetRoiSize().Y;
                 double[] daHeight = new double[nImgWidth];
-
                 // implement
                 byte* pSrc = (byte*)img.GetPtr().ToPointer();
                 for (int x = 0; x < nImgWidth; x++, pSrc++)
@@ -4218,11 +4218,13 @@ namespace Root_AOP01_Inspection.Module
                     byte* pSrcY = pSrc;
                     int nSum = 0;
                     int nYSum = 0;
+                    
                     for (int y = 0; y < nImgHeight; y++, pSrcY += nImgWidth)
                     {
-                        if (*pSrcY < m_nLaserThreshold) continue;
-                        nSum += *pSrcY;
-                        nYSum += *pSrcY * y;
+                        int b = *pSrcY;
+                        if (b < m_nLaserThreshold) continue;
+                        nSum += b;
+                        nYSum += b * y;
                     }
                     int iIndex = x;
                     daHeight[iIndex] = (nSum != 0) ? ((double)nYSum / (double)nSum) : 0.0;
