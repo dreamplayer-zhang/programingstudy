@@ -504,7 +504,7 @@ namespace Root_EFEM.Module
                 p_infoCarrier.m_bReqLoad = false;
                 StartRun(m_runDocking);
             }
-            if (p_infoCarrier.m_bReqUnload)
+            if (p_infoCarrier.m_bReqUnload && p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
             {
                 p_infoCarrier.m_bReqUnload = false;
                 StartRun(m_runUndocking);
@@ -851,18 +851,23 @@ namespace Root_EFEM.Module
                     Thread.Sleep(10);
                     if (EQ.p_bStop) return p_sInfo + "EQ Stop";
                 }
-                foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
+                //foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
+                //{
+                //    while(pj.p_eState != GemPJ.eState.Processing && m_gem.p_cjRun.p_eState != GemCJ.eState.Excuting)
+                //    {
+                //        Thread.Sleep(10);
+                //        if (EQ.p_bStop) return p_sInfo + "EQ Stop";
+                //    }
+                //    break;
+                //}
+                while(m_infoCarrier.p_eAccess != GemCarrierBase.eAccess.InAccessed)
                 {
-                    while(pj.p_eState != GemPJ.eState.Processing && m_gem.p_cjRun.p_eState != GemCJ.eState.Excuting)
-                    {
-                        Thread.Sleep(10);
-                        if (EQ.p_bStop) return p_sInfo + "EQ Stop";
-                    }
-                    break;
+                    Thread.Sleep(10);
+                    if (EQ.p_bStop) return p_sInfo + "EQ Stop";
                 }
-                for(int i=0; i<m_infoCarrier.m_aGemSlot.Count; i++)
+                for (int i=0; i<m_infoCarrier.m_aGemSlot.Count; i++)
                 {
-                    if (m_infoCarrier.m_aGemSlot[i].p_eState == GemSlotBase.eState.Exist) 
+                    if (m_infoCarrier.m_aGemSlot[i].p_eState == GemSlotBase.eState.Select) 
                         m_infoCarrier.StartProcess(m_infoCarrier.m_aGemSlot[i].p_id);
                 }
 

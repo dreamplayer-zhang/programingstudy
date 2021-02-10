@@ -17,6 +17,7 @@ namespace Root_AOP01_Packing
         {
             m_Mainwindow = main;
             m_Engineer = engineer;
+            Init();
         }
         private void Init()
         {

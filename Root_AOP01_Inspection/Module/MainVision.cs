@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -1027,6 +1028,7 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_PatternShiftAndRotation(this), true, "Run PatternShiftAndRotation");
             AddModuleRunList(new Run_AlignKeyInspection(this), true, "Run AlignKeyInspection");
             AddModuleRunList(new Run_PellicleShiftAndRotation(this), true, "Run PellicleShiftAndRotation");
+            AddModuleRunList(new Run_PellicleExpandingInspection(this), true, "Run PellicleExpanding");
             var main = new Run_SurfaceInspection(this, App.MainRecipeRegName, App.MainInspMgRegName);
             main.m_sModuleRun = App.MainModuleName;// "MainSurfaceInspection";
             AddModuleRunList(main, true, "Run MainSurfaceInspection");
@@ -2690,7 +2692,7 @@ namespace Root_AOP01_Inspection.Module
                 img.SetData(p, crtROI, (int)mem.W);
                 int nFlipCount = 0;
                 bool bCurrentDark = false;
-                if (bDarkBackground) bCurrentDark = true;
+                bool bPreDark = true;
 
                 switch (eDirection)
                 {
@@ -2702,21 +2704,12 @@ namespace Root_AOP01_Inspection.Module
                             for (int y = 0; y < img.p_Size.Y; y++)
                             {
                                 bp = (byte*)img.GetPtr() + y * img.p_Stride + x;
-                                if (bDarkBackground)
+                                if (*bp > nThreshold) bCurrentDark = false;
+                                else bCurrentDark = true;
+                                if (bPreDark != bCurrentDark)
                                 {
-                                    if (*bp > nThreshold)
-                                    {
-                                        bCurrentDark = !bCurrentDark;
-                                        nFlipCount++;
-                                    }
-                                }
-                                else
-                                {
-                                    if (*bp < nThreshold)
-                                    {
-                                        bCurrentDark = !bCurrentDark;
-                                        nFlipCount++;
-                                    }
+                                    nFlipCount++;
+                                    bPreDark = bCurrentDark;
                                 }
                             }
                             if (nFlipCount > 30) return x;
@@ -2732,21 +2725,12 @@ namespace Root_AOP01_Inspection.Module
                             for (int y = 0; y < img.p_Size.Y; y++)
                             {
                                 bp = (byte*)img.GetPtr() + y * img.p_Stride + x;
-                                if (bDarkBackground)
+                                if (*bp > nThreshold) bCurrentDark = false;
+                                else bCurrentDark = true;
+                                if (bPreDark != bCurrentDark)
                                 {
-                                    if (*bp > nThreshold)
-                                    {
-                                        bCurrentDark = !bCurrentDark;
-                                        nFlipCount++;
-                                    }
-                                }
-                                else
-                                {
-                                    if (*bp < nThreshold)
-                                    {
-                                        bCurrentDark = !bCurrentDark;
-                                        nFlipCount++;
-                                    }
+                                    nFlipCount++;
+                                    bPreDark = bCurrentDark;
                                 }
                             }
                             if (nFlipCount > 30) return x;
@@ -2794,6 +2778,8 @@ namespace Root_AOP01_Inspection.Module
                         m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
                 });
                 matReturn = img.Mat;
+
+                m_module.p_nBarcodeInspectionProgressPercent = 100;
 
                 return matReturn;
             }
@@ -3249,7 +3235,7 @@ namespace Root_AOP01_Inspection.Module
             MainVision m_module;
             public int m_nSearchArea = 2000;
             public double m_dMatchScore = 0.95;
-            public double m_dNGSpecDistance_um = 100.0;
+            public double m_dNGSpecDistance_mm = 500.0;
             public double m_dNGSpecDegree = 0.5;
 
             public Run_PatternShiftAndRotation(MainVision module)
@@ -3263,7 +3249,7 @@ namespace Root_AOP01_Inspection.Module
                 Run_PatternShiftAndRotation run = new Run_PatternShiftAndRotation(m_module);
                 run.m_nSearchArea = m_nSearchArea;
                 run.m_dMatchScore = m_dMatchScore;
-                run.m_dNGSpecDistance_um = m_dNGSpecDistance_um;
+                run.m_dNGSpecDistance_mm = m_dNGSpecDistance_mm;
                 run.m_dNGSpecDegree = m_dNGSpecDegree;
                 return run;
             }
@@ -3272,7 +3258,7 @@ namespace Root_AOP01_Inspection.Module
             {
                 m_nSearchArea = tree.Set(m_nSearchArea, m_nSearchArea, "Search Area Size [px]", "Search Area Size [px]", bVisible);
                 m_dMatchScore = tree.Set(m_dMatchScore, m_dMatchScore, "Template Matching Score [0.0~1.0]", "Template Matching Score [0.0~1.0]", bVisible);
-                m_dNGSpecDistance_um = tree.GetTree("NG Spec", false, bVisible).Set(m_dNGSpecDistance_um, m_dNGSpecDistance_um, "Distance NG Spec [um]", "Distance NG Spec [um]", bVisible);
+                m_dNGSpecDistance_mm = tree.GetTree("NG Spec", false, bVisible).Set(m_dNGSpecDistance_mm, m_dNGSpecDistance_mm, "Distance NG Spec [mm]", "Distance NG Spec [mm]", bVisible);
                 m_dNGSpecDegree = tree.GetTree("NG Spec", false, bVisible).Set(m_dNGSpecDegree, m_dNGSpecDegree, "Degree NG Spec", "Degree NG Spec", bVisible);
             }
 
@@ -3390,6 +3376,7 @@ namespace Root_AOP01_Inspection.Module
                     //matSearchArea = m_module.GetMatImage(mem, crtSearchArea);
                     //imgSearchArea = matSearchArea.ToImage<Gray, byte>();
                     imgSearchArea = m_module.GetGrayByteImageFromMemory(mem, crtSearchArea);
+                    imgSearchArea.Save("D:\\TEST.BMP");
                     CPoint cptFoundCenter;
                     bFound = m_module.TemplateMatching(mem, crtSearchArea, imgSearchArea, imgTemplate, out cptFoundCenter, m_dMatchScore);
                     if (bFound) cptarrInResultCenterPositions[i] = new CPoint(cptFoundCenter);
@@ -3403,7 +3390,7 @@ namespace Root_AOP01_Inspection.Module
                 // Get distance From InFeatureCentroid & OutFeatureCentroid
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
                 double dResultDistance = m_module.GetDistanceOfTwoPoint(cptInFeatureCentroid, cptOutFeatureCentroid);
-                m_module.p_dPatternShiftDistance = dResultDistance * moduleRunGrab.m_dResY_um;
+                m_module.p_dPatternShiftDistance = dResultDistance * moduleRunGrab.m_dResY_um / 1000;
 
                 // Get Degree
                 CPoint cptOutLeftCenter = new CPoint((cptarrOutResultCenterPositions[(int)eSearchPoint.LT].X + cptarrOutResultCenterPositions[(int)eSearchPoint.LB].X) / 2,
@@ -3429,7 +3416,7 @@ namespace Root_AOP01_Inspection.Module
                 //m_module.p_dPatternShiftAngle = dThetaDegree;
 
                 // Judgement
-                if (m_dNGSpecDistance_um < (dResultDistance * moduleRunGrab.m_dResY_um))
+                if (m_dNGSpecDistance_mm < (dResultDistance * moduleRunGrab.m_dResY_um / 1000))
                 {
                     m_module.p_bPatternShiftPass = false;
                 }
@@ -3537,7 +3524,6 @@ namespace Root_AOP01_Inspection.Module
                 Image<Gray, byte> imgTemplate;
                 Point ptStart, ptEnd;
                 CRect crtSearchArea;
-                Mat matSearchArea;
                 CPoint cptSearchAreaCenter;
                 bool bFound = false;
                 Mat[] matarr = new Mat[4];
@@ -3578,8 +3564,7 @@ namespace Root_AOP01_Inspection.Module
                     ptStart = new Point(cptSearchAreaCenter.X - (m_nSearchArea / 2), cptSearchAreaCenter.Y - (m_nSearchArea / 2));
                     ptEnd = new Point(cptSearchAreaCenter.X + (m_nSearchArea / 2), cptSearchAreaCenter.Y + (m_nSearchArea / 2));
                     crtSearchArea = new CRect(ptStart, ptEnd);
-                    matSearchArea = m_module.GetMatImage(mem, crtSearchArea);
-                    imgSearchArea = matSearchArea.ToImage<Gray, byte>();
+                    imgSearchArea = m_module.GetGrayByteImageFromMemory(mem, crtSearchArea);
                     CPoint cptFoundCenter;
                     bFound = m_module.TemplateMatching(mem, crtSearchArea, imgSearchArea, imgTemplate, out cptFoundCenter, m_dMatchScore);
 
@@ -3588,10 +3573,9 @@ namespace Root_AOP01_Inspection.Module
                         ptStart = new Point(cptFoundCenter.X - (imgTemplate.Width / 2), cptFoundCenter.Y - (imgTemplate.Height / 2));
                         ptEnd = new Point(cptFoundCenter.X + (imgTemplate.Width / 2), cptFoundCenter.Y + (imgTemplate.Height / 2));
                         CRect crtFoundRect = new CRect(ptStart, ptEnd);
-                        Mat matFound = m_module.GetMatImage(mem, crtFoundRect);
-                        Mat matBinary = new Mat();
-                        CvInvoke.Threshold(matFound, matBinary, m_nThreshold, 128, ThresholdType.BinaryInv);
-                        Image<Gray, byte> imgBinary = matBinary.ToImage<Gray, byte>();
+                        Image<Gray, byte> imgFound = m_module.GetGrayByteImageFromMemory(mem, crtFoundRect);
+                        Image<Gray, byte> imgBinary = imgFound.ThresholdBinaryInv(new Gray(m_nThreshold), new Gray(128));
+                        Mat matBinary = imgBinary.Mat;
                         CvBlobs blobs = new CvBlobs();
                         CvBlobDetector blobDetector = new CvBlobDetector();
                         blobDetector.Detect(imgBinary, blobs);
@@ -3608,21 +3592,20 @@ namespace Root_AOP01_Inspection.Module
                         CRect crtBoundingBox;
                         Mat matResult = FloodFill(matBinary, ptsContour[0], 255, out crtBoundingBox, Connectivity.EightConnected);
                         matResult = matResult - matBinary;
-                        //if (i == (int)eSearchPoint.RT)  // Flip Horizontal
-                        //{
-                        //    CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
-                        //}
-                        //else if (i == (int)eSearchPoint.RB) // Flip Horizontal & Vertical
-                        //{
-                        //    CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
-                        //    CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
-                        //}
-                        //else if (i == (int)eSearchPoint.LB) // Flip Vertical
-                        //{
-                        //    CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
-                        //}
+                        if (i == (int)eSearchPoint.RT)  // Flip Horizontal
+                        {
+                            CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
+                        }
+                        else if (i == (int)eSearchPoint.RB) // Flip Horizontal & Vertical
+                        {
+                            CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
+                            CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
+                        }
+                        else if (i == (int)eSearchPoint.LB) // Flip Vertical
+                        {
+                            CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
+                        }
                         matarr[i] = matResult.Clone();
-                        //matResult.Save("D:\\TEST" + i + ".bmp");
                     }
 
                     m_module.p_nAlignKeyProgressValue++;
@@ -3673,7 +3656,7 @@ namespace Root_AOP01_Inspection.Module
                                 }
                             }
                             Image<Gray, byte> imgSub = new Image<Gray, byte>(barrMaster);
-                            //imgSub = imgSub.Erode(1);
+                            imgSub = imgSub.Erode(1);
 
                             // 차영상 Blob 결과
                             bool bResult = GetResultFromImage(imgSub);
@@ -3855,7 +3838,7 @@ namespace Root_AOP01_Inspection.Module
             public int m_nFrameEdgeThreshold = 40;
             public int m_nSearchArea = 100;
 
-            public double m_dNGSpecDistance_um = 100.0;
+            public double m_dNGSpecDistance_mm = 0.3;
             public double m_dNGSpecDegree = 0.5;
 
             public CPoint m_cptReticleEdgeTLROI = new CPoint();
@@ -3893,7 +3876,7 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nFrameEdgeThreshold = m_nFrameEdgeThreshold;
                 run.m_nSearchArea = m_nSearchArea;
 
-                run.m_dNGSpecDistance_um = m_dNGSpecDistance_um;
+                run.m_dNGSpecDistance_mm = m_dNGSpecDistance_mm;
                 run.m_dNGSpecDegree = m_dNGSpecDegree;
 
                 run.m_cptReticleEdgeTLROI = m_cptReticleEdgeTLROI;
@@ -3927,7 +3910,7 @@ namespace Root_AOP01_Inspection.Module
                 m_nFrameEdgeThreshold = tree.Set(m_nFrameEdgeThreshold, m_nFrameEdgeThreshold, "Frame Edge Threshold", "Frame Edge Threshold", bVisible);
                 m_nSearchArea = tree.Set(m_nSearchArea, m_nSearchArea, "Search Area", "Search Area", bVisible);
 
-                m_dNGSpecDistance_um = tree.Set(m_dNGSpecDistance_um, m_dNGSpecDistance_um, "Distance NG Spec [um]", "Distance NG Spec [um]", bVisible);
+                m_dNGSpecDistance_mm = tree.Set(m_dNGSpecDistance_mm, m_dNGSpecDistance_mm, "Distance NG Spec [mm]", "Distance NG Spec [mm]", bVisible);
                 m_dNGSpecDegree = tree.Set(m_dNGSpecDegree, m_dNGSpecDegree, "Degree NG Spec", "Degree NG Spec", bVisible);
 
                 m_cptReticleEdgeTLROI = tree.Set(m_cptReticleEdgeTLROI, m_cptReticleEdgeTLROI, "TL Reticle Edge", "TL Reticle Edge", bVisible);
@@ -3956,6 +3939,7 @@ namespace Root_AOP01_Inspection.Module
                 double dReticleAngle = 0;
                 double dFrameAngle = 0;
 
+                m_module.p_bPellicleShiftPass = true;
                 m_module.p_nPellicleShiftProgressValue = 0;
                 m_module.p_nPellicleShiftProgressMin = 0;
                 m_module.p_nPellicleShiftProgressMax = 16;
@@ -4128,12 +4112,10 @@ namespace Root_AOP01_Inspection.Module
                 double dResultAngle = Math.Abs(dFrameAngle - dReticleAngle);
 
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
-                if (m_dNGSpecDistance_um < (dResultDistance * moduleRunGrab.m_dResY_um)) m_module.p_bPellicleShiftPass = false;
-                else m_module.p_bPellicleShiftPass = true;
+                if (m_dNGSpecDistance_mm < (dResultDistance * moduleRunGrab.m_dResY_um)) m_module.p_bPellicleShiftPass = false;
                 if (m_dNGSpecDegree < m_module.p_dPatternShiftAngle) m_module.p_bPellicleShiftPass = false;
-                else m_module.p_bPellicleShiftPass = true;
 
-                m_module.p_dPellicleShiftDistance = dResultDistance;
+                m_module.p_dPellicleShiftDistance = dResultDistance * moduleRunGrab.m_dResY_um / 1000;
                 m_module.p_dPellicleShiftAngle = dResultAngle;
                 
                 return "OK";
@@ -4178,7 +4160,7 @@ namespace Root_AOP01_Inspection.Module
                 MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                 int nMMPerUM = 1000;
                 int nReticleSizeY_px = Convert.ToInt32(moduleRunLADS.m_nReticleSize_mm * nMMPerUM / moduleRunLADS.m_dResY_um);  // 레티클 영역의 Y픽셀 갯수
-                int nCamHeight = 480;//grabMode.m_camera.GetRoiSize().Y;
+                int nCamHeight = 100;//grabMode.m_camera.GetRoiSize().Y;
                 
                 // implement
                 ladsinfos.Clear();
@@ -4203,8 +4185,8 @@ namespace Root_AOP01_Inspection.Module
             {
                 GrabMode grabMode = m_module.GetGrabMode("LADS");
                 IntPtr p = mem.GetPtr();
-                int nCamWidth = 640; //grabMode.m_camera.GetRoiSize().X;
-                int nCamHeight = 480; //grabMode.m_camera.GetRoiSize().Y;
+                int nCamWidth = 100; //grabMode.m_camera.GetRoiSize().X;
+                int nCamHeight = 100; //grabMode.m_camera.GetRoiSize().Y;
                 int nCount = nReticleHeight_px / nCamHeight;
                 LADSInfo ladsinfo = new LADSInfo(new RPoint(), 0, nCount);
 
@@ -4226,10 +4208,9 @@ namespace Root_AOP01_Inspection.Module
             {
                 // variable
                 GrabMode grabMode = m_module.GetGrabMode("LADS");
-                int nImgWidth = 640; //grabMode.m_camera.GetRoiSize().X;
-                int nImgHeight = 480; //grabMode.m_camera.GetRoiSize().Y;
+                int nImgWidth = 100; //grabMode.m_camera.GetRoiSize().X;
+                int nImgHeight = 100; //grabMode.m_camera.GetRoiSize().Y;
                 double[] daHeight = new double[nImgWidth];
-
                 // implement
                 byte* pSrc = (byte*)img.GetPtr().ToPointer();
                 for (int x = 0; x < nImgWidth; x++, pSrc++)
@@ -4237,11 +4218,13 @@ namespace Root_AOP01_Inspection.Module
                     byte* pSrcY = pSrc;
                     int nSum = 0;
                     int nYSum = 0;
+                    
                     for (int y = 0; y < nImgHeight; y++, pSrcY += nImgWidth)
                     {
-                        if (*pSrcY < m_nLaserThreshold) continue;
-                        nSum += *pSrcY;
-                        nYSum += *pSrcY * y;
+                        int b = *pSrcY;
+                        if (b < m_nLaserThreshold) continue;
+                        nSum += b;
+                        nYSum += b * y;
                     }
                     int iIndex = x;
                     daHeight[iIndex] = (nSum != 0) ? ((double)nYSum / (double)nSum) : 0.0;
@@ -4274,7 +4257,7 @@ namespace Root_AOP01_Inspection.Module
                 Mat ResultMat = new Mat();
 
                 // Min-Max 값 알아내기
-                int nMin = 480;
+                int nMin = 100;
                 int nMax = 0;
                 for (int x = 0; x < nX; x++)
                 {
@@ -4285,13 +4268,24 @@ namespace Root_AOP01_Inspection.Module
                     }
                 }
 
+                StringBuilder strBuilder = new StringBuilder();
+                for (int y = 0; y<nY; y++)
+                {
+                    for (int x = 0; x<nX; x++)
+                    {
+                        strBuilder.Append(ladsinfos[x].m_Heightinfo[y].ToString() + ",");
+                    }
+                    strBuilder.AppendLine();
+                }
+                File.WriteAllText("D:\\test.csv", strBuilder.ToString());
+
                 for (int x = 0; x < nX; x++)
                 {
                     Mat Vmat = new Mat();
                     for (int y = 0; y < nY; y++)
                     {
                         Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 3);
-                        MCvScalar color = HeatColor(ladsinfos[x].m_Heightinfo[y], nMin-1, nMax+1);
+                        MCvScalar color = HeatColor(ladsinfos[x].m_Heightinfo[y], nMin-2, nMax+2);
                         ColorImg.SetTo(color);
 
                         if (y == 0)
@@ -4346,10 +4340,15 @@ namespace Root_AOP01_Inspection.Module
             {
                 double r = 0, g = 0, b = 0;
                 double x = (dValue - dMin) / (dMax - dMin);
-                r = 255 * (-4 * Math.Abs(x - 0.75) + 2);
-                g = 255 * (-4 * Math.Abs(x - 0.50) + 2);
-                b = 255 * (-4 * Math.Abs(x) + 2);
+                //r = 255 * (-4 * Math.Abs(x - 0.75) + 2);
+                //g = 255 * (-4 * Math.Abs(x - 0.50) + 2);
+                //b = 255 * (-4 * Math.Abs(x) + 2);
 
+                r = 255 * (-4 * Math.Abs(1 - 0.75) + 2);
+                g = 255 * (-4 * Math.Abs(x - 0.25) + 2);
+                b = 0;
+                
+                
                 return new MCvScalar(b, g, r);
             }
             #endregion

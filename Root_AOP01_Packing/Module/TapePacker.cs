@@ -564,12 +564,10 @@ namespace Root_AOP01_Packing.Module
         {
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
-            //return "OK"; //0202 
 
-            //0203 inforwafer 확인
             if (p_infoWafer == null)
                 return p_id + " IsGetOK - InfoWafer not Exist";
-            //이 아래는 맞는거 같음
+
             switch (p_eProcess)
             {
                 case eProcess.Case:
@@ -589,17 +587,23 @@ namespace Root_AOP01_Packing.Module
         }
         public string AfterGet(int nID)
         {
-            //return "OK"; // 0202
-
-            //0203 nID로 AfterGet 후 각도 동작하고
-            //if (Run(m_stage.RunRotate(-30))) return p_sInfo;
-
-            //여기도 맞는거 같음
             switch (p_eProcess)
             {
-                case eProcess.Case: if (nID == 0) p_eProcess = eProcess.Empty; break;
-                case eProcess.Done: if (nID == 0) p_eProcess = eProcess.Empty; break;
-                case eProcess.Reticle: if (nID == 1) p_eProcess = eProcess.Opened; break;
+                case eProcess.Case: 
+                    if (nID == 0) 
+                        p_eProcess = eProcess.Empty; 
+                    break;
+                case eProcess.Done: 
+                    if (nID == 0) 
+                        p_eProcess = eProcess.Empty; 
+                    break;
+                case eProcess.Reticle:
+                    if (nID == 1)
+                    {
+                        p_eProcess = eProcess.Opened; 
+                        
+                    }
+                    break;
             }
             return CheckGetPut();
         }
@@ -625,11 +629,8 @@ namespace Root_AOP01_Packing.Module
         }
         public string IsPutOK(InfoWafer infoWafer, int nID)
         {
-            //0203 디버그 p_infowafer 확인
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            //return "OK"; // 0202
 
-            //p_eProcess 확인
             switch (p_eProcess)
             {
                 case eProcess.Empty:
@@ -653,13 +654,7 @@ namespace Root_AOP01_Packing.Module
             return p_id + " IsPutOK - Process " + p_eProcess.ToString();
         }
         public string AfterPut(int nID)
-        {
-            //0203 nID로 구분해서 p_eProcess 바꺼? //p_eProcess = eProcess.Case; or p_eProcess = eProcess.Reticle;
-
-            //return "OK"; //0202 
-
-            //0203 nID로 AfterGet 후 각도 동작
-            //if (Run(m_stage.RunRotate(-30))) return p_sInfo;
+        {        
             switch (p_eProcess)
             {
                 case eProcess.Empty:
@@ -736,9 +731,7 @@ namespace Root_AOP01_Packing.Module
         #region Functions
         public string RunCoverOpen()
         {
-            //p_eProcess = eProcess.Empty;
-            //0203  p_eProcess = eProcess.Case
-            //p_eProcess = eProcess.Case; //0203 삭제
+            //0203  p_eProcess = eProcess.Case;
             if (p_eProcess != eProcess.Case) return "Process not Case : " + p_eProcess.ToString();
             p_eProcess = eProcess.Opening;
             if (Run(m_head.RunVacuum(false)))
@@ -757,8 +750,7 @@ namespace Root_AOP01_Packing.Module
         }
         public string RunCoverClose()
         {
-            //0203 p_eProcess = eProcess.Reticle
-            //p_eProcess = eProcess.Reticle; 0203 삭제
+            //0203 p_eProcess = eProcess.Reticle;
             if (p_eProcess != eProcess.Reticle) return "Process not Reticle : " + p_eProcess.ToString();
             p_eProcess = eProcess.Closing;
             if (Run(m_head.RunSol(true, true)))
@@ -768,7 +760,6 @@ namespace Root_AOP01_Packing.Module
             if (Run(m_head.RunSol(true, false)))
                 return p_sInfo;
             p_eProcess = eProcess.Closed;
-            //0203 p_eProcess = eProcess.Closed
             return "OK";
         }
         public string RunHeadUp()
@@ -782,8 +773,7 @@ namespace Root_AOP01_Packing.Module
         
         public string RunTaping()
         {
-            //Thread.Sleep(10);
-            //0203 Closed 상태 면 테이핑 ㄱㄱ
+            //p_eProcess = eProcess.Closed;
             if (p_eProcess != eProcess.Closed) return "Process not Closed : " + p_eProcess.ToString();
             p_eProcess = eProcess.Taping;
             if (Run(m_stage.m_axis.StartHome()))
@@ -803,7 +793,7 @@ namespace Root_AOP01_Packing.Module
             if (Run(m_cartridge.RunMove(Cartridge.ePos.Taping))) return p_sInfo;
             if (Run(m_stage.RunRotate(705))) return p_sInfo;
 
-            if (Run(m_stage.RunRotate(33))) return p_sInfo;
+            if (Run(m_stage.RunRotate(34))) return p_sInfo;
             if (Run(m_cartridge.RunMove(Cartridge.ePos.Cutting))) return p_sInfo;
             if (Run(m_cartridge.RunCutter())) return p_sInfo;
 
@@ -811,7 +801,7 @@ namespace Root_AOP01_Packing.Module
             if (Run(m_cartridge.RunMove(Cartridge.ePos.CheckTape))) return p_sInfo;
             //if (Run(m_camera.RunCheckEndVRS())) return p_sInfo;
 
-            if (Run(m_stage.RunRotate(327))) return p_sInfo;
+            if (Run(m_stage.RunRotate(326))) return p_sInfo;
             if (Run(m_stage.RunMove(m_stage.m_degReady))) return p_sInfo;
 
             if (Run(m_head.RunHeadDown(false))) return p_sInfo;
@@ -835,6 +825,7 @@ namespace Root_AOP01_Packing.Module
         public override void Reset()
         {
             m_roller.RunRollerPushUp(false);
+            p_eProcess = eProcess.Empty;
             //여기가 프로세스별 Recovery 진행하거나 알람 띄우면 되나
             base.Reset();
         }
@@ -850,6 +841,8 @@ namespace Root_AOP01_Packing.Module
                 return "OK";
             }
             p_sInfo = base.StateHome();
+            if (Run(m_cartridge.RunCutter()))
+                return p_sInfo;
             if (Run(m_head.RunSol(true, true)))
                 return p_sInfo;
             if (Run(m_roller.RunRollerPushUp(false)))

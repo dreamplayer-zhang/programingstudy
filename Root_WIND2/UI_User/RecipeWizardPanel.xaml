@@ -36,8 +36,6 @@
                     <Button Content="NEW" Command="{Binding btnNewRecipeBack}" Style="{StaticResource sidetap_child_button}"/>
                     <Button Content="SAVE" Command="{Binding btnSaveRecipeBack}" Style="{StaticResource sidetap_child_button}"/>
                     <Button Content="LOAD" Command="{Binding btnLoadRecipeBack}" Style="{StaticResource sidetap_child_button}"/>
-                    <Button Content="Save"/>
-                    <Button Content="Load"/>
                 </StackPanel>
             </Border>
         </ControlTemplate>

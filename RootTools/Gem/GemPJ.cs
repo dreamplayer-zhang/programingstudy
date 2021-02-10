@@ -98,7 +98,7 @@ namespace RootTools.Gem
             List<GemSlotBase.eState> aSlotState = m_aSlotState[iIndex];
             while (aSlotState.Count <= iSlot) aSlotState.Add(GemSlotBase.eState.Empty);
             aSlotState[iSlot] = GemSlotBase.eState.Exist;
-            //carrier.m_aGemSlot[iSlot].p_eState = GemSlotBase.eState.Select;
+            carrier.m_aGemSlot[iSlot].p_eState = GemSlotBase.eState.Select;
         }
 
         int GetCarrierIndex(GemCarrierBase carrier)

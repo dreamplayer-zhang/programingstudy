@@ -136,9 +136,8 @@ namespace Root_AOP01_Packing.Module
                     m_doLamp.Write(eLamp.Yellow);
                     break;
                 case EQ.eState.Home:
-                    do_door_Lock.Write(true);
-                    m_doLamp.Write(eLamp.Green);
-                    m_doLamp.Write(eLamp.Red);
+                    //do_Buzzer.Write(eBuzzer.Buzzer4);
+                    //do_door_Lock.Write(true);
                     m_doLamp.Write(eLamp.Yellow);
                     break;
                 case EQ.eState.Ready:
@@ -148,14 +147,15 @@ namespace Root_AOP01_Packing.Module
                     m_doLamp.Write(eLamp.Yellow);
                     break;
                 case EQ.eState.Run:
-                    do_door_Lock.Write(true);
+                    //do_door_Lock.Write(true);
                     m_doLamp.Write(eLamp.Green);
                     break;
                 case EQ.eState.Recovery:
-                    do_door_Lock.Write(true);
+                    //do_door_Lock.Write(true);
                     m_doLamp.Write(eLamp.Yellow);
                     break;
                 case EQ.eState.Error:
+                    //do_Buzzer.Write(eBuzzer.Buzzer1);
                     m_doLamp.Write(eLamp.Red);
                     break;
             }
@@ -171,7 +171,7 @@ namespace Root_AOP01_Packing.Module
         {
             if (di_EMO.p_bIn)
             {
-                if (!di_CDA.p_bIn)
+                if (di_CDA.p_bIn)
                     alid_EMS.Run(di_EMO.p_bIn, "Please Check " + "EMS");
                 else
                     alid_EMS.Run(di_EMO.p_bIn, "Please Check " + "EMO");
