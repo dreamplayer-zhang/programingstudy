@@ -236,6 +236,20 @@ namespace RootTools.Module
             set { OnPropertyChanged(); }
         }
 
+        int _percent;
+        public int p_Percent
+        {
+            get
+            {
+                return (int)(p_iRun / p_maxRun * 100);
+            }
+            set
+            {
+                _percent = value;
+                OnPropertyChanged();
+            }
+        }
+
         public string ClickRunRnR()
         {
             if (EQ.p_eState != EQ.eState.Ready) return "EQ not Ready"; 

@@ -24,5 +24,11 @@ namespace Root_AOP01_Packing
         {
             InitializeComponent();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var asdf = this.DataContext;
+            var adsfff = prog.DataContext;
+        }
     }
 }
