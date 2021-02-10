@@ -143,7 +143,16 @@ namespace RootTools.RADS
 			get { return m_IsRun; }
 			set { SetProperty(ref m_IsRun, value); }
 		}
-		public int AdsData { get; set; }
+
+		int m_nAdsData = 0;
+		public int p_nAdsData
+        {
+            get { return m_nAdsData; }
+            set
+            {
+				SetProperty(ref m_nAdsData, value);
+            }
+        }
 		
 		private void OnSearchComplete()
 		{
@@ -166,14 +175,14 @@ namespace RootTools.RADS
 				else if (p_connect.p_CurrentController.p_ADS_up > 0)
 				{
 					p_IsRun = true;
-                    AdsData = p_connect.p_CurrentController.p_ADS_data * -1;
-                    Console.WriteLine("AdsData : {0}", AdsData);
+                    p_nAdsData = p_connect.p_CurrentController.p_ADS_data * -1;
+                    //Console.WriteLine("AdsData : {0}", p_nAdsData);
 				}
 				else
 				{
 					p_IsRun = true;
-                    AdsData = p_connect.p_CurrentController.p_ADS_data;
-                    Console.WriteLine("AdsData : {0}", AdsData);
+                    p_nAdsData = p_connect.p_CurrentController.p_ADS_data;
+                    //Console.WriteLine("AdsData : {0}", p_nAdsData);
 				}
 
 			}

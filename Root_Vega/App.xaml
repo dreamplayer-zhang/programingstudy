@@ -5,6 +5,19 @@
              StartupUri="MainWindow.xaml">
     
     <Application.Resources>
+        <SolidColorBrush x:Key="PanelBackGround" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+        <SolidColorBrush x:Key="ControlBackGround" Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
+        <SolidColorBrush x:Key="GroupBoxBackground" Color="Transparent"/>
+        <SolidColorBrush x:Key="Splitter" Color="DimGray"/>
+        <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Height" Value="40"/>
+            <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
+            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
+        </Style>
         <!--<SolidColorBrush x:Key="BdrBackGround" Color="White"/>
         <SolidColorBrush x:Key="BdrTitleBackGround" Color="#FF43437A"/>
         <SolidColorBrush x:Key="TbForeGround" Color="White"/>

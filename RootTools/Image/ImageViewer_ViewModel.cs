@@ -1030,6 +1030,8 @@ namespace RootTools
 				nY = 0;
 			else if (nY > p_ImageData.p_Size.Y - p_View_Rect.Height)
 				nY = p_ImageData.p_Size.Y - p_View_Rect.Height;
+			if (nX % 2 != 0) nX += 1;
+			if (nY % 2 != 0) nY += 1;
 			return new CPoint(nX, nY);
 		}
 		CPoint GetCurrentPoint()
@@ -1472,11 +1474,11 @@ namespace RootTools
 
 				if (lines < 0)
 				{
-					zoom *= 1.1F;
+					zoom *= 1.4F;
 				}
 				if (lines > 0)
 				{
-					zoom *= 0.9F;
+					zoom *= 0.6F;
 				}
 
 				//double nDev = 0;
