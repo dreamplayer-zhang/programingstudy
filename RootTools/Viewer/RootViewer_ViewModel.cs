@@ -572,14 +572,6 @@ namespace RootTools
                                 p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y));
 
                         }
-                        else if (p_ImageData.p_nByte == 2)
-                        {
-                            Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
-
-                            IntPtr ptrMem = p_ImageData.GetPtr();
-                            if (ptrMem == IntPtr.Zero)
-                                return;
-                        }
                         else if (p_ImageData.p_nByte == 3)
                         {
                             if (p_eColorViewMode == eColorViewMode.All)
@@ -1205,14 +1197,7 @@ namespace RootTools
                 {
                     if (result.Value)
                     {
-                        int channel = 0;
-                        if (p_ImageData.p_nByte == 3)
-                        {
-                            if (p_eColorViewMode == eColorViewMode.G) channel = 1;
-                            else if (p_eColorViewMode == eColorViewMode.B) channel = 2;
-                        }
-                        
-                        p_ImageData.OpenFile(ofd.FileName, p_CopyOffset, channel);
+                        p_ImageData.OpenFile(ofd.FileName, p_CopyOffset);
                     }
                     else
                     {
@@ -1229,50 +1214,6 @@ namespace RootTools
                 return;
             }
             _CancelCopy();
-
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter += "컬러 24비트 이미지(*.bmp)|*.bmp";
-            sfd.Filter += "|단색 8비트 이미지(*.bmp)|*.bmp";
-            if(p_ImageData.p_nByte != 3)
-                sfd.Filter += "|단색 16비트 이미지(*.bmp)|*.bmp";
-
-            switch(p_ImageData.p_nByte)
-            {
-                case 1:
-                    sfd.FilterIndex = 2;
-                    break;
-                case 2:
-                    sfd.FilterIndex = 3;
-                    break;
-                case 3:
-                default:
-                    sfd.FilterIndex = 1;
-                    break;
-            }
-            
-
-            if (sfd.ShowDialog() == DialogResult.OK)
-            {
-                bool isGrayScale = (sfd.FilterIndex != 1 ? true : false);
-                
-                // 선택된 RGB에 따라 boolean 변수 설정
-                bool[] rgbEnable = new bool[3] { false, false, false };
-                if(p_ImageData.p_nByte == 3)
-                {
-                    switch (p_eColorViewMode)
-                    {
-                        case eColorViewMode.R: rgbEnable[0] = true; break;
-                        case eColorViewMode.G: rgbEnable[1] = true; break;
-                        case eColorViewMode.B: rgbEnable[2] = true; break;
-                        case eColorViewMode.All:
-                        default:
-                            rgbEnable[0] = rgbEnable[1] = rgbEnable[2] = true;
-                            break;
-                    }
-                }
-
-                p_ImageData.SaveWholeImage(sfd.FileName, isGrayScale, rgbEnable[0], rgbEnable[1], rgbEnable[2]);
-            }
 
             ////if (m_BasicTool.m_Element.Count == 0 || m_BasicTool.m_Element[0].GetType() != typeof(System.Windows.Shapes.Rectangle))
             ////	m_ImageData.SaveWholeImage();
@@ -1309,13 +1250,6 @@ namespace RootTools
             get
             {
                 return new RelayCommand(_openImage);
-            }
-        }
-        public ICommand SaveImage
-        {
-            get
-            {
-                return new RelayCommand(_saveImage);
             }
         }
         public ICommand ClearImage

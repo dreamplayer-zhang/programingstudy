@@ -239,7 +239,6 @@ namespace RootTools
 			m_MemData = data;
 			p_Size = data.p_sz;
 			p_nByte = data.p_nCount;
-
 			SetBackGroundWorker();
 		}
 
@@ -470,63 +469,55 @@ namespace RootTools
 			}
 			return GetByteToBitmap(rect.Width, rect.Height, GetRectByteArray(rect));
 		}
-		public void SaveRectImage(CRect memRect, bool red = true, bool green = true, bool blue = true)
-        {
-			bool isGrayScale = (p_nByte != 3 ? true : false);
-			SaveRectImage(memRect, isGrayScale, red, green, blue);
-        }
-		public void SaveRectImage(CRect memRect, bool isGrayScale, bool red = true, bool green = true, bool blue = true)
+		public void SaveRectImage(CRect memRect)
 		{
-			SaveFileDialog sfd = new SaveFileDialog();
-			sfd.Filter = "BMP파일|*.bmp";
+			SaveFileDialog ofd = new SaveFileDialog();
+			ofd.Filter = "BMP파일|*.bmp";
 
-			if (sfd.ShowDialog() == DialogResult.OK)
-				SaveRectImage(memRect, sfd.FileName, isGrayScale, red, green, blue);
-        }
-        public void SaveRectImage(CRect memRect, string saveTargetPath, bool red = true, bool green = true, bool blue = true)
-        {
-            bool isGrayScale = (p_nByte != 3 ? true : false);
-            SaveRectImage(memRect, saveTargetPath, isGrayScale, red, green, blue);
-        }
-        public void SaveRectImage(CRect memRect, string saveTargetPath, bool isGrayScale, bool red = true, bool green = true, bool blue = true)
+			if (ofd.ShowDialog() == DialogResult.OK)
+			{
+				List<object> arguments = new List<object>();
+				arguments.Add(ofd.FileName);
+				arguments.Add(memRect);
+
+				BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+				Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
+				Worker_MemorySave.RunWorkerAsync(arguments);
+			}
+		}
+		public void SaveRectImage(CRect memRect, string saveTargetPath)
 		{
 			List<object> arguments = new List<object>();
 			arguments.Add(saveTargetPath);
 			arguments.Add(memRect);
-            arguments.Add(red);
-            arguments.Add(green);
-            arguments.Add(blue);
-			arguments.Add(isGrayScale);
 
-            BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+			BackgroundWorker Worker_MemorySave = new BackgroundWorker();
 			Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
 			Worker_MemorySave.RunWorkerAsync(arguments);
 		}
 		public void SaveWholeImage()
-        {
-			bool isGrayScale = (p_nByte == 1 && p_nByte == 2) ? true : false;
-
-			SaveWholeImage(isGrayScale, true, true, true);
-        }
-		public void SaveWholeImage(bool isGrayScale, bool red = true, bool green = true, bool blue = true)
 		{
-			SaveFileDialog sfd = new SaveFileDialog();
-			sfd.Filter = "BMP파일|*.bmp";
+			SaveFileDialog ofd = new SaveFileDialog();
+			ofd.Filter = "BMP파일|*.bmp";
 
-			if (sfd.ShowDialog() == DialogResult.OK)
-				SaveWholeImage(sfd.FileName, isGrayScale, red, green, blue);
+			if (ofd.ShowDialog() == DialogResult.OK)
+			{
+				List<object> arguments = new List<object>();
+				arguments.Add(ofd.FileName);
+				arguments.Add(new CRect(0, 0, p_Size.X, p_Size.Y));
+
+				BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+				Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
+				Worker_MemorySave.RunWorkerAsync(arguments);
+			}
 		}
-		public void SaveWholeImage(string targetPath, bool isGrayScale, bool red = true, bool green = true, bool blue = true)
+		public void SaveWholeImage(string targetPath)
 		{
 			List<object> arguments = new List<object>();
 			arguments.Add(targetPath);
 			arguments.Add(new CRect(0, 0, p_Size.X, p_Size.Y));
-            arguments.Add(red);
-            arguments.Add(green);
-            arguments.Add(blue);
-            arguments.Add(isGrayScale);
 
-            BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+			BackgroundWorker Worker_MemorySave = new BackgroundWorker();
 			Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
 			Worker_MemorySave.RunWorkerAsync(arguments);
 		}
@@ -543,31 +534,10 @@ namespace RootTools
 
 			string sPath = arguments[0].ToString();
 			CRect MemRect = (CRect)arguments[1];
-            bool red = (bool)arguments[2];
-            bool green = (bool)arguments[3];
-            bool blue = (bool)arguments[4];
-			bool isGrayScale = (bool)arguments[5];
 
-            //FileSaveBMP(sPath, m_ptrImg, MemRect, red, green, blue);
-			if(isGrayScale)
-            {
-				int nByte = (p_nByte == 2 ? 2 : 1);
-				eRgbChannel channel = eRgbChannel.None;
-				if(p_nByte == 3)
-                {
-					if (red == true) channel = eRgbChannel.R;
-					else if (green == true) channel = eRgbChannel.G;
-                    else if (blue == true) channel = eRgbChannel.B;
-                }
-				FileSaveGrayBMP(sPath, MemRect, nByte, channel);
-			}
-            else
-            {
-				FileSaveRgbBMP(sPath, MemRect, red, green, blue);
-            }
-				
+			FileSaveBMP(sPath, m_ptrImg, MemRect);
 		}
-		unsafe void FileSaveBMP(string sFile, IntPtr ptr, CRect rect, bool red = true, bool green = true, bool blue = true)
+		unsafe void FileSaveBMP(string sFile, IntPtr ptr, CRect rect)
 		{
 			//int width = (int)(rect.Right * 0.25);
 			//if (width * 4 != rect.Right) rect.Right = (width + 1) * 4;
@@ -616,209 +586,32 @@ namespace RootTools
 					bw.Write(Convert.ToByte(i));
 					bw.Write(Convert.ToByte(255));
 				}
-            }
+			}
+			if (rect.Width % 4 != 0)
+			{
+				rect.Right += 4 - rect.Width % 4;
+			}
+			byte[] aBuf = new byte[p_nByte * rect.Width];
+			for (int i = rect.Height - 1; i >= 0; i--)
+			{
+				Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * p_Size.X * p_nByte), aBuf, 0, rect.Width * p_nByte);
+				bw.Write(aBuf);
+				p_nProgress = Convert.ToInt32(((double)(rect.Height - i) / rect.Height) * 100);
+			}
 
-            // RGB 채널별 데이터 얻어오기
-            IntPtr ptrR = GetPtr(0);
-            IntPtr ptrG = GetPtr(1);
-            IntPtr ptrB = GetPtr(2);
-
-			// 픽셀 데이터 Write
-			int step = (rect.Width * p_nByte + 3) & ~3;
-			byte[] aBuf = new byte[step];
-			for (int j = rect.Top + rect.Height - 1; j >= rect.Top; j--)
-            {
-				Array.Clear(aBuf, 0, step);
-
-				Parallel.For(0, rect.Width, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (i) =>
-				{
-					int idx = j * p_Size.X + i + rect.Left;
-
-					aBuf[i * 3 + 0] = (byte)(blue ? ((byte*)ptrB.ToPointer())[idx] : 0);
-                    aBuf[i * 3 + 1] = (byte)(green ? ((byte*)ptrG.ToPointer())[idx] : 0);
-                    aBuf[i * 3 + 2] = (byte)(red ? ((byte*)ptrR.ToPointer())[idx] : 0);
-                });
-
-                bw.Write(aBuf);
-                p_nProgress = Convert.ToInt32(((double)(rect.Height - (j - rect.Top)) / rect.Height) * 100);
-            }
-
-            bw.Close();
+			//byte[] pBuf = br.ReadBytes(nWidth);
+			//Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + offset.X + (long)p_Size.X * ((long)offset.Y + y)), lowwidth);
+			//p_nProgress = Convert.ToInt32(((double)y / lowheight) * 100);
+			//for (int i = rect.Height - 1; i >= 0; i--)
+			//{  
+			//    Marshal.Copy(ptr + i * rect.Width, aBuf, 0, rect.Width);
+			//    p_nProgress = Convert.ToInt32(((double)(rect.Height - i) / rect.Height) * 100);
+			//    bw.Write(aBuf);
+			//}
+			bw.Close();
 			fs.Close();
 		}
-		bool WriteBitmapFileHeader(BinaryWriter bw, int nByte)
-        {
-			if (bw == null)
-				return false;
-
-			int offbit = 14 + 40 + (nByte == 1 ? (256 * 4) : 0);
-
-            bw.Write(Convert.ToUInt16(0x4d42));                     // bfType;
-            bw.Write(Convert.ToUInt32(14));                         // bfSize
-            bw.Write(Convert.ToUInt16(0));                          // bfReserved1
-            bw.Write(Convert.ToUInt16(0));                          // bfReserved2
-            bw.Write(Convert.ToUInt32(offbit));                     // bfOffbits
-
-            return true;
-        }
-		bool WriteBitmapInfoHeader(BinaryWriter bw, int width, int height, bool isGrayScale)
-        {
-			if (bw == null)
-				return false;
-
-            bw.Write(Convert.ToUInt32(40));                         // biSize
-            bw.Write(Convert.ToInt32(width));                       // biWidth
-			bw.Write(Convert.ToInt32(height));						// biHeight
-            bw.Write(Convert.ToUInt16(1));                          // biPlanes
-            bw.Write(Convert.ToUInt16(8 * p_nByte));                // biBitCount
-            bw.Write(Convert.ToUInt32(0));                          // biCompression
-            bw.Write(Convert.ToUInt32(0));                          // biSizeImage
-            bw.Write(Convert.ToInt32(0));                           // biXPelsPerMeter
-            bw.Write(Convert.ToInt32(0));                           // biYPelsPerMeter
-            bw.Write(Convert.ToUInt32((isGrayScale == true) ? 256 : 0));   // biClrUsed
-            bw.Write(Convert.ToUInt32((isGrayScale == true) ? 256 : 0));   // biClrImportant
-
-            return true;
-        }
-		bool WritePalette(BinaryWriter bw)
-        {
-            if (bw == null)
-                return false;
-
-            for (int i = 0; i < 256; i++)
-            {
-                bw.Write(Convert.ToByte(i));
-                bw.Write(Convert.ToByte(i));
-                bw.Write(Convert.ToByte(i));
-                bw.Write(Convert.ToByte(255));
-            }
-
-			return true;
-        }
-		public enum eRgbChannel
-        {
-			None, R, G, B
-        }
-		unsafe void FileSaveGrayBMP(string sFile, CRect rect, int nByte, eRgbChannel channel = eRgbChannel.None)
-        {
-			FileStream fs = null;
-
-			try
-			{
-				fs = new FileStream(sFile, FileMode.Create, FileAccess.Write);
-			}
-			catch (Exception) { }
-
-            BinaryWriter bw = new BinaryWriter(fs);
-
-            // Bitmap File Header
-            WriteBitmapFileHeader(bw, nByte);
-
-            // Bitmap Info Header
-            WriteBitmapInfoHeader(bw, rect.Width, rect.Height, true);
-
-            // Palette (if it's 1byte gray image)
-            if (p_nByte == 1)
-                WritePalette(bw);
-
-            // Pixel data
-            int rowSize = (rect.Width * nByte + 3) & ~3;
-            byte[] aBuf = new byte[rowSize];
-			IntPtr ptr = IntPtr.Zero;
-			if (p_nByte == 1 && p_nByte == 2)
-			{
-                ptr = GetPtr(0);
-            }
-			else /*if(p_nByte == 3)*/
-            {
-				ptr = IntPtr.Zero;
-				switch(channel)
-                {
-					case eRgbChannel.R: ptr = GetPtr(0); break;
-					case eRgbChannel.G: ptr = GetPtr(1); break;
-                    case eRgbChannel.B: ptr = GetPtr(2); break;
-					default:
-						break;
-                }
-			}
-
-			if(ptr != IntPtr.Zero)
-            {
-                for (int j = rect.Top + rect.Height - 1; j >= rect.Top; j--)
-                {
-                    Array.Clear(aBuf, 0, rowSize);
-
-                    int idx = j * p_Size.X + rect.Left;
-                    Marshal.Copy(ptr + idx, aBuf, 0, rowSize);
-
-                    bw.Write(aBuf);
-                    p_nProgress = Convert.ToInt32(((double)(rect.Height - (j - rect.Top)) / rect.Height) * 100);
-                }
-            }
-
-            bw.Close();
-            fs.Close();
-        }
-        unsafe void FileSaveRgbBMP(string sFile, CRect rect, bool red = true, bool green = true, bool blue = true)
-        {
-            FileStream fs = null;
-
-            try
-            {
-                fs = new FileStream(sFile, FileMode.Create, FileAccess.Write);
-            }
-            catch (Exception) { }
-
-            BinaryWriter bw = new BinaryWriter(fs);
-
-			/// Bitmap File Header
-			WriteBitmapFileHeader(bw, 3);
-
-            /// Bitmap Info Header
-			WriteBitmapInfoHeader(bw, rect.Width, rect.Height, false);
-
-            /// Pixel data
-            int rowSize = (rect.Width * 3 + 3) & ~3;
-            byte[] aBuf = new byte[rowSize];
-            IntPtr ptrR = IntPtr.Zero;
-            IntPtr ptrG = IntPtr.Zero;
-            IntPtr ptrB = IntPtr.Zero;
-            if (p_nByte == 1 || p_nByte == 2)
-            {
-				ptrR = ptrG = ptrB = GetPtr(0);
-            }
-			else if(p_nByte == 3)
-            {
-                // RGB 채널별 데이터 얻어오기
-                ptrR = GetPtr(0);
-                ptrG = GetPtr(1);
-                ptrB = GetPtr(2);
-            }
-
-			if(ptrR != IntPtr.Zero && ptrG != IntPtr.Zero && ptrB != IntPtr.Zero)
-            {
-                for (int j = rect.Top + rect.Height - 1; j >= rect.Top; j--)
-                {
-                    Array.Clear(aBuf, 0, rowSize);
-
-                    Parallel.For(0, rect.Width, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (i) =>
-                    {
-                        int idx = j * p_Size.X + i + rect.Left;
-
-                        aBuf[i * 3 + 0] = (byte)(blue ? ((byte*)ptrB.ToPointer())[idx] : 0);
-                        aBuf[i * 3 + 1] = (byte)(green ? ((byte*)ptrG.ToPointer())[idx] : 0);
-                        aBuf[i * 3 + 2] = (byte)(red ? ((byte*)ptrR.ToPointer())[idx] : 0);
-                    });
-
-                    bw.Write(aBuf);
-                    p_nProgress = Convert.ToInt32(((double)(rect.Height - (j - rect.Top)) / rect.Height) * 100);
-                }
-            }
-
-            bw.Close();
-            fs.Close();
-        }
-        public void OpenFile(string sFileName, CPoint offset, int channel = 0)
+		public void OpenFile(string sFileName, CPoint offset)
 		{
 			FileInfo fileInfo = new FileInfo(sFileName);
 			if (fileInfo.Exists)
@@ -826,7 +619,6 @@ namespace RootTools
 				List<object> arguments = new List<object>();
 				arguments.Add(sFileName);
 				arguments.Add(offset);
-				arguments.Add(channel);
 				Worker_MemoryCopy.RunWorkerAsync(arguments);
 			}
 			else
@@ -842,10 +634,9 @@ namespace RootTools
 
 			string sPath = arguments[0].ToString();
 			CPoint offset = (CPoint)(arguments[1]);
-			int channel = (int)(arguments[2]);
 			if (sPath.ToLower().IndexOf(".bmp") >= 0)
 			{
-				OpenBMPFile2(sPath, e, offset, channel);
+				OpenBMPFile(sPath, e, offset);
 			}
 			else if (sPath.ToLower().IndexOf(".jpg") >= 0)
 			{
@@ -916,7 +707,7 @@ namespace RootTools
 			{
 				return;
 			}
-			
+
 			int a = 0;
 			UInt32 b = 0;
 			BinaryReader br = new BinaryReader(fs);
@@ -1168,220 +959,6 @@ namespace RootTools
 
 			return true;
 		}
-        bool ReadBitmapFileHeader(BinaryReader br, ref uint bfOffbits)
-        {
-            if (br == null)
-                return false;
-
-			ushort bfType;
-			uint bfSize;
-
-			bfType = br.ReadUInt16();       // bfType;
-            bfSize = br.ReadUInt32();		// bfSize
-            br.ReadUInt16();				// bfReserved1
-            br.ReadUInt16();				// bfReserved2
-			bfOffbits = br.ReadUInt32();		// bfOffbits
-
-			if (bfType != 0x4d42)
-				return false;
-
-            return true;
-        }
-        bool ReadBitmapInfoHeader(BinaryReader br, ref int width, ref int height, ref int nByte)
-        {
-            if (br == null)
-                return false;
-
-			uint biSize;
-
-            biSize = br.ReadUInt32();       // biSize
-            width = br.ReadInt32();         // biWidth
-            height = br.ReadInt32();        // biHeight
-            br.ReadUInt16();				// biPlanes
-            nByte = br.ReadUInt16() / 8;	// biBitCount
-            br.ReadUInt32();				// biCompression
-            br.ReadUInt32();				// biSizeImage
-            br.ReadInt32();					// biXPelsPerMeter
-            br.ReadInt32();					// biYPelsPerMeter
-            br.ReadUInt32();				// biClrUsed
-            br.ReadUInt32();				// biClrImportant
-
-            return true;
-        }
-        unsafe void OpenBMPFile2(string sFile, DoWorkEventArgs e, CPoint offset, int channel = 0)
-        {
-            FileStream fs = null;
-            try
-            {
-                fs = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read, 32768, true);
-            }
-            catch (Exception)
-            {
-                return;
-            }
-
-			BinaryReader br = null;
-			try
-			{
-				br = new BinaryReader(fs);
-			}
-			catch(Exception)
-            {
-				fs.Close();
-				return;
-            }
-
-			try
-            {
-                // Bitmap File Header
-                uint bfOffbits = 0;
-                ReadBitmapFileHeader(br, ref bfOffbits);
-
-                // Bitmap Info Header
-                int width = 0;
-                int height = 0;
-                int nByte = 0;
-                ReadBitmapInfoHeader(br, ref width, ref height, ref nByte);
-
-                // 이미지 파일의 채널 개수가 이미 생성된 메모리의 채널 개수보다 많을 경우 Open 과정 중단
-                if (nByte > p_nByte)
-                {
-                    //System.Windows.MessageBox.Show("Not enough memory count to load image file");
-                    return;
-                }
-
-                // 
-                CRect rect = new CRect(0, 0, width, height);
-                rect.Right = Math.Min(p_Size.X, rect.Width);
-                rect.Bottom = Math.Min(p_Size.Y, rect.Height);
-
-                // 픽셀 데이터 존재하는 부분으로 Seek
-                fs.Seek(bfOffbits, SeekOrigin.Begin);
-
-				// Pixel Data
-				byte[] aBuf = new byte[rect.Width * nByte];
-				int fileRowSize = (width * nByte + 3) & ~3; // 파일 내 하나의 열당 너비 사이즈 (4의 배수)
-                if (nByte == 1)
-                {
-                    IntPtr ptr = m_MemData.GetPtr(channel);
-					if (ptr == IntPtr.Zero)
-						return;
-
-                    // 이미지 높이가 메모리보다 클 경우 모자라는 하단부분은 읽지 않고 스킵
-                    fs.Seek((height - rect.Height) * fileRowSize, SeekOrigin.Current);
-
-                    for (int j = rect.Height - 1; j >= 0; j--)
-                    {
-                        Array.Clear(aBuf, 0, rect.Width * nByte);
-
-                        if (Worker_MemoryCopy.CancellationPending)
-                            return;
-
-						// 파일에서 필요한 만큼 데이터를 읽어 메모리에 복사
-						fs.Read(aBuf, 0, rect.Width * nByte);
-                        Marshal.Copy(aBuf, 0, ptr + j * p_Size.X, rect.Width);
-
-                        // 이미지 너비가 메모리보다 클 경우 모자라는 우측부분은 읽지 않고 스킵
-                        fs.Seek(fileRowSize - rect.Width * nByte, SeekOrigin.Current);
-
-						// 진행상황 표시
-						p_nProgress = Convert.ToInt32(((double)rect.Height - j) / rect.Height * 100);
-					}
-                }
-                else if (nByte == 2)
-                {
-                    IntPtr ptr = m_MemData.GetPtr(channel);
-                    if (ptr == IntPtr.Zero)
-                        return;
-
-                    // 이미지 높이가 메모리보다 클 경우 모자라는 하단부분은 읽지 않고 스킵
-                    fs.Seek((height - rect.Height) * fileRowSize, SeekOrigin.Current);
-
-                    for (int j = rect.Height - 1; j >= 0; j--)
-                    {
-                        Array.Clear(aBuf, 0, rect.Width * nByte);
-
-                        if (Worker_MemoryCopy.CancellationPending)
-                            return;
-
-                        // 파일에서 필요한 만큼 데이터를 읽어 메모리에 복사
-                        fs.Read(aBuf, 0, rect.Width * nByte);
-                        Marshal.Copy(aBuf, 0, ptr + j * p_Size.X, rect.Width);
-
-                        // 이미지 너비가 메모리보다 클 경우 모자라는 우측부분은 읽지 않고 스킵
-                        fs.Seek(fileRowSize - rect.Width * nByte, SeekOrigin.Current);
-
-                        // 진행상황 표시
-                        p_nProgress = Convert.ToInt32(((double)rect.Height - j) / rect.Height * 100);
-                    }
-                }
-                else/* if (nByte == 3)*/
-                {
-                    IntPtr ptrR = m_MemData.GetPtr(0);
-                    IntPtr ptrG = m_MemData.GetPtr(1);
-                    IntPtr ptrB = m_MemData.GetPtr(2);
-					if (ptrR == IntPtr.Zero || ptrB == IntPtr.Zero || ptrG == IntPtr.Zero)
-						return;
-
-					// 이미지 높이가 메모리보다 클 경우 모자라는 하단부분은 읽지 않고 스킵
-					fs.Seek((height - rect.Height) * fileRowSize, SeekOrigin.Current);
-
-                    for (int j = rect.Height - 1; j >= 0; j--)
-                    {
-                        Array.Clear(aBuf, 0, rect.Width * nByte);
-
-                        if (Worker_MemoryCopy.CancellationPending)
-                            return;
-
-                        // 파일에서 필요한 만큼 데이터를 읽어 메모리에 복사
-                        fs.Read(aBuf, 0, rect.Width * nByte);
-
-                        for (int i = 0; i < rect.Width * nByte; i += 3)
-                        {
-                            ((byte*)(ptrB))[i / 3 + (long)j * p_Size.X] = aBuf[i];
-                            ((byte*)(ptrG))[i / 3 + (long)j * p_Size.X] = aBuf[i + 1];
-                            ((byte*)(ptrR))[i / 3 + (long)j * p_Size.X] = aBuf[i + 2];
-                        }
-
-                        // 이미지 너비가 메모리보다 클 경우 모자라는 우측부분은 읽지 않고 스킵
-                        fs.Seek(fileRowSize - rect.Width * nByte, SeekOrigin.Current);
-
-						// 진행상황 표시
-                        p_nProgress = Convert.ToInt32(((double)rect.Height - j) / rect.Height * 100);
-                    }
-                }
-            }
-			catch(Exception)
-            {
-            }
-			finally
-            {
-                br.Close();
-                fs.Close();
-            }
-
-			
-
-//             br.Close();
-//             fs.Close();
-
-// 			else /*if(nByte == 3)*/
-//             {
-//                 for (int y = nStartHeight - 1; y >= nEndHeight; y--)
-//                 {
-//                     if (Worker_MemoryCopy.CancellationPending)
-//                         return;
-//                     fss.Read(buf, 0, nWidth * nByte);
-//                     for (int i = 0; i < nLowWidth * 3; i = i + 3)
-//                     {
-//                         ((byte*)(ptrB))[i / 3 + (long)y * p_Size.X] = buf[i];
-//                         ((byte*)(ptrG))[i / 3 + (long)y * p_Size.X] = buf[i + 1];
-//                         ((byte*)(ptrR))[i / 3 + (long)y * p_Size.X] = buf[i + 2];
-//                     }
-//                     nLine++;
-//                 }
-//             }
-        }
 
 		public void ClearImage()
 		{
