@@ -27,6 +27,12 @@
             <Setter Property="HorizontalAlignment"
                     Value="Left" />
         </Style>
+        <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -2118,9 +2124,8 @@
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="35*" />
                         <RowDefinition Height="auto" />
-                        <RowDefinition Height="9*" />
+                        <RowDefinition Height="25*" />
                         <RowDefinition Height="auto" />
-                        <RowDefinition Height="9*" />
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0"
                               Header="Mask Location">
@@ -2174,14 +2179,65 @@
                               Header="LoadPort">
 
                     </GroupBox>
-                    <Button Grid.Row="6"
+                    <!--<Button Grid.Row="6"
                             FontSize="15"
                             Content="Start"
                             Margin="10" />
                     <Button Grid.Row="8"
                             FontSize="15"
                             Content="Stop"
-                            Margin="10" />
+                            Margin="10" />-->
+                    <Grid Grid.Row="6">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0"
+                                    x:Name="buttonResume"
+                                    Content="Resume"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonResume_Click"/>
+                            <Button Grid.Column="1"
+                                    x:Name="buttonPause"
+                                    Content="Pause"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonPause_Click"/>
+                            <Button Grid.Column="2"
+                                    x:Name="buttonInitialize"
+                                    Content="Initialize"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonInitialize_Click"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0"
+                                    x:Name="buttonRecovery"
+                                    Content="Recovery"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonRecovery_Click"/>
+                            <Button Grid.Column="2"
+                                    x:Name="buttonBuzzOff"
+                                    Content="Buzzer Off"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonBuzzOff_Click"/>
+                        </Grid>
+                    </Grid>
+                    
                 </Grid>
             </Grid>
         </Border>
