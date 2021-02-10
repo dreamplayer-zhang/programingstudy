@@ -171,7 +171,7 @@ namespace Root_AOP01_Packing.Module
         {
             if (di_EMO.p_bIn)
             {
-                if (!di_CDA.p_bIn)
+                if (di_CDA.p_bIn)
                     alid_EMS.Run(di_EMO.p_bIn, "Please Check " + "EMS");
                 else
                     alid_EMS.Run(di_EMO.p_bIn, "Please Check " + "EMO");
