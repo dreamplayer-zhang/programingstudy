@@ -103,7 +103,8 @@ namespace Root_WIND2
 
 			for (int i = 0; i < bufferHeight / roiHeight; i++)
 			{
-				int calcStartY = (roiHeight * i) + startY;
+				//int calcStartY = (roiHeight * i) + startY; // 첫번째 빈 buffer 지웠을 경우
+				int calcStartY = (roiHeight * i) + startY + recipe.CameraHeight;
 				int calcHeight = roiHeight;
 
 				if ((calcStartY + roiHeight) > endY)

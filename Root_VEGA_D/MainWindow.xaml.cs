@@ -1,4 +1,7 @@
-﻿using Root_VEGA_D.Engineer;
+﻿using Root_EFEM.Module;
+using Root_VEGA_D.Engineer;
+using RootTools;
+using RootTools.Module;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
@@ -11,6 +14,7 @@ namespace Root_VEGA_D
     /// </summary>
     public partial class MainWindow : Window
     {
+        VEGA_D_Handler m_handler;
         public MainWindow()
         {
             InitializeComponent();
@@ -87,11 +91,91 @@ namespace Root_VEGA_D
         {
             m_engineer.Init("VEGA_D");
             engineerUI.Init(m_engineer);
+            m_handler = m_engineer.m_handler;
         }
 
         void ThreadStop()
         {
             m_engineer.ThreadStop();
+        }
+
+        bool IsEnable_Resume()
+        {
+            if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (m_handler.m_process.m_qSequence.Count <= 0) return false;
+            return true;
+        }
+        private void buttonResume_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsEnable_Resume() == false) return;
+            EQ.p_bStop = false;
+            EQ.p_eState = EQ.eState.Run;
+        }
+
+        bool IsEnable_Pause()
+        {
+            if (EQ.p_eState != EQ.eState.Run) return false;
+            return true;
+        }
+        private void buttonPause_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsEnable_Pause() == false) return;
+            EQ.p_eState = EQ.eState.Ready;
+        }
+
+        bool IsRunModule(ModuleBase module)
+        {
+            if (module.p_eState == ModuleBase.eState.Run) return true;
+            if (module.p_eState == ModuleBase.eState.Home) return true;
+            return (module.m_qModuleRun.Count > 0);
+        }
+        bool IsRunModule()
+        {
+            if (IsRunModule((Loadport_Cymechs)m_handler.m_aLoadport[0])) return true;
+            if (IsRunModule((Loadport_Cymechs)m_handler.m_aLoadport[1])) return true;
+            if (IsRunModule(m_handler.m_wtr)) return true;
+            if (IsRunModule(m_handler.m_vision)) return true;
+            if (IsRunModule(m_handler.m_visionIPU)) return true;
+            return false;
+        }
+        bool IsEnable_Initial()
+        {
+            if (IsRunModule()) return false;
+            switch (EQ.p_eState)
+            {
+                case EQ.eState.Run: return false;
+                case EQ.eState.Home: return false;
+            }
+            return true;
+        }
+        private void buttonInitialize_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsEnable_Initial() == false) return;
+            EQ.p_bStop = false;
+            m_handler.m_process.ClearInfoWafer();
+            EQ.p_eState = EQ.eState.Home;
+            //Camellia Camera Connect
+        }
+
+        bool IsEnable_Recovery()
+        {
+            if (IsRunModule()) return false;
+            if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (EQ.p_bStop == true) return false;
+            return m_handler.IsEnableRecovery();
+        }
+        private void buttonRecovery_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsEnable_Recovery() == false) return;
+            m_handler.CalcRecover();
+            EQ.p_bStop = false;
+            EQ.p_eState = EQ.eState.Run;
+            EQ.p_bRecovery = true;
+        }
+
+        private void buttonBuzzOff_Click(object sender, RoutedEventArgs e)
+        {
+            m_engineer.BuzzerOff();
         }
     }
 }
