@@ -373,12 +373,12 @@ namespace RootTools.Camera.Silicon
             m_LastROI = new CRect();
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
-            m_lGrab = nLine / 400 ;/*잠깐하드코딩*/
+            m_lGrab = nLine/m_Height;/*잠깐하드코딩*/
             m_nInverseYOffset = m_GrabData.ReverseOffsetY;
             m_nYEnd = (m_lGrab - 1) * m_Height;
             m_cpScanOffset.Y = 0;
             m_nGrabTrigger = 0;
-            m_bscanDir = !m_GrabData.bInvY;
+            m_bscanDir = m_GrabData.bInvY;
             m_nSkipGrabCount = m_GrabData.m_nSkipGrabCount;
 
             rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);
@@ -409,10 +409,10 @@ namespace RootTools.Camera.Silicon
                     {
                         int yp;
 
-                        if (!Scandir)
+                        if (Scandir)
                             yp = m_nYEnd - (y + iBlock * m_Height) + m_nInverseYOffset;
                         else
-                            yp = y + iBlock * m_Height;
+                            yp = y + iBlock * m_Height ;
 
                         IntPtr srcPtr = ipSrc + m_Width * y;
                         IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * m_Memory.W);

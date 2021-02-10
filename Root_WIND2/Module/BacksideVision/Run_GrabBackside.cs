@@ -9,6 +9,7 @@ using RootTools.Module;
 using RootTools.Trees;
 using System.Collections.Generic;
 using static RootTools.Control.Axis;
+using System.Windows;
 
 namespace Root_WIND2.Module
 {
@@ -18,7 +19,6 @@ namespace Root_WIND2.Module
         BackSideVision m_module;
         GrabMode m_MaingrabMode = null;
         GrabMode m_LADSgrabMode = null;
-        List<List<double>> ladsinfos;
         string m_sGrabMode = "";
         string m_sLADSGrabMode = "";
 
@@ -90,15 +90,17 @@ namespace Root_WIND2.Module
 
             MemoryData Mainmem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
 
-
-
             double dStartPosY = m_MaingrabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
             double dEndPosY = m_MaingrabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
             double dTriggerStartPosY = m_MaingrabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2;
             double dTriggerEndPosY = m_MaingrabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2;
 
-            ladsinfos = new List<List<double>>();
+            if (Math.Abs(dTriggerEndPosY - dStartPosY) > Math.Abs(dTriggerStartPosY - dStartPosY))
+                dTriggerEndPosY += nScanOffset_pulse;
+            else
+                dTriggerStartPosY -= nScanOffset_pulse;
+
             GrabData grabData = m_MaingrabMode.m_GD;
             grabData.ReverseOffsetY = m_MaingrabMode.m_nReverseOffsetY;
             if (!m_MaingrabMode.m_bUseLADS) //LADS 안쓸때
@@ -137,11 +139,6 @@ namespace Root_WIND2.Module
                         if (m_module.Run(axisZ.WaitReady()))
                             return p_sInfo;
 
-                        if (Math.Abs(dTriggerEndPosY - dStartPosY) > Math.Abs(dTriggerStartPosY - dStartPosY))
-                            dTriggerEndPosY += nScanOffset_pulse;
-                        else
-                            dTriggerStartPosY -= nScanOffset_pulse;
-
                         axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_MaingrabMode.m_dTrigger,5, true);
 
                         m_MaingrabMode.StartGrab(Mainmem, cpMemoryOffset, nWaferSizeY_px, grabData);
@@ -167,38 +164,28 @@ namespace Root_WIND2.Module
                     m_MaingrabMode.SetLight(false);
                 }
             }
-            else //LADS 쓸 때 ==> 오른쪽부터 왼쪽 방향으로 Snap함
+            else //LADS 쓸 때
             {
-                if (m_LADSgrabMode == null) return "Grab Mode : LADS == null";
-
+                if (m_module.LadsInfos.Count == 0)
+                {
+                    MessageBox.Show("LADS 정보가 없습니다.");
+                    return "Error";                
+                }
                 try
                 {
-                    ladsinfos.Clear();
-
                     m_MaingrabMode.SetLight(true);
-                    m_LADSgrabMode.SetLight(true);
 
-                    CPoint cpLADSMemoryOffset = new CPoint(m_LADSgrabMode.m_cpMemoryOffset);
-
-                    int nLADSCamWidth = m_LADSgrabMode.m_camera.GetRoiSize().X;
-                    int nLADSCamHeight = m_LADSgrabMode.m_camera.GetRoiSize().Y;
-
-                    cpMemoryOffset.X += nWaferSizeY_px - m_MaingrabMode.m_ScanStartLine * nCamWidth;
-                    cpLADSMemoryOffset.X += Convert.ToInt32(m_LADSgrabMode.m_nWaferSize_mm * nMMPerUM / m_LADSgrabMode.m_dResY_um)
-                        - m_MaingrabMode.m_ScanStartLine * nLADSCamWidth;
-
-                    string strLADSPool = m_LADSgrabMode.m_memoryPool.p_id;
-                    string strLADSGroup = m_LADSgrabMode.m_memoryGroup.p_id;
-                    string strLADSMemory = m_LADSgrabMode.m_memoryData.p_id;
-
-                    MemoryData LADSmem = m_module.m_engineer.GetMemory(strLADSPool, strLADSGroup, strLADSMemory);
-                    grabData.m_nSkipGrabCount = (int)(m_LADSgrabMode.m_dResX_um * nLADSCamHeight / m_MaingrabMode.m_dResX_um/2);
+                    cpMemoryOffset.X += m_MaingrabMode.m_ScanStartLine * nCamWidth;
+                    grabData.m_nSkipGrabCount = -1;
+                    //Convert.ToInt32(m_MaingrabMode.m_nWaferSize_mm * nMMPerUM / m_MaingrabMode.m_dResY_um)
+                    int nLADSMaxScanNum = Convert.ToInt32((m_LADSgrabMode.m_nWaferSize_mm * nMMPerUM / m_LADSgrabMode.m_dResY_um)/m_LADSgrabMode.m_camera.GetRoiSize().X);
+                    int nMainMaxScanNum = nWaferSizeY_px / m_MaingrabMode.m_camera.GetRoiSize().X;
 
                     while (m_MaingrabMode.m_ScanLineNum > nScanLine)
                     {
                         if (EQ.IsStop())
                             return "OK";
-
+                        //if (m_MaingrabMode.m_bUseBiDirectionScan && (Math.Abs(axisXY.p_axisY.p_posActual - dStartPosY) > Math.Abs(axisXY.p_axisY.p_posActual - dEndPosY)))
                         if (m_MaingrabMode.m_bUseBiDirectionScan && (nScanLine % 2 != 0))
                         {
                             GeneralFunction.Swap(ref dStartPosY, ref dEndPosY);
@@ -209,8 +196,8 @@ namespace Root_WIND2.Module
 
                         grabData.bInvY = m_MaingrabMode.m_eGrabDirection == eGrabDirection.Forward;
 
-                        double dPosX = m_MaingrabMode.m_rpAxisCenter.X + nWaferSizeY_px * (double)m_MaingrabMode.m_dTrigger
-                                    - (nScanLine + m_MaingrabMode.m_ScanStartLine) * nCamWidth * dXScale;
+                        double dPosX = m_MaingrabMode.m_rpAxisCenter.X - nWaferSizeY_px * (double)m_MaingrabMode.m_dTrigger / 2
+                            + (nScanLine + m_MaingrabMode.m_ScanStartLine) * nCamWidth * dXScale;
 
                         if (m_module.Run(axisZ.StartMove(m_MaingrabMode.m_nFocusPosZ)))
                             return p_sInfo;
@@ -221,46 +208,33 @@ namespace Root_WIND2.Module
                         if (m_module.Run(axisZ.WaitReady()))
                             return p_sInfo;
 
-                        if (Math.Abs(dTriggerEndPosY - dStartPosY) > Math.Abs(dTriggerStartPosY - dStartPosY))
-                            dTriggerEndPosY += nScanOffset_pulse;
-                        else
-                            dTriggerStartPosY -= nScanOffset_pulse;
+                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_MaingrabMode.m_dTrigger, 5, true);
 
-                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_MaingrabMode.m_dTrigger,5, true);
+                        int ladsinfonum = nLADSMaxScanNum * nScanLine / nMainMaxScanNum;
+                        SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, SetScanAxisPos(nScanLine, dTriggerStartPosY, dTriggerEndPosY),
+                            m_module.LadsInfos[ladsinfonum], m_module.LadsInfos[ladsinfonum].Count, false, nScanSpeed);
 
-                        if(nScanLine>0)
-                        {
-                            SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, SetScanAxisPos(nScanLine, dTriggerStartPosY, dTriggerEndPosY),
-                            ladsinfos[nScanLine - 1], ladsinfos[nScanLine - 1].Count, false);
-                            m_MaingrabMode.StartGrab(Mainmem, cpMemoryOffset, nWaferSizeY_px, m_MaingrabMode.m_GD);
-                            m_MaingrabMode.Grabed += GrabMode_Grabed;
-                            cpMemoryOffset.X -= nCamWidth;
-                        }
+                        m_MaingrabMode.StartGrab(Mainmem, cpMemoryOffset, nWaferSizeY_px, grabData);
+                        m_MaingrabMode.Grabed += GrabMode_Grabed;
 
-                        m_LADSgrabMode.StartGrab(LADSmem, cpLADSMemoryOffset, nWaferSizeY_px, grabData);
-
-                        string res = MoveAxisToEndPos(nScanLine > 0, axisXY, dEndPosY, nScanSpeed);
+                        string res = MoveAxisToEndPos(true, axisXY, dEndPosY, nScanSpeed);
 
                         if (!res.Equals("OK"))
                             return res;
 
                         axisXY.p_axisY.RunTrigger(false);
 
-                        CalculateHeight(cpLADSMemoryOffset.X, LADSmem, nWaferSizeY_px, 230, m_MaingrabMode.m_bUseBiDirectionScan && (nScanLine % 2 != 0));
-
                         nScanLine++;
-                        cpLADSMemoryOffset.X -= nLADSCamWidth;
+                        cpMemoryOffset.X += nCamWidth;
                     }
 
                     m_MaingrabMode.m_camera.StopGrab();
-                    m_LADSgrabMode.m_camera.StopGrab();
 
                     return "OK";
                 }
                 finally
                 {
                     m_MaingrabMode.SetLight(false);
-                    m_LADSgrabMode.SetLight(false);
                 }
             }
         }
@@ -274,8 +248,8 @@ namespace Root_WIND2.Module
         private double[] SetScanAxisPos(int nScanLine, double dTriggerStartPosY, double dTriggerEndPosY)
         {
             double dTriggerDistance = Math.Abs(dTriggerEndPosY - dTriggerStartPosY);
-            double dSection = dTriggerDistance / ladsinfos[nScanLine - 1].Count;
-            double[] darrScanAxisPos = new double[ladsinfos[nScanLine - 1].Count];
+            double dSection = dTriggerDistance / m_module.LadsInfos[nScanLine].Count;
+            double[] darrScanAxisPos = new double[m_module.LadsInfos[nScanLine].Count];
             for (int i = 0; i < darrScanAxisPos.Length; i++)
             {
                 if (dTriggerStartPosY > dTriggerEndPosY)
@@ -289,14 +263,18 @@ namespace Root_WIND2.Module
         {
             if (isCompensated)
             {
-                CAXM.AxmContiStart(((AjinAxis)axisXY.p_axisY).m_nAxis, 0, 0);
+                //uint res = CAXM.AxmContiStart(((AjinAxis)axisXY.p_axisY).m_nAxis, 0, 0);
+                uint res = CAXM.AxmContiStart(0, 0, 0);
 
                 Thread.Sleep(10);
                 uint unRunning = 0;
                 while (true)
                 {
-                    CAXM.AxmContiIsMotion(((AjinAxis)axisXY.p_axisY).m_nAxis, ref unRunning);
-                    if (unRunning == 0) break;
+                    //res = CAXM.AxmContiIsMotion(((AjinAxis)axisXY.p_axisY).m_nAxis, ref unRunning);
+                    res = CAXM.AxmContiIsMotion(0, ref unRunning);
+
+                    if (unRunning == 0) 
+                        break;
                     Thread.Sleep(100);
                 }
             }
@@ -309,13 +287,13 @@ namespace Root_WIND2.Module
             }
             return "OK";
         }
-        private void SetFocusMap(int nScanAxisNo, int nZAxisNo, double[] darrScanAxisPos, List<double> darrZAxisPos, int nPointCount, bool bReverse)
+        private void SetFocusMap(int nScanAxisNo, int nZAxisNo, double[] darrScanAxisPos, List<double> darrZAxisPos, int nPointCount, bool bReverse, int speed)
         {
             int iIdxScan = 0;
             int iIdxZ = 1;
             int[] narrAxisNo = new int[2];
             double[] darrPosition = new double[2];
-            double dMaxVelocity = m_module.AxisXY.p_axisY.GetSpeedValue(eSpeed.Move).m_v;
+            double dMaxVelocity = speed;/*m_module.AxisXY.p_axisY.GetSpeedValue(eSpeed.Move).m_v;*/
             double dMaxAccel = m_module.AxisXY.p_axisY.GetSpeedValue(eSpeed.Move).m_acc;
             double dMaxDecel = m_module.AxisXY.p_axisY.GetSpeedValue(eSpeed.Move).m_dec;
 
@@ -325,18 +303,21 @@ namespace Root_WIND2.Module
                 iIdxZ = 0;
                 iIdxScan = 1;
             }
+
             narrAxisNo[iIdxScan] = nScanAxisNo;
             narrAxisNo[iIdxZ] = nZAxisNo;
 
+            nScanAxisNo = 0;
             // Queue 초기화
-            uint res = CAXM.AxmContiWriteClear(nScanAxisNo);
+            uint res = CAXM.AxmContiWriteClear(0);
+
             // 보간구동 축 맵핑
-            res = CAXM.AxmContiSetAxisMap(nScanAxisNo, (uint)2, narrAxisNo);
+            res = CAXM.AxmContiSetAxisMap(0, (uint)2, narrAxisNo);
             // 구동모드 설정 -> [0] : 절대위치구동, [1] : 상대위치구동
             uint unAbsRelMode = 0;
-            res = CAXM.AxmContiSetAbsRelMode(nScanAxisNo, unAbsRelMode);
+            res = CAXM.AxmContiSetAbsRelMode(0, unAbsRelMode);
             // Conti 작성 시작 -> AxmContiBeginNode ~ AxmContiEndNode 사이의 AXM관련 함수들이 Conti Queue에 등록된다.
-            res = CAXM.AxmContiBeginNode(nScanAxisNo);
+            res = CAXM.AxmContiBeginNode(0);
 
             int m_nFocusPosZ = m_MaingrabMode.m_nFocusPosZ;
 
@@ -346,7 +327,7 @@ namespace Root_WIND2.Module
                 for (int i = nPointCount - 1; i >= 0; i--)
                 {
                     darrPosition[iIdxScan] = darrScanAxisPos[i];
-                    darrPosition[iIdxZ] = m_nFocusPosZ + darrZAxisPos[i] * 10*m_LADSgrabMode.m_dResX_um;
+                    darrPosition[iIdxZ] = m_nFocusPosZ- darrZAxisPos[i] * 400;/* 10*m_LADSgrabMode.m_dResX_um*/;
                     res = CAXM.AxmLineMove(nScanAxisNo, darrPosition, dMaxVelocity, dMaxAccel, dMaxDecel);
                 }
             }
@@ -355,7 +336,7 @@ namespace Root_WIND2.Module
                 for (int i = 0; i < nPointCount; i++)
                 {
                     darrPosition[iIdxScan] = darrScanAxisPos[i];
-                    darrPosition[iIdxZ] = m_nFocusPosZ + darrZAxisPos[i] * 10*m_LADSgrabMode.m_dResX_um;
+                    darrPosition[iIdxZ] = m_nFocusPosZ - darrZAxisPos[i] * 400; /*10*m_LADSgrabMode.m_dResX_um*/;
                     res = CAXM.AxmLineMove(nScanAxisNo, darrPosition, dMaxVelocity, dMaxAccel, dMaxDecel);
                 }
             }
@@ -367,7 +348,7 @@ namespace Root_WIND2.Module
         {
             int nCamWidth = m_LADSgrabMode.m_camera.GetRoiSize().X;
             int nCamHeight = m_LADSgrabMode.m_camera.GetRoiSize().Y;
-            int hCnt = WaferHeight / m_MaingrabMode.m_camera.GetRoiSize().Y;
+            int hCnt = WaferHeight / nCamHeight;
 
             byte* ptr = (byte*)mem.GetPtr().ToPointer();
 
@@ -380,7 +361,7 @@ namespace Root_WIND2.Module
                 {
                     li.Clear();
 
-                    for (int h = 0; h < nCamHeight; h++)
+                    for (int h = (int)(nCamHeight*0.25); h < nCamHeight*0.75; h++)
                     {
                         int curpxl = 0;
                         for (int w = 0; w < nCamWidth; w++)
@@ -421,13 +402,98 @@ namespace Root_WIND2.Module
                     }
 
                     if (li.Count > 0)
-                        ladsinfo.Add(((li[li.Count - 1] - li[0]) / 2 - (double)nCamHeight / 2) * Math.Sqrt(2)); //Frame의 가운데가 Focus가 맞는 지점이라고 생각
+                        ladsinfo.Add(((li[li.Count - 1] + li[0]) / 2 - (double)nCamHeight / 2) * Math.Sqrt(2)); //Frame의 가운데가 Focus가 맞는 지점이라고 생각
                     else
                         ladsinfo.Add(0);
                 }
             }
 
-            ladsinfos.Add(ladsinfo);
+            m_module.LadsInfos.Add(ladsinfo);
         }
     }
 }
+#region 한줄씩찍으면서 LADS 정보획득
+/*if (m_LADSgrabMode == null) return "Grab Mode : LADS == null";
+
+try
+{
+    ladsinfos.Clear();
+
+    m_MaingrabMode.SetLight(true);
+
+    CPoint cpLADSMemoryOffset = new CPoint(m_LADSgrabMode.m_cpMemoryOffset);
+
+    int nLADSCamWidth = m_LADSgrabMode.m_camera.GetRoiSize().X;
+    int nLADSCamHeight = m_LADSgrabMode.m_camera.GetRoiSize().Y;
+
+    cpMemoryOffset.X += nWaferSizeY_px - m_MaingrabMode.m_ScanStartLine * nCamWidth;
+    cpLADSMemoryOffset.X += Convert.ToInt32(m_MaingrabMode.m_nWaferSize_mm * nMMPerUM / m_LADSgrabMode.m_dResY_um)
+        - m_MaingrabMode.m_ScanStartLine * nLADSCamWidth;
+
+    string strLADSPool = m_LADSgrabMode.m_memoryPool.p_id;
+    string strLADSGroup = m_LADSgrabMode.m_memoryGroup.p_id;
+    string strLADSMemory = m_LADSgrabMode.m_memoryData.p_id;
+
+    MemoryData LADSmem = m_module.m_engineer.GetMemory(strLADSPool, strLADSGroup, strLADSMemory);
+
+    while (m_MaingrabMode.m_ScanLineNum >= nScanLine)
+    {
+        if (EQ.IsStop())
+            return "OK";
+
+        if (m_MaingrabMode.m_bUseBiDirectionScan && (nScanLine % 2 != 0))
+        {
+            GeneralFunction.Swap(ref dStartPosY, ref dEndPosY);
+            m_MaingrabMode.m_eGrabDirection = eGrabDirection.BackWard;
+        }
+        else
+            m_MaingrabMode.m_eGrabDirection = eGrabDirection.Forward;
+
+        grabData.bInvY = m_MaingrabMode.m_eGrabDirection == eGrabDirection.Forward;
+
+        double dPosX = m_MaingrabMode.m_rpAxisCenter.X + nWaferSizeY_px * (double)m_MaingrabMode.m_dTrigger/2
+                    - (nScanLine + m_MaingrabMode.m_ScanStartLine) * nCamWidth * dXScale;
+
+        if (m_module.Run(axisZ.StartMove(m_MaingrabMode.m_nFocusPosZ)))
+            return p_sInfo;
+        if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
+            return p_sInfo;
+        if (m_module.Run(axisXY.WaitReady()))
+            return p_sInfo;
+        if (m_module.Run(axisZ.WaitReady()))
+            return p_sInfo;
+
+
+        if (nScanLine > 0)
+        {
+            SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, SetScanAxisPos(nScanLine, dTriggerStartPosY, dTriggerEndPosY),
+            ladsinfos[nScanLine - 1], ladsinfos[nScanLine - 1].Count, false, nScanSpeed);
+            m_MaingrabMode.StartGrab(Mainmem, cpMemoryOffset, nWaferSizeY_px, m_MaingrabMode.m_GD);
+            m_MaingrabMode.Grabed += GrabMode_Grabed;
+            cpMemoryOffset.X -= nCamWidth;
+        }
+        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_MaingrabMode.m_dTrigger, 5, true);
+        //m_LADSgrabMode.StartGrab(LADSmem, cpLADSMemoryOffset, Convert.ToInt32(m_LADSgrabMode.m_nWaferSize_mm * nMMPerUM / m_LADSgrabMode.m_dResY_um), grabData);
+        m_LADSgrabMode.StartGrab(LADSmem, cpMemoryOffset,nWaferSizeY_px, grabData);
+        string res = MoveAxisToEndPos(nScanLine > 0, axisXY, dEndPosY, nScanSpeed);
+
+        if (!res.Equals("OK"))
+            return res;
+
+        axisXY.p_axisY.RunTrigger(false);
+
+        CalculateHeight(cpLADSMemoryOffset.X, LADSmem, Convert.ToInt32(m_LADSgrabMode.m_nWaferSize_mm * nMMPerUM / m_LADSgrabMode.m_dResY_um), 230, m_MaingrabMode.m_bUseBiDirectionScan && (nScanLine % 2 != 0));
+
+        nScanLine++;
+        cpLADSMemoryOffset.X -= nLADSCamWidth;
+    }
+
+    m_MaingrabMode.m_camera.StopGrab();
+
+    return "OK";
+}
+finally
+{
+    m_MaingrabMode.SetLight(false);
+}*/
+#endregion

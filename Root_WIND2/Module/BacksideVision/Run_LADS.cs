@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using RootTools;
 using RootTools.Camera;
 using RootTools.Control;
@@ -83,7 +84,16 @@ namespace Root_WIND2.Module
                 double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
                 double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
+                if (Math.Abs(dTriggerEndPosY - dStartPosY) > Math.Abs(dTriggerStartPosY - dStartPosY))
+                    dTriggerEndPosY += nScanOffset_pulse;
+
+                else
+                    dTriggerStartPosY -= nScanOffset_pulse;
+
                 GrabData grabData = m_grabMode.m_GD;
+                grabData.ReverseOffsetY = m_grabMode.m_nReverseOffsetY;
+
+                m_module.LadsInfos.Clear();
 
                 while (m_grabMode.m_ScanLineNum > nScanLine)
                 {
@@ -112,11 +122,7 @@ namespace Root_WIND2.Module
                     if (m_module.Run(axisZ.WaitReady()))
                         return p_sInfo;
 
-                    if (Math.Abs(dTriggerEndPosY - dStartPosY) > Math.Abs(dTriggerStartPosY - dStartPosY))
-                        dTriggerEndPosY += nScanOffset_pulse;
 
-                    else
-                        dTriggerStartPosY -= nScanOffset_pulse;
 
                     axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger*nCamHeight /2,5, true);
 
@@ -130,16 +136,18 @@ namespace Root_WIND2.Module
                     axisXY.p_axisY.RunTrigger(false);
 
 
-                    while (m_grabMode.m_camera.p_nGrabProgress != 100)
-                    {
-                        System.Threading.Thread.Sleep(10);
-                        m_log.Info("Wait Camera GrabProcess");
-                    }
-                    m_grabMode.m_camera.StopGrab();
+                    //while (m_grabMode.m_camera.p_nGrabProgress != 100)
+                    //{
+                    //    System.Threading.Thread.Sleep(10);
+                    //    m_log.Info("Wait Camera GrabProcess");
+                    //}
+                    //m_grabMode.m_camera.StopGrab();
+                    CalculateHeight(cpMemoryOffset.X, mem, nWaferSizeY_px, 230, grabData.bInvY);
                     nScanLine++;
                     cpMemoryOffset.X += nCamWidth;
                 }
                 m_grabMode.m_camera.StopGrab();
+
 
                 return "OK";
             }
@@ -147,6 +155,78 @@ namespace Root_WIND2.Module
             {
                 m_grabMode.SetLight(false);
             }
+        }
+
+        unsafe void CalculateHeight(int xmempos, MemoryData mem, int WaferHeight, int gv, bool InvY)
+        {
+            int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
+            int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
+            int hCnt = WaferHeight / nCamHeight;
+
+            byte* ptr = (byte*)mem.GetPtr().ToPointer();
+
+            List<double> ladsinfo = new List<double>();
+            List<double> li = new List<double>();// 뭔가 값이 있는곳에 대한 정보
+
+            if (!InvY)
+            {//정방향 스캔시
+                for (int cnt = 0; cnt < hCnt; cnt++)
+                {
+                    li.Clear();
+
+                    for (int h = (int)(nCamHeight * 0.25); h < nCamHeight * 0.75; h++)
+                    {
+                        int curpxl = 0;
+                        //if ((ptr[xmempos + (cnt * nCamHeight + h) * mem.W] < gv) && (ptr[nCamWidth / 2 + xmempos + (cnt * nCamHeight + h) * mem.W] < gv) && (ptr[nCamWidth + (cnt * nCamHeight + h) * mem.W] < gv))
+                        //    return;
+                        for (int w = 0; w < nCamWidth; w++)
+                        {
+                            /*arr[cnt*camheight+h][w+(m_granCurLine*nCamWidth)]*/
+                            if (ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W] >= gv)
+                                curpxl++;
+                        }
+
+                        if (curpxl > 0)
+                            li.Add(h);
+                    }
+
+                    if (li.Count > 0)
+                        ladsinfo.Add(((li[li.Count - 1] + li[0]) / 2 - (double)nCamHeight / 2) * Math.Sqrt(2)); //Frame의 가운데가 Focus가 맞는 지점이라고 생각
+                    else
+                        ladsinfo.Add(0);
+                }
+            }
+            else
+            {
+                for (int cnt = hCnt - 1; cnt >= 0; cnt--)
+                {
+                    li.Clear();
+
+                    for (int h = (int)(nCamHeight * 0.25); h < nCamHeight * 0.75; h++)
+
+                    {
+                        int curpxl = 0;
+                        //if ((ptr[xmempos + (cnt * nCamHeight + h) * mem.W] < gv) && (ptr[nCamWidth / 2 + xmempos + (cnt * nCamHeight + h) * mem.W] < gv) && (ptr[nCamWidth + (cnt * nCamHeight + h) * mem.W] < gv))
+                        //    return;
+                        for (int w = 0; w < nCamWidth; w++)
+                        {
+                            /*arr[cnt*camheight+h][w+(m_granCurLine*nCamWidth)]*/
+                            if (ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W] >= gv)
+                                curpxl++;
+                        }
+
+                        if (curpxl > 0)
+                            li.Add(h);
+                    }
+
+                    if (li.Count > 0)
+                        ladsinfo.Add(((li[li.Count - 1] + li[0]) / 2 - (double)nCamHeight / 2) * Math.Sqrt(2)); //Frame의 가운데가 Focus가 맞는 지점이라고 생각
+                    else
+                        ladsinfo.Add(0);
+                }
+            }
+
+            m_module.LadsInfos.Add(ladsinfo);
         }
     }
 }
