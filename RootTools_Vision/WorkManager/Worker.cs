@@ -25,6 +25,7 @@ namespace RootTools_Vision
 
     public delegate void EventRequestStop();
 
+
     sealed internal class Worker : IWorkStartable
     {
         #region [Members]

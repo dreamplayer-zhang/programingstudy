@@ -1357,9 +1357,10 @@ namespace Root_AOP01_Packing.Module
             {
                 m_module = module;
                 InitModuleRun(module);
+                //p_id = p_id + "m_eStep";
             }
 
-            eStep m_eStep = eStep.GetWrapper;
+            public eStep m_eStep = eStep.GetWrapper;
             public override ModuleRunBase Clone()
             {
                 Run_Step run = new Run_Step(m_module);
@@ -1373,9 +1374,10 @@ namespace Root_AOP01_Packing.Module
             }
 
             public override string Run()
-            {
+            {                
                 return m_module.RunStep(m_eStep); 
             }
+
         }
 
         public class Run_Packing : ModuleRunBase

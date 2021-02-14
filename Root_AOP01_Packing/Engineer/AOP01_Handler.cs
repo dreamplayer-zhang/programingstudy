@@ -7,6 +7,7 @@ using RootTools.Module;
 using RootTools.OHTNew;
 using RootTools.Trees;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -50,34 +51,34 @@ namespace Root_AOP01_Packing
             InitWTR();
             InitLoadport();
 
-            //m_RFID = new RFID_Brooks("RFID", m_engineer, null);
-            //InitModule(m_RFID);
+            m_RFID = new RFID_Brooks("RFID", m_engineer, null);
+            InitModule(m_RFID);
 
             m_tapePacker = new TapePacker("TapePacker", m_engineer);
             InitModule(m_tapePacker);
-            //((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);
-            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_tapePacker);
+            ((IWTR)m_aRTR[0]).AddChild((IWTRChild)m_tapePacker);
+            ((IWTR)m_aRTR[1]).AddChild((IWTRChild)m_tapePacker);
 
             m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
             InitModule(m_vacuumPacker);
-            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_vacuumPacker);
+            ((IWTR)m_aRTR[1]).AddChild((IWTRChild)m_vacuumPacker);
 
-            //m_elevator = new IndividualElevator("IndividualElevator", m_engineer);
-            //InitModule(m_elevator);
-            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_elevator);
+            m_elevator = new IndividualElevator("IndividualElevator", m_engineer);
+            InitModule(m_elevator);
+            ((IWTR)m_aRTR[1]).AddChild((IWTRChild)m_elevator);
 
             m_unloadport = new Unloadport_AOP("Unloadport", m_engineer);
             InitModule(m_unloadport);
             ((IWTR)m_aRTR[1]).AddChild((IWTRChild)m_unloadport);
 
-            //m_aWTR[0].RunTree(Tree.eMode.RegRead);
-            //m_aWTR[0].RunTree(Tree.eMode.Init);
-            //m_aWTR[1].RunTree(Tree.eMode.RegRead);
-            //m_aWTR[1].RunTree(Tree.eMode.Init);
-            //((IWTR)m_aWTR[1]).ReadInfoReticle_Registry();
+            m_aRTR[0].RunTree(Tree.eMode.RegRead);
+            m_aRTR[0].RunTree(Tree.eMode.Init);
+            m_aRTR[1].RunTree(Tree.eMode.RegRead);
+            m_aRTR[1].RunTree(Tree.eMode.Init);
+            ((IWTR)m_aRTR[1]).ReadInfoReticle_Registry();
 
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
-            //m_recipe.AddModule();
+            m_recipe.AddModule();
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys)
                 m_recipe.AddModule(module);
 
@@ -114,7 +115,7 @@ namespace Root_AOP01_Packing
         #endregion
 
         #region Module Loadport
-        public List<ILoadport> m_aLoadport = new List<ILoadport>();
+        public ObservableCollection<ILoadport> m_aLoadport = new ObservableCollection<ILoadport>();
         void InitLoadport()
         {
             Loadport_Cymechs loadportA = new Loadport_Cymechs("LoadportA", m_engineer, false, false);

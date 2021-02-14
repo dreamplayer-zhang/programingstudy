@@ -45,6 +45,8 @@ namespace RootTools_Vision
             if (!(this.currentWorkplace.MapIndexX == -1 && this.currentWorkplace.MapIndexY == -1))
                 return;
 
+            WorkEventManager.OnProcessDefectWaferStart(this, new ProcessDefectWaferStartEventArgs());
+
             // Option Param
             int mergeDist = 1;
             int backsideOffset = 1700;

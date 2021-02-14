@@ -63,6 +63,14 @@ namespace RootTools_Vision
         }
     }
 
+    public class ProcessDefectWaferStartEventArgs : EventArgs
+    {
+        public ProcessDefectWaferStartEventArgs()
+        {
+
+        }
+    }
+
     public class ProcessDefectEdgeDoneEventArgs : EventArgs
     {
         public ProcessDefectEdgeDoneEventArgs()
@@ -100,6 +108,13 @@ namespace RootTools_Vision
     public class RequestStopEventArgs : EventArgs
     {
         public RequestStopEventArgs()
+        {
+        }
+    }
+
+    public class InspectionStartArgs : EventArgs
+    {
+        public InspectionStartArgs()
         {
         }
     }

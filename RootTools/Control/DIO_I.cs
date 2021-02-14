@@ -2,7 +2,7 @@
 
 namespace RootTools.Control
 {
-    public class DIO_I : IDIO
+    public class DIO_I : NotifyPropertyChanged, IDIO
     {
         public BitDI m_bitDI = new BitDI();
 
@@ -12,7 +12,6 @@ namespace RootTools.Control
         {
             get { return (m_bitDI.p_bOn != m_bReverse); }
         }
-
 
         ListDIO m_listDI; 
         public string m_id;
