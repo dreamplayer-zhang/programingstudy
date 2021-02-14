@@ -1007,12 +1007,65 @@ namespace Root_AOP01_Packing.Module
                 switch (m_eCover)
                 {
                     case eCover.Open:
-                        return m_module.RunCoverOpen();
+                        return RunCoverOpen();
                     case eCover.Close:
-                        return m_module.RunCoverClose();
+                        return RunCoverClose();
                     case eCover.HeadUp:
-                        return m_module.RunHeadUp();
+                        return RunHeadUp();
                 }
+                return "OK";
+            }
+            public string RunCoverOpen()
+            {
+                //0203  p_eProcess = eProcess.Case;
+                if (m_module.p_eProcess != eProcess.Case)
+                    return "Process not Case : " + m_module.p_eProcess.ToString();
+                m_module.p_eProcess = eProcess.Opening;
+                if (m_module.Run(m_module.m_head.RunVacuum(false)))
+                    return p_sInfo;
+                p_nProgress += 20;
+                if (m_module.Run(m_module.m_head.RunSol(false, false)))
+                    return p_sInfo;
+                p_nProgress += 20;
+                if (m_module.Run(m_module.m_head.RunSol(true, true)))
+                    return p_sInfo;
+                p_nProgress += 20;
+                if (m_module.Run(m_module.m_head.RunVacuum(true)))
+                    return p_sInfo;
+                p_nProgress += 20;
+                if (m_module.Run(m_module.m_head.RunSol(false, true)))
+                    return p_sInfo;
+                p_nProgress += 20;
+                m_module.p_eProcess = eProcess.Opened;
+                //p_eProcess = eProcess.Opened
+                return "OK";
+            }
+            public string RunCoverClose()
+            {
+                //0203 p_eProcess = eProcess.Reticle;
+                if (m_module.p_eProcess != eProcess.Reticle)
+                    return "Process not Reticle : " + m_module.p_eProcess.ToString();
+                m_module.p_eProcess = eProcess.Closing;
+                if (m_module.Run(m_module.m_head.RunSol(true, true)))
+                    return p_sInfo;
+                p_nProgress += 33;
+                if (m_module.Run(m_module.m_head.RunVacuum(false)))
+                    return p_sInfo;
+                p_nProgress += 33;
+                if (m_module.Run(m_module.m_head.RunSol(true, false)))
+                    return p_sInfo;
+                p_nProgress += 34;
+                m_module.p_eProcess = eProcess.Closed;
+                return "OK";
+            }
+            public string RunHeadUp()
+            {
+                if (m_module.Run(m_module.m_head.RunVacuum(false)))
+                    return p_sInfo;
+                p_nProgress += 50;
+                if (m_module.Run(m_module.m_head.RunSol(false, false)))
+                    return p_sInfo;
+                p_nProgress += 50;
                 return "OK";
             }
         }
@@ -1039,6 +1092,69 @@ namespace Root_AOP01_Packing.Module
             public override string Run()
             {
                 return m_module.RunTaping();
+            }
+            public string RunTaping()
+            {
+                //p_eProcess = eProcess.Closed;
+                if (m_module.p_eProcess != eProcess.Closed)
+                    return "Process not Closed : " + m_module.p_eProcess.ToString();
+                m_module.p_eProcess = eProcess.Taping;
+                if (m_module.Run(m_module.m_stage.m_axis.StartHome()))
+                    return p_sInfo;
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_stage.m_axis.WaitReady()))
+                    return p_sInfo;
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_head.RunSol(true, false)))
+                    return p_sInfo; // Overload는 여기서 체크
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_roller.RunRollerPushUp(true)))
+                    return p_sInfo;
+                p_nProgress += 6;
+                // 0203 Check Case Top Sensor 시퀀스 추가 필요
+                if (m_module.Run(m_module.m_cartridge.RunMove(Cartridge.ePos.Attach)))
+                    return p_sInfo;
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_stage.RunRotate(15)))
+                    return p_sInfo;
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_cartridge.RunStopper(false)))
+                    return p_sInfo;
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_cartridge.RunMove(Cartridge.ePos.Taping)))
+                    return p_sInfo;
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_stage.RunRotate(705)))
+                    return p_sInfo;
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_stage.RunRotate(34)))
+                    return p_sInfo;
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_cartridge.RunMove(Cartridge.ePos.Cutting)))
+                    return p_sInfo;
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_cartridge.RunCutter()))
+                    return p_sInfo;
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_cartridge.RunMove(Cartridge.ePos.CheckTape)))
+                    return p_sInfo;
+                p_nProgress += 6;
+                // 0203 Tape 잔량 시퀀스 추가 필요
+                //if (Run(m_camera.RunCheckEndVRS())) return p_sInfo;
+                if (m_module.Run(m_module.m_stage.RunRotate(326)))
+                    return p_sInfo;
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_stage.RunMove(m_module.m_stage.m_degReady)))
+                    return p_sInfo;
+                p_nProgress += 6;
+                if (m_module.Run(m_module.m_head.RunHeadDown(false)))
+                    return p_sInfo;
+                p_nProgress += 5;
+                if (m_module.Run(m_module.m_roller.RunRollerPushUp(false)))
+                    return p_sInfo;
+                p_nProgress += 5;
+                m_module.p_eProcess = eProcess.Done;
+                return "OK";
             }
         }
         #endregion

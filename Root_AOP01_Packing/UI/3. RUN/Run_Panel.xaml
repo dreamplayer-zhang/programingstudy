@@ -15,6 +15,7 @@
         <local:ModuleRunImageConverter x:Key="ModuleRunImageConverter" />
         <local:ModuleRunStepConverter x:Key="ModuleRunStepConverter" />
         <local:ModuleRunStateVisibleConverter x:Key="ModuleRunStateVisibleConverter" />
+        <local:ModuleRunProgressConverter x:Key="ModuleRunProgressConverter" />
     </UserControl.Resources>
     <ScrollViewer>
         <StackPanel>
@@ -267,16 +268,16 @@
                                                             <ColumnDefinition />
                                                             <ColumnDefinition Width="1.5*" />
                                                         </Grid.ColumnDefinitions>
-                                                        <Image Source="{Binding Converter={StaticResource ModuleRunImageConverter}}" />
+                                                        <Image Source="{Binding Converter={StaticResource ModuleRunImageConverter}}" Opacity="{Binding p_eRunState, Converter={StaticResource ModuleRunStateVisibleConverter}, ConverterParameter=Opacity}" />
                                                         <local:LoadingControl Visibility="{Binding p_eRunState, Converter={StaticResource ModuleRunStateVisibleConverter}}"/>
                                                         <Grid Grid.Column="1" Margin="40,50">
                                                             <Grid.RowDefinitions>
                                                                 <RowDefinition />
                                                                 <RowDefinition />
                                                             </Grid.RowDefinitions>
-                                                            <TextBlock Text="{Binding p_eState}" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial" />
-                                                            <!--<ProgressBar Grid.Row="1" Value="{Binding modulerun내에}" Foreground="SteelBlue" Margin="0,5" />
-                                                            <TextBlock Text="{Binding 위의value}" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" />-->
+                                                            <TextBlock Text="{Binding p_eRunState}" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial" />
+                                                            <ProgressBar Grid.Row="1" Maximum="100" Value="{Binding p_nProgress}" Foreground="SteelBlue" Margin="0,5"/>
+                                                            <!--<TextBlock Text="{Binding 위의value}" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" />-->
                                                         </Grid>
                                                     </Grid>
                                                 </GroupBox>
@@ -290,10 +291,10 @@
                 </Grid>
                 <Grid Grid.Column="2">
                     <StackPanel Grid.Row="1" Margin="0,20">
-                        <Button Content="START" Style="{StaticResource SetupPanelBtn}" />
+                        <Button Content="{Binding p_sNameStartBtn}" Style="{StaticResource SetupPanelBtn}" Command="{Binding cmdStart}" />
                         <Button Content="ONLINE" Style="{StaticResource SetupPanelBtn}" />
-                        <Button Content="INITIALIZE" Style="{StaticResource SetupPanelBtn}" />
-                        <Button Content="RECOVERY" Style="{StaticResource SetupPanelBtn}" Click="Button_Click" />
+                        <Button Content="INITIALIZE" Style="{StaticResource SetupPanelBtn}" Command="{Binding cmdInit}"/>
+                        <Button Content="RECOVERY" Style="{StaticResource SetupPanelBtn}" Command="{Binding cmdHome}"/>
                     </StackPanel>
                 </Grid>
             </Grid>

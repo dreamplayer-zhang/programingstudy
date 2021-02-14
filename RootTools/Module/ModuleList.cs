@@ -114,11 +114,18 @@ namespace RootTools.Module
                         {
                             ModuleRunBase moduleRun = m_qModuleRun.Peek();
                             p_iRun = m_qModuleRun.Count;
-                            p_Percent = "Set";
                             moduleRun.StartRun();
                             Thread.Sleep(100);
                             while (moduleRun.m_moduleBase.m_qModuleRun.Count > 0) Thread.Sleep(10);
                             while (moduleRun.m_moduleBase.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+                            
+                            if (moduleRun.m_moduleBase.p_eState == ModuleBase.eState.Error)
+                            {
+                                m_qModuleRun.Clear();
+                                moduleRun.p_eRunState = ModuleRunBase.eRunState.Error;
+                                EQ.p_eState = EQ.eState.Error;
+                                break;
+                            }
                             if (m_qModuleRun.Count <= 1)
                             {
                                 p_visibleRnR = Visibility.Visible;
@@ -133,7 +140,10 @@ namespace RootTools.Module
                             p_iRun = p_maxRun;
 
                         break;
-                    case EQ.eState.Error: p_sRun = "Reset"; break;
+                    case EQ.eState.Error:
+                        p_Percent = "ERROR";
+                        p_sRun = "Reset"; 
+                        break;
                 }
             }
         }
@@ -260,15 +270,26 @@ namespace RootTools.Module
                 OnPropertyChanged();
             }
         }
+        private int _iRun = 0;
         public int p_iRun
         {
             get
             {
-                return (m_qModuleRun.Count == 0) ? p_maxRun : p_maxRun - m_qModuleRun.Count; 
+                return _iRun;
             }
             set 
             {
-                p_Percent = "set";
+                
+                if (value == 0)
+                    _iRun = value;
+                else
+                    _iRun = (m_qModuleRun.Count == 0) ? p_maxRun : p_maxRun - m_qModuleRun.Count;
+
+                int now = p_maxRun - (int)value;
+                if (now == 0)
+                    p_Percent = "100%";
+                else
+                    p_Percent = ((double)now / (double)p_maxRun * 100).ToString("F2");
                 OnPropertyChanged(); 
             }
         }
@@ -278,8 +299,12 @@ namespace RootTools.Module
         {
             get
             {
-                double percent = (double)p_iRun / (double)p_maxRun * 100;
-                return percent.ToString("F2") + " % ";
+                if (_percent == "ERROR")
+                    return _percent;
+                else
+                    return _percent + " % ";
+                //double percent = (double)p_iRun / (double)p_maxRun * 100;
+                //return percent.ToString("F2") + " % ";
             }
             set
             {
@@ -314,7 +339,7 @@ namespace RootTools.Module
         IHandler m_handler;
         Log m_log;
         /// <summary> m_moduleRunList : ModuleRun 편집용 -> m_qModuleRun 으로 실행 </summary>
-        public ModuleRunList m_moduleRunList; // 이거를 프로퍼티로 선언해서 모듈런베이스의 프로그레스를 받아오면 개꿀임
+        public ModuleRunList m_moduleRunList;
         public ModuleList(IEngineer engineer)
         {
             m_id = EQ.m_sModel;
