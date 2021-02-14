@@ -905,7 +905,8 @@ namespace Root_AOP01_Packing.Module
 
             public override string Run()
             {
-                Thread.Sleep((int)(1000 * m_secDelay));
+
+                Thread.Sleep((int)(1000 * m_secDelay/2));
                 return "OK";
             }
         }

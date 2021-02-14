@@ -46,6 +46,8 @@ namespace RootTools.Module
         }
         #endregion
 
+        
+
         public string p_id { get; set; }
 
         public string m_sModuleRun;

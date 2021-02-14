@@ -27,8 +27,11 @@ namespace Root_AOP01_Packing
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var asdf = this.DataContext;
-            var adsfff = prog.DataContext;
+            Run_ViewModel vm = this.DataContext as Run_ViewModel;
+            
+            //vm.p_LoadportA.p_diPlaced.btest = true;
+            //vm.p_LoadportA = vm.p_LoadportA;
+
         }
     }
 }
