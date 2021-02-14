@@ -2,10 +2,13 @@
 using Root_VEGA_D.Engineer;
 using RootTools;
 using RootTools.Module;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Root_VEGA_D
 {
@@ -92,6 +95,9 @@ namespace Root_VEGA_D
             m_engineer.Init("VEGA_D");
             engineerUI.Init(m_engineer);
             m_handler = m_engineer.m_handler;
+            loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
+            loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
+            InitTimer();
         }
 
         void ThreadStop()
@@ -177,5 +183,41 @@ namespace Root_VEGA_D
         {
             m_engineer.BuzzerOff();
         }
+
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(20);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            TimerUI();
+            TimerLamp();
+
+            buttonResume.IsEnabled = IsEnable_Resume();
+            buttonPause.IsEnabled = IsEnable_Pause();
+            buttonInitialize.IsEnabled = IsEnable_Initial();
+            buttonRecovery.IsEnabled = IsEnable_Recovery();
+        }
+        void TimerUI()
+        {
+            if (EQ.p_eState != EQ.eState.Run) EQ.p_bRecovery = false;
+            //textState.Text = m_bRecovery ? "Recovery" : EQ.p_eState.ToString();
+            textState.Text = EQ.p_bRecovery ? "Recovery" : EQ.p_eState.ToString();
+            textState.Text = string.Format("State : {0}", textState.Text);
+        }
+
+        void TimerLamp()
+        {
+            //working
+            lampRed.Background = EQ.p_eState == EQ.eState.Error ? Brushes.Crimson : Brushes.LavenderBlush;
+            lampYellow.Background = EQ.p_eState == EQ.eState.Ready ? Brushes.Gold : Brushes.Ivory;
+            lampGreen.Background = EQ.p_eState == EQ.eState.Run ? Brushes.SeaGreen : Brushes.Honeydew;
+        }
+        #endregion
     }
 }

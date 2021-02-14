@@ -27,12 +27,6 @@
             <Setter Property="HorizontalAlignment"
                     Value="Left" />
         </Style>
-        <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
-            <Setter Property="FontFamily" Value="Arial"/>
-            <Setter Property="FontSize" Value="15"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
-        </Style>
     </Window.Resources>
 
     <Grid>
@@ -178,6 +172,10 @@
                         <ColumnDefinition Width="20*" />
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="10*" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="10*" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="10*" />
                     </Grid.ColumnDefinitions>
                     <Line Grid.Column="1"
                           Stroke="{StaticResource Splitter}"
@@ -233,6 +231,31 @@
                             <control:LoadingControl />
                         </Viewbox>
                     </Grid>
+                    <TextBlock Grid.Column="6"
+                               x:Name="textState"
+                               FontWeight="SemiBold"
+                               Text="State : Error"/>
+                    <Border Grid.Column="8"
+                            Margin="8"
+                            BorderBrush="#FF707070"
+                            BorderThickness="1">
+                        <Grid Opacity="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0"
+                                  x:Name="lampRed"
+                              Background="Crimson"/>
+                            <Grid Grid.Row="1"
+                                  x:Name="lampYellow"
+                              Background="Gold"/>
+                            <Grid Grid.Row="2"
+                                  x:Name="lampGreen"
+                              Background="SeaGreen"/>
+                        </Grid>
+                    </Border>
                 </Grid>
                 <!--Right Top Panel-->
                 <Grid Grid.Column="4"
@@ -2171,14 +2194,12 @@
                             </Grid>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="2"
-                              Header="OHT">
-
-                    </GroupBox>
-                    <GroupBox Grid.Row="4"
-                              Header="LoadPort">
-
-                    </GroupBox>
+                    <Grid Grid.Row="2">
+                        <local:Loadport_UI x:Name="loadportA"/>
+                    </Grid>
+                    <Grid Grid.Row="4">
+                        <local:Loadport_UI x:Name="loadportB"/>
+                    </Grid>
                     <!--<Button Grid.Row="6"
                             FontSize="15"
                             Content="Start"
