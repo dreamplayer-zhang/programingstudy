@@ -291,6 +291,7 @@ namespace RootTools.Memory
             if (m_bMaster == false) return; 
             bool bVisible = true; 
             RunTreeProcess(m_treeRootRun.GetTree("Process"), bVisible);
+            RunTreeTCPSetup(m_treeRootRun.GetTree("TCP Set"));
         }
         #endregion
 
