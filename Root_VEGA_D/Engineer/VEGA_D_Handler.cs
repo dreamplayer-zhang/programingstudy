@@ -44,6 +44,7 @@ namespace Root_VEGA_D.Engineer
             InitWTR();
             IWTR iWTR = (IWTR)m_wtr;
             InitLoadport();
+            InitRFID();
             InitAligner();
             m_vision = new Vision("Vision", m_engineer);
             InitModule(m_vision);
@@ -126,6 +127,20 @@ namespace Root_VEGA_D.Engineer
                 InitModule(module);
                 m_aLoadport.Add((ILoadport)module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
+            }
+        }
+
+        public List<IRFID> m_aRFID = new List<IRFID>();
+        void InitRFID()
+        {
+            ModuleBase module;
+            char cID = 'A';
+            for(int n=0; n<m_lLoadport; n++, cID++)
+            {
+                string sID = "RFID" + cID;
+                module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]);
+                InitModule(module);
+                m_aRFID.Add((IRFID)module);
             }
         }
 

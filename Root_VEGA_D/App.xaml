@@ -7,8 +7,9 @@
         <!--Color-->
         <SolidColorBrush x:Key="PanelBackGround"
                          Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
-        <SolidColorBrush x:Key="ControlBackGround"
-                         Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}" />
+        <SolidColorBrush x:Key="ControlBackGround" 
+                         Color="#FF5482A1"/>
+                         <!--="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}" />-->
         <SolidColorBrush x:Key="GroupBoxBackground"
                          Color="Transparent" />
         <SolidColorBrush x:Key="Splitter"
@@ -114,6 +115,12 @@
                     Value="10" />
             <Setter Property="Data"
                     Value="M48.578243,0 L57.856652,0 71.665367,15.433628 85.779,0 94.404,0 75.760063,19.752212 94.404,39.999999 85.125595,39.999999 71.229759,24.460176 56.98544,39.999999 48.404,39.999999 67.135063,20.141593 z" />
+        </Style>
+        <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
         </Style>
         <!--GroupBox-->
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter" />
