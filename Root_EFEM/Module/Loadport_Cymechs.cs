@@ -15,14 +15,95 @@ namespace Root_EFEM.Module
     public class Loadport_Cymechs : ModuleBase, IWTRChild, ILoadport
     {
         #region ToolBox
+
         RS232 m_rs232;
-        public DIO_I m_diPlaced;
-        public DIO_I m_diPresent;
-        public DIO_I m_diOpen;
-        public DIO_I m_diClose;
-        public DIO_I m_diReady;
-        public DIO_I m_diRun;
-        public OHT_Semi m_OHT;
+        public DIO_I p_diPlaced
+        {
+            get
+            {
+                return m_diPlaced;
+            }
+            set
+            {
+                m_diPlaced = value;
+            }
+        }
+        public DIO_I p_diPresent
+        {
+            get
+            {
+                return m_diPresent;
+            }
+            set
+            {
+                m_diPresent = value;
+            }
+        }
+        public DIO_I p_diOpen
+        {
+            get
+            {
+                return m_diOpen;
+            }
+            set
+            {
+                m_diOpen = value;
+            }
+        }
+        public DIO_I p_diClose
+        {
+            get
+            {
+                return m_diClose;
+            }
+            set
+            {
+                m_diClose = value;
+            }
+        }
+        public DIO_I p_diReady
+        {
+            get
+            {
+                return m_diReady;
+            }
+            set
+            {
+                m_diReady = value;
+            }
+        }
+        public DIO_I p_diRun
+        {
+            get
+            {
+                return m_diRun;
+            }
+            set
+            {
+                m_diRun = value;
+            }
+        }
+        public OHT_Semi p_OHT
+
+        {
+            get
+            {
+                return m_OHT;
+            }
+            set
+            {
+                m_OHT = value;
+            }
+        }
+
+        private DIO_I m_diPlaced;
+        private DIO_I m_diPresent;
+        private DIO_I m_diOpen;
+        private DIO_I m_diClose;
+        private DIO_I m_diReady;
+        private DIO_I m_diRun;
+        private OHT_Semi m_OHT;
+
         public bool m_bLoadCheck = false;
         public bool m_bUnLoadCheck = false;
         public override void GetTools(bool bInit)
@@ -679,23 +760,24 @@ namespace Root_EFEM.Module
                 }
                 else
                 {
-//                    if (m_diDoorOpen.p_bIn) return p_id + " Door Opened";
                     if (Run(CmdUnload())) return p_sInfo;
                 }
             }
-            //if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
-            //{
-            //    p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-            //    m_bPlaced= true;
+            if (m_diPlaced.p_bIn && m_diPresent.p_bIn)
+            {
+                p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                m_bPlaced = true;
 
-            //    if (Run(CmdLoad())) return p_sInfo;
-            //    if (Run(CmdUnload())) return p_sInfo;
-            //}
-            //else
-            //{
+                //if (Run(CmdLoad()))
+                //    return p_sInfo;
+                //if (Run(CmdUnload()))
+                //    return p_sInfo;
+            }
+            else
+            {
                 p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
                 m_bPlaced = false;
-            //}
+            }
             p_eState = eState.Ready;
             p_infoCarrier.AfterHome();
             return "OK";
@@ -856,15 +938,19 @@ namespace Root_EFEM.Module
             {
                 m_module.m_bUnLoadCheck = false;
                 if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
-                //if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed)
-                //{
-                //    m_module.m_alidLoad.Run(true, p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
-                //    return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                //}//0202
+                if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed)
+                {
+                    m_module.m_alidLoad.Run(true, p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
+                    return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                }
                 if (m_module.Run(m_module.CmdLoad()))
                 {
                     m_module.m_alidLoad.Run(true, p_sInfo);
                     return p_sInfo;
+                }
+                if (m_infoCarrier.m_aInfoWafer[0] == null)
+                {
+                    m_module.m_alidInforeticle.Run(true, "There is No Reticle");
                 }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
                 m_module.m_ceidDocking.Send();
@@ -905,7 +991,7 @@ namespace Root_EFEM.Module
                     m_module.m_alidUnLoad.Run(true, p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
                     return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 }
-                //if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
+                if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
                 if (m_module.Run(m_module.CmdUnload()))
                 {
                     m_module.m_alidUnLoad.Run(true, p_sInfo);

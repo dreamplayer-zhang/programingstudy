@@ -70,17 +70,17 @@ namespace Root_WIND2.UI_User
 
         // BACK
         public readonly UI_User.BacksideSetup backsideSetup = new UI_User.BacksideSetup();
-
+        public readonly UI_User.BacksideInspect backsideInspect = new UI_User.BacksideInspect();
 
         // EDGE
         public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
+        public readonly UI_User.EdgesideInspect edgesideInspect = new UI_User.EdgesideInspect();
 
         // EBR
-
+        public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
 
         // Camera
         public readonly UI_User.Camera_VRS cameraVrs = new UI_User.Camera_VRS();
-        public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
         #endregion
 
         #region [ViewModels]
@@ -146,19 +146,35 @@ namespace Root_WIND2.UI_User
         {
             get => this.backsideSetupVM;
         }
+
+        private UI_User.BacksideInspect_ViewModel backsideInspectVM = new UI_User.BacksideInspect_ViewModel();
+        public UI_User.BacksideInspect_ViewModel BacksideInspectVM
+        {
+            get => this.backsideInspectVM;
+        }
         #endregion
 
+        #region [Edge ViewModels]
         private UI_User.EdgesideSetup_ViewModel edgesideSetupVM = new UI_User.EdgesideSetup_ViewModel();
         public UI_User.EdgesideSetup_ViewModel EdgesideSetupVM
 		{
             get => edgesideSetupVM;
 		}
+        private UI_User.EdgesideInspect_ViewModel edgesideInspectionVM = new UI_User.EdgesideInspect_ViewModel();
+        public UI_User.EdgesideInspect_ViewModel EdgesideInspectionVM
+        {
+            get => edgesideInspectionVM;
+        }
+		#endregion
 
-        private UI_User.EBRSetup_ViewModel ebrSetupVM = new UI_User.EBRSetup_ViewModel();
+		#region [EBR ViewModels]
+		private UI_User.EBRSetup_ViewModel ebrSetupVM = new UI_User.EBRSetup_ViewModel();
         public UI_User.EBRSetup_ViewModel EBRSetupVM
         {
             get => ebrSetupVM;
         }
+        #endregion
+
         #endregion
 
 
@@ -425,7 +441,8 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
-                    edgesideSetupVM.Inspect();
+                    SetPage(edgesideInspect);
+                    edgesideInspect.DataContext = EdgesideInspectionVM;
                 });
             }
         }
@@ -568,7 +585,8 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
-
+                    SetPage(backsideInspect);
+                    backsideInspect.DataContext = backsideInspectVM;
                 });
             }
         }
@@ -690,6 +708,7 @@ namespace Root_WIND2.UI_User
             }
         }
         #endregion
+
         #endregion
 
         public void SetPage(UserControl page)

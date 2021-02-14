@@ -173,7 +173,12 @@ namespace RootTools.Comm
 
         private void M_tcpSocket_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
-            if (EventReciveData != null) EventReciveData(aBuf, nSize, socket); 
+            if (EventReciveData != null)
+            {
+                Thread.Sleep(100);
+                EventReciveData(aBuf, nSize, socket);
+            }
+            
         }
         #endregion
 
@@ -190,7 +195,7 @@ namespace RootTools.Comm
             RunTree(m_treeRoot);
         }
 
-        void RunTree(Tree treeRoot)
+        public void RunTree(Tree treeRoot)
         {
             RunSetTree(treeRoot.GetTree("Set"));
         }
@@ -205,9 +210,9 @@ namespace RootTools.Comm
 
         public string p_id { get; set; }
         Log m_log;
-        int m_nBufReceive = 1024 * 1024;
+        int m_nBufReceive = 1920 * 1080;
         public TreeRoot m_treeRoot;
-        Socket m_socket = null;
+        public Socket m_socket = null;
         public CommLog m_commLog;
 
         public TCPIPServer(string id, Log log, int nBufReceive = -1)

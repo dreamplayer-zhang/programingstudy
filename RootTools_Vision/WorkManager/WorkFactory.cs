@@ -8,11 +8,25 @@ using System.Windows;
 
 namespace RootTools_Vision
 {
+    public delegate void WorkManagerAllWorkDoneEvent();
+
     public abstract class WorkFactory : IWorkStartable
     {
         #region [Members]
         private List<WorkManager> workManagers;
         private readonly RemoteProcess remote = null;
+        private readonly REMOTE_MODE remoteMode;
+
+        private WorkplaceBundle workplaceBundle;
+        private WorkBundle workBundle;
+
+        private RecipeBase recipe;
+        #endregion
+
+
+        #region [Event]
+        public event WorkManagerAllWorkDoneEvent AllWorkDone;
+
         #endregion
 
         //List<WorkplaceBundle> bundleList = new List<WorkplaceBundle>();
@@ -38,52 +52,22 @@ namespace RootTools_Vision
         {
             workManagers = new List<WorkManager>();
             this.remote = new RemoteProcess(mode);
-
+            this.remoteMode = mode;
+                
             Initialize();
 
             WorkEventManager.RequestStop += OnRequestStop_Callback;
+        }
+
+        public void SetRecipe(RecipeBase recipeBase)
+        {
+            this.recipe = recipeBase;
         }
 
         public void OnRequestStop_Callback(object obj, RequestStopEventArgs args)
         {
             Stop();
         }
-
-        /// <summary>
-        /// Workplace는 객체를 유지하고, Work는 한번 사용 후 삭제
-        /// </summary>
-        /// <param name="bundle"></param>
-        /// <returns></returns>
-        //private WorkplaceBundle SetWorkplaceBundle(WorkplaceBundle bundle)
-        //{
-        //    if (bundle == null || bundle.Count == 0)
-        //    {
-        //        throw new ArgumentNullException("WorkplaceBundle이 null이거나 데이터가 없습니다.");
-        //        return false;
-        //    }
-
-        //    workplaceBundle = bundle.Clone(); //Clone
-
-        //    foreach(WorkManager wm in this.workManagers)
-        //    {
-        //        wm.SetWorkplaceBundle(this.workplaceBundle);
-        //    }
-
-        //    return true;
-        //}
-
-        /// <summary>
-        /// Workplace는 객체를 유지하고, Work는 한번 사용 후 삭제
-        /// </summary>
-        //public bool SetWorkBundle(WorkBundle bundle)
-        //{
-        //    foreach(WorkManager wm in this.workManagers)
-        //    {
-        //        wm.SetWorkBundle(bundle);
-        //    }
-            
-        //    return true;
-        //}
 
         #region [abstract method]
         /// <summary>
@@ -117,14 +101,7 @@ namespace RootTools_Vision
 
         #endregion
 
-        public void Exit()
-        {
-            foreach (WorkManager wm in this.workManagers)
-                wm.Exit();
-            this.workManagers.Clear();
-        }
-
-
+        #region [Control]
         /// <summary>
         /// WorkplaceBundle 생성
         /// WorkBundle 생성
@@ -138,6 +115,14 @@ namespace RootTools_Vision
             GC.Collect(2, GCCollectionMode.Optimized);
 
             WorkplaceBundle workplaces = CreateWorkplaceBundle();
+            if(workplaces == null)
+            {
+                MessageBox.Show("맵 정보가 없습니다.");
+                return;
+            }
+            
+            this.workplaceBundle = workplaces;
+
             WorkBundle works = CreateWorkBundle();
             works.SetWorkplacBundle(workplaces);
 
@@ -154,6 +139,8 @@ namespace RootTools_Vision
             Debug.WriteLine("[Start]");
             DebugOutput.PrintWorkplaceBundle(workplaces);
 #endif
+
+            WorkEventManager.OnInspectionStart(this, new InspectionStartArgs());
 
             foreach (WorkManager wm in this.workManagers)
             {
@@ -174,33 +161,85 @@ namespace RootTools_Vision
 
         public void Start()
         {
-            WaitStop(); /// 타임 아웃 걸어야함
-
-            GC.Collect(2, GCCollectionMode.Optimized);
-
-            WorkplaceBundle workplaces = CreateWorkplaceBundle();
-            WorkBundle works = CreateWorkBundle();
-            works.SetWorkplacBundle(workplaces);
-
-            if (Ready(workplaces, works) == false)
+            if(this.remoteMode == REMOTE_MODE.Slave)
             {
-                MessageBox.Show("검사 정보 생성에 실패하였습니다");
-                return;
-            }
+                WaitStop(); /// 타임 아웃 걸어야함
 
-            // Workplace State 초기화
-            workplaces.SetWorkState(WORK_TYPE.NONE);
+                GC.Collect(2, GCCollectionMode.Optimized);
+
+                WorkplaceBundle workplaces = this.workplaceBundle;
+                if (workplaces == null)
+                {
+                    MessageBox.Show("맵 정보가 없습니다.");
+                    return;
+                }
+
+                WorkBundle works = CreateWorkBundle();
+                works.SetWorkplacBundle(workplaces);
+
+
+                this.workplaceBundle = workplaces;
+
+                if (Ready(workplaces, works) == false)
+                {
+                    MessageBox.Show("검사 정보 생성에 실패하였습니다");
+                    return;
+                }
+
+                // Workplace State 초기화
+                workplaces.SetWorkState(WORK_TYPE.NONE);
 
 #if DEBUG
-            Debug.WriteLine("[Start]");
-            DebugOutput.PrintWorkplaceBundle(workplaces);
+                Debug.WriteLine("[Start]");
+                DebugOutput.PrintWorkplaceBundle(workplaces);
 #endif
 
-            foreach (WorkManager wm in this.workManagers)
+                foreach (WorkManager wm in this.workManagers)
+                {
+                    wm.SetWorkplaceBundle(workplaces);
+                    wm.SetWorkBundle(works);
+                    wm.Start();
+                }
+            }
+            else
             {
-                wm.SetWorkplaceBundle(workplaces);
-                wm.SetWorkBundle(works);
-                wm.Start();
+                WaitStop(); /// 타임 아웃 걸어야함
+
+                GC.Collect(2, GCCollectionMode.Optimized);
+
+                WorkplaceBundle workplaces = CreateWorkplaceBundle();
+                if (workplaces == null)
+                {
+                    MessageBox.Show("맵 정보가 없습니다.");
+                    return;
+                }
+
+                WorkBundle works = CreateWorkBundle();
+                works.SetWorkplacBundle(workplaces);
+
+
+                this.workplaceBundle = workplaces;
+
+                if (Ready(workplaces, works) == false)
+                {
+                    MessageBox.Show("검사 정보 생성에 실패하였습니다");
+                    return;
+                }
+
+                // Workplace State 초기화
+                workplaces.SetWorkState(WORK_TYPE.NONE);
+
+#if DEBUG
+                Debug.WriteLine("[Start]");
+                DebugOutput.PrintWorkplaceBundle(workplaces);
+#endif
+
+                foreach (WorkManager wm in this.workManagers)
+                {
+                    wm.SetWorkplaceBundle(workplaces);
+                    wm.SetWorkBundle(works);
+                    wm.Start();
+                }
             }
         }
 
@@ -277,70 +316,104 @@ namespace RootTools_Vision
             }
         }
 
-        // Edge쪽 이동예정
-        //public bool CreateWorkplaceBundle_RegionVertical(int imageWidth, int imageHeight, int imageByteCnt, int partitionNumber, IntPtr imageBufferR_GRAY, IntPtr imageBufferG, IntPtr imageBufferB)
-        //{
-        //    //bundleList.Clear();
-        //    int regionWidth = imageWidth;
-        //    int regionHeight = (int)Math.Floor((double)imageHeight / partitionNumber);
-        //    int regionLastHeight = imageHeight - regionHeight * (partitionNumber - 1); // 숫자가 딱 안나눠떨어지는 경우가있으므로
+        public void Exit()
+        {
+            foreach (WorkManager wm in this.workManagers)
+                wm.Exit();
+            this.workManagers.Clear();
+        }
 
+        public void WaitAllWorkDone()
+        {
+            bool isDone = false;
+            while (!isDone)
+            {
+                Task.Delay(1000);
+                isDone = true;
+                foreach (Workplace wp in workplaceBundle)
+                {
+                    if (wp.WorkState != workManagers[workManagers.Count - 1].WorkType)
+                    {
+                        isDone = false;
+                        break;
+                    }
+                }
+            }
 
-        //    WorkplaceBundle bundle = new WorkplaceBundle();
-        //    int index = 0;
-        //    for(int i = 0; i < partitionNumber - 1; i++)
-        //    {
-        //        bundle.Add(new Workplace(0, i, 0, regionHeight * i, regionWidth, regionHeight, index++));
-        //    }
+            if (this.AllWorkDone != null)
+                AllWorkDone();
+        }
 
-        //    // Last Region
-        //    bundle.Add(new Workplace(0, partitionNumber - 1, 0, regionHeight * (partitionNumber - 1), regionWidth, regionLastHeight, index));
+        public bool CheckAllWorkDone()
+        {
+            bool isDone = true;
+            foreach (Workplace wp in workplaceBundle)
+            {
+                if (wp.WorkState != workManagers[workManagers.Count - 1].WorkType)
+                {
+                    isDone = false;
+                    break;
+                }
+            }
 
+            return isDone;
+        }
 
-        //    //Set SharedBuffer;
-        //    bundle.SetSharedBuffer(imageBufferR_GRAY, imageWidth, imageHeight, imageByteCnt, imageBufferG, imageBufferB);
-
-        //    // Add Bundle
-        //    //bundleList.Add(bundle);
-
-
-        //    return true;            
-        //}
-
-        //public bool CreateWorkplaceBundle_RegionHorizontal(int imageWidth, int imageHeight, int imageByteCnt, int partitionNumber, IntPtr imageBufferR_GRAY, IntPtr imageBufferG, IntPtr imageBufferB)
-        //{
-        //    //bundleList.Clear();
-        //    int regionWidth = (int)Math.Floor((double)imageWidth / partitionNumber);
-        //    int regionLastWidth = imageWidth - regionWidth * (partitionNumber - 1); // 숫자가 딱 안나눠떨어지는 경우가있으므로
-        //    int regionHeight = imageHeight;
-            
-        //    WorkplaceBundle bundle = new WorkplaceBundle();
-        //    int index = 0;
-        //    for (int i = 0; i < partitionNumber - 1; i++)
-        //    {
-        //        bundle.Add(new Workplace(i, 0, regionWidth * i, 0, regionWidth, regionHeight, index++));
-        //    }
-
-        //    // Last Region
-        //    bundle.Add(new Workplace(partitionNumber - 1, 0, regionWidth * (partitionNumber - 1), 0, regionLastWidth, regionHeight, index));
-
-        //    //Set SharedBuffer;
-        //    bundle.SetSharedBuffer(imageBufferR_GRAY, imageWidth, imageHeight, imageByteCnt, imageBufferG, imageBufferB);
-
-        //    // Add Bundle
-        //    //bundleList.Add(bundle);
-
-        //    return true;
-        //}
-
+        #endregion
 
         #region [Remote Process]
+
+        private void PipeCommMessageReceived_Callback(PipeProtocol protocol)
+        {
+            MessageBox.Show(protocol.msgType.ToString());
+            MessageBox.Show(protocol.msg);
+            MessageBox.Show(protocol.data?.ToString());
+            MessageBox.Show(protocol.dataType?.ToString());
+
+            switch (protocol.msgType)
+            {
+                case PIPE_MESSAGE_TYPE.Message:
+                    RemoteMessage_MessageHandler((string)protocol.data);
+                    break;
+                case PIPE_MESSAGE_TYPE.Command:
+                    RemoteMessage_MessageHandler((string)protocol.data);
+                    break;
+                case PIPE_MESSAGE_TYPE.Data:
+                    break;
+                case PIPE_MESSAGE_TYPE.Event:
+                    
+                    break;
+            }
+        }
+
+        private void RemoteMessage_MessageHandler(string msg)
+        {
+
+        }
+
+        private void RemoteMessage_CommandHandler(string msg)
+        {
+
+        }
+
+        private void RemoteMessage_EventHandler(string evnt)
+        {
+
+        }
+
+        private void RemoteMessage_DataHandler(string msg)
+        {
+
+        }
+
 
 
 
         public void RemoteStart()
         {
             remote.StartProcess();
+
+            remote.MessageReceived += PipeCommMessageReceived_Callback;
 
             //WorkplaceBundle wb = this.CreateWorkplaceBundle();
             //if (wb == null) return;
@@ -350,14 +423,196 @@ namespace RootTools_Vision
 
         public void WriteTest()
         {
-            WorkplaceBundle wb = this.CreateWorkplaceBundle();
-            if (wb == null) return;
+            remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Message, "Start"));
 
-            remote.Send<WorkplaceBundle>(wb);
-            remote.Send("SSIBALL");
-            remote.Send("SSIBALL");
-            remote.Send("SSIBALLSSIBALLSSIBALLSSIBALLSSIBALLSSIBALL SSIBALLSSIBALL");
+            WorkplaceBundle wb = new WorkplaceBundle();
+            wb.Add(new Workplace(0, 0, 0, 0, 0, 0, 0));
+            wb.Add(new Workplace(0, 1, 0, 0, 0, 0, 0));
+            wb.Add(new Workplace(0, 2, 0, 0, 0, 0, 0));
+            wb.Add(new Workplace(0, 3, 0, 0, 0, 0, 0));
+
+            remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, "WorkplaceBundle", typeof(WorkplaceBundle).ToString(), wb));
+
+            remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Command, "Command!!!!"));
+
+
+            remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Event, "Event!!", typeof(Workplace).ToString(), new Workplace(10, 10, 10, 10, 10, 10, 10)));
+
+            //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Message, typeof(string).ToString(), "AAAAAAAAAAA"));
+
+            //InitializeRemoteWorkFactory();
         }
+
+        public void InitializeRemoteWorkFactory()
+        {
+            const string InitializeStartMsg = "InitializeStart";
+            const string InitializeDoneMsg = "InitializeDone";
+
+            if (remoteMode == REMOTE_MODE.Master)
+            {
+                //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Message, InitializeStartMsg));
+                //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, this.recipe.RecipePath));
+                //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, this.workManagers));
+                //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, this.CreateWorkplaceBundle()));
+                //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, this.CreateWorkBundle().CloneForRemote()));
+
+                PipeProtocol protocol = new PipeProtocol();
+                remote.Read(protocol);
+
+
+                switch (protocol.msgType)
+                {
+                    case PIPE_MESSAGE_TYPE.Message:
+                        MessageBox.Show((string)protocol.data);
+                        break;
+                    case PIPE_MESSAGE_TYPE.Command:
+                        break;
+                    case PIPE_MESSAGE_TYPE.Data:
+                        break;
+                    case PIPE_MESSAGE_TYPE.Event:
+                        break;
+                }
+                //string message = "";
+                //remote.Send<string>(InitializeStartMsg);
+
+                //remote.Send<string>(this.recipe.RecipePath);
+                //remote.Send<List<WorkManager>>(this.workManagers);
+                //remote.Send<WorkplaceBundle>(this.CreateWorkplaceBundle());
+                //remote.Send<WorkBundle>(this.CreateWorkBundle().CloneForRemote());
+
+                //if (remote.Read<string>() == InitializeDoneMsg)
+                //{
+                //    Debug.WriteLine(message);
+                //    return;
+                //}
+                //Debug.WriteLine(message);
+            }
+            else // Slave
+            {
+                PipeProtocol protocol = new PipeProtocol();
+
+                remote.Read(protocol);
+
+
+                //string message = remote.Read<string>();
+                //if (message != InitializeStartMsg)
+                //{
+                //    Debug.WriteLine(message);
+                //    return;
+                //}
+                //Debug.WriteLine(message);
+
+                //string recipePath = remote.Read<string>();
+                //Debug.WriteLine(recipePath);
+
+                //this.recipe = new CloneableRecipe();
+                //this.recipe.RecipePath = recipePath;
+                //this.recipe.Read(recipePath);
+
+
+                //List<WorkManager> workManagers = remote.Read<List<WorkManager>>();
+                //foreach (WorkManager wm in workManagers)
+                //{
+                //    this.workManagers.Add(wm.Clone());
+                //}
+
+                //if (this.workManagers == null)
+                //{
+                //    Debug.WriteLine("workManagers == null");
+                //}
+
+                //this.workplaceBundle = remote.Read<WorkplaceBundle>();
+                //if (this.workplaceBundle == null)
+                //{
+                //    Debug.WriteLine("WorkplaceBundle == null");
+                //}
+
+                //WorkBundle wb = remote.Read<WorkBundle>();
+                //if (wb == null)
+                //{
+                //    Debug.WriteLine("workBundle == null");
+                //}
+                //this.workBundle = new WorkBundle();
+                //int indexParam = 0;
+                //foreach (CloneableWorkBase clone in wb)
+                //{
+                //    WorkBase work = (WorkBase)Tools.CreateInstance(Type.GetType(clone.InspectionName));
+                //    this.workBundle.Add(work);
+                //    if (indexParam < this.recipe.ParameterItemList.Count)
+                //    {
+                //        if (this.recipe.ParameterItemList[indexParam].InspectionType.ToString() == clone.InspectionName)
+                //        {
+                //            work.SetParameter(this.recipe.ParameterItemList[indexParam]);
+                //            indexParam++;
+                //        }
+                //    }
+                //}
+
+
+                //Debug.WriteLine(this.workplaceBundle.Count.ToString());
+
+                //remote.Send<string>(InitializeDoneMsg);
+                //string message = remote.Read<string>();
+                //if (message != InitializeStartMsg)
+                //{
+                //    Debug.WriteLine(message);
+                //    return;
+                //}
+                //Debug.WriteLine(message);
+
+                //string recipePath = remote.Read<string>();
+                //Debug.WriteLine(recipePath);
+
+                //this.recipe = new CloneableRecipe();
+                //this.recipe.RecipePath = recipePath;
+                //this.recipe.Read(recipePath);
+
+
+                //List<WorkManager> workManagers = remote.Read<List<WorkManager>>();
+                //foreach(WorkManager wm in workManagers)
+                //{
+                //    this.workManagers.Add(wm.Clone());
+                //}
+
+                //if (this.workManagers == null)
+                //{
+                //    Debug.WriteLine("workManagers == null");
+                //}
+
+                //this.workplaceBundle = remote.Read<WorkplaceBundle>();
+                //if(this.workplaceBundle == null)
+                //{
+                //    Debug.WriteLine("WorkplaceBundle == null");
+                //}
+
+                //WorkBundle wb= remote.Read<WorkBundle>();
+                //if (wb == null)
+                //{
+                //    Debug.WriteLine("workBundle == null");
+                //}
+                //this.workBundle = new WorkBundle();
+                //int indexParam = 0;
+                //foreach (CloneableWorkBase clone in wb)
+                //{
+                //    WorkBase work = (WorkBase)Tools.CreateInstance(Type.GetType(clone.InspectionName));
+                //    this.workBundle.Add(work);
+                //    if( indexParam < this.recipe.ParameterItemList.Count)
+                //    {
+                //        if (this.recipe.ParameterItemList[indexParam].InspectionType.ToString() == clone.InspectionName)
+                //        {
+                //            work.SetParameter(this.recipe.ParameterItemList[indexParam]);
+                //            indexParam++;
+                //        }
+                //    }  
+                //}
+
+
+                //Debug.WriteLine(this.workplaceBundle.Count.ToString());
+
+                //remote.Send<string>(InitializeDoneMsg);
+            }
+        }
+
 
         public void ExitRemoteProcess()
         {
@@ -369,5 +624,6 @@ namespace RootTools_Vision
             ExitRemoteProcess();
         }
         #endregion
+
     }
 }

@@ -15,9 +15,11 @@ namespace Root_WIND2
 {
 	public class InspectionManagerEdge : WorkFactory
 	{
-		#region [Memberws]
+		#region [Members]
 		private readonly RecipeEdge recipe;
 		private readonly SharedBufferInfo[] bufferInfoArray;
+
+		private WorkplaceBundle workplaceBundle;
 		#endregion
 
 		#region [Properties]
@@ -74,8 +76,7 @@ namespace Root_WIND2
 
 		private WorkplaceBundle CreateWorkplace_Edge()
 		{
-			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
-
+			workplaceBundle = new WorkplaceBundle();
 			CreateWorkplace_Edge(recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop, recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop, EdgeSurface.EdgeMapPositionX.Top, this.SharedBufferInfoArray[0], ref workplaceBundle);
 			CreateWorkplace_Edge(recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide, recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide, EdgeSurface.EdgeMapPositionX.Side, this.SharedBufferInfoArray[1], ref workplaceBundle);
 			CreateWorkplace_Edge(recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm, recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm, EdgeSurface.EdgeMapPositionX.Btm, this.SharedBufferInfoArray[2], ref workplaceBundle);
@@ -103,7 +104,8 @@ namespace Root_WIND2
 
 			for (int i = 0; i < bufferHeight / roiHeight; i++)
 			{
-				int calcStartY = (roiHeight * i) + startY;
+				//int calcStartY = (roiHeight * i) + startY; // 첫번째 빈 buffer 지웠을 경우
+				int calcStartY = (roiHeight * i) + startY + recipe.CameraHeight;
 				int calcHeight = roiHeight;
 
 				if ((calcStartY + roiHeight) > endY)
@@ -116,6 +118,11 @@ namespace Root_WIND2
 
 				workplaceBundle.Add(workplace);
 			}
+		}
+
+		public int GetWorkplaceCount()
+		{
+			return workplaceBundle.Count();
 		}
 
 		public new void Start()

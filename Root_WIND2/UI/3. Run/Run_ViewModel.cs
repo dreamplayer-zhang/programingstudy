@@ -154,7 +154,15 @@ namespace Root_WIND2
             {
                 p_LoadPort1 = (Loadport_RND)((WIND2_Handler)(engineer.ClassHandler())).p_aLoadport[0];
                 p_LoadPort2 = (Loadport_RND)((WIND2_Handler)(engineer.ClassHandler())).p_aLoadport[1];
-                p_Aligner = (Aligner_RND)((WIND2_Handler)(engineer.ClassHandler())).p_Aligner;
+                try
+                {
+                    p_Aligner = (Aligner_RND)((WIND2_Handler)(engineer.ClassHandler())).p_Aligner;
+                }
+                catch
+                {
+
+                }
+                
                 p_WTR = (WTR_RND)((WIND2_Handler)(engineer.ClassHandler())).p_WTR;
                 p_EdgeVision = (EdgeSideVision)((WIND2_Handler)(engineer.ClassHandler())).p_EdgeSideVision;
                 p_BackSideVision  = (BackSideVision)((WIND2_Handler)(engineer.ClassHandler())).p_BackSideVision;

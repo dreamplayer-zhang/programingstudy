@@ -243,6 +243,7 @@
     </Compile>
     <Compile Include="Maskbk.cs" />
     <Compile Include="Module\BacksideVision\Run_GrabBackside.cs" />
+    <Compile Include="Module\BacksideVision\Run_InspectBackside.cs" />
     <Compile Include="Module\BacksideVision\Run_LADS.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />
@@ -281,6 +282,11 @@
     <Compile Include="UI_User\BACK\BacksideSetup.xaml.cs">
       <DependentUpon>BacksideSetup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_User\BACK\BacksideInspect.xaml.cs">
+      <DependentUpon>BacksideInspect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\BACK\ViewModels\BacksideInspect_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\BACK\ViewModels\BacksideInspect_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ViewModel.cs" />
     <Compile Include="UI_User\CAMERA\CameraVRS.xaml.cs">
@@ -295,10 +301,15 @@
       <DependentUpon>EBRSetup.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\EBR\ViewModel\EBRSetup_ViewModel.cs" />
+    <Compile Include="UI_User\EBR\ViewModel\EBR_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\EDGE\EdgesideInspect.xaml.cs">
+      <DependentUpon>EdgesideInspect.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_User\EDGE\EdgesideSetup.xaml.cs">
       <DependentUpon>EdgesideSetup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_User\EDGE\ViewModel\EdgesideSetup_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\EDGE\ViewModel\EdgesideInspect_ViewModel.cs" />
+    <Compile Include="UI_User\EDGE\ViewModel\Edgeside_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\EDGE\ViewModel\EdgesideSetup_ViewModel.cs" />
     <Compile Include="UI_User\FRONT\FrontsideAlignment.xaml.cs" />
     <Compile Include="UI_User\FRONT\FrontsideInspect.xaml.cs">
@@ -700,6 +711,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI_User\BACK\BacksideInspect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI_User\CAMERA\CameraVRS.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -711,6 +726,10 @@
     <Page Include="UI_User\EBR\EBRSetup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_User\EDGE\EdgesideInspect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\EDGE\EdgesideSetup.xaml">
       <Generator>MSBuild:Compile</Generator>

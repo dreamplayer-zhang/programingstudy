@@ -24,6 +24,8 @@ namespace Root_EFEM.Module
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
+
+                InitALID();
             }
         }
         #endregion

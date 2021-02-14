@@ -390,14 +390,14 @@
                                             <RowDefinition/>
                                         </Grid.RowDefinitions>
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                        <TextBlock FontSize="12" Text="Distance" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+                                        <TextBlock FontSize="12" Text="Shift" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                         <TextBlock FontSize="12" Text="Angle" Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                         <TextBlock FontWeight="Bold" FontSize="12" 
                                                    Text="{Binding p_mainVision.p_bPatternShiftPass, Converter={StaticResource BooleanToPassFailString}}" 
                                                    Foreground="{Binding p_mainVision.p_bPatternShiftPass, Converter={StaticResource BooleanToPassFailColor}}"
                                                    Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
-                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPatternShiftDistance}" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="1" />
-                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPatternShiftAngle}" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
+                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPatternShiftDistance, StringFormat={}\{0:n4\} mm}" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="1" />
+                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPatternShiftAngle, StringFormat={}\{0:n4\} º}" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Header="Pellicle Shift" Grid.Row="3">

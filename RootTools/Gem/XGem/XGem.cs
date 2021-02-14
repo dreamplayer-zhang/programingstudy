@@ -1230,7 +1230,7 @@ namespace RootTools.Gem.XGem
                                 carrier.p_eReqAccess = GemCarrierBase.eAccess.InAccessed;
                             }
                         }
-                        m_engineer.ClassHandler().CalcSequence();
+                        if(!EQ.p_bSimulate) m_engineer.ClassHandler().CalcSequence();
                         step = eThreadStep.Processing;
                         break;
                     case eThreadStep.Processing:

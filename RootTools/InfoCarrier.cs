@@ -223,7 +223,7 @@ namespace RootTools
         {
             if (nID < 0) return;
             if (nID >= p_lWafer) return;
-            if (infoWafer == null) m_aInfoWafer[nID].ClearInfo(); 
+            if (infoWafer == null && m_aInfoWafer[nID] != null) m_aInfoWafer[nID].ClearInfo(); 
             m_aInfoWafer[nID] = infoWafer;
             SaveInfoWafer(nID);
         }

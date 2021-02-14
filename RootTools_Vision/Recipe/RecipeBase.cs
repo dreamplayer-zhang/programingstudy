@@ -9,7 +9,8 @@ using System.Xml.Serialization;
 
 namespace RootTools_Vision
 {
-    public abstract class RecipeBase : IRecipe
+    [Serializable]
+    public class RecipeBase : IRecipe
     {
         #region [Member Variables]
         private string name = "";
@@ -57,7 +58,7 @@ namespace RootTools_Vision
         /// <summary>
         /// 레시피에 파라매터와 레시피 항목을 추가합니다.
         /// </summary>
-        public abstract void Initilize();
+        public virtual void Initilize() { }
 
 
         /// <summary>
@@ -184,7 +185,7 @@ namespace RootTools_Vision
             {
                 using (Stream reader = new FileStream(recipeFolderPath + "Base.xml", FileMode.Open))
                 {
-                    XmlSerializer xml = new XmlSerializer(this.GetType());
+                    XmlSerializer xml = new XmlSerializer(this.GetType().BaseType);
                     RecipeBase temp = this;
                     temp = (RecipeBase)xml.Deserialize(reader);
 
@@ -261,10 +262,12 @@ namespace RootTools_Vision
 
             try
             {
+
+                RecipeBase recipeBase = CloneBase();
                 using (TextWriter tw = new StreamWriter(recipeFolderPath + "Base.xml", false))
                 {
-                    XmlSerializer xml = new XmlSerializer(this.GetType());
-                    xml.Serialize(tw, this);
+                    XmlSerializer xml = new XmlSerializer(recipeBase.GetType());
+                    xml.Serialize(tw, recipeBase);
                 }
 
                 using (TextWriter tw = new StreamWriter(recipeFolderPath + "Parameter.xml", false))
@@ -289,6 +292,16 @@ namespace RootTools_Vision
             return rst;
         }
 
+        public RecipeBase CloneBase()
+        {
+            RecipeBase recipeBase = new RecipeBase();
+            recipeBase.Name = this.Name;
+            recipeBase.RecipeFolderPath = this.RecipeFolderPath;
+            recipeBase.RecipePath = this.RecipePath;
+            recipeBase.WaferMap = this.WaferMap;
+
+            return recipeBase;
+        }
         public void SaveMasterImage(int _posX, int _posY, int _width, int _height, int _byteCnt, byte[] _rawData)
         {
             OriginRecipe recipe = this.GetItem<OriginRecipe>();

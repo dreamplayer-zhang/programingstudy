@@ -193,6 +193,14 @@
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dummy.cs" />
+    <Compile Include="Converter\LoadportBrushConverter.cs" />
+    <Compile Include="Converter\InfoCarrierBrushConverter.cs" />
+    <Compile Include="Converter\ModuleStateBrushConverter.cs" />
+    <Compile Include="Converter\ModuleRunStateBrushconverter.cs" />
+    <Compile Include="Converter\ModuleRunImageConverter.cs" />
+    <Compile Include="Converter\ModuleRunStepConverter.cs" />
+    <Compile Include="Converter\ModuleRunStateVisibleConverter.cs" />
+    <Compile Include="Converter\ModuleRunProgressConverter.cs" />
     <Compile Include="Module\AOP01_P.cs" />
     <Compile Include="Module\IndividualElevator.cs" />
     <Compile Include="Module\Loadport_AOP.cs" />
@@ -398,15 +406,15 @@
   <ItemGroup>
     <Resource Include="Resource\PACKING_LOADER.png" />
     <Resource Include="Resource\PACKING_STAGE.png" />
-    <Resource Include="Resource\POD_LOADPORTpng.png" />
-    <Resource Include="Resource\PTR.png" />
-    <Resource Include="Resource\RETICLE_LOADPORT.png" />
-    <Resource Include="Resource\RTR.png" />
+    <Resource Include="Resource\LOADPORT_B.png" />
+    <Resource Include="Resource\RTR_B.png" />
+    <Resource Include="Resource\LOADPORT_A.png" />
+    <Resource Include="Resource\RTR_A.png" />
     <Resource Include="Resource\TAPING_MODULE.png" />
     <Resource Include="Resource\UNLOADPORT.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resource\INDIVISUAL_CASE_LOADERpng.png" />
+    <Resource Include="Resource\ElEVATOR.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

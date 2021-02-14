@@ -1,7 +1,11 @@
-﻿using RootTools;
+﻿using Root_WIND2.Module;
+using RootTools;
+using RootTools.Database;
+using RootTools.Module;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -23,8 +27,8 @@ namespace Root_WIND2.UI_User
 
         private class MapViewerColorDefines
         {
-            public static SolidColorBrush NoChip = Brushes.DimGray;
-            public static SolidColorBrush Normal = Brushes.LightGray;
+            public static SolidColorBrush NoChip = Brushes.LightGray;
+            public static SolidColorBrush Normal = Brushes.DimGray;
             public static SolidColorBrush Snap = Brushes.LightSkyBlue;
             public static SolidColorBrush Position = Brushes.SkyBlue;
             public static SolidColorBrush Inspection = Brushes.Gold;
@@ -70,22 +74,35 @@ namespace Root_WIND2.UI_User
                 SetProperty<MapViewer_ViewModel>(ref this.mapViewerVM, value);
             }
         }
+
+        private Database_DataView_VM m_DataViewer_VM = new Database_DataView_VM();
+        public Database_DataView_VM p_DataViewer_VM
+        {
+            get { return this.m_DataViewer_VM; }
+            set { SetProperty(ref m_DataViewer_VM, value); }
+        }
         #endregion
+
+        
+
 
         public FrontsideInspect_ViewModel()
         {
+            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero)
+                return;
+
             // Initialize ImageViewer
             this.imageViewerVM = new FrontsideInspect_ImageViewer_ViewModel();
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
 
+            WorkEventManager.InspectionStart += InspectionStart_Callback;
             WorkEventManager.PositionDone += PositionDone_Callback;
             WorkEventManager.InspectionDone += InspectionDone_Callback;
-            //WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
+            WorkEventManager.ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
+            WorkEventManager.ProcessDefectWaferDone += ProcessDefectWaferDone_Callback;
 
             // Initialize MapViewer
             this.mapViewerVM = new MapViewer_ViewModel();
-
-            WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
         }
 
         private string currentRecipe = "";
@@ -138,8 +155,20 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 LoadRecipe();
+
+                WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+                WIND2EventManager.SnapDone += SnapDone_Callback;
             });
         }
+        public RelayCommand UnloadedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                WorkEventManager.WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
+                WIND2EventManager.SnapDone -= SnapDone_Callback;
+            });
+        }
+
 
         public RelayCommand btnStart
         {
@@ -155,6 +184,31 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
+
+                return;
+
+                EQ.p_bStop = false;
+                Vision vision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision;
+                if (vision.p_eState != ModuleBase.eState.Ready)
+                {
+                    MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                    return;
+                }
+
+                Run_GrabLineScan Grab = (Run_GrabLineScan)vision.CloneModuleRun("GrabLineScan");
+                var viewModel = new Dialog_Scan_ViewModel(vision, Grab);
+                Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+                if (result.HasValue)
+                {
+                    if (result.Value)
+                    {
+                        vision.StartRun(Grab);
+                    }
+                    else
+                    {
+
+                    }
+                }
             });
         }
 
@@ -163,7 +217,9 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 GlobalObjects.Instance.Get<InspectionManagerFrontside>().WriteTest();
-                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
+
+                return;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
             });
         }
 
@@ -185,6 +241,14 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Callback]
+        private void InspectionStart_Callback(object e, InspectionStartArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            {
+                this.ImageViewerVM.ClearObjects();
+            }));
+        }
+
         object lockObj = new object();
         private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
         {
@@ -207,6 +271,7 @@ namespace Root_WIND2.UI_User
                 }));
             }
         }
+
         private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
         {
             Workplace workplace = obj as Workplace;
@@ -224,9 +289,27 @@ namespace Root_WIND2.UI_User
 
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                DrawRectDefect(rectList, textList, args.reDraw);
+                DrawRectDefect(rectList, textList);
             }));
         }
+
+        private void ProcessDefectWaferStart_Callback(object obj, ProcessDefectWaferStartEventArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            {
+                this.ImageViewerVM.RemoveObjectsByTag("defect");
+            }));
+        }
+
+        private void ProcessDefectWaferDone_Callback(object obj, ProcessDefectWaferDoneEventArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            {
+                DatabaseManager.Instance.SelectData();
+                m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
+            }));
+        }
+
 
         public void WorkplaceStateChanged_Callback(object obj, WorkplaceStateChangedEventArgs args)
         {
@@ -238,25 +321,33 @@ namespace Root_WIND2.UI_User
             }));
         }
 
+
+        private void SnapDone_Callback(object obj, SnapDoneArgs args)
+        {
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            {
+                this.ImageViewerVM.SetRoiRect();
+            }));
+        }
         #endregion
 
         #region [ImageView Draw Method]
 
         public void DrawRectMasterFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text, bool bSuccess)
         {
-            ImageViewerVM.AddDrawRect(ptOldStart, ptOldEnd, ImageViewerColorDefines.MasterPosition);
-            ImageViewerVM.AddDrawRect(ptNewStart, ptNewEnd, bSuccess ? ImageViewerColorDefines.MasterPostionMove: ImageViewerColorDefines.PostionFail);
+            ImageViewerVM.AddDrawRect(ptOldStart, ptOldEnd, ImageViewerColorDefines.MasterPosition, "position");
+            ImageViewerVM.AddDrawRect(ptNewStart, ptNewEnd, bSuccess ? ImageViewerColorDefines.MasterPostionMove: ImageViewerColorDefines.PostionFail, "position");
             //ImageViewerVM.DrawText(ptNew)
         }
 
         public void DrawRectChipFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text, bool bSuccess)
         {
-            ImageViewerVM.AddDrawRect(ptOldStart, ptOldEnd, ImageViewerColorDefines.ChipPosition);
-            ImageViewerVM.AddDrawRect(ptNewStart, ptNewEnd, bSuccess ? ImageViewerColorDefines.ChipPositionMove : ImageViewerColorDefines.PostionFail);
+            ImageViewerVM.AddDrawRect(ptOldStart, ptOldEnd, ImageViewerColorDefines.ChipPosition, "position");
+            ImageViewerVM.AddDrawRect(ptNewStart, ptNewEnd, bSuccess ? ImageViewerColorDefines.ChipPositionMove : ImageViewerColorDefines.PostionFail, "position");
         }
-        public void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
+        public void DrawRectDefect(List<CRect> rectList, List<String> text)
         {
-            ImageViewerVM.AddDrawRectList(rectList, ImageViewerColorDefines.Defect);
+            ImageViewerVM.AddDrawRectList(rectList, ImageViewerColorDefines.Defect, "defect");
         }
             #endregion
     }

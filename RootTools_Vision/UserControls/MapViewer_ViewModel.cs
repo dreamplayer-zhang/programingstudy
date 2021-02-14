@@ -200,7 +200,7 @@ namespace RootTools_Vision
             }
             else
             {
-                MessageBox.Show("Chip Index를 벗어났습니다.");
+                //MessageBox.Show("Chip Index를 벗어났습니다.");
             }
         }
 

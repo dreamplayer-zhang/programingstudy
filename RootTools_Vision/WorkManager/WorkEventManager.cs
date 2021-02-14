@@ -44,12 +44,21 @@ namespace RootTools_Vision
         }
         #endregion
 
+        
+
         #region [ProcessDefectWaferDone]
         public static event EventHandler<ProcessDefectWaferDoneEventArgs> ProcessDefectWaferDone;
 
         public static void OnProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs args)
         {
             ProcessDefectWaferDone?.Invoke(obj, args);
+        }
+
+        public static event EventHandler<ProcessDefectWaferStartEventArgs> ProcessDefectWaferStart;
+
+        public static void OnProcessDefectWaferStart(object obj, ProcessDefectWaferStartEventArgs args)
+        {
+            ProcessDefectWaferStart?.Invoke(obj, args);
         }
         #endregion
 
@@ -95,6 +104,15 @@ namespace RootTools_Vision
         public static void OnRequestStop(object obj, RequestStopEventArgs args)
         {
             RequestStop?.Invoke(obj, args);
+        }
+        #endregion
+
+        #region [InspectionStart]
+        public static event EventHandler<InspectionStartArgs> InspectionStart;
+
+        public static void OnInspectionStart(object obj, InspectionStartArgs args)
+        {
+            InspectionStart?.Invoke(obj, args);
         }
         #endregion
     }

@@ -6,8 +6,13 @@
              xmlns:local="clr-namespace:Root_WIND2"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1200">
+    <UserControl.Resources>
+        <local:EnumToRadioButtonConverter x:Key="EnumToRadioButtonConverter"/>
+    </UserControl.Resources>
+    
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
@@ -44,5 +49,141 @@
                 </Grid>
             </Grid>
         </GroupBox>
+        <Grid  Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="500" />
+                <RowDefinition Height="226"/>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Header="Generated Map Information" Margin="4" Style="{StaticResource main_view_groupbox}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+                    <vision:MapViewer DataContext="{Binding MapViewerVM}"  Margin="4"/>
+                    <Grid Grid.Row="1" HorizontalAlignment="Stretch"  Margin="4" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Map Unit Size [pxl]"  Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="W" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="2" Text="{Binding MapUnitWidth}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="H" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="4" Text="{Binding MapUnitHeight}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                    </Grid>
+                    <Grid Grid.Row="2" HorizontalAlignment="Stretch"  Margin="4" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Origin Point"  Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="2" Text="{Binding OriginPointX}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="4" Text="{Binding OriginPointY}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                    </Grid>
+                    <Grid Grid.Row="3" HorizontalAlignment="Stretch"  Margin="4" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Searched Center Point"  Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="2" Text="{Binding SearchedCenterPointX}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="4" Text="{Binding SearchedCenterPointY}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                    </Grid>
+                    <Grid Grid.Row="4" HorizontalAlignment="Stretch"  Margin="4" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Searched Circle Radius"  Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBox Grid.Column="2" Text="{Binding SearchedCircleRadius}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                    </Grid>
+                </Grid>
+            </GroupBox>
+            
+            
+            <GroupBox Grid.Row="1" Header="Create ROI Information" Margin="4" Style="{StaticResource main_view_groupbox}">
+                <StackPanel Margin="4,0,4,0">
+                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Map Size"  Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="2" Text="{Binding MapSizeX}" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="4" Text="{Binding MapSizeY}" HorizontalContentAlignment="Center"/>
+                    </Grid>
+                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Center Point"  Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="2" Text="{Binding CenterPointX}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                        <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="4" Text="{Binding CenterPointY}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                    </Grid>
+                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Circle Radius * 2 [pxl]"  Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBox Grid.Column="1" Text="{Binding CircleRadius}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                    </Grid>
+                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="DownSampling [1/n]"  Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBox Grid.Column="1" Text="{Binding DownSamplingRatio}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                    </Grid>
+                    <Grid Margin="0, 16, 0, 10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <RadioButton Grid.Column="0" 
+                                     IsChecked="{Binding Path=SearchROIOptions, Converter={StaticResource EnumToRadioButtonConverter}, ConverterParameter=IncludeWaferEdge}"
+                                     Content="Include Wafer Edge" 
+                                     HorizontalAlignment="Center"
+                                     Foreground="{StaticResource groupbox_button_text}"/>
+                        <RadioButton Grid.Column="1" 
+                                     IsChecked="{Binding Path=SearchROIOptions, Converter={StaticResource EnumToRadioButtonConverter}, ConverterParameter=ExcludeWaferEdge}"
+                                     Content="Exclude Wafer Edge" 
+                                     HorizontalAlignment="Center"
+                                     Foreground="{StaticResource groupbox_button_text}"/>
+                    </Grid>
+                    <Button Content="Create ROI" Command="{Binding btnCreateROICommand}" Style="{StaticResource groupbox_button}"/>
+                </StackPanel>
+            </GroupBox>
+        </Grid>
     </Grid>
 </UserControl>
