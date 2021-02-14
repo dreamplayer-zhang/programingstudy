@@ -363,9 +363,13 @@ namespace RootTools.Memory
             m_abuf = new byte[CanvasWidth * CanvasHeight];
             _bRecieve = true;
             m_Server.Send(str);
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             while (_bRecieve)
             {
                 Thread.Sleep(10);
+                if (watch.ElapsedMilliseconds > 500)
+                    return m_abuf;
             }
             _bRecieve = false;
             return m_abuf;
