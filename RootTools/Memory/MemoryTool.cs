@@ -355,7 +355,6 @@ namespace RootTools.Memory
         #region TCP
         const char Splitter = '+';
         bool _bRecieve = false;
-        BitmapSource m_ReciveBitmapSource;
         byte[] m_abuf;
         public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem)
         {
@@ -368,13 +367,12 @@ namespace RootTools.Memory
             while (_bRecieve)
             {
                 Thread.Sleep(10);
-                if (watch.ElapsedMilliseconds > 500)
+                if (watch.ElapsedMilliseconds > 5000)
                     return m_abuf;
             }
             _bRecieve = false;
             return m_abuf;
         }
-
         private void M_Server_EventReciveData(byte[] aBuf, int nSize, System.Net.Sockets.Socket socket)
         {
             //socket.Send(aBuf, nSize, SocketFlags.None);
@@ -382,6 +380,7 @@ namespace RootTools.Memory
             //m_qLog.Enqueue(new Mars(0, Encoding.ASCII.GetString(aBuf, 0, nSize)));
             //string[] aStr = str.Split(Splitter);
             //string astr = str;
+            
             m_abuf = Convert.FromBase64String(str);
             _bRecieve = false;
             //switch (aStr)
