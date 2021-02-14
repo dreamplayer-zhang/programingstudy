@@ -166,9 +166,9 @@ namespace RootTools
 			m_ToolMemory = tool;
 		}
 
-		public BitmapSource GetData(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
+		public byte[] GetData(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
 		{
-			return  m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight);
+			return m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight);
 			//return new byte[5];  // 이게 머여??
 		}
 

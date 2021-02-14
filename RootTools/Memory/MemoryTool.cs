@@ -356,9 +356,11 @@ namespace RootTools.Memory
         const char Splitter = '+';
         bool _bRecieve = false;
         BitmapSource m_ReciveBitmapSource;
-        public BitmapSource GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
+        byte[] m_abuf;
+        public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
         {
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight;
+            m_abuf = new byte[CanvasWidth * CanvasHeight];
             _bRecieve = true;
             m_Server.Send(str);
             while (_bRecieve)
@@ -366,7 +368,7 @@ namespace RootTools.Memory
                 Thread.Sleep(100);
             }
             _bRecieve = false;
-            return m_ReciveBitmapSource;
+            return m_abuf;
         }
 
         private void M_Server_EventReciveData(byte[] aBuf, int nSize, System.Net.Sockets.Socket socket)
@@ -375,13 +377,15 @@ namespace RootTools.Memory
             string str = Encoding.ASCII.GetString(aBuf, 0, nSize);
             //m_qLog.Enqueue(new Mars(0, Encoding.ASCII.GetString(aBuf, 0, nSize)));
             //string[] aStr = str.Split(Splitter);
-            string astr = str;
+            //string astr = str;
+            m_abuf = Convert.FromBase64String(str);
             //switch (aStr)
             //{
             //    case "GET":
-            m_ReciveBitmapSource = StringToImageSource(astr);
+            //m_ReciveBitmapSource = StringToImageSource(astr);
+            
             //      m_ReciveBitmapSource = (BitmapSource)GetSerializeObject(aStr, m_ReciveBitmapSource.GetType());
-                    _bRecieve = true;
+            //        _bRecieve = true;
             //        break;
             //}
         }
@@ -454,7 +458,7 @@ namespace RootTools.Memory
 
 
 
-        private unsafe BitmapSource GetImageView(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
+        private unsafe byte[] GetImageView(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
         {
             object o = new object();
 
@@ -466,8 +470,8 @@ namespace RootTools.Memory
             int pix_x = 0;
             int pix_y = 0;
             int rectX, rectY, rectWidth, rectHeight, sizeX;
-            //byte[] result = new byte[CanvasWidth * CanvasHeight];
-            byte[,,] viewptr = view.Data;
+            byte[] result = new byte[CanvasWidth * CanvasHeight];
+            //byte[,,] viewptr = view.Data;
             //byte* imageptr = (byte*)ptrMem.ToPointer();
 
             rectX = View_Rect.X;
@@ -486,42 +490,11 @@ namespace RootTools.Memory
                     for (int xx = 0; xx < CanvasWidth; xx++)
                     {
                         pix_x = rectX + xx * rectWidth / CanvasWidth;
-                        viewptr[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
+                        result[yy * CanvasWidth + xx] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
                     }
                 }
             });
-            return ImageHelper.ToBitmapSource(view);
-            //Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
-
-            //IntPtr ptrMem = p_ImageData.GetPtr();
-            //if (ptrMem == IntPtr.Zero)
-            //    return;
-
-            //int rectX, rectY, rectWidth, rectHeight, sizeX;
-            //byte[,,] viewptr = view.Data;
-
-            //rectX = p_View_Rect.X;
-            //rectY = p_View_Rect.Y;
-            //rectWidth = p_View_Rect.Width;
-            //rectHeight = p_View_Rect.Height;
-
-            //sizeX = p_ImageData.p_Size.X;
-
-            //Parallel.For(0, p_CanvasHeight, (yy) =>
-            //{
-            //    {
-            //        long pix_y = rectY + yy * rectHeight / p_CanvasHeight;
-
-            //        for (int xx = 0; xx < p_CanvasWidth; xx++)
-            //        {
-            //            long pix_x = rectX + xx * rectWidth / p_CanvasWidth;
-            //            viewptr[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
-            //        }
-            //    }
-            //});
-
-
-           // return result;
+           return result;
         }
 
         public void SendTest()
