@@ -463,7 +463,7 @@ namespace RootTools.Memory
             object o = new object();
 
             Image<Gray, byte> view = new Image<Gray, byte>(CanvasWidth, CanvasHeight);
-            MemoryData memdata = GetMemory("pool", "group", "mem");
+            MemoryData memdata = GetMemory("Vision.Memory", "Vision", "Main");
             IntPtr ptrMem = memdata.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return null;
