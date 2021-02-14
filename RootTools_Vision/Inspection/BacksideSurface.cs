@@ -48,17 +48,8 @@ namespace RootTools_Vision
                 return;
 			}
 
-
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterBackside.IndexChannel);
             byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameterBackside.IndexChannel);
-
-            //bool isBackside = false;
-
-            // BACKSIDE
-            //if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == false)
-            //{
-            //    return;
-            //}
 
             // Inspection Param
             bool isDarkInsp = !parameterBackside.IsBright; // Option
