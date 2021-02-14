@@ -408,7 +408,40 @@ namespace Root_AOP01_Packing.Module
 
             public override string Run()
             {
-                return m_module.RunMapping();
+                return RunMapping();
+            }
+            public string RunMapping()
+            {
+                m_module.p_infoWafer = null;
+                // State Home에 프로텍션 체크넣어야됨
+
+                if (m_module.Run(m_module.m_axis.StartMove(ePos.Bottom)))
+                    return p_sInfo;
+                p_nProgress += 10;
+                if (m_module.Run(m_module.m_axis.WaitReady()))
+                    return p_sInfo;
+                p_nProgress += 10;
+                for (int n = 0; n < 8; n++)
+                {
+                    Thread.Sleep(200);
+                    if (m_module.p_bCheck)
+                    {
+                        p_nProgress = 80;
+                        if (m_module.Run(m_module.m_axis.StartShift(65000)))
+                            return p_sInfo;
+                        p_nProgress = 90;
+                        if (m_module.Run(m_module.m_axis.WaitReady()))
+                            return p_sInfo;
+                        p_nProgress = 100;
+                        m_module.p_infoWafer = new InfoWafer(p_id, 0, m_module.m_engineer);
+                        return "OK";
+                    }
+                    m_module.Run(m_module.m_axis.StartShift(65000));
+                    p_nProgress += 5;
+                    m_module.Run(m_module.m_axis.WaitReady());
+                    p_nProgress += 5;
+                }
+                return "No Case";
             }
         }
         #endregion

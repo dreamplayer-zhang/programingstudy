@@ -152,7 +152,7 @@ namespace Root_WIND2
 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
-            iWTR.ReadInfoReticle_Registry();
+            //iWTR.ReadInfoReticle_Registry();
 
             m_recipe = new WIND2_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);

@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace RootTools
 {
@@ -663,14 +664,30 @@ namespace RootTools
                 {
                     if (p_ImageData.m_eMode == ImageData.eMode.OtherPCMem)
                     {
-                        Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
-                        byte[,,] viewptr = view.Data;
-                        byte[] image = p_ImageData.GetData(p_View_Rect,p_CanvasWidth, p_CanvasHeight);
-                        for (int xx = 0; xx < p_CanvasWidth; xx++)
-                        {   
-                            viewptr[xx, xx, 0] = image[p_View_Rect.Width * xx];
+                        if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
+                        {
+                            Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+                            byte[,,] viewptr = view.Data;
+                            byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+                            //for (int yy = 0; yy < p_CanvasHeight; yy++)
+                            Parallel.For(0, p_CanvasHeight, (yy) =>
+                            {
+                                for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                {
+                                    viewptr[yy, xx, 0] = image[p_CanvasWidth * yy + xx];
+                                }
+                            });
+                            p_ImgSource = ImageHelper.ToBitmapSource(view);
                         }
-                        p_ImgSource = ImageHelper.ToBitmapSource(view);
+                        //        p_ImgSource = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+                        //Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+                        //byte[,,] viewptr = view.Data;
+                        //byte[] image = p_ImageData.GetData(p_View_Rect,p_CanvasWidth, p_CanvasHeight);
+                        //for (int xx = 0; xx < p_CanvasWidth; xx++)
+                        //{   
+                        //    viewptr[xx, xx, 0] = image[p_View_Rect.Width * xx];
+                        //}
+                        //p_ImgSource = ImageHelper.ToBitmapSource(view);
                     }
                     else
                     {

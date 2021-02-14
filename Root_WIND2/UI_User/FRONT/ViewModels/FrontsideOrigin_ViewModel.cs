@@ -21,7 +21,10 @@ namespace Root_WIND2.UI_User
 
         public FrontsideOrigin_ViewModel()
         {
-            this.imageViewerVM = new FrontsideOrigin_ImageViewer_ViewModel();
+            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero && GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").m_eMode !=  ImageData.eMode.OtherPCMem)
+                return;
+
+            this.imageViewerVM = new FrontsideOrigin_ImageViewer_ViewModel();           
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
 
             this.imageViewerVM.OriginBoxReset += OriginBoxReset_Callback;

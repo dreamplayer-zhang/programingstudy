@@ -1,11 +1,13 @@
 ﻿using Root_AOP01_Packing.Module;
 using Root_EFEM.Module;
+using RootTools;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Root_AOP01_Packing
 {
@@ -17,10 +19,19 @@ namespace Root_AOP01_Packing
         {
             m_Mainwindow = main;
             m_Engineer = engineer;
+            Init();
         }
         private void Init()
         {
             p_ModuleList = m_Engineer.ClassModuleList();
+            p_RTRA = (m_Engineer.ClassHandler() as AOP01_Handler).m_aRTR[0] as WTR_RND;
+            p_RTRB = (m_Engineer.ClassHandler() as AOP01_Handler).m_aRTR[1] as WTR_RND;
+            p_LoadportA = (m_Engineer.ClassHandler() as AOP01_Handler).m_aLoadport[0] as Loadport_Cymechs;
+            p_LoadportB = (m_Engineer.ClassHandler() as AOP01_Handler).m_aLoadport[1] as Loadport_AOP;
+            p_Unloadport = (m_Engineer.ClassHandler() as AOP01_Handler).m_unloadport;
+            p_Elevator = (m_Engineer.ClassHandler() as AOP01_Handler).m_elevator;
+            p_TapePacker = (m_Engineer.ClassHandler() as AOP01_Handler).m_tapePacker;
+            p_VacuumPacker = (m_Engineer.ClassHandler() as AOP01_Handler).m_vacuumPacker;
         }
 
         #region Property Module
@@ -132,8 +143,62 @@ namespace Root_AOP01_Packing
             {
                 SetProperty(ref _VacuumPacker, value);
             }
-            
+
         }
         #endregion
+
+        private string _sNameStartBtn = "START";
+        public string p_sNameStartBtn
+        {
+            get
+            {
+                return _sNameStartBtn;
+            }
+            set
+            {
+                SetProperty(ref _sNameStartBtn, value);
+            }
+        }
+
+        public ICommand cmdStart
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (p_sNameStartBtn == "START")
+                    {
+                        m_Engineer.ClassModuleList().StartModuleRuns();
+                        p_sNameStartBtn = "STOP";
+                    }
+                    else
+                    {
+                        m_Engineer.ClassModuleList().ThreadStop();
+                        EQ.p_eState = EQ.eState.Error;
+                        EQ.p_bStop = true;
+                        p_sNameStartBtn = "START";
+                    }
+                });
+            }
+        }
+        public ICommand cmdHome
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    ModuleList moduleList = m_Engineer.ClassModuleList();
+
+                    moduleList.p_iRun = 0;
+                    foreach (ModuleRunBase moduleRun in moduleList.p_moduleList)
+                    {
+                        moduleList.p_Percent = "0";
+                        moduleRun.p_eRunState = ModuleRunBase.eRunState.Ready;
+                    }
+                    EQ.p_eState = EQ.eState.Home;
+                });
+
+            }
+        }
     }
 }

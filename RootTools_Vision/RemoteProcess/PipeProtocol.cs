@@ -8,28 +8,39 @@ namespace RootTools_Vision
 {
 
     public enum PIPE_MESSAGE_TYPE
-    { 
-        String,
-        Object,
-        Command
+    {
+        Message = 0,
+        Command,
+        Data,
+        Event
     }
 
-    //[Serializable]
-    //public class PipeProtocol
-    //{
-    //    private PIPE_MESSAGE_TYPE msgType;
-    //    private int Length;
+    [Serializable]
+    public struct PipeProtocol
+    {
+        public PIPE_MESSAGE_TYPE msgType;
+        public string msg;
+        public string dataType;
+        public object data;
+        
+        public PipeProtocol(PIPE_MESSAGE_TYPE msgType, string msg, string dataType = "", object data = null)
+        {
+            this.msgType = msgType;
+            this.msg = msg;
+            this.dataType = dataType;
+            this.data = data;
 
-    //    public PipeProtocol(PIPE_MESSAGE_TYPE msgType, int length, int obj)
-    //    {
-    //        this.msgType = msgType;
-    //        Length = length;
-    //    }
 
-    //    public PipeProtocol(PIPE_MESSAGE_TYPE msgType, string msg)
-    //    {
-    //        this.msgType = msgType;
-    //        Length = length;
-    //    }
-    //}
+            if (msg == "")
+            {
+                throw new InvalidProtocolException(this);
+            }
+
+            if (msgType == PIPE_MESSAGE_TYPE.Data || msgType == PIPE_MESSAGE_TYPE.Event)
+            {
+                if (dataType == "" || data == null)
+                    throw new InvalidProtocolException(this);
+            }
+        }
+    }
 }

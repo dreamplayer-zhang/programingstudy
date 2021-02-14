@@ -27,11 +27,16 @@ namespace RootTools_Vision
         }
     }
 
+    [Serializable]
     public abstract class WorkBase : ObservableObject
     {
         protected RecipeBase recipe;
         protected ParameterBase parameter;
+        
+        [NonSerialized]
         protected Workplace currentWorkplace;
+
+        [NonSerialized]
         protected WorkplaceBundle workplaceBundle;
 
         protected byte[] workplaceBufferR_GRAY;

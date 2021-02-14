@@ -51,7 +51,7 @@
         </GroupBox>
         <Grid  Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="400" />
+                <RowDefinition Height="500" />
                 <RowDefinition Height="226"/>
                 <RowDefinition />
             </Grid.RowDefinitions>

@@ -20,6 +20,13 @@ namespace RootTools.Module
         private void buttonHome_Click(object sender, RoutedEventArgs e)
         {
             m_moduleList.p_visibleRnR = Visibility.Hidden;
+            m_moduleList.p_iRun = 0;
+            foreach (ModuleRunBase moduleRun in m_moduleList.p_moduleList)
+            {
+                m_moduleList.p_Percent = "0";
+                moduleRun.p_eRunState = ModuleRunBase.eRunState.Ready;
+            }
+            
             EQ.p_eState = EQ.eState.Home;
         }
 
@@ -29,6 +36,11 @@ namespace RootTools.Module
         }
         public void ModuleListRun()
         {
+            foreach (ModuleRunBase moduleRun in m_moduleList.p_moduleList)
+            {
+                m_moduleList.p_Percent = "0";
+                moduleRun.p_eRunState = ModuleRunBase.eRunState.Ready;
+            }
             m_moduleList.p_visibleRnR = Visibility.Hidden;
             m_moduleList.p_sInfo = m_moduleList.ClickRun();
         }

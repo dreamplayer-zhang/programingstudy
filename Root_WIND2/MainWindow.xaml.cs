@@ -167,7 +167,7 @@ namespace Root_WIND2
 
         private string memoryBackPool = "BackSide Vision.BackSide Memory";
         private string memoryBackGroup = "BackSide Vision";
-        private string memoryBack = "Main";
+        private string memoryBack = "BackSide";
 
 
         private string memoryEdgePool = "EdgeSide Vision.Memory";
@@ -191,9 +191,22 @@ namespace Root_WIND2
 
                 MemoryTool memoryTool = engineer.ClassMemoryTool();
 
+                ImageData frontImage;
+                ImageData maskLayer;
                 // ImageData
-                ImageData frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
-                ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
+                if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+                {
+
+                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryFrontPool, memoryFrontGroup, memoryFront, engineer.ClassMemoryTool());
+                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage",memoryFrontPool, memoryFrontGroup, memoryMask , engineer.ClassMemoryTool());
+                    //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
+                }
+                else
+                {
+                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
+                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
+                }
+
 
                 ImageData backImage = GlobalObjects.Instance.RegisterNamed<ImageData>("BackImage", memoryTool.GetMemory(memoryBackPool, memoryBackGroup, memoryBack));
 
@@ -230,9 +243,11 @@ namespace Root_WIND2
                         recipeFront,
                         new SharedBufferInfo(frontImage.GetPtr(0), frontImage.p_Size.X, frontImage.p_Size.Y, frontImage.p_nByte, frontImage.GetPtr(1), frontImage.GetPtr(2))
                         );
+
+                    inspectionFront.SetRecipe(recipeFront);
                 }
 
-                if (frontImage.GetPtr() == IntPtr.Zero)
+                if (backImage.GetPtr() == IntPtr.Zero)
                 {
                     //MessageBox.Show("Back Inspection 생성 실패, 메모리 할당 없음");
                 }
@@ -241,7 +256,7 @@ namespace Root_WIND2
                     InspectionManagerBackside inspectionBack = GlobalObjects.Instance.Register<InspectionManagerBackside>
                     (
                     recipeBack,
-                    new SharedBufferInfo(frontImage.GetPtr(0), frontImage.p_Size.X, frontImage.p_Size.Y, frontImage.p_nByte, frontImage.GetPtr(1), frontImage.GetPtr(2))
+                    new SharedBufferInfo(backImage.GetPtr(0), backImage.p_Size.X, backImage.p_Size.Y, backImage.p_nByte, backImage.GetPtr(1), backImage.GetPtr(2))
                     );
                 }
 

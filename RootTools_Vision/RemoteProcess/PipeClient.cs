@@ -34,11 +34,13 @@ namespace RootTools_Vision
         public const uint OPEN_EXISTING = 3;
         public const uint FILE_FLAG_OVERLAPPED = (0x40000000);
 
-        public delegate void MessageReceivedHandler(string message);
+        public delegate void MessageReceivedHandler(PipeProtocol protocol);
+
         public event MessageReceivedHandler MessageReceived;
+
         void _Dummy()
         {
-            if (MessageReceived != null) MessageReceived(""); 
+            if (MessageReceived != null) MessageReceived(new PipeProtocol()); 
         }
 
         public const int BUFFER_SIZE = 4096;
@@ -81,79 +83,32 @@ namespace RootTools_Vision
 
             this.connected = true;
 
+            this.stream = new FileStream(this.handle, FileAccess.ReadWrite, BUFFER_SIZE, true);
+
             //start listening for messages
             this.readThread = new Thread(new ThreadStart(Read));
             this.readThread.Start();
         }
-
-        
-        /// <summary>
-        /// Reads data from the server
-        /// </summary>
-        public void Read()
+        public void Send<T>(T obj)
         {
-            this.stream = new FileStream(this.handle, FileAccess.ReadWrite, BUFFER_SIZE, true);
-            byte[] readBuffer = new byte[BUFFER_SIZE];
-            int readBytes = 0;
+            byte[] bufferData = Tools.ObjectToByteArray<T>(obj);
+            byte[] bufferSize = BitConverter.GetBytes(bufferData.Length);
+
+            this.stream.Write(bufferSize, 0, sizeof(int));
+            this.stream.Write(bufferData, 0, bufferData.Length);
+            this.stream.Flush();
+        }
+
+        public void Send(string msg)
+        {
             ASCIIEncoding encoder = new ASCIIEncoding();
-            while (true)
-            {
-                try
-                {
-                    // Type
-                    readBytes = this.stream.Read(readBuffer, 0, BUFFER_SIZE);
-                    stream.Flush();
+            byte[] bufferData = encoder.GetBytes(msg);
+            byte[] bufferSize = BitConverter.GetBytes(bufferData.Length);
 
-                    PIPE_MESSAGE_TYPE type = (PIPE_MESSAGE_TYPE)ConvertBytesToInt(readBuffer);
+            this.stream.Write(bufferSize, 0, sizeof(int));
+            this.stream.Write(bufferData, 0, bufferData.Length);
 
-                    switch (type)
-                    {
-                        case PIPE_MESSAGE_TYPE.String:
-                            readBytes = this.stream.Read(readBuffer, 0, BUFFER_SIZE);
-                            stream.Flush();
-                            string msg = encoder.GetString(readBuffer);
-                            Debug.WriteLine(msg + "\n");
-                            break;
-                        case PIPE_MESSAGE_TYPE.Object:
-                            this.stream.Read(readBuffer, 0, BUFFER_SIZE);
-                            stream.Flush();
-                            int size = ConvertBytesToInt(readBuffer);
-                            byte[] temp = new byte[size];
-                            readBytes = 0;
-                            while (readBytes != size)
-                            {
-                                readBytes += this.stream.Read(temp, readBytes, size - readBytes);
-                                stream.Flush();
-                            }
-                            WorkplaceBundle wb = Tools.ByteArrayToObject<WorkplaceBundle>(temp);
-                            Debug.WriteLine(wb.Count.ToString()+ "\n");
-
-                            break;
-                        case PIPE_MESSAGE_TYPE.Command:
-                            break;
-                    }
-                    //stream.Flush();
-                }
-                catch (Exception ex)
-                {
-                    //read error occurred
-                    MessageBox.Show(ex.Message);
-                }
-
-                //server has disconnected
-                //if (bytesRead == 0)
-                //    break;
-
-                //fire message received event
-                //if (this.MessageReceived != null)
-                //    this.MessageReceived(encoder.GetString(readBuffer, 0, bytesRead));
-            }
-
-
-
-            //clean up resource
-            //this.stream.Close();
-            //this.handle.Close();
+            this.stream.Flush();
         }
 
         /// <summary>
@@ -175,6 +130,92 @@ namespace RootTools_Vision
             Buffer.BlockCopy(buffer, 0, temp, 0, sizeof(int));
             
             return (int)BitConverter.ToInt32(temp, 0);
+        }
+
+        public void Read()
+        {
+            byte[] bufferType = new byte[sizeof(PIPE_MESSAGE_TYPE)];
+            bool isExit = false;
+            int readBytes = 0;
+            while (isExit == false)
+            {
+
+                readBytes = stream.Read(bufferType, 0, bufferType.Length);
+                PIPE_MESSAGE_TYPE type = (PIPE_MESSAGE_TYPE)BitConverter.ToInt32(bufferType, 0);
+
+                object data = null;
+                string dataType = "";
+
+                switch (type)
+                {
+                    case PIPE_MESSAGE_TYPE.Message:
+                    case PIPE_MESSAGE_TYPE.Command:
+                    case PIPE_MESSAGE_TYPE.Event:
+                    case PIPE_MESSAGE_TYPE.Data:
+                        {
+                            byte[] bufferDataTypeSize = new byte[sizeof(int)];
+                            readBytes = stream.Read(bufferDataTypeSize, 0, sizeof(int));
+                            int dataTypeSize = BitConverter.ToInt32(bufferDataTypeSize, 0);
+
+                            byte[] bufferDataType = new byte[dataTypeSize];
+                            readBytes = stream.Read(bufferDataType, 0, dataTypeSize);
+                            dataType = Tools.ByteArrayToObject<string>(bufferDataType);
+
+                            byte[] bufferDataSize = new byte[sizeof(int)];
+                            readBytes = stream.Read(bufferDataSize, 0, sizeof(int));
+                            int dataSize = BitConverter.ToInt32(bufferDataSize, 0);
+
+                            byte[] bufferData = new byte[dataSize];
+                            readBytes = stream.Read(bufferData, 0, dataSize);
+                            data = Tools.ByteArrayToObject(bufferData);
+                        }
+                        break;
+                    default:
+                        Debug.WriteLine("No Defined Message");
+                        stream.Flush();
+                        isExit = true;
+                        break;
+                }
+
+                //if (MessageReceived != null)
+                    //MessageReceived(new PipeProtocol(type, dataType, data));
+
+                stream.Flush();
+            }
+
+            stream.Close();
+            this.handle.Close();
+        }
+
+
+
+        public void Send(PipeProtocol protocol)
+        {
+            byte[] bufferType = BitConverter.GetBytes((int)protocol.msgType);
+            stream.Write(bufferType, 0, bufferType.Length);
+
+            switch (protocol.msgType)
+            {
+                case PIPE_MESSAGE_TYPE.Message:
+                case PIPE_MESSAGE_TYPE.Command:
+                case PIPE_MESSAGE_TYPE.Event:
+                case PIPE_MESSAGE_TYPE.Data:
+                    {
+                        byte[] bufferDataType = Tools.ObejctToByteArray(protocol.dataType);
+                        byte[] bufferDataTypeSize = Tools.ObejctToByteArray(bufferDataType.Length);
+
+                        byte[] bufferData = Tools.ObjectToByteArray(protocol.data);
+                        byte[] bufferDataSize = BitConverter.GetBytes(bufferData.Length);
+
+                        stream.Write(bufferDataTypeSize, 0, sizeof(int));
+                        stream.Write(bufferDataType, 0, bufferDataType.Length);
+                        stream.Write(bufferDataSize, 0, sizeof(int));
+                        stream.Write(bufferData, 0, bufferData.Length);
+                    }
+                    break;
+            }
+
+            stream.Flush();
         }
     }
 }
