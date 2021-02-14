@@ -364,17 +364,15 @@ namespace RootTools_Vision
             return objects;
         }
 
-        public static byte[] ObjectToByteArray(object obj)
+        public static byte[] ObjectToByteArray<T>(T obj)
         {
-            if (obj == null) return null;
-
-            BinaryFormatter bf = new BinaryFormatter();
             MemoryStream ms = new MemoryStream();
-            bf.Serialize(ms, obj);
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(ms, obj);
             return ms.ToArray();
         }
 
-        public static byte[] ObejctToByteArray<T>(T obj)
+        public static byte[] ObejctToByteArray(object obj)
         {
             MemoryStream ms = new MemoryStream();
             IFormatter formatter = new BinaryFormatter();
@@ -384,6 +382,8 @@ namespace RootTools_Vision
 
         public static T ByteArrayToObject<T>(byte[] byteArr)
         {
+            if (byteArr == null) return default(T);
+
             MemoryStream ms = new MemoryStream();
             BinaryFormatter bf = new BinaryFormatter();
             ms.Write(byteArr, 0, byteArr.Length);

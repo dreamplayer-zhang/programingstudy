@@ -121,6 +121,11 @@ namespace Root_WIND2.Module
                 dPos = m_grabMode.m_dVRSFocusPos + m_dVRSToAlignOffsetZ;
             }
 
+            if (m_module.Run(axisZ.WaitReady()))
+                return p_sInfo;
+            if (m_module.Run(axisXY.WaitReady()))
+                return p_sInfo;
+
             if (m_module.Run(axisZ.StartMove(dPos)))
                 return p_sInfo;
             if (m_module.Run(axisXY.StartMove(m_firstPointPulse)))

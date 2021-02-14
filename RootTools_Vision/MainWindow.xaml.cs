@@ -38,13 +38,38 @@ namespace RootTools_Vision
 
         }
 
-        public RemoteProcess process = new RemoteProcess(REMOTE_MODE.Slave);
+        bool isServer = false;
+
+        private ClonableWorkFactory client = new ClonableWorkFactory();
+        private ServerWorkFactory server = new ServerWorkFactory();
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            if (this.isServer)
+                server.RemoteStart();
+            else
+                client.RemoteStart();
+            
+        }
 
-            process.StartProcess();
-            //inspectionManager = new InspectionManager();
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            if (this.isServer)
+                server.WriteTest();
+            else
+                client.WriteTest();
+        }
+
+        private void Button_Server(object sender, RoutedEventArgs e)
+        {
+            this.isServer = true;
+
+            PIPE_MESSAGE_TYPE test = PIPE_MESSAGE_TYPE.Command;
+        }
+
+        private void Button_Client(object sender, RoutedEventArgs e)
+        {
+            this.isServer = false;
         }
     }
 }

@@ -55,7 +55,7 @@ namespace Root_WIND2.UI_User
 
         #region [Draw Method]
 
-        public void AddDrawRect(CRect rect, SolidColorBrush color = null)
+        public void AddDrawRect(CRect rect, SolidColorBrush color = null, string tag = "")
         {
             if(color == null)
             {
@@ -72,7 +72,7 @@ namespace Root_WIND2.UI_User
             rt.Stroke = color;
             rt.StrokeThickness = DrawDefines.RectTickness;
             rt.Opacity = 1;
-
+            rt.Tag = tag.Clone();
 
             Canvas.SetLeft(rt, canvasLeftTop.X);
             Canvas.SetTop(rt, canvasLeftTop.Y);
@@ -88,15 +88,15 @@ namespace Root_WIND2.UI_User
             p_DrawElement.Add(rt);
         }
 
-        public void AddDrawRectList(List<CRect> rectList, SolidColorBrush color = null)
+        public void AddDrawRectList(List<CRect> rectList, SolidColorBrush color = null, string tag = "")
         {
             foreach(CRect rect in rectList)
             {
-                AddDrawRect(rect, color);
+                AddDrawRect(rect, color, tag);
             }
         }
 
-        public void AddDrawRect(CPoint leftTop, CPoint rightBottom, SolidColorBrush color = null)
+        public void AddDrawRect(CPoint leftTop, CPoint rightBottom, SolidColorBrush color = null, string tag = "")
         {
             if (color == null)
             {
@@ -113,6 +113,7 @@ namespace Root_WIND2.UI_User
             rt.Stroke = color;
             rt.StrokeThickness = DrawDefines.RectTickness;
             rt.Opacity = 1;
+            rt.Tag = tag.Clone();
 
             Canvas.SetLeft(rt, canvasLeftTop.X);
             Canvas.SetTop(rt, canvasLeftTop.Y);
@@ -130,7 +131,7 @@ namespace Root_WIND2.UI_User
         }
 
 
-        public void AddDrawText(CRect rect, string text, SolidColorBrush color = null)
+        public void AddDrawText(CRect rect, string text, SolidColorBrush color = null, string tag = "")
         {
             Grid grid = new Grid();
             TextBlock tb = new TextBlock();
@@ -143,6 +144,8 @@ namespace Root_WIND2.UI_User
             tb.Height = canvasRightBottom.Y - canvasLeftTop.Y;
             tb.Foreground = color;
             tb.FontSize = 15;
+            tb.Tag = tag.Clone();
+
             grid.Children.Add(tb);
 
             Canvas.SetLeft(grid, canvasLeftTop.X);
@@ -189,6 +192,24 @@ namespace Root_WIND2.UI_User
                     Canvas.SetTop(rectangle, canvasLeftTop.Y);
                 }
             }
+        }
+
+        public void RemoveObjectsByTag(string tag)
+        {
+            p_DrawElement.Clear();
+
+            List<TRect> newRectList = new List<TRect>();
+
+            foreach (TRect rt in rectList)
+            {
+                if((string)rt.UIElement.Tag != tag)
+                {
+                    newRectList.Add(rt);
+                    p_DrawElement.Add(rt.UIElement);
+                }
+            }
+
+            this.rectList = newRectList;
         }
 
         public void ClearObjects()

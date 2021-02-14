@@ -17,32 +17,41 @@ namespace RootTools_Vision
 
     public class RemoteProcess
     {
+        public event PipeCommMessageReceivedHandler MessageReceived;
+
         #region [Members]
 
         REMOTE_MODE mode;
         //Process process;
         private string processName = "RootTools_Vision";
-        private PipeComm pipe = null;
-        private PipeServer pipeServer;
-        private PipeClient pipeClient;
+        private PipeComm pipeComm = null;
+
+        int timeoutMillisecond;
 
         #endregion
 
-        public RemoteProcess(REMOTE_MODE _mode = REMOTE_MODE.None)
+        public RemoteProcess(REMOTE_MODE _mode = REMOTE_MODE.None, string moduleName = "module", int timeoutMillisecond = 3000)
         {
-            this.mode = _mode;
-            if(this.mode == REMOTE_MODE.Master)
+            this.timeoutMillisecond = timeoutMillisecond;
+
+            if (_mode == REMOTE_MODE.Master)
             {
-                //pipe = new PipeComm(PIPE_MODE.Server, processName);
-                pipeServer = new PipeServer(processName);
+                pipeComm = new PipeComm(moduleName, PIPE_MODE.Server);
             }
-            else if(this.mode == REMOTE_MODE.Slave)
+            else if(_mode == REMOTE_MODE.Slave)
             {
-                //pipe = new PipeComm(PIPE_MODE.Client, processName);
-                pipeClient = new PipeClient(processName);
+                pipeComm = new PipeComm(moduleName, PIPE_MODE.Client);
             }
         }
-        
+
+
+        #region [Communiation]
+        private void PipeComm_MessageReceived(PipeProtocol protocol)
+        {
+            if (this.MessageReceived != null)
+                this.MessageReceived(protocol);
+        }
+
         public void StartProcess()
         {
             if (this.mode == REMOTE_MODE.None)
@@ -63,24 +72,41 @@ namespace RootTools_Vision
 
                 //process = Process.Start(processName + ".exe");
 
-                pipeServer.Start();
+                pipeComm.Listen();
+            }
+            else if(this.mode == REMOTE_MODE.Slave)
+            {
+                pipeComm.Connect();
+            }
+        }
+
+        public void Send(PipeProtocol protocol)
+        {
+            if (this.mode == REMOTE_MODE.Master)
+            {
+                this.pipeComm.Write(protocol);
             }
             else
             {
-                pipeClient.Connect();
+                this.pipeComm.Write(protocol);
             }
-
-            //pipe.Connect();
         }
 
-
-        private void ConnectProcess()
+        public void Read(PipeProtocol protocol)
         {
-            if (this.mode == REMOTE_MODE.None) return;
-
-            this.pipe.Connect();
+            if (this.mode == REMOTE_MODE.Master)
+            {
+                //this.pipeServer.Read(protocol);
+            }
+            else
+            {
+                //this.pipeClient.Read(protocol);
+            }
+            return;
         }
+        #endregion
 
+        #region [Process]
         public void ExitProcess()
         {
             foreach (Process prc in Process.GetProcesses())
@@ -91,26 +117,6 @@ namespace RootTools_Vision
                 }
             }
         }
-
-        public void Send<T>(T obj)
-        {
-            this.pipeServer.Send<T>(obj);
-
-            return;
-            //if (obj == null) return;
-            //if(this.mode == REMOTE_MODE.None)
-            //{
-                //MessageBox.Show("Remote Mode를 사용할 수 없습니다.\n생성자에서 Remote Mode를 Master로 설정하세요");
-                //return;
-            //}
-            //this.pipe.Write<T>(obj);
-        }
-
-        public void Send(string msg)
-        {
-            this.pipeServer.Send(msg);
-
-            return;
-        }
+        #endregion
     }
 }

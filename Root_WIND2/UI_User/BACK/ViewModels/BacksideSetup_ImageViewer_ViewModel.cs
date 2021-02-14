@@ -23,6 +23,7 @@ namespace Root_WIND2.UI_User
             public static SolidColorBrush Circle  = Brushes.Blue;
             public static SolidColorBrush SearchCenterPoint = Brushes.Yellow;
             public static SolidColorBrush SearchCircle = Brushes.Yellow;
+            public static SolidColorBrush Map = Brushes.YellowGreen;
         }
 
         #endregion
@@ -117,6 +118,8 @@ namespace Root_WIND2.UI_User
 
         private CPoint searchedCenterMemoryPoint = new CPoint();
         private List<CPoint> searchedCirclePoints = new List<CPoint>();
+
+        private List<TRect> mapRectList = new List<TRect>();
 
 
         #region [Initilize UIElements]
@@ -352,6 +355,60 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        public void SetMapRectList(List<CRect> rectList)
+        {
+            this.mapRectList.Clear();
+            foreach(CRect rt in rectList)
+            {
+                CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.Left, rt.Top));
+                CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.Right, rt.Bottom));
+
+                Rectangle rtUI = new Rectangle();
+                rtUI.Width = canvasRightBottom.X - canvasLeftTop.X;
+                rtUI.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+                rtUI.Stroke = ColorDefines.Map;
+                rtUI.StrokeThickness = 2;
+                rtUI.Opacity = 1;
+                rtUI.Tag = "Map";
+
+                Canvas.SetLeft(rtUI, canvasLeftTop.X);
+                Canvas.SetTop(rtUI, canvasLeftTop.Y);
+
+                TRect tRect = new TRect();
+                tRect.UIElement = rtUI;
+                tRect.MemoryRect.Left = rt.Left;
+                tRect.MemoryRect.Top = rt.Top;
+                tRect.MemoryRect.Right = rt.Right;
+                tRect.MemoryRect.Bottom = rt.Bottom;
+
+                mapRectList.Add(tRect);
+                p_DrawElement.Add(rtUI);
+            }
+        }
+
+        public void DrawMapRectList()
+        {
+            if(this.mapRectList.Count > 0)
+            {
+                foreach (TRect rt in mapRectList)
+                {
+                    if (p_DrawElement.Contains(rt.UIElement) == true)
+                    {
+                        Rectangle rectangle = rt.UIElement as Rectangle;
+                        CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+                        CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+
+                        rectangle.Width = canvasRightBottom.X - canvasLeftTop.X;
+                        rectangle.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+                        Canvas.SetLeft(rectangle, canvasLeftTop.X);
+                        Canvas.SetTop(rectangle, canvasLeftTop.Y);
+                    }
+                }
+            }
+        }
+
         public void SetSearchedCenter(CPoint memPt)
         {
             this.searchedCenterMemoryPoint = memPt;
@@ -378,8 +435,8 @@ namespace Root_WIND2.UI_User
         {
             DrawCircle();
             DrawCircleEdit();
-
-            DrawSearchedCircle();            
+            DrawSearchedCircle();
+            DrawMapRectList();
         }
 
         #endregion

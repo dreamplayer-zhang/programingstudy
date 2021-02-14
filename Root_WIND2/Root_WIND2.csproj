@@ -243,6 +243,7 @@
     </Compile>
     <Compile Include="Maskbk.cs" />
     <Compile Include="Module\BacksideVision\Run_GrabBackside.cs" />
+    <Compile Include="Module\BacksideVision\Run_InspectBackside.cs" />
     <Compile Include="Module\BacksideVision\Run_LADS.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
     <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />

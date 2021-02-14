@@ -13,6 +13,7 @@ using System.Windows;
 
 namespace RootTools_Vision
 {
+    [Serializable]
     internal class WorkManager : IWorkStartable
     {
         #region [Members]
@@ -21,18 +22,29 @@ namespace RootTools_Vision
         private readonly int workerNumber;
         private readonly bool isFull;
 
+        [NonSerialized]
         private List<Worker> workers;
 
+        [NonSerialized]
         private WORKMANAGER_STATE state = WORKMANAGER_STATE.NONE;
 
         // Task
+        [NonSerialized]
         private Task task = null;
+
+        [NonSerialized]
         private CancellationTokenSource cancellationTokenSource;
+
+        [NonSerialized]
         private ManualResetEvent _waitSignal = new ManualResetEvent(false);
 
+        [NonSerialized]
         private bool isStop = false;
 
+        [NonSerialized]
         WorkBundle workBundle;
+
+        [NonSerialized]
         WorkplaceBundle workplaceBundle;
 
 
@@ -107,6 +119,13 @@ namespace RootTools_Vision
 
             this.State = WORKMANAGER_STATE.CREATED;
         }
+
+        public WorkManager Clone()
+        {
+            WorkManager workManager = new WorkManager(this.workType, this.preWorkType, this.workerNumber, this.isFull);
+            return workManager;
+        }
+
 
         public bool SetWorkBundle(WorkBundle bundle)
         {

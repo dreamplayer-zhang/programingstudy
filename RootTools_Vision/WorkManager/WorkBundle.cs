@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
+    [Serializable]
     public class WorkBundle : ObservableCollection<WorkBase>
     {
         public void SetRecipe(RecipeBase recipe)
@@ -55,6 +56,17 @@ namespace RootTools_Vision
                 works.Add(wb.Clone());
             }
             return works;
+        }
+
+        public WorkBundle CloneForRemote()
+        {
+            WorkBundle wb = new WorkBundle();
+            foreach(WorkBase work in this)
+            {
+                wb.Add(new CloneableWorkBase(work.GetType().ToString()));
+            }
+
+            return wb;
         }
 
         // 다시 고려
