@@ -41,6 +41,9 @@ namespace Root_WIND2.UI_User
 
         public FrontsideMask_ViewModel()
         {
+            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero)
+                return;
+
             base.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
             p_VisibleMenu = Visibility.Collapsed;
 

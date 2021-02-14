@@ -92,8 +92,9 @@
                 <GroupBox Grid.Row="1" 
                       Header="Defect List"
                       Margin="4,0,4,4"
-                      Style="{StaticResource main_view_groupbox}">
-
+                      Style="{StaticResource main_view_groupbox}" >
+                    <tools:Database_DataView DataContext="{Binding p_DataViewer_VM}" Margin="4">
+                    </tools:Database_DataView>
                 </GroupBox>
             </Grid>
         </Grid>

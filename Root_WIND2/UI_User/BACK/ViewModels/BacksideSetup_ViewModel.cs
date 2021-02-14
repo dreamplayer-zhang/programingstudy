@@ -334,6 +334,8 @@ namespace Root_WIND2.UI_User
                     }
                 }
 
+                DrawMapRect(mapData, outMapX, outMapY, OriginX, OriginY, memW, memH);
+
                 SetRecipe();
             }
         }
@@ -348,6 +350,33 @@ namespace Root_WIND2.UI_User
             backsideRecipe.OriginY = this.originY;
             backsideRecipe.DiePitchX = this.mapUnitWidth;
             backsideRecipe.DiePitchY = this.mapUnitHeight;
+        }
+
+
+        public void DrawMapRect(int[] mapData, int mapX, int mapY, int orgX, int orgY, int chipW, int chipH)
+        {
+            List<CRect> rectList = new List<CRect>();
+            int offsetY = 0;
+            bool isOrigin = true;
+
+            for (int x = 0; x < mapX; x++)
+            {
+                for (int y = 0; y < mapY; y++)
+                {
+                    if (mapData[y * mapX + x] == 1)
+                    {
+                        if (isOrigin)
+                        {
+                            offsetY = orgY - (y + 1) * chipH;
+                            isOrigin = false;
+                        }
+
+                        rectList.Add(new CRect(orgX + x * chipW, offsetY + y * chipH, orgX + (x + 1) * chipW, offsetY + (y + 1) * chipH));
+                    }
+                }
+            }
+
+            this.ImageViewerVM.SetMapRectList(rectList);
         }
 
 

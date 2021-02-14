@@ -148,13 +148,26 @@
                 </StackPanel>
             </Grid>
         </Grid>
-        <Border Grid.Column="1"
-                DataContext="{Binding p_CamRADS}">
-            <tools:ImageViewer Width="{PriorityBinding}"
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="9*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0"
+                    DataContext="{Binding p_CamRADS}">
+                <tools:ImageViewer Width="{PriorityBinding}"
                                Height="{PriorityBinding}"
                                DataContext="{Binding p_ImageViewer}"
                                Margin="20,10,20,10"></tools:ImageViewer>
-        </Border>
+            </Border>
+            <Border Grid.Row="1">
+                <TextBlock Style="{StaticResource BasicTb}"
+                           Text="{Binding p_timerControl.p_nAdsData}"
+                           TextAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="20"/>
+            </Border>
+        </Grid>
         <Border Grid.Column="2">
             <Tree:TreeUI Grid.Row="1"
                          Background="White"

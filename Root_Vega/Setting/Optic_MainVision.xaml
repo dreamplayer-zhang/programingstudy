@@ -694,6 +694,10 @@
                                             <Binding Path="p_PatternVision.p_id"></Binding>
                                         </MultiBinding>
                                     </Canvas.Left>
+                                    <Rectangle Fill="Blue"
+                                               Opacity="0.5"
+                                               Width="25"
+                                               Height="25"></Rectangle>
                                 </Grid>
                             </Canvas>
                             <Canvas Grid.Column="1"
@@ -701,15 +705,21 @@
                                 <Rectangle Width="40"
                                            Height="20"
                                            Fill="HotPink"></Rectangle>
-                                <!--<Canvas.Bottom>
-                                    <MultiBinding Converter="{StaticResource PositionScalingConverters}"
+                                <Grid>
+                                    <Rectangle Fill="Blue"
+                                               Opacity="0.5"
+                                               Width="40"
+                                               Height="40"></Rectangle>
+                                    <Canvas.Bottom>
+                                        <MultiBinding Converter="{StaticResource PositionScalingConverters}"
                                                       ConverterParameter="AxisZ">
-                                        <Binding Path="p_PatternVision.p_axisZ"></Binding>
-                                        <Binding Path="ActualHeight" ElementName="CanvasZ"></Binding>
-                                        <Binding Path="p_PatternVision.p_axisZ.p_posActual"></Binding>
-                                        <Binding Path="p_PatternVision.p_id"></Binding>
-                                    </MultiBinding>
-                                </Canvas.Bottom>-->
+                                            <Binding Path="p_PatternVision.p_axisZ"></Binding>
+                                            <Binding Path="ActualHeight" ElementName="CanvasZ"></Binding>
+                                            <Binding Path="p_PatternVision.p_axisZ.p_posActual"></Binding>
+                                            <Binding Path="p_PatternVision.p_id"></Binding>
+                                        </MultiBinding>
+                                    </Canvas.Bottom>
+                                </Grid>
                             </Canvas>
                             <Grid Grid.Column="2">
                                 <Grid.RowDefinitions>

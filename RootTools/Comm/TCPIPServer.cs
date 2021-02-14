@@ -190,7 +190,7 @@ namespace RootTools.Comm
             RunTree(m_treeRoot);
         }
 
-        void RunTree(Tree treeRoot)
+        public void RunTree(Tree treeRoot)
         {
             RunSetTree(treeRoot.GetTree("Set"));
         }
@@ -207,7 +207,7 @@ namespace RootTools.Comm
         Log m_log;
         int m_nBufReceive = 1024 * 1024;
         public TreeRoot m_treeRoot;
-        Socket m_socket = null;
+        public Socket m_socket = null;
         public CommLog m_commLog;
 
         public TCPIPServer(string id, Log log, int nBufReceive = -1)

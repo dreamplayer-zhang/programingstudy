@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -11,6 +12,9 @@ using System.Windows;
 
 namespace RootTools_Vision
 {
+
+
+
     class PipeServer
     {
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -38,19 +42,19 @@ namespace RootTools_Vision
             public FileStream stream;
         }
 
-        public delegate void MessageReceivedHandler(Client client, string message);
+        public delegate void MessageReceivedHandler(PipeProtocol protocol);
 
         public event MessageReceivedHandler MessageReceived;
         public const int BUFFER_SIZE = 4096;
         void _Dummy()
         {
-            if (MessageReceived != null) MessageReceived(null, "");
+            if (MessageReceived != null) MessageReceived(new PipeProtocol());
         }
 
         string pipeName;
         Thread listenThread;
         bool running;
-        List<Client> clients;
+        Client client;
 
         public string PipeName
         {
@@ -66,7 +70,6 @@ namespace RootTools_Vision
         public PipeServer(string pipeName)
         {
             this.pipeName = pipeName;
-            this.clients = new List<Client>();
         }
 
         /// <summary>
@@ -109,98 +112,141 @@ namespace RootTools_Vision
                 if (success == 0)
                     return;
 
-                Client client = new Client();
+                client = new Client();
                 client.handle = clientHandle;
 
-                lock (clients)
-                    this.clients.Add(client);
+                client.stream = new FileStream(client.handle, FileAccess.ReadWrite, BUFFER_SIZE, true);
 
-                Thread readThread = new Thread(new ParameterizedThreadStart(Read));
-                readThread.Start(client);
+                Thread readThread = new Thread(new ThreadStart(Read));
+                readThread.Start();
             }
         }
 
-        /// <summary>
-        /// Reads incoming data from connected clients
-        /// </summary>
-        /// <param name="clientObj"></param>
-        private void Read(object clientObj)
+        public T Read<T>()
         {
-            Client client = (Client)clientObj;
-            client.stream = new FileStream(client.handle, FileAccess.ReadWrite, BUFFER_SIZE, true);
-            while (true)
+            StreamDataReader reader = new StreamDataReader(client.stream);
+            T obj = Tools.ByteArrayToObject<T>(reader.Read());
+            client.stream.Close();
+
+            return obj;
+        }
+
+
+        public void Read()
+        {
+            Client client = this.client;
+            FileStream stream = this.client.stream;
+
+            byte[] bufferType = new byte[sizeof(PIPE_MESSAGE_TYPE)];
+
+            bool isExit = false;
+            int readBytes = 0;
+            while (isExit == false)
             {
-                int bytesRead = 0;
-                try
+
+                readBytes = stream.Read(bufferType, 0, bufferType.Length);
+                PIPE_MESSAGE_TYPE type = (PIPE_MESSAGE_TYPE)BitConverter.ToInt32(bufferType, 0);
+
+                object data = null;
+                string dataType = "";
+
+                switch (type)
                 {
-                    byte[] bufferSize = new byte[sizeof(Int32)];
-                    client.stream.Read(bufferSize, 0, sizeof(Int32));
+                    case PIPE_MESSAGE_TYPE.Message:
+                    case PIPE_MESSAGE_TYPE.Command:
+                    case PIPE_MESSAGE_TYPE.Event:
+                    case PIPE_MESSAGE_TYPE.Data:
+                        {
+                            byte[] bufferDataTypeSize = new byte[sizeof(int)];
+                            readBytes = stream.Read(bufferDataTypeSize, 0, sizeof(int));
+                            int dataTypeSize = BitConverter.ToInt32(bufferDataTypeSize, 0);
 
-                    int len = BitConverter.ToInt32(bufferSize, 0);
-                    byte[] buffer = new byte[len];
-                    client.stream.Read(buffer, 0, len);
+                            byte[] bufferDataType = new byte[dataTypeSize];
+                            readBytes = stream.Read(bufferDataType, 0, dataTypeSize);
+                            dataType = Tools.ByteArrayToObject<string>(bufferDataType);
+
+                            byte[] bufferDataSize = new byte[sizeof(int)];
+                            readBytes = stream.Read(bufferDataSize, 0, sizeof(int));
+                            int dataSize = BitConverter.ToInt32(bufferDataSize, 0);
+
+                            byte[] bufferData = new byte[dataSize];
+                            readBytes = stream.Read(bufferData, 0, dataSize);
+                            data = Tools.ByteArrayToObject(bufferData);
+                        }
+                        break;
+                    default:
+                        Debug.WriteLine("No Defined Message");
+                        stream.Flush();
+                        isExit = true;
+                        break;
                 }
-                catch
-                {
-                    //read error has occurred
-                    break;
-                }
 
-                //client has disconnected
-                if (bytesRead == 0)
-                    break;
+                //if (MessageReceived != null)
+                //    MessageReceived(new PipeProtocol(type, dataType, data));
 
-                //fire message received event
-                //if (this.MessageReceived != null)
-                //    this.MessageReceived(client, encoder.GetString(buffer, 0, bytesRead));
+                stream.Flush();
             }
 
-            //clean up resources
-            client.stream.Close();
+            stream.Close();
             client.handle.Close();
-            lock (this.clients)
-                this.clients.Remove(client);
         }
 
         public void Send<T>(T obj)
         {
-            if(this.clients.Count == 0)
+            lock (this.client)
             {
-                MessageBox.Show("연결된 Client가 업습니다.");
+                byte[] bufferData = Tools.ObjectToByteArray<T>(obj);
+                byte[] bufferSize = BitConverter.GetBytes(bufferData.Length);
+                
+                client.stream.Write(bufferSize, 0, sizeof(int));
+                client.stream.Write(bufferData, 0, bufferData.Length);
+                client.stream.Flush();
             }
+        }
 
-            lock (this.clients)
+        public void Send(PipeProtocol protocol)
+        {
+            lock (this.client)
             {
-                Client client = this.clients[0];
+                byte[] bufferType = BitConverter.GetBytes((int)protocol.msgType);
+                client.stream.Write(bufferType, 0, bufferType.Length);
+
+                switch (protocol.msgType)
+                {
+                    case PIPE_MESSAGE_TYPE.Message:
+                    case PIPE_MESSAGE_TYPE.Command:
+                    case PIPE_MESSAGE_TYPE.Event:
+                    case PIPE_MESSAGE_TYPE.Data:
+                        {
+                            byte[] bufferDataType = Tools.ObejctToByteArray(protocol.dataType);
+                            byte[] bufferDataTypeSize = BitConverter.GetBytes(bufferDataType.Length);
+                            
+                            byte[] bufferData = Tools.ObjectToByteArray(protocol.data);
+                            byte[] bufferDataSize = BitConverter.GetBytes(bufferData.Length);
 
 
-                client.stream.Write(ConvertIntToBytes((int)PIPE_MESSAGE_TYPE.Object), 0, BUFFER_SIZE);
+                            client.stream.Write(bufferDataTypeSize, 0, sizeof(int));
+                            client.stream.Write(bufferDataType, 0, bufferDataType.Length);
+                            client.stream.Write(bufferDataSize, 0, sizeof(int));
+                            client.stream.Write(bufferData, 0, bufferData.Length);
+                        }
+                        break;
+                }
 
-                byte[] buffer = Tools.ObejctToByteArray<T>(obj);
-                client.stream.Write(ConvertIntToBytes(buffer.Length), 0, BUFFER_SIZE);
-                client.stream.Write(buffer, 0, buffer.Length);
                 client.stream.Flush();
             }
         }
 
         public void Send(string msg)
         {
-            if (this.clients.Count == 0)
-            {
-                MessageBox.Show("연결된 Client가 없습니다.");
-            }
+            ASCIIEncoding encoder = new ASCIIEncoding();
+            byte[] bufferData = encoder.GetBytes(msg);
+            byte[] bufferSize = BitConverter.GetBytes(bufferData.Length);
 
-            lock (this.clients)
-            {
-                Client client = this.clients[0];
+            client.stream.Write(bufferSize, 0, sizeof(int));
+            client.stream.Write(bufferData, 0, bufferData.Length);
 
-                client.stream.Write(ConvertIntToBytes((int)PIPE_MESSAGE_TYPE.String), 0, BUFFER_SIZE);
-
-                ASCIIEncoding encoder = new ASCIIEncoding();
-                byte[] buffer = encoder.GetBytes(msg);
-                client.stream.Write(buffer, 0, buffer.Length);
-                client.stream.Flush();
-            }
+            client.stream.Flush();
         }
 
         public byte[] ConvertIntToBytes(int data)

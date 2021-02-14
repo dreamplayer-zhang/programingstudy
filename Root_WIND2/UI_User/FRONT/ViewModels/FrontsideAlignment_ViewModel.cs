@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools_Vision;
+using System;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows;
@@ -19,6 +20,8 @@ namespace Root_WIND2.UI_User
 
         public FrontsideAlignment_ViewModel()
         {
+            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero)
+                return;
             this.imageViewerVM = new FrontsideAlignment_ImageViewer_ViewModel();
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
 

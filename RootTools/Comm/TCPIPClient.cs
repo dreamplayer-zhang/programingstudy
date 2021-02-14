@@ -186,6 +186,11 @@ namespace RootTools.Comm
             m_treeRoot.p_eMode = mode;
             RunTreeSetting(m_treeRoot.GetTree("Setting"));
         }
+
+        public void RunTree(Tree treeRoot)
+        {
+            RunTreeSetting(treeRoot.GetTree("Setting"));
+        }
         #endregion
 
         #region Thread

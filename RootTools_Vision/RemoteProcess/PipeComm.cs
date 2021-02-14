@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -12,123 +15,283 @@ using System.Windows;
 
 namespace RootTools_Vision
 {
+
     public enum PIPE_MODE
     {
         Server = 0,
-        Client
+        Client = 1
     }
 
-    class PipeComm
+    public delegate void PipeCommMessageReceivedHandler(PipeProtocol protocol);
+
+    public class PipeComm
     {
-        PipeStream pipe;
-        PIPE_MODE mode;
+        public event PipeCommMessageReceivedHandler MessageReceived;
 
-        Thread readThread;
-
-        public PipeComm(PIPE_MODE mode, string pipeName)
+        public PipeComm(string pipeName, PIPE_MODE mode)
         {
+            this.pipeName = pipeName;
             this.mode = mode;
-            if(mode == PIPE_MODE.Server)
-            {
-                pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut);
-            }
-            else
-            {
-                pipe = new NamedPipeClientStream(".",pipeName, PipeDirection.InOut);
-            }
         }
+
+        #region [Win32API]
+
+        // Server
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern SafeFileHandle CreateNamedPipe(
+            String pipeName,   
+            uint dwOpenMode,
+            uint dwPipeMode,
+            uint nMaxInstances,
+            uint nOutBufferSize,
+            uint nInBufferSize,
+            uint nDefaultTimeOut,
+            IntPtr lpSecurityAttributes);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern int ConnectNamedPipe(
+           SafeFileHandle hNamedPipe,
+           IntPtr lpOverlapped);
+
+        // Client
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern SafeFileHandle CreateFile(
+            String pipeName,
+            uint dwDesiredAccess,
+            uint dwShareMode,
+            IntPtr lpSecurityAttributes,
+            uint dwCreationDisposition,
+            uint dwFlagsAndAttributes,
+            IntPtr hTemplate);
+
+        public const uint GENERIC_READ = (0x80000000);
+        public const uint GENERIC_WRITE = (0x40000000);
+        public const uint OPEN_EXISTING = 3;
+        public const uint FILE_FLAG_OVERLAPPED = (0x40000000);
+        public const uint DUPLEX = (0x00000003);
+        #endregion
+
+        #region [Common]
+        private string pipeName;
+        private PIPE_MODE mode;
+        public const int BUFFER_SIZE = 4096;
+        private FileStream stream;
+        private SafeFileHandle handle;
+        Thread readThread;
+        bool connected;
+
+        Thread listenThread;
+        bool running;
+
+        #endregion
+
+        #region [Properties]
+        public bool Connected
+        {
+            get { return this.connected; }
+        }
+
+        public string PipeName
+        {
+            get { return this.pipeName; }
+            set { this.pipeName = value; }
+        }
+        #endregion
+
+        #region [Client]
 
         public void Connect()
         {
-            if(this.mode == PIPE_MODE.Server)
+            if (this.mode == PIPE_MODE.Server)
             {
-                NamedPipeServerStream server = pipe as NamedPipeServerStream;
-                server.WaitForConnection();
-                this.readThread = new Thread(new ThreadStart(Read));
-                this.readThread.Start();
+                throw new ArgumentException("Server는 Listen Method를 사용할 수 없습니다");
+            }
 
-                MessageBox.Show("Server!! Client");
-            }
-            else
-            {
-                NamedPipeClientStream client = pipe as NamedPipeClientStream;
-                client.Connect();
-                this.readThread = new Thread(new ThreadStart(Read));
-                this.readThread.Start();
-                MessageBox.Show("Connect!! Client");
-            }
+            this.handle =
+               CreateFile(
+                  @"\\.\pipe\" + this.pipeName,
+                  GENERIC_READ | GENERIC_WRITE,
+                  0,
+                  IntPtr.Zero,
+                  OPEN_EXISTING,
+                  FILE_FLAG_OVERLAPPED,
+                  IntPtr.Zero);
+
+            //could not create handle - server probably not running
+            if (this.handle.IsInvalid)
+                return;
+
+            this.connected = true;
+
+            this.stream = new FileStream(this.handle, FileAccess.ReadWrite, BUFFER_SIZE, true);
+
+            //start listening for messages
+            this.readThread = new Thread(new ThreadStart(Read));
+            this.readThread.Start();
         }
+        #endregion
 
-        public void Write<T>(T obj)
+
+        #region [Server]
+        public void Listen()
         {
-            if(this.pipe.IsConnected == true)
+            if (this.mode == PIPE_MODE.Client)
             {
-                //NamedPipeServerStream server = pipe as NamedPipeServerStream;
-                //server.RunAsClient(() =>
-                {
-                    byte[] buffer = new byte[sizeof(Int32)];
-
-                    Int32 len = buffer.Length;
-
-                    try
-                    {
-                        this.pipe.Write(BitConverter.GetBytes(len), 0, sizeof(Int32));
-                        this.pipe.WaitForPipeDrain();
-                    }
-                    catch(Exception)
-                    {
-
-                    }
-                    
-                    //this.pipe.WriteAsync(buffer, 0, buffer.Length);                    
-                }
-                
+                throw new ArgumentException("Client는 Listen Method를 사용할 수 없습니다");
             }
+
+            //start the listening thread
+            this.listenThread = new Thread(new ThreadStart(ListenForClients));
+            this.listenThread.Start();
+
+            this.running = true;
         }
 
-        public void Read()
+        private void ListenForClients()
         {
             while (true)
             {
-                int bytesRead = 0;
+                SafeFileHandle clientHandle =
+                CreateNamedPipe(
+                     @"\\.\pipe\" + this.pipeName,
+                     DUPLEX | FILE_FLAG_OVERLAPPED,
+                     0,
+                     255,
+                     BUFFER_SIZE,
+                     BUFFER_SIZE,
+                     0,
+                     IntPtr.Zero);
 
-                try
-                {
-                    byte[] buffer;
-                    buffer = new byte[sizeof(int)];
-                    this.pipe.Read(buffer, 0, sizeof(int));
+                //could not create named pipe
+                if (clientHandle.IsInvalid)
+                    return;
 
-                    int len = BitConverter.ToInt32(buffer, 0);
-                    buffer = new byte[len];
-                    bytesRead = this.pipe.Read(buffer, 0, len);
+                int success = ConnectNamedPipe(clientHandle, IntPtr.Zero);
 
-                    WorkplaceBundle wb = Tools.ByteArrayToObject<WorkplaceBundle>(buffer);
-                    MessageBox.Show(wb.Count.ToString());
-                }
-                catch
-                {
-                    //read error occurred
-                    
-                }
+                //could not connect client
+                if (success == 0)
+                    return;
 
-                //server has disconnected
-                //if (bytesRead == 0)
-                //    break;
+                handle = clientHandle;
+                stream = new FileStream(handle, FileAccess.ReadWrite, BUFFER_SIZE, true);
 
-                //fire message received event
-                //if (this.MessageReceived != null)
-                //    this.MessageReceived(encoder.GetString(readBuffer, 0, bytesRead));
+                this.connected = true;
+
+                Thread readThread = new Thread(new ThreadStart(Read));
+                readThread.Start();
             }
-
-
-
-            //clean up resource
-            //this.pipe.Close();
         }
+        #endregion
 
-        public void Write()
+        #region [Read/Write]
+        private void Read()
         {
+            byte[] bufferType = new byte[sizeof(int)];
+            byte[] bufferDataTypeSize = new byte[sizeof(int)];
+            byte[] bufferDataSize = new byte[sizeof(int)];
 
+            bool isExit = false;
+            int readBytes = 0;
+
+            try
+            {
+                while (isExit == false)
+                {
+                    readBytes = stream.Read(bufferType, 0, bufferType.Length);
+                    PIPE_MESSAGE_TYPE type = (PIPE_MESSAGE_TYPE)BitConverter.ToInt32(bufferType, 0);
+
+                    object data = null;
+                    string dataType = "";
+
+                    switch (type)
+                    {
+                        case PIPE_MESSAGE_TYPE.Message:
+                        case PIPE_MESSAGE_TYPE.Command:
+                        case PIPE_MESSAGE_TYPE.Event:
+                        case PIPE_MESSAGE_TYPE.Data:
+                            {
+                                // Read Data Type
+                                readBytes = stream.Read(bufferDataTypeSize, 0, sizeof(int));
+                                int dataTypeSize = BitConverter.ToInt32(bufferDataTypeSize, 0);
+
+                                byte[] bufferDataType = new byte[dataTypeSize];
+                                readBytes = stream.Read(bufferDataType, 0, dataTypeSize);
+                                dataType = Tools.ByteArrayToObject<string>(bufferDataType);
+
+
+                                // Read Data
+                                readBytes = stream.Read(bufferDataSize, 0, sizeof(int));
+                                int dataSize = BitConverter.ToInt32(bufferDataSize, 0);
+
+                                byte[] bufferData = new byte[dataSize];
+                                readBytes = 0;
+                                while (readBytes != dataSize)
+                                {
+                                    readBytes += stream.Read(bufferData, readBytes, dataSize - readBytes);
+                                }
+                                data = Tools.ByteArrayToObject(bufferData);
+                            }
+                            break;
+                        default:
+                            Debug.WriteLine("No Defined Message");
+                            stream.Flush();
+                            isExit = true;
+                            break;
+                    }
+                    //if (this.MessageReceived != null)
+                    //    MessageReceived(new PipeProtocol(type, dataType, data));
+
+                    stream.Flush();
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Connection 종료");
+            }
+            finally
+            {
+                stream.Close();
+                handle.Close();
+            }
+            if(handle.IsClosed == false)
+            {
+                stream.Close();
+                handle.Close();
+            }
         }
+
+
+        private object lockObj = new object();
+        public void Write(PipeProtocol protocol)
+        {
+            lock(lockObj)
+            {
+                byte[] bufferType = BitConverter.GetBytes((int)protocol.msgType);
+                stream.Write(bufferType, 0, bufferType.Length);
+
+                switch (protocol.msgType)
+                {
+                    case PIPE_MESSAGE_TYPE.Message:
+                    case PIPE_MESSAGE_TYPE.Command:
+                    case PIPE_MESSAGE_TYPE.Event:
+                    case PIPE_MESSAGE_TYPE.Data:
+                        {
+                            byte[] bufferDataType = Tools.ObejctToByteArray(protocol.dataType);
+                            byte[] bufferDataTypeSize = BitConverter.GetBytes(bufferDataType.Length);
+
+                            byte[] bufferData = Tools.ObjectToByteArray(protocol.data);
+                            byte[] bufferDataSize = BitConverter.GetBytes(bufferData.Length);
+
+                            stream.Write(bufferDataTypeSize, 0, sizeof(int));
+                            stream.Write(bufferDataType, 0, bufferDataType.Length);
+                            stream.Write(bufferDataSize, 0, sizeof(int));
+                            stream.Write(bufferData, 0, bufferData.Length);
+                        }
+                        break;
+                }
+            }
+        }
+        #endregion
     }
+
 }

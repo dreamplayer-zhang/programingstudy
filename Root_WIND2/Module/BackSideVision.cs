@@ -34,10 +34,13 @@ namespace Root_WIND2.Module
         LightSet lightSet;
         Camera_Dalsa camMain;
         Camera_Silicon camLADS;
+        List<List<double>> ladsinfos;
 
         #region Getter/Setter
         public Axis AxisZ { get => axisZ; private set => axisZ = value; }
         public AxisXY AxisXY { get => axisXY; private set => axisXY = value; }
+        public List<List<double>> LadsInfos
+        { get => ladsinfos; private set => ladsinfos = value; }
         #endregion
 
         public override void GetTools(bool bInit)
@@ -52,6 +55,9 @@ namespace Root_WIND2.Module
             p_sInfo = m_toolBox.Get(ref camMain, this, "MainCam");
             p_sInfo = m_toolBox.Get(ref camLADS, this, "LADSCam");
             memoryGroup = memoryPool.GetGroup(p_id);
+
+            if (camLADS != null)
+                camLADS.Connect();
         }
         #endregion
 
@@ -91,8 +97,8 @@ namespace Root_WIND2.Module
             foreach (GrabMode grabMode in m_aGrabMode)
             {
                 grabMode.RunTree(tree.GetTree(grabMode.p_sName, false), true, false);
-                if(!grabMode.p_sName.Contains("LADS"))
-                    grabMode.RunTreeLADS(tree.GetTree("Name", false));
+                if (!grabMode.p_sName.Contains("LADS"))
+                    grabMode.RunTreeLADS(tree.GetTree(grabMode.p_sName, false));
             }
         }
 
@@ -297,9 +303,8 @@ namespace Root_WIND2.Module
 
             if (camMain != null && camMain.p_CamInfo.p_eState == eCamState.Init)
                 camMain.Connect();
-            if (camLADS != null)
-                camLADS.Connect();
-                
+
+
             base.StateHome();
 
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
@@ -325,6 +330,7 @@ namespace Root_WIND2.Module
         {
             AddModuleRunList(new Run_GrabBackside(this), true, "Run Grab Backside");
             AddModuleRunList(new Run_LADS(this), true, "Run LADS");
+
         }
         public ImageData GetMemoryData(ScanMemory mem)
         {
@@ -336,6 +342,7 @@ namespace Root_WIND2.Module
         {
             base.InitBase(id, engineer);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
+            ladsinfos = new List<List<double>>();
             //InitMemorys();
         }
 
