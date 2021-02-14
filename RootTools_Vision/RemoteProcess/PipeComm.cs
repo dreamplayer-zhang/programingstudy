@@ -186,7 +186,8 @@ namespace RootTools_Vision
         #region [Read/Write]
         private void Read()
         {
-            byte[] bufferType = new byte[sizeof(int)];
+            byte[] bufferMsgType = new byte[sizeof(int)];
+            byte[] bufferMsgSize = new byte[sizeof(int)];
             byte[] bufferDataTypeSize = new byte[sizeof(int)];
             byte[] bufferDataSize = new byte[sizeof(int)];
 
@@ -197,22 +198,35 @@ namespace RootTools_Vision
             {
                 while (isExit == false)
                 {
-                    readBytes = stream.Read(bufferType, 0, bufferType.Length);
-                    PIPE_MESSAGE_TYPE type = (PIPE_MESSAGE_TYPE)BitConverter.ToInt32(bufferType, 0);
+                    readBytes = stream.Read(bufferMsgType, 0, bufferMsgType.Length);
+                    PIPE_MESSAGE_TYPE msgType = (PIPE_MESSAGE_TYPE)BitConverter.ToInt32(bufferMsgType, 0);
 
+                    string msg = "";
                     object data = null;
                     string dataType = "";
 
-                    switch (type)
+                    // Read Msg
+                    readBytes = stream.Read(bufferMsgSize, 0, bufferMsgSize.Length);
+                    int msgSize = BitConverter.ToInt32(bufferMsgSize, 0);
+
+                    byte[] bufferMsg = new byte[msgSize];
+                    readBytes = stream.Read(bufferMsg, 0, bufferMsg.Length);
+                    msg = Tools.ByteArrayToObject<string>(bufferMsg);
+
+                    switch (msgType)
                     {
                         case PIPE_MESSAGE_TYPE.Message:
+                            break;
                         case PIPE_MESSAGE_TYPE.Command:
+                            break;
                         case PIPE_MESSAGE_TYPE.Event:
                         case PIPE_MESSAGE_TYPE.Data:
                             {
                                 // Read Data Type
                                 readBytes = stream.Read(bufferDataTypeSize, 0, sizeof(int));
                                 int dataTypeSize = BitConverter.ToInt32(bufferDataTypeSize, 0);
+
+                                if (dataTypeSize == 0) break;
 
                                 byte[] bufferDataType = new byte[dataTypeSize];
                                 readBytes = stream.Read(bufferDataType, 0, dataTypeSize);
@@ -238,8 +252,8 @@ namespace RootTools_Vision
                             isExit = true;
                             break;
                     }
-                    //if (this.MessageReceived != null)
-                    //    MessageReceived(new PipeProtocol(type, dataType, data));
+                    if (this.MessageReceived != null)
+                        MessageReceived(new PipeProtocol(msgType, msg,dataType, data));
 
                     stream.Flush();
                 }
@@ -266,14 +280,44 @@ namespace RootTools_Vision
         {
             lock(lockObj)
             {
-                byte[] bufferType = BitConverter.GetBytes((int)protocol.msgType);
-                stream.Write(bufferType, 0, bufferType.Length);
+                if(stream == null)
+                {
+                    MessageBox.Show("연결된 Client가 없습니다.");
+                    return;
+                }
+                byte[] bufferMsgType = BitConverter.GetBytes((int)protocol.msgType);
+                stream.Write(bufferMsgType, 0, bufferMsgType.Length);
+
+                byte[] bufferMsg = Tools.ObjectToByteArray<string>(protocol.msg);
+                byte[] bufferMsgSize = BitConverter.GetBytes(bufferMsg.Length);
+
+                stream.Write(bufferMsgSize, 0, bufferMsgSize.Length);
+                stream.Write(bufferMsg, 0, bufferMsg.Length);
 
                 switch (protocol.msgType)
                 {
                     case PIPE_MESSAGE_TYPE.Message:
+                        break;
                     case PIPE_MESSAGE_TYPE.Command:
+                        break;
                     case PIPE_MESSAGE_TYPE.Event:
+                        {
+                            byte[] bufferDataType = Tools.ObejctToByteArray(protocol.dataType);
+                            byte[] bufferDataTypeSize = BitConverter.GetBytes(bufferDataType.Length);
+
+                            if(protocol.data == null)
+                            {
+                                break;
+                            }
+                            byte[] bufferData = Tools.ObjectToByteArray(protocol.data);
+                            byte[] bufferDataSize = BitConverter.GetBytes(bufferData.Length);
+
+                            stream.Write(bufferDataTypeSize, 0, sizeof(int));
+                            stream.Write(bufferDataType, 0, bufferDataType.Length);
+                            stream.Write(bufferDataSize, 0, sizeof(int));
+                            stream.Write(bufferData, 0, bufferData.Length);
+                        }
+                        break;
                     case PIPE_MESSAGE_TYPE.Data:
                         {
                             byte[] bufferDataType = Tools.ObejctToByteArray(protocol.dataType);
@@ -289,6 +333,8 @@ namespace RootTools_Vision
                         }
                         break;
                 }
+
+                stream.Flush();
             }
         }
         #endregion
