@@ -24,6 +24,7 @@ namespace Root_WIND2.UI_User
             public static SolidColorBrush SearchCenterPoint = Brushes.Yellow;
             public static SolidColorBrush SearchCircle = Brushes.Yellow;
             public static SolidColorBrush Map = Brushes.YellowGreen;
+            public static SolidColorBrush MapFill = Brushes.Transparent;
         }
 
         #endregion
@@ -358,6 +359,8 @@ namespace Root_WIND2.UI_User
         public void SetMapRectList(List<CRect> rectList)
         {
             this.mapRectList.Clear();
+            this.p_DrawElement.Clear();
+
             foreach(CRect rt in rectList)
             {
                 CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.Left, rt.Top));
@@ -371,6 +374,7 @@ namespace Root_WIND2.UI_User
                 rtUI.StrokeThickness = 2;
                 rtUI.Opacity = 1;
                 rtUI.Tag = "Map";
+                rtUI.Fill = ColorDefines.MapFill;
 
                 Canvas.SetLeft(rtUI, canvasLeftTop.X);
                 Canvas.SetTop(rtUI, canvasLeftTop.Y);

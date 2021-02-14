@@ -63,8 +63,6 @@ namespace RootTools_Vision
         private void Button_Server(object sender, RoutedEventArgs e)
         {
             this.isServer = true;
-
-            PIPE_MESSAGE_TYPE test = PIPE_MESSAGE_TYPE.Command;
         }
 
         private void Button_Client(object sender, RoutedEventArgs e)

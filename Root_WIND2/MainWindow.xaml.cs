@@ -167,7 +167,7 @@ namespace Root_WIND2
 
         private string memoryBackPool = "BackSide Vision.BackSide Memory";
         private string memoryBackGroup = "BackSide Vision";
-        private string memoryBack = "Main";
+        private string memoryBack = "BackSide";
 
 
         private string memoryEdgePool = "EdgeSide Vision.Memory";
@@ -247,7 +247,7 @@ namespace Root_WIND2
                     inspectionFront.SetRecipe(recipeFront);
                 }
 
-                if (frontImage.GetPtr() == IntPtr.Zero)
+                if (backImage.GetPtr() == IntPtr.Zero)
                 {
                     //MessageBox.Show("Back Inspection 생성 실패, 메모리 할당 없음");
                 }
@@ -256,7 +256,7 @@ namespace Root_WIND2
                     InspectionManagerBackside inspectionBack = GlobalObjects.Instance.Register<InspectionManagerBackside>
                     (
                     recipeBack,
-                    new SharedBufferInfo(frontImage.GetPtr(0), frontImage.p_Size.X, frontImage.p_Size.Y, frontImage.p_nByte, frontImage.GetPtr(1), frontImage.GetPtr(2))
+                    new SharedBufferInfo(backImage.GetPtr(0), backImage.p_Size.X, backImage.p_Size.Y, backImage.p_nByte, backImage.GetPtr(1), backImage.GetPtr(2))
                     );
                 }
 
