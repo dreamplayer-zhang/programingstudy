@@ -594,7 +594,7 @@ namespace RootTools.Camera.Dalsa
         }
 
         unsafe void RunGrabLineColorScanThread()
-        {
+        {           
             StopWatch swGrab = new StopWatch();
             int DelayGrab = 1000 * m_nGrabCount;
 
@@ -669,8 +669,28 @@ namespace RootTools.Camera.Dalsa
                 m_nPreWidthB = nFovSize;
                 m_clrip.Cpp_CreatInterpolationData(2,m_dPReXScaleB, m_dPReXShiftB, m_nPreWidthB);
             }
-              while (iBlock < m_nGrabCount)
+
+            const int nTimeOut_10s = 10000; //ms            
+            const int nTimeOutInterval = 10; // ms
+            int nScanAxisTimeOut = nTimeOut_10s / nTimeOutInterval;
+            int previBlock = 0;
+            while (iBlock < m_nGrabCount)
             {
+                if(previBlock == iBlock)
+                {
+                    Thread.Sleep(nTimeOutInterval);
+                    if (--nScanAxisTimeOut <= 0)
+                    {
+                        m_log.Info("TimeOut - RunGrabLineColorScanThread");
+                        m_nGrabTrigger = m_nGrabCount;
+                    }
+                    
+                }
+                else
+                {
+                    previBlock = iBlock;
+                    nScanAxisTimeOut = nTimeOut_10s / nTimeOutInterval;
+                }
                 if (iBlock < m_nGrabTrigger)
                 {   
                     IntPtr ipSrc = m_pSapBuf[iBlock % p_nBuf];
@@ -689,9 +709,7 @@ namespace RootTools.Camera.Dalsa
                         IntPtr RedPtr = (IntPtr)((long)m_RedMemPtr + n);
                         IntPtr GreenPtr = (IntPtr)((long)m_GreenMemPtr + n);
                         IntPtr BluePtr = (IntPtr)((long)m_BlueMemPtr + n);
-                        int nThreadIdx = GetReadyThread();
-                        //int nThreadIdx = 1;
-
+                        int nThreadIdx = GetReadyThread();      
 
                         if (m_sapBuf.Format == SapFormat.RGB8888)
                         {
@@ -739,15 +757,15 @@ namespace RootTools.Camera.Dalsa
                                     Overlap(pbOG, pGreen, nOverlap);
                                     Overlap(pbOB, pBlue, nOverlap);
                                 }                              
-                            }
-                            SetTheadDone(nThreadIdx);
+                            }                         
                         }
                         else if (m_sapBuf.Format == SapFormat.RGBP8)
                         {
                             Buffer.MemoryCopy((void*)srcPtr, (void*)RedPtr, nCamWidth, nCamWidth);
                             Buffer.MemoryCopy((void*)(srcPtr + nBufSize), (void*)GreenPtr, nCamWidth, nCamWidth);
                             Buffer.MemoryCopy((void*)(srcPtr + nBufSize * 2), (void*)BluePtr, nCamWidth, nCamWidth);
-                        }
+                        } 
+                        SetTheadDone(nThreadIdx);
                     });
                     iBlock++;
                     m_LastROI.Left = nScanOffsetX;
