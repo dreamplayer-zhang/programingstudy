@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Comm;
+using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -13,10 +14,12 @@ namespace Root_VEGA_P.Module
     public class ParticleCounter : ModuleBase
     {
         #region ToolBox
+        DIO_Os m_doValve; 
         RS232 m_rs232;
         Modbus m_modbus;
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_doValve, this, "SolValve", m_asValve.ToArray()); 
             p_sInfo = m_toolBox.Get(ref m_modbus, this, "Modbus");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
             if (bInit)
@@ -25,6 +28,34 @@ namespace Root_VEGA_P.Module
                 m_rs232.p_bConnect = true;
                 ConnectModbus();
             }
+        }
+        #endregion
+
+        #region DO Valve
+        List<string> m_asValve = new List<string>();
+        Registry m_reg; 
+        void InitDOValve(string id)
+        {
+            m_reg = new Registry(id);
+            p_nValve = m_reg.Read("nValve", p_nValve); 
+        }
+
+        int _nValve = 0; 
+        public int p_nValve
+        {
+            get { return _nValve; }
+            set
+            {
+                if (_nValve == value) return;
+                _nValve = value;
+                m_asValve.Clear();
+                for (int n = 0; n < value; n++) m_asValve.Add("SolValve " + n.ToString("00")); 
+            }
+        }
+
+        void RunTreeSolValve(Tree tree)
+        {
+            p_nValve = tree.Set(p_nValve, p_nValve, "Count", "SolValve Count"); 
         }
         #endregion
 
@@ -243,6 +274,7 @@ namespace Root_VEGA_P.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
+            RunTreeSolValve(tree.GetTree("SolValve"));
             RunTreeProperty(tree.GetTree("Property"));
             RunTreeSample(tree.GetTree("Sample"));
             RunTreeCount(tree.GetTree("Count"));
@@ -251,6 +283,7 @@ namespace Root_VEGA_P.Module
 
         public ParticleCounter(string id, IEngineer engineer)
         {
+            InitDOValve(id); 
             InitCount();
             p_id = id;
             InitBase(id, engineer);
