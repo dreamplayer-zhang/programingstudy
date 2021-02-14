@@ -22,6 +22,14 @@ namespace Root_AOP01_Packing
         private void Init()
         {
             p_ModuleList = m_Engineer.ClassModuleList();
+            p_RTRA = (m_Engineer.ClassHandler() as AOP01_Handler).m_aRTR[0] as WTR_RND;
+            p_RTRB = (m_Engineer.ClassHandler() as AOP01_Handler).m_aRTR[1] as WTR_RND;
+            p_LoadportA = (m_Engineer.ClassHandler() as AOP01_Handler).m_aLoadport[0] as Loadport_Cymechs;
+            p_LoadportB = (m_Engineer.ClassHandler() as AOP01_Handler).m_aLoadport[1] as Loadport_AOP;
+            p_Unloadport = (m_Engineer.ClassHandler() as AOP01_Handler).m_unloadport;
+            p_Elevator = (m_Engineer.ClassHandler() as AOP01_Handler).m_elevator;
+            p_TapePacker = (m_Engineer.ClassHandler() as AOP01_Handler).m_tapePacker;
+            p_VacuumPacker = (m_Engineer.ClassHandler() as AOP01_Handler).m_vacuumPacker;
         }
 
         #region Property Module

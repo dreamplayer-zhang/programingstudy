@@ -15,14 +15,95 @@ namespace Root_EFEM.Module
     public class Loadport_Cymechs : ModuleBase, IWTRChild, ILoadport
     {
         #region ToolBox
+
         RS232 m_rs232;
-        public DIO_I m_diPlaced;
-        public DIO_I m_diPresent;
-        public DIO_I m_diOpen;
-        public DIO_I m_diClose;
-        public DIO_I m_diReady;
-        public DIO_I m_diRun;
-        public OHT_Semi m_OHT;
+        public DIO_I p_diPlaced
+        {
+            get
+            {
+                return m_diPlaced;
+            }
+            set
+            {
+                m_diPlaced = value;
+            }
+        }
+        public DIO_I p_diPresent
+        {
+            get
+            {
+                return m_diPresent;
+            }
+            set
+            {
+                m_diPresent = value;
+            }
+        }
+        public DIO_I p_diOpen
+        {
+            get
+            {
+                return m_diOpen;
+            }
+            set
+            {
+                m_diOpen = value;
+            }
+        }
+        public DIO_I p_diClose
+        {
+            get
+            {
+                return m_diClose;
+            }
+            set
+            {
+                m_diClose = value;
+            }
+        }
+        public DIO_I p_diReady
+        {
+            get
+            {
+                return m_diReady;
+            }
+            set
+            {
+                m_diReady = value;
+            }
+        }
+        public DIO_I p_diRun
+        {
+            get
+            {
+                return m_diRun;
+            }
+            set
+            {
+                m_diRun = value;
+            }
+        }
+        public OHT_Semi p_OHT
+
+        {
+            get
+            {
+                return m_OHT;
+            }
+            set
+            {
+                m_OHT = value;
+            }
+        }
+
+        private DIO_I m_diPlaced;
+        private DIO_I m_diPresent;
+        private DIO_I m_diOpen;
+        private DIO_I m_diClose;
+        private DIO_I m_diReady;
+        private DIO_I m_diRun;
+        private OHT_Semi m_OHT;
+
         public bool m_bLoadCheck = false;
         public bool m_bUnLoadCheck = false;
         public override void GetTools(bool bInit)

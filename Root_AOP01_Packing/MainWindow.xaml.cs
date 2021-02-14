@@ -113,11 +113,12 @@ namespace Root_AOP01_Packing
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
             dialogService.Register<TK4S, TK4SModuleUI>();
             dialogService.Register<FFUModule, FFUModuleUI>();
-            Init_ViewModel();
-            Init_UI();
 
             m_engineer.Init("AOP01",dialogService);
+            Init_ViewModel();
+            Init_UI();
             m_Setup.m_Home.Engineer.Engineer_UI.Init(m_engineer);
+
         }
         void Init_ViewModel()
         {
