@@ -190,7 +190,7 @@ namespace RootTools.Comm
             RunTree(m_treeRoot);
         }
 
-        void RunTree(Tree treeRoot)
+        public void RunTree(Tree treeRoot)
         {
             RunSetTree(treeRoot.GetTree("Set"));
         }
