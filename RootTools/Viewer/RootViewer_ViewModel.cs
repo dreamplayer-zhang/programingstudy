@@ -663,14 +663,15 @@ namespace RootTools
                 {
                     if (p_ImageData.m_eMode == ImageData.eMode.OtherPCMem)
                     {
-                        Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
-                        byte[,,] viewptr = view.Data;
-                        byte[] image = p_ImageData.GetData(p_View_Rect,p_CanvasWidth, p_CanvasHeight);
-                        for (int xx = 0; xx < p_CanvasWidth; xx++)
-                        {   
-                            viewptr[xx, xx, 0] = image[p_View_Rect.Width * xx];
-                        }
-                        p_ImgSource = ImageHelper.ToBitmapSource(view);
+                        p_ImgSource = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+                        //Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+                        //byte[,,] viewptr = view.Data;
+                        //byte[] image = p_ImageData.GetData(p_View_Rect,p_CanvasWidth, p_CanvasHeight);
+                        //for (int xx = 0; xx < p_CanvasWidth; xx++)
+                        //{   
+                        //    viewptr[xx, xx, 0] = image[p_View_Rect.Width * xx];
+                        //}
+                        //p_ImgSource = ImageHelper.ToBitmapSource(view);
                     }
                     else
                     {

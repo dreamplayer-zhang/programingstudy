@@ -159,16 +159,16 @@ namespace RootTools
 			});
 		}
 
-		public ImageData(string sIP, string sPool, string sGroup, string sMem, MemoryTool tool)
+		public ImageData(string sPool, string sGroup, string sMem, MemoryTool tool)
 		{
 			m_eMode = eMode.OtherPCMem;
 			m_ToolMemory = tool;
 		}
 
-		public byte[] GetData(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
+		public BitmapSource GetData(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
 		{
-			//m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight);
-			return new byte[5];  // 이게 머여??
+			return  m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight);
+			//return new byte[5];  // 이게 머여??
 		}
 
 		public unsafe void SetData(IntPtr ptr, CRect rect, int stride, int nByte = 1)
