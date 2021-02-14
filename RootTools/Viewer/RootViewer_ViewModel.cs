@@ -669,10 +669,14 @@ namespace RootTools
                             Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
                             byte[,,] viewptr = view.Data;
                             byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
-                            for (int xx = 0; xx < p_CanvasWidth; xx++)
+                            //for (int yy = 0; yy < p_CanvasHeight; yy++)
+                            Parallel.For(0, p_CanvasHeight, (yy) =>
                             {
-                                viewptr[xx, xx, 0] = image[p_View_Rect.Width * xx];
-                            }
+                                for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                {
+                                    viewptr[yy, xx, 0] = image[p_CanvasWidth * yy + xx];
+                                }
+                            });
                             p_ImgSource = ImageHelper.ToBitmapSource(view);
                         }
                         //        p_ImgSource = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);

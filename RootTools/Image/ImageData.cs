@@ -158,9 +158,15 @@ namespace RootTools
 				ent[j] = b;
 			});
 		}
+		string m_sPool;
+		string m_sGroup;
+		string m_sMem;
 
 		public ImageData(string sPool, string sGroup, string sMem, MemoryTool tool)
 		{
+			m_sPool = sPool;
+			m_sGroup = sGroup;
+			m_sMem = sMem;
 			m_eMode = eMode.OtherPCMem;
 			p_Size = new CPoint(40000, 40000);
 			m_ToolMemory = tool;
@@ -168,7 +174,7 @@ namespace RootTools
 
 		public byte[] GetData(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
 		{
-			return m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight);
+			return m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight, m_sPool, m_sGroup, m_sMem);
 			//return new byte[5];  // 이게 머여??
 		}
 

@@ -357,15 +357,15 @@ namespace RootTools.Memory
         bool _bRecieve = false;
         BitmapSource m_ReciveBitmapSource;
         byte[] m_abuf;
-        public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
+        public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem)
         {
-            string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight;
+            string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem;
             m_abuf = new byte[CanvasWidth * CanvasHeight];
             _bRecieve = true;
             m_Server.Send(str);
             while (_bRecieve)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(10);
             }
             _bRecieve = false;
             return m_abuf;
@@ -379,11 +379,12 @@ namespace RootTools.Memory
             //string[] aStr = str.Split(Splitter);
             //string astr = str;
             m_abuf = Convert.FromBase64String(str);
+            _bRecieve = false;
             //switch (aStr)
             //{
             //    case "GET":
             //m_ReciveBitmapSource = StringToImageSource(astr);
-            
+
             //      m_ReciveBitmapSource = (BitmapSource)GetSerializeObject(aStr, m_ReciveBitmapSource.GetType());
             //        _bRecieve = true;
             //        break;
@@ -398,7 +399,7 @@ namespace RootTools.Memory
             {
                 case "GET":
                     System.Drawing.Rectangle rect = new System.Drawing.Rectangle();
-                    byte[] res = GetImageView((System.Drawing.Rectangle)(GetSerializeObject(aStr[1], rect.GetType())), Convert.ToInt32(aStr[2]), Convert.ToInt32(aStr[3]));
+                    byte[] res = GetImageView((System.Drawing.Rectangle)(GetSerializeObject(aStr[1], rect.GetType())), Convert.ToInt32(aStr[2]), Convert.ToInt32(aStr[3]), Convert.ToString(aStr[4]), Convert.ToString(aStr[5]), Convert.ToString(aStr[6]));
                     //string strResult = ImageSourceToString(res);
                     //string strResult = GetSerializeString(res);
                     //string strresult = Encoding.Default.GetString(res);
@@ -458,12 +459,12 @@ namespace RootTools.Memory
 
 
 
-        private unsafe byte[] GetImageView(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
+        private unsafe byte[] GetImageView(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight, string sPool, string sGroup, string sMem)
         {
             object o = new object();
 
             Image<Gray, byte> view = new Image<Gray, byte>(CanvasWidth, CanvasHeight);
-            MemoryData memdata = GetMemory("Vision.Memory", "Vision", "Main");
+            MemoryData memdata = GetMemory(sPool, sGroup, sMem);
             IntPtr ptrMem = memdata.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return null;
