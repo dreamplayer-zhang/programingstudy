@@ -191,9 +191,22 @@ namespace Root_WIND2
 
                 MemoryTool memoryTool = engineer.ClassMemoryTool();
 
+                ImageData frontImage;
+                ImageData maskLayer;
                 // ImageData
-                ImageData frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
-                ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
+                if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+                {
+
+                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryFrontPool, memoryFrontGroup, memoryFront, engineer.ClassMemoryTool());
+                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage",memoryFrontPool, memoryFrontGroup, memoryMask , engineer.ClassMemoryTool());
+                    //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
+                }
+                else
+                {
+                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
+                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
+                }
+
 
                 ImageData backImage = GlobalObjects.Instance.RegisterNamed<ImageData>("BackImage", memoryTool.GetMemory(memoryBackPool, memoryBackGroup, memoryBack));
 

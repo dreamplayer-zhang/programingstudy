@@ -23,6 +23,11 @@ namespace Root_AOP01_Packing.Module
             m_holder.GetTools(m_toolBox, bInit); 
             m_loader.GetTools(m_toolBox, bInit);
             m_heater.GetTools(m_toolBox, bInit);
+
+            if (bInit)
+            {
+                InitALID();
+            }
         }
         #endregion
 
@@ -139,6 +144,7 @@ namespace Root_AOP01_Packing.Module
             {
                 Up, //위 위치
                 Down, // 아래 위치
+                Down2, // 아래 위치
                 Open, // 봉투벌리는 높이
                 Push // 푸셔 밀때의 높이
             }
@@ -571,6 +577,7 @@ namespace Root_AOP01_Packing.Module
         {
             string m_id;
             VacuumPacker m_packer;
+            public int m_secVac = 10;
             public Loader(string id, VacuumPacker packer)
             {
                 m_id = id;
@@ -723,7 +730,7 @@ namespace Root_AOP01_Packing.Module
                 return m_diPodCheck.p_bIn; 
             }
 
-            public int m_secVac = 10; 
+            
             public string RunVacPump()
             {
                 m_doArmVacuumPump.Write(true);
@@ -754,6 +761,8 @@ namespace Root_AOP01_Packing.Module
         {
             string m_id;
             VacuumPacker m_packer;
+            public double m_secHeat = 3;
+            public double m_secHeatBefore = 2;
             public Heater(string id, VacuumPacker packer)
             {
                 m_id = id;
@@ -761,7 +770,8 @@ namespace Root_AOP01_Packing.Module
             }
             public void RunTree(Tree tree)
             {
-                m_secHeat = tree.Set(m_secHeat, m_secHeat, "Vacuum", "Vacuum On Wait (sec)");
+                m_secHeat = tree.Set(m_secHeat, m_secHeat, "Heat", "Heat On Wait (sec)");
+                m_secHeatBefore = tree.Set(m_secHeatBefore, m_secHeatBefore, "Heat Before", "Heat Before On Wait(sec)");
             }
             public string StateHome()
             {
@@ -788,6 +798,7 @@ namespace Root_AOP01_Packing.Module
                 {
                     m_dioHeat.Write(false);
                     m_doHeatTimeout.Write(false);
+                    m_packer.m_holder.RunHold_Both(true);
                     m_packer.m_heater.RunHeaterSol(false);
                     m_packer.m_heater.RunSpongeSol(false);
                     //m_packer.InitSolvalve(m_solSponge[0]);
@@ -835,14 +846,18 @@ namespace Root_AOP01_Packing.Module
                 return "HeaterClose Timeout";
             }
 
-            public double m_secHeat = 3; 
-            public string RunHeat()
+            public string RunHeat(bool bBefore)
             {
+                double sec = 0;
+                if (bBefore)
+                    sec = m_secHeat;
+                else
+                    sec = m_secHeatBefore;
                 try
                 {
                     m_dioHeat.Write(true);
                     StopWatch sw = new StopWatch();
-                    int msHeat = (int)(1000 * m_secHeat);
+                    int msHeat = (int)(1000 * sec);
                     while (sw.ElapsedMilliseconds < msHeat)
                     {
                         Thread.Sleep(10);
@@ -879,28 +894,31 @@ namespace Root_AOP01_Packing.Module
             Rotate, // 90도 돌리기
             PushToLoader, //Picker가 다시 밀어주기
             Unload, 
+            Heatingtest,
         }
 
         public string RunStep(eStep eStep)
         {
             switch (eStep)
             {
+
                 case eStep.GetWrapper:
                     //if (m_wrapper.IsWapperExist() == false) return "No Wrapper";
                     if (Run(m_wrapper.RunMoveX(Wrapper.ePosMove.Pick))) return p_sInfo;
                     if (Run(m_wrapper.RunMoveZ(Wrapper.ePosPicker.Down))) return p_sInfo;
                     Thread.Sleep(10);
-                    if (Run(m_wrapper.RunVacOn()))
-                    {
-                        alid_VacuumPacker.Run(true, p_sInfo);
-                        //0207
-                        //봉투 못잡았따 알람
-                        // Z, X Home으로
-                        return p_sInfo;
-                    }
+                    Run(m_wrapper.RunVacOn());
+                    //if (Run(m_wrapper.RunVacOn()))
+                    //{
+                    //    alid_VacuumPacker.Run(true, p_sInfo);
+                    //    //0207
+                    //    //봉투 못잡았따 알람
+                    //    // Z, X Home으로
+                    //    return p_sInfo;
+                    //}
                     if (Run(m_wrapper.RunMoveZ(Wrapper.ePosPicker.Open))) return p_sInfo;
                     if (Run(m_wrapper.RunMoveX(Wrapper.ePosMove.Place))) return p_sInfo;
-                    if (Run(m_wrapper.RunMoveZ(Wrapper.ePosPicker.Down))) return p_sInfo;
+                    if (Run(m_wrapper.RunMoveZ(Wrapper.ePosPicker.Down2))) return p_sInfo;
                     if (Run(m_holder.RunVacuum_Down(true))) return p_sInfo;
                     if (Run(m_wrapper.RunVacOff(false))) return p_sInfo;
                     if (Run(m_wrapper.RunMoveZ(Wrapper.ePosPicker.Open))) return p_sInfo;
@@ -909,9 +927,11 @@ namespace Root_AOP01_Packing.Module
                     if (Run(m_holder.RunHold_Both(false))) return p_sInfo;
                     if (Run(m_holder.RunGuideDownForward(true))) return p_sInfo;
                     if (Run(m_holder.RunHold_Down(true))) return p_sInfo;
+                    Thread.Sleep(1000);
                     if (Run(m_holder.RunVacuum_Down(false))) return p_sInfo;
                     if (Run(m_wrapper.RunMoveZ(Wrapper.ePosPicker.Up))) return p_sInfo;
                     if (Run(m_holder.RunHold_Up(true))) return p_sInfo;
+                    Thread.Sleep(1000);
                     return "OK";
                 case eStep.BackWrapper:
                     if (Run(m_wrapper.RunVacOff(true))) return p_sInfo;
@@ -963,13 +983,29 @@ namespace Root_AOP01_Packing.Module
                     return "OK";
                 case eStep.VacuumPump:
                     if (Run(m_loader.RunVacPump())) return p_sInfo;
+                    if (Run(m_heater.RunHeat(true))) return p_sInfo;
                     if (Run(m_loader.RunMoveArmX(Loader.ePosArmX.Heating, Loader.eSpeed.Fast))) return p_sInfo;
                     if (Run(m_loader.RunVacPumpOff())) return p_sInfo;
                     return "OK";
+                case eStep.Heatingtest:
+                    if (Run(m_heater.RunSpongeSol(true)))
+                        return p_sInfo;
+                    if (Run(m_heater.RunHeat(true)))
+                        return p_sInfo;
+                    if (Run(m_heater.RunHeaterSol(true)))
+                        return p_sInfo;
+                    if (Run(m_heater.RunHeat(false)))
+                        return p_sInfo;
+                    if (Run(m_heater.RunHeaterSol(false)))
+                        return p_sInfo;
+                    if (Run(m_heater.RunSpongeSol(false)))
+                        return p_sInfo;
+                    return "OK";
                 case eStep.Heating:
-                    if (Run(m_heater.RunSpongeSol(true))) return p_sInfo;
+                    if (Run(m_heater.RunSpongeSol(true)))
+                        return p_sInfo;
                     if (Run(m_heater.RunHeaterSol(true))) return p_sInfo;
-                    if (Run(m_heater.RunHeat())) return p_sInfo;
+                    if (Run(m_heater.RunHeat(false))) return p_sInfo;
                     if (Run(m_heater.RunHeaterSol(false))) return p_sInfo;
                     if (Run(m_heater.RunSpongeSol(false))) return p_sInfo;
                     if (Run(m_loader.RunMoveArmX(Loader.ePosArmX.Ready, Loader.eSpeed.Slow))) return p_sInfo;
@@ -1190,6 +1226,7 @@ namespace Root_AOP01_Packing.Module
 
         public override void Reset()
         {
+            p_infoWafer = null;
             base.Reset();
         }
         #endregion
@@ -1202,6 +1239,7 @@ namespace Root_AOP01_Packing.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            p_infoWafer = null;
             //p_sInfo = base.StateHome();
             if (Run(m_heater.StateHome()))
                 return p_sInfo;

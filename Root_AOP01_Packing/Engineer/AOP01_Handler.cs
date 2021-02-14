@@ -50,31 +50,31 @@ namespace Root_AOP01_Packing
             InitWTR();
             InitLoadport();
 
-            m_RFID = new RFID_Brooks("RFID", m_engineer, null);
-            InitModule(m_RFID);
+            //m_RFID = new RFID_Brooks("RFID", m_engineer, null);
+            //InitModule(m_RFID);
 
             m_tapePacker = new TapePacker("TapePacker", m_engineer);
             InitModule(m_tapePacker);
-            ((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);
-            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_tapePacker);
+            //((IWTR)m_aWTR[0]).AddChild((IWTRChild)m_tapePacker);
+            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_tapePacker);
 
             m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
             InitModule(m_vacuumPacker);
-            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_vacuumPacker);
+            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_vacuumPacker);
 
-            m_elevator = new IndividualElevator("IndividualElevator", m_engineer);
-            InitModule(m_elevator);
-            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_elevator);
+            //m_elevator = new IndividualElevator("IndividualElevator", m_engineer);
+            //InitModule(m_elevator);
+            //((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_elevator);
 
             m_unloadport = new Unloadport_AOP("Unloadport", m_engineer);
             InitModule(m_unloadport);
-            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)m_unloadport);
+            ((IWTR)m_aRTR[1]).AddChild((IWTRChild)m_unloadport);
 
-            m_aWTR[0].RunTree(Tree.eMode.RegRead);
-            m_aWTR[0].RunTree(Tree.eMode.Init);
-            m_aWTR[1].RunTree(Tree.eMode.RegRead);
-            m_aWTR[1].RunTree(Tree.eMode.Init);
-            ((IWTR)m_aWTR[1]).ReadInfoReticle_Registry();
+            //m_aWTR[0].RunTree(Tree.eMode.RegRead);
+            //m_aWTR[0].RunTree(Tree.eMode.Init);
+            //m_aWTR[1].RunTree(Tree.eMode.RegRead);
+            //m_aWTR[1].RunTree(Tree.eMode.Init);
+            //((IWTR)m_aWTR[1]).ReadInfoReticle_Registry();
 
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
             //m_recipe.AddModule();
@@ -101,15 +101,15 @@ namespace Root_AOP01_Packing
         #endregion
 
         #region Module WTR
-        public List<ModuleBase> m_aWTR = new List<ModuleBase>(); 
+        public List<ModuleBase> m_aRTR = new List<ModuleBase>(); 
         void InitWTR()
         {
-            m_aWTR.Add(new WTR_RND("WTR_A", m_engineer));
-            InitModule(m_aWTR[0]);
-            ((WTR_RND)m_aWTR[0]).m_dicArm[WTR_RND.eArm.Lower].p_bEnable = false;
-            m_aWTR.Add(new WTR_RND("WTR_B", m_engineer));
-            InitModule(m_aWTR[1]);
-            ((WTR_RND)m_aWTR[1]).m_dicArm[WTR_RND.eArm.Lower].p_bEnable = false;
+            m_aRTR.Add(new WTR_RND("RTR_A", m_engineer));
+            InitModule(m_aRTR[0]);
+            ((WTR_RND)m_aRTR[0]).m_dicArm[WTR_RND.eArm.Lower].p_bEnable = false;
+            m_aRTR.Add(new WTR_RND("RTR_B", m_engineer));
+            InitModule(m_aRTR[1]);
+            ((WTR_RND)m_aRTR[1]).m_dicArm[WTR_RND.eArm.Lower].p_bEnable = false;
         }
         #endregion
 
@@ -120,12 +120,12 @@ namespace Root_AOP01_Packing
             Loadport_Cymechs loadportA = new Loadport_Cymechs("LoadportA", m_engineer, false, false);
             InitModule(loadportA);
             m_aLoadport.Add(loadportA);
-            ((IWTR)m_aWTR[0]).AddChild((IWTRChild)loadportA);
+            ((IWTR)m_aRTR[0]).AddChild((IWTRChild)loadportA);
 
             Loadport_AOP loadportAOP = new Loadport_AOP("LoadportB", m_engineer, false, false);
             InitModule(loadportAOP);
             m_aLoadport.Add(loadportAOP);
-            ((IWTR)m_aWTR[1]).AddChild((IWTRChild)loadportAOP);
+            ((IWTR)m_aRTR[1]).AddChild((IWTRChild)loadportAOP);
         }
         #endregion
 

@@ -13,22 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_AOP01_Packing
+namespace Root_VEGA_D.Control
 {
     /// <summary>
-    /// Run_Panel.xaml에 대한 상호 작용 논리
+    /// LoadingControl.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Run_Panel : UserControl
+    public partial class LoadingControl : UserControl
     {
-        public Run_Panel()
+        public LoadingControl()
         {
             InitializeComponent();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            var asdf = this.DataContext;
-            var adsfff = prog.DataContext;
         }
     }
 }
