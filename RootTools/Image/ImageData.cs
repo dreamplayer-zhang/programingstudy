@@ -162,6 +162,7 @@ namespace RootTools
 		public ImageData(string sPool, string sGroup, string sMem, MemoryTool tool)
 		{
 			m_eMode = eMode.OtherPCMem;
+			p_Size = new CPoint(40000, 40000);
 			m_ToolMemory = tool;
 		}
 

@@ -359,7 +359,7 @@ namespace RootTools.Memory
         public BitmapSource GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
         {
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight;
-            _bRecieve = false;
+            _bRecieve = true;
             m_Server.Send(str);
             while (_bRecieve)
             {
@@ -374,14 +374,16 @@ namespace RootTools.Memory
             //socket.Send(aBuf, nSize, SocketFlags.None);
             string str = Encoding.ASCII.GetString(aBuf, 0, nSize);
             //m_qLog.Enqueue(new Mars(0, Encoding.ASCII.GetString(aBuf, 0, nSize)));
-            string[] aStr = str.Split(Splitter);
-            switch (aStr[0])
-            {
-                case "GET":
-                    m_ReciveBitmapSource = (BitmapSource)GetSerializeObject(aStr[1], m_ReciveBitmapSource.GetType());
+            //string[] aStr = str.Split(Splitter);
+            string astr = str;
+            //switch (aStr)
+            //{
+            //    case "GET":
+            m_ReciveBitmapSource = StringToImageSource(astr);
+            //      m_ReciveBitmapSource = (BitmapSource)GetSerializeObject(aStr, m_ReciveBitmapSource.GetType());
                     _bRecieve = true;
-                    break;
-            }
+            //        break;
+            //}
         }
 
         private void M_Client_EventReciveData(byte[] aBuf, int nSize, Socket socket)
@@ -452,7 +454,7 @@ namespace RootTools.Memory
 
 
 
-        private unsafe byte[] GetImageView(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
+        private unsafe BitmapSource GetImageView(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
         {
             object o = new object();
 
@@ -464,7 +466,8 @@ namespace RootTools.Memory
             int pix_x = 0;
             int pix_y = 0;
             int rectX, rectY, rectWidth, rectHeight, sizeX;
-            byte[] result = new byte[CanvasWidth * CanvasHeight];
+            //byte[] result = new byte[CanvasWidth * CanvasHeight];
+            byte[,,] viewptr = view.Data;
             //byte* imageptr = (byte*)ptrMem.ToPointer();
 
             rectX = View_Rect.X;
@@ -483,11 +486,42 @@ namespace RootTools.Memory
                     for (int xx = 0; xx < CanvasWidth; xx++)
                     {
                         pix_x = rectX + xx * rectWidth / CanvasWidth;
-                        result[yy * CanvasWidth + xx] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
+                        viewptr[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
                     }
                 }
             });
-            return result;
+            return ImageHelper.ToBitmapSource(view);
+            //Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+
+            //IntPtr ptrMem = p_ImageData.GetPtr();
+            //if (ptrMem == IntPtr.Zero)
+            //    return;
+
+            //int rectX, rectY, rectWidth, rectHeight, sizeX;
+            //byte[,,] viewptr = view.Data;
+
+            //rectX = p_View_Rect.X;
+            //rectY = p_View_Rect.Y;
+            //rectWidth = p_View_Rect.Width;
+            //rectHeight = p_View_Rect.Height;
+
+            //sizeX = p_ImageData.p_Size.X;
+
+            //Parallel.For(0, p_CanvasHeight, (yy) =>
+            //{
+            //    {
+            //        long pix_y = rectY + yy * rectHeight / p_CanvasHeight;
+
+            //        for (int xx = 0; xx < p_CanvasWidth; xx++)
+            //        {
+            //            long pix_x = rectX + xx * rectWidth / p_CanvasWidth;
+            //            viewptr[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
+            //        }
+            //    }
+            //});
+
+
+           // return result;
         }
 
         public void SendTest()
