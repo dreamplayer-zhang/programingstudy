@@ -12,11 +12,21 @@ namespace Root_AOP01_Packing
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             ModuleRunBase.eRunState state = (ModuleRunBase.eRunState)value;
-
-            if (state == ModuleRunBase.eRunState.Run)
-                return Visibility.Visible;
+            if ((string)parameter == "Opacity")
+            {
+                if (state == ModuleRunBase.eRunState.Run)
+                    return 0.5;
+                else
+                    return 1;
+            }
             else
-                return Visibility.Collapsed;
+            {
+                if (state == ModuleRunBase.eRunState.Run)
+                    return Visibility.Visible;
+                else
+                    return Visibility.Collapsed;
+            }
+
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

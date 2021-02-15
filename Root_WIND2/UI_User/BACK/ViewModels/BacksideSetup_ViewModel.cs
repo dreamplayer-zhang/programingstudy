@@ -62,13 +62,13 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        private int mapsSizeY = 40;
+        private int mapSizeY = 40;
         public int MapSizeY
         {
-            get => this.mapsSizeY;
+            get => this.mapSizeY;
             set
             {
-                SetProperty<int>(ref this.mapsSizeY, value);
+                SetProperty<int>(ref this.mapSizeY, value);
             }
         }
 
@@ -132,23 +132,23 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        private int originX = 0;
-        public int OriginX
+        private int originPointX = 0;
+        public int OriginPointX
         {
-            get => this.originX;
+            get => this.originPointX;
             set
             {
-                SetProperty<int>(ref this.originX, value);
+                SetProperty<int>(ref this.originPointX, value);
             }
         }
 
-        private int originY = 0;
-        public int OriginY
+        private int originPointY = 0;
+        public int OriginPointY
         {
-            get => this.originY;
+            get => this.originPointY;
             set
             {
-                SetProperty<int>(ref this.originY, value);
+                SetProperty<int>(ref this.originPointY, value);
             }
         }
 
@@ -172,13 +172,13 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        private int searchedCirclRadius = 0;
-        public int SearchedCirclRadius
+        private int searchedCircleRadius = 0;
+        public int SearchedCircleRadius
         {
-            get => this.searchedCirclRadius;
+            get => this.searchedCircleRadius;
             set
             {
-                SetProperty<int>(ref this.searchedCirclRadius, value);
+                SetProperty<int>(ref this.searchedCircleRadius, value);
             }
         }
 
@@ -196,6 +196,9 @@ namespace Root_WIND2.UI_User
 
         public BacksideSetup_ViewModel()
         {
+            if (GlobalObjects.Instance.GetNamed<ImageData>("BackImage").GetPtr() == IntPtr.Zero)
+                return;
+
             this.imageViewerVM = new BacksideSetup_ImageViewer_ViewModel();
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("BackImage"), GlobalObjects.Instance.Get<DialogService>());
 
@@ -305,25 +308,27 @@ namespace Root_WIND2.UI_User
                 for (int i = 0; i < WaferEdge.Length; i++)
                     points.Add(new CPoint(WaferEdge[i].x * DownSample, WaferEdge[i].y * DownSample));
 
-                this.OriginX = (int)outOriginX;
-                this.OriginY = (int)outOriginY;
+                this.mapSizeX = outMapX;
+                this.mapSizeY = outMapY;
+                this.OriginPointX = (int)outOriginX;
+                this.OriginPointY = (int)outOriginY;
                 this.SearchedCenterPointX = (int)centerX;
                 this.SearchedCenterPointY = (int)centerY;
-                this.SearchedCirclRadius = (int)outRadius;
+                this.SearchedCircleRadius = (int)outRadius;
                 this.MapUnitWidth = (int)outChipSzX;
                 this.MapUnitHeight = (int)outChipSzY;
 
                 this.ImageViewerVM.SetSearchedCenter(new CPoint((int)centerX, (int)centerY));
                 this.ImageViewerVM.SetSearchedCirclePoints(points);
 
-                this.MapViewerVM.CreateMap(this.mapSizeX, this.mapsSizeY);
+                this.MapViewerVM.CreateMap(this.mapSizeX, this.mapSizeY);
 
-                for(int i = 0; i < this.mapsSizeY; i++)
+                for(int i = 0; i < this.mapSizeY; i++)
                 {
                     for(int j = 0; j < this.mapSizeX; j++)
                     {
                         int index = j + i * this.mapSizeX;
-                        if(mapData[index] == 0)
+                        if (mapData[index] == 0)
                         {
                             this.MapViewerVM.SetChipColor(j, i, Brushes.DimGray);
                         }
@@ -334,7 +339,7 @@ namespace Root_WIND2.UI_User
                     }
                 }
 
-                DrawMapRect(mapData, outMapX, outMapY, OriginX, OriginY, memW, memH);
+                DrawMapRect(mapData, outMapX, outMapY, OriginPointX, OriginPointY, MapUnitWidth, MapUnitHeight);
 
                 SetRecipe();
             }
@@ -346,10 +351,17 @@ namespace Root_WIND2.UI_User
 
             BacksideRecipe backsideRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<BacksideRecipe>();
             // Map Data Recipe 생성
-            backsideRecipe.OriginX = this.originX;
-            backsideRecipe.OriginY = this.originY;
+            backsideRecipe.OriginX = this.originPointX;
+            backsideRecipe.OriginY = this.originPointY;
             backsideRecipe.DiePitchX = this.mapUnitWidth;
             backsideRecipe.DiePitchY = this.mapUnitHeight;
+            backsideRecipe.CenterX = this.SearchedCenterPointY;
+            backsideRecipe.CenterY = this.SearchedCenterPointY;
+            backsideRecipe.Radius = this.SearchedCircleRadius;
+            backsideRecipe.IsEdgeIncluded = (this.SearchROIOptions == SEARCH_ROI_OPTIONS.IncludeWaferEdge) ? true : false;
+
+
+            GlobalObjects.Instance.Get<RecipeBack>().WaferMap = new RecipeType_WaferMap(this.MapSizeX, this.MapSizeY, this.MapData);
         }
 
 

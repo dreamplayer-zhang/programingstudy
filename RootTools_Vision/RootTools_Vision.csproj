@@ -103,7 +103,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ClonableWorkFactory.cs" />
+    <Compile Include="Inspection\BacksideAlignment.cs" />
     <Compile Include="Inspection\BacksideSurface.cs" />
+    <Compile Include="Inspection\ProcessDefect_Backside.cs" />
     <Compile Include="Inspection\ReticleSurface.cs" />
     <Compile Include="GlobalObjects.cs" />
     <Compile Include="InspectionManager.cs" />

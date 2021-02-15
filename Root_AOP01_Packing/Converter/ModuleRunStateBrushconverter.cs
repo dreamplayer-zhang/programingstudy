@@ -16,6 +16,8 @@ namespace Root_AOP01_Packing
                 return new SolidColorBrush(Colors.SteelBlue);
             if (state == ModuleRunBase.eRunState.Run)
                 return new SolidColorBrush(Colors.LightSteelBlue);
+            if (state == ModuleRunBase.eRunState.Error)
+                return new SolidColorBrush(Colors.Crimson);
             else
                 return new SolidColorBrush(Colors.AliceBlue);
         }

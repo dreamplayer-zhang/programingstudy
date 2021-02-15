@@ -16,7 +16,8 @@ namespace RootTools.Module
         {
             Ready,
             Run,
-            Done
+            Done,
+            Error,
         }
         eRunState _eRunState = eRunState.Ready;
         public eRunState p_eRunState
@@ -48,8 +49,18 @@ namespace RootTools.Module
 
         
 
+        private int _nProgress = 0;
+        public int p_nProgress
+        {
+            get
+            {
+                return _nProgress;
+            }
+            set
+            {
+            SetProperty(ref _nProgress, value);}
+        }
         public string p_id { get; set; }
-
         public string m_sModuleRun;
         protected Log m_log;
         public ModuleBase m_moduleBase = null;

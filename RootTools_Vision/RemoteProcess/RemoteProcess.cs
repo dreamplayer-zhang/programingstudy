@@ -34,13 +34,16 @@ namespace RootTools_Vision
         {
             this.timeoutMillisecond = timeoutMillisecond;
 
+            this.mode = _mode;
             if (_mode == REMOTE_MODE.Master)
             {
                 pipeComm = new PipeComm(moduleName, PIPE_MODE.Server);
+                pipeComm.MessageReceived += PipeComm_MessageReceived;
             }
             else if(_mode == REMOTE_MODE.Slave)
             {
                 pipeComm = new PipeComm(moduleName, PIPE_MODE.Client);
+                pipeComm.MessageReceived += PipeComm_MessageReceived;
             }
         }
 

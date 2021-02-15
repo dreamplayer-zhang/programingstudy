@@ -14,7 +14,10 @@ namespace RootTools.Database
         //string m_SDbName = "wind2"; // DB명
         //string m_sUid = "root";
         //string m_sPw = "root";
-
+        public bool IsConnected
+        {
+            get => this.m_bConnected;
+        }
 
         bool m_bConnected = false;
         int m_ThreadID;

@@ -343,7 +343,7 @@ namespace Root_WIND2.Module
             base.InitBase(id, engineer);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             ladsinfos = new List<List<double>>();
-            //InitMemorys();
+            InitMemorys();
         }
 
         public override void ThreadStop()

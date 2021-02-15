@@ -157,6 +157,15 @@ namespace Root_ASIS.Module
         }
         #endregion
 
+        #region StateReady
+        public override string StateReady()
+        {
+            if (m_diTop.p_bIn && p_eMove == eMove.Stop) p_eMove = eMove.Down;
+            if (!m_diTop.p_bIn && p_eMove == eMove.Down) p_eMove = eMove.Stop;
+            return "OK"; 
+        }
+        #endregion
+
         #region RunLoad
         public string RunLoad(double secTimeout)
         {

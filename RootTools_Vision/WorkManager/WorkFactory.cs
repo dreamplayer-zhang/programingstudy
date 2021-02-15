@@ -365,6 +365,11 @@ namespace RootTools_Vision
 
         private void PipeCommMessageReceived_Callback(PipeProtocol protocol)
         {
+            MessageBox.Show(protocol.msgType.ToString());
+            MessageBox.Show(protocol.msg);
+            MessageBox.Show(protocol.data?.ToString());
+            MessageBox.Show(protocol.dataType?.ToString());
+
             switch (protocol.msgType)
             {
                 case PIPE_MESSAGE_TYPE.Message:
@@ -418,13 +423,21 @@ namespace RootTools_Vision
 
         public void WriteTest()
         {
+            remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Message, "Start"));
+
             WorkplaceBundle wb = new WorkplaceBundle();
             wb.Add(new Workplace(0, 0, 0, 0, 0, 0, 0));
             wb.Add(new Workplace(0, 1, 0, 0, 0, 0, 0));
             wb.Add(new Workplace(0, 2, 0, 0, 0, 0, 0));
             wb.Add(new Workplace(0, 3, 0, 0, 0, 0, 0));
 
-            //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, typeof(WorkplaceBundle).ToString(), wb));
+            remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, "WorkplaceBundle", typeof(WorkplaceBundle).ToString(), wb));
+
+            remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Command, "Command!!!!"));
+
+
+            remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Event, "Event!!", typeof(Workplace).ToString(), new Workplace(10, 10, 10, 10, 10, 10, 10)));
+
             //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Message, typeof(string).ToString(), "AAAAAAAAAAA"));
 
             //InitializeRemoteWorkFactory();

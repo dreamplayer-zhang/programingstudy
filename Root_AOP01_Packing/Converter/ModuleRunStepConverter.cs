@@ -16,7 +16,10 @@ namespace Root_AOP01_Packing
 
             if (module.m_moduleBase.GetType() == typeof(VacuumPacker))
             {
-                return module.p_id + "." + (module as Run_Step).m_eStep.ToString();
+                if(module.GetType() == typeof(Run_Step))
+                    return module.p_id + "." + (module as Run_Step).m_eStep.ToString();
+                else
+                    return module.p_id;
             }
             else
             {

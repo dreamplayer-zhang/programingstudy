@@ -200,6 +200,7 @@
     <Compile Include="Converter\ModuleRunImageConverter.cs" />
     <Compile Include="Converter\ModuleRunStepConverter.cs" />
     <Compile Include="Converter\ModuleRunStateVisibleConverter.cs" />
+    <Compile Include="Converter\ModuleRunProgressConverter.cs" />
     <Compile Include="Module\AOP01_P.cs" />
     <Compile Include="Module\IndividualElevator.cs" />
     <Compile Include="Module\Loadport_AOP.cs" />
