@@ -172,7 +172,9 @@ namespace Root_Rinse_Unloader.Module
         double m_fJogScale = 1;
         public string MoveStackReady()
         {
-            if (m_axis.p_posCommand > m_posStackReady - 1000) MoveStack();
+            MoveStack();
+            return "OK";
+/*            if (m_axis.p_posCommand > m_posStackReady - 1000) MoveStack();
             if (m_stack.p_bLevel)
             {
                 m_axis.Jog(-m_fJogScale);
@@ -186,7 +188,7 @@ namespace Root_Rinse_Unloader.Module
             m_axis.StopAxis();
             m_axis.WaitReady();
             Thread.Sleep(500);
-            return "OK";
+            return "OK"; */ 
         }
 
         public bool p_bIsEnablePick

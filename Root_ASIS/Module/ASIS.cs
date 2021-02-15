@@ -10,11 +10,13 @@ namespace Root_ASIS.Module
     public class ASIS : ModuleBase
     {
         #region ToolBox
-        DIO_Os m_doBuzzer; 
+        DIO_Os m_doBuzzer;
+        DIO_I m_diPickerSet; 
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", Enum.GetNames(typeof(eBuzzer))); 
+            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", Enum.GetNames(typeof(eBuzzer)));
+            p_sInfo = m_toolBox.Get(ref m_diPickerSet, this, "PickerSet"); 
             if (bInit) InitTools();
         }
 
@@ -38,6 +40,38 @@ namespace Root_ASIS.Module
         }
         #endregion
 
+        #region PickerSet
+        public enum ePickerSet
+        {
+            UpDown,
+            Vacuum,
+            End
+        }
+        StopWatch m_swPickerSet = new StopWatch();
+        public ePickerSet CheckPickerSet()
+        {
+            while (m_diPickerSet.p_bIn == false)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return ePickerSet.End;
+            }
+            m_swPickerSet.Start();
+            while (m_diPickerSet.p_bIn)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return ePickerSet.End;
+                if (m_swPickerSet.ElapsedMilliseconds > 3000) return ePickerSet.End;
+            }
+            return (m_swPickerSet.ElapsedMilliseconds < 600) ? ePickerSet.UpDown : ePickerSet.Vacuum;
+        }
+
+        public string m_sFilePickerSet = "";
+        void RunTreePickerSet(Tree tree)
+        {
+            m_sFilePickerSet = tree.SetFile(m_sFilePickerSet, m_sFilePickerSet, "RunRinse_Loader", "ModuleRun", "PickerSet ModuleRun File");
+        }
+        #endregion
+
         #region Run Mode
         void RunTreeMode(Tree tree) //forget
         {
@@ -56,7 +90,8 @@ namespace Root_ASIS.Module
 
         void RunTreeSetup(Tree tree)
         {
-            RunTreeMode(tree.GetTree("Mode", false));
+            RunTreeMode(tree.GetTree("Mode"));
+            RunTreePickerSet(tree.GetTree("PickerSet"));
         }
 
         public override void Reset()
