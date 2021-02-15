@@ -56,10 +56,10 @@ namespace RootTools_Vision
 			if (this.currentWorkplace.MapIndexY == -1)
 				return;
 
-			byte[] arrSrc = this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY);
-			Emgu.CV.Mat mat = new Emgu.CV.Mat((int)(parameterEdge.EdgeParamBaseTop.ROIHeight), (int)(parameterEdge.EdgeParamBaseTop.ROIWidth), Emgu.CV.CvEnum.DepthType.Cv8U, 1);
-			Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
-			mat.Save(@"D:/" + this.currentWorkplace.Index.ToString() + ".bmp");
+			//byte[] arrSrc = this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY);
+			//Emgu.CV.Mat mat = new Emgu.CV.Mat((int)(parameterEdge.EdgeParamBaseTop.ROIHeight), (int)(parameterEdge.EdgeParamBaseTop.ROIWidth), Emgu.CV.CvEnum.DepthType.Cv8U, 1);
+			//Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
+			//mat.Save(@"D:/" + this.currentWorkplace.Index.ToString() + ".bmp");
 
 			EdgeSurfaceParameterBase param;
 			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
@@ -86,6 +86,9 @@ namespace RootTools_Vision
 			int defectSize = param.DefectSizeMin;
 			int searchLevel = param.EdgeSearchLevel;
 			double resolution = param.CamResolution;
+
+			if (this.currentWorkplace.Height < roiHeight)
+				roiHeight = this.currentWorkplace.Height;
 
 			int roiSize = roiWidth * roiHeight;
 

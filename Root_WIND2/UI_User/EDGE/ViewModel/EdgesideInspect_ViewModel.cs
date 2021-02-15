@@ -22,6 +22,7 @@ namespace Root_WIND2.UI_User
 		private Edgeside_ImageViewer_ViewModel imgeViewerBtmVM;
 
 		private int progress = 0;
+		private int maxProgress = 100;
 		private string percentage = "0";
 		private DataTable defectDataTable;
 		private object selectedDefect;
@@ -47,6 +48,11 @@ namespace Root_WIND2.UI_User
 		{
 			get => progress;
 			set => SetProperty(ref progress, value);
+		}
+		public int MaxProgress
+		{
+			get => maxProgress;
+			set => SetProperty(ref maxProgress, value);
 		}
 		public string Percentage
 		{
@@ -111,6 +117,7 @@ namespace Root_WIND2.UI_User
 				this.ImageViewerSideVM.ClearObjects();
 				this.ImageViewerBtmVM.ClearObjects();
 				Progress = 0;
+				//MaxProgress = GlobalObjects.Instance.Get<InspectionManagerEdge>().GetWorkplaceCount();
 				Inspect();
 			});
 		}
@@ -231,9 +238,13 @@ namespace Root_WIND2.UI_User
 		private void UpdateProgress()
 		{
 			int workplaceCount = GlobalObjects.Instance.Get<InspectionManagerEdge>().GetWorkplaceCount();
+			MaxProgress = workplaceCount - 1;
 			Progress++;
 
-			Percentage = ((Progress / workplaceCount) * 100).ToString();
+			int proc = (int)(((double)Progress / MaxProgress) * 100);
+			//if (proc > 99)
+			//	proc = 99;
+			Percentage = proc.ToString();
 		}
 
 		private void UpdateDefectData()

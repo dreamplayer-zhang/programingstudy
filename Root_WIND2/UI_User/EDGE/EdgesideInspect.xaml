@@ -60,7 +60,7 @@
             <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource inspection_menu_button}"/>
         </StackPanel>
 
-        <ProgressBar Value="{Binding Progress}" Width="300" Height="35"
+        <ProgressBar Value="{Binding Progress}" Width="300" Height="35" Maximum="{Binding MaxProgress}"
                 Visibility="{Binding Path=Progress, Converter= {StaticResource ConverterVisibleProgresss}}" />
         <Border VerticalAlignment="Center" HorizontalAlignment="Center" Width="200" Height="35"
                 Visibility="{Binding Path=Progress, Converter= {StaticResource ConverterVisibleProgresss}}">
