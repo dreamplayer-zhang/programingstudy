@@ -22,5 +22,7 @@ namespace RootTools.OHTNew
         ModuleRunBase GetModuleRunUndocking();
 
         int p_secHome { get; set; }
+
+        IRFID m_rfid { get; set; }
     }
 }

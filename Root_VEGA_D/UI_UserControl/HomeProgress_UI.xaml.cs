@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Root_EFEM.Module;
+using Root_VEGA_D.Engineer;
+using RootTools;
+using RootTools.Module;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,28 +16,24 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Root_EFEM.Module;
-using RootTools;
-using RootTools.Module;
 
-namespace Root_CAMELLIA.UI_UserControl
+namespace Root_VEGA_D
 {
     /// <summary>
     /// HomeProgress_UI.xaml에 대한 상호 작용 논리
     /// </summary>
     public partial class HomeProgress_UI : Window
     {
+        bool bShow = false;
         static int nloadport = 2;
         StopWatch m_swWTR = new StopWatch();
         StopWatch[] m_swLoadport = new StopWatch[nloadport];
-        StopWatch m_swAligner = new StopWatch();
         StopWatch m_swVision = new StopWatch();
-        CAMELLIA_Handler m_handler;
-        bool bShow = false;
+        VEGA_D_Handler m_handler;
         public HomeProgress_UI()
         {
             InitializeComponent();
-            for(int i=0; i< nloadport; i++)
+            for (int i = 0; i < nloadport; i++)
             {
                 m_swLoadport[i] = new StopWatch();
             }
@@ -45,39 +44,14 @@ namespace Root_CAMELLIA.UI_UserControl
             m_swWTR.Start();
             m_swLoadport[0].Start();
             m_swLoadport[1].Start();
-            m_swAligner.Start();
             m_swVision.Start();
             bShow = true;
         }
 
-        public void Init(CAMELLIA_Handler handler)
+        public void Init(VEGA_D_Handler handler)
         {
             m_handler = handler;
             InitTimer();
-        }
-
-        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            this.DragMove();
-        }
-
-        private void MinizimeButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.WindowState = WindowState.Minimized;
-        }
-
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        public void Reset()
-        {
-            m_swWTR.Reset();
-            m_swLoadport[0].Reset();
-            m_swLoadport[1].Reset();
-            m_swAligner.Reset();
-            m_swVision.Reset();
         }
 
         #region Timer
@@ -94,7 +68,7 @@ namespace Root_CAMELLIA.UI_UserControl
             if (bShow) this.Show();
             if (m_handler.m_wtr.p_eState == ModuleBase.eState.Home)
             {
-                progressWTR.Value = (int)(100 * Math.Min((m_swWTR.ElapsedMilliseconds / (((WTR_RND)m_handler.m_wtr).m_secHome * 1000)), 1.0));
+                progressWTR.Value = (int)(100 * Math.Min((m_swWTR.ElapsedMilliseconds / (((WTR_Cymechs)m_handler.m_wtr).m_secHome * 1000)), 1.0));
             }
             else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Ready) progressWTR.Value = 100;
             else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Error) progressWTR.Value = 0;    //working
@@ -116,25 +90,16 @@ namespace Root_CAMELLIA.UI_UserControl
             else if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Error) progressLP2.Value = 0;    //working
             else progressLP2.Value = 0;
 
-            if (m_handler.m_Aligner.p_eState == ModuleBase.eState.Home)
-            {
-                progressAL.Value = (int)(100 * Math.Min((m_swAligner.ElapsedMilliseconds / (10 * 1000)), 1.0));
-            }
-            else if (m_handler.m_Aligner.p_eState == ModuleBase.eState.Ready) progressAL.Value = 100;
-            else if (m_handler.m_Aligner.p_eState == ModuleBase.eState.Error) progressAL.Value = 0; //working
-            else progressAL.Value = 0;
-
-            if (m_handler.m_camellia.p_eState == ModuleBase.eState.Home)
-            {
-                progressVS.Value = (int)(100 * Math.Min((m_swVision.ElapsedMilliseconds / (20 * 1000)), 1.0));
-            }
-            else if (m_handler.m_camellia.p_eState == ModuleBase.eState.Ready) progressVS.Value = 100;
-            else if (m_handler.m_camellia.p_eState == ModuleBase.eState.Error) progressVS.Value = 0;    //working
-            else progressVS.Value = 0;
+            //if (m_handler.m_camellia.p_eState == ModuleBase.eState.Home)
+            //{
+            //    progressVS.Value = (int)(100 * Math.Min((m_swAligner.ElapsedMilliseconds / (20 * 1000)), 1.0));
+            //}
+            //else if (m_handler.m_camellia.p_eState == ModuleBase.eState.Ready) progressVS.Value = 100;
+            //else if (m_handler.m_camellia.p_eState == ModuleBase.eState.Error) progressVS.Value = 0;    //working
+            //else progressVS.Value = 0;
 
             if (m_handler.m_wtr.p_eState == ModuleBase.eState.Ready && m_handler.m_loadport[0].p_eState == ModuleBase.eState.Ready &&
-                m_handler.m_loadport[1].p_eState == ModuleBase.eState.Ready && m_handler.m_Aligner.p_eState == ModuleBase.eState.Ready
-                && m_handler.m_camellia.p_eState == ModuleBase.eState.Ready)
+                m_handler.m_loadport[1].p_eState == ModuleBase.eState.Ready)
                 this.Close();
         }
         #endregion
@@ -144,6 +109,16 @@ namespace Root_CAMELLIA.UI_UserControl
             e.Cancel = true;
             this.Hide();
             bShow = false;
+        }
+
+        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.DragMove();
+        }
+
+        private void MinizimeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
         }
     }
 }
