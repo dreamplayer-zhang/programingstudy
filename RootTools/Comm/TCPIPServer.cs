@@ -94,7 +94,7 @@ namespace RootTools.Comm
                 }
             }
 
-            int m_nBufReceive = 1024 * 1024;
+            int m_nBufReceive = 1920 * 1080 *3 ;
             byte[] m_aReadBuff = null;
             void CallBack_Receive(IAsyncResult ar)
             {
@@ -174,8 +174,7 @@ namespace RootTools.Comm
         private void M_tcpSocket_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
             if (EventReciveData != null)
-            {
-                Thread.Sleep(100);
+            {  
                 EventReciveData(aBuf, nSize, socket);
             }
             
@@ -210,7 +209,7 @@ namespace RootTools.Comm
 
         public string p_id { get; set; }
         Log m_log;
-        int m_nBufReceive = 1920 * 1080;
+        int m_nBufReceive = 1920 * 1080 * 3;
         public TreeRoot m_treeRoot;
         public Socket m_socket = null;
         public CommLog m_commLog;

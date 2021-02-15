@@ -356,9 +356,9 @@ namespace RootTools.Memory
         const char Splitter = '+';
         bool _bRecieve = false;
         byte[] m_abuf;
-        public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem)
+        public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem, int nByte)
         {
-            string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem;
+            string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
             m_abuf = new byte[CanvasWidth * CanvasHeight];
             _bRecieve = true;
             m_Server.Send(str);
@@ -402,7 +402,7 @@ namespace RootTools.Memory
             {
                 case "GET":
                     System.Drawing.Rectangle rect = new System.Drawing.Rectangle();
-                    byte[] res = GetImageView((System.Drawing.Rectangle)(GetSerializeObject(aStr[1], rect.GetType())), Convert.ToInt32(aStr[2]), Convert.ToInt32(aStr[3]), Convert.ToString(aStr[4]), Convert.ToString(aStr[5]), Convert.ToString(aStr[6]));
+                    byte[] res = GetImageView((System.Drawing.Rectangle)(GetSerializeObject(aStr[1], rect.GetType())), Convert.ToInt32(aStr[2]), Convert.ToInt32(aStr[3]), Convert.ToString(aStr[4]), Convert.ToString(aStr[5]), Convert.ToString(aStr[6]), Convert.ToInt32(aStr[7]));
                     //string strResult = ImageSourceToString(res);
                     //string strResult = GetSerializeString(res);
                     //string strresult = Encoding.Default.GetString(res);
@@ -462,42 +462,67 @@ namespace RootTools.Memory
 
 
 
-        private unsafe byte[] GetImageView(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight, string sPool, string sGroup, string sMem)
+        private unsafe byte[] GetImageView(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight, string sPool, string sGroup, string sMem, int nByte)
         {
             object o = new object();
 
-            Image<Gray, byte> view = new Image<Gray, byte>(CanvasWidth, CanvasHeight);
+            //Image<Gray, byte> view = new Image<Gray, byte>(CanvasWidth, CanvasHeight);
             MemoryData memdata = GetMemory(sPool, sGroup, sMem);
             IntPtr ptrMem = memdata.GetPtr();
+            IntPtr ptrMem2 = memdata.GetPtr(1); // G
+            IntPtr ptrMem3 = memdata.GetPtr(2); // B
+
             if (ptrMem == IntPtr.Zero)
                 return null;
             int pix_x = 0;
             int pix_y = 0;
             int rectX, rectY, rectWidth, rectHeight, sizeX;
             byte[] result = new byte[CanvasWidth * CanvasHeight];
-            //byte[,,] viewptr = view.Data;
-            //byte* imageptr = (byte*)ptrMem.ToPointer();
-
             rectX = View_Rect.X;
             rectY = View_Rect.Y;
             rectWidth = View_Rect.Width;
             rectHeight = View_Rect.Height;
-
             sizeX = Convert.ToInt32(memdata.W);
-
-            Parallel.For(0, CanvasHeight, (yy) =>
+            if(nByte == 3)
+                result = new byte[CanvasWidth * CanvasHeight * 3];
+            //byte[,,] viewptr = view.Data;
+            //byte* imageptr = (byte*)ptrMem.ToPointer();
+            if (nByte == 1)
             {
-                lock (o)
-                {
-                    pix_y = rectY + yy * rectHeight / CanvasHeight;
 
-                    for (int xx = 0; xx < CanvasWidth; xx++)
+                Parallel.For(0, CanvasHeight, (yy) =>
+                {
+                    lock (o)
                     {
-                        pix_x = rectX + xx * rectWidth / CanvasWidth;
-                        result[yy * CanvasWidth + xx] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
+                        pix_y = rectY + yy * rectHeight / CanvasHeight;
+
+                        for (int xx = 0; xx < CanvasWidth; xx++)
+                        {
+                            pix_x = rectX + xx * rectWidth / CanvasWidth;
+                            result[yy * CanvasWidth + xx] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
+                        }
                     }
-                }
-            });
+                });
+            }
+            else if (nByte == 3)
+            {
+                int nTerm = CanvasWidth * CanvasHeight;
+                Parallel.For(0, CanvasHeight, (yy) =>
+                {
+                    lock (o)
+                    {
+                        pix_y = rectY + yy * rectHeight / CanvasHeight;
+
+                        for (int xx = 0; xx < CanvasWidth; xx++)
+                        {
+                            pix_x = rectX + xx * rectWidth / CanvasWidth;
+                            result[yy * CanvasWidth + xx] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
+                            result[yy * CanvasWidth + xx + nTerm] = ((byte*)ptrMem2)[pix_x + (long)pix_y * sizeX];
+                            result[yy * CanvasWidth + xx + nTerm * 2] = ((byte*)ptrMem3)[pix_x + (long)pix_y * sizeX];
+                        }
+                    }
+                });
+            }
            return result;
         }
 

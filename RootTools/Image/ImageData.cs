@@ -162,12 +162,13 @@ namespace RootTools
 		string m_sGroup;
 		string m_sMem;
 
-		public ImageData(string sPool, string sGroup, string sMem, MemoryTool tool)
+		public ImageData(string sPool, string sGroup, string sMem, MemoryTool tool, int nByte)
 		{
 			m_sPool = sPool;
 			m_sGroup = sGroup;
 			m_sMem = sMem;
 			m_eMode = eMode.OtherPCMem;
+			p_nByte = nByte;
 			p_Size = new CPoint(40000, 40000);
 			m_ToolMemory = tool;
 		}
