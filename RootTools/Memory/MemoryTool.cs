@@ -409,7 +409,7 @@ namespace RootTools.Memory
                     //string strResult = GetSerializeString(res);
                     //string strresult = Encoding.Default.GetString(res);
                     //string strresult = bytestostring(res);
-                    byte[] rescom = SerializeAndCompress(res);
+                    byte[] rescom = Compress(res);                   
                     string strresult = Convert.ToBase64String(rescom);
                     //string stst = BitConverter.ToString(res);
 
@@ -418,25 +418,35 @@ namespace RootTools.Memory
             }
             //System.Drawing.Rectangle viewrect = GetSerializeObject(aStr[1],     );
         }
-        static byte[] SerializeAndCompress(byte[] obj)
+        public static Byte[] Compress(Byte[] buffer)
         {
-
+            Byte[] compressedByte;
             using (MemoryStream ms = new MemoryStream())
-            using (DeflateStream zs = new DeflateStream( ms, CompressionMode.Compress, true))
             {
-                zs.Write(obj, 0, obj.Length);
-                return ms.ToArray();
+                using (DeflateStream ds = new DeflateStream(ms, CompressionMode.Compress))
+                {
+                    ds.Write(buffer, 0, buffer.Length);
+                }
+
+                compressedByte = ms.ToArray();
             }
+            return compressedByte;
         }
-        static byte[] DecompressAndDeserialize(byte[] data)
+        public static Byte[] Decompress(Byte[] buffer)
         {
             MemoryStream resultStream = new MemoryStream();
-            using (MemoryStream ms = new MemoryStream(data))
-            using (GZipStream zs = new GZipStream(ms, CompressionMode.Decompress, true))
+
+            using (MemoryStream ms = new MemoryStream(buffer))
             {
-                zs.CopyTo(resultStream);
-                return resultStream.ToArray();
+                using (DeflateStream ds = new DeflateStream(ms, CompressionMode.Decompress))
+                {
+                    ds.CopyTo(resultStream);
+                    ds.Close();
+                }
             }
+            Byte[] decompressedByte = resultStream.ToArray();
+            resultStream.Dispose();
+            return decompressedByte;
         }
         static string bytestostring(byte[] bytesss)
         {
