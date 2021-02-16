@@ -36,7 +36,7 @@ namespace RootTools_Vision.Utility
 		public double sampleCenterLocationY;            // 센터 Die의 Left,bottom와 실제 제품 Center간의 차이.
 
 		public String sampleTestPlan = "";
-		public String defectInfor = "";
+		public String defectListInfor = "";
 		public String DCollData = "";
 		public String MEMMAP;
 
