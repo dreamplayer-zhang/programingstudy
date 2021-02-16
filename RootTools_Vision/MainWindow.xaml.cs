@@ -31,16 +31,43 @@ namespace RootTools_Vision
 
     public partial class MainWindow : Window
     {
-        InspectionManager inspectionManager;
+        //InspectionManager inspectionManager;
         public MainWindow()
         {
             InitializeComponent();
 
         }
 
+        bool isServer = false;
+
+        private ClonableWorkFactory client = new ClonableWorkFactory();
+        private ServerWorkFactory server = new ServerWorkFactory();
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            inspectionManager = new InspectionManager();
+            if (this.isServer)
+                server.RemoteStart();
+            else
+                client.RemoteStart();
+            
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            if (this.isServer)
+                server.WriteTest();
+            else
+                client.WriteTest();
+        }
+
+        private void Button_Server(object sender, RoutedEventArgs e)
+        {
+            this.isServer = true;
+        }
+
+        private void Button_Client(object sender, RoutedEventArgs e)
+        {
+            this.isServer = false;
         }
     }
 }

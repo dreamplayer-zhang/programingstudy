@@ -10,6 +10,7 @@ using RootTools_Vision;
 
 namespace RootTools_Vision
 {
+    [Serializable]
     // ParameterBase를 상속받는 Class를 추가할 경우
     // XmlSerialize를 위해서 XmlInclude Attribute를 사용해서 class 타입을 추가해야함
     [XmlInclude(typeof(D2DParameter))]

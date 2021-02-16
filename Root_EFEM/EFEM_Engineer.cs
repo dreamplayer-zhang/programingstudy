@@ -12,7 +12,7 @@ using RootTools.Trees;
 
 namespace Root_EFEM
 {
-    public class EFEM_Engineer : IEngineer
+    public class EFEM_Engineer : NotifyProperty, IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
@@ -22,7 +22,8 @@ namespace Root_EFEM
         {
             switch (m_eControl)
             {
-                case eControl.Ajin: return m_ajin; 
+                case eControl.Ajin: return m_ajin;
+                case eControl.ACS: return m_ACS;
             }
             return m_ajin; 
         }
@@ -95,12 +96,23 @@ namespace Root_EFEM
         #endregion
 
         #region XGem
-        bool m_bUseXGem = true; 
+        //bool m_bUseXGem = true; 
+        bool _bUseXGem = false;
+        public bool p_bUseXGem
+        {
+            get { return _bUseXGem; }
+            set
+            {
+                if (_bUseXGem == value) return;
+                _bUseXGem = value;
+                OnPropertyChanged();
+            }
+        }
         XGem m_xGem = null;
         XGem_UI m_xGemUI = new XGem_UI();
         void InitXGem()
         {
-            if (m_bUseXGem == false) return; 
+            if (p_bUseXGem == false) return; 
             m_xGem = new XGem();
             m_xGem.Init("XGem", this);
             m_xGemUI.Init(m_xGem);
@@ -109,7 +121,7 @@ namespace Root_EFEM
 
         void RunTreeXGem(Tree tree)
         {
-            m_bUseXGem = tree.Set(m_bUseXGem, m_bUseXGem, "Use", "Use XGem"); 
+            p_bUseXGem = tree.Set(p_bUseXGem, p_bUseXGem, "Use", "Use XGem"); 
         }
         #endregion
 

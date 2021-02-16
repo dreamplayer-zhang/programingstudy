@@ -1,5 +1,6 @@
 ﻿using RootTools.GAFs;
 using System.Collections.Generic;
+using static RootTools.Gem.XGem.XGem;
 
 namespace RootTools.Gem
 {
@@ -56,5 +57,7 @@ namespace RootTools.Gem
         void STSSetProcessing(GemSlotBase gemSlot, GemSlotBase.eSTSProcess process);
 
         void DeleteAllJobInfo();
+
+        eControl p_eControl { get; set; }
     }
 }

@@ -24,5 +24,14 @@ namespace Root_AOP01_Packing
         {
             InitializeComponent();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Run_ViewModel vm = this.DataContext as Run_ViewModel;
+            
+            //vm.p_LoadportA.p_diPlaced.btest = true;
+            //vm.p_LoadportA = vm.p_LoadportA;
+
+        }
     }
 }

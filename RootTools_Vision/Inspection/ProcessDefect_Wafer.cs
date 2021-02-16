@@ -9,12 +9,20 @@ using RootTools;
 using System.ComponentModel;
 using RootTools_CLR;
 using System.IO;
+using System.Collections;
+using System.Drawing.Imaging;
+using RootTools_Vision.Utility;
 
 namespace RootTools_Vision
 {
     public class ProcessDefect_Wafer : WorkBase
     {
         BacksideRecipe recipeBackside;
+        string sDefectimagePath = @"D:\DefectImage";
+        /// <summary>
+        /// Defect Image가 저장될 Root Directory Path. 기본값 : D:\DefectImage
+        /// </summary>
+        public string DefectImagePath { get => sDefectimagePath; set => sDefectimagePath = value; }
 
         public ProcessDefect_Wafer()
         {
@@ -40,6 +48,8 @@ namespace RootTools_Vision
             if (!(this.currentWorkplace.MapIndexX == -1 && this.currentWorkplace.MapIndexY == -1))
                 return;
 
+            WorkEventManager.OnProcessDefectWaferStart(this, new ProcessDefectWaferStartEventArgs());
+
             // Option Param
             int mergeDist = 1;
             int backsideOffset = 1700;
@@ -59,14 +69,14 @@ namespace RootTools_Vision
                 radius = recipeBackside.Radius;
             }
 
-            //Defect 넣는 부분 정리 필요
+			//Defect 넣는 부분 정리 필요
 
             List<Defect> DefectList = CollectDefectData();
             if (isBackside) // Backside Option
                 DeleteOutsideDefect(DefectList, waferCenterX, waferCenterY, radius, backsideOffset);
 
             List<Defect> MergeDefectList = MergeDefect(DefectList, mergeDist);
-
+            OriginRecipe originRecipe = null;
             foreach (Defect defect in MergeDefectList)
             {
                 if (isBackside)
@@ -74,7 +84,7 @@ namespace RootTools_Vision
 
                 else
                 {
-                    OriginRecipe originRecipe = this.recipe.GetItem<OriginRecipe>();
+                    originRecipe = this.recipe.GetItem<OriginRecipe>();
                     defect.CalcAbsToRelPos(originRecipe.OriginX, originRecipe.OriginY); // Frontside
                 }
             }
@@ -84,9 +94,8 @@ namespace RootTools_Vision
             foreach (Defect defect in MergeDefectList)
                 this.currentWorkplace.DefectList.Add(defect);
 
-            string sDefectimagePath = @"D:\DefectImage";
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            SaveDefectImage(Path.Combine(sDefectimagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
+            SaveDefectImage(Path.Combine(DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
 
             //// Add Defect to DB
             if (MergeDefectList.Count > 0)
@@ -106,6 +115,24 @@ namespace RootTools_Vision
                 //}
             }
 
+            //KlarfData_Lot kd = new KlarfData_Lot();
+
+            //kd.SaveKlarf(@"D:\", false);
+            //RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            if (!isBackside)
+            {
+                GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList,  originRecipe);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+                
+
+                GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(sDefectimagePath , false);
+            }
+         
+
+
+            string sTiffImagePath = @"D:\DefectImage";
+            SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
             WorkEventManager.OnProcessDefectWaferDone(this.currentWorkplace, new ProcessDefectWaferDoneEventArgs());
         }
@@ -133,7 +160,7 @@ namespace RootTools_Vision
 
             for (int i = 0; i < DefectList.Count; i++) // 현재는 Defect의 중점으로 하고있으나, 잘 제거되지 않으면 Defect Bounding Box의 꼭지점들로 제거
             {
-                // 좌상단
+                // 좌상단^
                 float distX = Math.Abs(waferCenterX - (float)DefectList[i].p_rtDefectBox.Left);
                 float distY = Math.Abs(waferCenterY - (float)DefectList[i].p_rtDefectBox.Top);
                 double dist = Math.Sqrt(Math.Pow(distX, 2) + Math.Pow(distY, 2));
@@ -299,21 +326,84 @@ namespace RootTools_Vision
                        currentWorkplace.SharedBufferWidth,
                        currentWorkplace.SharedBufferHeight,
                        defectArray);
+
+
                 }
             }
         }
-        private void SaveTiffImage(String Path, List<Defect> DefectList, int nByteCnt)
+
+        ArrayList inputImage = new ArrayList();
+        private void SaveTiffImage(string Path, List<Defect> DefectList, int nByteCnt)
         {
             Path += "\\";
             DirectoryInfo di = new DirectoryInfo(Path);
             if (!di.Exists)
                 di.Create();
 
+            for (int i = 0; i < DefectList.Count; i++)
+            {
+                MemoryStream image = new MemoryStream();
+                System.Drawing.Bitmap bitmap = Tools.ConvertArrayToColorBitmap(currentWorkplace.SharedBufferR_GRAY, currentWorkplace.SharedBufferG, currentWorkplace.SharedBufferB,currentWorkplace.SharedBufferWidth, 3, DefectList[i].GetRect());
+                //System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
+                bitmap.Save(image, ImageFormat.Tiff);
+                inputImage.Add(image);
+            }
 
-            
+            ImageCodecInfo info = null;
+            foreach (ImageCodecInfo ice in ImageCodecInfo.GetImageEncoders())
+            {
+                if (ice.MimeType == "image/tiff")
+                {
+                    info = ice;
+                    break;
+                }
+            }
+
+            string test = "test";
+            Path += test +".tiff";
+
+            EncoderParameters ep = new EncoderParameters(2);
+
+            bool firstPage = true;
+
+            System.Drawing.Image img = null;
+
+            for(int i = 0; i < inputImage.Count; i++)
+            {
+                System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
+                Guid guid = img_src.FrameDimensionsList[0];
+                System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
+
+                for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+                {
+                    img_src.SelectActiveFrame(dimension, nLoopFrame);
+
+                    ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
+
+                    if (firstPage)
+                    {
+                        img = img_src;
+
+                        ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+                        img.Save(Path, info, ep);
+
+                        firstPage = false;
+                        continue;
+                    }
+
+                    ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+                    img.SaveAdd(img_src, ep);
+                }
+            }
+            if(inputImage.Count == 0)
+            {
+                File.Create(Path);
+                return;
+            }
+
+            ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+            img.SaveAdd(ep);
         }
-        
-
 
     }
 }

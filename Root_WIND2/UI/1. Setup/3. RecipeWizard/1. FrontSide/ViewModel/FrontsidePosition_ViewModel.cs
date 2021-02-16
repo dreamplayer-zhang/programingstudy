@@ -682,12 +682,12 @@ namespace Root_WIND2
                 p_VisibleEmpty[2] = Visibility.Collapsed;
         }
 
-        private void _saveImage()
-        {
-        }
+        //private void _saveImage()
+        //{
+        //}
         private void _addMasterMark()
         {
-            var asdf = p_nMarkIndex;
+
             if (BoxImage == null)
                 return;
 

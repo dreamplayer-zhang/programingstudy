@@ -1,13 +1,13 @@
-﻿using Root_EFEM;
+using Root_EFEM;
 using Root_EFEM.Module;
 using RootTools;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
+using RootTools.Lens.LinearTurret;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
-using RootTools.RADS;
 using RootTools.Trees;
 using RootTools_Vision.Utility;
 using System.Collections.Generic;
@@ -25,19 +25,17 @@ namespace Root_WIND2.Module
         DIO_O m_doVac;
         DIO_O m_doBlow;
         MemoryPool m_memoryPool;
-        MemoryPool m_memoryPool2;
         MemoryGroup m_memoryGroup;
-        MemoryGroup m_memoryGroup2;
         MemoryData m_memoryMain;
+        MemoryData m_memoryLayer;
         LightSet m_lightSet;
-        RADSControl m_RADSControl;
 
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
         Camera_Basler m_CamAutoFocus;
 
         KlarfData_Lot m_KlarfData_Lot;
-
+        LensLinearTurret m_LensLinearTurret;
         #region [Getter Setter]
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
         public Axis AxisZ { get => m_axisZ; private set => m_axisZ = value; }
@@ -45,12 +43,10 @@ namespace Root_WIND2.Module
         public DIO_O DoVac { get => m_doVac; private set => m_doVac = value; }
         public DIO_O DoBlow { get => m_doBlow; private set => m_doBlow = value; }
         public MemoryPool MemoryPool { get => m_memoryPool; private set => m_memoryPool = value; }
-        public MemoryPool MemoryPool2 { get => m_memoryPool2; private set => m_memoryPool2 = value; }
         public MemoryGroup MemoryGroup { get => m_memoryGroup; private set => m_memoryGroup = value; }
-        public MemoryGroup MemoryGroup2 { get => m_memoryGroup2; private set => m_memoryGroup2 = value; }
         public MemoryData MemoryMain { get => m_memoryMain; private set => m_memoryMain = value; }
+        public MemoryData MemoryLayer { get => m_memoryLayer; private set => m_memoryLayer = value; }
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
-        public RADSControl RADSControl { get => m_RADSControl; private set => m_RADSControl = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
@@ -68,13 +64,12 @@ namespace Root_WIND2.Module
                 p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
                 p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-                p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
                 p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.Get(ref m_CamAlign, this, "AlignCam");
                 p_sInfo = m_toolBox.Get(ref m_CamAutoFocus, this, "AutoFocusCam");
+                p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
             }
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-            p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
             m_remote.GetTools(bInit);
         }
         #endregion
@@ -118,7 +113,7 @@ namespace Root_WIND2.Module
             while (m_aGrabMode.Count < m_lGrabMode)
             {
                 string id = "Mode." + m_aGrabMode.Count.ToString("00");
-                GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool, m_RADSControl);
+                GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool, m_LensLinearTurret);
                 m_aGrabMode.Add(grabMode);
             }
             while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
@@ -172,8 +167,7 @@ namespace Root_WIND2.Module
         {
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
-            m_memoryGroup2 = m_memoryPool2.GetGroup("group");
-            m_memoryGroup2.CreateMemory("ROI", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+            m_memoryMain = m_memoryGroup.CreateMemory("Layer", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
         }
 
         #endregion
@@ -447,7 +441,6 @@ namespace Root_WIND2.Module
             AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
             AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
             AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
-            
         }
         #endregion
     }

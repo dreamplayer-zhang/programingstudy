@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Database;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,9 +10,11 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 
 namespace RootTools_Vision
@@ -34,6 +37,159 @@ namespace RootTools_Vision
             return data;
         }
 
+        public static Bitmap ConvertArrayToBitmapRect(byte[] rawData, int _width, int _height, int _byteCount, CRect _rect)
+        {
+            try
+            {
+                System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                if (_byteCount == 1)
+                {
+                    format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                }
+                else if (_byteCount == 3)
+                {
+                    format = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("지원하지 않는 PixelFormat입니다.");
+                    return null;
+                }
+
+                int stride = (int)Math.Ceiling((double)_width / 4) * 4;
+                Bitmap bmp = new Bitmap(_width, _height, format);
+                ColorPalette palette = bmp.Palette;
+                if (_byteCount == 1)
+                {
+                    for (int i = 0; i < 256; i++)
+                        palette.Entries[i] = Color.FromArgb(i, i, i);
+
+                    bmp.Palette = palette;
+                }
+                else
+                {
+                    //Color Palette 만들줄 아는사람 넣어줘
+                }
+
+            }
+            catch
+            {
+
+            }
+            return null;
+        }
+
+        public static Bitmap ConvertArrayToColorBitmap(IntPtr rawDataR, IntPtr rawDataG, IntPtr rawDataB, int _memWidth, int _byteCount, Rect rect)
+        {
+            try
+            {
+                System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                if (_byteCount == 1)
+                {
+                    format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                }
+                else if (_byteCount == 3)
+                {
+                    format = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("지원하지 않는 PixelFormat입니다.");
+                    return null;
+                }
+
+                int stride = (int)Math.Ceiling((double)640 / 4) * 4;
+                Bitmap bmp = new Bitmap(640, 480, format);
+
+                ColorPalette palette = bmp.Palette;
+
+                if (_byteCount == 1)
+                {
+                    for (int i = 0; i < 256; i++)
+                        palette.Entries[i] = Color.FromArgb(i, i, i);
+
+                    bmp.Palette = palette;
+                }
+                else
+                {
+                    //Color Palette 만들줄 아는사람 넣어줘
+                }
+                //Marshal.Copy(,);
+
+
+                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, 640, 480), ImageLockMode.WriteOnly, format);
+
+                int centerX = (int)(rect.X + (rect.Width / 2));
+                int centerY = (int)(rect.Y + (rect.Height / 2));
+
+                Rect rt = new Rect();
+                int saveW = 640;
+                int saveH = 480;
+                if(rect.Width < saveW && rect.Height < saveH)
+                {
+                    rt.X = centerX - (saveW / 2);
+                    rt.Y = centerY - (saveH / 2);
+                    rt.Width = saveW;
+                    rt.Height = saveH;
+                }
+                else
+                {
+                    int nSaveW;
+                    int nSaveH;
+                    if (rect.Width > saveW)
+                        nSaveW = (int)rect.Width;
+                    else
+                        nSaveW = 640;
+
+                    if (rect.Height > saveH)
+                        nSaveH = (int)rect.Height;
+                    else
+                        nSaveH = 480;
+
+                    rt.X = (centerX - saveW / 2);
+                    rt.Y = (centerY - saveH / 2);
+                    rt.Width = nSaveW;
+                    rt.Height = nSaveH;
+                }
+                
+
+
+                IntPtr pointer = bmpData.Scan0;
+                {
+                    unsafe
+                    {
+                        byte* pPointer = (byte*)pointer.ToPointer();
+                        byte* pR = (byte*)rawDataR.ToPointer();
+                        byte* pG = (byte*)rawDataG.ToPointer();
+                        byte* pB = (byte*)rawDataB.ToPointer();
+                        for (int i = 0; i < 480; i++)
+                            for (int j = 0; j < 640; j++)
+                            {
+                                pPointer[i * (saveW * 3) + j * _byteCount + 0] = pB[(i + (int)(rt.Y)) * _memWidth + (j + (int)(rt.X))];
+                                pPointer[i * (saveW * 3) + j * _byteCount + 1] = pG[(i + (int)(rt.Y)) * _memWidth + (j + (int)(rt.X))];
+                                pPointer[i * (saveW * 3) + j * _byteCount + 2] = pR[(i + (int)(rt.Y)) * _memWidth + (j + (int)(rt.X))];
+                            }
+                    }
+                }
+                bmp.UnlockBits(bmpData);
+
+                if (rt.Width != 640 || rt.Height != 480)
+                {
+                    using (Graphics g = Graphics.FromImage(bmp))
+                    {
+                        g.DrawImage(bmp, 0, 0, saveW, saveH);
+                    }
+                }
+
+                return bmp;
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show(ex.ToString());
+            }
+            return null;
+        }
+
         public static Bitmap CovertArrayToBitmap(byte[] rawdata, int _width, int _height, int _byteCount)
         {
             try
@@ -49,7 +205,7 @@ namespace RootTools_Vision
                 }
                 else
                 {
-                    MessageBox.Show("지원하지 않는 PixelFormat입니다.");
+                    System.Windows.MessageBox.Show("지원하지 않는 PixelFormat입니다.");
                     return null;
                 }
 
@@ -100,7 +256,7 @@ namespace RootTools_Vision
 
                 return bmp;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -115,7 +271,7 @@ namespace RootTools_Vision
                 Bitmap bmp = CovertArrayToBitmap(rawdata, _width, _height, _byteCount);
                 bmp.Save(filepath);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 rst = false;
             }
@@ -127,7 +283,7 @@ namespace RootTools_Vision
         public unsafe static byte[] LoadBitmapToRawdata(string filepath, int* _width, int* _height)
         {
             byte[] resData = null;
-            bool res = false;
+            //bool res = false;
             try
             {
                 int byteCount = 1;
@@ -245,7 +401,7 @@ namespace RootTools_Vision
                 }
 
             }
-            catch( Exception ex)
+            catch( Exception)
             {
                 rst = false;
             }
@@ -325,7 +481,7 @@ namespace RootTools_Vision
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 rst = false;
             }
@@ -362,14 +518,31 @@ namespace RootTools_Vision
             return objects;
         }
 
-        public static byte[] ObjectToByteArray(object obj)
+        public static byte[] ObjectToByteArray<T>(T obj)
         {
-            if (obj == null) return null;
-
-            BinaryFormatter bf = new BinaryFormatter();
             MemoryStream ms = new MemoryStream();
-            bf.Serialize(ms, obj);
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(ms, obj);
             return ms.ToArray();
+        }
+
+        public static byte[] ObejctToByteArray(object obj)
+        {
+            MemoryStream ms = new MemoryStream();
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(ms, obj);
+            return ms.ToArray();
+        }
+
+        public static T ByteArrayToObject<T>(byte[] byteArr)
+        {
+            if (byteArr == null) return default(T);
+
+            MemoryStream ms = new MemoryStream();
+            BinaryFormatter bf = new BinaryFormatter();
+            ms.Write(byteArr, 0, byteArr.Length);
+            ms.Seek(0, SeekOrigin.Begin);
+            return (T)bf.Deserialize(ms);
         }
 
         public static object ByteArrayToObject(byte[] byteArr)
@@ -385,7 +558,7 @@ namespace RootTools_Vision
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                System.Windows.MessageBox.Show(ex.Message);
             }
 
             return null;
@@ -429,14 +602,15 @@ namespace RootTools_Vision
                     Marshal.Copy(new IntPtr(ptrSrc.ToInt64() + (i * (Int64)srcStride + left)), byteDst, width * (i - top), width);
 
                 });
+
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 //검사 종료할 경우 buffer 카피하다가 workplace가 reset되서 다운
             }
         }
 
-        public static System.Windows.Media.Imaging.BitmapSource BitmapFromSource(System.Drawing.Bitmap bitmap)
+        public static System.Windows.Media.Imaging.BitmapSource ConvertBitmapToSource(System.Drawing.Bitmap bitmap)
         {
             var bitmapData = bitmap.LockBits(
                 new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
@@ -451,6 +625,91 @@ namespace RootTools_Vision
             bitmap.UnlockBits(bitmapData);
 
             return bitmapSource;
+        }
+
+        public static List<Defect> MergeDefect(List<Defect> DefectList, int mergeDist)
+        {
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+            List<Defect> MergeDefectList = new List<Defect>();
+            int nDefectIndex = 1;
+
+            for (int i = 0; i < DefectList.Count; i++)
+            {
+                if (DefectList[i].m_fSize == -123)
+                    continue;
+
+                for (int j = 0; j < DefectList.Count; j++)
+                {
+                    System.Windows.Rect defectRect1 = DefectList[i].p_rtDefectBox;
+                    System.Windows.Rect defectRect2 = DefectList[j].p_rtDefectBox;
+
+                    if (DefectList[j].m_fSize == -123 || (i == j))
+                        continue;
+
+                    else if (defectRect1.Contains(defectRect2))
+                    {
+                        DefectList[j].m_fSize = -123;
+                        continue;
+                    }
+                    else if (defectRect2.Contains(defectRect1))
+                    {
+                        DefectList[i].SetDefectInfo(sInspectionID, DefectList[j].m_nDefectCode, DefectList[j].m_fSize, DefectList[j].m_fGV, DefectList[j].m_fWidth, DefectList[j].m_fHeight
+                            , 0, 0, (float)DefectList[j].p_rtDefectBox.Left, (float)DefectList[j].p_rtDefectBox.Top, DefectList[j].m_nChipIndexX, DefectList[j].m_nCHipIndexY);
+                        DefectList[j].m_fSize = -123;
+                        continue;
+                    }
+                    else if (defectRect1.IntersectsWith(defectRect2))
+                    {
+                        System.Windows.Rect intersect = System.Windows.Rect.Intersect(defectRect1, defectRect2);
+                        if (intersect.Height == 0 || intersect.Width == 0)
+                        {
+                            DefectList[j].m_fSize = -123;
+                            continue;
+                        }
+                    }
+
+                    defectRect1.Inflate(new System.Windows.Size(mergeDist, mergeDist)); // Rect 가로/세로 mergeDist 만큼 확장
+                    if (defectRect1.IntersectsWith(defectRect2) && (DefectList[i].m_nDefectCode == DefectList[j].m_nDefectCode))
+                    {
+                        System.Windows.Rect intersect = System.Windows.Rect.Intersect(defectRect1, defectRect2);
+                        if (intersect.Height == 0 || intersect.Width == 0) // Rect가 선만 겹쳐도 Intersect True가 됨! (실제 Dist보다 +1 만큼 더 되어 merge되는 것을 방지)
+                            continue;
+
+                        // Merge Defect Info
+                        int nDefectCode = DefectList[j].m_nDefectCode;
+
+                        float fDefectGV = (float)((DefectList[i].m_fGV + DefectList[j].m_fGV) / 2.0);
+                        float fDefectLeft = (defectRect2.Left < defectRect1.Left + mergeDist) ? (float)defectRect2.Left : (float)defectRect1.Left + mergeDist;
+                        float fDefectTop = (defectRect2.Top < defectRect1.Top + mergeDist) ? (float)defectRect2.Top : (float)defectRect1.Top + mergeDist;
+                        float fDefectRight = (defectRect2.Right > defectRect1.Right - mergeDist) ? (float)defectRect2.Right : (float)defectRect1.Right - mergeDist;
+                        float fDefectBottom = (defectRect2.Bottom > defectRect1.Bottom - mergeDist) ? (float)defectRect2.Bottom : (float)defectRect1.Bottom - mergeDist;
+
+                        float fDefectWidth = fDefectRight - fDefectLeft;
+                        float fDefectHeight = fDefectBottom - fDefectTop;
+
+                        float fDefectSz = (fDefectWidth > fDefectHeight) ? fDefectWidth : fDefectHeight;
+
+                        float fDefectRelX = 0;
+                        float fDefectRelY = 0;
+
+                        DefectList[i].SetDefectInfo(sInspectionID, nDefectCode, fDefectSz, fDefectGV, fDefectWidth, fDefectHeight
+                            , fDefectRelX, fDefectRelY, fDefectLeft, fDefectTop, DefectList[j].m_nChipIndexX, DefectList[j].m_nCHipIndexY);
+
+                        DefectList[j].m_fSize = -123; // Merge된 Defect이 중복 저장되지 않도록...
+                    }
+                }
+            }
+
+            for (int i = 0; i < DefectList.Count; i++)
+            {
+                if (DefectList[i].m_fSize != -123)
+                {
+                    MergeDefectList.Add(DefectList[i]);
+                    MergeDefectList[nDefectIndex - 1].SetDefectIndex(nDefectIndex++);
+                }
+            }
+
+            return MergeDefectList;
         }
     }
 }

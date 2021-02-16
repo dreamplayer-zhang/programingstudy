@@ -25,6 +25,17 @@ namespace RootTools
             Y = 0;
         }
 
+        /// <summary>
+        /// Left/Top Point 생성
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public CPoint(System.Windows.Rect rect)
+        {
+            X = (int)(rect.Left);
+            Y = (int)(rect.Top);
+        }
+
         public CPoint(int x, int y)
         {
             X = x;
@@ -93,12 +104,18 @@ namespace RootTools
 
         public static bool operator ==(CPoint cp0, CPoint cp1)
         {
+            if (cp0 is null && cp1 is null) 
+                return true;
+
             cp0 = cp0 ?? new CPoint();  
             return cp0.Equals(cp1);
         }
 
         public static bool operator !=(CPoint cp0, CPoint cp1)
         {
+            if (cp0 is null && cp1 is null)
+                return true;
+
             cp0 = cp0 ?? new CPoint();
             return !cp0.Equals(cp1);
         }

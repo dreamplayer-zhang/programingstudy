@@ -47,6 +47,8 @@
 #include "opencv2/core.hpp"
 #include "opencv2/opencv_modules.hpp"
 
+#pragma warning(disable: 26812)
+
 namespace cv {
 namespace detail {
 

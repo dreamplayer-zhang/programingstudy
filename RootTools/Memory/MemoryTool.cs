@@ -1,4 +1,7 @@
-﻿using Microsoft.Win32;
+﻿using Emgu.CV;
+using Emgu.CV.Structure;
+using Microsoft.Win32;
+using RootTools.Comm;
 using RootTools.Inspects;
 using RootTools.Trees;
 using System;
@@ -6,10 +9,18 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Xml.Serialization;
+using System.IO.Compression;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace RootTools.Memory
 {
@@ -173,6 +184,10 @@ namespace RootTools.Memory
         #region MemoryProcess
         bool m_bThreadProcess = false;
         Thread m_threadProcess = null;
+        TCPIPServer m_Server;
+        TCPIPClient m_Client;
+        bool bServer = true;
+
         public void InitThreadProcess()
         {
             m_bThreadProcess = true;
@@ -211,6 +226,18 @@ namespace RootTools.Memory
             m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "Memory Process ID", bVisible && m_bStartProcess);
             m_sProcessFile = tree.SetFile(m_sProcessFile, m_sProcessFile, "exe", "File", "Process File Name", bVisible && m_bStartProcess);
         }
+
+        void RunTreeTCPSetup(Tree tree)
+        {
+            bServer = tree.Set(bServer, bServer, "MemServer", "Memory Tool Server");
+            if (bServer && m_Server != null)
+            {
+                m_Server.RunTree(tree);
+            }
+            if (!bServer && m_Client != null)
+                m_Client.RunTree(tree);
+        }
+
         #endregion
 
         #region Read & Save Memory
@@ -266,6 +293,7 @@ namespace RootTools.Memory
             if (m_bMaster == false) return; 
             bool bVisible = true; 
             RunTreeProcess(m_treeRootRun.GetTree("Process"), bVisible);
+            RunTreeTCPSetup(m_treeRootRun.GetTree("TCP Set"));
         }
         #endregion
 
@@ -300,7 +328,21 @@ namespace RootTools.Memory
             m_treeRootRun.UpdateTree += M_treeRootRun_UpdateTree;
             RunTreeRun(Tree.eMode.RegRead);
             KillInspectProcess();
-            if (bMaster == false) InitTimer(); 
+            if (bMaster == false) InitTimer();
+
+            if (bServer)
+            {
+                m_Server = new TCPIPServer(id, m_log);
+                RunTreeRun(Tree.eMode.RegRead);
+                m_Server.Init();
+                m_Server.EventReciveData += M_Server_EventReciveData;
+            }
+            else
+            {
+                m_Client = new TCPIPClient(id, m_log);
+                RunTreeRun(Tree.eMode.RegRead);
+                m_Client.EventReciveData += M_Client_EventReciveData;
+            }
         }
 
         public void ThreadStop()
@@ -311,6 +353,249 @@ namespace RootTools.Memory
                 m_threadProcess.Join(); 
             }
         }
+
+        #region TCP
+        const char Splitter = '+';
+        bool _bRecieve = false;
+        byte[] m_abuf;
+        public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem, int nByte)
+        {
+            string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
+            m_abuf = new byte[CanvasWidth * CanvasHeight * nByte];
+            _bRecieve = true;
+            m_Server.Send(str);
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            while (_bRecieve)
+            {
+                Thread.Sleep(10);
+                if (watch.ElapsedMilliseconds > 5000)
+                    return m_abuf;
+            }
+            _bRecieve = false;
+            return m_abuf;
+        }
+        private void M_Server_EventReciveData(byte[] aBuf, int nSize, System.Net.Sockets.Socket socket)
+        {
+            //socket.Send(aBuf, nSize, SocketFlags.None);
+            string str = Encoding.ASCII.GetString(aBuf, 0, nSize);
+            //m_qLog.Enqueue(new Mars(0, Encoding.ASCII.GetString(aBuf, 0, nSize)));
+            //string[] aStr = str.Split(Splitter);
+            //string astr = str;
+            
+            m_abuf = Convert.FromBase64String(str);
+            _bRecieve = false;
+            //switch (aStr)
+            //{
+            //    case "GET":
+            //m_ReciveBitmapSource = StringToImageSource(astr);
+
+            //      m_ReciveBitmapSource = (BitmapSource)GetSerializeObject(aStr, m_ReciveBitmapSource.GetType());
+            //        _bRecieve = true;
+            //        break;
+            //}
+        }
+
+        private void M_Client_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        {
+            string str = Encoding.ASCII.GetString(aBuf, 0, nSize);
+            string[] aStr = str.Split(Splitter);
+            switch (aStr[0])
+            {
+                case "GET":
+                    System.Drawing.Rectangle rect = new System.Drawing.Rectangle();
+                    byte[] res = GetImageView((System.Drawing.Rectangle)(GetSerializeObject(aStr[1], rect.GetType())), Convert.ToInt32(aStr[2]), Convert.ToInt32(aStr[3]), Convert.ToString(aStr[4]), Convert.ToString(aStr[5]), Convert.ToString(aStr[6]), Convert.ToInt32(aStr[7]));
+                    //string strResult = ImageSourceToString(res);
+                    //string strResult = GetSerializeString(res);
+                    //string strresult = Encoding.Default.GetString(res);
+                    //string strresult = bytestostring(res);
+                    byte[] rescom = Compress(res);                   
+                    string strresult = Convert.ToBase64String(rescom);
+                    //string stst = BitConverter.ToString(res);
+
+                    m_Client.Send(strresult);
+                    break;
+            }
+            //System.Drawing.Rectangle viewrect = GetSerializeObject(aStr[1],     );
+        }
+        public static Byte[] Compress(Byte[] buffer)
+        {
+            Byte[] compressedByte;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (DeflateStream ds = new DeflateStream(ms, CompressionMode.Compress))
+                {
+                    ds.Write(buffer, 0, buffer.Length);
+                }
+
+                compressedByte = ms.ToArray();
+            }
+            return compressedByte;
+        }
+        public static Byte[] Decompress(Byte[] buffer)
+        {
+            MemoryStream resultStream = new MemoryStream();
+
+            using (MemoryStream ms = new MemoryStream(buffer))
+            {
+                using (DeflateStream ds = new DeflateStream(ms, CompressionMode.Decompress))
+                {
+                    ds.CopyTo(resultStream);
+                    ds.Close();
+                }
+            }
+            Byte[] decompressedByte = resultStream.ToArray();
+            resultStream.Dispose();
+            return decompressedByte;
+        }
+        static string bytestostring(byte[] bytesss)
+        {
+            using (MemoryStream stream = new MemoryStream(bytesss))
+            {
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
+        private string ImageSourceToString(BitmapSource imageSource)
+        {
+            byte[] bytes = null;
+            var bitmapSource = imageSource as BitmapSource;
+            var encoder = new BmpBitmapEncoder();
+            if (bitmapSource != null)
+            {
+                encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
+                using (var stream = new MemoryStream())
+                {
+                    encoder.Save(stream);
+                    bytes = stream.ToArray();
+                }
+            }
+            return Convert.ToBase64String(bytes);
+        }
+        private BitmapSource StringToImageSource(string str)
+        {
+            byte[] bytes = Convert.FromBase64String(str);
+            var bitImg = new BitmapImage();
+            BitmapSource imageSource = null;
+            using (var stream = new MemoryStream(bytes))
+            {
+                bitImg.BeginInit();
+                bitImg.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                bitImg.CacheOption = BitmapCacheOption.OnLoad;
+                bitImg.StreamSource = stream;
+                bitImg.EndInit();
+                imageSource = bitImg as BitmapSource;
+            }
+            return imageSource;
+        }
+
+
+
+        private unsafe byte[] GetImageView(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight, string sPool, string sGroup, string sMem, int nByte)
+        {
+            object o = new object();
+
+            //Image<Gray, byte> view = new Image<Gray, byte>(CanvasWidth, CanvasHeight);
+            MemoryData memdata = GetMemory(sPool, sGroup, sMem);
+            IntPtr ptrMem = memdata.GetPtr();
+            IntPtr ptrMem2 = memdata.GetPtr(1); // G
+            IntPtr ptrMem3 = memdata.GetPtr(2); // B
+
+            if (ptrMem == IntPtr.Zero)
+                return null;
+            int pix_x = 0;
+            int pix_y = 0;
+            int rectX, rectY, rectWidth, rectHeight, sizeX;
+            byte[] result = new byte[CanvasWidth * CanvasHeight];
+            rectX = View_Rect.X;
+            rectY = View_Rect.Y;
+            rectWidth = View_Rect.Width;
+            rectHeight = View_Rect.Height;
+            sizeX = Convert.ToInt32(memdata.W);
+            if(nByte == 3)
+                result = new byte[CanvasWidth * CanvasHeight * 3];
+            //byte[,,] viewptr = view.Data;
+            //byte* imageptr = (byte*)ptrMem.ToPointer();
+            if (nByte == 1)
+            {
+
+                Parallel.For(0, CanvasHeight, (yy) =>
+                {
+                    lock (o)
+                    {
+                        pix_y = rectY + yy * rectHeight / CanvasHeight;
+
+                        for (int xx = 0; xx < CanvasWidth; xx++)
+                        {
+                            pix_x = rectX + xx * rectWidth / CanvasWidth;
+                            result[yy * CanvasWidth + xx] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
+                        }
+                    }
+                });
+            }
+            else if (nByte == 3)
+            {
+                int nTerm = CanvasWidth * CanvasHeight;
+                Parallel.For(0, CanvasHeight, (yy) =>
+                {
+                    lock (o)
+                    {
+                        pix_y = rectY + yy * rectHeight / CanvasHeight;
+
+                        for (int xx = 0; xx < CanvasWidth; xx++)
+                        {
+                            pix_x = rectX + xx * rectWidth / CanvasWidth;
+                            result[yy * CanvasWidth + xx] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
+                            result[yy * CanvasWidth + xx + nTerm] = ((byte*)ptrMem2)[pix_x + (long)pix_y * sizeX];
+                            result[yy * CanvasWidth + xx + nTerm * 2] = ((byte*)ptrMem3)[pix_x + (long)pix_y * sizeX];
+                        }
+                    }
+                });
+            }
+           return result;
+        }
+
+        public void SendTest()
+        {
+            if (bServer)
+            {
+                m_Server.Send("testserver");
+            }
+            else
+            {
+                m_Client.Send("testclient");
+            }
+        }
+
+        public string GetSerializeString(object obj)
+        {
+            string result;
+            XmlSerializer xmlSerializer;
+            StringWriter textWriter = new StringWriter();
+            xmlSerializer = new XmlSerializer(obj.GetType());
+            System.IO.Stream stream = new System.IO.MemoryStream();
+            xmlSerializer.Serialize(textWriter, obj);
+            result = textWriter.ToString();
+            textWriter.Dispose();
+            return result;
+        }
+
+        public object GetSerializeObject(string str, Type type)
+        {
+            object result;
+            XmlSerializer xmlSerializer;
+            StringReader xmlReader;
+            xmlSerializer = new XmlSerializer(type);
+            xmlReader = new StringReader(str);
+            result = xmlSerializer.Deserialize(xmlReader);
+            xmlReader.Dispose();
+            return result;
+        }
+
+        #endregion
 
         #region MemCheck
         [DllImport("kernel32", EntryPoint = "GetLastError")]

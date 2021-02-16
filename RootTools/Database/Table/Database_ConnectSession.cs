@@ -10,11 +10,14 @@ namespace RootTools.Database
 {
     class Database_ConnectSession
     {
-        string m_sServerName = "localhost";
-        string m_SDbName = "wind2"; // DB명
-        string m_sUid = "root";
-        string m_sPw = "root";
-
+        //string m_sServerName = "localhost";
+        //string m_SDbName = "wind2"; // DB명
+        //string m_sUid = "root";
+        //string m_sPw = "root";
+        public bool IsConnected
+        {
+            get => this.m_bConnected;
+        }
 
         bool m_bConnected = false;
         int m_ThreadID;

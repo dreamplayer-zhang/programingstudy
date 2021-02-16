@@ -124,8 +124,29 @@ namespace Root_WIND2
 			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
 			parameter = recipe.GetItem<EBRParameter>();
 
-			WorkEventManager.InspectionDone += InspectionDone_Callback;
-			WorkEventManager.ProcessMeasurementDone += ProcessMeasurementDone_Callback;
+			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
+			WorkEventManager.ProcessMeasurementDone += WorkEventManager_ProcessMeasurementDone;
+		}
+
+		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
+		{
+			Workplace workplace = sender as Workplace;
+
+			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+			{
+				UpdateProgress();
+			}));
+		}
+
+		private void WorkEventManager_ProcessMeasurementDone(object sender, ProcessMeasurementDoneEventArgs e)
+		{
+			Workplace workplace = sender as Workplace;
+
+			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+			{
+				UpdateDataGrid();
+				DrawGraph();
+			}));
 		}
 
 		public void Scan()
@@ -155,27 +176,6 @@ namespace Root_WIND2
 				return;
 
 			Parameter = recipe.GetItem<EBRParameter>();
-		}
-
-		private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
-		{
-			Workplace workplace = obj as Workplace;
-
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				UpdateProgress();
-			}));
-		}
-
-		private void ProcessMeasurementDone_Callback(object obj, ProcessMeasurementDoneEventArgs e)
-		{
-			Workplace workplace = obj as Workplace;
-
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				UpdateDataGrid();
-				DrawGraph();
-			}));
 		}
 
 		private void UpdateProgress()

@@ -25,5 +25,10 @@ namespace Root_WIND2
         {
             InitializeComponent();
         }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.DragMove();
+        }
     }
 }

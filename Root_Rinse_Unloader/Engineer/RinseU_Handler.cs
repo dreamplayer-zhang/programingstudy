@@ -116,7 +116,7 @@ namespace Root_Rinse_Unloader.Engineer
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
-            if (gaf != null) gaf.ClearALID();
+            gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
         }
         #endregion
@@ -192,7 +192,7 @@ namespace Root_Rinse_Unloader.Engineer
                         //forget
                         break;
                 }
-                p_bRun = (EQ.p_eState == EQ.eState.Run) && (m_loader.m_bPickersetMode == false);
+                p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
             }
         }
         #endregion
@@ -201,7 +201,7 @@ namespace Root_Rinse_Unloader.Engineer
         public string StartPickerSet()
         {
             if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist";
-            m_loader.m_bPickersetMode = true;
+            EQ.p_bPickerSet = true;
             p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
             p_moduleList.StartModuleRuns();
             return "OK";

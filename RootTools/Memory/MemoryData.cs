@@ -2,6 +2,7 @@
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -282,12 +283,63 @@ namespace RootTools.Memory
             {
                 byte[] pBuf = br.ReadBytes(p_nByte * szMemory.X);
                 Marshal.Copy(pBuf, 0, GetPtr(nIndex, 0, y), p_nByte * szMemory.X);
+                UpdateOpenProgress?.Invoke(Convert.ToInt32(((double)y / p_sz.Y) * 100));
             }
             br.Close();
             fs.Close();
             return "OK"; 
         }
         #endregion
+
+        private void Worker_MemoryCopy_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if(UpdateOpenProgress != null)
+            UpdateOpenProgress(100);
+        }
+
+        private void Worker_MemoryCopy_DoWork(object sender, DoWorkEventArgs e)
+        {
+            List<object> arguments = (List<object>)(e.Argument);
+
+            string sFile = arguments[0].ToString();
+            int nMemIndex = Convert.ToInt32(arguments[1]);
+            switch (GetUpperExt(sFile))
+            {
+                case "BAYER":
+                    FileOpenBayer(sFile, nMemIndex);
+                    break;
+                case "BMP":
+                    FileOpenBMP(sFile, nMemIndex);
+                    break;
+                case "JPG":
+                    FileOpenJPG(sFile, nMemIndex);
+                    break;
+            }
+        }
+        string GetUpperExt(string sFile)
+        {
+            string[] sFiles = sFile.Split('.');
+            return sFiles[sFiles.Length - 1].ToUpper();
+        }
+
+
+        public void FileOpen(string sFile, int nMemoryIndex)
+        {
+
+            FileInfo fileInfo = new FileInfo(sFile);
+            if (fileInfo.Exists)
+            {
+                List<object> arguments = new List<object>();
+                arguments.Add(sFile);
+                arguments.Add(nMemoryIndex);
+                Worker_MemoryCopy.RunWorkerAsync(arguments);
+            }
+            else
+            {
+                ImageData data = new ImageData(123, 123);
+                System.Windows.MessageBox.Show("OpenFile() - 파일이 존재 하지 않거나 열기에 실패하였습니다. - " + sFile);
+            }
+        }
 
         #region BMP File
         public string FileOpenBMP(string sFile, int nIndex)
@@ -324,7 +376,8 @@ namespace RootTools.Memory
             for (int y = 0; y < szBMP.Y; y++)
             {
                 byte[] pBuf = br.ReadBytes(p_nByte * szBMP.X);
-                Marshal.Copy(pBuf, 0, GetPtr(nIndex, 0, szBMP.Y - y - 1), p_nByte * szBMP.X); 
+                Marshal.Copy(pBuf, 0, GetPtr(nIndex, 0, szBMP.Y - y - 1), p_nByte * szBMP.X);
+                UpdateOpenProgress?.Invoke(Convert.ToInt32(((double)y / p_sz.Y) * 100));
             }
             br.Close();
             fs.Close();
@@ -397,7 +450,8 @@ namespace RootTools.Memory
             int wMemory = p_nByte * p_sz.X; 
             for (int y = 0; y < p_sz.Y; y++)
             {
-                Marshal.Copy(aBuf, y * wJpg, GetPtr(nIndex, 0, p_sz.Y - y - 1), wMemory); 
+                Marshal.Copy(aBuf, y * wJpg, GetPtr(nIndex, 0, p_sz.Y - y - 1), wMemory);
+                UpdateOpenProgress?.Invoke(Convert.ToInt32(((double)y / p_sz.Y) * 100));
             }
             bitmap.UnlockBits(bitmapData);
             return "OK";
@@ -440,6 +494,11 @@ namespace RootTools.Memory
         public MemoryGroup m_group;
         public List<MemoryDraw> m_aDraw = new List<MemoryDraw>(); 
         Log m_log;
+
+        public delegate void DelegateOneInt(int nInt);
+        public event DelegateOneInt UpdateOpenProgress;
+        BackgroundWorker Worker_MemoryCopy = new BackgroundWorker();
+
         public MemoryData(MemoryGroup group, string id, int nCount, int nByte, int xSize, int ySize, ref int gbOffset)
         {
             m_group = group;
@@ -449,6 +508,9 @@ namespace RootTools.Memory
             p_nByte = nByte;
             p_sz = new CPoint(xSize, ySize);
             InitAddress(ref gbOffset);
+            Worker_MemoryCopy.DoWork += Worker_MemoryCopy_DoWork;
+            Worker_MemoryCopy.RunWorkerCompleted += Worker_MemoryCopy_RunWorkerCompleted;
+            Worker_MemoryCopy.WorkerSupportsCancellation = true;
         }
     }
 }

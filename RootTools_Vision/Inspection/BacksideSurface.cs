@@ -43,27 +43,21 @@ namespace RootTools_Vision
         {
             if (this.currentWorkplace.Index == 0)
                 return;
-
-
+            if(this.currentWorkplace.MapIndexX == -1 && this.currentWorkplace.MapIndexY == -1)
+			{
+                return;
+			}
 
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterBackside.IndexChannel);
             byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameterBackside.IndexChannel);
-
-            bool isBackside = false;
-
-            // BACKSIDE
-            //if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == false)
-            //{
-            //    return;
-            //}
 
             // Inspection Param
             bool isDarkInsp = !parameterBackside.IsBright; // Option
             int nGrayLevel = parameterBackside.Intensity; // Option
             int nDefectSz = parameterBackside.Size; // Option     
 
-            int chipH = this.currentWorkplace.Width; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
-            int chipW = this.currentWorkplace.Height;
+            int chipW = this.currentWorkplace.Width; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
+            int chipH = this.currentWorkplace.Height;
 
             byte[] arrBinImg = new byte[chipW * chipH]; // Threashold 결과 array
             
@@ -75,7 +69,7 @@ namespace RootTools_Vision
             switch (parameterBackside.DiffFilter)
             {
                 case DiffFilterMethod.Average:
-                    CLR_IP.Cpp_AverageBlur(arrBinImg, arrBinImg, chipW, chipH);
+                    CLR_IP.Cpp_AverageBlur(arrBinImg, arrBinImg, chipW, chipH);//문제 있음. ipp exception발생중
                     break;
                 case DiffFilterMethod.Gaussian:
                     CLR_IP.Cpp_GaussianBlur(arrBinImg, arrBinImg, chipW, chipH, 2);

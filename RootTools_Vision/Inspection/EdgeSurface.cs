@@ -37,11 +37,11 @@ namespace RootTools_Vision
 
 		protected override bool Preparation()
 		{
-			if(this.parameterEdge == null || this.recipeEdge == null)
-            {
+			if (this.parameterEdge == null || this.recipeEdge == null)
+			{
 				this.parameterEdge = this.parameter as EdgeSurfaceParameter;
 				this.recipeEdge = recipe.GetItem<EdgeSurfaceRecipe>();
-            }
+			}
 			return true;
 		}
 
@@ -53,57 +53,48 @@ namespace RootTools_Vision
 
 		public void DoInspection()
 		{
-			if (this.currentWorkplace.Index == 0)
+			if (this.currentWorkplace.MapIndexY == -1)
 				return;
-
 
 			//byte[] arrSrc = this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY);
 			//Emgu.CV.Mat mat = new Emgu.CV.Mat((int)(parameterEdge.EdgeParamBaseTop.ROIHeight), (int)(parameterEdge.EdgeParamBaseTop.ROIWidth), Emgu.CV.CvEnum.DepthType.Cv8U, 1);
 			//Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
 			//mat.Save(@"D:/" + this.currentWorkplace.Index.ToString() + ".bmp");
 
-			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), parameterEdge);
-			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), parameterEdge);
-			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), parameterEdge);
+			EdgeSurfaceParameterBase param;
+			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
+				param = parameterEdge.EdgeParamBaseTop;
+			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Side)
+				param = parameterEdge.EdgeParamBaseSide;
+			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
+				param = parameterEdge.EdgeParamBaseBtm;
+			else
+				return;
+
+			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), param);
+			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), param);
+			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), param);
 
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 		}
 
-		private void DoColorInspection(byte[] arrSrc, EdgeSurfaceParameter param)
+		private void DoColorInspection(byte[] arrSrc, EdgeSurfaceParameterBase param)
 		{
-			int roiHeight;
-			int roiWidth;
-			int threshold;
-			int defectSize;
+			int roiWidth = param.ROIWidth;
+			int roiHeight = param.ROIHeight;
+			int threshold = param.Threshold;
+			int defectSize = param.DefectSizeMin;
+			int searchLevel = param.EdgeSearchLevel;
+			double resolution = param.CamResolution;
 
-			// parameter
-			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
-			{
-				roiHeight = parameterEdge.EdgeParamBaseTop.ROIHeight;
-				roiWidth = parameterEdge.EdgeParamBaseTop.ROIWidth;
-				threshold = parameterEdge.EdgeParamBaseTop.Threshold;
-				defectSize = parameterEdge.EdgeParamBaseTop.DefectSizeMin;
-			}
-			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Side)
-			{
-				roiHeight = parameterEdge.EdgeParamBaseSide.ROIHeight;
-				roiWidth = parameterEdge.EdgeParamBaseSide.ROIWidth;
-				threshold = parameterEdge.EdgeParamBaseSide.Threshold;
-				defectSize = parameterEdge.EdgeParamBaseSide.DefectSizeMin;
-			}
-			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
-			{
-				roiHeight = parameterEdge.EdgeParamBaseBtm.ROIHeight;
-				roiWidth = parameterEdge.EdgeParamBaseBtm.ROIWidth;
-				threshold = parameterEdge.EdgeParamBaseBtm.Threshold;
-				defectSize = parameterEdge.EdgeParamBaseBtm.DefectSizeMin;
-			}
-			else
-			{
-				return;
-			}
+			if (this.currentWorkplace.Height < roiHeight)
+				roiHeight = this.currentWorkplace.Height;
 
 			int roiSize = roiWidth * roiHeight;
+
+			// Search Wafer Edge
+			int lastEdge = FindEdge(arrSrc, roiWidth, roiHeight, searchLevel);
+			int startPtX = lastEdge;    // Edge부터 검사 시작
 
 			// profile 생성
 			List<int> temp = new List<int>();
@@ -123,13 +114,13 @@ namespace RootTools_Vision
 			byte[] diff = new byte[roiSize];
 			for (int j = 0; j < roiHeight; j++)
 			{
-				for (int i = 0; i < roiWidth; i++)
+				for (int i = startPtX; i < roiWidth; i++)
 				{
 					diff[(j * roiWidth) + i] = (byte)(Math.Abs(arrSrc[(j * roiWidth) + i] - profile[i]));
 				}
 			}
 
-			// Threshold
+			// Threshold and Labeling
 			byte[] thresh = new byte[roiSize];
 			CLR_IP.Cpp_Threshold(diff, thresh, roiWidth, roiHeight, false, threshold);
 			var label = CLR_IP.Cpp_Labeling(diff, thresh, roiWidth, roiHeight, true);
@@ -146,13 +137,68 @@ namespace RootTools_Vision
 						label[i].value,
 						this.currentWorkplace.PositionX + label[i].boundLeft,
 						this.currentWorkplace.PositionY + label[i].boundTop,
-						Math.Abs(label[i].boundRight - label[i].boundLeft),
-						Math.Abs(label[i].boundBottom - label[i].boundTop),
+						(float)(Math.Abs(label[i].boundRight - label[i].boundLeft) * resolution),
+						(float)(Math.Abs(label[i].boundBottom - label[i].boundTop) * resolution),
 						this.currentWorkplace.MapIndexX,
 						this.currentWorkplace.MapIndexY
 						);
 				}
 			}
+		}
+
+		public float CalcDegree(int defectLeft)
+		{
+			float degree = 0;
+			//// (끝지점 - 시작지점) / defectLeft
+			//int bufferY = (int)(360000 / this.parameterEdge.camTriggerRatio) + this.parameterEdge.camHeight;
+
+			//degree = () / defectLeft;
+
+			return degree;
+		}
+
+		public int FindEdge(byte[] arrSrc, int width, int height, int searchLevel = 70)
+		{
+			int min = 256;
+			int max = 0;
+			int prox = min + (int)((max - min) * searchLevel * 0.01);
+
+			if (searchLevel >= 100)
+				prox = max;
+			else if (searchLevel <= 0)
+				prox = min;
+
+			int startPtX = 0;
+			int startPtY = 0;
+			int avg, avgNext;
+			int edge = width;
+			
+			avgNext = MeanForYCoordinates(arrSrc, startPtY, startPtX, width, height);
+			for (int x = startPtX + 1; x < width; x++)
+			{
+				avg = avgNext;
+				avgNext = MeanForYCoordinates(arrSrc, startPtY, x, width, height);
+
+				if ((avg >= prox && prox > avgNext) || (avg <= prox && prox < avgNext))
+				{
+					edge = x;
+					x = width + 1;
+				}
+			}
+			return edge;
+		}
+
+		public int MeanForYCoordinates(byte[] arrSrc, int startPtY, int findPtX, int width, int height)
+		{
+			int avg = 0;
+
+			for (int y = startPtY; y < width*height; y += width)
+				avg += arrSrc[y + findPtX];
+			
+			if (avg != 0)
+				avg /= (height - startPtY + 1);
+
+			return avg;
 		}
 	}
 }

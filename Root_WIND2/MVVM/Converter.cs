@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -123,6 +124,51 @@ namespace Root_WIND2
                 parent = VisualTreeHelper.GetParent(parent);
             }
             return parent as TreeViewItem;
+        }
+    }
+
+    public class CollectionCountToVisibilityConverter : IValueConverter
+    {
+
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return ((int)value == 0) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            Visibility result = (Visibility)Enum.Parse(typeof(Visibility), value.ToString(), true);
+
+            return result == Visibility.Visible ? true : false;
+        }
+    }
+
+    public class EnumToRadioButtonConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string stringParamater = parameter as string;
+
+            if (stringParamater == null) 
+                return DependencyProperty.UnsetValue;
+
+            if(Enum.IsDefined(value.GetType(), value)==false)
+            {
+                return DependencyProperty.UnsetValue;
+            }
+
+            object parameterValue = Enum.Parse(value.GetType(), stringParamater);
+
+            return parameterValue.Equals(value);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string parameterString = parameter as string;
+            if (parameterString == null)
+                return DependencyProperty.UnsetValue;
+
+            return Enum.Parse(targetType, parameterString);
         }
     }
 }

@@ -11,6 +11,7 @@ using System.ComponentModel;
 using Root_AOP01_Inspection.UI._3._RUN;
 using System.Threading;
 using RootTools.OHTNew;
+using Root_AOP01_Inspection.Module;
 
 namespace Root_AOP01_Inspection.UI_UserControl
 {
@@ -27,13 +28,13 @@ namespace Root_AOP01_Inspection.UI_UserControl
 
         AOP01_Engineer m_engineer;
         AOP01_Handler m_handler;
-        Loadport_Cymechs m_loadport;
+        Loadport_AOP01 m_loadport;
         InfoCarrier m_infoCarrier;
         RFID_Brooks m_rfid;
 
         public void Init(ILoadport loadport, AOP01_Engineer engineer, IRFID rfid)
         {
-            m_loadport = (Loadport_Cymechs)loadport;
+            m_loadport = (Loadport_AOP01)loadport;
             m_infoCarrier = m_loadport.p_infoCarrier;
             
             m_engineer = engineer;
@@ -97,7 +98,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
             bool bReadyToLoad = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
             bReadyToLoad = true;
             bool bReadyState = (m_loadport.m_qModuleRun.Count == 0);
-            bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
+            bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready || EQ.p_eState == EQ.eState.Idle);
             if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
             bool bPlaced = m_loadport.CheckPlaced();
 
@@ -116,6 +117,12 @@ namespace Root_AOP01_Inspection.UI_UserControl
             m_rfid.StartRun(moduleRun);
             while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
             m_loadport.RunDocking();
+            if (m_loadport.p_infoCarrier.m_aInfoWafer[0] == null)
+            {
+                m_loadport.m_alidEmpty.Run(true, "Pod Empty");
+                m_loadport.RunUndocking();
+                return;
+            }
             if (m_manualjob.ShowPopup(m_handler) == false) return;
             m_bgwLoad.RunWorkerAsync();
         }

@@ -1,4 +1,5 @@
-﻿using RootTools.Database;
+﻿using Root_WIND2.Module;
+using RootTools.Database;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
@@ -44,46 +45,24 @@ namespace Root_WIND2
 
 		protected override WorkplaceBundle CreateWorkplaceBundle()
 		{
-			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
-			int notchY = recipe.GetItem<EBRParameter>().NotchY; // notch memory Y 좌표
-			int stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
-			int workplaceCnt = 360 / stepDegree;
-			int imageHeight = 270000;
-			int imageHeightPerDegree = imageHeight / 360; // 1도 당 Image Height
+			int cameraHeight = recipe.GetItem<EBRRecipe>().CameraHeight;
+			int bufferHeight = (int)(360000 / recipe.GetItem<EBRRecipe>().TriggerRatio);
+			int bufferHeightPerDegree = bufferHeight / 360; // 1도 당 Image Height
 
 			int width = recipe.GetItem<EBRParameter>().ROIWidth;
 			int height = recipe.GetItem<EBRParameter>().ROIHeight;
+			int stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
+			int workplaceCnt = 360 / stepDegree;
 
-			int index = 0;
-			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, index++));
+			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
+			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, workplaceBundle.Count));
 			
 			for (int i = 0; i < workplaceCnt; i++)
 			{
-				int posY = (imageHeightPerDegree * i) - (height / 2);
-				if (posY <= 0)
-					posY = 0;
-				Workplace workplace = new Workplace(0, 0, 0, posY, width, height, index++);
+				int posY = (bufferHeightPerDegree * i) - (height / 2);
+				Workplace workplace = new Workplace(0, 0, 0, posY + cameraHeight, width, height, workplaceBundle.Count);
 				workplaceBundle.Add(workplace);
 			}
-
-			// TO-DO test
-			/*
-			for (int i = 0; i < workplaceCnt; i++)
-			{
-				int posY = (imageHeightPerDegree * i);
-				if (posY - (height / 2) <= 0)
-				{
-					posY = 0;
-				}
-				if (posY + (height / 2) > imageHeight)
-				{
-					posY = 0;
-				}
-
-				Workplace workplace = new Workplace(0, 0, 0, posY, width, height, index++);
-				workplaceBundle.Add(workplace);
-			}
-			*/
 
 			workplaceBundle.SetSharedBuffer(this.sharedBufferInfo);
 			return workplaceBundle;

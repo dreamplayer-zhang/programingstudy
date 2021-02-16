@@ -15,44 +15,46 @@ using System.Windows.Shapes;
 
 namespace Root_AOP01_Inspection
 {
-    /// <summary>
-    /// SelectMode.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class SelectMode : UserControl
-    {
-        MainWindow m_MainWindow;
-        public SelectMode()
-        {
-            InitializeComponent();
-        }
-        public void Init(MainWindow main)
-        {
-            m_MainWindow = main;
-        }
-        private void GroupBox_MouseEnter(object sender, MouseEventArgs e)
-        {
-            ((GroupBox)sender).Background = Brushes.AliceBlue;
-        }
-        private void GroupBox_MouseLeave(object sender, MouseEventArgs e)
-        {
-            ((GroupBox)sender).Background = Brushes.Gainsboro;
-        }
-        private void Setup_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            m_MainWindow.MainPanel.Children.Clear();
-            m_MainWindow.MainPanel.Children.Add(m_MainWindow.Setup);
-        }
+	/// <summary>
+	/// SelectMode.xaml에 대한 상호 작용 논리
+	/// </summary>
+	public partial class SelectMode : UserControl
+	{
+		public SelectMode()
+		{
+			InitializeComponent();
+		}
+		public void Init()
+		{
+		}
+		private void GroupBox_MouseEnter(object sender, MouseEventArgs e)
+		{
+			((GroupBox)sender).Background = Brushes.AliceBlue;
+		}
+		private void GroupBox_MouseLeave(object sender, MouseEventArgs e)
+		{
+			((GroupBox)sender).Background = Brushes.Gainsboro;
+		}
+		private void Setup_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			UIManager.Instance.ChangUISetup();
+		}
 
-        private void Review_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            m_MainWindow.MainPanel.Children.Clear();
-            m_MainWindow.MainPanel.Children.Add(m_MainWindow.Review);
-        }
+		private void Review_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			UIManager.Instance.ChangUIReview();
+		}
 
-        private void Run_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            m_MainWindow.MainPanel.Children.Clear();
-            m_MainWindow.MainPanel.Children.Add(m_MainWindow.Run);
-        }
-    }
+		private void Run_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			UIManager.Instance.ChangUIRun();
+		}
+
+		private void button_Click(object sender, RoutedEventArgs e)
+		{
+			//Tune tune = new Tune();
+			//tune.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+			//tune.ShowDialog();
+		}
+	}
 }

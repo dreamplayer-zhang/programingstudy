@@ -56,7 +56,7 @@ namespace Root_CAMELLIA.ManualJob
         public bool ShowPopup()
         {
             p_ManualJobBlink = true;
-            if (ManualJobSchedule_UI.m_bShow) return false;
+            //if (ManualJobSchedule_UI.m_bShow) return false;
             ManualJobSchedule_UI jobschedulePopup = new ManualJobSchedule_UI(m_infoCarrier);
             jobschedulePopup.Init(this, m_infoCarrier);
             //m_handler.m_nRnR = p_bRnR ? p_nRnR : 1;   //working

@@ -24,6 +24,17 @@ namespace Root_WIND2
             }
         }
 
+        bool _bUseXGem = false;
+        public bool p_bUseXGem
+        {
+            get { return _bUseXGem; }
+            set
+            {
+                if (_bUseXGem == value) return;
+                _bUseXGem = value;
+            }
+        }
+
         public IGem ClassGem()
         {
             return m_xGem;

@@ -219,6 +219,7 @@ namespace RootTools
         {
             MemoryRect = new CRect();
             CanvasRect = new Rectangle();
+            MemPointBuffer = new CPoint();
             Data = new List<PointLine>();
         }
         public TRect(Brush brush, double thickness, double opacity)

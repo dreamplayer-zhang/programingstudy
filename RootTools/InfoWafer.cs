@@ -240,7 +240,7 @@ namespace RootTools
         {
             string sRecipe = m_sManualRecipe;
             bool bOffline = (m_gem == null) ? true : m_gem.p_bOffline; 
-            m_sManualRecipe = tree.SetFile(m_sManualRecipe, m_sManualRecipe, EQ.m_sModel, "Recipe", "Recipe Name", bOffline);
+            m_sManualRecipe = tree.SetFile(m_sManualRecipe, m_sManualRecipe, EQ.m_sModel, "Recipe", "Recipe Name", true, !bOffline);
             if (sRecipe != m_sManualRecipe) RecipeOpen(m_sManualRecipe);
             if (m_moduleRunList != null) m_moduleRunList.RunTree(tree);
         }
@@ -268,6 +268,13 @@ namespace RootTools
             m_qCalcProcess.Clear(); 
             ModuleRunBase[] aProcess = m_qProcess.ToArray();
             foreach (ModuleRunBase run in aProcess) m_qCalcProcess.Enqueue(run); 
+        }
+
+        public override void ClearInfo()
+        {
+            base.ClearInfo();
+            m_moduleRunList.Clear();
+            m_qCalcProcess.Clear(); 
         }
         #endregion
 

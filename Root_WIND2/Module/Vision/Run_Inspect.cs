@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Root_WIND2.Module
 {
@@ -22,7 +23,7 @@ namespace Root_WIND2.Module
         double m_dTDIToVRSOffsetZ = 0;
 
         // Grab 관련 파라매터 (이거 나중에 구조 변경 필요할듯)
-        bool m_bInvDir = false;
+        //bool m_bInvDir = false;
         public GrabMode m_grabMode = null;
         string m_sGrabMode = "";
 
@@ -89,10 +90,15 @@ namespace Root_WIND2.Module
                 inspectionFront.Stop();
             }
 
+            //ImageData frontImage = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage");
+            //frontImage.ClearImage();
+
             try
             {
                 m_module.p_bStageVac = true;
                 m_grabMode.SetLight(true);
+
+
 
                 AxisXY axisXY = m_module.AxisXY;
                 Axis axisZ = m_module.AxisZ;
@@ -101,8 +107,15 @@ namespace Root_WIND2.Module
                 int nScanLine = 0;
                 int nMMPerUM = 1000;
 
+                // Calc Whole Wafer Scan Line Num
+                int nWaferSizeX_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dResX_um);
+                int nWholeWaferScanLineNumber  = (int)Math.Ceiling((double)nWaferSizeX_px / m_grabMode.m_GD.m_nFovSize);
+                int nScanStartLine = 0;
+
+                //
+
                 double dXScale = m_grabMode.m_dResX_um * 10;
-                cpMemoryOffset.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize;
+                cpMemoryOffset.X += (nScanLine + nScanStartLine) * m_grabMode.m_GD.m_nFovSize;
                 m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                 int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
@@ -111,7 +124,9 @@ namespace Root_WIND2.Module
                 int startOffsetX = cpMemoryOffset.X;
                 int startOffsetY = 0;
 
-                while (m_grabMode.m_ScanLineNum > nScanLine)
+
+
+                while (nWholeWaferScanLineNumber > nScanLine)
                 {
                     if (EQ.IsStop())
                         return "OK";
@@ -156,7 +171,7 @@ namespace Root_WIND2.Module
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
                     }
-                    else
+/*                    else
                     {
                         if (m_module.Run(axisXY.p_axisY.WaitReady()))
                             return p_sInfo;
@@ -164,7 +179,7 @@ namespace Root_WIND2.Module
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-                    }
+                    } */
                     if (m_module.Run(axisZ.WaitReady()))
                         return p_sInfo;
                     double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - nTotalTriggerCount / 2;
@@ -209,13 +224,23 @@ namespace Root_WIND2.Module
                         System.Threading.Thread.Sleep(10);
                         m_log.Info("Wait Camera GrabProcess");
                     }
-                    WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
 
+                    WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
 
                     nScanLine++;
                     cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
                 }
                 m_grabMode.m_camera.StopGrab();
+
+
+                while(inspectionFront.CheckAllWorkDone() == false)
+                {
+                    if(EQ.IsStop())
+                        return "OK";
+
+                    Task.Delay(1000);
+                }
+
                 return "OK";
             }
             finally

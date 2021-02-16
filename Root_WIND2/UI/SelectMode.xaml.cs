@@ -20,7 +20,7 @@ namespace Root_WIND2
     /// </summary>
     public partial class SelectMode : UserControl
     {
-        MainWindow m_Mainwindow;
+        //MainWindow m_Mainwindow;
         public SelectMode()
         {
             InitializeComponent();
@@ -38,7 +38,8 @@ namespace Root_WIND2
         }
         private void Setup_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            UIManager.Instance.ChangUISetup();
+            UIManager.Instance.ChangUISetupUser();
+
         }
 
         private void Review_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -49,6 +50,11 @@ namespace Root_WIND2
         private void Run_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             UIManager.Instance.ChangUIRun();
+        }
+
+        private void ButtonEngineer_Clicked(object sender, RoutedEventArgs e)
+        {
+            UIManager.Instance.ChangUISetup();
         }
 
         private void button_Click(object sender, RoutedEventArgs e)

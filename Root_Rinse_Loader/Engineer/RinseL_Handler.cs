@@ -5,7 +5,6 @@ using RootTools.Gem;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -41,10 +40,10 @@ namespace Root_Rinse_Loader.Engineer
             p_moduleList = new ModuleList(m_engineer);
             m_rinse = new RinseL("RinseL", m_engineer);
             InitModule(m_rinse);
-            m_storage = new Storage("Storage", m_engineer, m_rinse);
-            InitModule(m_storage);
             m_rail = new Rail("Rail", m_engineer, m_rinse);
             InitModule(m_rail);
+            m_storage = new Storage("Storage", m_engineer, m_rinse, m_rail);
+            InitModule(m_storage);
             m_roller = new Roller("Roller", m_engineer, m_rinse);
             InitModule(m_roller);
             m_loader = new Loader("Loader", m_engineer, m_rinse, m_storage, m_roller);
@@ -116,7 +115,7 @@ namespace Root_Rinse_Loader.Engineer
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
-            if (gaf != null) gaf.ClearALID();
+            gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
         }
         #endregion
@@ -190,7 +189,7 @@ namespace Root_Rinse_Loader.Engineer
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run: break;
                 }
-                p_bRun = (EQ.p_eState == EQ.eState.Run) && (m_loader.m_bPickersetMode == false);
+                p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
             }
         }
         #endregion
@@ -198,11 +197,20 @@ namespace Root_Rinse_Loader.Engineer
         #region PickerSet
         public string StartPickerSet()
         {
-            if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist";
-            m_loader.m_bPickersetMode = true; 
-            p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
-            p_moduleList.StartModuleRuns(); 
-            return "OK";
+            if (EQ.p_bPickerSet)
+            {
+                EQ.p_eState = EQ.eState.Ready;
+                p_moduleList.m_qModuleRun.Clear(); 
+                return "OK"; 
+            }
+            else
+            {
+                if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist";
+                EQ.p_bPickerSet = true;
+                p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
+                p_moduleList.StartModuleRuns();
+                return "OK";
+            }
         }
         #endregion
 

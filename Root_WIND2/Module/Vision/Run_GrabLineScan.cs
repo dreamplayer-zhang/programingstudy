@@ -16,7 +16,7 @@ namespace Root_WIND2.Module
     {
         Vision m_module;
         
-        bool m_bInvDir = false;
+        //bool m_bInvDir = false;
         public GrabMode m_grabMode = null;
         double m_dTDIToVRSOffsetZ = 0;
         string m_sGrabMode = "";
@@ -57,6 +57,7 @@ namespace Root_WIND2.Module
 
             try
             {
+                m_grabMode.SetLens();
                 m_grabMode.SetLight(true);
 
                 AxisXY axisXY = m_module.AxisXY;
@@ -75,12 +76,17 @@ namespace Root_WIND2.Module
 
                 int startOffsetX = cpMemoryOffset.X;
                 int startOffsetY = 0;
-
+                const int nTimeOut_10s = 10000; //ms
+                const int nTimeOut_50s = 50000; //ms
+                const int nTimeOutInterval = 10; // ms
+                int nRescanCount = 0;
+                const int nRescanTotal = 3;
                 while (m_grabMode.m_ScanLineNum > nScanLine)
                 {
                     if (EQ.IsStop())
                         return "OK";
 
+                    bool bNormal = true;
                     // 위에서 아래로 찍는것을 정방향으로 함, 즉 Y축 값이 큰쪽에서 작은쪽으로 찍는것이 정방향
                     // Grab하기 위해 이동할 Y축의 시작 끝 점
                     //ybkwon0113
@@ -89,16 +95,14 @@ namespace Root_WIND2.Module
                     double dStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
                     double dEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
-                    m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
-                    //  if (m_grabMode.m_bUseBiDirectionScan && Math.Abs(axisXY.p_axisY.p_posActual - dStartPosY) > Math.Abs(axisXY.p_axisY.p_posActual - dEndPosY))
+                    m_grabMode.m_eGrabDirection = eGrabDirection.Forward;                    
                     if (m_grabMode.m_bUseBiDirectionScan && nScanLine % 2 == 1)
                     {
                         double dTemp = dStartPosY;  // dStartPosY <--> dEndPosY 바꿈.
                         dStartPosY = dEndPosY;
                         dEndPosY = dTemp;
                         m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
-                    }
-                    System.Diagnostics.Debug.Print("s:" + dStartPosY.ToString() + "e: " + dEndPosY.ToString());
+                    }                    
                     double dfovum = m_grabMode.m_GD.m_nFovSize * dXScale;
                     double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
                     double dNextPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + 1 + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
@@ -108,30 +112,22 @@ namespace Root_WIND2.Module
                     {
                         dPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
                     }
-                    if (m_module.Run(axisZ.StartMove(m_grabMode.m_nFocusPosZ)))
+                    //포커스 높이로 이동
+                    if (m_module.Run(axisZ.StartMove(dPosZ)))
                         return p_sInfo;
-  
-                    //if (nScanLine == 0)
-                    if(true)
-                    {
-                        if (m_module.Run(axisXY.WaitReady()))
+
+                    // XY 찍는 위치로 이동
+                    if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
                     if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
-                        return p_sInfo;
-                    }
-                    else
-                    {
-                        if (m_module.Run(axisXY.p_axisY.WaitReady()))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.p_axisY.StartMove(dStartPosY)))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady()))
-                            return p_sInfo;
-                    }
+                        return p_sInfo;                    
+        
                    if (m_module.Run(axisZ.WaitReady()))
                         return p_sInfo;
+
+
                     double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - nTotalTriggerCount / 2;
                     double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + nTotalTriggerCount / 2 ;
                     axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
@@ -145,42 +141,88 @@ namespace Root_WIND2.Module
                     GrabData gd = m_grabMode.m_GD;
                     gd.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.BackWard;
                     gd.nScanOffsetY = (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_nYOffset;
-
-                    m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px , m_grabMode.m_GD);
-                    //m_grabMode.StartGrabColor(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
-
+                    //카메라 그랩 시작
+                    m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_GD);
+                    //Y축 트리거 발생
                     if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                         return p_sInfo;
+
+                    //스캔 축 타임 아웃
+                    int nScanAxisTimeOut = nTimeOut_50s / nTimeOutInterval;
+                    // 스캔 축이 트리거 설정 레이지에 도달했으면
                     if (m_grabMode.m_eGrabDirection == eGrabDirection.Forward)
                     {
                         while (axisXY.p_axisY.p_posActual < dTriggerEndPosY)
                         {
-                            System.Threading.Thread.Sleep(10);
+                            System.Threading.Thread.Sleep(nTimeOutInterval);
+                            if (--nScanAxisTimeOut <= 0)
+                            {
+                                m_log.Info("TimeOut - Scan Axis Error Forward");
+                                bNormal = false;
+                                break;
+                            }
                         }
                     }
                     else
                     {
                         while (axisXY.p_axisY.p_posActual > dTriggerStartPosY)
                         {
-                            System.Threading.Thread.Sleep(10);
+                            System.Threading.Thread.Sleep(nTimeOutInterval);
+                            if (--nScanAxisTimeOut <= 0)
+                            {
+                                m_log.Info("TimeOut - Scan Axis Error Reverse");
+                                bNormal = false;
+                                break;
+                            }
                         }
                     }
+                    // X축을 미리 움직임
                     axisXY.p_axisX.StartMove(dNextPosX);
-                                       
                     axisXY.p_axisY.RunTrigger(false);
 
+                    // 카메라 그랩 완료 대기
+                    int nCameraTimeOut = nTimeOut_10s / nTimeOutInterval;                    
                     while (m_grabMode.m_camera.p_nGrabProgress != 100)
                     {
-                        System.Threading.Thread.Sleep(10);
+                        System.Threading.Thread.Sleep(nTimeOutInterval);
                         m_log.Info("Wait Camera GrabProcess");
+                        if(--nCameraTimeOut <= 0)
+                        {
+                            m_log.Info("TimeOut Camera GrabProcess");
+                            bNormal = false;
+                            break;
+                        }
                     }
-                    WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
+                    if (bNormal == true)
+                    {
+                        WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
 
-                   
-                    nScanLine++;
-                    cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
+                        nScanLine++;
+                        cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
+                    }
+                    else //비정상 스캔일때.
+                    {
+                        m_grabMode.m_camera.StopGrab();
+                        if (nRescanCount > nRescanTotal)
+                        {
+                            
+                            throw new Exception("Run_GrabLineScan Rescan Count Over");
+                        }
+                        nRescanCount++;
+
+                        if (nScanLine > 0)
+                        {
+                            nScanLine--;
+                            cpMemoryOffset.X -= m_grabMode.m_GD.m_nFovSize;
+                        }
+                    }
                 }
                 m_grabMode.m_camera.StopGrab();
+                return "OK";
+            }
+            catch(Exception e)
+            {
+                m_log.Info(e.Message);
                 return "OK";
             }
             finally

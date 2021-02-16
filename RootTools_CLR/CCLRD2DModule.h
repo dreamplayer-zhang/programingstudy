@@ -1,6 +1,9 @@
 #pragma once
 #include "../RootTools_CLR/CCLRD2DStructure.h"
 #include <math.h>
+
+#pragma warning(disable: 4244)
+
 namespace RootTools_CLR
 {
 	public ref class CCLRD2DModule

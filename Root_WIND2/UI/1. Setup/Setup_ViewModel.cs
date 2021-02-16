@@ -50,7 +50,7 @@ namespace Root_WIND2
         private EBR_ViewModel ebrVM;
         private Edgeside_ViewModel edgeVM;
         //private InspTest_ViewModel inspTestVM;  //삭제
-        private BacksideInspection_ViewModel backsideInspTestVM;
+        //private BacksideInspection_ViewModel backsideInspTestVM;
         public Maintenance_ViewModel maintVM;
         private GEM_ViewModel gemVM;
 
@@ -79,13 +79,13 @@ namespace Root_WIND2
 
         private void InitAllPanel()
         {
-            backsideVM = new Backside_ViewModel(this);
-            edgeVM = new Edgeside_ViewModel(this);
-            ebrVM = new EBR_ViewModel(this);
-            frontsideVM = new Frontside_ViewModel(this);      
+            //backsideVM = new Backside_ViewModel(this);
+            //edgeVM = new Edgeside_ViewModel(this);
+            //ebrVM = new EBR_ViewModel(this);
+            //frontsideVM = new Frontside_ViewModel(this);      
             homeVM = new Home_ViewModel(this);
-            Wizard = new RecipeWizard_ViewModel(this);
-            inspectionVM = new Inspection_ViewModel(this);
+            //Wizard = new RecipeWizard_ViewModel(this);
+            //inspectionVM = new Inspection_ViewModel(this);
             maintVM = new Maintenance_ViewModel(this);
             gemVM = new GEM_ViewModel(this);
         }
@@ -348,10 +348,10 @@ namespace Root_WIND2
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
 
-            Wizard.SetPage(Wizard.Summary);
+            //Wizard.SetPage(Wizard.Summary);
 
-            p_CurrentPanel = Wizard.Main;
-            p_CurrentPanel.DataContext = Wizard;
+            //p_CurrentPanel = Wizard.Main;
+            //p_CurrentPanel.DataContext = Wizard;
         }
         public void SetMaintenance()
         {
@@ -373,19 +373,20 @@ namespace Root_WIND2
         public void ShowSettingDialog()
         {
 
-            MessageBox.Show("Setting Dialog 연결해줘요!");
-            //Nullable<bool> result = ProgramManager.Instance.DialogService.ShowDialog(UIManager.Instance.SettingDialogViewModel);
-            //if (result.HasValue)
-            //{
-            //    if (result.Value)
-            //    {
-                    
-            //    }
-            //    else
-            //    {
+            //MessageBox.Show("Setting Dialog 연결해줘요!");
+            var viewModel = UIManager.Instance.SettingDialogViewModel;
+            Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+            if (result.HasValue)
+            {
+                if (result.Value)
+                {
 
-            //    }
-            //}
+                }
+                else
+                {
+
+                }
+            }
 
         }
 

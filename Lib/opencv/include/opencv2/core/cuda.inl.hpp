@@ -48,6 +48,9 @@
 
 //! @cond IGNORED
 
+#pragma warning(disable: 4793)
+#pragma warning(disable: 6297)
+
 namespace cv { namespace cuda {
 
 //===================================================================================

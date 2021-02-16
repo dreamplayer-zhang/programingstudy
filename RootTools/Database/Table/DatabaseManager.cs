@@ -60,6 +60,7 @@ namespace RootTools.Database
 
 		protected Lotinfo m_Loftinfo = new Lotinfo(); // 현재 Lot정보
 		protected string m_sInspectionID; // INSPECTION ID(DB PRIMARY KEY)
+		public string InspectionID { get { return m_sInspectionID; } }
 
 		public DataSet m_DataSet = new DataSet();
 		public DataTable m_DefectTable = new DataTable();
@@ -76,6 +77,70 @@ namespace RootTools.Database
 				return m_MainConnectSession.GetConnectionState();
 			else
 				return false;
+		}
+
+		public bool ValidateDatabase()
+		{
+			try
+			{
+				DataSet data = new DataSet();
+				string sSelectQuery = "select distinct TABLE_NAME from INFORMATION_SCHEMA.columns where table_schema='wind2'"; // Temp
+				MySqlCommand cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+				MySqlDataReader rdr = cmd.ExecuteReader();
+				List<string> tableList = new List<string>();
+				while (rdr.Read())
+				{
+					object table = rdr["TABLE_NAME"];
+					tableList.Add(table.ToString());
+					//sSelectQuery = "select column_name from INFORMATION_SCHEMA.columns where table_schema='wind2' and table_name='"+a.ToString()+"'";
+					//cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+					//MySqlDataReader rdr2 = cmd.ExecuteReader();
+					//while (rdr2.Read())
+					//               {
+					//	object b = rdr["COLUMN_NAME"];
+					//}
+					////for ()
+
+				}
+				rdr.Close();
+				bool isSame = true;
+				FieldInfo[] defectFieldInfos = null;
+				List<string> columnList = new List<string>();
+				for (int i = 0; i < tableList.Count; i++)
+				{
+					if (tableList[i].Equals("defect"))
+					{
+						Type defectType = typeof(Defect);
+						defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+					}
+					sSelectQuery = "select column_name from INFORMATION_SCHEMA.columns where table_schema='wind2' and table_name='" + tableList[i] + "'";
+					cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+
+					rdr = cmd.ExecuteReader();
+					int a = 0;
+					while (rdr.Read())
+					{
+						object columnName = rdr["COLUMN_NAME"];
+						columnList.Add(columnName.ToString());
+					}
+
+					object[] tt = defectFieldInfos[i].GetCustomAttributes(true);
+					ObsoleteAttribute ob = (ObsoleteAttribute)tt[0];
+					string test = ob.Message;
+					if (defectFieldInfos.Length != columnList.Count)
+                    {
+						isSame = false;
+						break;
+                    }
+				}
+				rdr.Close();
+				return true;
+			}
+			catch(Exception e)
+			{
+				MessageBox.Show(e.ToString());
+				return false;
+			}
 		}
 
 
@@ -116,9 +181,12 @@ namespace RootTools.Database
 
 		public void SendQuery(string sQueryMessage) // Main
 		{
+			if (m_MainConnectSession.IsConnected == false)
+				return;
 #if !DEBUG
 			try
 			{
+
 #endif
 				MySqlCommand cmd = new MySqlCommand(sQueryMessage, m_MainConnectSession.GetConnection());
 				cmd.ExecuteNonQuery();
@@ -164,6 +232,8 @@ namespace RootTools.Database
 
 		public void SelectData()
 		{
+			if (m_MainConnectSession.IsConnected == false)
+				return;
 #if !DEBUG
 			try
 			{
@@ -172,6 +242,8 @@ namespace RootTools.Database
 				DataSet data = new DataSet();
 				string sSelectQuery = "SELECT * FROM wind2.defect"; // Temp
 				MySqlDataAdapter ap = new MySqlDataAdapter();
+			
+			
 				ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
 				ap.Fill(data); // DataSet으로 전체 데이터 복사.
 				m_DefectTable = data.Tables[0].Copy();
@@ -284,6 +356,7 @@ namespace RootTools.Database
 			try
 			{
 #endif
+				SendQuery("TRUNCATE defect;");
 				StringBuilder temp = new StringBuilder();
 				StringBuilder sbQuery = new StringBuilder();
 				StringBuilder sbColumList = new StringBuilder();
@@ -324,7 +397,7 @@ namespace RootTools.Database
 					if (i != sbValueList.Count - 1)
 						sbQuery.Append(",");
 				}
-				SendQuery(sbQuery.ToString());
+				 SendQuery(sbQuery.ToString());
 #if !DEBUG
 			}
 			catch (Exception ex)

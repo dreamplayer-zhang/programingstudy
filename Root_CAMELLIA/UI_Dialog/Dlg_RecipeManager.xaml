@@ -745,7 +745,7 @@
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas x:Name="StagePreView" Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
-                                            <i:Interaction.Triggers>
+                                            <!--<i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseMove">
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
                                                 </i:EventTrigger>
@@ -755,7 +755,7 @@
                                                 <i:EventTrigger EventName="MouseLeftButtonDown" >
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
                                                 </i:EventTrigger>
-                                            </i:Interaction.Triggers>
+                                            </i:Interaction.Triggers>-->
                                         </Canvas>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>

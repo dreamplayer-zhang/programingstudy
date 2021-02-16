@@ -88,6 +88,8 @@
 #include <float.h>
 #endif // SKIP_INCLUDES
 
+#pragma warning(disable: 26495)
+
 #if defined _WIN32
 #  define CV_CDECL __cdecl
 #  define CV_STDCALL __stdcall

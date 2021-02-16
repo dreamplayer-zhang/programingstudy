@@ -633,7 +633,7 @@ namespace Root_Vega.Module
         #endregion
 
         #region Inspect
-        int m_lMaxGrab = 3000;
+        //int m_lMaxGrab = 3000;
         
         MemoryData m_memorySideTop;
         MemoryData m_memorySideLeft;

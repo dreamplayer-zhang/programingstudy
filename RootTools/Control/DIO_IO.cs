@@ -19,7 +19,7 @@ namespace RootTools.Control
 
         ListDIO m_listDI;
         ListDIO m_listDO;
-        string m_id;
+        public string m_id;
         Log m_log;
         public DIO_IO(IToolDIO tool, string id, Log log, bool bEnableRun)
         {

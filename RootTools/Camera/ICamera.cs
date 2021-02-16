@@ -22,8 +22,10 @@ namespace RootTools.Camera
         public double m_dShiftG = 0;
         public double m_dShiftB = 0;
         public int m_nFovStart = 0;
-        public int m_nFovSize = 4000;
+        public int m_nFovSize = 8000;
         public int m_nOverlap = 0;
+
+        public int m_nSkipGrabCount = -1; //LADS 사용시 Trigger Skip용으로 사용
     }
     public interface ICamera
     {

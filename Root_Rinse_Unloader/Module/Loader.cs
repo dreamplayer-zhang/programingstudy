@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -20,8 +21,17 @@ namespace Root_Rinse_Unloader.Module
             foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox, bInit);
             if (bInit)
             {
+                InitALID();
                 InitPos();
             }
+        }
+        #endregion
+
+        #region GAF
+        ALID m_alidPickerDown;
+        void InitALID()
+        {
+            m_alidPickerDown = m_gaf.GetALID(this, "PickerDown", "Picker Up & Down Error");
         }
         #endregion
 
@@ -75,31 +85,10 @@ namespace Root_Rinse_Unloader.Module
             p_bVacuum = bOn;
             for (int n = 0; n < 4; n++)
             {
-                if (m_roller.m_bExist[n]) m_aPicker[n].m_dioVacuum.Write(bOn);
+                m_aPicker[n].m_dioVacuum.Write(bOn && m_roller.m_bExist[n]); 
             }
             Thread.Sleep(200);
-            if (bOn)
-            {
-                StopWatch sw = new StopWatch();
-                int msVac = (int)(1000 * m_secVac);
-                int nExist = 4;
-                int nVac = 0;
-                while (nExist != nVac)
-                {
-                    Thread.Sleep(10);
-                    nExist = 0;
-                    nVac = 0;
-                    for (int n = 0; n < 4; n++)
-                    {
-                        if (m_roller.m_bExist[n])
-                        {
-                            nExist++;
-                            if (m_aPicker[n].m_dioVacuum.p_bIn) nVac++;
-                        }
-                    }
-                    if (sw.ElapsedMilliseconds > msVac) return m_bPickersetMode ? "OK" : "Run Vacuum Timeout";
-                }
-            }
+            if (bOn) Thread.Sleep((int)(1000 * m_secVac));
             else
             {
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
@@ -111,7 +100,7 @@ namespace Root_Rinse_Unloader.Module
 
         void RunTreePicker(Tree tree)
         {
-            m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Timeout (sec)");
+            m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Time Delay (sec)");
             m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
         }
         #endregion
@@ -123,7 +112,9 @@ namespace Root_Rinse_Unloader.Module
         {
             m_bPickerDown = bDown;
             m_dioPickerDown.Write(bDown);
-            return m_dioPickerDown.WaitDone();
+            string sRun = m_dioPickerDown.WaitDone();
+            m_alidPickerDown.p_bSet = (sRun != "OK");
+            return sRun;
         }
         #endregion
 
@@ -193,7 +184,7 @@ namespace Root_Rinse_Unloader.Module
 
         public string RunRun()
         {
-            if (m_bPickersetMode) return "OK";
+            if (EQ.p_bPickerSet) return "OK";
             return p_bVacuum ? RunUnload() : RunLoad();
         }
         #endregion
@@ -221,10 +212,9 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region PickerSet
-        public bool m_bPickersetMode = false;
         string RunPickerSet()
         {
-            m_bPickersetMode = true; 
+            EQ.p_bPickerSet = true; 
             try
             {
                 if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
@@ -247,7 +237,7 @@ namespace Root_Rinse_Unloader.Module
                 RunVacuum(false);
                 RunPickerDown(false);
                 MoveLoader(ePos.Roller);
-                m_bPickersetMode = false;
+                EQ.p_bPickerSet = false;
             }
         }
 

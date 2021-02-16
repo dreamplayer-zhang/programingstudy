@@ -36,6 +36,13 @@ namespace RootTools
             return o;
         }
 
+        public static void Swap<T>(ref T first, ref T second)
+        {
+            T tmp;
+            tmp = first;
+            first = second;
+            second = tmp;
+        }
         public static TList GetSelectedRandom<TList>(this TList list, int count, int nMin, int nMax) where TList : IList, new()
         {
             var listCopy = new TList();

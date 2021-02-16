@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools.Database;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -19,10 +20,10 @@ namespace RootTools_Vision.Utility
 		#region [Variables]
 		public int klarfType;
 
-		public int waferID_num;
-		public int slot;                                // Hynix는 WaferID와 동일하게 사용.// WaferID 0~25
+		public int waferID_num = 0;
+		public int slot = 0;                                // Hynix는 WaferID와 동일하게 사용.// WaferID 0~25
 		public String partID;                          // Part ID
-		public String lotID;                           // Lot ID
+		public String lotID = "";                           // Lot ID
 		public String deviceID;                        // Device ID
 		public String waferID_name;
 		public String sampleOrientationMarkType;       // FLAT or NOTCH
@@ -34,19 +35,19 @@ namespace RootTools_Vision.Utility
 		public double sampleCenterLocationX;            // 센터 Die의 Left,bottom와 실제 제품 Center간의 차이.
 		public double sampleCenterLocationY;            // 센터 Die의 Left,bottom와 실제 제품 Center간의 차이.
 
-		public String sampleTestPlan;
-		public String defectInfor;
-		public String DCollData;
+		public String sampleTestPlan = "";
+		public String defectInfor = "";
+		public String DCollData = "";
 		public String MEMMAP;
 
-		public String areaPerTest;
-		public int sampleTestCnt;
-		public int defectDieCnt;
-		public int centerX;
-		public int centerY;
+		public String areaPerTest = "";
+		public int sampleTestCnt = 0;
+		public int defectDieCnt = 0;
+		public int centerX = 0;
+		public int centerY = 0;
 
-		public int klarfRow;
-		public int klarfCol;
+		public int klarfRow = 0;
+		public int klarfCol = 0;
 
 		public String tempString;
 		public float resX;
@@ -69,9 +70,10 @@ namespace RootTools_Vision.Utility
 			//PutClassLookup(sw);
 			PutInspectionTest(sw);
 			PutSampleTestPlan(sw);
-			PutTiffFileName(sw); // 170802 syyun 추가
+			//PutTiffFileName(sw); // 170802 syyun 추가
 			PutDefectInfor(sw);
 			PutDCollData(sw);
+
 
 			return true;
         }
@@ -229,7 +231,7 @@ namespace RootTools_Vision.Utility
 
 		private void PutDefectInfor(StreamWriter sw)
 		{
-			sw.Write(defectInfor);
+			sw.Write(defectListInfor);
 		}
 
 		private void PutDCollData(StreamWriter sw)
@@ -243,7 +245,115 @@ namespace RootTools_Vision.Utility
 			sw.Write(tempString);
 		}
 
+		public void SetSampleTestPlan(RecipeType_WaferMap _mapdata /*, Vision::CParameter* pParam, CRecipeData* pRecipe*/)
+		{   // 검사한 Die들의 좌표 입력.
+			sampleTestPlan = "";
+			sampleTestCnt = 0;
+			defectDieCnt = 0;
 
+
+
+			int[] mapData = _mapdata.Data;
+
+
+
+			klarfRow = _mapdata.MapSizeX;
+			klarfCol = _mapdata.MapSizeY;
+
+
+
+			// Center Die 좌표.
+			if (klarfType == 0)
+			{
+				//if (/*pRecipe != NULL*/true)
+				//{
+				//	// Foundry
+				//	centerX = _mapdata.MasterDieX;
+				//	centerY = _mapdata.MasterDieY;
+				//}
+				//else
+				{
+					// 기존
+					centerX = _mapdata.MapSizeX / 2 + _mapdata.MapSizeX % 2;
+					centerY = _mapdata.MapSizeY / 2 + _mapdata.MapSizeY % 2;
+				}
+			}
+			else if (klarfType == 1)
+			{
+				centerX = _mapdata.MapSizeX / 2 + (_mapdata.MapSizeX % 2);  // 기존 코드 
+				centerY = _mapdata.MapSizeY / 2;
+			}
+
+
+
+			if (mapData != null)
+			{
+				for (int i = 0; i < _mapdata.MapSizeY; i++)
+				{
+					for (int j = 0; j < _mapdata.MapSizeX; j++)
+					{
+						//if ((mapData[i * _mapdata.MapSizeX + j]) != WAFER_MAP_CHIP_NOCHIP && (mapData[i * _mapdata.MapSizeX + j]) != WAFER_MAP_CHIP_FLATZONE)
+						{
+
+							tempString = string.Format("{0:d} {1:d}\n", j - centerX + 1, (centerY - i - 1));
+							sampleTestPlan = sampleTestPlan + tempString;
+							sampleTestCnt++;
+
+
+
+							//if (mapData[i * _mapdata.MapSizeX + j] == WAFER_MAP_CHIP_DEFECT)
+							//    defectDieCnt++;
+						}
+					}
+				}
+			}
+
+
+			tempString = string.Format("SampleTestPlan {0:d}\n", sampleTestCnt);
+			sampleTestPlan = sampleTestPlan.Substring(0, sampleTestPlan.Length - 1);
+			sampleTestPlan = tempString + sampleTestPlan + ";\n";
+
+			float nAreaPerTest = (float)(diePitchX * diePitchY * sampleTestCnt);
+			areaPerTest = string.Format("AreaPerTest {0:e};\n", nAreaPerTest);
+		}
+
+		public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<Defect> _defectdata, OriginRecipe recipe)
+        {
+			string defectList;
+			defectList = string.Format("DefectRecordSpec 17 DEFECTID XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER REVIEWSAMPLE IMAGECOUNT IMAGELIST;\n");
+			defectListInfor += defectList;
+			defectList = string.Format("DefectList\n");
+			defectListInfor += defectList;
+
+
+
+			//double diePitchX = recipe.DiePitchX;
+			//double diePitchY = recipe.DiePitchY;
+
+			Point pt = new Point();
+			
+			
+			double diePitchX = this.diePitchX;
+
+			
+			for (int i = 0; i < _defectdata.Count; i++)
+            {
+				//defectList = string.Format("{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0}",
+				//	i + 1, );
+
+			}
+
+			 
+			defectList = string.Format("SummarySpec 5");
+			defectListInfor += defectList;
+			defectList = string.Format(" TESTNO NDEFECT DEFDENSITY NDIE NDEFDIE;\n");
+			defectListInfor += defectList;
+			defectList = string.Format("SummaryList\n");
+			defectListInfor += defectList;
+			//m_sTemp.Format("%d %d %f %d %d;\n", 1, nDNum, fDensity, m_nSampleTestCnt, m_nDefectDieCnt);
+			//m_sDefectInfor += m_sTemp;
+
+		}
 
 		public void SetMEMMAP(RecipeType_WaferMap _mapdata)
 		{
@@ -286,11 +396,11 @@ namespace RootTools_Vision.Utility
 						tempString = string.Format("X= {0:4d} Y= {1:4d} B= 91\n", j + nDATASStartX, i + nDATASStartY);
 						MEMMAP += tempString;
 					}
-					else if (false/*p[cnt] != WAFER_MAP_CHIP_NOCHIP && p[cnt] != WAFER_MAP_CHIP_FLATZONE*/)
-					{
-						tempString = string.Format("X= {0:4d} Y= {1:4d} B= 01\n", j + nDATASStartX, i + nDATASStartY);
-						MEMMAP += tempString;
-					}
+					//else if (false/*p[cnt] != WAFER_MAP_CHIP_NOCHIP && p[cnt] != WAFER_MAP_CHIP_FLATZONE*/)
+					//{
+						//tempString = string.Format("X= {0:4d} Y= {1:4d} B= 01\n", j + nDATASStartX, i + nDATASStartY);
+						//MEMMAP += tempString;
+					//}
 				}
 			}
 
@@ -298,7 +408,7 @@ namespace RootTools_Vision.Utility
 			MEMMAP += tempString;
 		}
 
-		PointF GetDefectPos(int DCode, int inspMode, int posX, int posY, Point ptStart, int chipWidth, int chipHeight)
+		PointF GetDefectPos(int posX, int posY, Point ptStart, int chipWidth, int chipHeight)
 		{
 			Point pt = new Point(posX, posY);
 			PointF ptf = new PointF();

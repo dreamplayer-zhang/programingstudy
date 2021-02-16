@@ -30,6 +30,7 @@
                 </Grid>
             </TabItem>
             <TabItem x:Name="tabItemAxis" Header="Axis"/>
+            <TabItem x:Name="tabItemComm" Header="Comm"/>
         </TabControl>
 
     </Grid>

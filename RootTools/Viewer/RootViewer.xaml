@@ -91,7 +91,16 @@
                 obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}" Grid.ColumnSpan="2">
                     <Image Source="{Binding Path=p_ImgSource}" Stretch="UniformToFill"/>
                 </Canvas>
-                <Image Source="{Binding p_LayerSource}" Opacity="0.5" Grid.Column="1"/>
+                <Canvas ClipToBounds="True"
+                        obs:SizeObserver.Observe="true"
+                        obs:SizeObserver.ObservedWidth="{Binding p_LayerCanvasWidth, Mode=OneWayToSource}"
+                        obs:SizeObserver.ObservedHeight="{Binding p_LayerCanvasHeight, Mode=OneWayToSource}">
+                    <Image Source="{Binding p_LayerSource}" 
+                           Canvas.Left="{Binding p_LayerCanvasOffsetX}" 
+                           Canvas.Top="{Binding p_LayerCanvasOffsetY}"
+                           Opacity="0.5" 
+                           Grid.Column="1"/>
+                </Canvas>
 
                 <ItemsControl ItemsSource="{Binding p_ViewElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
@@ -102,7 +111,7 @@
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl> 
-                <ItemsControl ItemsSource="{Binding p_UIElements}"
+                <ItemsControl ItemsSource="{Binding p_UIElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
                     <ItemsControl.ItemsPanel>

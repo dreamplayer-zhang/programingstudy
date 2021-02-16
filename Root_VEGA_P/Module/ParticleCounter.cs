@@ -1,7 +1,9 @@
 ﻿using RootTools;
 using RootTools.Comm;
+using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -16,6 +18,10 @@ namespace Root_VEGA_P.Module
         Modbus m_modbus;
         public override void GetTools(bool bInit)
         {
+            for (int n = 0; n < m_aSolValve.Count; n++)
+            {
+                p_sInfo = m_toolBox.Get(ref m_aSolValve[n].m_do, this, m_aSolValve[n].m_id);
+            }
             p_sInfo = m_toolBox.Get(ref m_modbus, this, "Modbus");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
             if (bInit)
@@ -27,25 +33,133 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-        #region RS232
-        string ConnectRS232()
+        #region SolValve
+        public class SolValve
         {
-            m_rs232.p_bConnect = true;
-            return m_rs232.p_bConnect ? "OK" : "RS232 Connect Error";
+            public DIO_O m_do = null;
+            public string m_id = "";
+            public string p_sName { get; set; }
+
+            public void Write(bool bOpen)
+            {
+                m_do?.Write(bOpen); 
+            }
+
+            public SolValve(string id)
+            {
+                m_id = id;
+                p_sName = id; 
+            }
+        }
+        List<SolValve> m_aSolValve = new List<SolValve>(); 
+
+        Registry m_reg; 
+        void InitSolValve(string id)
+        {
+            m_reg = new Registry(id);
+            p_nSolValve = m_reg.Read("nSolValve", 1);
+            p_nSolValveSet = m_reg.Read("nSolValveSet", 1);
         }
 
-        private void M_rs232_OnReceive(string sRead)
+        int _nSolValve = 0; 
+        public int p_nSolValve
         {
-            //forget
+            get { return _nSolValve; }
+            set
+            {
+                if (_nSolValve == value) return;
+                _nSolValve = value;
+                m_aSolValve.Clear(); 
+                for (int n = 0; n < value; n++)
+                {
+                    m_aSolValve.Add(new SolValve("SolValve " + n.ToString("00")));
+                }
+            }
+        }
+
+        void RunTreeSolValve(Tree tree)
+        {
+            p_nSolValve = tree.Set(p_nSolValve, p_nSolValve, "Count", "SolValve Count");
+            Tree treeSol = tree.GetTree("Name");
+            foreach (SolValve sol in m_aSolValve) sol.p_sName = treeSol.Set(sol.p_sName, sol.p_sName, sol.m_id, "Solvalve Name"); 
         }
         #endregion
 
-        #region Vacuum Pump
-        public string RunPump(bool bOn)
+        #region SolValue Set
+        public class SolValveSet
         {
-            if (Run(ConnectRS232())) return p_sInfo;
-            //RunPump
-            return "OK";
+            public string m_id;
+            public string p_sName { get; set; }
+            List<bool> m_aSet = new List<bool>();
+
+            public void RunTree(Tree tree)
+            {
+                p_sName = tree.Set(p_sName, p_sName, "Name", "SolValve Set Name"); 
+                for (int n = 0; n < m_aSet.Count; n++)
+                {
+                    m_aSet[n] = tree.Set(m_aSet[n], m_aSet[n], n.ToString("00") + "." + m_pc.m_aSolValve[n].p_sName, "SolValve Set On/Off"); 
+                }
+            }
+
+            public string Run()
+            {
+                for (int n = 0; n < m_aSet.Count; n++)
+                {
+                    m_pc.m_aSolValve[n].Write(m_aSet[n]); 
+                }
+                return "OK"; 
+            }
+
+            ParticleCounter m_pc = null; 
+            public SolValveSet(string id, ParticleCounter pc)
+            {
+                m_id = id;
+                p_sName = id;
+                m_pc = pc;
+                m_aSet.Clear(); 
+                for (int n = 0; n < pc.m_aSolValve.Count; n++) m_aSet.Add(false); 
+            }
+        }
+        List<SolValveSet> m_aSolValveSet = new List<SolValveSet>(); 
+        public List<string> p_asSolValveSet
+        {
+            get
+            {
+                List<string> asSet = new List<string>();
+                foreach (SolValveSet set in m_aSolValveSet) asSet.Add(set.p_sName);
+                return asSet; 
+            }
+        }
+
+        SolValveSet GetSolValveSet(string sSolValveSet)
+        {
+            foreach (SolValveSet set in m_aSolValveSet)
+            {
+                if (set.p_sName == sSolValveSet) return set; 
+            }
+            return null; 
+        }
+
+        int _nSolValveSet = 0;
+        public int p_nSolValveSet
+        {
+            get { return _nSolValveSet; }
+            set
+            {
+                if (_nSolValveSet == value) return;
+                _nSolValveSet = value;
+                m_aSolValveSet.Clear();
+                for (int n = 0; n < value; n++)
+                {
+                    m_aSolValveSet.Add(new SolValveSet("SolValveSet " + n.ToString("00"), this));
+                }
+            }
+        }
+
+        void RunTreeSolValveSet(Tree tree)
+        {
+            p_nSolValveSet = tree.Set(p_nSolValveSet, p_nSolValveSet, "Count", "SolValveSet Count");
+            foreach (SolValveSet sol in m_aSolValveSet) sol.RunTree(tree.GetTree(sol.p_sName, false)); 
         }
         #endregion
 
@@ -66,6 +180,75 @@ namespace Root_VEGA_P.Module
             _nUnit = tree.Set(_nUnit, _nUnit, "Unit", "Modbus Unit #");
             m_nUnit = (byte)_nUnit;
         }
+        #endregion
+
+        #region RS232
+        string ConnectRS232()
+        {
+            m_rs232.p_bConnect = true;
+            return m_rs232.p_bConnect ? "OK" : "RS232 Connect Error";
+        }
+
+        private void M_rs232_OnReceive(string sRead)
+        {
+        }
+        #endregion
+
+        #region Pressure
+        int _nPump = 1000; 
+        public int p_nPump
+        {
+            get { return _nPump; }
+            set
+            {
+                _nPump = value;
+                RunPump(value);
+                OnPropertyChanged();
+            }
+        }
+
+        string RunPump(int nPump)
+        {
+            if (Run(ConnectRS232())) return p_sInfo;
+            m_rs232.Send("SET " + nPump.ToString());
+            return "OK";
+        }
+        
+        List<int> m_aPressure = new List<int>();
+        double _fPressure = 0;
+        public double p_fPressure
+        {
+            get { return _fPressure; }
+            set
+            {
+                _fPressure = value;
+                OnPropertyChanged();
+            }
+        }
+
+        string ReadPressure()
+        {
+            if (Run(m_modbus.ReadInputRegister(m_nUnit, 221, m_aPressure))) return p_sInfo;
+            p_fPressure = ((m_aPressure[0] & 0xffff) << 16) + (m_aPressure[1] & 0xffff);
+            return "OK";
+        }
+        /*
+        double m_dfPressure = 0.05; 
+        public string RunPressure()
+        {
+            RunPump(p_nPump); 
+            for (int n = 0; n < 10; n ++)
+            {
+                Thread.Sleep(2000);
+                ReadPressure();
+                double dfPressure = Math.Abs(p_fPressure - 1); 
+                if (dfPressure > 0.1) return "Pressure Range over";
+                if (dfPressure < m_dfPressure) return "OK";
+                p_nPump = (int)Math.Round(p_nPump / p_fPressure); 
+            }
+            return "Pressure Error"; 
+        }
+        */
         #endregion
 
         #region Sample
@@ -105,7 +288,7 @@ namespace Root_VEGA_P.Module
             try
             {
                 //p_bDone = false;
-                if (Run(RunPump(true))) return p_sInfo;
+                if (Run(RunPump(p_nPump))) return p_sInfo;
                 if (Run(ConnectModbus())) return p_sInfo;
                 if (Run(SetSample())) return p_sInfo;
                 Thread.Sleep(10);
@@ -119,7 +302,7 @@ namespace Root_VEGA_P.Module
             }
             finally
             {
-                RunPump(false);
+                RunPump(0);
                 p_bDone = false;
             }
         }
@@ -185,7 +368,7 @@ namespace Root_VEGA_P.Module
             if (m_sReadParticle != "OK") return;
             for (int n = 0; n < 8; n++)
             {
-                p_aCount[n] = (m_aRead[2 * n] << 16) + m_aRead[2 * n + 1]; //forget018 높음 낮음 ??
+                p_aCount[n] = (m_aRead[2 * n] << 16) + m_aRead[2 * n + 1]; 
             }
             RunTree(Tree.eMode.Init);
         }
@@ -198,11 +381,14 @@ namespace Root_VEGA_P.Module
             RunTreeProperty(tree.GetTree("Property"));
             RunTreeSample(tree.GetTree("Sample"));
             RunTreeCount(tree.GetTree("Count"));
+            RunTreeSolValve(tree.GetTree("SolValve"));
+            RunTreeSolValveSet(tree.GetTree("SolValveSet"));
         }
         #endregion
 
         public ParticleCounter(string id, IEngineer engineer)
         {
+            InitSolValve(id); 
             InitCount();
             p_id = id;
             InitBase(id, engineer);
@@ -259,20 +445,23 @@ namespace Root_VEGA_P.Module
             public override ModuleRunBase Clone()
             {
                 Run_Pump run = new Run_Pump(m_module);
+                run.m_nPump = m_nPump; 
                 run.m_secDelay = m_secDelay;
                 return run;
             }
 
+            int m_nPump = 1000; 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_nPump = tree.Set(m_nPump, m_nPump, "Pump", "Pump Power (0 ~ 1000)"); 
                 m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Delay Time (sec)", bVisible);
             }
 
             public override string Run()
             {
-                if (m_module.Run(m_module.RunPump(true))) return p_sInfo;
+                if (m_module.Run(m_module.RunPump(m_nPump))) return p_sInfo;
                 Thread.Sleep(1000 * m_secDelay);
-                if (m_module.Run(m_module.RunPump(false))) return p_sInfo;
+                if (m_module.Run(m_module.RunPump(0))) return p_sInfo;
                 return "OK";
             }
         }

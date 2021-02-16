@@ -74,13 +74,15 @@ namespace RootTools_Vision
 	public class EdgeSurfaceParameterBase : ObservableObject
 	{
 		#region [Parameter]
-		private int roiHeight = 0;
-		private int roiWidth = 0;
-		private int threshold = 0;
-		private int defectSizeMin = 0;
-		private int mergeDist = 0;
-		private int illumWhite = 0;
-		private int illumSide = 0;
+		private int roiHeight = 1;
+		private int roiWidth = 1;
+		private int threshold = 1;
+		private int defectSizeMin = 1;
+		private int mergeDist = 1;
+		private int edgeSearchLevel = 20;
+		
+		// 카메라 정보
+		private double camResolution = 0;
 		#endregion
 
 		#region [Getter/Setter]
@@ -130,21 +132,21 @@ namespace RootTools_Vision
 			}
 		}
 		[Category("Parameter")]
-		public int IllumWhite
+		public int EdgeSearchLevel
 		{
-			get => this.illumWhite;
+			get => this.edgeSearchLevel;
 			set
 			{
-				SetProperty<int>(ref this.illumWhite, value);
+				SetProperty<int>(ref this.edgeSearchLevel, value);
 			}
 		}
 		[Category("Parameter")]
-		public int IllumSide
+		public double CamResolution
 		{
-			get => this.illumSide;
+			get => this.camResolution;
 			set
 			{
-				SetProperty<int>(ref this.illumSide, value);
+				SetProperty<double>(ref this.camResolution, value);
 			}
 		}
 		#endregion

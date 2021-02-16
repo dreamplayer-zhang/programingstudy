@@ -24,6 +24,16 @@ namespace Root_WIND2
 		private RootViewer_ViewModel drawToolVM;
 
 		private EdgeSurfaceParameterBase parameter;
+		private int selectedGrabModeIndex = 0;
+		private int camWidth;
+		private int camHeight;
+		private double camResolution;
+		private double camTriggerRatio;
+
+		//private int topOffset;
+		//private int sideOffset;
+		//private int btmOffset;
+
 		private bool _IsTopChecked = true;
 		private bool _IsSideChecked = false;
 		private bool _IsBtmChecked = false;
@@ -31,6 +41,7 @@ namespace Root_WIND2
 		private DataTable defectDataTable;
 		private object selectedDefect;
 		private BitmapSource defectImage;
+		private double triggerRatio = 0;
 
 		#region [Getter / Setter]
 		public RootViewer_ViewModel DrawToolVM
@@ -45,6 +56,43 @@ namespace Root_WIND2
 			set 
 			{
 				SetProperty(ref parameter, value);
+			}
+		}
+
+		public int TopOffset
+		{
+			//get => topOffset;
+			set
+			{
+				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
+				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
+				this.TopOffset = inspect.TopOffset;
+			}
+		}
+
+		public int SideOffset
+		{
+			//get => sideOffset;
+			set
+			{
+				//SetProperty<int>(ref this.sideOffset, value);/
+			}
+		}
+
+		public int BtmOffset
+		{
+			//get => btmOffset;
+			set
+			{
+				//SetProperty<int>(ref this.btmOffset, value);
+			}
+		}
+
+		public int SelectedGrabModeIndex
+		{
+			get => this.selectedGrabModeIndex;
+			set
+			{
 			}
 		}
 
@@ -89,7 +137,7 @@ namespace Root_WIND2
 				}
 			}
 		}
-
+		
 		public DataTable DefectDataTable
 		{
 			get => defectDataTable;
@@ -169,11 +217,43 @@ namespace Root_WIND2
 
 			DrawToolVM = new RootViewer_ViewModel();
 			DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
+			DrawToolVM.p_ROILayer = GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage");
 
 			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
 			parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 
-			WorkEventManager.ProcessDefectWaferDone += ProcessDefectWaferDone;
+			//WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
+			//WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
+		}
+
+		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
+		{
+			Workplace workplace = sender as Workplace;
+			List<string> textList = new List<string>();
+			List<CRect> rectList = new List<CRect>();
+
+			foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+			{
+				string text = "";
+				rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+				textList.Add(text);
+			}
+
+			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+			{
+				DrawRectDefect(rectList, textList, e.reDraw);
+				UpdateProgress();
+			}));
+		}
+
+		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
+		{
+			Workplace workplace = sender as Workplace;
+
+			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+			{
+				UpdateDefectData();
+			}));
 		}
 
 		public void Scan()
@@ -233,14 +313,13 @@ namespace Root_WIND2
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm;
 		}
 
-		private void ProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs e)
+		private void DrawRectDefect(List<CRect> rectList, List<String> text, bool reDraw = false)
 		{
-			Workplace workplace = obj as Workplace;
+		}
 
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				UpdateDefectData();
-			}));
+		private void UpdateProgress()
+		{
+
 		}
 
 		private void UpdateDefectData()
@@ -255,7 +334,7 @@ namespace Root_WIND2
 			DefectDataTable = DatabaseManager.Instance.SelectTablewithInspectionID(sDefect, sInspectionID);
 		}
 
-		public object GetDataGridItem(DataTable table, DataRowView selectedRow, string sColumnName)
+		private object GetDataGridItem(DataTable table, DataRowView selectedRow, string sColumnName)
 		{
 			object result;
 			for (int i = 0; i < table.Columns.Count; i++)
@@ -269,7 +348,7 @@ namespace Root_WIND2
 			return null;
 		}
 
-		public void DisplayDefectImage(string sInspectionID, string sDefectImageName)
+		private void DisplayDefectImage(string sInspectionID, string sDefectImageName)
 		{
 			string sDefectimagePath = @"D:\DefectImage";
 			sDefectimagePath = Path.Combine(sDefectimagePath, sInspectionID, sDefectImageName);
