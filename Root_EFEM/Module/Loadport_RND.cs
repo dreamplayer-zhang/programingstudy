@@ -579,8 +579,17 @@ namespace Root_EFEM.Module
         {
             get; set;
         }
-        public IRFID m_rfid;
-        public Loadport_RND(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount, IRFID rfid = null)
+        //public IRFID m_rfid;
+        IRFID _rfid;
+        public IRFID m_rfid
+        {
+            get { return _rfid; }
+            set
+            {
+                _rfid = value;
+            }
+        }
+        public Loadport_RND(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
             p_bLock = false;
             InitCmd();
@@ -590,7 +599,6 @@ namespace Root_EFEM.Module
                 p_infoCarrier.p_sLocID = "LP1";
             else if (id == "LoadportB")
                 p_infoCarrier.p_sLocID = "LP2";
-            m_rfid = rfid;
             m_aTool.Add(p_infoCarrier);
             InitBase(id, engineer);
             InitGAF();

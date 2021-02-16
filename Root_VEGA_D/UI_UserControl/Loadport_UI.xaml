@@ -7,6 +7,16 @@
              mc:Ignorable="d" 
              Background="White"
              d:DesignHeight="500" d:DesignWidth="500">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Background" Value="#FF5482A1"/>
+        </Style>
+        <SolidColorBrush x:Key="ControlBackGround" 
+                         Color="#FF5482A1"/>
+    </UserControl.Resources>
     <Grid>
         <GroupBox Header="{Binding p_id}">
             <Grid Grid.Row="0">

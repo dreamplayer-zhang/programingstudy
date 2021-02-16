@@ -19,7 +19,7 @@ namespace Root_WIND2.UI_User
 
         public FrontsideSpec_ViewModel()
         {
-            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero)
+            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero && GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").m_eMode != ImageData.eMode.OtherPCMem)
                 return;
 
             this.imageViewerVM = new FrontsideSpec_ImageViewer_ViewModel();

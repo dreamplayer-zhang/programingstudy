@@ -472,6 +472,15 @@ namespace Root_AOP01_Packing.Module
         }
         #endregion
 
+        IRFID _rfid;
+        public IRFID m_rfid
+        {
+            get { return _rfid; }
+            set
+            {
+                _rfid = value;
+            }
+        }
         public InfoCarrier p_infoCarrier { get; set; }
         public Loadport_AOP(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {

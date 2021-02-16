@@ -111,6 +111,7 @@ namespace RootTools.Comm
                 m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+
                 m_socket.BeginConnect(p_sIP, p_nPort, new AsyncCallback(CallBack_Connect), m_socket);
                 return "OK"; 
             }
@@ -151,19 +152,39 @@ namespace RootTools.Comm
             catch (Exception eX) { p_sInfo = p_id + eX.Message; }
         }
 
-        Queue<string> m_qSend = new Queue<string>(); 
+        Queue<byte[]> m_qSendByte = new Queue<byte[]>();
+        Queue<string> m_qSend = new Queue<string>();
         public string Send(string sMsg)
         {
             m_qSend.Enqueue(sMsg);
             return "OK"; 
         }
-
+        public string Send(byte[] sMsg)
+        {
+            m_qSendByte.Enqueue(sMsg);
+            return "OK";
+        }
         string SendMsg(string sMsg)
         {
             try
             {
                 if (sMsg.Length < 128) m_commLog.Add(CommLog.eType.Send, sMsg);
                 m_socket.Send(Encoding.ASCII.GetBytes(sMsg));
+            }
+            catch (Exception e)
+            {
+                p_sInfo = "Send : " + e.Message;
+                return p_sInfo;
+            }
+            return "OK";
+        }
+        string SendMsg(byte[] sMsg)
+        {
+            try
+            {
+                if (sMsg.Length < 128)
+                    m_commLog.Add(CommLog.eType.Send, Encoding.ASCII.GetString(sMsg));
+                m_socket.Send(sMsg);
             }
             catch (Exception e)
             {
@@ -203,7 +224,7 @@ namespace RootTools.Comm
             Thread.Sleep(3000);
             while (m_bThread)
             {
-                Thread.Sleep(10);
+                Thread.Sleep(2);
                 if (p_bUse)
                 {
                     if (p_bConnect == false)
@@ -217,6 +238,15 @@ namespace RootTools.Comm
                         string sSend = SendMsg(sMsg);
                         if (sSend == "OK") m_qSend.Dequeue();
                         else m_commLog.Add(CommLog.eType.Info, sSend); 
+                    }
+                    else if (m_qSendByte.Count > 0)
+                    {
+                        byte[] sMsg = m_qSendByte.Peek();
+                        string sSend = SendMsg(sMsg);
+                        if (sSend == "OK")
+                            m_qSendByte.Dequeue();
+                        else
+                            m_commLog.Add(CommLog.eType.Info, sSend);
                     }
                 }
                 else if (m_socket != null)
@@ -254,6 +284,7 @@ namespace RootTools.Comm
             {
                 m_bThread = false;
                 m_qSend.Clear();
+                m_qSendByte.Clear();
                 m_thread.Join();
             }
             if (m_socket != null)

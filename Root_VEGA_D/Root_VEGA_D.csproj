@@ -192,6 +192,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ManualJobSchedule\ManualJobSchedule_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_UserControl\HomeProgress_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Icon\AtiLogo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -232,6 +240,13 @@
     <Compile Include="Engineer\VEGA_D_Recipe.cs" />
     <Compile Include="Engineer\VEGA_D_Recipe_UI.xaml.cs">
       <DependentUpon>VEGA_D_Recipe_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ManualJobSchedule\ManualJobSchedule.cs" />
+    <Compile Include="ManualJobSchedule\ManualJobSchedule_UI.xaml.cs">
+      <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_UserControl\HomeProgress_UI.xaml.cs">
+      <DependentUpon>HomeProgress_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Icon\AtiLogo.xaml.cs">
       <DependentUpon>AtiLogo.xaml</DependentUpon>

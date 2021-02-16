@@ -34,7 +34,7 @@ namespace Root_VEGA_D
 
         VEGA_D_Handler m_handler;
         Loadport_Cymechs m_loadport;
-        RFID_Brooks m_rfid;
+        IRFID m_rfid;
 
         public Loadport_UI()
         {
@@ -82,7 +82,7 @@ namespace Root_VEGA_D
         {
             m_loadport = (Loadport_Cymechs)loadport;
             m_handler = handler;
-            m_rfid = (RFID_Brooks)rfid;
+            m_rfid = rfid;
             this.DataContext = loadport;
             InitTimer();
             m_bgwLoad.DoWork += M_bgwLoad_DoWork;
@@ -94,14 +94,12 @@ namespace Root_VEGA_D
             switch (m_loadport.p_eState)
             {
                 case ModuleBase.eState.Ready:
-                    //m_loadport.p_infoCarrier.p_eState = InfoCarrier.eState.Dock;
                     if (EQ.p_bRecovery == false)
                     {
-                        InfoCarrier infoCarrier = m_loadport.p_infoCarrier;
-                        //ManualJobSchedule manualJobSchedule = new ManualJobSchedule(infoCarrier);
-                        //manualJobSchedule.ShowPopup();
+                        //InfoCarrier infoCarrier = m_loadport.p_infoCarrier;
+                        //ManualJobSchedule manualJob = new ManualJobSchedule(infoCarrier);
+                        //manualJob.ShowPopup();
                     }
-                    //EQ.p_nRnR = 0;
                     EQ.p_eState = EQ.eState.Run;
                     break;
             }
@@ -109,6 +107,13 @@ namespace Root_VEGA_D
 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
+            InfoCarrier infoCarrier = m_loadport.p_infoCarrier;
+            infoCarrier.m_aInfoWafer[0] = (InfoWafer)infoCarrier.m_aGemSlot[0];
+            infoCarrier.m_aInfoWafer[0].p_eState = GemSlotBase.eState.Exist;
+
+            ManualJobSchedule manualJob = new ManualJobSchedule(infoCarrier);
+            if (manualJob.ShowPopup() == false) return;
+
             m_loadport.StartRun(m_loadport.GetModuleRunDocking().Clone());
 
             if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;

@@ -72,6 +72,7 @@ namespace RootTools.Module
         public void AddModule(ModuleBase module, UserControl uc)
         {
             m_aModule.Add(module, uc);
+            if (module.p_id.Contains("RFID")) return;
             m_asModule.Add(module.p_id);
         }
 
