@@ -142,7 +142,7 @@ namespace Root_WIND2.Module
                     //    m_log.Info("Wait Camera GrabProcess");
                     //}
                     //m_grabMode.m_camera.StopGrab();
-                    CalculateHeight(cpMemoryOffset.X, mem, nWaferSizeY_px, 230, grabData.bInvY);
+                    CalculateHeight(cpMemoryOffset.X, mem, nWaferSizeY_px, 20, grabData.bInvY);
                     nScanLine++;
                     cpMemoryOffset.X += nCamWidth;
                 }
@@ -168,30 +168,34 @@ namespace Root_WIND2.Module
             List<double> ladsinfo = new List<double>();
             List<double> li = new List<double>();// 뭔가 값이 있는곳에 대한 정보
 
-            if (!InvY)
+            if (InvY)
             {//정방향 스캔시
                 for (int cnt = 0; cnt < hCnt; cnt++)
                 {
+                    int sumofgv = 0;
+                    int sumofposgv = 0;
                     li.Clear();
 
                     for (int h = (int)(nCamHeight * 0.25); h < nCamHeight * 0.75; h++)
                     {
-                        int curpxl = 0;
-                        //if ((ptr[xmempos + (cnt * nCamHeight + h) * mem.W] < gv) && (ptr[nCamWidth / 2 + xmempos + (cnt * nCamHeight + h) * mem.W] < gv) && (ptr[nCamWidth + (cnt * nCamHeight + h) * mem.W] < gv))
-                        //    return;
+                        int curGV = 0;
+
                         for (int w = 0; w < nCamWidth; w++)
                         {
                             /*arr[cnt*camheight+h][w+(m_granCurLine*nCamWidth)]*/
                             if (ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W] >= gv)
-                                curpxl++;
+                                curGV = Math.Max(curGV, ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W]);
                         }
 
-                        if (curpxl > 0)
-                            li.Add(h);
+                        if (curGV > 0)
+                        {
+                            sumofgv += curGV;
+                            sumofposgv += (h*curGV);
+                        }
                     }
 
                     if (li.Count > 0)
-                        ladsinfo.Add(((li[li.Count - 1] + li[0]) / 2 - (double)nCamHeight / 2) * Math.Sqrt(2)); //Frame의 가운데가 Focus가 맞는 지점이라고 생각
+                        ladsinfo.Add((sumofposgv / sumofgv) * Math.Sqrt(2)); //Frame의 가운데가 Focus가 맞는 지점이라고 생각
                     else
                         ladsinfo.Add(0);
                 }
@@ -200,27 +204,30 @@ namespace Root_WIND2.Module
             {
                 for (int cnt = hCnt - 1; cnt >= 0; cnt--)
                 {
+                    int sumofgv = 0;
+                    int sumofposgv = 0;
                     li.Clear();
 
                     for (int h = (int)(nCamHeight * 0.25); h < nCamHeight * 0.75; h++)
-
                     {
-                        int curpxl = 0;
-                        //if ((ptr[xmempos + (cnt * nCamHeight + h) * mem.W] < gv) && (ptr[nCamWidth / 2 + xmempos + (cnt * nCamHeight + h) * mem.W] < gv) && (ptr[nCamWidth + (cnt * nCamHeight + h) * mem.W] < gv))
-                        //    return;
+                        int curGV = 0;
+
                         for (int w = 0; w < nCamWidth; w++)
                         {
                             /*arr[cnt*camheight+h][w+(m_granCurLine*nCamWidth)]*/
                             if (ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W] >= gv)
-                                curpxl++;
+                                curGV = Math.Max(curGV, ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W]);
                         }
 
-                        if (curpxl > 0)
-                            li.Add(h);
+                        if (curGV > 0)
+                        {
+                            sumofgv += curGV;
+                            sumofposgv += (h * curGV);
+                        }
                     }
 
                     if (li.Count > 0)
-                        ladsinfo.Add(((li[li.Count - 1] + li[0]) / 2 - (double)nCamHeight / 2) * Math.Sqrt(2)); //Frame의 가운데가 Focus가 맞는 지점이라고 생각
+                        ladsinfo.Add((sumofposgv / sumofgv) * Math.Sqrt(2)); //Frame의 가운데가 Focus가 맞는 지점이라고 생각
                     else
                         ladsinfo.Add(0);
                 }
