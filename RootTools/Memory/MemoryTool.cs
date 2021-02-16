@@ -407,8 +407,15 @@ namespace RootTools.Memory
                 case "GET":
                     System.Drawing.Rectangle rect = new System.Drawing.Rectangle();
                     byte[] res = GetImageView((System.Drawing.Rectangle)(GetSerializeObject(aStr[1], rect.GetType())), Convert.ToInt32(aStr[2]), Convert.ToInt32(aStr[3]), Convert.ToString(aStr[4]), Convert.ToString(aStr[5]), Convert.ToString(aStr[6]), Convert.ToInt32(aStr[7]));
-                   // res = Compress(res);
-                    m_Client.Send(res);
+                    //string strResult = ImageSourceToString(res);
+                    //string strResult = GetSerializeString(res);
+                    //string strresult = Encoding.Default.GetString(res);
+                    //string strresult = bytestostring(res);
+                    byte[] rescom = Compress(res);                   
+                    string strresult = Convert.ToBase64String(rescom);
+                    //string stst = BitConverter.ToString(res);
+
+                    m_Client.Send(strresult);
                     break;
             }
             //System.Drawing.Rectangle viewrect = GetSerializeObject(aStr[1],     );
@@ -501,29 +508,31 @@ namespace RootTools.Memory
 
             if (ptrMem == IntPtr.Zero)
                 return null;
-           
+            int pix_x = 0;
+            int pix_y = 0;
             int rectX, rectY, rectWidth, rectHeight, sizeX;
-            byte[] result = new byte[CanvasWidth * CanvasHeight * nByte];
+            byte[] result = new byte[CanvasWidth * CanvasHeight];
             rectX = View_Rect.X;
             rectY = View_Rect.Y;
             rectWidth = View_Rect.Width;
             rectHeight = View_Rect.Height;
             sizeX = Convert.ToInt32(memdata.W);
-
+            if(nByte == 3)
+                result = new byte[CanvasWidth * CanvasHeight * 3];
             //byte[,,] viewptr = view.Data;
             //byte* imageptr = (byte*)ptrMem.ToPointer();
             if (nByte == 1)
             {
-              
+
                 Parallel.For(0, CanvasHeight, (yy) =>
                 {
-                    //   lock (o)
+                    lock (o)
                     {
-                        int pix_y = rectY + yy * rectHeight / CanvasHeight;
+                        pix_y = rectY + yy * rectHeight / CanvasHeight;
 
                         for (int xx = 0; xx < CanvasWidth; xx++)
                         {
-                            int pix_x = rectX + xx * rectWidth / CanvasWidth;
+                            pix_x = rectX + xx * rectWidth / CanvasWidth;
                             result[yy * CanvasWidth + xx] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
                         }
                     }
@@ -532,15 +541,15 @@ namespace RootTools.Memory
             else if (nByte == 3)
             {
                 int nTerm = CanvasWidth * CanvasHeight;
-                Parallel.For(0, CanvasHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (yy) =>
+                Parallel.For(0, CanvasHeight, (yy) =>
                 {
-                    //lock (o)
+                    lock (o)
                     {
-                        int pix_y = rectY + yy * rectHeight / CanvasHeight;
+                        pix_y = rectY + yy * rectHeight / CanvasHeight;
 
                         for (int xx = 0; xx < CanvasWidth; xx++)
                         {
-                            int pix_x = rectX + xx * rectWidth / CanvasWidth;
+                            pix_x = rectX + xx * rectWidth / CanvasWidth;
                             result[yy * CanvasWidth + xx] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
                             result[yy * CanvasWidth + xx + nTerm] = ((byte*)ptrMem2)[pix_x + (long)pix_y * sizeX];
                             result[yy * CanvasWidth + xx + nTerm * 2] = ((byte*)ptrMem3)[pix_x + (long)pix_y * sizeX];
