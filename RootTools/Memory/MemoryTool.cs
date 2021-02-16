@@ -361,7 +361,7 @@ namespace RootTools.Memory
         public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem, int nByte)
         {
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
-            m_abuf = new byte[CanvasWidth * CanvasHeight];
+            m_abuf = new byte[CanvasWidth * CanvasHeight * nByte];
             _bRecieve = true;
             m_Server.Send(str);
             Stopwatch watch = new Stopwatch();
