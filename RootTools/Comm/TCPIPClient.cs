@@ -156,14 +156,12 @@ namespace RootTools.Comm
         Queue<string> m_qSend = new Queue<string>();
         public string Send(string sMsg)
         {
-            m_socket.Send(Encoding.ASCII.GetBytes(sMsg));
-            //m_qSend.Enqueue(sMsg);
+            m_qSend.Enqueue(sMsg);
             return "OK"; 
         }
         public string Send(byte[] sMsg)
         {
-            m_socket.Send(sMsg);
-            //m_qSendByte.Enqueue(sMsg);
+            m_qSendByte.Enqueue(sMsg);
             return "OK";
         }
         string SendMsg(string sMsg)
