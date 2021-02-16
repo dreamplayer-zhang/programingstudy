@@ -100,6 +100,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Database\CustomAttribute\DatabaseAttribute.cs" />
+    <Compile Include="Database\defect.cs" />
     <Compile Include="GlobalObjects.cs" />
     <Compile Include="InspectionManager.cs" />
     <Compile Include="Inspection\BacksideSurface.cs" />

@@ -144,7 +144,9 @@ namespace Root_WIND2
 
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1);
+            DatabaseManager.Instance.ValidateDatabase();
             //////
+
             logView.Init(LogView.m_logView);
             WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
             InitTimer();
@@ -174,8 +176,6 @@ namespace Root_WIND2
         private string memoryEdgeBottom = "EdgeBottom";
         private string memoryEdgeEBR = "EBR";
         
-
-
         public bool RegisterGlobalObjects()
         {
             try
