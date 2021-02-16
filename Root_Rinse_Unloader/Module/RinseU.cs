@@ -256,7 +256,15 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region Thread Send
-        Protocol m_protocolSend = null;
+        Protocol _protocolSend = null;
+        Protocol p_protocolSend
+        {
+            get { return _protocolSend; }
+            set
+            {
+                _protocolSend = value; 
+            }
+        }
         Queue<Protocol> m_qProtocolSend = new Queue<Protocol>();
         Queue<Protocol> m_qProtocolReply = new Queue<Protocol>();
         bool m_bRunSend = false;
@@ -279,11 +287,13 @@ namespace Root_Rinse_Unloader.Module
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();
                     m_tcpip.Send(protocol.p_sCmd);
+                    Thread.Sleep(10); 
                 }
-                else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
+                else if ((m_qProtocolSend.Count > 0) && (p_protocolSend == null))
                 {
-                    m_protocolSend = m_qProtocolSend.Dequeue();
-                    m_tcpip.Send(m_protocolSend.p_sCmd);
+                    p_protocolSend = m_qProtocolSend.Dequeue();
+                    m_tcpip.Send(p_protocolSend.p_sCmd);
+                    Thread.Sleep(10);
                 }
             }
         }
@@ -310,7 +320,7 @@ namespace Root_Rinse_Unloader.Module
                     return;
                 }
                 eCmd eCmd = GetCmd(asRead[1]);
-                if (asRead[0] == p_id) m_protocolSend = null;
+                if (asRead[0] == p_id) p_protocolSend = null;
                 else
                 {
                     switch (eCmd)

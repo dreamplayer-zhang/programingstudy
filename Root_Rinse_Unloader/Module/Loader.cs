@@ -88,16 +88,16 @@ namespace Root_Rinse_Unloader.Module
                 {
                     Thread.Sleep(10);
                     nExist = 0;
-                    nVac = 0; 
+                    nVac = 0;
                     for (int n = 0; n < 4; n++)
                     {
                         if (m_roller.m_bExist[n])
                         {
                             nExist++;
-                            if (m_aPicker[n].m_dioVacuum.p_bIn) nVac++; 
+                            if (m_aPicker[n].m_dioVacuum.p_bIn) nVac++;
                         }
                     }
-                    if (sw.ElapsedMilliseconds > msVac) return m_bPickersetMode ? "OK" : "Run Vacuum Timeout"; 
+                    if (sw.ElapsedMilliseconds > msVac) return m_bPickersetMode ? "OK" : "Run Vacuum Timeout";
                 }
             }
             else
