@@ -121,6 +121,7 @@ namespace Root_Vega
             m_DialogService = dialogService;
             p_MemoryModule = m_Engineer.ClassMemoryTool();
             p_ImageViewer = new ImageViewer_ViewModel(null, dialogService);
+            p_ImageViewer.DoubleClicked += M_DoubleClicked;
             Worker_ViewerUpdate.DoWork += Worker_ViewerUpdate_DoWork;
             Worker_ViewerUpdate.WorkerReportsProgress = true;
             Worker_ViewerUpdate.ProgressChanged += Worker_ViewerUpdate_ProgressChanged;
@@ -131,6 +132,33 @@ namespace Root_Vega
             p_ImageViewer.SetDrawer((DrawToolVM)p_SimpleShapeDrawer);
             
             InitAlarmData();
+        }
+
+        private void M_DoubleClicked(object sender, EventArgs e)
+        {
+            // variable
+            CPoint cptMemPos = new CPoint();
+            PatternVision modulePatternVision = m_Engineer.m_handler.m_patternVision;
+            SideVision moduleSideVision = m_Engineer.m_handler.m_sideVision;
+
+            // implement
+            if (p_ImageViewer.p_ImageData == null) return;  // 선택된 메모리가 없으면 return
+            if (modulePatternVision.p_eState != ModuleBase.eState.Ready) return;
+            cptMemPos = (CPoint)sender;  // Memory 좌표 받아오기
+            if (p_ImageViewer.p_ImageData.m_MemData.p_id == "Main")
+            {
+                PatternVision.Run_VRSReviewImageCapture moduleRun = (PatternVision.Run_VRSReviewImageCapture)modulePatternVision.CloneModuleRun("VRSReviewImageCapture");
+                RPoint rptAxisPos = moduleRun.GetAxisPosFromMemoryPos(cptMemPos);
+                if (modulePatternVision.Run(modulePatternVision.p_axisXY.StartMove(rptAxisPos))) return;
+                if (modulePatternVision.Run(modulePatternVision.p_axisXY.WaitReady())) return;
+                if (modulePatternVision.Run(modulePatternVision.p_axisZ.StartMove(moduleRun.m_dVRSFocusPosZ_pulse))) return;
+                if (modulePatternVision.Run(modulePatternVision.p_axisZ.WaitReady())) return;
+
+                moduleRun.VRSAutoFocus();
+                modulePatternVision.m_CamVRS.Grab();
+            }
+
+            return;
         }
 
         public void SetImageData()
@@ -189,7 +217,7 @@ namespace Root_Vega
                 SetProperty(ref nTime, value);
             }
         }
-
+        
         private void Worker_ViewerUpdate_DoWork(object sender, DoWorkEventArgs e)
         {  
         }
