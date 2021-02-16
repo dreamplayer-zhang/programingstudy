@@ -7,8 +7,9 @@
         xmlns:PackIcon="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:wpg="clr-namespace:System.Windows.Controls"
+        xmlns:icons="clr-namespace:Root_WIND2.Icons"
         mc:Ignorable="d"
-        Title="Setting" Height="450" Width="600" ResizeMode="NoResize">
+        Height="450" Width="600" ResizeMode="NoResize" WindowStyle="None" BorderThickness="2" BorderBrush="Black">
     <Window.Resources>
         <!-- #region [Color Dedines] -->
         <SolidColorBrush x:Key="SelectedColor" Color="LightCyan"/>
@@ -182,63 +183,101 @@
             </Setter>
         </Style>
     </Window.Resources>
-    
-    <Grid Background="{StaticResource PanelBackGround}">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="25"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="5*"/>
-        </Grid.ColumnDefinitions>
-        <Border Grid.Column="0">
-            <TextBlock Text="Menu" FontSize="15" VerticalAlignment="Center" Margin="9"/>
-        </Border>
-        <Border Grid.Column="0"
+        <!--Title Bar Start-->
+        <Grid Grid.Row="0"
+              Name="TitleBar"   
+              Background="{StaticResource MainThema}"
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <icons:AtiLogo Width="30"
+                           Height="18"
+                           VerticalAlignment="Center"
+                           Margin="3" />
+            <TextBlock Text="WIND2 - Setting"
+                       Foreground="White"
+                       VerticalAlignment="Center"
+                       FontSize="15"
+                       Margin="5,0,0,0"
+                       Grid.Column="1" />
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
+                        Orientation="Horizontal"
+                        Grid.Column="2">
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="CloseButton"
+                        Width="34"
+                        Height="26"
+                        Margin="0,0,10,-1"
+                        Foreground="White"
+                        Command="{Binding CmdClose}"
+                        VerticalAlignment="Center" >
+                    <Path Style="{StaticResource CloseIconKey}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Grid Background="{StaticResource PanelBackGround}" Grid.Row="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="5*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0">
+                <TextBlock Text="Menu" FontSize="15" VerticalAlignment="Center" Margin="9"/>
+            </Border>
+            <Border Grid.Column="0"
                 Grid.Row="1"
                 Margin="4"
                 BorderThickness="1"
                 BorderBrush="Black">
-            <TreeView x:Name="MenuTreeView" ItemsSource="{Binding MenuItems}">
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                        
-                        <TextBlock Text="{Binding Name}"/>
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectedItemChanged">
-                        <i:InvokeCommandAction
+                <TreeView x:Name="MenuTreeView" ItemsSource="{Binding MenuItems}">
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+
+                            <TextBlock Text="{Binding Name}"/>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectedItemChanged">
+                            <i:InvokeCommandAction
                             Command="{Binding SelectedItemCommand}"
                             CommandParameter="{Binding RelativeSource={RelativeSource self}}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </TreeView>
-        </Border>
-        <Border Grid.Column="1"
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TreeView>
+            </Border>
+            <Border Grid.Column="1"
                 Grid.Row="0"
                 Grid.RowSpan="2">
-            <wpg:WpfPropertyGrid SelectedObject="{Binding SelectedSettingData, Mode=TwoWay, FallbackValue=null}"
+                <wpg:WpfPropertyGrid SelectedObject="{Binding SelectedSettingData, Mode=TwoWay, FallbackValue=null}"
                                  TitleVisible="True"
                                  HorizontalAlignment="Stretch"
                                  VerticalAlignment="Stretch"
                                  HelpVisible="True"
                                  ToolbarVisible="False"
                                  PropertySort="Categorized"/>
-        </Border>
-        <StackPanel Grid.Column="0"
+            </Border>
+            <StackPanel Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Grid.Row="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right">
-            <Button Width="100" Content="확인" Margin="4" Command="{Binding btnOKCommand}"/>
-            <Button Width="100" Content="취소" Margin="4" Command="{Binding btnCancelCommand}"/>
+                <Button Width="100" Content="확인" Margin="4" Command="{Binding btnOKCommand}"/>
+                <Button Width="100" Content="취소" Margin="4" Command="{Binding btnCancelCommand}"/>
 
-        </StackPanel>
-        
-
-
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
