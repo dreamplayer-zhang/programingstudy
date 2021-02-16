@@ -83,12 +83,24 @@ namespace Root_WIND2
 
         public void OnButtonClickedOK()
         {
+            Save();
             CloseRequested(this, new DialogCloseRequestedEventArgs(true));
         }
 
         public void OnButtonClickedCancel()
         {
             CloseRequested(this, new DialogCloseRequestedEventArgs(false));
+        }
+
+        public ICommand CmdClose
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    CloseRequested(this, new DialogCloseRequestedEventArgs(false));
+                });
+            }
         }
 
         public void OnSelectedItemChanged_Callback()
@@ -127,9 +139,27 @@ namespace Root_WIND2
             MenuItems = new TreeItemCollection();
             SettingDataList = new List<ISettingData>();
 
+
             SetMenuItems();
+            Load();
         }
 
+        public void Save()
+        {
+            for(int i = 0; i < SettingDataList.Count; i++)
+
+            {
+                SettingDataList[i].Save();
+            }
+        }
+
+        public void Load()
+        {
+            for(int i = 0; i < SettingDataList.Count; i++)
+            {
+                SettingDataList[i].Load(SettingDataList[i]);
+            }
+        }
 
         public void SetMenuItems()
         {
@@ -140,6 +170,7 @@ namespace Root_WIND2
             SettingDataList.Add(new SettingData_SetupFrontside(new string[] { "Setup", "Frontside" }));
 
             menuItems.SetTreeItem("Setup", "Frontside", "Get out of Here");
+            SettingDataList.Add(new SettingData_SetupFrontside(new string[] { "Setup", "Frontside", "Get out of Here" }));
 
             menuItems.SetTreeItem("Setup", "Backside");
             SettingDataList.Add(new SettingData_SetupBackside(new string[] { "Setup", "Backside" }));

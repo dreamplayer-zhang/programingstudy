@@ -4,26 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using static RootTools_Vision.Database.DatabaseAttribute;
 
-namespace RootTools.Database
+namespace RootTools_Vision.Database
 {
     public class Defect
     {
-
-
         // 각 Inspection에서 올라오는 결과 데이터
+        [Database(typeEnum.INT, 40, true, true, key:keyEnum.PRIMARYKEY)]
         public int m_nDefectIndex;
         public string m_strInspectionID;
         public int m_nDefectCode;
         public float m_fSize; // Pxl Size
         public float m_fWidth;
         public float m_fHeight;
-        
+
         public float m_fRelX; // 절대좌표 - CeterPoint
         public float m_fRelY;
         public float m_fAbsX; // 상대좌표 Origin 좌 하단 <-> Defect 좌 상단
         public float m_fAbsY;
-        
+
         public float m_fGV;
         public int m_nChipIndexX; // Chip Index
         public int m_nCHipIndexY;
@@ -41,8 +41,8 @@ namespace RootTools.Database
                 m_rtDefectBox = value;
             }
         }
-        
-        protected int m_nImgsizeX; 
+
+        protected int m_nImgsizeX;
         protected int m_nImgsizeY;
 
         protected Rect m_rtDefectBox;
@@ -125,7 +125,6 @@ namespace RootTools.Database
 
             p_rtDefectRect = new Rect(m_rtDefectBox.Left, p_rtDefectBox.Top, m_fWidth, m_fHeight);
         }
-
         public void CalcAbsToRelPos(int nRefX, int nRefY)
         {
             m_fRelX = m_fAbsX - nRefX;
@@ -136,9 +135,5 @@ namespace RootTools.Database
         {
             return p_rtDefectRect;
         }
-        public void CalcDegree()
-		{
-
-		}
     }
 }

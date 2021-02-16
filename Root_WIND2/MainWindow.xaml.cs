@@ -17,6 +17,7 @@ using RootTools.Database;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using RootTools_Vision.Utility;
 
 namespace Root_WIND2
 {
@@ -143,7 +144,9 @@ namespace Root_WIND2
 
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1);
+            DatabaseManager.Instance.ValidateDatabase();
             //////
+
             logView.Init(LogView.m_logView);
             WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
             InitTimer();
@@ -177,8 +180,6 @@ namespace Root_WIND2
         private string memoryEdgeBottom = "EdgeBottom";
         private string memoryEdgeEBR = "EBR";
         
-
-
         public bool RegisterGlobalObjects()
         {
             try
@@ -228,6 +229,9 @@ namespace Root_WIND2
                 RecipeBack recipeBack = GlobalObjects.Instance.Register<RecipeBack>();
                 RecipeEdge recipeEdge = GlobalObjects.Instance.Register<RecipeEdge>();
                 RecipeEBR recipeEBR = GlobalObjects.Instance.Register<RecipeEBR>();
+
+                // Klarf
+                KlarfData_Lot klarfData_lot = GlobalObjects.Instance.Register<KlarfData_Lot>();
 
 
                 if(frontImage.GetPtr() == IntPtr.Zero)
