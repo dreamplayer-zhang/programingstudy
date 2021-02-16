@@ -43,12 +43,42 @@ namespace RootTools.ZoomLens
         }
         #endregion
 
+        #region Property
         int m_nCurrentPos;
         public int p_nCurrentPos
         {
             get { return m_nCurrentPos; }
             set { SetProperty(ref m_nCurrentPos, value); }
         }
+
+        int m_nSlot1Pos = 0;
+        public int p_nSlot1Pos
+        {
+            get { return m_nSlot1Pos; }
+            set { SetProperty(ref m_nSlot1Pos, value); }
+        }
+
+        int m_nSlot2Pos = 0;
+        public int p_nSlot2Pos
+        {
+            get { return m_nSlot2Pos; }
+            set { SetProperty(ref m_nSlot2Pos, value); }
+        }
+
+        int m_nSlot3Pos = 0;
+        public int p_nSlot3Pos
+        {
+            get { return m_nSlot3Pos; }
+            set { SetProperty(ref m_nSlot3Pos, value); }
+        }
+
+        int m_nSlot4Pos = 0;
+        public int p_nSlot4Pos
+        {
+            get { return m_nSlot4Pos; }
+            set { SetProperty(ref m_nSlot4Pos, value); }
+        }
+        #endregion
         public Log m_log;
         public RS232 m_rs232;
         public ZoomLens(string id, Log log)
@@ -433,6 +463,30 @@ namespace RootTools.ZoomLens
             GetStatus(1);
         }
 
+        public void Slot1Clicked()
+        {
+            AbsoluteGo(p_nSlot1Pos);
+            GetStatus(1);
+        }
+
+        public void Slot2Clicked()
+        {
+            AbsoluteGo(p_nSlot2Pos);
+            GetStatus(1);
+        }
+
+        public void Slot3Clicked()
+        {
+            AbsoluteGo(p_nSlot3Pos);
+            GetStatus(1);
+        }
+
+        public void Slot4Clicked()
+        {
+            AbsoluteGo(p_nSlot4Pos);
+            GetStatus(1);
+        }
+
         public RelayCommand HomeCommand
         {
             get
@@ -517,6 +571,38 @@ namespace RootTools.ZoomLens
             get
             {
                 return new RelayCommand(JogDownMouseUp);
+            }
+        }
+
+        public RelayCommand Slot1Command
+        {
+            get
+            {
+                return new RelayCommand(Slot1Clicked);
+            }
+        }
+
+        public RelayCommand Slot2Command
+        {
+            get
+            {
+                return new RelayCommand(Slot2Clicked);
+            }
+        }
+
+        public RelayCommand Slot3Command
+        {
+            get
+            {
+                return new RelayCommand(Slot3Clicked);
+            }
+        }
+
+        public RelayCommand Slot4Command
+        {
+            get
+            {
+                return new RelayCommand(Slot4Clicked);
             }
         }
         #endregion
