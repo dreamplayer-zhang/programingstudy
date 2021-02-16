@@ -27,6 +27,7 @@ namespace RootTools
 {
 
     public delegate void LoadedDelegate();
+	public delegate void DoubleClickDelegate();
 	// public delegate void RedrawDelegate();
 	public class ImageViewer_ViewModel : ObservableObject
 	{
@@ -533,11 +534,10 @@ namespace RootTools
 			m_InformationTool = new UniquenessDrawerVM(this);
 			m_InformationTool.m_Stroke = System.Windows.Media.Brushes.Red;
 
-
 			p_Element = new ObservableCollection<UIElement>();
 		}
 
-		public void SetDrawer(DrawToolVM _SelectedTool)
+        public void SetDrawer(DrawToolVM _SelectedTool)
 		{
 			SelectedTool = _SelectedTool;
 
@@ -1663,6 +1663,13 @@ namespace RootTools
 				return new RelayCommand(Loaded_function);
 			}
 		}
+		public ICommand MouseDoubleClickCommand
+        {
+            get
+            {
+				return new RelayCommand(MouseDoubleClick);
+            }
+        }
 		public event LoadedDelegate m_AfterLoaded;
 		void Loaded_function()
 		{
@@ -1670,6 +1677,14 @@ namespace RootTools
 				InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
 			if (m_AfterLoaded != null)
 				m_AfterLoaded();
+		}
+
+		public EventHandler DoubleClicked;
+		void MouseDoubleClick()
+        {
+			if (DoubleClicked != null)
+				DoubleClicked.Invoke(new CPoint(p_MouseMemX, p_MouseMemY), null);
+
 		}
 		#endregion
 	}
