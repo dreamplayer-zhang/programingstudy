@@ -361,29 +361,31 @@ namespace RootTools.Memory
         public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem, int nByte)
         {
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
-            m_abuf = new byte[CanvasWidth * CanvasHeight * nByte];
+           
             _bRecieve = true;
             m_Server.Send(str);
             Stopwatch watch = new Stopwatch();
             watch.Start();
             while (_bRecieve)
             {
-                Thread.Sleep(10);
+                Thread.Sleep(5);
                 if (watch.ElapsedMilliseconds > 5000)
                     return m_abuf;
             }
             _bRecieve = false;
+            m_log.Warn(watch.ElapsedMilliseconds.ToString());
             return m_abuf;
         }
         private void M_Server_EventReciveData(byte[] aBuf, int nSize, System.Net.Sockets.Socket socket)
         {
             //socket.Send(aBuf, nSize, SocketFlags.None);
-            string str = Encoding.ASCII.GetString(aBuf, 0, nSize);
+            //string str = Encoding.Default.GetString(aBuf, 0, nSize);
             //m_qLog.Enqueue(new Mars(0, Encoding.ASCII.GetString(aBuf, 0, nSize)));
             //string[] aStr = str.Split(Splitter);
             //string astr = str;
-            
-            m_abuf = Convert.FromBase64String(str);
+
+            m_abuf = aBuf;// Encoding.Default.GetBytes(str);//            Convert.FromBase64String(str);
+           // m_abuf = Decompress(m_abuf);
             _bRecieve = false;
             //switch (aStr)
             //{
