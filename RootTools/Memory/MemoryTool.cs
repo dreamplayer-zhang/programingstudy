@@ -38,7 +38,7 @@ namespace RootTools.Memory
 
         public void ClearBuffer()
         {
-            Array.Clear(Buffer, 0, BufferSize);
+         //   Array.Clear(Buffer, 0, BufferSize);
         }
     }
     public class MemServer
@@ -537,13 +537,14 @@ namespace RootTools.Memory
         bool _bRecieve = false;
         byte[] m_abuf;
         public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem, int nByte)
-        {
+        {  
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
            
             _bRecieve = true;
             m_Server.Send(str);
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
+        
             while (_bRecieve)
             {
                 Thread.Sleep(5);
@@ -551,7 +552,7 @@ namespace RootTools.Memory
                     return m_abuf;
             }
             _bRecieve = false;
-            m_log.Warn(watch.ElapsedMilliseconds.ToString());
+              m_log.Warn(watch.ElapsedMilliseconds.ToString());
             return m_abuf;
         }
         private void M_Server_EventReciveData(byte[] aBuf, int nSize)

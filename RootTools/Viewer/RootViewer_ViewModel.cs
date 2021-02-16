@@ -690,7 +690,7 @@ namespace RootTools
                                 byte[,,] viewptr = view.Data;
                                 byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
                                 int nTerm = p_CanvasWidth * p_CanvasHeight;
-                                //for (int yy = 0; yy < p_CanvasHeight; yy++)
+                                if(image !=null)                              
                                 Parallel.For(0, p_CanvasHeight, (yy) =>
                                 {
                                     for (int xx = 0; xx < p_CanvasWidth; xx++)
