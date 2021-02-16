@@ -20,7 +20,7 @@ namespace Root_WIND2.UI_User
 
         public FrontsideAlignment_ViewModel()
         {
-            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero)
+            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero && GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").m_eMode != ImageData.eMode.OtherPCMem)
                 return;
             this.imageViewerVM = new FrontsideAlignment_ImageViewer_ViewModel();
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
