@@ -60,6 +60,7 @@ namespace RootTools.Database
 
 		protected Lotinfo m_Loftinfo = new Lotinfo(); // 현재 Lot정보
 		protected string m_sInspectionID; // INSPECTION ID(DB PRIMARY KEY)
+		public string InspectionID { get { return m_sInspectionID; } }
 
 		public DataSet m_DataSet = new DataSet();
 		public DataTable m_DefectTable = new DataTable();
@@ -180,9 +181,12 @@ namespace RootTools.Database
 
 		public void SendQuery(string sQueryMessage) // Main
 		{
+			if (m_MainConnectSession.IsConnected == false)
+				return;
 #if !DEBUG
 			try
 			{
+
 #endif
 				MySqlCommand cmd = new MySqlCommand(sQueryMessage, m_MainConnectSession.GetConnection());
 				cmd.ExecuteNonQuery();
@@ -228,6 +232,8 @@ namespace RootTools.Database
 
 		public void SelectData()
 		{
+			if (m_MainConnectSession.IsConnected == false)
+				return;
 #if !DEBUG
 			try
 			{
@@ -236,6 +242,8 @@ namespace RootTools.Database
 				DataSet data = new DataSet();
 				string sSelectQuery = "SELECT * FROM wind2.defect"; // Temp
 				MySqlDataAdapter ap = new MySqlDataAdapter();
+			
+			
 				ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
 				ap.Fill(data); // DataSet으로 전체 데이터 복사.
 				m_DefectTable = data.Tables[0].Copy();
@@ -348,6 +356,7 @@ namespace RootTools.Database
 			try
 			{
 #endif
+				SendQuery("TRUNCATE defect;");
 				StringBuilder temp = new StringBuilder();
 				StringBuilder sbQuery = new StringBuilder();
 				StringBuilder sbColumList = new StringBuilder();
@@ -388,7 +397,7 @@ namespace RootTools.Database
 					if (i != sbValueList.Count - 1)
 						sbQuery.Append(",");
 				}
-				SendQuery(sbQuery.ToString());
+				 SendQuery(sbQuery.ToString());
 #if !DEBUG
 			}
 			catch (Exception ex)

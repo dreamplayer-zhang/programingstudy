@@ -98,7 +98,7 @@ namespace Root_WIND2
                     }
                 }));
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 MessageBox.Show("Map State Change Error\n");
             }

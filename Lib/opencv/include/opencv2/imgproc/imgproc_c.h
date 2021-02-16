@@ -45,6 +45,8 @@
 
 #include "opencv2/imgproc/types_c.h"
 
+#pragma warning(disable: 26495)
+
 #ifdef __cplusplus
 extern "C" {
 #endif

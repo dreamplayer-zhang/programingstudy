@@ -49,6 +49,7 @@ namespace Root_WIND2
         {
             var ff = cbxColors.SelectedItem;
             InspectionROI roi = this.DataContext as InspectionROI;
+            if (roi == null) return;
             var select = typeof(Colors).GetProperties()
                         .Where(p => p.GetValue(null, null).ToString() == roi.p_Color.ToString())
                         .Select(p => p).FirstOrDefault();

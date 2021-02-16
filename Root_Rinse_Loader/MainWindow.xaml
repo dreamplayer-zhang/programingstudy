@@ -193,7 +193,6 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition />
                                     <RowDefinition Height="Auto" />
-
                                 </Grid.RowDefinitions>
 
                                 <Grid Grid.Row="0"
@@ -350,7 +349,7 @@
                                     <ColumnDefinition Width="3*"/>
                                     <ColumnDefinition Width="2*"/>
                                 </Grid.ColumnDefinitions>
-                                <TabControl Grid.Column="0" x:Name="tabControlStorage">
+                                <TabControl Grid.Column="0" x:Name="tabControlStorage" Margin="5">
                                     <TabItem Header="Magazine" Height="0">
                                         <ui:Magazine_UI x:Name="magazineUI"/>
                                     </TabItem>
@@ -358,6 +357,7 @@
                                         <ui:Stack_UI x:Name="stackUI"/>
                                     </TabItem>
                                 </TabControl>
+                                <ui:Progress_UI Grid.Column="1" x:Name="progressUI" Margin="5"/>
                             </Grid>
                         </Grid>
                     </TabItem>

@@ -35,7 +35,7 @@ namespace Root_AOP01_Inspection
             }
         }
 
-        public MainWindow m_MainWindow;
+        //public MainWindow m_MainWindow;
 
         private SetupHome_ViewModel m_Home;
         public Maintenance_ViewModel m_Maintenance;
@@ -43,23 +43,17 @@ namespace Root_AOP01_Inspection
 
         private RecipeWizard_ViewModel m_RecipeWizard;
         private RecipeSpec_ViewModel m_RecipeSpec;
-        private Recipe45D_ViewModel m_Recipe45D;
-        private RecipeFrontside_ViewModel m_RecipeFrontSide;
-        private RecipeEdge_ViewModel m_RecipeEdge;
+        public Recipe45D_ViewModel m_Recipe45D { get; private set; }
+        public RecipeFrontside_ViewModel m_RecipeFrontSide { get; private set; }
+        public RecipeEdge_ViewModel m_RecipeEdge { get; private set; }
         private RecipeLADS_ViewModel m_RecipeLADS;
 
-        InspectionManager_AOP inspectionManager;
-        public InspectionManager_AOP InspectionManager { get => inspectionManager; private set => inspectionManager = value; }
-
-        public Setup_ViewModel(MainWindow mainwindow)
+        public Setup_ViewModel()
         {
-            m_MainWindow = mainwindow;
-
             Init_ViewModel();
             Init_NaviBtn();
 
             Set_HomePanel();
-            inspectionManager = ProgramManager.Instance.InspectionManager;
         }
 
         void Init_ViewModel()
@@ -70,7 +64,7 @@ namespace Root_AOP01_Inspection
             m_GEM = new GEM_ViewModel(this);
 
             m_Recipe45D = new Recipe45D_ViewModel(this);
-            m_RecipeFrontSide = new RecipeFrontside_ViewModel(this);
+            m_RecipeFrontSide = new RecipeFrontside_ViewModel(this, m_RecipeWizard.RecipeFrontside.canvas.Dispatcher);
             m_RecipeEdge = new RecipeEdge_ViewModel(this);
             m_RecipeLADS = new RecipeLADS_ViewModel(this);
             m_RecipeSpec = new RecipeSpec_ViewModel(this);

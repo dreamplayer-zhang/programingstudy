@@ -161,13 +161,17 @@ namespace Root_WIND2
         private string memoryFrontPool = "Vision.Memory";
         private string memoryFrontGroup = "Vision";
         private string memoryFront = "Main";
+        private string memoryMask = "Layer";
 
-        // Backside 메모리 이름 필요
+        //private string memoryMaskPool = "pool";
+        //private string memoryMaskGroup = "group";
+        //private string memoryMask = "ROI";
 
 
-        private string memoryMaskPool = "pool";
-        private string memoryMaskGroup = "group";
-        private string memoryMask = "ROI";
+        private string memoryBackPool = "BackSide Vision.BackSide Memory";
+        private string memoryBackGroup = "BackSide Vision";
+        private string memoryBack = "BackSide";
+
 
         private string memoryEdgePool = "EdgeSide Vision.Memory";
         private string memoryEdgeGroup = "EdgeSide Vision";
@@ -188,15 +192,32 @@ namespace Root_WIND2
 
                 MemoryTool memoryTool = engineer.ClassMemoryTool();
 
-                ImageData frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
-                ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask));
+                ImageData frontImage;
+                ImageData maskLayer;
+                // ImageData
+                if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
+                {
+
+                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryFrontPool, memoryFrontGroup, memoryFront, engineer.ClassMemoryTool(),3);
+                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage",memoryFrontPool, memoryFrontGroup, memoryMask , engineer.ClassMemoryTool(),3);
+                    //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
+                }
+                else
+                {
+                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
+                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
+                }
+
+
+                ImageData backImage = GlobalObjects.Instance.RegisterNamed<ImageData>("BackImage", memoryTool.GetMemory(memoryBackPool, memoryBackGroup, memoryBack));
+
                 ImageData edgeTopImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeTopImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop));
                 ImageData edgeSideImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeSideImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeSide));
                 ImageData edgeBottomImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeBottomImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeBottom));
                 ImageData ebrImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EBRImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR));
 
                 if (frontImage.m_MemData != null) frontImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nCount;
-                if (maskLayer.m_MemData != null) maskLayer.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nByte;
+                if (maskLayer.m_MemData != null) maskLayer.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask).p_nByte;
                 if (edgeTopImage.m_MemData != null) edgeTopImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop).p_nCount;
                 if (edgeSideImage.m_MemData != null) edgeSideImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeSide).p_nCount;
                 if (edgeBottomImage.m_MemData != null) edgeBottomImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeBottom).p_nCount;
@@ -215,7 +236,7 @@ namespace Root_WIND2
 
                 if(frontImage.GetPtr() == IntPtr.Zero)
                 {
-                    MessageBox.Show("Front Inspection 생성 실패, 메모리 할당 없음");
+                    //MessageBox.Show("Front Inspection 생성 실패, 메모리 할당 없음");
                 }
                 else
                 {
@@ -226,24 +247,26 @@ namespace Root_WIND2
                         recipeFront,
                         new SharedBufferInfo(frontImage.GetPtr(0), frontImage.p_Size.X, frontImage.p_Size.Y, frontImage.p_nByte, frontImage.GetPtr(1), frontImage.GetPtr(2))
                         );
+
+                    inspectionFront.SetRecipe(recipeFront);
                 }
 
-                if (frontImage.GetPtr() == IntPtr.Zero)
+                if (backImage.GetPtr() == IntPtr.Zero)
                 {
-                    MessageBox.Show("Back Inspection 생성 실패, 메모리 할당 없음");
+                    //MessageBox.Show("Back Inspection 생성 실패, 메모리 할당 없음");
                 }
                 else
                 {
                     InspectionManagerBackside inspectionBack = GlobalObjects.Instance.Register<InspectionManagerBackside>
                     (
                     recipeBack,
-                    new SharedBufferInfo(frontImage.GetPtr(0), frontImage.p_Size.X, frontImage.p_Size.Y, frontImage.p_nByte, frontImage.GetPtr(1), frontImage.GetPtr(2))
+                    new SharedBufferInfo(backImage.GetPtr(0), backImage.p_Size.X, backImage.p_Size.Y, backImage.p_nByte, backImage.GetPtr(1), backImage.GetPtr(2))
                     );
                 }
 
                 if (edgeTopImage.GetPtr() == IntPtr.Zero || edgeSideImage.GetPtr() == IntPtr.Zero || edgeBottomImage.GetPtr() == IntPtr.Zero)
                 {
-                    MessageBox.Show("Edge Inspection 생성 실패, 메모리 할당 없음");
+                    //MessageBox.Show("Edge Inspection 생성 실패, 메모리 할당 없음");
                 }
                 else
                 {
@@ -263,7 +286,7 @@ namespace Root_WIND2
 
                 if (ebrImage.GetPtr() == IntPtr.Zero)
                 {
-                    MessageBox.Show("EBR Inspection 생성 실패, 메모리 할당 없음");
+                    //MessageBox.Show("EBR Inspection 생성 실패, 메모리 할당 없음");
                 }
                 else
                 {

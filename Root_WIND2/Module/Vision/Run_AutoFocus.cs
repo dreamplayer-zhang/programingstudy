@@ -27,7 +27,7 @@ namespace Root_WIND2.Module
         RPoint m_ptVRSCamPos = new RPoint();
 
         int m_nStartFocusPosZ = 0;
-        int m_nEndFocusPosZ = 0;
+        //int m_nEndFocusPosZ = 0;
         // 추후 모드 추가
 
         int m_nAFOffset = 0;
@@ -210,6 +210,7 @@ namespace Root_WIND2.Module
                 while (pos.Count != nFrameDone)
                 {
                     Thread.Sleep(10);
+                    if (EQ.IsStop()) return "OK";
                 }
 
                 axisZ.WaitReady();

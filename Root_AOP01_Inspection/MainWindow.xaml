@@ -35,12 +35,18 @@
                 <Viewbox Margin="3" VerticalAlignment="Center">
                     <icon:AtiLogo/>
                 </Viewbox>
-                <TextBlock Text="AOP01  -  Ver. 1.0.01"
+                <TextBlock Text="AOP01  -  Ver."
                            Foreground="White"
                            VerticalAlignment="Center"
                            FontSize="12"
                            Margin="5,0,0,0"
                            Grid.Column="1" />
+                <TextBlock Name="textblockAssembly" Text=""
+                           Foreground="White"
+                           VerticalAlignment="Center"
+                           FontSize="12"/>
+
+
             </StackPanel>
             <TextBlock Text="Recipe Name.rcp"
                        Foreground="White"

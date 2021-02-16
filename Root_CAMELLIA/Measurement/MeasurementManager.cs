@@ -19,6 +19,10 @@ namespace Root_CAMELLIA
         public bool IsInitialized { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
+        public void _Dummy()
+        {
+            if (PropertyChanged != null) PropertyChanged(null, null); 
+        }
 
         public void StartMeasurement()
         {

@@ -24,11 +24,28 @@ namespace Root_WIND2
         {
             if(this.m_cInspROI != null) this.m_InspROI = this.m_cInspROI[0];
             
+            // Method
             m_cInspMethod = new ObservableCollection<ParameterBase>();
             p_cInspMethod = ParameterBase.GetChildClass();
 
             this.p_InspMethod = this.m_cInspMethod[1]; // Position
             this.p_InspChannel = IMAGE_CHANNEL.R_GRAY;
+
+            // Mask
+            m_cInspROI = new ObservableCollection<InspectionROI>();
+            MaskRecipe maskRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<MaskRecipe>();
+            for (int i = 0; i < maskRecipe.MaskList.Count; i++)
+            {
+                InspectionROI roi = new InspectionROI();
+                roi.p_Index = i;
+                roi.p_Size = maskRecipe.MaskList[i].Area;
+                roi.p_Data = maskRecipe.MaskList[i].ToPointLineList();
+                roi.p_Color = maskRecipe.MaskList[i].ColorIndex;
+                this.p_cInspROI.Add(roi);
+            }
+
+            if (this.p_cInspROI.Count > 0)
+                this.p_InspROI = this.p_cInspROI[0];
         }
 
         public int p_Index

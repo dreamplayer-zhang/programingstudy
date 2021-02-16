@@ -63,7 +63,7 @@ namespace Root_AOP01_Packing
         }
         public DIO_I[] DiDoorLock
         {
-            get => _diDoorLock; 
+            get => _diDoorLock;
             set => _diDoorLock = value;
         }
         public DIO_I[] DiLightCurtain
@@ -97,6 +97,12 @@ namespace Root_AOP01_Packing
             set => _alid_ProtectionBar = value;
         }
         #endregion
+        public Certification(string id, IEngineer engineer)
+        {
+            m_RNR = new Run_RNR(this);
+            base.InitBase(id, engineer);
+            InitThreadCheck();
+        }
 
         public override void RunTree(Tree tree)
         {
@@ -114,10 +120,10 @@ namespace Root_AOP01_Packing
             p_sInfo = m_toolBox.Get(ref _axisAll[7], this, "Loader Plate X");
             p_sInfo = m_toolBox.Get(ref _axisAll[8], this, "Picker X");
             p_sInfo = m_toolBox.Get(ref _axisAll[9], this, "Picker Z");
-            p_sInfo = m_toolBox.Get(ref _axisAll[10], this, "Loader Plate");
+            p_sInfo = m_toolBox.Get(ref _axisAll[10], this, "Loader Pusher X");
 
             p_sInfo = m_toolBox.Get(ref _diEMS, this, "EMS");
-           
+
             p_sInfo = m_toolBox.Get(ref _diAllDoorLock, this, "All Door Lock");
 
             p_sInfo = m_toolBox.Get(ref _diDoorLock[0], this, "Main Panel Top left Door Lock");
@@ -132,14 +138,9 @@ namespace Root_AOP01_Packing
 
             _alid_EMS = m_gaf.GetALID(this, "EMS", "EMS ERROR");
             _alid_DoorOpen = m_gaf.GetALID(this, "DOOR", "DOOR ERROR");
+            _alid_LightCurtain = m_gaf.GetALID(this, "Light Curtain", "LIGHT CURTAIN ERROR");
+            _alid_ProtectionBar = m_gaf.GetALID(this, "Protection Bar", "PROTECTION BAR ERROR");
             m_RNR.GetTools(m_toolBox, bInit);
-        }
-        
-        public Certification(string id, IEngineer engineer)
-        {
-            m_RNR = new Run_RNR(this);
-            base.InitBase(id, engineer);
-            InitThreadCheck();
         }
         protected override void InitModuleRuns()
         {
@@ -168,60 +169,78 @@ namespace Root_AOP01_Packing
         }
         void RunThreadCheck()
         {
-            m_bThreadCheck = true;
-            Thread.Sleep(1000);
-            while (m_bThreadCheck)
-            {
-                Thread.Sleep(10);
-                if (_diEMS.p_bIn)
-                {
-                    this.p_eState = eState.Error;
-                    EQ.p_bStop = true;
-                    _alid_EMS.Run(!_diEMS.p_bIn, "Please Check the Emergency Buttons");
-                }
-                for (int i = 0; i < _diDoorLock.Length; i++)
-                {
-                    if (_diDoorLock[i].p_bIn)
-                    {
-                        this.p_eState = eState.Error;
-                        EQ.p_bStop = true;
-                        string strDoor = " ";
-                        if (i == 0)
-                            strDoor = "Main Panel Top Left Door";
-                        if (i == 1)
-                            strDoor = "Main Panel Bottom Left Door";
-                        if (i == 2)
-                            strDoor = "Main Panel Door";
+            //m_bThreadCheck = true;
+            //Thread.Sleep(5000);
+            //while (m_bThreadCheck)
+            //{
+            //    //Thread.Sleep(5000);
+            //    //this.p_eState = eState.Error;
+            //    //EQ.p_bStop = true;
+            //    //Debug.WriteLine("Run Thread EQ Stop");
 
-                        _alid_DoorOpen.Run(!_diDoorLock[i].p_bIn, strDoor + "Opened");
-                    }
-                }
-                if (m_bUseCurtain)
-                {
-                    for (int i = 0; i < _diLightCurtain.Length; i++)
-                    {
-                        if (_diLightCurtain[i].p_bIn)
-                        {
-                            this.p_eState = eState.Error;
-                            EQ.p_bStop = true;
-                            string strCurtain = " ";
-                            if (i == 0)
-                                strCurtain = "Unloadport Light Curtain Error";
-                            if (i == 1)
-                                strCurtain = "Loadport Light Curatin Error";
+            //    Thread.Sleep(10);
 
-                            _alid_LightCurtain.Run(!_diLightCurtain[i].p_bIn, strCurtain);
+            //    if (_diEMS.p_bIn)
+            //    {
+            //        this.p_eState = eState.Error;
+            //        EQ.p_bStop = true;
+            //        _alid_EMS.Run(_diEMS.p_bIn, "Please Check the Emergency Buttons");
+            //    }
+            //    for (int i = 0; i < _diDoorLock.Length - 1; i++)
+            //    {
+            //        if (_diDoorLock[i].p_bIn)
+            //        {
+            //            this.p_eState = eState.Error;
+            //            EQ.p_bStop = true;
+            //            string strDoor = " ";
+            //            if (i == 0)
+            //                strDoor = "Main Panel Top Left Door";
+            //            if (i == 1)
+            //                strDoor = "Main Panel Bottom Left Door";
+            //            if (i == 2)
+            //                continue;
+            //            //strDoor = "Main Panel Door";
 
-                        }
-                    }
-                }
-                if (_diProtectionBar.p_bIn)
-                {
-                    this.p_eState = eState.Error;
-                    EQ.p_bStop = true;
-                    _alid_EMS.Run(!_diProtectionBar.p_bIn, "Protection Bar Error");
-                }
-            }
+            //            _alid_DoorOpen.Run(_diDoorLock[i].p_bIn, strDoor + "Opened");
+            //        }
+            //    }
+            //    if (m_bUseCurtain)
+            //    {
+            //        for (int i = 0; i < _diLightCurtain.Length; i++)
+            //        {
+            //            if (_diLightCurtain[i].p_bIn)
+            //            {
+            //                this.p_eState = eState.Error;
+            //                EQ.p_bStop = true;
+            //                string strCurtain = " ";
+            //                if (i == 0)
+            //                    strCurtain = "Unloadport Light Curtain Error";
+            //                if (i == 1)
+            //                    strCurtain = "Loadport Light Curatin Error";
+
+
+            //                _alid_LightCurtain.Run(_diLightCurtain[i].p_bIn, strCurtain);
+            //                //Thread.Sleep(5000);
+
+            //            }
+            //        }
+            //    }
+            //    if (_diProtectionBar.p_bIn)
+            //    {
+            //        this.p_eState = eState.Error;
+            //        EQ.p_bStop = true;
+            //        _alid_ProtectionBar.Run(_diProtectionBar.p_bIn, "Protection Bar Error");
+            //    }
+
+            //    if (EQ.IsStop())
+            //    {
+            //        foreach (Axis axis in AxisAll)
+            //        {
+            //            axis.StopAxis();
+            //        }
+            //        p_eState = eState.Error;
+            //    }
+            //}
         }
 
         public class Run_RNR : ModuleRunBase
@@ -252,32 +271,88 @@ namespace Root_AOP01_Packing
                 m_module.DODoorLock.Write(true);
                 for (int nRepeat = 0; nRepeat < m_nRepeatCnt; nRepeat++)
                 {
+                    //Thread.Sleep(1000);
                     if (EQ.IsStop())
                         return "EQ Stop";
-                    //foreach (Axis axis in m_module.AxisAll)
-                    //{
-                    //    m_module.Run(axis.StartMove(10000));
-                    //}
-                    //foreach (Axis axis in m_module.AxisAll)
-                    //{
-                    //    m_module.Run(axis.WaitReady());
-                    //}
-                    //foreach (Axis axis in m_module.AxisAll)
-                    //{
-                    //    m_module.Run(axis.StartMove(0));
-                    //}
-                    //foreach (Axis axis in m_module.AxisAll)
-                    //{
-                    //    m_module.Run(axis.WaitReady());
-                    //}
-                    //m_module.Run(m_module.AxisAll[0].StartMove(1000));
+                    for (int i = 0; i < m_module.AxisAll.Length; i++)
+                    {
+                        if (i == 2 || i == 3)
+                        {
+                            //m_module.AxisAll[i].StartMove(2500);
+                            continue;
+                        }
 
-                    Thread.Sleep(1000);
-                    Debug.WriteLine(nRepeat);
-                    //if (nRepeat== 4)
-                    //{
-                    //    m_module.ALID_EMS.Run(true, "test");
-                    //}
+                        m_module.AxisAll[i].StartHome();
+                        if (i == 0)
+                            Debug.WriteLine("Axis" + i.ToString() + "Home");
+                        else
+                            Debug.WriteLine("Axis" + (i + 1).ToString() + "Home");
+                    }
+                    for (int i = 0; i < m_module.AxisAll.Length; i++)
+                    {
+                        //if (i == 2 || i == 3)
+                        //    continue;
+
+                        m_module.AxisAll[i].WaitReady();
+                        if (i == 0)
+                            Debug.WriteLine("Axis" + i.ToString() + "Home");
+                        else
+                            Debug.WriteLine("Axis" + (i + 1).ToString() + "Home Done");
+
+                    }
+
+                    //m_module.Run(m_module.AxisAll[0].StartMove(500000));
+                    //m_module.Run(m_module.AxisAll[1].StartMove(150000));
+                    ////m_module.Run(m_module.AxisAll[2].StartMove(4500));
+                    ////m_module.Run(m_module.AxisAll[3].StartMove(4500));
+                    //m_module.Run(m_module.AxisAll[4].StartMove(150000));
+                    //m_module.Run(m_module.AxisAll[5].StartMove(20000));
+                    //m_module.Run(m_module.AxisAll[6].StartMove(40000));
+                    //m_module.Run(m_module.AxisAll[7].StartMove(40000));
+                    //m_module.Run(m_module.AxisAll[8].StartMove(150000));
+                    //m_module.Run(m_module.AxisAll[9].StartMove(20000));
+                    //m_module.Run(m_module.AxisAll[10].StartMove(150000));
+
+                    //m_module.Run(m_module.AxisAll[0].WaitReady());
+                    //Debug.WriteLine("Axis 1" + "Move Done");
+                    //m_module.Run(m_module.AxisAll[1].WaitReady());
+                    //Debug.WriteLine("Axis 2" + "Move Done");
+                    //m_module.Run(m_module.AxisAll[4].WaitReady());
+                    //Debug.WriteLine("Axis 5" + "Move Done");
+                    //m_module.Run(m_module.AxisAll[5].WaitReady());
+                    //Debug.WriteLine("Axis 6" + "Move Done");
+                    //m_module.Run(m_module.AxisAll[6].WaitReady());
+                    //Debug.WriteLine("Axis 7" + "Move Done");
+                    //m_module.Run(m_module.AxisAll[7].WaitReady());
+                    //Debug.WriteLine("Axis 8" + "Move Done");
+                    //m_module.Run(m_module.AxisAll[8].WaitReady());
+                    //Debug.WriteLine("Axis 9" + "Move Done");
+                    //m_module.Run(m_module.AxisAll[9].WaitReady());
+                    //Debug.WriteLine("Axis 10" + "Move Done");
+                    //m_module.Run(m_module.AxisAll[10].WaitReady());
+                    //Debug.WriteLine("Axis 11" + "Move Done");
+
+                    //Debug.WriteLine(nRepeat.ToString() + "번");    
+                    //m_module.Run(m_module.AxisAll[0].StartMove(1000));
+                    //m_module.Run(m_module.AxisAll[1].StartMove(1000));
+                    //m_module.Run(m_module.AxisAll[4].StartMove(1000));
+                    //m_module.Run(m_module.AxisAll[5].StartMove(1000));
+                    //m_module.Run(m_module.AxisAll[6].StartMove(1000));
+                    //m_module.Run(m_module.AxisAll[7].StartMove(1000));
+                    //m_module.Run(m_module.AxisAll[8].StartMove(1000));
+                    //m_module.Run(m_module.AxisAll[9].StartMove(1000));
+                    //m_module.Run(m_module.AxisAll[10].StartMove(1000));
+
+                    //m_module.Run(m_module.AxisAll[0].WaitReady());
+                    //m_module.Run(m_module.AxisAll[1].WaitReady());
+                    //m_module.Run(m_module.AxisAll[4].WaitReady());
+                    //m_module.Run(m_module.AxisAll[5].WaitReady());
+                    //m_module.Run(m_module.AxisAll[6].WaitReady());
+                    //m_module.Run(m_module.AxisAll[7].WaitReady());
+                    //m_module.Run(m_module.AxisAll[8].WaitReady());
+                    //m_module.Run(m_module.AxisAll[9].WaitReady());
+                    //m_module.Run(m_module.AxisAll[10].WaitReady());
+
                 }
                 //반복할거임
                 //시작하면 Door lock I / O켜

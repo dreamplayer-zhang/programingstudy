@@ -21,18 +21,25 @@
 					<Button Content="Set Center"
                             Command="{Binding commandSetCenter}"
                             Style="{StaticResource SetupPanelBtn}"/>
-					<Button Content="Start Recipe Teaching"
-                            Command="{Binding commandStartTeaching}"
-                            Style="{StaticResource SetupPanelBtn}"/>
 					<Button Content="Inspection"
                             Command="{Binding commandInspTest}"
                             Style="{StaticResource SetupPanelBtn}"/>
+					<Rectangle Height="2"
+							   Margin="10,20"
+							   Stroke="Transparent"
+							   Fill="Gray"/>
+					<ToggleButton Content="Draw Edge Box" 
+								  Style="{StaticResource SetupPanelToggleBtn}"
+								  IsChecked="{Binding EdgeDrawMode}"/>
+					<Button Content="Save Edge Box"
+                            Command="{Binding commandSaveEdgeBox}"
+                            Style="{StaticResource SetupPanelBtn}"/>
 				</StackPanel>
-                <Button Content="Back"
+				<Button Content="Back"
                         Command="{Binding btnBack}"
                         Style="{StaticResource SetupPanelBtn}"
                         VerticalAlignment="Bottom"/>
-            </Grid>
+			</Grid>
         </Border>
 
         <Grid Grid.Column="1">
@@ -47,7 +54,8 @@
 
                         <Grid Grid.Column="0">
                             <GroupBox Header="45D Image">
-								<tools:RootViewer DataContext="{Binding p_ImageViewer_VM}"/>
+								<tools:RootViewer DataContext="{Binding p_ImageViewer_VM}"
+												  x:Name="canvas"/>
 								<!--<Image Source="/Root_AOP01_Inspection;component/Resource/ReticleMap2.PNG"/>-->
                             </GroupBox>
                         </Grid>
@@ -134,16 +142,21 @@
                                                     <RowDefinition/>
                                                     <RowDefinition/>
                                                 </Grid.RowDefinitions>
-                                                <TextBlock FontSize="12" Text="Use Absolute GV" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                                <TextBlock FontSize="12" Text="Pit Level" Style="{StaticResource BasicTb}" Grid.Row="3"/>
+                                                <TextBlock FontSize="12" Text="Birght Inspection" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                                <!--<TextBlock FontSize="12" Text="Pit Level" Style="{StaticResource BasicTb}" Grid.Row="3"/>-->
                                                 <TextBlock FontSize="12" Text="GV" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                                 <TextBlock FontSize="12" Text="Size" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                                <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
-                                                      VerticalAlignment="Center"
-                                                      HorizontalAlignment="Center" Width="85"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="1" Text="80"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="2" Text="10"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="3" Text="1"/>
+                                                <ToggleButton Content="{Binding BrightGV}" Grid.Row="0" Grid.Column="1" 
+                                                      VerticalAlignment="Stretch"
+                                                      HorizontalAlignment="Center" Width="85"
+															  Margin="0,5"
+															  IsChecked="{Binding AbsoluteGV}"/>
+                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="1" 
+														 Text="{Binding SurfaceGV}"/>
+                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="2" 
+														 Text="{Binding SurfaceSize}"/>
+                                                <!--<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="3" 
+														 Text="{Binding PitLevel}"/>-->
                                             </Grid>
                                         </GroupBox>
                                         <GroupBox Header="Defect Code" Grid.Row="1">
@@ -266,12 +279,18 @@
                                 <GroupBox Grid.Row="2" Header="Defect Image"
                                   Background="{StaticResource GroupBoxBackground}">
                                     <Grid Background="Black">
-                                        <Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG"/>
-                                    </Grid>
+                                        <!--<Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG"/>-->
+										<Image Source="{Binding SelectedTDIImage}"/>
+									</Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="3" Header="Insepction Info"
                                   Background="{StaticResource GroupBoxBackground}">
-                                    <DataGrid IsReadOnly="True" Grid.Row="1">
+									<DataGrid IsReadOnly="True" Grid.Row="1" 
+											  ItemsSource="{Binding ResultDataTable}"
+											  SelectionMode="Single"
+											  SelectedItem="{Binding SelectedDataTable}"
+											  AutoGenerateColumns="True">
+										<!--
                                         <DataGrid.Resources>
                                             <Style TargetType="DataGridColumnHeader">
                                                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -298,7 +317,7 @@
                                         <local:Dummy a="10" b="2678, 6345" c="1.8mm" d="61" e="0x000000"/>
                                         <local:Dummy a="11" b="4378, 6385" c="1.6mm" d="55" e="0x000000"/>
                                         <local:Dummy a="12" b="7178, 5375" c="1.6mm" d="71" e="0x000000"/>
-                                        <local:Dummy a="13" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="13" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>-->
                                     </DataGrid>
                                 </GroupBox>
                             </Grid>

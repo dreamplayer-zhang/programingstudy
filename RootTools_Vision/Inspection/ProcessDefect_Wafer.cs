@@ -18,6 +18,11 @@ namespace RootTools_Vision
     public class ProcessDefect_Wafer : WorkBase
     {
         BacksideRecipe recipeBackside;
+        string sDefectimagePath = @"D:\DefectImage";
+        /// <summary>
+        /// Defect Image가 저장될 Root Directory Path. 기본값 : D:\DefectImage
+        /// </summary>
+        public string DefectImagePath { get => sDefectimagePath; set => sDefectimagePath = value; }
 
         public ProcessDefect_Wafer()
         {
@@ -43,6 +48,8 @@ namespace RootTools_Vision
             if (!(this.currentWorkplace.MapIndexX == -1 && this.currentWorkplace.MapIndexY == -1))
                 return;
 
+            WorkEventManager.OnProcessDefectWaferStart(this, new ProcessDefectWaferStartEventArgs());
+
             // Option Param
             int mergeDist = 1;
             int backsideOffset = 1700;
@@ -62,7 +69,7 @@ namespace RootTools_Vision
                 radius = recipeBackside.Radius;
             }
 
-            //Defect 넣는 부분 정리 필요
+			//Defect 넣는 부분 정리 필요
 
             List<Defect> DefectList = CollectDefectData();
             if (isBackside) // Backside Option
@@ -87,9 +94,8 @@ namespace RootTools_Vision
             foreach (Defect defect in MergeDefectList)
                 this.currentWorkplace.DefectList.Add(defect);
 
-            string sDefectimagePath = @"D:\DefectImage";
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            SaveDefectImage(Path.Combine(sDefectimagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
+            SaveDefectImage(Path.Combine(DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
 
             //// Add Defect to DB
             if (MergeDefectList.Count > 0)

@@ -31,11 +31,10 @@ namespace Root_CAMELLIA.UI_UserControl
         StopWatch m_swVision = new StopWatch();
         CAMELLIA_Handler m_handler;
         bool bShow = false;
-        int nLoadport = 2;
         public HomeProgress_UI()
         {
             InitializeComponent();
-            for(int i=0; i<nLoadport; i++)
+            for(int i=0; i< nloadport; i++)
             {
                 m_swLoadport[i] = new StopWatch();
             }
@@ -127,7 +126,7 @@ namespace Root_CAMELLIA.UI_UserControl
 
             if (m_handler.m_camellia.p_eState == ModuleBase.eState.Home)
             {
-                progressVS.Value = (int)(100 * Math.Min((m_swAligner.ElapsedMilliseconds / (20 * 1000)), 1.0));
+                progressVS.Value = (int)(100 * Math.Min((m_swVision.ElapsedMilliseconds / (20 * 1000)), 1.0));
             }
             else if (m_handler.m_camellia.p_eState == ModuleBase.eState.Ready) progressVS.Value = 100;
             else if (m_handler.m_camellia.p_eState == ModuleBase.eState.Error) progressVS.Value = 0;    //working

@@ -38,14 +38,14 @@ namespace Root_Vega
 		bool refEnabled;
 		bool alignEnabled;
 
-		SqliteDataDB VSDBManager;
-		int currentDefectIdx;
-		System.Data.DataTable VSDataInfoDT;
-		System.Data.DataTable VSDataDT;
+		//SqliteDataDB VSDBManager;
+		//int currentDefectIdx;
+		//System.Data.DataTable VSDataInfoDT;
+		//System.Data.DataTable VSDataDT;
 
-		private string inspDefaultDir;
-		private string inspFileName;
-		bool bUsingInspection;
+		//private string inspDefaultDir;
+		//private string inspFileName;
+		//bool bUsingInspection;
 
 		public Recipe p_Recipe
 		{
@@ -59,11 +59,11 @@ namespace Root_Vega
 			}
 		}
 
-		int tempImageWidth = 640;
-		int tempImageHeight = 480;
+		//int tempImageWidth = 640;
+		//int tempImageHeight = 480;
 
-		int currentSnap;
-		int wLimit;
+		//int currentSnap;
+		//int wLimit;
 
 		public _2_5_MainVisionViewModel(Vega_Engineer engineer, IDialogService dialogService)
 		{
@@ -72,7 +72,7 @@ namespace Root_Vega
 			Init(engineer, dialogService);
 
 			//m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
-			bUsingInspection = false;
+			//bUsingInspection = false;
 		}
 		/// <summary>
 		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드

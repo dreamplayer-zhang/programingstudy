@@ -9,32 +9,47 @@ using System.Windows.Input;
 using RootTools.Trees;
 using RootTools.GAFs;
 using RootTools;
+using System.Windows.Threading;
+using RootTools_Vision;
 
 namespace Root_AOP01_Inspection
 {
     class Run_ViewModel : ObservableObject
     {
-        MainWindow m_Mainwindow;
-        public Run_ViewModel(MainWindow main)
+        //MainWindow m_Mainwindow;
+        public Run_ViewModel()
         {
-            m_Mainwindow = main;
-            m_mainVision = ((AOP01_Handler)main.m_engineer.ClassHandler()).m_mainVision;
+            //m_Mainwindow = main;
+            //m_mainVision = ((AOP01_Handler)main.m_engineer.ClassHandler()).m_mainVision;
             
             // MiniViewer
-            p_miniViewerMain = new MiniViewer_ViewModel(ProgramManager.Instance.ImageMain);
-            p_miniViewerLeft = new MiniViewer_ViewModel(ProgramManager.Instance.ImageSideLeft);
-            p_miniViewerTop = new MiniViewer_ViewModel(ProgramManager.Instance.ImageSideTop, true);
-            p_miniViewerRight = new MiniViewer_ViewModel(ProgramManager.Instance.ImageSideRight);
-            p_miniViewerBottom = new MiniViewer_ViewModel(ProgramManager.Instance.ImageSideBottom, true);
+            p_miniViewerMain = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.MainRegName));
+            p_miniViewerLeft = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideLeftRegName));
+            p_miniViewerTop = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideTopRegName), true);
+            p_miniViewerRight = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideRightRegName));
+            p_miniViewerBottom = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.SideBotRegName), true);
+            InitTimer();
+        }
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(2000);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
         }
 
-        #region Property
-        MainVision m_mainVision;
-        public MainVision p_mainVision
+        private void M_timer_Tick(object sender, EventArgs e)
         {
-            get { return m_mainVision; }
-            set { SetProperty(ref m_mainVision, value); }
+            var temp = (AOP01_Handler)(GlobalObjects.Instance.Get<AOP01_Engineer>().ClassHandler());
+            p_dSequencePercent = Math.Ceiling(temp.m_process.m_dSequencePercent);
         }
+        #region Property
+        //MainVision m_mainVision;
+        //public MainVision p_mainVision
+        //{
+        //    get { return m_mainVision; }
+        //    set { SetProperty(ref m_mainVision, value); }
+        //}
         #endregion
 
         #region MiniViewer
@@ -43,6 +58,25 @@ namespace Root_AOP01_Inspection
         {
             get { return m_miniViewerMain; }
             set { SetProperty(ref m_miniViewerMain, value); }
+        }
+        public double _dSequencePercent = 0;
+        public double p_dSequencePercent
+        {
+            get { return _dSequencePercent; }
+            set
+            {
+                SetProperty(ref _dSequencePercent, value);
+                p_sSequencePercent = _dSequencePercent.ToString() + "%";
+            }
+        }
+        public string _sSequencePercent = "";
+        public string p_sSequencePercent
+        {
+            get { return _sSequencePercent; }
+            set
+            {
+                SetProperty(ref _sSequencePercent, value);
+            }
         }
 
         MiniViewer_ViewModel m_miniViewerLeft;

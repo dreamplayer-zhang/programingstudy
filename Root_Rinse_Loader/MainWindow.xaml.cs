@@ -46,6 +46,7 @@ namespace Root_Rinse_Loader
             magazineUI.Init(m_handler.m_rinse, m_handler.m_storage);
             stackUI.Init(m_handler.m_storage.m_stack, m_handler.m_loader);
             tabControlStorage.SelectedIndex = (int)m_handler.m_rinse.p_eMode;
+            progressUI.Init(m_handler.m_rinse); 
         }
         #endregion
 

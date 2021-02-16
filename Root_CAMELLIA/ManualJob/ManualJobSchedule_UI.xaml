@@ -252,7 +252,7 @@
                 <RowDefinition Height="4*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" Height="auto">
-                <GroupBox FontSize="20" Header="Infomation" Height="auto" Foreground="White">
+                <GroupBox FontSize="20" Header="Information" Height="auto" Foreground="White">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition/>

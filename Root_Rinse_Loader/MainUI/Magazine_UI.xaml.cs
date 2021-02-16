@@ -1,4 +1,5 @@
 ﻿using Root_Rinse_Loader.Module;
+using RootTools;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -33,7 +34,7 @@ namespace Root_Rinse_Loader.MainUI
             InitTimer(); 
         }
 
-        List<MagazineLevel_UI> m_aMagazine = new List<MagazineLevel_UI>(); 
+        List<MagazineClamp_UI> m_aMagazine = new List<MagazineClamp_UI>(); 
         void InitMagazine()
         {
             gridMagazineLevels.Children.Clear();
@@ -41,7 +42,7 @@ namespace Root_Rinse_Loader.MainUI
             foreach (Storage.Magazine magazine in m_storage.m_aMagazine)
             {
                 gridMagazineLevels.RowDefinitions.Add(new RowDefinition());
-                MagazineLevel_UI ui = new MagazineLevel_UI();
+                MagazineClamp_UI ui = new MagazineClamp_UI();
                 ui.Init(magazine);
                 Grid.SetRow(ui, 3 - gridMagazineLevels.Children.Count);
                 gridMagazineLevels.Children.Add(ui);
@@ -61,7 +62,8 @@ namespace Root_Rinse_Loader.MainUI
         private void M_timer_Tick(object sender, EventArgs e)
         {
             m_bBlink = !m_bBlink;
-            foreach (MagazineLevel_UI ui in m_aMagazine) ui.OnTimer(m_bBlink); 
+            foreach (MagazineClamp_UI ui in m_aMagazine) ui.OnTimer(m_bBlink);
+            groupBoxMagazine.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
         }
 
         private void buttonNew_Click(object sender, RoutedEventArgs e)

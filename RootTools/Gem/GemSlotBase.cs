@@ -28,7 +28,7 @@ namespace RootTools.Gem
             set
             {
                 if (_eState == value) return;
-                if (m_log != null) m_log.Info(p_id + " State : " + _eState.ToString() + " -> " + value.ToString());
+                m_log?.Info(p_id + " State : " + _eState.ToString() + " -> " + value.ToString());
                 _eState = value;
                 OnPropertyChanged();
                 RegWrite(); 
@@ -42,7 +42,7 @@ namespace RootTools.Gem
             set
             {
                 if (_sSlotID == value) return;
-                if (m_log != null) m_log.Info(p_id + " Slot ID : " + _sSlotID + " -> " + value);
+                m_log?.Info(p_id + " Slot ID : " + _sSlotID + " -> " + value);
                 _sSlotID = value;
                 OnPropertyChanged();
                 RegWrite();
@@ -57,7 +57,7 @@ namespace RootTools.Gem
             set
             {
                 if (_sLotID == value) return;
-                if (m_log != null) m_log.Info(p_id + " Lot ID : " + _sLotID + " -> " + value);
+                m_log?.Info(p_id + " Lot ID : " + _sLotID + " -> " + value);
                 _sLotID = value;
                 OnPropertyChanged();
                 RegWrite();
@@ -76,6 +76,15 @@ namespace RootTools.Gem
                 OnPropertyChanged();
                 RegWrite();
             }
+        }
+
+        public virtual void ClearInfo()
+        {
+            p_eState = eState.Empty; 
+            p_sSlotID = "";
+            p_sLocID = "";
+            p_sCarrierID = "";
+            p_sRecipe = ""; 
         }
 
         protected virtual void RunTreeProperty(Tree tree)
@@ -101,7 +110,7 @@ namespace RootTools.Gem
             set
             {
                 if (_eSTS == value) return;
-                if (m_log != null) m_log.Info(p_id + " STS : " + _eSTS.ToString() + " -> " + value.ToString());
+                m_log?.Info(p_id + " STS : " + _eSTS.ToString() + " -> " + value.ToString());
                 _eSTS = value;
                 OnPropertyChanged();
                 RegWrite();
@@ -126,7 +135,7 @@ namespace RootTools.Gem
             set
             {
                 if (_eSTSProcess == value) return;
-                if (m_log != null) m_log.Info(p_id + " STS Process : " + _eSTSProcess.ToString() + " -> " + value.ToString());
+                m_log?.Info(p_id + " STS Process : " + _eSTSProcess.ToString() + " -> " + value.ToString());
                 _eSTSProcess = value;
                 OnPropertyChanged();
                 RegWrite();
@@ -140,7 +149,7 @@ namespace RootTools.Gem
             set
             {
                 if (_sLocID == value) return;
-                if (m_log != null) m_log.Info(p_id + " LocID : " + _sLocID.ToString() + " -> " + value.ToString());
+                m_log?.Info(p_id + " LocID : " + _sLocID.ToString() + " -> " + value.ToString());
                 _sLocID = value;
                 OnPropertyChanged();
                 RegWrite();
@@ -151,7 +160,7 @@ namespace RootTools.Gem
         {
             eSTS sts = bDestination ? eSTS.atDestination : eSTS.atWork;
             if (sts == eSTS.atWork) p_eSTSProcess = eSTSProcess.NeedProcessing;
-            if (m_gem != null) m_gem.STSSetTransport(sLocID, this, sts);
+            m_gem?.STSSetTransport(sLocID, this, sts);
             return "OK";
         }
 
@@ -192,7 +201,8 @@ namespace RootTools.Gem
         {
             foreach (GemPJ pj in m_aPJ)
             {
-                tree.Set(pj.m_sRecipeID, pj.m_sRecipeID, pj.m_sPJobID, "PJ Recipe ID", true, true); 
+                //tree.Set(pj.m_sRecipeID, pj.m_sRecipeID, pj.m_sPJobID, "PJ Recipe ID", true, true); 
+                tree.Set(pj.m_sPJobID, pj.m_sPJobID, pj.m_sPJobID, "ProcessJob ID", true, true);
             }
         }
         #endregion

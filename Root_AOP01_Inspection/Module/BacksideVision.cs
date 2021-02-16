@@ -39,14 +39,14 @@ namespace Root_AOP01_Inspection.Module
         public DIO_I m_diReticleTiltCheck;
         public DIO_I m_diReticleFrameCheck;
         MemoryPool m_memoryPool;
-        MemoryGroup m_memoryGroup;
-        MemoryData m_memoryMain;
-        MemoryData m_memorySideLeft;
-        MemoryData m_memorySideRight;
-        MemoryData m_memorySideTop;
-        MemoryData m_memorySideBottom;
-        MemoryData m_memoryTDI45;
-        MemoryData m_memoryLADS;
+        //MemoryGroup m_memoryGroup;
+        //MemoryData m_memoryMain;
+        //MemoryData m_memorySideLeft;
+        //MemoryData m_memorySideRight;
+        //MemoryData m_memorySideTop;
+        //MemoryData m_memorySideBottom;
+        //MemoryData m_memoryTDI45;
+        //MemoryData m_memoryLADS;
 
         LightSet m_lightSet;
         Camera_Dalsa m_CamTDI90;
@@ -980,14 +980,6 @@ namespace Root_AOP01_Inspection.Module
 
         #endregion
 
-        public RTRCleanUnit p_wtr
-        {
-            get
-            {
-                AOP01_Handler handler = (AOP01_Handler)m_engineer.ClassHandler();
-                return (RTRCleanUnit)handler.m_wtr;
-            }
-        }
 
         public BacksideVision(string id, IEngineer engineer, MainVision mainvision)
         {

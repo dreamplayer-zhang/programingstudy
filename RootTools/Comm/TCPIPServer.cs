@@ -94,7 +94,7 @@ namespace RootTools.Comm
                 }
             }
 
-            int m_nBufReceive = 1024 * 1024;
+            int m_nBufReceive = 1920 * 1080 *3 ;
             byte[] m_aReadBuff = null;
             void CallBack_Receive(IAsyncResult ar)
             {
@@ -173,7 +173,11 @@ namespace RootTools.Comm
 
         private void M_tcpSocket_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
-            if (EventReciveData != null) EventReciveData(aBuf, nSize, socket); 
+            if (EventReciveData != null)
+            {  
+                EventReciveData(aBuf, nSize, socket);
+            }
+            
         }
         #endregion
 
@@ -190,7 +194,7 @@ namespace RootTools.Comm
             RunTree(m_treeRoot);
         }
 
-        void RunTree(Tree treeRoot)
+        public void RunTree(Tree treeRoot)
         {
             RunSetTree(treeRoot.GetTree("Set"));
         }
@@ -205,9 +209,9 @@ namespace RootTools.Comm
 
         public string p_id { get; set; }
         Log m_log;
-        int m_nBufReceive = 1024 * 1024;
+        int m_nBufReceive = 1920 * 1080 * 3;
         public TreeRoot m_treeRoot;
-        Socket m_socket = null;
+        public Socket m_socket = null;
         public CommLog m_commLog;
 
         public TCPIPServer(string id, Log log, int nBufReceive = -1)
@@ -237,8 +241,8 @@ namespace RootTools.Comm
             }
             catch (Exception ex)
             {
-                if (m_log != null) m_log.Error(p_id + " Server Bind & Listen Fail !!");
-                if (m_log != null) m_log.Error(p_id + " Exception : " + ex.Message);
+                m_log?.Error(p_id + " Server Bind & Listen Fail !!");
+                m_log?.Error(p_id + " Exception : " + ex.Message);
                 return;
             }
         }

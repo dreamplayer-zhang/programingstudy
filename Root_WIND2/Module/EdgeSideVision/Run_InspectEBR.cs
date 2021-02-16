@@ -14,6 +14,7 @@ namespace Root_WIND2.Module
 		EdgeSideVision module;
 
 		string recipeName = string.Empty;
+		int height = 2000; // camera height
 
 		#region [Getter/Setter]
 
@@ -21,6 +22,11 @@ namespace Root_WIND2.Module
 		{
 			get => recipeName;
 			set => recipeName = value;
+		}
+		public int Height
+		{
+			get => height;
+			set => height = value;
 		}
 		#endregion
 
@@ -34,6 +40,7 @@ namespace Root_WIND2.Module
 		{
 			Run_InspectEBR run = new Run_InspectEBR(module);
 			run.recipeName = recipeName;
+			run.height = height;
 
 			return run;
 		}
@@ -41,7 +48,7 @@ namespace Root_WIND2.Module
 		public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
 		{
 			recipeName = tree.SetFile(recipeName, recipeName, "rcp", "Recipe", "Recipe Name", bVisible);
-
+			height = (tree.GetTree("Camera Height", false, bVisible)).Set(height, height, "Height", "Camera Height", bVisible);
 		}
 
 		public override string Run()

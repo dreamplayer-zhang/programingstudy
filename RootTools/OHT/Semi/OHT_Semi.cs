@@ -185,11 +185,11 @@ namespace RootTools.OHT.Semi
         }
 
         StopWatch m_swTD = new StopWatch();
-        eTP m_eCheckTD = eTP.TD3;
+        //eTP m_eCheckTD = eTP.TD3;
         int m_msTD = 0;
         public void StartTD3()
         {
-            m_eCheckTD = eTP.TD3;
+            //m_eCheckTD = eTP.TD3;
             m_msTD = 1000 * m_dicTP[eTP.TD3];
             m_swTD.Start();
             m_log.Info(eTP.TD3.ToString() + " Start StopWatch");

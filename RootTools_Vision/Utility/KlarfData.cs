@@ -20,34 +20,34 @@ namespace RootTools_Vision.Utility
 		#region [Variables]
 		public int klarfType;
 
-		public int waferID_num;
-		public int slot;                                // Hynix는 WaferID와 동일하게 사용.// WaferID 0~25
-		public string partID;                          // Part ID
-		public string lotID;                           // Lot ID
-		public string deviceID;                        // Device ID
-		public string waferID_name;
-		public string sampleOrientationMarkType;       // FLAT or NOTCH
-		public string orientationMarkLocation;         // Flat zone 방향 // UP, DOWN, LEFT, RIGHT
-		public string tiffFileName;                    // Tiff file 명
+		public int waferID_num = 0;
+		public int slot = 0;                                // Hynix는 WaferID와 동일하게 사용.// WaferID 0~25
+		public String partID;                          // Part ID
+		public String lotID = "";                           // Lot ID
+		public String deviceID;                        // Device ID
+		public String waferID_name;
+		public String sampleOrientationMarkType;       // FLAT or NOTCH
+		public String orientationMarkLocation;         // Flat zone 방향 // UP, DOWN, LEFT, RIGHT
+		public String tiffFileName;                    // Tiff file 명
 
 		public double diePitchX, diePitchY;          // Die Pitch
 		public double dieOriginX, dieOriginY;        // 센터 기준. 무조건 0, 0 으로 보고 셋팅
 		public double sampleCenterLocationX;            // 센터 Die의 Left,bottom와 실제 제품 Center간의 차이.
 		public double sampleCenterLocationY;            // 센터 Die의 Left,bottom와 실제 제품 Center간의 차이.
 
-		public string sampleTestPlan;
-		public string defectListInfor;
-		public string DCollData;
-		public string MEMMAP;
+		public String sampleTestPlan = "";
+		public String defectInfor = "";
+		public String DCollData = "";
+		public String MEMMAP;
 
-		public string areaPerTest;
-		public int sampleTestCnt;
-		public int defectDieCnt;
-		public int centerX;
-		public int centerY;
+		public String areaPerTest = "";
+		public int sampleTestCnt = 0;
+		public int defectDieCnt = 0;
+		public int centerX = 0;
+		public int centerY = 0;
 
-		public int klarfRow;
-		public int klarfCol;
+		public int klarfRow = 0;
+		public int klarfCol = 0;
 
 		public String tempString;
 		public float resX;
@@ -396,11 +396,11 @@ namespace RootTools_Vision.Utility
 						tempString = string.Format("X= {0:4d} Y= {1:4d} B= 91\n", j + nDATASStartX, i + nDATASStartY);
 						MEMMAP += tempString;
 					}
-					else if (false/*p[cnt] != WAFER_MAP_CHIP_NOCHIP && p[cnt] != WAFER_MAP_CHIP_FLATZONE*/)
-					{
-						tempString = string.Format("X= {0:4d} Y= {1:4d} B= 01\n", j + nDATASStartX, i + nDATASStartY);
-						MEMMAP += tempString;
-					}
+					//else if (false/*p[cnt] != WAFER_MAP_CHIP_NOCHIP && p[cnt] != WAFER_MAP_CHIP_FLATZONE*/)
+					//{
+						//tempString = string.Format("X= {0:4d} Y= {1:4d} B= 01\n", j + nDATASStartX, i + nDATASStartY);
+						//MEMMAP += tempString;
+					//}
 				}
 			}
 

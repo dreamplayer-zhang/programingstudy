@@ -3,11 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools" 
 		xmlns:local="clr-namespace:RootTools_Vision"
-        xmlns:controls="clr-namespace:RootTools_Vision.UserControls"
-        Title="MainWindow" Height="800" Width="1400">
+        Title="MainWindow" Height="600" Width="600">
 
     <Grid>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="344,204,0,0" VerticalAlignment="Top" Width="654" Height="411" Click="Button_Click"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="64,52,0,0" VerticalAlignment="Top" Width="238" Height="219" Click="Button_Click"/>
+        <Button Content="TEST" HorizontalAlignment="Left" Margin="344,52,0,0" VerticalAlignment="Top" Width="238" Height="219" Click="Button_Click_1"/>
+        <Button Content="Server" HorizontalAlignment="Left" Margin="64,286,0,0" VerticalAlignment="Top" Width="238" Height="71" Click="Button_Server"/>
+        <Button Content="Client" HorizontalAlignment="Left" Margin="344,286,0,0" VerticalAlignment="Top" Width="238" Height="71" Click="Button_Client"/>
 
     </Grid>
 </Window>

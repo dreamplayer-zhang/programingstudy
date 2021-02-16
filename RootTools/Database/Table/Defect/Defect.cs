@@ -125,6 +125,7 @@ namespace RootTools.Database
 
             p_rtDefectRect = new Rect(m_rtDefectBox.Left, p_rtDefectBox.Top, m_fWidth, m_fHeight);
         }
+
         public void CalcAbsToRelPos(int nRefX, int nRefY)
         {
             m_fRelX = m_fAbsX - nRefX;
@@ -135,5 +136,9 @@ namespace RootTools.Database
         {
             return p_rtDefectRect;
         }
+        public void CalcDegree()
+		{
+
+		}
     }
 }

@@ -66,9 +66,9 @@
     <Reference Include="CyUSB">
       <HintPath>CyUSB\CyUSB.dll</HintPath>
     </Reference>
-    <Reference Include="DALSA.SaperaLT.SapClassBasic, Version=8.0.0.1509, Culture=neutral, PublicKeyToken=4d8604101dcb6b58, processorArchitecture=AMD64">
+    <Reference Include="DALSA.SaperaLT.SapClassBasic, Version=8.51.1.2023, Culture=neutral, PublicKeyToken=4d8604101dcb6b58, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Teledyne DALSA\Sapera\Components\NET\Bin\DALSA.SaperaLT.SapClassBasic.dll</HintPath>
+      <HintPath>Camera\Dalsa\DLL\DALSA.SaperaLT.SapClassBasic.dll</HintPath>
     </Reference>
     <Reference Include="DataMatrix.net">
       <HintPath>RTC5s\DLL\DataMatrix.net.dll</HintPath>
@@ -327,6 +327,10 @@
     <Compile Include="Control\Ajin\AjinLib\AXL.cs" />
     <Compile Include="Control\Ajin\AjinLib\AXM.cs" />
     <Compile Include="Control\DIO_I2O.cs" />
+    <Compile Include="Comm\FFU_Group.cs" />
+    <Compile Include="Comm\FFU_Group_UI.xaml.cs">
+      <DependentUpon>FFU_Group_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GeneralFunction.cs" />
     <Compile Include="ImageProcess\AutoFocus.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
@@ -423,6 +427,9 @@
     </Compile>
     <Compile Include="Comm\TK4SModuleUI.xaml.cs">
       <DependentUpon>TK4SModuleUI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Comm\FFUModuleUI.xaml.cs">
+      <DependentUpon>FFUModuleUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
     <Compile Include="Viewer\Root_Viewer.cs" />
@@ -871,6 +878,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Comm\FFU_Group_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GAFs\ALIDList_PopupUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -1062,6 +1073,10 @@
     <Page Include="Comm\TK4SModuleUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\FFUModuleUI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Viewer\RootViewer.xaml">
       <SubType>Designer</SubType>

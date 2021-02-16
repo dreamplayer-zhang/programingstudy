@@ -597,7 +597,7 @@ namespace RootTools.Camera.BaslerPylon
                 // Check if the image can be displayed.
                 if (grabResult.IsValid)
                 {
-                    if (!stopWatch.IsRunning)
+                    //if (!stopWatch.IsRunning)
                     {  
                         if (m_bLive)
                         {
@@ -617,7 +617,7 @@ namespace RootTools.Camera.BaslerPylon
                             }
                             GrabEvent();
 
-                            if(stopWatch.ElapsedMilliseconds > 33)
+                           // if(stopWatch.ElapsedMilliseconds > 33)
                             {
                                 // 샘플링 스레드에서 사용할 이미지 데이터 복사
                                 int imgSize = m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y;
@@ -645,6 +645,7 @@ namespace RootTools.Camera.BaslerPylon
                                     stopWatch.Restart();
                                 }
                             }
+                            stopWatch.Reset();
                         }
                         else
                         {
@@ -756,8 +757,15 @@ namespace RootTools.Camera.BaslerPylon
                     m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbed;
                     // Start the grabbing of images until grabbing is stopped.
 
+                    m_cam.Parameters[PLCamera.TriggerSelector].SetValue(PLCamera.TriggerSelector.FrameStart);
+                    m_cam.Parameters[PLCamera.TriggerMode].SetValue(PLCamera.TriggerMode.Off);
                     m_cam.Parameters[PLCamera.TriggerSelector].SetValue(PLCamera.TriggerSelector.AcquisitionStart);
                     m_cam.Parameters[PLCamera.TriggerMode].SetValue(PLCamera.TriggerMode.On);
+
+                    // Parameter 확인
+                    string strTriggerSelector = m_cam.Parameters[PLCamera.TriggerSelector].GetValue();
+                    string strTriggerMode = m_cam.Parameters[PLCamera.TriggerMode].GetValue();
+
                     m_cam.StreamGrabber.Start(GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
                     p_CamInfo._IsCanGrab = false;
                     p_CamInfo._IsGrabbing = false;
