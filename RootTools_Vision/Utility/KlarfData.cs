@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools.Database;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -69,9 +70,10 @@ namespace RootTools_Vision.Utility
 			//PutClassLookup(sw);
 			PutInspectionTest(sw);
 			PutSampleTestPlan(sw);
-			PutTiffFileName(sw); // 170802 syyun 추가
+			//PutTiffFileName(sw); // 170802 syyun 추가
 			PutDefectInfor(sw);
 			PutDCollData(sw);
+
 
 			return true;
         }
@@ -229,7 +231,7 @@ namespace RootTools_Vision.Utility
 
 		private void PutDefectInfor(StreamWriter sw)
 		{
-			sw.Write(defectInfor);
+			sw.Write(defectListInfor);
 		}
 
 		private void PutDCollData(StreamWriter sw)
@@ -243,7 +245,115 @@ namespace RootTools_Vision.Utility
 			sw.Write(tempString);
 		}
 
+		public void SetSampleTestPlan(RecipeType_WaferMap _mapdata /*, Vision::CParameter* pParam, CRecipeData* pRecipe*/)
+		{   // 검사한 Die들의 좌표 입력.
+			sampleTestPlan = "";
+			sampleTestCnt = 0;
+			defectDieCnt = 0;
 
+
+
+			int[] mapData = _mapdata.Data;
+
+
+
+			klarfRow = _mapdata.MapSizeX;
+			klarfCol = _mapdata.MapSizeY;
+
+
+
+			// Center Die 좌표.
+			if (klarfType == 0)
+			{
+				//if (/*pRecipe != NULL*/true)
+				//{
+				//	// Foundry
+				//	centerX = _mapdata.MasterDieX;
+				//	centerY = _mapdata.MasterDieY;
+				//}
+				//else
+				{
+					// 기존
+					centerX = _mapdata.MapSizeX / 2 + _mapdata.MapSizeX % 2;
+					centerY = _mapdata.MapSizeY / 2 + _mapdata.MapSizeY % 2;
+				}
+			}
+			else if (klarfType == 1)
+			{
+				centerX = _mapdata.MapSizeX / 2 + (_mapdata.MapSizeX % 2);  // 기존 코드 
+				centerY = _mapdata.MapSizeY / 2;
+			}
+
+
+
+			if (mapData != null)
+			{
+				for (int i = 0; i < _mapdata.MapSizeY; i++)
+				{
+					for (int j = 0; j < _mapdata.MapSizeX; j++)
+					{
+						//if ((mapData[i * _mapdata.MapSizeX + j]) != WAFER_MAP_CHIP_NOCHIP && (mapData[i * _mapdata.MapSizeX + j]) != WAFER_MAP_CHIP_FLATZONE)
+						{
+
+							tempString = string.Format("{0:d} {1:d}\n", j - centerX + 1, (centerY - i - 1));
+							sampleTestPlan = sampleTestPlan + tempString;
+							sampleTestCnt++;
+
+
+
+							//if (mapData[i * _mapdata.MapSizeX + j] == WAFER_MAP_CHIP_DEFECT)
+							//    defectDieCnt++;
+						}
+					}
+				}
+			}
+
+
+			tempString = string.Format("SampleTestPlan {0:d}\n", sampleTestCnt);
+			sampleTestPlan = sampleTestPlan.Substring(0, sampleTestPlan.Length - 1);
+			sampleTestPlan = tempString + sampleTestPlan + ";\n";
+
+			float nAreaPerTest = (float)(diePitchX * diePitchY * sampleTestCnt);
+			areaPerTest = string.Format("AreaPerTest {0:e};\n", nAreaPerTest);
+		}
+
+		public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<Defect> _defectdata, OriginRecipe recipe)
+        {
+			string defectList;
+			defectList = string.Format("DefectRecordSpec 17 DEFECTID XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER REVIEWSAMPLE IMAGECOUNT IMAGELIST;\n");
+			defectListInfor += defectList;
+			defectList = string.Format("DefectList\n");
+			defectListInfor += defectList;
+
+
+
+			//double diePitchX = recipe.DiePitchX;
+			//double diePitchY = recipe.DiePitchY;
+
+			Point pt = new Point();
+			
+			
+			double diePitchX = this.diePitchX;
+
+			
+			for (int i = 0; i < _defectdata.Count; i++)
+            {
+				//defectList = string.Format("{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0}",
+				//	i + 1, );
+
+			}
+
+			 
+			defectList = string.Format("SummarySpec 5");
+			defectListInfor += defectList;
+			defectList = string.Format(" TESTNO NDEFECT DEFDENSITY NDIE NDEFDIE;\n");
+			defectListInfor += defectList;
+			defectList = string.Format("SummaryList\n");
+			defectListInfor += defectList;
+			//m_sTemp.Format("%d %d %f %d %d;\n", 1, nDNum, fDensity, m_nSampleTestCnt, m_nDefectDieCnt);
+			//m_sDefectInfor += m_sTemp;
+
+		}
 
 		public void SetMEMMAP(RecipeType_WaferMap _mapdata)
 		{
@@ -298,7 +408,7 @@ namespace RootTools_Vision.Utility
 			MEMMAP += tempString;
 		}
 
-		PointF GetDefectPos(int DCode, int inspMode, int posX, int posY, Point ptStart, int chipWidth, int chipHeight)
+		PointF GetDefectPos(int posX, int posY, Point ptStart, int chipWidth, int chipHeight)
 		{
 			Point pt = new Point(posX, posY);
 			PointF ptf = new PointF();
