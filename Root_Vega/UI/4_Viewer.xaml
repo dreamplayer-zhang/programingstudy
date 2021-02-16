@@ -232,7 +232,13 @@
                         <tools:ImageViewer DataContext="{Binding p_ImageViewer}"
                                        Width="{PriorityBinding}"
                                        Height="{PriorityBinding}" 
-                                           x:Name="viewer"/>
+                                           x:Name="viewer">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDoubleClick">
+                                    <i:InvokeCommandAction Command="{Binding MouseDoubleClickCommand}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </tools:ImageViewer>
                     </Grid>
                     <Grid Grid.Column="1"
                       Margin="0,15,15,0">
