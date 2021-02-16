@@ -19,6 +19,8 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Serialization;
+using System.IO.Compression;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace RootTools.Memory
 {
@@ -407,7 +409,8 @@ namespace RootTools.Memory
                     //string strResult = GetSerializeString(res);
                     //string strresult = Encoding.Default.GetString(res);
                     //string strresult = bytestostring(res);
-                    string strresult = Convert.ToBase64String(res);
+                    byte[] rescom = SerializeAndCompress(res);
+                    string strresult = Convert.ToBase64String(rescom);
                     //string stst = BitConverter.ToString(res);
 
                     m_Client.Send(strresult);
@@ -415,7 +418,26 @@ namespace RootTools.Memory
             }
             //System.Drawing.Rectangle viewrect = GetSerializeObject(aStr[1],     );
         }
+        static byte[] SerializeAndCompress(byte[] obj)
+        {
 
+            using (MemoryStream ms = new MemoryStream())
+            using (DeflateStream zs = new DeflateStream( ms, CompressionMode.Compress, true))
+            {
+                zs.Write(obj, 0, obj.Length);
+                return ms.ToArray();
+            }
+        }
+        static byte[] DecompressAndDeserialize(byte[] data)
+        {
+            MemoryStream resultStream = new MemoryStream();
+            using (MemoryStream ms = new MemoryStream(data))
+            using (GZipStream zs = new GZipStream(ms, CompressionMode.Decompress, true))
+            {
+                zs.CopyTo(resultStream);
+                return resultStream.ToArray();
+            }
+        }
         static string bytestostring(byte[] bytesss)
         {
             using (MemoryStream stream = new MemoryStream(bytesss))
