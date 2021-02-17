@@ -306,7 +306,7 @@
                                         </Grid>
                                     </GroupBox>
                                     <GroupBox Header="Rotate Speed"
-                                          Grid.Column="1"
+                                          Grid.Column="2"
                                           Style="{StaticResource group}"
                                           BorderThickness="0"
                                           Margin="5,10">
