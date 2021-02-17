@@ -526,14 +526,6 @@ namespace RootTools.Inspects
 				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '1') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='1';");
 			}
 
-			System.Drawing.PointF AffineTransform(System.Drawing.PointF ptSrc, float[] Coef)
-			{
-				System.Drawing.PointF ptRst = new System.Drawing.PointF();
-				ptRst.X = (int)Math.Ceiling(ptSrc.X * Coef[0] + ptSrc.Y * Coef[1] + Coef[2]);
-				ptRst.Y = (int)Math.Ceiling(ptSrc.X * Coef[3] + ptSrc.Y * Coef[4] + Coef[5]);
-				return ptRst;
-			}
-
 			connector.Close();
 
 			//Monitor.Wait(lockObj);
@@ -557,6 +549,15 @@ namespace RootTools.Inspects
 			}
 
 		}
+
+		System.Drawing.PointF AffineTransform(System.Drawing.PointF ptSrc, float[] Coef)
+		{
+			System.Drawing.PointF ptRst = new System.Drawing.PointF();
+			ptRst.X = (int)Math.Ceiling(ptSrc.X * Coef[0] + ptSrc.Y * Coef[1] + Coef[2]);
+			ptRst.Y = (int)Math.Ceiling(ptSrc.X * Coef[3] + ptSrc.Y * Coef[4] + Coef[5]);
+			return ptRst;
+		}
+
 		public List<string> GetDirectoryFileList(string directory, string filter)
 		{
 			if (Directory.Exists(directory))
