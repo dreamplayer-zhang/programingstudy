@@ -132,7 +132,9 @@ namespace Root_Rinse_Loader
 
             gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
             gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Run)) ? Brushes.Gold : Brushes.YellowGreen;
-            gridGreen.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.SeaGreen : Brushes.DarkGreen; 
+            gridGreen.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.SeaGreen : Brushes.DarkGreen;
+
+            textBolckUnloadState.Foreground = rinse.m_tcpip.p_bConnect ? Brushes.Black : Brushes.Gray; 
         }
         #endregion
 
