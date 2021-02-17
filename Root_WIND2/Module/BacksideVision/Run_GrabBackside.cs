@@ -213,8 +213,8 @@ namespace Root_WIND2.Module
 
                         axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_MaingrabMode.m_dTrigger, 5, true);
 
-                        int ladsinfonum = nLADSMaxScanNum * nScanLine / nMainMaxScanNum;
-                        SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, SetScanAxisPos(nScanLine, dTriggerStartPosY, dTriggerEndPosY),
+                        int ladsinfonum = nMainMaxScanNum * nScanLine / nLADSMaxScanNum;
+                        SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, SetScanAxisPos(ladsinfonum, dTriggerStartPosY, dTriggerEndPosY),
                             m_module.LadsInfos[ladsinfonum], m_module.LadsInfos[ladsinfonum].Count, false, nScanSpeed);
 
                         m_MaingrabMode.StartGrab(Mainmem, cpMemoryOffset, nWaferSizeY_px, grabData);
@@ -332,7 +332,7 @@ namespace Root_WIND2.Module
                 for (int i = nPointCount - 1; i >= 0; i--)
                 {
                     darrPosition[iIdxScan] = darrScanAxisPos[i];
-                    darrPosition[iIdxZ] = m_nFocusPosZ- darrZAxisPos[i] * 400;/* 10*m_LADSgrabMode.m_dResX_um*/;
+                    darrPosition[iIdxZ] = m_nFocusPosZ+ darrZAxisPos[i] * 200;/* 10*m_LADSgrabMode.m_dResX_um*/;
                     res = CAXM.AxmLineMove(nScanAxisNo, darrPosition, dMaxVelocity, dMaxAccel, dMaxDecel);
                 }
             }
@@ -341,7 +341,7 @@ namespace Root_WIND2.Module
                 for (int i = 0; i < nPointCount; i++)
                 {
                     darrPosition[iIdxScan] = darrScanAxisPos[i];
-                    darrPosition[iIdxZ] = m_nFocusPosZ - darrZAxisPos[i] * 400; /*10*m_LADSgrabMode.m_dResX_um*/;
+                    darrPosition[iIdxZ] = m_nFocusPosZ + darrZAxisPos[i] * 200; /*10*m_LADSgrabMode.m_dResX_um*/;
                     res = CAXM.AxmLineMove(nScanAxisNo, darrPosition, dMaxVelocity, dMaxAccel, dMaxDecel);
                 }
             }

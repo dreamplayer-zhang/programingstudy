@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
@@ -125,8 +126,6 @@ namespace Root_WIND2.Module
                     if (m_module.Run(axisZ.WaitReady()))
                         return p_sInfo;
 
-
-
                     axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger*nCamHeight /2,5, true);
 
                     m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, grabData);
@@ -161,8 +160,6 @@ namespace Root_WIND2.Module
             }
         }
 
-        double mHeight, MHeight;
-
         unsafe void CalculateHeight(int xmempos, MemoryData mem, int WaferHeight, int gv, bool InvY)
         {
             int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
@@ -173,9 +170,6 @@ namespace Root_WIND2.Module
 
             List<double> ladsinfo = new List<double>();
             List<double> li = new List<double>();// 뭔가 값이 있는곳에 대한 정보
-
-            mHeight = double.MaxValue;
-            MHeight = double.MinValue;
 
             if (InvY)
             {//정방향 스캔시
@@ -190,7 +184,10 @@ namespace Root_WIND2.Module
                         for (int w = 0; w < nCamWidth; w++)
                             sum += ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
 
-                        li.Add(sum / nCamWidth);
+                        if (sum < 10)
+                            li.Add(0);
+                        else
+                            li.Add(sum / nCamWidth);
                     }
 
                     double M = double.MinValue;
@@ -203,7 +200,10 @@ namespace Root_WIND2.Module
                             res = (li[i - 1] * (i - 1) + li[i] * i + li[i + 1] * (i + 1)) / (li[i - 1] + li[i] + li[i + 1]);
                         }
                     }
-                    ladsinfo.Add(res * Math.Sqrt(2));
+                    if (double.IsNaN(res)  )
+                        ladsinfo.Add(ladsinfo.Min());
+                    else
+                        ladsinfo.Add(res * Math.Sqrt(2));
                 }
             }
             else
@@ -219,7 +219,10 @@ namespace Root_WIND2.Module
                         for (int w = 0; w < nCamWidth; w++)
                             sum += ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
 
-                        li.Add(sum/nCamWidth);
+                        if (sum < 10)
+                            li.Add(0);
+                        else
+                            li.Add(sum / nCamWidth);
                     }
 
                     double M = double.MinValue;
@@ -232,7 +235,11 @@ namespace Root_WIND2.Module
                             res = (li[i - 1] * (i - 1) + li[i] * i + li[i + 1] * (i + 1)) / (li[i - 1] + li[i] + li[i + 1]);
                         }
                     }
-                    ladsinfo.Add(res * Math.Sqrt(2));
+
+                    if (double.IsNaN(res))
+                        ladsinfo.Add(ladsinfo.Min());
+                    else
+                        ladsinfo.Add(res * Math.Sqrt(2));
                 }
             }
 
@@ -254,6 +261,8 @@ namespace Root_WIND2.Module
                 for (int y=0;y<nY;y++)
                 {
                     Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1);
+                    double MHeight = m_module.LadsInfos[x].Max();
+                    double mHeight = m_module.LadsInfos[x].Min();
                     double rate = 255 / (MHeight - mHeight);
                     MCvScalar color = new MCvScalar(rate*infos[x][y]);
                     ColorImg.SetTo(color);
