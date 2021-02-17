@@ -786,6 +786,15 @@ namespace Root_AOP01_Inspection.Module
         public bool p_bPresent { get { return m_diPresent.p_bIn; } }
         #endregion
 
+        IRFID _rfid;
+        public IRFID m_rfid
+        {
+            get { return _rfid; }
+            set
+            {
+                _rfid = value;
+            }
+        }
         public InfoCarrier p_infoCarrier { get; set; }
         public StopWatch m_swLotTime;
         public Loadport_AOP01(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)

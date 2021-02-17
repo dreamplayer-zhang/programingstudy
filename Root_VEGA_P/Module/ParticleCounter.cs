@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Comm;
+using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -17,6 +18,10 @@ namespace Root_VEGA_P.Module
         Modbus m_modbus;
         public override void GetTools(bool bInit)
         {
+            for (int n = 0; n < m_aSolValve.Count; n++)
+            {
+                p_sInfo = m_toolBox.Get(ref m_aSolValve[n].m_do, this, m_aSolValve[n].m_id);
+            }
             p_sInfo = m_toolBox.Get(ref m_modbus, this, "Modbus");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
             if (bInit)
@@ -25,6 +30,136 @@ namespace Root_VEGA_P.Module
                 m_rs232.p_bConnect = true;
                 ConnectModbus();
             }
+        }
+        #endregion
+
+        #region SolValve
+        public class SolValve
+        {
+            public DIO_O m_do = null;
+            public string m_id = "";
+            public string p_sName { get; set; }
+
+            public void Write(bool bOpen)
+            {
+                m_do?.Write(bOpen); 
+            }
+
+            public SolValve(string id)
+            {
+                m_id = id;
+                p_sName = id; 
+            }
+        }
+        List<SolValve> m_aSolValve = new List<SolValve>(); 
+
+        Registry m_reg; 
+        void InitSolValve(string id)
+        {
+            m_reg = new Registry(id);
+            p_nSolValve = m_reg.Read("nSolValve", 1);
+            p_nSolValveSet = m_reg.Read("nSolValveSet", 1);
+        }
+
+        int _nSolValve = 0; 
+        public int p_nSolValve
+        {
+            get { return _nSolValve; }
+            set
+            {
+                if (_nSolValve == value) return;
+                _nSolValve = value;
+                m_aSolValve.Clear(); 
+                for (int n = 0; n < value; n++)
+                {
+                    m_aSolValve.Add(new SolValve("SolValve " + n.ToString("00")));
+                }
+            }
+        }
+
+        void RunTreeSolValve(Tree tree)
+        {
+            p_nSolValve = tree.Set(p_nSolValve, p_nSolValve, "Count", "SolValve Count");
+            Tree treeSol = tree.GetTree("Name");
+            foreach (SolValve sol in m_aSolValve) sol.p_sName = treeSol.Set(sol.p_sName, sol.p_sName, sol.m_id, "Solvalve Name"); 
+        }
+        #endregion
+
+        #region SolValue Set
+        public class SolValveSet
+        {
+            public string m_id;
+            public string p_sName { get; set; }
+            List<bool> m_aSet = new List<bool>();
+
+            public void RunTree(Tree tree)
+            {
+                p_sName = tree.Set(p_sName, p_sName, "Name", "SolValve Set Name"); 
+                for (int n = 0; n < m_aSet.Count; n++)
+                {
+                    m_aSet[n] = tree.Set(m_aSet[n], m_aSet[n], n.ToString("00") + "." + m_pc.m_aSolValve[n].p_sName, "SolValve Set On/Off"); 
+                }
+            }
+
+            public string Run()
+            {
+                for (int n = 0; n < m_aSet.Count; n++)
+                {
+                    m_pc.m_aSolValve[n].Write(m_aSet[n]); 
+                }
+                return "OK"; 
+            }
+
+            ParticleCounter m_pc = null; 
+            public SolValveSet(string id, ParticleCounter pc)
+            {
+                m_id = id;
+                p_sName = id;
+                m_pc = pc;
+                m_aSet.Clear(); 
+                for (int n = 0; n < pc.m_aSolValve.Count; n++) m_aSet.Add(false); 
+            }
+        }
+        List<SolValveSet> m_aSolValveSet = new List<SolValveSet>(); 
+        public List<string> p_asSolValveSet
+        {
+            get
+            {
+                List<string> asSet = new List<string>();
+                foreach (SolValveSet set in m_aSolValveSet) asSet.Add(set.p_sName);
+                return asSet; 
+            }
+        }
+
+        string RunSolValveSet(string sSolValveSet)
+        {
+            foreach (SolValveSet set in m_aSolValveSet)
+            {
+                if (set.p_sName == sSolValveSet) return set.Run(); 
+            }
+            return "Invalid SolValveSet Name"; 
+        }
+
+        int _nSolValveSet = 0;
+        public int p_nSolValveSet
+        {
+            get { return _nSolValveSet; }
+            set
+            {
+                if (_nSolValveSet == value) return;
+                _nSolValveSet = value;
+                m_aSolValveSet.Clear();
+                for (int n = 0; n < value; n++)
+                {
+                    m_aSolValveSet.Add(new SolValveSet("SolValveSet " + n.ToString("00"), this));
+                }
+            }
+        }
+
+        void RunTreeSolValveSet(Tree tree)
+        {
+            p_nSolValveSet = tree.Set(p_nSolValveSet, p_nSolValveSet, "Count", "SolValveSet Count");
+            foreach (SolValveSet sol in m_aSolValveSet) sol.RunTree(tree.GetTree(sol.p_sName, false)); 
         }
         #endregion
 
@@ -246,11 +381,14 @@ namespace Root_VEGA_P.Module
             RunTreeProperty(tree.GetTree("Property"));
             RunTreeSample(tree.GetTree("Sample"));
             RunTreeCount(tree.GetTree("Count"));
+            RunTreeSolValve(tree.GetTree("SolValve"));
+            RunTreeSolValveSet(tree.GetTree("SolValveSet"));
         }
         #endregion
 
         public ParticleCounter(string id, IEngineer engineer)
         {
+            InitSolValve(id); 
             InitCount();
             p_id = id;
             InitBase(id, engineer);

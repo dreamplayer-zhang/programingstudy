@@ -87,6 +87,13 @@ namespace Root_WIND2.UI_User
             base.SetRoiRect();
             RedrawShapes();
         }
+
+        public override void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
+        {
+            base.CanvasMovePoint_Ref(point, nX, nY);
+            MoveDefectPt(point);
+            RedrawShapes();
+        }
         #endregion
 
         public void ClearObjects()
@@ -187,5 +194,8 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        private void MoveDefectPt(CPoint point)
+		{
+        }
 	}
 }

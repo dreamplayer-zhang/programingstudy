@@ -664,20 +664,44 @@ namespace RootTools
                 {
                     if (p_ImageData.m_eMode == ImageData.eMode.OtherPCMem)
                     {
-                        if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
+                        if (p_ImageData.p_nByte == 1)
                         {
-                            Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
-                            byte[,,] viewptr = view.Data;
-                            byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
-                            //for (int yy = 0; yy < p_CanvasHeight; yy++)
-                            Parallel.For(0, p_CanvasHeight, (yy) =>
+                            if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
                             {
-                                for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+                                byte[,,] viewptr = view.Data;
+                                byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+                                //for (int yy = 0; yy < p_CanvasHeight; yy++)
+                                Parallel.For(0, p_CanvasHeight, (yy) =>
                                 {
-                                    viewptr[yy, xx, 0] = image[p_CanvasWidth * yy + xx];
-                                }
-                            });
-                            p_ImgSource = ImageHelper.ToBitmapSource(view);
+                                    for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                    {
+                                        viewptr[yy, xx, 0] = image[p_CanvasWidth * yy + xx];
+                                    }
+                                });
+                                p_ImgSource = ImageHelper.ToBitmapSource(view);
+                            }
+                        }
+                        else if (p_ImageData.p_nByte == 3)
+                        {
+                            if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
+                            {
+                                Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
+                                byte[,,] viewptr = view.Data;
+                                byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+                                int nTerm = p_CanvasWidth * p_CanvasHeight;
+                                if(image !=null)                              
+                                Parallel.For(0, p_CanvasHeight, (yy) =>
+                                {
+                                    for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                    {
+                                        viewptr[yy, xx, 0] = image[p_CanvasWidth * yy + xx];
+                                        viewptr[yy, xx, 1] = image[p_CanvasWidth * yy + xx + nTerm];
+                                        viewptr[yy, xx, 2] = image[p_CanvasWidth * yy + xx + nTerm * 2];
+                                    }
+                                });
+                                p_ImgSource = ImageHelper.ToBitmapSource(view);
+                            }
                         }
                         //        p_ImgSource = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
                         //Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);

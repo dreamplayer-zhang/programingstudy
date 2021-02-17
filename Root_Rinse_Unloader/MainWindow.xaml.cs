@@ -185,6 +185,5 @@ namespace Root_Rinse_Unloader
             if (binding != null) binding.UpdateSource();
         }
         #endregion
-
     }
 }

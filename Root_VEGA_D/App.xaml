@@ -7,8 +7,8 @@
         <!--Color-->
         <SolidColorBrush x:Key="PanelBackGround"
                          Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
-        <SolidColorBrush x:Key="ControlBackGround"
-                         Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}" />
+        <SolidColorBrush x:Key="ControlBackGround" 
+                         Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
         <SolidColorBrush x:Key="GroupBoxBackground"
                          Color="Transparent" />
         <SolidColorBrush x:Key="Splitter"
@@ -66,6 +66,15 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
+            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
+        </Style>
+        
         <Style x:Key="ChromeIconBaseKey"
                TargetType="{x:Type Path}">
             <Setter Property="Width"

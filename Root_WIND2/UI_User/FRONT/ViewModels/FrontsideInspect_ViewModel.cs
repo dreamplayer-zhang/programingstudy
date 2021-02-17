@@ -88,7 +88,7 @@ namespace Root_WIND2.UI_User
 
         public FrontsideInspect_ViewModel()
         {
-            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero)
+            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero && GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").m_eMode != ImageData.eMode.OtherPCMem)
                 return;
 
             // Initialize ImageViewer

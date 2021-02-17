@@ -293,7 +293,7 @@ namespace Root_EFEM.Module
         }
         protected override void InitModuleRuns()
         {
-            _runReadID = AddModuleRunList(new Run_ReadRFID(this), true, "RFID Read");
+            _runReadID = AddModuleRunList(new Run_ReadRFID(this), false, "RFID Read");
         }
 
         public string ReadRFID(byte nCh, out string sRFID)
@@ -310,32 +310,33 @@ namespace Root_EFEM.Module
                 m_module = module;
                 InitModuleRun(module);
             }
-            bool m_bRFID = false;
-            string m_sSimulCarrierID = "CarrierID";
+            //bool m_bRFID = false;
+            //string m_sSimulCarrierID = "CarrierID";
             public override ModuleRunBase Clone()
             {
                 Run_ReadRFID run = new Run_ReadRFID(m_module);
-                run.m_bRFID = m_bRFID;
-                run.m_sSimulCarrierID = m_sSimulCarrierID;
+                //run.m_bRFID = m_bRFID;
+                //run.m_sSimulCarrierID = m_sSimulCarrierID;
                 return run;
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_bRFID = tree.Set(m_bRFID, m_bRFID, "Use", "Run ReadRFID", bVisible);
-                m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation", bVisible && EQ.p_bSimulate);
+                //m_bRFID = tree.Set(m_bRFID, m_bRFID, "Use", "Run ReadRFID", bVisible);
+                //m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation", bVisible && EQ.p_bSimulate);
             }
 
             public override string Run()
             {
                 string sResult = "OK";
-                if (EQ.p_bSimulate) m_module.m_sReadID = m_sSimulCarrierID;
-                else
-                {
-                    if (m_bRFID)
-                    {
-                        sResult = m_module.ReadRFID();
-                    }
-                }
+                //if (EQ.p_bSimulate) m_module.m_sReadID = m_sSimulCarrierID;
+                //else
+                //{
+                //    if (m_bRFID)
+                //    {
+                //        sResult = m_module.ReadRFID();
+                //    }
+                //}
+                sResult = m_module.ReadRFID();
                 if (sResult == "OK")
                     m_log.Info(m_module.m_sReadID);
                 if(m_module.m_loadport != null)

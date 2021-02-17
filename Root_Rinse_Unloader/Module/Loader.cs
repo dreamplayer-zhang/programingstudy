@@ -85,31 +85,11 @@ namespace Root_Rinse_Unloader.Module
             p_bVacuum = bOn;
             for (int n = 0; n < 4; n++)
             {
-                if (m_roller.m_bExist[n]) m_aPicker[n].m_dioVacuum.Write(bOn);
+                m_aPicker[n].m_dioVacuum.Write(bOn);
+                //m_aPicker[n].m_dioVacuum.Write(bOn && m_roller.m_bExist[n]);
             }
             Thread.Sleep(200);
-            if (bOn)
-            {
-                StopWatch sw = new StopWatch();
-                int msVac = (int)(1000 * m_secVac);
-                int nExist = 4;
-                int nVac = 0;
-                while (nExist != nVac)
-                {
-                    Thread.Sleep(10);
-                    nExist = 0;
-                    nVac = 0; 
-                    for (int n = 0; n < 4; n++)
-                    {
-                        if (m_roller.m_bExist[n])
-                        {
-                            nExist++;
-                            if (m_aPicker[n].m_dioVacuum.p_bIn) nVac++; 
-                        }
-                    }
-                    if (sw.ElapsedMilliseconds > msVac) return EQ.p_bPickerSet ? "OK" : "Run Vacuum Timeout"; 
-                }
-            }
+            if (bOn) Thread.Sleep((int)(1000 * m_secVac));
             else
             {
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
@@ -121,7 +101,7 @@ namespace Root_Rinse_Unloader.Module
 
         void RunTreePicker(Tree tree)
         {
-            m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Timeout (sec)");
+            m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Time Delay (sec)");
             m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
         }
         #endregion
@@ -190,9 +170,9 @@ namespace Root_Rinse_Unloader.Module
                     if (EQ.IsStop()) return "EQ Stop";
                 }
                 if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
-                if (Run(RunPickerDown(true))) return p_sInfo;
+                //if (Run(RunPickerDown(true))) return p_sInfo;
                 if (Run(RunVacuum(false))) return p_sInfo;
-                if (Run(RunPickerDown(false))) return p_sInfo;
+                //if (Run(RunPickerDown(false))) return p_sInfo;
                 if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
                 m_storage.StartMoveStackReady();
                 return "OK";

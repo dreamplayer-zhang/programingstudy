@@ -347,19 +347,20 @@ namespace Root_WIND2
         public void ShowSettingDialog()
         {
 
-            MessageBox.Show("Setting Dialog 연결해줘요!");
-            //Nullable<bool> result = ProgramManager.Instance.DialogService.ShowDialog(UIManager.Instance.SettingDialogViewModel);
-            //if (result.HasValue)
-            //{
-            //    if (result.Value)
-            //    {
-                    
-            //    }
-            //    else
-            //    {
+            //MessageBox.Show("Setting Dialog 연결해줘요!");
+            var viewModel = UIManager.Instance.SettingDialogViewModel;
+            Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+            if (result.HasValue)
+            {
+                if (result.Value)
+                {
 
-            //    }
-            //}
+                }
+                else
+                {
+
+                }
+            }
 
         }
 

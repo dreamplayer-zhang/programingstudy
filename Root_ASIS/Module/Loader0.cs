@@ -269,9 +269,9 @@ namespace Root_ASIS.Module
         {
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
             AddModuleRunList(new Run_Move(this), false, "Move Loader0");
-            AddModuleRunList(new Run_Picker(this), false, "Run Picker");
             m_runLoad = AddModuleRunList(new Run_Load(this), false, "Run Load");
             m_runUnload = AddModuleRunList(new Run_Unload(this), false, "Run Unload");
+
         }
 
         public class Run_Delay : ModuleRunBase
@@ -331,38 +331,6 @@ namespace Root_ASIS.Module
             public override string Run()
             {
                 return m_module.AxisMove(m_ePos, m_ePicker); 
-            }
-        }
-
-        public class Run_Picker : ModuleRunBase
-        {
-            Loader0 m_module;
-            public Run_Picker(Loader0 module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            ePicker m_ePicker = ePicker.Strip;
-            bool m_bLoad = true; 
-            public override ModuleRunBase Clone()
-            {
-                Run_Picker run = new Run_Picker(m_module);
-                run.m_ePicker = m_ePicker;
-                run.m_bLoad = m_bLoad; 
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_ePicker = (ePicker)tree.Set(m_ePicker, m_ePicker, "Picker", "Loader0 Picker", bVisible);
-                m_bLoad = tree.Set(m_bLoad, m_bLoad, "Load", "Load = true, Unload = false", bVisible); 
-            }
-
-            public override string Run()
-            {
-                if (m_bLoad) return m_module.m_aPicker[m_ePicker].RunLoadEV(m_module.m_loadEV);
-                else return m_module.m_aPicker[m_ePicker].RunUnload(); 
             }
         }
 

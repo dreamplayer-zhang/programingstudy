@@ -21,6 +21,9 @@ namespace Root_WIND2.UI_User
 		private Edgeside_ImageViewer_ViewModel imgeViewerSideVM;
 		private Edgeside_ImageViewer_ViewModel imgeViewerBtmVM;
 
+		private int progress = 0;
+		private int maxProgress = 100;
+		private string percentage = "0";
 		private DataTable defectDataTable;
 		private object selectedDefect;
 		private BitmapSource defectImage;
@@ -40,6 +43,21 @@ namespace Root_WIND2.UI_User
 		{
 			get => imgeViewerBtmVM;
 			set => SetProperty(ref imgeViewerBtmVM, value);
+		}
+		public int Progress
+		{
+			get => progress;
+			set => SetProperty(ref progress, value);
+		}
+		public int MaxProgress
+		{
+			get => maxProgress;
+			set => SetProperty(ref maxProgress, value);
+		}
+		public string Percentage
+		{
+			get => percentage;
+			set => SetProperty(ref percentage, value);
 		}
 		public DataTable DefectDataTable
 		{
@@ -61,6 +79,20 @@ namespace Root_WIND2.UI_User
 					string sInspectionID = (string)GetDataGridItem(DefectDataTable, selectedRow, "m_strInspectionID");
 					string sFileName = nIndex.ToString() + ".bmp";
 					DisplayDefectImage(sInspectionID, sFileName);
+
+					int mapIndexX = (int)GetDataGridItem(DefectDataTable, selectedRow, "m_nChipIndexX");
+					double x = (double)GetDataGridItem(DefectDataTable, selectedRow, "m_fAbsX");
+					double y = (double)GetDataGridItem(DefectDataTable, selectedRow, "m_fAbsY");
+
+					Edgeside_ImageViewer_ViewModel imageViewerVM = new Edgeside_ImageViewer_ViewModel();
+					if (mapIndexX == (int)EdgeSurface.EdgeMapPositionX.Top)
+						imageViewerVM = ImageViewerTopVM;
+					else if (mapIndexX == (int)EdgeSurface.EdgeMapPositionX.Side)
+						imageViewerVM = ImageViewerSideVM;
+					else if (mapIndexX == (int)EdgeSurface.EdgeMapPositionX.Btm)
+						imageViewerVM = ImageViewerBtmVM;
+
+					MoveDefect(imageViewerVM, (int)x, (int)y);
 				}
 			}
 		}
@@ -84,6 +116,8 @@ namespace Root_WIND2.UI_User
 				this.ImageViewerTopVM.ClearObjects();
 				this.ImageViewerSideVM.ClearObjects();
 				this.ImageViewerBtmVM.ClearObjects();
+				Progress = 0;
+				//MaxProgress = GlobalObjects.Instance.Get<InspectionManagerEdge>().GetWorkplaceCount();
 				Inspect();
 			});
 		}
@@ -160,7 +194,6 @@ namespace Root_WIND2.UI_User
 			//	rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
 			//	textList.Add(text);
 			//}
-
 			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
 			{
 				//DrawRectDefect(rectList, textList, e.reDraw);
@@ -204,7 +237,14 @@ namespace Root_WIND2.UI_User
 
 		private void UpdateProgress()
 		{
+			int workplaceCount = GlobalObjects.Instance.Get<InspectionManagerEdge>().GetWorkplaceCount();
+			MaxProgress = workplaceCount - 1;
+			Progress++;
 
+			int proc = (int)(((double)Progress / MaxProgress) * 100);
+			//if (proc > 99)
+			//	proc = 99;
+			Percentage = proc.ToString();
 		}
 
 		private void UpdateDefectData()
@@ -239,6 +279,11 @@ namespace Root_WIND2.UI_User
 			}
 			else
 				DefectImage = null;
+		}
+
+		private void MoveDefect(Edgeside_ImageViewer_ViewModel imageViewerVM, int x, int y)
+		{
+			imageViewerVM.CanvasMovePoint_Ref(new CPoint(x, y), 1, 1);
 		}
 	}
 }
