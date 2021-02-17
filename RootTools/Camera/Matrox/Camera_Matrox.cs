@@ -123,8 +123,8 @@ namespace RootTools.Camera.Matrox
                 SetProperty(ref m_CamInfo, value);
             }
         }
-        const int c_nBuf = 300;
-        int _nBuf = 300;
+        const int c_nBuf = 400;
+        int _nBuf = 400;
         public int p_nBuf
         {
             get
@@ -416,7 +416,7 @@ namespace RootTools.Camera.Matrox
         private const int BUFFERING_SIZE_MAX = 20;
         MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(LineScanArchiveFunction);
         UserDataObject userObject = new UserDataObject();
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
         {
             m_nGrabCount = (int)Math.Truncate(1.0 * nLine / p_nHeight);
             m_nGrabTrigger = 0;
@@ -499,9 +499,9 @@ namespace RootTools.Camera.Matrox
                         }
                     });
                     iBlock++;
-                    GrabEvent();
-                    if (m_nGrabCount != 0)
-                        p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
+                    //GrabEvent();
+                    //if (m_nGrabCount != 0)
+                    //    p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
             }
             p_CamInfo.p_eState = eCamState.Ready;

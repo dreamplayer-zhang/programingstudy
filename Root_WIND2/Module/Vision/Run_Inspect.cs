@@ -5,10 +5,13 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using RootTools_Vision;
+using RootTools_Vision.Utility;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -70,6 +73,8 @@ namespace Root_WIND2.Module
 
         public override string Run()
         {
+            StopWatch inspectionTimeWatcher = new StopWatch();
+            inspectionTimeWatcher.Start();
 
             //레시피에 GrabMode 저장하고 있어야함
             InspectionManagerFrontside inspectionFront = GlobalObjects.Instance.Get<InspectionManagerFrontside>();
@@ -79,7 +84,7 @@ namespace Root_WIND2.Module
 
             if (EQ.IsStop() == false)
             {
-                if (inspectionFront.Recipe.Read(m_sRecipeName, true) == false)
+                if (inspectionFront.Recipe.Read(m_sRecipeName) == false)
                     return "Recipe Open Fail";
 
                 inspectionFront.Start();
@@ -233,13 +238,35 @@ namespace Root_WIND2.Module
                 m_grabMode.m_camera.StopGrab();
 
 
+                //  Check
+                
+                int timeOutMinutes = 10;
+                StopWatch timeOutWatcher = new StopWatch();
+                timeOutWatcher.Start();
                 while(inspectionFront.CheckAllWorkDone() == false)
                 {
                     if(EQ.IsStop())
+                    {
+                        inspectionTimeWatcher.Stop();
+                        timeOutWatcher.Stop();
                         return "OK";
+                    }
 
-                    Task.Delay(1000);
+                    if (timeOutMinutes < timeOutWatcher.ElapsedMilliseconds / 1000)
+                    {
+                        timeOutWatcher.Stop();
+                        inspectionTimeWatcher.Stop();
+                        TempLogger.Write("Inspection", "Time out!!!");
+                        return "OK";
+                    }
+
+                    Thread.Sleep(1000);
                 }
+
+                timeOutWatcher.Stop();
+                inspectionTimeWatcher.Stop();
+
+                TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
 
                 return "OK";
             }

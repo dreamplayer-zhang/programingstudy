@@ -229,7 +229,19 @@ namespace RootTools_Vision
             {
                 exception = true;
                 //쓰레드 하나라도 죽으면 WorkFactory Thread 다시 생성하고, WorkFactory Reset
-                MessageBox.Show("예기치 못한 상황 발생으로 검사를 중단합니다.\n" + ex.Message);
+                //MessageBox.Show(
+                //    "예기치 못한 상황 발생으로 검사를 중단합니다.\n"
+                //    + ex.Message + "\n"
+                //    + ex.InnerException.Message + "\n"
+                //    + ex.InnerException.StackTrace);
+
+                string msg = "예기치 못한 상황 발생으로 검사를 중단합니다.\n" + ex.Message + "\n";
+                if(ex.InnerException != null)
+                {
+                    msg += ex.InnerException.Message + "\n" + ex.InnerException.StackTrace;
+                }
+
+                TempLogger.Write("Worker", msg);
             }
             finally
             {
@@ -238,7 +250,7 @@ namespace RootTools_Vision
                     this.task = null;
                     this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
-                    WorkEventManager.OnRequestStop(this, new RequestStopEventArgs());
+                    //WorkEventManager.OnRequestStop(this, new RequestStopEventArgs());
                 }
             }
         }

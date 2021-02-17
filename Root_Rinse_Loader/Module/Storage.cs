@@ -225,7 +225,7 @@ namespace Root_Rinse_Loader.Module
 
         double m_pulseDown = 10000; 
         double m_posStackReady = -100000; 
-        double m_fJogScale = 0.5; 
+        double m_fJogScale = 1; 
         public string MoveStackReady()
         {
             if (m_axis.p_posCommand > m_posStackReady - m_pulseDown) MoveStack();

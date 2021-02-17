@@ -131,19 +131,13 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region Rotate
-        double m_fJogScale = 1;
         Axis m_axisRotate;
 
         public string RunRotate(bool bRotate)
         {
-            if (bRotate) m_axisRotate.Jog(m_fJogScale);
+            if (bRotate) m_axisRotate.Jog(m_rinse.p_fRotateSpeed);
             else m_axisRotate.StopAxis(); 
             return "OK";
-        }
-
-        void RunTreeRotate(Tree tree)
-        {
-            m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Speed", "Rotate Speed (Scale)");
         }
         #endregion
 
@@ -285,7 +279,6 @@ namespace Root_Rinse_Unloader.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeRotate(tree.GetTree("Rotate", false));
         }
         #endregion
 

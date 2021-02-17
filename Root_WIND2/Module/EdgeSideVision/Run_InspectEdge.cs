@@ -102,7 +102,7 @@ namespace Root_WIND2.Module
 			{
 				InspectionManagerEdge inspectionEdge = GlobalObjects.Instance.Get<InspectionManagerEdge>();
 
-				if (inspectionEdge.Recipe.Read(recipeName, true) == false)
+				if (inspectionEdge.Recipe.Read(recipeName) == false)
 					return "Recipe Open Fail";
 
 				inspectionEdge.Start();

@@ -55,9 +55,9 @@ namespace RootTools_Vision
         }
     }
 
-    public class ProcessDefectWaferDoneEventArgs : EventArgs
+    public class IntegratedProcessDefectDoneEventArgs : EventArgs
     {
-        public ProcessDefectWaferDoneEventArgs()
+        public IntegratedProcessDefectDoneEventArgs()
         {
 
         }

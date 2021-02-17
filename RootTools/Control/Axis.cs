@@ -294,13 +294,21 @@ namespace RootTools.Control
             return GetSpeedValue(speed.ToString());
         }
 
-        Speed GetSpeedValue(string sSpeed)
+        public Speed GetSpeedValue(string sSpeed)
         {
             foreach (Speed speed in m_aSpeed)
             {
                 if (speed.m_id == sSpeed) return speed;
             }
             return null;
+        }
+
+        public void SetSpeed(string sSpeed, Speed speed)
+        {
+            for (int n = 0; n < m_aSpeed.Count; n++)
+            {
+                if (m_aSpeed[n].m_id == sSpeed) m_aSpeed[n] = speed; 
+            }
         }
 
         public enum eSpeed
