@@ -124,8 +124,8 @@ namespace Root_WIND2
 			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
 			parameter = recipe.GetItem<EBRParameter>();
 
-			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
-			WorkEventManager.ProcessMeasurementDone += WorkEventManager_ProcessMeasurementDone;
+			GlobalObjects.Instance.Get<InspectionManagerEBR>().InspectionDone += WorkEventManager_InspectionDone;
+			GlobalObjects.Instance.Get<InspectionManagerEBR>().ProcessMeasurementDone += WorkEventManager_ProcessMeasurementDone;
 		}
 
 		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)

@@ -124,8 +124,8 @@ namespace Root_WIND2.UI_User
 			ImageViewerBtmVM = new Edgeside_ImageViewer_ViewModel();
 			ImageViewerBtmVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeBottomImage"), GlobalObjects.Instance.Get<DialogService>());
 
-			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
-			WorkEventManager.ProcessDefectEdgeDone += WorkEventManager_ProcessDefectEdgeDone;
+			GlobalObjects.Instance.Get<InspectionManagerEdge>().InspectionDone += WorkEventManager_InspectionDone;
+			GlobalObjects.Instance.Get<InspectionManagerEdge>().IntegratedProcessDefectDone += WorkEventManager_IntegratedProcessDefectDone;
 		}
 
 		public void Scan()
@@ -168,7 +168,7 @@ namespace Root_WIND2.UI_User
 			}));
 		}
 
-		private void WorkEventManager_ProcessDefectEdgeDone(object sender, ProcessDefectEdgeDoneEventArgs e)
+		private void WorkEventManager_IntegratedProcessDefectDone(object sender, IntegratedProcessDefectDoneEventArgs e)
 		{
 			Workplace workplace = sender as Workplace;
 			List<CRect> rectList = new List<CRect>();

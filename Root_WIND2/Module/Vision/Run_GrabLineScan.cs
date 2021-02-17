@@ -4,8 +4,10 @@ using RootTools.Control;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,6 +56,9 @@ namespace Root_WIND2.Module
         public override string Run()
         {
             if (m_grabMode == null) return "Grab Mode == null";
+
+            StopWatch snapTimeWatcher = new StopWatch();
+            snapTimeWatcher.Start();
 
             try
             {
@@ -195,7 +200,7 @@ namespace Root_WIND2.Module
                     }
                     if (bNormal == true)
                     {
-                        WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
+                        //WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
 
                         nScanLine++;
                         cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
@@ -218,6 +223,12 @@ namespace Root_WIND2.Module
                     }
                 }
                 m_grabMode.m_camera.StopGrab();
+
+
+                snapTimeWatcher.Stop();
+                // Log
+                TempLogger.Write("Snap", string.Format("{0:F3}", (double)snapTimeWatcher.ElapsedMilliseconds / (double)1000));
+
                 return "OK";
             }
             catch(Exception e)

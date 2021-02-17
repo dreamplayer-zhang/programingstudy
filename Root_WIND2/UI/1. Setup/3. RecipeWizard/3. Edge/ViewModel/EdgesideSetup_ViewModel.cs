@@ -246,7 +246,7 @@ namespace Root_WIND2
 			}));
 		}
 
-		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
+		private void WorkEventManager_ProcessDefectWaferDone(object sender, IntegratedProcessDefectDoneEventArgs e)
 		{
 			Workplace workplace = sender as Workplace;
 

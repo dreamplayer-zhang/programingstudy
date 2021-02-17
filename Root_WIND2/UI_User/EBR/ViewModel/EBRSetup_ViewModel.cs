@@ -190,8 +190,9 @@ namespace Root_WIND2.UI_User
 			Recipe = recipe.GetItem<EBRRecipe>();
 			Parameter = recipe.GetItem<EBRParameter>();
 
-			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
-			WorkEventManager.ProcessMeasurementDone += WorkEventManager_ProcessMeasurementDone;
+
+			GlobalObjects.Instance.Get<InspectionManagerEBR>().InspectionDone += WorkEventManager_InspectionDone;
+			GlobalObjects.Instance.Get<InspectionManagerEBR>().ProcessMeasurementDone += WorkEventManager_ProcessMeasurementDone;
 		}
 
 		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)

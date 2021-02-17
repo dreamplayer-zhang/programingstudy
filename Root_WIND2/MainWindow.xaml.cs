@@ -147,7 +147,6 @@ namespace Root_WIND2
             logView.Init(LogView.m_logView);
             WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
             InitTimer();
-
         }
 
         void ThreadStop()
@@ -196,7 +195,6 @@ namespace Root_WIND2
                 // ImageData
                 if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
                 {
-
                     frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryFrontPool, memoryFrontGroup, memoryFront, engineer.ClassMemoryTool());
                     maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage",memoryFrontPool, memoryFrontGroup, memoryMask , engineer.ClassMemoryTool());
                     //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));

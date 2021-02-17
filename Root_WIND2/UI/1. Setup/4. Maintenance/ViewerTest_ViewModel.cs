@@ -47,12 +47,12 @@ namespace Root_WIND2.UI
 
         public void Init(MemoryTool tool)
         {
-            //m_Viewer.init(null, GlobalObjects.Instance.Get<DialogService>());
-            //m_ToolMemory = tool;
+            m_Viewer.init(null, GlobalObjects.Instance.Get<DialogService>());
+            m_ToolMemory = tool;
 
-            //m_imagedata = new ImageData(m_ToolMemory.GetMemory("Vision.Memory", "Vision", "Main"));
-            //m_imagedata.p_nByte = 3;
-            //p_Viewer.SetImageData(m_imagedata);
+            m_imagedata = new ImageData(m_ToolMemory.GetMemory("Vision.Memory", "Vision", "Main"));
+            m_imagedata.p_nByte = 3;
+            p_Viewer.SetImageData(m_imagedata);
         }
 
         public RelayCommand btnTest

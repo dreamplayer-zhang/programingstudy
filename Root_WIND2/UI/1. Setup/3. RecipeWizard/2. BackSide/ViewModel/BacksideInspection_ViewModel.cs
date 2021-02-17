@@ -70,30 +70,29 @@ namespace Root_WIND2
             timer.Tick += new EventHandler(timer_Tick);
             //DatabaseManager.Instance.SetDatabase(1);
 
-            WorkEventManager.PositionDone += PositionDone_Callback;
-            WorkEventManager.InspectionDone += SurfaceInspDone_Callback;
-            WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
+            GlobalObjects.Instance.Get<InspectionManagerBackside>().PositionDone += PositionDone_Callback;
+            GlobalObjects.Instance.Get<InspectionManagerBackside>().InspectionDone += SurfaceInspDone_Callback;
+            GlobalObjects.Instance.Get<InspectionManagerBackside>().ProcessDefectDone += ProcessDefectDone_Callback;
         }
 
-        object lockObj = new object();
+
         private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
         {
             Workplace workplace = obj as Workplace;
-            lock (this.lockObj)
+
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+                String test = "";
+                if (true) // Display Option : Position Trans
                 {
-                    String test = "";
-                    if (true) // Display Option : Position Trans
-                    {
-                        test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
-                    }
-                    if (workplace.Index == 0)
-                        DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
-                    else
-                        DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
-                }));
-            }
+                    test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
+                }
+                if (workplace.Index == 0)
+                    DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
+                else
+                    DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
+            }));
+
         }
         private void SurfaceInspDone_Callback(object obj, InspectionDoneEventArgs args)
         {

@@ -22,7 +22,6 @@ namespace Root_WIND2
 
             p_selectedMethodItem = null;
 
-            WIND2EventManager.BeforeRecipeSave += BeforeRecipeSave_Callback;
         }
 
         private void ViewerInit()
