@@ -95,11 +95,14 @@ namespace Root_WIND2.UI_User
             this.imageViewerVM = new FrontsideInspect_ImageViewer_ViewModel();
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
 
-            GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionStart += InspectionStart_Callback;
-            GlobalObjects.Instance.Get<InspectionManagerFrontside>().PositionDone += PositionDone_Callback;
-            GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionDone += InspectionDone_Callback;
-            GlobalObjects.Instance.Get<InspectionManagerFrontside>().ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
-            GlobalObjects.Instance.Get<InspectionManagerFrontside>().IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
+            if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+            {
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionStart += InspectionStart_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().PositionDone += PositionDone_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionDone += InspectionDone_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
+            }
 
             // Initialize MapViewer
             this.mapViewerVM = new MapViewer_ViewModel();
@@ -156,16 +159,23 @@ namespace Root_WIND2.UI_User
             {
                 LoadRecipe();
 
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged += WorkplaceStateChanged_Callback;
-                WIND2EventManager.SnapDone += SnapDone_Callback;
+                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                {
+                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+                    WIND2EventManager.SnapDone += SnapDone_Callback;
+                }
+                    
             });
         }
         public RelayCommand UnloadedCommand
         {
             get => new RelayCommand(() =>
             {
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
-                WIND2EventManager.SnapDone -= SnapDone_Callback;
+                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                {
+                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
+                    WIND2EventManager.SnapDone -= SnapDone_Callback;
+                }
             });
         }
 
@@ -175,7 +185,10 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 this.ImageViewerVM.ClearObjects();
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().Start(WORK_TYPE.SNAP);
+                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                {
+                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().Start(WORK_TYPE.SNAP);
+                }
             });
         }
 
@@ -183,7 +196,10 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
+                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                {
+                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
+                }
 
                 return;
 
@@ -216,7 +232,10 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
+                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                {
+                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
+                }
             });
         }
 

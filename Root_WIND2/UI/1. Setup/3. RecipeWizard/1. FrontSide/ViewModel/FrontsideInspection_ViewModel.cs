@@ -76,9 +76,12 @@ namespace Root_WIND2
             //DatabaseManager.Instance.SetDatabase(1);
 
 
-            GlobalObjects.Instance.Get<InspectionManagerFrontside>().PositionDone += PositionDone_Callback;
-            GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionDone += InspectionDone_Callback;
-            GlobalObjects.Instance.Get<InspectionManagerFrontside>().ProcessDefectDone += ProcessDefectDone_Callback;
+            if(GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+            {
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().PositionDone += PositionDone_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionDone += InspectionDone_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().ProcessDefectDone += ProcessDefectDone_Callback;
+            }
         }
 
         private void PositionDone_Callback(object obj, PositionDoneEventArgs args)

@@ -151,6 +151,8 @@ namespace Root_WIND2.UI_User
 
 		public EdgesideInspect_ViewModel()
 		{
+			
+
 			ImageViewerTopVM = new Edgeside_ImageViewer_ViewModel();
 			ImageViewerTopVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
 			ImageViewerSideVM = new Edgeside_ImageViewer_ViewModel();
@@ -158,8 +160,11 @@ namespace Root_WIND2.UI_User
 			ImageViewerBtmVM = new Edgeside_ImageViewer_ViewModel();
 			ImageViewerBtmVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeBottomImage"), GlobalObjects.Instance.Get<DialogService>());
 
-			GlobalObjects.Instance.Get<InspectionManagerEdge>().InspectionDone += WorkEventManager_InspectionDone;
-			GlobalObjects.Instance.Get<InspectionManagerEdge>().IntegratedProcessDefectDone += WorkEventManager_IntegratedProcessDefectDone;
+			if (GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
+            {
+				GlobalObjects.Instance.Get<InspectionManagerEdge>().InspectionDone += WorkEventManager_InspectionDone;
+				GlobalObjects.Instance.Get<InspectionManagerEdge>().IntegratedProcessDefectDone += WorkEventManager_IntegratedProcessDefectDone;
+			}
 		}
 
 		public void Scan()
@@ -178,7 +183,8 @@ namespace Root_WIND2.UI_User
 
 		public void Inspect()
 		{
-			GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();
+			if (GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
+				GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();
 		}
 
 		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
@@ -237,14 +243,17 @@ namespace Root_WIND2.UI_User
 
 		private void UpdateProgress()
 		{
-			int workplaceCount = GlobalObjects.Instance.Get<InspectionManagerEdge>().GetWorkplaceCount();
-			MaxProgress = workplaceCount - 1;
-			Progress++;
+			if (GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
+            {
+				int workplaceCount = GlobalObjects.Instance.Get<InspectionManagerEdge>().GetWorkplaceCount();
+				MaxProgress = workplaceCount - 1;
+				Progress++;
 
-			int proc = (int)(((double)Progress / MaxProgress) * 100);
-			//if (proc > 99)
-			//	proc = 99;
-			Percentage = proc.ToString();
+				int proc = (int)(((double)Progress / MaxProgress) * 100);
+				//if (proc > 99)
+				//	proc = 99;
+				Percentage = proc.ToString();
+			}
 		}
 
 		private void UpdateDefectData()

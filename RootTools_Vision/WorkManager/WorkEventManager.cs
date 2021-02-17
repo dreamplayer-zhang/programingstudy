@@ -49,7 +49,7 @@ namespace RootTools_Vision
         #region [ProcessDefectWaferDone]
         public static event EventHandler<IntegratedProcessDefectDoneEventArgs> IntegratedProcessDefectDone;
 
-        public static void OnIntegratedProcessDefectWaferDone(object obj, IntegratedProcessDefectDoneEventArgs args)
+        public static void OnIntegratedProcessDefectDone(object obj, IntegratedProcessDefectDoneEventArgs args)
         {
             IntegratedProcessDefectDone?.Invoke(obj, args);
         }

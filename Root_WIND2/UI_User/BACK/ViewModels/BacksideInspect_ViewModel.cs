@@ -68,11 +68,15 @@ namespace Root_WIND2.UI_User
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("BackImage"), GlobalObjects.Instance.Get<DialogService>());
 
 
-            GlobalObjects.Instance.Get<InspectionManagerBackside>().InspectionStart += InspectionStart_Callback;
-            GlobalObjects.Instance.Get<InspectionManagerBackside>().PositionDone += PositionDone_Callback;
-            GlobalObjects.Instance.Get<InspectionManagerBackside>().InspectionDone += InspectionDone_Callback;
-            GlobalObjects.Instance.Get<InspectionManagerBackside>().ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
-            GlobalObjects.Instance.Get<InspectionManagerBackside>().IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
+            if(GlobalObjects.Instance.Get<InspectionManagerBackside>() != null)
+            {
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().InspectionStart += InspectionStart_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().PositionDone += PositionDone_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().InspectionDone += InspectionDone_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
+            }
+            
 
             // Initialize MapViewer
             this.mapViewerVM = new MapViewer_ViewModel();
@@ -81,6 +85,8 @@ namespace Root_WIND2.UI_User
         private string currentRecipe = "";
         public void LoadRecipe()
         {
+            if (GlobalObjects.Instance.Get<InspectionManagerBackside>() == null) return;
+
             if (currentRecipe != GlobalObjects.Instance.Get<RecipeBack>().Name)
             {
                 RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;

@@ -51,7 +51,7 @@ namespace RootTools_Vision
                 DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
             
             //WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
-            WorkEventManager.OnIntegratedProcessDefectWaferDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
+            WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
 
         }
 

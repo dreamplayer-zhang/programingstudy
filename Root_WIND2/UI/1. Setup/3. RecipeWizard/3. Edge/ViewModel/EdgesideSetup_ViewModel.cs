@@ -272,7 +272,8 @@ namespace Root_WIND2
 
 		public void Inspect()
 		{
-			GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();			
+			if(GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
+				GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();			
 		}
 
 		private void ChangeViewer(string dataName)

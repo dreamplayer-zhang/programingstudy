@@ -112,7 +112,7 @@ namespace RootTools_Vision
             //string sTiffImagePath = @"D:\DefectImage";
             //SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
-            WorkEventManager.OnProcessDefectWaferDone(this.currentWorkplace, new ProcessDefectWaferDoneEventArgs());
+            WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
         }
 
         public override WorkBase Clone()
