@@ -36,7 +36,6 @@ namespace RootTools.Camera.Silicon
         int m_Width;
         int m_Height;
         int m_nGrabProgress;
-        int m_nSkipGrabCount;
         string m_sMCF="";
 
         IntPtr m_MemPtr;
@@ -135,7 +134,6 @@ namespace RootTools.Camera.Silicon
             m_Width = 0;
             m_Height = 0;
             m_nGrabTrigger = 0;
-            m_nSkipGrabCount = -1;
             rc = fgErrorType.fgeOK;
 
             m_szBuf = new CPoint(0, 0);
@@ -373,13 +371,12 @@ namespace RootTools.Camera.Silicon
             m_LastROI = new CRect();
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
-            m_lGrab = nLine/m_Height;/*잠깐하드코딩*/
+            m_lGrab = nLine/m_Height;
             m_nInverseYOffset = m_GrabData.ReverseOffsetY;
             m_nYEnd = (m_lGrab - 1) * m_Height;
             m_cpScanOffset.Y = 0;
             m_nGrabTrigger = 0;
             m_bscanDir = m_GrabData.bInvY;
-            m_nSkipGrabCount = m_GrabData.m_nSkipGrabCount;
 
             rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);
 
@@ -391,13 +388,6 @@ namespace RootTools.Camera.Silicon
             int iBlock = 0;
             while (iBlock < m_lGrab)
             {
-                //if(m_nSkipGrabCount > 0)
-                //{
-                //    // TDI 카메라와 Silicon Grabber의 해상도가 달라서 트리거 갯수를 다르게 줘야해서 Skip 할 수 있도록 추가
-                //    if (m_nGrabTrigger % m_nSkipGrabCount != 0) //LADS를 사용할 땐 m_nGrabTrigger가 TDI 기준으로 카운트가 올라감
-                //        continue;
-                //}
-
                 if (iBlock < m_nGrabTrigger)
                 {
                     int nY = iBlock * m_Height;

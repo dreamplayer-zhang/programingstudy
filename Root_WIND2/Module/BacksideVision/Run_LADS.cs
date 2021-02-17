@@ -61,6 +61,7 @@ namespace Root_WIND2.Module
             {
                 m_grabMode.SetLight(true);
 
+                #region Local Variable
                 AxisXY axisXY = m_module.AxisXY;
                 Axis axisZ = m_module.AxisZ;
                 CPoint cpMemoryOffset = new CPoint(m_grabMode.m_cpMemoryOffset);
@@ -72,7 +73,7 @@ namespace Root_WIND2.Module
                 double dXScale = m_grabMode.m_dResX_um * 10;
                 cpMemoryOffset.X += (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth;
                 m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
-                int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
+                int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수 
                 int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
                 int nScanOffset_pulse = 10000;
                 string strPool = m_grabMode.m_memoryPool.p_id;
@@ -87,22 +88,28 @@ namespace Root_WIND2.Module
 
                 double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
                 double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
-
+                
                 if (Math.Abs(dTriggerEndPosY - dStartPosY) > Math.Abs(dTriggerStartPosY - dStartPosY))
                     dTriggerEndPosY += nScanOffset_pulse;
-
                 else
                     dTriggerStartPosY -= nScanOffset_pulse;
 
                 GrabData grabData = m_grabMode.m_GD;
                 grabData.ReverseOffsetY = m_grabMode.m_nReverseOffsetY;
 
-                m_module.LadsInfos.Clear();
+                #endregion
+
+                if(m_module.LadsInfos.Count ==0)
+                {  //lads 초기 생성시에 dummy 생성
+                    int lisize = nWaferSizeY_px / nCamWidth;
+                    for (int i = 0; i < lisize; i++)
+                        m_module.LadsInfos.Add(new List<double>());
+                }
 
                 while (m_grabMode.m_ScanLineNum > nScanLine)
                 {
                     if (EQ.IsStop())
-                        return "OK";
+                        return "OK";                    
 
                     double dPosX = m_grabMode.m_rpAxisCenter.X - nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2
                         + (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
@@ -137,20 +144,40 @@ namespace Root_WIND2.Module
 
                     axisXY.p_axisY.RunTrigger(false);
 
-
-                    //while (m_grabMode.m_camera.p_nGrabProgress != 100)
-                    //{
-                    //    System.Threading.Thread.Sleep(10);
-                    //    m_log.Info("Wait Camera GrabProcess");
-                    //}
-                    //m_grabMode.m_camera.StopGrab();
-                    CalculateHeight(cpMemoryOffset.X, mem, nWaferSizeY_px, 20, grabData.bInvY);
+                    CalculateHeight(cpMemoryOffset.X, mem, nWaferSizeY_px, 20,nScanLine+m_grabMode.m_ScanStartLine,grabData.bInvY);
                     nScanLine++;
                     cpMemoryOffset.X += nCamWidth;
                 }
                 m_grabMode.m_camera.StopGrab();
 
                 CreateFocusMap();
+
+                //앞뒤 0인애들 고치는거
+                for(int i=0;i<m_module.LadsInfos.Count;i++)
+                {
+                    List<double> li = m_module.LadsInfos[i];
+                    for(int y=0;y<li.Count;y++)
+                    {
+                        if (li[y] == 0)
+                            continue;
+
+                        for (int yy = 0; yy < y; yy++)
+                            li[yy] = li[y];
+
+                        break;
+                    }
+
+                    for(int y = li.Count-1;y>=0;y--)
+                    {
+                        if (li[y] == 0)
+                            continue;
+
+                        for (int yy = li.Count - 1; yy > y; yy--)
+                            li[yy] = li[y];
+
+                        break;
+                    }
+                }
 
                 return "OK";
             }
@@ -160,19 +187,18 @@ namespace Root_WIND2.Module
             }
         }
 
-        unsafe void CalculateHeight(int xmempos, MemoryData mem, int WaferHeight, int gv, bool InvY)
+        unsafe void CalculateHeight(int xmempos, MemoryData mem, int WaferHeight, int gv, int nScanNum,bool InvY)
         {
             int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
             int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
             int hCnt = WaferHeight / nCamHeight;
 
             byte* ptr = (byte*)mem.GetPtr().ToPointer();
-
             List<double> ladsinfo = new List<double>();
-            List<double> li = new List<double>();// 뭔가 값이 있는곳에 대한 정보
+            List<double> li = new List<double>();
 
             if (InvY)
-            {//정방향 스캔시
+            {
                 for (int cnt = 0; cnt < hCnt; cnt++)
                 {
                     li.Clear();
@@ -180,30 +206,29 @@ namespace Root_WIND2.Module
                     for (int h = (int)(nCamHeight * 0.25); h < nCamHeight * 0.75; h++)
                     {
                         double sum = 0;
-
                         for (int w = 0; w < nCamWidth; w++)
-                            sum += ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
+                        {
+                            //ptr[cnt*nCamHeight+h][w+xmempos]
+                            int curgv = ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
 
-                        if (sum < 10)
-                            li.Add(0);
-                        else
-                            li.Add(sum / nCamWidth);
+                            if (curgv >= gv)
+                                sum += ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
+                        }
+
+                        li.Add(sum / nCamWidth);
                     }
 
                     double M = double.MinValue;
                     double res = 0;
                     for (int i = 1; i < li.Count - 1; i++)
                     {
-                        if (M < li[i])
+                        if (M < li[i] && li[i] != 0)
                         {
                             M = li[i];
                             res = (li[i - 1] * (i - 1) + li[i] * i + li[i + 1] * (i + 1)) / (li[i - 1] + li[i] + li[i + 1]);
                         }
                     }
-                    if (double.IsNaN(res)  )
-                        ladsinfo.Add(ladsinfo.Min());
-                    else
-                        ladsinfo.Add(res * Math.Sqrt(2));
+                    ladsinfo.Add(res * Math.Sqrt(2));
                 }
             }
             else
@@ -215,72 +240,72 @@ namespace Root_WIND2.Module
                     for (int h = (int)(nCamHeight * 0.25); h < nCamHeight * 0.75; h++)
                     {
                         double sum = 0;
-
                         for (int w = 0; w < nCamWidth; w++)
-                            sum += ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
-
-                        if (sum < 10)
-                            li.Add(0);
-                        else
-                            li.Add(sum / nCamWidth);
+                        {
+                            int curgv = ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
+                            if (curgv >= gv)
+                                sum += ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
+                        }
+                        li.Add(sum / nCamWidth);
                     }
 
                     double M = double.MinValue;
-                    double res=0;
-                    for(int i=1;i<li.Count-1;i++)
+                    double res = 0;
+                    for (int i = 1; i < li.Count - 1; i++)
                     {
-                        if(M<li[i])
+                        if (M < li[i] && li[i] != 0)
                         {
                             M = li[i];
                             res = (li[i - 1] * (i - 1) + li[i] * i + li[i + 1] * (i + 1)) / (li[i - 1] + li[i] + li[i + 1]);
                         }
                     }
-
-                    if (double.IsNaN(res))
-                        ladsinfo.Add(ladsinfo.Min());
-                    else
-                        ladsinfo.Add(res * Math.Sqrt(2));
+                    ladsinfo.Add(res * Math.Sqrt(2));
                 }
             }
 
-            m_module.LadsInfos.Add(ladsinfo);
+            m_module.LadsInfos.RemoveAt(nScanNum);
+            m_module.LadsInfos.Insert(nScanNum, ladsinfo);
         }
 
         unsafe void CreateFocusMap()
         {
-            List<List<double>> infos = m_module.LadsInfos;
             Mat ResultMat = new Mat();
-            int nX = infos.Count;
-            int nY = infos[0].Count;
-            int thumsize = 30;
 
-            for(int x = 0;x<nX;x++)
+            int nX = m_module.LadsInfos.Count;
+            int nY = m_module.LadsInfos[0].Count;
+            int thumsize = 30;
+            //getminmax
+            double mHeight = double.MaxValue, MHeight = double.MinValue;
+            for (int x = 0; x < nX; x++)
+            {
+                mHeight = Math.Min(mHeight, m_module.LadsInfos[x].Min());
+                MHeight = Math.Max(MHeight, m_module.LadsInfos[x].Max());
+            }
+            double rate = 255 / (MHeight - mHeight);
+
+            for (int x = 0; x < nX; x++)
             {
                 Mat Vmat = new Mat();
 
-                for (int y=0;y<nY;y++)
+                for (int y = 0; y < nY; y++)
                 {
-                    Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1);
-                    double MHeight = m_module.LadsInfos[x].Max();
-                    double mHeight = m_module.LadsInfos[x].Min();
-                    double rate = 255 / (MHeight - mHeight);
-                    MCvScalar color = new MCvScalar(rate*infos[x][y]);
+                    Mat ColorImg = new Mat(thumsize, (thumsize * nY / nX), DepthType.Cv8U, 1);
+                    MCvScalar color = new MCvScalar(rate * m_module.LadsInfos[x][y]);
                     ColorImg.SetTo(color);
 
                     if (y == 0)
                         Vmat = ColorImg;
                     else
-                        CvInvoke.VConcat(ColorImg, Vmat, Vmat);
+                        CvInvoke.VConcat(Vmat, ColorImg, Vmat);
                 }
 
                 if (x == 0)
                     ResultMat = Vmat;
                 else
                     CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
-
-                CvInvoke.Imwrite(@"D:\Test\" + x + ".bmp", ResultMat);
             }
 
+            CvInvoke.ApplyColorMap(ResultMat, ResultMat, ColorMapType.Ocean);
             CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
         }
     }
