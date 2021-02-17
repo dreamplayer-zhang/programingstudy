@@ -47,6 +47,7 @@ namespace Root_Rinse_Loader
             stackUI.Init(m_handler.m_storage.m_stack, m_handler.m_loader);
             tabControlStorage.SelectedIndex = (int)m_handler.m_rinse.p_eMode;
             progressUI.Init(m_handler.m_rinse); 
+            textBoxRotateSpeed.DataContext = m_handler.m_rinse;
         }
         #endregion
 
@@ -176,7 +177,14 @@ namespace Root_Rinse_Loader
             BindingExpression binding = BindingOperations.GetBindingExpression((TextBox)sender, property);
             if (binding != null) binding.UpdateSource();
         }
-        #endregion
 
+        private void textBoxRotateSpeed_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+            DependencyProperty property = TextBox.TextProperty;
+            BindingExpression binding = BindingOperations.GetBindingExpression((TextBox)sender, property);
+            if (binding != null) binding.UpdateSource();
+        }
+        #endregion
     }
 }

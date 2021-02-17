@@ -49,6 +49,19 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
+        double _fRotateSpeed = 1;
+        public double p_fRotateSpeed
+        {
+            get { return _fRotateSpeed; }
+            set
+            {
+                if (_fRotateSpeed == value) return;
+                _fRotateSpeed = value;
+                OnPropertyChanged();
+                AddProtocol(p_id, eCmd.SetRotateSpeed, value);
+            }
+        }
+
         Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1; 
         public Storage.eMagazine p_eMagazine
         {
@@ -374,6 +387,7 @@ namespace Root_Rinse_Loader.Module
             StripSend,
             StripReceive,
             ResultClear,
+            SetRotateSpeed,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
@@ -515,6 +529,7 @@ namespace Root_Rinse_Loader.Module
             InitTimer(); 
             AddProtocol(p_id, eCmd.SetMode, p_eMode);
             AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
+            AddProtocol(p_id, eCmd.SetRotateSpeed, p_fRotateSpeed); 
         }
 
         public override void ThreadStop()
