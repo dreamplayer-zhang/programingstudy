@@ -356,7 +356,7 @@ namespace RootTools.Camera.Silicon
         {
             return new CPoint(m_Width, m_Height);
         }
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
         {
             if (!m_hDev.IsValid)
             {

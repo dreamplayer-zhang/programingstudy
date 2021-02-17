@@ -742,7 +742,7 @@ namespace RootTools.Camera.BaslerPylon
         int m_nFrameTotal;
         MemoryData m_Memory;
         CPoint m_cpScanOffset;
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
         {
             try
             {

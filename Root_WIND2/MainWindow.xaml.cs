@@ -305,6 +305,7 @@ namespace Root_WIND2
                 dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
                 dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
                 dialogService.Register<TK4S, TK4SModuleUI>();
+                dialogService.Register<FFUModule, FFUModuleUI>();
 
 
 
