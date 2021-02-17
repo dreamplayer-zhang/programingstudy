@@ -125,10 +125,46 @@ namespace Root_EFEM
         {
             m_lLoadport = tree.Set(m_lLoadport, m_lLoadport, "Count", "Loadport Count");
             while (m_aLoadportType.Count < m_lLoadport) m_aLoadportType.Add(eLoadport.RND);
-            Tree treeType = tree.GetTree("Type"); 
+            Tree treeType = tree.GetTree("Type");
             for (int n = 0; n < m_lLoadport; n++)
             {
-                m_aLoadportType[n] = (eLoadport)treeType.Set(m_aLoadportType[n], m_aLoadportType[n], n.ToString("00"), "Loadport Type"); 
+                m_aLoadportType[n] = (eLoadport)treeType.Set(m_aLoadportType[n], m_aLoadportType[n], n.ToString("00"), "Loadport Type");
+            }
+        }
+
+        enum eRFID
+        {
+            Brooks,
+            Ceyon,
+        }
+        List<eRFID> m_aRFIDType = new List<eRFID>();
+        public List<IRFID> m_aRFID = new List<IRFID>();
+        void InitRFID()
+        {
+            ModuleBase module;
+            char cID = 'A';
+            for(int n=0; n<m_lLoadport; n++)
+            {
+                string sID = "RFID" + cID;
+                switch (m_aRFIDType[n])
+                {
+                    case eRFID.Brooks: module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]); break;
+                    case eRFID.Ceyon: module = new RFID_Ceyon(sID, m_engineer, m_aLoadport[n]); break;
+                    default: module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]); break;
+                }
+                InitModule(module);
+                m_aRFID.Add((IRFID)module);
+                m_aLoadport[n].m_rfid = m_aRFID[n];
+            }
+        }
+
+        public void RunTreeRFID(Tree tree)
+        {
+            while (m_aRFIDType.Count < m_lLoadport) m_aRFIDType.Add(eRFID.Brooks);
+            Tree treeType = tree.GetTree("Type");
+            for (int n = 0; n < m_lLoadport; n++)
+            {
+                m_aRFIDType[n] = (eRFID)treeType.Set(m_aRFIDType[n], m_aRFIDType[n], n.ToString("00"), "RFID Type");
             }
         }
         #endregion
@@ -424,6 +460,7 @@ namespace Root_EFEM
         {
             RunTreeWTR(tree.GetTree("WTR"));
             RunTreeLoadport(tree.GetTree("Loadport"));
+            RunTreeRFID(tree.GetTree("RFID"));
             RunTreeAligner(tree.GetTree("Aligner"));
             RunTreeVision(tree.GetTree("Vision"));
         }
