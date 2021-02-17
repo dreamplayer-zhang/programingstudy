@@ -15,6 +15,7 @@ namespace Root_WIND2
     public class WIND2 : ModuleBase
     {
         public TK4SGroup m_tk4s;
+        public FFU_Group m_FFUGourp;
         DIO_I di_Door_VSPC;
         DIO_I di_Door_VSTop;
         DIO_I di_Door_VSBTM;
@@ -49,10 +50,14 @@ namespace Root_WIND2
         ALID alid_Ionizer;
         ALID alid_CDA;
         ALID alid_VAC1;
+        public DIO_Os m_doLamp;
+        string[] asLamp = Enum.GetNames(typeof(eLamp));
 
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Tower Lamp", asLamp);
             m_toolBox.Get(ref m_tk4s, this, "FDC", GlobalObjects.Instance.Get<DialogService>());
+            m_toolBox.Get(ref m_FFUGourp, this, "FFU", GlobalObjects.Instance.Get<DialogService>());
             p_sInfo = m_toolBox.Get(ref di_Door_VSPC, this, "Vision PC Door");
             p_sInfo = m_toolBox.Get(ref di_Door_VSTop, this, "Vision Top Door");
             p_sInfo = m_toolBox.Get(ref di_Door_VSBTM, this, "Vision Bottom Door");
@@ -96,9 +101,12 @@ namespace Root_WIND2
         {
             base.InitBase(id, engineer);
             m_tk4s.OnDetectLimit += M_tk4s_OnDetectLimit;
+            m_FFUGourp.OnDetectLimit += M_FFUGourp_OnDetectLimit;
             m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
             m_threadCheck.Start();
         }
+
+        
 
         void RunThreadCheck()
         {
@@ -107,6 +115,7 @@ namespace Root_WIND2
             while (m_bThreadCheck)
             {
                 Thread.Sleep(1000);
+                LampProcess();
                 //DoorCheck();
                 //FanCheck();
                 //AlarmCheck();
@@ -158,6 +167,47 @@ namespace Root_WIND2
                 //	EQ.p_bStop = true;
                 //	_alid_EMS.Run(!_diProtectionBar.p_bIn, "Protection Bar Error");
                 //}
+            }
+        }
+
+        public enum eLamp
+        {
+            Red,
+            Yellow,
+            Green
+        }
+        private void LampProcess()
+        {
+            if (EQ.p_bSimulate)
+                return;
+            switch (EQ.p_eState)
+            {
+                case EQ.eState.Init:
+                    m_doLamp.Write(eLamp.Yellow);
+                    break;
+                case EQ.eState.Home:
+                    //do_Buzzer.Write(eBuzzer.Buzzer4);
+                    //do_door_Lock.Write(true);
+                    m_doLamp.Write(eLamp.Yellow);
+                    break;
+                case EQ.eState.Ready:
+                    m_doLamp.Write(eLamp.Yellow);
+                    break;
+                case EQ.eState.Idle:
+                    m_doLamp.Write(eLamp.Yellow);
+                    break;
+                case EQ.eState.Run:
+                    //do_door_Lock.Write(true);
+                    m_doLamp.Write(eLamp.Green);
+                    break;
+                case EQ.eState.Recovery:
+                    //do_door_Lock.Write(true);
+                    m_doLamp.Write(eLamp.Yellow);
+                    break;
+                case EQ.eState.Error:
+                    //do_Buzzer.Write(eBuzzer.Buzzer1);
+                    m_doLamp.Write(eLamp.Red);
+                    break;
             }
         }
 
@@ -265,6 +315,11 @@ namespace Root_WIND2
         }
 
         private void M_tk4s_OnDetectLimit(string str)
+        {
+            GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str);
+        }
+
+        private void M_FFUGourp_OnDetectLimit(string str)
         {
             GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str);
         }

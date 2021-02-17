@@ -52,21 +52,21 @@ namespace Root_Rinse_Unloader.Module
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit) 
             {
-                InitPosWidth(); 
+                InitPosWidth();
+                m_axisRotate[1].SetSpeed("Jog", m_axisRotate[0].GetSpeedValue("Jog"));
             }
         }
         #endregion
 
         #region Rotate
-        double m_fJogScale = 1;
         Axis[] m_axisRotate = new Axis[2];
 
         public string RunRotate(bool bRotate)
         {
             if (bRotate)
             {
-                m_axisRotate[0].Jog(m_fJogScale);
-                m_axisRotate[1].Jog(m_fJogScale);
+                m_axisRotate[0].Jog(m_rinse.p_fRotateSpeed);
+                m_axisRotate[1].Jog(m_rinse.p_fRotateSpeed);
             }
             else
             {
@@ -74,11 +74,6 @@ namespace Root_Rinse_Unloader.Module
                 m_axisRotate[1].StopAxis();
             }
             return "OK";
-        }
-
-        void RunTreeRotate(Tree tree)
-        {
-            m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Speed", "Rotate Speed (Scale)");
         }
         #endregion
 
@@ -359,7 +354,6 @@ namespace Root_Rinse_Unloader.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeRotate(tree.GetTree("Rotate"));
             RunTreeAlign(tree.GetTree("Align")); 
         }
         #endregion

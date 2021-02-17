@@ -48,7 +48,7 @@ namespace RootTools.Camera
 
         //void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine,int nScanOffsetY =0, bool bInvY = false, int ReserveOffsetY = 0, GrabData m_GrabData = null);
         //void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReverseOffsetY = 0, GrabData m_GrabData = null);/
-        void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null);
+        void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false);
         void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null);
         double GetFps();
     }

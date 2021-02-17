@@ -488,7 +488,7 @@ namespace Root_WIND2
                         StateHome();
                         break;
                     case EQ.eState.Ready:
-                        //CheckLoad();
+                        CheckLoad();
                         break;
                     case EQ.eState.Run:
                         if (p_moduleList.m_qModuleRun.Count == 0)
@@ -511,7 +511,7 @@ namespace Root_WIND2
         }
         
         #endregion
-        /*
+        
         void CheckLoad()
         {
             foreach (ILoadport loadport in m_aLoadport)
@@ -548,7 +548,7 @@ namespace Root_WIND2
             //    }
             //}
         }
-
+        /*
         void CheckUnload()
         {
             EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();

@@ -123,8 +123,8 @@ namespace RootTools.Camera.Matrox
                 SetProperty(ref m_CamInfo, value);
             }
         }
-        const int c_nBuf = 400;
-        int _nBuf = 400;
+        const int c_nBuf = 300;
+        int _nBuf = 300;
         public int p_nBuf
         {
             get
@@ -499,9 +499,9 @@ namespace RootTools.Camera.Matrox
                         }
                     });
                     iBlock++;
-                    //GrabEvent();
-                    //if (m_nGrabCount != 0)
-                    //    p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
+                    GrabEvent();
+                    if (m_nGrabCount != 0)
+                        p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
             }
             p_CamInfo.p_eState = eCamState.Ready;
