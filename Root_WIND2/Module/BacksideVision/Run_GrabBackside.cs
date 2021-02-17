@@ -22,6 +22,8 @@ namespace Root_WIND2.Module
         string m_sGrabMode = "";
         string m_sLADSGrabMode = "";
 
+        #region Property
+
         string p_sMainGrabMode
         {
             get { return m_sGrabMode; }
@@ -41,6 +43,7 @@ namespace Root_WIND2.Module
                 m_LADSgrabMode = m_module.GetGrabMode(value);
             }
         }
+        #endregion
 
         public Run_GrabBackside(BackSideVision module)
         {
@@ -245,6 +248,8 @@ namespace Root_WIND2.Module
             m_module.p_nProgress = ga.nProgress;
         }
 
+
+        #region LADS Functions
         private double[] SetScanAxisPos(int nScanLine, double dTriggerStartPosY, double dTriggerEndPosY)
         {
             double dTriggerDistance = Math.Abs(dTriggerEndPosY - dTriggerStartPosY);
@@ -410,6 +415,7 @@ namespace Root_WIND2.Module
 
             m_module.LadsInfos.Add(ladsinfo);
         }
+        #endregion
     }
 }
 #region 한줄씩찍으면서 LADS 정보획득
@@ -497,3 +503,5 @@ finally
     m_MaingrabMode.SetLight(false);
 }*/
 #endregion
+
+
