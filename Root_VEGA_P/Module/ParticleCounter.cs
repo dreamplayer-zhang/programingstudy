@@ -131,13 +131,13 @@ namespace Root_VEGA_P.Module
             }
         }
 
-        SolValveSet GetSolValveSet(string sSolValveSet)
+        string RunSolValveSet(string sSolValveSet)
         {
             foreach (SolValveSet set in m_aSolValveSet)
             {
-                if (set.p_sName == sSolValveSet) return set; 
+                if (set.p_sName == sSolValveSet) return set.Run(); 
             }
-            return null; 
+            return "Invalid SolValveSet Name"; 
         }
 
         int _nSolValveSet = 0;

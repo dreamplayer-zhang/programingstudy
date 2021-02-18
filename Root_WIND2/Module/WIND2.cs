@@ -15,6 +15,7 @@ namespace Root_WIND2
     public class WIND2 : ModuleBase
     {
         public TK4SGroup m_tk4s;
+        public FFU_Group m_FFUGourp;
         DIO_I di_Door_VSPC;
         DIO_I di_Door_VSTop;
         DIO_I di_Door_VSBTM;
@@ -44,15 +45,22 @@ namespace Root_WIND2
         DIO_I di_Ionizer_Edge;
         DIO_I di_Ionizer_VS;
         DIO_I di_ProtectionBar;
+        DIO_O do_door_Lock;
+        DIO_O do_SERVOON;
 
         ALID alid_EMS;
         ALID alid_Ionizer;
         ALID alid_CDA;
         ALID alid_VAC1;
+        ALID alid_MCRESET;
+        public DIO_Os m_doLamp;
+        string[] asLamp = Enum.GetNames(typeof(eLamp));
 
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Tower Lamp", asLamp);
             m_toolBox.Get(ref m_tk4s, this, "FDC", GlobalObjects.Instance.Get<DialogService>());
+            m_toolBox.Get(ref m_FFUGourp, this, "FFU", GlobalObjects.Instance.Get<DialogService>());
             p_sInfo = m_toolBox.Get(ref di_Door_VSPC, this, "Vision PC Door");
             p_sInfo = m_toolBox.Get(ref di_Door_VSTop, this, "Vision Top Door");
             p_sInfo = m_toolBox.Get(ref di_Door_VSBTM, this, "Vision Bottom Door");
@@ -82,11 +90,14 @@ namespace Root_WIND2
             p_sInfo = m_toolBox.Get(ref di_Ionizer_Edge, this, "Ionizer Edge");
             p_sInfo = m_toolBox.Get(ref di_Ionizer_VS, this, "Ionizer VS");
             p_sInfo = m_toolBox.Get(ref di_ProtectionBar, this, "Protection Bar");
+            p_sInfo = m_toolBox.Get(ref do_door_Lock, this, "Door Lock");
+            p_sInfo = m_toolBox.Get(ref do_SERVOON, this, "Servo On");
 
             alid_EMS = m_gaf.GetALID(this, "EMS", "EMS ERROR");
             alid_Ionizer = m_gaf.GetALID(this, "Ionizer", "Ionizer ERROR");
             alid_CDA = m_gaf.GetALID(this, "CDA", "CDA ERROR");
             alid_VAC1 = m_gaf.GetALID(this, "VAC1", "VAC Error");
+            alid_MCRESET = m_gaf.GetALID(this, "MCReset", "MC Reset Error");
         }
 
         Thread m_threadCheck;
@@ -96,9 +107,12 @@ namespace Root_WIND2
         {
             base.InitBase(id, engineer);
             m_tk4s.OnDetectLimit += M_tk4s_OnDetectLimit;
+            m_FFUGourp.OnDetectLimit += M_FFUGourp_OnDetectLimit;
             m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
             m_threadCheck.Start();
         }
+
+        
 
         void RunThreadCheck()
         {
@@ -107,85 +121,158 @@ namespace Root_WIND2
             while (m_bThreadCheck)
             {
                 Thread.Sleep(1000);
-                //DoorCheck();
-                //FanCheck();
-                //AlarmCheck();
+                LampProcess();
+                DoorCheck();
+                FanCheck();
+                AlarmCheck();
                 //if (_diEMS.p_bIn)
                 //{
-                //	this.p_eState = eState.Error;
-                //	EQ.p_bStop = true;
-                //	_alid_EMS.Run(!_diEMS.p_bIn, "Please Check the Emergency Buttons");
+                //    this.p_eState = eState.Error;
+                //    EQ.p_bStop = true;
+                //    _alid_EMS.Run(!_diEMS.p_bIn, "Please Check the Emergency Buttons");
                 //}
                 //for (int i = 0; i < _diDoorLock.Length; i++)
                 //{
-                //	if (_diDoorLock[i].p_bIn)
-                //	{
-                //		this.p_eState = eState.Error;
-                //		EQ.p_bStop = true;
-                //		string strDoor = " ";
-                //		if (i == 0)
-                //			strDoor = "Main Panel Top Left Door";
-                //		if (i == 1)
-                //			strDoor = "Main Panel Bottom Left Door";
-                //		if (i == 2)
-                //			strDoor = "Main Panel Door";
+                //    if (_diDoorLock[i].p_bIn)
+                //    {
+                //        this.p_eState = eState.Error;
+                //        EQ.p_bStop = true;
+                //        string strDoor = " ";
+                //        if (i == 0)
+                //            strDoor = "Main Panel Top Left Door";
+                //        if (i == 1)
+                //            strDoor = "Main Panel Bottom Left Door";
+                //        if (i == 2)
+                //            strDoor = "Main Panel Door";
 
-                //		_alid_DoorOpen.Run(!_diDoorLock[i].p_bIn, strDoor + "Opened");
-                //	}
+                //        _alid_DoorOpen.Run(!_diDoorLock[i].p_bIn, strDoor + "Opened");
+                //    }
                 //}
                 //if (m_bUseCurtain)
                 //{
-                //	for (int i = 0; i < _diLightCurtain.Length; i++)
-                //	{
-                //		if (_diLightCurtain[i].p_bIn)
-                //		{
-                //			this.p_eState = eState.Error;
-                //			EQ.p_bStop = true;
-                //			string strCurtain = " ";
-                //			if (i == 0)
-                //				strCurtain = "Unloadport Light Curtain Error";
-                //			if (i == 1)
-                //				strCurtain = "Loadport Light Curatin Error";
+                //    for (int i = 0; i < _diLightCurtain.Length; i++)
+                //    {
+                //        if (_diLightCurtain[i].p_bIn)
+                //        {
+                //            this.p_eState = eState.Error;
+                //            EQ.p_bStop = true;
+                //            string strCurtain = " ";
+                //            if (i == 0)
+                //                strCurtain = "Unloadport Light Curtain Error";
+                //            if (i == 1)
+                //                strCurtain = "Loadport Light Curatin Error";
 
-                //			_alid_LightCurtain.Run(!_diLightCurtain[i].p_bIn, strCurtain);
+                //            _alid_LightCurtain.Run(!_diLightCurtain[i].p_bIn, strCurtain);
 
-                //		}
-                //	}
+                //        }
+                //    }
                 //}
                 //if (_diProtectionBar.p_bIn)
                 //{
-                //	this.p_eState = eState.Error;
-                //	EQ.p_bStop = true;
-                //	_alid_EMS.Run(!_diProtectionBar.p_bIn, "Protection Bar Error");
+                //    this.p_eState = eState.Error;
+                //    EQ.p_bStop = true;
+                //    _alid_EMS.Run(!_diProtectionBar.p_bIn, "Protection Bar Error");
                 //}
+            }
+        }
+
+        public enum eLamp
+        {
+            Red,
+            Yellow,
+            Green
+        }
+
+        StopWatch m_swLamp = new StopWatch();
+        private void LampProcess()
+        {
+            if (EQ.p_bSimulate)
+                return;
+
+           
+            switch (EQ.p_eState)
+            {
+                case EQ.eState.Init:
+                    m_doLamp.Write(eLamp.Red);
+                    //m_doLamp.Write(eLamp.Yellow);
+                    //m_doLamp.Write(eLamp.Green);
+                    break;
+                case EQ.eState.Home:
+                    //if (m_swLamp.ElapsedMilliseconds > 1000)
+                    //{
+                    //    m_doLamp.Write(eLamp.Red, true);
+                    //    m_doLamp.Write(eLamp.Yellow, true);
+                    //    m_doLamp.Write(eLamp.Green, true);
+                    //    m_swLamp.Restart();
+                    //}
+                    //else
+                    //{
+                    //    m_doLamp.Write(eLamp.Red, false);
+                    //    m_doLamp.Write(eLamp.Yellow, false);
+                    //    m_doLamp.Write(eLamp.Green, false);
+                    //}
+                    m_doLamp.Write(eLamp.Yellow);
+                    //do_Buzzer.Write(eBuzzer.Buzzer4);
+                    //do_door_Lock.Write(true);
+                    break;
+                case EQ.eState.Ready:
+                    m_doLamp.Write(eLamp.Yellow);
+                    break;
+                case EQ.eState.Idle:
+                    m_doLamp.Write(eLamp.Yellow);
+                    break;
+                case EQ.eState.Run:
+                    do_door_Lock.Write(true);
+                    m_doLamp.Write(eLamp.Green);
+                    break;
+                case EQ.eState.Recovery:
+                    //do_door_Lock.Write(true);
+                    m_doLamp.Write(eLamp.Yellow);
+                    break;
+                case EQ.eState.Error:
+                    //do_Buzzer.Write(eBuzzer.Buzzer1);
+                    m_doLamp.Write(eLamp.Red);
+                    break;
             }
         }
 
         private void AlarmCheck()
         {
+            do_SERVOON.Write(true);
             if (!di_EMO.p_bIn)
             {
                 this.p_eState = eState.Error;
+                EQ.p_eState = EQ.eState.Error;
                 EQ.p_bStop = true;
                 alid_EMS.Run(!di_EMO.p_bIn, "Please Check the Emergency Buttons");
             }
             else if (!di_EMO.p_bIn)
             {
                 this.p_eState = eState.Error;
+                EQ.p_eState = EQ.eState.Error;
                 EQ.p_bStop = true;
                 alid_Ionizer.Run(!di_EMO.p_bIn, "Please Check Ionizer State");
             }
             else if (!di_CDA.p_bIn)
             {
                 this.p_eState = eState.Error;
+                EQ.p_eState = EQ.eState.Error;
                 EQ.p_bStop = true;
                 alid_CDA.Run(!di_CDA.p_bIn, "Please Check CDA State");
             }
             else if (!(di_VAC1.p_bIn && di_VAC2.p_bIn))
             {
                 this.p_eState = eState.Error;
+                EQ.p_eState = EQ.eState.Error;
                 EQ.p_bStop = true;
                 alid_VAC1.Run(!(di_VAC1.p_bIn && di_VAC2.p_bIn), "Please Check VAC State");
+            }
+            else if (!(di_MCReset.p_bIn ))
+            {
+                this.p_eState = eState.Error;
+                EQ.p_eState = EQ.eState.Error;
+                EQ.p_bStop = true;
+                alid_MCRESET.Run(!di_MCReset.p_bIn, "MC Reset Error");
             }
         }
 
@@ -265,6 +352,11 @@ namespace Root_WIND2
         }
 
         private void M_tk4s_OnDetectLimit(string str)
+        {
+            GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str);
+        }
+
+        private void M_FFUGourp_OnDetectLimit(string str)
         {
             GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str);
         }

@@ -24,8 +24,6 @@ namespace RootTools.Camera
         public int m_nFovStart = 0;
         public int m_nFovSize = 8000;
         public int m_nOverlap = 0;
-
-        public int m_nSkipGrabCount = -1; //LADS 사용시 Trigger Skip용으로 사용
     }
     public interface ICamera
     {
@@ -50,7 +48,7 @@ namespace RootTools.Camera
 
         //void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine,int nScanOffsetY =0, bool bInvY = false, int ReserveOffsetY = 0, GrabData m_GrabData = null);
         //void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReverseOffsetY = 0, GrabData m_GrabData = null);/
-        void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null);
+        void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false);
         void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null);
         double GetFps();
     }

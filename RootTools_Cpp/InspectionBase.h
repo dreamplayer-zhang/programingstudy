@@ -17,7 +17,7 @@ public :
 	void CheckConditions() const;
 	static int defectIdx;
 protected:
-	int m_nInspOffset = 5;
+	int m_nInspOffset = 10;
 	byte inspbuffer[4000][4000];
 	//byte inspbuffer2[16000000];
 	RECT inspbufferROI;

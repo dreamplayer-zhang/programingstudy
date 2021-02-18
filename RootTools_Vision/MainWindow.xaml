@@ -6,10 +6,24 @@
         Title="MainWindow" Height="600" Width="600">
 
     <Grid>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="64,52,0,0" VerticalAlignment="Top" Width="238" Height="219" Click="Button_Click"/>
-        <Button Content="TEST" HorizontalAlignment="Left" Margin="344,52,0,0" VerticalAlignment="Top" Width="238" Height="219" Click="Button_Click_1"/>
-        <Button Content="Server" HorizontalAlignment="Left" Margin="64,286,0,0" VerticalAlignment="Top" Width="238" Height="71" Click="Button_Server"/>
-        <Button Content="Client" HorizontalAlignment="Left" Margin="344,286,0,0" VerticalAlignment="Top" Width="238" Height="71" Click="Button_Client"/>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="300"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="0" Grid.Column="0">
+            <Button Content="Button" HorizontalAlignment="Stretch" Height="100"  Click="Button_Click"/>
+            <Button Content="TEST" HorizontalAlignment="Stretch" Height="100" Click="Button_Click_1"/>
+        </StackPanel>
+        <StackPanel Grid.Row="0" Grid.Column="1">
+            <Button Content="Server" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Height="100" Click="Button_Server"/>
+            <Button Content="Client" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="100" Click="Button_Client"/>
+        </StackPanel>
+        <Grid Grid.Row="1" Grid.ColumnSpan="2" DataContext="{Binding ImageViewerVM}">
+            <local:CloneImageViewer x:Name="viewer"/>
+        </Grid>
     </Grid>
 </Window>

@@ -103,7 +103,7 @@ namespace RootTools.Database
 
 				}
 				rdr.Close();
-				bool isSame = true;
+				//bool isSame = true;
 				FieldInfo[] defectFieldInfos = null;
 				List<string> columnList = new List<string>();
 				for (int i = 0; i < tableList.Count; i++)
@@ -117,7 +117,7 @@ namespace RootTools.Database
 					cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
 
 					rdr = cmd.ExecuteReader();
-					int a = 0;
+					//int a = 0;
 					while (rdr.Read())
 					{
 						object columnName = rdr["COLUMN_NAME"];
@@ -129,7 +129,7 @@ namespace RootTools.Database
 					string test = ob.Message;
 					if (defectFieldInfos.Length != columnList.Count)
                     {
-						isSame = false;
+						//isSame = false;
 						break;
                     }
 				}

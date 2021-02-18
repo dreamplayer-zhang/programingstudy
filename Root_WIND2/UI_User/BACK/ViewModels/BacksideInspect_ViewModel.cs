@@ -67,11 +67,16 @@ namespace Root_WIND2.UI_User
             this.imageViewerVM = new BacksideInspect_ImageViewer_ViewModel();
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("BackImage"), GlobalObjects.Instance.Get<DialogService>());
 
-            WorkEventManager.InspectionStart += InspectionStart_Callback;
-            WorkEventManager.PositionDone += PositionDone_Callback;
-            WorkEventManager.InspectionDone += InspectionDone_Callback;
-            WorkEventManager.ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
-            WorkEventManager.ProcessDefectWaferDone += ProcessDefectWaferDone_Callback;
+
+            if(GlobalObjects.Instance.Get<InspectionManagerBackside>() != null)
+            {
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().InspectionStart += InspectionStart_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().PositionDone += PositionDone_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().InspectionDone += InspectionDone_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
+            }
+            
 
             // Initialize MapViewer
             this.mapViewerVM = new MapViewer_ViewModel();
@@ -80,6 +85,8 @@ namespace Root_WIND2.UI_User
         private string currentRecipe = "";
         public void LoadRecipe()
         {
+            if (GlobalObjects.Instance.Get<InspectionManagerBackside>() == null) return;
+
             if (currentRecipe != GlobalObjects.Instance.Get<RecipeBack>().Name)
             {
                 RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
@@ -158,14 +165,14 @@ namespace Root_WIND2.UI_User
             {
                 LoadRecipe();
 
-                WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().WorkplaceStateChanged += WorkplaceStateChanged_Callback;
             });
         }
         public RelayCommand UnloadedCommand
         {
             get => new RelayCommand(() =>
             {
-                WorkEventManager.WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
             });
         }
 
@@ -222,27 +229,25 @@ namespace Root_WIND2.UI_User
             }));
         }
 
-        object lockObj = new object();
         private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
         {
             Workplace workplace = obj as Workplace;
-            lock (this.lockObj)
+
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+                String test = "";
+                if (workplace.Index == 0)
                 {
-                    String test = "";
-                    if (workplace.Index == 0)
-                    {
-                        test += "Trans : {" + workplace.OffsetX.ToString() + ", " + workplace.OffsetX.ToString() + "}" + "\n";
-                        DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
-                    }
-                    else
-                    {
-                        test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
-                        DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
-                    }
-                }));
-            }
+                    test += "Trans : {" + workplace.OffsetX.ToString() + ", " + workplace.OffsetX.ToString() + "}" + "\n";
+                    DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
+                }
+                else
+                {
+                    test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
+                    DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
+                }
+            }));
+
         }
 
         private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
@@ -274,7 +279,7 @@ namespace Root_WIND2.UI_User
             }));
         }
 
-        private void ProcessDefectWaferDone_Callback(object obj, ProcessDefectWaferDoneEventArgs args)
+        private void ProcessDefectWaferDone_Callback(object obj, IntegratedProcessDefectDoneEventArgs args)
         {
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {

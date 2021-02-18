@@ -35,8 +35,6 @@ namespace RootTools_Vision
         }
         #endregion
 
-
-
         /// <summary>
         /// 검사에서 사용할 SharedBuffer를 설정합니다.
         /// </summary>

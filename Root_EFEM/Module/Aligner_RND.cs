@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows.Threading;
+using RootTools.GAFs;
 
 namespace Root_EFEM.Module
 {
@@ -20,6 +21,11 @@ namespace Root_EFEM.Module
         RS232 m_rs232;
         MemoryPool m_memoryPool;
         Camera_CognexOCR m_camOCR;
+        ALID m_alid_WaferExist;
+        public ALID m_alid_AlignFail;
+
+
+
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diWaferExist, this, "WaferExist");
@@ -32,6 +38,8 @@ namespace Root_EFEM.Module
                 m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
             }
+            m_alid_WaferExist = m_gaf.GetALID(this, "Aligner Wafer Exist", "Aligner Wafer Exist");
+            m_alid_AlignFail = m_gaf.GetALID(this, "Align Fail", "Aligner Align Fail");
         }
 
         private void M_rs232_OnReceive(string sRead)
@@ -411,7 +419,11 @@ namespace Root_EFEM.Module
                             m_aligner.p_sAlignerControl = m_aligner.GetControlState(Convert.ToInt32(sReads[1]));
                             break; 
                         default:
-                            if (sReads.Length > 1) m_aligner.p_sInfo = m_aligner.GetError(sReads[1]);
+                            if (sReads.Length > 1)
+                            {
+                                m_aligner.p_sInfo = m_aligner.GetError(sReads[1]);
+                                m_aligner.m_alid_AlignFail.Run(true, "Aligner Align Fail");
+                            }
                             break;
                     }
                 }
@@ -452,11 +464,20 @@ namespace Root_EFEM.Module
 
         public string RunAlign(double fDeg)
         {
+            if (!m_diWaferExist.p_bIn)
+            {
+                m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
+                return "Fail";
+            }
             int nDeg = (int)Math.Round(100 * fDeg); 
             string sCmd = "0,0," + nDeg.ToString(); 
             Protocol protocol = new Protocol(this, eCmd.AlignRotate, sCmd);
             m_qSend.Enqueue(protocol);
-            if (Run(protocol.WaitReceive())) return p_sInfo;
+            if (Run(protocol.WaitReceive()))
+            {
+               
+                return p_sInfo;
+            }
             return "OK";
         }
 

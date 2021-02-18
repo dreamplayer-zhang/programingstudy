@@ -690,7 +690,7 @@ namespace RootTools
                                 byte[,,] viewptr = view.Data;
                                 byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
                                 int nTerm = p_CanvasWidth * p_CanvasHeight;
-                                //for (int yy = 0; yy < p_CanvasHeight; yy++)
+                                if(image !=null)                              
                                 Parallel.For(0, p_CanvasHeight, (yy) =>
                                 {
                                     for (int xx = 0; xx < p_CanvasWidth; xx++)
@@ -797,9 +797,9 @@ namespace RootTools
                                             {
                                                 long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
-                                                    viewPtr[yy, xx, 0] = imageptrR[pix_x + (long)pix_y * sizeX];
-                                                    viewPtr[yy, xx, 1] = imageptrG[pix_x + (long)pix_y * sizeX];
-                                                    viewPtr[yy, xx, 2] = imageptrB[pix_x + (long)pix_y * sizeX];
+                                                viewPtr[yy, xx, 0] = imageptrR[pix_x + (long)pix_y * sizeX];
+                                                viewPtr[yy, xx, 1] = imageptrG[pix_x + (long)pix_y * sizeX];
+                                                viewPtr[yy, xx, 2] = imageptrB[pix_x + (long)pix_y * sizeX];
                                             }
                                         }
                                     });
@@ -1148,9 +1148,9 @@ namespace RootTools
                     for (int xx = 0; xx < p_ThumbWidth; xx++)
                     {
                         pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
-                        view.Data[yy, xx, 2] = ((byte*)imageptrR)[0 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
-                        view.Data[yy, xx, 1] = ((byte*)imageptrG)[1 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
-                        view.Data[yy, xx, 0] = ((byte*)imageptrB)[2 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        //view.Data[yy, xx, 2] = ((byte*)imageptrR)[0 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        //view.Data[yy, xx, 1] = ((byte*)imageptrG)[1 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        //view.Data[yy, xx, 0] = ((byte*)imageptrB)[2 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
                     }
                 }
                 if (view.Width != 0 && view.Height != 0)

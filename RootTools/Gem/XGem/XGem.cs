@@ -960,7 +960,7 @@ namespace RootTools.Gem.XGem
         }
 
         void InitEventControlJob()
-        {
+        {            
             m_xGem.OnCJCreated += M_xGem_OnCJCreated;
             m_xGem.OnCJDeleted += M_xGem_OnCJDeleted;
             m_xGem.OnCJStateChanged += M_xGem_OnCJStateChanged;

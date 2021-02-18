@@ -49,11 +49,8 @@ namespace Root_WIND2
         {
             ThreadStop();
 
-            GlobalObjects.Instance.Get<InspectionManagerFrontside>().Exit();
-            if(GlobalObjects.Instance.Get<InspectionManagerBackside>() != null)
-            {
-                GlobalObjects.Instance.Get<InspectionManagerBackside>().Exit();
-            }
+            //GlobalObjects.Instance.Get<InspectionManagerFrontside>().Exit();
+            //GlobalObjects.Instance.Get<InspectionManagerBackside>().Exit();
 
             GlobalObjects.Instance.Clear();
             //GlobalObjects.Instance.Get<InspectionManagerEdge>().Exit();
@@ -147,13 +144,12 @@ namespace Root_WIND2
 
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1);
-            DatabaseManager.Instance.ValidateDatabase();
+            //DatabaseManager.Instance.ValidateDatabase();
             //////
 
             logView.Init(LogView.m_logView);
             WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
             InitTimer();
-
         }
 
         void ThreadStop()
@@ -308,6 +304,7 @@ namespace Root_WIND2
                 dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
                 dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
                 dialogService.Register<TK4S, TK4SModuleUI>();
+                dialogService.Register<FFUModule, FFUModuleUI>();
 
 
 

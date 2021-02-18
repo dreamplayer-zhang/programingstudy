@@ -4,6 +4,10 @@
              xmlns:local="clr-namespace:RootTools_Vision"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <SolidColorBrush x:Key="PanelBackGround" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+        <SolidColorBrush x:Key="ControlBackGround" Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
+        <SolidColorBrush x:Key="GroupBoxBackground" Color="Transparent"/>
+        <SolidColorBrush x:Key="Splitter" Color="DimGray"/>
+        <SolidColorBrush x:Key="MainThema" Color="#FF2D2D50"/>
     </Application.Resources>
 </Application>

@@ -167,7 +167,6 @@ namespace Root_Vega
         #endregion
 
         #region Calc Sequence
-        public int m_nRnR = 1;
         dynamic m_infoRnRSlot; 
         public string AddSequence(dynamic infoSlot)
         {
@@ -230,11 +229,11 @@ namespace Root_Vega
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0) )
+                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0) )
                             {
                                 m_process.p_sInfo = m_process.AddInfoReticle(m_infoRnRSlot);
                                 m_process.ReCalcSequence();
-                                m_nRnR--;
+                                EQ.p_nRnR--;
                                 EQ.p_eState = EQ.eState.Run; 
                             }
                         }

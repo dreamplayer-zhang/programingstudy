@@ -136,18 +136,6 @@ namespace RootTools_Vision
             parameterItemList = new List<ParameterBase>();
 
             Initilize();
-
-            WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
-        }
-
-        public bool Read(string recipePath, bool bUpdateUI)
-        {
-            bool bRst = Read(recipePath);
-
-            if(bUpdateUI == true)
-                WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
-
-            return bRst;
         }
 
         public bool Read(string recipePath)

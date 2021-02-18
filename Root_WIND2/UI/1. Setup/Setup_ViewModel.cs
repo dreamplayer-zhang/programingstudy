@@ -43,12 +43,12 @@ namespace Root_WIND2
         }
 
         private Home_ViewModel homeVM;
-        private Inspection_ViewModel inspectionVM;
+        private Inspection_ViewModel inspectionVM = null;
         private RecipeWizard_ViewModel wizardVM;
-        private Frontside_ViewModel frontsideVM;
-        private Backside_ViewModel backsideVM;
-        private EBR_ViewModel ebrVM;
-        private Edgeside_ViewModel edgeVM;
+        private Frontside_ViewModel frontsideVM = null;
+        private Backside_ViewModel backsideVM = null;
+        private EBR_ViewModel ebrVM = null;
+        private Edgeside_ViewModel edgeVM = null;
         //private InspTest_ViewModel inspTestVM;  //삭제
         //private BacksideInspection_ViewModel backsideInspTestVM;
         public Maintenance_ViewModel maintVM;
@@ -63,18 +63,7 @@ namespace Root_WIND2
         {
             InitAllPanel();
             InitAllNaviBtn();
-            InitEvent();
             SetHome();
-        }
-
-        public void UI_Redraw()
-        {
-            // 이거 사용하지 말것... 
-
-            // 이거 필요없을것같음
-            //frontsideVM.UpdateUI();
-            //edgeVM.UpdateUI();
-            //ebrVM.UpdateUI();
         }
 
         private void InitAllPanel()
@@ -131,21 +120,6 @@ namespace Root_WIND2
             m_btnNaviGeneralSetup = new NaviBtn("General Setup");
             m_btnNaviGeneralSetup.Btn.Click += NaviGeneralSetupBtn_Click;
 
-        }
-
-        private void InitEvent()
-        {
-            WorkEventManager.UIRedraw += UIRedraw_Callback;
-        }
-
-        private void UIRedraw_Callback(object obj, UIRedrawEventArgs args)
-        {
-            {
-                Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-                {
-                  UI_Redraw();
-                }));
-            }
         }
 
         #region Navi Buttons

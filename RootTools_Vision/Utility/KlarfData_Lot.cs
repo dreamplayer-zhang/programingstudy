@@ -257,8 +257,7 @@ namespace RootTools_Vision.Utility
 		{
 			timeFile = DateTime.Now;
 
-			FileStream fs = new FileStream(strFilePath, FileMode.Append, FileAccess.Write);
-			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
+
 
 			if (bCollector)
 			{
@@ -274,6 +273,9 @@ namespace RootTools_Vision.Utility
 			tempString += ".001";
 			tiffFileName = tempString;
 			tiffFileName.Replace(".001", ".tif");
+
+			FileStream fs = new FileStream(tiffFileName, FileMode.Create, FileAccess.Write);
+			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
 
 			if (sw != null)
 			{

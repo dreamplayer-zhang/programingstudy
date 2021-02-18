@@ -667,7 +667,7 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null) { }
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest =false) { }
         public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null) { }
         public CPoint GetRoiSize() { return null; }
 

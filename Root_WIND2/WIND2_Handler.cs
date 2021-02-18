@@ -467,7 +467,6 @@ namespace Root_WIND2
         #region Thread
         bool m_bThread = false;
         Thread m_thread = null;
-        public int m_nRnR = 1;
         dynamic m_infoRnRSlot = null;
         void InitThread()
         {
@@ -488,7 +487,7 @@ namespace Root_WIND2
                         StateHome();
                         break;
                     case EQ.eState.Ready:
-                        //CheckLoad();
+                        CheckLoad();
                         break;
                     case EQ.eState.Run:
                         if (p_moduleList.m_qModuleRun.Count == 0)
@@ -497,11 +496,11 @@ namespace Root_WIND2
 
                             if (m_process.m_qSequence.Count == 0)
                                 //CheckUnload();
-                            if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
-                                m_nRnR--;
+                                EQ.p_nRnR--;
                                 EQ.p_eState = EQ.eState.Run;
                             }
                         }
@@ -511,7 +510,7 @@ namespace Root_WIND2
         }
         
         #endregion
-        /*
+        
         void CheckLoad()
         {
             foreach (ILoadport loadport in m_aLoadport)
@@ -548,7 +547,7 @@ namespace Root_WIND2
             //    }
             //}
         }
-
+        /*
         void CheckUnload()
         {
             EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();

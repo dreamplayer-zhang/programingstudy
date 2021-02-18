@@ -1,4 +1,5 @@
-﻿using RootTools.Module;
+﻿using RootTools;
+using RootTools.Module;
 using RootTools.Trees;
 using RootTools_Vision;
 using System;
@@ -14,7 +15,8 @@ namespace Root_WIND2.Module
 		EdgeSideVision module;
 
 		string recipeName = string.Empty;
-		int height = 2000; // camera height
+		int cameraHeight = 2000; // camera height
+		int imageOffset = 0;	// 이미지 시작 지점 offset
 
 		#region [Getter/Setter]
 
@@ -23,10 +25,16 @@ namespace Root_WIND2.Module
 			get => recipeName;
 			set => recipeName = value;
 		}
-		public int Height
+		public int CameraHeight
 		{
-			get => height;
-			set => height = value;
+			get => cameraHeight;
+			set => cameraHeight = value;
+		}
+
+		public int ImageOffset
+		{
+			get => imageOffset;
+			set => imageOffset = value;
 		}
 		#endregion
 
@@ -40,27 +48,40 @@ namespace Root_WIND2.Module
 		{
 			Run_InspectEBR run = new Run_InspectEBR(module);
 			run.recipeName = recipeName;
-			run.height = height;
-
+			run.cameraHeight = cameraHeight;
+			run.imageOffset = imageOffset;
 			return run;
 		}
 
 		public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
 		{
 			recipeName = tree.SetFile(recipeName, recipeName, "rcp", "Recipe", "Recipe Name", bVisible);
-			height = (tree.GetTree("Camera Height", false, bVisible)).Set(height, height, "Height", "Camera Height", bVisible);
+			cameraHeight = (tree.GetTree("Camera Height", false, bVisible)).Set(cameraHeight, cameraHeight, "Height", "Camera Height", bVisible);
+			imageOffset = (tree.GetTree("Image Offset", false, bVisible)).Set(imageOffset, imageOffset, "Top Camera", "Height offset (pxl)", bVisible);
 		}
 
 		public override string Run()
 		{
 			try
 			{
+				if (EQ.IsStop())
+					return "OK";
+
 				InspectionManagerEBR inspectionEBR = GlobalObjects.Instance.Get<InspectionManagerEBR>();
 
-				if (inspectionEBR.Recipe.Read(recipeName, true) == false)
+				if (inspectionEBR.Recipe.Read(recipeName) == false)
 					return "Recipe Open Fail";
 
 				inspectionEBR.Start();
+				
+				while (inspectionEBR.CheckAllWorkDone() == false)
+				{
+					if (EQ.IsStop())
+						return "OK";
+
+					Task.Delay(1000);
+				}
+
 				return "OK";
 			}
 			finally

@@ -13,6 +13,7 @@ namespace RootTools_Vision
 		private int cameraWidth;
 		private int cameraHeight;
 		private double cameraTriggerRatio;
+		private int imageOffset;
 
 		// Light
 		private int lightWhite = 0;
@@ -34,6 +35,11 @@ namespace RootTools_Vision
 		{
 			get => this.cameraTriggerRatio;
 			set => SetProperty<double>(ref this.cameraTriggerRatio, value);
+		}
+		public int ImageOffset
+		{
+			get => this.imageOffset;
+			set => SetProperty<int>(ref this.imageOffset, value);
 		}
 		public int LightWhite
 		{

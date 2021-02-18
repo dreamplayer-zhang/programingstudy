@@ -180,14 +180,34 @@
                                 <ColumnDefinition Width="33"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Offset" Style="{StaticResource group_box_item_name_text}" Margin="6,1,0,1" Grid.ColumnSpan="2"/>
+                            <TextBlock Text="Image Offset[pxl]" Style="{StaticResource group_box_item_name_text}" Margin="6,1,0,1" Grid.ColumnSpan="2"/>
                             <TextBlock Text="Top" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,2"/>
-                            <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding TopOffset}" HorizontalContentAlignment="Center" VerticalAlignment="Top"/>
+                            <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding TopImageOffset}" HorizontalContentAlignment="Center" VerticalAlignment="Top"/>
                             <TextBlock Text="Side" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding SideOffset}" HorizontalContentAlignment="Center"/>
+                            <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding SideImageOffset}" HorizontalContentAlignment="Center"/>
                             <TextBlock Text="Btm" Grid.Column="5"  HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            <TextBox Grid.Column="6" IsEnabled="False" Text="{Binding BtmOffset}" HorizontalContentAlignment="Center"/>
+                            <TextBox Grid.Column="6" IsEnabled="False" Text="{Binding BtmImageOffset}" HorizontalContentAlignment="Center"/>
                         </Grid>
+                        
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions >
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="33"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="33"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="33"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Position Offset" Style="{StaticResource group_box_item_name_text}" Margin="6,1,0,1" Grid.ColumnSpan="2"/>
+                            <TextBlock Text="Top" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,2"/>
+                            <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding TopPositionOffset}" HorizontalContentAlignment="Center" VerticalAlignment="Top"/>
+                            <TextBlock Text="Side" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding SidePositionOffset}" HorizontalContentAlignment="Center"/>
+                            <TextBlock Text="Btm" Grid.Column="5"  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBox Grid.Column="6" IsEnabled="False" Text="{Binding BtmPositionOffset}" HorizontalContentAlignment="Center"/>
+                        </Grid>
+                        
                     </StackPanel>
                 </GroupBox>
 
