@@ -66,7 +66,7 @@ namespace Root_WIND2
 			{
 				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
 				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
-				this.TopOffset = inspect.TopOffset;
+				this.TopOffset = inspect.TopPositionOffset;
 			}
 		}
 
