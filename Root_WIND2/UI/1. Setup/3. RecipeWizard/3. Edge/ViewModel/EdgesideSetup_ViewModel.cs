@@ -246,7 +246,7 @@ namespace Root_WIND2
 			}));
 		}
 
-		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
+		private void WorkEventManager_ProcessDefectWaferDone(object sender, IntegratedProcessDefectDoneEventArgs e)
 		{
 			Workplace workplace = sender as Workplace;
 
@@ -272,7 +272,8 @@ namespace Root_WIND2
 
 		public void Inspect()
 		{
-			GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();			
+			if(GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
+				GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();			
 		}
 
 		private void ChangeViewer(string dataName)

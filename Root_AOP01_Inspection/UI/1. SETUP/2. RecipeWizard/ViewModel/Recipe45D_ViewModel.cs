@@ -290,7 +290,7 @@ namespace Root_AOP01_Inspection
 			}
 		}
 
-		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
+		private void WorkEventManager_ProcessDefectWaferDone(object sender, IntegratedProcessDefectDoneEventArgs e)
 		{
 		}
 

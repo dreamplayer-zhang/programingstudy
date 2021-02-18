@@ -92,9 +92,9 @@ namespace Root_WIND2.Module
             m_dVRSFocusPos = tree.Set(m_dVRSFocusPos, m_dVRSFocusPos, "VRS Focus Z", "VRS Focus Z", bVisible, true);
         }
 
-        public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine , GrabData m_GrabData = null)
+        public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
         {
-            m_camera.GrabLineScan(memory, cpScanOffset, nLine, m_GrabData);
+            m_camera.GrabLineScan(memory, cpScanOffset, nLine, m_GrabData, bTest);
             m_camera.Grabed += m_camera_Grabed;
         }
         public void StartGrabColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)

@@ -57,7 +57,7 @@ namespace Root_WIND2.Module
 			{
 				InspectionManagerEBR inspectionEBR = GlobalObjects.Instance.Get<InspectionManagerEBR>();
 
-				if (inspectionEBR.Recipe.Read(recipeName, true) == false)
+				if (inspectionEBR.Recipe.Read(recipeName) == false)
 					return "Recipe Open Fail";
 
 				inspectionEBR.Start();

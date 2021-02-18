@@ -52,41 +52,21 @@ namespace RootTools_Vision
 
             // Option Param
             int mergeDist = 1;
-            int backsideOffset = 1700;
-            bool isBackside = false;
-            // Recipe
 
-            // Backside
-            int waferCenterX = 0;
-            int waferCenterY = 0;
-            int radius = 0;
-
-            if (isBackside)
-            {
-                this.recipeBackside = this.recipe.GetItem<BacksideRecipe>();
-                waferCenterX = recipeBackside.CenterX;
-                waferCenterY = recipeBackside.CenterY;
-                radius = recipeBackside.Radius;
-            }
-
-			//Defect 넣는 부분 정리 필요
 
             List<Defect> DefectList = CollectDefectData();
-            if (isBackside) // Backside Option
-                DeleteOutsideDefect(DefectList, waferCenterX, waferCenterY, radius, backsideOffset);
+
+
+            TempLogger.Write("Defect", string.Format("Total : {0}", DefectList.Count));
 
             List<Defect> MergeDefectList = MergeDefect(DefectList, mergeDist);
-            OriginRecipe originRecipe = null;
+
+            TempLogger.Write("Defect", string.Format("Merge : {0}", MergeDefectList.Count));
+
             foreach (Defect defect in MergeDefectList)
             {
-                if (isBackside)
-                    defect.CalcAbsToRelPos(waferCenterX, waferCenterY);
-
-                else
-                {
-                    originRecipe = this.recipe.GetItem<OriginRecipe>();
-                    defect.CalcAbsToRelPos(originRecipe.OriginX, originRecipe.OriginY); // Frontside
-                }
+                OriginRecipe originRecipe = this.recipe.GetItem<OriginRecipe>();
+                defect.CalcAbsToRelPos(originRecipe.OriginX, originRecipe.OriginY); // Frontside
             }
 
 
@@ -119,22 +99,20 @@ namespace RootTools_Vision
 
             //kd.SaveKlarf(@"D:\", false);
             //RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-            if (!isBackside)
-            {
-                GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList,  originRecipe);
-                GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
-                GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+
+                //GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList,  originRecipe);
+                //GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
+                //GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
                 
 
-                GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(sDefectimagePath , false);
-            }
+                //GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(sDefectimagePath , false);
          
 
 
-            string sTiffImagePath = @"D:\DefectImage";
-            SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
+            //string sTiffImagePath = @"D:\DefectImage";
+            //SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
-            WorkEventManager.OnProcessDefectWaferDone(this.currentWorkplace, new ProcessDefectWaferDoneEventArgs());
+            WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
         }
 
         public override WorkBase Clone()
