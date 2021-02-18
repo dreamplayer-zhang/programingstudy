@@ -1,4 +1,5 @@
-﻿using RootTools.Module;
+﻿using RootTools;
+using RootTools.Module;
 using RootTools.Trees;
 using RootTools_Vision;
 using System;
@@ -12,17 +13,23 @@ namespace Root_WIND2.Module
 	public class Run_InspectEdge : ModuleRunBase
 	{
 		EdgeSideVision module;
-
+		
 		string recipeName = string.Empty;
 
 		// degree, 카메라 위치 각도 offset
-		int topOffset = 0;
-		int sideOffset = 45;
-		int btmOffset = 90;
+		int topPositionOffset = 0;
+		int sidePositionOffset = 45;
+		int btmPositionOffset = 90;
 
-		int topHeight = 2000;
-		int sideHeight = 2000;
-		int btmHeight = 2000;
+		// 이미지 시작 지점 offset
+		int topImageOffset = 0;
+		int sideImageOffset = 0;
+		int btmImageOffset = 0;
+
+		// camera height
+		int topCameraHeight = 2000;
+		int sideCameraHeight = 2000;
+		int btmCameraHeight = 2000;
 
 		#region [Getter/Setter]
 		public string RecipeName
@@ -30,35 +37,50 @@ namespace Root_WIND2.Module
 			get => recipeName;
 			set => recipeName = value;
 		}
-		public int TopOffset
+		public int TopPositionOffset
 		{
-			get => topOffset;
-			set => topOffset = value;
+			get => topPositionOffset;
+			set => topPositionOffset = value;
 		}
-		public int SideOffset
+		public int SidePositionOffset
 		{
-			get => sideOffset;
-			set => sideOffset = value;
+			get => sidePositionOffset;
+			set => sidePositionOffset = value;
 		}
-		public int BtmOffset
+		public int BtmPositionOffset
 		{
-			get => btmOffset;
-			set => btmOffset = value;
+			get => btmPositionOffset;
+			set => btmPositionOffset = value;
 		}
-		public int TopHeight
+		public int TopImageOffset
 		{
-			get => topHeight;
-			set => topHeight = value;
+			get => topImageOffset;
+			set => topImageOffset = value;
 		}
-		public int SideHeight
+		public int SideImageOffset
 		{
-			get => sideHeight;
-			set => sideHeight = value;
+			get => sideImageOffset;
+			set => sideImageOffset = value;
 		}
-		public int BtmHeight
+		public int BtmImageOffset
 		{
-			get => btmHeight;
-			set => btmHeight = value;
+			get => btmImageOffset;
+			set => btmImageOffset = value;
+		}
+		public int TopCameraHeight
+		{
+			get => topCameraHeight;
+			set => topCameraHeight = value;
+		}
+		public int SideCameraHeight
+		{
+			get => sideCameraHeight;
+			set => sideCameraHeight = value;
+		}
+		public int BtmCameraHeight
+		{
+			get => btmCameraHeight;
+			set => btmCameraHeight = value;
 		}
 		#endregion
 
@@ -73,13 +95,17 @@ namespace Root_WIND2.Module
 			Run_InspectEdge run = new Run_InspectEdge(module);
 			run.recipeName = recipeName;
 
-			run.topOffset = topOffset;
-			run.sideOffset = sideOffset;
-			run.btmOffset = btmOffset;
+			run.topPositionOffset = topPositionOffset;
+			run.sidePositionOffset = sidePositionOffset;
+			run.btmPositionOffset = btmPositionOffset;
 
-			run.topHeight = topHeight;
-			run.sideHeight = sideHeight;
-			run.btmHeight = btmHeight;
+			run.topImageOffset = topImageOffset;
+			run.sideImageOffset = sideImageOffset;
+			run.btmImageOffset = btmImageOffset;
+
+			run.topCameraHeight = topCameraHeight;
+			run.sideCameraHeight = sideCameraHeight;
+			run.btmCameraHeight = btmCameraHeight;
 
 			return run;
 		}
@@ -87,25 +113,41 @@ namespace Root_WIND2.Module
 		public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
 		{
 			recipeName = tree.SetFile(recipeName, recipeName, "rcp", "Recipe", "Recipe Name", bVisible);
-			topHeight = (tree.GetTree("Camera Height", false, bVisible)).Set(topHeight, topHeight, "Top", "Camera Height", bVisible);
-			sideHeight = (tree.GetTree("Camera Height", false, bVisible)).Set(sideHeight, sideHeight, "Side", "Camera Height", bVisible);
-			btmHeight = (tree.GetTree("Camera Height", false, bVisible)).Set(btmHeight, btmHeight, "Bottom", "Camera Height", bVisible);
+			topCameraHeight = (tree.GetTree("Camera Height", false, bVisible)).Set(topCameraHeight, topCameraHeight, "Top", "Camera Height", bVisible);
+			sideCameraHeight = (tree.GetTree("Camera Height", false, bVisible)).Set(sideCameraHeight, sideCameraHeight, "Side", "Camera Height", bVisible);
+			btmCameraHeight = (tree.GetTree("Camera Height", false, bVisible)).Set(btmCameraHeight, btmCameraHeight, "Bottom", "Camera Height", bVisible);
 
-			topOffset = (tree.GetTree("Camera Offset", false, bVisible)).Set(topOffset, topOffset, "Top Camera", "카메라 위치 offset (Degree)", bVisible);
-			sideOffset = (tree.GetTree("Camera Offset", false, bVisible)).Set(sideOffset, sideOffset, "Side Camera", "카메라 위치 offset (Degree)", bVisible);
-			btmOffset = (tree.GetTree("Camera Offset", false, bVisible)).Set(btmOffset, btmOffset, "Bottom Camera", "카메라 위치 offset (Degree)", bVisible);
+			topPositionOffset = (tree.GetTree("Camera Position Offset", false, bVisible)).Set(topPositionOffset, topPositionOffset, "Top Camera", "카메라 위치 offset (Degree)", bVisible);
+			sidePositionOffset = (tree.GetTree("Camera Position Offset", false, bVisible)).Set(sidePositionOffset, sidePositionOffset, "Side Camera", "카메라 위치 offset (Degree)", bVisible);
+			btmPositionOffset = (tree.GetTree("Camera Position Offset", false, bVisible)).Set(btmPositionOffset, btmPositionOffset, "Bottom Camera", "카메라 위치 offset (Degree)", bVisible);
+
+			topImageOffset = (tree.GetTree("Image Offset", false, bVisible)).Set(topImageOffset, topImageOffset, "Top Camera", "Height offset (pxl)", bVisible);
+			sideImageOffset = (tree.GetTree("Image Offset", false, bVisible)).Set(sideImageOffset, sideImageOffset, "Side Camera", "Height offset (pxl)", bVisible);
+			btmImageOffset = (tree.GetTree("Image Offset", false, bVisible)).Set(btmImageOffset, btmImageOffset, "Bottom Camera", "Heightoffset (pxl)", bVisible);
 		}
 
 		public override string Run()
 		{
 			try
 			{
+				if (EQ.IsStop())
+					return "OK";
+
 				InspectionManagerEdge inspectionEdge = GlobalObjects.Instance.Get<InspectionManagerEdge>();
 
 				if (inspectionEdge.Recipe.Read(recipeName) == false)
 					return "Recipe Open Fail";
 
 				inspectionEdge.Start();
+
+				while (inspectionEdge.CheckAllWorkDone() == false)
+				{
+					if (EQ.IsStop())
+						return "OK";
+
+					Task.Delay(1000);
+				}
+
 				return "OK";
 			}
 			finally
