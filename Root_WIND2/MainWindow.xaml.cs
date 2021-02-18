@@ -50,7 +50,10 @@ namespace Root_WIND2
             ThreadStop();
 
             GlobalObjects.Instance.Get<InspectionManagerFrontside>().Exit();
-            GlobalObjects.Instance.Get<InspectionManagerBackside>().Exit();
+            if(GlobalObjects.Instance.Get<InspectionManagerBackside>() != null)
+            {
+                GlobalObjects.Instance.Get<InspectionManagerBackside>().Exit();
+            }
 
             GlobalObjects.Instance.Clear();
             //GlobalObjects.Instance.Get<InspectionManagerEdge>().Exit();

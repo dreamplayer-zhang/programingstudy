@@ -52,6 +52,8 @@ namespace RootTools_Vision.Utility
 		public String tempString;
 		public float resX;
 		public float resY;
+
+		public string defectListInfor;
 		#endregion
 
 		public bool Save(StreamWriter sw)

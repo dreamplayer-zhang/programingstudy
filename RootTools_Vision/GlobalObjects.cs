@@ -123,9 +123,9 @@ namespace RootTools_Vision
                     return (T)obj;
                 }
             }
-            throw new ArgumentException("객체가 등록되지 않았습니다.(Type :", typeof(T).ToString());
+            //throw new ArgumentException("객체가 등록되지 않았습니다.(Type :", typeof(T).ToString());
             //MessageBox.Show("객체가 등록되지 않았습니다.\n RegisterObject 메서드를 통해 등록하세요.");
-            //return default(T);
+            return default(T);
         }
 
         public void Clear()
