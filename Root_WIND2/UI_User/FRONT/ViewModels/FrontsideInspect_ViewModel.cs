@@ -186,7 +186,7 @@ namespace Root_WIND2.UI_User
                 GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
 
                 return;
-
+                /*
                 EQ.p_bStop = false;
                 Vision vision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision;
                 if (vision.p_eState != ModuleBase.eState.Ready)
@@ -208,7 +208,7 @@ namespace Root_WIND2.UI_User
                     {
 
                     }
-                }
+                }*/
             });
         }
 
@@ -219,7 +219,7 @@ namespace Root_WIND2.UI_User
                 GlobalObjects.Instance.Get<InspectionManagerFrontside>().WriteTest();
 
                 return;
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
+                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
             });
         }
 

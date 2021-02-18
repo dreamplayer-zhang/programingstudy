@@ -161,7 +161,7 @@ namespace RootTools.Memory
             {
                 mainSock.Connect(thisAddress, port);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                return;
             }
