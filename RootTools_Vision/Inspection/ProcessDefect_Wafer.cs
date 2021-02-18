@@ -95,22 +95,17 @@ namespace RootTools_Vision
                 //}
             }
 
-            //KlarfData_Lot kd = new KlarfData_Lot();
-
-            //kd.SaveKlarf(@"D:\", false);
-            //RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-
-                //GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList,  originRecipe);
-                //GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
-                //GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
-                
-
-                //GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(sDefectimagePath , false);
-         
+            GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
+            GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
+            GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
 
 
-            //string sTiffImagePath = @"D:\DefectImage";
-            //SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
+            GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(sDefectimagePath, false);
+
+
+
+            string sTiffImagePath = @"D:\DefectImage";
+            SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
             WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
         }

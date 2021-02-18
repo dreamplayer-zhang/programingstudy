@@ -249,7 +249,7 @@ namespace RootTools_Vision
                 {
                     this.task = null;
                     this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-
+                    this.isStop = true;
                     //WorkEventManager.OnRequestStop(this, new RequestStopEventArgs());
                 }
             }
