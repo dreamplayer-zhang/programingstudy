@@ -81,7 +81,7 @@ namespace RootTools_Vision
         bool connected;
 
         Thread listenThread;
-        bool running;
+        //bool running;
 
         #endregion
 
@@ -144,7 +144,7 @@ namespace RootTools_Vision
             this.listenThread = new Thread(new ThreadStart(ListenForClients));
             this.listenThread.Start();
 
-            this.running = true;
+            //this.running = true;
         }
 
         private void ListenForClients()
