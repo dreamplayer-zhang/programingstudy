@@ -2,6 +2,7 @@
 using Emgu.CV.Cvb;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using Emgu.CV.Util;
 using Root_AOP01_Inspection.Recipe;
 using Root_EFEM;
 using Root_EFEM.Module;
@@ -4144,6 +4145,7 @@ namespace Root_AOP01_Inspection.Module
                 Run_PellicleShiftAndRotation run = new Run_PellicleShiftAndRotation(m_module);
                 run.m_cptReticleCenter = m_cptReticleCenter;
                 run.m_nSearchArea = m_nSearchArea;
+                run.m_nReticleEdgeThreshold = m_nReticleEdgeThreshold;
                 return run;
             }
 
@@ -4151,6 +4153,7 @@ namespace Root_AOP01_Inspection.Module
             {
                 m_cptReticleCenter = tree.Set(m_cptReticleCenter, m_cptReticleCenter, "Reticle Center Position", "Reticle Center Position", bVisible);
                 m_nSearchArea = tree.Set(m_nSearchArea, m_nSearchArea, "Search Area", "Search Area", bVisible);
+                m_nReticleEdgeThreshold = tree.Set(m_nReticleEdgeThreshold, m_nReticleEdgeThreshold, "Reticle Edge Threshold", "Reticle Edge Threshold", bVisible);
             }
 
             public override string Run()
@@ -4169,8 +4172,10 @@ namespace Root_AOP01_Inspection.Module
                                                                    eSearchDirection.TopToBottom, eSearchDirection.TopToBottom, eSearchDirection.RightToLeft, eSearchDirection.RightToLeft };
                 CRect[] arrCRectReticleEdgeROI = new CRect[8];
                 CRect[] arrCRectFrameEdgeROI = new CRect[8];
-                int[] narrReticleEdgePoint = new int[8];
-                int[] narrFrameEdgePoint = new int[8];
+                System.Drawing.Point[] ptarrReticleEdgePoint = new System.Drawing.Point[8];
+                System.Drawing.Point[] ptarrFrameEdgePoint = new System.Drawing.Point[8];
+                VectorOfPoint contour = new VectorOfPoint();
+                double dReticleAngle = 0.0;
 
                 // implement
                 // Reticle Edge 찾기  -> TL,TR,RT,RB,BR,BL,LB,LT
@@ -4191,9 +4196,60 @@ namespace Root_AOP01_Inspection.Module
                 arrCRectReticleEdgeROI[7] = new CRect(new CPoint(m_cptReticleCenter.X - nOutterPointDistanceFromCenter_px - (m_nSearchArea / 2), m_cptReticleCenter.Y - nInnerPointDistanceFromCenter_px - (m_nSearchArea / 2)),
                                                       new CPoint(m_cptReticleCenter.X - nOutterPointDistanceFromCenter_px + (m_nSearchArea / 2), m_cptReticleCenter.Y - nInnerPointDistanceFromCenter_px + (m_nSearchArea / 2)));
 
+                int nTemp = 0;
                 for (int i = 0; i<arrCRectReticleEdgeROI.Length; i++)
                 {
-                    narrReticleEdgePoint[i] = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
+                    if (earrReticleEdgeSearchDirection[i] == eSearchDirection.TopToBottom || earrReticleEdgeSearchDirection[i] == eSearchDirection.BottomToTop)
+                    {
+                        if (i == 0 || i == 5)
+                        {
+                            nTemp = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
+                            ptarrReticleEdgePoint[i] = new System.Drawing.Point(m_cptReticleCenter.X - nInnerPointDistanceFromCenter_px, arrCRectReticleEdgeROI[i].Top + nTemp);
+                        }
+                        else
+                        {
+                            nTemp = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
+                            ptarrReticleEdgePoint[i] = new System.Drawing.Point(m_cptReticleCenter.X + nInnerPointDistanceFromCenter_px, arrCRectReticleEdgeROI[i].Top + nTemp);
+                        }
+                    }
+                    else
+                    {
+                        if (i == 2 || i == 7)
+                        {
+                            nTemp = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
+                            ptarrReticleEdgePoint[i] = new System.Drawing.Point(arrCRectReticleEdgeROI[i].Left + nTemp, m_cptReticleCenter.Y - nInnerPointDistanceFromCenter_px);
+                        }
+                        else
+                        {
+                            nTemp = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
+                            ptarrReticleEdgePoint[i] = new System.Drawing.Point(arrCRectReticleEdgeROI[i].Left + nTemp, m_cptReticleCenter.Y + nInnerPointDistanceFromCenter_px);
+                        }
+                    }
+                }
+                contour.Push(ptarrReticleEdgePoint);
+                RotatedRect rtReticleEdge = CvInvoke.MinAreaRect(contour);
+                dReticleAngle = rtReticleEdge.Angle;
+                int nBreakCount = 0;
+                while (true)
+                {
+                    if (dReticleAngle <= 10 && dReticleAngle >= -10)
+                    {
+                        break;
+                    }
+                    else if (dReticleAngle > 10)
+                    {
+                        dReticleAngle -= 90;
+                        nBreakCount++;
+                    }
+                    else if (dReticleAngle < -10)
+                    {
+                        dReticleAngle += 90;
+                        nBreakCount++;
+                    }
+                    else
+                    {
+                        if (nBreakCount > 4) break;
+                    }
                 }
 
                 return "OK";
