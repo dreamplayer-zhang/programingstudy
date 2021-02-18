@@ -193,75 +193,48 @@ namespace Root_WIND2.Module
             int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
             int hCnt = WaferHeight / nCamHeight;
 
+            int s = (int)(nCamHeight * 0.25);
             byte* ptr = (byte*)mem.GetPtr().ToPointer();
             List<double> ladsinfo = new List<double>();
-            List<double> li = new List<double>();
+            List<double> profile = new List<double>();
+
+            for (int cnt = 0; cnt < hCnt; cnt++)
+            {
+                profile.Clear();
+
+                for (int h = (int)(nCamHeight * 0.25); h < nCamHeight * 0.75; h++)
+                {
+                    double sum = 0;
+                    for (int w = 0; w < nCamWidth; w++)
+                    {
+                        //ptr[cnt*nCamHeight+h][w+xmempos]
+                        int curgv = ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
+
+                        if (curgv >= gv)
+                            sum += curgv;
+                    }
+
+                    profile.Add(sum / nCamWidth);
+                }
+
+                double M = double.MinValue;
+                double res = 0;
+                for (int i = 1; i < profile.Count - 1; i++)
+                {
+                    if (M < profile[i] && profile[i] != 0)
+                    {
+                        M = profile[i];
+                        res = (profile[i - 1] * (i + s - 1) + profile[i] * (i + s) + profile[i + 1] * (i + s + 1)) / (profile[i - 1] + profile[i] + profile[i + 1]);
+                    }
+                }
+                if (res != 0)
+                    ladsinfo.Add((res - nCamHeight/2));
+                else
+                    ladsinfo.Add(0);
+            }
 
             if (InvY)
-            {
-                for (int cnt = 0; cnt < hCnt; cnt++)
-                {
-                    li.Clear();
-
-                    for (int h = (int)(nCamHeight * 0.25); h < nCamHeight * 0.75; h++)
-                    {
-                        double sum = 0;
-                        for (int w = 0; w < nCamWidth; w++)
-                        {
-                            //ptr[cnt*nCamHeight+h][w+xmempos]
-                            int curgv = ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
-
-                            if (curgv >= gv)
-                                sum += ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
-                        }
-
-                        li.Add(sum / nCamWidth);
-                    }
-
-                    double M = double.MinValue;
-                    double res = 0;
-                    for (int i = 1; i < li.Count - 1; i++)
-                    {
-                        if (M < li[i] && li[i] != 0)
-                        {
-                            M = li[i];
-                            res = (li[i - 1] * (i - 1) + li[i] * i + li[i + 1] * (i + 1)) / (li[i - 1] + li[i] + li[i + 1]);
-                        }
-                    }
-                    ladsinfo.Add(res * Math.Sqrt(2));
-                }
-            }
-            else
-            {
-                for (int cnt = hCnt - 1; cnt >= 0; cnt--)
-                {
-                    li.Clear();
-
-                    for (int h = (int)(nCamHeight * 0.25); h < nCamHeight * 0.75; h++)
-                    {
-                        double sum = 0;
-                        for (int w = 0; w < nCamWidth; w++)
-                        {
-                            int curgv = ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
-                            if (curgv >= gv)
-                                sum += ptr[w + xmempos + (cnt * nCamHeight + h) * mem.W];
-                        }
-                        li.Add(sum / nCamWidth);
-                    }
-
-                    double M = double.MinValue;
-                    double res = 0;
-                    for (int i = 1; i < li.Count - 1; i++)
-                    {
-                        if (M < li[i] && li[i] != 0)
-                        {
-                            M = li[i];
-                            res = (li[i - 1] * (i - 1) + li[i] * i + li[i + 1] * (i + 1)) / (li[i - 1] + li[i] + li[i + 1]);
-                        }
-                    }
-                    ladsinfo.Add(res * Math.Sqrt(2));
-                }
-            }
+                ladsinfo.Reverse();
 
             m_module.LadsInfos.RemoveAt(nScanNum);
             m_module.LadsInfos.Insert(nScanNum, ladsinfo);
@@ -274,7 +247,7 @@ namespace Root_WIND2.Module
             int nX = m_module.LadsInfos.Count;
             int nY = m_module.LadsInfos[0].Count;
             int thumsize = 30;
-            //getminmax
+
             double mHeight = double.MaxValue, MHeight = double.MinValue;
             for (int x = 0; x < nX; x++)
             {
@@ -290,13 +263,17 @@ namespace Root_WIND2.Module
                 for (int y = 0; y < nY; y++)
                 {
                     Mat ColorImg = new Mat(thumsize, (thumsize * nY / nX), DepthType.Cv8U, 1);
-                    MCvScalar color = new MCvScalar(rate * m_module.LadsInfos[x][y]);
+                    MCvScalar color;
+                    if (m_module.LadsInfos[x][y] == 0)
+                        color = new MCvScalar(255);
+                    else
+                        color = new MCvScalar(rate * (m_module.LadsInfos[x][y] + Math.Abs(mHeight)));
                     ColorImg.SetTo(color);
 
                     if (y == 0)
                         Vmat = ColorImg;
                     else
-                        CvInvoke.VConcat(Vmat, ColorImg, Vmat);
+                        CvInvoke.VConcat(ColorImg, Vmat, Vmat);
                 }
 
                 if (x == 0)
