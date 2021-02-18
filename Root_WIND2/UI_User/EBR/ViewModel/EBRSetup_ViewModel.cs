@@ -190,8 +190,11 @@ namespace Root_WIND2.UI_User
 			Recipe = recipe.GetItem<EBRRecipe>();
 			Parameter = recipe.GetItem<EBRParameter>();
 
-			WorkEventManager.InspectionDone += WorkEventManager_InspectionDone;
-			WorkEventManager.ProcessMeasurementDone += WorkEventManager_ProcessMeasurementDone;
+			if (GlobalObjects.Instance.Get<InspectionManagerEBR>() != null)
+            {
+				GlobalObjects.Instance.Get<InspectionManagerEBR>().InspectionDone += WorkEventManager_InspectionDone;
+				GlobalObjects.Instance.Get<InspectionManagerEBR>().ProcessMeasurementDone += WorkEventManager_ProcessMeasurementDone;
+			}
 		}
 
 		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
@@ -231,7 +234,8 @@ namespace Root_WIND2.UI_User
 
 		public void Inspect()
 		{
-			GlobalObjects.Instance.Get<InspectionManagerEBR>().Start();			
+			if (GlobalObjects.Instance.Get<InspectionManagerEBR>() != null)
+				GlobalObjects.Instance.Get<InspectionManagerEBR>().Start();			
 		}
 
 		public void LoadParameter()

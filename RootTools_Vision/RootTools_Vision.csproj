@@ -152,10 +152,15 @@
     <Compile Include="RemoteProcess\PipeComm.cs" />
     <Compile Include="RemoteProcess\PipeProtocol.cs" />
     <Compile Include="RemoteProcess\PipeServer.cs" />
+    <Compile Include="RemoteProcess\RemoteMessageDefines.cs" />
     <Compile Include="RemoteProcess\StreamDataReader.cs" />
     <Compile Include="RemoteProcess\RemoteProcess.cs" />
     <Compile Include="RemoteProcess\StreamDataWriter.cs" />
     <Compile Include="ServerWorkFactory.cs" />
+    <Compile Include="UI\CloneImageViewer.xaml.cs">
+      <DependentUpon>CloneImageViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\CloneImageViewer_ViewModel.cs" />
     <Compile Include="UserControls\MapViewer.xaml.cs">
       <DependentUpon>MapViewer.xaml</DependentUpon>
     </Compile>
@@ -165,6 +170,7 @@
     <Compile Include="Utility\KlarfData.cs" />
     <Compile Include="Utility\KlarfData_Lot.cs" />
     <Compile Include="SingleObject.cs" />
+    <Compile Include="Utility\TempLogger.cs" />
     <Compile Include="WorkManager\CloneableWorkBase.cs" />
     <Compile Include="WorkManager\DebugOutput.cs" />
     <Compile Include="WorkManager\Interfaces\IWorkplaceBundle.cs" />
@@ -195,6 +201,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\CloneImageViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\MapViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -183,7 +183,7 @@ namespace RootTools_Vision
 
                 return bmp;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //MessageBox.Show(ex.ToString());
             }

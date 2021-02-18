@@ -29,7 +29,7 @@ namespace RootTools.Database
         public int m_nCHipIndexY;
         //public string sImagePath;
 
-        private Rect m_rtDefectRect;
+        //private Rect m_rtDefectRect;
         public Rect p_rtDefectRect
         {
             get

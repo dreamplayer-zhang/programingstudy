@@ -18,7 +18,7 @@ namespace RootTools_Vision
         private readonly REMOTE_MODE remoteMode;
 
         private WorkplaceBundle workplaceBundle;
-        private WorkBundle workBundle;
+        //private WorkBundle workBundle;
 
         private RecipeBase recipe;
         #endregion
@@ -27,6 +27,21 @@ namespace RootTools_Vision
         #region [Event]
         public event WorkManagerAllWorkDoneEvent AllWorkDone;
 
+        public event EventHandler<PositionDoneEventArgs> PositionDone;
+
+        public event EventHandler<InspectionStartArgs> InspectionStart;
+
+        public event EventHandler<InspectionDoneEventArgs> InspectionDone;
+
+        public event EventHandler<IntegratedProcessDefectDoneEventArgs> IntegratedProcessDefectDone;
+
+        public event EventHandler<ProcessDefectWaferStartEventArgs> ProcessDefectWaferStart;
+
+        public event EventHandler<ProcessDefectDoneEventArgs> ProcessDefectDone;
+
+        public event EventHandler<ProcessMeasurementDoneEventArgs> ProcessMeasurementDone;
+
+        public event EventHandler<WorkplaceStateChangedEventArgs> WorkplaceStateChanged;
         #endregion
 
         //List<WorkplaceBundle> bundleList = new List<WorkplaceBundle>();
@@ -57,7 +72,64 @@ namespace RootTools_Vision
             Initialize();
 
             WorkEventManager.RequestStop += OnRequestStop_Callback;
+
+            WorkEventManager.PositionDone += PositionDone_Callback;
+
+            WorkEventManager.InspectionStart += InspectionStart_Callback;
+            WorkEventManager.InspectionDone += InspectionDone_Callback;
+
+            WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
+
+            WorkEventManager.ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
+            WorkEventManager.IntegratedProcessDefectDone += IntegratedProcessDefectDone_Callback;
+
+            WorkEventManager.ProcessMeasurementDone += ProcessMeasurementDone_Callback;
+
+            WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
         }
+
+        #region [WorkEventManager Callback Link]
+        private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
+        {
+            this.PositionDone?.Invoke(obj, args);
+        }
+
+        private void InspectionStart_Callback(object obj, InspectionStartArgs args)
+        {
+            this.InspectionStart?.Invoke(obj, args);
+        }
+
+        private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
+        {
+            this.InspectionDone?.Invoke(obj, args);
+        }
+
+        private void ProcessDefectDone_Callback(object obj, ProcessDefectDoneEventArgs args)
+        {
+            this.ProcessDefectDone?.Invoke(obj, args);
+        }
+
+        private void ProcessDefectWaferStart_Callback(object obj, ProcessDefectWaferStartEventArgs args)
+        {
+            this.ProcessDefectWaferStart?.Invoke(obj, args);
+        }
+
+        private void IntegratedProcessDefectDone_Callback(object obj, IntegratedProcessDefectDoneEventArgs args)
+        {
+            this.IntegratedProcessDefectDone?.Invoke(obj, args);
+        }
+
+        private void ProcessMeasurementDone_Callback(object obj, ProcessMeasurementDoneEventArgs args)
+        {
+            this.ProcessMeasurementDone?.Invoke(obj, args);
+        }
+
+        private void WorkplaceStateChanged_Callback(object obj, WorkplaceStateChangedEventArgs args)
+        {
+            this.WorkplaceStateChanged?.Invoke(obj, args);
+        }
+
+        #endregion
 
         public void SetRecipe(RecipeBase recipeBase)
         {
@@ -194,6 +266,8 @@ namespace RootTools_Vision
                 DebugOutput.PrintWorkplaceBundle(workplaces);
 #endif
 
+                WorkEventManager.OnInspectionStart(this, new InspectionStartArgs());
+
                 foreach (WorkManager wm in this.workManagers)
                 {
                     wm.SetWorkplaceBundle(workplaces);
@@ -233,6 +307,7 @@ namespace RootTools_Vision
                 Debug.WriteLine("[Start]");
                 DebugOutput.PrintWorkplaceBundle(workplaces);
 #endif
+                WorkEventManager.OnInspectionStart(this, new InspectionStartArgs());
 
                 foreach (WorkManager wm in this.workManagers)
                 {
@@ -344,7 +419,7 @@ namespace RootTools_Vision
                 AllWorkDone();
         }
 
-        public bool CheckAllWorkDone()
+        public bool CheckAllWorkDone(int timeoutMinutes = 10)
         {
             bool isDone = true;
             foreach (Workplace wp in workplaceBundle)
@@ -365,18 +440,18 @@ namespace RootTools_Vision
 
         private void PipeCommMessageReceived_Callback(PipeProtocol protocol)
         {
-            MessageBox.Show(protocol.msgType.ToString());
-            MessageBox.Show(protocol.msg);
-            MessageBox.Show(protocol.data?.ToString());
-            MessageBox.Show(protocol.dataType?.ToString());
+            //MessageBox.Show(protocol.msgType.ToString());
+            //MessageBox.Show(protocol.msg);
+            //MessageBox.Show(protocol.data?.ToString());
+            //MessageBox.Show(protocol.dataType?.ToString());
 
             switch (protocol.msgType)
             {
                 case PIPE_MESSAGE_TYPE.Message:
-                    RemoteMessage_MessageHandler((string)protocol.data);
+                    RemoteMessage_MessageHandler(protocol);
                     break;
                 case PIPE_MESSAGE_TYPE.Command:
-                    RemoteMessage_MessageHandler((string)protocol.data);
+                    RemoteMessage_CommandHandler(protocol);
                     break;
                 case PIPE_MESSAGE_TYPE.Data:
                     break;
@@ -386,24 +461,91 @@ namespace RootTools_Vision
             }
         }
 
-        private void RemoteMessage_MessageHandler(string msg)
-        {
 
+        public void StartRemoteProcess()
+        {
+            if (this.remoteMode != REMOTE_MODE.Master) return;
+
+            this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Command, REMOTE_MASTER_MESSAGES.StartRemote));
         }
 
-        private void RemoteMessage_CommandHandler(string msg)
+        private void RemoteMessage_MessageHandler(PipeProtocol protocol)
         {
+            if(this.remoteMode == REMOTE_MODE.Master)
+            {
 
+            }
+            else
+            {
+
+            }
         }
 
-        private void RemoteMessage_EventHandler(string evnt)
+        private void RemoteMessage_CommandHandler(PipeProtocol protocol)
         {
+            if (this.remoteMode == REMOTE_MODE.Master)  // Slave에서 보낸 메시지를 처리
+            {
+                REMOTE_SLAVE_MESSAGES msg = (REMOTE_SLAVE_MESSAGES)Enum.Parse(typeof(REMOTE_SLAVE_MESSAGES), protocol.msg, true);
+                switch (msg)
+                {
+                    case REMOTE_SLAVE_MESSAGES.StartRemoteAck:
+                        this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Command, REMOTE_MASTER_MESSAGES.StartCreateCloneFactory));
+                        break;
+                        
+                        //
+                        // StartCreate CloneFactory
+                        //
+                    case REMOTE_SLAVE_MESSAGES.StartCreateCloneFactoryAck:
 
+                        // Send WorkManager
+                        this.remote.Send(new PipeProtocol(
+                            PIPE_MESSAGE_TYPE.Data, 
+                            REMOTE_DATA_TYPE.WorkManagerList, 
+                            typeof(List<WorkManager>).ToString(), 
+                            this.workManagers
+                            ));
+                        break;
+                }
+            }
+            else  // 마스터에서 보낸 메시지를 처리
+            {
+                REMOTE_MASTER_MESSAGES msg = (REMOTE_MASTER_MESSAGES)Enum.Parse(typeof(REMOTE_MASTER_MESSAGES), protocol.msg, true);
+                switch (msg)
+                {
+                    case REMOTE_MASTER_MESSAGES.StartRemote:
+                        this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Command, REMOTE_SLAVE_MESSAGES.StartRemoteAck));
+                        break;
+                    case REMOTE_MASTER_MESSAGES.StartCreateCloneFactory:
+                        this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Command, REMOTE_SLAVE_MESSAGES.StartCreateCloneFactoryAck));
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
-        private void RemoteMessage_DataHandler(string msg)
+        private void RemoteMessage_EventHandler(PipeProtocol protocol)
         {
+            if (this.remoteMode == REMOTE_MODE.Master)
+            {
 
+            }
+            else
+            {
+
+            }
+        }
+
+        private void RemoteMessage_DataHandler(PipeProtocol protocol)
+        {
+            if (this.remoteMode == REMOTE_MODE.Master)
+            {
+
+            }
+            else
+            {
+
+            }
         }
 
 
@@ -412,9 +554,7 @@ namespace RootTools_Vision
         public void RemoteStart()
         {
             remote.StartProcess();
-
             remote.MessageReceived += PipeCommMessageReceived_Callback;
-
             //WorkplaceBundle wb = this.CreateWorkplaceBundle();
             //if (wb == null) return;
 
@@ -445,8 +585,8 @@ namespace RootTools_Vision
 
         public void InitializeRemoteWorkFactory()
         {
-            const string InitializeStartMsg = "InitializeStart";
-            const string InitializeDoneMsg = "InitializeDone";
+            //const string InitializeStartMsg = "InitializeStart";
+            //const string InitializeDoneMsg = "InitializeDone";
 
             if (remoteMode == REMOTE_MODE.Master)
             {

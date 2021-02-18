@@ -177,76 +177,105 @@ namespace RootTools_Vision
 
         private void Run()
         {
-            while (!cancellationTokenSource.Token.IsCancellationRequested)
+            bool exception = false;
+            try
             {
-                if (isStop == true)
+                while (!cancellationTokenSource.Token.IsCancellationRequested)
                 {
-#if WORKMANAGER_DEBUG
-#if DEBUG
-                    DebugOutput.PrintWorkManagerInfo(this, "STOP");
-#endif
-#endif
-                    Reset();
-                    this.State = WORKMANAGER_STATE.STOP;
-                    _waitSignal.Reset();
-                    _waitSignal.WaitOne();
-                }
-                else
-                {
-                    this.State = WORKMANAGER_STATE.READY;
-                    _waitSignal.WaitOne(100);
-                }
-
-                this.State = WORKMANAGER_STATE.CHECK;
-                // 아직 일이 남아있는지 체크
-                if (this.workplaceBundle != null && this.workplaceBundle.CheckStateCompleted(this.workType) == true) // 모두 완료되었다면,
-                {
-                    Stop();
-                    continue;
-                }
-
-                if (cancellationTokenSource.Token.IsCancellationRequested)
-                {
-                    this.State = WORKMANAGER_STATE.EXIT;
-                    return;
-                }
-
-                this.State = WORKMANAGER_STATE.ASSIGN;
-                if(this.workplaceBundle != null)
-                {
-                    //Task.Run(() =>
+                    if (isStop == true)
                     {
-                        if (AssignWorkToWorker() == false)
-                        {
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                            //DebugOutput.PrintWorkManagerInfo(this, "False");
+                        DebugOutput.PrintWorkManagerInfo(this, "STOP");
 #endif
 #endif
-                        }
-                        else
-                        {
-#if WORKMANAGER_DEBUG
-#if DEBUG
-                            //DebugOutput.PrintWorkManagerInfo(this, "True");
-#endif
-#endif
-                        }
+                        Reset();
+                        this.State = WORKMANAGER_STATE.STOP;
+                        _waitSignal.Reset();
+                        _waitSignal.WaitOne();
                     }
-                    //);
+                    else
+                    {
+                        this.State = WORKMANAGER_STATE.READY;
+                        _waitSignal.WaitOne(100);
+                    }
+
+                    this.State = WORKMANAGER_STATE.CHECK;
+                    // 아직 일이 남아있는지 체크
+                    if (this.workplaceBundle != null && this.workplaceBundle.CheckStateCompleted(this.workType) == true) // 모두 완료되었다면,
+                    {
+                        Stop();
+                        continue;
+                    }
+
+                    if (cancellationTokenSource.Token.IsCancellationRequested)
+                    {
+                        this.State = WORKMANAGER_STATE.EXIT;
+                        return;
+                    }
+
+                    this.State = WORKMANAGER_STATE.ASSIGN;
+                    if (this.workplaceBundle != null)
+                    {
+                        //Task.Run(() =>
+                        {
+                            if (AssignWorkToWorker() == false)
+                            {
+#if WORKMANAGER_DEBUG
+#if DEBUG
+                                //DebugOutput.PrintWorkManagerInfo(this, "False");
+#endif
+#endif
+                            }
+                            else
+                            {
+#if WORKMANAGER_DEBUG
+#if DEBUG
+                                //DebugOutput.PrintWorkManagerInfo(this, "True");
+#endif
+#endif
+                            }
+                        }
+                        //);
+                    }
+
+
+                    this.State = WORKMANAGER_STATE.DONE;
+
+
+                    _waitSignal.Reset();
+                }
+            }
+            catch(Exception ex)
+            {
+                exception = true;
+                //쓰레드 하나라도 죽으면 WorkFactory Thread 다시 생성하고, WorkFactory Reset
+                //MessageBox.Show(
+                //    "예기치 못한 상황 발생으로 검사를 중단합니다.\n"
+                //    + ex.Message + "\n"
+                //    + ex.InnerException.Message + "\n"
+                //    + ex.InnerException.StackTrace);
+
+                string msg = "예기치 못한 상황 발생으로 검사를 중단합니다.\n" + ex.Message + "\n";
+                if (ex.InnerException != null)
+                {
+                    msg += ex.InnerException.Message + "\n" + ex.InnerException.StackTrace;
                 }
 
-
-                this.State = WORKMANAGER_STATE.DONE;
-
-
-                _waitSignal.Reset();
+                TempLogger.Write("Worker", msg);
             }
+            finally
+            {
+                this.task = Task.Factory.StartNew(() => { Run(); }, cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+                this.isStop = true;
+
+                this.State = WORKMANAGER_STATE.CREATED;
+            }
+           
         }
 
 
 
-        private object lockObj = new object();
         /// <summary>
         /// Worker를 선택할 때, WorkState를 이 메서드에서 확인안해도 되는 이유는 
         /// 단일 쓰레드이기 때문에 선택된 worker를 다시 할당할 수 없다.
@@ -259,32 +288,27 @@ namespace RootTools_Vision
                     return false;
             }
             
-            //if (worker == null) return false;
-
-            lock (lockObj)
+            Worker worker = GetAvailableWorker();
+            while (worker != null)
             {
-                Worker worker = GetAvailableWorker();
-                while (worker != null)
+
+                Workplace workplace = this.workplaceBundle.GetWorkplaceRemained(this.preWorkType);
+
+
+                if (workplace == null || worker == null)
                 {
-
-                    Workplace workplace = this.workplaceBundle.GetWorkplaceRemained(this.preWorkType);
-
-
-                    if (workplace == null || worker == null)
-                    {
-                        return false;
-                    }
+                    return false;
+                }
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                    //Debug.WriteLine(this.workType + " : " + workplace.MapIndexX + ", " + workplace.MapIndexY + " : " + "할당");
+                //Debug.WriteLine(this.workType + " : " + workplace.MapIndexX + ", " + workplace.MapIndexY + " : " + "할당");
 #endif
 #endif
 
-                    worker.SetWorkplace(workplace);
-                    worker.Start();
+                worker.SetWorkplace(workplace);
+                worker.Start();
 
-                    worker = GetAvailableWorker();
-                }
+                worker = GetAvailableWorker();
             }
 
             return true;

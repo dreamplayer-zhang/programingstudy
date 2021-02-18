@@ -253,7 +253,6 @@ namespace Root_VEGA_D.Engineer
         #endregion
 
         #region Calc Sequence
-        public int m_nRnR = 1;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
@@ -376,7 +375,7 @@ namespace Root_VEGA_D.Engineer
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);

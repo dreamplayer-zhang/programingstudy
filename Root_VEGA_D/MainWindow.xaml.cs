@@ -72,7 +72,7 @@ namespace Root_VEGA_D
 
         #endregion
 
-        bool m_blogin = false;
+        //bool m_blogin = false;
 
 
 

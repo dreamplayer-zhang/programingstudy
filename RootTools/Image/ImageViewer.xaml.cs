@@ -34,9 +34,10 @@ namespace RootTools
 		//    ImageViewer_ViewModel vm = (ImageViewer_ViewModel)this.DataContext;
 		//    vm.KeyEvent = e;
 		//}
-		public void AddBlock(double left, double top, double width, double height, Brush color,Pen lineColor)
+		public void AddBlock(double dCenterX, double dCenterY, double width, double height, Brush color,Pen lineColor)
 		{
-			canvas.rects.Add(new CustomCanvas.CustomRect { Pen = lineColor, Brush = color, Rect = new Rect(left, top, width, height) });
+			//canvas.rects.Add(new CustomCanvas.CustomRect { Pen = lineColor, Brush = color, Rect = new Rect(left, top, width, height) });
+			canvas.rects.Add(new CustomCanvas.CustomRect { Pen = lineColor, Brush = color, Rect = new Rect(dCenterX - (width / 2), dCenterY - (height / 2), width, height) });
 		}
 
 		public void ClearRect()

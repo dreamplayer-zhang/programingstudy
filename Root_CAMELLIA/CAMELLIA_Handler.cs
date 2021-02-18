@@ -325,7 +325,6 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Calc Sequence
-        //public int m_nRnR = 1;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {

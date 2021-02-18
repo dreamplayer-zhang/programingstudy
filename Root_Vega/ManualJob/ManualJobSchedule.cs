@@ -137,7 +137,7 @@ namespace Root_Vega.ManualJob
             jobschedulePopup.Init(this);
             p_bRnR = false; 
             jobschedulePopup.ShowDialog();
-            m_handler.m_nRnR = p_bRnR ? p_nRnR : 1; 
+            EQ.p_nRnR = p_bRnR ? p_nRnR : 1; 
             return jobschedulePopup.DialogResult == true;
         }
     }

@@ -25,10 +25,10 @@ namespace Root_WIND2
 
 		private EdgeSurfaceParameterBase parameter;
 		private int selectedGrabModeIndex = 0;
-		private int camWidth;
-		private int camHeight;
-		private double camResolution;
-		private double camTriggerRatio;
+		//private int camWidth;
+		//private int camHeight;
+		//private double camResolution;
+		//private double camTriggerRatio;
 
 		//private int topOffset;
 		//private int sideOffset;
@@ -41,7 +41,7 @@ namespace Root_WIND2
 		private DataTable defectDataTable;
 		private object selectedDefect;
 		private BitmapSource defectImage;
-		private double triggerRatio = 0;
+		//private double triggerRatio = 0;
 
 		#region [Getter / Setter]
 		public RootViewer_ViewModel DrawToolVM
@@ -246,7 +246,7 @@ namespace Root_WIND2
 			}));
 		}
 
-		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
+		private void WorkEventManager_ProcessDefectWaferDone(object sender, IntegratedProcessDefectDoneEventArgs e)
 		{
 			Workplace workplace = sender as Workplace;
 
@@ -272,7 +272,8 @@ namespace Root_WIND2
 
 		public void Inspect()
 		{
-			GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();			
+			if(GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
+				GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();			
 		}
 
 		private void ChangeViewer(string dataName)
