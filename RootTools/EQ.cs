@@ -210,7 +210,7 @@ namespace RootTools
             }
         }
 
-        int _nRnR = 0;
+        int _nRnR = 1;
         public int p_nRnR 
         {
             get { return _nRnR; }

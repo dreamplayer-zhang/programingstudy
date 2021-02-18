@@ -80,7 +80,7 @@ namespace Root_WIND2.Module
                 int nScanOffset_pulse = 40000;
 
                 int startOffsetX = cpMemoryOffset.X;
-                int startOffsetY = 0;
+                //int startOffsetY = 0;
                 const int nTimeOut_10s = 10000; //ms
                 const int nTimeOut_50s = 50000; //ms
                 const int nTimeOutInterval = 10; // ms

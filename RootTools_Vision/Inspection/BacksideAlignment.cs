@@ -11,8 +11,8 @@ namespace RootTools_Vision
         #region [Member Variables]
         public override WORK_TYPE Type => WORK_TYPE.ALIGNMENT;
 
-        OriginRecipe recipeOrigin;
-        IntPtr InspectionSharedBuffer;
+        //OriginRecipe recipeOrigin;
+        //IntPtr InspectionSharedBuffer;
 
         protected override bool Preparation()
         {

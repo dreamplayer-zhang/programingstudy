@@ -38,7 +38,7 @@ namespace RootTools_Vision
             set => this.imageViewerVM = value;
         }
 
-        ImageData imageData;
+        //ImageData imageData;
         //InspectionManager inspectionManager;
         public MainWindow()
         {

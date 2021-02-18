@@ -13,7 +13,7 @@ namespace RootTools_Vision
 
         public string DataType { get; set; }
 
-        public object Data { get; set; }
+        public new object Data { get; set; }
 
         public InvalidProtocolException(PipeProtocol protocol)
         {

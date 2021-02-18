@@ -17,7 +17,7 @@ namespace RootTools_Vision
 {
     public class ProcessDefect_Wafer : WorkBase
     {
-        BacksideRecipe recipeBackside;
+        //BacksideRecipe recipeBackside;
         string sDefectimagePath = @"D:\DefectImage";
         /// <summary>
         /// Defect Image가 저장될 Root Directory Path. 기본값 : D:\DefectImage

@@ -18,7 +18,7 @@ namespace RootTools_Vision
         private readonly REMOTE_MODE remoteMode;
 
         private WorkplaceBundle workplaceBundle;
-        private WorkBundle workBundle;
+        //private WorkBundle workBundle;
 
         private RecipeBase recipe;
         #endregion
@@ -585,8 +585,8 @@ namespace RootTools_Vision
 
         public void InitializeRemoteWorkFactory()
         {
-            const string InitializeStartMsg = "InitializeStart";
-            const string InitializeDoneMsg = "InitializeDone";
+            //const string InitializeStartMsg = "InitializeStart";
+            //const string InitializeDoneMsg = "InitializeDone";
 
             if (remoteMode == REMOTE_MODE.Master)
             {
