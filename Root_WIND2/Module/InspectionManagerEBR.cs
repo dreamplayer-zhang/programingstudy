@@ -16,6 +16,8 @@ namespace Root_WIND2
 		#region [Members]
 		private readonly RecipeEBR recipe;
 		private readonly SharedBufferInfo sharedBufferInfo;
+
+		private WorkplaceBundle workplaceBundle;
 		#endregion
 
 		#region [Properties]
@@ -54,7 +56,7 @@ namespace Root_WIND2
 			int stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
 			int workplaceCnt = 360 / stepDegree;
 
-			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
+			workplaceBundle = new WorkplaceBundle();
 			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, workplaceBundle.Count));
 			
 			for (int i = 0; i < workplaceCnt; i++)
@@ -83,6 +85,10 @@ namespace Root_WIND2
 			workBundle.SetRecipe(recipe);
 
 			return workBundle;
+		}
+		public int GetWorkplaceCount()
+		{
+			return workplaceBundle.Count();
 		}
 
 		protected override bool Ready(WorkplaceBundle workplaces, WorkBundle works)
