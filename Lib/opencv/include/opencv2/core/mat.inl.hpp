@@ -55,6 +55,7 @@
 #endif
 
 #pragma warning(disable: 4793)
+#pragma warning(disable: 6011)
 #pragma warning(disable: 6297)
 #pragma warning(disable: 26451)
 #pragma warning(disable: 26495)
