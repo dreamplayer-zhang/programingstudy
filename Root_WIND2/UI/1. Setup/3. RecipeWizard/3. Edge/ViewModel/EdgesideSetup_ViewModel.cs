@@ -25,10 +25,10 @@ namespace Root_WIND2
 
 		private EdgeSurfaceParameterBase parameter;
 		private int selectedGrabModeIndex = 0;
-		private int camWidth;
-		private int camHeight;
-		private double camResolution;
-		private double camTriggerRatio;
+		//private int camWidth;
+		//private int camHeight;
+		//private double camResolution;
+		//private double camTriggerRatio;
 
 		//private int topOffset;
 		//private int sideOffset;
@@ -41,7 +41,7 @@ namespace Root_WIND2
 		private DataTable defectDataTable;
 		private object selectedDefect;
 		private BitmapSource defectImage;
-		private double triggerRatio = 0;
+		//private double triggerRatio = 0;
 
 		#region [Getter / Setter]
 		public RootViewer_ViewModel DrawToolVM
@@ -66,7 +66,7 @@ namespace Root_WIND2
 			{
 				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
 				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
-				this.TopOffset = inspect.TopOffset;
+				this.TopOffset = inspect.TopPositionOffset;
 			}
 		}
 

@@ -264,7 +264,6 @@ namespace Root_AOP01_Inspection
         #endregion
 
         #region Calc Sequence
-        public int m_nRnR = 1;
         public int p_nRnRCount = 0;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
@@ -394,12 +393,12 @@ namespace Root_AOP01_Inspection
                             //CheckLoad();
                             m_process.p_sInfo = m_process.RunNextSequence();
                             //CheckUnload();
-                            if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            if((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
-                                m_nRnR--;
+                                EQ.p_nRnR--;
                                 p_nRnRCount++;
                                 EQ.p_eState = EQ.eState.Run;
                             }

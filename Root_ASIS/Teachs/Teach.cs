@@ -216,7 +216,7 @@ namespace Root_ASIS.Teachs
         eTimer m_eTimer = eTimer.Stop;
         InfoStrip m_inspectStrip = null;
         MemoryData m_inspectMemory = null; 
-        public string Inspect(InfoStrip infoStrip)
+        public string StartInspect(InfoStrip infoStrip)
         {
             if (infoStrip == null)
             {
@@ -227,6 +227,21 @@ namespace Root_ASIS.Teachs
             m_inspectMemory = m_memoryPool.m_viewer.p_memoryData;
             m_bgwInspect.RunWorkerAsync(); 
             return "OK";
+        }
+
+        public bool IsBusy()
+        {
+            return m_bgwInspect.IsBusy; 
+        }
+
+        public string WaitReady()
+        {
+            while (IsBusy())
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop"; 
+            }
+            return "OK"; 
         }
 
         BackgroundWorker m_bgwInspect = new BackgroundWorker(); 

@@ -266,8 +266,12 @@ namespace RootTools
         public void InitCalcProcess()
         {
             m_qCalcProcess.Clear(); 
-            ModuleRunBase[] aProcess = m_qProcess.ToArray();
-            foreach (ModuleRunBase run in aProcess) m_qCalcProcess.Enqueue(run); 
+            if (EQ.p_nRnR > 1) foreach (ModuleRunBase run in m_moduleRunList.p_aModuleRun) m_qCalcProcess.Enqueue(run);
+            else
+            {
+                ModuleRunBase[] aProcess = m_qProcess.ToArray();
+                foreach (ModuleRunBase run in aProcess) m_qCalcProcess.Enqueue(run); 
+            }
         }
 
         public override void ClearInfo()

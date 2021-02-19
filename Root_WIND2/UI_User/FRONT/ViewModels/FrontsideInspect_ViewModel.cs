@@ -202,7 +202,7 @@ namespace Root_WIND2.UI_User
                 }
 
                 return;
-
+                /*
                 EQ.p_bStop = false;
                 Vision vision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision;
                 if (vision.p_eState != ModuleBase.eState.Ready)
@@ -224,7 +224,7 @@ namespace Root_WIND2.UI_User
                     {
 
                     }
-                }
+                }*/
             });
         }
 

@@ -20,7 +20,7 @@
         <SolidColorBrush x:Key="main_view_background" Color="#505050"/>
 
         <!-- sidetap -->
-        <SolidColorBrush x:Key="sidetap_parent_menu_normal" Color="#202040"/>
+        <SolidColorBrush x:Key="sidetap_parent_menu_normal" Color="#505060"/>
         <SolidColorBrush x:Key="sidetap_parent_menu_mouseover" Color="#404070"/>
         <!--<SolidColorBrush x:Key="sidetap_parent_menu_selected" Color="DarkSlateBlue"/>-->
 

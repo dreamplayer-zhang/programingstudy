@@ -127,14 +127,14 @@ namespace Root_AOP01_Inspection.UI._3._RUN
             dlg_Start.ShowDialog();
             if (p_bRnR)
             {
-                m_handler.m_nRnR = p_nRnR;
+                m_handler.p_nRnRCount = p_nRnR;
                 RNR_UI rnr_ui = new RNR_UI();
                 rnr_ui.Init(m_engineer);
                 rnr_ui.Show();
             }
             else if (!p_bRnR)
             {
-                m_handler.m_nRnR = 1;
+                m_handler.p_nRnRCount = 1;
             }
             p_nRnR = 1;
             return dlg_Start.DialogResult == true;

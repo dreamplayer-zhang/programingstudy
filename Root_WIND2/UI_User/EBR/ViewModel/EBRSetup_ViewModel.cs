@@ -28,6 +28,10 @@ namespace Root_WIND2.UI_User
 		private SeriesCollection measurementGraph;
 		private string[] xLabels;
 
+		private int progress = 0;
+		private int maxProgress = 100;
+		private string percentage = "0";
+
 		private int sizeYMaxVal = 1000; 
 		private double sizeFrom = 0;
 		private double sizeTo = 50;
@@ -76,7 +80,7 @@ namespace Root_WIND2.UI_User
 				}
 
 				if (Recipe.CameraHeight == 0)
-					Recipe.CameraHeight = inspect.Height;
+					Recipe.CameraHeight = inspect.CameraHeight;
 
 				Recipe.TriggerRatio = mode.m_dCamTriggerRatio;
 				Parameter.CamResolution = mode.m_dResX_um;
@@ -84,7 +88,21 @@ namespace Root_WIND2.UI_User
 				SetProperty<int>(ref this.selectedGrabModeIndex, value);
 			}
 		}
-
+		public int Progress
+		{
+			get => progress;
+			set => SetProperty(ref progress, value);
+		}
+		public int MaxProgress
+		{
+			get => maxProgress;
+			set => SetProperty(ref maxProgress, value);
+		}
+		public string Percentage
+		{
+			get => percentage;
+			set => SetProperty(ref percentage, value);
+		}
 		public DataTable MeasurementDataTable
 		{
 			get => measurementDataTable;
@@ -152,6 +170,7 @@ namespace Root_WIND2.UI_User
 			get => new RelayCommand(() =>
 			{
 				this.ImageViewerVM.ClearObjects();
+				Progress = 0;
 				Inspect();
 			});
 		}
@@ -251,7 +270,15 @@ namespace Root_WIND2.UI_User
 
 		private void UpdateProgress()
 		{
+			if (GlobalObjects.Instance.Get<InspectionManagerEBR>() != null)
+			{
+				int workplaceCount = GlobalObjects.Instance.Get<InspectionManagerEBR>().GetWorkplaceCount();
+				MaxProgress = workplaceCount - 1;
+				Progress++;
 
+				int proc = (int)(((double)Progress / MaxProgress) * 100);
+				Percentage = proc.ToString();
+			}
 		}
 
 		private void UpdateDataGrid()

@@ -7,7 +7,7 @@
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:packicon="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools" mc:Ignorable="d" d:DesignHeight="888"
-        d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
+        d:DesignWidth="1912" Background="{StaticResource main_view_background}">
     <UserControl.Resources>
         <local:ModuleStateToColorConverter x:Key="ModuleStateToColorConverters"></local:ModuleStateToColorConverter>
         <Style TargetType="{x:Type TabItem}">
@@ -84,6 +84,43 @@
             <Setter Property="Width"
                     Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"></Setter>
         </Style>
+        <Style x:Key="eq_menu_button" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource groupbox_button_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource groupbox_button_text}"/>
+            <Setter Property="Margin" Value="4,4,0,4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <!--<Setter Property="FontWeight" Value="Bold"/>-->
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                CornerRadius="6"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
+                            </Trigger>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_press}"/>
+                                <Setter Property="Foreground" Value="{StaticResource groupbox_button_press_text}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -149,7 +186,7 @@
                             <RowDefinition Height="1.5*" />
                             <RowDefinition Height="6*" />
                         </Grid.RowDefinitions>
-                        <GroupBox Grid.Row="0" Header="Progress">
+                        <GroupBox Grid.Row="0" Header="Progress" Margin="4" Style="{StaticResource main_view_groupbox}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="1.5*" />
@@ -185,7 +222,7 @@
                                 </UniformGrid>
                             </Grid>
                         </GroupBox>
-                        <GroupBox Grid.Row="1" Header="Product">
+                        <GroupBox Grid.Row="1" Header="Product" Margin="4" Style="{StaticResource main_view_groupbox}">
                             <UniformGrid Margin="20,5" Columns="2">
                                 <TextBlock Text="Cst ID" VerticalAlignment="Center" />
                                 <TextBlock Text="-" VerticalAlignment="Center"
@@ -201,7 +238,7 @@
                                         HorizontalAlignment="Center" />
                             </UniformGrid>
                         </GroupBox>
-                        <GroupBox Grid.Row="2" Header="Module State">
+                        <GroupBox Grid.Row="2" Header="Module State" Margin="4" Style="{StaticResource main_view_groupbox}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition />
@@ -233,11 +270,8 @@
                                                     VerticalAlignment="Center"
                                                     HorizontalAlignment="Center" />
                                             <Button Grid.Column="1" Margin="5" Content="Initial"
-                                                    Command="{Binding CommandHome}"
-                                                    Style="{StaticResource BasicBtn}"
-                                                    BorderThickness="0" Height="{PriorityBinding}"
-                                                    Background="{StaticResource PanelBackGround}"
-                                                    FontSize="13" FontWeight="Bold"></Button>
+                                                    Command="{Binding CommandHome}" 
+                                                    Style="{StaticResource eq_menu_button}"></Button>
                                         </Grid>
 
                                     </Border>
@@ -397,22 +431,22 @@
                                                 <ColumnDefinition></ColumnDefinition>
                                             </Grid.ColumnDefinitions>
                                             <Button Grid.Column="0" Content="BackSide Image"
-                                                    Style="{StaticResource btnImage}"
+                                                    Style="{StaticResource eq_menu_button}"
                                                     Command="{Binding CommandBackSideImageView}"></Button>
                                             <Button Grid.Column="1" Content="Edge Top Image"
-                                                    Style="{StaticResource btnImage}"
+                                                    Style="{StaticResource eq_menu_button}"
                                                     Command="{Binding CommandEdgeTopImageView}"></Button>
                                             <Button Grid.Column="2" Content="Edge Side Image"
-                                                    Style="{StaticResource btnImage}"
+                                                    Style="{StaticResource eq_menu_button}"
                                                     Command="{Binding CommandEdgeSideImageView}"></Button>
                                             <Button Grid.Column="3" Content="Edge Btm Image"
-                                                    Style="{StaticResource btnImage}"
+                                                    Style="{StaticResource eq_menu_button}"
                                                     Command="{Binding CommandEdgeBtmImageView}"></Button>
                                             <Button Grid.Column="4" Content="EBR Image"
-                                                    Style="{StaticResource btnImage}"
+                                                    Style="{StaticResource eq_menu_button}"
                                                     Command="{Binding CommandEBRImageView}"></Button>
                                             <Button Grid.Column="5" Content="Front Image"
-                                                    Style="{StaticResource btnImage}"></Button>
+                                                    Style="{StaticResource eq_menu_button}"></Button>
                                         </Grid>
                                         <tools:RootViewer Grid.Row="2"
                                                 DataContext="{Binding p_Viewer}"></tools:RootViewer>
@@ -423,7 +457,7 @@
                                             <RowDefinition Height="1*"></RowDefinition>
                                             <RowDefinition Height="4*"></RowDefinition>
                                         </Grid.RowDefinitions>
-                                        <GroupBox Grid.Row="0" Header="FDC" Margin="10,0,0,0">
+                                        <GroupBox Grid.Row="0" Header="FDC" Margin="4" Style="{StaticResource main_view_groupbox}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -497,7 +531,7 @@
                                                 </Border>
                                             </Grid>
                                         </GroupBox>
-                                        <GroupBox Grid.Row="1" Header="FFU" Margin="10,0,0,0">
+                                        <GroupBox Grid.Row="1" Header="FFU" Margin="4" Style="{StaticResource main_view_groupbox}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>

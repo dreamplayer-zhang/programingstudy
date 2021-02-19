@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using Root_EFEM.Module;
+using RootTools.GAFs;
 
 namespace Root_WIND2.Module
 {
@@ -27,6 +28,7 @@ namespace Root_WIND2.Module
         DIO_O doVac;
         DIO_O doBlow;
         DIO_I diWaferExist;
+        DIO_I diWaferExistVac;
         MemoryPool memoryPool;
         MemoryGroup memoryGroup;
         MemoryData memoryMain;
@@ -35,6 +37,8 @@ namespace Root_WIND2.Module
         Camera_Dalsa camMain;
         Camera_Silicon camLADS;
         List<List<double>> ladsinfos;
+
+        ALID alid_WaferExist;
 
         #region Getter/Setter
         public Axis AxisZ { get => axisZ; private set => axisZ = value; }
@@ -50,11 +54,14 @@ namespace Root_WIND2.Module
             p_sInfo = m_toolBox.Get(ref doVac, this, "Stage Vacuum");
             p_sInfo = m_toolBox.Get(ref doBlow, this, "Stage Blow");
             p_sInfo = m_toolBox.Get(ref diWaferExist, this, "Wafer Exist");
+            p_sInfo = m_toolBox.Get(ref diWaferExistVac, this, "Wafer Exist Vac Check");
+            
             p_sInfo = m_toolBox.Get(ref memoryPool, this, "BackSide Memory", 1);
             p_sInfo = m_toolBox.Get(ref lightSet, this);
             p_sInfo = m_toolBox.Get(ref camMain, this, "MainCam");
             p_sInfo = m_toolBox.Get(ref camLADS, this, "LADSCam");
             memoryGroup = memoryPool.GetGroup(p_id);
+            alid_WaferExist = m_gaf.GetALID(this, "Wafer Exist", "Wafer Exist");
 
             if (camLADS != null)
                 camLADS.Connect();
@@ -228,7 +235,7 @@ namespace Root_WIND2.Module
         }
 
         public string BeforePut(int nID)
-        {
+        {   
             //            string info = MoveReadyPos();
             //            if (info != "OK") return info;
             return "OK";
@@ -241,6 +248,8 @@ namespace Root_WIND2.Module
 
         public string AfterPut(int nID)
         {
+            if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
+                alid_WaferExist.Run(true, "Wafer Check Error");
             return "OK";
         }
 

@@ -46,7 +46,7 @@ namespace RootTools.Memory
         public delegate void OnReciveData(byte[] aBuf, int nSize);
         public event OnReciveData EventReciveData;
         const int nSize = 1920 * 1080 * 3;
-        IPAddress thisAddress;
+        //IPAddress thisAddress;
         int port;
         Socket mainSock;
         public MemServer()
@@ -161,7 +161,7 @@ namespace RootTools.Memory
             {
                 mainSock.Connect(thisAddress, port);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                return;
             }

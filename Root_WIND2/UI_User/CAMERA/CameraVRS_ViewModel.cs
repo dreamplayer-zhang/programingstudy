@@ -13,7 +13,7 @@ namespace Root_WIND2.UI_User
         public CameraVRS_ViewModel()
         {
             imageViewerVM = new CameraVRS_ImageViewer_ViewModel();
-            imageViewerVM.init();
+            //imageViewerVM.init();
         }
     }
 }
