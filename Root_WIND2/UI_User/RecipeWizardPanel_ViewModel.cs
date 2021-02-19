@@ -80,7 +80,7 @@ namespace Root_WIND2.UI_User
         public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
 
         // Camera
-        public readonly UI_User.Camera_VRS cameraVrs = new UI_User.Camera_VRS();
+        public readonly UI_User.CameraVRS cameraVrs = new UI_User.CameraVRS();
         #endregion
 
         #region [ViewModels]
