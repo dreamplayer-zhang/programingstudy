@@ -88,10 +88,11 @@ namespace Root_WIND2
 		{
 			// 360도 memory height
 			//int bufferHeight = (int)(360000 / recipe.TriggerRatio);	// 첫번째 빈 buffer 지웠을 경우
-			int bufferHeight = (int)(360000 / recipe.TriggerRatio) + recipe.CameraHeight;
+			//int bufferHeight = (int)(360000 / recipe.TriggerRatio) + recipe.CameraHeight;
+			int bufferHeight = (int)(360000 / recipe.TriggerRatio) + recipe.ImageOffset;
 
 			// 검사 시작/끝 Y좌표 설정
-			int startY = recipe.Offset * (bufferHeight / 360);
+			int startY = recipe.PositionOffset * (bufferHeight / 360);
 			int endY = bufferHeight + startY;
 
 			// ROI
@@ -105,7 +106,9 @@ namespace Root_WIND2
 			for (int i = 0; i < bufferHeight / roiHeight; i++)
 			{
 				//int calcStartY = (roiHeight * i) + startY; // 첫번째 빈 buffer 지웠을 경우
-				int calcStartY = (roiHeight * i) + startY + recipe.CameraHeight;
+				//int calcStartY = (roiHeight * i) + startY + recipe.CameraHeight;
+				int calcStartY = (roiHeight * i) + startY + recipe.ImageOffset;
+
 				int calcHeight = roiHeight;
 
 				if ((calcStartY + roiHeight) > endY)

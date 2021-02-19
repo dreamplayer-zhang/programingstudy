@@ -71,7 +71,7 @@
             <Border
                 Background="{StaticResource sidetap_child_background}">
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
-                    <RadioButton Content="VRS Camera " IsChecked="True" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="VRS Camera " Command="{Binding btnCameraVRS}" IsChecked="True" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Align Camera " Style="{StaticResource sidetap_child_radiobutton}"/>
                 </StackPanel>
             </Border>

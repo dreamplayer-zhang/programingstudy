@@ -3,11 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Root_WIND2.UI_User" xmlns:tools="clr-namespace:RootTools;assembly=RootTools" xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:local="clr-namespace:Root_WIND2.UI_User" xmlns:tools="clr-namespace:RootTools;assembly=RootTools" xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf" xmlns:convert="clr-namespace:ViewConverter;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="1600">
     
     <UserControl.Resources>
+        <convert:ConverterVisibleProgress x:Key="ConverterVisibleProgresss"/>
         <Style x:Key="inspection_menu_button" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource groupbox_button_normal}"/>
             <Setter Property="Foreground" Value="{StaticResource groupbox_button_text}"/>
@@ -48,11 +49,7 @@
     </UserControl.Resources>
     
     <Grid Background="{StaticResource main_view_background}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4*"/>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="3*"/>
-        </Grid.ColumnDefinitions>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="46"/>
             <RowDefinition Height="*"/>
@@ -64,12 +61,23 @@
             <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource inspection_menu_button}"/>
         </StackPanel>
 
-        <Grid Grid.Row="1" Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition></RowDefinition>
-            </Grid.RowDefinitions>
-            <WrapPanel/>
-            <Grid Grid.Column="0" Grid.Row="0">
+        <ProgressBar Value="{Binding Progress}" Width="300" Height="35" Maximum="{Binding MaxProgress}"
+                Visibility="{Binding Path=Progress, Converter= {StaticResource ConverterVisibleProgresss}}" />
+        <Border VerticalAlignment="Center" HorizontalAlignment="Center" Width="200" Height="35"
+                Visibility="{Binding Path=Progress, Converter= {StaticResource ConverterVisibleProgresss}}">
+            <TextBlock TextElement.Foreground="Black"
+                    Text="{Binding Percentage, StringFormat={}{0:0}%}"
+                    TextAlignment="Center" FontSize="30"></TextBlock>
+        </Border>
+
+        <Grid Grid.Row="1"  Background="{StaticResource main_view_background}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="80*"/>
                     <ColumnDefinition Width="173"/>
@@ -103,9 +111,10 @@
                     </GroupBox>
                 </Grid>
             </Grid>
-        </Grid>
+        
 
-        <StackPanel Grid.Row="1" Grid.Column="1">
+        
+        <StackPanel Grid.Column="1">
             <Grid Background="{StaticResource main_view_background}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -155,6 +164,16 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Resolution[um]" Style="{StaticResource group_box_item_name_text}"/>
                                 <TextBox Grid.Column="1" IsEnabled="False" Text="{Binding CamResolution}" HorizontalContentAlignment="Center"/>
+                            </Grid>
+
+                            <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}"
+                                  DataContext="{Binding Parameter}">
+                                <Grid.ColumnDefinitions >
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Image Offset[pxl]" Style="{StaticResource group_box_item_name_text}"/>
+                                <TextBox Grid.Column="1" IsEnabled="False" Text="{Binding ImageOffset}" HorizontalContentAlignment="Center"/>
                             </Grid>
                         </StackPanel>
                     </GroupBox>
@@ -287,7 +306,7 @@
             </Grid>
         </StackPanel>
         
-        <Grid Grid.Row="2" Grid.Column="2"
+        <Grid Grid.Column="2"
               Background="{StaticResource main_view_background}">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -316,6 +335,7 @@
                     </lvc:CartesianChart>
                 </Grid>
             </GroupBox>
+            
             <GroupBox Grid.Row="1" Grid.Column="1" Header="Measurement Data" Margin="4"
                                   Style="{StaticResource main_view_groupbox}"
                                   Background="{StaticResource GroupBoxBackground}">
@@ -340,6 +360,8 @@
                     </DataGrid.Resources>
                 </DataGrid>
             </GroupBox>
+            
+        </Grid>
         </Grid>
     </Grid>
 </UserControl>

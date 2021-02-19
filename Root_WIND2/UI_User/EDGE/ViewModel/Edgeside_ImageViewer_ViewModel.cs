@@ -91,7 +91,6 @@ namespace Root_WIND2.UI_User
         public override void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
         {
             base.CanvasMovePoint_Ref(point, nX, nY);
-            MoveDefectPt(point);
             RedrawShapes();
         }
         #endregion
@@ -196,6 +195,10 @@ namespace Root_WIND2.UI_User
 
         private void MoveDefectPt(CPoint point)
 		{
+            if (p_ImageData == null) return;
+
+            CPoint MovePoint = new CPoint();
+            MovePoint.X = point.X + p_View_Rect.Width;
         }
 	}
 }
