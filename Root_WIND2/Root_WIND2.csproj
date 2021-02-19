@@ -290,6 +290,9 @@
     <Compile Include="UI_User\BACK\ViewModels\BacksideInspect_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ViewModel.cs" />
+    <Compile Include="UI_User\CAMERA\CameraAlign.xaml.cs">
+      <DependentUpon>CameraAlign.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_User\CAMERA\CameraVRS.xaml.cs">
       <DependentUpon>CameraVRS.xaml</DependentUpon>
     </Compile>
@@ -298,6 +301,8 @@
     <Compile Include="UI_User\CAMERA\MotionControlViewer.xaml.cs">
       <DependentUpon>MotionControlViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_User\CAMERA\ViewModels\CameraAlign_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\CAMERA\ViewModels\CameraAlign_ViewModel.cs" />
     <Compile Include="UI_User\EBR\EBRSetup.xaml.cs">
       <DependentUpon>EBRSetup.xaml</DependentUpon>
     </Compile>
@@ -713,6 +718,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\BACK\BacksideInspect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\CAMERA\CameraAlign.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
