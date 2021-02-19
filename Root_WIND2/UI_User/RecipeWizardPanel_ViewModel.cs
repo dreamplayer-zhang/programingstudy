@@ -129,8 +129,8 @@ namespace Root_WIND2.UI_User
         }
 
         #region [Camera ViewModes]
-        private UI_User.CameraVRS_ViewModel cameraVrsVM = new UI_User.CameraVRS_ViewModel();
-        public UI_User.CameraVRS_ViewModel CameraVrsVM
+        private UI_User.CameraVRS_ImageViewer_ViewModel cameraVrsVM = new UI_User.CameraVRS_ImageViewer_ViewModel();
+        public UI_User.CameraVRS_ImageViewer_ViewModel CameraVrsVM
         {
             get => cameraVrsVM;
         }

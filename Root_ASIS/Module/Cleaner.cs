@@ -231,47 +231,69 @@ namespace Root_ASIS.Module
         #region RunClean
         public string RunCleaner()
         {
-            StartBackgroudWork(); 
-            if (m_diSensor[0].p_bIn || m_diSensor[1].p_bIn) return "Check Clean Sensor";
-            double dY = Strip.p_szStrip.Y - Strip.m_szStripTeach.Y;
-            if (CheckProduct(0, true) != "OK") return "Pusher Side Product Sensor not Detected";
-            if (CheckProduct(1, false) != "OK") return "Gripper Side Product Sensor Detected";
-            m_axis[0].StartMove(ePosPusher.Load, -dY / 2);
-            m_axis[1].StartMove(ePosGripper.Start);
-            if (Run(m_axis[0].WaitReady())) return p_sInfo;
-            if (Run(RunAlign(0))) return p_sInfo;
-            m_dioGrip[1].Write(false);
-            if (Run(RunGrip(0, true))) return p_sInfo;
-            if (Run(RunGrip(1, false))) return p_sInfo;
-            m_axis[0].StartMove(ePosPusher.Ready, -dY / 2);
-            if (Run(m_axis[0].WaitReady())) return p_sInfo;
-            if (Run(m_axis[1].WaitReady())) return p_sInfo;
-            if (Run(RunGrip(1, true))) return p_sInfo;
-            if (Run(RunGrip(0, false))) return p_sInfo;
-            m_axis[0].StartMove(0);
-            p_bBlowOn = true;
-            m_axis[1].StartMove(ePosGripper.Start, -Strip.p_szStrip.Y, eSpeed.Clean);
-            if (Run(m_axis[1].WaitReady())) return p_sInfo;
-            p_bBlowOn = false;
-            m_axis[1].StartMove(ePosGripper.Done, -dY / 2);
-            if (Run(m_axis[1].WaitReady())) return p_sInfo;
-            if (Run(RunGrip(1, false))) return p_sInfo;
-            m_axis[1].StartMove(0);
-            if (Run(RunAlign(1))) return p_sInfo;
-            if (Run(m_axis[0].WaitReady())) return p_sInfo;
-            if (Run(m_axis[1].WaitReady())) return p_sInfo;
-            if (CheckProduct(0, false) != "OK") return "Pusher Side Product Sensor Detected";
-            if (CheckProduct(1, true) != "OK") return "Gripper Side Product Sensor not Detected";
-            if (m_bgw0.IsBusy || m_bgw1.IsBusy)
+            while (p_infoStrip1 != null)
             {
-                m_bRunBGW = false;
-                return "Check Strip Length Error"; 
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop"; 
             }
-            if (Run(CompareLength(0))) return p_sInfo;
-            if (Run(CompareLength(1))) return p_sInfo;
-            p_infoStrip1 = p_infoStrip0;
-            p_infoStrip0 = null;
-            return "OK";
+            try
+            {
+                StartBackgroudWork();
+                if (m_diSensor[0].p_bIn || m_diSensor[1].p_bIn) return "Check Clean Sensor";
+                double dY = Strip.p_szStrip.Y - Strip.m_szStripTeach.Y;
+                if (CheckProduct(0, true) != "OK") return "Pusher Side Product Sensor not Detected";
+                if (CheckProduct(1, false) != "OK") return "Gripper Side Product Sensor Detected";
+                m_axis[0].StartMove(ePosPusher.Load, -dY / 2);
+                m_axis[1].StartMove(ePosGripper.Start);
+                if (Run(m_axis[0].WaitReady())) return p_sInfo;
+                if (Run(RunAlign(0))) return p_sInfo;
+                m_dioGrip[1].Write(false);
+                if (Run(RunGrip(0, true))) return p_sInfo;
+                if (Run(RunGrip(1, false))) return p_sInfo;
+                m_axis[0].StartMove(ePosPusher.Ready, -dY / 2);
+                if (Run(m_axis[0].WaitReady())) return p_sInfo;
+                if (Run(m_axis[1].WaitReady())) return p_sInfo;
+                if (Run(RunGrip(1, true))) return p_sInfo;
+                if (Run(RunGrip(0, false))) return p_sInfo;
+                m_axis[0].StartMove(0);
+                p_bBlowOn = true;
+                m_axis[1].StartMove(ePosGripper.Start, -Strip.p_szStrip.Y, eSpeed.Clean);
+                if (Run(m_axis[1].WaitReady())) return p_sInfo;
+                p_bBlowOn = false;
+                m_axis[1].StartMove(ePosGripper.Done, -dY / 2);
+                if (Run(m_axis[1].WaitReady())) return p_sInfo;
+                if (Run(RunGrip(1, false))) return p_sInfo;
+                m_axis[1].StartMove(0);
+                if (Run(RunAlign(1))) return p_sInfo;
+                if (Run(m_axis[0].WaitReady())) return p_sInfo;
+                if (Run(m_axis[1].WaitReady())) return p_sInfo;
+                if (CheckProduct(0, false) != "OK") return "Pusher Side Product Sensor Detected";
+                if (CheckProduct(1, true) != "OK") return "Gripper Side Product Sensor not Detected";
+                if (m_bgw0.IsBusy || m_bgw1.IsBusy)
+                {
+                    m_bRunBGW = false;
+                    return "Check Strip Length Error";
+                }
+                if (Run(CompareLength(0))) return p_sInfo;
+                if (Run(CompareLength(1))) return p_sInfo;
+                p_infoStrip1 = p_infoStrip0;
+                p_infoStrip0 = null;
+                return "OK";
+            }
+            finally
+            {
+                p_bBlowOn = false; 
+                RunGrip(0, false);
+                RunGrip(1, false);
+                m_axis[0].StartMove(0);
+                m_axis[1].StartMove(0);
+                m_bRunBGW = false;
+            }
+        }
+
+        public string StartCleaner()
+        {
+            return StartRun(m_runClean); //forget Recipe
         }
 
         double m_fCompareError = 10; 
@@ -319,9 +341,17 @@ namespace Root_ASIS.Module
         void CheckLength(int nSide)
         {
             m_aLength[nSide] = 0;
-            while (m_bRunBGW && m_diSensor[nSide].p_bIn == false) Thread.Sleep(1);
+            while (m_diSensor[nSide].p_bIn == false)
+            {
+                Thread.Sleep(1);
+                if (m_bRunBGW == false) return; 
+            }
             double fStart = m_axis[nSide].p_posCommand;
-            while (m_bRunBGW && m_diSensor[nSide].p_bIn) Thread.Sleep(1);
+            while (m_diSensor[nSide].p_bIn)
+            {
+                Thread.Sleep(1);
+                if (m_bRunBGW == false) return;
+            }
             m_aLength[nSide] = Math.Abs(m_axis[nSide].p_posCommand - fStart); 
         }
         #endregion

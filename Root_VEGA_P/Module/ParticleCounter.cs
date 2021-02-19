@@ -33,6 +33,16 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
+        #region Property
+        int _nUnit = 1;
+        byte m_nUnit = 1;
+        void RunTreeProperty(Tree tree)
+        {
+            _nUnit = tree.Set(_nUnit, _nUnit, "Unit", "Modbus Unit #");
+            m_nUnit = (byte)_nUnit;
+        }
+        #endregion
+
         #region SolValve
         public class SolValve
         {
@@ -163,25 +173,6 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-        #region Modbus
-        string ConnectModbus()
-        {
-            if (m_modbus.m_client.Connected) return "OK";
-            p_sInfo = m_modbus.Connect();
-            return m_modbus.m_client.Connected ? "OK" : "Modbus Connect Error";
-        }
-        #endregion
-
-        #region Property
-        int _nUnit = 1;
-        byte m_nUnit = 1;
-        void RunTreeProperty(Tree tree)
-        {
-            _nUnit = tree.Set(_nUnit, _nUnit, "Unit", "Modbus Unit #");
-            m_nUnit = (byte)_nUnit;
-        }
-        #endregion
-
         #region RS232
         string ConnectRS232()
         {
@@ -232,23 +223,49 @@ namespace Root_VEGA_P.Module
             p_fPressure = ((m_aPressure[0] & 0xffff) << 16) + (m_aPressure[1] & 0xffff);
             return "OK";
         }
-        /*
-        double m_dfPressure = 0.05; 
-        public string RunPressure()
+        #endregion
+
+        #region Set Pressure
+        const double c_fPressureSet = 0.03; 
+        public string RunSetPressure(bool bPumpOn)
         {
-            RunPump(p_nPump); 
-            for (int n = 0; n < 10; n ++)
+            if (Run(RunPump(p_nPump))) return p_sInfo;
+            if (Run(ConnectModbus())) return p_sInfo;
+            if (Run(m_modbus.WriteCoils(m_nUnit, 8, false))) return p_sInfo;
+            if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 2, 1))) return p_sInfo;
+            if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 3, 1))) return p_sInfo;
+            if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 4, 0))) return p_sInfo;
+            if (Run(m_modbus.WriteCoils(m_nUnit, 0, true))) return p_sInfo;
+            try
             {
-                Thread.Sleep(2000);
-                ReadPressure();
-                double dfPressure = Math.Abs(p_fPressure - 1); 
-                if (dfPressure > 0.1) return "Pressure Range over";
-                if (dfPressure < m_dfPressure) return "OK";
-                p_nPump = (int)Math.Round(p_nPump / p_fPressure); 
+                int dV = -4; 
+                while (EQ.IsStop() == false)
+                {
+                    Thread.Sleep(1000);
+                    ReadPressure();
+                    if (Math.Abs(p_fPressure - 1) < c_fPressureSet) return "OK"; 
+                    if ((dV > 0) && (p_fPressure > 1)) dV = -dV + 1;
+                    if ((dV < 0) && (p_fPressure < 1)) dV = -dV;
+                    p_nPump += dV;
+                    return "OK"; 
+                }
+                return "EQ Stop";
             }
-            return "Pressure Error"; 
+            finally
+            {
+                if (bPumpOn == false) RunPump(0); 
+                m_modbus.WriteCoils(m_nUnit, 0, false);
+            }
         }
-        */
+        #endregion
+
+        #region Modbus
+        string ConnectModbus()
+        {
+            if (m_modbus.m_client.Connected) return "OK";
+            p_sInfo = m_modbus.Connect();
+            return m_modbus.m_client.Connected ? "OK" : "Modbus Connect Error";
+        }
         #endregion
 
         #region Sample
@@ -399,7 +416,8 @@ namespace Root_VEGA_P.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
-            AddModuleRunList(new Run_Pump(this), false, "Run Vacuum Pump");
+            AddModuleRunList(new Run_Pump(this), false, "Run Pump");
+            AddModuleRunList(new Run_Pressure(this), false, "Run Set Pump Pressure");
             AddModuleRunList(new Run_Run(this), false, "Run Particle Counter");
         }
 
@@ -466,6 +484,31 @@ namespace Root_VEGA_P.Module
             }
         }
 
+        public class Run_Pressure : ModuleRunBase
+        {
+            ParticleCounter m_module;
+            public Run_Pressure(ParticleCounter module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Pressure run = new Run_Pressure(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunSetPressure(false);
+            }
+        }
+
         public class Run_Run : ModuleRunBase
         {
             ParticleCounter m_module;
@@ -487,6 +530,7 @@ namespace Root_VEGA_P.Module
 
             public override string Run()
             {
+                if (m_module.Run(m_module.RunSetPressure(true))) return p_sInfo; 
                 m_module.StartReadParticle();
                 return m_module.WaitDone();
             }

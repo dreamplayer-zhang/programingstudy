@@ -171,7 +171,7 @@ namespace Root_AOP01_Inspection
             EQ.p_bStop = false;
             m_handler.m_process.m_dSequencePercent = 0;
             m_handler.m_process.ClearInfoWafer();
-            m_handler.m_nRnR = 0; //Init 할때 RNR 카운트초기화
+            m_handler.p_nRnRCount = 0; //Init 할때 RNR 카운트초기화
             m_handler.m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState = InfoCarrier.eState.Placed;  //210201 모니터링필요 EQ.Stop 되고 이닛누르면 간헐적으로 Loadport Docking 상태로 무언정지 생김
             EQ.p_eState = EQ.eState.Home;
         }

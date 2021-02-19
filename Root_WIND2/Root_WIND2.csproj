@@ -298,7 +298,7 @@
     </Compile>
     <Compile Include="UI_User\CAMERA\CameraVRS_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\CAMERA\CameraVRS_ViewModel.cs" />
-    <Compile Include="UI_User\CAMERA\MotionControlViewer.xaml.cs">
+    <Compile Include="UI_User\CAMERA\MotionViewer\MotionControlViewer.xaml.cs">
       <DependentUpon>MotionControlViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\CAMERA\ViewModels\CameraAlign_ImageViewer_ViewModel.cs" />
@@ -729,7 +729,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_User\CAMERA\MotionControlViewer.xaml">
+    <Page Include="UI_User\CAMERA\MotionViewer\MotionControlViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -258,6 +258,8 @@
     <Compile Include="ModuleRun\Run_Delay.cs" />
     <Compile Include="ModuleRun\Run_InitCalibration.cs" />
     <Compile Include="ModuleRun\Run_Measure.cs" />
+    <Compile Include="Module\Interlock.cs" />
+    <Compile Include="Module\TowerLamp.cs" />
     <Compile Include="UI_Dialog\test.xaml.cs">
       <DependentUpon>test.xaml</DependentUpon>
     </Compile>

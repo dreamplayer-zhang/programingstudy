@@ -52,6 +52,7 @@ namespace RootTools_Vision.Utility
 		public String tempString;
 		public float resX;
 		public float resY;
+
 		#endregion
 
 		public bool Save(StreamWriter sw)
