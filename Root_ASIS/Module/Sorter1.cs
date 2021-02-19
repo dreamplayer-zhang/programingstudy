@@ -3,11 +3,7 @@ using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Root_ASIS.Module
 {
@@ -131,8 +127,11 @@ namespace Root_ASIS.Module
         string RunLoadEV()
         {
             LoadEV loadEV = m_paperEV; 
-            if (m_trays.p_bFull) return "Run Load Cancel : Tray Full";
-            if (m_picker.p_infoStrip != null) return "Run Load Cancel : Picker Already has Strip";
+            if (EQ.p_eState == EQ.eState.Run)
+            {
+                if (m_trays.p_bFull) return "Run Load Cancel : Tray Full";
+                if (m_picker.p_infoStrip != null) return "Run Load Cancel : Picker Already has Strip";
+            }
             try
             {
                 for (int nTry = 0; nTry < m_nRetry; nTry++)
@@ -260,7 +259,11 @@ namespace Root_ASIS.Module
             }
             else
             {
-                if (m_paperEV.p_bDone) return StartRun(m_runLoad);
+                if (m_paperEV.p_bUsePaper == false) m_trays.m_cpNeedPaper = null;
+                else
+                {
+                    if (m_paperEV.p_bDone) return StartRun(m_runLoad);
+                }
             }
             return "OK"; 
         }

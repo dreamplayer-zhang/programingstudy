@@ -93,20 +93,24 @@ namespace Root_ASIS.Module
         {
             if (m_loadEV.p_bDone == false) return "LoadEV not Done";
             if (Run(AxisMove(ePos.LoadEV, m_loadEV.p_bPaper ? ePicker.Paper : ePicker.Strip))) return p_sInfo;
-            if (m_loadEV.p_bPaper == false)
+            try
             {
-                if (m_aPicker[ePicker.Paper].p_infoStrip != null) m_aPicker[ePicker.Paper].StartUnload();
-                if (Run(m_aPicker[ePicker.Strip].RunLoadEV(m_loadEV))) return p_sInfo;
-                m_aPicker[ePicker.Strip].p_infoStrip = m_loadEV.GetNewInfoStrip();
-                if (Run(m_aPicker[ePicker.Paper].WaitReady())) return p_sInfo;
-                m_aPicker[ePicker.Paper].p_infoStrip = null; 
+                if (m_loadEV.p_bPaper == false)
+                {
+                    if (m_aPicker[ePicker.Paper].p_infoStrip != null) m_aPicker[ePicker.Paper].StartUnload();
+                    if (Run(m_aPicker[ePicker.Strip].RunLoadEV(m_loadEV))) return p_sInfo;
+                    m_aPicker[ePicker.Strip].p_infoStrip = m_loadEV.GetNewInfoStrip();
+                    if (Run(m_aPicker[ePicker.Paper].WaitReady())) return p_sInfo;
+                    m_aPicker[ePicker.Paper].p_infoStrip = null;
+                }
+                else
+                {
+                    if (Run(m_aPicker[ePicker.Paper].RunLoadEV(m_loadEV))) return p_sInfo;
+                    m_aPicker[ePicker.Paper].p_infoStrip = new InfoStrip(-1);
+                }
+                return "OK";
             }
-            else
-            {
-                if (Run(m_aPicker[ePicker.Paper].RunLoadEV(m_loadEV))) return p_sInfo;
-                m_aPicker[ePicker.Paper].p_infoStrip = new InfoStrip(-1); 
-            }
-            return "OK";
+            finally { m_loadEV.StartLoad(); }
         }
 
         string RunLoadMGZ()
@@ -124,7 +128,8 @@ namespace Root_ASIS.Module
                     if (Run(AxisMove(ePos.Boat, 0))) return p_sInfo;
                     if (Run(m_aPicker[ePicker].RunUnload())) return p_sInfo;
                     m_boat.p_infoStrip = m_aPicker[ePicker.Strip].p_infoStrip;
-                    m_aPicker[ePicker.Strip].p_infoStrip = null; 
+                    m_aPicker[ePicker.Strip].p_infoStrip = null;
+                    if (EQ.p_eState == EQ.eState.Run) m_boat.StartInspect();
                     break;
                 case ePicker.Paper: 
                     if (Run(AxisMove(ePos.LoadEV, ePicker.Strip))) return p_sInfo;

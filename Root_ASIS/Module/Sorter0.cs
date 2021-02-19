@@ -134,8 +134,12 @@ namespace Root_ASIS.Module
         Cleaner.eCleaner m_eCleanerLoad = Cleaner.eCleaner.Cleaner0; 
         string RunLoad(Cleaner.eCleaner eCleaner)
         {
-            if (m_trays.p_bFull) return "Run Load Cancel : Tray Full";
-            if (m_picker.p_infoStrip != null) return "Run Load Cancel : Picker Already has Strip";
+            if (EQ.p_eState == EQ.eState.Run)
+            {
+                if (m_trays.p_bFull) return "Run Load Cancel : Tray Full";
+                if (m_picker.p_infoStrip != null) return "Run Load Cancel : Picker Already has Strip";
+                if (m_aCleaner[eCleaner].p_infoStrip1 == null) return "Run Load Cancel : Cleaner has no Strip";
+            }
             try
             {
                 for (int nTry = 0; nTry < m_nTry; nTry++)
@@ -153,7 +157,8 @@ namespace Root_ASIS.Module
                     {
                         m_picker.p_infoStrip = m_aCleaner[eCleaner].p_infoStrip1;
                         m_aCleaner[eCleaner].p_infoStrip1 = null;
-                        m_eCleanerLoad = eCleaner; 
+                        m_eCleanerLoad = eCleaner;
+                        m_cpTrayUnload = m_trays.GetTrayPosition(m_picker.p_infoStrip);
                         return "OK"; 
                     }
                 }
@@ -171,11 +176,12 @@ namespace Root_ASIS.Module
         #endregion
 
         #region RunUnload
+        CPoint m_cpTrayUnload = null;
         string RunUnload(CPoint cpTray)
         {
             if (m_trays.p_bFull) return "Run Unload Cancel : Tray Full";
             if (m_picker.p_infoStrip == null) return "Run Unload Cancel : Picker has no Strip";
-            Cleaner.eCleaner eCleanerNext = 1 - m_eCleanerLoad; 
+            ePosX ePosReturn = (m_eCleanerLoad == Cleaner.eCleaner.Cleaner0) ? ePosX.Cleaner1 : ePosX.Cleaner0;
             try
             {
                 if (Run(AxisMoveZ(ePosZ.TrayBottom, GetTrayOffsetZ(cpTray.Y)))) return p_sInfo;
@@ -188,19 +194,15 @@ namespace Root_ASIS.Module
                 Unload();
                 m_trays.AddSort(cpTray);
                 m_picker.p_infoStrip = null;
-                m_cpTrayUnload = null; 
-                if ((m_aCleaner[eCleanerNext].p_infoStrip1 == null) && (m_aCleaner[1 - eCleanerNext].p_infoStrip1 != null)) eCleanerNext = 1 - eCleanerNext;
-                ePosX ePosX = (eCleanerNext == Cleaner.eCleaner.Cleaner0) ? ePosX.Cleaner0 : ePosX.Cleaner1;
-                if (Run(m_axisX.StartMove(ePosX))) return p_sInfo; 
-                m_bgwCalcTray.RunWorkerAsync(eCleanerNext); 
-                while (m_bgwCalcTray.IsBusy)
+                if (cpTray == m_cpTrayUnload)
                 {
-                    Thread.Sleep(10);
-                    if (EQ.IsStop()) return "EQ Stop";
+                    m_trays.m_cpNeedPaper = m_cpTrayUnload;
+                    m_cpTrayUnload = null;
                 }
+                if (Run(m_axisX.StartMove(ePosReturn))) return p_sInfo; 
                 return m_axisX.WaitReady(); 
             }
-            finally { AxisMoveX((eCleanerNext == Cleaner.eCleaner.Cleaner0) ? ePosX.Cleaner0 : ePosX.Cleaner1); }
+            finally { m_axisX.StartMove(ePosReturn); }
         }
 
         double m_dzUnload = 1;
@@ -222,29 +224,6 @@ namespace Root_ASIS.Module
         void RunTreeUnload(Tree tree)
         {
             m_dzUnload = tree.Set(m_dzUnload, m_dzUnload, "dZ Unload", "Unload Down dZ (unit)");
-        }
-        #endregion
-
-        #region CalcTray
-        BackgroundWorker m_bgwCalcTray = new BackgroundWorker();
-        void InitBackgroundWork()
-        {
-            m_bgwCalcTray.DoWork += M_bgwCalcTray_DoWork;
-        }
-
-        CPoint m_cpTrayUnload = null;
-        private void M_bgwCalcTray_DoWork(object sender, DoWorkEventArgs e)
-        {
-            Cleaner.eCleaner eCleaner = (Cleaner.eCleaner)sender; 
-            while (m_aCleaner[eCleaner].p_infoStrip1 == null)
-            {
-                Thread.Sleep(10);
-                eCleaner = 1 - eCleaner; 
-            }
-            InfoStrip infoStrip = m_aCleaner[eCleaner].p_infoStrip1;
-            m_eCleanerLoad = eCleaner; 
-            m_cpTrayUnload = m_trays.GetTrayPosition(infoStrip);
-            m_trays.m_cpNeedPaper = m_cpTrayUnload; 
         }
         #endregion
 
@@ -289,14 +268,9 @@ namespace Root_ASIS.Module
             }
             else
             {
-                if (m_cpTrayUnload == null)
-                {
-                    if (m_bgwCalcTray.IsBusy) return "OK";
-                    m_bgwCalcTray.RunWorkerAsync();
-                    return "OK";
-                }
-                if (m_aCleaner[m_eCleanerLoad].p_infoStrip1 == null) return "OK";
-                return StartRunLoad(m_eCleanerLoad); 
+                if (m_aCleaner[m_eCleanerLoad].p_infoStrip1 != null) return StartRunLoad(m_eCleanerLoad);
+                m_eCleanerLoad = 1 - m_eCleanerLoad;
+                return "OK";
             }
         }
 
@@ -342,7 +316,6 @@ namespace Root_ASIS.Module
             m_trays = trays;
             InitPicker();
             base.InitBase(id, engineer);
-            InitBackgroundWork();
             InitThreadCheck();
         }
 

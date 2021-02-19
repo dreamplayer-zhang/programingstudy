@@ -57,12 +57,12 @@ namespace Root_ASIS.Module
         #region RunLoad
         public string RunLoad()
         {
-            if (m_boat1.p_bDone == false) return "Boat1 not Done";
+            if (m_boat.p_bDone == false) return "Boat1 not Done";
             if (m_picker.p_infoStrip != null) return "Picker already Load";
             if (Run(AxisMove(ePos.Boat1))) return p_sInfo;
             if (Run(m_picker.RunLoad())) return p_sInfo;
-            m_picker.p_infoStrip = m_boat1.p_infoStrip;
-            m_boat1.p_infoStrip = null;
+            m_picker.p_infoStrip = m_boat.p_infoStrip;
+            m_boat.p_infoStrip = null;
             return "OK";
         }
         #endregion
@@ -81,6 +81,7 @@ namespace Root_ASIS.Module
                 if (Run(AxisMove(ePos.Boat1))) return p_sInfo;
                 cleaner.p_infoStrip0 = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
+                if (EQ.p_eState == EQ.eState.Run) cleaner.StartCleaner(); 
                 return "OK";
             }
             finally { AxisMove(ePos.Boat1); }
@@ -136,7 +137,7 @@ namespace Root_ASIS.Module
             }
             else
             {
-                if (m_boat1.p_bDone) StartRun(m_runLoad);
+                if (m_boat.p_bDone) StartRun(m_runLoad);
             }
             return "OK";
         }
@@ -174,11 +175,11 @@ namespace Root_ASIS.Module
         }
         #endregion
 
-        Boat m_boat1;
+        Boat m_boat;
         Dictionary<Cleaner.eCleaner, Cleaner> m_aCleaner; 
         public Loader3(string id, IEngineer engineer, Boat boat1, Dictionary<Cleaner.eCleaner, Cleaner> aCleaner)
         {
-            m_boat1 = boat1;
+            m_boat = boat1;
             m_aCleaner = aCleaner; 
             InitPicker();
             base.InitBase(id, engineer);

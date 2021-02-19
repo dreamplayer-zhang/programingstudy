@@ -14,7 +14,7 @@ namespace Root_ASIS.Module
 {
     public class Boat : ModuleBase
     {
-        #region eCleaner
+        #region eBoat
         public enum eBoat
         {
             Boat0,
@@ -103,7 +103,6 @@ namespace Root_ASIS.Module
                 OnPropertyChanged();
             }
         }
-
         #endregion
 
         #region Axis Function
@@ -224,36 +223,54 @@ namespace Root_ASIS.Module
         }
         #endregion
 
-        #region Grab
+        #region Run
         double m_vGrab = 10; 
         double m_dpAcc = 10;
-        public string RunGrab(string sLightMode)
+        public string RunInspect(string sLightMode, bool bInsepect)
         {
             StopWatch sw = new StopWatch();
             LightMode lightMode = GetLightMode(sLightMode);
-            if (lightMode != null) lightMode.p_bLightOn = true; 
-            p_bVacuum = true;
-            p_bCleanBlow = true;
-            double posStart = m_axis.m_trigger.m_aPos[0] - m_dpAcc;
-            if (m_axis.p_posCommand < posStart)
+            try
             {
-                m_axis.StartMove(posStart);
-                if (Run(m_axis.WaitReady())) return p_sInfo; 
+                if (lightMode != null) lightMode.p_bLightOn = true;
+                p_bVacuum = true;
+                p_bCleanBlow = true;
+                double posStart = m_axis.m_trigger.m_aPos[0] - m_dpAcc;
+                if (m_axis.p_posCommand < posStart)
+                {
+                    m_axis.StartMove(posStart);
+                    if (Run(m_axis.WaitReady())) return p_sInfo;
+                }
+                if (Run(m_teach.WaitReady())) return p_sInfo;
+                m_axis.RunTrigger(true);
+                Axis.Trigger trigger = m_axis.m_trigger;
+                int nLine = (int)Math.Round((trigger.m_aPos[1] - trigger.m_aPos[0]) / trigger.m_dPos);
+                if (Run(m_cam.StartGrab(new CPoint(), nLine))) return p_sInfo;
+                double v = m_axis.GetSpeedValue(Axis.eSpeed.Move).m_v;
+                double posDone = m_axis.GetPosValue(ePos.Done);
+                m_axis.StartMoveV(v, posStart, m_vGrab, posDone);
+                while (m_cam.p_bOnGrab && (m_axis.p_posCommand < posDone)) Thread.Sleep(10);
+                m_axis.OverrideVelocity(v);
+                if (bInsepect) m_teach.StartInspect(p_infoStrip);
+                if (Run(m_axis.WaitReady())) return p_sInfo;
+                if (m_cam.p_bOnGrab) return "Camera Dalsa OnGrab Error";
+                p_bCleanBlow = false;
+                if (lightMode != null) lightMode.p_bLightOn = false;
+                m_log.Info("RunGrab Done : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00"));
+                p_bDone = true; 
+                return "OK";
             }
-            m_axis.RunTrigger(true);
-            Axis.Trigger trigger = m_axis.m_trigger; 
-            int nLine = (int)Math.Round((trigger.m_aPos[1] - trigger.m_aPos[0]) / trigger.m_dPos);
-            if (Run(m_cam.StartGrab(new CPoint(), nLine))) return p_sInfo; 
-            double v = m_axis.GetSpeedValue(Axis.eSpeed.Move).m_v;
-            double posDone = m_axis.GetPosValue(ePos.Done); 
-            m_axis.StartMoveV(v, posStart, m_vGrab, posDone);
-            while (m_cam.p_bOnGrab && (m_axis.p_posCommand < posDone)) Thread.Sleep(10);
-            m_axis.OverrideVelocity(v);
-            if (Run(m_axis.WaitReady())) return p_sInfo;
-            if (m_cam.p_bOnGrab) return "Camera Dalsa OnGrab Error";
-            p_bCleanBlow = false;
-            if (lightMode != null) lightMode.p_bLightOn = false;
-            m_log.Info("RunGrab Done : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00")); 
+            finally
+            {
+                if (lightMode != null) lightMode.p_bLightOn = false;
+                p_bVacuum = false;
+                p_bCleanBlow = false;
+            }
+        }
+
+        public string StartInspect()
+        {
+            StartRun(m_runInspect); //forget Recipe 
             return "OK"; 
         }
 
@@ -374,12 +391,14 @@ namespace Root_ASIS.Module
         }
 
         #region ModuleRun
-        ModuleRunBase m_runMove; 
+        ModuleRunBase m_runMove;
+        ModuleRunBase m_runInspect;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
             m_runMove = AddModuleRunList(new Run_Move(this), false, "Move Boat");
             AddModuleRunList(new Run_Grab(this), false, "Grab LineScan");
+            m_runInspect = AddModuleRunList(new Run_Inspect(this), false, "Run Grab & Inspect");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -464,7 +483,35 @@ namespace Root_ASIS.Module
 
             public override string Run()
             {
-                return m_module.RunGrab(m_sLightMode); 
+                return m_module.RunInspect(m_sLightMode, false); 
+            }
+        }
+
+        public class Run_Inspect : ModuleRunBase
+        {
+            Boat m_module;
+            public Run_Inspect(Boat module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            string m_sLightMode = "";
+            public override ModuleRunBase Clone()
+            {
+                Run_Inspect run = new Run_Inspect(m_module);
+                run.m_sLightMode = m_sLightMode;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_sLightMode = tree.Set(m_sLightMode, m_sLightMode, m_module.p_asLightMode, "LightMode", "LightMode ID", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.RunInspect(m_sLightMode, true);
             }
         }
         #endregion
