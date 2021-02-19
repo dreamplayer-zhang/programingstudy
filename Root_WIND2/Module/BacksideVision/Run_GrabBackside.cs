@@ -135,6 +135,7 @@ namespace Root_WIND2.Module
                         m_MaingrabMode.m_eGrabDirection = eGrabDirection.Forward;
 
                     grabData.bInvY = m_MaingrabMode.m_eGrabDirection == eGrabDirection.Forward;
+                    //grabData.nScanOffsetY = Convert.ToInt32( (nScanLine + m_MaingrabMode.m_ScanStartLine) * (4.0 / 22));  //* m_MaingrabMode.m_nYOffset;
 
                     double dPosX = m_MaingrabMode.m_rpAxisCenter.X - nWaferSizeY_px * (double)m_MaingrabMode.m_dTrigger / 2
                         + (nScanLine + m_MaingrabMode.m_ScanStartLine) * nCamWidth * dXScale;
@@ -155,7 +156,7 @@ namespace Root_WIND2.Module
                         int nLADSMaxScanNum = Convert.ToInt32((m_LADSgrabMode.m_nWaferSize_mm * nMMPerUM / m_LADSgrabMode.m_dResY_um) / m_LADSgrabMode.m_camera.GetRoiSize().X);
                         int nMainMaxScanNum = nWaferSizeY_px / m_MaingrabMode.m_camera.GetRoiSize().X;
 
-                        int ladsinfonum = nLADSMaxScanNum * nScanLine / nMainMaxScanNum;
+                        int ladsinfonum = nLADSMaxScanNum * (nScanLine+ m_MaingrabMode.m_ScanStartLine) / nMainMaxScanNum;
                         SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, SetScanAxisPos(ladsinfonum, dTriggerStartPosY, dTriggerEndPosY),
                             new List<double>(m_module.LadsInfos[ladsinfonum]), m_MaingrabMode.m_bUseBiDirectionScan && (nScanLine % 2 != 0), nScanSpeed);
                     }
@@ -190,7 +191,6 @@ namespace Root_WIND2.Module
             GrabedArgs ga = (GrabedArgs)e;
             m_module.p_nProgress = ga.nProgress;
         }
-
 
         #region LADS Functions
         private List<double> SetScanAxisPos(int nScanLine, double dTriggerStartPosY, double dTriggerEndPosY)
@@ -267,12 +267,12 @@ namespace Root_WIND2.Module
             for(int i=0;i<darrZAxisPos.Count;i++)
             {
                 darrPosition[iIdxScan] = darrScanAxisPos[i];
-                darrPosition[iIdxZ] = m_MaingrabMode.m_nFocusPosZ + darrZAxisPos[i] * Math.Sqrt(2) * 200;/*pixel per pulse*/;
+                darrPosition[iIdxZ] = m_MaingrabMode.m_nFocusPosZ - (darrZAxisPos[i] * Math.Sqrt(2) * 90);/*pixel per pulse*/;
                 CAXM.AxmLineMove(contiNum, darrPosition, dMaxVelocity, dMaxAccel, dMaxDecel);
             }
 
             // Conti 작성 종료
-            CAXM.AxmContiEndNode(nScanAxisNo);
+            CAXM.AxmContiEndNode(contiNum);
         }
         #endregion
     }

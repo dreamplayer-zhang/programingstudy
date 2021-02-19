@@ -150,7 +150,8 @@ namespace Root_WIND2.Module
                 }
                 m_grabMode.m_camera.StopGrab();
 
-                CreateFocusMap();
+                if(nScanLine == (nWaferSizeY_px / nCamWidth))
+                    CreateFocusMap();
 
                 //앞뒤 0인애들 고치는거
                 for(int i=0;i<m_module.LadsInfos.Count;i++)
