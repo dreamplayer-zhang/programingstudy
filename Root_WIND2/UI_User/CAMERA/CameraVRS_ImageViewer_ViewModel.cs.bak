@@ -106,7 +106,7 @@ namespace Root_WIND2.UI_User
             dispatcher = Application.Current.Dispatcher;
         }
 
-        private void OnUpdateImage(Object sender, EventArgs args)
+        public void OnUpdateImage(object obj, EventArgs args)
         {
             dispatcher.Invoke(() =>
             {

@@ -53,7 +53,6 @@ namespace RootTools_Vision.Utility
 		public float resX;
 		public float resY;
 
-		public string defectListInfor;
 		#endregion
 
 		public bool Save(StreamWriter sw)
