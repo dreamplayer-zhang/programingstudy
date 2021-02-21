@@ -189,6 +189,8 @@ namespace Root_WIND2
                 WIND2_Warning warning = GlobalObjects.Instance.Register<WIND2_Warning>();
                 engineer.Init("WIND2");
 
+
+                
                 MemoryTool memoryTool = engineer.ClassMemoryTool();
 
                 ImageData frontImage;
@@ -244,8 +246,15 @@ namespace Root_WIND2
                         (
                         ((WIND2_Handler)engineer.ClassHandler()).p_Vision,
                         recipeFront,
-                        new SharedBufferInfo(frontImage.GetPtr(0), frontImage.p_Size.X, frontImage.p_Size.Y, frontImage.p_nByte, frontImage.GetPtr(1), frontImage.GetPtr(2))
-                        );
+                        new SharedBufferInfo(
+                            frontImage.GetPtr(0), 
+                            frontImage.p_Size.X, 
+                            frontImage.p_Size.Y, 
+                            frontImage.p_nByte, 
+                            frontImage.GetPtr(1), 
+                            frontImage.GetPtr(2), 
+                            new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)
+                        ));
 
                     inspectionFront.SetRecipe(recipeFront);
                 }

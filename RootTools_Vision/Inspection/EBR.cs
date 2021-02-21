@@ -145,14 +145,39 @@ namespace RootTools_Vision
 
 			// Add measurement
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			this.currentWorkplace.AddDefect(sInspectionID,
-									11111,
-									0, 0,
-									this.currentWorkplace.Index * this.parameterEBR.StepDegree, 0,
-									waferEdgeX - bevelX,
-									waferEdgeX - ebrX,
-									this.currentWorkplace.MapIndexX,
-									this.currentWorkplace.MapIndexY);
+			
+			this.currentWorkplace.AddMeasurement(sInspectionID,
+								"EDGE",
+								Measurement.MeasureType.EBR,
+								Measurement.EBRMeasureItem.Bevel,
+								waferEdgeX - bevelX,
+								this.currentWorkplace.Width,
+								this.currentWorkplace.Height,
+								this.currentWorkplace.PositionX,
+								this.currentWorkplace.PositionY,
+								this.currentWorkplace.MapIndexX,
+								this.currentWorkplace.MapIndexY);
+
+			this.currentWorkplace.AddMeasurement(sInspectionID,
+								"EDGE",
+								Measurement.MeasureType.EBR,
+								Measurement.EBRMeasureItem.EBR,
+								waferEdgeX - ebrX,
+								this.currentWorkplace.Width,
+								this.currentWorkplace.Height,
+								this.currentWorkplace.PositionX,
+								this.currentWorkplace.PositionY,
+								this.currentWorkplace.MapIndexX,
+								this.currentWorkplace.MapIndexY);
+			
+			//this.currentWorkplace.AddDefect(sInspectionID,
+			//						11111,
+			//						0, 0,
+			//						this.currentWorkplace.Index * this.parameterEBR.StepDegree, 0,
+			//						waferEdgeX - bevelX,
+			//						waferEdgeX - ebrX,
+			//						this.currentWorkplace.MapIndexX,
+			//						this.currentWorkplace.MapIndexY);
 		}
 
 		private float FindEdge(int[] diff, int searchStartX, int standardDiff)

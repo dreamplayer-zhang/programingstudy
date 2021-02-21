@@ -97,5 +97,15 @@ namespace RootTools_Vision
             InspectionStart?.Invoke(obj, args);
         }
         #endregion
+
+
+        #region [ReceivedMemoryID]
+        public static event EventHandler<MemoryIDArgs> ReceivedMemoryID;
+
+        public static void OnReceivedMemoryID(object obj, MemoryIDArgs args)
+        {
+            ReceivedMemoryID?.Invoke(obj, args);
+        }
+        #endregion
     }
 }

@@ -13,9 +13,17 @@ namespace Root_WIND2.UI_User
         public class DrawDefines
         {
             public static int RectTickness = 4;
+            public static int BoxTickness = 1;
+        }
+
+        public class ColorDefines
+        {
+            public static SolidColorBrush Box = Brushes.Yellow;
         }
 
 
+        bool isBoxDrawing = false;
+        List<TRect> boxList;
         List<TRect> rectList;
 
         public FrontsideInspect_ImageViewer_ViewModel()
@@ -23,20 +31,313 @@ namespace Root_WIND2.UI_User
             this.p_VisibleMenu = System.Windows.Visibility.Collapsed;
 
             rectList = new List<TRect>();
+            boxList = new List<TRect>();
         }
 
+        #region [Properties]
+        private bool isColorChecked = true;
+        public bool IsColorChecked
+        {
+            get => this.isColorChecked;
+            set
+            {
+                if(value == true)
+                {
+                    this.IsRChecked = false;
+                    this.IsGChecked = false;
+                    this.IsBChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.All;
+                SetProperty<bool>(ref this.isColorChecked, value);
+            }
+        }
+
+        private bool isRChecked = false;
+        public bool IsRChecked
+        {
+            get => this.isRChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsColorChecked = false;
+                    this.IsGChecked = false;
+                    this.IsBChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.R;
+                SetProperty<bool>(ref this.isRChecked, value);
+            }
+        }
+
+        private bool isGChecked = false;
+        public bool IsGChecked
+        {
+            get => this.isGChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsRChecked = false;
+                    this.IsColorChecked = false;
+                    this.IsBChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.G;
+                SetProperty<bool>(ref this.isGChecked, value);
+            }
+        }
+
+        private bool isBChecked = false;
+        public bool IsBChecked
+        {
+            get => this.isBChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsRChecked = false;
+                    this.IsGChecked = false;
+                    this.IsColorChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.B;
+                SetProperty<bool>(ref this.isBChecked, value);
+            }
+        }
+
+        private bool isBoxChecked = false;
+        public bool IsBoxChecked
+        {
+            get => this.isBoxChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsRularChecked = false;
+                }
+                SetProperty<bool>(ref this.isBoxChecked, value);
+            }
+        }
+
+        private bool isRularChecked = false;
+        public bool IsRularChecked
+        {
+            get => this.isRularChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsBoxChecked = false;
+                }
+                SetProperty<bool>(ref this.isRularChecked, value);
+            }
+        }
+        #endregion
+
+        #region [Command]
+        public RelayCommand btnOpenCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this._openImage();
+                });
+            }
+        }
+
+        public RelayCommand btnSaveCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this._saveImage();
+                });
+            }
+        }
+
+        public RelayCommand btnClearCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this._clearImage();
+                });
+            }
+        }
+
+        public RelayCommand btnToolClearCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.ClearUIElement();
+                });
+            }
+        }
+        #endregion
+
         #region [Overrides]
+
+        private CPoint boxFirstPoint = new CPoint();
 
         public override void PreviewMouseDown(object sender, MouseEventArgs e)
         {
             base.PreviewMouseDown(sender, e);
-            //RedrawShapes();
+
+            if (m_KeyEvent != null)
+                if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
+                    return;
+
+            if (this.isBoxChecked == true )
+            {
+                if(this.isBoxDrawing == false)
+                {
+                    this.boxFirstPoint = new CPoint(p_MouseMemX, p_MouseMemY);
+
+                    CPoint canvasLeftTop = GetCanvasPoint(new CPoint(p_MouseMemX, p_MouseMemY));
+                    CPoint canvasRightBottom = GetCanvasPoint(new CPoint(p_MouseMemX, p_MouseMemY));
+
+                    Rectangle rt = new Rectangle();
+                    rt.Width = canvasRightBottom.X - canvasLeftTop.X;
+                    rt.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+                    rt.Stroke = ColorDefines.Box;
+                    rt.StrokeThickness = DrawDefines.BoxTickness;
+                    rt.Opacity = 1;
+                    rt.Fill = Brushes.Transparent;
+                    rt.Tag = "box";
+
+                    Canvas.SetLeft(rt, canvasLeftTop.X);
+                    Canvas.SetTop(rt, canvasLeftTop.Y);
+
+                    TRect tRect = new TRect();
+                    tRect.UIElement = rt;
+                    tRect.MemoryRect.Left = p_MouseMemX;
+                    tRect.MemoryRect.Top = p_MouseMemY;
+                    tRect.MemoryRect.Right = p_MouseMemX;
+                    tRect.MemoryRect.Bottom = p_MouseMemY;
+
+                    boxList.Add(tRect);
+                    p_UIElement.Add(rt);
+                    this.isBoxDrawing = true;
+                }
+                else
+                {
+                    this.isBoxDrawing = false;
+
+                    //TRect tRect = boxList[boxList.Count - 1];
+                    //tRect.MemoryRect.Right = p_MouseMemX;
+                    //tRect.MemoryRect.Bottom = p_MouseMemY;
+
+                    //CPoint canvasLeftTop = GetCanvasPoint(new CPoint(tRect.MemoryRect.Left, tRect.MemoryRect.Top));
+                    //CPoint canvasRightBottom = GetCanvasPoint(new CPoint(tRect.MemoryRect.Right, tRect.MemoryRect.Bottom));
+
+                    //Rectangle rt = tRect.UIElement as Rectangle;
+                    //rt.Width = Math.Abs(canvasRightBottom.X - canvasLeftTop.X);
+                    //rt.Height = Math.Abs(canvasRightBottom.Y - canvasLeftTop.Y);
+
+                    //Canvas.SetLeft(rt, canvasLeftTop.X < canvasRightBottom.X ? canvasLeftTop.X : canvasRightBottom.X);
+                    //Canvas.SetTop(rt, canvasLeftTop.Y < canvasRightBottom.Y ? canvasLeftTop.Y : canvasRightBottom.Y);
+
+                    //if (tRect.MemoryRect.Right < tRect.MemoryRect.Left)
+                    //{
+                    //    int temp = tRect.MemoryRect.Right;
+                    //    tRect.MemoryRect.Right = tRect.MemoryRect.Left;
+                    //    tRect.MemoryRect.Left = temp;
+                    //}
+
+                    //if (tRect.MemoryRect.Bottom < tRect.MemoryRect.Top)
+                    //{
+                    //    int temp = tRect.MemoryRect.Bottom;
+                    //    tRect.MemoryRect.Bottom = tRect.MemoryRect.Top;
+                    //    tRect.MemoryRect.Top = temp;
+                    //}
+
+                    //TRect tRect = boxList[boxList.Count - 1];
+                    //if (this.boxFirstPoint.X > p_MouseMemX)
+                    //{
+                    //    tRect.MemoryRect.Left = p_MouseMemX;
+                    //    tRect.MemoryRect.Right = this.boxFirstPoint.X;
+                    //}
+                    //else
+                    //{
+                    //    tRect.MemoryRect.Right = p_MouseMemX;
+                    //    tRect.MemoryRect.Left = this.boxFirstPoint.X;
+                    //}
+
+                    TRect tRect = boxList[boxList.Count - 1];
+                    if (this.boxFirstPoint.Y > p_MouseMemY)
+                    {
+                        tRect.MemoryRect.Top = p_MouseMemY;
+                        tRect.MemoryRect.Bottom = this.boxFirstPoint.Y;
+                    }
+                    else
+                    {
+                        tRect.MemoryRect.Bottom = p_MouseMemY;
+                        tRect.MemoryRect.Top = this.boxFirstPoint.Y;
+                    }
+
+                    CPoint canvasLeftTop = GetCanvasPoint(new CPoint(tRect.MemoryRect.Left, tRect.MemoryRect.Top));
+                    CPoint canvasRightBottom = GetCanvasPoint(new CPoint(tRect.MemoryRect.Right, tRect.MemoryRect.Bottom));
+
+                    Rectangle rt = tRect.UIElement as Rectangle;
+                    rt.Width = Math.Abs(canvasRightBottom.X - canvasLeftTop.X);
+                    rt.Height = Math.Abs(canvasRightBottom.Y - canvasLeftTop.Y);
+
+                    Canvas.SetLeft(rt, canvasLeftTop.X < canvasRightBottom.X ? canvasLeftTop.X : canvasRightBottom.X);
+                    Canvas.SetTop(rt, canvasLeftTop.Y < canvasRightBottom.Y ? canvasLeftTop.Y : canvasRightBottom.Y);
+
+                    rt.ToolTip = string.Format("W: {0}  H: {1}", tRect.MemoryRect.Width, tRect.MemoryRect.Height);
+
+                    this.IsBoxChecked = false;
+                }
+            }
+
+            RedrawShapes();
         }
         public override void MouseMove(object sender, MouseEventArgs e)
         {
             base.MouseMove(sender, e);
-            RedrawShapes();
 
+            if(this.isBoxChecked == true && this.isBoxDrawing == true)
+            {
+                TRect tRect = boxList[boxList.Count - 1];
+                if (this.boxFirstPoint.X > p_MouseMemX)
+                {
+                    tRect.MemoryRect.Left = p_MouseMemX;
+                    tRect.MemoryRect.Right = this.boxFirstPoint.X;
+                }
+                else
+                {
+                    tRect.MemoryRect.Right = p_MouseMemX;
+                    tRect.MemoryRect.Left = this.boxFirstPoint.X;
+                }
+
+                if (this.boxFirstPoint.Y > p_MouseMemY)
+                {
+                    tRect.MemoryRect.Top = p_MouseMemY;
+                    tRect.MemoryRect.Bottom = this.boxFirstPoint.Y;
+                }
+                else
+                {
+                    tRect.MemoryRect.Bottom = p_MouseMemY;
+                    tRect.MemoryRect.Top = this.boxFirstPoint.Y;
+                }
+
+                CPoint canvasLeftTop = GetCanvasPoint(new CPoint(tRect.MemoryRect.Left, tRect.MemoryRect.Top));
+                CPoint canvasRightBottom = GetCanvasPoint(new CPoint(tRect.MemoryRect.Right, tRect.MemoryRect.Bottom));
+
+                Rectangle rt = tRect.UIElement as Rectangle;
+                rt.Width = Math.Abs(canvasRightBottom.X - canvasLeftTop.X);
+                rt.Height = Math.Abs(canvasRightBottom.Y - canvasLeftTop.Y);
+
+                Canvas.SetLeft(rt, canvasLeftTop.X < canvasRightBottom.X ? canvasLeftTop.X : canvasRightBottom.X);
+                Canvas.SetTop(rt, canvasLeftTop.Y < canvasRightBottom.Y ? canvasLeftTop.Y : canvasRightBottom.Y);
+            }
+
+            RedrawShapes();
         }
         public override void PreviewMouseUp(object sender, MouseEventArgs e)
         {
@@ -187,6 +488,22 @@ namespace Root_WIND2.UI_User
 
                     rectangle.Width = canvasRightBottom.X - canvasLeftTop.X;
                     rectangle.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+                    Canvas.SetLeft(rectangle, canvasLeftTop.X);
+                    Canvas.SetTop(rectangle, canvasLeftTop.Y);
+                }
+            }
+
+            foreach (TRect rt in boxList)
+            {
+                if (p_UIElement.Contains(rt.UIElement) == true)
+                {
+                    Rectangle rectangle = rt.UIElement as Rectangle;
+                    CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+                    CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+
+                    rectangle.Width = Math.Abs(canvasRightBottom.X - canvasLeftTop.X);
+                    rectangle.Height = Math.Abs(canvasRightBottom.Y - canvasLeftTop.Y);
 
                     Canvas.SetLeft(rectangle, canvasLeftTop.X);
                     Canvas.SetTop(rectangle, canvasLeftTop.Y);

@@ -118,4 +118,15 @@ namespace RootTools_Vision
         {
         }
     }
+
+    ///
+    public class MemoryIDArgs : EventArgs
+    {
+        public readonly MemoryID MemoryID;
+
+        public MemoryIDArgs(MemoryID memoryID)
+        {
+            this.MemoryID = memoryID;
+        }
+    }
 }
