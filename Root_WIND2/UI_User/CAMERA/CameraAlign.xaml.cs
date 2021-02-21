@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Root_WIND2.UI_User
 {
     /// <summary>
-    /// Camera_VRS.xaml에 대한 상호 작용 논리
+    /// CameraAlign.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class CameraVRS : UserControl
+    public partial class CameraAlign : UserControl
     {
-        public CameraVRS()
+        public CameraAlign()
         {
             InitializeComponent();
         }

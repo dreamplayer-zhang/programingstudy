@@ -258,9 +258,9 @@ namespace RootTools_Vision
                     stream.Flush();
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                MessageBox.Show("Connection 종료");
+                MessageBox.Show("Connection 종료\n"+ex.Message);
             }
             finally
             {

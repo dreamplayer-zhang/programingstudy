@@ -10,22 +10,22 @@ namespace RootTools_Vision
     {
         StartRemote,
         StartCreateCloneFactory,
+        MemoryID,
+        WorkManagerList,
+        EndCreateCloneFactory,
+        StartCreateWork,
+        RecipeName,
+        WorkplaceBundle,
+        WorkBundle,
+        EndCreateWork,
     }
 
     public enum REMOTE_SLAVE_MESSAGES
     {
         StartRemoteAck,
         StartCreateCloneFactoryAck,
-    }
-
-    public enum REMOTE_DATA_TYPE
-    {
-        WorkManager,
-        WorkManagerList,
-        SharedBuffer,
-        Work,
-        WorkBundle,
-        Workplace,
-        WorkplaceBundle,
+        EndCreateCloneFactoryAck,
+        StartCreateWorkAck,
+        EndCreateWorkAck,
     }
 }

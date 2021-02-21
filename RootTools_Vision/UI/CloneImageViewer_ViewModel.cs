@@ -5,25 +5,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace RootTools_Vision
 {
     public class CloneImageViewer_ViewModel : RootViewer_ViewModel
     {
-
-        private string memoryFrontPool = "Vision.Memory";
-        private string memoryFrontGroup = "Vision";
-        private string memoryFront = "Main";
-
-        
-
         public CloneImageViewer_ViewModel()
         {
-            MemoryPool pool = new MemoryPool(memoryFrontPool);
-            ImageData imageData = new ImageData(pool.GetMemory(memoryFrontGroup, memoryFront));
+            WorkEventManager.ReceivedMemoryID += ReceivedMemoryID_Callback;
+        }
 
-            base.init(imageData);
+        public void ReceivedMemoryID_Callback(object obj, MemoryIDArgs args)
+        {
+            Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+
+                MemoryID memoryID = args.MemoryID;
+
+                MemoryPool pool = new MemoryPool(memoryID.Pool);
+                ImageData imageData = new ImageData(pool.GetMemory(memoryID.Group, memoryID.Data));
+
+                base.SetImageData(imageData);
+
+            });
+
         }
 
         public override void MouseMove(object sender, MouseEventArgs e)

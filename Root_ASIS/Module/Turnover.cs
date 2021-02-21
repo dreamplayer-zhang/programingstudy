@@ -108,6 +108,11 @@ namespace Root_ASIS.Module
         #region RunTurn
         public string RunTurn()
         {
+            while (p_infoStrip1 != null)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop"; 
+            }
             try
             {
                 p_bVacuum0 = true;
@@ -128,6 +133,11 @@ namespace Root_ASIS.Module
                 p_infoStrip1 = p_infoStrip0;
                 p_infoStrip0 = null; 
             }
+        }
+
+        public string StartTurn()
+        {
+            return StartRun(m_runTurn); 
         }
         #endregion
 
