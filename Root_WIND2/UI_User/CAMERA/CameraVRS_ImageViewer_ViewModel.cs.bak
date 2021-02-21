@@ -89,6 +89,19 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        bool m_IsSlowCheck = true;
+        public bool p_IsSlowCheck
+        {
+            get
+            {
+                return m_IsSlowCheck;
+            }
+            set
+            {
+                SetProperty(ref m_IsSlowCheck, value);
+            }
+        }
+
         Dispatcher dispatcher = null;
         public CameraVRS_ImageViewer_ViewModel()
         {
@@ -106,12 +119,129 @@ namespace Root_WIND2.UI_User
             dispatcher = Application.Current.Dispatcher;
         }
 
-        public void OnUpdateImage(object obj, EventArgs args)
+        private void OnUpdateImage(Object sender, EventArgs args)
         {
             dispatcher.Invoke(() =>
             {
                 p_RootViewer.SetImageSource();
             });
         }
+
+        #region [Command]
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    p_Vision.p_CamAutoFocus.GrabContinuousShot();
+                });
+            }
+        }
+
+        public RelayCommand UnloadedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                p_Vision.p_CamAutoFocus.StopGrab();
+            });
+        }
+
+        public ICommand CmdAxisXMoveLeft
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (!p_IsSlowCheck)
+                    {
+                        p_axisX.Jog(-1);
+                    }
+                    else
+                    {
+                        p_axisX.Jog(-0.31);
+                    }
+                });
+            }
+        }
+
+        public ICommand CmdAxisXMoveRight
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (!p_IsSlowCheck)
+                    {
+                        p_axisX.Jog(1);
+                    }
+                    else
+                    {
+                        p_axisX.Jog(0.31);
+                    }
+                });
+            }
+        }
+
+        public ICommand CmdAxisYMoveUp
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (!p_IsSlowCheck)
+                    {
+                        p_axisY.Jog(1);
+                    }
+                    else
+                    {
+                        p_axisY.Jog(0.31);
+                    }
+                });
+            }
+        }
+
+        public ICommand CmdAxisYMoveDown
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (!p_IsSlowCheck)
+                    {
+                        p_axisY.Jog(-1);
+                    }
+                    else
+                    {
+                        p_axisY.Jog(-0.31);
+                    }
+                });
+            }
+        }
+
+        public ICommand CmdXStop
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    p_axisX.StopAxis();
+                });
+            }
+        }
+
+        public ICommand CmdYStop
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    p_axisY.StopAxis();
+                });
+            }
+        }
+
+
+        #endregion
     }
 }

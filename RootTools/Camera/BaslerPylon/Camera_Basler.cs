@@ -532,7 +532,7 @@ namespace RootTools.Camera.BaslerPylon
         {
             try
             {
-                if (m_cam.IsOpen)
+                if (m_cam != null && m_cam.IsOpen)
                 {
                     m_bLive = true;
                     //stopWatch.Reset();
