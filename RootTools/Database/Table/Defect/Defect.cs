@@ -136,6 +136,7 @@ namespace RootTools.Database
         {
             return p_rtDefectRect;
         }
+
         public void CalcDegree()
 		{
 

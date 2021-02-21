@@ -60,7 +60,7 @@ namespace RootTools_Vision
         [NonSerialized] private int subState;
 
         [NonSerialized] private List<Defect> defectList = new List<Defect>();
-        [NonSerialized] private List<Measurement> measure = new List<Measurement>();
+        [NonSerialized] private List<Measurement> measureList = new List<Measurement>();
 
         #endregion
 
@@ -225,6 +225,12 @@ namespace RootTools_Vision
             get => this.defectList;
             set => this.defectList = value;
         }
+
+        public List<Measurement> MeasureList
+		{
+            get => this.measureList;
+            set => this.measureList = value;
+		}
         private Dictionary<PREWORKDATA_KEY, object> PreworkDataDictionary { get => preworkdataDicitonary; set => preworkdataDicitonary = value; }
 
         #endregion
@@ -360,12 +366,22 @@ namespace RootTools_Vision
             defectList.Add(defect);
         }
 
-        public void AddMeasure()
-        {
-            Measurement measure = new Measurement();
+        public void AddMeasurement(string strInspectionID, string strSide, Measurement.MeasureType type, Measurement.EBRMeasureItem measureItem, float fData, float fDefectW, float fDefectH, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)
+		{
+            Measurement measurement = new Measurement(strInspectionID,
+                                                      strSide,
+                                                      type.ToString(),
+                                                      measureItem.ToString(),
+                                                      fData,
+                                                      fDefectW,
+                                                      fDefectH,
+                                                      fDefectAbsLeft,
+                                                      fDefectAbsTop,
+                                                      nChipIdxX,
+                                                      nChipIdxY);
 
-            //defectList.Add(measure);
-        }
+            measureList.Add(measurement);
+		}
 
         public object GetPreworkData(PREWORKDATA_KEY key)
         {
