@@ -960,7 +960,7 @@ namespace RootTools.Gem.XGem
         }
 
         void InitEventControlJob()
-        {
+        {            
             m_xGem.OnCJCreated += M_xGem_OnCJCreated;
             m_xGem.OnCJDeleted += M_xGem_OnCJDeleted;
             m_xGem.OnCJStateChanged += M_xGem_OnCJStateChanged;
@@ -990,7 +990,8 @@ namespace RootTools.Gem.XGem
         {
             if (p_cjRun != null && p_cjRun.m_sCJobID == sCJobID)
             {
-                m_aCJFinish.Add(p_cjRun);
+                //m_aCJFinish.Add(p_cjRun);
+                m_aCJFinish.Add(m_qCJ.Dequeue());
                 p_cjRun = null;
                 return;
             }
@@ -1212,7 +1213,8 @@ namespace RootTools.Gem.XGem
                     case eThreadStep.Ready:
                         if ((p_cjRun == null) && (m_qCJ.Count > 0))
                         {
-                            p_cjRun = m_qCJ.Dequeue();
+                            //p_cjRun = m_qCJ.Dequeue();
+                            p_cjRun = m_qCJ.Peek();
                             SendCJReqSelect(p_cjRun);
                             step = eThreadStep.CheckPJ;
                         }
@@ -1228,7 +1230,7 @@ namespace RootTools.Gem.XGem
                                 carrier.p_eReqAccess = GemCarrierBase.eAccess.InAccessed;
                             }
                         }
-                        m_engineer.ClassHandler().CalcSequence();
+                        if(!EQ.p_bSimulate) m_engineer.ClassHandler().CalcSequence();
                         step = eThreadStep.Processing;
                         break;
                     case eThreadStep.Processing:

@@ -64,7 +64,8 @@ namespace Root_WIND2
         #region [Overrides]
         protected override void Initialize()
         {
-            CreateWorkManager(WORK_TYPE.ALIGNMENT, 8);
+            CreateWorkManager(WORK_TYPE.SNAP);
+            CreateWorkManager(WORK_TYPE.ALIGNMENT);
             CreateWorkManager(WORK_TYPE.INSPECTION, 8);
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 8);
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS_ALL, 1, true);
@@ -89,24 +90,26 @@ namespace Root_WIND2
         {
             WorkBundle workBundle = new WorkBundle();
 
-            Position position = new Position();
-            position.SetParameter(recipe.GetItem<PositionParameter>());
+            BacksideAlignment alignment = new BacksideAlignment();
 
-            BacksideSurface surface = new BacksideSurface();            
-            surface.SetParameter(recipe.GetItem<BacksideSurfaceParameter>());
+            BacksideSurface surface = new BacksideSurface();
+            BacksideSurfaceParameter param = new BacksideSurfaceParameter();
+            param.Intensity = 150;
+            param.Size = 1;
+            surface.SetParameter(param);
 
             ProcessDefect processDefect = new ProcessDefect();
-            ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
+            ProcessDefect_Backside processDefect_Backside = new ProcessDefect_Backside();
 
 
-            workBundle.Add(position);
+            workBundle.Add(alignment);
             workBundle.Add(surface);
             workBundle.Add(processDefect);
-            workBundle.Add(processDefect_Wafer);
+            workBundle.Add(processDefect_Backside);
 
             //workBundle.SetRecipe(recipe); // Recipe에서?
 
-            return new WorkBundle();
+            return workBundle;
         }
 
         protected override bool Ready(WorkplaceBundle workplaces, WorkBundle works)
@@ -139,32 +142,11 @@ namespace Root_WIND2
         public WorkplaceBundle CreateWorkplaceBundle_WaferMap()
         {
             RecipeType_WaferMap mapInfo = recipe.WaferMap;
-            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
-            PositionRecipe positionRecipe = recipe.GetItem<PositionRecipe>();
+            BacksideRecipe backRecipe = recipe.GetItem<BacksideRecipe>();
 
             WorkplaceBundle bundle = new WorkplaceBundle();
             try
-            {
-                int maxMasterFeaturePositionX = int.MinValue;
-                int maxMasterFeaturePositionY = int.MinValue;
-                int maxMasterFeatureWidth = int.MinValue;
-                int maxMasterFeatureHeight = int.MinValue;
-                foreach (RecipeType_ImageData feature in positionRecipe.ListMasterFeature)
-                {
-                    if (maxMasterFeaturePositionX < feature.PositionX + feature.Width)
-                    {
-                        maxMasterFeaturePositionX = feature.PositionX;
-                        maxMasterFeatureWidth = feature.Width;
-                    }
-
-                    if (maxMasterFeaturePositionY < feature.PositionY + feature.Height)
-                    {
-                        maxMasterFeaturePositionY = feature.PositionY;
-                        maxMasterFeatureHeight = feature.Height;
-                    }
-                }
-
-                //bundle.Add(new Workplace(-1, -1, maxMasterFeaturePositionX + originRecipe.OriginX + maxMasterFeatureWidth, maxMasterFeaturePositionY + originRecipe.OriginY + maxMasterFeatureHeight, 0, 0, bundle.Count));
+            {                
                 bundle.Add(new Workplace(-1, -1, 0, 0, 0, 0, bundle.Count));
 
                 var wafermap = mapInfo.Data;
@@ -172,11 +154,11 @@ namespace Root_WIND2
                 int nSizeY = mapInfo.MapSizeY;
                 int nMasterX = mapInfo.MasterDieX;
                 int nMasterY = mapInfo.MasterDieY;
-                int nDiePitchX = originRecipe.DiePitchX;
-                int nDiePitchY = originRecipe.DiePitchY;
+                int nDiePitchX = backRecipe.DiePitchX;
+                int nDiePitchY = backRecipe.DiePitchY;
 
-                int nOriginAbsX = originRecipe.OriginX;
-                int nOriginAbsY = originRecipe.OriginY - originRecipe.DiePitchY; // 좌상단 기준
+                int nOriginAbsX = backRecipe.OriginX;
+                int nOriginAbsY = backRecipe.OriginY - backRecipe.DiePitchY; // 좌상단 기준
 
                 bundle.SizeX = nSizeX;
                 bundle.SizeY = nSizeY;

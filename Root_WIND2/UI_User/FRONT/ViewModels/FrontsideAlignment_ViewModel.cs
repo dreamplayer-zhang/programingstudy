@@ -1,14 +1,16 @@
 ﻿using RootTools;
 using RootTools_Vision;
+using System;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace Root_WIND2.UI_User
 {
-    class FrontsideAlignment_ViewModel : ObservableObject
+    class FrontsideAlignment_ViewModel : ObservableObject, IPage
     {
         private readonly FrontsideAlignment_ImageViewer_ViewModel imageViewerVM;
         public FrontsideAlignment_ImageViewer_ViewModel ImageViewerVM
@@ -18,15 +20,54 @@ namespace Root_WIND2.UI_User
 
         public FrontsideAlignment_ViewModel()
         {
+            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero && GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").m_eMode != ImageData.eMode.OtherPCMem)
+                return;
             this.imageViewerVM = new FrontsideAlignment_ImageViewer_ViewModel();
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
 
             this.ImageViewerVM.FeatureBoxDone += FeatureBoxDone_Callback;
         }
 
-        public void SetPage()
+        public void LoadRecipe()
         {
-            this.ImageViewerVM.SetViewRect();
+            PositionRecipe positionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
+
+            p_WaferFeatureList.Clear();
+            p_ShotFeatureList.Clear();
+            p_ChipFeatureList.Clear();
+
+            // Master
+            foreach (RecipeType_ImageData feature in positionRecipe.ListMasterFeature)
+            {
+                FeatureControl fc = new FeatureControl();
+                fc.p_Offset = new CPoint(feature.PositionX, feature.PositionY);
+                fc.p_ImageSource = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt));
+                fc.DataContext = this;
+
+                p_WaferFeatureList.Add(fc);
+            }
+
+            // Shot
+            foreach (RecipeType_ImageData feature in positionRecipe.ListShotFeature)
+            {
+                FeatureControl fc = new FeatureControl();
+                fc.p_Offset = new CPoint(feature.PositionX, feature.PositionY);
+                fc.p_ImageSource = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt));
+                fc.DataContext = this;
+
+                p_ShotFeatureList.Add(fc);
+            }
+
+            // Chip
+            foreach (RecipeType_ImageData feature in positionRecipe.ListDieFeature)
+            {
+                FeatureControl fc = new FeatureControl();
+                fc.p_Offset = new CPoint(feature.PositionX, feature.PositionY);
+                fc.p_ImageSource = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt));
+                fc.DataContext = this;
+
+                p_ChipFeatureList.Add(fc);
+            }
         }
 
         #region [Members]
@@ -169,7 +210,18 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Command]
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this.ImageViewerVM.DisplayBox();
 
+                    LoadRecipe();
+                });
+            }
+        }
         public RelayCommand btnFeatureBoxClearCommand
         {
             get => new RelayCommand(() =>

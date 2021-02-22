@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using RootTools.Camera.Matrox;
 using Root_EFEM.Module;
 using Root_EFEM;
+using RootTools.GAFs;
 
 namespace Root_WIND2.Module
 {
@@ -24,6 +25,7 @@ namespace Root_WIND2.Module
 		DIO_O doVac;
 		DIO_O doBlow;
 		DIO_I diWaferExist;
+		DIO_I diWaferExistVac;
 
 		MemoryPool memoryPool;
 		MemoryGroup memoryGroup;
@@ -37,6 +39,8 @@ namespace Root_WIND2.Module
 		Camera_Dalsa camEdgeSide;
 		Camera_Dalsa camEdgeBtm;
 		Camera_Matrox camEBR;
+
+		ALID alid_WaferExist;
 
 		#region Getter/Setter
 		public Axis AxisRotate { get => axisRotate; private set => axisRotate = value; }
@@ -67,6 +71,8 @@ namespace Root_WIND2.Module
 			p_sInfo = m_toolBox.Get(ref doVac, this, "Stage Vacuum");
 			p_sInfo = m_toolBox.Get(ref doBlow, this, "Stage Blow");
 			p_sInfo = m_toolBox.Get(ref diWaferExist, this, "Wafer Exist");
+			p_sInfo = m_toolBox.Get(ref diWaferExistVac, this, "Wafer Exist -Vac");
+			
 			p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
 			p_sInfo = m_toolBox.Get(ref camEdgeTop, this, "Cam EdgeTop");
 			p_sInfo = m_toolBox.Get(ref camEdgeSide, this, "Cam EdgeSide");
@@ -74,6 +80,8 @@ namespace Root_WIND2.Module
             p_sInfo = m_toolBox.Get(ref camEBR, this, "Cam EBR");
             p_sInfo = m_toolBox.Get(ref lightSet, this);
 			memoryGroup = memoryPool.GetGroup(p_id);
+			alid_WaferExist = m_gaf.GetALID(this, "Wafer Exist", "Wafer Exist");
+
 		}
 		#endregion
 
@@ -155,24 +163,24 @@ namespace Root_WIND2.Module
 
 		double pulse360 = 360000;
 		public double Pulse360 { get => pulse360; set => pulse360 = value; }
-		double edgeCamTriggerRatio = 1; //캠익에서 트리거 분주비
-		public double EdgeCamTriggerRatio { get => edgeCamTriggerRatio; set => edgeCamTriggerRatio = value; }
-		double ebrCamTriggerRatio = 3.0/4;
-		public double EbrCamTriggerRatio { get => ebrCamTriggerRatio; set => ebrCamTriggerRatio = value; }
-		double margin = 36000;
-		public double Margin { get => margin; set => margin = value; }
+		//double edgeCamTriggerRatio = 1; //캠익에서 트리거 분주비
+		//public double EdgeCamTriggerRatio { get => edgeCamTriggerRatio; set => edgeCamTriggerRatio = value; }
+		//double ebrCamTriggerRatio = 3.0 / 4;
+		//public double EbrCamTriggerRatio { get => ebrCamTriggerRatio; set => ebrCamTriggerRatio = value; }
+		//double margin = 36000;
+		//public double Margin { get => margin; set => margin = value; }
 
 		public override void InitMemorys()
 		{
 			int nImageX = 1000; //camEdgeTop.GetRoiSize().X;
-			int nImageY = (int)(pulse360 * edgeCamTriggerRatio + margin);
+			int nImageY = 1000; //(int)(pulse360 * edgeCamTriggerRatio + margin);
 			memoryGroup = memoryPool.GetGroup(p_id);
 			memoryEdgeTop = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeTop.ToString(), 3, 1, nImageX, nImageY);
 			memoryEdgeSide = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeSide.ToString(), 3, 1, nImageX, nImageY);
 			memoryEdgeBtm = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeBottom.ToString(), 3, 1, nImageX, nImageY);
 
 			int ebrImageX = 1000; //camEBR.GetRoiSize().X;
-			int ebrImageY = (int)(pulse360 * ebrCamTriggerRatio + margin);
+			int ebrImageY = 1000; //(int)(pulse360 * ebrCamTriggerRatio + margin);
 			memoryEBR = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EBR.ToString(), 1, 1, ebrImageX, ebrImageY);
 		}
 		#endregion
@@ -295,6 +303,9 @@ namespace Root_WIND2.Module
 
 		public string AfterPut(int nID)
 		{
+			doVac.Write(true);
+			if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
+				alid_WaferExist.Run(true, "Wafer Check Error");
 			return "OK";
 		}
 

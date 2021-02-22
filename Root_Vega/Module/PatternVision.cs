@@ -9,6 +9,7 @@ using RootTools.Camera.Matrox;
 using RootTools.Camera.Silicon;
 using RootTools.Control;
 using RootTools.Control.Ajin;
+using RootTools.ImageProcess;
 using RootTools.Inspects;
 using RootTools.Light;
 using RootTools.Memory;
@@ -792,7 +793,7 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_EBRInspection(this), true, "Run EBR Inspection");
             AddModuleRunList(new Run_InspectionComplete(this), true, "Run Inspection Complete");
             AddModuleRunList(new Run_AutoIllumination(this), true, "Run AutoIllumination");
-            AddModuleRunList(new Run_VRSReviewImagCapture(this), true, "Run VRSReviewImageCapture");
+            AddModuleRunList(new Run_VRSReviewImageCapture(this), true, "Run VRSReviewImageCapture");
         }
         //------------------------------------------------------
         public class Run_Grab : ModuleRunBase
@@ -1478,7 +1479,7 @@ namespace Root_Vega.Module
                 bool bUseRADS = m_grabMode.GetUseRADS();
 
                 // AutoIllumination variable
-                bool bFeatureScanned = false;
+                //bool bFeatureScanned = false;
                 bool bFoundFeature = false;
                 CPoint cptStandard = new CPoint(0, 0);
                 int nLightCalKeyStartOffsetX = 0;
@@ -1655,7 +1656,7 @@ namespace Root_Vega.Module
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
 
                 }
@@ -1699,7 +1700,7 @@ namespace Root_Vega.Module
         #endregion
         //--------------------------------------------------------
         #region VRS Review Image Capture
-        public class Run_VRSReviewImagCapture : ModuleRunBase
+        public class Run_VRSReviewImageCapture : ModuleRunBase
         {
             //--------------------------------------------------------
             PatternVision m_module;
@@ -1724,8 +1725,11 @@ namespace Root_Vega.Module
 
             public int m_nXPos = 0;
             public int m_nYPos = 0;
+
+            public int m_nVRSAutoFocusStartZPos = 0;
+            public int m_nVRSAutoFocusEndZPos = 0;
             //--------------------------------------------------------
-            public Run_VRSReviewImagCapture(PatternVision module)
+            public Run_VRSReviewImageCapture(PatternVision module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -1733,7 +1737,7 @@ namespace Root_Vega.Module
             //--------------------------------------------------------
             public override ModuleRunBase Clone()
             {
-                Run_VRSReviewImagCapture run = new Run_VRSReviewImagCapture(m_module);
+                Run_VRSReviewImageCapture run = new Run_VRSReviewImageCapture(m_module);
                 run.p_sGrabMode = p_sGrabMode;
                 run.m_rpReticleCenterPos = m_rpReticleCenterPos;
                 run.m_rpDistanceOfTDIToVRS_pulse = m_rpDistanceOfTDIToVRS_pulse;
@@ -1744,6 +1748,9 @@ namespace Root_Vega.Module
 
                 run.m_nXPos = m_nXPos;
                 run.m_nYPos = m_nYPos;
+
+                run.m_nVRSAutoFocusStartZPos = m_nVRSAutoFocusStartZPos;
+                run.m_nVRSAutoFocusEndZPos = m_nVRSAutoFocusEndZPos;
 
                 return run;
             }
@@ -1767,6 +1774,9 @@ namespace Root_Vega.Module
 
                 m_nXPos = tree.Set(m_nXPos, m_nXPos, "Memory X Coordinate", "Memory X Coordinate", bVisible);
                 m_nYPos = tree.Set(m_nYPos, m_nYPos, "Memory Y Coordinate", "Memory Y Coordinate", bVisible);
+
+                m_nVRSAutoFocusStartZPos = tree.Set(m_nVRSAutoFocusStartZPos, m_nVRSAutoFocusStartZPos, "VRS AutoFocus Start Z Position", "VRS AutoFocus Start Z Position", bVisible);
+                m_nVRSAutoFocusEndZPos = tree.Set(m_nVRSAutoFocusEndZPos, m_nVRSAutoFocusEndZPos, "VRS AutoFocus End Z Position", "VRS AutoFocus End Z Position", bVisible);
             }
             //--------------------------------------------------------
             public override string Run()
@@ -1813,6 +1823,7 @@ namespace Root_Vega.Module
 
                         // VRS 촬영 및 저장
                         //Thread.Sleep(1000);
+                        VRSAutoFocus();
                         string strTemp = cam.Grab();
                         //                    Thread.Sleep(1000);
 
@@ -1891,6 +1902,57 @@ namespace Root_Vega.Module
                 rpAxis.Y = dTriggerStartPosY - (m_grabMode.m_dTrigger * cpMemory.Y) - m_rpDistanceOfTDIToVRS_pulse.Y;
 
                 return rpAxis;
+            }
+            //--------------------------------------------------------
+            public void VRSAutoFocus()
+            {
+                // variable
+                AutoFocus af = new AutoFocus();
+                Axis axisZ = m_module.p_axisZ;
+                Camera_Basler camVRS = m_module.m_CamVRS;
+                ImageData img = camVRS.p_ImageViewer.p_ImageData;
+                double dStepPulse = (double)(m_nVRSAutoFocusStartZPos - m_nVRSAutoFocusEndZPos) / 10;
+                double dMaxScore = 0.0;
+                double dMaxScorePos = 0.0;
+
+                // implement
+                // VRS Camera 연결 대기
+                StopWatch sw = new StopWatch();
+                string strLightName = "VRS";
+                m_module.SetLightByName(strLightName, 20);
+                if (camVRS.p_CamInfo._OpenStatus == false) camVRS.Connect();
+                while (camVRS.p_CamInfo._OpenStatus == false)
+                {
+                    if (sw.ElapsedMilliseconds > 15000)
+                    {
+                        sw.Stop();
+                        return;
+                    }
+                }
+                sw.Stop();
+
+                // Max Score Position 찾기
+                for (int i = 0; i<10; i++)
+                {
+                    // Z축 이동
+                    if (m_module.Run(axisZ.StartMove(m_nVRSAutoFocusStartZPos - (i*dStepPulse)))) return;
+                    if (m_module.Run(axisZ.WaitReady())) return;
+
+                    // VRS Snap
+                    string strTemp = camVRS.Grab();
+                    double dScore = af.GetImageVarianceScore(img, 100);
+                    if (dScore > dMaxScore)
+                    {
+                        dMaxScore = dScore;
+                        dMaxScorePos = m_nVRSAutoFocusStartZPos - (i * dStepPulse);
+                    }
+                }
+
+                // Max Score Position으로 이동 후 Snap
+                if (m_module.Run(axisZ.StartMove(dMaxScore))) return;
+                if (m_module.Run(axisZ.WaitReady())) return;
+
+                return;
             }
             //--------------------------------------------------------
         }

@@ -27,6 +27,7 @@ namespace RootTools
 {
 
     public delegate void LoadedDelegate();
+	public delegate void DoubleClickDelegate();
 	// public delegate void RedrawDelegate();
 	public class ImageViewer_ViewModel : ObservableObject
 	{
@@ -533,11 +534,10 @@ namespace RootTools
 			m_InformationTool = new UniquenessDrawerVM(this);
 			m_InformationTool.m_Stroke = System.Windows.Media.Brushes.Red;
 
-
 			p_Element = new ObservableCollection<UIElement>();
 		}
 
-		public void SetDrawer(DrawToolVM _SelectedTool)
+        public void SetDrawer(DrawToolVM _SelectedTool)
 		{
 			SelectedTool = _SelectedTool;
 
@@ -821,9 +821,9 @@ namespace RootTools
                     {
                         long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
-                        viewPtr[yy, xx, 0] = imageptr[(pix_x * this.p_ImageData.p_nByte + 0) + (long)pix_y * (sizeX * 3)];
+                        viewPtr[yy, xx, 0] = imageptr[(pix_x * this.p_ImageData.p_nByte + 2) + (long)pix_y * (sizeX * 3)];
                         viewPtr[yy, xx, 1] = imageptr[(pix_x * this.p_ImageData.p_nByte + 1) + (long)pix_y * (sizeX * 3)];
-                        viewPtr[yy, xx, 2] = imageptr[(pix_x * this.p_ImageData.p_nByte + 2) + (long)pix_y * (sizeX * 3)];
+                        viewPtr[yy, xx, 2] = imageptr[(pix_x * this.p_ImageData.p_nByte + 0) + (long)pix_y * (sizeX * 3)];
                     }
                 }
             });
@@ -1030,6 +1030,8 @@ namespace RootTools
 				nY = 0;
 			else if (nY > p_ImageData.p_Size.Y - p_View_Rect.Height)
 				nY = p_ImageData.p_Size.Y - p_View_Rect.Height;
+			if (nX % 2 != 0) nX += 1;
+			if (nY % 2 != 0) nY += 1;
 			return new CPoint(nX, nY);
 		}
 		CPoint GetCurrentPoint()
@@ -1472,11 +1474,11 @@ namespace RootTools
 
 				if (lines < 0)
 				{
-					zoom *= 1.1F;
+					zoom *= 1.4F;
 				}
 				if (lines > 0)
 				{
-					zoom *= 0.9F;
+					zoom *= 0.6F;
 				}
 
 				//double nDev = 0;
@@ -1661,6 +1663,13 @@ namespace RootTools
 				return new RelayCommand(Loaded_function);
 			}
 		}
+		public ICommand MouseDoubleClickCommand
+        {
+            get
+            {
+				return new RelayCommand(MouseDoubleClick);
+            }
+        }
 		public event LoadedDelegate m_AfterLoaded;
 		void Loaded_function()
 		{
@@ -1668,6 +1677,14 @@ namespace RootTools
 				InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
 			if (m_AfterLoaded != null)
 				m_AfterLoaded();
+		}
+
+		public EventHandler DoubleClicked;
+		void MouseDoubleClick()
+        {
+			if (DoubleClicked != null)
+				DoubleClicked.Invoke(new CPoint(p_MouseMemX, p_MouseMemY), null);
+
 		}
 		#endregion
 	}

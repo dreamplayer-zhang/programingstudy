@@ -44,6 +44,8 @@
 
 #include <opencv2/dnn.hpp>
 
+#pragma warning(disable: 26495)
+
 namespace cv {
 namespace dnn {
 CV__DNN_EXPERIMENTAL_NS_BEGIN

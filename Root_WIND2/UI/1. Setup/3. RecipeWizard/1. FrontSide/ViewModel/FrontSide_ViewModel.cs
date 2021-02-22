@@ -115,7 +115,7 @@ namespace Root_WIND2
 
 
         Setup_ViewModel m_Setup;
-        RecipeBase m_Recipe;
+        RecipeBase m_Recipe = null;
         public Frontside_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;

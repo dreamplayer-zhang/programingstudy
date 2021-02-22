@@ -61,10 +61,10 @@ namespace Root_AOP01_Inspection.UI._3._RUN
         public string m_sRecipe = "";
         public string SetInfoPod()
         {
-            m_loadport.p_infoCarrier.p_sLocID = p_sLocID;
-            m_loadport.p_infoCarrier.m_aGemSlot[0].p_sLotID = p_sLotID;
-            m_loadport.p_infoCarrier.p_sCarrierID = p_sCarrierID;
-            m_loadport.p_infoCarrier.m_aGemSlot[0].p_sSlotID = p_sSlotID;
+            //m_loadport.p_infoCarrier.p_sLocID = p_sLocID;
+            //m_loadport.p_infoCarrier.m_aGemSlot[0].p_sLotID = p_sLotID;
+            //m_loadport.p_infoCarrier.p_sCarrierID = p_sCarrierID;  //210208 LYJ Carrier ID 초기화 함 임시 지움 
+            //m_loadport.p_infoCarrier.m_aGemSlot[0].p_sSlotID = p_sSlotID;
 
             if (m_loadport.p_infoCarrier.m_aInfoWafer == null)
             {
@@ -105,9 +105,9 @@ namespace Root_AOP01_Inspection.UI._3._RUN
 
         AOP01_Handler m_handler;
         AOP01_Engineer m_engineer;
-        public Loadport_Cymechs m_loadport;
+        public Loadport_AOP01 m_loadport;
         public InfoCarrier m_infoCarrier = null;
-        public ManualJobSchedule(Loadport_Cymechs loadport, AOP01_Engineer engineer, InfoCarrier infoCarrier)
+        public ManualJobSchedule(Loadport_AOP01 loadport, AOP01_Engineer engineer, InfoCarrier infoCarrier)
         {
             m_infoCarrier = infoCarrier;
             if (m_infoCarrier == null) return;
@@ -127,14 +127,14 @@ namespace Root_AOP01_Inspection.UI._3._RUN
             dlg_Start.ShowDialog();
             if (p_bRnR)
             {
-                m_handler.m_nRnR = p_nRnR;
+                m_handler.p_nRnRCount = p_nRnR;
                 RNR_UI rnr_ui = new RNR_UI();
                 rnr_ui.Init(m_engineer);
                 rnr_ui.Show();
             }
             else if (!p_bRnR)
             {
-                m_handler.m_nRnR = 1;
+                m_handler.p_nRnRCount = 1;
             }
             p_nRnR = 1;
             return dlg_Start.DialogResult == true;

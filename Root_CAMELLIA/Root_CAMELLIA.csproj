@@ -268,6 +268,8 @@
     <Compile Include="ModuleRun\Run_Measure.cs" />
     <Compile Include="Module\Module_FDC.cs" />
     <Compile Include="Module\Module_FFU.cs" />
+    <Compile Include="Module\Interlock.cs" />
+    <Compile Include="Module\TowerLamp.cs" />
     <Compile Include="UI_Dialog\test.xaml.cs">
       <DependentUpon>test.xaml</DependentUpon>
     </Compile>

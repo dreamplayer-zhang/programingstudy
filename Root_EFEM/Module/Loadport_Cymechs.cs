@@ -9,20 +9,102 @@ using System.Threading;
 using RootTools.Control;
 using RootTools.OHT.Semi;
 using RootTools.OHTNew;
+using static RootTools.Gem.XGem.XGem;
 
 namespace Root_EFEM.Module
 {
     public class Loadport_Cymechs : ModuleBase, IWTRChild, ILoadport
     {
         #region ToolBox
+
         RS232 m_rs232;
-        public DIO_I m_diPlaced;
-        public DIO_I m_diPresent;
-        public DIO_I m_diOpen;
-        public DIO_I m_diClose;
-        public DIO_I m_diReady;
-        public DIO_I m_diRun;
-        public OHT_Semi m_OHT;
+        public DIO_I p_diPlaced
+        {
+            get
+            {
+                return m_diPlaced;
+            }
+            set
+            {
+                m_diPlaced = value;
+            }
+        }
+        public DIO_I p_diPresent
+        {
+            get
+            {
+                return m_diPresent;
+            }
+            set
+            {
+                m_diPresent = value;
+            }
+        }
+        public DIO_I p_diOpen
+        {
+            get
+            {
+                return m_diOpen;
+            }
+            set
+            {
+                m_diOpen = value;
+            }
+        }
+        public DIO_I p_diClose
+        {
+            get
+            {
+                return m_diClose;
+            }
+            set
+            {
+                m_diClose = value;
+            }
+        }
+        public DIO_I p_diReady
+        {
+            get
+            {
+                return m_diReady;
+            }
+            set
+            {
+                m_diReady = value;
+            }
+        }
+        public DIO_I p_diRun
+        {
+            get
+            {
+                return m_diRun;
+            }
+            set
+            {
+                m_diRun = value;
+            }
+        }
+        public OHT_Semi p_OHT
+
+        {
+            get
+            {
+                return m_OHT;
+            }
+            set
+            {
+                m_OHT = value;
+            }
+        }
+
+        private DIO_I m_diPlaced;
+        private DIO_I m_diPresent;
+        private DIO_I m_diOpen;
+        private DIO_I m_diClose;
+        private DIO_I m_diReady;
+        private DIO_I m_diRun;
+        private OHT_Semi m_OHT;
+
         public bool m_bLoadCheck = false;
         public bool m_bUnLoadCheck = false;
         public override void GetTools(bool bInit)
@@ -39,10 +121,19 @@ namespace Root_EFEM.Module
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
+
+                InitALID();
             }
         }
         #endregion
 
+        #region GAF
+        ALID alid_Cymechs;
+        void InitALID()
+        {
+            alid_Cymechs = m_gaf.GetALID(this, "Cymechs", "LOADPORT CYMECHS ERROR");
+        }
+        #endregion
         //forget
         #region DIO Function
         public bool m_bPlaced = false;
@@ -157,7 +248,7 @@ namespace Root_EFEM.Module
 
         string IsRunOK()
         {
-            return "OK"; 
+            //return "OK"; 
             //0202 확인
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
             return p_infoCarrier.IsRunOK();
@@ -165,7 +256,7 @@ namespace Root_EFEM.Module
 
         public void RunTreeTeach(Tree tree)
         {
-            p_infoCarrier.m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
+            p_infoCarrier.m_waferSize.RunTreeTeach(tree.GetTree(p_id, true));
         }
 
         public void ReadInfoWafer_Registry()
@@ -476,6 +567,8 @@ namespace Root_EFEM.Module
                 case 'E':
                     p_eState = eState.Error;
                     p_sInfo = "Cymech Error " + sRead + " : " + GetErrorString(sRead);
+                    alid_Cymechs.Run(true, p_sInfo);
+                    //0207 alid run p_sinfo 
                     break;
                 case 'C':
                     p_sInfo = SetEvent(sRead);
@@ -668,23 +761,24 @@ namespace Root_EFEM.Module
                 }
                 else
                 {
-//                    if (m_diDoorOpen.p_bIn) return p_id + " Door Opened";
                     if (Run(CmdUnload())) return p_sInfo;
                 }
             }
-            //if(!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
-            //{
-            //    p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-            //    m_bPlaced= true;
+            if (m_diPlaced.p_bIn && m_diPresent.p_bIn)
+            {
+                p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                m_bPlaced = true;
 
-            //    if (Run(CmdLoad())) return p_sInfo;
-            //    if (Run(CmdUnload())) return p_sInfo;
-            //}
-            //else
-            //{
+                //if (Run(CmdLoad()))
+                //    return p_sInfo;
+                //if (Run(CmdUnload()))
+                //    return p_sInfo;
+            }
+            else
+            {
                 p_infoCarrier.p_eState = InfoCarrier.eState.Empty;
                 m_bPlaced = false;
-            //}
+            }
             p_eState = eState.Ready;
             p_infoCarrier.AfterHome();
             return "OK";
@@ -769,12 +863,23 @@ namespace Root_EFEM.Module
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }
+        //public IRFID m_rfid;
+        IRFID _rfid;
+        public IRFID m_rfid
+        {
+            get { return _rfid; }
+            set
+            {
+                _rfid = value;
+            }
+        }
         public Loadport_Cymechs(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
             p_bLock = false;
             p_id = id;
             InitCmd();
             p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
+            //m_rfid = rfid;
             m_aTool.Add(p_infoCarrier);
             InitBase(id, engineer);
             InitEvent();
@@ -814,6 +919,7 @@ namespace Root_EFEM.Module
         protected override void InitModuleRuns()
         {
             m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");
+            AddModuleRunList(new Run_GemProcess(this), false, "Gem Slot Process Start");
             m_runUndocking = AddModuleRunList(new Run_Undocking(this), false, "Undocking Carrier from Work Position");
         }
 
@@ -828,37 +934,123 @@ namespace Root_EFEM.Module
                 InitModuleRun(module);
             }
 
+            string m_sSimulCarrierID = "CarrierID";
             bool m_bMapping = true;
+            bool m_bReadRFID = true;
             public override ModuleRunBase Clone()
             {
                 Run_Docking run = new Run_Docking(m_module);
+                run.m_sSimulCarrierID = m_sSimulCarrierID;
                 run.m_bMapping = m_bMapping;
+                run.m_bReadRFID = m_bReadRFID;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation", bVisible);
                 m_bMapping = tree.Set(m_bMapping, m_bMapping, "Mapping", "Wafer Mapping When Loading", bVisible);
+                m_bReadRFID = tree.Set(m_bReadRFID, m_bReadRFID, "Read RFID", "Read RFID", bVisible);
             }
 
             public override string Run()
             {
-                m_module.m_bUnLoadCheck = false;
-                if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
-                //if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed)
-                //{
-                //    m_module.m_alidLoad.Run(true, p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
-                //    return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                //}//0202
+                string sResult = "OK";
+                if (EQ.p_bSimulate)
+                {
+                    m_infoCarrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                    m_infoCarrier.p_sCarrierID = m_sSimulCarrierID;
+                }
+                else
+                {
+                    if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed)
+                        return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                    if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock)
+                        return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+
+                    if (m_bReadRFID)
+                    {
+                        sResult = m_module.m_rfid.ReadRFID();
+                        m_infoCarrier.p_sCarrierID = (sResult == "OK") ? m_module.m_rfid.m_sReadID : "";
+                    }
+                    else m_infoCarrier.p_sCarrierID = m_sSimulCarrierID;
+                }
+                if(sResult == "OK")
+                    m_infoCarrier.SendCarrierID(m_infoCarrier.p_sCarrierID);
+                else
+                    return p_sInfo + " SendCarrierID : " + m_infoCarrier.p_sCarrierID;
+
+                while (m_infoCarrier.p_eStateCarrierID != GemCarrierBase.eGemState.VerificationOK)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.p_bStop) return p_sInfo + "EQ Stop";
+                    if (m_infoCarrier.p_eStateCarrierID == GemCarrierBase.eGemState.VerificationFailed)
+                        return p_sInfo + " infoCarrier.p_eStateCarrierID = " + m_infoCarrier.p_eStateCarrierID.ToString();
+                }
+                if (m_infoCarrier.p_eTransfer != GemCarrierBase.eTransfer.TransferBlocked)
+                    return p_sInfo + " infoCarrier.p_eTransfer = " + m_infoCarrier.p_eTransfer.ToString();
+
                 if (m_module.Run(m_module.CmdLoad()))
                 {
                     m_module.m_alidLoad.Run(true, p_sInfo);
                     return p_sInfo;
                 }
+                InfoCarrier infoCarrier = m_infoCarrier;
+                List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
+                string sMap = "1000000000000000000000000";
+                foreach (char ch in sMap)
+                {
+                    switch (ch)
+                    {
+                        case '0':
+                            aSlot.Add(GemSlotBase.eState.Empty);
+                            break;
+                        case '1':
+                            aSlot.Add(GemSlotBase.eState.Exist);
+                            break;
+                        case 'D':
+                            aSlot.Add(GemSlotBase.eState.Double);
+                            break;
+                        case 'C':
+                            aSlot.Add(GemSlotBase.eState.Cross);
+                            break;
+                        default:
+                            aSlot.Add(GemSlotBase.eState.Undefined);
+                            break;
+                    }
+                }
+                infoCarrier.SetMapData(aSlot);
+                m_infoCarrier.SendSlotMap();
+                while (m_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.p_bStop) return p_sInfo + "EQ Stop";
+                    if (m_infoCarrier.p_eStateSlotMap == GemCarrierBase.eGemState.VerificationFailed)
+                        return p_sInfo + " infoCarrier.p_eStateSlotMap = " + m_infoCarrier.p_eStateSlotMap.ToString();
+                }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
-                m_module.m_ceidDocking.Send();
-                m_module.m_bLoadCheck = true;
                 return "OK";
+
+                //m_module.m_bUnLoadCheck = false;
+                //if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
+                //if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed)
+                //{
+                //    m_module.m_alidLoad.Run(true, p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
+                //    return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                //}
+                //if (m_module.Run(m_module.CmdLoad()))
+                //{
+                //    m_module.m_alidLoad.Run(true, p_sInfo);
+                //    return p_sInfo;
+                //}
+                //if (m_infoCarrier.m_aInfoWafer[0] == null)
+                //{
+                //    m_module.m_alidInforeticle.Run(true, "There is No Reticle");
+                //}
+                //m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+                //m_module.m_ceidDocking.Send();
+                //m_module.m_bLoadCheck = true;
+                //return "OK";
             }
         }
 
@@ -888,24 +1080,116 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
-                m_module.m_bLoadCheck = false;
-                if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
+                bool bUseXGem = m_module.m_engineer.p_bUseXGem;
+                IGem m_gem = m_module.m_gem;
+                if (!EQ.p_bSimulate)
                 {
-                    m_module.m_alidUnLoad.Run(true, p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
-                    return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                    if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
+                        return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 }
-                //if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
-                if (m_module.Run(m_module.CmdUnload()))
+                if (bUseXGem)
                 {
-                    m_module.m_alidUnLoad.Run(true, p_sInfo);
-                    return p_sInfo;
+                    while (m_infoCarrier.p_eAccess != GemCarrierBase.eAccess.InAccessed)
+                    {
+                        Thread.Sleep(10);
+                        if (EQ.p_bStop) return p_sInfo + "EQ Stop";
+                    }
+                    if (m_gem.p_cjRun == null) return p_sInfo;
+                    foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
+                    {
+                        m_gem.SendPJComplete(pj.m_sPJobID);
+                        Thread.Sleep(100);
+                    }
+                    while (m_gem.p_cjRun.p_eState != GemCJ.eState.Completed)
+                    {
+                        Thread.Sleep(10);
+                        if (EQ.p_bStop) return p_sInfo + "EQ Stop";
+                    }
+                }
+                if (!EQ.p_bSimulate)
+                {
+                    if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
+                    if (m_module.Run(m_module.CmdUnload()))
+                    {
+                        m_module.m_alidUnLoad.Run(true, p_sInfo);
+                        return p_sInfo;
+                    }
                 }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
-                m_module.m_ceidUnDocking.Send();
-                m_module.m_bUnLoadCheck = true;
                 return "OK";
+
+                //m_module.m_bLoadCheck = false;
+                //if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
+                //{
+                //    m_module.m_alidUnLoad.Run(true, p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
+                //    return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                //}
+                //if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
+                //if (m_module.Run(m_module.CmdUnload()))
+                //{
+                //    m_module.m_alidUnLoad.Run(true, p_sInfo);
+                //    return p_sInfo;
+                //}
+                //m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                //m_module.m_ceidUnDocking.Send();
+                //m_module.m_bUnLoadCheck = true;
+                //return "OK";
             }
         }
+
+        public class Run_GemProcess : ModuleRunBase
+        {
+            Loadport_Cymechs m_module;
+            InfoCarrier m_infoCarrier;
+            public Run_GemProcess(Loadport_Cymechs module)
+            {
+                m_module = module;
+                m_infoCarrier = module.p_infoCarrier;
+                InitModuleRun(module);
+            }
+            public override ModuleRunBase Clone()
+            {
+                Run_GemProcess run = new Run_GemProcess(m_module);
+                return run;
+            }
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                //m_sUndocking = tree.Set(m_sUndocking, m_sUndocking, "Undocking", "Carrier Undocking", bVisible, true);
+            }
+
+            public override string Run()
+            {
+                string sResult = "OK";
+                IGem m_gem = m_module.m_gem;
+                if (m_gem == null || m_gem.p_eControl != eControl.ONLINEREMOTE) return p_id + " is not Gem Ready.";
+                if (!EQ.p_bSimulate)
+                {
+                    if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
+                        return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
+                }
+
+                while (m_gem.p_cjRun == null)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.p_bStop) return p_sInfo + "EQ Stop";
+                }
+
+                while (m_infoCarrier.p_eAccess != GemCarrierBase.eAccess.InAccessed)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.p_bStop) return p_sInfo + "EQ Stop";
+                }
+
+                for (int i = 0; i < m_infoCarrier.m_aGemSlot.Count; i++)
+                {
+                    if (m_infoCarrier.m_aGemSlot[i].p_eState == GemSlotBase.eState.Select)
+                        m_infoCarrier.StartProcess(m_infoCarrier.m_aGemSlot[i].p_id);
+                }
+
+                return sResult;
+            }
+        }
+
         #endregion
     }
 }

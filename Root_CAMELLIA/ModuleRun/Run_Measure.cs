@@ -84,8 +84,8 @@ namespace Root_CAMELLIA.Module
 
             Camera_Basler VRS = m_module.p_CamVRS;
             ImageData img = VRS.p_ImageViewer.p_ImageData;
-            string strVRSImageDir = "D:\\";
-            string strVRSImageFullPath = "";
+            //string strVRSImageDir = "D:\\";
+            //string strVRSImageFullPath = "";
             RPoint MeasurePoint;
 
             double centerX;

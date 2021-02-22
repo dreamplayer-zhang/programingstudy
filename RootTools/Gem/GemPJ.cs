@@ -98,7 +98,7 @@ namespace RootTools.Gem
             List<GemSlotBase.eState> aSlotState = m_aSlotState[iIndex];
             while (aSlotState.Count <= iSlot) aSlotState.Add(GemSlotBase.eState.Empty);
             aSlotState[iSlot] = GemSlotBase.eState.Exist;
-            //carrier.m_aGemSlot[iSlot].p_eState = GemSlotBase.eState.Select;
+            carrier.m_aGemSlot[iSlot].p_eState = GemSlotBase.eState.Select;
         }
 
         int GetCarrierIndex(GemCarrierBase carrier)
@@ -125,6 +125,7 @@ namespace RootTools.Gem
         public void RunTree(Tree tree)
         {
             p_eState = (eState)tree.Set(p_eState, p_eState, "State", "ProcessJob State", true, true);
+            m_sPJobID = tree.Set(m_sPJobID, m_sPJobID, "PJobID", "ProcessJob ID", true, true);
             m_sRecipeID = tree.Set(m_sRecipeID, m_sRecipeID, "Recipe", "ProcessJob Recipe ID", true, true); 
         }
         #endregion

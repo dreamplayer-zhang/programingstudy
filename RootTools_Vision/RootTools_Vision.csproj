@@ -47,6 +47,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -74,6 +75,9 @@
     <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.31\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -99,17 +103,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Database\CustomAttribute\DatabaseAttribute.cs" />
+    <Compile Include="Database\defect.cs" />
+    <Compile Include="ClonableWorkFactory.cs" />
+    <Compile Include="Inspection\BacksideAlignment.cs" />
+    <Compile Include="Inspection\BacksideSurface.cs" />
+    <Compile Include="Inspection\ProcessDefect_Backside.cs" />
+    <Compile Include="Inspection\ReticleSurface.cs" />
     <Compile Include="GlobalObjects.cs" />
     <Compile Include="InspectionManager.cs" />
-    <Compile Include="Inspection\BacksideSurface.cs" />
     <Compile Include="Inspection\D2D.cs" />
     <Compile Include="Inspection\EBR.cs" />
     <Compile Include="Inspection\EdgeSurface.cs" />
+    <Compile Include="Inspection\ProcessDefect_Edge.cs" />
     <Compile Include="Inspection\ProcessDefect_Wafer.cs" />
     <Compile Include="Inspection\ProcessMeasurement.cs" />
     <Compile Include="Inspection\Snap.cs" />
+    <Compile Include="Recipe\CloneableRecipe.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
     <Compile Include="Recipe\Parameter\BacksideSurfaceParameter.cs" />
+    <Compile Include="Recipe\Parameter\ReticleSurfaceParameter.cs" />
     <Compile Include="Recipe\Parameter\D2DParameter.cs" />
     <Compile Include="Recipe\Interfaces\IBacksideInspection.cs" />
     <Compile Include="Recipe\Interfaces\IColorInspection.cs" />
@@ -134,42 +147,48 @@
     <Compile Include="Recipe\Recipe\RecipeItemBase.cs" />
     <Compile Include="Recipe\Recipe\MaskRecipe.cs" />
     <Compile Include="Recipe\Recipe\SurfaceRecipe.cs" />
-    <Compile Include="UserControls\BasicTreeView.xaml.cs">
-      <DependentUpon>BasicTreeView.xaml</DependentUpon>
+    <Compile Include="RemoteProcess\Exceptions\InvalidProtocolException.cs" />
+    <Compile Include="RemoteProcess\PipeClient.cs" />
+    <Compile Include="RemoteProcess\PipeComm.cs" />
+    <Compile Include="RemoteProcess\PipeProtocol.cs" />
+    <Compile Include="RemoteProcess\PipeServer.cs" />
+    <Compile Include="RemoteProcess\RemoteMessageDefines.cs" />
+    <Compile Include="RemoteProcess\StreamDataReader.cs" />
+    <Compile Include="RemoteProcess\RemoteProcess.cs" />
+    <Compile Include="RemoteProcess\StreamDataWriter.cs" />
+    <Compile Include="ServerWorkFactory.cs" />
+    <Compile Include="UI\CloneImageViewer.xaml.cs">
+      <DependentUpon>CloneImageViewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\BasicTreeView_ViewModel.cs" />
+    <Compile Include="UI\CloneImageViewer_ViewModel.cs" />
+    <Compile Include="UserControls\MapViewer.xaml.cs">
+      <DependentUpon>MapViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\SizeObserver.cs" />
+    <Compile Include="UserControls\MapViewer_ViewModel.cs" />
     <Compile Include="Utility\Enums.cs" />
     <Compile Include="Utility\KlarfData.cs" />
     <Compile Include="Utility\KlarfData_Lot.cs" />
     <Compile Include="SingleObject.cs" />
-    <Compile Include="WorkManager2\DebugOutput.cs" />
-    <Compile Include="WorkManager2\Interfaces\IWorkplaceBundle.cs" />
-    <Compile Include="WorkManager2\Interfaces\IWorkStartable.cs" />
-    <Compile Include="WorkManager2\WorkBase.cs" />
-    <Compile Include="WorkManager2\WorkBundle.cs" />
-    <Compile Include="WorkManager2\WorkDefines.cs" />
-    <Compile Include="WorkManager2\Worker.cs" />
-    <Compile Include="WorkManager2\WorkEventManager.cs" />
-    <Compile Include="WorkManager2\WorkEventManagerArgs.cs" />
-    <Compile Include="WorkManager2\WorkFactory.cs" />
-    <Compile Include="WorkManager2\WorkManager.cs" />
-    <Compile Include="WorkManager2\Workplace.cs" />
-    <Compile Include="WorkManager2\WorkplaceBundle.cs" />
-    <Compile Include="WorkManager\WorkEventManager.cs" />
-    <Compile Include="Inspection\ProcessDefect.cs" />
-    <Compile Include="Utility\Tools.cs" />
-    <Compile Include="WorkManager\WorkEventManager.EvenArgs.cs" />
-    <Compile Include="WorkManager\WorkFactory.cs" />
+    <Compile Include="Utility\TempLogger.cs" />
+    <Compile Include="WorkManager\CloneableWorkBase.cs" />
+    <Compile Include="WorkManager\DebugOutput.cs" />
+    <Compile Include="WorkManager\Interfaces\IWorkplaceBundle.cs" />
+    <Compile Include="WorkManager\Interfaces\IWorkStartable.cs" />
     <Compile Include="WorkManager\WorkBase.cs" />
-    <Compile Include="WorkManager\IWorkable.cs" />
-    <Compile Include="Inspection\Position.cs" />
-    <Compile Include="Inspection\Surface.cs" />
     <Compile Include="WorkManager\WorkBundle.cs" />
+    <Compile Include="WorkManager\WorkDefines.cs" />
     <Compile Include="WorkManager\Worker.cs" />
-    <Compile Include="WorkManager\WorkerManager.cs" />
+    <Compile Include="WorkManager\WorkEventManager.cs" />
+    <Compile Include="WorkManager\WorkEventManagerArgs.cs" />
+    <Compile Include="WorkManager\WorkFactory.cs" />
     <Compile Include="WorkManager\WorkManager.cs" />
     <Compile Include="WorkManager\Workplace.cs" />
     <Compile Include="WorkManager\WorkplaceBundle.cs" />
+    <Compile Include="Inspection\ProcessDefect.cs" />
+    <Compile Include="Utility\Tools.cs" />
+    <Compile Include="Inspection\Position.cs" />
+    <Compile Include="Inspection\Surface.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -182,7 +201,11 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UserControls\BasicTreeView.xaml">
+    <Page Include="UI\CloneImageViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\MapViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

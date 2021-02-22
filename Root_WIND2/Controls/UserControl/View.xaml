@@ -51,9 +51,8 @@
         </Grid.ColumnDefinitions>
         <!--Defect View-->
         <Grid Grid.Column="0">
-            <GroupBox Grid.Row="1"
-                          Header="Defect View">
-                <Grid>
+            <GroupBox Grid.Row="1" Header="Defect View" Style="{StaticResource main_view_groupbox}">
+                <Grid Background="White" Margin="4">
                     <StackPanel VerticalAlignment="Top"
                                     Margin="10,10">
                         <Grid Margin="0,0,0,10" HorizontalAlignment="Left">
@@ -84,15 +83,15 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <TextBlock Text="Wafer ID" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="0" Margin="0,5,0,5"  VerticalAlignment="Center"/>
-                        <TextBlock Text="Recipe"   FontSize="15" FontWeight="Bold"  Grid.Row="1" Grid.Column="0" Margin="0,5,0,5" VerticalAlignment="Center"/>
-                        <TextBlock Text="Defect"   FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="0" Margin="0,5,0,5"  VerticalAlignment="Center"/>
-                        <TextBlock Text="   :    " FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
-                        <TextBlock Text="   :    " FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
-                        <TextBlock Text="   :    " FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
-                        <TextBlock Text="DummyWafer001" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                        <TextBlock Text="test200804.rcp"    FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                        <TextBlock Text="68423 (EA)"    FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                        <TextBlock Text="Wafer ID" Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="0" Margin="0,5,0,5"  VerticalAlignment="Center"/>
+                        <TextBlock Text="Recipe" Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="0" Margin="0,5,0,5" VerticalAlignment="Center"/>
+                        <TextBlock Text="Defect" Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="0" Margin="0,5,0,5"  VerticalAlignment="Center"/>
+                        <TextBlock Text="   :    " Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
+                        <TextBlock Text="   :    " Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
+                        <TextBlock Text="   :    " Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
+                        <TextBlock Text="DummyWafer001" Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                        <TextBlock Text="test200804.rcp" Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                        <TextBlock Text="68423 (EA)" Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
                     </Grid>
                     <Canvas VerticalAlignment="Stretch"
                                         HorizontalAlignment="Stretch"
@@ -134,7 +133,8 @@
                                 <CheckBox Content="EBR" FontSize="15" FontWeight="Bold"   Margin="0,0,15,0"/>
                             </StackPanel>
                             <Button Content="Tuning" Grid.Column="1"
-                                    Margin="3" FontWeight="Bold"/>
+                                    Margin="3" FontWeight="Bold"
+                                    Style="{StaticResource groupbox_button}"/>
                             <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="3">
                                 <GroupBox.Header>
                                     <TextBlock Text="Result"/>
@@ -208,7 +208,7 @@
                                     <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
                                 </DataGrid>
                             </GroupBox>
-                            <GroupBox  Grid.Column="1" Grid.Row="1">
+                            <GroupBox  Grid.Column="1" Grid.Row="1" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Defect Image"/>
                                 </GroupBox.Header>
@@ -219,11 +219,13 @@
                                                    HorizontalAlignment="Center"/>
                                 </Grid>
                             </GroupBox>
-                            <GroupBox Grid.Column="1" Grid.Row="2">
+                            <GroupBox Grid.Column="1" Grid.Row="2" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Map"/>
                                 </GroupBox.Header>
-                                <Image Source="/Root_WIND2;component/Resources/WaferMap.PNG"/>
+                                <Grid Background="White" Margin="4">
+                                    <Image Source="/Root_WIND2;component/Resources/WaferMap.PNG"/>
+                                </Grid>
                             </GroupBox>
                         </Grid>
                     </TabItem>
@@ -240,7 +242,8 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Button Content="Tuning" Grid.Column="1"
-                                    Margin="3" FontWeight="Bold"/>
+                                    Margin="3" FontWeight="Bold"
+                                    Style="{StaticResource groupbox_button}"/>
                             <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
                                 <GroupBox.Header>
                                     <TextBlock Text="Result"/>
@@ -314,7 +317,7 @@
                                     <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
                                 </DataGrid>
                             </GroupBox>
-                            <GroupBox Grid.Column="1" Grid.Row="1">
+                            <GroupBox Grid.Column="1" Grid.Row="1" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Defect Image"/>
                                 </GroupBox.Header>
@@ -325,11 +328,11 @@
                                                    HorizontalAlignment="Center"/>
                                 </Grid>
                             </GroupBox>
-                            <GroupBox Grid.Column="1" Grid.Row="2">
+                            <GroupBox Grid.Column="1" Grid.Row="2" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Map"/>
                                 </GroupBox.Header>
-                                <Grid>
+                                <Grid Background="White" Margin="4">
                                     <Viewbox Margin="10">
                                         <Ellipse VerticalAlignment="Stretch"
                                              HorizontalAlignment="Stretch"
@@ -346,7 +349,7 @@
                                     </Viewbox>
                                 </Grid>
                             </GroupBox>
-                            <GroupBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2">
+                            <GroupBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Measurement Data"/>
                                 </GroupBox.Header>

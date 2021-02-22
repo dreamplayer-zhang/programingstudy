@@ -34,7 +34,7 @@ namespace Root_CAMELLIA.Module
         public bool m_useCentering = true;
 
         List<double> m_aLightPower = new List<double>();
-        LightSet m_lightSet;
+        LightSet m_lightSet = null;
 
         void RunTreeLight(Tree tree, bool bVisible, bool bReadOnly)
         {

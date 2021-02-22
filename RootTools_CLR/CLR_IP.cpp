@@ -3,6 +3,10 @@
 #include "CLR_IP.h"
 #include <msclr\marshal_cppstd.h>
 
+#pragma warning(disable: 4244)
+#pragma warning(disable: 4267)
+#pragma warning(disable: 4793)
+
 namespace RootTools_CLR
 {
 	void CLR_IP::Cpp_Threshold(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH, bool bDark, int nThresh)
@@ -150,7 +154,7 @@ namespace RootTools_CLR
 			for (int i = 0; i < vtLabeled.size(); i++)
 			{
 				local[i] = gcnew Cpp_LabelParam();
-				local[i]->centerX = vtLabeled[i].centerX;
+				local[i]->centerX = (float)vtLabeled[i].centerX;
 				local[i]->centerY = vtLabeled[i].centerY;
 
 				local[i]->width = vtLabeled[i].width;

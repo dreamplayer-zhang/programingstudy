@@ -35,6 +35,9 @@ namespace Root_WIND2
 
         public FrontsideInspection_ImageViewer_ViewModel()
         {
+            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero && GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").m_eMode != ImageData.eMode.OtherPCMem)
+                return;
+
             base.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
             p_VisibleMenu = Visibility.Visible;
             //Shapes.CollectionChanged += Shapes_CollectionChanged;
@@ -261,7 +264,7 @@ namespace Root_WIND2
             return grid;
         }
 
-        static long time = 0;
+        //static long time = 0;
         static StopWatch watch = new StopWatch();
         private void RedrawShapes()
         {

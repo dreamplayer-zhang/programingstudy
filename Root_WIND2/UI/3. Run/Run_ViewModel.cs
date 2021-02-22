@@ -154,7 +154,15 @@ namespace Root_WIND2
             {
                 p_LoadPort1 = (Loadport_RND)((WIND2_Handler)(engineer.ClassHandler())).p_aLoadport[0];
                 p_LoadPort2 = (Loadport_RND)((WIND2_Handler)(engineer.ClassHandler())).p_aLoadport[1];
-                p_Aligner = (Aligner_RND)((WIND2_Handler)(engineer.ClassHandler())).p_Aligner;
+                try
+                {
+                    p_Aligner = (Aligner_RND)((WIND2_Handler)(engineer.ClassHandler())).p_Aligner;
+                }
+                catch
+                {
+
+                }
+                
                 p_WTR = (WTR_RND)((WIND2_Handler)(engineer.ClassHandler())).p_WTR;
                 p_EdgeVision = (EdgeSideVision)((WIND2_Handler)(engineer.ClassHandler())).p_EdgeSideVision;
                 p_BackSideVision  = (BackSideVision)((WIND2_Handler)(engineer.ClassHandler())).p_BackSideVision;
@@ -163,10 +171,7 @@ namespace Root_WIND2
                 m_Viewer.init(null, GlobalObjects.Instance.Get<DialogService>());
                 m_ToolMemory = engineer.ClassMemoryTool();
 
-                m_imagedata = new ImageData(m_ToolMemory.GetMemory("BackSide Vision.BackSide Memory", "BackSide Vision", "Main"));
-                m_imagedata.p_nByte = 3;
-                p_Viewer.SetImageData(m_imagedata);
-
+                p_Viewer.SetImageData(p_BackSideVision.GetMemoryData(BackSideVision.ScanMemory.BackSide));
                 p_ModuleList = engineer.ClassModuleList();
                 p_aTK4S = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_tk4s.p_aTK4S;
             }
@@ -202,7 +207,7 @@ namespace Root_WIND2
 
         public void FuncBackSideImageView()
         {
-            m_imagedata = new ImageData(m_ToolMemory.GetMemory("BackSide Vision.BackSide Memory", "BackSide Vision", "Main"));
+            m_imagedata = p_BackSideVision.GetMemoryData(BackSideVision.ScanMemory.BackSide);
             m_imagedata.p_nByte = 3;
             p_Viewer.SetImageData(m_imagedata);
         }

@@ -142,4 +142,33 @@ namespace Root_WIND2
             return result == Visibility.Visible ? true : false;
         }
     }
+
+    public class EnumToRadioButtonConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string stringParamater = parameter as string;
+
+            if (stringParamater == null) 
+                return DependencyProperty.UnsetValue;
+
+            if(Enum.IsDefined(value.GetType(), value)==false)
+            {
+                return DependencyProperty.UnsetValue;
+            }
+
+            object parameterValue = Enum.Parse(value.GetType(), stringParamater);
+
+            return parameterValue.Equals(value);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string parameterString = parameter as string;
+            if (parameterString == null)
+                return DependencyProperty.UnsetValue;
+
+            return Enum.Parse(targetType, parameterString);
+        }
+    }
 }

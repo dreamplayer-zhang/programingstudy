@@ -168,6 +168,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Control\Block.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\DateTimePicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\LoadingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Engineer\VEGA_D_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -180,6 +192,26 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ManualJobSchedule\ManualJobSchedule_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_UserControl\HomeProgress_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Icon\AtiLogo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Icon\Calendar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_UserControl\Loadport_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -187,6 +219,15 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Control\Block.xaml.cs">
+      <DependentUpon>Block.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\DateTimePicker.xaml.cs">
+      <DependentUpon>DateTimePicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\LoadingControl.xaml.cs">
+      <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Engineer\VEGA_D_Engineer.cs" />
     <Compile Include="Engineer\VEGA_D_Engineer_UI.xaml.cs">
@@ -200,12 +241,29 @@
     <Compile Include="Engineer\VEGA_D_Recipe_UI.xaml.cs">
       <DependentUpon>VEGA_D_Recipe_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ManualJobSchedule\ManualJobSchedule.cs" />
+    <Compile Include="ManualJobSchedule\ManualJobSchedule_UI.xaml.cs">
+      <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_UserControl\HomeProgress_UI.xaml.cs">
+      <DependentUpon>HomeProgress_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Icon\AtiLogo.xaml.cs">
+      <DependentUpon>AtiLogo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Icon\Calendar.xaml.cs">
+      <DependentUpon>Calendar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_UserControl\Loadport_UI.xaml.cs">
+      <DependentUpon>Loadport_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\Vision.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -241,9 +299,11 @@
       <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
       <Name>Root_EFEM</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Root_VEGA_D_IPU\Root_VEGA_D_IPU.csproj">
+      <Project>{4d850dee-fd1b-43ce-99fa-737a86047114}</Project>
+      <Name>Root_VEGA_D_IPU</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Module\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2.UI_User
 {
-    class FrontsideMask_ViewModel : RootViewer_ViewModel
+    class FrontsideMask_ViewModel : RootViewer_ViewModel, IPage
     {
         private class DefineColors
         {
@@ -41,6 +41,9 @@ namespace Root_WIND2.UI_User
 
         public FrontsideMask_ViewModel()
         {
+            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero && GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").m_eMode != ImageData.eMode.OtherPCMem)
+                return;
+
             base.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
             p_VisibleMenu = Visibility.Collapsed;
 
@@ -63,17 +66,26 @@ namespace Root_WIND2.UI_User
             p_ViewElement.Add(OriginBox);
         }
 
-        public void SetPage()
+
+        public void LoadRecipe()
         {
-            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+            p_cInspROI.Clear();
 
-            OriginOffset.X = originRecipe.OriginX;
-            OriginOffset.Y = originRecipe.OriginY - originRecipe.OriginHeight;
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            foreach (RecipeType_Mask mask in recipe.GetItem<MaskRecipe>().MaskList)
+            {
+                InspectionROI roi = new InspectionROI();
+                roi.p_Color = mask.ColorIndex;
+                roi.p_Index = p_cInspROI.Count();
+                roi.p_Data = mask.ToPointLineList();
 
-            this.p_LayerMemoryOffsetX = OriginOffset.X;
-            this.p_LayerMemoryOffsetY = OriginOffset.Y;
+                p_cInspROI.Add(roi);
+            }
 
-            this.DisplayBox();
+            if (p_cInspROI.Count > 0)
+            {
+                p_SelectedROI = p_cInspROI.First();
+            }
         }
 
         #region Property
@@ -1761,6 +1773,7 @@ namespace Root_WIND2.UI_User
             {
                 recipe.GetItem<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data , p_cInspROI[i].p_Color);
             }
+            p_LoadingOpacity = 0;
         }
 
         private void Worker_SaveROI_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -1772,6 +1785,26 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region ICommand
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+                    OriginOffset.X = originRecipe.OriginX;
+                    OriginOffset.Y = originRecipe.OriginY - originRecipe.OriginHeight;
+
+                    this.p_LayerMemoryOffsetX = OriginOffset.X;
+                    this.p_LayerMemoryOffsetY = OriginOffset.Y;
+
+                    this.DisplayBox();
+
+                    LoadRecipe();
+                });
+            }
+        }
         public RelayCommand btnViewFullCommand
         {
             get

@@ -10,13 +10,25 @@ using RootTools.Control.ACS;
 
 namespace Root
 {
-    public class Root_Engineer : IEngineer
+    public class Root_Engineer : NotifyProperty, IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
         public Login.User p_user { get { return m_login.p_user; } }
 
         public IGem ClassGem() { return null; }
+
+        bool _bUseXGem = false;
+        public bool p_bUseXGem
+        {
+            get { return _bUseXGem; }
+            set
+            {
+                if (_bUseXGem == value) return;
+                _bUseXGem = value;
+                OnPropertyChanged();
+            }
+        }
 
         GAF m_gaf = new GAF();
         public GAF ClassGAF() { return m_gaf; }

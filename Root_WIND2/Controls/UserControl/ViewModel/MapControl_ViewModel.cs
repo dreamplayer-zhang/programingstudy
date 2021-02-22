@@ -25,7 +25,6 @@ namespace Root_WIND2
         CPoint MapSize;
         public MapControl_ViewModel()
         {
-            WorkEventManager.WorkplaceStateChanged += MapStateChanged_Callback;
         }
 
 
@@ -98,7 +97,7 @@ namespace Root_WIND2
                     }
                 }));
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 MessageBox.Show("Map State Change Error\n");
             }

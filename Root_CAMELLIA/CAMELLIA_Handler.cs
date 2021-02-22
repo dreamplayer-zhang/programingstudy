@@ -188,10 +188,11 @@ namespace Root_CAMELLIA
             char cID = 'A';
             for (int n = 0; n < m_lLoadport; n++, cID++)
             {
-                string sID = "Rfid" + cID;
+                string sID = "RFID" + cID;
                 module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]);
                 InitModule(module);
                 m_aRFID.Add((IRFID)module);
+                m_aLoadport[n].m_rfid = m_aRFID[n];
             }
         }
         #endregion
@@ -330,7 +331,6 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Calc Sequence
-        //public int m_nRnR = 1;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {

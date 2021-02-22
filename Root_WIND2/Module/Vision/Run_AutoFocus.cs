@@ -169,7 +169,14 @@ namespace Root_WIND2.Module
                 m_CamAutoFocus.Grabed -= CamAutoFocus_Grabed;
                 m_CamAutoFocus.Grabed += CamAutoFocus_Grabed;
                 if (m_CamAutoFocus.p_CamInfo._IsGrabbing == false)
-                    m_CamAutoFocus.GrabContinuousShot();
+                {
+                    m_CamAutoFocus.GrabContinuousShot(false);
+                }
+                else
+                {
+                    m_CamAutoFocus.StopGrab();
+                    m_CamAutoFocus.GrabContinuousShot(false);
+                }
 
                 pos.Clear();
                 nFrame = 0;
@@ -191,29 +198,29 @@ namespace Root_WIND2.Module
 
                     if (nFrameDone < nFrame)
                     {
-                        double pos = axisZ.p_posActual;
+
+                            double pos = axisZ.p_posActual;
 
 
-                        m_buff.Add(matSrc.Clone());
+                            m_buff.Add(matSrc.Clone());
 
-                        CalcParameter param = new CalcParameter(nFrameDone, pos);
+                            CalcParameter param = new CalcParameter(nFrameDone, pos);
 
-                        ThreadPool.QueueUserWorkItem(CalcAutoFocus, param);
-                        nFrameDone++;
-
-                        Thread.Sleep(1);
-
+                            ThreadPool.QueueUserWorkItem(CalcAutoFocus, param);
+                            nFrameDone++;
+                            Thread.Sleep(1);
                     }
-
                 }
+
+                
                 m_CamAutoFocus.StopGrab();
                 while (pos.Count != nFrameDone)
                 {
                     Thread.Sleep(10);
+                    if (EQ.IsStop()) return "OK";
                 }
 
                 axisZ.WaitReady();
-                System.Diagnostics.Debug.WriteLine(nFrameDone);
                 List<AF_Result> orderList = pos.OrderBy(x => x.score).ToList();
 
                 double resPos = orderList[0].pos + m_nAFOffset;
@@ -229,7 +236,16 @@ namespace Root_WIND2.Module
                     axisZ.WaitReady();
 
                     if (m_CamAutoFocus.p_CamInfo._IsGrabbing == false)
-                        m_CamAutoFocus.GrabContinuousShot();
+                    {
+                        m_CamAutoFocus.GrabContinuousShot(false);
+                    }
+                    else
+                    {
+                        m_CamAutoFocus.StopGrab();
+                        m_CamAutoFocus.GrabContinuousShot(false);
+                    }
+                       
+
 
                     nFrame = 0;
 
@@ -270,7 +286,6 @@ namespace Root_WIND2.Module
                         Thread.Sleep(10);
                     }
                     axisZ.WaitReady();
-                    System.Diagnostics.Debug.WriteLine(nFrameDone);
                     orderList = pos.OrderBy(x => x.score).ToList();
 
                     resPos = orderList[0].pos + m_nAFOffset2;
@@ -302,8 +317,8 @@ namespace Root_WIND2.Module
         {
             Mat img = m_buff[m_buff.Count - 1];
 
-            StopWatch sw = new StopWatch();
-            sw.Start();
+            //StopWatch sw = new StopWatch();
+            //sw.Start();
             double curPos = ((CalcParameter)obj).pos;
 
             VectorOfUMat rgb = new VectorOfUMat();
@@ -357,7 +372,7 @@ namespace Root_WIND2.Module
 
             pos.Add(new AF_Result(curPos, res));
 
-            sw.Stop();
+           // sw.Stop();
 
         }
 

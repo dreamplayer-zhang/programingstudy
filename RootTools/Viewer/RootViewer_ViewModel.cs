@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace RootTools
 {
@@ -79,6 +80,8 @@ namespace RootTools
         #region Property
         /// <summary>
         /// Global UI Shapes
+        /// 이거는 RootViewer !!!자체 기능!!! 마우스 따라다니는 점선같은 것들 추가할 때 사용하고
+        /// 외부에서 수정하거나 초기화하지 않도록 하자.
         /// </summary>
         public ObservableCollection<UIElement> p_ViewElement
         {
@@ -95,6 +98,7 @@ namespace RootTools
 
         /// <summary>
         /// Global UI Shapes
+        /// 이거는 레시피 티칭과 같이 사용자가 커스터마이징할 수 있는 UI Element
         /// </summary>
         public ObservableCollection<UIElement> p_UIElement
         {
@@ -110,7 +114,8 @@ namespace RootTools
         private ObservableCollection<UIElement> m_UIElement = new ObservableCollection<UIElement>();
 
         /// <summary>
-        /// Global UI Shapes
+        /// 이것도 마찬가지 인데.... 사용자와 Interaction(상호작용)하는 경우(레시피 티칭 등)를 제외한
+        /// 그리기를 사용할 때 사용하자
         /// </summary>
         public ObservableCollection<UIElement> p_DrawElement
         {
@@ -659,14 +664,54 @@ namespace RootTools
                 {
                     if (p_ImageData.m_eMode == ImageData.eMode.OtherPCMem)
                     {
-                        Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
-                        byte[,,] viewptr = view.Data;
-                        byte[] image = p_ImageData.GetData(p_View_Rect,p_CanvasWidth, p_CanvasHeight);
-                        for (int xx = 0; xx < p_CanvasWidth; xx++)
-                        {   
-                            viewptr[xx, xx, 0] = image[p_View_Rect.Width * xx];
+                        if (p_ImageData.p_nByte == 1)
+                        {
+                            if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
+                            {
+                                Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+                                byte[,,] viewptr = view.Data;
+                                byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+                                //for (int yy = 0; yy < p_CanvasHeight; yy++)
+                                Parallel.For(0, p_CanvasHeight, (yy) =>
+                                {
+                                    for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                    {
+                                        viewptr[yy, xx, 0] = image[p_CanvasWidth * yy + xx];
+                                    }
+                                });
+                                p_ImgSource = ImageHelper.ToBitmapSource(view);
+                            }
                         }
-                        p_ImgSource = ImageHelper.ToBitmapSource(view);
+                        else if (p_ImageData.p_nByte == 3)
+                        {
+                            if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
+                            {
+                                Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
+                                byte[,,] viewptr = view.Data;
+                                byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+                                int nTerm = p_CanvasWidth * p_CanvasHeight;
+                                if(image !=null)                              
+                                Parallel.For(0, p_CanvasHeight, (yy) =>
+                                {
+                                    for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                    {
+                                        viewptr[yy, xx, 0] = image[p_CanvasWidth * yy + xx];
+                                        viewptr[yy, xx, 1] = image[p_CanvasWidth * yy + xx + nTerm];
+                                        viewptr[yy, xx, 2] = image[p_CanvasWidth * yy + xx + nTerm * 2];
+                                    }
+                                });
+                                p_ImgSource = ImageHelper.ToBitmapSource(view);
+                            }
+                        }
+                        //        p_ImgSource = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+                        //Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+                        //byte[,,] viewptr = view.Data;
+                        //byte[] image = p_ImageData.GetData(p_View_Rect,p_CanvasWidth, p_CanvasHeight);
+                        //for (int xx = 0; xx < p_CanvasWidth; xx++)
+                        //{   
+                        //    viewptr[xx, xx, 0] = image[p_View_Rect.Width * xx];
+                        //}
+                        //p_ImgSource = ImageHelper.ToBitmapSource(view);
                     }
                     else
                     {
@@ -752,9 +797,9 @@ namespace RootTools
                                             {
                                                 long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
-                                                    viewPtr[yy, xx, 0] = imageptrR[pix_x + (long)pix_y * sizeX];
-                                                    viewPtr[yy, xx, 1] = imageptrG[pix_x + (long)pix_y * sizeX];
-                                                    viewPtr[yy, xx, 2] = imageptrB[pix_x + (long)pix_y * sizeX];
+                                                viewPtr[yy, xx, 0] = imageptrR[pix_x + (long)pix_y * sizeX];
+                                                viewPtr[yy, xx, 1] = imageptrG[pix_x + (long)pix_y * sizeX];
+                                                viewPtr[yy, xx, 2] = imageptrB[pix_x + (long)pix_y * sizeX];
                                             }
                                         }
                                     });
@@ -910,23 +955,32 @@ namespace RootTools
                         int viewrectX = ((p_View_Rect.X - memOffset.X) <= 0)?0:(p_View_Rect.X - memOffset.X);
                         int viewrectY = ((p_View_Rect.Y - memOffset.Y) <= 0)?0:(p_View_Rect.Y - memOffset.Y);
 
+                        int layerMemWidth = p_ROILayer.p_Size.X;
+                        int layerMemHeight = p_ROILayer.p_Size.Y;
+                        
                         int viewrectWidth = p_View_Rect.Width;
                         int viewrectHeight = p_View_Rect.Height;
-                        
-                        int sizeX = p_ROILayer.p_Size.X;
+
+
 
                         Parallel.For(0, CanvasHeight, (yy) =>
                         {
                             long pix_y = viewrectY + yy * viewrectHeight / CanvasHeight;
-                            long pix_rect = pix_y * sizeX;
-                            for (int xx = 0; xx < CanvasWidth; xx++)
-                            {
-                                long pix_x = viewrectX + xx * viewrectWidth / CanvasWidth;
+                            long pix_rect = pix_y * layerMemWidth;
 
-                                viewPtr[yy, xx, 3] = imageptr[3 + 4 * (pix_x + pix_rect)]; //0;
-                                viewPtr[yy, xx, 2] = imageptr[2 + 4 * (pix_x + pix_rect)]; //0;//imageptr[0 + 3 * (pix_x + pix_rect)];
-                                viewPtr[yy, xx, 1] = imageptr[1 + 4 * (pix_x + pix_rect)]; //0;//imageptr[1 + 3 * (pix_x + pix_rect)];
-                                viewPtr[yy, xx, 0] = imageptr[0 + 4 * (pix_x + pix_rect)]; //0;//imageptr[2 + 3 * (pix_x + pix_rect)];
+                            if(pix_y < layerMemHeight)
+                            {
+                                for (int xx = 0; xx < CanvasWidth; xx++)
+                                {
+                                    long pix_x = viewrectX + xx * viewrectWidth / CanvasWidth;
+                                    if (pix_x < layerMemWidth)
+                                    {
+                                        viewPtr[yy, xx, 3] = imageptr[3 + 4 * (pix_x + pix_rect)]; //0;
+                                        viewPtr[yy, xx, 2] = imageptr[2 + 4 * (pix_x + pix_rect)]; //0;//imageptr[0 + 3 * (pix_x + pix_rect)];
+                                        viewPtr[yy, xx, 1] = imageptr[1 + 4 * (pix_x + pix_rect)]; //0;//imageptr[1 + 3 * (pix_x + pix_rect)];
+                                        viewPtr[yy, xx, 0] = imageptr[0 + 4 * (pix_x + pix_rect)]; //0;//imageptr[2 + 3 * (pix_x + pix_rect)];
+                                    }
+                                }
                             }
                         });
 
@@ -959,6 +1013,22 @@ namespace RootTools
                 System.Windows.MessageBox.Show(ee.ToString());
             }
         }
+
+        public void ClearViewElement()
+        {
+            this.p_ViewElement.Clear();
+        }
+
+        public void ClearUIElement()
+        {
+            this.p_UIElement.Clear();
+        }
+
+        public void ClearDrawElement()
+        {
+            this.p_UIElement.Clear();
+        }
+
         public void InitRoiRect(int nWidth, int nHeight)
         {
             if (p_ImageData == null)
@@ -1078,9 +1148,9 @@ namespace RootTools
                     for (int xx = 0; xx < p_ThumbWidth; xx++)
                     {
                         pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
-                        view.Data[yy, xx, 2] = ((byte*)imageptrR)[0 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
-                        view.Data[yy, xx, 1] = ((byte*)imageptrG)[1 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
-                        view.Data[yy, xx, 0] = ((byte*)imageptrB)[2 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        //view.Data[yy, xx, 2] = ((byte*)imageptrR)[0 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        //view.Data[yy, xx, 1] = ((byte*)imageptrG)[1 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        //view.Data[yy, xx, 0] = ((byte*)imageptrB)[2 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
                     }
                 }
                 if (view.Width != 0 && view.Height != 0)

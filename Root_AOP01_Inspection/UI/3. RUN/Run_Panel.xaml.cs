@@ -5,9 +5,11 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using RootTools;
 using RootTools.Module;
+using RootTools.Control;
 using Root_AOP01_Inspection.Module;
 using Root_EFEM.Module;
 using Root_AOP01_Inspection.UI._3._RUN;
+using System.Threading;
 
 namespace Root_AOP01_Inspection
 {
@@ -21,25 +23,26 @@ namespace Root_AOP01_Inspection
         AOP01_Handler m_handler;
         MainVision m_mainvision;
         BacksideVision m_backsidevision;
-        RTRCleanUnit m_rtrcleanunit;
-        WTRArm m_wtr;
+        //RTRCleanUnit m_rtrcleanunit;
+        RTR_RND m_rndrtr;
+        WTRArm m_rtrarm;
         RTR_RND.Arm m_arm;
-        Loadport_Cymechs[] m_loadport = new Loadport_Cymechs[2];
+        Loadport_AOP01[] m_loadport = new Loadport_AOP01[2];
         RFID_Brooks[] m_rfid = new RFID_Brooks[2];
-        AOP01_Handler.eLoadport LoadportType;
+        //AOP01_Handler.eLoadport LoadportType;
         public Run_Panel()
         {
             InitializeComponent();
         }
 
-        public void Init(MainVision mainvision, BacksideVision backsidevision, RTRCleanUnit wtrcleanunit, Loadport_Cymechs loadport1,
-            Loadport_Cymechs loadport2, AOP01_Engineer engineer, RFID_Brooks rfid1, RFID_Brooks rfid2)
+        public void Init(MainVision mainvision, BacksideVision backsidevision, RTR_RND rtr, Loadport_AOP01 loadport1,
+            Loadport_AOP01 loadport2, AOP01_Engineer engineer, RFID_Brooks rfid1, RFID_Brooks rfid2)
         {
             m_engineer = engineer;
             m_handler = engineer.m_handler;
-            m_rtrcleanunit = wtrcleanunit;
-            m_wtr = m_rtrcleanunit.p_aArm[0];
-            m_arm = m_rtrcleanunit.m_dicArm[0];
+            m_rndrtr = rtr;
+            m_rtrarm = m_rndrtr.p_aArm[0];
+            m_arm = m_rndrtr.m_dicArm[0];
             m_loadport[0] = loadport1;
             m_loadport[1] = loadport2;
             m_mainvision = mainvision;
@@ -50,7 +53,11 @@ namespace Root_AOP01_Inspection
             loadportB.Init(m_handler.m_aLoadport[1], m_engineer, m_rfid[1]);
             LoadportA_State.DataContext = loadport1;
             LoadportB_State.DataContext = loadport2;
-            RTR_State.DataContext = wtrcleanunit;
+            buttonAlarmList.DataContext = m_handler.m_gaf.m_listALID;
+            RTR_State.DataContext = m_rndrtr;
+            //progressBarSequence.DataContext = m_handler.m_process;
+            //textblockSequence.DataContext = m_handler.m_process;
+            Machine_State.DataContext = EQ.m_EQ;
             InitFFU();
             InitTimer();
         }
@@ -72,27 +79,31 @@ namespace Root_AOP01_Inspection
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();
         }
-
+        public string p_sLotElapsedTime = "";
         private void M_timer_Tick(object sender, EventArgs e)
         {
             CheckMainVisionState();
-            ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_wtr.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
+            ExistRTR.Background = m_arm.m_diCheckVac.p_bIn == true && m_rtrarm.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
             ExistVision.Background = (m_mainvision.m_diExistVision.p_bIn == true && m_mainvision.p_infoWafer != null)||
                 (m_backsidevision.m_diExistVision.p_bIn == true && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
+            //ExistRTR.Background = CheckChattering(m_arm.m_diCheckVac,true,500) == false && m_rtrarm.p_infoWafer != null ? Brushes.SteelBlue : Brushes.LightGray;
+            //ExistVision.Background = (CheckChattering(m_mainvision.m_diExistVision, true, 500) == false && m_mainvision.p_infoWafer != null) ||
+            //    (CheckChattering(m_backsidevision.m_diExistVision, true, 500) == false && m_backsidevision.p_infoWafer != null) ? Brushes.SteelBlue : Brushes.LightGray;
+            if (m_loadport[0].m_swLotTime.IsRunning) textblockRunTime1.Text = m_loadport[0].p_swLotTime;
+            if (m_loadport[1].m_swLotTime.IsRunning) textblockRunTime2.Text = m_loadport[1].p_swLotTime;
             ButtonInitialize.IsEnabled = IsEnableInitialization();
             ButtonRecovery.IsEnabled = IsEnableRecovery();
             TimerLamp();
-            if (EQ.p_eState != EQ.eState.Recovery)
-                m_rtrcleanunit.m_bRecovery = false;
         }
         #endregion
         #region Button Recovery
         bool IsEnableRecovery()
         {
             if (IsRunModule()) return false;
+            if (IsErrorModule()) return false;
             if (m_handler.m_bIsPossible_Recovery == false) return false;
             // Daniel check
-            if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (EQ.p_eState != EQ.eState.Ready && EQ.p_eState != EQ.eState.Idle) return false;
             if (EQ.p_bStop == true) return false;
             return m_handler.IsEnableRecovery();
         }
@@ -104,7 +115,6 @@ namespace Root_AOP01_Inspection
             m_handler.CalcRecover();
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Recovery;
-            m_rtrcleanunit.m_bRecovery = true;
         }
         #endregion
 
@@ -125,7 +135,7 @@ namespace Root_AOP01_Inspection
 
         bool IsRunModule()
         {
-            if (IsRunModule(m_loadport[0]) || IsRunModule(m_loadport[1]) || IsRunModule(m_rtrcleanunit) || IsRunModule(m_handler.m_mainVision) || IsRunModule(m_handler.m_backsideVision))
+            if (IsRunModule(m_loadport[0]) || IsRunModule(m_loadport[1]) || IsRunModule(m_rndrtr) || IsRunModule(m_handler.m_mainVision) || IsRunModule(m_handler.m_backsideVision))
                 return true;
             //if (IsRunModule(m_loadport[0])) return true;
             //if (IsRunModule(m_loadport[1])) return true;
@@ -133,6 +143,20 @@ namespace Root_AOP01_Inspection
             //if (IsRunModule(m_handler.m_mainVision)) return true;
             //if (IsRunModule(m_handler.m_backsideVision)) return true;
             return false;
+        }
+        bool IsErrorModule()
+        {
+            if (IsErrorModule(m_loadport[0]) || IsErrorModule(m_loadport[1]) || IsErrorModule(m_rndrtr) || IsErrorModule(m_handler.m_mainVision) || IsErrorModule(m_handler.m_backsideVision))
+                return true;
+            else 
+                return false;
+        }
+        bool IsErrorModule(ModuleBase module)
+        {
+            if (module.p_eState == ModuleBase.eState.Error) 
+                return true;
+            else 
+                return false;
         }
         bool IsRunModule(ModuleBase module)
         {
@@ -145,8 +169,9 @@ namespace Root_AOP01_Inspection
         {
             if (IsEnableInitialization() == false) return;
             EQ.p_bStop = false;
+            m_handler.m_process.m_dSequencePercent = 0;
             m_handler.m_process.ClearInfoWafer();
-            m_handler.m_nRnR = 0; //Init 할때 RNR 카운트초기화
+            m_handler.p_nRnRCount = 0; //Init 할때 RNR 카운트초기화
             m_handler.m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState = InfoCarrier.eState.Placed;  //210201 모니터링필요 EQ.Stop 되고 이닛누르면 간헐적으로 Loadport Docking 상태로 무언정지 생김
             EQ.p_eState = EQ.eState.Home;
         }
@@ -162,7 +187,7 @@ namespace Root_AOP01_Inspection
         }
         bool IsEnableResume()
         {
-            if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (EQ.p_eState != EQ.eState.Ready && EQ.p_eState != EQ.eState.Idle) return false;
             if (m_handler.m_process.m_qSequence.Count <= 0) return false;
             return true;
         }
@@ -207,23 +232,14 @@ namespace Root_AOP01_Inspection
             m_engineer.m_handler.m_aop01.BuzzerOff();
         }
 
-        private void DoorCheck_Click(object sender, RoutedEventArgs e)
+        private void DoorLock_Click(object sender, RoutedEventArgs e)
         {
-            if ((String)DoorCheck.Content == "DoorAlarm Off")
-            {
-                DoorCheck.Content = "DoorAlarm On";
-                m_engineer.m_handler.m_aop01.m_bDoorAlarm = false;
-            }
-            else
-            {
-                DoorCheck.Content = "DoorAlarm Off";
-                m_engineer.m_handler.m_aop01.m_bDoorAlarm = true;
-            }
+            m_engineer.m_handler.m_aop01.m_doDoorLock_Use.Write(false);
         }
 
         private void ButtonStop_Click(object sender, RoutedEventArgs e)
         {
-            EQ.p_bStop = true; //수정 필요
+            EQ.p_bStop = true;
         }
         #endregion
         void TimerLamp()
@@ -247,5 +263,30 @@ namespace Root_AOP01_Inspection
             else if (m_mainvision.p_eState == ModuleBase.eState.Ready && m_backsidevision.p_eState == ModuleBase.eState.Ready)
                 MainVision_State.Text = "Ready";
         }
+        //public bool CheckChattering(DIO_I input, bool bType, double dChatteringTime, double dChatteringPercent = 0.5)
+        //{
+        //    int nChattering = 0;
+        //    for(int i=0;i<dChatteringTime; i++)
+        //    {
+        //        if (input.p_bIn == bType)
+        //        {
+        //            Thread.Sleep(1);
+        //            nChattering++;
+        //        }
+        //        else
+        //        {
+        //            break;
+        //        }
+
+        //    }
+        //    if(nChattering>(int)(dChatteringTime *(1-dChatteringPercent)))
+        //    {
+        //        return false;
+        //    }
+        //    else
+        //        return true;
+
+        //}
+
     }
 }

@@ -13,7 +13,25 @@ namespace Root_WIND2.UI_User
         public CameraVRS_ViewModel()
         {
             imageViewerVM = new CameraVRS_ImageViewer_ViewModel();
-            imageViewerVM.init();
+            //imageViewerVM.init();
         }
+
+        #region [Command]
+        public RelayCommand LoadedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+
+
+            });
+        }
+        public RelayCommand UnloadedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+
+            });
+        }
+        #endregion
     }
 }

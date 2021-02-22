@@ -82,6 +82,11 @@
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding CommandEndInsp}"
                             Margin="0,0,0,10" />
+                    <ProgressBar Height="50"
+                                 Value="{Binding p_dProgressValue}"
+                                 Minimum="0"
+                                 Maximum="100"
+                                 Margin="0,0,0,10"/>
                     <Expander Header="Feature Parameters"
 							  Margin="0,0,0,10"
 							  Foreground="White">

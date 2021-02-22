@@ -161,13 +161,12 @@ namespace Root_Vega
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
-            if (gaf != null) gaf.ClearALID();
+            gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
         }
         #endregion
 
         #region Calc Sequence
-        public int m_nRnR = 1;
         dynamic m_infoRnRSlot; 
         public string AddSequence(dynamic infoSlot)
         {
@@ -189,7 +188,7 @@ namespace Root_Vega
             if (m_process.m_qSequence.Count > 0) return; 
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
-                if (m_gem != null) m_gem.SendPJComplete(pj.m_sPJobID);
+                m_gem?.SendPJComplete(pj.m_sPJobID);
                 Thread.Sleep(100); 
             }
         }
@@ -230,11 +229,11 @@ namespace Root_Vega
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0) )
+                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0) )
                             {
                                 m_process.p_sInfo = m_process.AddInfoReticle(m_infoRnRSlot);
                                 m_process.ReCalcSequence();
-                                m_nRnR--;
+                                EQ.p_nRnR--;
                                 EQ.p_eState = EQ.eState.Run; 
                             }
                         }

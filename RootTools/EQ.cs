@@ -11,6 +11,7 @@ namespace RootTools
             Init,
             Home,
             Ready,
+            Idle,//LYJ 210203 add
             Run,
             Recovery,  //LYJ 210128 add
             Error,
@@ -209,7 +210,7 @@ namespace RootTools
             }
         }
 
-        int _nRnR = 0;
+        int _nRnR = 1;
         public int p_nRnR 
         {
             get { return _nRnR; }

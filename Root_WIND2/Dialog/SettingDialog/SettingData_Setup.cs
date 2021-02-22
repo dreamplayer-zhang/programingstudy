@@ -27,10 +27,9 @@ namespace Root_WIND2
                 this.test = value;
             }
         }
-
         public SettingData_Setup(string[] _treeViewPath) : base(_treeViewPath)
         {
-
+            
         }
     }
 }

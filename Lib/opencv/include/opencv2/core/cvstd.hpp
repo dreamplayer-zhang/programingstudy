@@ -61,6 +61,8 @@
 #  include <cstdlib> //for abs(int)
 #  include <cmath>
 
+#pragma warning(disable: 4793)
+
 namespace cv
 {
     static inline uchar abs(uchar a) { return a; }

@@ -6,10 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Root_WIND2.UI_User
 {
-    class FrontsideOrigin_ViewModel : ObservableObject
+    class FrontsideOrigin_ViewModel : ObservableObject, IPage
     {
         private readonly FrontsideOrigin_ImageViewer_ViewModel imageViewerVM;
         public FrontsideOrigin_ImageViewer_ViewModel ImageViewerVM
@@ -20,7 +21,10 @@ namespace Root_WIND2.UI_User
 
         public FrontsideOrigin_ViewModel()
         {
-            this.imageViewerVM = new FrontsideOrigin_ImageViewer_ViewModel();
+            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero && GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").m_eMode !=  ImageData.eMode.OtherPCMem)
+                return;
+
+            this.imageViewerVM = new FrontsideOrigin_ImageViewer_ViewModel();           
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
 
             this.imageViewerVM.OriginBoxReset += OriginBoxReset_Callback;
@@ -29,6 +33,25 @@ namespace Root_WIND2.UI_User
             this.imageViewerVM.PitchPointDone += PitchPointDone_Callback;
 
         }
+
+        public void LoadRecipe()
+        {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+            this.OriginX = originRecipe.OriginX;
+            this.OriginY =  originRecipe.OriginY;
+
+            this.OriginWidth = originRecipe.OriginWidth;
+            this.OriginHeight = originRecipe.OriginHeight;
+
+            this.PitchX = originRecipe.DiePitchX;
+            this.PitchY = originRecipe.DiePitchY;
+
+            ImageViewerVM.SetOriginBox(new CPoint(this.OriginX, this.OriginY), this.OriginWidth, this.OriginHeight, this.PitchX, this.PitchY);
+
+            WIND2EventManager.OnRecipeUpdated(this, new RecipeEventArgs());
+        }
+
 
         public void OriginBoxReset_Callback()
         {
@@ -49,6 +72,8 @@ namespace Root_WIND2.UI_User
 
             this.PitchX = originRecipe.DiePitchX;
             this.PitchY = originRecipe.DiePitchY;
+
+            WIND2EventManager.OnRecipeUpdated(this, new RecipeEventArgs());
         }
 
         public void OriginBoxDone_Callback()
@@ -56,7 +81,7 @@ namespace Root_WIND2.UI_User
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
 
             this.OriginX = originRecipe.OriginX;
-            this.OriginY = originRecipe.OriginY;
+            this.OriginY = originRecipe.OriginX;
 
             this.OriginWidth = originRecipe.OriginWidth;
             this.OriginHeight = originRecipe.OriginHeight;
@@ -69,7 +94,7 @@ namespace Root_WIND2.UI_User
 
         public void Clear()
         {
-            this.ImageViewerVM.ClearOrigin(true);
+            this.ImageViewerVM.ClearObjects(true);
 
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
             originRecipe.Clear();
@@ -83,6 +108,8 @@ namespace Root_WIND2.UI_User
 
             WIND2EventManager.OnRecipeUpdated(this, new RecipeEventArgs());
         }
+
+
 
         #region [Properties]
         private int originX = 0;
@@ -147,6 +174,17 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Command]
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    LoadRecipe();
+                });
+            }
+        }
+
         public RelayCommand btnOriginClearCommand
         {
             get
@@ -158,11 +196,6 @@ namespace Root_WIND2.UI_User
             }
         }
         #endregion
-
-
-
-
-
 
     }
 }

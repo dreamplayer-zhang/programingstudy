@@ -49,6 +49,19 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
+        double _fRotateSpeed = 1;
+        public double p_fRotateSpeed
+        {
+            get { return _fRotateSpeed; }
+            set
+            {
+                if (_fRotateSpeed == value) return;
+                _fRotateSpeed = value;
+                OnPropertyChanged();
+                AddProtocol(p_id, eCmd.SetRotateSpeed, value);
+            }
+        }
+
         Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1; 
         public Storage.eMagazine p_eMagazine
         {
@@ -165,6 +178,7 @@ namespace Root_Rinse_Loader.Module
 
         #region Rinse
         DIO_I m_diRinseRun;
+        DIO_O m_doRinseEmg; 
 
         public enum eRinseRun
         {
@@ -180,6 +194,22 @@ namespace Root_Rinse_Loader.Module
                 if (_eStateRinse == value) return;
                 _eStateRinse = value;
                 OnPropertyChanged(); 
+                if (value == eRinseRun.Ready)
+                {
+                    if (EQ.p_eState == EQ.eState.Run) EQ.p_eState = EQ.eState.Ready; 
+                }
+            }
+        }
+
+        bool _bRinseEmg = false; 
+        public bool p_bRinseEmg
+        {
+            get { return _bRinseEmg; }
+            set
+            {
+                if (_bRinseEmg == value) return;
+                _bRinseEmg = value;
+                m_doRinseEmg.Write(!value); 
             }
         }
         #endregion
@@ -199,14 +229,16 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region ToolBox
-        TCPIPClient m_tcpip; 
+        public TCPIPClient m_tcpip; 
         public override void GetTools(bool bInit)
         {
             GetToolsDIO(); 
             p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
-            p_sInfo = m_toolBox.Get(ref m_diRinseRun, this, "Rinse Run"); 
+            p_sInfo = m_toolBox.Get(ref m_diRinseRun, this, "Rinse Run");
+            p_sInfo = m_toolBox.Get(ref m_doRinseEmg, this, "Rinse Emg Stop");
             if (bInit) 
             {
+                m_doRinseEmg.Write(false); 
                 EQ.m_EQ.OnChanged += M_EQ_OnChanged;
                 m_tcpip.EventReciveData += M_tcpip_EventReciveData;
             }
@@ -353,8 +385,8 @@ namespace Root_Rinse_Loader.Module
             {
                 switch (EQ.p_eState)
                 {
-                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Green); break;
-                    case EQ.eState.Run: m_doLamp.Write(eLamp.Yellow); break;
+                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Yellow); break;
+                    case EQ.eState.Run: m_doLamp.Write(eLamp.Green); break;
                     case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
                     default: m_doLamp.AllOff(); break;
                 }
@@ -374,6 +406,7 @@ namespace Root_Rinse_Loader.Module
             StripSend,
             StripReceive,
             ResultClear,
+            SetRotateSpeed,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
@@ -416,6 +449,7 @@ namespace Root_Rinse_Loader.Module
             {
                 Thread.Sleep(10);
                 p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready;
+                p_bRinseEmg = (p_eStateRinse == eRinseRun.Run) && (p_eStateUnloader != EQ.eState.Run); 
                 RunThreadDIO(); 
                 if (m_qProtocolReply.Count > 0)
                 {
@@ -515,6 +549,7 @@ namespace Root_Rinse_Loader.Module
             InitTimer(); 
             AddProtocol(p_id, eCmd.SetMode, p_eMode);
             AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
+            AddProtocol(p_id, eCmd.SetRotateSpeed, p_fRotateSpeed); 
         }
 
         public override void ThreadStop()

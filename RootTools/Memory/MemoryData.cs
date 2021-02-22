@@ -8,6 +8,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
+using System.Windows;
 
 namespace RootTools.Memory
 {
@@ -315,15 +316,12 @@ namespace RootTools.Memory
                     FileOpenJPG(sFile, nMemIndex);
                     break;
             }
-
-            throw new NotImplementedException();
         }
         string GetUpperExt(string sFile)
         {
             string[] sFiles = sFile.Split('.');
             return sFiles[sFiles.Length - 1].ToUpper();
         }
-
 
         public void FileOpen(string sFile, int nMemoryIndex)
         {
@@ -339,7 +337,7 @@ namespace RootTools.Memory
             else
             {
                 ImageData data = new ImageData(123, 123);
-                System.Windows.MessageBox.Show("OpenFile() - 파일이 존재 하지 않거나 열기에 실패하였습니다. - " + sFile);
+                MessageBox.Show("OpenFile() - 파일이 존재 하지 않거나 열기에 실패하였습니다. - " + sFile);
             }
         }
 
