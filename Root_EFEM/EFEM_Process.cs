@@ -328,11 +328,17 @@ namespace Root_EFEM
 
         IWTRChild GetNextChild(InfoWafer infoWaferGet)
         {
-            for (int n = 1; n < infoWaferGet.m_qCalcProcess.Count; n++)
+            ModuleRunBase[] aProcess = infoWaferGet.m_qCalcProcess.ToArray(); 
+            for (int n = 1; n < aProcess.Length; n++)
             {
-                ModuleRunBase moduleRun = infoWaferGet.m_qCalcProcess.Peek();
-                if (moduleRun.m_moduleBase.p_id != m_wtr.p_id) return (IWTRChild)moduleRun.m_moduleBase;
+                ModuleBase module = aProcess[n].m_moduleBase; 
+                if (module.p_id != m_wtr.p_id) return (IWTRChild)module;
             }
+            //for (int n = 1; n < infoWaferGet.m_qCalcProcess.Count; n++)
+            //{
+                //ModuleRunBase moduleRun = infoWaferGet.m_qCalcProcess.Peek();
+                //if (moduleRun.m_moduleBase.p_id != m_wtr.p_id) return (IWTRChild)moduleRun.m_moduleBase;
+            //}
             return null;
         }
         #endregion

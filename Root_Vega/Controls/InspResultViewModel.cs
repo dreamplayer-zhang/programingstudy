@@ -715,7 +715,7 @@ namespace Root_Vega.Controls
 						//		break;
 						//}
 					}
-					catch (Exception ex)
+					catch (Exception)
 					{
 
 					}

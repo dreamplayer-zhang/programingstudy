@@ -10,7 +10,21 @@ namespace RootTools.Camera
         Forward,
         BackWard,
     }
-
+    public class GrabData
+    {
+        public int nScanOffsetY = 0;
+        public bool bInvY = false;
+        public int ReverseOffsetY = 0;
+        public double m_dScaleR = 1;
+        public double m_dScaleG = 1;
+        public double m_dScaleB = 1;
+        public double m_dShiftR = 0;
+        public double m_dShiftG = 0;
+        public double m_dShiftB = 0;
+        public int m_nFovStart = 0;
+        public int m_nFovSize = 8000;
+        public int m_nOverlap = 0;
+    }
     public interface ICamera
     {
         event EventHandler Grabed;
@@ -31,8 +45,11 @@ namespace RootTools.Camera
 
         string StopGrab();
 
-        void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine,int nScanOffsetY =0, bool bInvY = false, int ReserveOffsetY = 0);
-        void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY=0, bool bInvY = false, int ReverseOffsetY = 0);
+
+        //void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine,int nScanOffsetY =0, bool bInvY = false, int ReserveOffsetY = 0, GrabData m_GrabData = null);
+        //void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReverseOffsetY = 0, GrabData m_GrabData = null);/
+        void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false);
+        void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null);
         double GetFps();
     }
 

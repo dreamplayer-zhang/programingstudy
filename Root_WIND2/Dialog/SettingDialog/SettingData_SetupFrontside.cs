@@ -12,12 +12,30 @@ namespace Root_WIND2
         {
         
         }
-        private int test;
-
-        public int Test
+        private string path = "D:\\";
+        public string Path
         {
-            get { return test; }
-            set { test = value; }
+            get
+            {
+                return path;
+            }
+            set
+            {
+                path = value;
+            }
+        }
+
+        private string path2 = "C:\\";
+        public string Path2
+        {
+            get
+            {
+                return path2;
+            }
+            set
+            {
+                path2 = value;
+            }
         }
     }
 }

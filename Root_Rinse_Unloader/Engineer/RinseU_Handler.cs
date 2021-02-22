@@ -116,7 +116,7 @@ namespace Root_Rinse_Unloader.Engineer
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
-            if (gaf != null) gaf.ClearALID();
+            gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
         }
         #endregion
@@ -151,6 +151,33 @@ namespace Root_Rinse_Unloader.Engineer
             m_thread.Start();
         }
 
+        bool _bRun = false;
+        public bool p_bRun
+        {
+            get { return _bRun; }
+            set
+            {
+                if (_bRun == value) return;
+                _bRun = value;
+                StartRun(value);
+            }
+        }
+
+        void StartRun(bool bRun)
+        {
+            if (bRun)
+            {
+                m_rail.StartRun();
+                m_roller.StartRun();
+                m_loader.StartRun();
+                m_storage.StartRun(); 
+            }
+            else
+            {
+
+            }
+        }
+
         void RunThread()
         {
             m_bThread = true;
@@ -165,37 +192,18 @@ namespace Root_Rinse_Unloader.Engineer
                         //forget
                         break;
                 }
+                p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
             }
         }
         #endregion
 
         #region PickerSet
-        BackgroundWorker m_bgwPickerSet = new BackgroundWorker();
-        void InitBackgroundWorker()
-        {
-            m_bgwPickerSet.DoWork += M_bgwPickerSet_DoWork;
-        }
-
-        private void M_bgwPickerSet_DoWork(object sender, DoWorkEventArgs e)
-        {
-            RunPickerSet();
-        }
-
-        string RunPickerSet()
-        {
-            m_loader.m_bPickersetMode = true;
-            m_storage.StartMoveStackReady();
-            EQ.p_eState = EQ.eState.Run;
-            while (m_storage.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
-            if (EQ.IsStop()) return "EQ Stop";
-            m_loader.StartPickerSet();
-            EQ.p_eState = EQ.eState.Run;
-            return "OK";
-        }
-
         public string StartPickerSet()
         {
-            m_bgwPickerSet.RunWorkerAsync();
+            if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist";
+            EQ.p_bPickerSet = true;
+            p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
+            p_moduleList.StartModuleRuns();
             return "OK";
         }
         #endregion

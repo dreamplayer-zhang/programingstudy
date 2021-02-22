@@ -18,6 +18,8 @@ namespace RootTools_Vision
         int centerX;
         int centerY;
         int radius;
+
+        bool isEdgeIncluded;
         #endregion
 
         #region [Getter Setter]
@@ -28,6 +30,8 @@ namespace RootTools_Vision
         public int OriginY { get => originY; set => originY = value; }
         public int DiePitchX { get => diePitchX; set => diePitchX = value; }
         public int DiePitchY { get => diePitchY; set => diePitchY = value; }
+
+        public bool IsEdgeIncluded { get => this.isEdgeIncluded; set => this.isEdgeIncluded = value; }
         #endregion
 
         public BacksideRecipe()

@@ -22,22 +22,22 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    
+
     <ScrollViewer VerticalScrollBarVisibility="Visible">
         <StackPanel>
             <Grid Height="838" DataContext="{Binding p_ROI_VM}">
                 <Grid Opacity="{Binding p_PageOpacity}" IsEnabled="{Binding p_PageEnable}">
                     <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2.5*"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2.5*"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0">
-                    <GroupBox Grid.Row="0" Header="Origin View"
+                        <GroupBox Grid.Row="0" Header="Origin View"
                               Background="{StaticResource GroupBoxBackground}">
-                        <tools:RootViewer/>
-                    </GroupBox>
-                </Grid>
+                            <tools:RootViewer/>
+                        </GroupBox>
+                    </Grid>
                     <GridSplitter Grid.Column="1" 
                               HorizontalAlignment="Stretch" 
                               VerticalAlignment="Stretch" 
@@ -122,11 +122,15 @@
                               IsEnabled="{Binding p_ToolEnable}"
                               Background="{StaticResource GroupBoxBackground}">
                             <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="47*"/>
+                                    <ColumnDefinition Width="412*"/>
+                                </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <ListBox SelectedIndex="{Binding p_SelectedToolIndex}">
+                                <ListBox SelectedIndex="{Binding p_SelectedToolIndex}" Grid.ColumnSpan="2">
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <UniformGrid Columns="3"/>
@@ -145,7 +149,7 @@
                                     <ListBoxItem Background="LightBlue" Content="Polygon"
                                              VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                                 </ListBox>
-                                <StackPanel Grid.Row="1">
+                                <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
                                     <Button Content="Clear"
                                             Command="{Binding ClearROI}"
                                             VerticalAlignment="Top"

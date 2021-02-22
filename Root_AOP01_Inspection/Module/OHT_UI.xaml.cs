@@ -410,10 +410,10 @@ namespace Root_AOP01_Inspection.Module
         #endregion
 
 
-        Loadport_Cymechs m_loadport;
+        Loadport_AOP01 m_loadport;
         OHT_Semi m_OHT;
         GemCarrierBase m_carrier = null;
-        public void Init(Loadport_Cymechs loadport)
+        public void Init(Loadport_AOP01 loadport)
         {
             m_loadport = loadport;
             m_OHT = loadport.m_OHT;

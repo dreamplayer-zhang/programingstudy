@@ -42,31 +42,31 @@ namespace Root_Rinse_Unloader.Module
 
         #region ToolBox
         Axis m_axisAlign; 
-        DIO_I2O m_dioStopperUP; 
+        DIO_I2O m_dioStopperUp; 
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisRotate[0], this, "Rotate0");
             p_sInfo = m_toolBox.Get(ref m_axisRotate[1], this, "Rotate1");
             p_sInfo = m_toolBox.Get(ref m_axisAlign, this, "Align"); 
-            p_sInfo = m_toolBox.Get(ref m_dioStopperUP, this, "StopperUp", "Down", "Up"); 
+            p_sInfo = m_toolBox.Get(ref m_dioStopperUp, this, "StopperUp", "Down", "Up"); 
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit) 
             {
-                InitPosWidth(); 
+                InitPosWidth();
+                m_axisRotate[1].SetSpeed("Jog", m_axisRotate[0].GetSpeedValue("Jog"));
             }
         }
         #endregion
 
         #region Rotate
-        double m_fJogScale = 1;
         Axis[] m_axisRotate = new Axis[2];
 
         public string RunRotate(bool bRotate)
         {
             if (bRotate)
             {
-                m_axisRotate[0].Jog(m_fJogScale);
-                m_axisRotate[1].Jog(m_fJogScale);
+                m_axisRotate[0].Jog(m_rinse.p_fRotateSpeed);
+                m_axisRotate[1].Jog(m_rinse.p_fRotateSpeed);
             }
             else
             {
@@ -74,11 +74,6 @@ namespace Root_Rinse_Unloader.Module
                 m_axisRotate[1].StopAxis();
             }
             return "OK";
-        }
-
-        void RunTreeRotate(Tree tree)
-        {
-            m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Speed", "Rotate Speed (Scale)");
         }
         #endregion
 
@@ -113,7 +108,7 @@ namespace Root_Rinse_Unloader.Module
         #region Stopper
         public string RunStopperUp(bool bUp)
         {
-            return m_dioStopperUP.RunSol(bUp); 
+            return m_dioStopperUp.RunSol(bUp); 
         }
         #endregion
 
@@ -145,16 +140,17 @@ namespace Root_Rinse_Unloader.Module
                 {
                     if (_eSensor == value) return;
                     _eSensor = value;
-                    OnPropertyChanged(); 
-
+                    OnPropertyChanged();
                 }
             }
+
             public void CheckSensor()
             {
                 switch (p_eSensor)
                 {
                     case eSensor.Empty:
-                        if (m_diCheck[0].p_bIn || m_diCheck[1].p_bIn) p_eSensor = eSensor.Exist;
+                        //if (m_diCheck[0].p_bIn || m_diCheck[1].p_bIn) p_eSensor = eSensor.Exist;
+                        if (m_diCheck[0].p_bIn) p_eSensor = eSensor.Exist;
                         break;
                     case eSensor.Exist:
                         if (m_diCheck[2].p_bIn) p_eSensor = eSensor.Arrived;
@@ -171,7 +167,7 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
-        List<Line> m_aLine = new List<Line>();
+        public List<Line> m_aLine = new List<Line>();
         void InitILines()
         {
             for (int n = 0; n < 4; n++) m_aLine.Add(new Line("Line" + n.ToString(), this));
@@ -224,61 +220,83 @@ namespace Root_Rinse_Unloader.Module
                 foreach (Line line in m_aLine) line.CheckSensor(); 
                 if ((EQ.p_eState == EQ.eState.Run) && (m_qModuleRun.Count == 0))
                 {
-                    switch (p_eStep)
-                    {
-                        case eStep.Empty:
-                            foreach (Line line in m_aLine)
-                            {
-                                if (line.p_eSensor != Line.eSensor.Empty)
-                                {
-                                    p_eStep = eStep.Exist;
-                                    RunStopperUp(true);
-                                }
-                            }
-                            break;
-                        case eStep.Exist:
-                            int nExist = 0;
-                            foreach (Line line in m_aLine)
-                            {
-                                if (line.p_eSensor == Line.eSensor.Exist) nExist++;
-                            }
-                            if (nExist == 0) p_eStep = eStep.Arrived;
-                            break;
-                        case eStep.Arrived:
-                            p_eStep = eStep.Align;
-                            break;
-                        case eStep.Align:
-                            p_sInfo = RunAlign();
-                            break;
-                        case eStep.Send:
-                            int nArrived = 0;
-                            foreach (Line line in m_aLine)
-                            {
-                                if (line.p_eSensor == Line.eSensor.Arrived) nArrived++;
-                            }
-                            if (nArrived == 0) p_eStep = eStep.Empty;
-                            break;
-                    }
+                    RunThreadCheck_Sensor(); 
                 }
             }
+        }
+
+        void RunThreadCheck_Sensor()
+        {
+            switch (p_eStep)
+            {
+                case eStep.Empty:
+                    foreach (Line line in m_aLine)
+                    {
+                        if (line.p_eSensor != Line.eSensor.Empty)
+                        {
+                            p_eStep = eStep.Exist;
+                            RunStopperUp(true);
+                        }
+                    }
+                    break;
+                case eStep.Exist:
+                    int nExist = 0;
+                    foreach (Line line in m_aLine)
+                    {
+                        if (line.p_eSensor == Line.eSensor.Exist) nExist++;
+                    }
+                    if (nExist == 0) p_eStep = eStep.Arrived;
+                    break;
+                case eStep.Arrived:
+                    p_eStep = eStep.Align;
+                    break;
+                case eStep.Align:
+                    p_sInfo = RunAlign();
+                    break;
+                case eStep.Send:
+                    int nArrived = 0;
+                    foreach (Line line in m_aLine)
+                    {
+                        if (line.p_eSensor == Line.eSensor.Arrived) nArrived++;
+                    }
+                    if (nArrived == 0) p_eStep = eStep.Empty;
+                    break;
+            }
+        }
+
+        public string RunWaitArrived()
+        {
+            while ((p_eStep != eStep.Picker) && (p_eStep != eStep.Send))
+            {
+                Thread.Sleep(10);
+                RunThreadCheck_Sensor();
+                if (EQ.IsStop()) return "EQ Stop";
+            }
+            string sReceive = "";
+            foreach (Line line in m_aLine) sReceive += (line.p_eSensor == Line.eSensor.Arrived) ? 'O' : '.';
+            m_rinse.AddStripReceive(sReceive); 
+            return RunAlign();
         }
         #endregion
 
         #region Align
+        double m_secArrived = 1;
         public List<bool> m_bExist = new List<bool>();
         public string RunAlign()
         {
-            while (m_bExist.Count < 4) m_bExist.Add(false); 
             try
-                {
+            {
+                Thread.Sleep((int)(1000 * m_secArrived)); 
                 if (Run(RunRotate(false))) return p_sInfo;
-                if (Run(RunMoveAlign(false))) return p_sInfo;
-                if (Run(RunAlignerUp(true))) return p_sInfo;
-                if (Run(RunMoveAlign(true))) return p_sInfo;
-                if (Run(RunMoveAlign(false))) return p_sInfo;
-                if (Run(RunAlignerUp(false))) return p_sInfo;
-                m_bExist.Clear();
-                foreach (Line line in m_aLine) m_bExist.Add(line.p_eSensor != Line.eSensor.Empty);
+                if (m_rinse.p_eMode == RinseU.eRunMode.Magazine)
+                {
+                    if (Run(RunMoveAlign(false))) return p_sInfo;
+                    if (Run(RunAlignerUp(true))) return p_sInfo;
+                    if (Run(RunMoveAlign(true))) return p_sInfo;
+                    if (Run(RunMoveAlign(false))) return p_sInfo;
+                    if (Run(RunAlignerUp(false))) return p_sInfo;
+                }
+                for (int n = 0; n < 4; n++) m_bExist[n] = m_aLine[n].p_eSensor != Line.eSensor.Empty;
                 switch (m_rinse.p_eMode)
                 {
                     case RinseU.eRunMode.Magazine:
@@ -286,21 +304,26 @@ namespace Root_Rinse_Unloader.Module
                         while (m_rail.p_eState != eState.Ready)
                         {
                             Thread.Sleep(10);
-                            if (EQ.IsStop()) return "EQ Stop"; 
+                            if (EQ.IsStop()) return "EQ Stop";
                         }
-                        m_rail.StartRun(m_bExist); 
+                        m_rail.StartRun(m_bExist);
                         RunRotate(true);
                         Thread.Sleep(100);
                         p_eStep = eStep.Send;
-                        foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty; 
-                            break;
+                        foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
+                        break;
                     case RinseU.eRunMode.Stack:
                         p_eStep = eStep.Picker;
-                        break; 
+                        break;
                 }
                 return "OK";
             }
             finally { RunAlignerUp(false); }
+        }
+
+        void RunTreeAlign(Tree tree)
+        {
+            m_secArrived = tree.Set(m_secArrived, m_secArrived, "Arrived", "Arrived Delay (sec)");
         }
         #endregion
 
@@ -331,7 +354,7 @@ namespace Root_Rinse_Unloader.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeRotate(tree.GetTree("Rotate", false));
+            RunTreeAlign(tree.GetTree("Align")); 
         }
         #endregion
 
@@ -339,6 +362,7 @@ namespace Root_Rinse_Unloader.Module
         Rail m_rail;
         public Roller(string id, IEngineer engineer, RinseU rinse, Rail rail)
         {
+            while (m_bExist.Count < 4) m_bExist.Add(false);
             p_id = id;
             m_rinse = rinse;
             m_rail = rail; 
@@ -376,6 +400,7 @@ namespace Root_Rinse_Unloader.Module
             AddModuleRunList(new Run_StopperUp(this), false, "Roller StopperUp");
             AddModuleRunList(new Run_AlignerUp(this), false, "Roller AlignerUp");
             AddModuleRunList(new Run_Align(this), false, "Roller Align");
+            AddModuleRunList(new Run_WaitArrive(this), false, "Wait Strip Arrived");
         }
 
         public class Run_Rotate : ModuleRunBase
@@ -485,6 +510,31 @@ namespace Root_Rinse_Unloader.Module
             {
                 m_module.RunMoveAlign(true);
                 return m_module.RunMoveAlign(false);
+            }
+        }
+
+        public class Run_WaitArrive : ModuleRunBase
+        {
+            Roller m_module;
+            public Run_WaitArrive(Roller module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_WaitArrive run = new Run_WaitArrive(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunWaitArrived();
             }
         }
         #endregion

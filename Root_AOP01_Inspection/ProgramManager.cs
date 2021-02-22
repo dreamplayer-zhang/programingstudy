@@ -48,7 +48,7 @@ namespace Root_AOP01_Inspection
 		#endregion
 
 		#region [Members]
-		private IDialogService dialogService;
+		private new IDialogService dialogService;
 
 		private AOP01_Engineer engineer = new AOP01_Engineer();
 		private MemoryTool memoryTool;
@@ -63,6 +63,7 @@ namespace Root_AOP01_Inspection
 		private ImageData roiLayer;
 
 		InspectionManager_AOP inspectionManager;
+		InspectionManager_AOP patternInspectionManager;
 		#endregion
 
 		#region [Getter Setter]
@@ -77,7 +78,8 @@ namespace Root_AOP01_Inspection
 		public ImageData ImageSideBottom { get => imageSideBottom; private set => imageSideBottom = value; }
 
 		public ImageData ROILayer { get => roiLayer; private set => roiLayer = value; }
-		public InspectionManager_AOP InspectionManager { get => inspectionManager; private set => inspectionManager = value; }
+		public InspectionManager_AOP PellInspectionManager { get => inspectionManager; private set => inspectionManager = value; }
+		public InspectionManager_AOP PatternInspectionManager { get => patternInspectionManager; private set => patternInspectionManager = value; }
 
 		public IDialogService DialogService { get => dialogService; set => dialogService = value; }
 		#endregion
@@ -105,7 +107,7 @@ namespace Root_AOP01_Inspection
 					}
 				}
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				IsInitilized = false;
 				result = false;
@@ -154,10 +156,13 @@ namespace Root_AOP01_Inspection
 				Directory.CreateDirectory(recipeFolderPath);
 
 			// Front
-			this.InspectionManager = new InspectionManager_AOP(imageMain.GetPtr(), imageMain.p_Size.X, imageMain.p_Size.Y);
+			this.PellInspectionManager = new InspectionManager_AOP(image45D.GetPtr(), image45D.p_Size.X, image45D.p_Size.Y);
+			this.PatternInspectionManager = new InspectionManager_AOP(imageMain.GetPtr(), imageMain.p_Size.X, imageMain.p_Size.Y);
 
-			this.Engineer.InspectionManager = this.InspectionManager;
-			//this.Engineer.InspectionManager.Recipe = this.recipe;
+			this.Engineer.PellInspectionManager = this.PellInspectionManager;
+			this.Engineer.PellInspectionManager.Recipe = this.recipe;
+			this.Engineer.PatternInspectionManager = this.PatternInspectionManager;
+			this.Engineer.PatternInspectionManager.Recipe = this.recipe;
 
 			return true;
 		}

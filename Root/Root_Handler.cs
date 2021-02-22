@@ -12,39 +12,24 @@ namespace Root
     {
         #region Module
         public ModuleList p_moduleList { get; set; }
-        //public Test m_test;
-        //public ScareCrow m_scarecrow;
-        //public Siltron m_siltron;
+        public Test m_test;
         //public BayerConvert m_bayer;
-        //public ACS m_acs;
-        //public TestMars m_testMars;
-        public TestRepeat m_testRepeat;
         //public ReadExcel m_readExcel;
-        public RemoteModule m_remote;
-        public RemoteModule m_server;
+        //public RemoteModule m_remote;
+        //public RemoteModule m_server;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            //m_test = new Test("Test", m_engineer);
-            //InitModule(m_test);
-            //m_scarecrow =new ScareCrow("ScareCrow", m_engineer);
-            //InitModule(m_scarecrow);
-            //m_siltron = new Siltron("Siltrion", m_engineer);
-            //InitModule(m_siltron);
+            m_test = new Test("Test", m_engineer);
+            InitModule(m_test);
             //m_bayer = new BayerConvert("BayerConvert", m_engineer);
             //InitModule(m_bayer);
-            //m_acs = new ACS("ACS", m_engineer);
-            //InitModule(m_acs);
-            //m_testMars = new TestMars("TestMars", m_engineer);
-            //InitModule(m_testMars);
-            m_testRepeat = new TestRepeat("TestRepeat", m_engineer);
-            InitModule(m_testRepeat);
             //m_readExcel = new ReadExcel("ReadExcel", m_engineer);
             //InitModule(m_readExcel);
-            m_server = new RemoteModule("Server", m_engineer, ModuleBase.eRemote.Server);
-            InitModule(m_server);
-            m_remote = new RemoteModule("Remote", m_engineer, ModuleBase.eRemote.Client);
-            InitModule(m_remote);
+            //m_server = new RemoteModule("Server", m_engineer, ModuleBase.eRemote.Server);
+            //InitModule(m_server);
+            //m_remote = new RemoteModule("Remote", m_engineer, ModuleBase.eRemote.Client);
+            //InitModule(m_remote);
         }
 
         void InitModule(ModuleBase module)
@@ -117,7 +102,7 @@ namespace Root
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
-            if (gaf != null) gaf.ClearALID();
+            gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
         }
         #endregion

@@ -12,7 +12,7 @@ namespace RootTools.Control
             set
             {
                 if (_bOn == value) return;
-                if (m_log != null) m_log.Info(p_sLongID + " : " + _bOn.ToString() + " -> " + value.ToString());
+                m_log?.Info(p_sLongID + " : " + _bOn.ToString() + " -> " + value.ToString());
                 _bOn = value;
                 OnPropertyChanged();
                 OnPropertyChanged("p_bColor");

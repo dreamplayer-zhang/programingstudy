@@ -17,6 +17,7 @@ namespace RootTools
         _LogView m_logView; 
         public void Init(_LogView logView)
         {
+            
             m_logView = logView;
             DataContext = logView;
             comboLog.SelectedIndex = 0;
@@ -37,6 +38,7 @@ namespace RootTools
             comboLog.ItemsSource = null;
             foreach (ILogGroup log in m_logView.m_aGroup) m_asLog.Add(log.p_id);
             comboLog.ItemsSource = m_asLog;
+            
         }
 
         void UpdateLogTab(ILogGroup log)

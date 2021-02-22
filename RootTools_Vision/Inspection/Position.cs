@@ -485,9 +485,6 @@ namespace RootTools_Vision
                 float centerMatchingX = (int)maxX /*+ tplW / 2*/;
                 float centerMatchingY = (int)maxY /*+ tplH / 2*/;
 
-                //int transX = (int)(centerROIX - centerMatchingX);
-                //int transY = (int)(centerROIY - centerMatchingY);
-
                 int transX = (int)(centerMatchingX - tplCenterX);
                 int transY = (int)(centerMatchingY - tplCenterY);
 
@@ -498,40 +495,6 @@ namespace RootTools_Vision
                     this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, false);
 
                     this.currentWorkplace.SetTrans(transX, transY);
-
-                    //if(this.currentWorkplace.MapIndexY != this.workplaceBundle[startChipIndex].MapIndexY)
-                    //{
-                    //    //Workplace nextWorkplace = this.workplaceBundle[this.currentWorkplace.Index + 1];
-                    //    //if (nextWorkplace != null)
-                    //    {
-                    //        if(this.currentWorkplace.MapIndexY < this.workplaceBundle[startChipIndex].MapIndexY)
-                    //        {
-                    //            Workplace workplaceUp = this.workplaceBundle.GetWorkplace(this.currentWorkplace.MapIndexX, this.currentWorkplace.MapIndexY - 1);
-                    //            int index = 2;
-                    //            while (workplaceUp != null)
-                    //            {
-                    //                workplaceUp.AddOffset(transX, transY);
-
-                    //                workplaceUp = this.workplaceBundle.GetWorkplace(this.currentWorkplace.MapIndexX, this.currentWorkplace.MapIndexY - index++);
-                    //            }
-                    //        }
-                    //        else
-                    //        {
-                    //            Workplace workplaceDown = this.workplaceBundle.GetWorkplace(this.currentWorkplace.MapIndexX, this.currentWorkplace.MapIndexY + 1);
-                    //            int index = 2;
-                    //            while (workplaceDown != null)
-                    //            {
-                    //                workplaceDown.AddOffset(transX, transY);
-
-                    //                workplaceDown = this.workplaceBundle.GetWorkplace(this.currentWorkplace.MapIndexX, this.currentWorkplace.MapIndexY + index++);
-                    //            }
-                    //        }
-                    //    }
-                    //}
-#if DEBUG
-                    DebugOutput.PrintWorkplaceBundleOffset(this.workplaceBundle);
-#endif
-                    //this.workplaceBundle.GetWorkplace(this.currentWorkplace.MapIndexX + 1, this.currentWorkplace.MapIndexY + 1);
 
                     WorkEventManager.OnPositionDone(this.currentWorkplace, new PositionDoneEventArgs(new CPoint(tplStartX, tplStartY), new CPoint(tplStartX + tplW, tplStartY + tplH),
                             new CPoint(tplStartX + transX, tplStartY + transY), new CPoint(tplStartX + tplW + transX, tplStartY + tplH + transY), true));

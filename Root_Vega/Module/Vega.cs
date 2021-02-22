@@ -31,7 +31,7 @@ namespace Root_Vega.Module
             Buzzer3,
             Buzzer4,
         }
-        bool _eIonizerState = false;
+        //bool _eIonizerState = false;
 
         string[] m_asLamp = Enum.GetNames(typeof(eLamp));
         string[] m_asIonizer = Enum.GetNames(typeof(eIonizer));
@@ -99,8 +99,8 @@ namespace Root_Vega.Module
         ALID m_alidElecPnl_2_FanAlarm;
         ALID m_alidPCPnl_FanAlarm;
         ALID m_alidPC_FanAlarm;
-        ALID m_alidLED1FanAlarm;
-        ALID m_alidLED2FanAlarm;
+        //ALID m_alidLED1FanAlarm;
+        //ALID m_alidLED2FanAlarm;
         ALID m_alidDoorLock;
         ALID m_alidIonizerAlarm;
         ALID m_alidRecipeLoadAlarm;

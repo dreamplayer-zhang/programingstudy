@@ -1,10 +1,12 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Root_Rinse_Loader.Module
 {
@@ -15,10 +17,10 @@ namespace Root_Rinse_Loader.Module
         {
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Rotate");
             p_sInfo = m_toolBox.Get(ref m_axisWidth, this, "Width");
-            foreach (Line line in m_aLine) line.GetTools(m_toolBox); 
-            if (bInit) 
+            foreach (Line line in m_aLine) line.GetTools(m_toolBox);
+            if (bInit)
             {
-                InitPosWidth(); 
+                InitPosWidth();
             }
         }
         #endregion
@@ -34,6 +36,12 @@ namespace Root_Rinse_Loader.Module
                 m_rail.p_sInfo = toolBox.Get(ref m_diCheck[2], m_rail, m_id + ".Arrived");
             }
 
+            public bool m_bExist = false; 
+            public void CheckSensor()
+            {
+                if (m_diCheck[0].p_bIn) m_bExist = true; 
+            }
+
             string m_id;
             Rail m_rail; 
             public Line(string id, Rail rail)
@@ -47,6 +55,17 @@ namespace Root_Rinse_Loader.Module
         void InitLines()
         {
             for (int n = 0; n < 4; n++) m_aLine.Add(new Line("Line" + n.ToString(), this)); 
+        }
+
+        public void CheckStrip(bool bCheck)
+        {
+            if (bCheck)
+            {
+                string sSend = "";
+                foreach (Line line in m_aLine) sSend += line.m_bExist ? 'O' : '.';
+                m_rinse.AddStripSend(sSend);
+            }
+            foreach (Line line in m_aLine) line.m_bExist = false;
         }
         #endregion
 
@@ -73,18 +92,13 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region Rotate
-        double m_fJogScale = 1;
         Axis m_axisRotate;
 
         public string RunRotate(bool bRotate)
         {
-            m_axisRotate.Jog(m_fJogScale);
+            if (bRotate) m_axisRotate.Jog(m_rinse.p_fRotateSpeed);
+            else m_axisRotate.StopAxis(); 
             return "OK"; 
-        }
-
-        void RunTreeRotate(Tree tree)
-        {
-            m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Speed", "Rotate Speed (Scale)"); 
         }
         #endregion
 
@@ -108,11 +122,31 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
+        #region Check Thread
+        bool m_bThreadCheck = false;
+        Thread m_threadCheck;
+        void InitThreadCheck()
+        {
+            m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
+            m_threadCheck.Start();
+        }
+
+        void RunThreadCheck()
+        {
+            m_bThreadCheck = true;
+            Thread.Sleep(2000);
+            while (m_bThreadCheck)
+            {
+                Thread.Sleep(10);
+                foreach (Line line in m_aLine) line.CheckSensor();
+            }
+        }
+        #endregion
+
         #region Tree
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeRotate(tree.GetTree("Rotate", false));
         }
         #endregion
 
@@ -123,10 +157,16 @@ namespace Root_Rinse_Loader.Module
             m_rinse = rinse; 
             InitLines(); 
             InitBase(id, engineer);
+            InitThreadCheck();
         }
 
         public override void ThreadStop()
         {
+            if (m_bThreadCheck)
+            {
+                m_bThreadCheck = false;
+                m_threadCheck.Join();
+            }
             base.ThreadStop();
         }
 

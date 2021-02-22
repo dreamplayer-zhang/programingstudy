@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -71,6 +72,7 @@ namespace RootTools.Module
         public void AddModule(ModuleBase module, UserControl uc)
         {
             m_aModule.Add(module, uc);
+            if (module.p_id.Contains("RFID")) return;
             m_asModule.Add(module.p_id);
         }
 
@@ -107,6 +109,7 @@ namespace RootTools.Module
                     case EQ.eState.Home: p_sRun = "Stop"; break;
                     case EQ.eState.Ready: p_sRun = "Run"; break;
                     case EQ.eState.Run:
+                    case EQ.eState.Recovery:
                         p_sRun = "Stop";
                         if (m_qModuleRun.Count > 0)
                         {
@@ -116,15 +119,32 @@ namespace RootTools.Module
                             Thread.Sleep(100);
                             while (moduleRun.m_moduleBase.m_qModuleRun.Count > 0) Thread.Sleep(10);
                             while (moduleRun.m_moduleBase.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+                            
+                            if (moduleRun.m_moduleBase.p_eState == ModuleBase.eState.Error)
+                            {
+                                m_qModuleRun.Clear();
+                                moduleRun.p_eRunState = ModuleRunBase.eRunState.Error;
+                                EQ.p_eState = EQ.eState.Error;
+                                break;
+                            }
                             if (m_qModuleRun.Count <= 1)
                             {
                                 p_visibleRnR = Visibility.Visible;
                                 EQ.p_eState = EQ.eState.Ready;
                             }
-                            if (m_qModuleRun.Count > 0) m_qModuleRun.Dequeue();
+                            if (m_qModuleRun.Count > 0)
+                            {
+                                m_qModuleRun.Dequeue();
+                            }
                         }
+                        if (m_qModuleRun.Count == 0)
+                            p_iRun = p_maxRun;
+
                         break;
-                    case EQ.eState.Error: p_sRun = "Reset"; break;
+                    case EQ.eState.Error:
+                        p_Percent = "ERROR";
+                        p_sRun = "Reset"; 
+                        break;
                 }
             }
         }
@@ -151,12 +171,16 @@ namespace RootTools.Module
                     else
                     {
                         m_qModuleRun.Clear();
+                        p_moduleList.Clear();
+                        
                         p_iRun = m_qModuleRun.Count;
                         EQ.p_bStop = true;
                     }
                     break;
                 case EQ.eState.Run:
+                case EQ.eState.Recovery:
                     m_qModuleRun.Clear();
+                    p_moduleList.Clear();
                     p_iRun = m_qModuleRun.Count;
                     EQ.p_bStop = true;
                     break;
@@ -168,7 +192,13 @@ namespace RootTools.Module
         public void StartModuleRuns()
         {
             EQ.p_bStop = false;
-            foreach (ModuleRunBase moduleRun in m_moduleRunList.p_aModuleRun) m_qModuleRun.Enqueue(moduleRun);
+            p_moduleList.Clear();
+            foreach (ModuleRunBase moduleRun in m_moduleRunList.p_aModuleRun)
+            {
+                m_qModuleRun.Enqueue(moduleRun);
+                p_moduleList.Add(moduleRun);
+            }
+
             p_maxRun = m_qModuleRun.Count;
             EQ.p_eState = EQ.eState.Run;
         }
@@ -182,6 +212,7 @@ namespace RootTools.Module
                 if (moduleRun.p_id == p_sRunStep)
                 {
                     m_qModuleRun.Enqueue(moduleRun);
+                    
                     return "OK";  //forget
                 }
             }
@@ -201,6 +232,19 @@ namespace RootTools.Module
                 if (_visibleRnR == value) return;
                 _visibleRnR = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<ModuleRunBase> m_moduleList = new ObservableCollection<ModuleRunBase>();
+        public ObservableCollection<ModuleRunBase> p_moduleList
+        {
+            get
+            {
+                return m_moduleList;
+            }
+            set
+            {
+                m_moduleList = value;
             }
         }
 
@@ -227,11 +271,47 @@ namespace RootTools.Module
                 OnPropertyChanged();
             }
         }
-
+        private int _iRun = 0;
         public int p_iRun
         {
-            get { return (m_qModuleRun.Count == 0) ? 0 : p_maxRun - m_qModuleRun.Count; }
-            set { OnPropertyChanged(); }
+            get
+            {
+                return _iRun;
+            }
+            set 
+            {
+                
+                if (value == 0)
+                    _iRun = value;
+                else
+                    _iRun = (m_qModuleRun.Count == 0) ? p_maxRun : p_maxRun - m_qModuleRun.Count;
+
+                int now = p_maxRun - (int)value;
+                if (now == 0)
+                    p_Percent = "100%";
+                else
+                    p_Percent = ((double)now / (double)p_maxRun * 100).ToString("F2");
+                OnPropertyChanged(); 
+            }
+        }
+
+        string _percent;
+        public string p_Percent
+        {
+            get
+            {
+                if (_percent == "ERROR")
+                    return _percent;
+                else
+                    return _percent + " % ";
+                //double percent = (double)p_iRun / (double)p_maxRun * 100;
+                //return percent.ToString("F2") + " % ";
+            }
+            set
+            {
+                _percent = value;
+                OnPropertyChanged();
+            }
         }
 
         public string ClickRunRnR()
@@ -240,6 +320,7 @@ namespace RootTools.Module
             if (m_qModuleRun.Count > 0)
             {
                 m_qModuleRun.Clear();
+                p_moduleList.Clear();
                 EQ.p_bStop = true;
                 return "ModuleRun Queue Clear"; 
             }

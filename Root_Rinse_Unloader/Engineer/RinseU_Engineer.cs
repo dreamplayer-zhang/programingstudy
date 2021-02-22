@@ -11,7 +11,7 @@ using RootTools.Trees;
 
 namespace Root_Rinse_Unloader.Engineer
 {
-    public class RinseU_Engineer : IEngineer
+    public class RinseU_Engineer : NotifyProperty, IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
@@ -80,12 +80,23 @@ namespace Root_Rinse_Unloader.Engineer
         #endregion
 
         #region XGem
-        bool m_bUseXGem = false;
+        //bool m_bUseXGem = false;
+        bool _bUseXGem = false;
+        public bool p_bUseXGem
+        {
+            get { return _bUseXGem; }
+            set
+            {
+                if (_bUseXGem == value) return;
+                _bUseXGem = value;
+                OnPropertyChanged();
+            }
+        }
         XGem m_xGem = null;
         XGem_UI m_xGemUI = new XGem_UI();
         void InitXGem()
         {
-            if (m_bUseXGem == false) return;
+            if (p_bUseXGem == false) return;
             m_xGem = new XGem();
             m_xGem.Init("XGem", this);
             m_xGemUI.Init(m_xGem);

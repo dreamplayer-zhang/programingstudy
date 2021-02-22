@@ -1,17 +1,25 @@
-﻿using RootTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision.delete
+namespace RootTools_Vision
 {
-    public class WorkEventManager
+    internal class WorkEventManager
     {
+        #region [WorkDoneAll]
+        public static event EventHandler<WorkDoneAllEventArgs> WorkDoneAll;
+
+        public static void OnPositionDone(object obj, WorkDoneAllEventArgs args)
+        {
+            WorkDoneAll?.Invoke(obj, args);
+        }
+        #endregion
+
         #region [PositionDone]
         public static event EventHandler<PositionDoneEventArgs> PositionDone;
-        
+
         public static void OnPositionDone(object obj, PositionDoneEventArgs args)
         {
             PositionDone?.Invoke(obj, args);
@@ -36,13 +44,21 @@ namespace RootTools_Vision.delete
         }
         #endregion
 
+        
 
         #region [ProcessDefectWaferDone]
-        public static event EventHandler<ProcessDefectWaferDoneEventArgs> ProcessDefectWaferDone;
+        public static event EventHandler<IntegratedProcessDefectDoneEventArgs> IntegratedProcessDefectDone;
 
-        public static void OnProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs args)
+        public static void OnIntegratedProcessDefectDone(object obj, IntegratedProcessDefectDoneEventArgs args)
         {
-            ProcessDefectWaferDone?.Invoke(obj, args);
+            IntegratedProcessDefectDone?.Invoke(obj, args);
+        }
+
+        public static event EventHandler<ProcessDefectWaferStartEventArgs> ProcessDefectWaferStart;
+
+        public static void OnProcessDefectWaferStart(object obj, ProcessDefectWaferStartEventArgs args)
+        {
+            ProcessDefectWaferStart?.Invoke(obj, args);
         }
         #endregion
 
@@ -55,21 +71,40 @@ namespace RootTools_Vision.delete
         }
         #endregion
 
-        #region [UIRedraw]
-        public static event EventHandler<UIRedrawEventArgs> UIRedraw;
-
-        public static void OnUIRedraw(object obj, UIRedrawEventArgs args)
-        {
-            UIRedraw?.Invoke(obj, args);
-        }
-        #endregion
-
         #region [WorkplaceStateChanged]
         public static event EventHandler<WorkplaceStateChangedEventArgs> WorkplaceStateChanged;
 
         public static void OnWorkplaceStateChanged(object obj, WorkplaceStateChangedEventArgs args)
         {
             WorkplaceStateChanged?.Invoke(obj, args);
+        }
+        #endregion
+
+        #region [RequestStop]
+        public static event EventHandler<RequestStopEventArgs> RequestStop;
+
+        public static void OnRequestStop(object obj, RequestStopEventArgs args)
+        {
+            RequestStop?.Invoke(obj, args);
+        }
+        #endregion
+
+        #region [InspectionStart]
+        public static event EventHandler<InspectionStartArgs> InspectionStart;
+
+        public static void OnInspectionStart(object obj, InspectionStartArgs args)
+        {
+            InspectionStart?.Invoke(obj, args);
+        }
+        #endregion
+
+
+        #region [ReceivedMemoryID]
+        public static event EventHandler<MemoryIDArgs> ReceivedMemoryID;
+
+        public static void OnReceivedMemoryID(object obj, MemoryIDArgs args)
+        {
+            ReceivedMemoryID?.Invoke(obj, args);
         }
         #endregion
     }

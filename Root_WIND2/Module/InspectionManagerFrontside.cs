@@ -21,7 +21,9 @@ namespace Root_WIND2
     {
         #region [Members]
         private readonly RecipeFront recipe;
-        private readonly SharedBufferInfo sharedBufferInfo;
+        //private readonly SharedBufferInfo sharedBufferInfo;
+
+        private readonly Module.Vision vision;
         #endregion
 
         #region [Properties]
@@ -31,16 +33,19 @@ namespace Root_WIND2
         }
 
         
-        public SharedBufferInfo SharedBufferInfo
+        public List<SharedBufferInfo> SharedBufferInfoList
         {
-            get => this.sharedBufferInfo;
+            get => this.sharedBufferInfoList;
         }
         #endregion
 
-        public InspectionManagerFrontside(RecipeFront recipe, SharedBufferInfo bufferInfo)
+        public InspectionManagerFrontside(Module.Vision vision, RecipeFront recipe, SharedBufferInfo bufferInfo) : base(REMOTE_MODE.Master)
         {
+            this.vision = vision;
             this.recipe = recipe;
-            this.sharedBufferInfo = bufferInfo;
+            //this.sharedBufferInfo = bufferInfo;
+
+            this.sharedBufferInfoList.Add(bufferInfo);
         }
 
 
@@ -49,8 +54,8 @@ namespace Root_WIND2
         {
             CreateWorkManager(WORK_TYPE.SNAP);
             CreateWorkManager(WORK_TYPE.ALIGNMENT);
-            CreateWorkManager(WORK_TYPE.INSPECTION, 4);
-            CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 4);
+            CreateWorkManager(WORK_TYPE.INSPECTION, 6);
+            CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 6);
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS_ALL, 1, true);
 
             WIND2EventManager.SnapDone += SnapDone_Callback;
@@ -142,6 +147,9 @@ namespace Root_WIND2
             OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
             PositionRecipe positionRecipe = recipe.GetItem<PositionRecipe>();
             PositionParameter positionParameter = recipe.GetItem<PositionParameter>();
+
+            if (positionParameter == null) return null;
+
             WorkplaceBundle bundle = new WorkplaceBundle();
             try
             {
@@ -263,7 +271,7 @@ namespace Root_WIND2
                     }
                 }
 
-                bundle.SetSharedBuffer(this.sharedBufferInfo);
+                bundle.SetSharedBuffer(this.sharedBufferInfoList[0]);
                 this.workplaceBundle = bundle;
                 return bundle;
             }
@@ -278,7 +286,7 @@ namespace Root_WIND2
         {
             if (this.workplaceBundle == null || this.IsStop == true) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
 
-            Task.Delay(1000);
+            //Task.Delay(1000);
             Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
 
             foreach (Workplace wp in this.workplaceBundle)

@@ -177,6 +177,7 @@
     <Reference Include="MahApps.Metro.IconPacks.Zondicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Zondicons.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data, Version=8.0.20.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -198,13 +199,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Module\InspectionManager_AOP.cs" />
+    <Compile Include="Recipe\AOP_RecipeSurface.cs" />
+    <Compile Include="UIManager.cs" />
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeEdge_Viewer_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeFrontside_Viewer_ViewModel.cs" />
     <Compile Include="Engineer\AOP01_Process.cs" />
     <Compile Include="Engineer\AOP01_Process_UI.xaml.cs">
       <DependentUpon>AOP01_Process_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\BacksideVision.cs" />
+    <Compile Include="Module\FDC.cs" />
     <Compile Include="Module\FFU_Fan_UI.xaml.cs">
       <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\Loadport_AOP01.cs" />
     <Compile Include="Module\RTR_RND.cs" />
     <Compile Include="Module\FFU.cs" />
     <Compile Include="UI\3. RUN\ManualJobSchedule.cs" />
@@ -215,7 +224,6 @@
     <Compile Include="Module\EventArgs.cs" />
     <Compile Include="Module\EventManager.cs" />
     <Compile Include="Module\GrabMode.cs" />
-    <Compile Include="Module\InspectionManager_AOP.cs" />
     <Compile Include="Module\InspectionMode.cs" />
     <Compile Include="Module\MainVision.cs" />
     <Compile Include="Module\OHTs_UI.xaml.cs">
@@ -224,9 +232,7 @@
     <Compile Include="Module\OHT_UI.xaml.cs">
       <DependentUpon>OHT_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Module\RTRCleanUnit.cs" />
     <Compile Include="MVVM\Helper.cs" />
-    <Compile Include="ProgramManager.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\Recipe45D_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\3. Maintenance\ViewerTest.xaml.cs">
       <DependentUpon>ViewerTest.xaml</DependentUpon>

@@ -10,7 +10,7 @@ namespace Root_WIND2
     class Siltron_Result
     {
         // All Defect or Each Defect List(Front/Back/Side)?
-        public List<EdgeDefect> m_listDefect;
+        public List<EdgeDefect> m_listDefect = null;
     }
 
     public class EdgeDefect

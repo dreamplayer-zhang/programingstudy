@@ -4,9 +4,2263 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_VEGA_D"
+        xmlns:icon="clr-namespace:Root_VEGA_D.Icon"
+        xmlns:control="clr-namespace:Root_VEGA_D.Control"
+        xmlns:engineer="clr-namespace:Root_VEGA_D.Engineer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        WindowStyle="None"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing"
+        Title="MainWindow" Height="1000" Width="1920" WindowState="Maximized">
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily"
+                    Value="Arial" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Left" />
+        </Style>
+    </Window.Resources>
+
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <!--Title Bar Start-->
+        <Grid Name="TitleBar"
+              Background="#FF5482A1"
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <icon:AtiLogo Width="35"
+                           Height="20"
+                           Margin="3" />
+            <TextBlock Text="ADI"
+                       FontFamily="Arial"
+                       Foreground="White"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       FontSize="15"
+                       Margin="10,0,0,0"
+                       Grid.Column="1" />
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
+                        Orientation="Horizontal"
+                        Grid.Column="2">
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MinimizeButton"
+                        Width="34"
+                        Height="26"
+                        Margin="0,0,10,0"
+                        Foreground="White"
+                        Click="MinimizeButton_Click">
+                    <Path Style="{StaticResource MinimizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MaximizeButton"
+                        Width="34"
+                        Height="26"
+                        Margin="0,0,10,0"
+                        Foreground="White"
+                        Click="MaximizeButton_Click">
+                    <Path Style="{StaticResource MaximizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="NormalizeButton"
+                        Width="34"
+                        Height="26"
+                        Margin="0,0,10,0"
+                        Foreground="White"
+                        Click="NormalizeButton_Click">
+                    <Path Style="{StaticResource NormalizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="CloseButton"
+                        Width="34"
+                        Height="26"
+                        Margin="0,0,10,2"
+                        Foreground="White"
+                        Click="CloseButton_Click"
+                        VerticalAlignment="Bottom">
+                    <Path Style="{StaticResource CloseIconKey}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+        <!--Title Bar End-->
+
+        <Border Grid.Row="1"
+                BorderBrush="DimGray"
+                BorderThickness="2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="6.2*" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="1.8*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="8*" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="92*" />
+                </Grid.RowDefinitions>
+
+                <Line Grid.Row="1"
+                      Grid.ColumnSpan="5"
+                      Stroke="{StaticResource Splitter}"
+                      StrokeThickness="1"
+                      Stretch="Fill"
+                      Margin="-1,0,-1,0"
+                      X2="1" />
+                <Line Grid.Column="1"
+                      Grid.RowSpan="3"
+                      Stroke="{StaticResource Splitter}"
+                      StrokeThickness="1"
+                      Stretch="Fill"
+                      Margin="0,-1,0,-1"
+                      Y2="1" />
+                <Line Grid.Column="3"
+                      Grid.RowSpan="3"
+                      Stroke="{StaticResource Splitter}"
+                      StrokeThickness="1"
+                      Stretch="Fill"
+                      Margin="0,-1,0,-1"
+                      Y2="1" />
+
+                <!--Left Top Panel-->
+                <Grid Grid.Column="0"
+                      Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="1"
+                          Grid.Row="0">
+                        <TextBlock Text="ADI"
+                                   FontWeight="Bold" />
+                    </Grid>
+                    <Grid Grid.Column="1"
+                          Grid.Row="1">
+                        <TextBlock Text="Software Ver 0.01"
+                                   FontWeight="Bold" />
+                    </Grid>
+                    <Grid Grid.Column="0"
+                          Grid.RowSpan="2">
+                        <icon:AtiLogo Margin="20,10,20,10" />
+                    </Grid>
+                </Grid>
+                <!--Center Top Panel-->
+                <Grid Grid.Column="2"
+                      Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80*" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="20*" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="10*" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="10*" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="10*" />
+                    </Grid.ColumnDefinitions>
+                    <Line Grid.Column="1"
+                          Stroke="{StaticResource Splitter}"
+                          StrokeThickness="1"
+                          Stretch="Fill"
+                          Margin="0,-1,0,-1"
+                          Y2="1" />
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <TextBlock Text="Date : 2020-07-08 11:08"
+                                       HorizontalAlignment="Left"
+                                       Margin="30,0,0,0"
+                                       FontWeight="Bold" />
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <TextBlock Text="Now Progress"
+                                       HorizontalAlignment="Left"
+                                       Margin="30,0,0,0"
+                                       FontWeight="Bold" />
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="1.5*" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0"
+                                   Text="Need"
+                                   FontWeight="Bold" />
+                        <TextBlock Grid.Row="1"
+                                   Text="Run"
+                                   FontWeight="Bold" />
+                        <TextBlock Grid.Column="1"
+                                   Grid.Row="0"
+                                   Text="00 : 00 : 00"
+                                   FontWeight="Bold" />
+                        <TextBlock Grid.Column="1"
+                                   Grid.Row="1"
+                                   Text="00 : 00 : 00"
+                                   FontWeight="Bold" />
+                    </Grid>
+                    <Grid Grid.Column="4">
+                        <Viewbox Margin="5">
+                            <control:LoadingControl />
+                        </Viewbox>
+                    </Grid>
+                    <TextBlock Grid.Column="6"
+                               x:Name="textState"
+                               FontWeight="SemiBold"
+                               Text="State : Error"/>
+                    <Border Grid.Column="8"
+                            Margin="8"
+                            BorderBrush="#FF707070"
+                            BorderThickness="1">
+                        <Grid Opacity="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0"
+                                  x:Name="lampRed"
+                              Background="Crimson"/>
+                            <Grid Grid.Row="1"
+                                  x:Name="lampYellow"
+                              Background="Gold"/>
+                            <Grid Grid.Row="2"
+                                  x:Name="lampGreen"
+                              Background="SeaGreen"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+                <!--Right Top Panel-->
+                <Grid Grid.Column="4"
+                      Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0"
+                          Margin="5"
+                          Background="#FF5482A1">
+                        <TextBlock Text="GEM"
+                                   Foreground="White"
+                                   FontSize="15" />
+                    </Grid>
+                    <Grid Grid.Column="1"
+                          Margin="5"
+                          Background="#FF5482A1">
+                        <TextBlock Text="OHT"
+                                   Foreground="White"
+                                   FontSize="15" />
+                    </Grid>
+                    <TextBlock Grid.Column="2"
+                               FontWeight="Bold"
+                               VerticalAlignment="Top"
+                               Margin="0,6,0,0"
+                               Text="Mode"
+                               FontSize="13" />
+                    <Grid Grid.Column="2"
+                          Margin="5,20,5,5"
+                          Background="#FF5482A1">
+                        <TextBlock Text="User"
+                                   Foreground="White"
+                                   x:Name="tbUser"
+                                   FontSize="15" />
+                    </Grid>
+                </Grid>
+                <!--Left Panel-->
+                <Grid Grid.Column="0"
+                      Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="3*" />
+                        <RowDefinition Height="4*" />
+                        <RowDefinition Height="3*" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <GroupBox Header="TDI View">
+                            <Grid Background="Black" />
+                        </GroupBox>
+                        <TextBlock Text="TDI View(Align Key/Defect/Snap)"
+                                   Foreground="White" />
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <GroupBox Header="Map">
+                            <Grid Background="Black">
+                                <Image Source="Resource/ReticleMap2.PNG"
+                                       Margin="20,10"
+                                       Stretch="Fill" />
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                    <Grid Grid.Row="2">
+                        <GroupBox Header="Control">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="25" />
+                                    <RowDefinition Height="2.5*" />
+                                    <RowDefinition Height="2" />
+                                    <RowDefinition Height="40" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="2" />
+                                    <ColumnDefinition Width="3*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.RowSpan="2"
+                                      Background="White">
+                                    <Border BorderBrush="#FFACACAC"
+                                            BorderThickness="1">
+                                        <Grid Grid.Column="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition />
+                                                <RowDefinition Height="8*" />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+
+                                            <TextBlock Text="{Binding ElementName=red, Path=Value, StringFormat=N0}"
+                                                       Grid.Column="0" />
+                                            <TextBlock Text="{Binding ElementName=green, Path=Value, StringFormat=N0}"
+                                                       Grid.Column="1" />
+                                            <TextBlock Text="{Binding ElementName=blue, Path=Value, StringFormat=N0}"
+                                                       Grid.Column="2" />
+                                            <Slider Orientation="Vertical"
+                                                    HorizontalAlignment="Center"
+                                                    Grid.Row="1"
+                                                    Grid.Column="0"
+                                                    Minimum="0"
+                                                    Maximum="255"
+                                                    x:Name="red"
+                                                    SmallChange="1" />
+                                            <Slider Orientation="Vertical"
+                                                    HorizontalAlignment="Center"
+                                                    Grid.Row="1"
+                                                    Grid.Column="1"
+                                                    Minimum="0"
+                                                    Maximum="255"
+                                                    x:Name="green"
+                                                    SmallChange="1" />
+                                            <Slider Orientation="Vertical"
+                                                    HorizontalAlignment="Center"
+                                                    Grid.Row="1"
+                                                    Grid.Column="2"
+                                                    Minimum="0"
+                                                    Maximum="255"
+                                                    x:Name="blue"
+                                                    SmallChange="1" />
+                                            <TextBlock Text="R"
+                                                       Grid.Column="0"
+                                                       Grid.Row="2" />
+                                            <TextBlock Text="G"
+                                                       Grid.Column="1"
+                                                       Grid.Row="2" />
+                                            <TextBlock Text="B"
+                                                       Grid.Column="2"
+                                                       Grid.Row="2" />
+                                        </Grid>
+                                    </Border>
+
+                                </Grid>
+                                <Border Grid.Column="2"
+                                        Grid.Row="0"
+                                        BorderBrush="#FFACACAC"
+                                        BorderThickness="1"
+                                        Margin="0,0,0,2"
+                                        Background="White">
+                                    <Grid Margin="5,0,0,0">
+                                        <Grid.Resources>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="FontSize"
+                                                        Value="10" />
+                                                <Setter Property="VerticalAlignment"
+                                                        Value="Center" />
+                                                <Setter Property="HorizontalAlignment"
+                                                        Value="Left" />
+                                            </Style>
+                                        </Grid.Resources>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="2*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="X"
+                                                   Grid.Column="0" />
+                                        <TextBlock Text="0"
+                                                   Grid.Column="1" />
+                                        <TextBlock Text="Y"
+                                                   Grid.Column="2" />
+                                        <TextBlock Text="0"
+                                                   Grid.Column="3" />
+                                        <TextBlock Text="Z"
+                                                   Grid.Column="4" />
+                                        <TextBlock Text="0"
+                                                   Grid.Column="5" />
+                                        <TextBlock Text="Th"
+                                                   Grid.Column="6" />
+                                        <TextBlock Text="0"
+                                                   Grid.Column="7" />
+                                    </Grid>
+                                </Border>
+
+                                <TabControl Grid.Column="2"
+                                            Grid.Row="1"
+                                            Background="White">
+                                    <TabItem Header="Jog">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="0.5*" />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+
+                                            <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="0"
+                                                    Margin="5" />
+                                            <TextBlock Grid.Column="0"
+                                                       Grid.Row="0"
+                                                       Text="X" />
+                                            <Button Content="→"
+                                                    Grid.Column="2"
+                                                    Grid.Row="0"
+                                                    Margin="5" />
+                                            <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="1"
+                                                    Margin="5" />
+                                            <TextBlock Grid.Column="0"
+                                                       Grid.Row="1"
+                                                       Text="Y" />
+                                            <Button Content="→"
+                                                    Grid.Column="2"
+                                                    Grid.Row="1"
+                                                    Margin="5" />
+                                            <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="2"
+                                                    Margin="5" />
+                                            <TextBlock Grid.Column="0"
+                                                       Grid.Row="2"
+                                                       Text="Z" />
+                                            <Button Content="→"
+                                                    Grid.Column="2"
+                                                    Grid.Row="2"
+                                                    Margin="5" />
+                                            <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="3"
+                                                    Margin="5" />
+                                            <TextBlock Grid.Column="0"
+                                                       Grid.Row="3"
+                                                       Text="Theta" />
+                                            <Button Content="→"
+                                                    Grid.Column="2"
+                                                    Grid.Row="3"
+                                                    Margin="5" />
+
+                                        </Grid>
+                                    </TabItem>
+                                    <TabItem Header="Absolute">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="0.5*" />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                                       Grid.Row="0"
+                                                       Text="X" />
+                                            <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="0"
+                                                    Margin="5" />
+                                            <TextBox Grid.Column="2"
+                                                     Grid.Row="0"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                            <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="0"
+                                                    Margin="5" />
+
+                                            <TextBlock Grid.Column="0"
+                                                       Grid.Row="1"
+                                                       Text="Y" />
+                                            <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="1"
+                                                    Margin="5" />
+                                            <TextBox Grid.Column="2"
+                                                     Grid.Row="1"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                            <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="1"
+                                                    Margin="5" />
+
+                                            <TextBlock Grid.Column="0"
+                                                       Grid.Row="2"
+                                                       Text="Z" />
+                                            <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="2"
+                                                    Margin="5" />
+                                            <TextBox Grid.Column="2"
+                                                     Grid.Row="2"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                            <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="2"
+                                                    Margin="5" />
+
+                                            <TextBlock Grid.Column="0"
+                                                       Grid.Row="3"
+                                                       Text="Theta" />
+                                            <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="3"
+                                                    Margin="5" />
+                                            <TextBox Grid.Column="2"
+                                                     Grid.Row="3"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                            <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="3"
+                                                    Margin="5" />
+
+                                        </Grid>
+                                    </TabItem>
+                                    <TabItem Header="Reference">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="0.5*" />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                                       Grid.Row="0"
+                                                       Text="X" />
+                                            <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="0"
+                                                    Margin="5" />
+                                            <TextBox Grid.Column="2"
+                                                     Grid.Row="0"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                            <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="0"
+                                                    Margin="5" />
+
+                                            <TextBlock Grid.Column="0"
+                                                       Grid.Row="1"
+                                                       Text="Y" />
+                                            <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="1"
+                                                    Margin="5" />
+                                            <TextBox Grid.Column="2"
+                                                     Grid.Row="1"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                            <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="1"
+                                                    Margin="5" />
+
+                                            <TextBlock Grid.Column="0"
+                                                       Grid.Row="2"
+                                                       Text="Z" />
+                                            <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="2"
+                                                    Margin="5" />
+                                            <TextBox Grid.Column="2"
+                                                     Grid.Row="2"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                            <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="2"
+                                                    Margin="5" />
+
+                                            <TextBlock Grid.Column="0"
+                                                       Grid.Row="3"
+                                                       Text="Theta" />
+                                            <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="3"
+                                                    Margin="5" />
+                                            <TextBox Grid.Column="2"
+                                                     Grid.Row="3"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                            <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="3"
+                                                    Margin="5" />
+
+                                        </Grid>
+                                    </TabItem>
+                                    <TabItem Header="Option">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="Speed Sacle" />
+                                            <ComboBox Grid.Column="1"
+                                                      Margin="5"
+                                                      VerticalAlignment="Center">
+                                                <ComboBoxItem Content="1.0x" />
+                                                <ComboBoxItem Content="1.5x" />
+                                                <ComboBoxItem Content="2.0x" />
+                                                <ComboBoxItem Content="2.5x" />
+                                                <ComboBoxItem Content="3.0x" />
+                                            </ComboBox>
+                                        </Grid>
+                                    </TabItem>
+                                </TabControl>
+                                <Grid Grid.ColumnSpan="4"
+                                      Grid.Row="3">
+                                    <UniformGrid Columns="2">
+                                        <Button Content="Auto Focus"
+                                                Margin="3" />
+                                        <Button Content="Scan"
+                                                Margin="3" />
+                                    </UniformGrid>
+                                </Grid>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                </Grid>
+                <!--Tab Area-->
+                <Grid Grid.Column="2"
+                      Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="4*" />
+                        <RowDefinition Height="0"
+                                       x:Name="LogSplitter" />
+                        <RowDefinition Height="00"
+                                       x:Name="LogArea" />
+                    </Grid.RowDefinitions>
+                    <TabControl Style="{StaticResource ResourceKey=WizardTabControl}"
+                                Margin="2">
+                        <TabItem Header="Information"
+                                 Style="{StaticResource ResourceKey=WizardTabItem}">
+                            <ScrollViewer Background="White">
+                                <Grid>
+                                    <Grid Grid.Column="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="120" />
+                                            <RowDefinition Height="120" />
+                                            <RowDefinition Height="120" />
+                                            <RowDefinition Height="450" />
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Column="0"
+                                              Grid.Row="0"
+                                              Grid.ColumnSpan="2"
+                                              Background="AliceBlue">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="2.5*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid Grid.Column="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Content="Save"
+                                                        Margin="3" />
+                                                <Button Content="Save As"
+                                                        Grid.Column="1"
+                                                        Margin="3" />
+                                                <Button Content="Load"
+                                                        Grid.Column="2"
+                                                        Margin="3" />
+                                            </Grid>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="D:\200811ADI.rcp"
+                                                       FontWeight="Bold" />
+                                        </Grid>
+
+                                        <GroupBox Header="Product Info"
+                                                  Grid.Column="0"
+                                                  Grid.Row="1">
+                                            <UniformGrid Margin="10">
+                                                <TextBlock Text="Reticle ID"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Text="PA200131022"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Text="Reticle Type"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Text="EUV"
+                                                           HorizontalAlignment="Left" />
+                                            </UniformGrid>
+                                        </GroupBox>
+                                        <GroupBox Header="Recipe Info"
+                                                  Grid.Column="0"
+                                                  Grid.Row="2">
+                                            <UniformGrid Margin="5,2">
+                                                <TextBlock Text="Recipe Name"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Text="200811ADI.rcp"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Text="Last Write Time"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Text="2020-08-11 11:20"
+                                                           HorizontalAlignment="Left" />
+                                            </UniformGrid>
+                                        </GroupBox>
+                                        <GroupBox Header="Illumination Info"
+                                                  Grid.Column="0"
+                                                  Grid.Row="3">
+                                            <UniformGrid Margin="5,2"
+                                                         Columns="2">
+                                                <TextBlock Text="Red"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Text="Green"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Text="Red"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Text="0"
+                                                           HorizontalAlignment="Left" />
+                                            </UniformGrid>
+                                        </GroupBox>
+                                        <GroupBox Header="Coordinate Info"
+                                                  Grid.Column="0"
+                                                  Grid.Row="4">
+                                            <Grid Margin="5,2">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition />
+                                                    <RowDefinition Height="1.5*" />
+                                                </Grid.RowDefinitions>
+                                                <UniformGrid Columns="2"
+                                                             Grid.Row="0">
+                                                    <TextBlock Text="File"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="D:\DieInfoFile.xml"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="Die Size"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="17972, 50504"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="Scribe Lane Size"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="280, 280"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="Shot Size"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="127484, 101288"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="Shot"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="64.18, 180.37"
+                                                               HorizontalAlignment="Left" />
+                                                </UniformGrid>
+                                                <DataGrid IsReadOnly="True"
+                                                          Margin="0,2"
+                                                          Grid.Row="1">
+                                                    <DataGrid.Resources>
+                                                        <Style TargetType="DataGridColumnHeader">
+                                                            <Setter Property="HorizontalAlignment"
+                                                                    Value="Stretch" />
+                                                            <Setter Property="HorizontalContentAlignment"
+                                                                    Value="Center" />
+                                                        </Style>
+                                                    </DataGrid.Resources>
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Header="No."
+                                                                            Binding="{Binding Path=no}"
+                                                                            Width="30" />
+                                                        <DataGridTextColumn Header="Type"
+                                                                            Binding="{Binding Path=type}"
+                                                                            Width="1.5*" />
+                                                        <DataGridTextColumn Header="X"
+                                                                            Binding="{Binding Path=x}"
+                                                                            Width="*" />
+                                                        <DataGridTextColumn Header="Y"
+                                                                            Binding="{Binding Path=y}"
+                                                                            Width="*" />
+                                                    </DataGrid.Columns>
+                                                   
+                                                </DataGrid>
+                                            </Grid>
+
+                                        </GroupBox>
+                                        <Grid Grid.Column="1"
+                                              Grid.Row="1">
+                                            <GroupBox  Header="Inspection Info"
+                                                       Grid.Row="0">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="1.5*" />
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="2*" />
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="2*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition />
+                                                        <RowDefinition />
+                                                    </Grid.RowDefinitions>
+                                                    <TextBlock Text="Pattern"
+                                                               Grid.Column="0"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="True"
+                                                               Foreground="Green"
+                                                               Grid.Column="1"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Center" />
+                                                    <TextBlock Text="X, Y"
+                                                               Grid.Column="2"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Center" />
+                                                    <TextBlock Text="12315, 465547"
+                                                               Grid.Column="3"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="Size"
+                                                               Grid.Column="4"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Center" />
+                                                    <TextBlock Text="34555, 273433"
+                                                               Grid.Column="5"
+                                                               Grid.Row="0"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="NonPattern"
+                                                               Grid.Column="0"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="True"
+                                                               Foreground="Green"
+                                                               Grid.Column="1"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Center" />
+                                                    <TextBlock Text="X, Y"
+                                                               Grid.Column="2"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Center" />
+                                                    <TextBlock Text="2315, 765547"
+                                                               Grid.Column="3"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Left" />
+                                                    <TextBlock Text="Size"
+                                                               Grid.Column="4"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Center" />
+                                                    <TextBlock Text="74555, 573433"
+                                                               Grid.Column="5"
+                                                               Grid.Row="1"
+                                                               HorizontalAlignment="Left" />
+                                                </Grid>
+                                            </GroupBox>
+                                        </Grid>
+                                        <GroupBox Header="Inspection Area"
+                                                  Grid.Column="1"
+                                                  Grid.Row="2"
+                                                  Grid.RowSpan="3">
+
+                                            <Grid Background="Black">
+                                                <Image Source="Resource/ReticleMap2.PNG"
+                                                       Stretch="Fill"
+                                                       Margin="10" />
+                                                <Viewbox>
+                                                    <Canvas Width="1000"
+                                                            Height="1000">
+                                                        <TextBlock Text="Pattern Area"
+                                                                   Canvas.Left="230"
+                                                                   Canvas.Top="70"
+                                                                   FontSize="15"
+                                                                   FontWeight="Bold"
+                                                                   Panel.ZIndex="5"
+                                                                   Height="20" />
+                                                        <TextBlock Text="NonPattern Area"
+                                                                   Canvas.Left="160"
+                                                                   Canvas.Top="20"
+                                                                   FontSize="15"
+                                                                   FontWeight="Bold"
+                                                                   Panel.ZIndex="5"
+                                                                   Height="20" />
+                                                        <Rectangle Stroke="Coral"
+                                                                   Fill="Coral"
+                                                                   StrokeThickness="4"
+                                                                   Opacity="0.3"
+                                                                   Panel.ZIndex="2"
+                                                                   Width="558"
+                                                                   Height="856"
+                                                                   Canvas.Left="225"
+                                                                   Canvas.Top="70" />
+                                                        <Rectangle Stroke="SteelBlue"
+                                                                   Fill="SteelBlue"
+                                                                   StrokeThickness="4"
+                                                                   Opacity="0.3"
+                                                                   Width="708"
+                                                                   Height="956"
+                                                                   Canvas.Left="155"
+                                                                   Canvas.Top="20" />
+
+                                                    </Canvas>
+                                                </Viewbox>
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
+                                </Grid>
+                            </ScrollViewer>
+                        </TabItem>
+                        <TabItem Header="Recipe Wizard"
+                                 Style="{StaticResource ResourceKey=WizardTabItem}">
+                            <ScrollViewer Background="White">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="2*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="900" />
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Column="0"
+                                              Grid.Row="0"
+                                              Grid.ColumnSpan="2"
+                                              Background="AliceBlue">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="2.5*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid Grid.Column="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Content="Save"
+                                                        Margin="3" />
+                                                <Button Content="Save As"
+                                                        Grid.Column="1"
+                                                        Margin="3" />
+                                                <Button Content="Load"
+                                                        Grid.Column="2"
+                                                        Margin="3" />
+                                            </Grid>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="D:\200811ADI.rcp"
+                                                       FontWeight="Bold" />
+                                        </Grid>
+                                        <Grid Grid.Column="0"
+                                              Grid.Row="1">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="79*" />
+                                                    <RowDefinition Height="21*" />
+                                                </Grid.RowDefinitions>
+                                                <GroupBox Header="Recipe List"
+                                                          Grid.Row="0">
+
+                                                    <DataGrid IsReadOnly="True"
+                                                              Margin="5,2">
+                                                        <DataGrid.Resources>
+                                                            <Style TargetType="DataGridColumnHeader">
+                                                                <Setter Property="HorizontalAlignment"
+                                                                        Value="Stretch" />
+                                                                <Setter Property="HorizontalContentAlignment"
+                                                                        Value="Center" />
+                                                            </Style>
+                                                        </DataGrid.Resources>
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="No."
+                                                                                Width="30"
+                                                                                Binding="{Binding no}" />
+                                                            <DataGridTextColumn Header="Recipe Name"
+                                                                                Width="*"
+                                                                                Binding="{Binding type}" />
+                                                            <DataGridTextColumn Header="Mask ID"
+                                                                                Width="*"
+                                                                                Binding="{Binding x}" />
+                                                            <DataGridTextColumn Header="Write Time"
+                                                                                Width="1.5*"
+                                                                                Binding="{Binding y}" />
+                                                        </DataGrid.Columns>
+                                                      
+                                                    </DataGrid>
+                                                </GroupBox>
+                                                <GroupBox Header="Search Option"
+                                                          Grid.Row="1">
+                                                    <Grid Margin="5,2">
+                                                        <StackPanel>
+                                                            <CheckBox Content="Start Date"
+                                                                      VerticalAlignment="Center"
+                                                                      Margin="0,5,0,0"
+                                                                      FontSize="12"
+                                                                      x:Name="cbStart" />
+                                                            <control:DateTimePicker IsEnabled="{Binding ElementName=cbStart, Path=IsChecked}"
+                                                                                    DateFormat="yyyy-MM-dd" />
+                                                            <CheckBox Content="End Date"
+                                                                      VerticalAlignment="Center"
+                                                                      Margin="0,5,0,0"
+                                                                      FontSize="12"
+                                                                      x:Name="cbEnd" />
+                                                            <control:DateTimePicker IsEnabled="{Binding ElementName=cbEnd, Path=IsChecked}"
+                                                                                    DateFormat="yyyy-MM-dd" />
+                                                            <Grid Margin="0,7,0,0">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition />
+                                                                    <ColumnDefinition Width="1.5*" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <CheckBox Content="Mask ID"
+                                                                          VerticalAlignment="Center"
+                                                                          x:Name="cbWafer" />
+                                                                <TextBox Grid.Column="1"
+                                                                         IsEnabled="{Binding ElementName=cbWafer, Path=IsChecked}" />
+                                                            </Grid>
+                                                            <Grid Margin="0,7,0,0">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition />
+                                                                    <ColumnDefinition Width="1.5*" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <CheckBox Content="Recipe Name"
+                                                                          VerticalAlignment="Center"
+                                                                          x:Name="cbRecipe" />
+                                                                <TextBox Grid.Column="1"
+                                                                         IsEnabled="{Binding ElementName=cbRecipe, Path=IsChecked}" />
+                                                            </Grid>
+                                                            <Button Content="Search"
+                                                                    Margin="0,9,0,0"
+                                                                    Height="30" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </GroupBox>
+                                            </Grid>
+                                        </Grid>
+                                        <Grid Grid.Column="1"
+                                              Grid.Row="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="1.2*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid Grid.Column="0">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="1.5*" />
+                                                    <RowDefinition Height="4*" />
+                                                    <RowDefinition Height="4.5*" />
+                                                </Grid.RowDefinitions>
+                                                <GroupBox Header="Alignment"
+                                                          Grid.Column="0"
+                                                          Grid.Row="0">
+                                                    <Grid Margin="5,2">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                            <RowDefinition Height="30" />
+                                                            <RowDefinition Height="30" />
+                                                        </Grid.RowDefinitions>
+                                                        <UniformGrid Columns="3"
+                                                                     Rows="1">
+                                                            <TextBlock Text="Reticle Type"
+                                                                       HorizontalAlignment="Left" />
+                                                            <CheckBox Content="EUV"
+                                                                      Margin="0,1,0,0" />
+                                                            <CheckBox Content="DUV"
+                                                                      Margin="0,1,0,0" />
+                                                        </UniformGrid>
+                                                        <UniformGrid Columns="3"
+                                                                     Rows="1"
+                                                                     Grid.Row="1">
+                                                            <TextBlock Text="Option"
+                                                                       HorizontalAlignment="Left" />
+                                                            <CheckBox Content="2 Point"
+                                                                      Margin="0,1,0,0" />
+                                                            <CheckBox Content="3 Point"
+                                                                      Margin="0,1,0,0" />
+                                                            <Grid />
+                                                            <CheckBox Content="Use Edge"
+                                                                      Margin="0,2,0,0" />
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="Score"
+                                                                           Margin="0,0,5,0" />
+                                                                <TextBox Width="50"
+                                                                         VerticalAlignment="Center" />
+                                                            </StackPanel>
+                                                        </UniformGrid>
+                                                        <Button Content="Algin Test"
+                                                                Height="25"
+                                                                Grid.Row="3"
+                                                                VerticalAlignment="Bottom" />
+                                                        <Button Content="Auto Align"
+                                                                Height="25"
+                                                                Grid.Row="4"
+                                                                VerticalAlignment="Bottom" />
+                                                    </Grid>
+                                                </GroupBox>
+                                                <GroupBox Header="Map"
+                                                          Grid.Column="0"
+                                                          Grid.Row="1">
+                                                    <Grid Background="Black"
+                                                          Margin="5,2">
+                                                        <Image Source="Resource/ReticleMap2.PNG"
+                                                               Margin="20,10"
+                                                               Stretch="Fill" />
+                                                    </Grid>
+                                                </GroupBox>
+                                                <GroupBox Header="Coordinate"
+                                                          Grid.Column="0"
+                                                          Grid.Row="2">
+                                                    <Grid Margin="5,2">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="20" />
+                                                            <RowDefinition Height="3*" />
+                                                            <RowDefinition Height="20" />
+                                                            <RowDefinition Height="7*" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid Grid.Row="0">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="0.5*" />
+                                                                <ColumnDefinition Width="5*" />
+                                                                <ColumnDefinition />
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="File"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="D:\DieInfoFile.xml"
+                                                                       Grid.Column="1" />
+                                                            <Button Content="..."
+                                                                    VerticalAlignment="Center"
+                                                                    Grid.Column="2" />
+                                                        </Grid>
+                                                        <UniformGrid Columns="2"
+                                                                     Margin="0,5"
+                                                                     Grid.Row="1">
+                                                            <TextBlock Text="Die Size"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="17972, 50504"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="Scribe Lane Size"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="280, 280"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="Shot Size"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="127484, 101288"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="Shot"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="64.18, 180.37"
+                                                                       HorizontalAlignment="Left" />
+                                                        </UniformGrid>
+                                                        <Grid Grid.Row="2"
+                                                              Grid.ColumnSpan="2"
+                                                              Background="AliceBlue" />
+                                                        <CheckBox Content="Manual Input"
+                                                                  Grid.ColumnSpan="2"
+                                                                  x:Name="cbManualMap"
+                                                                  Margin="0,5,0,0"
+                                                                  Grid.Row="2" />
+                                                        <Grid IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                                              Background="AliceBlue"
+                                                              Grid.Row="3">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="40" />
+                                                                <ColumnDefinition Width="4*" />
+                                                                <ColumnDefinition Width="3*" />
+                                                                <ColumnDefinition Width="3*" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition Height="30" />
+                                                            </Grid.RowDefinitions>
+                                                            <TextBlock Text="Index"
+                                                                       Grid.Column="0"
+                                                                       HorizontalAlignment="Left"
+                                                                       Margin="0,2" />
+                                                            <TextBlock Text="Property"
+                                                                       Grid.Column="1"
+                                                                       Margin="0,2"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="X"
+                                                                       Grid.Column="2"
+                                                                       Margin="0,2" />
+                                                            <TextBlock Text="Y"
+                                                                       Grid.Column="3"
+                                                                       Margin="0,2" />
+                                                            <TextBlock Text="a."
+                                                                       Grid.Row="1"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="b."
+                                                                       Grid.Row="2"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="c."
+                                                                       Grid.Row="3"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="d."
+                                                                       Grid.Row="4"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="e."
+                                                                       Grid.Row="5"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="f."
+                                                                       Grid.Row="6"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="g."
+                                                                       Grid.Row="7"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="h."
+                                                                       Grid.Row="8"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="FirstDieLeft"
+                                                                       Grid.Column="1"
+                                                                       Grid.Row="1"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="FirstDieRight"
+                                                                       Grid.Column="1"
+                                                                       Grid.Row="2"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="SecondDieLeft"
+                                                                       Grid.Column="1"
+                                                                       Grid.Row="3"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="LastDieRight"
+                                                                       Grid.Column="1"
+                                                                       Grid.Row="4"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="FirstDieBottom"
+                                                                       Grid.Column="1"
+                                                                       Grid.Row="5"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="FirstDieUp"
+                                                                       Grid.Column="1"
+                                                                       Grid.Row="6"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="SecondDieBottom"
+                                                                       Grid.Column="1"
+                                                                       Grid.Row="7"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="LastDieUp"
+                                                                       Grid.Column="1"
+                                                                       Grid.Row="8"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBox Grid.Column="2"
+                                                                     Grid.Row="1"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="2"
+                                                                     Grid.Row="2"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="2"
+                                                                     Grid.Row="3"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="2"
+                                                                     Grid.Row="4"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="2"
+                                                                     Grid.Row="5"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="2"
+                                                                     Grid.Row="6"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="2"
+                                                                     Grid.Row="7"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="2"
+                                                                     Grid.Row="8"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="3"
+                                                                     Grid.Row="1"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="3"
+                                                                     Grid.Row="2"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="3"
+                                                                     Grid.Row="3"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="3"
+                                                                     Grid.Row="4"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="3"
+                                                                     Grid.Row="5"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="3"
+                                                                     Grid.Row="6"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="3"
+                                                                     Grid.Row="7"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="3"
+                                                                     Grid.Row="8"
+                                                                     Margin="3,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <Button Content="Adjust"
+                                                                    Grid.ColumnSpan="4"
+                                                                    Grid.Row="9"
+                                                                    Height="25"
+                                                                    VerticalAlignment="Bottom" />
+                                                        </Grid>
+                                                    </Grid>
+                                                </GroupBox>
+                                            </Grid>
+                                            <Grid Grid.Column="1">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="0.8*" />
+                                                    <RowDefinition Height="6.7*" />
+                                                    <RowDefinition Height="1*" />
+                                                    <RowDefinition Height="1.5*" />
+                                                </Grid.RowDefinitions>
+                                                <GroupBox Header="Inspection Item">
+                                                    <Grid Margin="5,2">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid Grid.Row="0"
+                                                              Background="AliceBlue">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition />
+                                                                <ColumnDefinition Width="2.5*" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <CheckBox Content="Pattern"
+                                                                      Margin="0,1,0,0"
+                                                                      x:Name="cbPatternInsp" />
+                                                            <Grid Grid.Column="1"
+                                                                  IsEnabled="{Binding ElementName=cbPatternInsp, Path=IsChecked}">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="30" />
+                                                                    <ColumnDefinition />
+                                                                    <ColumnDefinition Width="60" />
+                                                                    <ColumnDefinition />
+                                                                    <ColumnDefinition Width="30" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <TextBlock Text="Size"
+                                                                           Margin="0,0,5,0"
+                                                                           Grid.Column="0"
+                                                                           HorizontalAlignment="Left" />
+                                                                <TextBox Width="60"
+                                                                         HorizontalAlignment="Left"
+                                                                         VerticalAlignment="Center"
+                                                                         Grid.Column="1" />
+                                                                <TextBlock Text="Intensity"
+                                                                           Margin="0,0,5,0"
+                                                                           Grid.Column="2"
+                                                                           HorizontalAlignment="Left" />
+                                                                <TextBox Width="60"
+                                                                         HorizontalAlignment="Left"
+                                                                         VerticalAlignment="Center"
+                                                                         Grid.Column="3" />
+                                                                <Button Content="..."
+                                                                        Grid.Column="5"
+                                                                        VerticalAlignment="Center" />
+                                                            </Grid>
+                                                            <Popup Placement="Bottom">
+                                                                <Border BorderBrush="Gainsboro"
+                                                                        BorderThickness="1"
+                                                                        Width="377"
+                                                                        Height="200"
+                                                                        Background="AliceBlue"
+                                                                        Opacity="0.9">
+                                                                </Border>
+                                                            </Popup>
+                                                        </Grid>
+                                                        <Grid Grid.Row="1"
+                                                              Background="AliceBlue">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition />
+                                                                <ColumnDefinition Width="2.5*" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <CheckBox Content="NonPattern"
+                                                                      Margin="0,1,0,0"
+                                                                      x:Name="cbNonPatternInsp" />
+                                                            <Grid Grid.Column="1"
+                                                                  IsEnabled="{Binding ElementName=cbNonPatternInsp, Path=IsChecked}">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="30" />
+                                                                    <ColumnDefinition />
+                                                                    <ColumnDefinition Width="60" />
+                                                                    <ColumnDefinition />
+                                                                    <ColumnDefinition Width="30" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <TextBlock Text="Size"
+                                                                           Margin="0,0,5,0"
+                                                                           Grid.Column="0"
+                                                                           HorizontalAlignment="Left" />
+                                                                <TextBox Width="60"
+                                                                         HorizontalAlignment="Left"
+                                                                         VerticalAlignment="Center"
+                                                                         Grid.Column="1" />
+                                                                <TextBlock Text="GV"
+                                                                           Margin="0,0,5,0"
+                                                                           Grid.Column="2"
+                                                                           HorizontalAlignment="Left" />
+                                                                <TextBox Width="60"
+                                                                         HorizontalAlignment="Left"
+                                                                         VerticalAlignment="Center"
+                                                                         Grid.Column="3" />
+                                                                <Button Content="..."
+                                                                        Grid.Column="5"
+                                                                        VerticalAlignment="Center" />
+                                                            </Grid>
+                                                            <Popup Placement="Bottom">
+                                                                <Border BorderBrush="Gainsboro"
+                                                                        BorderThickness="1"
+                                                                        Width="377"
+                                                                        Height="200"
+                                                                        Background="AliceBlue"
+                                                                        Margin="0,0,0,0" />
+                                                            </Popup>
+                                                        </Grid>
+
+                                                    </Grid>
+                                                </GroupBox>
+                                                <GroupBox Header="Image View"
+                                                          Grid.Row="1">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="88*" />
+                                                            <RowDefinition Height="30" />
+                                                            <RowDefinition Height="30" />
+                                                            <RowDefinition Height="30" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid Grid.Row="0"
+                                                              Background="Black"
+                                                              Margin="5,2">
+                                                            <TextBlock Text="Image Viewer"
+                                                                       Foreground="White" />
+                                                        </Grid>
+                                                        <Grid Grid.Row="1"
+                                                              Margin="5,2">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition />
+                                                                <ColumnDefinition Width="2" />
+                                                                <ColumnDefinition />
+                                                            </Grid.ColumnDefinitions>
+                                                            <Button Content="Draw"
+                                                                    Grid.Row="2"
+                                                                    Height="25"
+                                                                    VerticalAlignment="Bottom" />
+                                                            <Button Content="Clear"
+                                                                    Grid.Column="2"
+                                                                    Height="25"
+                                                                    VerticalAlignment="Bottom" />
+                                                        </Grid>
+                                                        <Button Content="Scan"
+                                                                Grid.Row="2"
+                                                                Margin="5,0"
+                                                                Height="25"
+                                                                VerticalAlignment="Bottom" />
+                                                        <Button Content="Full Scan"
+                                                                Grid.Row="3"
+                                                                Margin="5,0"
+                                                                Height="25"
+                                                                VerticalAlignment="Bottom" />
+                                                    </Grid>
+                                                </GroupBox>
+                                                <GroupBox Header="Illumination"
+                                                          Grid.Row="2">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition />
+                                                            <ColumnDefinition Width="8*" />
+                                                            <ColumnDefinition />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+                                                        <TextBlock Text="R"
+                                                                   Grid.Row="0" />
+                                                        <TextBlock Text="G"
+                                                                   Grid.Row="1" />
+                                                        <TextBlock Text="B"
+                                                                   Grid.Row="2" />
+                                                        <Slider Grid.Row="0"
+                                                                Grid.Column="1"
+                                                                VerticalAlignment="Center" />
+                                                        <Slider Grid.Row="1"
+                                                                Grid.Column="1"
+                                                                VerticalAlignment="Center" />
+                                                        <Slider Grid.Row="2"
+                                                                Grid.Column="1"
+                                                                VerticalAlignment="Center" />
+                                                        <TextBlock Text="0"
+                                                                   Grid.Row="0"
+                                                                   Grid.Column="2" />
+                                                        <TextBlock Text="0"
+                                                                   Grid.Row="1"
+                                                                   Grid.Column="2" />
+                                                        <TextBlock Text="0"
+                                                                   Grid.Row="2"
+                                                                   Grid.Column="2" />
+                                                    </Grid>
+                                                </GroupBox>
+                                                <GroupBox Header="Inspection Area"
+                                                          Grid.Row="3">
+                                                    <Grid Margin="5,2">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="20" />
+                                                            <RowDefinition Height="*" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid Background="AliceBlue" />
+                                                        <CheckBox Content="Manual Input"
+                                                                  Grid.ColumnSpan="2"
+                                                                  x:Name="cbManualROI"
+                                                                  Margin="0,5,0,0" />
+                                                        <Grid IsEnabled="{Binding ElementName=cbManualROI, Path=IsChecked}"
+                                                              Background="AliceBlue"
+                                                              Grid.Row="1">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="2*" />
+                                                                <ColumnDefinition />
+                                                                <ColumnDefinition />
+                                                                <ColumnDefinition />
+                                                                <ColumnDefinition />
+                                                            </Grid.ColumnDefinitions>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition Height="30" />
+                                                            </Grid.RowDefinitions>
+                                                            <TextBlock Text="Property"
+                                                                       Grid.Column="0"
+                                                                       Grid.Row="0"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBlock Text="X"
+                                                                       Grid.Column="1"
+                                                                       Grid.Row="0" />
+                                                            <TextBlock Text="Y"
+                                                                       Grid.Column="2"
+                                                                       Grid.Row="0" />
+                                                            <TextBlock Text="Width"
+                                                                       Grid.Column="3"
+                                                                       Grid.Row="0" />
+                                                            <TextBlock Text="Height"
+                                                                       Grid.Column="4"
+                                                                       Grid.Row="0" />
+                                                            <TextBlock Text="Pattern(D2D)"
+                                                                       Grid.Column="0"
+                                                                       Grid.Row="1"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBox Grid.Column="1"
+                                                                     Grid.Row="1"
+                                                                     Margin="2,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="2"
+                                                                     Grid.Row="1"
+                                                                     Margin="2,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="3"
+                                                                     Grid.Row="1"
+                                                                     Margin="2,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="4"
+                                                                     Grid.Row="1"
+                                                                     Margin="2,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBlock Text="NonPattern(Surface)"
+                                                                       Grid.Column="0"
+                                                                       Grid.Row="2"
+                                                                       HorizontalAlignment="Left" />
+                                                            <TextBox Grid.Column="1"
+                                                                     Grid.Row="2"
+                                                                     Margin="2,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="2"
+                                                                     Grid.Row="2"
+                                                                     Margin="2,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="3"
+                                                                     Grid.Row="2"
+                                                                     Margin="2,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <TextBox Grid.Column="4"
+                                                                     Grid.Row="2"
+                                                                     Margin="2,0"
+                                                                     VerticalAlignment="Center" />
+                                                            <Button Content="Adjust"
+                                                                    Grid.ColumnSpan="5"
+                                                                    Grid.Row="3"
+                                                                    Height="25"
+                                                                    VerticalAlignment="Bottom" />
+                                                        </Grid>
+                                                    </Grid>
+                                                </GroupBox>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
+                        <TabItem Header="Run"
+                                 Style="{StaticResource ResourceKey=WizardTabItem}">
+                            <ScrollViewer>
+                                <StackPanel>
+                                    <Grid Background="White">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="200" />
+                                            <RowDefinition Height="680" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="0"
+                                              Grid.Row="0"
+                                              Grid.ColumnSpan="2"
+                                              Background="AliceBlue">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="2.5*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid Grid.Column="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Content="Save"
+                                                        Margin="3" />
+                                                <Button Content="Save As"
+                                                        Grid.Column="1"
+                                                        Margin="3" />
+                                                <Button Content="Load"
+                                                        Grid.Column="2"
+                                                        Margin="3" />
+                                            </Grid>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="D:\200811ADI.rcp"
+                                                       FontWeight="Bold" />
+                                        </Grid>
+                                        <Grid Grid.Column="0"
+                                              Grid.Row="1">
+                                            <GroupBox Header="Progress">
+                                                <Grid Margin="10,2">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="1*" />
+                                                        <RowDefinition Height="1.5*" />
+                                                        <RowDefinition Height="1*" />
+                                                    </Grid.RowDefinitions>
+                                                    <UniformGrid Columns="2">
+                                                        <TextBlock Text="Reticle ID"
+                                                                   HorizontalAlignment="Left" />
+                                                        <TextBlock Text="PA200131022"
+                                                                   HorizontalAlignment="Left" />
+                                                        <TextBlock Text="Reticle Type"
+                                                                   HorizontalAlignment="Left" />
+                                                        <TextBlock Text="EUV"
+                                                                   HorizontalAlignment="Left" />
+                                                    </UniformGrid>
+                                                    <StackPanel Grid.Row="1"
+                                                                VerticalAlignment="Center">
+                                                        <TextBlock Text="Main Progress"
+                                                                   FontWeight="Bold"
+                                                                   HorizontalAlignment="Left" />
+                                                        <Grid>
+                                                            <ProgressBar Height="30"
+                                                                         Value="7" />
+                                                            <TextBlock Text="7%"
+                                                                       Foreground="Black"
+                                                                       FontWeight="Bold" />
+                                                        </Grid>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Row="2"
+                                                                VerticalAlignment="Center">
+                                                        <TextBlock Text="Sub Progress"
+                                                                   FontWeight="Bold"
+                                                                   HorizontalAlignment="Left" />
+                                                        <Grid>
+                                                            <ProgressBar Height="20"
+                                                                         Value="80"
+                                                                         Grid.ColumnSpan="2" />
+                                                            <TextBlock Text="Sub Process Name"
+                                                                       Foreground="Black" />
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </GroupBox>
+                                        </Grid>
+                                        <Grid Grid.Column="1"
+                                              Grid.Row="1">
+                                            <GroupBox Header="Histogram">
+                                                <Image Margin="10"
+                                                       Stretch="Fill"
+                                                       Source="Resource/Histogram.PNG" />
+                                            </GroupBox>
+                                        </Grid>
+                                        <Grid Grid.Column="0"
+                                              Grid.Row="2">
+                                            <GroupBox Header="Defect List">
+                                                <Grid Margin="5,2">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="30" />
+                                                        <RowDefinition />
+                                                    </Grid.RowDefinitions>
+                                                    <StackPanel>
+                                                        <TextBlock Text="Point Base"
+                                                                   HorizontalAlignment="Left" />
+                                                        <StackPanel Orientation="Horizontal"
+                                                                    VerticalAlignment="Bottom">
+                                                            <CheckBox Content="Left-Top"
+                                                                      Margin="5,0"
+                                                                      IsChecked="True" />
+                                                            <CheckBox Content="Left-Bottom"
+                                                                      Margin="5,0" />
+                                                            <CheckBox Content="Right-Top"
+                                                                      Margin="5,0" />
+                                                            <CheckBox Content="Right-Bottom"
+                                                                      Margin="5,0" />
+                                                            <CheckBox Content="Center"
+                                                                      Margin="5,0" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                    <DataGrid IsReadOnly="True"
+                                                              Grid.Row="1">
+                                                        <DataGrid.Resources>
+                                                            <Style TargetType="DataGridColumnHeader">
+                                                                <Setter Property="HorizontalAlignment"
+                                                                        Value="Stretch" />
+                                                                <Setter Property="HorizontalContentAlignment"
+                                                                        Value="Center" />
+                                                            </Style>
+                                                        </DataGrid.Resources>
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="No."
+                                                                                Width="30"
+                                                                                Binding="{Binding no}" />
+                                                            <DataGridTextColumn Header="Defect Code"
+                                                                                Width="*"
+                                                                                Binding="{Binding type}" />
+                                                            <DataGridTextColumn Header="Die Index"
+                                                                                Width="*"
+                                                                                Binding="{Binding index}" />
+                                                            <DataGridTextColumn Header="Location"
+                                                                                Width="1.5*"
+                                                                                Binding="{Binding loac}" />
+                                                            <DataGridTextColumn Header="Size(Pxl)"
+                                                                                Width="*"
+                                                                                Binding="{Binding x}" />
+                                                            <DataGridTextColumn Header="GV"
+                                                                                Width="1*"
+                                                                                Binding="{Binding y}" />
+                                                        </DataGrid.Columns>
+
+                                                    </DataGrid>
+                                                </Grid>
+
+                                            </GroupBox>
+                                        </Grid>
+                                        <Grid Grid.Column="1"
+                                              Grid.Row="2">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="1*" />
+                                                <RowDefinition Height="1*" />
+                                            </Grid.RowDefinitions>
+
+                                            <GroupBox Header="Defect Image"
+                                                      Grid.Row="0">
+                                                <Grid Background="Black">
+                                                    <TextBlock Text="Defect Image"
+                                                               Foreground="White" />
+                                                </Grid>
+                                            </GroupBox>
+
+                                            <GroupBox Header="Module State"
+                                                      Grid.Row="1">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition />
+                                                        <RowDefinition />
+                                                        <RowDefinition />
+                                                        <RowDefinition />
+                                                    </Grid.RowDefinitions>
+                                                    <Grid Margin="10,5">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="20" />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+                                                        <TextBlock Text="LoadPort2"
+                                                                   VerticalAlignment="Bottom"
+                                                                   FontSize="13"
+                                                                   FontWeight="Bold" />
+                                                        <Border Grid.Row="1"
+                                                                CornerRadius="5"
+                                                                BorderBrush="DimGray"
+                                                                BorderThickness="1"
+                                                                Background="{StaticResource PanelBackGround}">
+                                                            <TextBlock Text="Ready"
+                                                                       VerticalAlignment="Center"
+                                                                       HorizontalAlignment="Center" />
+                                                        </Border>
+                                                    </Grid>
+                                                    <Grid Margin="10,5"
+                                                          Grid.Row="1">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="20" />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+                                                        <TextBlock Text="WTR"
+                                                                   VerticalAlignment="Bottom"
+                                                                   FontSize="13"
+                                                                   FontWeight="Bold" />
+                                                        <Border Grid.Row="1"
+                                                                CornerRadius="5"
+                                                                BorderBrush="DimGray"
+                                                                BorderThickness="1"
+                                                                Background="{StaticResource PanelBackGround}">
+                                                            <TextBlock Text="Ready"
+                                                                       VerticalAlignment="Center"
+                                                                       HorizontalAlignment="Center" />
+                                                        </Border>
+                                                    </Grid>
+                                                    <Grid Margin="10,5"
+                                                          Grid.Row="2">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="20" />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+                                                        <TextBlock Text="Aligner"
+                                                                   VerticalAlignment="Bottom"
+                                                                   FontSize="13"
+                                                                   FontWeight="Bold" />
+                                                        <Border Grid.Row="1"
+                                                                CornerRadius="5"
+                                                                BorderBrush="DimGray"
+                                                                BorderThickness="1"
+                                                                Background="{StaticResource PanelBackGround}">
+                                                            <TextBlock Text="Run"
+                                                                       FontWeight="Bold"
+                                                                       VerticalAlignment="Center"
+                                                                       HorizontalAlignment="Center" />
+                                                        </Border>
+                                                    </Grid>
+                                                    <Grid Margin="10,5"
+                                                          Grid.Row="3">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="20" />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+                                                        <TextBlock Text="Vision"
+                                                                   VerticalAlignment="Bottom"
+                                                                   FontSize="13"
+                                                                   FontWeight="Bold" />
+                                                        <Border Grid.Row="1"
+                                                                CornerRadius="5"
+                                                                BorderBrush="DimGray"
+                                                                BorderThickness="1"
+                                                                Background="{StaticResource PanelBackGround}">
+                                                            <TextBlock Text="Ready"
+                                                                       VerticalAlignment="Center"
+                                                                       HorizontalAlignment="Center" />
+                                                        </Border>
+                                                    </Grid>
+
+                                                </Grid>
+                                            </GroupBox>
+
+                                        </Grid>
+                                    </Grid>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
+                        <TabItem Header="Review"
+                                 Style="{StaticResource ResourceKey=WizardTabItem}">
+                            <Button Content="test"/>
+                        </TabItem>
+                        <TabItem Header="Engineer"
+                                 Style="{StaticResource ResourceKey=WizardTabItem}">
+                            <engineer:VEGA_D_Engineer_UI x:Name="engineerUI"/>
+                        </TabItem>
+                        <!--<TabItem Header="Maint"
+                                 Style="{StaticResource ResourceKey=WizardTabItem}"
+                                 x:Name="TabMaint"
+                                 IsEnabled="False"
+                                 Opacity="0.5">
+                            <Grid Margin="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="1.5*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="75*" />
+                                            <RowDefinition Height="25*" />
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0">
+                                            <GroupBox>
+                                                <GroupBox.Header>
+                                                    <TextBlock Text="Recipe List" />
+                                                </GroupBox.Header>
+                                                <DataGrid Margin="2">
+                                                    <DataGrid.Resources>
+                                                        <Style TargetType="DataGridColumnHeader">
+                                                            <Setter Property="HorizontalAlignment"
+                                                                    Value="Stretch" />
+                                                            <Setter Property="HorizontalContentAlignment"
+                                                                    Value="Center" />
+                                                        </Style>
+                                                    </DataGrid.Resources>
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Header="No."
+                                                                            Width="40" />
+                                                        <DataGridTextColumn Header="Recipe Name"
+                                                                            Width="*" />
+                                                        <DataGridTextColumn Header="Mask ID"
+                                                                            Width="*" />
+                                                        <DataGridTextColumn Header="Write Time"
+                                                                            Width="*" />
+                                                    </DataGrid.Columns>
+                                                </DataGrid>
+                                            </GroupBox>
+                                        </Grid>
+                                        <Grid Grid.Row="1">
+                                            <GroupBox Grid.Row="0">
+                                                <GroupBox.Header>
+                                                    <TextBlock Text="Search Option" />
+                                                </GroupBox.Header>
+                                                <Grid Grid.Row="1">
+                                                    <StackPanel Margin="10,0,10,0">
+                                                        <StackPanel>
+                                                            <CheckBox Content="Start Date"
+                                                                      VerticalAlignment="Center"
+                                                                      Margin="0,5,0,0"
+                                                                      FontSize="12" />
+                                                            <control:DateTimePicker IsEnabled="{Binding ElementName=cbStart, Path=IsChecked}"
+                                                                                    DateFormat="yyyt-mm-dd"
+                                                                                    Background="#FFFBFBFB" />
+                                                            <CheckBox Content="End Date"
+                                                                      VerticalAlignment="Center"
+                                                                      Margin="0,5,0,0"
+                                                                      FontSize="12" />
+                                                            <control:DateTimePicker IsEnabled="{Binding ElementName=cbEnd, Path=IsChecked}"
+                                                                                    DateFormat="yyyy-MM-dd" />
+                                                            <Grid Margin="0,8,0,0">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition />
+                                                                    <ColumnDefinition Width="1.5*" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <CheckBox Content="Mask ID"
+                                                                          VerticalAlignment="Center" />
+                                                                <TextBox Grid.Column="1"
+                                                                         IsEnabled="{Binding ElementName=cbWafer, Path=IsChecked}" />
+                                                            </Grid>
+                                                            <Grid Margin="0,8,0,0">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition />
+                                                                    <ColumnDefinition Width="1.5*" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <CheckBox Content="Recipe Name"
+                                                                          VerticalAlignment="Center" />
+                                                                <TextBox Grid.Column="1"
+                                                                         IsEnabled="{Binding ElementName=cbRecipe, Path=IsChecked}" />
+                                                            </Grid>
+                                                            <Button Content="Search"
+                                                                    Margin="0,12,0,0"
+                                                                    Height="40" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </GroupBox>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                                <Grid Grid.Column="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <GroupBox>
+                                            <GroupBox.Header>
+                                                <TextBlock Text="Image View" />
+                                            </GroupBox.Header>
+                                            <Grid Background="Black">
+                                                <TextBlock Text="Line Scan Image View"
+                                                           Foreground="White" />
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <GroupBox>
+                                            <GroupBox.Header>
+                                                <TextBlock Text="General" />
+                                            </GroupBox.Header>
+                                            <TabControl>
+                                                <TabItem Header="BF">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*" />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid Grid.Row="0" />
+                                                    </Grid>
+                                                </TabItem>
+                                                <TabItem Header="DF">
+
+                                                </TabItem>
+                                                <TabItem Header="Option">
+
+                                                </TabItem>
+                                            </TabControl>
+                                        </GroupBox>
+                                    </Grid>
+
+                                </Grid>
+
+                            </Grid>
+                        </TabItem>-->
+                    </TabControl>
+                    <GridSplitter Grid.Row="1"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  Background="{StaticResource Splitter}"
+                                  ShowsPreview="True"
+                                  Grid.ColumnSpan="2" />
+                    <TabControl Grid.Row="2"
+                                Background="White">
+                        <TabItem Header="System" />
+                        <TabItem Header="Process" />
+                        <TabItem Header="Error" />
+                        <TabItem Header="I/O" />
+                        <TabItem Header="Result" />
+
+                    </TabControl>
+                </Grid>
+                <!--Right Panel-->
+                <Grid Grid.Column="4"
+                      Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="12*" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="35*" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="35*" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="25*" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <GroupBox Grid.Row="0"
+                              Header="Mask Location">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="3*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <TextBlock Text="Loading..."
+                                           VerticalAlignment="Bottom" />
+                            </Grid>
+                            <Grid Grid.Column="1">
+
+                            </Grid>
+                            <Grid Grid.Column="2">
+
+                            </Grid>
+                            <Grid Grid.Column="0"
+                                  Grid.Row="1"
+                                  Background="Gray"
+                                  Margin="5">
+                                <TextBlock Text="LoadPort" />
+                            </Grid>
+                            <Grid Grid.Column="1"
+                                  Grid.Row="1"
+                                  Background="Gray"
+                                  Opacity="0.6"
+                                  Margin="5">
+                                <TextBlock Text="Robot" />
+                            </Grid>
+                            <Grid Grid.Column="2"
+                                  Grid.Row="1"
+                                  Background="Gray"
+                                  Opacity="0.6"
+                                  Margin="5">
+                                <TextBlock Text="Vision" />
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <Grid Grid.Row="2">
+                        <local:Loadport_UI x:Name="loadportA"/>
+                    </Grid>
+                    <Grid Grid.Row="4">
+                        <local:Loadport_UI x:Name="loadportB"/>
+                    </Grid>
+                    <!--<Button Grid.Row="6"
+                            FontSize="15"
+                            Content="Start"
+                            Margin="10" />
+                    <Button Grid.Row="8"
+                            FontSize="15"
+                            Content="Stop"
+                            Margin="10" />-->
+                    <Grid Grid.Row="6">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0"
+                                    x:Name="buttonResume"
+                                    Content="Resume"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonResume_Click"/>
+                            <Button Grid.Column="1"
+                                    x:Name="buttonPause"
+                                    Content="Pause"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonPause_Click"/>
+                            <Button Grid.Column="2"
+                                    x:Name="buttonInitialize"
+                                    Content="Initialize"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonInitialize_Click"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0"
+                                    x:Name="buttonRecovery"
+                                    Content="Recovery"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonRecovery_Click"/>
+                            <Button Grid.Column="2"
+                                    x:Name="buttonBuzzOff"
+                                    Content="Buzzer Off"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonBuzzOff_Click"/>
+                        </Grid>
+                    </Grid>
+                    
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

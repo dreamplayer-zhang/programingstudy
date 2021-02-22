@@ -3,6 +3,10 @@
 #include "CLR_IP.h"
 #include <msclr\marshal_cppstd.h>
 
+#pragma warning(disable: 4244)
+#pragma warning(disable: 4267)
+#pragma warning(disable: 4793)
+
 namespace RootTools_CLR
 {
 	void CLR_IP::Cpp_Threshold(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH, bool bDark, int nThresh)
@@ -150,7 +154,7 @@ namespace RootTools_CLR
 			for (int i = 0; i < vtLabeled.size(); i++)
 			{
 				local[i] = gcnew Cpp_LabelParam();
-				local[i]->centerX = vtLabeled[i].centerX;
+				local[i]->centerX = (float)vtLabeled[i].centerX;
 				local[i]->centerY = vtLabeled[i].centerY;
 
 				local[i]->width = vtLabeled[i].width;
@@ -791,5 +795,19 @@ namespace RootTools_CLR
 		pSrc = nullptr;
 		pDst = nullptr;
 	}
+	ResizeSSE m_ResizeSSE[3];
+	void CLR_IP::Cpp_CreatInterpolationData(int i, double dXScale, double dXShift, int nWidth)
+	{
+		m_ResizeSSE[i].CreatInterpolationData(dXScale, dXShift, nWidth);
+	}
+	void CLR_IP::Cpp_ProcessInterpolation(int i,int  thid, BYTE* pSrcImg, int nSrcHeight, int nSrcWidth, int nFovWidth, LPBYTE* ppTarget, int nXOffset, int nYOffset, int nDir, int nSy, int nEy)
+	{
+		m_ResizeSSE[i].ProcessInterpolation(thid, pSrcImg, nSrcHeight, nSrcWidth, nFovWidth, ppTarget, nXOffset, nYOffset, nDir, nSy, nEy);
+	}
+	void CLR_IP::Cpp_ProcessInterpolation(int i,int  thid, BYTE* pSrcImg, int nSrcHeight, int nSrcWidth, int nFovWidth, LPBYTE pTarget)
+	{
+		m_ResizeSSE[i].ProcessInterpolation(thid, pSrcImg, nSrcHeight, nSrcWidth, nFovWidth, pTarget);
+	}
+
 
 }

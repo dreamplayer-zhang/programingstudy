@@ -9,10 +9,14 @@ using RootTools.Memory;
 using RootTools.Trees;
 using System.Diagnostics;
 using System.Windows.Threading;
+using System.Threading;
+using System.Threading.Tasks;
+using Emgu.CV;
+using Emgu.CV.Structure;
 
 namespace RootTools.Camera.BaslerPylon
 {
-    public class Camera_Basler : ObservableObject, RootTools.Camera.ICamera
+    public class Camera_Basler : ObservableObject, ICamera
     {
         public Dispatcher _dispatcher;
 
@@ -471,7 +475,10 @@ namespace RootTools.Camera.BaslerPylon
         {
             get
             {
-                return new RelayCommand(GrabContinuousShot);
+                return new RelayCommand(() =>
+                {
+                    GrabContinuousShot();
+                });
             }
             set
             {
@@ -488,13 +495,28 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
+        public RelayCommand ShowChartWindowCommand
+        {
+            get
+            {
+                return new RelayCommand(ShowChartWindow);
+            }
+            set
+            {
+            }
+        }
+
         public void GrabOneShot()
         {
             try
             {
                 if (m_cam.IsOpen)
                 {
-                    stopWatch.Reset();
+                    //stopWatch.Reset();
+                    stopWatch.Restart();
+
+                    m_cam.StreamGrabber.ImageGrabbed -= OnImageGrabbed;
+                    
                     m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbed;
                 }
                 // Starts the grabbing of one image.
@@ -506,15 +528,27 @@ namespace RootTools.Camera.BaslerPylon
 
 
         // Starts the continuous grabbing of images and handles exceptions.
-        public void GrabContinuousShot()
+        public void GrabContinuousShot(bool isImageUpdate = true)
         {
             try
             {
-                if (m_cam.IsOpen)
+                if (m_cam != null && m_cam.IsOpen)
                 {
                     m_bLive = true;
-                    stopWatch.Reset();
-                    m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbed;
+                    //stopWatch.Reset();
+                    stopWatch.Restart();
+                    m_cam.StreamGrabber.ImageGrabbed -= OnImageGrabbedNoUpdateView;
+                    m_cam.StreamGrabber.ImageGrabbed -= OnImageGrabbed;
+                    if (isImageUpdate)
+                    {
+                       
+                        m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbed;
+                    }
+                    else
+                    {
+                        m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbedNoUpdateView;
+                    }
+
                     // Start the grabbing of images until grabbing is stopped.
                     m_cam.Parameters[PLCamera.AcquisitionMode].SetValue(PLCamera.AcquisitionMode.Continuous);
                     string s_curPixelFormat = m_cam.Parameters[PLCamera.PixelFormat].GetValue();
@@ -539,7 +573,6 @@ namespace RootTools.Camera.BaslerPylon
                     m_cam.StreamGrabber.Start(GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
                     p_CamInfo._IsCanGrab = false;
                     p_CamInfo._IsGrabbing = true;
-
                 }
             }
             catch (Exception e) 
@@ -553,23 +586,39 @@ namespace RootTools.Camera.BaslerPylon
             if (m_cam == null) return;
             m_cam.StreamGrabber.Stop();
             m_cam.StreamGrabber.ImageGrabbed -= OnImageGrabbed;
+            m_cam.StreamGrabber.ImageGrabbed -= OnImageGrabbedNoUpdateView;
             p_CamInfo._IsCanGrab = true;
             p_CamInfo._IsGrabbing = false;
+
+            if(m_threadImgUpdate != null)
+                m_threadImgUpdate.Abort();
+        }
+
+        private void ShowChartWindow()
+        {
+            GraphWindowTest window = new GraphWindowTest();
+            window.Owner = Application.Current.MainWindow;
+
+            window.SetImage(m_ImageGrab);
+            window.Init();
+            window.Show();
         }
 
         private Stopwatch stopWatch = new Stopwatch();
         private bool m_bLive = true;
         private CRect m_LastROI = new CRect(0, 0, 0, 0);
-        private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
+
+        private void OnImageGrabbedNoUpdateView(Object sender, ImageGrabbedEventArgs e)
         {
             try
             {
                 IGrabResult grabResult = e.GrabResult;
+
                 // Check if the image can be displayed.
                 if (grabResult.IsValid)
                 {
-                    if (!stopWatch.IsRunning)
-                    {  
+                    //if (!stopWatch.IsRunning)
+                    {
                         if (m_bLive)
                         {
                             m_ImageGrab.p_nByte = ((m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString()) ? 1 : 3);
@@ -581,28 +630,127 @@ namespace RootTools.Camera.BaslerPylon
                                 converter.OutputPixelFormat = PixelType.BGR8packed;
                                 converter.Convert(m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.p_nByte, grabResult);
                             }
-                            else
+                            else if (m_ImageGrab.p_nByte == 1)
                             {
                                 byte[] aBuf = grabResult.PixelData as byte[];
                                 Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
                             }
                             GrabEvent();
 
-                            if (stopWatch.ElapsedMilliseconds > 33)
+                            // if(stopWatch.ElapsedMilliseconds > 33)
                             {
-                                if (_dispatcher != null)
+                                // 샘플링 스레드에서 사용할 이미지 데이터 복사
+                                int imgSize = m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y;
+                                if (m_ImageGrab.p_nByte == 3)
                                 {
-                                    _dispatcher.Invoke(new Action(delegate ()
-                                    {
-                                        m_ImageGrab.UpdateImage();
-                                    }));
+                                    // 이미지 데이터 복사
+                                    m_threadBuf = new byte[imgSize * m_ImageGrab.p_nByte];
+
+                                    PixelDataConverter converter = new PixelDataConverter();
+                                    converter.OutputPixelFormat = PixelType.BGR8packed;
+                                    converter.Convert(m_threadBuf, grabResult);
                                 }
-                                else
+                                else if (m_ImageGrab.p_nByte == 1)
                                 {
-                                    Application.Current.Dispatcher.Invoke((Action)delegate
+                                    // 이미지 데이터 복사
+                                    m_threadBuf = new byte[imgSize * m_ImageGrab.p_nByte];
+                                    Marshal.Copy(m_ImageGrab.GetPtr(), m_threadBuf, 0, imgSize * m_ImageGrab.p_nByte);
+                                }
+                            }
+                            stopWatch.Reset();
+                        }
+                        else
+                        {
+                            int nFrameOffsetCntY = m_cpScanOffset.Y + m_nFrameCnt;
+                            if (m_nFrameCnt < m_nFrameTotal)
+                            {
+                                if (m_Memory.p_sz.Y > (nFrameOffsetCntY + 1) * m_ImageGrab.p_Size.Y)
+                                {
+                                    byte[] aBuf = grabResult.PixelData as byte[];
+                                    IntPtr dstPtr = (IntPtr)((long)m_Memory.GetPtr() + m_cpScanOffset.X + (m_ImageGrab.p_Size.Y * (long)m_Memory.W * nFrameOffsetCntY));
+                                    for (int n = 0; n < m_ImageGrab.p_Size.Y; n++, dstPtr = (IntPtr)((long)dstPtr + m_Memory.W))
                                     {
-                                        m_ImageGrab.UpdateImage();
-                                    });
+                                        Marshal.Copy(aBuf, m_ImageGrab.p_Size.X * n, dstPtr, m_ImageGrab.p_Size.X);
+                                    }
+
+                                    m_LastROI.Left = m_cpScanOffset.X;
+                                    m_LastROI.Right = m_cpScanOffset.X + m_ImageGrab.p_Size.X;
+                                    m_LastROI.Top = m_cpScanOffset.Y;
+                                    m_LastROI.Bottom = m_cpScanOffset.Y + m_ImageGrab.p_Size.Y;
+                                    m_nFrameCnt++;
+                                    GrabEvent();
+                                    p_nGrabProgress = Convert.ToInt32((double)m_nFrameCnt * 100 / m_nFrameTotal);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.ToString());
+            }
+            finally
+            {
+                // Dispose the grab result if needed for returning it to the grab loop.
+                e.DisposeGrabResultIfClone();
+            }
+        }
+        private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
+        {
+            try
+            {
+                IGrabResult grabResult = e.GrabResult;
+                
+                // Check if the image can be displayed.
+                if (grabResult.IsValid)
+                {
+                    //if (!stopWatch.IsRunning)
+                    {
+                        if (m_bLive)
+                        {
+                            m_ImageGrab.p_nByte = ((m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString()) ? 1 : 3);
+                            m_ImageGrab.p_Size = new CPoint((int)m_CamParam._Width, (int)m_CamParam._Height);
+
+                            if (m_ImageGrab.p_nByte == 3)
+                            {
+                                PixelDataConverter converter = new PixelDataConverter();
+                                converter.OutputPixelFormat = PixelType.BGR8packed;
+                                converter.Convert(m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.p_nByte, grabResult);
+                            }
+                            else if (m_ImageGrab.p_nByte == 1)
+                            {
+                                byte[] aBuf = grabResult.PixelData as byte[];
+                                Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
+                            }
+                            GrabEvent();
+
+                            // if(stopWatch.ElapsedMilliseconds > 33)
+                            {
+                                // 샘플링 스레드에서 사용할 이미지 데이터 복사
+                                int imgSize = m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y;
+                                if (m_ImageGrab.p_nByte == 3)
+                                {
+                                    // 이미지 데이터 복사
+                                    m_threadBuf = new byte[imgSize * m_ImageGrab.p_nByte];
+
+                                    PixelDataConverter converter = new PixelDataConverter();
+                                    converter.OutputPixelFormat = PixelType.BGR8packed;
+                                    converter.Convert(m_threadBuf, grabResult);
+                                }
+                                else if (m_ImageGrab.p_nByte == 1)
+                                {
+                                    // 이미지 데이터 복사
+                                    m_threadBuf = new byte[imgSize * m_ImageGrab.p_nByte];
+                                    Marshal.Copy(m_ImageGrab.GetPtr(), m_threadBuf, 0, imgSize * m_ImageGrab.p_nByte);
+                                }
+
+                                if (m_threadImgUpdate.ThreadState == System.Threading.ThreadState.Stopped ||
+                                    m_threadImgUpdate.ThreadState == System.Threading.ThreadState.Aborted)
+                                {
+                                    StartImageUpdateThread();
+
+                                    stopWatch.Restart();
                                 }
                             }
                             stopWatch.Reset();
@@ -676,6 +824,11 @@ namespace RootTools.Camera.BaslerPylon
             {
                 Connect();
             }
+
+            if (m_threadImgUpdate == null)
+                StartImageUpdateThread();
+            else
+                m_threadImgUpdate.Abort();
         }
         public void FunctionUserSetLoad()
         {
@@ -697,7 +850,7 @@ namespace RootTools.Camera.BaslerPylon
         int m_nFrameTotal;
         MemoryData m_Memory;
         CPoint m_cpScanOffset;
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReverseOffsetY = 0)
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
         {
             try
             {
@@ -712,8 +865,15 @@ namespace RootTools.Camera.BaslerPylon
                     m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbed;
                     // Start the grabbing of images until grabbing is stopped.
 
+                    m_cam.Parameters[PLCamera.TriggerSelector].SetValue(PLCamera.TriggerSelector.FrameStart);
+                    m_cam.Parameters[PLCamera.TriggerMode].SetValue(PLCamera.TriggerMode.Off);
                     m_cam.Parameters[PLCamera.TriggerSelector].SetValue(PLCamera.TriggerSelector.AcquisitionStart);
                     m_cam.Parameters[PLCamera.TriggerMode].SetValue(PLCamera.TriggerMode.On);
+
+                    // Parameter 확인
+                    string strTriggerSelector = m_cam.Parameters[PLCamera.TriggerSelector].GetValue();
+                    string strTriggerMode = m_cam.Parameters[PLCamera.TriggerMode].GetValue();
+
                     m_cam.StreamGrabber.Start(GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
                     p_CamInfo._IsCanGrab = false;
                     p_CamInfo._IsGrabbing = false;
@@ -732,5 +892,104 @@ namespace RootTools.Camera.BaslerPylon
             return "OK"; 
         }
         public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReserveOffsetY = 0) { }
+
+        private Thread m_threadImgUpdate;
+        private byte[] m_threadBuf;
+
+        public void StartImageUpdateThread()
+        {
+            int nByte = m_ImageGrab.p_nByte;
+            int x = m_ImageViewer.p_View_Rect.X;
+            int y = m_ImageViewer.p_View_Rect.Y;
+            int rectWidth = m_ImageViewer.p_View_Rect.Width;
+            int rectHeight = m_ImageViewer.p_View_Rect.Height;
+            int canvasWidth = m_ImageViewer.p_CanvasWidth;
+            int canvasHeight = m_ImageViewer.p_CanvasHeight;
+
+            m_threadImgUpdate = new Thread(() => ImageUpdateThreadFunc(this, nByte, x, y, rectWidth, rectHeight, canvasWidth, canvasHeight));
+            m_threadImgUpdate.Start();
+        }
+
+        static unsafe void ImageUpdateThreadFunc(Camera_Basler cam, int nByte, int x, int y, int rectWidth, int rectHeight, int canvasWidth, int canvasHeight)
+        {
+            if(cam != null)
+            {
+                // Dispatcher 얻어오기
+                Dispatcher dispatcher = null;
+                if (cam._dispatcher == null)
+                    dispatcher = Application.Current.Dispatcher;
+                else
+                    dispatcher = cam._dispatcher;
+
+                if (nByte == 1)
+                {
+                    // 이미지 샘플링
+                    Image<Gray, byte> image = cam.m_ImageViewer.GetSamplingGrayImage();
+
+                        // sampling 함수 추후 직접 구현 예정
+//                     IntPtr ptrMem = cam.m_ImageViewer.p_ImageData.GetPtr();
+//                     if (ptrMem == IntPtr.Zero)
+//                         return;
+// 
+//                     Image<Gray, byte> image = new Image<Gray, byte>(canvasWidth, canvasHeight);
+// 
+//                     Parallel.For(0, canvasHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (yy) =>
+//                     {
+//                         long pix_y = y + yy * rectHeight / canvasHeight;
+// 
+//                         for (int xx = 0; xx < canvasWidth; xx++)
+//                         {
+//                             long pix_x = x + xx * rectWidth / canvasWidth;
+//                             image.Data[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * x];
+//                         }
+//                     });
+
+
+                    // Dispatcher를 통해 메인스레드에서 화면표시
+                    dispatcher.Invoke(new Action(delegate ()
+                    {
+                        cam.m_ImageViewer.SetImageSource(image);
+                        //cam.m_ImageGrab.UpdateImage();
+                    }));
+                }
+                else if (nByte == 3)
+                {
+                    // 이미지 샘플링
+                    Image<Rgb, byte> image = cam.m_ImageViewer.GetSamplingRgbImage();
+                    
+                    // sampling 함수 추후 직접 구현 예정
+//                     IntPtr ptrMem = cam.m_ImageViewer.p_ImageData.GetPtr();
+//                     if (ptrMem == IntPtr.Zero)
+//                         return;
+// 
+//                     Image<Gray, byte> image = new Image<Gray, byte>(canvasWidth, canvasHeight);
+// 
+//                     Parallel.For(0, canvasHeight, (yy) =>
+//                     {
+//                         long pix_y = y + yy * rectHeight / canvasHeight;
+//                         for (int xx = 0; xx < canvasWidth; xx++)
+//                         {
+//                             long pix_x = x + xx * rectWidth / canvasWidth;
+// 
+//                             image.Data[yy, xx, 0] = ((byte*)ptrMem)[(pix_x * nByte + 0) + (long)pix_y * (x * 3)];
+//                             image.Data[yy, xx, 1] = ((byte*)ptrMem)[(pix_x * nByte + 1) + (long)pix_y * (x * 3)];
+//                             image.Data[yy, xx, 2] = ((byte*)ptrMem)[(pix_x * nByte + 2) + (long)pix_y * (x * 3)];
+//                         }
+//                     });
+
+                    // Dispatcher를 통해 메인스레드에서 화면표시
+                    dispatcher.Invoke(new Action(delegate ()
+                    {
+                        cam.m_ImageViewer.SetImageSource(image);
+                        //cam.m_ImageGrab.UpdateImage();
+                    }));
+                }
+            }
+        }
+
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

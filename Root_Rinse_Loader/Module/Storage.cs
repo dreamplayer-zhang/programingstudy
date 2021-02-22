@@ -27,6 +27,15 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region Magazine
+        public enum eMagazine
+        {
+            Magazine1,
+            Magazine2,
+            Magazine3,
+            Magazine4,
+        }
+        public string[] m_asMagazine = Enum.GetNames(typeof(eMagazine)); 
+
         public class Magazine : NotifyProperty
         {
             DIO_I m_diCheck;
@@ -64,7 +73,7 @@ namespace Root_Rinse_Loader.Module
             public void CheckSensor()
             {
                 p_bCheck = m_diCheck.p_bIn;
-                p_bClamp = !m_dioClamp.p_bIn; 
+                p_bClamp = m_dioClamp.p_bIn; 
             }
 
             public void RunClamp(bool bClamp)
@@ -72,19 +81,21 @@ namespace Root_Rinse_Loader.Module
                 m_dioClamp.Write(bClamp && p_bCheck); 
             }
 
-            string m_id; 
-            Storage m_storage; 
-            public Magazine(string id, Storage storage)
+            public eMagazine m_eMagazine = eMagazine.Magazine1;
+            public string m_id; 
+            public Storage m_storage; 
+            public Magazine(eMagazine eMagazine, Storage storage)
             {
-                m_id = id; 
+                m_eMagazine = eMagazine; 
+                m_id = eMagazine.ToString(); 
                 m_storage = storage; 
             }
         }
 
-        List<Magazine> m_aMagazine = new List<Magazine>(); 
+        public List<Magazine> m_aMagazine = new List<Magazine>(); 
         void InitMagazine()
         {
-            for (int n = 0; n < 4; n++) m_aMagazine.Add(new Magazine("Magazine" + n.ToString(), this)); 
+            for (int n = 0; n < 4; n++) m_aMagazine.Add(new Magazine((eMagazine)n, this)); 
         }
 
         public string RunClamp(bool bClamp, double secDelay)
@@ -103,7 +114,7 @@ namespace Root_Rinse_Loader.Module
         public class Stack : NotifyProperty
         {
             DIO_I m_diLevel;
-            DIO_I[] m_diCheck = new DIO_I[4]; 
+            public DIO_I[] m_diCheck = new DIO_I[4]; 
             public void GetTools(ToolBox toolBox)
             {
                 m_storage.p_sInfo = toolBox.Get(ref m_diLevel, m_storage, m_id + ".Level");
@@ -144,14 +155,14 @@ namespace Root_Rinse_Loader.Module
             }
 
             string m_id;
-            Storage m_storage; 
+            public Storage m_storage; 
             public Stack(string id, Storage storage)
             {
                 m_id = id;
                 m_storage = storage; 
             }
         }
-        Stack m_stack; 
+        public Stack m_stack; 
         void InitStack()
         {
             m_stack = new Stack("Stack", this); 
@@ -164,7 +175,8 @@ namespace Root_Rinse_Loader.Module
         public string RunPusher()
         {
             int msWait = (int)(1000 * m_dioPusher.m_secTimeout); 
-            StopWatch sw = new StopWatch(); 
+            StopWatch sw = new StopWatch();
+            m_rail.CheckStrip(false); 
             m_dioPusher.Write(true);
             while (m_dioPusher.p_bDone == false)
             {
@@ -183,44 +195,40 @@ namespace Root_Rinse_Loader.Module
                 }
             }
             m_dioPusher.Write(false);
-            return m_dioPusher.WaitDone(); 
+            string sDone = m_dioPusher.WaitDone();
+            m_rail.CheckStrip(true);
+            return sDone;
         }
         #endregion
 
         #region Elevator
         Axis m_axis;
-        public enum ePos
-        {
-            Magazine0,
-            Magazine1,
-            Magazine2,
-            Magazine3,
-            Stack
-        }
         void InitPosElevator()
         {
-            m_axis.AddPos(Enum.GetNames(typeof(ePos))); 
+            m_axis.AddPos(Enum.GetNames(typeof(eMagazine)));
+            m_axis.AddPos("Stack");
         }
 
         int m_dZ = 6;
-        public string MoveMagazine(ePos ePos, int iIndex)
+        public string MoveMagazine(eMagazine eMagazine, int iIndex, bool bWait = true)
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index"; 
-            m_axis.StartMove(ePos, iIndex * m_dZ);
+            m_axis.StartMove(eMagazine, iIndex * m_dZ);
             return m_axis.WaitReady(); 
         }
 
         public string MoveStack()
         {
-            m_axis.StartMove(ePos.Stack);
+            m_axis.StartMove("Stack");
             return m_axis.WaitReady();
         }
 
-        double m_posStackReady = 0; 
-        double m_fJogScale = 0.5; 
+        double m_pulseDown = 10000; 
+        double m_posStackReady = -100000; 
+        double m_fJogScale = 1; 
         public string MoveStackReady()
         {
-            if (Math.Abs(m_posStackReady - m_axis.p_posCommand) > 100) MoveStack();
+            if (m_axis.p_posCommand > m_posStackReady - m_pulseDown) MoveStack();
             if (m_stack.p_bLevel)
             {
                 m_axis.Jog(-m_fJogScale);
@@ -228,21 +236,18 @@ namespace Root_Rinse_Loader.Module
                 m_axis.StopAxis();
                 Thread.Sleep(500);
             }
-            m_axis.StartMove(m_axis.p_posCommand - 10000);
-            m_axis.WaitReady();
             m_axis.Jog(m_fJogScale);
             while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
             m_posStackReady = m_axis.p_posCommand;
             m_axis.StopAxis();
             m_axis.WaitReady();
             Thread.Sleep(500);
-            m_posStackReady = m_axis.p_posCommand;
             return "OK";
         }
 
-        public void StartShiftDown()
+        public void StartStackDown()
         {
-            m_axis.StartMove(m_axis.p_posCommand - 10000); 
+            m_axis.StartMove(m_posStackReady - m_pulseDown); 
         }
 
         public bool p_bIsEnablePick
@@ -253,7 +258,8 @@ namespace Root_Rinse_Loader.Module
         void RunTreeElevator(Tree tree)
         {
             m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Magazine Slot Pitch (pulse)");
-            m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Jog Scale", "Jog Move Scale (0 ~ 1)"); 
+            m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Jog Scale", "Jog Move Scale (0 ~ 1)");
+            m_pulseDown = tree.Set(m_pulseDown, m_pulseDown, "Stack Down", "Stack Down (pulse)"); 
         }
         #endregion
 
@@ -261,16 +267,25 @@ namespace Root_Rinse_Loader.Module
         double m_secRunDelay = 0; 
         public string RunMagazine()
         {
-            for (int n = m_rinse.p_iMagazine; n < 80; n++)
+            foreach (eMagazine eMagazine in Enum.GetValues(typeof(eMagazine)))
             {
-                ePos eMGZ = (ePos)(n / 20);
-                int iMGZ = n % 20;
-                if (Run(MoveMagazine(eMGZ, iMGZ))) return p_sInfo; 
-                if (Run(RunPusher())) return p_sInfo;
-                m_rinse.p_iMagazine++; 
-                Thread.Sleep((int)(1000 * m_secRunDelay)); 
+                m_rinse.p_eMagazine = eMagazine; 
+                RunMagazine(eMagazine);
             }
             return "OK";
+        }
+
+        string RunMagazine(eMagazine eMagazine)
+        {
+            if (m_aMagazine[(int)eMagazine].p_bCheck == false) return "OK";
+            for (int n = 0; n < 20; n++)
+            {
+                m_rinse.p_iMagazine = n; 
+                if (Run(MoveMagazine(eMagazine, n))) return p_sInfo;
+                if (Run(RunPusher())) return p_sInfo;
+                Thread.Sleep((int)(1000 * m_secRunDelay));
+            }
+            return "OK"; 
         }
         #endregion
 
@@ -325,10 +340,12 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         RinseL m_rinse;
-        public Storage(string id, IEngineer engineer, RinseL rinse)
+        Rail m_rail; 
+        public Storage(string id, IEngineer engineer, RinseL rinse, Rail rail)
         {
             p_id = id;
             m_rinse = rinse;
+            m_rail = rail;
             InitMagazine();
             InitStack(); 
             InitBase(id, engineer);
@@ -337,12 +354,12 @@ namespace Root_Rinse_Loader.Module
 
         public override void ThreadStop()
         {
-            base.ThreadStop();
             if (m_bThreadCheck)
             {
                 m_bThreadCheck = false;
-                m_threadCheck.Join(); 
+                m_threadCheck.Join();
             }
+            base.ThreadStop();
         }
 
         #region StartRun
@@ -371,42 +388,67 @@ namespace Root_Rinse_Loader.Module
         ModuleRunBase m_runMagazine;
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_MovePos(this), false, "Move Elevator Position");
+            AddModuleRunList(new Run_MoveMagazine(this), false, "Move Elevator Magazine Position");
+            AddModuleRunList(new Run_MoveStack(this), false, "Move Elevator Stack Position");
             AddModuleRunList(new Run_Pusher(this), false, "Move Elevator & Run Pusher");
             AddModuleRunList(new Run_Clamp(this), false, "Run Clamp");
             m_runReady = AddModuleRunList(new Run_StackReady(this), false, "Run Stack Move Ready Position");
             m_runMagazine = AddModuleRunList(new Run_RunMagazine(this), false, "Run Magazine");
         }
 
-        public class Run_MovePos : ModuleRunBase
+        public class Run_MoveMagazine : ModuleRunBase
         {
             Storage m_module; 
-            public Run_MovePos(Storage module)
+            public Run_MoveMagazine(Storage module)
             {
                 m_module = module;
                 InitModuleRun(module); 
             }
 
-            ePos m_ePos = ePos.Stack;
+            eMagazine m_eMagazine = eMagazine.Magazine1;
             int m_iIndex = 0; 
             public override ModuleRunBase Clone()
             {
-                Run_MovePos run = new Run_MovePos(m_module);
-                run.m_ePos = m_ePos;
+                Run_MoveMagazine run = new Run_MoveMagazine(m_module);
+                run.m_eMagazine = m_eMagazine;
                 run.m_iIndex = m_iIndex;
                 return run; 
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_ePos = (ePos)tree.Set(m_ePos, m_ePos, "Pos", "Elevator Position", bVisible);
-                m_iIndex = tree.Set(m_iIndex, m_iIndex, "Index", "Magazine Index", bVisible && (m_ePos != ePos.Stack)); 
+                m_eMagazine = (eMagazine)tree.Set(m_eMagazine, m_eMagazine, "Pos", "Elevator Position", bVisible);
+                m_iIndex = tree.Set(m_iIndex, m_iIndex, "Index", "Magazine Index", bVisible); 
             }
 
             public override string Run()
             {
-                if (m_ePos == ePos.Stack) return m_module.MoveStack();
-                return m_module.MoveMagazine(m_ePos, m_iIndex); 
+                return m_module.MoveMagazine(m_eMagazine, m_iIndex); 
+            }
+        }
+
+        public class Run_MoveStack : ModuleRunBase
+        {
+            Storage m_module;
+            public Run_MoveStack(Storage module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_MoveStack run = new Run_MoveStack(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.MoveStack();
             }
         }
 
@@ -419,26 +461,25 @@ namespace Root_Rinse_Loader.Module
                 InitModuleRun(module);
             }
 
-            ePos m_ePos = ePos.Stack;
+            eMagazine m_eMagazine = eMagazine.Magazine1;
             int m_iIndex = 0;
             public override ModuleRunBase Clone()
             {
                 Run_Pusher run = new Run_Pusher(m_module);
-                run.m_ePos = m_ePos;
+                run.m_eMagazine = m_eMagazine;
                 run.m_iIndex = m_iIndex;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_ePos = (ePos)tree.Set(m_ePos, m_ePos, "Pos", "Elevator Position", bVisible);
-                m_iIndex = tree.Set(m_iIndex, m_iIndex, "Index", "Magazine Index", bVisible && (m_ePos != ePos.Stack));
+                m_eMagazine = (eMagazine)tree.Set(m_eMagazine, m_eMagazine, "Pos", "Elevator Position", bVisible);
+                m_iIndex = tree.Set(m_iIndex, m_iIndex, "Index", "Magazine Index", bVisible);
             }
 
             public override string Run()
             {
-                if (m_ePos == ePos.Stack) return m_module.MoveStack();
-                if (m_module.Run(m_module.MoveMagazine(m_ePos, m_iIndex))) return p_sInfo;
+                if (m_module.Run(m_module.MoveMagazine(m_eMagazine, m_iIndex))) return p_sInfo;
                 return m_module.RunPusher(); 
             }
         }

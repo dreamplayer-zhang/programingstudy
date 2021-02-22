@@ -46,6 +46,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -65,7 +66,7 @@
     <Reference Include="CyUSB">
       <HintPath>CyUSB\CyUSB.dll</HintPath>
     </Reference>
-    <Reference Include="DALSA.SaperaLT.SapClassBasic, Version=8.40.0.1937, Culture=neutral, PublicKeyToken=4d8604101dcb6b58, processorArchitecture=AMD64">
+    <Reference Include="DALSA.SaperaLT.SapClassBasic, Version=8.51.1.2023, Culture=neutral, PublicKeyToken=4d8604101dcb6b58, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Camera\Dalsa\DLL\DALSA.SaperaLT.SapClassBasic.dll</HintPath>
     </Reference>
@@ -245,6 +246,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera\BaslerPylon\ChannelGraph.xaml.cs">
+      <DependentUpon>ChannelGraph.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Camera\BaslerPylon\GraphWindowTest.xaml.cs">
+      <DependentUpon>GraphWindowTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Comm\Modbus.cs" />
     <Compile Include="Comm\Modbus_UI.xaml.cs">
       <DependentUpon>Modbus_UI.xaml</DependentUpon>
@@ -271,6 +278,7 @@
     <Compile Include="Database\Table\Defect\Defect.cs" />
     <Compile Include="Database\Table\Defect\DefectManager.cs" />
     <Compile Include="Database\Table\Lotinfo.cs" />
+    <Compile Include="Database\Table\Measurement\EBRMeasurement.cs" />
     <Compile Include="Database\Table\Measurement\Measurement.cs" />
     <Compile Include="Database\Table\Measurement\MeasurementManager.cs" />
     <Compile Include="Camera\Matrox\Camera_Matrox.cs" />
@@ -319,6 +327,10 @@
     <Compile Include="Control\Ajin\AjinLib\AXL.cs" />
     <Compile Include="Control\Ajin\AjinLib\AXM.cs" />
     <Compile Include="Control\DIO_I2O.cs" />
+    <Compile Include="Comm\FFU_Group.cs" />
+    <Compile Include="Comm\FFU_Group_UI.xaml.cs">
+      <DependentUpon>FFU_Group_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GeneralFunction.cs" />
     <Compile Include="ImageProcess\AutoFocus.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
@@ -384,6 +396,19 @@
       <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="InfoWafer.cs" />
+    <Compile Include="Lens\ILens.cs" />
+    <Compile Include="Lens\LensSet.cs" />
+    <Compile Include="Lens\LensSet_UI.xaml.cs">
+      <DependentUpon>LensSet_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Lens\LinearTurret\LensLinearTurret.cs" />
+    <Compile Include="Lens\LinearTurret\LensLinearTurret_UI.xaml.cs">
+      <DependentUpon>LensLinearTurret_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Lens\ToolSetLens.cs" />
+    <Compile Include="Lens\ToolSetLens_UI.xaml.cs">
+      <DependentUpon>ToolSetLens_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Light\LightTool_DAWOO.cs" />
     <Compile Include="Light\LightTool_DAWOO_UI.xaml.cs">
       <DependentUpon>LightTool_DAWOO_UI.xaml</DependentUpon>
@@ -402,6 +427,9 @@
     </Compile>
     <Compile Include="Comm\TK4SModuleUI.xaml.cs">
       <DependentUpon>TK4SModuleUI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Comm\FFUModuleUI.xaml.cs">
+      <DependentUpon>FFUModuleUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
     <Compile Include="Viewer\Root_Viewer.cs" />
@@ -746,6 +774,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Camera\BaslerPylon\ChannelGraph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Camera\BaslerPylon\GraphWindowTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Camera\CameraSet_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -842,6 +878,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Comm\FFU_Group_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GAFs\ALIDList_PopupUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -883,6 +923,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Inspects\InspectTool_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Lens\LensSet_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Lens\LinearTurret\LensLinearTurret_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Lens\ToolSetLens_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -1021,6 +1073,10 @@
     <Page Include="Comm\TK4SModuleUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\FFUModuleUI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Viewer\RootViewer.xaml">
       <SubType>Designer</SubType>

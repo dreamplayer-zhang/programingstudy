@@ -75,32 +75,33 @@ namespace Root_WIND2
             timer.Tick += new EventHandler(timer_Tick);
             //DatabaseManager.Instance.SetDatabase(1);
 
-            WorkEventManager.PositionDone += PositionDone_Callback;
-            WorkEventManager.InspectionDone += InspectionDone_Callback;
-            WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
+
+            if(GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+            {
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().PositionDone += PositionDone_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionDone += InspectionDone_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().ProcessDefectDone += ProcessDefectDone_Callback;
+            }
         }
 
-        object lockObj = new object();
         private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
         {
             Workplace workplace = obj as Workplace;
-            lock (this.lockObj)
+
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+                String test = "";
+                if (workplace.Index == 0)
                 {
-                    String test = "";
-                    if (workplace.Index == 0)
-                    {
-                        test += "Trans : {" + workplace.OffsetX.ToString() + ", " + workplace.OffsetX.ToString() + "}" + "\n";
-                        DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
-                    }
-                    else
-                    {
-                        test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
-                        DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
-                    }
-                }));
-            }
+                    test += "Trans : {" + workplace.OffsetX.ToString() + ", " + workplace.OffsetX.ToString() + "}" + "\n";
+                    DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
+                }
+                else
+                {
+                    test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
+                    DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test, args.bSuccess);
+                }
+            }));
         }
         private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
         {
@@ -112,13 +113,6 @@ namespace Root_WIND2
             foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
             {
                 String text = "";
-
-                if (false) // Display Option : Rel Position
-                    text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
-                if (false) // Display Option : Defect Size
-                    text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
-                if (false) // Display Option : GV Value
-                    text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
 
                 rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
                 textList.Add(text);

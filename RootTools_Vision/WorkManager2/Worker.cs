@@ -1,4 +1,4 @@
-﻿//#define WORKER_DEBUG
+﻿#define WORKER_DEBUG
 using RootTools;
 using System;
 using System.Collections.Generic;
@@ -142,13 +142,26 @@ namespace RootTools_Vision
                     {
                         Reset();
                         this.workerState = WORKER_STATE.WORK_STOP;
+#if WORKER_DEBUG
+#if DEBUG
+                        DebugOutput.PrintWorker(this, this.workerState.ToString());
+#endif
+#endif
                         _waitSignal.Reset();
                         _waitSignal.WaitOne();
                     }
                     else
                     {
                         if (this.workerState != WORKER_STATE.WORK_ASSIGNED)
+                        {
+#if WORKER_DEBUG
+#if DEBUG
+                            //DebugOutput.PrintWorker(this);
+#endif
+#endif
                             _waitSignal.WaitOne();
+                        }
+      
                     }
 
                     if (token.IsCancellationRequested)
@@ -186,7 +199,7 @@ namespace RootTools_Vision
                                 {
 #if WORKER_DEBUG
 #if DEBUG
-                                DebugOutput.PrintWork(work);
+                                //DebugOutput.PrintWork(work);
 #endif
 #endif
                                     workDone = work.DoWork();
@@ -205,7 +218,8 @@ namespace RootTools_Vision
                         {
 #if WORKER_DEBUG
 #if DEBUG
-                        DebugOutput.PrintWorker(this, "Incomplete");                        
+                            if(this.WorkType  == WORK_TYPE.DEFECTPROCESS)
+                                DebugOutput.PrintWorker(this, "Incomplete");                        
 #endif
 #endif
                             Incomplete();
@@ -214,8 +228,8 @@ namespace RootTools_Vision
                         {
 #if WORKER_DEBUG
 #if DEBUG
-
-                        DebugOutput.PrintWorker(this, "Complete");
+                            if (this.WorkType == WORK_TYPE.DEFECTPROCESS)
+                                DebugOutput.PrintWorker(this, "Complete");
 #endif
 #endif
                             Complete();

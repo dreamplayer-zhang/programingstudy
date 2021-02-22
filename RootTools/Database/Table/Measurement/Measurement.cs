@@ -3,15 +3,73 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
-namespace RootTools.Database.DataFormat
+namespace RootTools.Database
 {
-    /// <summary>
-    /// Measurement Data 타입
-    /// </summary>
-    class Measurement
+    public class Measurement
     {
+        // 각 Inspection에서 올라오는 결과 데이터
+        public int m_nMeasurementIndex; //
+        public string m_strInspectionID;
 
-        
+        public string m_strSide;
+        public string m_strMeasureType;
+        public string m_strMeasureItem;
+
+        public float m_fData;
+        public float m_fWidth;
+        public float m_fHeight;
+
+        public float m_fRelX; // 절대좌표 - CeterPoint
+        public float m_fRelY;
+        public float m_fAbsX; // 상대좌표 Origin 좌 하단 <-> Defect 좌 상단
+        public float m_fAbsY;
+
+        public int m_nChipIndexX; // Chip Index
+        public int m_nCHipIndexY;
+
+        public Rect m_rtDefectBox;
+
+        public enum MeasureType
+		{
+            EBR,
+		}
+
+        public enum EBRMeasureItem
+        {
+            Bevel,
+            EBR,
+        }
+
+        public Measurement()
+        { 
+
+        }
+
+        public Measurement(string strInspectionID, string strSide, string strType, string strMeasureName, float fData, float fDefectW, float fDefectH, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)
+        {
+            m_strInspectionID = strInspectionID;
+            m_strSide = strSide;
+            m_strMeasureType = strType;
+            m_strMeasureItem = strMeasureName;
+
+            m_fData = fData;
+            m_fWidth = fDefectW;
+            m_fHeight = fDefectH;
+
+            m_fAbsX = fDefectAbsLeft + fDefectW / 2;
+            m_fAbsY = fDefectAbsTop + fDefectH / 2;
+
+            m_nChipIndexX = nChipIdxX;
+            m_nCHipIndexY = nChipIdxY;
+
+			m_rtDefectBox = new Rect(fDefectAbsLeft, fDefectAbsTop, fDefectW, fDefectH);
+		}
+
+        public void SetMeasureIndex(int nIndex)
+        {
+            m_nMeasurementIndex = nIndex;
+        }
     }
 }

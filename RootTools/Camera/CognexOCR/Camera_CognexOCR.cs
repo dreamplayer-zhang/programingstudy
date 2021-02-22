@@ -15,6 +15,10 @@ namespace RootTools.Camera.CognexOCR
     public class Camera_CognexOCR : ObservableObject, ICamera
     {
         public event System.EventHandler Grabed;
+        void _Dummy()
+        {
+            if (Grabed != null) Grabed(null, null);
+        }
 
         #region Property
         public string p_id { get; set; }
@@ -251,11 +255,11 @@ namespace RootTools.Camera.CognexOCR
             return null;
         }
         public double GetFps() { return 0; }
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY=0, bool bInvY = false, int ReserveOffsetY = 0) { }
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false) { }
         public string StopGrab()
         {
             return "FALSE";
         }
-        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReserveOffsetY = 0) { }
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null) { }
     }
 }

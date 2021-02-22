@@ -8,5 +8,7 @@ namespace Root_WIND2
 {
     public interface ISettingData
     {
+        void Save();
+        void Load(object obj);
     }
 }

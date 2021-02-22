@@ -339,11 +339,11 @@ namespace Root_AOP01_Packing.Module
         #endregion
 
         #region Timeout
-        int m_secHome = 40;
+        public int p_secHome { get; set; }
         int m_secMotion = 20;
         void RunTimeoutTree(Tree tree)
         {
-            m_secHome = tree.Set(m_secHome, m_secHome, "Home", "Timeout (sec)");
+            p_secHome = tree.Set(p_secHome, p_secHome, "Home", "Timeout (sec)");
             m_secMotion = tree.Set(m_secMotion, m_secMotion, "Motion", "Timeout (sec)");
         }
         #endregion
@@ -472,9 +472,19 @@ namespace Root_AOP01_Packing.Module
         }
         #endregion
 
+        IRFID _rfid;
+        public IRFID m_rfid
+        {
+            get { return _rfid; }
+            set
+            {
+                _rfid = value;
+            }
+        }
         public InfoCarrier p_infoCarrier { get; set; }
         public Loadport_AOP(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
+            p_secHome = 40; 
             p_bLock = false;
             p_id = id;
             p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);

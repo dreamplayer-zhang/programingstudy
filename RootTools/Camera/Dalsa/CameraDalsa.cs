@@ -12,6 +12,10 @@ namespace RootTools.Camera.Dalsa
     public class CameraDalsa : NotifyProperty, ICamera
     {
         public event EventHandler Grabed;
+        void _Dummy()
+        {
+            if (Grabed != null) Grabed(null, null);
+        }
 
         #region Property
         public string p_id { get; set; }
@@ -292,10 +296,10 @@ namespace RootTools.Camera.Dalsa
         public bool p_bOnGrab { get { return m_sapXfer.Grabbing; } }
 
         bool m_bLive = false; 
-        public void GrabLineScan(MemoryData memory, CPoint cp0, int nLine, int nScanOffsetY = 0, bool bInvY = false, int yInvOffset = 0)
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
         {
             SetMemoryData(memory);
-            p_sInfo = StartGrab(cp0, nLine, bInvY, yInvOffset); 
+            p_sInfo = StartGrab(cpScanOffset, nLine, m_GrabData.bInvY, m_GrabData.nScanOffsetY); 
         }
 
         public string StartGrab()
@@ -488,6 +492,6 @@ namespace RootTools.Camera.Dalsa
 
         public double GetFps() { return 0; }
 
-        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReserveOffsetY = 0) { }
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null) { }
     }
 }

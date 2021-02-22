@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -83,6 +84,23 @@ namespace RootTools.Memory
                 OnPropertyChanged();
             }
         }
+
+        public int p_nProgress
+        {
+            get
+            {
+                return m_nProgress;
+            }
+            set
+            {
+                if (m_nProgress== value)
+                    return;
+                m_nProgress = value;
+                OnPropertyChanged();
+                //SetProperty(ref m_nProgress, value);
+            }
+        }
+        private int m_nProgress = 0;
         #endregion
 
         #region MemoryData
@@ -90,6 +108,11 @@ namespace RootTools.Memory
         {
             p_memoryData = memoryData;
             p_nMemoryIndex = nIndex;
+        }
+
+        private void P_memoryData_UpdateOpenProgress(int nInt)
+        {
+            p_nProgress = nInt;
         }
 
         MemoryData _memoryData = null;
@@ -136,14 +159,21 @@ namespace RootTools.Memory
         #region File Open & Save
         public void FileOpen(string sFile)
         {
-            if (p_memoryData == null) return; 
-            switch (GetUpperExt(sFile))
-            {
-                case "BAYER": p_memoryData.p_sInfo = p_memoryData.FileOpenBayer(sFile, p_nMemoryIndex); break;
-                case "BMP": p_memoryData.p_sInfo = p_memoryData.FileOpenBMP(sFile, p_nMemoryIndex); break;
-                case "JPG": p_memoryData.p_sInfo = p_memoryData.FileOpenJPG(sFile, p_nMemoryIndex); break; 
-            }
+            if (p_memoryData == null) return;
+            p_memoryData.UpdateOpenProgress += P_memoryData_UpdateOpenProgress1;
+            p_memoryData.FileOpen(sFile ,p_nMemoryIndex);
+            //switch (GetUpperExt(sFile))
+            //{
+            //    case "BAYER": p_memoryData.p_sInfo = p_memoryData.FileOpenBayer(sFile, p_nMemoryIndex); break;
+            //    case "BMP": p_memoryData.p_sInfo = p_memoryData.FileOpenBMP(sFile, p_nMemoryIndex); break;
+            //    case "JPG": p_memoryData.p_sInfo = p_memoryData.FileOpenJPG(sFile, p_nMemoryIndex); break; 
+            //}
             UpdateBitmapSource(); 
+        }
+
+        private void P_memoryData_UpdateOpenProgress1(int nInt)
+        {
+            p_nProgress = nInt;
         }
 
         public void FileSave(string sFile)
@@ -419,6 +449,8 @@ namespace RootTools.Memory
             m_log = log;
             InitTimer(); 
         }
+
+        
 
         public void ThreadStop()
         {

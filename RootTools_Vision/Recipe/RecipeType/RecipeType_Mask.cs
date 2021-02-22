@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Xml.Serialization;
 
 namespace RootTools_Vision
@@ -17,6 +18,7 @@ namespace RootTools_Vision
         private long area;
         private CRect boundingBox;
         private List<RecipeType_PointLine> pointLines;
+        private Color colorIndex = Colors.AliceBlue;
 
         [XmlIgnore]
         public CRect BoundingBox
@@ -56,6 +58,15 @@ namespace RootTools_Vision
                 boundingBox.Top = minY;
                 boundingBox.Right = maxX;
                 boundingBox.Bottom = maxY;
+            }
+        }
+
+        public Color ColorIndex
+        {
+            get => this.colorIndex;
+            set
+            {
+                this.colorIndex = value;
             }
         }
 
@@ -108,8 +119,10 @@ namespace RootTools_Vision
             boundingBox.Bottom = maxY;
         }
 
-        public RecipeType_Mask(List<PointLine> _pointLines)
+        public RecipeType_Mask(List<PointLine> _pointLines, Color _colorIndex)
         {
+            this.colorIndex = _colorIndex;
+
             area = 0;
             pointLines = new List<RecipeType_PointLine>();
             boundingBox = new CRect();
@@ -143,6 +156,17 @@ namespace RootTools_Vision
             {
                 _pointLines.Add(new PointLine(pl.StartPoint, pl.Length));
             }
+        }
+
+        public List<PointLine> ToPointLineList()
+        {
+            List<PointLine> _pointLines = new List<PointLine>();
+            foreach (RecipeType_PointLine pl in this.pointLines)
+            {
+                _pointLines.Add(new PointLine(pl.StartPoint, pl.Length));
+            }
+
+            return _pointLines;
         }
     }
 
@@ -183,6 +207,11 @@ namespace RootTools_Vision
         {
             this.startPoint = _pointLine.StartPt;
             this.length = _pointLine.Width;
+        }
+
+        public PointLine ToPointLine()
+        {
+            return new PointLine(this.startPoint, this.Length);
         }
     }
 }

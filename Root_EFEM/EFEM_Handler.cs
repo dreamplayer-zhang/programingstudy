@@ -125,10 +125,46 @@ namespace Root_EFEM
         {
             m_lLoadport = tree.Set(m_lLoadport, m_lLoadport, "Count", "Loadport Count");
             while (m_aLoadportType.Count < m_lLoadport) m_aLoadportType.Add(eLoadport.RND);
-            Tree treeType = tree.GetTree("Type"); 
+            Tree treeType = tree.GetTree("Type");
             for (int n = 0; n < m_lLoadport; n++)
             {
-                m_aLoadportType[n] = (eLoadport)treeType.Set(m_aLoadportType[n], m_aLoadportType[n], n.ToString("00"), "Loadport Type"); 
+                m_aLoadportType[n] = (eLoadport)treeType.Set(m_aLoadportType[n], m_aLoadportType[n], n.ToString("00"), "Loadport Type");
+            }
+        }
+
+        enum eRFID
+        {
+            Brooks,
+            Ceyon,
+        }
+        List<eRFID> m_aRFIDType = new List<eRFID>();
+        public List<IRFID> m_aRFID = new List<IRFID>();
+        void InitRFID()
+        {
+            ModuleBase module;
+            char cID = 'A';
+            for(int n=0; n<m_lLoadport; n++)
+            {
+                string sID = "RFID" + cID;
+                switch (m_aRFIDType[n])
+                {
+                    case eRFID.Brooks: module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]); break;
+                    case eRFID.Ceyon: module = new RFID_Ceyon(sID, m_engineer, m_aLoadport[n]); break;
+                    default: module = new RFID_Brooks(sID, m_engineer, m_aLoadport[n]); break;
+                }
+                InitModule(module);
+                m_aRFID.Add((IRFID)module);
+                m_aLoadport[n].m_rfid = m_aRFID[n];
+            }
+        }
+
+        public void RunTreeRFID(Tree tree)
+        {
+            while (m_aRFIDType.Count < m_lLoadport) m_aRFIDType.Add(eRFID.Brooks);
+            Tree treeType = tree.GetTree("Type");
+            for (int n = 0; n < m_lLoadport; n++)
+            {
+                m_aRFIDType[n] = (eRFID)treeType.Set(m_aRFIDType[n], m_aRFIDType[n], n.ToString("00"), "RFID Type");
             }
         }
         #endregion
@@ -276,13 +312,12 @@ namespace Root_EFEM
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
-            if (gaf != null) gaf.ClearALID();
+            gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
         }
         #endregion
 
         #region Calc Sequence
-        public int m_nRnR = 1;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
@@ -335,14 +370,14 @@ namespace Root_EFEM
         {
             foreach (EFEM_Process.Sequence sequence in aSequence)
             {
-                if (loadport.p_id == sequence.m_infoWafer.m_sModule)
-                {
-                    if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
-                    ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
-                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
-                    m_process.m_qSequence.Enqueue(sequenceDock);
-                    return true;
-                }
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
+                //{
+                    //if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
+                    //ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
+                    //EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    //m_process.m_qSequence.Enqueue(sequenceDock);
+                    //return true;
+                //}
             }
             return false; 
         }
@@ -364,7 +399,7 @@ namespace Root_EFEM
             if (m_process.m_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
-                if (m_gem != null) m_gem.SendPJComplete(pj.m_sPJobID);
+                m_gem?.SendPJComplete(pj.m_sPJobID);
                 Thread.Sleep(100);
             }
         }
@@ -405,11 +440,11 @@ namespace Root_EFEM
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
-                                m_nRnR--;
+                                EQ.p_nRnR--;
                                 EQ.p_eState = EQ.eState.Run;
                             }
                         }
@@ -424,6 +459,7 @@ namespace Root_EFEM
         {
             RunTreeWTR(tree.GetTree("WTR"));
             RunTreeLoadport(tree.GetTree("Loadport"));
+            RunTreeRFID(tree.GetTree("RFID"));
             RunTreeAligner(tree.GetTree("Aligner"));
             RunTreeVision(tree.GetTree("Vision"));
         }

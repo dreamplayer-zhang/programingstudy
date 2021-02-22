@@ -633,7 +633,7 @@ namespace Root_Vega.Module
         #endregion
 
         #region Inspect
-        int m_lMaxGrab = 3000;
+        //int m_lMaxGrab = 3000;
         
         MemoryData m_memorySideTop;
         MemoryData m_memorySideLeft;
@@ -1396,8 +1396,7 @@ namespace Root_Vega.Module
                         if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
                         else
                         {
-                            dLeftCurrentScore = af.GetImageVarianceScore
-                                (img, m_nVarianceSize);
+                            dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
                             bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                         }
 

@@ -3,6 +3,7 @@ using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
+using RootTools.Lens;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
@@ -49,7 +50,7 @@ namespace RootTools.Module
             }
             set
             {
-                if (_nProgress == value) return;
+                //if (_nProgress == value) return;
                 _nProgress = value;
                 OnPropertyChanged();
             }
@@ -75,13 +76,14 @@ namespace RootTools.Module
                 _sInfo = value;
                 OnPropertyChanged();
                 if (value == "OK") return;
-                if (m_log != null) m_log.Info("Info : " + _sInfo);
+                m_log?.Info("Info : " + _sInfo);
                 m_infoList.Add(_sInfo);
                 EQ.p_sInfo = p_id + " : " + value; 
             }
         }
         public bool Run(string sInfo)
         {
+            
             p_sInfo = sInfo;
             if (EQ.IsStop()) p_sInfo = "EQ Stop";
             return sInfo != "OK";
@@ -227,8 +229,7 @@ namespace RootTools.Module
                             m_qModuleRun.Clear();
                         }
                     }
-                    if (m_qModuleRun.Count > 0) 
-                        p_eState = eState.Run;
+                    if (m_qModuleRun.Count > 0) p_eState = eState.Run;
                     break;
                 case eState.Run:
                     p_bEnableHome = false;
@@ -264,6 +265,7 @@ namespace RootTools.Module
         public List<ITool> m_aTool = new List<ITool>();
 
         public CameraSet m_cameraSet = null;
+        public LensSet m_lensSet = null; 
         #endregion
 
         #region Home
@@ -377,16 +379,15 @@ namespace RootTools.Module
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
             m_swRun.Restart();
             m_log.Info("ModuleRun : " + moduleRun.p_id + " Start");
-            try 
+			try 
             { 
                 switch (p_eRemote)
                 {
                     case eRemote.Client: p_sInfo = m_remote.RemoteSend(moduleRun); break;
-                    default: p_sInfo = moduleRun.Run();break; 
+                    default: p_sInfo = moduleRun.Run();break;
                 }
             }
             catch (Exception e) { p_sInfo = "StateRun Exception = " + e.Message; }
-
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
             m_log.Info("ModuleRun : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
             if (m_qModuleRun.Count > 0) m_qModuleRun.Dequeue();
@@ -873,6 +874,8 @@ namespace RootTools.Module
             }
         }
         #endregion
+
+
 
         public string p_id { get; set; }
 

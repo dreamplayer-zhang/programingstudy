@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision.delete
+namespace RootTools_Vision
 {
     public static class ReflectiveEnumerator
     {
@@ -27,14 +27,25 @@ namespace RootTools_Vision.delete
         }
     }
 
+    [Serializable]
     public abstract class WorkBase : ObservableObject
     {
+        protected RecipeBase recipe;
+        protected ParameterBase parameter;
+        
+        [NonSerialized]
+        protected Workplace currentWorkplace;
 
-        public delegate void ChangeMode(object e);
-        public event ChangeMode changeMode;
+        [NonSerialized]
+        protected WorkplaceBundle workplaceBundle;
+
+        protected byte[] workplaceBufferR_GRAY;
+        protected byte[] workplaceBufferG;
+        protected byte[] workplaceBufferB;
+
 
         protected string m_sName;
-        public string p_sName 
+        public string p_sName
         {
             get { return m_sName; }
             set { m_sName = value; }
@@ -55,37 +66,105 @@ namespace RootTools_Vision.delete
             set { bWorkDone = value; }
         }
 
+#if DEBUG
+        public Workplace Workplace { get=> this.currentWorkplace; }
+#endif
+
 
         public abstract WORK_TYPE Type { get; }
 
 
+        public void SetRecipe(RecipeBase recipe)
+        {
+            this.recipe = recipe;
+        }
 
-        public abstract void SetWorkplace(Workplace workplace);
+        public void SetParameter(ParameterBase param)
+        {
+            this.parameter = param;
+        }
 
-        public abstract void SetWorkplaceBundle(WorkplaceBundle workplace);
+        public void SetWorkplace(Workplace workplace)
+        {
+            this.currentWorkplace = workplace;
+        }
 
-        public abstract void SetRecipe(RecipeBase _recipe);
+        public void SetWorkplaceBundle(WorkplaceBundle workplaceBundle)
+        {
+            this.workplaceBundle = workplaceBundle;
+        }
 
-        public abstract WorkBase Clone();
+        public void SetWorkplaceBuffer(byte[] bufferR_GRAY, byte[] bufferG, byte[] bufferB)
+        {
+            this.workplaceBufferR_GRAY = bufferR_GRAY;
+            this.workplaceBufferG = bufferG;
+            this.workplaceBufferB = bufferB;
+        }
+
+        public byte[] GetWorkplaceBuffer(IMAGE_CHANNEL channel)
+        {
+            switch (channel)
+            {
+                case IMAGE_CHANNEL.R_GRAY:
+                    return this.workplaceBufferR_GRAY;
+                case IMAGE_CHANNEL.G:
+                    return this.workplaceBufferG;
+                case IMAGE_CHANNEL.B:
+                    return this.workplaceBufferB;
+
+            }
+            return this.workplaceBufferR_GRAY;
+        }
+
+
+        /// <summary>
+        /// 멤버 중에 값이 아닌 참조 타입에 객체가 있으면 직접 구현해줘야함
+        /// </summary>
+        /// <returns></returns>
+        public virtual WorkBase Clone()
+        {
+            return (WorkBase)this.MemberwiseClone();
+        }
 
         // Virtual
-        public virtual bool DoPrework()
+        public bool DoPrework()
         {
             // Prework 작업이 필요한 경우가 있을 때만 구현하고,
             // 없을시 pass
-            this.IsPreworkDone = true;
+            this.IsPreworkDone = Preparation();
 
-            return true;
+            return this.IsPreworkDone;
         }
 
-        public virtual void DoWork()
+        /// <summary>
+        /// 메인작업(execution에서 실행되는 작업)을 수행하기 전에 준비해야할 작업을 구현합니다.
+        /// </summary>
+        /// <returns>완료 true, 미완료 false</returns>
+
+        protected abstract bool Preparation();
+
+        public bool DoWork()
         {
-            this.IsWorkDone = true; // 이거 반드시 true로 바꿔줘야 다음 검사 진행
+            this.IsWorkDone = this.Execution(); // 이거 반드시 true로 바꿔줘야 다음 검사 진행
+            return this.IsWorkDone;
         }
+
+        /// <summary>
+        /// 실제로 수행할 메인작업을 구현합니다.
+        /// </summary>
+        /// <returns>완료 true, 미완료 false</returns>
+        protected abstract bool Execution();
+        
 
         public WorkBase CreateInstnace(WorkBase work)
         {
             return Activator.CreateInstance(work.GetType()) as WorkBase;
+        }
+
+        public void Reset()
+        {
+            this.IsPreworkDone = false;
+            this.IsWorkDone = false;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿//#define WORKMANAGER_DEBUG
+﻿#define WORKMANAGER_DEBUG
 
 using System;
 using System.Collections.Generic;
@@ -61,7 +61,7 @@ namespace RootTools_Vision
                 this.state = value;
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                DebugOutput.PrintWorkManagerInfo(this);
+                //DebugOutput.PrintWorkManagerInfo(this);
 #endif
 #endif
             }
@@ -162,6 +162,11 @@ namespace RootTools_Vision
             {
                 if (isStop == true)
                 {
+#if WORKMANAGER_DEBUG
+#if DEBUG
+                    DebugOutput.PrintWorkManagerInfo(this, "STOP");
+#endif
+#endif
                     Reset();
                     this.State = WORKMANAGER_STATE.STOP;
                     _waitSignal.Reset();
@@ -196,7 +201,7 @@ namespace RootTools_Vision
                         {
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                            DebugOutput.PrintWorkManagerInfo(this, "False");
+                            //DebugOutput.PrintWorkManagerInfo(this, "False");
 #endif
 #endif
                         }
@@ -204,7 +209,7 @@ namespace RootTools_Vision
                         {
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                            DebugOutput.PrintWorkManagerInfo(this, "True");
+                            //DebugOutput.PrintWorkManagerInfo(this, "True");
 #endif
 #endif
                         }
@@ -252,7 +257,7 @@ namespace RootTools_Vision
                     }
 #if WORKMANAGER_DEBUG
 #if DEBUG
-                    Debug.WriteLine(this.workType + " : " + workplace.MapIndexX + ", " + workplace.MapIndexY + " : " + "할당");
+                    //Debug.WriteLine(this.workType + " : " + workplace.MapIndexX + ", " + workplace.MapIndexY + " : " + "할당");
 #endif
 #endif
 

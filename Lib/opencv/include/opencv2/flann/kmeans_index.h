@@ -48,6 +48,7 @@
 #include "saving.h"
 #include "logger.h"
 
+#pragma warning(disable: 26812)
 
 namespace cvflann
 {

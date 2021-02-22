@@ -22,7 +22,7 @@ namespace RootTools.Memory
                 if (value == _fGB) return;
                 if (_fGB == 0)
                 {
-                    if (m_memoryTool.m_bMaster)
+                    if (m_memoryTool != null && m_memoryTool.m_bMaster)
                     {
                         OpenPool();
                         if (m_MMF == null) CreatePool(value);
@@ -36,7 +36,7 @@ namespace RootTools.Memory
 
         bool CreatePool(double fGB)
         {
-             StopWatch sw = new StopWatch();
+            StopWatch sw = new StopWatch();
             long nPool = (long)Math.Ceiling(fGB * c_fGB);
             try
             {
@@ -63,7 +63,7 @@ namespace RootTools.Memory
                 }
             }
             catch { return "Open Error"; }
-            m_log.Info(p_id + " Memory Pool Open Done");
+            m_log?.Info(p_id + " Memory Pool Open Done");
             return (m_MMF != null) ? "OK" : "Error"; 
         }
 
@@ -129,7 +129,7 @@ namespace RootTools.Memory
         public void UpdateMemoryData()
         {
             p_aGroup.Clear();
-            int nGroup = m_reg.Read("Count", 0);
+            int nGroup = m_reg?.Read("Count", 0);
             for (int n = 0; n < nGroup; n++)
             {
                 string sGroup = m_reg.Read("Group" + n.ToString(), "");
@@ -143,6 +143,7 @@ namespace RootTools.Memory
         DispatcherTimer m_timer = new DispatcherTimer(); 
         void InitTimer()
         {
+            if (m_memoryTool == null) return;
             if (m_memoryTool.m_bMaster) return;
             m_log.Info(p_id + " Start Timer"); 
             m_timer.Interval = TimeSpan.FromSeconds(0.2);
@@ -204,9 +205,13 @@ namespace RootTools.Memory
             foreach (MemoryGroup group in p_aGroup)
             {
                 bool bVisible = (group.p_id == m_sSelectedGroup); 
-                group.RunTree(m_treeRoot, bVisible, !m_memoryTool.m_bMaster);
+                group.RunTree(m_treeRoot, bVisible, m_memoryTool == null ? false : !m_memoryTool.m_bMaster);
             }
-            if (m_treeRoot.IsUpdated()) m_memoryTool.MemoryChanged();
+            if (m_treeRoot.IsUpdated())
+            {
+                if(m_memoryTool != null)
+                    m_memoryTool.MemoryChanged();
+            }
         }
         #endregion
 
@@ -227,6 +232,23 @@ namespace RootTools.Memory
             p_fGB = m_reg.Read("fGB", fGB);
             InitTree();
             InitTimer(); 
+        }
+
+
+        /// <summary>
+        /// RootUI(m_memoryTool)을 사용하지 않고 메모리를 사용하기 위해서
+        /// </summary>
+        /// <param name="id"></param>
+        public MemoryPool(string id)
+        {
+            p_aGroup = new ObservableCollection<MemoryGroup>();
+            p_id = id;
+            m_reg = new Registry(p_id, "MemoryTools");
+            p_fGB = m_reg.Read("fGB", p_fGB);
+
+            InitTree();
+            OpenPool();
+            UpdateMemoryData();
         }
 
         public void ThreadStop()

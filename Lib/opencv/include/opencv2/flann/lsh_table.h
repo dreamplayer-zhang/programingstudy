@@ -56,6 +56,10 @@
 #include "dynamic_bitset.h"
 #include "matrix.h"
 
+#pragma warning(disable: 26451)
+#pragma warning(disable: 26495)
+#pragma warning(disable: 26812)
+
 namespace cvflann
 {
 

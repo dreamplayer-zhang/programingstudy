@@ -1,4 +1,5 @@
-﻿using RootTools.Database;
+﻿using Root_WIND2.Module;
+using RootTools.Database;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace Root_WIND2
 		#region [Members]
 		private readonly RecipeEBR recipe;
 		private readonly SharedBufferInfo sharedBufferInfo;
+
+		private WorkplaceBundle workplaceBundle;
 		#endregion
 
 		#region [Properties]
@@ -33,7 +36,6 @@ namespace Root_WIND2
 		{
 			this.recipe = _recipe;
 			this.sharedBufferInfo = _bufferInfo;
-
 		}
 
 		#region [Overrides]
@@ -45,41 +47,48 @@ namespace Root_WIND2
 
 		protected override WorkplaceBundle CreateWorkplaceBundle()
 		{
-			WorkplaceBundle workplaceBundle = new WorkplaceBundle();
-			int notchY = recipe.GetItem<EBRParameter>().NotchY; // notch memory Y 좌표
+			int cameraHeight = recipe.GetItem<EBRRecipe>().CameraHeight;
+			int bufferHeight = (int)(360000 / recipe.GetItem<EBRRecipe>().TriggerRatio);
+			int bufferHeightPerDegree = bufferHeight / 360; // 1도 당 Image Height
+
+			int width = recipe.GetItem<EBRParameter>().ROIWidth;
+			int height = recipe.GetItem<EBRParameter>().ROIHeight;
 			int stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
 			int workplaceCnt = 360 / stepDegree;
-			int imageHeight = 270000;
-			int imageHeightPerDegree = imageHeight / 360; // 1도 당 Image Height
 
-			int width = recipe.GetItem<EBRParameter>().RoiWidth;
-			int height = recipe.GetItem<EBRParameter>().RoiHeight;
-
-			int index = 0;
-			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, index++));
+			workplaceBundle = new WorkplaceBundle();
+			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, workplaceBundle.Count));
+			
 			for (int i = 0; i < workplaceCnt; i++)
 			{
-				int posY = (imageHeightPerDegree * i) - (height / 2);
-				if (posY <= 0)
-					posY = 0;
-				Workplace workplace = new Workplace(0, 0, 0, posY, width, height, index++);
+				int posY = (bufferHeightPerDegree * i) - (height / 2);
+				Workplace workplace = new Workplace(0, 0, 0, posY + cameraHeight, width, height, workplaceBundle.Count);
 				workplaceBundle.Add(workplace);
 			}
 
+			workplaceBundle.SetSharedBuffer(this.sharedBufferInfo);
 			return workplaceBundle;
 		}
 
 		protected override WorkBundle CreateWorkBundle()
 		{
+			List<ParameterBase> paramList = recipe.ParameterItemList;
 			WorkBundle workBundle = new WorkBundle();
 			EBR ebr = new EBR();
 			ProcessMeasurement processMeasurement = new ProcessMeasurement();
+
+			foreach (ParameterBase param in paramList)
+				ebr.SetParameter(param);
 
 			workBundle.Add(ebr);
 			workBundle.Add(processMeasurement);
 			workBundle.SetRecipe(recipe);
 
 			return workBundle;
+		}
+		public int GetWorkplaceCount()
+		{
+			return workplaceBundle.Count();
 		}
 
 		protected override bool Ready(WorkplaceBundle workplaces, WorkBundle works)

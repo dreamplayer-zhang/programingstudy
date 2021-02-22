@@ -75,7 +75,7 @@ namespace RootTools.Inspects
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
-		public event ChangeDefectInfoEventHanlder AddD2DDefect;
+		//public event ChangeDefectInfoEventHanlder AddD2DDefect;
 		/// <summary>
 		/// UI Defect을 지우기 위해 발생하는 Event
 		/// </summary>
@@ -350,7 +350,7 @@ namespace RootTools.Inspects
 
 		public void InspectionDone(string inspIndexFilePath)
 		{
-			bool testFlag = false;
+			//bool testFlag = false;
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
 			//여기서 DB관련동작 이하생략!
@@ -526,14 +526,6 @@ namespace RootTools.Inspects
 				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '1') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='1';");
 			}
 
-			System.Drawing.PointF AffineTransform(System.Drawing.PointF ptSrc, float[] Coef)
-			{
-				System.Drawing.PointF ptRst = new System.Drawing.PointF();
-				ptRst.X = (int)Math.Ceiling(ptSrc.X * Coef[0] + ptSrc.Y * Coef[1] + Coef[2]);
-				ptRst.Y = (int)Math.Ceiling(ptSrc.X * Coef[3] + ptSrc.Y * Coef[4] + Coef[5]);
-				return ptRst;
-			}
-
 			connector.Close();
 
 			//Monitor.Wait(lockObj);
@@ -557,6 +549,15 @@ namespace RootTools.Inspects
 			}
 
 		}
+
+		System.Drawing.PointF AffineTransform(System.Drawing.PointF ptSrc, float[] Coef)
+		{
+			System.Drawing.PointF ptRst = new System.Drawing.PointF();
+			ptRst.X = (int)Math.Ceiling(ptSrc.X * Coef[0] + ptSrc.Y * Coef[1] + Coef[2]);
+			ptRst.Y = (int)Math.Ceiling(ptSrc.X * Coef[3] + ptSrc.Y * Coef[4] + Coef[5]);
+			return ptRst;
+		}
+
 		public List<string> GetDirectoryFileList(string directory, string filter)
 		{
 			if (Directory.Exists(directory))

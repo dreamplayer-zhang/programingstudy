@@ -18,16 +18,16 @@ namespace Root_Vega
     
     class AlarmSortHelper
     {
-        public string m_sCode;
-        public string m_sState;
-        public string m_sClassName;
-        public string m_sAlarmName;
+        public string m_sCode = "";
+        public string m_sState = "";
+        public string m_sClassName = "";
+        public string m_sAlarmName = "";
         public List<DateTime> m_ListSetT = new List<DateTime>();
         public List<DateTime> m_ListClearT = new List<DateTime>();
     }
     class AlarmRawData
     {
-        public DateTime day;
+        public DateTime day = DateTime.Now;
         public string m_sDate
         {
             get;
@@ -438,6 +438,7 @@ namespace Root_Vega
         void ReadAlaram(string path)
         {
             return;
+            /*
             DirectoryInfo[] dirs = new DirectoryInfo(path).GetDirectories(EQ.m_sModel, SearchOption.AllDirectories);
             foreach (DirectoryInfo di in dirs)
             {
@@ -538,7 +539,7 @@ namespace Root_Vega
                         }
                     }
                 }
-            }
+            } */
         }
     }
 }

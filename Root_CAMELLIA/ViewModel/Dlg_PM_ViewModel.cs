@@ -14,5 +14,10 @@ namespace Root_CAMELLIA
         }
 
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
+
+        public void _Dummy()
+        {
+            if (CloseRequested != null) CloseRequested(null, null); 
+        }
     }
 }

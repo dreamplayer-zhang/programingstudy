@@ -133,6 +133,7 @@ namespace RootTools.Control.Xenax
             GetErrorString,
             SoftLimitLeft,
             SoftLimitRight,
+            ML,
         }
         public Dictionary<eCmd, string> m_aCmd = new Dictionary<eCmd, string>();
         void InitCmd()
@@ -154,6 +155,7 @@ namespace RootTools.Control.Xenax
             m_aCmd.Add(eCmd.GetErrorString, "TES");
             m_aCmd.Add(eCmd.SoftLimitLeft, "LL");
             m_aCmd.Add(eCmd.SoftLimitRight, "LR");
+            m_aCmd.Add(eCmd.ML, "ML");
         }
 
         eCmd GetCmd(string sRead, ref string sData)
@@ -415,6 +417,8 @@ namespace RootTools.Control.Xenax
             }
             p_sInfo = base.StartHome();
             if (p_sInfo != "OK") return p_sInfo;
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.Event]));
+            m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.ML], m_nML));
             m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.HomeDir], (int)m_eHomeDir));
             m_qProtocol.Enqueue(new Protocol(m_aCmd[eCmd.Home]));
             return "OK";
@@ -432,8 +436,10 @@ namespace RootTools.Control.Xenax
             }
         }
 
+        int m_nML = 2000; 
         void RunTreeSettingHome(Tree tree)
         {
+            m_nML = tree.Set(m_nML, m_nML, "ML", "ML"); 
             m_eHomeDir = (eHomeDir)tree.Set(m_eHomeDir, m_eHomeDir, "Dir", "Search Home Direction");
         }
         #endregion
@@ -499,51 +505,9 @@ namespace RootTools.Control.Xenax
                     return " : " + id[1] + "Interlock Error";
                 }
             }
-            // IOList for true
-            for (int i = 0; i < m_aSensors.Count; i++)
-            {
-                if (m_aSensors[i].m_bHome == true)
-                {
-                    if (!m_listAxis.m_aAxis[i].p_sensorHome) return " : HomeSensor Interlock Error";
-                }
-                if (m_aSensors[i].m_bPlus == true)
-                {
-                    if (!m_listAxis.m_aAxis[i].p_sensorPlusLimit) return " : Plus Limit Interlock Error";
-                }
-                if (m_aSensors[i].m_bMinus == true)
-                {
-                    if (!m_listAxis.m_aAxis[i].p_sensorMinusLimit) return " : Minus Limit Interlock Error";
-                }
-            }
             return "OK";
         }
-
-        public override void RunTreeInterlock(Tree.eMode mode)
-        {
-            m_treeRootInterlock.p_eMode = mode;
-            RunTreeInterlockAxis(m_treeRootInterlock.GetTree("Axis"));
-        }
-
-        void RunTreeInterlockAxis(Tree tree)
-        {
-            for (int i = 0; i < m_listAxis.m_aAxis.Count; i++)
-            {
-                CSensor sensor = new CSensor(m_listAxis.m_aAxis[i].p_id);
-                int iIndex = m_aSensors.FindIndex(x => x.m_strAxisName == m_listAxis.m_aAxis[i].p_id);
-                if (iIndex < 0) m_aSensors.Add(sensor);
-                RunTreeSensor(m_treeRootInterlock.GetTree(m_aSensors[i].m_strAxisName), i);
-            }
-        }
-
-        void RunTreeSensor(Tree tree, int iIndex)
-        {
-            m_aSensors[iIndex].m_bHome = tree.Set(m_aSensors[iIndex].m_bHome, m_aSensors[iIndex].m_bHome, "Home", "Home Sensor");
-            m_aSensors[iIndex].m_bPlus = tree.Set(m_aSensors[iIndex].m_bPlus, m_aSensors[iIndex].m_bPlus, "Plus", "Plus Sensor");
-            m_aSensors[iIndex].m_bMinus = tree.Set(m_aSensors[iIndex].m_bMinus, m_aSensors[iIndex].m_bMinus, "Minus", "Minus Sensor");
-        }
         #endregion
-
-        //===============================================
 
         #region Thread
         bool m_bThread = false;

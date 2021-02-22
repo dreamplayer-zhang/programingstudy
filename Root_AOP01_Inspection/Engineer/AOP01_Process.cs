@@ -137,15 +137,7 @@ namespace Root_AOP01_Inspection.Engineer
                 string sChild = moduleRun.m_moduleBase.p_id;
                 bool bGetPut = (sChild != m_wtr.p_id);
                 bool bPut = !IsSameModule(infoWafer.m_moduleRunList, n - 1, n);
-                if (bPut && bGetPut)
-                {
-                    ModuleRunBase run = m_wtr.CloneRunPut(sChild, -1);
-                    if (sChild == "MainVision")
-                    {
-                            ((RTR_RND.Run_Put)run).m_eSide = moduleRun.m_valueGeneral;
-                    }
-                    qProcess.Enqueue(run);
-                }
+                if (bPut && bGetPut) qProcess.Enqueue(m_wtr.CloneRunPut(sChild, -1));
                 qProcess.Enqueue(moduleRun);
                 bool bGet = !IsSameModule(infoWafer.m_moduleRunList, n, n + 1);
                 if (bGet && bGetPut) qProcess.Enqueue(m_wtr.CloneRunGet(sChild, -1));
@@ -158,9 +150,7 @@ namespace Root_AOP01_Inspection.Engineer
         {
             if (i0 < 0) return false;
             if (i1 >= moduleRunList.p_aModuleRun.Count) return false;
-            if (moduleRunList.p_aModuleRun[i0].m_moduleBase.p_id != moduleRunList.p_aModuleRun[i1].m_moduleBase.p_id) return false;
-            if (moduleRunList.p_aModuleRun[i0].m_moduleBase.p_id != "MainVision") return true;
-            return moduleRunList.p_aModuleRun[i0].m_valueGeneral == moduleRunList.p_aModuleRun[i1].m_valueGeneral; 
+            return (moduleRunList.p_aModuleRun[i0].m_moduleBase.p_id == moduleRunList.p_aModuleRun[i1].m_moduleBase.p_id);
         }
 
         public void ClearInfoWafer()
@@ -187,7 +177,8 @@ namespace Root_AOP01_Inspection.Engineer
         List<InfoWafer> m_aCalcWafer = new List<InfoWafer>();
         /// <summary> RunThread에서 실행 될 ModuleRun List (from Handler when EQ.p_eState == Run) </summary>
         public Queue<Sequence> m_qSequence = new Queue<Sequence>();
-
+        public double m_dSequencePercent = 0;
+        public double m_dOneSequencePercent = 0;
         public string ReCalcSequence()
         {
             try
@@ -386,6 +377,7 @@ namespace Root_AOP01_Inspection.Engineer
         #endregion
 
         #region RunSequence
+
         /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
         public string RunNextSequence()
         {
@@ -405,9 +397,14 @@ namespace Root_AOP01_Inspection.Engineer
             }
             else sequence.m_moduleRun.StartRun();
             m_qSequence.Dequeue();
+            m_dSequencePercent += m_dOneSequencePercent;
             InfoWafer infoWafer = sequence.m_infoWafer;
             if (infoWafer.m_qProcess.Count > 0) infoWafer.m_qProcess.Dequeue();
-            if (m_qSequence.Count == 0) ClearInfoWafer();
+            if (m_qSequence.Count == 0)
+            {
+                m_dSequencePercent = 100;
+                ClearInfoWafer();
+            }
             RunTree(Tree.eMode.Init);
             return "OK";
         }

@@ -25,11 +25,14 @@ namespace RootTools_Vision
 		private int diffEBR;
 		private int offsetBevel;
 		private int offsetEBR;
+
+		// 카메라 정보
+		private double camResolution = 0;
 		#endregion
 
 		#region [Getter/Setter]
 		[Category("Parameter")]
-		public int RoiWidth
+		public int ROIWidth
 		{
 			get => this.roiWidth;
 			set
@@ -38,7 +41,7 @@ namespace RootTools_Vision
 			}
 		}
 		[Category("Parameter")]
-		public int RoiHeight
+		public int ROIHeight
 		{
 			get => this.roiHeight;
 			set
@@ -116,6 +119,15 @@ namespace RootTools_Vision
 			set
 			{
 				SetProperty<int>(ref this.offsetEBR, value);
+			}
+		}
+		[Category("Parameter")]
+		public double CamResolution
+		{
+			get => this.camResolution;
+			set
+			{
+				SetProperty<double>(ref this.camResolution, value);
 			}
 		}
 

@@ -17,11 +17,11 @@ std::vector<DefectDataStruct> CInspectionReticle::StripInspection(int nBandwidth
 	std::vector<DefectDataStruct> vResult;
 	bool bInspResult = false;
 
-	RECT rt;
+	//RECT rt;
 	RECT rtROI = GetROI();
 	RECT rtinspROI = GetInspbufferROI();
-	float ret;
-	byte* pPos;
+	//float ret;
+	//byte* pPos;
 	POINT ptDefectPos;
 	ptDefectPos.x = rtROI.left;
 	ptDefectPos.y = rtROI.top;

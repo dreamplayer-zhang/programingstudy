@@ -11,6 +11,8 @@ using RootTools.Module;
 using System.Threading;
 using System.Windows.Threading;
 using System;
+using System.Linq;
+using Root_AOP01_Inspection.Module;
 
 namespace Root_AOP01_Inspection
 {
@@ -39,8 +41,8 @@ namespace Root_AOP01_Inspection
             m_bShow = false;
         }
         ManualJobSchedule m_JobSchedule;
-        Loadport_Cymechs m_loadport;
-        public void Init(ManualJobSchedule jobschdule, AOP01_Engineer engineer, Loadport_Cymechs loadport)
+        Loadport_AOP01 m_loadport;
+        public void Init(ManualJobSchedule jobschdule, AOP01_Engineer engineer, Loadport_AOP01 loadport)
         {
             m_engineer = engineer;
             m_handler = engineer.m_handler;
@@ -76,15 +78,8 @@ namespace Root_AOP01_Inspection
                 Start.Content = "Start";
             }
         }
-        //public void Init(ManualJobSchedule jobschdule)
-        //{
-        //    m_aRecipe = new ObservableCollection<Recipe>();
-        //    listviewRCP.ItemsSource = m_aRecipe;
-        //    m_JobSchedule = jobschdule;
-        //    this.DataContext = jobschdule;
-        //    LoadportNum.Text = Loadport_UI.sLoadportNum;
-        //}   
-        #region Recipe List
+ 
+        #region Recipe
         public class Recipe : NotifyProperty
         {
             int _nNumber = 1;
@@ -125,9 +120,30 @@ namespace Root_AOP01_Inspection
             string[] Getfiles = Directory.GetFiles(m_recipe.m_sPath, "*.AOP01");
             foreach (string files in Getfiles)
             {
+
                 FileInfo file = new FileInfo(files);
                 string rcpname = file.Name;
-                AddRecipe(rcpname, file.LastWriteTime.ToString());
+                string temprcpname = Path.GetFileNameWithoutExtension(rcpname).ToLower();
+                DateTime rcpdate = file.LastWriteTime.Date;
+                if (cbRecipe.IsChecked == true)
+                {
+                    string TempRcpText = TextBoxRecipe.Text.ToLower();
+                    if (temprcpname.Contains(TempRcpText))
+                        AddRecipe(rcpname, file.LastWriteTime.ToString());
+                }
+                else if (cbDate.IsChecked == true)
+                {
+                    if(DatePicker.SelectedDate == rcpdate)
+                        AddRecipe(rcpname, file.LastWriteTime.ToString());
+                }
+                else if(cbRecipe.IsChecked == true && cbDate.IsChecked == true)
+                {
+                    string TempRcpText = TextBoxRecipe.Text.ToLower();
+                    if (temprcpname.Contains(TempRcpText) && DatePicker.SelectedDate == rcpdate)
+                        AddRecipe(rcpname, file.LastWriteTime.ToString());
+                }
+                else
+                    AddRecipe(rcpname, file.LastWriteTime.ToString());
             }
         }
         public string sRecipeName = "";
@@ -141,7 +157,7 @@ namespace Root_AOP01_Inspection
         }
         #endregion
 
-
+        #region Button Start
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
             m_handler.bInit = true;
@@ -154,6 +170,9 @@ namespace Root_AOP01_Inspection
             }
             this.DialogResult = true;
         }
+        #endregion
+
+        #region Button Close
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             m_loadport.RunUndocking();
@@ -161,6 +180,7 @@ namespace Root_AOP01_Inspection
             //while ((EQ.IsStop() != true) && m_loadport.IsBusy()) Thread.Sleep(10);
             this.Close();
         }
+        #endregion
     }
 
 }

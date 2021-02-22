@@ -15,7 +15,14 @@
         <SolidColorBrush x:Key="MainThema"
                          Color="LightSteelBlue" />
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter" />
-        <Style TargetType="{x:Type GroupBox}">
+        <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
+            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
+        </Style>
+        <Style TargetType="{x:Type GroupBox}" x:Key="group">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type GroupBox}">
