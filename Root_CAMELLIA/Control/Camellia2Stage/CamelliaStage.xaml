@@ -7,7 +7,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="1030" d:DesignWidth="1030">
     <Grid>
-        <Border SnapsToDevicePixels="True" ClipToBounds="True" BorderBrush="Black" BorderThickness="1" >
+        <Border ClipToBounds="True">
+            <Viewbox>
             <Canvas  Width="1000" Height="1000" Background="#01FFFFFF" Focusable="True" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseRightButtonDown="Canvas_MouseRightButtonDown">
                     <Path StrokeThickness="1">
                         <Path.Data>
@@ -1729,6 +1730,7 @@
                     <ScaleTransform x:Name="CanvasScaleTransform"/>
                 </Viewbox.RenderTransform>-->
 
+            </Viewbox>
         </Border>
     </Grid>
 </UserControl>

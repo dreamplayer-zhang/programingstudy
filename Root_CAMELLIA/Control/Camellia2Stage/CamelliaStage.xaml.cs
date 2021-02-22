@@ -30,14 +30,14 @@ namespace Camellia2Stage
         {
             Point pt = e.GetPosition((UIElement)sender);
             offsetPt.X += 500 - pt.X;
-            offsetPt.Y -= 500 - pt.Y;
+            offsetPt.Y += 500 - pt.Y;
             CanvasScaleTransform.ScaleX *= 2;
             CanvasScaleTransform.ScaleY *= 2;
 
-            offsetPt.X *= 2;
-            offsetPt.Y *= 2;
-            CanvasScaleTransform.CenterX = pt.X - (500 - pt.X);
-            CanvasScaleTransform.CenterY = pt.Y - (500 - pt.Y);
+            //offsetPt.X *= 2;
+            //offsetPt.Y *= 2;
+            CanvasScaleTransform.CenterX = (offsetPt.X);
+            CanvasScaleTransform.CenterY = (offsetPt.Y);
         }
 
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
