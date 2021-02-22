@@ -16,7 +16,18 @@ namespace Root_CAMELLIA
     public class MainWindow_ViewModel : ObservableObject
     {
         private MainWindow m_MainWindow;
-        public DataManager DataManager;
+
+        private DataManager _DataManager;
+        public DataManager DataManager {
+            get
+            {
+                return _DataManager;
+            }
+            set
+            {
+                SetProperty(ref _DataManager, value);
+            }
+        }
         
 
         #region Property
@@ -326,7 +337,9 @@ namespace Root_CAMELLIA
                     SettingViewModel.LoadParameter();
                 }
             }
-           
+            SettingViewModel.LoadSettingData();
+
+
         }
 
         private void Init()
@@ -349,8 +362,8 @@ namespace Root_CAMELLIA
         private void ViewModelInit()
         {
             EngineerViewModel = new Dlg_Engineer_ViewModel(this);
-            RecipeViewModel = new Dlg_RecipeManager_ViewModel(this);   
             SettingViewModel = new Dlg_Setting_ViewModel(this);
+            RecipeViewModel = new Dlg_RecipeManager_ViewModel(this);   
             PMViewModel = new Dlg_PM_ViewModel(this);
         }
 
@@ -473,14 +486,24 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     var viewModel = new Dlg_RecipeManager_ViewModel(this);
-                    viewModel.dataManager = RecipeViewModel.dataManager;
-                    viewModel.UpdateListView(true);
-                    viewModel.UpdateView(true);
+                    //viewModel.dataManager = RecipeViewModel.dataManager;
+                    bool isRecipeLoad = false;
+                    if(DataManager.Instance.recipeDM.TeachRecipeName != "")
+                    {
+                        isRecipeLoad = true;
+                    }
+                    viewModel.UpdateListView(isRecipeLoad);
+                    viewModel.UpdateView(isRecipeLoad);
                     Nullable<bool> result = dialogService.ShowDialog(viewModel);
 
-                    RecipeViewModel.UpdateListView(true);
+                    isRecipeLoad = false;
+                    if (DataManager.Instance.recipeDM.TeachRecipeName != "")
+                    {
+                        isRecipeLoad = true;
+                    }
+                    RecipeViewModel.UpdateListView(!isRecipeLoad);
                     RecipeViewModel.UpdateLayerGridView();
-                    RecipeViewModel.UpdateView(true);
+                    RecipeViewModel.UpdateView(!isRecipeLoad);
 
                     DrawMeasureRoute();
 
@@ -525,6 +548,7 @@ namespace Root_CAMELLIA
                     {
                         viewModel.LoadParameter();
                     }
+                    viewModel.LoadSettingData();
                     viewModel.LoadConfig();
                     Nullable<bool> result = dialogService.ShowDialog(viewModel);
                 });

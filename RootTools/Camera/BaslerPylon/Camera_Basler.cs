@@ -581,7 +581,7 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
-        private void GrabStop()
+        public void GrabStop()
         {
             if (m_cam == null) return;
             m_cam.StreamGrabber.Stop();

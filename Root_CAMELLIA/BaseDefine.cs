@@ -17,6 +17,8 @@ namespace Root_CAMELLIA
 
         public const string RegNanoViewConfig = "NanoViewConfigPath";
         public const string RegNanoViewPort = "NanoViewPort";
+        public const string RegNanoViewExceptNIR = "ExceptNIR";
+        public const string RegNanoViewUseThickness = "Use Thickness"; 
         public const string RegLightSourcePath = "LightSourcePath";
         public const string Dir_Preset = @"C:\Camellia\Preset\";
         public const string Dir_StageMap = @"C:\Camellia\StageMap\";

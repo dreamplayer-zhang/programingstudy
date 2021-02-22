@@ -11,6 +11,113 @@
             <Setter Property="FontFamily" Value="Arial"/>
         </Style>
 
+        <Style x:Key="CustomToggleButton" TargetType="{x:Type ToggleButton}">
+            <Style.Resources>
+                <Color x:Key="Color.Additional.LightGrey">#989EA8</Color>
+                <Color x:Key="Color.Additional.MediumGrey">#61656B</Color>
+                <Color x:Key="Color.MedtronicBranding.MedtronicBlue">#004B87</Color>
+                <Color x:Key="Color.MedtronicBranding.CobaltBlue">#0085CA</Color>
+                <Style x:Key="ToggleButtonContentTextbox" TargetType="TextBlock">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="VerticalAlignment" Value="Stretch" />
+                </Style>
+                <SolidColorBrush x:Key="ToggleButtonFalseBackground"
+                         Color="{StaticResource Color.Additional.LightGrey}" />
+                <SolidColorBrush x:Key="ToggleButtonTrueBackground"
+                         Color="{StaticResource Color.MedtronicBranding.CobaltBlue}" />
+                <SolidColorBrush x:Key="ToggleButtonFalseForeground"
+                         Color="{StaticResource Color.Additional.MediumGrey}" />
+                <SolidColorBrush x:Key="ToggleButtonTrueForeground"
+                         Color="{StaticResource Color.MedtronicBranding.MedtronicBlue}" />
+                <TextBlock x:Key="OffContent"
+                   Style="{StaticResource ToggleButtonContentTextbox}"
+                   Text="Off" />
+            </Style.Resources>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Grid x:Name="MainRow">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="{Binding ElementName=TopRow, Path=ActualHeight}" />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="{Binding ElementName=TopRow, Path=ActualHeight}" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition x:Name="TopRow" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+
+                                <Ellipse x:Name="BackgroundEllipse1"
+                                 Grid.RowSpan="2"
+                                 Grid.Column="0"
+                                 Grid.ColumnSpan="3"
+                                 Width="{Binding ElementName=MainRow,
+                                                 Path=ActualHeight}"
+                                 Height="{Binding ElementName=MainRow,
+                                                  Path=ActualHeight}"
+                                 HorizontalAlignment="Left"
+                                 Fill="{StaticResource ToggleButtonTrueBackground}" />
+                                <Ellipse x:Name="BackgroundEllipse2"
+                                 Grid.Row="0"
+                                 Grid.RowSpan="2"
+                                 Grid.Column="0"
+                                 Grid.ColumnSpan="3"
+                                 Width="{Binding ElementName=MainRow,
+                                                 Path=ActualHeight}"
+                                 Height="{Binding ElementName=MainRow,
+                                                  Path=ActualHeight}"
+                                 HorizontalAlignment="Right"
+                                 Fill="{StaticResource ToggleButtonFalseBackground}" />
+                                <Border x:Name="BackgroundBorder"
+                                Grid.Row="0"
+                                Grid.RowSpan="2"
+                                Grid.Column="1"
+                                Background="{StaticResource ToggleButtonTrueBackground}" />
+                            </Grid>
+                            <Grid HorizontalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition x:Name="AnimationWidth" />
+                                    <ColumnDefinition Width="{Binding ElementName=MainRow, Path=ActualHeight}" />
+                                </Grid.ColumnDefinitions>
+                                <Border x:Name="AnimationSizeBorder" Grid.Column="0" />
+                                <TextBlock x:Name="OnText" Grid.Column="0" Margin="8,0,0,0" Foreground="White" Text="On" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                            <Grid HorizontalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="{Binding ElementName=MainRow, Path=ActualHeight}" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="OffText" Visibility="Hidden" Grid.Column="1" Margin="0,0,8,0" Foreground="White" Text="Off" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                            <Grid Background="Transparent">
+                                <StackPanel HorizontalAlignment="Left"
+                                    Orientation="Horizontal">
+                                    <Border Width="{Binding ElementName=AnimationSizeBorder, Path=ActualWidth}" />
+                                    <Ellipse x:Name="ForegroundEllipse"
+                                     Width="{Binding ElementName=MainRow, Path=ActualHeight}"
+                                     Height="{Binding ElementName=MainRow, Path=ActualHeight}"
+                                     HorizontalAlignment="Right"
+                                     Fill="{StaticResource ToggleButtonTrueForeground}" />
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter TargetName="BackgroundBorder" Property="Background"
+                Value="{StaticResource ToggleButtonFalseBackground}" />
+                                <Setter TargetName="ForegroundEllipse" Property="Fill"
+                Value="{StaticResource ToggleButtonFalseForeground}" />
+                                <Setter TargetName="AnimationSizeBorder" Property="Width" Value="0" />
+                                <Setter TargetName="OffText" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="OnText" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <LinearGradientBrush x:Key="ProgressBarBorderBrush"
                      EndPoint="0,1"
                      StartPoint="0,0">
@@ -282,6 +389,7 @@
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
 
         <!--Color-->
+        <!--<SolidColorBrush x:Key="PanelBackGround" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>-->
         <SolidColorBrush x:Key="PanelBackGround" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
         <SolidColorBrush x:Key="ControlBackGround" Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
         <SolidColorBrush x:Key="GroupBoxBackground" Color="Transparent"/>
