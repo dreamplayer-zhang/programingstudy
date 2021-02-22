@@ -106,18 +106,20 @@ namespace Root_WIND2.UI_User
         Dispatcher dispatcher = null;
         public CameraVRS_ImageViewer_ViewModel()
         {
-            
-            p_Vision = GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_Vision;
+            if (GlobalObjects.Instance.Get<WIND2_Engineer>().m_eMode == WIND2_Engineer.eMode.Vision)
+            {
+                p_Vision = GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_Vision;
 
-            p_axisX = p_Vision.AxisXY.p_axisX;
-            p_axisY = p_Vision.AxisXY.p_axisY;
-            p_axisZ = p_Vision.AxisZ;
-            p_axisRotate = p_Vision.AxisRotate;
+                p_axisX = p_Vision.AxisXY.p_axisX;
+                p_axisY = p_Vision.AxisXY.p_axisY;
+                p_axisZ = p_Vision.AxisZ;
+                p_axisRotate = p_Vision.AxisRotate;
 
-            p_Vision.p_CamAutoFocus.Grabed += OnUpdateImage;
-            p_RootViewer.p_VisibleMenu = System.Windows.Visibility.Collapsed;
-            p_RootViewer.p_ImageData = p_Vision.p_CamAutoFocus.p_ImageViewer.p_ImageData;
-            dispatcher = Application.Current.Dispatcher;
+                p_Vision.p_CamAutoFocus.Grabed += OnUpdateImage;
+                p_RootViewer.p_VisibleMenu = System.Windows.Visibility.Collapsed;
+                p_RootViewer.p_ImageData = p_Vision.p_CamAutoFocus.p_ImageViewer.p_ImageData;
+                dispatcher = Application.Current.Dispatcher;
+            }
         }
 
         private void OnUpdateImage(Object sender, EventArgs args)

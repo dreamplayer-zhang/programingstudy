@@ -53,7 +53,7 @@
                        VerticalAlignment="Center"
                        Margin="5,0,0,0"
                        Grid.Column="1" />
-            <TextBlock Text="Recipe Name.Rcp"
+            <TextBlock Text="{Binding RecipeViewModel.RecipePath}"
                        FontSize="12"
                        FontWeight="Bold"
                        Foreground="Black"
@@ -160,9 +160,15 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Grid Background="Crimson"/>
-                        <Grid Background="Gold" Grid.Row="1"/>
-                        <Grid Background="SeaGreen" Grid.Row="2"/>
+                        <Border BorderThickness="0,0,0,1" BorderBrush="#FF707070">
+                            <Grid Background="#FFDDDDDD"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0,1" BorderBrush="#FF707070" Grid.Row="1">
+                            <Grid Background="Gold"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0,0" BorderBrush="#FF707070" Grid.Row="2">
+                            <Grid Background="#FFDDDDDD" />
+                        </Border>
                     </Grid>
                 </Border>
             </StackPanel>
@@ -203,7 +209,7 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition/>
+                    <RowDefinition Height="1.3*"/>
                     <RowDefinition Height="14*"/>
                 </Grid.RowDefinitions>
                 <GroupBox Header="Monitoring" Grid.Row="0">
@@ -232,24 +238,34 @@
                                 <TextBlock Text="Time : -1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                         </UniformGrid>
-                        <UniformGrid Columns="3" Rows="2" Margin="2,0" Grid.Column="1">
+                        <UniformGrid Columns="4" Rows="2" Margin="2,0" Grid.Column="1">
                             <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                <TextBlock Text="Wafer Stage Offset X" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center">
+                                   Differential
+                                    <LineBreak/>
+                                    pressure
+                                </TextBlock>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                <TextBlock Text="Wafer Stage Offset Y" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="Vacuum" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
+                                <TextBlock Text="Temperature" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
-                                <TextBlock Text="Theta Align" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="Humidity" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
-                                <TextBlock Text="0um" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
-                                <TextBlock Text="0um" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
+                                <TextBlock Text="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,1,1,1">
-                                <TextBlock Text="0 º" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                         </UniformGrid>
                     </Grid>
@@ -515,7 +531,7 @@
                                                     <RowDefinition Height="0.4*"/>
                                                 </Grid.RowDefinitions>
                                                 <DataGrid Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
-                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding RecipeViewModel.GridLayerData}" IsReadOnly="True">
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding RecipeViewModel.GridLayerData}" IsReadOnly="True" IsEnabled="{Binding RecipeViewModel.p_UseThickness}">
                                                     <DataGrid.Columns>
                                                         <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True" Foreground="Blue" FontWeight="ExtraBold"/>
                                                         <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedHost1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
@@ -719,7 +735,7 @@
                 <TabItem Header="Log" Width="80">
                 </TabItem>
                 <TabItem Header="RT Graph">
-                    <!--<met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>-->
+                    <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
                 </TabItem>
             </TabControl>
             <Grid Grid.Column="3">

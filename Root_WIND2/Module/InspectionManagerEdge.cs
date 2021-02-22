@@ -118,6 +118,8 @@ namespace Root_WIND2
 
 		public int GetWorkplaceCount()
 		{
+			if (workplaceBundle == null)
+				return 1;
 			return workplaceBundle.Count();
 		}
 
