@@ -500,7 +500,9 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <stage:CamelliaStage></stage:CamelliaStage>
+                        <Grid>
+                            <stage:CamelliaStage></stage:CamelliaStage>
+                        </Grid>
                         <!--<Viewbox Margin="10" Width="auto" Grid.Row="0">
                             <ItemsControl ItemsSource="{Binding p_DrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"

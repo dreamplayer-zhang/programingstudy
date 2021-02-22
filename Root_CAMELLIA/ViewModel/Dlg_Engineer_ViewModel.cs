@@ -65,16 +65,22 @@ namespace Root_CAMELLIA
                             CurrentAxisWorkPoints = GetWorkPoint(AxisLifter.m_aPos);
                             return;
                         }
-                    case TabAxis.StageZ:
-                        {
-                            return;
-                        }
                     case TabAxis.TiltX:
                         {
+                            SelectedAxis = TiltAxisX;
+                            CurrentAxisWorkPoints = GetWorkPoint(TiltAxisX.m_aPos);
                             return;
                         }
                     case TabAxis.TiltY:
                         {
+                            SelectedAxis = TiltAxisY;
+                            CurrentAxisWorkPoints = GetWorkPoint(TiltAxisY.m_aPos);
+                            return;
+                        }
+                    case TabAxis.TiltZ:
+                        {
+                            SelectedAxis = TiltAxisZ;
+                            CurrentAxisWorkPoints = GetWorkPoint(TiltAxisZ.m_aPos);
                             return;
                         }
                 }
@@ -212,6 +218,46 @@ namespace Root_CAMELLIA
         }
         private Axis _AxisLifter;
 
+        public Axis TiltAxisX
+        {
+            get
+            {
+                return _TiltAxisX;
+            }
+            set
+            {
+                SetProperty(ref _TiltAxisX, value);
+            }
+        }
+        private Axis _TiltAxisX;
+
+        public Axis TiltAxisY
+        {
+            get
+            {
+                return _TiltAxisY;
+            }
+            set
+            {
+                SetProperty(ref _TiltAxisY, value);
+            }
+        }
+        private Axis _TiltAxisY;
+
+        public Axis TiltAxisZ
+        {
+            get
+            {
+                return _TiltAxisZ;
+            }
+            set
+            {
+                SetProperty(ref _TiltAxisZ, value);
+            }
+        }
+        private Axis _TiltAxisZ;
+
+
         //private Visibility _tttt = Visibility.Hidden;
         //public Visibility tttt
         //{
@@ -331,6 +377,10 @@ namespace Root_CAMELLIA
             AxisY = ModuleCamellia.p_axisXY.p_axisY;
             AxisZ = ModuleCamellia.p_axisZ;
             AxisLifter = ModuleCamellia.p_axisLifter;
+
+            TiltAxisX = ModuleCamellia.p_tiltAxisXY.p_axisX;
+            TiltAxisY = ModuleCamellia.p_tiltAxisXY.p_axisY;
+            TiltAxisZ = ModuleCamellia.p_tiltAxisZ;
 
             ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
 
@@ -757,7 +807,7 @@ namespace Root_CAMELLIA
             AxisY,
             AxisZ,
             Lifter,
-            StageZ,
+            TiltZ,
             TiltX,
             TiltY
         }
