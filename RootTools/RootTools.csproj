@@ -257,6 +257,14 @@
       <DependentUpon>Modbus_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Comm\RS232byte.cs" />
+    <Compile Include="Comm\TCPAsyncClient.cs" />
+    <Compile Include="Comm\TCPAsyncClient_UI.xaml.cs">
+      <DependentUpon>TCPAsyncClient_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Comm\TCPAsyncServer.cs" />
+    <Compile Include="Comm\TCPAsyncServer_UI.xaml.cs">
+      <DependentUpon>TCPAsyncServer_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\Xenax\Xenax.cs" />
     <Compile Include="Control\Xenax\XenaxAxis.cs" />
     <Compile Include="Control\Xenax\XenaxAxis_UI.xaml.cs">
@@ -819,6 +827,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Comm\Modbus_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\TCPAsyncClient_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\TCPAsyncServer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

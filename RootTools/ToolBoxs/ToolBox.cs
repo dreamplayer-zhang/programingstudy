@@ -406,6 +406,30 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
+        public string Get(ref TCPAsyncServer value, ModuleBase module, string id, int lMaxBuffer = 4096)
+        {
+            if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
+            if (value == null)
+            {
+                value = new TCPAsyncServer(module.p_id + "." + id, module.m_log, lMaxBuffer);
+                m_toolSetComm.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            return "OK";
+        }
+
+        public string Get(ref TCPAsyncClient value, ModuleBase module, string id, int lMaxBuffer = 4096)
+        {
+            if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
+            if (value == null)
+            {
+                value = new TCPAsyncClient(module.p_id + "." + id, module.m_log, lMaxBuffer);
+                m_toolSetComm.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            return "OK";
+        }
+
         public string Get(ref RS232 value, ModuleBase module, string id)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
