@@ -194,6 +194,10 @@ namespace Root_Rinse_Loader.Module
                 if (_eStateRinse == value) return;
                 _eStateRinse = value;
                 OnPropertyChanged(); 
+                if (value == eRinseRun.Ready)
+                {
+                    if (EQ.p_eState == EQ.eState.Run) EQ.p_eState = EQ.eState.Ready; 
+                }
             }
         }
 
