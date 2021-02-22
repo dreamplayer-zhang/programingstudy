@@ -65,6 +65,8 @@ namespace Root_CAMELLIA
         public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
         public Module_FDC m_FDC;
         public Module_FFU m_FFU;
+        public TowerLamp m_towerlamp;
+        public Interlock m_interlock;
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
@@ -76,6 +78,10 @@ namespace Root_CAMELLIA
             m_camellia = new Module_Camellia("Camellia", m_engineer);
             InitModule(m_camellia);
             m_HomeProgress.Init(this);
+            m_towerlamp = new TowerLamp("Towerlamp", m_engineer);
+            InitModule(m_towerlamp);
+            m_interlock = new Interlock("Interlock", m_engineer);
+            InitModule(m_interlock);
             //InitXGem();
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_camellia);
