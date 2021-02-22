@@ -30,7 +30,9 @@ namespace RootTools.Camera
         event EventHandler Grabed;
 
         string p_id { get; set; }
-
+        bool bStopThread
+        {
+            get;set; }
         int p_nGrabProgress { get; set; }
 
         TreeRoot p_treeRoot { get; set; }

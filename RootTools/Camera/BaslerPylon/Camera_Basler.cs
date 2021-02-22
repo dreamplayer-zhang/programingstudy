@@ -24,6 +24,11 @@ namespace RootTools.Camera.BaslerPylon
 
         #region Property
         public string p_id { get; set; }
+        public bool bStopThread
+        {
+            get;
+            set;
+        }
         public int p_nGrabProgress
         {
             get { return 0; }

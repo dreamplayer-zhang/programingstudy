@@ -145,12 +145,12 @@ namespace Root_WIND2.Module
 					return p_sInfo;
 				axisR.SetTrigger(triggerStart, triggerDest, 1, true);
 
-				//gmTop.StartGrab(gmTop.m_memoryData, new CPoint(0, 0), grabCount, gmTop.m_GD, true);
-				//gmTop.Grabed += m_gmTop_Grabed;
-				gmSide.StartGrab(gmSide.m_memoryData, new CPoint(0, 0), grabCount, gmSide.m_GD, true);
-				//gmBtm.StartGrab(gmBtm.m_memoryData, new CPoint(0, 0), grabCount, gmBtm.m_GD, true);
+                gmTop.StartGrab(gmTop.m_memoryData, new CPoint(0, 0), grabCount, gmTop.m_GD, true);
+                gmTop.Grabed += m_gmTop_Grabed;
+                gmSide.StartGrab(gmSide.m_memoryData, new CPoint(0, 0), grabCount, gmSide.m_GD, true);
+                gmBtm.StartGrab(gmBtm.m_memoryData, new CPoint(0, 0), grabCount, gmBtm.m_GD, true);
 
-				if (module.Run(axisR.StartMove(moveEnd, scanSpeed, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc)))
+                if (module.Run(axisR.StartMove(moveEnd, scanSpeed, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc)))
 					return p_sInfo;
 				if (module.Run(axisR.WaitReady()))
 					return p_sInfo;
