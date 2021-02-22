@@ -362,7 +362,6 @@ void IP::SelectMinDiffinArea(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int 
     LPBYTE pCurChipLT;
 
     byte* pResult = pDst;
-    byte* pCurrent;
     byte* pHeader = NULL;
 
     pResult += nChipW * stride + stride;

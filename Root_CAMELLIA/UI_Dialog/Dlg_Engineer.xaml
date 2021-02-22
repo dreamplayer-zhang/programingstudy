@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:viewConverter="clr-namespace:ViewConverter;assembly=RootTools"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
@@ -27,6 +28,7 @@
         <local:AxisYToMotionUIConverter x:Key="AxisYToMotionUI"/>
         <local:AxisZToMotionUIConverter x:Key="AxisZToMotionUI"/>
         <local:AxisLifterToMotionUIConverter x:Key="AxisLifterToMotionUI"/>
+        <viewConverter:ConnectStringToBoolConverter x:Key="ConnectStringToBoolConverters" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -788,9 +790,29 @@
                                                         </DataGrid>
                                                     </TabItem>-->
                                                     </TabControl>
-                                                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1">
-                                                        <tools:RootViewer></tools:RootViewer>
-                                                    </Border>
+                                                    <Grid Grid.Column="1">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="0.079*"/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <UniformGrid Columns="4">
+                                                            <Button Command="{Binding ConnectCommand}"
+                                                                Content="{Binding ModuleCamellia.p_CamVRS.p_CamInfo._OpenStatus, Converter= {StaticResource ConnectStringToBoolConverters}}">
+                                                            </Button>
+                                                            <Button Content="Grab" Command="{Binding GrabCommand}"
+                                                                    IsEnabled="{Binding ModuleCamellia.p_CamVRS.p_CamInfo._IsCanGrab}">
+                                                            </Button>
+                                                            <Button Content="Live" Command="{Binding ContinousGrabCommand}"
+                                                                    IsEnabled="{Binding ModuleCamellia.p_CamVRS.p_CamInfo._IsCanGrab}">
+                                                            </Button>
+                                                            <Button Content="Stop" Command="{Binding StopGrabCommand}">
+
+                                                            </Button>
+                                                        </UniformGrid>
+                                                        <Border Grid.Row="1">
+                                                            <tools:RootViewer DataContext="{Binding p_rootViewer}"></tools:RootViewer>
+                                                        </Border>
+                                                    </Grid>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -843,7 +865,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Handler"
-                     Width="100" Visibility="{Binding tttt, UpdateSourceTrigger=PropertyChanged}">
+                     Width="100">
                 <Grid>
                     <local:Camellia_Hander_UI x:Name="HandlerUI" />
                 </Grid>

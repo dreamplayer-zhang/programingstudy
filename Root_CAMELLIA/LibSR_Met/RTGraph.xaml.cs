@@ -193,8 +193,11 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 else
                 {
-                    DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength(nm)", "Reflectance(%)");
-                    DrawTransmittanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength(nm)", "Transmittance(%)");
+                    if ((int)comboBoxDataIndex.SelectedIndex != -1)
+                    {
+                        DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength(nm)", "Reflectance(%)");
+                        DrawTransmittanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength(nm)", "Transmittance(%)");
+                    }
                 }
             }));
         }
