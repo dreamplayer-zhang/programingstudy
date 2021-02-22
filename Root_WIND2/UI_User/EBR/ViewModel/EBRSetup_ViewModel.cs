@@ -82,12 +82,14 @@ namespace Root_WIND2.UI_User
 				if (Recipe.CameraHeight == 0)
 					Recipe.CameraHeight = inspect.CameraHeight;
 
+				Recipe.ImageOffset = inspect.ImageOffset;
 				Recipe.TriggerRatio = mode.m_dCamTriggerRatio;
 				Parameter.CamResolution = mode.m_dResX_um;
-
+				
 				SetProperty<int>(ref this.selectedGrabModeIndex, value);
 			}
 		}
+
 		public int Progress
 		{
 			get => progress;
@@ -103,6 +105,7 @@ namespace Root_WIND2.UI_User
 			get => percentage;
 			set => SetProperty(ref percentage, value);
 		}
+
 		public DataTable MeasurementDataTable
 		{
 			get => measurementDataTable;
@@ -232,8 +235,8 @@ namespace Root_WIND2.UI_User
 
 			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
 			{
-				UpdateDataGrid();
-				DrawGraph();
+				//UpdateDataGrid();
+				//DrawGraph();
 			}));
 		}
 
@@ -289,7 +292,7 @@ namespace Root_WIND2.UI_User
 			string sRecipeID = recipe.Name;
 			string sReicpeFileName = sRecipeID + ".rcp";
 
-			string sDefect = "defect";
+			string sDefect = "measurement";
 			MeasurementDataTable = DatabaseManager.Instance.SelectTablewithInspectionID(sDefect, sInspectionID);
 		}
 

@@ -167,7 +167,7 @@
                             </Grid>
 
                             <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}"
-                                  DataContext="{Binding Parameter}">
+                                  DataContext="{Binding Recipe}">
                                 <Grid.ColumnDefinitions >
                                     <ColumnDefinition Width="120"/>
                                     <ColumnDefinition Width="*"/>

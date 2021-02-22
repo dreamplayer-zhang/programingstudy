@@ -47,9 +47,10 @@ namespace Root_WIND2
 
 		protected override WorkplaceBundle CreateWorkplaceBundle()
 		{
-			int cameraHeight = recipe.GetItem<EBRRecipe>().CameraHeight;
-			int bufferHeight = (int)(360000 / recipe.GetItem<EBRRecipe>().TriggerRatio);
-			int bufferHeightPerDegree = bufferHeight / 360; // 1도 당 Image Height
+			int firstNotch = 0;	// notch 찾기
+			int lastNotch = 270000;
+			int bufferHeight = lastNotch - firstNotch;
+			int bufferHeightPerDegree = bufferHeight / 360;
 
 			int width = recipe.GetItem<EBRParameter>().ROIWidth;
 			int height = recipe.GetItem<EBRParameter>().ROIHeight;
@@ -59,10 +60,16 @@ namespace Root_WIND2
 			workplaceBundle = new WorkplaceBundle();
 			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, workplaceBundle.Count));
 			
-			for (int i = 0; i < workplaceCnt; i++)
+			for (int i = 1; i < workplaceCnt; i++)
 			{
-				int posY = (bufferHeightPerDegree * i) - (height / 2);
-				Workplace workplace = new Workplace(0, 0, 0, posY + cameraHeight, width, height, workplaceBundle.Count);
+				int posY = (bufferHeightPerDegree * stepDegree * i) - (height / 2);
+
+				//if (posY < firstNotch)
+				//	posY = firstNotch;
+				//if (posY + height > lastNotch)
+				//	posY -= (posY + height) - lastNotch;
+
+				Workplace workplace = new Workplace(0, 0, 0, posY, width, height, workplaceBundle.Count);
 				workplaceBundle.Add(workplace);
 			}
 
@@ -86,8 +93,11 @@ namespace Root_WIND2
 
 			return workBundle;
 		}
+
 		public int GetWorkplaceCount()
 		{
+			if (workplaceBundle == null)
+				return 1;
 			return workplaceBundle.Count();
 		}
 

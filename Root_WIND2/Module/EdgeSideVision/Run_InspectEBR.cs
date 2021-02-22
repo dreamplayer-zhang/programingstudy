@@ -57,7 +57,7 @@ namespace Root_WIND2.Module
 		{
 			recipeName = tree.SetFile(recipeName, recipeName, "rcp", "Recipe", "Recipe Name", bVisible);
 			cameraHeight = (tree.GetTree("Camera Height", false, bVisible)).Set(cameraHeight, cameraHeight, "Height", "Camera Height", bVisible);
-			imageOffset = (tree.GetTree("Image Offset", false, bVisible)).Set(imageOffset, imageOffset, "Top Camera", "Height offset (pxl)", bVisible);
+			imageOffset = (tree.GetTree("Image Offset", false, bVisible)).Set(imageOffset, imageOffset, "Offset", "Height offset (pxl)", bVisible);
 		}
 
 		public override string Run()
