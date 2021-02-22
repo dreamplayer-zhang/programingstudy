@@ -21,7 +21,7 @@ namespace Root_WIND2
     {
         #region [Members]
         private readonly RecipeFront recipe;
-        private readonly SharedBufferInfo sharedBufferInfo;
+        //private readonly SharedBufferInfo sharedBufferInfo;
 
         private readonly Module.Vision vision;
         #endregion
@@ -33,9 +33,9 @@ namespace Root_WIND2
         }
 
         
-        public SharedBufferInfo SharedBufferInfo
+        public List<SharedBufferInfo> SharedBufferInfoList
         {
-            get => this.sharedBufferInfo;
+            get => this.sharedBufferInfoList;
         }
         #endregion
 
@@ -43,7 +43,9 @@ namespace Root_WIND2
         {
             this.vision = vision;
             this.recipe = recipe;
-            this.sharedBufferInfo = bufferInfo;
+            //this.sharedBufferInfo = bufferInfo;
+
+            this.sharedBufferInfoList.Add(bufferInfo);
         }
 
 
@@ -269,7 +271,7 @@ namespace Root_WIND2
                     }
                 }
 
-                bundle.SetSharedBuffer(this.sharedBufferInfo);
+                bundle.SetSharedBuffer(this.sharedBufferInfoList[0]);
                 this.workplaceBundle = bundle;
                 return bundle;
             }

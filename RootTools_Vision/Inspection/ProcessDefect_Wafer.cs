@@ -89,7 +89,7 @@ namespace RootTools_Vision
                 //        DatabaseManager.Instance.AddDefectData(defect);
                 //    }
                 //}
-                //else
+                //else 
                 //{
                 //    DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
                 //}

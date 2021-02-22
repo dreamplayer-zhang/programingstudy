@@ -94,7 +94,7 @@ namespace Root_WIND2.UI_User
 
         public void Clear()
         {
-            this.ImageViewerVM.ClearOrigin(true);
+            this.ImageViewerVM.ClearObjects(true);
 
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
             originRecipe.Clear();

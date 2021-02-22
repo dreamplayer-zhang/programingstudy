@@ -42,6 +42,13 @@
                             <Button Content="Open" Command="{Binding btnOpen}" Style="{StaticResource imageViewer_toolbar_button}"/>
                             <Button Content="Save" Command="{Binding btnSave}" Style="{StaticResource imageViewer_toolbar_button}"/>
                             <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource imageViewer_toolbar_button}"/>
+
+                            <TextBlock Text="Channel" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <CheckBox Content="Color" IsChecked="{Binding IsColorChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                            <CheckBox Content="R" IsChecked="{Binding IsRChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                            <CheckBox Content="G" IsChecked="{Binding IsGChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                            <CheckBox Content="B" IsChecked="{Binding IsBChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                            
                         </StackPanel>
                         <Grid Grid.Row="1" >
                             <tools:RootViewer/>
@@ -113,6 +120,10 @@
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
+                    <!--<CheckBox Content="Top" Grid.Column="0" IsChecked="{Binding IsTopChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Side" Grid.Column="1" IsChecked="{Binding IsSideChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Bottom" Grid.Column="2" IsChecked="{Binding IsBtmChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>-->
+
                     <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
                                     FontWeight="Bold" FontSize="12"
                                     Content="Top" Grid.Column="0"
