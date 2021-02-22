@@ -29,6 +29,7 @@ using System.Windows.Diagnostics;
 using Root_EFEM.Module;
 using Root_EFEM;
 using static RootTools.Control.Axis;
+using RootTools.GAFs;
 
 namespace Root_CAMELLIA.Module
 {
@@ -144,7 +145,26 @@ namespace Root_CAMELLIA.Module
         DIO_I m_axisYReady;
         DIO_I m_vacuum;
         DIO_O m_vacuumOnOff;
-        public Camera_Basler m_CamVRS;
+        DIO_Os m_doLamp;
+        DIO_Os m_doBuzzer;
+        DIO_I m_diEMS;
+        DIO_I m_diProtectionBar;
+        DIO_I m_diMCReset;
+
+
+        private Camera_Basler m_CamVRS;
+        public Camera_Basler p_CamVRS
+        {
+            get
+            {
+                return m_CamVRS;
+            }
+            set
+            {
+                m_CamVRS = value;
+            }
+        }
+        
 
         #region Light
         public LightSet m_lightSet;
@@ -188,10 +208,18 @@ namespace Root_CAMELLIA.Module
         }
         #endregion
 
+
+
         #endregion
+
+
+     
 
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_diEMS, this, "EMS");
+            p_sInfo = m_toolBox.Get(ref m_diProtectionBar, this, "ProtectionBar");
+            p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
             p_sInfo = m_toolBox.Get(ref m_axisLifter, this, "StageLifter");
@@ -201,6 +229,7 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.Get(ref m_axisYReady, this, "Stage Y Ready");
             p_sInfo = m_toolBox.Get(ref m_vacuum, this, "Vaccum On");
             p_sInfo = m_toolBox.Get(ref m_vacuumOnOff, this, "Vaccum OnOff");
+
         }
         public Module_Camellia(string id, IEngineer engineer)
         {
@@ -220,7 +249,7 @@ namespace Root_CAMELLIA.Module
         {
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_InitCalibration(this), true, "InitCalCentering");
-            AddModuleRunList(new Run_CalibrationWaferCentering(this), true, "Bacground Calibration_Centering");
+            AddModuleRunList(new Run_CalibrationWaferCentering(this), true, "Background Calibration_Centering");
             AddModuleRunList(new Run_Measure(this), true, "Measurement");
         }
 
@@ -445,6 +474,7 @@ namespace Root_CAMELLIA.Module
 
         public string BeforeGet(int nID)
         {
+            m_CamVRS.FunctionConnect();
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;

@@ -117,52 +117,152 @@ namespace Root_CAMELLIA.Data
             r = Math.Sqrt((p0.X - cx) * (p0.X - cx) + (p0.Y - cy) * (p0.Y - cy));
         }
 
+        public bool FindEdgeDone = false;
+        public string ErrorString = "OK";
         public void FindEdge(object obj)
         {
-            ImageData ImgData = ((CenteringParam)obj).img;
+            //ImageData ImgData = ((CenteringParam)obj).img;
             CPoint ptROI = ((CenteringParam)obj).pt;
             eDir dir = ((CenteringParam)obj).dir;
             int nSearchRange = ((CenteringParam)obj).searchRange;
-            int nSearchLength = ((CenteringParam)obj).searchLength;
             int nSearchLevel = ((CenteringParam)obj).searchLevel;
-            Mat matSrc = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
-            Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
-            Mat matInsp = new Mat(ptROI.X, ptROI.Y, DepthType.Cv8U, 3);
+            //Mat matSrc = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
+            //Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
+            //Mat matInsp = new Mat(ptROI.X, ptROI.Y, DepthType.Cv8U, 3);
 
+            
+            ImageData ImgData = new ImageData(2044, 2044, 3);
+            //ImgData.OpenFile(@"C:\Users\cgkim\Desktop\image\test.bmp", new CPoint(0, 0));
+            ImgData.LoadImageSync(@"C:\Users\cgkim\Desktop\image\testbmp.bmp", new CPoint(0, 0));
+
+
+            //for (int i = 0; i < int.MaxValue; i++)
+            //{
+            //    int t = 10;
+            //}
+            Mat matSrc = new Mat(new Size(2044, 2044), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
+            Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
+            Mat matInsp = new Mat();
+            matSrc.CopyTo(matTest);
+            StopWatch stopWatch = new StopWatch();
+
+
+            try
+            {
+                stopWatch.Start();
+                matSrc.CopyTo(matInsp);
+                CvInvoke.CvtColor(matInsp, matInsp, ColorConversion.Bgr2Gray);
+
+                CvInvoke.MedianBlur(matInsp, matInsp, 7);
+
+                Point vector = new Point();
+                Point edge = new Point();
+                var tempList = new List<Point>();
+                PointF startPt = new PointF();
+                switch (dir)
+                {
+                    case eDir.LT:
+                        vector = new Point(0, 1);
+                        tempList = m_ptLT;
+                        //startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y / 2 - (nSearchLength / 2));
+                        //startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
+                        startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
+                        break;
+                    case eDir.RT:
+                        vector = new Point(0, 1);
+                        tempList = m_ptRT;
+                        //startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
+                        startPt = new PointF(0, 0);
+                        break;
+                    case eDir.RB:
+                        vector = new Point(0, -1);
+                        tempList = m_ptRB;
+                        //startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y);
+                        startPt = new PointF(0, ptROI.Y);
+                        break;
+                }
+                tempList.Clear();
+                int cnt = 0;
+                System.Diagnostics.Debug.WriteLine(stopWatch.ElapsedMilliseconds);
+
+                stopWatch.Stop();
+
+                stopWatch.Start();
+                //for (int i = 0; i < ptROI.X - nSearchRange; i += nSearchRange)
+                //{
+                    edge = GetEdgePoint(matInsp, new PointF((float)startPt.X, startPt.Y), vector, nSearchRange, ptROI.Y, nSearchLevel);
+                    if (edge.X == 0 && edge.Y == 0)
+                    {
+                        cnt++;
+                    }
+                    else
+                    {
+                        tempList.Add(edge);
+                    }
+                //}
+       
+                System.Diagnostics.Debug.WriteLine(stopWatch.ElapsedMilliseconds);
+                //? 일정 튀는 값 제거 진행.
+                float removeRange = 0.2f;
+                int Range = (int)(tempList.Count() * removeRange);
+                tempList = tempList.OrderBy(x => x.Y).ToList();
+                tempList.RemoveRange(0, Range);
+
+                tempList = tempList.OrderByDescending(x => x.Y).ToList();
+                tempList.RemoveRange(0, Range);
+
+                if (dir == eDir.RB)
+                {
+                    FindEdgeDone = true;
+                }
+
+                System.Diagnostics.Debug.WriteLine(stopWatch.ElapsedMilliseconds);
+
+                stopWatch.Stop();
+                for (int i = 0; i < tempList.Count; i++)
+                {
+                    CvInvoke.Circle(matTest, tempList[i], 5, new MCvScalar(0, 255, 0));
+                }
+                Emgu.CV.UI.ImageViewer.Show(matTest);
+            }
+            catch(Exception ex)
+            {
+                ErrorString = "Error";
+                //System.Windows.Forms.MessageBox.Show(ex.ToString());
+            }
+        }
+
+        public void FindEdge2(object obj)
+        {
+            //ImageData ImgData = ((CenteringParam)obj).img;
+            CPoint ptROI = ((CenteringParam)obj).pt;
+            eDir dir = ((CenteringParam)obj).dir;
+            int nSearchRange = ((CenteringParam)obj).searchRange;
+            int nSearchLevel = ((CenteringParam)obj).searchLevel;
+            ImageData ImgData = new ImageData(2044,2044,3);
+            //ImgData.OpenFile(@"C:\Users\cgkim\Desktop\image\test.bmp", new CPoint(0, 0));
+            ImgData.LoadImageSync(@"C:\Users\cgkim\Desktop\image\testbmp.bmp", new CPoint(0, 0));
+            for (int i = 0; i < int.MaxValue; i++)
+            {
+                int t = 10;
+            }
+            Mat matSrc = new Mat(new Size(2044, 2044), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
+            Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
+            Mat matInsp = new Mat();
+            int a = (int)Math.Sqrt((2044/2) * (2044 / 2) + (2044 / 2) * (2044 / 2));
+
+            int range = a / nSearchRange;
             matSrc.CopyTo(matInsp);
             CvInvoke.CvtColor(matInsp, matInsp, ColorConversion.Bgr2Gray);
 
             CvInvoke.MedianBlur(matInsp, matInsp, 7);
 
-            Point vector = new Point();
-            Point edge = new Point();
-            var tempList = new List<Point>();
-            PointF startPt = new PointF();
-            switch (dir)
-            {
-                case eDir.LT:
-                    vector = new Point(0, 1);
-                    tempList = m_ptLT;
-                    //startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y / 2 - (nSearchLength / 2));
-                    startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
-                    break;
-                case eDir.RT:
-                    vector = new Point(0, 1);
-                    tempList = m_ptRT;
-                    startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
-                    break;
-                case eDir.RB:
-                    vector = new Point(0, -1);
-                    tempList = m_ptRB;
-                    startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y);
-                    break;
-            }
-            tempList.Clear();
-            for (int i = 0; i < nSearchRange; i++)
-            {
-                edge = GetEdgePoint(matInsp, new PointF(startPt.X + (i * nSearchRange), startPt.Y), vector, nSearchRange, nSearchLength, nSearchLevel);
-                tempList.Add(edge);
-            }
+            Emgu.CV.UI.ImageViewer.Show(matInsp);
+            //byte[] buffer = new byte[a];
+        }
+        public void FindEdgeInit()
+        {
+            ErrorString = "OK";
         }
 
         public void FindEdge(ImageData ImgData, CPoint ptROI, int nSearchRange, int nSearchLength, int nSearchLevel, eDir dir)
@@ -170,8 +270,7 @@ namespace Root_CAMELLIA.Data
 
 
             Mat matSrc = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
-            Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
-            Mat matInsp = new Mat(ptROI.X, ptROI.Y, DepthType.Cv8U, 3);
+            Mat matInsp = new Mat();
 
             matSrc.CopyTo(matInsp);
             CvInvoke.CvtColor(matInsp, matInsp, ColorConversion.Bgr2Gray);
@@ -179,10 +278,10 @@ namespace Root_CAMELLIA.Data
             CvInvoke.MedianBlur(matInsp, matInsp, 7);
 
             Point vector = new Point();
-            Point edge = new Point();
             var tempList = new List<Point>();
             PointF startPt = new PointF();
             switch (dir)
+
             {
                 case eDir.LT:
                     vector = new Point(0, 1);
@@ -201,29 +300,37 @@ namespace Root_CAMELLIA.Data
                     break;
             }
             tempList.Clear();
-            for (int i = 0; i < nSearchRange; i++)
-            {
-                edge = GetEdgePoint(matInsp, new PointF(startPt.X + (i * nSearchRange / 2), startPt.Y), vector, nSearchRange, nSearchLength, nSearchLevel);
+            //for (int i = 0; i < nSearchRange; i++)
+            //{
+                Point edge = GetEdgePoint(matInsp, new PointF(startPt.X , startPt.Y), vector, nSearchRange, nSearchLength, nSearchLevel);
                 tempList.Add(edge);
-            }
+            //}
 
-            for (int i = 0; i < tempList.Count; i++)
-            {
-                CvInvoke.Circle(matTest, tempList[i], 5, new MCvScalar(0, 255, 0));
-            }
+            
+            //for (int i = 0; i < tempList.Count; i++)
+            //{
+            //    CvInvoke.Circle(matTest, tempList[i], 5, new MCvScalar(0, 255, 0));
+            //}
             //Emgu.CV.UI.ImageViewer.Show(matTest);
         }
 
         public Point GetEdgePoint(Mat Image, PointF ptStart, Point vector, int nSearchRange, int nSearchLength, int nSearchLevel)
         {
             Point ptEdge = new Point();
+            StopWatch sw = new StopWatch();
+
+            sw.Start();
             double prox = GetProx(Image, ptStart, vector, nSearchRange, nSearchLength, nSearchLevel);
             if (prox < 10)
             {
                 return ptEdge;
             }
+            System.Diagnostics.Debug.WriteLine("GetProx" + sw.ElapsedMilliseconds);
+            sw.Stop();
+            sw.Start();
             ptEdge = GetEdgePoint(Image, ptStart, vector, prox, nSearchRange, nSearchLength);
-
+            sw.Stop();
+            System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
             return ptEdge;
         }
         unsafe private Point GetEdgePoint(Mat Image, PointF point, PointF vector, double prox, int nSearchRange, int nSearchLength)
@@ -246,8 +353,6 @@ namespace Root_CAMELLIA.Data
             y = (int)(point.Y + 0.5);
             CheckPointRange(Image, ref x, ref y);
 
-
-            //prev /= (byte)nSearchRange;
             prev = pImg[y * Image.Width + x];
 
             SetDirection(vector, out positionX, out positionY, out vectorX, out vectorY);
@@ -312,7 +417,9 @@ namespace Root_CAMELLIA.Data
             double vectorX = 0;
             double vectorY = 0;
 
-
+            byte minValue = Byte.MaxValue;
+            byte maxValue = Byte.MinValue;
+            //Parallel.For(0, nSearchLength, i =>
             for (int i = 0; i < nSearchLength; i++)
             {
                 int LineSum = 0;
@@ -324,17 +431,20 @@ namespace Root_CAMELLIA.Data
                     LineSum += pImg[y * Image.Width + x];
                 }
                 byte LineAvg = (byte)(LineSum / nSearchRange);
-                if (LineAvg < min)
+                if (LineAvg < minValue)
                 {
-                    min = LineAvg;
+                    minValue = LineAvg;
                 }
-                if (LineAvg > max)
+                if (LineAvg > maxValue)
                 {
-                    max = LineAvg;
+                    maxValue = LineAvg;
                 }
                 vectorX += vector.X + nSearchRange;
                 vectorY += vector.Y;
-            }
+            }//);
+
+            min = minValue;
+            max = maxValue;
 
         }
 
@@ -351,16 +461,14 @@ namespace Root_CAMELLIA.Data
         public ImageData img;
         public CPoint pt;
         public int searchRange;
-        public int searchLength;
         public int searchLevel;
         public WaferCentering.eDir dir;
 
-        public CenteringParam(ImageData img, CPoint pt, int searchRange, int searchLength, int searchLevel, WaferCentering.eDir dir)
+        public CenteringParam(ImageData img, CPoint pt, int searchRange, int searchLevel, WaferCentering.eDir dir)
         {
             this.img = img;
             this.pt = pt;
             this.searchRange = searchRange;
-            this.searchLength = searchLength;
             this.searchLevel = searchLevel;
             this.dir = dir;
         }

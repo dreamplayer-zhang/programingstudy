@@ -81,6 +81,23 @@ namespace Root_CAMELLIA.Data
 
             m_ptCenter.X = cx;
             m_ptCenter.Y = cy;
+
+            string sPath = @"C:\Users\ATI\Desktop\CenteringTest\";
+            string sLogFileName = "Centering.txt";
+            string sTimeLog = DateTime.Now.ToString("HH:mm:ss") + ":" + DateTime.Now.Millisecond.ToString("000") + " : Center X =" + ((int)cx).ToString() + ", Center Y = " + ((int)cy).ToString();
+            {
+                string FullPath = sPath;
+                DirectoryInfo di = new DirectoryInfo(FullPath);
+                if (di.Exists == false)
+                {
+                    di.Create();
+                }
+                FullPath += sLogFileName;
+                StreamWriter sw = new StreamWriter(FullPath, true); // append
+
+                sw.WriteLine(sTimeLog);
+                sw.Close();
+            }
         }
 
         void Get3PointCircle(PointF p0, PointF p1, PointF p2, out double cx, out double cy, out double r)
@@ -117,7 +134,9 @@ namespace Root_CAMELLIA.Data
             r = Math.Sqrt((p0.X - cx) * (p0.X - cx) + (p0.Y - cy) * (p0.Y - cy));
         }
 
-        public bool FindEdgeDone = false;
+        public bool FindLTEdgeDone = false;
+        public bool FindRTEdgeDone = false;
+        public bool FindRBEdgeDone = false;
         public string ErrorString = "OK";
         public void FindEdge(object obj)
         {
@@ -129,8 +148,12 @@ namespace Root_CAMELLIA.Data
             Mat matSrc = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
             Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
             Mat matInsp = new Mat(ptROI.X, ptROI.Y, DepthType.Cv8U, 3);
+
+            StopWatch stopWatch = new StopWatch();
+
             try
             {
+                stopWatch.Start();
                 matSrc.CopyTo(matInsp);
                 CvInvoke.CvtColor(matInsp, matInsp, ColorConversion.Bgr2Gray);
 
@@ -145,28 +168,23 @@ namespace Root_CAMELLIA.Data
                     case eDir.LT:
                         vector = new Point(0, 1);
                         tempList = m_ptLT;
-                        //startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y / 2 - (nSearchLength / 2));
-                        //startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
-                        startPt = new PointF(0, 0);
+                        startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
                         break;
                     case eDir.RT:
                         vector = new Point(0, 1);
                         tempList = m_ptRT;
-                        //startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
-                        startPt = new PointF(0, 0);
+                        startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
                         break;
                     case eDir.RB:
                         vector = new Point(0, -1);
                         tempList = m_ptRB;
-                        //startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y);
-                        startPt = new PointF(0, ptROI.Y);
+                        startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y);
                         break;
                 }
                 tempList.Clear();
                 int cnt = 0;
-                for (int i = 0; i < ptROI.X - nSearchRange; i += nSearchRange)
-                {
-                    edge = GetEdgePoint(matInsp, new PointF((float)startPt.X + i, startPt.Y), vector, nSearchRange, ptROI.Y, nSearchLevel);
+
+                    edge = GetEdgePoint(matInsp, new PointF((float)startPt.X, startPt.Y), vector, nSearchRange, ptROI.Y, nSearchLevel);
                     if (edge.X == 0 && edge.Y == 0)
                     {
                         cnt++;
@@ -175,21 +193,49 @@ namespace Root_CAMELLIA.Data
                     {
                         tempList.Add(edge);
                     }
-                }
-                if (dir == eDir.RB)
+
+                string test = "";
+                if (dir == eDir.LT)
                 {
-                    FindEdgeDone = true;
+                    test = "LT";
+                }
+                else if (dir == eDir.RT)
+                {
+                    test = "RT";
+                }
+                else if (dir == eDir.RB)
+                {
+
+                    test = "RB";
+                }
+                if (dir == eDir.LT)
+                {
+                    m_ptLT = tempList;
+                    FindLTEdgeDone = true;
+                }
+                else if (dir == eDir.RT)
+                {
+                    m_ptRT = tempList;
+                    FindRTEdgeDone = true;
+                }
+                else if (dir == eDir.RB)
+                {
+                    m_ptRB = tempList;
+                    FindRBEdgeDone = true;
                 }
 
-                //for (int i = 0; i < tempList.Count; i++)
-                //{
-                //    CvInvoke.Circle(matTest, tempList[i], 5, new MCvScalar(0, 255, 0));
-                //}
-                //Emgu.CV.UI.ImageViewer.Show(matTest);
-            }catch(Exception ex)
+
+
+                stopWatch.Stop();
+                for (int i = 0; i < tempList.Count; i++)
+                {
+                    CvInvoke.Circle(matTest, tempList[i], 20, new MCvScalar(0, 0, 255),4);
+                }
+                matTest.Save(@"C:\Users\ATI\Desktop\CenteringTest\Image\" + DateTime.Now.ToString("yyMMddhhmmssff") + test + ".bmp");
+            }
+            catch(Exception ex)
             {
                 ErrorString = "Error";
-                //System.Windows.Forms.MessageBox.Show(ex.ToString());
             }
         }
 
@@ -203,8 +249,7 @@ namespace Root_CAMELLIA.Data
 
 
             Mat matSrc = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
-            Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
-            Mat matInsp = new Mat(ptROI.X, ptROI.Y, DepthType.Cv8U, 3);
+            Mat matInsp = new Mat();
 
             matSrc.CopyTo(matInsp);
             CvInvoke.CvtColor(matInsp, matInsp, ColorConversion.Bgr2Gray);
@@ -234,12 +279,13 @@ namespace Root_CAMELLIA.Data
                     break;
             }
             tempList.Clear();
-            for (int i = 0; i < nSearchRange; i++)
-            {
-                Point edge = GetEdgePoint(matInsp, new PointF(startPt.X + (i * nSearchRange / 2), startPt.Y), vector, nSearchRange, nSearchLength, nSearchLevel);
+            //for (int i = 0; i < nSearchRange; i++)
+            //{
+                Point edge = GetEdgePoint(matInsp, new PointF(startPt.X , startPt.Y), vector, nSearchRange, nSearchLength, nSearchLevel);
                 tempList.Add(edge);
-            }
+            //}
 
+            
             //for (int i = 0; i < tempList.Count; i++)
             //{
             //    CvInvoke.Circle(matTest, tempList[i], 5, new MCvScalar(0, 255, 0));
@@ -250,13 +296,18 @@ namespace Root_CAMELLIA.Data
         public Point GetEdgePoint(Mat Image, PointF ptStart, Point vector, int nSearchRange, int nSearchLength, int nSearchLevel)
         {
             Point ptEdge = new Point();
+            StopWatch sw = new StopWatch();
+
+            sw.Start();
             double prox = GetProx(Image, ptStart, vector, nSearchRange, nSearchLength, nSearchLevel);
             if (prox < 10)
             {
                 return ptEdge;
             }
+            sw.Stop();
+            sw.Start();
             ptEdge = GetEdgePoint(Image, ptStart, vector, prox, nSearchRange, nSearchLength);
-
+            sw.Stop();
             return ptEdge;
         }
         unsafe private Point GetEdgePoint(Mat Image, PointF point, PointF vector, double prox, int nSearchRange, int nSearchLength)
@@ -279,8 +330,6 @@ namespace Root_CAMELLIA.Data
             y = (int)(point.Y + 0.5);
             CheckPointRange(Image, ref x, ref y);
 
-
-            //prev /= (byte)nSearchRange;
             prev = pImg[y * Image.Width + x];
 
             SetDirection(vector, out positionX, out positionY, out vectorX, out vectorY);
@@ -345,7 +394,9 @@ namespace Root_CAMELLIA.Data
             double vectorX = 0;
             double vectorY = 0;
 
-
+            byte minValue = Byte.MaxValue;
+            byte maxValue = Byte.MinValue;
+            //Parallel.For(0, nSearchLength, i =>
             for (int i = 0; i < nSearchLength; i++)
             {
                 int LineSum = 0;
@@ -357,17 +408,20 @@ namespace Root_CAMELLIA.Data
                     LineSum += pImg[y * Image.Width + x];
                 }
                 byte LineAvg = (byte)(LineSum / nSearchRange);
-                if (LineAvg < min)
+                if (LineAvg < minValue)
                 {
-                    min = LineAvg;
+                    minValue = LineAvg;
                 }
-                if (LineAvg > max)
+                if (LineAvg > maxValue)
                 {
-                    max = LineAvg;
+                    maxValue = LineAvg;
                 }
                 vectorX += vector.X + nSearchRange;
                 vectorY += vector.Y;
-            }
+            }//);
+
+            min = minValue;
+            max = maxValue;
 
         }
 

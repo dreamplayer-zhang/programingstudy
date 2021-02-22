@@ -17,7 +17,7 @@ using System.Windows.Input;
 
 namespace Root_CAMELLIA
 {
-    public class Dlg_Engineer_ViewModel : ObservableObject, IDialogRequestClose
+    public class Dlg_Engineer_ViewModel : RootViewer_ViewModel, IDialogRequestClose
     {
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
 
@@ -233,23 +233,93 @@ namespace Root_CAMELLIA
                 {
                     asdf++;
 
-                    if(asdf > 10 && asdf <= 20)
+                    if (asdf > 10 && asdf <= 20)
                     {
                         tttt = Visibility.Visible;
                     }
-                    else if(asdf > 20)
+                    else if (asdf > 20)
                     {
                         tttt = Visibility.Hidden;
                         asdf = 0;
                     }
-                    
+
                 });
             }
         }
 
+        public ICommand ConnectCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //Thread thread = new Thread(() =>
+                    //{
+                        ModuleCamellia.p_CamVRS.FunctionConnect();
+                   // });
+                    //thread.Start();
+                });
+            }
+        }
+
+        public ICommand GrabCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //Thread thread = new Thread(() =>
+                   // {
+                        ModuleCamellia.p_CamVRS.GrabOneShot();
+                    //});
+                    //thread.Start();
+                });
+            }
+        }
+
+        public ICommand ContinousGrabCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //Thread thread = new Thread(() =>
+                    //{
+                        ModuleCamellia.p_CamVRS.GrabContinuousShot();
+                    //});
+                    //thread.Start();
+                });
+            }
+        }
+
+        public ICommand StopGrabCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //Thread thread = new Thread(() =>
+                    //{
+                        ModuleCamellia.p_CamVRS.GrabStop();
+                    //});
+                    //thread.Start();
+                });
+            }
+        }
         #endregion
 
-        private Module_Camellia ModuleCamellia;    
+        private Module_Camellia moduleCamellia;
+        public Module_Camellia ModuleCamellia
+        {
+            get
+            {
+                return moduleCamellia;
+            }
+            set
+            {
+                SetProperty(ref moduleCamellia, value);
+            }
+        }
         private TabAxis eTabAxis = TabAxis.AxisX;
 
         public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
@@ -261,8 +331,17 @@ namespace Root_CAMELLIA
             AxisY = ModuleCamellia.p_axisXY.p_axisY;
             AxisZ = ModuleCamellia.p_axisZ;
             AxisLifter = ModuleCamellia.p_axisLifter;
+
+            ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
+            p_VisibleMenu = Visibility.Collapsed;
+            p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+            bool _OpenStatus = ModuleCamellia.p_CamVRS.p_CamInfo._OpenStatus;
         }
 
+        private void OnGrabImageUpdate(object sender, EventArgs e)
+        {
+            ModuleCamellia.p_CamVRS.p_ImageViewer.SetImageSource();
+        }
 
 
         #region Motion Command
@@ -276,19 +355,6 @@ namespace Root_CAMELLIA
                     {
                         EnableBtn = false;
                         ModuleCamellia.StateHome();
-                        //m_AxisXY.p_axisX.StartHome();
-                        //m_AxisXY.p_axisY.StartHome();
-                        //m_AxisZ.StartHome();
-                        //m_AxisXY.WaitReady();
-                        //m_AxisZ.WaitReady();
-                        //AxisX.StartHome();
-                        //AxisY.StartHome();
-                        //AxisZ.StartHome();
-                        //AxisLifter.StartHome();
-                        //AxisX.WaitReady();
-                        //AxisY.WaitReady();
-                        //AxisZ.WaitReady();
-                        //AxisLifter.WaitReady();
                         EnableBtn = true;
                     });
                     thread.Start();
@@ -401,8 +467,8 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    SelectedAxis.ServoOn(!AxisX.p_bSeroOn);
-                    SelectedAxis.ServoOn(!AxisY.p_bSeroOn);
+                    SelectedAxis.ServoOn(!AxisX.p_bServoOn);
+                    SelectedAxis.ServoOn(!AxisY.p_bServoOn);
                 });
             }
         }
@@ -541,6 +607,27 @@ namespace Root_CAMELLIA
         }
         #endregion
 
+        //public override void MouseMove(Object sender, System.Windows.Input.MouseEventArgs e)
+        //{
+        //    base.MouseMove(sender, e);
+        //}
+
+        //public override void PreviewMouseDown(object sender, System.Windows.Input.MouseEventArgs e)
+        //{
+        //    base.PreviewMouseDown(sender, e);
+        //}
+
+        //public override void MouseWheel(object sender, MouseWheelEventArgs e)
+        //{
+        //    base.MouseWheel(sender, e);
+
+        //}
+
+        //public override void PreviewMouseUp(object sender, System.Windows.Input.MouseEventArgs e)
+        //{
+        //    base.PreviewMouseUp(sender, e);
+        //}
+
         #region General Command
         public ICommand CmdClose
         {
@@ -566,8 +653,12 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
-            measure.Run();
+            Thread thread = new Thread(() =>
+            {
+                Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+                measure.Run();
+            });
+            thread.Start();
         }
         private void Calibration()
         {
@@ -577,9 +668,14 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Run_CalibrationWaferCentering calibration = (Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("Calibration");
-            calibration.m_useCentering = false;
-            calibration.Run();
+            Thread thread = new Thread(() =>
+            {
+                Run_CalibrationWaferCentering calibration = (Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("CalibrationWaferCentering");
+                calibration.m_useCal = true;
+                calibration.m_useCentering = false;
+                calibration.Run();
+            });
+            thread.Start();
         }
         private void InitCalibration()
         {
@@ -589,8 +685,12 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Run_InitCalibration initCalibration = (Run_InitCalibration)ModuleCamellia.CloneModuleRun("InitCalWaferCentering");
-            initCalibration.Run();
+            Thread thread = new Thread(() =>
+            {
+                Run_InitCalibration initCalibration = (Run_InitCalibration)ModuleCamellia.CloneModuleRun("InitCalWaferCentering");
+                initCalibration.Run();
+            });
+            thread.Start();
         }
         private void Centering()
         {
@@ -600,9 +700,14 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Run_CalibrationWaferCentering centering = (Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("WaferCentering");
-            centering.m_useCal = false;
-            centering.Run();
+            Thread thread = new Thread(() =>
+            {
+                Run_CalibrationWaferCentering centering = (Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("CalibrationWaferCentering");
+                centering.m_useCal = false;
+                centering.m_useCentering = true;
+                centering.Run();
+            });
+            thread.Start();
         }
         private ObservableCollection<WorkPoint> GetWorkPoint(Dictionary<string, double> dic)
         {

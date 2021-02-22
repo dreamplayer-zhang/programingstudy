@@ -14,10 +14,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace Root_CAMELLIA
 {
-    public class Dlg_Engineer_ViewModel : RootViewer_ViewModel, IDialogRequestClose
+    public class Dlg_Engineer_ViewModel : ObservableObject, IDialogRequestClose
     {
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
 
@@ -211,62 +212,143 @@ namespace Root_CAMELLIA
         }
         private Axis _AxisLifter;
 
-        private Visibility _tttt = Visibility.Hidden;
-        public Visibility tttt
-        {
-            get
-            {
-                return _tttt;
-            }
-            set
-            {
-                SetProperty(ref _tttt, value);
-            }
-        }
+        //private Visibility _tttt = Visibility.Hidden;
+        //public Visibility tttt
+        //{
+        //    get
+        //    {
+        //        return _tttt;
+        //    }
+        //    set
+        //    {
+        //        SetProperty(ref _tttt, value);
+        //    }
+        //}
 
-        public int asdf = 0;
-        public ICommand CmdTest
+        //public int asdf = 0;
+        //public ICommand CmdTest
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            asdf++;
+
+        //            if (asdf > 10 && asdf <= 20)
+        //            {
+        //                tttt = Visibility.Visible;
+        //            }
+        //            else if (asdf > 20)
+        //            {
+        //                tttt = Visibility.Hidden;
+        //                asdf = 0;
+        //            }
+
+        //        });
+        //    }
+        //}
+
+        public ICommand ConnectCommand
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-                    asdf++;
 
-                    if(asdf > 10 && asdf <= 20)
-                    {
-                        tttt = Visibility.Visible;
-                    }
-                    else if(asdf > 20)
-                    {
-                        tttt = Visibility.Hidden;
-                        asdf = 0;
-                    }
-                    
+                    ModuleCamellia.p_CamVRS.FunctionConnect();
+
                 });
             }
         }
 
+        public ICommand GrabCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+
+                    ModuleCamellia.p_CamVRS.GrabOneShot();
+
+                });
+            }
+        }
+
+        public ICommand ContinousGrabCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+
+                    ModuleCamellia.p_CamVRS.GrabContinuousShot();
+
+                });
+            }
+        }
+
+        public ICommand StopGrabCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+
+                    ModuleCamellia.p_CamVRS.GrabStop();
+
+                });
+            }
+        }
         #endregion
 
-        private Module_Camellia ModuleCamellia;    
+        private Module_Camellia moduleCamellia;
+        public Module_Camellia ModuleCamellia
+        {
+            get
+            {
+                return moduleCamellia;
+            }
+            set
+            {
+                SetProperty(ref moduleCamellia, value);
+            }
+        }
         private TabAxis eTabAxis = TabAxis.AxisX;
+
+        private RootViewer_ViewModel m_rootViewer = new RootViewer_ViewModel();
+        public RootViewer_ViewModel p_rootViewer
+        {
+            get => this.m_rootViewer;
+        }
+
+        Dispatcher dispatcher = null;
 
         public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
         {
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
-            //m_AxisXY = ModuleCamellia.m_axisXY;
-            //m_AxisZ = ModuleCamellia.m_axisZ;
+
             AxisX = ModuleCamellia.p_axisXY.p_axisX;
             AxisY = ModuleCamellia.p_axisXY.p_axisY;
             AxisZ = ModuleCamellia.p_axisZ;
             AxisLifter = ModuleCamellia.p_axisLifter;
 
-            p_VisibleMenu = Visibility.Hidden;
-            p_ImageData = ModuleCamellia.m_CamVRS.p_ImageViewer.p_ImageData;
-            SetImageSource();
+            ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
+
+            p_rootViewer.p_VisibleMenu = Visibility.Collapsed;
+
+            p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+
+            dispatcher = Application.Current.Dispatcher;
         }
 
+        private void OnGrabImageUpdate(object sender, EventArgs e)
+        {
+            dispatcher.Invoke(() =>
+            {
+                p_rootViewer.SetImageSource();
+            });
+
+        }
 
 
         #region Motion Command
@@ -532,13 +614,7 @@ namespace Root_CAMELLIA
         }
         #endregion
 
-        //public void OnMouseEnter(Object sender, System.Windows.Input.MouseEventArgs e)
-        //{
-        //    //if (MouseState == MouseButtonState.Pressed)
-        //    //    MouseState = MouseEvent.LeftButton;
-        //    var viewer = (Grid)sender;
-        //    viewer.Focus();
-        //}
+
         #region General Command
         public ICommand CmdClose
         {

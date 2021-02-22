@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:viewConverter="clr-namespace:ViewConverter;assembly=RootTools"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
@@ -23,9 +24,13 @@
         <local:AxisStateToEnableConverter x:Key="AxisStateToEnable" />
         <local:AxisStateToOpacityConverter x:Key="AxisStateToOpacity" />
         <local:AxisStateToLoadingOpacityConverter x:Key="AxisStateToLoadingOpacity" />
-        <local:AxisToMotionUIConverter x:Key="AxisToMotionUI"/>
+        <local:AxisXToMotionUIConverter x:Key="AxisXToMotionUI"/>
+        <local:AxisYToMotionUIConverter x:Key="AxisYToMotionUI"/>
+        <local:AxisZToMotionUIConverter x:Key="AxisZToMotionUI"/>
+        <local:AxisLifterToMotionUIConverter x:Key="AxisLifterToMotionUI"/>
+        <viewConverter:ConnectStringToBoolConverter x:Key="ConnectStringToBoolConverters" />
     </Window.Resources>
-    <Grid Margin="5">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="690" />
@@ -77,6 +82,7 @@
         </Grid>
         <TabControl Grid.Row="1">
             <TabItem Header="Manual"
+                     Margin="-1,0,0,0"
                      Width="100">
                 <Grid>
                     <ScrollViewer Grid.Row="2"
@@ -95,7 +101,7 @@
                                     <Button FontWeight="Bold"
                                             Content="Test"
                                             Width="100"
-                                            Margin="5,5" />
+                                            Margin="5,5" Command="{Binding CmdTest}" />
                                 </StackPanel>
                             </Grid>
                             <Grid Height="610">
@@ -403,11 +409,18 @@
                                                     <Grid Grid.Row="3"
                                                           Margin="0,0"
                                                           VerticalAlignment="Stretch">
-                                                        <TextBlock Text="{Binding SelectedAxis.p_posActual}"
+                                                        <ContentControl>
+                                                            <TextBlock Text="{Binding SelectedAxis.p_posActual}"
                                                                    FontSize="35"
                                                                    FontWeight="Bold"
                                                                    Margin="10,5"
                                                                    VerticalAlignment="Bottom" />
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="MouseDoubleClick">
+                                                                    <i:InvokeCommandAction Command="{Binding CmdCopyCurrentPos}" />
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                        </ContentControl>
                                                     </Grid>
                                                     <Grid Grid.Row="4"
                                                           Margin="0">
@@ -520,10 +533,11 @@
                                                                     Width="10000" Height="10000">
                                                                 <Border Width="3000"
                                                                         Height="3000"
-                                                                        Canvas.Left="{Binding AxisX, Converter={StaticResource AxisToMotionUI}}"
-                                                                        Canvas.Top="{Binding AxisY, Converter={StaticResource AxisToMotionUI}}"
+                                                                        Canvas.Left="{Binding AxisX.p_posActual, Converter={StaticResource AxisXToMotionUI}}"
+                                                                        Canvas.Top="{Binding AxisY.p_posActual, Converter={StaticResource AxisYToMotionUI}}"
                                                                         Background="Gray"
                                                                         Margin="5">
+                                                                    
                                                                     <Grid>
                                                                         <Ellipse Width="2800"
                                                                                  Height="2800"
@@ -544,7 +558,7 @@
                                                                     Width="2000" Height="10000">
                                                                 <Border Width="2000"
                                                                         Height="500"
-                                                                        Canvas.Top="{Binding AxisZ, Converter={StaticResource AxisToMotionUI}}"
+                                                                        Canvas.Top="{Binding AxisZ.p_posActual, Converter={StaticResource AxisZToMotionUI}}"
                                                                         Background="Gray"
                                                                         Margin="5" />
                                                             </Canvas>
@@ -558,7 +572,7 @@
                                                                     Height="10000">
                                                                 <Border Width="2000"
                                                                         Height="500"
-                                                                        Canvas.Top="9500"
+                                                                        Canvas.Top="{Binding AxisLifter.p_posActual, Converter={StaticResource AxisLifterToMotionUI}}"
                                                                         Background="Gray"
                                                                         Margin="5" />
                                                             </Canvas>
@@ -572,7 +586,6 @@
                                                                     Height="10000">
                                                                 <Border Width="2000"
                                                                         Height="500"
-                                                                        Canvas.Top="9500"
                                                                         Background="Gray"
                                                                         Margin="5" />
                                                             </Canvas>
@@ -582,118 +595,123 @@
                                                 </Grid>
                                                 <Grid Grid.Column="1">
                                                     <!--<local:LoadingControl Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToLoadingOpacityConverter}}" />-->
-                                                    <local:LoadingControl Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToLoadingOpacity}}" />
+                                                    <local:LoadingControl Opacity="{Binding SelectedAxis, Converter={StaticResource AxisStateToLoadingOpacity}}" />
                                                 </Grid>
                                             </Grid>
                                             <Grid Grid.Row="1"
                                                   Margin="5">
-                                                <TabControl SelectedIndex="{Binding MotionTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                                    <TabItem Width="0" />
-                                                    <TabItem Header="X"
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="1*"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TabControl SelectedIndex="{Binding MotionTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                        <TabItem Width="0"/>
+                                                        <TabItem Header="X"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
-                                                        <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
+                                                            <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
                                                                   SelectedIndex="{Binding SelectedWorkPointIndex}"
                                                                   SelectionMode="Single"
                                                                   CanUserSortColumns="False"
                                                                   AutoGenerateColumns="False"
                                                                   CanUserAddRows="False">
-                                                            <i:Interaction.Triggers>
-                                                                <i:EventTrigger EventName="CellEditEnding">
-                                                                    <i:CallMethodAction TargetObject="{Binding}"
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="CellEditEnding">
+                                                                        <i:CallMethodAction TargetObject="{Binding}"
                                                                                         MethodName="DataGrid_CellEditEnding" />
-                                                                </i:EventTrigger>
-                                                            </i:Interaction.Triggers>
-                                                            <DataGrid.Columns>
-                                                                <DataGridTextColumn Header="  Name"
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                                <DataGrid.Columns>
+                                                                    <DataGridTextColumn Header="  Name"
                                                                                     Width="*"
                                                                                     IsReadOnly="True"
                                                                                     Binding="{Binding Name}" />
-                                                                <DataGridTextColumn Header="  Value"
+                                                                    <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
-                                                            </DataGrid.Columns>
-                                                        </DataGrid>
-                                                    </TabItem>
-                                                    <TabItem Header="Y"
+                                                                </DataGrid.Columns>
+                                                            </DataGrid>
+                                                        </TabItem>
+                                                        <TabItem Header="Y"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
-                                                        <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
+                                                            <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
                                                                   SelectedIndex="{Binding SelectedWorkPointIndex}"
                                                                   SelectionMode="Single"
                                                                   CanUserSortColumns="False"
                                                                   AutoGenerateColumns="False"
                                                                   CanUserAddRows="False">
-                                                            <i:Interaction.Triggers>
-                                                                <i:EventTrigger EventName="CellEditEnding">
-                                                                    <i:CallMethodAction TargetObject="{Binding}"
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="CellEditEnding">
+                                                                        <i:CallMethodAction TargetObject="{Binding}"
                                                                                         MethodName="DataGrid_CellEditEnding" />
-                                                                </i:EventTrigger>
-                                                            </i:Interaction.Triggers>
-                                                            <DataGrid.Columns>
-                                                                <DataGridTextColumn Header="  Name"
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                                <DataGrid.Columns>
+                                                                    <DataGridTextColumn Header="  Name"
                                                                                     Width="*"
                                                                                     IsReadOnly="True"
                                                                                     Binding="{Binding Name}" />
-                                                                <DataGridTextColumn Header="  Value"
+                                                                    <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
-                                                            </DataGrid.Columns>
-                                                        </DataGrid>
-                                                    </TabItem>
-                                                    <TabItem Header="Z"
+                                                                </DataGrid.Columns>
+                                                            </DataGrid>
+                                                        </TabItem>
+                                                        <TabItem Header="Z"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
-                                                        <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
+                                                            <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
                                                                   SelectedIndex="{Binding SelectedWorkPointIndex}"
                                                                   SelectionMode="Single"
                                                                   CanUserSortColumns="False"
                                                                   AutoGenerateColumns="False"
                                                                   CanUserAddRows="False">
-                                                            <i:Interaction.Triggers>
-                                                                <i:EventTrigger EventName="CellEditEnding">
-                                                                    <i:CallMethodAction TargetObject="{Binding}"
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="CellEditEnding">
+                                                                        <i:CallMethodAction TargetObject="{Binding}"
                                                                                         MethodName="DataGrid_CellEditEnding" />
-                                                                </i:EventTrigger>
-                                                            </i:Interaction.Triggers>
-                                                            <DataGrid.Columns>
-                                                                <DataGridTextColumn Header="  Name"
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                                <DataGrid.Columns>
+                                                                    <DataGridTextColumn Header="  Name"
                                                                                     Width="*"
                                                                                     IsReadOnly="True"
                                                                                     Binding="{Binding Name}" />
-                                                                <DataGridTextColumn Header="  Value"
+                                                                    <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
-                                                            </DataGrid.Columns>
-                                                        </DataGrid>
-                                                    </TabItem>
-                                                    <TabItem Header="Lifter"
+                                                                </DataGrid.Columns>
+                                                            </DataGrid>
+                                                        </TabItem>
+                                                        <TabItem Header="Lifter"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
-                                                        <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
+                                                            <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
                                                                   SelectedIndex="{Binding SelectedWorkPointIndex}"
                                                                   SelectionMode="Single"
                                                                   CanUserSortColumns="False"
                                                                   AutoGenerateColumns="False"
                                                                   CanUserAddRows="False">
-                                                            <i:Interaction.Triggers>
-                                                                <i:EventTrigger EventName="CellEditEnding">
-                                                                    <i:CallMethodAction TargetObject="{Binding}"
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="CellEditEnding">
+                                                                        <i:CallMethodAction TargetObject="{Binding}"
                                                                                         MethodName="DataGrid_CellEditEnding" />
-                                                                </i:EventTrigger>
-                                                            </i:Interaction.Triggers>
-                                                            <DataGrid.Columns>
-                                                                <DataGridTextColumn Header="  Name"
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                                <DataGrid.Columns>
+                                                                    <DataGridTextColumn Header="  Name"
                                                                                     Width="*"
                                                                                     IsReadOnly="True"
                                                                                     Binding="{Binding Name}" />
-                                                                <DataGridTextColumn Header="  Value"
+                                                                    <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
-                                                            </DataGrid.Columns>
-                                                        </DataGrid>
-                                                    </TabItem>
-                                                    <TabItem Header="Stage Z"
+                                                                </DataGrid.Columns>
+                                                            </DataGrid>
+                                                        </TabItem>
+                                                        <!--<TabItem Header="Stage Z"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
                                                         <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
@@ -770,8 +788,32 @@
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
                                                             </DataGrid.Columns>
                                                         </DataGrid>
-                                                    </TabItem>
-                                                </TabControl>
+                                                    </TabItem>-->
+                                                    </TabControl>
+                                                    <Grid Grid.Column="1">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="0.079*"/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <UniformGrid Columns="4">
+                                                            <Button Command="{Binding ConnectCommand}"
+                                                                Content="{Binding ModuleCamellia.p_CamVRS.p_CamInfo._OpenStatus, Converter= {StaticResource ConnectStringToBoolConverters}}">
+                                                            </Button>
+                                                            <Button Content="Grab" Command="{Binding GrabCommand}"
+                                                                    IsEnabled="{Binding ModuleCamellia.p_CamVRS.p_CamInfo._IsCanGrab}">
+                                                            </Button>
+                                                            <Button Content="Live" Command="{Binding ContinousGrabCommand}"
+                                                                    IsEnabled="{Binding ModuleCamellia.p_CamVRS.p_CamInfo._IsCanGrab}">
+                                                            </Button>
+                                                            <Button Content="Stop" Command="{Binding StopGrabCommand}">
+
+                                                            </Button>
+                                                        </UniformGrid>
+                                                        <Border Grid.Row="1">
+                                                            <tools:RootViewer></tools:RootViewer>
+                                                        </Border>
+                                                    </Grid>
+                                                </Grid>
                                             </Grid>
                                         </Grid>
                                     </GroupBox>
@@ -800,7 +842,7 @@
                                             Grid.Row="2"
                                             Margin="15,20"
                                             Content="Stop"
-                                            Command="{Binding CmdStop}" />
+                                            Command="{Binding CmdSeqStop}" />
                                     <Button Style="{StaticResource SetupPanelBtn}"
                                             Grid.Row="3"
                                             Margin="15,20"
@@ -823,7 +865,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Handler"
-                     Width="100">
+                     Width="100" Visibility="{Binding tttt, UpdateSourceTrigger=PropertyChanged}">
                 <Grid>
                     <local:Camellia_Hander_UI x:Name="HandlerUI" />
                 </Grid>
@@ -835,6 +877,7 @@
         </TabControl>
         <GridSplitter Grid.Row="2" 
                       Height="2"
+                      Margin="0,5"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
                       Background="{StaticResource Splitter}"
