@@ -51,9 +51,9 @@ namespace RootTools_Vision
 			int[] arrDiff;// = new int[roiWidth];
 
 			// raw data 저장
-			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			string folderPath = @"D:\EBRRawData\" + sInspectionID.ToString() + "\\";
-			sw = new StreamWriter(folderPath + this.currentWorkplace.Index.ToString() + ".csv");
+			//string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			//string folderPath = @"D:\EBRRawData\" + sInspectionID.ToString() + "\\";
+			//sw = new StreamWriter(folderPath + this.currentWorkplace.Index.ToString() + ".csv");
 
 			arrDiff = GetDiffArr(ptrMem, roiLeft, roiTop, roiWidth, roiHeight);
 			FindEdge(arrDiff);
@@ -109,11 +109,11 @@ namespace RootTools_Vision
 				arrDiff[x] = arrEqual[x + xRange] - arrEqual[x - xRange];
 			}
 
-			for (int i = 0;  i < arrDiff.Length; i++)
-            {
-				sw.WriteLine(arrAvg[i] + "," + arrEqual[i] + "," + arrDiff[i]);
-            }
-			sw.Close();
+			//for (int i = 0;  i < arrDiff.Length; i++)
+   //         {
+			//	sw.WriteLine(arrAvg[i] + "," + arrEqual[i] + "," + arrDiff[i]);
+   //         }
+			//sw.Close();
 
 			return arrDiff;
 		}

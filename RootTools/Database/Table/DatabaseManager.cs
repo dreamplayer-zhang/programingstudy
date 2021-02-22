@@ -408,7 +408,7 @@ namespace RootTools.Database
 #endif
 		}
 
-		public void AddMeasurementDataList(List<Measurement> _defectlist)
+		public void AddMeasurementDataList(List<Measurement> _measurelist)
 		{
 #if !DEBUG
 			try
@@ -420,17 +420,17 @@ namespace RootTools.Database
 			StringBuilder sbColumList = new StringBuilder();
 			StringBuilder sValueList = new StringBuilder();
 			List<string> sbValueList = new List<string>();
-			Type type = typeof(Defect);
+			Type type = typeof(Measurement);
 			FieldInfo[] fld = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
 
-			for (int defectListNum = 0; defectListNum < _defectlist.Count; defectListNum++)
+			for (int measureListNum = 0; measureListNum < _measurelist.Count; measureListNum++)
 			{
 				temp.Clear();
 				sbColumList.Clear();
 				for (int i = 0; i < fld.Length; i++)
 				{
 					var f = fld[i];
-					object obj = f.GetValue(_defectlist[defectListNum]);
+					object obj = f.GetValue(_measurelist[measureListNum]);
 					sbColumList.Append(f.Name);
 					if (i == 0)
 						temp.Append("(");
@@ -448,7 +448,7 @@ namespace RootTools.Database
 				sbValueList.Add(temp.ToString());
 			}
 
-			sbQuery.AppendFormat("INSERT INTO defect({0}) values", sbColumList.ToString());
+			sbQuery.AppendFormat("INSERT INTO measurement({0}) values", sbColumList.ToString());
 			for (int i = 0; i < sbValueList.Count; i++)
 			{
 				sbQuery.Append(sbValueList[i]);
