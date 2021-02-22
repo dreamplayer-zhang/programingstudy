@@ -24,10 +24,10 @@ namespace RootTools_Vision
 			return true;
 		}
 
-		public void DoProcessMeasurement()
-		{
-			if (this.currentWorkplace.Index != 0)
-				return;
+        public void DoProcessMeasurement()
+        {
+            if (this.currentWorkplace.Index != 0)
+                return;
 
             List<Measurement> measureList = new List<Measurement>();
 
@@ -37,17 +37,18 @@ namespace RootTools_Vision
 
             // TO DO 이거 측정마다 다를건데 어떻게 할거임
             int measureItem = Enum.GetValues(typeof(EBRMeasurement.EBRMeasureItem)).Length;
-            for (int i = 0; i < measureList.Count; i += measureItem)
+
+            for (int i = 0, index = 0; i < measureList.Count; i += measureItem, index++)
                 for (int j = 0; j < measureItem; j++)
-                    measureList[i+j].SetMeasureIndex(i);
+                    measureList[i + j].SetMeasureIndex(index);
 
-			string sMeasurementImagePath = @"D:\MeasurementImage";
-			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			SaveMeasurementImage(Path.Combine(sMeasurementImagePath, sInspectionID), measureList, this.currentWorkplace.SharedBufferByteCnt);
-			DatabaseManager.Instance.AddMeasurementDataList(measureList);
+            string sMeasurementImagePath = @"D:\MeasurementImage";
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+            SaveMeasurementImage(Path.Combine(sMeasurementImagePath, sInspectionID), measureList, this.currentWorkplace.SharedBufferByteCnt);
+            DatabaseManager.Instance.AddMeasurementDataList(measureList);
 
-			WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
-		}
+            WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
+        }
 
 		private void SaveMeasurementImage(String path, List<Measurement> measureList, int byteCnt)
 		{
@@ -66,8 +67,8 @@ namespace RootTools_Vision
                 for (int i = 0; i < measureList.Count; i++)
                 {
                     Cpp_Rect rect = new Cpp_Rect();
-					rect.x = (int)measureList[i].m_rtDefectBox.Left;
-					rect.y = (int)measureList[i].m_rtDefectBox.Top;
+					rect.x = (int)measureList[i].p_rtDefectBox.Left;
+					rect.y = (int)measureList[i].p_rtDefectBox.Top;
 					rect.w = (int)measureList[i].m_fWidth;
 					rect.h = (int)measureList[i].m_fHeight;
 

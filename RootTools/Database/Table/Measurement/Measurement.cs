@@ -29,7 +29,8 @@ namespace RootTools.Database
         public int m_nChipIndexX; // Chip Index
         public int m_nCHipIndexY;
 
-        public Rect m_rtDefectBox;
+        protected Rect m_rtDefectBox;
+        public Rect p_rtDefectBox { get => m_rtDefectBox; set => m_rtDefectBox = value; }
 
         public enum MeasureType
 		{
