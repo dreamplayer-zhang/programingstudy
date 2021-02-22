@@ -68,7 +68,12 @@ namespace RootTools.Comm
             set
             {
                 _eComm = value;
-                m_reg.Write("p_eComm", (int)p_eComm);
+                m_reg.Write("p_eComm", (int)value);
+                switch (value)
+                {
+                    case eComm.RS232: m_client.IPAddress = null; break;
+                    case eComm.TCPIP: m_client.SerialPort = null; break; 
+                }
             }
         }
         Registry m_reg;
