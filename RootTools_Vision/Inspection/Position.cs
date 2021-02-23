@@ -345,7 +345,8 @@ namespace RootTools_Vision
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                TempLogger.Write("Position", ex);
+                //MessageBox.Show(ex.Message);
             }
 
             return true;
@@ -510,7 +511,8 @@ namespace RootTools_Vision
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                TempLogger.Write("Position", ex);
+                //MessageBox.Show(ex.Message);
             }
 
             return true;

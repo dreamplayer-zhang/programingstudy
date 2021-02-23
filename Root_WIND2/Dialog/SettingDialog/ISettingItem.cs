@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    public interface ISettingData
+    public interface ISettingItem
     {
         void Save();
-        void Load(object obj);
+        void Load();
     }
 }

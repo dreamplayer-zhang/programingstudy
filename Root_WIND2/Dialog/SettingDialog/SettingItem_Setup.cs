@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    class SettingData_Setup : SettingData
+    class SettingItem_Setup : SettingItem
     {
         public enum TestEnum
         {
@@ -27,7 +27,8 @@ namespace Root_WIND2
                 this.test = value;
             }
         }
-        public SettingData_Setup(string[] _treeViewPath) : base(_treeViewPath)
+
+        public SettingItem_Setup(string[] _treeViewPath) : base(_treeViewPath)
         {
             
         }

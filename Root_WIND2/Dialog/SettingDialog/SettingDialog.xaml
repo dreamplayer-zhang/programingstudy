@@ -240,7 +240,8 @@
             <Border Grid.Column="0"
                 Grid.Row="1"
                 Margin="4"
-                BorderThickness="1"
+                SnapsToDevicePixels="True"
+                BorderThickness="0.5"
                 BorderBrush="Black">
                 <TreeView x:Name="MenuTreeView" ItemsSource="{Binding MenuItems}">
                     <TreeView.ItemTemplate>
@@ -276,7 +277,6 @@
                     HorizontalAlignment="Right">
                 <Button Width="100" Content="확인" Margin="4" Command="{Binding btnOKCommand}"/>
                 <Button Width="100" Content="취소" Margin="4" Command="{Binding btnCancelCommand}"/>
-
             </StackPanel>
         </Grid>
     </Grid>

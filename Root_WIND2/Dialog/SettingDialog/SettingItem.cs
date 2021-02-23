@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    public abstract class SettingData : ISettingData
+    public abstract class SettingItem : ISettingItem
     {
         #region Ini
         [DllImport("kernel32")]
@@ -16,37 +16,37 @@ namespace Root_WIND2
         [DllImport("kernel32")]
         public static extern int WritePrivateProfileString(string section, string key, string val, string filePath);
         #endregion
-        public SettingData(string[] _treeViewPath)
+        public SettingItem(string[] _treePath)
         {
-            treeViewPath = _treeViewPath;
+            treePath = _treePath;
         }
 
-        protected readonly string[] treeViewPath;
-        public string[] GetTreeViewPath()
+        protected readonly string[] treePath;
+        public string[] GetTreePath()
         {
-            return this.treeViewPath;
+            return this.treePath;
         }
 
-        public void Load(object type)
+        public void Load()
         {
-            Type types = type.GetType();
+            Type types = GetType();
             string sectionName = "";
-            for (int i = 0; i < treeViewPath.Length; i++)
+            for (int i = 0; i < treePath.Length; i++)
             {
-                if (i == treeViewPath.Length - 1)
+                if (i == treePath.Length - 1)
                 {
-                    sectionName += treeViewPath[i];
+                    sectionName += treePath[i];
                     break;
                 }
-                sectionName += treeViewPath[i] + ".";
+                sectionName += treePath[i] + ".";
             }
 
             for (int j = 0; j < types.GetProperties().Length; j++)
             {
                 PropertyInfo propertyInfo = types.GetProperty(types.GetProperties()[j].Name);
-                object asf = propertyInfo.GetValue(type);
+                object asf = propertyInfo.GetValue(this);
                 StringBuilder temp = new StringBuilder(255);
-                GetPrivateProfileString(sectionName, propertyInfo.Name, asf.ToString(), temp, 255, @"D:\\test.ini");
+                GetPrivateProfileString(sectionName, propertyInfo.Name, asf.ToString(), temp, 255, Constants.FilePath.SettingFilePath);
                 Type propType = propertyInfo.PropertyType;
 
                 string tempVal = temp.ToString();
@@ -76,7 +76,7 @@ namespace Root_WIND2
                 {
                     val = Enum.Parse(propType, tempVal);
                 }
-                propertyInfo.SetValue(type, val);
+                propertyInfo.SetValue(this, val);
             }
         }
 
@@ -84,29 +84,28 @@ namespace Root_WIND2
         {
             Type types = this.GetType();
             string sectionName = "";
-            for (int i = 0; i < treeViewPath.Length; i++)
+            for (int i = 0; i < treePath.Length; i++)
             {
-                if(i == treeViewPath.Length - 1)
+                if(i == treePath.Length - 1)
                 {
-                    sectionName += treeViewPath[i];
+                    sectionName += treePath[i];
                     break;
                 }
-                sectionName += treeViewPath[i] + ".";
+                sectionName += treePath[i] + ".";
             }
 
-            { 
-                for(int j = 0; j < types.GetProperties().Length; j++)
-                {
-                    PropertyInfo propertyInfo = types.GetProperty(types.GetProperties()[j].Name);
-                    object val = propertyInfo.GetValue(this);
-                    Type type = propertyInfo.PropertyType;
-                    if (type.IsEnum){
-                        val = (int)val;
-                    }
-                    WritePrivateProfileString(sectionName, propertyInfo.Name, val.ToString(), @"D:\\test.ini");
+
+            for(int j = 0; j < types.GetProperties().Length; j++)
+            {
+                PropertyInfo propertyInfo = types.GetProperty(types.GetProperties()[j].Name);
+                object val = propertyInfo.GetValue(this);
+                Type type = propertyInfo.PropertyType;
+                if (type.IsEnum){
+                    val = (int)val;
                 }
+
+                WritePrivateProfileString(sectionName, propertyInfo.Name, val.ToString(), Constants.FilePath.SettingFilePath);
             }
         }
-
     }
 }

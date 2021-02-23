@@ -17,6 +17,8 @@ namespace Root
         //public ReadExcel m_readExcel;
         //public RemoteModule m_remote;
         //public RemoteModule m_server;
+        public TestServer m_tcpServer;
+        public TestClient m_tcpClient;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -30,6 +32,10 @@ namespace Root
             //InitModule(m_server);
             //m_remote = new RemoteModule("Remote", m_engineer, ModuleBase.eRemote.Client);
             //InitModule(m_remote);
+            m_tcpServer = new TestServer("TestServer", m_engineer);
+            InitModule(m_tcpServer);
+            m_tcpClient = new TestClient("TestClient", m_engineer);
+            InitModule(m_tcpClient);
         }
 
         void InitModule(ModuleBase module)

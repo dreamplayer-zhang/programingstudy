@@ -548,7 +548,7 @@ namespace RootTools.Memory
             while (_bRecieve)
             {
                 Thread.Sleep(5);
-                if (watch.ElapsedMilliseconds > 5000)
+                if (watch.ElapsedMilliseconds > 100)
                     return m_abuf;
             }
             _bRecieve = false;

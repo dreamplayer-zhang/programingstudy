@@ -89,10 +89,10 @@ namespace Root_WIND2.Module
 				double triggerStart = startDegree * pulsePerDegree;
 				double triggerDest = triggerStart + (scanDegree * pulsePerDegree);
 
-                double moveStart = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed*4;   //y 축 이동 시작 지점 
-                double moveEnd = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;  // Y 축 이동 끝 지점.
-                //double moveEnd = triggerStart - scanAcc * scanSpeed * 4;   //y 축 이동 시작 지점 
-                //double moveStart = triggerDest + scanAcc * scanSpeed * 4;  // Y 축 이동 끝 지점.
+                //double moveStart = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed*4;   //y 축 이동 시작 지점 
+                //double moveEnd = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;  // Y 축 이동 끝 지점.
+                double moveEnd = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;   //y 축 이동 시작 지점 
+                double moveStart = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed * 4;  // Y 축 이동 끝 지점.
                 int grabCount = Convert.ToInt32(scanDegree * pulsePerDegree * gmEBR.m_dCamTriggerRatio);
 
 				if (module.Run(axisR.StartMove(moveStart)))
@@ -100,7 +100,7 @@ namespace Root_WIND2.Module
 				if (module.Run(axisR.WaitReady()))
 					return p_sInfo;
 
-				axisR.SetTrigger(triggerStart, triggerDest, trigger, 5,true);
+				axisR.SetTrigger(triggerStart, triggerDest, trigger, 10,true);
 				gmEBR.StartGrab(gmEBR.m_memoryData, new CPoint(0, 0), grabCount, gmEBR.m_GD);
                 gmEBR.Grabed += GmEBR_Grabed; ;
 

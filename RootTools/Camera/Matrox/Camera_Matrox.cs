@@ -71,6 +71,11 @@ namespace RootTools.Camera.Matrox
         Log m_log;
 
         public string p_id { get; set; }
+        public bool bStopThread
+        {
+            get;
+            set;
+        }
 
         int m_nGrabProgress = 0;
         public int p_nGrabProgress
@@ -488,7 +493,7 @@ namespace RootTools.Camera.Matrox
                 if (iBlock < m_nGrabTrigger)
                 {   
                     MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarray);
-                    Parallel.For(0, p_nHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
+                    Parallel.For(0, p_nHeight, (y) =>
                     {
                         int yp = y + (iBlock) * p_nHeight;
                         fixed (byte* p = srcarray)
