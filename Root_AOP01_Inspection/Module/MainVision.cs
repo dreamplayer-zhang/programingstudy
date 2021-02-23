@@ -1037,25 +1037,25 @@ namespace Root_AOP01_Inspection.Module
 
 
             var pell = new Run_SurfaceInspection(this, App.PellRecipeRegName, App.PellInspMgRegName);
-            main.m_sModuleRun = App.PellicleModuleName;
-            AddModuleRunList(main, true, "Run " + App.PellicleModuleName);
+            pell.m_sModuleRun = App.PellicleModuleName;
+            AddModuleRunList(pell, true, "Run " + App.PellicleModuleName);
 
 
             var left = new Run_SurfaceInspection(this, App.SideRecipeRegName, App.SideLeftInspMgRegName);
-            main.m_sModuleRun = App.SideLeftModuleName;
-            AddModuleRunList(main, true, "Run " + App.SideLeftModuleName);
+            left.m_sModuleRun = App.SideLeftModuleName;
+            AddModuleRunList(left, true, "Run " + App.SideLeftModuleName);
 
             var top = new Run_SurfaceInspection(this, App.SideRecipeRegName, App.SideTopInspMgRegName);
-            main.m_sModuleRun = App.SideTopModuleName;
-            AddModuleRunList(main, true, "Run " + App.SideTopModuleName);
+            top.m_sModuleRun = App.SideTopModuleName;
+            AddModuleRunList(top, true, "Run " + App.SideTopModuleName);
 
             var right = new Run_SurfaceInspection(this, App.SideRecipeRegName, App.SideRightInspMgRegName);
-            main.m_sModuleRun = App.SideRightModuleName;
-            AddModuleRunList(main, true, "Run " + App.SideRightModuleName);
+            right.m_sModuleRun = App.SideRightModuleName;
+            AddModuleRunList(right, true, "Run " + App.SideRightModuleName);
 
             var bottom = new Run_SurfaceInspection(this, App.SideRecipeRegName, App.SideBotInspMgRegName);
-            main.m_sModuleRun = App.SideBotModuleName;
-            AddModuleRunList(main, true, "Run " + App.SideBotModuleName);
+            bottom.m_sModuleRun = App.SideBotModuleName;
+            AddModuleRunList(bottom, true, "Run " + App.SideBotModuleName);
 
 
             AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
