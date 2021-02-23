@@ -109,12 +109,12 @@ namespace RootTools_Vision
 				{
 					if (Label[i].area > nDefectSz)
 					{
-						this.currentWorkplace.AddDefect(sInspectionID,
-							10001,
+						this.currentWorkplace.AddDefect(sInspectionID, parameterBackside.DefectCode
+							,
 							Label[i].area,
 							Label[i].value,
 							this.currentWorkplace.PositionX + Label[i].boundLeft,
-						    this.currentWorkplace.PositionY + Label[i].boundTop,
+							this.currentWorkplace.PositionY + Label[i].boundTop,
 							Label[i].width,
 							Label[i].height,
 							this.currentWorkplace.MapIndexX,

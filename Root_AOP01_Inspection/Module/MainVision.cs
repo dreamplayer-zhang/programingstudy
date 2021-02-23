@@ -34,6 +34,7 @@ using MBrushes = System.Windows.Media.Brushes;
 using DPoint = System.Drawing.Point;
 using RootTools_CLR;
 using System.Linq;
+using RootTools.Inspects;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -1516,22 +1517,29 @@ namespace Root_AOP01_Inspection.Module
 
                     RootViewer_ViewModel targetViewModel;
 
+                    int defectCode = 10000;
+
                     switch (currentMgmName)
                     {
                         case App.SideLeftInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerLeft_VM;
+                            defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionLeft, InspectionType.AbsoluteSurface, 0);
                             break;
                         case App.SideTopInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerTop_VM;
+                            defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionTop, InspectionType.AbsoluteSurface, 0);
                             break;
                         case App.SideBotInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerBot_VM;
+                            defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionBottom, InspectionType.AbsoluteSurface, 0);
                             break;
                         case App.SideRightInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerRight_VM;
+                            defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionRight, InspectionType.AbsoluteSurface, 0);
                             break;
                         case App.PellInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_Recipe45D.p_ImageViewer_VM;
+                            defectCode = InspectionManager.MakeDefectCode(InspectionTarget.Pellcile45, InspectionType.AbsoluteSurface, 0);
                             break;
                         //case App.BackInspMgRegName:
                         //	targetList = new List<TRect>(mainEdgeList[6]);
@@ -1540,6 +1548,7 @@ namespace Root_AOP01_Inspection.Module
                         case App.MainInspMgRegName:
                         default:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
+                            defectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.AbsoluteSurface, 0);
                             break;
                     }
 
@@ -1548,6 +1557,7 @@ namespace Root_AOP01_Inspection.Module
                     ReticleSurfaceParameter surParam = GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).GetItem<ReticleSurfaceParameter>();
                     surParam.IsBright = BrightGV;
                     surParam.Intensity = SurfaceGV;
+                    surParam.DefectCode = defectCode;
                     //surParam.DiffFilter = DiffFilterMethod.Gaussian;
                     surParam.Size = SurfaceSize;
 
