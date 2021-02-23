@@ -579,7 +579,7 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                dlg.InitialDirectory = Constants.Path.RecipeEBRRootPath;
+                dlg.InitialDirectory = Constants.RootPath.RecipeEBRRootPath;
                 dlg.Title = "Save Recipe";
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -620,7 +620,7 @@ namespace Root_WIND2.UI_User
                     else
                     {
                         System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                        dlg.InitialDirectory = Constants.Path.RecipeEBRRootPath;
+                        dlg.InitialDirectory = Constants.RootPath.RecipeEBRRootPath;
                         dlg.Title = "Save Recipe";
                         dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                         if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -653,7 +653,7 @@ namespace Root_WIND2.UI_User
                 return new RelayCommand(() =>
                 {
                     System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
-                    dlg.InitialDirectory = Constants.Path.RecipeEBRRootPath;
+                    dlg.InitialDirectory = Constants.RootPath.RecipeEBRRootPath;
                     dlg.Title = "Load Recipe";
                     dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                     if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
