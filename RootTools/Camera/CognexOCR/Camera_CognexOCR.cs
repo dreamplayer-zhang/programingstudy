@@ -22,6 +22,11 @@ namespace RootTools.Camera.CognexOCR
 
         #region Property
         public string p_id { get; set; }
+        public bool bStopThread
+        {
+            get;
+            set;
+        }
 
         string _sInfo = "Info";
         public string p_sInfo
@@ -68,6 +73,7 @@ namespace RootTools.Camera.CognexOCR
             }
         }
         #endregion
+
 
         #region Read OCR
         public string ReadOCR(ref string sID, ref double dSocre)
