@@ -5,6 +5,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.OHTNew;
 using RootTools_Vision;
+using RootTools.Database;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -181,6 +182,9 @@ namespace Root_WIND2
         {
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Home;
+
+            DatabaseManager.Instance.SelectData();
+            m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
         }
 
         ModuleList m_ModuleList;
@@ -297,5 +301,11 @@ namespace Root_WIND2
             }
         }
 
+        private Database_DataView_VM m_DataViewer_VM = new Database_DataView_VM();
+        public Database_DataView_VM p_DataViewer_VM
+        {
+            get { return this.m_DataViewer_VM; }
+            set { SetProperty(ref m_DataViewer_VM, value); }
+        }
     }
 }
