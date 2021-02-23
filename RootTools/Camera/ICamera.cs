@@ -24,13 +24,19 @@ namespace RootTools.Camera
         public int m_nFovStart = 0;
         public int m_nFovSize = 8000;
         public int m_nOverlap = 0;
+
+        public int m_nYShiftR = 0; // 채널별 Y 영상 맺히는 위치
+        public int m_nYShiftG = 0;
+        public int m_nYShiftB = 0;
     }
     public interface ICamera
     {
         event EventHandler Grabed;
 
         string p_id { get; set; }
-
+        bool bStopThread
+        {
+            get;set; }
         int p_nGrabProgress { get; set; }
 
         TreeRoot p_treeRoot { get; set; }

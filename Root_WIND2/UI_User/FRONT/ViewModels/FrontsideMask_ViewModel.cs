@@ -1768,11 +1768,24 @@ namespace Root_WIND2.UI_User
         public void SetRecipeData()
         {
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-            recipe.GetItem<MaskRecipe>().OriginPoint = this.OriginOffset;
-            for (int i = 0; i < p_cInspROI.Count; i++)
+            if(recipe.GetItem<MaskRecipe>().MaskList.Count != p_cInspROI.Count)
             {
-                recipe.GetItem<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data , p_cInspROI[i].p_Color);
+                recipe.GetItem<MaskRecipe>().Clear();
+                recipe.GetItem<MaskRecipe>().OriginPoint = this.OriginOffset;
+                for (int i = 0; i < p_cInspROI.Count; i++)
+                {
+                    recipe.GetItem<MaskRecipe>().MaskList.Add(new RecipeType_Mask(p_cInspROI[i].p_Data, p_cInspROI[i].p_Color));
+                }
             }
+            else
+            {
+                recipe.GetItem<MaskRecipe>().OriginPoint = this.OriginOffset;
+                for (int i = 0; i < p_cInspROI.Count; i++)
+                {
+                    recipe.GetItem<MaskRecipe>().MaskList[i] = new RecipeType_Mask(p_cInspROI[i].p_Data, p_cInspROI[i].p_Color);
+                }
+            }
+
             p_LoadingOpacity = 0;
         }
 

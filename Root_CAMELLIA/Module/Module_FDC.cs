@@ -144,6 +144,9 @@ namespace Root_CAMELLIA.Module
                 p_fValue = nValue / m_fDiv;
             }
 
+            bool m_IsUpdate = false;
+            public bool p_IsUpdate { get; set; }
+            
             public void RunTree(Tree tree, int module_number)
             {
                 p_id = tree.Set(p_id, p_id, "ID." + module_number.ToString("00"), "FDC Module Name");
@@ -162,6 +165,7 @@ namespace Root_CAMELLIA.Module
                 m_alid[1].p_id = "UpperLimit";
                 m_nUnitID = tree.Set(m_nUnitID, m_nUnitID, "Comm UnitID", "RS485 UnitID, 1보다 큰 숫자");
                 //m_nAddress = tree.Set(m_nAddress, m_nAddress, "Comm Address", "RS485 Address");
+                p_IsUpdate = true;
             }
 
             ModuleBase m_module;
@@ -217,6 +221,23 @@ namespace Root_CAMELLIA.Module
         }
         #endregion
 
+        #region Event
+        public event EventHandler ValueUpdate;
+
+        void UpdateEvent(int index)
+        {
+            if (ValueUpdate != null)
+                OnUpdated(index, new EventArgs());
+        }
+        
+        protected virtual void OnUpdated(int index, EventArgs e)
+        {
+            
+            if (ValueUpdate != null)
+                ValueUpdate.Invoke(index, e);
+        }
+        #endregion
+
         #region Check Thread
         int m_iData = 0;
         protected override void RunThread()
@@ -234,8 +255,10 @@ namespace Root_CAMELLIA.Module
                 {
                     m_aData[m_iData].ReadInputRegister(m_modbus);
                     m_iData = (m_iData + 1) % m_aData.Count;
+                    UpdateEvent(m_iData);
                 }
             }
+            
         }
 
         int m_msInterval = 100; 

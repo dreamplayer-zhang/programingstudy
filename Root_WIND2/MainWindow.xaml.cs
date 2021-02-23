@@ -183,6 +183,9 @@ namespace Root_WIND2
         {
             try
             {
+                // Settings
+                Settings settings = GlobalObjects.Instance.Register<Settings>();
+
                 // Engineer
                 WIND2_Engineer engineer = GlobalObjects.Instance.Register<WIND2_Engineer>();
                 DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
@@ -330,7 +333,7 @@ namespace Root_WIND2
 
         public void CreateGlobalPaths()
         {
-            Type t = typeof(Constants.Path);
+            Type t = typeof(Constants.RootPath);
             FieldInfo[] fields = t.GetFields(BindingFlags.Static | BindingFlags.Public);
             foreach (FieldInfo field in fields)
                 Directory.CreateDirectory(field.GetValue(null).ToString());

@@ -765,7 +765,8 @@ namespace RootTools
 			}
 			catch (Exception ee)
 			{
-				System.Windows.MessageBox.Show(ee.ToString());
+				TempLogger.Write("ImageViewer", ee);
+				//System.Windows.MessageBox.Show(ee.ToString());
 			}
 
 			RedrawingElement();
@@ -847,7 +848,8 @@ namespace RootTools
 			}
             catch (Exception ee)
             {
-                System.Windows.MessageBox.Show(ee.ToString());
+				TempLogger.Write("ImageViewer", ee);
+				//System.Windows.MessageBox.Show(ee.ToString());
             }
 
             RedrawingElement();
@@ -869,7 +871,8 @@ namespace RootTools
             }
             catch (Exception ee)
             {
-                System.Windows.MessageBox.Show(ee.ToString());
+				TempLogger.Write("ImageViewer", ee);
+				//System.Windows.MessageBox.Show(ee.ToString());
             }
 
             RedrawingElement();
@@ -1510,7 +1513,8 @@ namespace RootTools
 			}
 			catch (Exception ee)
 			{
-				System.Windows.Forms.MessageBox.Show(ee.ToString());
+				TempLogger.Write("ImageViewer", ee);
+				//System.Windows.Forms.MessageBox.Show(ee.ToString());
 			}
 			//if (ToolExist)
 			//    SelectedTool.Drawing();

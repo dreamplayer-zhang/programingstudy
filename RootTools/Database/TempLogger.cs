@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision
+namespace RootTools.Database
 {
     public class TempLogger
     {
@@ -16,7 +16,7 @@ namespace RootTools_Vision
         {
             Directory.CreateDirectory(tempLogRootPath);
 
-            lock(lockObj)
+            lock (lockObj)
             {
                 string strTime = DateTime.Now.ToString("yyyyMMdd");
                 string filePath = tempLogRootPath + "\\" + filename + "_" + strTime + ".txt";
