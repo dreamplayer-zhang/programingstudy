@@ -245,7 +245,7 @@ namespace Root_AOP01_Inspection
 
 			//TODO GlobalObjects에서 가져오도록 수정해야 함
 			//WorkEventManager.PositionDone += PositionDone_Callback;
-			//WorkEventManager.InspectionDone += SurfaceInspDone_Callback;
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.PellInspMgRegName).InspectionDone += SurfaceInspDone_Callback;
 			//WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
 			//WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
 			

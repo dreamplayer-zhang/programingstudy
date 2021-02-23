@@ -432,6 +432,9 @@
       <DependentUpon>FFUModuleUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
+    <Compile Include="Viewer\CustomViewer\DrawableRootViewer.xaml.cs">
+      <DependentUpon>DrawableRootViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Viewer\Root_Viewer.cs" />
     <Compile Include="Comm\TK4SGourpUI.xaml.cs">
       <DependentUpon>TK4SGourpUI.xaml</DependentUpon>
@@ -1075,6 +1078,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Comm\FFUModuleUI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Viewer\CustomViewer\DrawableRootViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
