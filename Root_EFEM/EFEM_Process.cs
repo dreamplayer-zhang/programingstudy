@@ -393,8 +393,21 @@ namespace Root_EFEM
                 return EQ.IsStop()? "EQ Stop" : "OK";
             }
             Sequence sequence = m_qSequence.Peek();
-            bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport; 
-            if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport) 
+            bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport;
+            if (bLoadport)
+            {
+                sequence.m_moduleRun.StartRun();
+                Thread.Sleep(100);
+                foreach(ILoadport loadport in m_aLoadport)
+                {
+                    if (loadport.p_id == sequence.m_infoWafer.m_sModule)
+                    {
+                        ModuleBase lp = (ModuleBase)loadport;
+                        while (lp.p_eState != ModuleBase.eState.Ready && (EQ.IsStop() == false)) Thread.Sleep(10);
+                    }
+                }
+            }
+            else if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport) 
             {
                 sequence.m_moduleRun.StartRun();
                 while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
@@ -492,13 +505,15 @@ namespace Root_EFEM
         public string m_id;
         IEngineer m_engineer;
         public IHandler m_handler;
+        List<ILoadport> m_aLoadport = new List<ILoadport>();
         IWTR m_wtr;
         Log m_log;
-        public EFEM_Process(string id, IEngineer engineer, IWTR wtr)
+        public EFEM_Process(string id, IEngineer engineer, IWTR wtr, List<ILoadport> loadports)
         {
             m_id = id;
             m_engineer = engineer;
             m_handler = engineer.ClassHandler();
+            m_aLoadport = loadports;
             m_wtr = wtr;
             m_log = LogView.GetLog(id);
             InitTree(id); 

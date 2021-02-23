@@ -59,6 +59,19 @@ namespace Root_CAMELLIA
         }
         private Module_FDC m_Module_FDC;
 
+        public Module_FDC p_Module_FDC_Vision
+        {
+            get
+            {
+                return m_Module_FDC_Vision;
+            }
+            set
+            {
+                SetProperty(ref m_Module_FDC_Vision, value);
+            }
+        }
+        private Module_FDC m_Module_FDC_Vision;
+
         public Run_Measure p_Run_Measure
         {
             get
@@ -371,7 +384,7 @@ namespace Root_CAMELLIA
 
                 GaugeListItem gauge = new GaugeListItem();
 
-                if (i < 4)
+                if (i < 5)
                 {
                     gauge.p_rowIndex = 0;
                 }
@@ -382,13 +395,36 @@ namespace Root_CAMELLIA
                 gauge.p_columnIndex = cols;
                 gauge.Gauge = gaugeChart;
                 cols++;
-                if (cols > 3)
+                if (cols > 4)
                 {
                     cols = 0;
                 }
                 GaugeListItems.Add(gauge);
 
             }
+
+            for (int i = 0; i < p_Module_FDC_Vision.p_lData; i++)
+            {
+                GaugeChart gaugeChart = new GaugeChart();
+                gaugeChart.p_from = p_Module_FDC_Vision.p_aData[i].m_mmLimit.X;
+                gaugeChart.p_to = p_Module_FDC_Vision.p_aData[i].m_mmLimit.Y;
+                gaugeChart.p_name = p_Module_FDC_Vision.p_aData[i].m_pid;
+                gaugeChart.p_unit = p_Module_FDC_Vision.p_aData[i].p_sUnit;
+                GaugeListItem gauge = new GaugeListItem();
+
+                gauge.p_rowIndex = 1;
+                if (i == 0)
+                {
+                    gauge.p_columnIndex = 2;
+                }
+                else
+                {
+                    gauge.p_columnIndex = 3;
+                }
+
+                GaugeListItems.Add(gauge);
+            }
+
         }
 
         Dispatcher dispatcher = null;
@@ -405,7 +441,7 @@ namespace Root_CAMELLIA
 
             p_Module_Camellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
             p_Module_FDC = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_FDC;
-
+            m_Module_FDC_Vision = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_FDC_Vision;
             //GaugeListItems.CollectionChanged += Test_CollectionChanged;
             int cols = 0;
             for (int i = 0; i < p_Module_FDC.p_lData; i++)
@@ -418,7 +454,7 @@ namespace Root_CAMELLIA
 
                 GaugeListItem gauge = new GaugeListItem();
                 
-                if (i < 4)
+                if (i < 5)
                 {
                     gauge.p_rowIndex = 0;
                 }
@@ -429,13 +465,39 @@ namespace Root_CAMELLIA
                 gauge.p_columnIndex = cols;
                 gauge.Gauge = gaugeChart;
                 cols++;
-                if (cols > 3)
+                if (cols > 4)
                 {
                     cols = 0;
                 }
                 GaugeListItems.Add(gauge);
             }
+
+            for(int i = 0; i < p_Module_FDC_Vision.p_lData; i++)
+            {
+                GaugeChart gaugeChart = new GaugeChart();
+                gaugeChart.p_from = p_Module_FDC_Vision.p_aData[i].m_mmLimit.X;
+                gaugeChart.p_to = p_Module_FDC_Vision.p_aData[i].m_mmLimit.Y;
+                gaugeChart.p_name = p_Module_FDC_Vision.p_aData[i].m_pid;
+                gaugeChart.p_unit = p_Module_FDC_Vision.p_aData[i].p_sUnit;
+                GaugeListItem gauge = new GaugeListItem();
+
+                gauge.p_rowIndex = 1;
+                if(i == 0)
+                {
+                    gauge.p_columnIndex = 2;
+                }
+                else
+                {
+                    gauge.p_columnIndex = 3;
+                }
+
+                GaugeListItems.Add(gauge);
+            }
+
+            
+
             p_Module_FDC.ValueUpdate += OnUpdateValue;
+            p_Module_FDC_Vision.ValueUpdate += OnUpdateValue;
             dispatcher = Application.Current.Dispatcher;
         }
 
@@ -443,8 +505,14 @@ namespace Root_CAMELLIA
         {
             dispatcher.Invoke(() =>
             {
-                GaugeListItems[(int)sender].Gauge.p_value = p_Module_FDC.p_aData[(int)sender].p_fValue;
-            });
+                if(p_Module_FDC.p_lData > (int)sender) { 
+                     GaugeListItems[(int)sender].Gauge.p_value = p_Module_FDC.p_aData[(int)sender].p_fValue;
+                }
+                else
+                {
+                    GaugeListItems[(int)sender].Gauge.p_value = p_Module_FDC_Vision.p_aData[(int)sender].p_fValue;
+                }
+             });
         }
 
         private void ViewModelInit()
