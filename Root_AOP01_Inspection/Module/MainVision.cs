@@ -1030,9 +1030,34 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_AlignKeyInspection(this), true, "Run AlignKeyInspection");
             AddModuleRunList(new Run_PellicleShiftAndRotation(this), true, "Run PellicleShiftAndRotation");
             AddModuleRunList(new Run_PellicleExpandingInspection(this), true, "Run PellicleExpanding");
+
             var main = new Run_SurfaceInspection(this, App.MainRecipeRegName, App.MainInspMgRegName);
-            main.m_sModuleRun = App.MainModuleName;// "MainSurfaceInspection";
-            AddModuleRunList(main, true, "Run MainSurfaceInspection");
+            main.m_sModuleRun = App.MainModuleName;
+            AddModuleRunList(main, true, "Run "+ App.MainModuleName);
+
+
+            var pell = new Run_SurfaceInspection(this, App.PellRecipeRegName, App.PellInspMgRegName);
+            main.m_sModuleRun = App.PellicleModuleName;
+            AddModuleRunList(main, true, "Run " + App.PellicleModuleName);
+
+
+            var left = new Run_SurfaceInspection(this, App.SideRecipeRegName, App.SideLeftInspMgRegName);
+            main.m_sModuleRun = App.SideLeftModuleName;
+            AddModuleRunList(main, true, "Run " + App.SideLeftModuleName);
+
+            var top = new Run_SurfaceInspection(this, App.SideRecipeRegName, App.SideTopInspMgRegName);
+            main.m_sModuleRun = App.SideTopModuleName;
+            AddModuleRunList(main, true, "Run " + App.SideTopModuleName);
+
+            var right = new Run_SurfaceInspection(this, App.SideRecipeRegName, App.SideRightInspMgRegName);
+            main.m_sModuleRun = App.SideRightModuleName;
+            AddModuleRunList(main, true, "Run " + App.SideRightModuleName);
+
+            var bottom = new Run_SurfaceInspection(this, App.SideRecipeRegName, App.SideBotInspMgRegName);
+            main.m_sModuleRun = App.SideBotModuleName;
+            AddModuleRunList(main, true, "Run " + App.SideBotModuleName);
+
+
             AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
         }
         #endregion
