@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    class SettingData_SetupBackside : SettingData
+    class SettingItem_SetupBackside : SettingItem
     {
-        public SettingData_SetupBackside(string[] _treeViewPath) : base(_treeViewPath)
+        public SettingItem_SetupBackside(string[] _treeViewPath) : base(_treeViewPath)
         {
             
         }

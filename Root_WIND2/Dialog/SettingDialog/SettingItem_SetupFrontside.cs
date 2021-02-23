@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    class SettingData_SetupFrontside : SettingData
+    class SettingItem_SetupFrontside : SettingItem
     {
-        public SettingData_SetupFrontside(string[] _treeViewPath): base(_treeViewPath)
+        public SettingItem_SetupFrontside(string[] _treeViewPath): base(_treeViewPath)
         {
         
         }
         private string path = "D:\\";
+
+        [EditorAttribute(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public string Path
         {
             get

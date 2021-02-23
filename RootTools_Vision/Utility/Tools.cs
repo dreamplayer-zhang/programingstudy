@@ -162,13 +162,31 @@ namespace RootTools_Vision
                         byte* pR = (byte*)rawDataR.ToPointer();
                         byte* pG = (byte*)rawDataG.ToPointer();
                         byte* pB = (byte*)rawDataB.ToPointer();
+
+                        for (int i = 0; i < rt.Y; i++)
+                        {
+                            pR += _memWidth;
+                            pG += _memWidth;
+                            pB += _memWidth;
+                        }
+
                         for (int i = 0; i < 480; i++)
+                        {
+                            pR += (int)rt.X;
+                            pG += (int)rt.X;
+                            pB += (int)rt.X;
+
                             for (int j = 0; j < 640; j++)
                             {
-                                pPointer[i * (saveW * 3) + j * _byteCount + 0] = pB[(i + (int)(rt.Y)) * _memWidth + (j + (int)(rt.X))];
-                                pPointer[i * (saveW * 3) + j * _byteCount + 1] = pG[(i + (int)(rt.Y)) * _memWidth + (j + (int)(rt.X))];
-                                pPointer[i * (saveW * 3) + j * _byteCount + 2] = pR[(i + (int)(rt.Y)) * _memWidth + (j + (int)(rt.X))];
+                                pPointer[i * (saveW * 3) + j * _byteCount + 0] = *(pB + j);
+                                pPointer[i * (saveW * 3) + j * _byteCount + 1] = *(pG + j);
+                                pPointer[i * (saveW * 3) + j * _byteCount + 2] = *(pR + j);
                             }
+
+                            pR += _memWidth;
+                            pG += _memWidth;
+                            pB += _memWidth;
+                        }
                     }
                 }
                 bmp.UnlockBits(bmpData);
@@ -565,7 +583,8 @@ namespace RootTools_Vision
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message);
+                //System.Windows.MessageBox.Show(ex.Message);
+                TempLogger.Write("Tools", ex);
             }
 
             return null;

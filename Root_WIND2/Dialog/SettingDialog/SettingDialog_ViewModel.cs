@@ -24,8 +24,8 @@ namespace Root_WIND2
             }
         }
 
-        List<ISettingData> settingDataList;
-        public List<ISettingData> SettingDataList
+        List<SettingItem> settingDataList;
+        public List<SettingItem> SettingItems
         {
             get => this.settingDataList;
             set
@@ -34,14 +34,14 @@ namespace Root_WIND2
             }
         }
 
-        private ISettingData selectedSettingData;
+        private SettingItem selectedSettingData;
 
-        public ISettingData SelectedSettingData
+        public SettingItem SelectedSettingData
         {
             get { return selectedSettingData; }
             set
             {
-                SetProperty<ISettingData>(ref this.selectedSettingData, value);
+                SetProperty<SettingItem>(ref this.selectedSettingData, value);
             }
         }
 
@@ -108,15 +108,15 @@ namespace Root_WIND2
             TreeItem item = MenuItems.GetSelectedItem();
             string[] FullPath = item.FullPath;
 
-            foreach(SettingData data in SettingDataList)
+            foreach(SettingItem data in SettingItems)
             {
-                if (data.GetTreeViewPath().Length != item.FullPath.Length)
+                if (data.GetTreePath().Length != item.FullPath.Length)
                     continue;
 
                 for (int i = 0; i < FullPath.Length; i++)
                 {
                     
-                    if(data.GetTreeViewPath()[i] == item.FullPath[i])
+                    if(data.GetTreePath()[i] == item.FullPath[i])
                     {
                         if(i == (FullPath.Length - 1))
                         {
@@ -134,10 +134,20 @@ namespace Root_WIND2
         #endregion
 
 
-        public SettingDialog_ViewModel()
+        public SettingDialog_ViewModel(Settings settings)
         {
             MenuItems = new TreeItemCollection();
-            SettingDataList = new List<ISettingData>();
+            SettingItems = settings.SettingItems;
+
+
+            SetMenuItems();
+            Load();
+        }
+
+        public SettingDialog_ViewModel(List<SettingItem> settingItems)
+        {
+            MenuItems = new TreeItemCollection();
+            SettingItems = settingItems;
 
 
             SetMenuItems();
@@ -146,48 +156,28 @@ namespace Root_WIND2
 
         public void Save()
         {
-            for(int i = 0; i < SettingDataList.Count; i++)
+            for(int i = 0; i < SettingItems.Count; i++)
 
             {
-                SettingDataList[i].Save();
+                SettingItems[i].Save();
             }
         }
 
         public void Load()
         {
-            for(int i = 0; i < SettingDataList.Count; i++)
+            for(int i = 0; i < SettingItems.Count; i++)
             {
-                SettingDataList[i].Load(SettingDataList[i]);
+                SettingItems[i].Load();
             }
         }
 
         public void SetMenuItems()
         {
-            menuItems.SetTreeItem("Setup");
-            SettingDataList.Add(new SettingData_Setup(new string[] { "Setup" }));
-
-            menuItems.SetTreeItem("Setup", "Frontside");
-            SettingDataList.Add(new SettingData_SetupFrontside(new string[] { "Setup", "Frontside" }));
-
-            menuItems.SetTreeItem("Setup", "Frontside", "Get out of Here");
-            SettingDataList.Add(new SettingData_SetupFrontside(new string[] { "Setup", "Frontside", "Get out of Here" }));
-
-            menuItems.SetTreeItem("Setup", "Backside");
-            SettingDataList.Add(new SettingData_SetupBackside(new string[] { "Setup", "Backside" }));
-
-            menuItems.SetTreeItem("Setup", "Edge");
-            menuItems.SetTreeItem("Setup", "EBR");
-
-            menuItems.SetTreeItem("Review");
-            menuItems.SetTreeItem("Review", "Frontside");
-            menuItems.SetTreeItem("Review", "Backside");
-            menuItems.SetTreeItem("Review", "Edge");
-            menuItems.SetTreeItem("Review", "EBR");
-
-            menuItems.SetTreeItem("Run", "Frontside");
-            menuItems.SetTreeItem("Run", "Backside");
-            menuItems.SetTreeItem("Run", "Edge");
-            menuItems.SetTreeItem("Run", "EBR");
+            foreach(SettingItem item in this.SettingItems)
+            {
+                string[] treepath = item.GetTreePath();
+                MenuItems.SetTreeItem(treepath);
+            }
         }
 
         public class TreeItemCollection : ObservableCollection<TreeItem>

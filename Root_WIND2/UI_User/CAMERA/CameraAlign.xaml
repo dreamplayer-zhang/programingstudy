@@ -16,25 +16,25 @@
             <i:InvokeCommandAction Command="{Binding UnloadedCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Grid Background="{StaticResource main_view_background}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="548"/>
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="528"/>
-            <ColumnDefinition Width="3*"/>
-        </Grid.ColumnDefinitions>
+
+    <StackPanel Background="{StaticResource main_view_background}" Orientation="Horizontal">
         <GroupBox Header="Align Camera Viewer" 
                   Margin="4"
+                  Width="{Binding ActualHeight, RelativeSource={RelativeSource self}}"
                   Style="{StaticResource main_view_groupbox}">
-            <tools:RootViewer VerticalAlignment="Top" DataContext="{Binding ImageViewerVM}" Width="512" Height="512"/>
+            <tools:RootViewer DataContext="{Binding ImageViewerVM}" Margin="4"/>
         </GroupBox>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
+            <GroupBox Header="Feature Information"
+                        Style="{StaticResource main_view_groupbox}" Margin="4">
+
+            </GroupBox>
         </Grid>
-    </Grid>
+    </StackPanel>
+
+        
 </UserControl>

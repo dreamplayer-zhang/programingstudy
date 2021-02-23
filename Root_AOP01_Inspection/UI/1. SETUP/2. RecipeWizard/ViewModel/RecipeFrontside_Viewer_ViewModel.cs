@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_AOP01_Inspection.Module;
+using RootTools;
 using RootTools.Memory;
 using RootTools_Vision;
 using System;
@@ -26,9 +27,25 @@ namespace Root_AOP01_Inspection
 			base.init(GlobalObjects.Instance.GetNamed<ImageData>(App.MainRegName), GlobalObjects.Instance.Get<DialogService>());
 			p_VisibleMenu = Visibility.Visible;
 			currectDispatcher = dispatcher;
-			
+
 			//Shapes.CollectionChanged += Shapes_CollectionChanged;
 			//InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;
+		}
+		public override void MouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			base.MouseWheel(sender, e);
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.MainInspMgRegName).RefreshDefect();
+		}
+		public override void MouseMove(object sender, MouseEventArgs e)
+		{
+			base.MouseMove(sender, e);
+			if (m_KeyEvent != null)
+			{
+				if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
+				{
+					GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.MainInspMgRegName).RefreshDefect();
+				}
+			}
 		}
 		public override void PreviewMouseUp(object sender, MouseEventArgs e)
 		{
