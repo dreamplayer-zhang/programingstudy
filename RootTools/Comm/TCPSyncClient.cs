@@ -2,11 +2,12 @@
 using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Windows.Controls;
 
 namespace RootTools.Comm
 {
-    public class TCPAsyncClient : NotifyProperty, ITool, IComm
+    public class TCPSyncClient : NotifyProperty, ITool, IComm
     {
         public delegate void OnReciveData(byte[] aBuf, int nSize, Socket socket);
         public event OnReciveData EventReciveData;
@@ -16,7 +17,7 @@ namespace RootTools.Comm
         {
             get
             {
-                TCPAsyncClient_UI ui = new TCPAsyncClient_UI();
+                TCPSyncClient_UI ui = new TCPSyncClient_UI();
                 ui.Init(this);
                 return ui;
             }
@@ -58,19 +59,6 @@ namespace RootTools.Comm
             p_bUse = bUse;
         }
         #endregion
-        
-        #region Async
-        public class Async
-        {
-            public byte[] m_aBuf;
-            public Socket m_socket;
-
-            public Async(int nL)
-            {
-                m_aBuf = new byte[nL];
-            }
-        }
-        #endregion
 
         #region Client Socket
         Socket m_socket = null;
@@ -78,8 +66,7 @@ namespace RootTools.Comm
         {
             m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             m_commLog.Add(CommLog.eType.Info, "Init Client Socket");
-            m_cbSend = new AsyncCallback(CallBackSend);
-            Connect(); 
+            Connect();
         }
         #endregion
 
@@ -94,56 +81,50 @@ namespace RootTools.Comm
             try
             {
                 m_socket.Connect(p_sIP, p_nPort);
-                Async async = new Async(m_lMaxBuffer);
-                async.m_socket = m_socket;
-                m_cbReceive = new AsyncCallback(CallBackReceive); 
-                m_socket.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
                 m_commLog.Add(CommLog.eType.Info, "Connected");
+                InitThread();
             }
             catch (Exception e)
             {
-                m_commLog.Add(CommLog.eType.Info, "Connect Error " + e.Message); 
+                m_commLog.Add(CommLog.eType.Info, "Connect Error " + e.Message);
             }
         }
         #endregion
 
-        #region Receive
-        AsyncCallback m_cbReceive;
-        void CallBackReceive(IAsyncResult ar)
+        #region Read Thread 
+        bool m_bThread = false;
+        Thread m_thread;
+        void InitThread()
         {
-            Async async = (Async)ar.AsyncState;
-            if (m_socket == null) return;
-            try
+            m_thread = new Thread(new ThreadStart(RunThread));
+            m_thread.Start();
+        }
+
+        byte[] m_aBufRead = null;
+        void RunThread()
+        {
+            m_bThread = true;
+            while (m_bThread)
             {
-                int lReceive = async.m_socket.EndReceive(ar);
-                if ((lReceive > 0) && (EventReciveData != null)) EventReciveData(async.m_aBuf, lReceive, async.m_socket);
-                //m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
-                async.m_socket.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
-            }
-            catch (Exception e)
-            {
-                if (m_socket != null) m_commLog.Add(CommLog.eType.Info, "CallBack Exception : " + e.Message); 
+                Thread.Sleep(1);
+                try
+                {
+                    int lReceive = m_socket.Receive(m_aBufRead);
+                    if (lReceive > 0) EventReciveData(m_aBufRead, lReceive, m_socket);
+                    //m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.ASCII.GetString(m_aBufRead, 0, lReceive) : "Large Data");
+                }
+                catch (Exception e) { m_commLog.Add(CommLog.eType.Info, "Receive Exception : " + e.Message); }
             }
         }
         #endregion
 
         #region Send
-        AsyncCallback m_cbSend;
+        public int m_lRead = 0; 
         public string Send(string sMsg)
         {
-            if (m_socket == null) return "Not Connected";
-            Async async = new Async(1);
-            async.m_aBuf = Encoding.Default.GetBytes(sMsg);
-            async.m_socket = m_socket;
-            m_socket.BeginSend(async.m_aBuf, 0, async.m_aBuf.Length, SocketFlags.None, m_cbSend, async);
+            m_socket.Send(Encoding.ASCII.GetBytes(sMsg));
+            //m_commLog.Add(CommLog.eType.Send, (sMsg.Length < 64) ? sMsg : "Large Data");
             return "OK";
-        }
-
-        void CallBackSend(IAsyncResult ar)
-        {
-            Async async = (Async)ar.AsyncState;
-            int lSend = async.m_socket.EndSend(ar);
-            //m_commLog.Add(CommLog.eType.Send, (lSend < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lSend) : "Large Data");
         }
         #endregion
 
@@ -175,13 +156,12 @@ namespace RootTools.Comm
         #endregion
 
         public string p_id { get; set; }
-        int m_lMaxBuffer = 4096;
         Log m_log;
         public CommLog m_commLog;
-        public TCPAsyncClient(string id, Log log, int lMaxBuffer = 4096)
+        public TCPSyncClient(string id, Log log, int lMaxBuffer = 4096)
         {
             p_id = id;
-            m_lMaxBuffer = lMaxBuffer;
+            m_aBufRead = new byte[lMaxBuffer]; 
             m_log = log;
             m_commLog = new CommLog(this, log);
 
@@ -190,9 +170,14 @@ namespace RootTools.Comm
 
         public void ThreadStop()
         {
+            if (m_bThread)
+            {
+                m_bThread = false;
+                m_thread.Interrupt();
+                m_thread.Abort();
+            }
             if (m_socket != null) m_socket.Close();
             m_socket = null;
         }
-
     }
 }

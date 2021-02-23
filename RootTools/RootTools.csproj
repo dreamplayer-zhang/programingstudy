@@ -265,6 +265,14 @@
     <Compile Include="Comm\TCPAsyncServer_UI.xaml.cs">
       <DependentUpon>TCPAsyncServer_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Comm\TCPSyncClient.cs" />
+    <Compile Include="Comm\TCPSyncClient_UI.xaml.cs">
+      <DependentUpon>TCPSyncClient_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Comm\TCPSyncServer.cs" />
+    <Compile Include="Comm\TCPSyncServer_UI.xaml.cs">
+      <DependentUpon>TCPSyncServer_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\Xenax\Xenax.cs" />
     <Compile Include="Control\Xenax\XenaxAxis.cs" />
     <Compile Include="Control\Xenax\XenaxAxis_UI.xaml.cs">
@@ -835,6 +843,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Comm\TCPAsyncServer_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\TCPSyncClient_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\TCPSyncServer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

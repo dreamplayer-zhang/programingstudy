@@ -10,7 +10,8 @@ namespace Root.Module
     public class TestServer : ModuleBase
     {
         #region ToolBox
-        TCPAsyncServer m_tcpip;
+        //TCPAsyncServer m_tcpip;
+        TCPSyncServer m_tcpip;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_tcpip, this, "Server", 2000000);
@@ -23,8 +24,9 @@ namespace Root.Module
         string m_sBuf = ""; 
         void InitBuffer()
         {
-            for (int n = 0; n < 2000000; n++) m_aBuf[n] = (byte)'a';
-            m_sBuf = Encoding.Default.GetString(m_aBuf); 
+            for (int n = 1; n < 2000000; n++) m_aBuf[n] = (byte)'a';
+            m_sBuf = Encoding.Default.GetString(m_aBuf);
+            //m_sBuf = "OK"; 
         }
 
         private void M_tcpip_EventReciveData(byte[] aBuf, int nSize, Socket socket)
