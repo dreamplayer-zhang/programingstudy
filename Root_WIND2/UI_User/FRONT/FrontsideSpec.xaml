@@ -227,7 +227,7 @@
                                                                   VerticalContentAlignment="Center">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="SelectionChanged">
-                                                    <i:InvokeCommandAction Command="{Binding ComboBoxSelectionChanged_InspChannel}" />
+                                                    <i:InvokeCommandAction Command="{Binding ComboBoxSelectionChanged_ChannelItem}" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </ComboBox>

@@ -18,6 +18,8 @@ namespace Root_WIND2
     {
         public event ComboboxItemChanged ComboBoxItemChanged_Mask;
         public event ComboboxItemChanged ComboBoxItemChanged_Method;
+        public event ComboboxItemChanged ComboBoxItemChanged_Channel;
+
         public event ButtonClicked ButtonClicked_Delete;
 
         public InspectionItem()
@@ -150,7 +152,18 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     if (ComboBoxItemChanged_Mask != null)
-                        ComboBoxItemChanged_Mask(p_InspROI, new EventArgs());
+                        ComboBoxItemChanged_Mask(this, new EventArgs());
+                });
+            }
+        }
+        public ICommand ComboBoxSelectionChanged_ChannelItem
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (ComboBoxItemChanged_Channel != null)
+                        ComboBoxItemChanged_Channel(this, new EventArgs());
                 });
             }
         }

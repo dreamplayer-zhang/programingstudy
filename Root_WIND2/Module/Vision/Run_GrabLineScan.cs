@@ -135,6 +135,7 @@ namespace Root_WIND2.Module
 
                     double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - nTotalTriggerCount / 2;
                     double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + nTotalTriggerCount / 2 ;
+
                     axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
                     string strPool = m_grabMode.m_memoryPool.p_id;
@@ -146,6 +147,7 @@ namespace Root_WIND2.Module
                     GrabData gd = m_grabMode.m_GD;
                     gd.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.BackWard;
                     gd.nScanOffsetY = (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_nYOffset;
+                    gd.ReverseOffsetY = m_grabMode.m_nReverseOffsetY;
                     //카메라 그랩 시작
                     m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_GD);
                     //Y축 트리거 발생

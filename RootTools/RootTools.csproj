@@ -331,6 +331,7 @@
     <Compile Include="Comm\FFU_Group_UI.xaml.cs">
       <DependentUpon>FFU_Group_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Database\TempLogger.cs" />
     <Compile Include="GeneralFunction.cs" />
     <Compile Include="ImageProcess\AutoFocus.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />

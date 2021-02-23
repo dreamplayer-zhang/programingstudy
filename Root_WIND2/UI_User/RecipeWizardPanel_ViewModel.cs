@@ -81,6 +81,7 @@ namespace Root_WIND2.UI_User
 
         // Camera
         public readonly UI_User.CameraVRS cameraVrs = new UI_User.CameraVRS();
+        public readonly UI_User.CameraAlign cameraAlign = new UI_User.CameraAlign();
         #endregion
 
         #region [ViewModels]
@@ -172,6 +173,14 @@ namespace Root_WIND2.UI_User
         public UI_User.EBRSetup_ViewModel EBRSetupVM
         {
             get => ebrSetupVM;
+        }
+        #endregion
+
+        #region [Camera ViewModels]
+        private UI_User.CameraAlign_ViewModel cameraAlignVM = new UI_User.CameraAlign_ViewModel();
+        public UI_User.CameraAlign_ViewModel CameraAlignVM
+        {
+            get => cameraAlignVM;
         }
         #endregion
 
@@ -323,7 +332,7 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                dlg.InitialDirectory = Constants.Path.RecipeFrontRootPath;
+                dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
                 dlg.Title = "Save Recipe";
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -364,7 +373,7 @@ namespace Root_WIND2.UI_User
                     else
                     {
                         System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                        dlg.InitialDirectory = Constants.Path.RecipeFrontRootPath;
+                        dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
                         dlg.Title = "Save Recipe";
                         dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                         if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -397,7 +406,7 @@ namespace Root_WIND2.UI_User
                 return new RelayCommand(() =>
                 {
                     System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
-                    dlg.InitialDirectory = Constants.Path.RecipeFrontRootPath;
+                    dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
                     dlg.Title = "Load Recipe";
                     dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                     if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -453,7 +462,7 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                dlg.InitialDirectory = Constants.Path.RecipeEdgeRootPath;
+                dlg.InitialDirectory = Constants.RootPath.RecipeEdgeRootPath;
                 dlg.Title = "Save Recipe";
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -494,7 +503,7 @@ namespace Root_WIND2.UI_User
                     else
                     {
                         System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                        dlg.InitialDirectory = Constants.Path.RecipeEdgeRootPath;
+                        dlg.InitialDirectory = Constants.RootPath.RecipeEdgeRootPath;
                         dlg.Title = "Save Recipe";
                         dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                         if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -527,7 +536,7 @@ namespace Root_WIND2.UI_User
                 return new RelayCommand(() =>
                 {
                     System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
-                    dlg.InitialDirectory = Constants.Path.RecipeEdgeRootPath;
+                    dlg.InitialDirectory = Constants.RootPath.RecipeEdgeRootPath;
                     dlg.Title = "Load Recipe";
                     dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                     if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -596,7 +605,7 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                dlg.InitialDirectory = Constants.Path.RecipeBackRootPath;
+                dlg.InitialDirectory = Constants.RootPath.RecipeBackRootPath;
                 dlg.Title = "Save Recipe";
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -637,7 +646,7 @@ namespace Root_WIND2.UI_User
                     else
                     {
                         System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                        dlg.InitialDirectory = Constants.Path.RecipeBackRootPath;
+                        dlg.InitialDirectory = Constants.RootPath.RecipeBackRootPath;
                         dlg.Title = "Save Recipe";
                         dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                         if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -670,7 +679,7 @@ namespace Root_WIND2.UI_User
                 return new RelayCommand(() =>
                 {
                     System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
-                    dlg.InitialDirectory = Constants.Path.RecipeBackRootPath;
+                    dlg.InitialDirectory = Constants.RootPath.RecipeBackRootPath;
                     dlg.Title = "Load Recipe";
                     dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                     if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -704,6 +713,18 @@ namespace Root_WIND2.UI_User
                 {
                     SetPage(cameraVrs);
                     cameraVrs.DataContext = CameraVrsVM;
+                });
+            }
+        }
+
+        public ICommand btnCameraAlign
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(cameraAlign);
+                    cameraAlign.DataContext = CameraAlignVM;
                 });
             }
         }

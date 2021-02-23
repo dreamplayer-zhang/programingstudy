@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
+using RootTools.Database;
 using System;
 using System.CodeDom;
 using System.Collections.ObjectModel;
@@ -892,7 +893,8 @@ namespace RootTools
             }
             catch (Exception ee)
             {
-                System.Windows.MessageBox.Show(ee.ToString());
+                TempLogger.Write("RootViewer", ee);
+                //System.Windows.MessageBox.Show(ee.ToString());
             }
 
         }
@@ -1010,7 +1012,8 @@ namespace RootTools
             }
             catch (Exception ee)
             {
-                System.Windows.MessageBox.Show(ee.ToString());
+                TempLogger.Write("RootViewer", ee);
+                //System.Windows.MessageBox.Show(ee.ToString());
             }
         }
 
@@ -1618,7 +1621,8 @@ namespace RootTools
                 }
                 catch (Exception ex)
                 {
-                    System.Windows.Forms.MessageBox.Show(ex.ToString());
+                    TempLogger.Write("RootViewer", ex);
+                    //System.Windows.Forms.MessageBox.Show(ex.ToString());
                 }
             }
         }

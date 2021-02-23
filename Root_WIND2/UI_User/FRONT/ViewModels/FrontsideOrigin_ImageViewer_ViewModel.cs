@@ -117,6 +117,12 @@ namespace Root_WIND2.UI_User
                     {
                         ClearObjects();
                     }
+                    else
+                    {
+                        this.originLeftBottom.X = this.originBox.Left;
+                        this.originLeftBottom.Y = this.originBox.Bottom;
+                        RedrawShapes();
+                    }
                 }
 
                 SetProperty<bool>(ref this.isOriginChecked, value);
@@ -143,6 +149,13 @@ namespace Root_WIND2.UI_User
 
                         this.pitchRightTop.X = this.originRightTop.X;
                         this.pitchRightTop.Y = this.originRightTop.Y;
+                    }
+                    else
+                    {
+                        this.pitchRightTop.X = this.pitchBox.Right;
+                        this.pitchRightBottom.X = this.pitchBox.Right;
+                        this.pitchRightTop.Y = this.pitchBox.Top;
+                        this.pitchRightBottom.Y = this.pitchBox.Bottom;
                     }
                 }
                 SetProperty<bool>(ref this.isPitchChecked, value);
@@ -306,8 +319,6 @@ namespace Root_WIND2.UI_User
 
         #region [Draw 관련 멤버]
 
-        TRect InspArea;
-        
         Grid OriginLeftBottom_UI = null;
         Grid OriginRightTop_UI = null;
         Grid OriginBox_UI = null;
@@ -319,6 +330,8 @@ namespace Root_WIND2.UI_User
 
         CPoint originLeftBottom = new CPoint();
         CPoint originRightTop = new CPoint();
+        CRect originBox = new CRect();
+
         CPoint pitchRightTop = new CPoint();
         CPoint pitchRightBottom = new CPoint();
         CRect pitchBox = new CRect();
@@ -528,6 +541,11 @@ namespace Root_WIND2.UI_User
                     originRightTop.X = memPt.X;
                     originRightTop.Y = memPt.Y;
 
+                    originBox.Left = originLeftBottom.X;
+                    originBox.Right = originRightTop.X;
+                    originBox.Top = originRightTop.Y;
+                    originBox.Bottom = originLeftBottom.Y;
+
                     DrawOriginRightTopPoint(originRightTop);
                     DrawingPitchPoint();
                     DrawOriginBox();
@@ -614,6 +632,11 @@ namespace Root_WIND2.UI_User
 
             this.originRightTop.X = originPt.X + originWidth;
             this.originRightTop.Y = originPt.Y - originHeight;
+
+            this.originBox.Left = this.originLeftBottom.X;
+            this.originBox.Right = this.originRightTop.X;
+            this.originBox.Top = this.originRightTop.Y;
+            this.originBox.Bottom = this.originLeftBottom.Y;
 
             this.pitchRightTop.X = originPt.X + diePitchX;
             this.pitchRightTop.Y = originPt.Y - diePitchY;
@@ -816,11 +839,11 @@ namespace Root_WIND2.UI_User
 
         private void DrawOriginBox()
         {
-            int left = this.originLeftBottom.X;
-            int top = this.originRightTop.Y;
+            int left = this.originBox.Left;
+            int top = this.originBox.Top;
 
-            int right = this.originRightTop.X;
-            int bottom = this.originLeftBottom.Y;
+            int right = this.originBox.Right;
+            int bottom = this.originBox.Bottom;
             
             CPoint canvasLeftTop = GetCanvasPoint(new CPoint(left, top));
             CPoint canvasLeftBottom = GetCanvasPoint(new CPoint(left, bottom));
@@ -980,64 +1003,6 @@ namespace Root_WIND2.UI_User
                 DrawPitchBox();
             }
         }
-
-
-        private void DrawOriginArea(CPoint padding)
-        {
-            if (InspArea == null)
-            {
-                InspArea = new TRect(Brushes.Yellow, 2, 0.5);
-            }
-            int left = originLeftBottom.X - padding.X;
-            int bottom = originLeftBottom.Y + padding.Y;
-            int right = pitchRightTop.X + padding.X;
-            int top = pitchRightTop.Y - padding.Y;
-
-            //InspArea의 크기가 변할때만 Delegate Call
-
-            if (InspArea.MemoryRect.Left != left || InspArea.MemoryRect.Right != right ||
-                InspArea.MemoryRect.Top != top || InspArea.MemoryRect.Bottom != bottom)
-            {
-                InspArea.MemoryRect.Left = left;
-                InspArea.MemoryRect.Bottom = bottom;
-                InspArea.MemoryRect.Right = right;
-                InspArea.MemoryRect.Top = top;
-            }
-
-            InspArea.MemoryRect.Left = left;
-            InspArea.MemoryRect.Bottom = bottom;
-            InspArea.MemoryRect.Right = right;
-            InspArea.MemoryRect.Top = top;
-
-
-            CPoint viewOriginPt = originLeftBottom;
-            CPoint viewPitchPt = pitchRightTop;
-
-            if (p_View_Rect.Width == 0) return;
-            if (p_View_Rect.Height == 0) return;
-            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
-            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
-
-            CPoint LT = new CPoint(viewOriginPt.X - padding.X, viewPitchPt.Y - padding.Y);
-            CPoint RB = new CPoint(viewPitchPt.X + padding.X, viewOriginPt.Y + padding.Y);
-
-            CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
-            CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
-
-            Canvas.SetLeft(InspArea.CanvasRect, canvasLT.X - pixSizeX / 2);
-            Canvas.SetTop(InspArea.CanvasRect, canvasLT.Y - pixSizeY / 2);
-
-            InspArea.CanvasRect.Width = Math.Abs(canvasRB.X - canvasLT.X + pixSizeX);
-            InspArea.CanvasRect.Height = Math.Abs(canvasRB.Y - canvasLT.Y + pixSizeY);
-
-            if (p_UIElement.Contains(InspArea.CanvasRect))
-            {
-                p_UIElement.Remove(InspArea.CanvasRect);
-            }
-            p_UIElement.Add(InspArea.CanvasRect);
-
-        }
-
         #endregion
 
         #region [Viewer Method]
