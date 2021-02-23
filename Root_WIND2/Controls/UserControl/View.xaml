@@ -111,7 +111,7 @@
         <!--End Defect View-->
 
         <Grid Grid.Column="1">
-            <GroupBox Header="Detail">
+            <GroupBox Header="Detail" Style="{StaticResource main_view_groupbox}">
                 <TabControl Background="{StaticResource PanelBackGround}"
                         BorderThickness="1">
                     <TabItem Header="Inspection">
@@ -135,7 +135,7 @@
                             <Button Content="Tuning" Grid.Column="1"
                                     Margin="3" FontWeight="Bold"
                                     Style="{StaticResource groupbox_button}"/>
-                            <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="3">
+                            <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="3" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Result"/>
                                 </GroupBox.Header>
@@ -244,7 +244,7 @@
                             <Button Content="Tuning" Grid.Column="1"
                                     Margin="3" FontWeight="Bold"
                                     Style="{StaticResource groupbox_button}"/>
-                            <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
+                            <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Result"/>
                                 </GroupBox.Header>
