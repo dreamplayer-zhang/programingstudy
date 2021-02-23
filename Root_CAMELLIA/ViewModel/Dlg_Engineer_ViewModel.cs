@@ -807,9 +807,9 @@ namespace Root_CAMELLIA
             AxisY,
             AxisZ,
             Lifter,
-            TiltZ,
             TiltX,
-            TiltY
+            TiltY,
+            TiltZ
         }
     }
 }
