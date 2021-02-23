@@ -536,7 +536,11 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     //select Axis jog
-                    SelectedAxis.Jog(-1);
+                    string str = SelectedAxis.Jog(-1);
+                    if (str != "OK")
+                    {
+                        MessageBox.Show(str);
+                    }
                 });
             }
         }
@@ -546,7 +550,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    SelectedAxis.Jog(-0.31);
+                    string str = SelectedAxis.Jog(-0.31);
+                    if (str != "OK")
+                    {
+                        MessageBox.Show(str);
+                    }
                 });
             }
         }
@@ -556,8 +564,12 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    
-                    SelectedAxis.StartMove(-PosValue);
+
+                    string str = SelectedAxis.StartMove(-PosValue);
+                    if(str != "OK")
+                    {
+                        MessageBox.Show(str);
+                    }
                     SelectedAxis.WaitReady();
                 });
             }
@@ -568,7 +580,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    SelectedAxis.StartMove(PosValue);
+                    string str = SelectedAxis.StartMove(PosValue);
+                    if (str != "OK")
+                    {
+                        MessageBox.Show(str);
+                    }
                     SelectedAxis.WaitReady();
                 });
             }
@@ -579,7 +595,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    SelectedAxis.Jog(0.31);
+                    string str = SelectedAxis.Jog(0.31);
+                    if (str != "OK")
+                    {
+                        MessageBox.Show(str);
+                    }
 
                 });
             }
@@ -590,7 +610,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    SelectedAxis.Jog(1);
+                    string str = SelectedAxis.Jog(1);
+                    if (str != "OK")
+                    {
+                        MessageBox.Show(str);
+                    }
                 });
             }
         }

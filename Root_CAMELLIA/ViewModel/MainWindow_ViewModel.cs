@@ -10,6 +10,8 @@ using Root_CAMELLIA.Module;
 using System.Drawing;
 using Root_CAMELLIA.Draw;
 using System.Windows.Media;
+using Root_CAMELLIA.Control;
+using System.Windows.Controls;
 
 namespace Root_CAMELLIA
 {
@@ -43,6 +45,19 @@ namespace Root_CAMELLIA
             }
         }
         private Module_Camellia m_Module_Camellia;
+
+        public Module_FDC p_Module_FDC
+        {
+            get
+            {
+                return m_Module_FDC;
+            }
+            set
+            {
+                SetProperty(ref m_Module_FDC, value);
+            }
+        }
+        private Module_FDC m_Module_FDC;
 
         public Run_Measure p_Run_Measure
         {
@@ -342,6 +357,41 @@ namespace Root_CAMELLIA
 
         }
 
+        private void UpdateGaugeUI()
+        {
+            GaugeListItems.Clear();
+            int cols = 0;
+            for (int i = 0; i < p_Module_FDC.p_lData; i++)
+            {
+                GaugeChart gaugeChart = new GaugeChart();
+                gaugeChart.p_from = p_Module_FDC.p_aData[i].m_mmLimit.X;
+                gaugeChart.p_to = p_Module_FDC.p_aData[i].m_mmLimit.Y;
+                gaugeChart.p_name = p_Module_FDC.p_aData[i].m_pid;
+                gaugeChart.p_unit = p_Module_FDC.p_aData[i].p_sUnit;
+
+                GaugeListItem gauge = new GaugeListItem();
+
+                if (i < 4)
+                {
+                    gauge.p_rowIndex = 0;
+                }
+                else
+                {
+                    gauge.p_rowIndex = 1;
+                }
+                gauge.p_columnIndex = cols;
+                gauge.Gauge = gaugeChart;
+                cols++;
+                if (cols > 3)
+                {
+                    cols = 0;
+                }
+                GaugeListItems.Add(gauge);
+
+            }
+        }
+
+        Dispatcher dispatcher = null;
         private void Init()
         {
             DataManager = DataManager.Instance;
@@ -354,10 +404,48 @@ namespace Root_CAMELLIA
             ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia.mwvm = this;
 
             p_Module_Camellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
+            p_Module_FDC = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_FDC;
 
+            //GaugeListItems.CollectionChanged += Test_CollectionChanged;
+            int cols = 0;
+            for (int i = 0; i < p_Module_FDC.p_lData; i++)
+            {
+                GaugeChart gaugeChart = new GaugeChart();
+                gaugeChart.p_from = p_Module_FDC.p_aData[i].m_mmLimit.X;
+                gaugeChart.p_to = p_Module_FDC.p_aData[i].m_mmLimit.Y;
+                gaugeChart.p_name = p_Module_FDC.p_aData[i].m_pid;
+                gaugeChart.p_unit = p_Module_FDC.p_aData[i].p_sUnit;
+
+                GaugeListItem gauge = new GaugeListItem();
+                
+                if (i < 4)
+                {
+                    gauge.p_rowIndex = 0;
+                }
+                else
+                {
+                    gauge.p_rowIndex = 1;
+                }
+                gauge.p_columnIndex = cols;
+                gauge.Gauge = gaugeChart;
+                cols++;
+                if (cols > 3)
+                {
+                    cols = 0;
+                }
+                GaugeListItems.Add(gauge);
+            }
+            p_Module_FDC.ValueUpdate += OnUpdateValue;
+            dispatcher = Application.Current.Dispatcher;
         }
 
-
+        private void OnUpdateValue(object sender, EventArgs args)
+        {
+            dispatcher.Invoke(() =>
+            {
+                GaugeListItems[(int)sender].Gauge.p_value = p_Module_FDC.p_aData[(int)sender].p_fValue;
+            });
+        }
 
         private void ViewModelInit()
         {
@@ -458,6 +546,36 @@ namespace Root_CAMELLIA
         {
             m_LightSourcetimer.Stop();
         }
+
+        GaugeChart m_Test = new GaugeChart();
+        public GaugeChart p_Test
+        {
+            get
+            {
+                return m_Test;
+            }
+            set
+            {
+                SetProperty(ref m_Test, value);
+            }
+        }
+
+        ObservableCollection<GaugeListItem> _GaugeListItem = new ObservableCollection<GaugeListItem>();
+        public ObservableCollection<GaugeListItem> GaugeListItems
+        {
+            get
+            {
+                return _GaugeListItem;
+            }
+            set
+            {
+                //_GaugeListItem = value;
+                SetProperty(ref _GaugeListItem, value);
+                //RaisePropertyChanged("GaugeListItems");
+                //RaisePropertyChanged("GaugeListItems");
+            }
+        }
+
         #endregion
 
         #region ICommand
@@ -522,6 +640,12 @@ namespace Root_CAMELLIA
                     dialog.LogUI.Init(LogView.m_logView);
                     dialog.ToolBoxUI.Init(App.m_engineer);
                     Nullable<bool> result = dialog.ShowDialog();
+
+                    if (m_Module_FDC.m_aData[0].p_IsUpdate)
+                    {
+                        UpdateGaugeUI();
+                        m_Module_FDC.m_aData[0].p_IsUpdate = false;
+                    }
                 });
             }
         }
@@ -532,11 +656,35 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    test tes = new test();
-                    tes.ShowDialog();
+                    ////test tes = new test();
+                    //// tes.ShowDialog();
+                    Random rand = new Random();
+                    for (int i = 0; i < GaugeListItems.Count; i++)
+                    {
+                        GaugeListItems[i].Gauge.p_value = double.Parse(rand.Next(0, 100).ToString("#.##"));
+                        //GaugeListItems[i].p_name = "strasgding" + i;
+                    }
+                    //GaugeListItem gauge = new GaugeListItem();
+                    //gauge.Gauge = new GaugeChart();
+                    //gauge.p_columnIndex = 0;
+                    //gauge.p_rowIndex = 3;
+                    //gauge.Gauge.p_name = "aftest";
+                    //gauge.Gauge.p_value = 40;
+                    //GaugeListItems.Add(gauge);
+                    ////p_Test.p_value = rand.Next(0,100);
+                    ///
+                   // GaugeListItems = new ObservableCollection<GaugeListItem>();
+                    int cols = 0;
+                    // GaugeListItems.Clear();
+
+                    //for(int i= 0; i < GaugeListItems.Count; i++)
+                    //{
+
+                    //}
                 });
             }
         }
+
         public ICommand CmdSetting
         {
             get
@@ -583,5 +731,86 @@ namespace Root_CAMELLIA
 
         }
         #endregion
+    }
+
+    public class GaugeListItem : ObservableObject
+    {
+        public GaugeListItem()
+        {
+            //Gauge = new GaugeChart();
+        }
+
+
+        GaugeChart _gauge = new GaugeChart();
+        public GaugeChart Gauge
+        {
+            get
+            {
+                return _gauge;
+            }
+            set
+            {
+                if(value == null)
+                {
+                   // return;
+                }
+                //_gauge.DataContext = value;
+                SetProperty(ref _gauge, value);
+
+            }
+        }
+        //string m_name;
+        //public string p_name
+        //{
+        //    get
+        //    {
+        //        return m_name;
+        //    }
+        //    set
+        //    {
+        //        //GaugeChart Gauge2 = new GaugeChart();
+        //        //Gauge2.p_name = value;
+        //        //Gauge2.p_value = 15000;
+        //        //Gauge2.p_from = 0;
+        //        //Gauge2.p_to = 20000;
+        //        //m_name = value;
+        //        ////Gauge.DataContext = Gauge;
+        //        ////Gauge = new GaugeChart();
+        //        //Gauge = Gauge2;
+        //        //Gauge.UpdateLayout();
+        //       // Gauge = Gauge;
+        //        //RaisePropertyChanged("Gauge");
+        //        //RaisePropertyChanged("GaugeListItem");
+        //    }
+        //}
+
+        int m_columnIndex = 0;
+        public int p_columnIndex
+        {
+            get
+            {
+                return m_columnIndex;
+            }
+            set
+            {
+                SetProperty(ref m_columnIndex, value);
+                RaisePropertyChanged("p_columnIndex");
+            }
+        }
+
+
+        int m_rowIndex = 0;
+        public int p_rowIndex
+        {
+            get
+            {
+                return m_rowIndex;
+            }
+            set
+            {
+                SetProperty(ref m_rowIndex, value);
+                RaisePropertyChanged("p_rowIndex");
+            }
+        }
     }
 }
