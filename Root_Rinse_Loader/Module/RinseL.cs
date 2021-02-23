@@ -194,6 +194,10 @@ namespace Root_Rinse_Loader.Module
                 if (_eStateRinse == value) return;
                 _eStateRinse = value;
                 OnPropertyChanged(); 
+                if (value == eRinseRun.Ready)
+                {
+                    if (EQ.p_eState == EQ.eState.Run) EQ.p_eState = EQ.eState.Ready; 
+                }
             }
         }
 
@@ -232,7 +236,7 @@ namespace Root_Rinse_Loader.Module
             p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
             p_sInfo = m_toolBox.Get(ref m_diRinseRun, this, "Rinse Run");
             p_sInfo = m_toolBox.Get(ref m_doRinseEmg, this, "Rinse Emg Stop");
-            if (bInit) 
+            if (bInit)
             {
                 m_doRinseEmg.Write(false); 
                 EQ.m_EQ.OnChanged += M_EQ_OnChanged;

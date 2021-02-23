@@ -19,8 +19,78 @@ namespace Root_WIND2.UI_User
             rectList = new List<TRect>();
         }
 
-        #region [Command]
-        public RelayCommand btnOpen
+        #region [Properties]
+        private bool isColorChecked = true;
+        public bool IsColorChecked
+        {
+            get => this.isColorChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsRChecked = false;
+                    this.IsGChecked = false;
+                    this.IsBChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.All;
+                SetProperty<bool>(ref this.isColorChecked, value);
+            }
+        }
+
+        private bool isRChecked = false;
+        public bool IsRChecked
+        {
+            get => this.isRChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsColorChecked = false;
+                    this.IsGChecked = false;
+                    this.IsBChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.R;
+                SetProperty<bool>(ref this.isRChecked, value);
+            }
+        }
+
+        private bool isGChecked = false;
+        public bool IsGChecked
+        {
+            get => this.isGChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsRChecked = false;
+                    this.IsColorChecked = false;
+                    this.IsBChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.G;
+                SetProperty<bool>(ref this.isGChecked, value);
+            }
+        }
+
+        private bool isBChecked = false;
+        public bool IsBChecked
+        {
+            get => this.isBChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsRChecked = false;
+                    this.IsGChecked = false;
+                    this.IsColorChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.B;
+                SetProperty<bool>(ref this.isBChecked, value);
+            }
+        }
+		#endregion
+
+		#region [Command]
+		public RelayCommand btnOpen
         {
             get
             {

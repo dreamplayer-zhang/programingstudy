@@ -408,6 +408,64 @@ namespace RootTools.Database
 #endif
 		}
 
+		public void AddMeasurementDataList(List<Measurement> _measurelist)
+		{
+#if !DEBUG
+			try
+			{
+#endif
+			SendQuery("TRUNCATE measurement;");
+			StringBuilder temp = new StringBuilder();
+			StringBuilder sbQuery = new StringBuilder();
+			StringBuilder sbColumList = new StringBuilder();
+			StringBuilder sValueList = new StringBuilder();
+			List<string> sbValueList = new List<string>();
+			Type type = typeof(Measurement);
+			FieldInfo[] fld = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+			for (int measureListNum = 0; measureListNum < _measurelist.Count; measureListNum++)
+			{
+				temp.Clear();
+				sbColumList.Clear();
+				for (int i = 0; i < fld.Length; i++)
+				{
+					var f = fld[i];
+					object obj = f.GetValue(_measurelist[measureListNum]);
+					sbColumList.Append(f.Name);
+					if (i == 0)
+						temp.Append("(");
+
+					temp.AppendFormat("'{0}'", obj);
+
+					if (i != fld.Length - 1)
+					{
+						sbColumList.Append(",");
+						temp.Append(",");
+					}
+					else
+						temp.Append(")");
+				}
+				sbValueList.Add(temp.ToString());
+			}
+
+			sbQuery.AppendFormat("INSERT INTO measurement({0}) values", sbColumList.ToString());
+			for (int i = 0; i < sbValueList.Count; i++)
+			{
+				sbQuery.Append(sbValueList[i]);
+				if (i != sbValueList.Count - 1)
+					sbQuery.Append(",");
+			}
+			SendQuery(sbQuery.ToString());
+#if !DEBUG
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("DB Query Error : (AddDefectDataList)" + ex.Message);
+			}
+
+#endif
+		}
+
 		public void SetLotinfo(string lotid, string partid, string setupid, string cstid, string waferid, string recipeid)
 		{
 			//Inspection ID 생성(KEY)

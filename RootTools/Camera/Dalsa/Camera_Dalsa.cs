@@ -25,7 +25,11 @@ namespace RootTools.Camera.Dalsa
         }
         #region Property
         public string p_id { get; set; }
-
+        public bool bStopThread
+        {
+            get;
+            set;
+        }
         int m_nGrabProgress = 0;
         public int p_nGrabProgress
         {
@@ -404,6 +408,7 @@ namespace RootTools.Camera.Dalsa
 
         public string StopGrab()
         {
+            bStopThread = true;
             //m_nGrabCount = 0;
             //p_CamParam.p_eTDIMode = DalsaParameterSet.eTDIMode.Tdi;
             p_CamParam.p_eDeviceScanType = DalsaParameterSet.eDeviceScanType.Linescan;
@@ -441,6 +446,7 @@ namespace RootTools.Camera.Dalsa
             m_MemPtr = memory.GetPtr();
 
             Scandir = m_GrabData.bInvY;
+            bStopThread = false;
 
             if (m_sapBuf.BytesPerPixel > 1)
             {
@@ -598,6 +604,8 @@ namespace RootTools.Camera.Dalsa
                 return 0;
             }
         }
+        
+
         unsafe void RunGrabLineColorScanThread2()
         {
             StopWatch swGrab = new StopWatch();
@@ -615,7 +623,7 @@ namespace RootTools.Camera.Dalsa
             int nBufSize = nCamHeight * nCamWidth;
             long nMemWidth = m_Memory.W;
 
-            while (iBlock < m_nGrabCount)
+            while (iBlock < m_nGrabCount && !bStopThread)
             {
                 if (iBlock < m_nGrabTrigger)
                 {
@@ -787,11 +795,21 @@ namespace RootTools.Camera.Dalsa
                         else
                             yp = y + iBlock * nCamHeight + nScanOffsetY + m_nOffsetTest;
 
-                        long n = nScanOffsetX + yp * nMemWidth;
+                        int ypR = yp + m_GD.m_nYShiftR;
+                        int ypG = yp + m_GD.m_nYShiftG;
+                        int ypB = yp + m_GD.m_nYShiftB;
+
+                        if (ypR < 0) ypR = 0;
+                        if (ypG < 0) ypG = 0;
+                        if (ypB < 0) ypB = 0;
+
+                        long nR = nScanOffsetX + ypR * nMemWidth;
+                        long nG = nScanOffsetX + ypG * nMemWidth;
+                        long nB = nScanOffsetX + ypB * nMemWidth;
                         IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt + nFovStart;
-                        IntPtr RedPtr = (IntPtr)((long)m_RedMemPtr + n);
-                        IntPtr GreenPtr = (IntPtr)((long)m_GreenMemPtr + n);
-                        IntPtr BluePtr = (IntPtr)((long)m_BlueMemPtr + n);
+                        IntPtr RedPtr = (IntPtr)((long)m_RedMemPtr + nR);
+                        IntPtr GreenPtr = (IntPtr)((long)m_GreenMemPtr + nG);
+                        IntPtr BluePtr = (IntPtr)((long)m_BlueMemPtr + nB);
                         int nThreadIdx = GetReadyThread();      
 
                         if (m_sapBuf.Format == SapFormat.RGB8888)
@@ -999,6 +1017,8 @@ namespace RootTools.Camera.Dalsa
             }
 
         }
+
+        
 
 
         #endregion

@@ -374,6 +374,13 @@ namespace RootTools_Vision
                 dstB[i] = srcColor[i * 3 + 2];
             }
         }
+        public static void ConvertRGB2Gray(byte[] srcColor, byte[] dstGray)
+        {
+            for (int i = 0; i < srcColor.Length / 3; i++)
+            {
+                dstGray[i] = (byte)(0.299 * srcColor[i * 3] + 0.587 * srcColor[i * 3 + 1] + 0.114 * srcColor[i * 3 + 2]);
+            }
+        }
         public static bool LoadBitmapToRawdata(string filepath, byte[] rawdata, int _width, int _height, int _byteCount)
         {
             //StopWatch stop = new StopWatch();

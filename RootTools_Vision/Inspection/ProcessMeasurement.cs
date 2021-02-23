@@ -24,52 +24,53 @@ namespace RootTools_Vision
 			return true;
 		}
 
-		public void DoProcessMeasurement()
-		{
-			if (this.currentWorkplace.Index != 0)
-				return;
+        public void DoProcessMeasurement()
+        {
+            if (this.currentWorkplace.Index != 0)
+                return;
 
-			List<Defect> defectList = new List<Defect>();
+            List<Measurement> measureList = new List<Measurement>();
 
-			foreach (Workplace workplace in workplaceBundle)
-				foreach (Defect defect in workplace.DefectList)
-					defectList.Add(defect);
+            foreach (Workplace workplace in workplaceBundle)
+                foreach (Measurement measure in workplace.MeasureList)
+                    measureList.Add(measure);
 
-            for (int i = 0; i < defectList.Count; i++)
-            {
-                defectList[i].SetDefectIndex(i);
-            }
+            // TO DO 이거 측정마다 다를건데 어떻게 할거임
+            int measureItem = Enum.GetValues(typeof(EBRMeasurement.EBRMeasureItem)).Length;
 
-            //string sDefectimagePath = @"D:\DefectImage";
-			//string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			//SaveDefectImage(Path.Combine(sDefectimagePath, sInspectionID), defectList, this.currentWorkplace.SharedBufferByteCnt);
+            for (int i = 0, index = 0; i < measureList.Count; i += measureItem, index++)
+                for (int j = 0; j < measureItem; j++)
+                    measureList[i + j].SetMeasureIndex(index);
 
-            DatabaseManager.Instance.AddDefectDataList(defectList);
+            string sMeasurementImagePath = @"D:\MeasurementImage";
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+            SaveMeasurementImage(Path.Combine(sMeasurementImagePath, sInspectionID), measureList, this.currentWorkplace.SharedBufferByteCnt);
+            DatabaseManager.Instance.AddMeasurementDataList(measureList);
 
-			WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
-		}
+            WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
+        }
 
-		private void SaveDefectImage(String path, List<Defect> defectList, int byteCnt)
+		private void SaveMeasurementImage(String path, List<Measurement> measureList, int byteCnt)
 		{
             path += "\\";
             DirectoryInfo di = new DirectoryInfo(path);
             if (!di.Exists)
                 di.Create();
 
-            if (defectList.Count < 1)
+            if (measureList.Count < 1)
                 return;
 
             unsafe
             {
-                Cpp_Rect[] defectArray = new Cpp_Rect[defectList.Count];
+                Cpp_Rect[] defectArray = new Cpp_Rect[measureList.Count];
 
-                for (int i = 0; i < defectList.Count; i++)
+                for (int i = 0; i < measureList.Count; i++)
                 {
                     Cpp_Rect rect = new Cpp_Rect();
-					rect.x = (int)defectList[i].p_rtDefectBox.Left;
-					rect.y = (int)defectList[i].p_rtDefectBox.Top;
-					rect.w = (int)defectList[i].m_fWidth;
-					rect.h = (int)defectList[i].m_fHeight;
+					rect.x = (int)measureList[i].p_rtDefectBox.Left;
+					rect.y = (int)measureList[i].p_rtDefectBox.Top;
+					rect.w = (int)measureList[i].m_fWidth;
+					rect.h = (int)measureList[i].m_fHeight;
 
 					defectArray[i] = rect;
                 }

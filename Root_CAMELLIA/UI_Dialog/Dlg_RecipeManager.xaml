@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Control.Icon"
         xmlns:cp="clr-namespace:ColorPickerLib.Controls;assembly=ColorPickerLib"
+        xmlns:stage ="clr-namespace:Camellia2Stage"
         xmlns:data="clr-namespace:Root_CAMELLIA.Data"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -20,6 +21,7 @@
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
         <local:ImageConverter x:Key="ImageConverter"/>
         <local:PathConverter x:Key="PathConverter"/>
+        <local:BoolConverter x:Key="BoolConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -41,12 +43,24 @@
                           Height="21"
                           VerticalAlignment="Center"
                           Margin="2"/>
-            <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
+                       FontSize="11"
+                       Foreground="Black"
+                       VerticalAlignment="Center"
+                       Margin="5,0,0,0"
+                       Grid.Column="0" />
+                <TextBlock Text="{Binding RecipePath}"
                        FontSize="11"
                        Foreground="Black"
                        VerticalAlignment="Center"
                        Margin="5,0,0,0"
                        Grid.Column="1" />
+            </Grid>
             <TextBlock Text="RECIPE MANGER"
                        FontSize="14"
                        FontWeight="Bold"
@@ -58,30 +72,6 @@
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
                         Orientation="Horizontal"
                         Grid.Column="2">
-                <!--<Button Style="{StaticResource SystemButton}"
-                        x:Name="MinimizeButton"
-                        Width="30"
-                        Height="25"
-                        Margin="2,0"
-                        Click="MinimizeButton_Click">
-                    <Path Style="{StaticResource MinimizeIconKey}" />
-                </Button>
-                <Button Style="{StaticResource SystemButton}"
-                        x:Name="MaximizeButton"
-                        Width="30"
-                        Height="25"
-                        Margin="2,0"
-                        Click="MaximizeButton_Click">
-                    <Path Style="{StaticResource MaximizeIconKey}" />
-                </Button>
-                <Button Style="{StaticResource SystemButton}"
-                        x:Name="NormalizeButton"
-                        Width="30"
-                        Height="25"
-                        Margin="2,0"
-                        Click="NormalizeButton_Click">
-                    <Path Style="{StaticResource NormalizeIconKey}" />
-                </Button>-->
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="CloseButton"
                         Width="30"
@@ -111,8 +101,8 @@
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <!--<RowDefinition Height="1*"/>-->
-                    <RowDefinition Height="2*"/>
-                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1.5*"/>
+                    <RowDefinition Height="0.6*"/>
                     <RowDefinition Height="5*"/>
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="1.3*"/>
@@ -143,14 +133,28 @@
                         <Button Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5" Command="{Binding Cmd73Point}"/>
                     </Grid>
                 </GroupBox>
-                <GroupBox Header="File Loader" Grid.Row="1">
+                <GroupBox Header="Select Using Measurement" Grid.Row="1">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Button Content="Open Klarf" Margin="5"/>
-                        <Button Content="Open CSV" Grid.Column="1" Margin="5"/>
+                        <Grid Grid.Column="0" Background="Gainsboro" Margin="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Use Thickness Measurement" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                            <ToggleButton Grid.Column="1" Style="{StaticResource CustomToggleButton}" IsChecked="{Binding p_UseThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                        <Grid Grid.Column="1" Background="Gainsboro" Margin="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Use Transmittance Measurement" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                            <ToggleButton Grid.Column="1" Style="{StaticResource CustomToggleButton}" IsChecked="{Binding p_UseTransmittance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
                     </Grid>
                 </GroupBox>
                 <GroupBox Header="Measurement Parameter" Grid.Row="2">
@@ -161,7 +165,8 @@
                             <RowDefinition Height="0.3*"/>
                         </Grid.RowDefinitions>
                         <DataGrid Margin="2" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" CanUserDeleteRows="False"
-                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding GridLayerData}" SelectedIndex="{Binding GridLayerIndex}">
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding GridLayerData}"
+                                  SelectedIndex="{Binding GridLayerIndex}" IsEnabled="{Binding p_UseThickness}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True" Foreground="Blue" FontWeight="ExtraBold"/>
                                 <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedHost1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
@@ -333,18 +338,18 @@
                                     </i:Interaction.Triggers>
                                 </ListView>
                                 <UniformGrid Grid.Column="2" Columns="1" Rows="2">
-                                    <Button Content="Add material"  Margin="7" Command="{Binding CmdAddMaterial}"/>
-                                    <Button Content="Delete material" Margin="7" Command="{Binding CmdDeleteMaterial}" />
+                                    <Button Content="Add material"  Margin="7" Command="{Binding CmdAddMaterial}" IsEnabled="{Binding p_UseThickness}"/>
+                                    <Button Content="Delete material" Margin="7" Command="{Binding CmdDeleteMaterial}" IsEnabled="{Binding p_UseThickness}"/>
                                 </UniformGrid>
                                 <UniformGrid Grid.Column="3" Columns="2" Rows="2" Margin="2">
-                                    <Button Content="Insert Layer" Margin="5" Command="{Binding CmdInsertLayer}"/>
-                                    <Button Content="Delete Layer" Margin="5" Command="{Binding CmdDeleteLayer}"/>
-                                    <Button Content="Open Model" Margin="5" Command="{Binding CmdOpenModel}"/>
-                                    <Button Content="Save Model" Margin="5" Command="{Binding CmdSaveModel}"/>
+                                    <Button Content="Insert Layer" Margin="5" Command="{Binding CmdInsertLayer}" IsEnabled="{Binding p_UseThickness}"/>
+                                    <Button Content="Delete Layer" Margin="5" Command="{Binding CmdDeleteLayer}" IsEnabled="{Binding p_UseThickness}"/>
+                                    <Button Content="Open Model" Margin="5" Command="{Binding CmdOpenModel}" IsEnabled="{Binding p_UseThickness}"/>
+                                    <Button Content="Save Model" Margin="5" Command="{Binding CmdSaveModel}" IsEnabled="{Binding p_UseThickness}"/>
                                 </UniformGrid>
                                 <TextBlock Text="Model File" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center"
                                            HorizontalAlignment="Center" Height="14" Width="Auto" Margin="8,8,42,8"/>
-                                <TextBox Grid.Row="1" Grid.Column="2" TextAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" Margin="70,2,2,2" Grid.ColumnSpan="2" Text="{Binding ModelPath}"/>
+                                <TextBox Grid.Row="1" Grid.Column="2" TextAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" Margin="70,2,2,2" Grid.ColumnSpan="2" Text="{Binding ModelPath}" IsEnabled="{Binding p_UseThickness}"/>
                             </Grid>
                         </Grid>
                         <UniformGrid Columns="2" Grid.Row="3">
@@ -362,7 +367,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Integration Time (NIR)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding NIRIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding NIRIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="{Binding p_SettingViewModel.p_ExceptNIR, Converter={StaticResource BoolConverter}}" />
                             </Grid>
                         </UniformGrid>
                     </Grid>
@@ -395,7 +400,8 @@
                                 <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
                                     <TextBlock Grid.Row="0" Text="Transmittance" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,2"/>
                                 </Border>
-                                <ListBox Grid.Row="1" ItemsSource="{Binding TransmittanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center" SelectedIndex="{Binding TransmittanceSelectedIndex}" />
+                                <ListBox Grid.Row="1" ItemsSource="{Binding TransmittanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center"
+                                         SelectedIndex="{Binding TransmittanceSelectedIndex}" IsEnabled="{Binding p_UseTransmittance}"/>
                             </Grid>
                         </Grid>
                         <Grid Grid.Column="2" Margin="5">
@@ -405,8 +411,8 @@
                             </Grid.RowDefinitions>
                             <UniformGrid Rows="3" Columns="1">
                                 <RadioButton Content="Reflectance" VerticalAlignment="Center" IsChecked="{Binding IsReflectanceCheck}"/>
-                                <RadioButton Content="Transmittance" VerticalAlignment="Center" IsChecked="{Binding IsTransmittanceCheck}"/>
-                                <TextBox Text="{Binding WaveLengthValue, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"/>
+                                <RadioButton Content="Transmittance" VerticalAlignment="Center" IsChecked="{Binding IsTransmittanceCheck}" IsEnabled="{Binding p_UseTransmittance}"/>
+                                <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthValue, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"/>
                             </UniformGrid>
                             <UniformGrid Rows="1" Columns="2" Grid.Row="1">
                                 <Button Content="Add" Margin="0,5,2,5" Command="{Binding CmdAddWaveLength}"/>
@@ -424,7 +430,8 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Lower WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding LowerWaveLength, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding LowerWaveLength, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"
+                                         IsEnabled="{Binding p_UseThickness}"></TextBox>
                             </Grid>
                             <Grid Margin="5" Background="Gainsboro">
                                 <Grid.ColumnDefinitions>
@@ -432,7 +439,8 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Upper WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding UpperWaveLength, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding UpperWaveLength, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"
+                                         IsEnabled="{Binding p_UseThickness}"></TextBox>
                             </Grid>
                             <Grid Margin="5" Background="Gainsboro">
                                 <Grid.ColumnDefinitions>
@@ -440,7 +448,8 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Thickness LM Iteration" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding ThicknessLMIteration, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding ThicknessLMIteration, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"
+                                         IsEnabled="{Binding p_UseThickness}"></TextBox>
                             </Grid>
                             <Grid Margin="5" Background="Gainsboro">
                                 <Grid.ColumnDefinitions>
@@ -448,7 +457,8 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Damping Factor" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding DampingFactor, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N1}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding DampingFactor, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N1}" TextAlignment="Center" VerticalContentAlignment="Center"
+                                         IsEnabled="{Binding p_UseThickness}"></TextBox>
                             </Grid>
                         </UniformGrid>
                     </Grid>
@@ -472,7 +482,6 @@
                                 <Button Content="Reset" Margin="5" Command="{Binding CmdReset}"/>
                                 <Button Content="Preset 1" Margin="5" Command="{Binding CmdPreset1}"/>
                                 <Button Content="Preset 2" Margin="5" Command="{Binding CmdPreset2}" />
-                                <Button Content="Custermize" Margin="5" Command="{Binding CmdCustomize}"/>
                             </UniformGrid>
                         </GroupBox>
                         <GroupBox Header="Point Selector" Grid.Column="1">
@@ -491,7 +500,10 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                        <Grid>
+                            <stage:CamelliaStage></stage:CamelliaStage>
+                        </Grid>
+                        <!--<Viewbox Margin="10" Width="auto" Grid.Row="0">
                             <ItemsControl ItemsSource="{Binding p_DrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
@@ -559,7 +571,7 @@
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </Canvas>
-                        </Viewbox>
+                        </Viewbox>-->
                     </Grid>
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
@@ -738,14 +750,15 @@
 
                 <Grid Grid.Row="3">
                     <GroupBox Header="PreView">
-                        <Viewbox Margin="10">
+                        <stage:CamelliaStage></stage:CamelliaStage>
+                        <!--<Viewbox Margin="10">
                             <ItemsControl ItemsSource="{Binding p_PreviewDrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas x:Name="StagePreView" Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
-                                            <!--<i:Interaction.Triggers>
+                                            --><!--<i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseMove">
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
                                                 </i:EventTrigger>
@@ -755,12 +768,12 @@
                                                 <i:EventTrigger EventName="MouseLeftButtonDown" >
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
                                                 </i:EventTrigger>
-                                            </i:Interaction.Triggers>-->
+                                            </i:Interaction.Triggers>--><!--
                                         </Canvas>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
-                        </Viewbox>
+                        </Viewbox>-->
                     </GroupBox>
                 </Grid>
             </Grid>

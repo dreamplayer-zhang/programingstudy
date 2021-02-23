@@ -151,8 +151,6 @@ namespace Root_WIND2.UI_User
 
 		public EdgesideInspect_ViewModel()
 		{
-			
-
 			ImageViewerTopVM = new Edgeside_ImageViewer_ViewModel();
 			ImageViewerTopVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
 			ImageViewerSideVM = new Edgeside_ImageViewer_ViewModel();
@@ -250,8 +248,8 @@ namespace Root_WIND2.UI_User
 				Progress++;
 
 				int proc = (int)(((double)Progress / MaxProgress) * 100);
-				//if (proc > 99)
-				//	proc = 99;
+				//if (proc == 100)
+				//	Percentage = "Processing";
 				Percentage = proc.ToString();
 			}
 		}
