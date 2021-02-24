@@ -81,7 +81,7 @@ namespace RootTools_Vision
 			int threshold = param.Threshold;
 			int defectSize = param.DefectSizeMin;
 			int searchLevel = param.EdgeSearchLevel;
-			double resolution = param.CamResolution;
+			//double resolution = param.Resolution;
 
 			if (this.currentWorkplace.Height < roiHeight)
 				roiHeight = this.currentWorkplace.Height;
@@ -133,8 +133,8 @@ namespace RootTools_Vision
 						label[i].value,
 						this.currentWorkplace.PositionX + label[i].boundLeft,
 						this.currentWorkplace.PositionY + label[i].boundTop,
-						(float)(Math.Abs(label[i].boundRight - label[i].boundLeft) * resolution),
-						(float)(Math.Abs(label[i].boundBottom - label[i].boundTop) * resolution),
+						Math.Abs(label[i].boundRight - label[i].boundLeft),// * resolution),
+						Math.Abs(label[i].boundBottom - label[i].boundTop),// * resolution),
 						this.currentWorkplace.MapIndexX,
 						this.currentWorkplace.MapIndexY
 						);

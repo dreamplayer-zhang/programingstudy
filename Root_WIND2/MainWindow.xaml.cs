@@ -142,8 +142,9 @@ namespace Root_WIND2
 
             UIManager.Instance.ChangeUIMode();
 
+            SettingItem_SetupFrontside frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
             ///////시연용 임시코드
-            DatabaseManager.Instance.SetDatabase(1);
+            DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
             //DatabaseManager.Instance.ValidateDatabase();
             //////
 
@@ -183,6 +184,9 @@ namespace Root_WIND2
         {
             try
             {
+                // Settings
+                Settings settings = GlobalObjects.Instance.Register<Settings>();
+
                 // Engineer
                 WIND2_Engineer engineer = GlobalObjects.Instance.Register<WIND2_Engineer>();
                 DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
@@ -217,12 +221,36 @@ namespace Root_WIND2
                 ImageData edgeBottomImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeBottomImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeBottom));
                 ImageData ebrImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EBRImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR));
 
-                if (frontImage.m_MemData != null) frontImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nCount;
-                if (maskLayer.m_MemData != null) maskLayer.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask).p_nByte;
-                if (edgeTopImage.m_MemData != null) edgeTopImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop).p_nCount;
-                if (edgeSideImage.m_MemData != null) edgeSideImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeSide).p_nCount;
-                if (edgeBottomImage.m_MemData != null) edgeBottomImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeBottom).p_nCount;
-                if (ebrImage.m_MemData != null) ebrImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR).p_nCount;
+                if (frontImage.m_MemData != null)
+                {
+                    frontImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nByte;
+                    frontImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nCount;
+                }
+                if (maskLayer.m_MemData != null)
+                {
+                    maskLayer.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nByte;
+                    maskLayer.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nCount;
+                }
+                if (edgeTopImage.m_MemData != null)
+                {
+                    edgeTopImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop).p_nByte;
+                    edgeTopImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop).p_nCount;
+                }
+                if (edgeSideImage.m_MemData != null)
+                {
+                    edgeSideImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeSide).p_nByte;
+                    edgeSideImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeSide).p_nCount;
+                }
+                if (edgeBottomImage.m_MemData != null)
+                {
+                    edgeBottomImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeBottom).p_nByte;
+                    edgeBottomImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeBottom).p_nCount;
+                }
+                if (ebrImage.m_MemData != null)
+                {
+                    ebrImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR).p_nByte;
+                    ebrImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR).p_nCount;
+                }
 
 
                 // Recipe
@@ -250,7 +278,7 @@ namespace Root_WIND2
                             frontImage.GetPtr(0), 
                             frontImage.p_Size.X, 
                             frontImage.p_Size.Y, 
-                            frontImage.p_nByte, 
+                            frontImage.frontImage.GetBytePerPixel(), 
                             frontImage.GetPtr(1), 
                             frontImage.GetPtr(2), 
                             new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)
@@ -268,7 +296,7 @@ namespace Root_WIND2
                     InspectionManagerBackside inspectionBack = GlobalObjects.Instance.Register<InspectionManagerBackside>
                     (
                     recipeBack,
-                    new SharedBufferInfo(backImage.GetPtr(0), backImage.p_Size.X, backImage.p_Size.Y, backImage.p_nByte, backImage.GetPtr(1), backImage.GetPtr(2))
+                    new SharedBufferInfo(frontImage.GetPtr(0), frontImage.p_Size.X, frontImage.p_Size.Y, frontImage.GetBytePerPixel(), frontImage.GetPtr(1), frontImage.GetPtr(2))
                     );
                 }
 
@@ -283,11 +311,11 @@ namespace Root_WIND2
                     recipeEdge,
                     new SharedBufferInfo[]{
                         // [0] Top
-                        new SharedBufferInfo(edgeTopImage.GetPtr(0), edgeTopImage.p_Size.X, edgeTopImage.p_Size.Y, edgeTopImage.p_nByte, edgeTopImage.GetPtr(1), edgeTopImage.GetPtr(2)),
+                        new SharedBufferInfo(edgeTopImage.GetPtr(0), edgeTopImage.p_Size.X, edgeTopImage.p_Size.Y, edgeTopImage.GetBytePerPixel(), edgeTopImage.GetPtr(1), edgeTopImage.GetPtr(2)),
                         // [1] Side
-                        new SharedBufferInfo(edgeSideImage.GetPtr(0), edgeSideImage.p_Size.X, edgeSideImage.p_Size.Y, edgeSideImage.p_nByte, edgeSideImage.GetPtr(1), edgeSideImage.GetPtr(2)),
+                        new SharedBufferInfo(edgeSideImage.GetPtr(0), edgeSideImage.p_Size.X, edgeSideImage.p_Size.Y, edgeSideImage.GetBytePerPixel(), edgeSideImage.GetPtr(1), edgeSideImage.GetPtr(2)),
                         // [2]
-                        new SharedBufferInfo(edgeBottomImage.GetPtr(0), edgeBottomImage.p_Size.X, edgeBottomImage.p_Size.Y, edgeBottomImage.p_nByte, edgeBottomImage.GetPtr(1), edgeBottomImage.GetPtr(2)),
+                        new SharedBufferInfo(edgeBottomImage.GetPtr(0), edgeBottomImage.p_Size.X, edgeBottomImage.p_Size.Y, edgeBottomImage.GetBytePerPixel(), edgeBottomImage.GetPtr(1), edgeBottomImage.GetPtr(2)),
                     });
                 }
 
@@ -301,7 +329,7 @@ namespace Root_WIND2
                     InspectionManagerEBR inspectionEBR = GlobalObjects.Instance.Register<InspectionManagerEBR>
                     (
                     recipeEBR,
-                    new SharedBufferInfo(ebrImage.GetPtr(0), ebrImage.p_Size.X, ebrImage.p_Size.Y, ebrImage.p_nByte, ebrImage.GetPtr(1), ebrImage.GetPtr(2))
+                    new SharedBufferInfo(ebrImage.GetPtr(0), ebrImage.p_Size.X, ebrImage.p_Size.Y, ebrImage.GetBytePerPixel(), ebrImage.GetPtr(1), ebrImage.GetPtr(2))
                     );
                 }
 
@@ -330,7 +358,7 @@ namespace Root_WIND2
 
         public void CreateGlobalPaths()
         {
-            Type t = typeof(Constants.Path);
+            Type t = typeof(Constants.RootPath);
             FieldInfo[] fields = t.GetFields(BindingFlags.Static | BindingFlags.Public);
             foreach (FieldInfo field in fields)
                 Directory.CreateDirectory(field.GetValue(null).ToString());

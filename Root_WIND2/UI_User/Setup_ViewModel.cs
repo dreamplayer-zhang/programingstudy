@@ -1,4 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using RootTools;
+using RootTools_Vision;
+using System;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Root_WIND2.UI_User
@@ -78,6 +81,30 @@ namespace Root_WIND2.UI_User
                 });
             }
         }
+
+        public ICommand btnPopUpSetting
+        {
+            get
+            {
+                return new RelayCommand(()=>
+                {
+                    var viewModel = UIManager.Instance.SettingDialogViewModel;
+                    Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+                    if (result.HasValue)
+                    {
+                        if (result.Value)
+                        {
+                            
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                });
+            }
+        }
+
         #endregion
     }
 }

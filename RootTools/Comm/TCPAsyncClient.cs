@@ -1,10 +1,7 @@
 ﻿using RootTools.Trees;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace RootTools.Comm
@@ -119,8 +116,8 @@ namespace RootTools.Comm
             try
             {
                 int lReceive = async.m_socket.EndReceive(ar);
-                if (lReceive > 0) EventReciveData(async.m_aBuf, lReceive, async.m_socket);
-                m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
+                if ((lReceive > 0) && (EventReciveData != null)) EventReciveData(async.m_aBuf, lReceive, async.m_socket);
+                //m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
                 async.m_socket.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
             }
             catch (Exception e)
@@ -146,7 +143,7 @@ namespace RootTools.Comm
         {
             Async async = (Async)ar.AsyncState;
             int lSend = async.m_socket.EndSend(ar);
-            m_commLog.Add(CommLog.eType.Send, (lSend < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lSend) : "Large Data");
+            //m_commLog.Add(CommLog.eType.Send, (lSend < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lSend) : "Large Data");
         }
         #endregion
 

@@ -77,14 +77,14 @@ namespace RootTools.Comm
 
         #region Accept
         AsyncCallback m_cbAccept;
-        Socket m_socketSend = null; 
+        Socket m_socketComm = null; 
         void CallBackAccept(IAsyncResult ar)
         {
-            m_socketSend = m_socket.EndAccept(ar);
+            m_socketComm = m_socket.EndAccept(ar);
             Async async = new Async(m_lMaxBuffer);
-            async.m_socket = m_socketSend;
+            async.m_socket = m_socketComm;
             m_cbReceive = new AsyncCallback(CallBackReceive);
-            m_socketSend.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
+            m_socketComm.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
             m_commLog.Add(CommLog.eType.Info, "Accept Client Socket");
         }
         #endregion
@@ -99,7 +99,7 @@ namespace RootTools.Comm
             {
                 int lReceive = async.m_socket.EndReceive(ar);
                 if (lReceive > 0) EventReciveData(async.m_aBuf, lReceive, async.m_socket);
-                m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.ASCII.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
+                //m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.ASCII.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
                 async.m_socket.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
             }
             catch (Exception e)
@@ -116,8 +116,8 @@ namespace RootTools.Comm
             if (m_socket == null) return "Not Connected"; 
             Async async = new Async(1);
             async.m_aBuf = Encoding.Default.GetBytes(sMsg);
-            async.m_socket = m_socketSend;
-            m_socketSend.BeginSend(async.m_aBuf, 0, async.m_aBuf.Length, SocketFlags.None, m_cbSend, async);
+            async.m_socket = m_socketComm;
+            m_socketComm.BeginSend(async.m_aBuf, 0, async.m_aBuf.Length, SocketFlags.None, m_cbSend, async);
             return "OK"; 
         }
 
@@ -125,7 +125,7 @@ namespace RootTools.Comm
         {
             Async async = (Async)ar.AsyncState;
             int lSend = async.m_socket.EndSend(ar);
-            m_commLog.Add(CommLog.eType.Send, (lSend < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lSend) : "Large Data"); 
+            //m_commLog.Add(CommLog.eType.Send, (lSend < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lSend) : "Large Data"); 
         }
         #endregion
 

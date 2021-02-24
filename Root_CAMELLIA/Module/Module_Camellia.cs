@@ -250,7 +250,7 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
             p_sInfo = m_toolBox.Get(ref m_axisLifter, this, "StageLifter");
             p_sInfo = m_toolBox.Get(ref m_tiltAxisXY, this, "TiltXY");
-            p_sInfo = m_toolBox.Get(ref m_tiltAxisZ, this, "TiltX");
+            p_sInfo = m_toolBox.Get(ref m_tiltAxisZ, this, "TiltZ");
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_axisXReady, this, "Stage X Ready");
@@ -287,6 +287,10 @@ namespace Root_CAMELLIA.Module
             if (EQ.p_bSimulate)
                 return "OK";
 
+            m_tiltAxisXY.p_axisX.p_eState = Axis.eState.Ready;
+            m_tiltAxisXY.p_axisY.p_eState = Axis.eState.Ready;
+            m_tiltAxisZ.p_eState = Axis.eState.Ready;
+
             Thread.Sleep(200);
             if (m_listAxis.Count == 0) return "OK";
             if (p_eState == eState.Run) return "Invalid State : Run";
@@ -307,6 +311,7 @@ namespace Root_CAMELLIA.Module
             {
                 p_eState = eState.Error;
                 p_sInfo = "Vacuum is not turn off";
+                MessageBox.Show(p_sInfo);
                 return p_sInfo;
             }
             p_axisLifter.StartHome();
@@ -314,6 +319,7 @@ namespace Root_CAMELLIA.Module
             {
                 p_eState = eState.Error;
                 p_sInfo = "Lifter Home Error";
+                MessageBox.Show(p_sInfo);
                 return p_sInfo;
             }
 

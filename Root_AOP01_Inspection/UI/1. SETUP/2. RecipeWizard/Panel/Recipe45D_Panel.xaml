@@ -54,7 +54,7 @@
 
                         <Grid Grid.Column="0">
                             <GroupBox Header="45D Image">
-								<tools:RootViewer DataContext="{Binding p_ImageViewer_VM}"
+								<tools:DrawableRootViewer DataContext="{Binding p_ImageViewer_VM}"
 												  x:Name="canvas"/>
 								<!--<Image Source="/Root_AOP01_Inspection;component/Resource/ReticleMap2.PNG"/>-->
                             </GroupBox>
