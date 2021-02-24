@@ -81,8 +81,6 @@ namespace RootTools_Vision
 		private int mergeDist = 1;
 		private int edgeSearchLevel = 20;
 		
-		// 카메라 정보
-		private double camResolution = 0;
 		#endregion
 
 		#region [Getter/Setter]
@@ -138,15 +136,6 @@ namespace RootTools_Vision
 			set
 			{
 				SetProperty<int>(ref this.edgeSearchLevel, value);
-			}
-		}
-		[Category("Parameter")]
-		public double CamResolution
-		{
-			get => this.camResolution;
-			set
-			{
-				SetProperty<double>(ref this.camResolution, value);
 			}
 		}
 		#endregion

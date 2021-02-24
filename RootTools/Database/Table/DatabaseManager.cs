@@ -138,7 +138,7 @@ namespace RootTools.Database
 			}
 			catch(Exception e)
 			{
-				MessageBox.Show(e.ToString());
+				TempLogger.Write("Database", e);
 				return false;
 			}
 		}
@@ -276,7 +276,7 @@ namespace RootTools.Database
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message);
+				TempLogger.Write("Database", ex);
 				table = data.Tables[0].Copy();
 				return table;
 			}
@@ -301,7 +301,7 @@ namespace RootTools.Database
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("SelectTablewithInspectionID : " + ex.Message);
+				TempLogger.Write("Database", ex);
 				table = data.Tables[0].Copy();
 				return table;
 			}
@@ -344,7 +344,7 @@ namespace RootTools.Database
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message);
+				TempLogger.Write("Database", ex);
 			}
 
 #endif
@@ -402,7 +402,7 @@ namespace RootTools.Database
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("DB Query Error : (AddDefectDataList)" + ex.Message);
+				TempLogger.Write("Database", ex);
 			}
 
 #endif

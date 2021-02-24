@@ -179,7 +179,7 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        public void AddDrawRect(CRect rect, SolidColorBrush color = null)
+        private void AddDrawRect(CRect rect, SolidColorBrush color = null)
         {
             if (color == null)
             {

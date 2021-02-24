@@ -18,9 +18,7 @@
         <TabControl Grid.Column="0">
             <TabItem Header="Handler" Background="{Binding p_brushHandler}">
                 <TabControl>
-                    <TabItem Header="Test">
-                        <Button Content="Test" Click="Button_Click"/>
-                    </TabItem>
+                    
                     <TabItem Header="ModuleList" Background="{Binding p_brushHandler}">
                         <module:ModuleList_UI x:Name="moduleListUI"/>
                     </TabItem>

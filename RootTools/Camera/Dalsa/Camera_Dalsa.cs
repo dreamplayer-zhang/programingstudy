@@ -795,11 +795,21 @@ namespace RootTools.Camera.Dalsa
                         else
                             yp = y + iBlock * nCamHeight + nScanOffsetY + m_nOffsetTest;
 
-                        long n = nScanOffsetX + yp * nMemWidth;
+                        int ypR = yp + m_GD.m_nYShiftR;
+                        int ypG = yp + m_GD.m_nYShiftG;
+                        int ypB = yp + m_GD.m_nYShiftB;
+
+                        if (ypR < 0) ypR = 0;
+                        if (ypG < 0) ypG = 0;
+                        if (ypB < 0) ypB = 0;
+
+                        long nR = nScanOffsetX + ypR * nMemWidth;
+                        long nG = nScanOffsetX + ypG * nMemWidth;
+                        long nB = nScanOffsetX + ypB * nMemWidth;
                         IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt + nFovStart;
-                        IntPtr RedPtr = (IntPtr)((long)m_RedMemPtr + n);
-                        IntPtr GreenPtr = (IntPtr)((long)m_GreenMemPtr + n);
-                        IntPtr BluePtr = (IntPtr)((long)m_BlueMemPtr + n);
+                        IntPtr RedPtr = (IntPtr)((long)m_RedMemPtr + nR);
+                        IntPtr GreenPtr = (IntPtr)((long)m_GreenMemPtr + nG);
+                        IntPtr BluePtr = (IntPtr)((long)m_BlueMemPtr + nB);
                         int nThreadIdx = GetReadyThread();      
 
                         if (m_sapBuf.Format == SapFormat.RGB8888)

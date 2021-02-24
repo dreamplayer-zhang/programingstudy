@@ -82,7 +82,6 @@ namespace Root_CAMELLIA
             InitModule(m_towerlamp);
             m_interlock = new Interlock("Interlock", m_engineer);
             InitModule(m_interlock);
-            //InitXGem();
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_camellia);
             m_wtr.RunTree(Tree.eMode.RegRead);
@@ -94,10 +93,8 @@ namespace Root_CAMELLIA
             m_FFU = new Module_FFU("FFU", m_engineer);
             InitModule(m_FFU);
             m_recipe = new CAMELLIA_Recipe("Recipe", m_engineer);
-            //m_recipe.AddModule(m_camellia);
             foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            //m_process = new CAMELLIA_Process("Process", m_engineer, this);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR);
+            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
         }
 
         void InitModule(ModuleBase module)

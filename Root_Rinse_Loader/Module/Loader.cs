@@ -252,7 +252,9 @@ namespace Root_Rinse_Loader.Module
             Thread.Sleep(200);
             if (Run(RunVacuum(true))) return p_sInfo;
             Thread.Sleep(200);
-            m_storage.StartStackDown();
+            //m_storage.StartStackDown();
+            if (Run(m_storage.MoveStack_Down())) return p_sInfo;
+            Thread.Sleep(100);
             if (Run(RunShakeUp())) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             return "OK";

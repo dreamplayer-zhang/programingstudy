@@ -45,10 +45,10 @@ namespace Root_CAMELLIA.Module
 
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
-            switch (eEQ) 
+            switch (eEQ)
             {
                 case _EQ.eEQ.State:
-                    switch ((EQ.eState)value) 
+                    switch ((EQ.eState)value)
                     {
                         case EQ.eState.Error:
                             RunBuzzer(eBuzzer.Error);
@@ -72,7 +72,7 @@ namespace Root_CAMELLIA.Module
         protected override void RunThread()
         {
             base.RunThread();
-            if(m_eState != EQ.p_eState)
+            //if(m_eState != EQ.p_eState)
             {
                 switch (EQ.p_eState) 
                 {
