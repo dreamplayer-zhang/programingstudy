@@ -235,7 +235,7 @@ namespace Root_WIND2
         private void P_BoxTool_VM_BoxDone(object e)
         {
             TRect BOX = e as TRect;
-            int byteCnt = p_OriginBoxTool_VM.p_ImageData.p_nByte;
+            int byteCnt = p_OriginBoxTool_VM.p_ImageData.GetBytePerPixel();
             long stride = p_OriginBoxTool_VM.p_ImageData.p_Stride;
             CRect boxImageRect = new CRect(BOX.MemoryRect.Left, BOX.MemoryRect.Top, BOX.MemoryRect.Right+1, BOX.MemoryRect.Bottom+1);
             ImageData BoxImageData = new ImageData(boxImageRect.Width, boxImageRect.Height, byteCnt);
@@ -253,10 +253,10 @@ namespace Root_WIND2
             p_OriginBoxTool_VM.AddInspArea(InspAreaBuf);
 
             CRect rect = new CRect(InspAreaBuf.MemoryRect.Left, InspAreaBuf.MemoryRect.Top, InspAreaBuf.MemoryRect.Right+1, InspAreaBuf.MemoryRect.Bottom+1);
-            OriginImageData = new ImageData(rect.Width, rect.Height, p_OriginBoxTool_VM.p_ImageData.p_nByte);
+            OriginImageData = new ImageData(rect.Width, rect.Height, p_OriginBoxTool_VM.p_ImageData.GetBytePerPixel());
             OriginImageData.m_eMode = ImageData.eMode.ImageBuffer;
             //OriginImageData.SetData(p_OriginBoxTool_VM.p_ImageData.GetPtr(), InspAreaBuf.MemoryRect, (int)p_OriginBoxTool_VM.p_ImageData.p_Stride, p_OriginBoxTool_VM.p_ImageData.p_nByte);
-            OriginImageData.SetData(p_OriginBoxTool_VM.p_ImageData, rect, (int)p_OriginBoxTool_VM.p_ImageData.p_Stride, p_OriginBoxTool_VM.p_ImageData.p_nByte);
+            OriginImageData.SetData(p_OriginBoxTool_VM.p_ImageData, rect, (int)p_OriginBoxTool_VM.p_ImageData.p_Stride, p_OriginBoxTool_VM.p_ImageData.GetBytePerPixel());
             InspAreaBuf.Tag = OriginImageData;
 
             SetOrigin(InspAreaBuf);
