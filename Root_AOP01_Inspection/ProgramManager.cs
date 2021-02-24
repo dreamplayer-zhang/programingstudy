@@ -124,17 +124,17 @@ namespace Root_AOP01_Inspection
 			memoryTool = this.engineer.ClassMemoryTool();
 
 			imageMain = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.mMainMem));
-			imageMain.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mMainMem).p_nCount;
+			//imageMain.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mMainMem).p_nCount;
 			image45D = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.m45DMem));
-			image45D.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.m45DMem).p_nCount;
+			//image45D.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.m45DMem).p_nCount;
 			imageSideLeft = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideLeftMem));
-			imageSideLeft.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideLeftMem).p_nCount;
+			//imageSideLeft.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideLeftMem).p_nCount;
 			imageSideTop = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideTopMem));
-			imageSideTop.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideTopMem).p_nCount;
+			//imageSideTop.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideTopMem).p_nCount;
 			imageSideRight = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideRightMem));
-			imageSideRight.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideRightMem).p_nCount;
+			//imageSideRight.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideRightMem).p_nCount;
 			imageSideBottom = new ImageData(memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideBotMem));
-			imageSideBottom.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideBotMem).p_nCount;
+			//imageSideBottom.p_nByte = memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideBotMem).p_nCount;
 
 			roiLayer = new ImageData(memoryTool.GetMemory("pool", "group", memoryNameROI));
 			//roiLayer.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameROI).p_nCount;

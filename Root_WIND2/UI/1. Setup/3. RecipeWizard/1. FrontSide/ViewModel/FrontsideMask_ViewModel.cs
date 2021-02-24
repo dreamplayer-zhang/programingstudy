@@ -1421,10 +1421,10 @@ namespace Root_WIND2
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
+            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel()];
             for (int y = 0; y < p_ROILayer.p_Size.Y; y++)
             {
-                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * y), buf.Length);
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel() * y), buf.Length);
             }
 
 
@@ -1464,10 +1464,10 @@ namespace Root_WIND2
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
+            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel()];
             for (int y = 0; y < p_ROILayer.p_Size.Y; y++)
             {
-                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * y), buf.Length);
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel() * y), buf.Length);
             }
 
 
@@ -1504,10 +1504,10 @@ namespace Root_WIND2
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
+            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel()];
             for (int i = 0; i < p_ROILayer.p_Size.Y; i++)
             {
-                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * i), buf.Length);
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel() * i), buf.Length);
             }
         }
         private void Worker_ClearROI_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

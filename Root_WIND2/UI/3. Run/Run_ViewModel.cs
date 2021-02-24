@@ -164,7 +164,8 @@ namespace Root_WIND2
                 m_ToolMemory = engineer.ClassMemoryTool();
 
                 m_imagedata = new ImageData(m_ToolMemory.GetMemory("BackSide Vision.BackSide Memory", "BackSide Vision", "Main"));
-                m_imagedata.p_nByte = 3;
+                m_imagedata.p_nByte = 1;
+                m_imagedata.p_nPlane = 3;
                 p_Viewer.SetImageData(m_imagedata);
 
                 p_ModuleList = engineer.ClassModuleList();
@@ -203,32 +204,37 @@ namespace Root_WIND2
         public void FuncBackSideImageView()
         {
             m_imagedata = new ImageData(m_ToolMemory.GetMemory("BackSide Vision.BackSide Memory", "BackSide Vision", "Main"));
-            m_imagedata.p_nByte = 3;
+            m_imagedata.p_nByte = 1;
+            m_imagedata.p_nPlane = 3;
             p_Viewer.SetImageData(m_imagedata);
         }
 
         public void FuncEdgeTopImageView()
         {
             m_imagedata =  p_EdgeVision.GetMemoryData(EdgeSideVision.EDGE_TYPE.EdgeTop);
-            m_imagedata.p_nByte = 3;
+            m_imagedata.p_nByte = 1;
+            m_imagedata.p_nPlane = 3;
             p_Viewer.SetImageData(m_imagedata);
         }
         public void FuncEdgeSideImageView()
         {
             m_imagedata = p_EdgeVision.GetMemoryData(EdgeSideVision.EDGE_TYPE.EdgeSide);
-            m_imagedata.p_nByte = 3;
+            m_imagedata.p_nByte = 1;
+            m_imagedata.p_nPlane = 3;
             p_Viewer.SetImageData(m_imagedata);
         }
         public void FuncEdgeBtmImageView()
         {
             m_imagedata = p_EdgeVision.GetMemoryData(EdgeSideVision.EDGE_TYPE.EdgeBottom);
-            m_imagedata.p_nByte = 3;
+            m_imagedata.p_nByte = 1;
+            m_imagedata.p_nPlane = 3;
             p_Viewer.SetImageData(m_imagedata);
         }
         public void FuncEBRImageView()
         {
             m_imagedata = p_EdgeVision.GetMemoryData(EdgeSideVision.EDGE_TYPE.EBR);
-            m_imagedata.p_nByte = 3;
+            m_imagedata.p_nByte = 1;
+            m_imagedata.p_nPlane = 3;
             p_Viewer.SetImageData(m_imagedata);
         }
 

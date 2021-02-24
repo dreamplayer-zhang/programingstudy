@@ -530,7 +530,7 @@ namespace Root_Vega.Module
             rcROI = new Rect(pt1, pt2);
 
             // Binarization
-            matSrc = new Mat((int)rcROI.Height, (int)rcROI.Width, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr((int)rcROI.Top, (int)rcROI.Left), (int)img.p_Stride);
+            matSrc = new Mat((int)rcROI.Height, (int)rcROI.Width, Emgu.CV.CvEnum.DepthType.Cv8U, img.GetBytePerPixel(), img.GetPtr((int)rcROI.Top, (int)rcROI.Left), (int)img.p_Stride);
             matBinary = new Mat();
             CvInvoke.Threshold(matSrc, matBinary, /*p_nThreshold*/200, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
 

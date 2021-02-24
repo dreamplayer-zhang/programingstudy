@@ -296,7 +296,7 @@ namespace Root_AOP01_Inspection
 			float outRadius = Radius;
 
 			IntPtr MainImage = new IntPtr();
-			if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
+			if (p_ImageViewer_VM.p_ImageData.GetBytePerPixel() == 3)
 			{
 				if (p_eColorViewMode != eColorViewMode.All)
 					MainImage = p_ImageViewer_VM.p_ImageData.GetPtr((int)p_eColorViewMode - 1);
@@ -614,7 +614,7 @@ namespace Root_AOP01_Inspection
 			//temp = backsideRecipe;
 
 			IntPtr SharedBuf = new IntPtr();
-			if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
+			if (p_ImageViewer_VM.p_ImageData.GetBytePerPixel() == 3)
 			{
 				if (p_ImageViewer_VM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
 					SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr((int)p_ImageViewer_VM.p_eColorViewMode - 1);
@@ -629,7 +629,7 @@ namespace Root_AOP01_Inspection
 				m_Setup.InspectionManager.SharedBufferR_Gray = SharedBuf;
 			}
 
-			m_Setup.InspectionManager.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.p_nByte;
+			m_Setup.InspectionManager.SharedBufferByteCnt = p_ImageViewer_VM.p_ImageData.GetBytePerPixel();
 
 			//if (m_Setup.InspectionManager.CreateInspection() == false)  //Del Temp LYJ
 			//{

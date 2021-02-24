@@ -21,7 +21,7 @@
             <Menu Background="{StaticResource ControlBackGround}" VerticalAlignment="Center">
                 <MenuItem BorderBrush="{x:Null}" Header="File" FontFamily="Arial" Margin="2,0" Height="30">
                     <MenuItem Header="Load Image" Command="{Binding OpenImage}"/>
-                    <MenuItem Header="Save Image" IsEnabled="False"/>
+                    <MenuItem Header="Save Image" Command="{Binding SaveImage}"/>
                     <MenuItem Header="Clear Image" Command="{Binding ClearImage}"/>
                 </MenuItem>
                 <MenuItem BorderBrush="{x:Null}" Header="Edit" FontFamily="Arial" Margin="2,0" Height="30">
