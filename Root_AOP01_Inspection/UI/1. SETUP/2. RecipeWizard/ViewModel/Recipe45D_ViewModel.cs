@@ -524,7 +524,7 @@ namespace Root_AOP01_Inspection
 			bool isIncludeMode = true;
 
 			IntPtr MainImage = new IntPtr();
-			if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
+			if (p_ImageViewer_VM.p_ImageData.GetBytePerPixel() == 3)
 			{
 				if (p_eColorViewMode != eColorViewMode.All)
 					MainImage = p_ImageViewer_VM.p_ImageData.GetPtr((int)p_eColorViewMode - 1);
@@ -769,7 +769,7 @@ namespace Root_AOP01_Inspection
 			recipe.ParameterItemList.Add(surParam);
 
 			IntPtr SharedBuf = new IntPtr();
-			if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
+			if (p_ImageViewer_VM.p_ImageData.GetBytePerPixel() == 3)
 			{
 				if (p_ImageViewer_VM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
 					SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr((int)p_ImageViewer_VM.p_eColorViewMode - 1);
