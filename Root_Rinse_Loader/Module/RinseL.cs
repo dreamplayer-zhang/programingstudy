@@ -449,7 +449,8 @@ namespace Root_Rinse_Loader.Module
             {
                 Thread.Sleep(10);
                 p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready;
-                p_bRinseEmg = (p_eStateRinse == eRinseRun.Run) && (p_eStateUnloader != EQ.eState.Run); 
+                //p_bRinseEmg = (p_eStateRinse == eRinseRun.Run) && (p_eStateUnloader != EQ.eState.Run); 
+                p_bRinseEmg = p_eStateUnloader == EQ.eState.Error;
                 RunThreadDIO(); 
                 if (m_qProtocolReply.Count > 0)
                 {
