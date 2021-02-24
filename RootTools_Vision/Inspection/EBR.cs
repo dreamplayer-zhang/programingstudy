@@ -132,6 +132,7 @@ namespace RootTools_Vision
 								(float)((waferEdgeX - bevelX) * recipeEBR.Resolution),
 								this.currentWorkplace.Width,
 								this.currentWorkplace.Height,
+								CalculateAngle(this.currentWorkplace.Index),
 								this.currentWorkplace.PositionX,
 								this.currentWorkplace.PositionY,
 								this.currentWorkplace.MapIndexX,
@@ -144,10 +145,18 @@ namespace RootTools_Vision
 								(float)(waferEdgeX - ebrX * recipeEBR.Resolution),
 								this.currentWorkplace.Width,
 								this.currentWorkplace.Height,
+								CalculateAngle(this.currentWorkplace.Index),
 								this.currentWorkplace.PositionX,
 								this.currentWorkplace.PositionY,
 								this.currentWorkplace.MapIndexX,
 								this.currentWorkplace.MapIndexY);
+		}
+
+		private float CalculateAngle(int index)
+		{
+			float angle = 0;
+
+			return angle;
 		}
 
 		private float FindEdge(int[] diff, int searchStartX, int standardDiff)

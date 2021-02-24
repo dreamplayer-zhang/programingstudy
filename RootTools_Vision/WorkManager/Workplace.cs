@@ -366,7 +366,7 @@ namespace RootTools_Vision
             defectList.Add(defect);
         }
 
-        public void AddMeasurement(string strInspectionID, string strSide, Measurement.MeasureType type, Measurement.EBRMeasureItem measureItem, float fData, float fDefectW, float fDefectH, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)
+        public void AddMeasurement(string strInspectionID, string strSide, Measurement.MeasureType type, Measurement.EBRMeasureItem measureItem, float fData, float fDefectW, float fDefectH, float fAngle, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)
 		{
             Measurement measurement = new Measurement(strInspectionID,
                                                       strSide,
@@ -375,6 +375,7 @@ namespace RootTools_Vision
                                                       fData,
                                                       fDefectW,
                                                       fDefectH,
+                                                      fAngle,
                                                       fDefectAbsLeft,
                                                       fDefectAbsTop,
                                                       nChipIdxX,
