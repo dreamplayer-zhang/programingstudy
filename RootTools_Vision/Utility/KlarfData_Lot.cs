@@ -214,6 +214,46 @@ namespace RootTools_Vision.Utility
 			klarfData.Add(data);
 			return true;
 		}
+
+		public bool AddSlot(RecipeType_WaferMap _mapdata, List<Measurement> _defectlist, OriginRecipe _origin)
+		{
+			UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
+
+			KlarfData data = new KlarfData();
+
+			data.SetKlarfType(klarfType);
+			data.tiffFileName = this.tiffFileName;
+
+			data.waferID_name = string.Format("{0:2d}", 0/*pMapdata->GetWaferID()*/);
+
+			//	data.m_nWaferID = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nWaferID);  
+			//	data.m_nSlot = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nSlot); 
+			data.partID = this.partID;
+
+			//	m_sLotID = data.m_sLotID = pRecipe->GetCurrentWFInfor()->m_strLotID;    
+
+			data.deviceID = this.deviceID;
+
+			data.sampleOrientationMarkType = this.sampleOrientationMarkType;
+			data.orientationMarkLocation = this.orientationMarkLocation;
+
+			data.diePitchX = this.diePitchX;
+			data.diePitchY = this.diePitchY;
+			data.dieOriginX = this.dieOriginX;
+			data.dieOriginY = this.dieOriginY;
+			data.sampleCenterLocationX = this.sampleCenterLocationX;
+			data.sampleCenterLocationY = this.sampleCenterLocationY;
+			data.resX = this.resX;
+			data.resY = this.resY;
+
+			//data.SetSampleTestPlan(_mapdata);
+			//data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin);
+			//data.SetMEMMAP(_mapdata);
+
+			klarfData.Add(data);
+			return true;
+		}
+
 		public bool AddSlotToServer(RecipeType_WaferMap _mapdata)
 		{
 			UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
@@ -257,8 +297,7 @@ namespace RootTools_Vision.Utility
 		{
 			timeFile = DateTime.Now;
 
-			FileStream fs = new FileStream(strFilePath, FileMode.Append, FileAccess.Write);
-			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
+
 
 			if (bCollector)
 			{
@@ -274,6 +313,9 @@ namespace RootTools_Vision.Utility
 			tempString += ".001";
 			tiffFileName = tempString;
 			tiffFileName.Replace(".001", ".tif");
+
+			FileStream fs = new FileStream(tiffFileName, FileMode.Create, FileAccess.Write);
+			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
 
 			if (sw != null)
 			{

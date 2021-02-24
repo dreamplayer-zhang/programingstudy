@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools_Vision;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -108,7 +109,7 @@ namespace Root_WIND2
         void InitSettingDialog()
         {
             settingDialog = new SettingDialog();
-            settingDialogViewModel = new SettingDialog_ViewModel();
+            settingDialogViewModel = new SettingDialog_ViewModel(GlobalObjects.Instance.Get<Settings>());
             settingDialog.DataContext = settingDialogViewModel;
         }
 

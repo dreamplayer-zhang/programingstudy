@@ -13,7 +13,7 @@ namespace Root_WIND2
             public const string Name = "AAAA";
         }
 
-        public static class Path
+        public static class RootPath
         {
             public const string RecipeRootPath = @"C:\Root\\Recipe\";
             public const string RecipeFrontRootPath = @"C:\Root\Recipe\Front\";
@@ -22,6 +22,12 @@ namespace Root_WIND2
             public const string RecipeEBRRootPath = @"C:\Root\Recipe\EBR\";
 
             public const string ImageRootPath = @"D:\Images\";
+
+        }
+
+        public static class FilePath
+        {
+            public const string SettingFilePath = @"C:\Root\Setting.ini";
         }
     }
 }

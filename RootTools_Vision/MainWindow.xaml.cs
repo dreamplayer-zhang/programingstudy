@@ -31,11 +31,19 @@ namespace RootTools_Vision
 
     public partial class MainWindow : Window
     {
+        CloneImageViewer_ViewModel imageViewerVM = new CloneImageViewer_ViewModel();
+        public CloneImageViewer_ViewModel ImageViewerVM
+        {
+            get => this.imageViewerVM;
+            set => this.imageViewerVM = value;
+        }
+
+        //ImageData imageData;
         //InspectionManager inspectionManager;
         public MainWindow()
         {
             InitializeComponent();
-
+            viewer.DataContext = ImageViewerVM;
         }
 
         bool isServer = false;
@@ -49,7 +57,6 @@ namespace RootTools_Vision
                 server.RemoteStart();
             else
                 client.RemoteStart();
-            
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -69,5 +76,6 @@ namespace RootTools_Vision
         {
             this.isServer = false;
         }
+
     }
 }

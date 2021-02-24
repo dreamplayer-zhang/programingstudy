@@ -87,12 +87,13 @@ namespace Root_ASIS.Module
         #region RunUnload
         public string RunUnload()
         {
-            if (m_boat1.p_bReady == false) return "Boat1 is not Ready";
+            if (m_boat.p_bReady == false) return "Boat1 is not Ready";
             if (m_picker.p_infoStrip == null) return "Picker has no Strip";
             if (Run(AxisMove(ePos.Boat1))) return p_sInfo;
             if (Run(m_picker.RunUnload())) return p_sInfo;
-            m_boat1.p_infoStrip = m_picker.p_infoStrip;
+            m_boat.p_infoStrip = m_picker.p_infoStrip;
             m_picker.p_infoStrip = null;
+            if (EQ.p_eState == EQ.eState.Run) m_boat.StartInspect();
             return "OK";
         }
         #endregion
@@ -141,7 +142,7 @@ namespace Root_ASIS.Module
             if (EQ.p_eState != EQ.eState.Run) return "OK";
             if (m_picker.p_infoStrip != null)
             {
-                if (m_boat1.p_bReady) StartRun(m_runUnload);
+                if (m_boat.p_bReady) StartRun(m_runUnload);
             }
             else
             {
@@ -175,13 +176,13 @@ namespace Root_ASIS.Module
         #endregion
 
         Loader1 m_loader1; 
-        Boat m_boat1;
+        Boat m_boat;
         Turnover m_turnover;
         public Loader2(string id, IEngineer engineer, Loader1 loader1, Turnover turnover, Boat boat1)
         {
             m_loader1 = loader1; 
             m_turnover = turnover;
-            m_boat1 = boat1;
+            m_boat = boat1;
             InitPicker();
             base.InitBase(id, engineer);
             InitThreadCheck();

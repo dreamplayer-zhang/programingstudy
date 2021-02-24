@@ -103,7 +103,7 @@ namespace RootTools.Database
 
 				}
 				rdr.Close();
-				bool isSame = true;
+				//bool isSame = true;
 				FieldInfo[] defectFieldInfos = null;
 				List<string> columnList = new List<string>();
 				for (int i = 0; i < tableList.Count; i++)
@@ -117,7 +117,7 @@ namespace RootTools.Database
 					cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
 
 					rdr = cmd.ExecuteReader();
-					int a = 0;
+					//int a = 0;
 					while (rdr.Read())
 					{
 						object columnName = rdr["COLUMN_NAME"];
@@ -129,7 +129,7 @@ namespace RootTools.Database
 					string test = ob.Message;
 					if (defectFieldInfos.Length != columnList.Count)
                     {
-						isSame = false;
+						//isSame = false;
 						break;
                     }
 				}
@@ -138,7 +138,7 @@ namespace RootTools.Database
 			}
 			catch(Exception e)
 			{
-				MessageBox.Show(e.ToString());
+				TempLogger.Write("Database", e);
 				return false;
 			}
 		}
@@ -276,7 +276,7 @@ namespace RootTools.Database
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message);
+				TempLogger.Write("Database", ex);
 				table = data.Tables[0].Copy();
 				return table;
 			}
@@ -301,7 +301,7 @@ namespace RootTools.Database
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("SelectTablewithInspectionID : " + ex.Message);
+				TempLogger.Write("Database", ex);
 				table = data.Tables[0].Copy();
 				return table;
 			}
@@ -344,7 +344,7 @@ namespace RootTools.Database
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message);
+				TempLogger.Write("Database", ex);
 			}
 
 #endif
@@ -398,6 +398,64 @@ namespace RootTools.Database
 						sbQuery.Append(",");
 				}
 				 SendQuery(sbQuery.ToString());
+#if !DEBUG
+			}
+			catch (Exception ex)
+			{
+				TempLogger.Write("Database", ex);
+			}
+
+#endif
+		}
+
+		public void AddMeasurementDataList(List<Measurement> _measurelist)
+		{
+#if !DEBUG
+			try
+			{
+#endif
+			SendQuery("TRUNCATE measurement;");
+			StringBuilder temp = new StringBuilder();
+			StringBuilder sbQuery = new StringBuilder();
+			StringBuilder sbColumList = new StringBuilder();
+			StringBuilder sValueList = new StringBuilder();
+			List<string> sbValueList = new List<string>();
+			Type type = typeof(Measurement);
+			FieldInfo[] fld = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+			for (int measureListNum = 0; measureListNum < _measurelist.Count; measureListNum++)
+			{
+				temp.Clear();
+				sbColumList.Clear();
+				for (int i = 0; i < fld.Length; i++)
+				{
+					var f = fld[i];
+					object obj = f.GetValue(_measurelist[measureListNum]);
+					sbColumList.Append(f.Name);
+					if (i == 0)
+						temp.Append("(");
+
+					temp.AppendFormat("'{0}'", obj);
+
+					if (i != fld.Length - 1)
+					{
+						sbColumList.Append(",");
+						temp.Append(",");
+					}
+					else
+						temp.Append(")");
+				}
+				sbValueList.Add(temp.ToString());
+			}
+
+			sbQuery.AppendFormat("INSERT INTO measurement({0}) values", sbColumList.ToString());
+			for (int i = 0; i < sbValueList.Count; i++)
+			{
+				sbQuery.Append(sbValueList[i]);
+				if (i != sbValueList.Count - 1)
+					sbQuery.Append(",");
+			}
+			SendQuery(sbQuery.ToString());
 #if !DEBUG
 			}
 			catch (Exception ex)

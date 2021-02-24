@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class WorkEventManager
+    internal class WorkEventManager
     {
         #region [WorkDoneAll]
         public static event EventHandler<WorkDoneAllEventArgs> WorkDoneAll;
@@ -47,11 +47,11 @@ namespace RootTools_Vision
         
 
         #region [ProcessDefectWaferDone]
-        public static event EventHandler<ProcessDefectWaferDoneEventArgs> ProcessDefectWaferDone;
+        public static event EventHandler<IntegratedProcessDefectDoneEventArgs> IntegratedProcessDefectDone;
 
-        public static void OnProcessDefectWaferDone(object obj, ProcessDefectWaferDoneEventArgs args)
+        public static void OnIntegratedProcessDefectDone(object obj, IntegratedProcessDefectDoneEventArgs args)
         {
-            ProcessDefectWaferDone?.Invoke(obj, args);
+            IntegratedProcessDefectDone?.Invoke(obj, args);
         }
 
         public static event EventHandler<ProcessDefectWaferStartEventArgs> ProcessDefectWaferStart;
@@ -62,30 +62,12 @@ namespace RootTools_Vision
         }
         #endregion
 
-        #region [ProcessDefectEdgeDone]
-        public static event EventHandler<ProcessDefectEdgeDoneEventArgs> ProcessDefectEdgeDone;
-
-        public static void OnProcessDefectEdgeDone(object obj, ProcessDefectEdgeDoneEventArgs args)
-        {
-            ProcessDefectEdgeDone?.Invoke(obj, args);
-        }
-        #endregion
-
         #region [ProcessMeasurementDone]
         public static event EventHandler<ProcessMeasurementDoneEventArgs> ProcessMeasurementDone;
 
         public static void OnProcessMeasurementDone(object obj, ProcessMeasurementDoneEventArgs args)
         {
             ProcessMeasurementDone?.Invoke(obj, args);
-        }
-        #endregion
-
-        #region [UIRedraw]
-        public static event EventHandler<UIRedrawEventArgs> UIRedraw;
-
-        public static void OnUIRedraw(object obj, UIRedrawEventArgs args)
-        {
-            UIRedraw?.Invoke(obj, args);
         }
         #endregion
 
@@ -113,6 +95,16 @@ namespace RootTools_Vision
         public static void OnInspectionStart(object obj, InspectionStartArgs args)
         {
             InspectionStart?.Invoke(obj, args);
+        }
+        #endregion
+
+
+        #region [ReceivedMemoryID]
+        public static event EventHandler<MemoryIDArgs> ReceivedMemoryID;
+
+        public static void OnReceivedMemoryID(object obj, MemoryIDArgs args)
+        {
+            ReceivedMemoryID?.Invoke(obj, args);
         }
         #endregion
     }

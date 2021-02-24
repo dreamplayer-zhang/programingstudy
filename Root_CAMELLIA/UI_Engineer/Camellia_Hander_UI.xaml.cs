@@ -53,27 +53,6 @@ namespace Root_CAMELLIA
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            InfoCarrier infoCarrier = m_handler.m_aLoadport[0].p_infoCarrier;
-            List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
-            string sMap = "1100110011111100000011010";
-            foreach (char ch in sMap)
-            {
-                switch (ch)
-                {
-                    case '0': aSlot.Add(GemSlotBase.eState.Empty); break;
-                    case '1': aSlot.Add(GemSlotBase.eState.Exist); break;
-                    case 'D': aSlot.Add(GemSlotBase.eState.Double); break;
-                    case 'C': aSlot.Add(GemSlotBase.eState.Cross); break;
-                    default:
-                        aSlot.Add(GemSlotBase.eState.Undefined);
-                        break;
-                }
-            }
-            infoCarrier.SetMapData(aSlot);
-            ManualJobSchedule jobSchedule = new ManualJobSchedule(infoCarrier);
-            jobSchedule.ShowPopup();
-        }
+        
     }
 }

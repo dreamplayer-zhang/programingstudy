@@ -96,6 +96,7 @@ namespace RootTools
     public class _EQ : NotifyProperty
     {
         #region Deligate
+
         public enum eEQ
         {
             State,
@@ -192,6 +193,7 @@ namespace RootTools
             get { return _bRecovery; }
             set
             {
+                if (_bRecovery == value) return;
                 _bRecovery = value;
                 OnPropertyChanged();
                 if (OnChanged != null) OnChanged(eEQ.Recovery, value);
@@ -210,7 +212,7 @@ namespace RootTools
             }
         }
 
-        int _nRnR = 0;
+        int _nRnR = 1;
         public int p_nRnR 
         {
             get { return _nRnR; }

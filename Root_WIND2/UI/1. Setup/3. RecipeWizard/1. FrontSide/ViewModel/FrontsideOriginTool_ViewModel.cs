@@ -474,7 +474,7 @@ namespace Root_WIND2
             int posY = this.Offset.Y;
             int width = this.p_ImageData.p_Size.X;
             int height = this.p_ImageData.p_Size.Y;
-            int byteCount = this.p_ImageData.p_nByte;
+            int byteCount = this.p_ImageData.GetBytePerPixel();
             byte[] rawdata = this.p_ImageData.GetByteArray();
 
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();

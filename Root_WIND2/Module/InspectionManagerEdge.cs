@@ -87,13 +87,10 @@ namespace Root_WIND2
 		private void CreateWorkplace_Edge(EdgeSurfaceRecipeBase recipe, EdgeSurfaceParameterBase param, EdgeSurface.EdgeMapPositionX mapX, SharedBufferInfo sharedBufferInfo, ref WorkplaceBundle workplaceBundle)
 		{
 			// 360도 memory height
-			//int bufferHeight = (int)(360000 / recipe.TriggerRatio);	// 첫번째 빈 buffer 지웠을 경우
-			int bufferHeight = (int)(360000 / recipe.TriggerRatio) + recipe.CameraHeight;
-
+			int bufferHeight = (int)(360000 / recipe.TriggerRatio) + recipe.ImageOffset;
 			// 검사 시작/끝 Y좌표 설정
-			int startY = recipe.Offset * (bufferHeight / 360);
+			int startY = recipe.PositionOffset * (bufferHeight / 360);
 			int endY = bufferHeight + startY;
-
 			// ROI
 			int roiWidth = param.ROIWidth;
 			int roiHeight = param.ROIHeight;
@@ -104,8 +101,7 @@ namespace Root_WIND2
 
 			for (int i = 0; i < bufferHeight / roiHeight; i++)
 			{
-				//int calcStartY = (roiHeight * i) + startY; // 첫번째 빈 buffer 지웠을 경우
-				int calcStartY = (roiHeight * i) + startY + recipe.CameraHeight;
+				int calcStartY = (roiHeight * i) + startY + recipe.ImageOffset;
 				int calcHeight = roiHeight;
 
 				if ((calcStartY + roiHeight) > endY)
@@ -122,6 +118,8 @@ namespace Root_WIND2
 
 		public int GetWorkplaceCount()
 		{
+			if (workplaceBundle == null)
+				return 1;
 			return workplaceBundle.Count();
 		}
 

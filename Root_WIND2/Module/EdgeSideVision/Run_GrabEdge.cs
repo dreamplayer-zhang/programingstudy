@@ -129,8 +129,10 @@ namespace Root_WIND2.Module
 				//double triggerStart = curr + startDegree * pulsePerDegree;
 				double triggerStart = startDegree * pulsePerDegree;
 				double triggerDest = triggerStart + scanDegree * pulsePerDegree;
-				double moveStart = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;   //y 축 이동 시작 지점 
-				double moveEnd = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;  // Y 축 이동 끝 지점.
+				//double moveStart = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;   //y 축 이동 시작 지점 
+				//double moveEnd = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;  // Y 축 이동 끝 지점.
+				double moveStart = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;  // Y 축 이동 끝 지점.
+				double moveEnd = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;   //y 축 이동 시작 지점 
 				int grabCount = Convert.ToInt32(scanDegree * pulsePerDegree * gmTop.m_dCamTriggerRatio); //module.EdgeCamTriggerRatio);
 
 				if (module.Run(axisEdgeX.StartMove(sideFocusAxis)))
@@ -141,17 +143,24 @@ namespace Root_WIND2.Module
 					return p_sInfo;
 				if (module.Run(axisR.WaitReady()))
 					return p_sInfo;
-				axisR.SetTrigger(triggerStart, triggerDest, gmTop.m_dTrigger, true);
+				axisR.SetTrigger(triggerStart, triggerDest, 1, true);
 
-				gmTop.StartGrab(gmTop.m_memoryData, new CPoint(0, 0), grabCount);
-				gmTop.Grabed += m_gmTop_Grabed;
-				gmSide.StartGrab(gmSide.m_memoryData, new CPoint(0, 0), grabCount);
-				gmBtm.StartGrab(gmBtm.m_memoryData, new CPoint(0, 0), grabCount);
+                gmTop.StartGrab(gmTop.m_memoryData, new CPoint(0, 0), grabCount, gmTop.m_GD, true);
+                gmTop.Grabed += m_gmTop_Grabed;
+                gmSide.StartGrab(gmSide.m_memoryData, new CPoint(0, 0), grabCount, gmSide.m_GD, true);
+                gmBtm.StartGrab(gmBtm.m_memoryData, new CPoint(0, 0), grabCount, gmBtm.m_GD, true);
 
-				if (module.Run(axisR.StartMove(moveEnd, scanSpeed, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc)))
+                if (module.Run(axisR.StartMove(moveEnd, 30000, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc)))
 					return p_sInfo;
 				if (module.Run(axisR.WaitReady()))
 					return p_sInfo;
+
+
+				while (gmTop.m_camera.p_nGrabProgress != 100 || gmSide.m_camera.p_nGrabProgress != 100 || gmBtm.m_camera.p_nGrabProgress != 100)
+				{
+					System.Threading.Thread.Sleep(10);
+					//m_log.Info("Wait Camera GrabProcess");
+				}
 
 				axisR.RunTrigger(false);
 				gmTop.StopGrab();

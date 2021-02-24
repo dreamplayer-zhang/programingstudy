@@ -33,6 +33,22 @@ namespace RootTools_Vision
 
 
     #region [Structs]
+
+    [Serializable]
+    public struct MemoryID
+    {
+        public readonly string Pool;
+        public readonly string Group;
+        public readonly string Data;
+
+        public MemoryID(string pool, string group, string data)
+        {
+            Pool = pool;
+            Group = group;
+            Data = data;
+        }
+    }
+
     public struct SharedBufferInfo
     {
         public IntPtr PtrR_GRAY;
@@ -42,6 +58,8 @@ namespace RootTools_Vision
         public int Width;
         public int Height;
         public int ByteCnt;
+
+        public MemoryID MemoryID;
 
         /// <summary>
         /// 
@@ -61,6 +79,20 @@ namespace RootTools_Vision
             this.Width = width;
             this.Height = height;
             this.ByteCnt = byteCnt;
+
+            this.MemoryID = new MemoryID();
+        }
+        public SharedBufferInfo(IntPtr sharedBufferR_GRAY, int width, int height, int byteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB , MemoryID memoryID)
+        {
+            this.PtrR_GRAY = sharedBufferR_GRAY;
+            this.PtrG = sharedBufferG;
+            this.PtrB = sharedBufferB;
+
+            this.Width = width;
+            this.Height = height;
+            this.ByteCnt = byteCnt;
+
+            this.MemoryID = memoryID;
         }
     }
     #endregion

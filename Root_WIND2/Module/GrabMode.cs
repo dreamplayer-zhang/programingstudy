@@ -69,6 +69,10 @@ namespace Root_WIND2.Module
             m_GD.m_dShiftG = tree.Set(m_GD.m_dShiftG, m_GD.m_dShiftG, "XShiftG", "X Shift G Channel, Default = 0", bVisible);
             m_GD.m_dShiftB = tree.Set(m_GD.m_dShiftB, m_GD.m_dShiftB, "XShiftB", "X Shift B Channel, Default = 0", bVisible);
             
+            m_GD.m_nYShiftR = tree.Set(m_GD.m_nYShiftR, m_GD.m_nYShiftR, "YShiftR", "Y Shift R Channel, Default = 0", bVisible);
+            m_GD.m_nYShiftG = tree.Set(m_GD.m_nYShiftG, m_GD.m_nYShiftG, "YShiftG", "Y Shift G Channel, Default = 0", bVisible);
+            m_GD.m_nYShiftB = tree.Set(m_GD.m_nYShiftB, m_GD.m_nYShiftB, "YShiftB", "Y Shift B Channel, Default = 0", bVisible);
+
             m_nFocusPosZ = tree.Set(m_nFocusPosZ, m_nFocusPosZ, "Focus Z Position", "Focus Z Position", bVisible);
             m_nWaferSize_mm = tree.Set(m_nWaferSize_mm, m_nWaferSize_mm, "Wafer Size Y", "Wafer Size Y", bVisible);
             m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
@@ -92,9 +96,9 @@ namespace Root_WIND2.Module
             m_dVRSFocusPos = tree.Set(m_dVRSFocusPos, m_dVRSFocusPos, "VRS Focus Z", "VRS Focus Z", bVisible, true);
         }
 
-        public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine , GrabData m_GrabData = null)
+        public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
         {
-            m_camera.GrabLineScan(memory, cpScanOffset, nLine, m_GrabData);
+            m_camera.GrabLineScan(memory, cpScanOffset, nLine, m_GrabData, bTest);
             m_camera.Grabed += m_camera_Grabed;
         }
         public void StartGrabColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)

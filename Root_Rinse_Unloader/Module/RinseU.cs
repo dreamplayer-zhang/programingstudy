@@ -47,6 +47,18 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
+        double _fRotateSpeed = 1;
+        public double p_fRotateSpeed
+        {
+            get { return _fRotateSpeed; }
+            set
+            {
+                if (_fRotateSpeed == value) return;
+                _fRotateSpeed = value;
+                OnPropertyChanged();
+            }
+        }
+
         Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1;
         public Storage.eMagazine p_eMagazine
         {
@@ -346,6 +358,7 @@ namespace Root_Rinse_Unloader.Module
             StripSend,
             StripReceive,
             ResultClear,
+            SetRotateSpeed,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd)); 
 
@@ -461,7 +474,12 @@ namespace Root_Rinse_Unloader.Module
                         case eCmd.StripSend:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             AddStripSend(asRead[2]); 
-                            break; 
+                            break;
+                        case eCmd.SetRotateSpeed:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            p_fRotateSpeed = Convert.ToDouble(asRead[2]);
+                            RunTree(Tree.eMode.Init);
+                            break;
                     }
                 }
             }

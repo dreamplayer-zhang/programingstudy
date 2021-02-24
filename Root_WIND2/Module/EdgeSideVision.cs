@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using RootTools.Camera.Matrox;
 using Root_EFEM.Module;
 using Root_EFEM;
+using RootTools.GAFs;
 
 namespace Root_WIND2.Module
 {
@@ -24,6 +25,7 @@ namespace Root_WIND2.Module
 		DIO_O doVac;
 		DIO_O doBlow;
 		DIO_I diWaferExist;
+		DIO_I diWaferExistVac;
 
 		MemoryPool memoryPool;
 		MemoryGroup memoryGroup;
@@ -37,6 +39,8 @@ namespace Root_WIND2.Module
 		Camera_Dalsa camEdgeSide;
 		Camera_Dalsa camEdgeBtm;
 		Camera_Matrox camEBR;
+
+		ALID alid_WaferExist;
 
 		#region Getter/Setter
 		public Axis AxisRotate { get => axisRotate; private set => axisRotate = value; }
@@ -67,6 +71,8 @@ namespace Root_WIND2.Module
 			p_sInfo = m_toolBox.Get(ref doVac, this, "Stage Vacuum");
 			p_sInfo = m_toolBox.Get(ref doBlow, this, "Stage Blow");
 			p_sInfo = m_toolBox.Get(ref diWaferExist, this, "Wafer Exist");
+			p_sInfo = m_toolBox.Get(ref diWaferExistVac, this, "Wafer Exist -Vac");
+			
 			p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
 			p_sInfo = m_toolBox.Get(ref camEdgeTop, this, "Cam EdgeTop");
 			p_sInfo = m_toolBox.Get(ref camEdgeSide, this, "Cam EdgeSide");
@@ -74,6 +80,8 @@ namespace Root_WIND2.Module
             p_sInfo = m_toolBox.Get(ref camEBR, this, "Cam EBR");
             p_sInfo = m_toolBox.Get(ref lightSet, this);
 			memoryGroup = memoryPool.GetGroup(p_id);
+			alid_WaferExist = m_gaf.GetALID(this, "Wafer Exist", "Wafer Exist");
+
 		}
 		#endregion
 
@@ -295,6 +303,9 @@ namespace Root_WIND2.Module
 
 		public string AfterPut(int nID)
 		{
+			doVac.Write(true);
+			if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
+				alid_WaferExist.Run(true, "Wafer Check Error");
 			return "OK";
 		}
 

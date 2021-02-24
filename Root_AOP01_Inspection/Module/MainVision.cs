@@ -800,8 +800,8 @@ namespace Root_AOP01_Inspection.Module
             ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
             IntPtr p = mem.GetPtr();
             img.SetData(p, crtROI, (int)mem.W);
-            Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
-            
+            Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.GetBytePerPixel(), img.GetPtr(), (int)img.p_Stride);
+
             return matReturn;
         }
 
@@ -4171,7 +4171,7 @@ namespace Root_AOP01_Inspection.Module
                     m_module.p_nPellicleExpandingProgressPercent = (int)((double)m_module.p_nPellicleExpandingProgressValue / (double)(m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin) * 100);
                 for (int i = 0; i<grabMode.m_ScanLineNum; i++)
                 {
-                    CalculateHeight_ESCHO(mem, grabMode.m_ScanStartLine + i, nReticleSizeY_px);
+                    CalculateHeight(mem, grabMode.m_ScanStartLine + i, nReticleSizeY_px);
                     m_module.p_nPellicleExpandingProgressValue = i;
                     if (m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin > 0)
                         m_module.p_nPellicleExpandingProgressPercent = (int)((double)m_module.p_nPellicleExpandingProgressValue / (double)(m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin) * 100);
@@ -4181,7 +4181,7 @@ namespace Root_AOP01_Inspection.Module
                 return "OK";
             }
             #region Sub Function
-            unsafe void CalculateHeight_ESCHO(MemoryData mem, int nCurrentLine, int nReticleHeight_px)
+            unsafe void CalculateHeight(MemoryData mem, int nCurrentLine, int nReticleHeight_px)
             {
                 GrabMode grabMode = m_module.GetGrabMode("LADS");
                 IntPtr p = mem.GetPtr();
@@ -4199,12 +4199,49 @@ namespace Root_AOP01_Inspection.Module
                     CRect crtROI = new CRect(nLeft, nTop, nRight, nBottom);
                     ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
                     img.SetData(p, crtROI, (int)mem.W);
-                    ladsinfo.m_Heightinfo[i] = CalculatingHeight(img);
+                    ladsinfo.m_Heightinfo[i] = GetLaserHeight(img);
                 }
                 ladsinfos.Add(ladsinfo);
             }
 
-            unsafe double CalculatingHeight(ImageData img)
+            unsafe double GetLaserHeight(ImageData img)
+            {
+                // variable
+                int nImgWidth = 100; //grabMode.m_camera.GetRoiSize().X;
+                int nImgHeight = 100; //grabMode.m_camera.GetRoiSize().Y;
+                double[] profile = new double[nImgWidth];
+                IntPtr dp = img.GetPtr();
+                
+                // implement
+                // make profile
+                for (int i = 0; i<nImgHeight; i++)
+                {
+                    byte* p = (byte*)(dp + nImgWidth * i);
+                    long sum = 0;
+                    for (int j = 0; j<nImgWidth; j++)
+                    {
+                        byte b = *(p + j);
+                        sum += b;
+                    }
+                    profile[i] = sum / nImgWidth;
+                }
+
+                double dReturnHeight = 0.0;
+                double max = 0;
+                for (int k = 1; k<profile.Length - 1; k++)
+                {
+                    if (max < profile[k])
+                    {
+                        max = profile[k];
+                        dReturnHeight = (profile[k] * k + profile[k - 1] * (k - 1) + profile[k + 1] * (k + 1)) / (profile[k] + profile[k - 1] + profile[k + 1]);
+                    }
+                }
+
+                return dReturnHeight;
+            }
+
+            #region CalculatingHeight(구)
+            unsafe double CalculatingHeight_ESCH(ImageData img)
             {
                 // variable
                 GrabMode grabMode = m_module.GetGrabMode("LADS");
@@ -4249,6 +4286,8 @@ namespace Root_AOP01_Inspection.Module
                 if (nHitCount == 0) return -1;
                 return dSum / nHitCount;
             }
+            #endregion
+
             private void SaveFocusMapImage(int nX, int nY)
             {
                 GrabMode grabMode = m_module.GetGrabMode("LADS");
@@ -4268,16 +4307,16 @@ namespace Root_AOP01_Inspection.Module
                     }
                 }
 
-                StringBuilder strBuilder = new StringBuilder();
-                for (int y = 0; y<nY; y++)
-                {
-                    for (int x = 0; x<nX; x++)
-                    {
-                        strBuilder.Append(ladsinfos[x].m_Heightinfo[y].ToString() + ",");
-                    }
-                    strBuilder.AppendLine();
-                }
-                File.WriteAllText("D:\\test.csv", strBuilder.ToString());
+                //StringBuilder strBuilder = new StringBuilder();
+                //for (int y = 0; y < nY; y++)
+                //{
+                //    for (int x = 0; x < nX; x++)
+                //    {
+                //        strBuilder.Append(ladsinfos[x].m_Heightinfo[y].ToString() + ",");
+                //    }
+                //    strBuilder.AppendLine();
+                //}
+                //File.WriteAllText("D:\\test.csv", strBuilder.ToString());
 
                 for (int x = 0; x < nX; x++)
                 {

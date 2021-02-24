@@ -111,6 +111,20 @@ namespace Root_WIND2.UI_User
                     this.IsPitchChecked = false;
                     this.IsRularChecked = false;
                 }
+                else
+                {
+                    if(!p_UIElement.Contains(OriginBox_UI))
+                    {
+                        ClearObjects();
+                    }
+                    else
+                    {
+                        this.originLeftBottom.X = this.originBox.Left;
+                        this.originLeftBottom.Y = this.originBox.Bottom;
+                        RedrawShapes();
+                    }
+                }
+
                 SetProperty<bool>(ref this.isOriginChecked, value);
             }
         }
@@ -125,6 +139,24 @@ namespace Root_WIND2.UI_User
                 {
                     this.IsOriginChecked = false;
                     this.IsRularChecked = false;
+                }
+                else
+                {
+                    if (!p_UIElement.Contains(PitchBox_UI))
+                    {
+                        this.pitchRightBottom.X = this.originRightTop.X;
+                        this.pitchRightBottom.Y = this.originLeftBottom.Y;
+
+                        this.pitchRightTop.X = this.originRightTop.X;
+                        this.pitchRightTop.Y = this.originRightTop.Y;
+                    }
+                    else
+                    {
+                        this.pitchRightTop.X = this.pitchBox.Right;
+                        this.pitchRightBottom.X = this.pitchBox.Right;
+                        this.pitchRightTop.Y = this.pitchBox.Top;
+                        this.pitchRightBottom.Y = this.pitchBox.Bottom;
+                    }
                 }
                 SetProperty<bool>(ref this.isPitchChecked, value);
             }
@@ -287,20 +319,22 @@ namespace Root_WIND2.UI_User
 
         #region [Draw 관련 멤버]
 
-        TRect InspArea;
-        
         Grid OriginLeftBottom_UI = null;
         Grid OriginRightTop_UI = null;
         Grid OriginBox_UI = null;
 
         Grid PitchRightTop_UI = null;
+        Grid PitchRightBottom_UI = null;
         Grid PitchBox_UI = null;
 
 
         CPoint originLeftBottom = new CPoint();
         CPoint originRightTop = new CPoint();
-        CPoint pitchRightTop = new CPoint();
+        CRect originBox = new CRect();
 
+        CPoint pitchRightTop = new CPoint();
+        CPoint pitchRightBottom = new CPoint();
+        CRect pitchBox = new CRect();
 
         public void InitializeUIElement()
         {
@@ -313,9 +347,50 @@ namespace Root_WIND2.UI_User
             OriginRightTop_UI.Children.Add(new Line());
 
             PitchRightTop_UI = new Grid();
-            PitchRightTop_UI.Children.Add(new Line());
-            PitchRightTop_UI.Children.Add(new Line());
 
+            Line line1 = new Line();
+            line1.X1 = 0;
+            line1.Y1 = -10;
+            line1.X2 = 0;
+            line1.Y2 = 40;
+            line1.Stroke = DefineColors.PitchColor;
+            line1.StrokeThickness = 3;
+            line1.Opacity = 1;
+
+            Line line2 = new Line();
+            line2.X1 = -40;
+            line2.Y1 = 0;
+            line2.X2 = 10;
+            line2.Y2 = 0;
+            line2.Stroke = DefineColors.PitchColor;
+            line2.StrokeThickness = 3;
+            line2.Opacity = 1;
+
+            PitchRightTop_UI.Children.Add(line1);
+            PitchRightTop_UI.Children.Add(line2);
+
+            PitchRightBottom_UI = new Grid();
+
+            Line line3 = new Line();
+            line3.X1 = 0;
+            line3.Y1 = -40;
+            line3.X2 = 0;
+            line3.Y2 = 10;
+            line3.Stroke = DefineColors.PitchColor;
+            line3.StrokeThickness = 3;
+            line3.Opacity = 1;
+
+            Line line4 = new Line();
+            line4.X1 = 10;
+            line4.Y1 = 0;
+            line4.X2 = -40;
+            line4.Y2 = 0;
+            line4.Stroke = DefineColors.PitchColor;
+            line4.StrokeThickness = 3;
+            line4.Opacity = 1;
+
+            PitchRightBottom_UI.Children.Add(line3);
+            PitchRightBottom_UI.Children.Add(line4);
 
             OriginBox_UI = new Grid();
             OriginBox_UI.Children.Add(new Line()); // Left
@@ -360,6 +435,33 @@ namespace Root_WIND2.UI_User
         {
             base.MouseMove(sender, e);
 
+            switch (this.ViewerState)
+            {
+                case FRONT_ORIGIN_VIEWER_STATE.Normal:
+                    break;
+                case FRONT_ORIGIN_VIEWER_STATE.Origin:
+                    if (this.originState == PROCESS_ORIGIN_STATE.OriginLeftBottom)
+                    {
+                        originLeftBottom.X = p_MouseMemX;
+                        originLeftBottom.Y = p_MouseMemY;
+                        DrawOriginLeftBottomPoint(originLeftBottom);
+                    }
+                    else if (this.originState == PROCESS_ORIGIN_STATE.OriginRightTop)
+                    {
+                        originRightTop.X = p_MouseMemX;
+                        originRightTop.Y = p_MouseMemY;
+                        DrawOriginRightTopPoint(originRightTop);
+                    }
+                    break;
+                case FRONT_ORIGIN_VIEWER_STATE.Pitch:
+                    if (this.pitchState == PROCESS_PITCH_STATE.PitchRightTop)
+                    {
+                        DrawingPitchPoint();
+                    }
+                    break;
+                case FRONT_ORIGIN_VIEWER_STATE.Rular:
+                    break;
+            }
         }
         public override void PreviewMouseUp(object sender, MouseEventArgs e)
         {
@@ -415,7 +517,7 @@ namespace Root_WIND2.UI_User
                 case PROCESS_ORIGIN_STATE.OriginLeftBottom:
 
                     // Origin 
-                    ClearOrigin();
+                    ClearObjects();
 
                     p_Cursor = Cursors.Arrow;
                     originLeftBottom = memPt;
@@ -430,23 +532,22 @@ namespace Root_WIND2.UI_User
 
                     p_Cursor = Cursors.Arrow;
 
-                    if(originLeftBottom.X > memPt.X || originLeftBottom.Y < memPt.Y)
-                    {
-                        MessageBox.Show("원점(Origin) 위치보다 오른쪽(또는 위쪽)에 위치해야합니다.");
-                        return;
-                    }
-
                     if( (memPt.X - originLeftBottom.X) > 30000 || (originLeftBottom.Y - memPt.Y) > 30000)
                     {
                         MessageBox.Show("Origin(혹은 검사) 영역의 크기는 높이 30000(혹은 너비 30000)을 넘을 수 없습니다.");
                         return;
                     }
                     
-                    originRightTop = memPt;
-                    pitchRightTop = memPt;
+                    originRightTop.X = memPt.X;
+                    originRightTop.Y = memPt.Y;
+
+                    originBox.Left = originLeftBottom.X;
+                    originBox.Right = originRightTop.X;
+                    originBox.Top = originRightTop.Y;
+                    originBox.Bottom = originLeftBottom.Y;
 
                     DrawOriginRightTopPoint(originRightTop);
-                    DrawPitchPoint(pitchRightTop);
+                    DrawingPitchPoint();
                     DrawOriginBox();
 
                     SetOrigin();
@@ -483,21 +584,28 @@ namespace Root_WIND2.UI_User
                 case PROCESS_PITCH_STATE.PitchRightTop:
                     p_Cursor = Cursors.Arrow;
 
-                    if (originRightTop.X > memPt.X || originRightTop.Y < memPt.Y)
-                    {
-                        MessageBox.Show("칩영역보다 오른쪽(또는 위쪽)에 위치해야합니다.");
-                        return;
-                    }
+                    DrawPitchPoint();
 
-                    pitchRightTop = memPt;
+                    int offset1 = Math.Abs(this.pitchRightTop.Y - this.originRightTop.Y);
+                    int offset2 = Math.Abs(this.pitchRightBottom.Y - this.originLeftBottom.Y);
+                    int offsetY = offset1 > offset2 ? offset1 : offset2;
+                    int offsetX = Math.Abs(this.pitchRightTop.X - this.originRightTop.X);
 
-                    DrawPitchPoint(pitchRightTop);
+                    this.pitchRightTop.Y = this.originRightTop.Y - offsetY;
+                    this.pitchRightBottom.Y = this.originLeftBottom.Y + offsetY;
+
+                    this.pitchBox.Left = this.originLeftBottom.X - offsetX;
+                    this.pitchBox.Right = this.originRightTop.X + offsetX;
+                    this.pitchBox.Top = this.originRightTop.Y - offsetY;
+                    this.pitchBox.Bottom = this.originLeftBottom.Y + offsetY;
+
                     DrawPitchBox();
 
                     if (this.PitchPointDone != null)
                         this.PitchPointDone();
 
                     ViewerState = FRONT_ORIGIN_VIEWER_STATE.Normal;
+                    pitchState = PROCESS_PITCH_STATE.None;
                     break;
             }
         }
@@ -515,25 +623,44 @@ namespace Root_WIND2.UI_User
 
         public void SetOriginBox(CPoint originPt, int originWidth, int originHeight, int diePitchX, int diePitchY)
         {
+            if (diePitchX == 0 || diePitchY == 0) return;
+
+            this.IsPitchEnable = true;
+
             this.originLeftBottom.X = originPt.X;
             this.originLeftBottom.Y = originPt.Y;
 
             this.originRightTop.X = originPt.X + originWidth;
             this.originRightTop.Y = originPt.Y - originHeight;
 
+            this.originBox.Left = this.originLeftBottom.X;
+            this.originBox.Right = this.originRightTop.X;
+            this.originBox.Top = this.originRightTop.Y;
+            this.originBox.Bottom = this.originLeftBottom.Y;
+
             this.pitchRightTop.X = originPt.X + diePitchX;
             this.pitchRightTop.Y = originPt.Y - diePitchY;
 
+            int offsetX = Math.Abs(diePitchX - originWidth);
+            int offsetY = Math.Abs(diePitchY - originHeight);
 
-            DrawOriginLeftBottomPoint(this.originLeftBottom);
-            DrawOriginRightTopPoint(this.originRightTop);
-            DrawPitchPoint(this.pitchRightTop);
+            this.pitchRightBottom.X = originPt.X + diePitchX;
+            this.pitchRightBottom.Y = originPt.Y + offsetY;
+
+            this.pitchBox.Left = originPt.X - offsetX;
+            this.pitchBox.Right = this.pitchRightBottom.X;
+            this.pitchBox.Top = this.pitchRightTop.Y;
+            this.pitchBox.Bottom = this.pitchRightBottom.Y;
+
+            DrawOriginLeftBottomPoint(this.originLeftBottom, true);
+            DrawOriginRightTopPoint(this.originRightTop, true);
+            DrawPitchPoint(true);
 
             DrawOriginBox();
             DrawPitchBox();
         }
 
-        private void DrawOriginLeftBottomPoint(CPoint memPt)
+        private void DrawOriginLeftBottomPoint(CPoint memPt, bool bRecipeLoaded = false)
         {
             if (memPt.X == 0 || memPt.Y == 0)
                 return;
@@ -570,17 +697,20 @@ namespace Root_WIND2.UI_User
                 p_UIElement.Add(OriginLeftBottom_UI);
             }
 
-            // Recipe
-            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+            if(bRecipeLoaded == false)
+            {
+                // Recipe
+                RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 
-            originRecipe.Clear();
+                originRecipe.Clear();
 
-            originRecipe.OriginX = memPt.X;
-            originRecipe.OriginY = memPt.Y;
+                originRecipe.OriginX = memPt.X;
+                originRecipe.OriginY = memPt.Y;
+            }
         }
 
-        private void DrawOriginRightTopPoint(CPoint memPt)
+        private void DrawOriginRightTopPoint(CPoint memPt, bool bRecipeLoaded = false)
         {
             if (memPt.X == 0 || memPt.Y == 0)
                 return;
@@ -618,69 +748,102 @@ namespace Root_WIND2.UI_User
                 p_UIElement.Add(OriginRightTop_UI);
             }
 
-            // Recipe
-            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+            if(bRecipeLoaded == false)
+            {
+                // Recipe
+                RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 
-            originRecipe.OriginWidth = memPt.X - originRecipe.OriginX;
-            originRecipe.OriginHeight = originRecipe.OriginY - memPt.Y;
+                originRecipe.OriginWidth = memPt.X - originRecipe.OriginX;
+                originRecipe.OriginHeight = originRecipe.OriginY - memPt.Y;
 
-            originRecipe.DiePitchX = memPt.X - originRecipe.OriginX;
-            originRecipe.DiePitchY = originRecipe.OriginY - memPt.Y;
+                originRecipe.DiePitchX = originRecipe.OriginWidth;
+                originRecipe.DiePitchY = originRecipe.OriginHeight;
+            }
         }
 
-        private void DrawPitchPoint(CPoint memPt)
+        private void DrawPitchPoint(bool bRecipeLoaded = false)
         {
-            if (memPt.X == 0 || memPt.Y == 0)
-                return;
+            int offset1 = Math.Abs(this.pitchRightTop.Y - this.originRightTop.Y);
+            int offset2 = Math.Abs(this.pitchRightBottom.Y - this.originLeftBottom.Y);
+            int offsetY = offset1 > offset2 ? offset1 : offset2;
+            int offsetX = Math.Abs(this.pitchRightTop.X - this.originRightTop.X);
 
-            CPoint viewPt = memPt;
-            CPoint canvasPt = GetCanvasPoint(viewPt);
+            this.pitchRightTop.Y = this.originRightTop.Y - offsetY;
+            this.pitchRightBottom.Y = this.originLeftBottom.Y + offsetY;
+
+            CPoint canvasPt1 = GetCanvasPoint(pitchRightTop);
+
+            Canvas.SetLeft(PitchRightTop_UI, canvasPt1.X);
+            Canvas.SetTop(PitchRightTop_UI, canvasPt1.Y);
+
+            CPoint canvasPt2 = GetCanvasPoint(pitchRightBottom);
+
+            Canvas.SetLeft(PitchRightBottom_UI, canvasPt2.X);
+            Canvas.SetTop(PitchRightBottom_UI, canvasPt2.Y);
+
+            if (!this.p_UIElement.Contains(PitchRightTop_UI))
+                this.p_UIElement.Add(PitchRightTop_UI);
+
+            if (!this.p_UIElement.Contains(PitchRightBottom_UI))
+                this.p_UIElement.Add(PitchRightBottom_UI);
+
+            if (bRecipeLoaded == false)
+            {
+                // Recipe
+                RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+
+                originRecipe.DiePitchX = originRecipe.OriginWidth + offsetX;
+                originRecipe.DiePitchY = originRecipe.OriginHeight + offsetY;
+            }
+        }
+
+        private void DrawingPitchPoint()
+        {
+            CPoint memPt = new CPoint(p_MouseMemX, p_MouseMemY);
 
             PitchRightTop_UI.Width = 40;
             PitchRightTop_UI.Height = 40;
 
-            Line line1 = PitchRightTop_UI.Children[0] as Line;
-            line1.X1 = 0;
-            line1.Y1 = -10;
-            line1.X2 = 0;
-            line1.Y2 = 40;
-            line1.Stroke = DefineColors.PitchColor;
-            line1.StrokeThickness = 3;
-            line1.Opacity = 1;
+            PitchRightBottom_UI.Width = 40;
+            PitchRightBottom_UI.Height = 40;
 
-            Line line2 = PitchRightTop_UI.Children[1] as Line;
-            line2.X1 = -40;
-            line2.Y1 = 0;
-            line2.X2 = 10;
-            line2.Y2 = 0;
-            line2.Stroke = DefineColors.PitchColor;
-            line2.StrokeThickness = 3;
-            line2.Opacity = 1;
 
-            Canvas.SetLeft(PitchRightTop_UI, canvasPt.X);
-            Canvas.SetTop(PitchRightTop_UI, canvasPt.Y);
+            this.pitchRightTop.X = memPt.X < originRightTop.X ? originRightTop.X : memPt.X;
+            this.pitchRightTop.Y = memPt.Y > originRightTop.Y ? originRightTop.Y : memPt.Y;
+
+            this.pitchRightBottom.X = memPt.X < originRightTop.X ? originRightTop.X : memPt.X;
+            this.pitchRightBottom.Y = memPt.Y < originLeftBottom.Y ? originLeftBottom.Y : memPt.Y;
+
+            CPoint canvasPt1 = GetCanvasPoint(pitchRightTop);
+
+            Canvas.SetLeft(PitchRightTop_UI, canvasPt1.X);
+            Canvas.SetTop(PitchRightTop_UI, canvasPt1.Y);
+
+            CPoint canvasPt2 = GetCanvasPoint(pitchRightBottom);
+
+            Canvas.SetLeft(PitchRightBottom_UI, canvasPt2.X);
+            Canvas.SetTop(PitchRightBottom_UI, canvasPt2.Y);
 
             if (!p_UIElement.Contains(PitchRightTop_UI))
             {
                 p_UIElement.Add(PitchRightTop_UI);
             }
 
-            // Recipe
-            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
-
-            originRecipe.DiePitchX = memPt.X - originRecipe.OriginX;
-            originRecipe.DiePitchY = originRecipe.OriginY - memPt.Y;
+            if (!p_UIElement.Contains(PitchRightBottom_UI))
+            {
+                p_UIElement.Add(PitchRightBottom_UI);
+            }
         }
 
         private void DrawOriginBox()
         {
-            int left = this.originLeftBottom.X;
-            int top = this.originRightTop.Y;
+            int left = this.originBox.Left;
+            int top = this.originBox.Top;
 
-            int right = this.originRightTop.X;
-            int bottom = this.originLeftBottom.Y;
+            int right = this.originBox.Right;
+            int bottom = this.originBox.Bottom;
             
             CPoint canvasLeftTop = GetCanvasPoint(new CPoint(left, top));
             CPoint canvasLeftBottom = GetCanvasPoint(new CPoint(left, bottom));
@@ -748,14 +911,11 @@ namespace Root_WIND2.UI_User
 
         private void DrawPitchBox()
         {
-            int offsetX = this.pitchRightTop.X - this.originRightTop.X;
-            int offsetY = this.originRightTop.Y - this.pitchRightTop.Y;
+            int left = pitchBox.Left;
+            int top = pitchBox.Top;
 
-            int left = this.originLeftBottom.X - offsetX;
-            int top = this.originRightTop.Y - offsetY;
-
-            int right = this.originRightTop.X + offsetX;
-            int bottom = this.originLeftBottom.Y + offsetY;
+            int right = pitchBox.Right;
+            int bottom = pitchBox.Bottom;
 
             CPoint canvasLeftTop = GetCanvasPoint(new CPoint(left, top));
             CPoint canvasLeftBottom = GetCanvasPoint(new CPoint(left, bottom));
@@ -830,7 +990,7 @@ namespace Root_WIND2.UI_User
             }
             if (p_UIElement.Contains(PitchRightTop_UI))
             {
-                DrawPitchPoint(pitchRightTop);
+                DrawPitchPoint();
             }
 
             if(p_UIElement.Contains(OriginBox_UI))
@@ -843,64 +1003,6 @@ namespace Root_WIND2.UI_User
                 DrawPitchBox();
             }
         }
-
-
-        private void DrawOriginArea(CPoint padding)
-        {
-            if (InspArea == null)
-            {
-                InspArea = new TRect(Brushes.Yellow, 2, 0.5);
-            }
-            int left = originLeftBottom.X - padding.X;
-            int bottom = originLeftBottom.Y + padding.Y;
-            int right = pitchRightTop.X + padding.X;
-            int top = pitchRightTop.Y - padding.Y;
-
-            //InspArea의 크기가 변할때만 Delegate Call
-
-            if (InspArea.MemoryRect.Left != left || InspArea.MemoryRect.Right != right ||
-                InspArea.MemoryRect.Top != top || InspArea.MemoryRect.Bottom != bottom)
-            {
-                InspArea.MemoryRect.Left = left;
-                InspArea.MemoryRect.Bottom = bottom;
-                InspArea.MemoryRect.Right = right;
-                InspArea.MemoryRect.Top = top;
-            }
-
-            InspArea.MemoryRect.Left = left;
-            InspArea.MemoryRect.Bottom = bottom;
-            InspArea.MemoryRect.Right = right;
-            InspArea.MemoryRect.Top = top;
-
-
-            CPoint viewOriginPt = originLeftBottom;
-            CPoint viewPitchPt = pitchRightTop;
-
-            if (p_View_Rect.Width == 0) return;
-            if (p_View_Rect.Height == 0) return;
-            double pixSizeX = p_CanvasWidth / p_View_Rect.Width;
-            double pixSizeY = p_CanvasHeight / p_View_Rect.Height;
-
-            CPoint LT = new CPoint(viewOriginPt.X - padding.X, viewPitchPt.Y - padding.Y);
-            CPoint RB = new CPoint(viewPitchPt.X + padding.X, viewOriginPt.Y + padding.Y);
-
-            CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
-            CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
-
-            Canvas.SetLeft(InspArea.CanvasRect, canvasLT.X - pixSizeX / 2);
-            Canvas.SetTop(InspArea.CanvasRect, canvasLT.Y - pixSizeY / 2);
-
-            InspArea.CanvasRect.Width = Math.Abs(canvasRB.X - canvasLT.X + pixSizeX);
-            InspArea.CanvasRect.Height = Math.Abs(canvasRB.Y - canvasLT.Y + pixSizeY);
-
-            if (p_UIElement.Contains(InspArea.CanvasRect))
-            {
-                p_UIElement.Remove(InspArea.CanvasRect);
-            }
-            p_UIElement.Add(InspArea.CanvasRect);
-
-        }
-
         #endregion
 
         #region [Viewer Method]
@@ -970,10 +1072,13 @@ namespace Root_WIND2.UI_User
         /// Parent에서 Origin Clear를 요청한 경우 OriginBoxReset을 발생 시키지 않는다.
         /// </summary>
         /// <param name="isFromParent"></param>
-        public void ClearOrigin(bool isFromParent = false)
+        public void ClearObjects(bool isFromParent = false)
         {
             this.IsPitchEnable = false;
             this.p_UIElement.Clear();
+
+            this.originState = PROCESS_ORIGIN_STATE.None;
+            this.pitchState = PROCESS_PITCH_STATE.None;
 
             if (this.OriginBoxReset != null && isFromParent == false)
                 this.OriginBoxReset();

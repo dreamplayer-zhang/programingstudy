@@ -38,14 +38,14 @@ namespace Root_WIND2.UI_User
 			set => SetProperty(ref parameter, value);
 		}
 
-		public int TopOffset
+		public int TopPositionOffset
 		{
 			get
 			{
 				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
 				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
 
-				return inspect.TopOffset;
+				return inspect.TopPositionOffset;
 			}
 			set
 			{
@@ -53,14 +53,14 @@ namespace Root_WIND2.UI_User
 			}
 		}
 
-		public int SideOffset
+		public int SidePositionOffset
 		{
 			get
 			{
 				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
 				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
 
-				return inspect.SideOffset;
+				return inspect.SidePositionOffset;
 			}
 			set
 			{
@@ -68,14 +68,59 @@ namespace Root_WIND2.UI_User
 			}
 		}
 
-		public int BtmOffset
+		public int BtmPositionOffset
 		{
 			get
 			{
 				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
 				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
 				
-				return inspect.BtmOffset;
+				return inspect.BtmPositionOffset;
+			}
+			set
+			{
+
+			}
+		}
+
+		public int TopImageOffset
+		{
+			get
+			{
+				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
+				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
+
+				return inspect.TopImageOffset;
+			}
+			set
+			{
+
+			}
+		}
+
+		public int SideImageOffset
+		{
+			get
+			{
+				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
+				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
+
+				return inspect.SideImageOffset;
+			}
+			set
+			{
+
+			}
+		}
+
+		public int BtmImageOffset
+		{
+			get
+			{
+				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
+				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
+
+				return inspect.BtmImageOffset;
 			}
 			set
 			{
@@ -109,15 +154,15 @@ namespace Root_WIND2.UI_User
 				if (Recipe.CameraHeight == 0)
 				{
 					if (_IsTopChecked)
-						Recipe.CameraHeight = inspect.TopHeight;
+						Recipe.CameraHeight = inspect.TopCameraHeight;
 					else if (_IsSideChecked)
-						Recipe.CameraHeight = inspect.SideHeight;
+						Recipe.CameraHeight = inspect.SideCameraHeight;
 					else if (_IsBtmChecked)
-						Recipe.CameraHeight = inspect.BtmHeight;
+						Recipe.CameraHeight = inspect.BtmCameraHeight;
 				}
 
+				Recipe.Resolution = mode.m_dResX_um;
 				Recipe.TriggerRatio = mode.m_dCamTriggerRatio;
-				Parameter.CamResolution = mode.m_dResX_um;
 
 				SetProperty<int>(ref this.selectedGrabModeIndex, value);
 			}
@@ -220,21 +265,21 @@ namespace Root_WIND2.UI_User
 				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop;
-				Recipe.Offset = this.TopOffset;
+				Recipe.PositionOffset = this.TopPositionOffset;
 			}
 			else if (dataName == "Side")
 			{
 				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeSideImage"), GlobalObjects.Instance.Get<DialogService>());
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide;
 				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide;
-				Recipe.Offset = this.SideOffset;
+				Recipe.PositionOffset = this.SidePositionOffset;
 			}
 			else if (dataName == "Bottom")
 			{
 				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeBottomImage"), GlobalObjects.Instance.Get<DialogService>());
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm;
 				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm;
-				Recipe.Offset = this.BtmOffset;
+				Recipe.PositionOffset = this.BtmPositionOffset;
 			}
 			else
 				return;

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 
@@ -67,6 +68,19 @@ namespace Root_WIND2.UI_User
                     }
                 }
 
+                TypeInfo info = parameterBase.GetType().GetTypeInfo();
+                if(info.ImplementedInterfaces.Contains(typeof(IColorInspection)) == true)
+                {
+                    item.p_InspChannel = ((IColorInspection)parameterBase).IndexChannel;
+                }
+
+                if (info.ImplementedInterfaces.Contains(typeof(IMaskInspection)) == true)
+                {
+                    item.p_InspROI = item.p_cInspROI[((IMaskInspection)parameterBase).MaskIndex];
+                }
+
+
+                item.ComboBoxItemChanged_Channel += ComboBoxItemChanged_Channel_Callback;
                 item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
                 item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
                 item.ButtonClicked_Delete += ButtonClicked_Delete_Callback;
@@ -154,7 +168,14 @@ namespace Root_WIND2.UI_User
 
         public void ComboBoxItemChanged_Mask_Callback(object obj, EventArgs args)
         {
-            InspectionROI mask = (InspectionROI)obj;
+            InspectionItem inspItem = (InspectionItem)obj;
+            SetParameter();
+        }
+
+        public void ComboBoxItemChanged_Channel_Callback(object obj, EventArgs args)
+        {
+            InspectionItem inspItem = (InspectionItem)obj;
+            SetParameter();
         }
 
         public void ComboBoxItemChanged_Method_Callback(object obj, EventArgs args)

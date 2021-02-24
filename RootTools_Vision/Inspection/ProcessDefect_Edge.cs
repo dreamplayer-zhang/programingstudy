@@ -1,5 +1,6 @@
 ﻿using RootTools.Database;
 using RootTools_CLR;
+using RootTools_Vision.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,16 +44,20 @@ namespace RootTools_Vision
 			foreach (Defect defect in MergeDefectList)
 				this.currentWorkplace.DefectList.Add(defect);
 
+            if (MergeDefectList.Count > 0)
+                DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
+
             string sDefectimagePath = @"D:\DefectImage";
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
             SaveDefectImage(Path.Combine(sDefectimagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
 
-            if (MergeDefectList.Count > 0)
-                DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
-            
-            //WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
-            WorkEventManager.OnProcessDefectEdgeDone(this.currentWorkplace, new ProcessDefectEdgeDoneEventArgs());
+			//GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
+			//GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
+			//GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+			//GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(sDefectimagePath, false);
 
+			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
+			WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
         }
 
 		public List<Defect> CollectDefectData(int mapX)

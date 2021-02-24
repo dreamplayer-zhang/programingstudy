@@ -243,10 +243,12 @@ namespace Root_AOP01_Inspection
 			CenterPoint.X = 66000;//p_ImageViewer_VM.p_ImageData.p_Size.X / 2;
 			CenterPoint.Y = 41000;// p_ImageViewer_VM.p_ImageData.p_Size.Y / 2;
 
-			WorkEventManager.PositionDone += PositionDone_Callback;
-			WorkEventManager.InspectionDone += SurfaceInspDone_Callback;
-			WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
-			WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
+			//TODO GlobalObjects에서 가져오도록 수정해야 함
+			//WorkEventManager.PositionDone += PositionDone_Callback;
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.PellInspMgRegName).InspectionDone += SurfaceInspDone_Callback;
+			//WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
+			//WorkEventManager.ProcessDefectWaferDone += WorkEventManager_ProcessDefectWaferDone;
+			
 			//InspectionManager_AOP.PellInspectionDone += InspectionManager_AOP_PellInspectionDone;//이벤트 추가 필요
 
 			SurfaceSize = 5;
@@ -290,7 +292,7 @@ namespace Root_AOP01_Inspection
 			}
 		}
 
-		private void WorkEventManager_ProcessDefectWaferDone(object sender, ProcessDefectWaferDoneEventArgs e)
+		private void WorkEventManager_ProcessDefectWaferDone(object sender, IntegratedProcessDefectDoneEventArgs e)
 		{
 		}
 
@@ -522,7 +524,7 @@ namespace Root_AOP01_Inspection
 			bool isIncludeMode = true;
 
 			IntPtr MainImage = new IntPtr();
-			if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
+			if (p_ImageViewer_VM.p_ImageData.GetBytePerPixel() == 3)
 			{
 				if (p_eColorViewMode != eColorViewMode.All)
 					MainImage = p_ImageViewer_VM.p_ImageData.GetPtr((int)p_eColorViewMode - 1);
@@ -767,7 +769,7 @@ namespace Root_AOP01_Inspection
 			recipe.ParameterItemList.Add(surParam);
 
 			IntPtr SharedBuf = new IntPtr();
-			if (p_ImageViewer_VM.p_ImageData.p_nByte == 3)
+			if (p_ImageViewer_VM.p_ImageData.GetBytePerPixel() == 3)
 			{
 				if (p_ImageViewer_VM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
 					SharedBuf = p_ImageViewer_VM.p_ImageData.GetPtr((int)p_ImageViewer_VM.p_eColorViewMode - 1);

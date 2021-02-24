@@ -52,6 +52,7 @@ namespace RootTools_Vision.Utility
 		public String tempString;
 		public float resX;
 		public float resY;
+
 		#endregion
 
 		public bool Save(StreamWriter sw)
@@ -330,7 +331,7 @@ namespace RootTools_Vision.Utility
 			//double diePitchX = recipe.DiePitchX;
 			//double diePitchY = recipe.DiePitchY;
 
-			Point pt = new Point();
+			//Point pt = new Point();
 			
 			
 			double diePitchX = this.diePitchX;

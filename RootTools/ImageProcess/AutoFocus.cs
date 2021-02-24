@@ -274,7 +274,7 @@ namespace RootTools.ImageProcess
 
         public double GetImageFocusScoreWithSobel(ImageData img, out Bitmap bmpOut)
         {
-            Emgu.CV.Mat matSrc = new Emgu.CV.Mat(img.p_Size.X, img.p_Size.Y, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
+            Emgu.CV.Mat matSrc = new Emgu.CV.Mat(img.p_Size.X, img.p_Size.Y, Emgu.CV.CvEnum.DepthType.Cv8U, img.GetBytePerPixel(), img.GetPtr(), (int)img.p_Stride);
             Emgu.CV.Mat matGrad = new Emgu.CV.Mat();
 
             int nScale = 1;

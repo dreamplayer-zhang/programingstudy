@@ -36,8 +36,7 @@ namespace RootTools.Camera.Silicon
         int m_Width;
         int m_Height;
         int m_nGrabProgress;
-        int m_nSkipGrabCount;
-        string m_sMCF="";
+        string m_sMCF = "";
 
         IntPtr m_MemPtr;
         IntPtr m_pBufGrab; //Frame Grabber꺼
@@ -64,7 +63,10 @@ namespace RootTools.Camera.Silicon
         }
         public string p_sMCF
         {
-            get { return m_sMCF; }
+            get
+            {
+                return m_sMCF;
+            }
             set
             {
                 SetProperty(ref m_sMCF, value);
@@ -82,7 +84,15 @@ namespace RootTools.Camera.Silicon
             }
         }
 
-        public string p_id { get; set; }
+        public string p_id
+        {
+            get; set;
+        }
+        public bool bStopThread
+        {
+            get;
+            set;
+        }
         public int p_nGrabProgress
         {
             get
@@ -107,7 +117,9 @@ namespace RootTools.Camera.Silicon
         }
 
         public CPoint p_sz
-        { get => m_szBuf; set => SetProperty(ref m_szBuf, value); }
+        {
+            get => m_szBuf; set => SetProperty(ref m_szBuf, value);
+        }
         #endregion
         #region UI
         public UserControl p_ui
@@ -135,7 +147,6 @@ namespace RootTools.Camera.Silicon
             m_Width = 0;
             m_Height = 0;
             m_nGrabTrigger = 0;
-            m_nSkipGrabCount = -1;
             rc = fgErrorType.fgeOK;
 
             m_szBuf = new CPoint(0, 0);
@@ -243,7 +254,7 @@ namespace RootTools.Camera.Silicon
             {
                 PylonC.NET.Pylon.Initialize();
                 uint unNumbDevices = PylonC.NET.Pylon.EnumerateDevices();
-                PylonCreateDevice();
+                PylonCreateDevice(unNumbDevices,"340km");
 
                 if (m_hDev == null)
                 {
@@ -251,7 +262,7 @@ namespace RootTools.Camera.Silicon
                     return;
                 }
 
-                PylonC.NET.Pylon.DeviceOpen(m_hDev, PylonC.NET.Pylon.cPylonAccessModeControl | PylonC.NET.Pylon.cPylonAccessModeStream);
+                //PylonC.NET.Pylon.DeviceOpen(m_hDev, PylonC.NET.Pylon.cPylonAccessModeControl | PylonC.NET.Pylon.cPylonAccessModeStream);
                 PylonC.NET.Pylon.DeviceFeatureFromString(m_hDev, "UserSetSelector", "UserSet1");
                 PylonC.NET.Pylon.DeviceExecuteCommandFeature(m_hDev, "UserSetLoad");
 
@@ -279,13 +290,32 @@ namespace RootTools.Camera.Silicon
             MessageBox.Show("Camera is Connected!");
         }
 
-        void PylonCreateDevice()
+        void PylonCreateDevice(uint NumberofDevices, string DeviceName)
         {
-            if (p_nDeviceIndex >= 0)
-                m_hDev = PylonC.NET.Pylon.CreateDeviceByIndex((uint)p_nDeviceIndex);
-
             if (p_nDeviceIndex < 0)
                 MessageBox.Show("Device Index not Defined !!");
+
+            for (uint i = 0; i < NumberofDevices; i++)
+            {
+                try
+                {
+                    //m_hDev = PylonC.NET.Pylon.CreateDeviceFromDirectShowID((int)i);
+                    m_hDev = PylonC.NET.Pylon.CreateDeviceByIndex(i);
+                    PylonC.NET.Pylon.DeviceOpen(m_hDev, PylonC.NET.Pylon.cPylonAccessModeControl | PylonC.NET.Pylon.cPylonAccessModeStream);
+                    string name = PylonC.NET.Pylon.DeviceFeatureToString(m_hDev, "DeviceModelName");
+
+                    if (PylonC.NET.Pylon.DeviceFeatureToString(m_hDev, "DeviceModelName").Contains(DeviceName))
+                        break;
+                    PylonC.NET.Pylon.DeviceClose(m_hDev);
+                    m_hDev = null;
+
+                }
+                catch (Exception e)
+                {
+                    i++;
+                }
+
+            }
 
             if (m_hDev == null)
                 MessageBox.Show("Device Create Error !!");
@@ -356,12 +386,12 @@ namespace RootTools.Camera.Silicon
         {
             return new CPoint(m_Width, m_Height);
         }
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
         {
             if (!m_hDev.IsValid)
             {
                 MessageBox.Show("Camera isn't connected");
-            
+
                 return;
             }
 
@@ -373,13 +403,12 @@ namespace RootTools.Camera.Silicon
             m_LastROI = new CRect();
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
-            m_lGrab = nLine/m_Height;/*잠깐하드코딩*/
+            m_lGrab = nLine / m_Height;
             m_nInverseYOffset = m_GrabData.ReverseOffsetY;
             m_nYEnd = (m_lGrab - 1) * m_Height;
             m_cpScanOffset.Y = 0;
             m_nGrabTrigger = 0;
             m_bscanDir = m_GrabData.bInvY;
-            m_nSkipGrabCount = m_GrabData.m_nSkipGrabCount;
 
             rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);
 
@@ -391,13 +420,6 @@ namespace RootTools.Camera.Silicon
             int iBlock = 0;
             while (iBlock < m_lGrab)
             {
-                //if(m_nSkipGrabCount > 0)
-                //{
-                //    // TDI 카메라와 Silicon Grabber의 해상도가 달라서 트리거 갯수를 다르게 줘야해서 Skip 할 수 있도록 추가
-                //    if (m_nGrabTrigger % m_nSkipGrabCount != 0) //LADS를 사용할 땐 m_nGrabTrigger가 TDI 기준으로 카운트가 올라감
-                //        continue;
-                //}
-
                 if (iBlock < m_nGrabTrigger)
                 {
                     int nY = iBlock * m_Height;
@@ -412,7 +434,7 @@ namespace RootTools.Camera.Silicon
                         if (Scandir)
                             yp = m_nYEnd - (y + iBlock * m_Height) + m_nInverseYOffset;
                         else
-                            yp = y + iBlock * m_Height ;
+                            yp = y + iBlock * m_Height;
 
                         IntPtr srcPtr = ipSrc + m_Width * y;
                         IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * m_Memory.W);
@@ -467,7 +489,9 @@ namespace RootTools.Camera.Silicon
         {
         }
 
-        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null) { }
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
+        {
+        }
 
         #region RelayCommand
         public RelayCommand ConnectCommand

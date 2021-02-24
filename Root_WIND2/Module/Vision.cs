@@ -33,6 +33,17 @@ namespace Root_WIND2.Module
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
         Camera_Basler m_CamAutoFocus;
+        public Camera_Basler p_CamAutoFocus
+        {
+            get
+            {
+                return m_CamAutoFocus;
+            }
+            set
+            {
+                m_CamAutoFocus = value;
+            }
+        }
 
         KlarfData_Lot m_KlarfData_Lot;
         LensLinearTurret m_LensLinearTurret;
