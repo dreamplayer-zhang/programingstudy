@@ -136,6 +136,7 @@ namespace Root_Rinse_Unloader.Engineer
         #region IEngineer Function
         public string BuzzerOff()
         {
+            m_handler.m_rinse.RunBuzzerOff();
             return "OK";
         }
 

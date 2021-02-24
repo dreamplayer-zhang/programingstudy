@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_AOP01_Inspection.Module;
+using RootTools;
 using RootTools.Memory;
 using RootTools_Vision;
 using System;
@@ -71,7 +72,22 @@ namespace Root_AOP01_Inspection
 		public ObservableCollection<InfoTextBolck> InfoTextBolcks = new ObservableCollection<InfoTextBolck>();
 		public ObservableCollection<TRect> TRectList = new ObservableCollection<TRect>();
 		TShape rectInfo;
-
+		public override void MouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			base.MouseWheel(sender, e);
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.PellInspMgRegName).RefreshDefect();
+		}
+		public override void MouseMove(object sender, MouseEventArgs e)
+		{
+			base.MouseMove(sender, e);
+			if (m_KeyEvent != null)
+			{
+				if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
+				{
+					GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.PellInspMgRegName).RefreshDefect();
+				}
+			}
+		}
 		public enum ColorType
 		{
 			MasterFeature,

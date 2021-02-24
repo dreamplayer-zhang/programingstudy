@@ -26,6 +26,7 @@
         <local:AxisToStageUIConverter x:Key="AxisToStageConverter"/>
         <local:MeasurePointToStageUIConverter x:Key="PointToStageConverter"/>
         <local:DoubleToProgressConverter x:Key="ProgressConverter"/>
+        
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -791,6 +792,10 @@
                             Style="{StaticResource SetupPanelBtn}" 
                             Height="40"
                             Click="buttonBuzzerOff_Click"/>
+                    <Button Content="OHT" x:Name="buttonOHT" Margin="0,200,0,0"
+                            Style="{StaticResource SetupPanelBtn}"
+                            Height="40"
+                            Click="buttonOHT_Click"/>
                 </StackPanel>
             </Grid>
         </Grid>

@@ -90,7 +90,7 @@ namespace RootTools.Camera.BaslerPylon
         {
             // RGB histogram data array
             int[][] arrRGB = CreateHistogram();
-            int imgSize = (m_img.p_Size.X * m_img.p_Size.Y) / m_img.p_nByte;
+            int imgSize = (m_img.p_Size.X * m_img.p_Size.Y) / m_img.GetBytePerPixel();
 
             // Set histogram data to apply
             for (int rgb = 0; rgb < 3; rgb++)
@@ -119,7 +119,7 @@ namespace RootTools.Camera.BaslerPylon
             {
                 for(int col = 0; col < m_img.p_Size.X; col++)
                 {
-                    int idx = ((m_img.p_Size.Y * row) + col) * m_img.p_nByte;
+                    int idx = ((m_img.p_Size.Y * row) + col) * m_img.GetBytePerPixel();
 
                     byte r = m_img.m_aBuf[idx + 2];
                     byte g = m_img.m_aBuf[idx + 1];
