@@ -201,8 +201,8 @@ namespace Root_WIND2
                 if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
                 {
 
-                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryFrontPool, memoryFrontGroup, memoryFront, engineer.ClassMemoryTool(),3);
-                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage",memoryFrontPool, memoryFrontGroup, memoryMask , engineer.ClassMemoryTool(),3);
+                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
+                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
                     //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
                 }
                 else
@@ -226,8 +226,8 @@ namespace Root_WIND2
                 }
                 if (maskLayer.m_MemData != null)
                 {
-                    maskLayer.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nByte;
-                    maskLayer.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nCount;
+                   // maskLayer.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nByte;
+                 //   maskLayer.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nCount;
                 }
                 if (edgeTopImage.m_MemData != null)
                 {
