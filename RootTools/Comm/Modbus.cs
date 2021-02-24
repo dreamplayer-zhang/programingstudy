@@ -69,11 +69,6 @@ namespace RootTools.Comm
             {
                 _eComm = value;
                 m_reg.Write("p_eComm", (int)value);
-                switch (value)
-                {
-                    case eComm.RS232: m_client.IPAddress = null; break;
-                    case eComm.TCPIP: m_client.SerialPort = null; break; 
-                }
             }
         }
         Registry m_reg;
@@ -98,6 +93,7 @@ namespace RootTools.Comm
         void RunTreeRS232(Tree tree)
         {
             if (p_eComm != eComm.RS232) return;
+            if (m_client.SerialPort == null) m_client.SerialPort = "COM50";
             lock (m_csLock)
             {
                 try
@@ -126,6 +122,7 @@ namespace RootTools.Comm
         void RunTreeTCPIP(Tree tree)
         {
             if (p_eComm != eComm.TCPIP) return;
+            if (m_client.IPAddress == null) m_client.IPAddress = "192.0.0.1";
             m_client.IPAddress = tree.Set(m_client.IPAddress, m_client.IPAddress, "IP", "IP Address");
             m_client.Port = tree.Set(m_client.Port, m_client.Port, "Port", "Port numver");
             if (tree.m_bUpdated && m_client.Connected) m_client.Disconnect();
@@ -136,7 +133,15 @@ namespace RootTools.Comm
         public string Connect()
         {
             if (m_client.Connected) return "OK";
-            try { m_client.Connect(); }
+            try 
+            { 
+                switch (p_eComm)
+                {
+                    case eComm.RS232: m_client.IPAddress = null; break;
+                    case eComm.TCPIP: m_client.SerialPort = null; break; 
+                }
+                m_client.Connect(); 
+            }
             catch (Exception) { return "Connection Error"; }
             if (m_client.Connected == false) return "Connection False";
             m_client.SendDataChanged += M_client_SendDataChanged;
