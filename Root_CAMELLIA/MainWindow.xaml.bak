@@ -279,7 +279,7 @@
                                 </ItemsControl.ItemContainerStyle>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <ctrl:Fan VerticalAlignment="Center" HorizontalAlignment="Center" DataContext="{Binding Fan, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                        <ctrl:Fan DataContext="{Binding Fan, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>

@@ -390,12 +390,6 @@ namespace Root_CAMELLIA
             InitFDC();
         }
 
-        private void UpdateFanUI()
-        {
-            FanListItems.Clear();
-            InitFFU();
-        }
-
         Dispatcher dispatcher = null;
         private void Init()
         {
@@ -480,10 +474,13 @@ namespace Root_CAMELLIA
         private void InitFFU()
         {
             int cols = 0;
-            for(int i = 0; i < p_Module_FFU.p_aUnit[0].m_aFan.Count; i++)
+            for(int i = 0; i < p_Module_FFU.p_aUnit.Count; i++)
             {
+                Fan fan = new Fan();
+                fan.DataContext = p_Module_FFU.p_aUnit[i];
+
                 FanListItem FanItem = new FanListItem();
-                FanItem.Fan = p_Module_FFU.p_aUnit[0].m_aFan[i];
+                FanItem.Fan = fan;
                 if(i < 2)
                 {
                     FanItem.p_rowIndex = 0;
@@ -746,13 +743,6 @@ namespace Root_CAMELLIA
                     {
                         UpdateGaugeUI();
                         m_Module_FDC.m_aData[0].p_IsUpdate = false;
-                        m_Module_FDC_Vision.m_aData[0].p_IsUpdate = false;
-                    }
-
-                    if (m_Module_FFU.p_aUnit[0].p_aFan[0].p_IsUpdate)
-                    {
-                        UpdateFanUI();
-                        m_Module_FFU.p_aUnit[0].p_aFan[0].p_IsUpdate = false;
                     }
                 });
             }
@@ -772,13 +762,6 @@ namespace Root_CAMELLIA
                         GaugeListItems[i].Gauge.p_value = double.Parse(rand.Next(0, 100).ToString("#.##"));
                         //GaugeListItems[i].p_name = "strasgding" + i;
                     }
-                    for (int i = 0; i < FanListItems.Count; i++)
-                    {
-                        if (FanListItems[i].Fan.p_bRun == false)
-                            FanListItems[i].Fan.p_bRun = true;
-                        else if (FanListItems[i].Fan.p_bRun)
-                            FanListItems[i].Fan.p_bRun = false;
-                    }
                     //GaugeListItem gauge = new GaugeListItem();
                     //gauge.Gauge = new GaugeChart();
                     //gauge.p_columnIndex = 0;
@@ -787,9 +770,9 @@ namespace Root_CAMELLIA
                     //gauge.Gauge.p_value = 40;
                     //GaugeListItems.Add(gauge);
                     ////p_Test.p_value = rand.Next(0,100);
-                            ///
-                            // GaugeListItems = new ObservableCollection<GaugeListItem>();
-                        int cols = 0;
+                    ///
+                   // GaugeListItems = new ObservableCollection<GaugeListItem>();
+                    int cols = 0;
                     // GaugeListItems.Clear();
 
                     //for(int i= 0; i < GaugeListItems.Count; i++)
@@ -854,8 +837,8 @@ namespace Root_CAMELLIA
         {
 
         }
-        Module_FFU.Unit.Fan _fan;
-        public Module_FFU.Unit.Fan Fan
+        Fan _fan = new Fan();
+        public Fan Fan
         {
             get
             {

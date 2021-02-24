@@ -630,6 +630,7 @@ namespace Root_CAMELLIA
                     }
                     double value = SelectedAxis.p_posActual;
                     Clipboard.SetText(value.ToString());
+                    MessageBox.Show("Copied Value!");
                 });
             }
         }

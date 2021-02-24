@@ -254,6 +254,9 @@
     <Compile Include="Control\Explorer.xaml.cs">
       <DependentUpon>Explorer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Fan.xaml.cs">
+      <DependentUpon>Fan.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\FocusExtension.cs" />
     <Compile Include="Control\GaugeChart.xaml.cs">
       <DependentUpon>GaugeChart.xaml</DependentUpon>
@@ -263,6 +266,7 @@
     </Compile>
     <Compile Include="Converter\BoolConverter.cs" />
     <Compile Include="Converter\LampStateToColorConverter.cs" />
+    <Compile Include="Converter\ValueToColorConverter.cs" />
     <Compile Include="LibSR_Met\Calculation.cs" />
     <Compile Include="LibSR_Met\ConstValue.cs" />
     <Compile Include="LibSR_Met\DataManager.cs" />
@@ -371,6 +375,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Control\Explorer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Fan.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

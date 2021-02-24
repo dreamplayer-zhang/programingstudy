@@ -64,6 +64,7 @@ namespace Root_CAMELLIA
         public Module_Camellia m_camellia;
         public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
         public Module_FDC m_FDC;
+        public Module_FDC m_FDC_Vision;
         public Module_FFU m_FFU;
         public TowerLamp m_towerlamp;
         public Interlock m_interlock;
@@ -91,6 +92,8 @@ namespace Root_CAMELLIA
 
             m_FDC = new Module_FDC("FDC", m_engineer);
             InitModule(m_FDC);
+            m_FDC_Vision = new Module_FDC("FDC_Vision", m_engineer);
+            InitModule(m_FDC_Vision);
             m_FFU = new Module_FFU("FFU", m_engineer);
             InitModule(m_FFU);
             m_recipe = new CAMELLIA_Recipe("Recipe", m_engineer);
