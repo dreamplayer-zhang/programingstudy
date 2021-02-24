@@ -49,7 +49,7 @@ namespace Root_VEGA_P.Engineer
 
             m_recipe = new VEGA_P_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR);
+            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
         }
 
         void InitModule(ModuleBase module)
