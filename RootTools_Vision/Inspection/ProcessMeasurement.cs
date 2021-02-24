@@ -1,5 +1,6 @@
 ﻿using RootTools.Database;
 using RootTools_CLR;
+using RootTools_Vision.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,67 +40,39 @@ namespace RootTools_Vision
                 this.currentWorkplace.MeasureList.Add(measure);
 
             // TO DO 이거 측정마다 다를건데 어떻게 할거임
-            int measureItem = Enum.GetValues(typeof(EBRMeasurement.EBRMeasureItem)).Length;
+            int measureItem = Enum.GetValues(typeof(Measurement.EBRMeasureItem)).Length;
 
             for (int i = 0, index = 0; i < measureList.Count; i += measureItem, index++)
                 for (int j = 0; j < measureItem; j++)
                     measureList[i + j].SetMeasureIndex(index);
 
-            string sMeasurementImagePath = @"D:\MeasurementImage";
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            SaveMeasurementImage(Path.Combine(sMeasurementImagePath, sInspectionID), measureList, this.currentWorkplace.SharedBufferByteCnt);
             DatabaseManager.Instance.AddMeasurementDataList(measureList);
+
+            SharedBufferInfo sharedBufferInfo = new SharedBufferInfo(currentWorkplace.SharedBufferR_GRAY,
+                                                                     currentWorkplace.Width,
+                                                                     currentWorkplace.Height,
+                                                                     currentWorkplace.SharedBufferByteCnt,
+                                                                     currentWorkplace.SharedBufferG,
+                                                                     currentWorkplace.SharedBufferB);
+            
+            SettingItem_SetupEBR settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupEBR>();
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+            Tools.SaveMeasurementImage(Path.Combine(settings.MeasureImagePath, sInspectionID), measureList, sharedBufferInfo);
+
+            if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
+            {
+				//GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, measureList, this.recipe.GetItem<OriginRecipe>());
+				//GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
+				//GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+				//GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
+
+				string sTiffImagePath = @"D:\DefectImage";
+				Tools.SaveTiffImage(sTiffImagePath, measureList, sharedBufferInfo);
+            }
 
             WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
         }
 
-		private void SaveMeasurementImage(String path, List<Measurement> measureList, int byteCnt)
-		{
-            path += "\\";
-            DirectoryInfo di = new DirectoryInfo(path);
-            if (!di.Exists)
-                di.Create();
-
-            if (measureList.Count < 1)
-                return;
-
-            unsafe
-            {
-                Cpp_Rect[] defectArray = new Cpp_Rect[measureList.Count];
-
-                for (int i = 0; i < measureList.Count; i++)
-                {
-                    Cpp_Rect rect = new Cpp_Rect();
-					rect.x = (int)measureList[i].p_rtDefectBox.Left;
-					rect.y = (int)measureList[i].p_rtDefectBox.Top;
-					rect.w = (int)measureList[i].m_fWidth;
-					rect.h = (int)measureList[i].m_fHeight;
-
-					defectArray[i] = rect;
-                }
-
-                if (byteCnt == 1)
-                {
-                    CLR_IP.Cpp_SaveDefectListBMP(
-                       path,
-                       (byte*)currentWorkplace.SharedBufferR_GRAY.ToPointer(),
-                       currentWorkplace.SharedBufferWidth,
-                       currentWorkplace.SharedBufferHeight,
-                       defectArray);
-                }
-
-                else if (byteCnt == 3)
-                {
-                    CLR_IP.Cpp_SaveDefectListBMP_Color(
-                        path,
-                       (byte*)currentWorkplace.SharedBufferR_GRAY.ToPointer(),
-                       (byte*)currentWorkplace.SharedBufferG.ToPointer(),
-                       (byte*)currentWorkplace.SharedBufferB.ToPointer(),
-                       currentWorkplace.SharedBufferWidth,
-                       currentWorkplace.SharedBufferHeight,
-                       defectArray);
-                }
-            }
-        }
+		
 	}
 }
