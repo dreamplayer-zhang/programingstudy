@@ -96,7 +96,7 @@ namespace RootTools.Comm
                 {
                     int lReceive = m_socketComm.Receive(m_aBufRead);
                     if (lReceive > 0) EventReciveData(m_aBufRead, lReceive, m_socketComm);
-                    //m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.ASCII.GetString(m_aBufRead, 0, lReceive) : "Large Data");
+                    if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.ASCII.GetString(m_aBufRead, 0, lReceive) : "Large Data");
                 }
                 catch (Exception e) { m_commLog.Add(CommLog.eType.Info, "Receive Exception : " + e.Message); }
             }
@@ -109,7 +109,7 @@ namespace RootTools.Comm
             if (m_socketComm == null) return "Not Connected";
             byte[] aBuf = Encoding.Default.GetBytes(sMsg);
             m_socketComm.Send(aBuf);
-            //m_commLog.Add(CommLog.eType.Send, (sMsg.Length < 64) ? sMsg : "Large Data");
+            if (m_bCommLog) m_commLog.Add(CommLog.eType.Send, (sMsg.Length < 64) ? sMsg : "Large Data");
             return "OK";
         }
 
@@ -117,8 +117,22 @@ namespace RootTools.Comm
         {
             if (m_socketComm == null) return "Not Connected";
             m_socketComm.Send(aBuf);
-            //m_commLog.Add(CommLog.eType.Send, (aBuf.Length < 64) ? Encoding.ASCII.GetString(aBuf, 0, aBuf.Length) : "Large Data");
+            if (m_bCommLog) m_commLog.Add(CommLog.eType.Send, (aBuf.Length < 64) ? Encoding.ASCII.GetString(aBuf, 0, aBuf.Length) : "Large Data");
             return "OK";
+        }
+        #endregion
+
+        #region CommLog
+        public CommLog m_commLog;
+        void InitCommLog()
+        {
+            m_commLog = new CommLog(this, m_log);
+        }
+
+        bool m_bCommLog = true;
+        void RunTreeCommLog(Tree tree)
+        {
+            m_bCommLog = tree.Set(m_bCommLog, m_bCommLog, "Enable", "CommLog Enable (false = Fast)");
         }
         #endregion
 
@@ -146,19 +160,18 @@ namespace RootTools.Comm
         public void RunTree(Tree treeRoot)
         {
             RunTreeSetting(treeRoot.GetTree("Setting"));
+            RunTreeCommLog(treeRoot.GetTree("CommLog"));
         }
         #endregion
 
         public string p_id { get; set; }
         Log m_log;
-        public CommLog m_commLog;
         public TCPSyncServer(string id, Log log, int lMaxBuffer = 4096)
         {
             p_id = id;
             m_aBufRead = new byte[lMaxBuffer];
             m_log = log;
-            m_commLog = new CommLog(this, log);
-
+            InitCommLog();
             InitTree();
         }
 
