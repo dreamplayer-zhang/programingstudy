@@ -178,7 +178,7 @@ namespace Root_Rinse_Loader.Module
 
         #region Rinse
         DIO_I m_diRinseRun;
-        DIO_O m_doRinseEmg; 
+        public DIO_O m_doRinseEmg; 
 
         public enum eRinseRun
         {
@@ -238,7 +238,7 @@ namespace Root_Rinse_Loader.Module
             p_sInfo = m_toolBox.Get(ref m_doRinseEmg, this, "Rinse Emg Stop");
             if (bInit)
             {
-                m_doRinseEmg.Write(false); 
+                m_doRinseEmg.Write(true); 
                 EQ.m_EQ.OnChanged += M_EQ_OnChanged;
                 m_tcpip.EventReciveData += M_tcpip_EventReciveData;
             }
@@ -449,7 +449,8 @@ namespace Root_Rinse_Loader.Module
             {
                 Thread.Sleep(10);
                 p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready;
-                p_bRinseEmg = (p_eStateRinse == eRinseRun.Run) && (p_eStateUnloader != EQ.eState.Run); 
+                //p_bRinseEmg = (p_eStateRinse == eRinseRun.Run) && (p_eStateUnloader != EQ.eState.Run); 
+                p_bRinseEmg = p_eStateUnloader == EQ.eState.Error;
                 RunThreadDIO(); 
                 if (m_qProtocolReply.Count > 0)
                 {
