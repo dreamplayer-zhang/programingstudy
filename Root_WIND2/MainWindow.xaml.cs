@@ -163,10 +163,8 @@ namespace Root_WIND2
         private string memoryFront = "Main";
         private string memoryMask = "Layer";
 
-        //private string memoryMaskPool = "pool";
-        //private string memoryMaskGroup = "group";
-        //private string memoryMask = "ROI";
-
+        private string memoryMaskPool = "pool";
+        private string memoryMaskGroup = "group";
 
         private string memoryBackPool = "BackSide Vision.BackSide Memory";
         private string memoryBackGroup = "BackSide Vision";
@@ -278,7 +276,7 @@ namespace Root_WIND2
                             frontImage.GetPtr(0), 
                             frontImage.p_Size.X, 
                             frontImage.p_Size.Y, 
-                            frontImage.frontImage.GetBytePerPixel(), 
+                            frontImage.GetBytePerPixel(), 
                             frontImage.GetPtr(1), 
                             frontImage.GetPtr(2), 
                             new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)
