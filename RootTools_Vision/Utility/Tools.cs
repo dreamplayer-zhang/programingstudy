@@ -19,7 +19,7 @@ using System.Windows.Forms;
 
 namespace RootTools_Vision
 {
-    public class Tools
+    public partial class Tools
     {
         public static byte[] CovertImageToArray(Image img)
         {
@@ -170,12 +170,12 @@ namespace RootTools_Vision
                             pB += _memWidth;
                         }
 
+                        pR += (int)rt.X;
+                        pG += (int)rt.X;
+                        pB += (int)rt.X;
+
                         for (int i = 0; i < 480; i++)
                         {
-                            pR += (int)rt.X;
-                            pG += (int)rt.X;
-                            pB += (int)rt.X;
-
                             for (int j = 0; j < 640; j++)
                             {
                                 pPointer[i * (saveW * 3) + j * _byteCount + 0] = *(pB + j);

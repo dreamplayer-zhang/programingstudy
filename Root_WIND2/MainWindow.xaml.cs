@@ -142,8 +142,9 @@ namespace Root_WIND2
 
             UIManager.Instance.ChangeUIMode();
 
+            SettingItem_SetupFrontside frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
             ///////시연용 임시코드
-            DatabaseManager.Instance.SetDatabase(1);
+            DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
             //DatabaseManager.Instance.ValidateDatabase();
             //////
 
