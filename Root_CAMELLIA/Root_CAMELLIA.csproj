@@ -79,7 +79,9 @@
     <Reference Include="ColorPickerLib, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.ColorPickerLib.1.6.2\lib\net40\ColorPickerLib.dll</HintPath>
     </Reference>
-    <Reference Include="EasyModbus, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="EasyModbus">
+      <HintPath>..\Lib\EasyModbus.dll</HintPath>
+    </Reference>
     <Reference Include="Emgu.CV.UI, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
     </Reference>
@@ -202,7 +204,7 @@
     </Reference>
     <Reference Include="NanoView, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\ATI\Desktop\SW PG\Root_Edge테스트\Lib\MetLib\NanoView.dll</HintPath>
+      <HintPath>..\Lib\MetLib\NanoView.dll</HintPath>
     </Reference>
     <Reference Include="NumericUpDownLib, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.NumericUpDownLib.2.4.2\lib\net40\NumericUpDownLib.dll</HintPath>
