@@ -508,7 +508,7 @@ namespace Root_EFEM.Module
             m_log.Info(" [ Send --> " + sCmd);
             switch (p_eComm)
             {
-                case eComm.TCPIP: return m_tcpip.Send(sCmd); 
+                case eComm.TCPIP: return m_tcpip.Send(sCmd + "\r"); 
                 case eComm.RS232: return m_rs232.Send(sCmd);
             }
             return "SendCmd Comm Type Error : " + p_eComm.ToString(); 
@@ -533,8 +533,9 @@ namespace Root_EFEM.Module
             public string m_sRead = ""; 
             public bool OnReceive(string sRead)
             {
-                m_sRead = sRead; 
-                return false; 
+                int nIndex = sRead.IndexOf("\r");
+                m_sRead = sRead.Substring(0, nIndex);
+                return false;
             }
 
             bool m_bSend = false; 
@@ -551,7 +552,7 @@ namespace Root_EFEM.Module
                 while (m_bSend == false)
                 {
                     if (EQ.IsStop()) return "EQ Stop";
-                    if (m_wtr.m_rs232.p_bConnect == false) return "RS232 Connection Lost !!";
+                    //if (m_wtr.m_rs232.p_bConnect == false) return "RS232 Connection Lost !!";
                     Thread.Sleep(10); 
                 }
                 m_sRead = ""; 
@@ -559,7 +560,7 @@ namespace Root_EFEM.Module
                 while (true)
                 {
                     if (EQ.IsStop()) return "EQ Stop";
-                    if (m_wtr.m_rs232.p_bConnect == false) return "RS232 Connection Lost !!";
+                    //if (m_wtr.m_rs232.p_bConnect == false) return "RS232 Connection Lost !!";
                     if (m_sRead != "") return "OK";
                     if (sw.Elapsed.TotalSeconds > secWait) return "Timeover"; 
                     Thread.Sleep(10); 
@@ -688,6 +689,29 @@ namespace Root_EFEM.Module
             if (asRead.Length < 3) return "RQ WAFER Error : " + sRead;
             bExist = (asRead[2] == "Y"); 
             return "OK";
+        }
+        #endregion
+
+        #region StateHome
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            try
+            {
+                //foreach (IWTRChild child in p_aChild) child.p_bLock = true;
+                if (Run(CmdHome())) return p_sInfo;
+                p_eState = eState.Ready;
+                foreach (IWTRChild child in p_aChild) child.p_bLock = false;
+                return "OK";
+            }
+            finally
+            {
+                // if (p_sInfo != "OK") p_eState = eState.Error;
+            }
         }
         #endregion
 

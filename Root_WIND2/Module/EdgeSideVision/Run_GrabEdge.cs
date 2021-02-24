@@ -150,10 +150,17 @@ namespace Root_WIND2.Module
                 gmSide.StartGrab(gmSide.m_memoryData, new CPoint(0, 0), grabCount, gmSide.m_GD, true);
                 gmBtm.StartGrab(gmBtm.m_memoryData, new CPoint(0, 0), grabCount, gmBtm.m_GD, true);
 
-                if (module.Run(axisR.StartMove(moveEnd, scanSpeed, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc)))
+                if (module.Run(axisR.StartMove(moveEnd, 30000, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc, axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc)))
 					return p_sInfo;
 				if (module.Run(axisR.WaitReady()))
 					return p_sInfo;
+
+
+				while (gmTop.m_camera.p_nGrabProgress != 100 || gmSide.m_camera.p_nGrabProgress != 100 || gmBtm.m_camera.p_nGrabProgress != 100)
+				{
+					System.Threading.Thread.Sleep(10);
+					//m_log.Info("Wait Camera GrabProcess");
+				}
 
 				axisR.RunTrigger(false);
 				gmTop.StopGrab();

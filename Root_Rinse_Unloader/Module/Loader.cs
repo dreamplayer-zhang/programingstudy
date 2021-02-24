@@ -29,9 +29,11 @@ namespace Root_Rinse_Unloader.Module
 
         #region GAF
         ALID m_alidPickerDown;
+        ALID m_alidRollerStripCheck;
         void InitALID()
         {
             m_alidPickerDown = m_gaf.GetALID(this, "PickerDown", "Picker Up & Down Error");
+            m_alidRollerStripCheck = m_gaf.GetALID(this, "Roller Strip Check", "Roller Strip Check Error");
         }
         #endregion
 
@@ -153,6 +155,7 @@ namespace Root_Rinse_Unloader.Module
             if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(RunPickerDown(false))) return p_sInfo;
+            if (Run(RunCheckStrip())) return p_sInfo;
             m_roller.p_eStep = Roller.eStep.Empty;
             if (Run(m_roller.RunRotate(true))) return p_sInfo;
             return "OK";
@@ -187,6 +190,20 @@ namespace Root_Rinse_Unloader.Module
         {
             if (EQ.p_bPickerSet) return "OK";
             return p_bVacuum ? RunUnload() : RunLoad();
+        }
+
+        public string RunCheckStrip()
+        {
+            string sResult = "OK";
+            foreach(Roller.Line line in m_roller.m_aLine)
+            {
+                if(line.m_diCheck[2].p_bIn)
+                {
+                    m_alidRollerStripCheck.p_bSet = true;
+                    return "Roller Check Strip";
+                }
+            }
+            return sResult;
         }
         #endregion
 

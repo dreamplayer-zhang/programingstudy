@@ -42,7 +42,7 @@ namespace Root_AOP01_Inspection
 		{
 			canvas.Dispatcher.Invoke(new Action(delegate ()
 			{
-				//canvas.RefreshDraw();
+				canvas.RefreshDraw();
 			}));
 		}
 
@@ -52,7 +52,7 @@ namespace Root_AOP01_Inspection
 			{
 				RootTools.Database.Defect defectInfo = item as RootTools.Database.Defect;
 				var temp = new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom);
-				//canvas.AddBlock(item.m_fAbsX, item.m_fAbsY, temp.Width, temp.Height, brush, pen);//Defect fAbsX정보로
+				canvas.AddBlock(item.m_fAbsX, item.m_fAbsY, temp.Width, temp.Height, brush, pen);//Defect fAbsX정보로
 			}
 		}
 
@@ -62,8 +62,8 @@ namespace Root_AOP01_Inspection
 			{
 				canvas.Dispatcher.Invoke(new Action(delegate ()
 				{
-					//canvas.ClearRect();
-					//canvas.RefreshDraw();
+					canvas.ClearRect();
+					canvas.RefreshDraw();
 				}));
 			}
 			catch (Exception ex)

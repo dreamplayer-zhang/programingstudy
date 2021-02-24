@@ -220,34 +220,43 @@ namespace Root_VEGA_P.Module
         string ReadPressure()
         {
             if (Run(m_modbus.ReadInputRegister(m_nUnit, 221, m_aPressure))) return p_sInfo;
-            p_fPressure = ((m_aPressure[0] & 0xffff) << 16) + (m_aPressure[1] & 0xffff);
+            p_fPressure = (((m_aPressure[0] & 0xffff) << 16) + (m_aPressure[1] & 0xffff)) / 1000.0;
             return "OK";
         }
         #endregion
 
         #region Set Pressure
-        const double c_fPressureSet = 0.03; 
+        const double c_fPressureSet = 0.02; 
         public string RunSetPressure(bool bPumpOn)
         {
             if (Run(RunPump(p_nPump))) return p_sInfo;
             if (Run(ConnectModbus())) return p_sInfo;
             if (Run(m_modbus.WriteCoils(m_nUnit, 8, false))) return p_sInfo;
             if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 2, 1))) return p_sInfo;
-            if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 3, 1))) return p_sInfo;
+            if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 3, 0))) return p_sInfo;
             if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 4, 0))) return p_sInfo;
             if (Run(m_modbus.WriteCoils(m_nUnit, 0, true))) return p_sInfo;
+            Thread.Sleep(2000);
             try
             {
-                int dV = -4; 
+                int dV = 8; 
                 while (EQ.IsStop() == false)
                 {
                     Thread.Sleep(1000);
                     ReadPressure();
-                    if (Math.Abs(p_fPressure - 1) < c_fPressureSet) return "OK"; 
-                    if ((dV > 0) && (p_fPressure > 1)) dV = -dV + 1;
-                    if ((dV < 0) && (p_fPressure < 1)) dV = -dV;
+                    p_sInfo = "p_fPressure = " + p_fPressure.ToString() + ", " + p_nPump.ToString(); 
+                    if (p_fPressure < 0.2) return "Pressure Too Low"; 
+                    if (Math.Abs(p_fPressure - 1) < c_fPressureSet) return "OK";
+                    if (p_fPressure < 1)
+                    {
+                        if (dV < 0) dV = -dV - 1;
+                    }
+                    else
+                    {
+                        if (dV > 0) dV = -dV;
+                    }
                     p_nPump += dV;
-                    return "OK"; 
+                    if (dV == 0) return "Set Pressure Error"; 
                 }
                 return "EQ Stop";
             }
@@ -296,8 +305,10 @@ namespace Root_VEGA_P.Module
         void InitCount()
         {
             p_aCount = new ObservableCollection<int>();
-            for (int n = 0; n < 16; n++) m_aRead.Add(0);
-            for (int n = 0; n < 8; n++) p_aCount.Add(0);
+            for (int n = 0; n < 2 * c_lParticle; n++) m_aRead.Add(0);
+            for (int n = 0; n < c_lParticle; n++) p_aCount.Add(0);
+            m_aPressure.Add(0);
+            m_aPressure.Add(0);
         }
 
         string ReadParticle()
@@ -314,7 +325,7 @@ namespace Root_VEGA_P.Module
                 Thread.Sleep(1000);
                 if (Run(WaitDone())) return p_sInfo;
                 if (Run(m_modbus.ReadInputRegister(m_nUnit, 228, m_aRead))) return p_sInfo;
-                for (int n = 0; n < 16; n++) m_aRead[n] &= 0xffff;
+                for (int n = 0; n < 2* c_lParticle; n++) m_aRead[n] &= 0xffff;
                 return "OK";
             }
             finally
@@ -322,6 +333,22 @@ namespace Root_VEGA_P.Module
                 RunPump(0);
                 p_bDone = false;
             }
+        }
+
+        string StartRead(bool bStart)
+        {
+            if (Run(ConnectModbus())) return p_sInfo;
+            if (Run(SetSample())) return p_sInfo;
+            Thread.Sleep(10);
+            if (Run(m_modbus.WriteCoils(m_nUnit, 0, bStart))) return p_sInfo;
+            return "OK"; 
+        }
+
+        string RunRead()
+        {
+            if (Run(m_modbus.ReadInputRegister(m_nUnit, 228, m_aRead))) return p_sInfo;
+            for (int n = 0; n < 2 * c_lParticle; n++) m_aRead[n] &= 0xffff;
+            return "OK";
         }
 
         public bool p_bDone
@@ -351,9 +378,10 @@ namespace Root_VEGA_P.Module
             return "Read Data Timeout";
         }
 
+        const int c_lParticle = 4; 
         void RunTreeCount(Tree tree)
         {
-            for (int n = 0; n < 8; n++)
+            for (int n = 0; n < c_lParticle; n++)
             {
                 tree.Set(p_aCount[n], p_aCount[n], n.ToString(), "Particle Count", true, true);
             }
@@ -383,7 +411,7 @@ namespace Root_VEGA_P.Module
         private void M_bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (m_sReadParticle != "OK") return;
-            for (int n = 0; n < 8; n++)
+            for (int n = 0; n < c_lParticle; n++)
             {
                 p_aCount[n] = (m_aRead[2 * n] << 16) + m_aRead[2 * n + 1]; 
             }
@@ -419,6 +447,8 @@ namespace Root_VEGA_P.Module
             AddModuleRunList(new Run_Pump(this), false, "Run Pump");
             AddModuleRunList(new Run_Pressure(this), false, "Run Set Pump Pressure");
             AddModuleRunList(new Run_Run(this), false, "Run Particle Counter");
+            AddModuleRunList(new Run_Start(this), false, "Run Particle Counter");
+            AddModuleRunList(new Run_Read(this), false, "Read Particle Counter");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -471,7 +501,7 @@ namespace Root_VEGA_P.Module
             int m_nPump = 1000; 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_nPump = tree.Set(m_nPump, m_nPump, "Pump", "Pump Power (0 ~ 1000)"); 
+                m_nPump = tree.Set(m_nPump, m_nPump, "Pump", "Pump Power (0 ~ 1000)", bVisible); 
                 m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Delay Time (sec)", bVisible);
             }
 
@@ -493,19 +523,22 @@ namespace Root_VEGA_P.Module
                 InitModuleRun(module);
             }
 
+            bool m_bPumpOn = false; 
             public override ModuleRunBase Clone()
             {
                 Run_Pressure run = new Run_Pressure(m_module);
+                run.m_bPumpOn = m_bPumpOn; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_bPumpOn = tree.Set(m_bPumpOn, m_bPumpOn, "Pump On", "Pump On After Set", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunSetPressure(false);
+                return m_module.RunSetPressure(m_bPumpOn);
             }
         }
 
@@ -533,6 +566,59 @@ namespace Root_VEGA_P.Module
                 if (m_module.Run(m_module.RunSetPressure(true))) return p_sInfo; 
                 m_module.StartReadParticle();
                 return m_module.WaitDone();
+            }
+        }
+
+        public class Run_Start : ModuleRunBase
+        {
+            ParticleCounter m_module;
+            public Run_Start(ParticleCounter module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            bool m_bStart = true; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Start run = new Run_Start(m_module);
+                run.m_bStart = m_bStart; 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bStart = tree.Set(m_bStart, m_bStart, "Start", "Start", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.StartRead(m_bStart);
+            }
+        }
+
+        public class Run_Read : ModuleRunBase
+        {
+            ParticleCounter m_module;
+            public Run_Read(ParticleCounter module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Read run = new Run_Read(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunRead();
             }
         }
         #endregion

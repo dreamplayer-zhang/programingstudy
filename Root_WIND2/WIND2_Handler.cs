@@ -122,7 +122,7 @@ namespace Root_WIND2
 
             m_recipe = new WIND2_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR);
+            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_ILoadport);
         }
 
         void InitEFEMModule()
@@ -156,7 +156,7 @@ namespace Root_WIND2
 
             m_recipe = new WIND2_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR);
+            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_ILoadport);
         }
 
         void InitModule(ModuleBase module)
@@ -215,6 +215,7 @@ namespace Root_WIND2
             Cymechs,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
+        List<ILoadport> m_ILoadport = new List<ILoadport>();
         public ObservableCollection<ILoadport> m_aLoadport = new ObservableCollection<ILoadport>();
         public ObservableCollection<ILoadport> p_aLoadport
         {
@@ -243,6 +244,7 @@ namespace Root_WIND2
                 }
                 InitModule(module);
                 m_aLoadport.Add((ILoadport)module);
+                m_ILoadport.Add((ILoadport)module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
             }
         }

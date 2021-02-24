@@ -390,7 +390,7 @@ namespace Root_EFEM
             {
                 EQ.p_eState = EQ.eState.Ready;
                 ClearInfoWafer();
-                return EQ.IsStop()? "EQ Stop" : "OK";
+                return EQ.IsStop() ? "EQ Stop" : "OK";
             }
             Sequence sequence = m_qSequence.Peek();
             bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport;
@@ -410,8 +410,10 @@ namespace Root_EFEM
             else if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport) 
             {
                 sequence.m_moduleRun.StartRun();
+                Thread.Sleep(100);
                 while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             }
+
             else sequence.m_moduleRun.StartRun();
             m_qSequence.Dequeue();
             InfoWafer infoWafer = sequence.m_infoWafer;
@@ -507,6 +509,7 @@ namespace Root_EFEM
         public IHandler m_handler;
         List<ILoadport> m_aLoadport = new List<ILoadport>();
         IWTR m_wtr;
+        List<ILoadport> m_aLoadport = new List<ILoadport>();
         Log m_log;
         public EFEM_Process(string id, IEngineer engineer, IWTR wtr, List<ILoadport> loadports)
         {
@@ -515,6 +518,7 @@ namespace Root_EFEM
             m_handler = engineer.ClassHandler();
             m_aLoadport = loadports;
             m_wtr = wtr;
+            m_aLoadport = loadports;
             m_log = LogView.GetLog(id);
             InitTree(id); 
             InitLocate();

@@ -49,7 +49,7 @@ namespace Root_AOP01_Inspection
 
             p_ImageViewer_VM.DrawDone += DrawDone_Callback;
             //TODO : GlobalObjects에서 가져오도록 수정해야 함
-            //WorkEventManager.InspectionDone += SurfaceInspDone_Callback;
+            GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.MainInspMgRegName).InspectionDone += SurfaceInspDone_Callback;
 
             MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)p_mainVision.CloneModuleRun(App.MainModuleName);
             BrightGV = surfaceInspection.BrightGV;
@@ -75,6 +75,7 @@ namespace Root_AOP01_Inspection
                 {
                     //m_Setup.PellInspectionManager.AddDefect(workplace.DefectList);//이벤트 추가 필요
                     GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.MainInspMgRegName).AddDefect(workplace.DefectList);
+                    GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.MainInspMgRegName).RefreshDefect();
                 }));
             }
         }
