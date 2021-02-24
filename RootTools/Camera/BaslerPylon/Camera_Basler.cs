@@ -645,25 +645,45 @@ namespace RootTools.Camera.BaslerPylon
                             }
                             GrabEvent();
 
-                            // if(stopWatch.ElapsedMilliseconds > 33)
+                            if(stopWatch.ElapsedMilliseconds > 33)
                             {
-                                // 샘플링 스레드에서 사용할 이미지 데이터 복사
                                 int imgSize = m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y;
-                                if (m_ImageGrab.p_nByte == 3)
-                                {
-                                    // 이미지 데이터 복사
-                                    m_threadBuf = new byte[imgSize * m_ImageGrab.p_nByte];
+                                m_threadBuf = new ImageData(m_ImageGrab.p_Size.X, m_ImageGrab.p_Size.Y, m_ImageGrab.GetBytePerPixel());
 
+                                // 샘플링 스레드에서 사용할 이미지 데이터 복사
+                                if (m_ImageGrab.GetBytePerPixel() == 3)
+                                {
                                     PixelDataConverter converter = new PixelDataConverter();
                                     converter.OutputPixelFormat = PixelType.BGR8packed;
-                                    converter.Convert(m_threadBuf, grabResult);
+
+                                    converter.Convert(m_threadBuf.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.GetBytePerPixel(), grabResult);
                                 }
-                                else if (m_ImageGrab.p_nByte == 1)
+                                else if (m_ImageGrab.GetBytePerPixel() == 1)
                                 {
-                                    // 이미지 데이터 복사
-                                    m_threadBuf = new byte[imgSize * m_ImageGrab.p_nByte];
-                                    Marshal.Copy(m_ImageGrab.GetPtr(), m_threadBuf, 0, imgSize * m_ImageGrab.p_nByte);
+                                    byte[] aBuf = grabResult.PixelData as byte[];
+                                    Marshal.Copy(aBuf, 0, m_threadBuf.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
                                 }
+
+                                // 스레드 동작 중이 아닐 때 화면 업데이트 위해 새 스레드 실행
+                             
+                                // 샘플링 스레드에서 사용할 이미지 데이터 복사
+
+                                //int imgSize = m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y;
+                                //if (m_ImageGrab.p_nByte == 3)
+                                //{
+                                //    // 이미지 데이터 복사
+                                //    m_threadBuf = new byte[imgSize * m_ImageGrab.p_nByte];
+
+                                //    PixelDataConverter converter = new PixelDataConverter();
+                                //    converter.OutputPixelFormat = PixelType.BGR8packed;
+                                //    converter.Convert(m_threadBuf, grabResult);
+                                //}
+                                //else if (m_ImageGrab.p_nByte == 1)
+                                //{
+                                //    // 이미지 데이터 복사
+                                //    m_threadBuf = new byte[imgSize * m_ImageGrab.p_nByte];
+                                //    Marshal.Copy(m_ImageGrab.GetPtr(), m_threadBuf, 0, imgSize * m_ImageGrab.p_nByte);
+                                //}
                             }
                             stopWatch.Reset();
                         }

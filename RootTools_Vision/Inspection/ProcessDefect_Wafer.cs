@@ -17,13 +17,6 @@ namespace RootTools_Vision
 {
     public class ProcessDefect_Wafer : WorkBase
     {
-        //BacksideRecipe recipeBackside;
-        string sDefectimagePath = @"D:\DefectImage";
-        /// <summary>
-        /// Defect Image가 저장될 Root Directory Path. 기본값 : D:\DefectImage
-        /// </summary>
-        public string DefectImagePath { get => sDefectimagePath; set => sDefectimagePath = value; }
-
         public ProcessDefect_Wafer()
         {
         }
@@ -75,7 +68,8 @@ namespace RootTools_Vision
                 this.currentWorkplace.DefectList.Add(defect);
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            SaveDefectImage(Path.Combine(DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
+
+            
 
             //// Add Defect to DB
             if (MergeDefectList.Count > 0)
@@ -94,20 +88,26 @@ namespace RootTools_Vision
                 //    DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
                 //}
             }
-            if(GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
+
+            SettingItem_SetupFrontside settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
+
+            SaveDefectImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
+
+            if (settings.UseKlarf)
             {
                 GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
                 GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
                 GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
 
+                GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
 
-                GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(sDefectimagePath, false);
-
-
-
-                string sTiffImagePath = @"D:\DefectImage";
-                SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
+                SaveTiffImage(settings.KlarfSavePath, MergeDefectList, 3);
             }
+
+            //GlobalObjects.Instance.Get<Settings>
+            //string sTiffImagePath = ;
+            //SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
+
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
             WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
         }

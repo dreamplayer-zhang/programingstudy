@@ -142,8 +142,9 @@ namespace Root_WIND2
 
             UIManager.Instance.ChangeUIMode();
 
+            SettingItem_SetupFrontside frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
             ///////시연용 임시코드
-            DatabaseManager.Instance.SetDatabase(1);
+            DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
             //DatabaseManager.Instance.ValidateDatabase();
             //////
 
@@ -162,10 +163,8 @@ namespace Root_WIND2
         private string memoryFront = "Main";
         private string memoryMask = "Layer";
 
-        //private string memoryMaskPool = "pool";
-        //private string memoryMaskGroup = "group";
-        //private string memoryMask = "ROI";
-
+        private string memoryMaskPool = "pool";
+        private string memoryMaskGroup = "group";
 
         private string memoryBackPool = "BackSide Vision.BackSide Memory";
         private string memoryBackGroup = "BackSide Vision";
@@ -277,7 +276,7 @@ namespace Root_WIND2
                             frontImage.GetPtr(0), 
                             frontImage.p_Size.X, 
                             frontImage.p_Size.Y, 
-                            frontImage.frontImage.GetBytePerPixel(), 
+                            frontImage.GetBytePerPixel(), 
                             frontImage.GetPtr(1), 
                             frontImage.GetPtr(2), 
                             new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)
