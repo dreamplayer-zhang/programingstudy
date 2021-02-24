@@ -19,6 +19,11 @@ namespace RootTools.Camera.Dalsa
 
         #region Property
         public string p_id { get; set; }
+        public bool bStopThread
+        {
+            get;
+            set;
+        }
 
         string _sInfo = "OK";
         public string p_sInfo
@@ -296,7 +301,7 @@ namespace RootTools.Camera.Dalsa
         public bool p_bOnGrab { get { return m_sapXfer.Grabbing; } }
 
         bool m_bLive = false; 
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
         {
             SetMemoryData(memory);
             p_sInfo = StartGrab(cpScanOffset, nLine, m_GrabData.bInvY, m_GrabData.nScanOffsetY); 

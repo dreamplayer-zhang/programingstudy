@@ -57,8 +57,8 @@ namespace Root_VEGA_D.Engineer
             iWTR.ReadInfoReticle_Registry();
             m_recipe = new VEGA_D_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR);
-            CalcRecover();
+            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
+            //CalcRecover();
         }
 
         void InitModule(ModuleBase module)
@@ -253,7 +253,6 @@ namespace Root_VEGA_D.Engineer
         #endregion
 
         #region Calc Sequence
-        public int m_nRnR = 1;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
@@ -306,14 +305,14 @@ namespace Root_VEGA_D.Engineer
         {
             foreach (EFEM_Process.Sequence sequence in aSequence)
             {
-                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true;
-                //{
-                //if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
-                //ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
-                //EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
-                //m_process.m_qSequence.Enqueue(sequenceDock);
-                //return true;
-                //}
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) //return true;
+                {
+                    if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
+                    ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
+                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    m_process.m_qSequence.Enqueue(sequenceDock);
+                    return true;
+                }
             }
             return false;
         }
@@ -376,7 +375,7 @@ namespace Root_VEGA_D.Engineer
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);

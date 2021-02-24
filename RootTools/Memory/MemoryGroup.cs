@@ -72,12 +72,12 @@ namespace RootTools.Memory
                 //MessageBox.Show("Memory Pool Size Error\n ID : " + id
                 //    + "  AllocMemory : " + (int)Math.Ceiling((double)mbPool / 1000)
                 //    + "[GB]  Required Memory : " + (int)Math.Ceiling((double)p_mbOffset / 1000 + 1) + "[GB]");
-                m_log.Error("Memory Size Overrun");
+                m_log?.Error("Memory Size Overrun");
             }
             p_aMemory.Add(memory);
             m_pool.RunTree(Tree.eMode.RegRead);
             m_pool.RunTree(Tree.eMode.Init); 
-            m_pool.m_memoryTool.MemoryChanged(); 
+            m_pool.m_memoryTool?.MemoryChanged(); 
             return memory; 
         }
 

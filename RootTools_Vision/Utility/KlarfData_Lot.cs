@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools.Database;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace RootTools_Vision.Utility
     {
 		public KlarfData_Lot()
 		{
-			klarfData.Clear();
+			klarfData = new List<KlarfData>();
 
 			fileVer1 = 1;
 			fileVer2 = 1;
@@ -77,9 +78,9 @@ namespace RootTools_Vision.Utility
 		private DateTime timeRecipe;                  // Recipe 생성 시간.
 		private DateTime timeResultStamp;
 
-		private String sampleType;                    // 검사 제품의 종류. (ex WAFER)
-		private String sampleOrientationMarkType;     // FLAT or NOTCH
-		private String orientationMarkLocation;       // Flat zone 방향 // UP, DOWN, LEFT, RIGHT
+		private string sampleType;                    // 검사 제품의 종류. (ex WAFER)
+		private string sampleOrientationMarkType;     // FLAT or NOTCH
+		private string orientationMarkLocation;       // Flat zone 방향 // UP, DOWN, LEFT, RIGHT
 
 		private double diePitchX, diePitchY;          // Die Pitch
 		private double dieOriginX, dieOriginY;        // 센터 기준. 무조건 0, 0 으로 보고 셋팅
@@ -87,9 +88,9 @@ namespace RootTools_Vision.Utility
 		private double sampleCenterLocationY;         // 센터 Die의 Left,bottom와 실제 제품 Center간의 차이.
 		private Size chipSize;                        // pixel 기준 칩 크기
 		private int sampleSize;                       // 제품의 크기. (ex 1 300)
-		private String tempString;
+		private string tempString;
 
-		private String tempLotEndResultTimeStamp;
+		private string tempLotEndResultTimeStamp;
 		private float resX;
 		private float resY;
 
@@ -114,7 +115,7 @@ namespace RootTools_Vision.Utility
 
 		#endregion
 
-		public bool LotStart(String _recipeName/*, CRecipeData_ProductSetting* _productInfor*/, RecipeType_WaferMap _mapdata, String _lotID, DateTime _lotStart)
+		public bool LotStart(string _recipeName/*, CRecipeData_ProductSetting* _productInfor*/, RecipeType_WaferMap _mapdata, string _lotID, DateTime _lotStart)
 		{
 			this.klarfData.Clear();
 			SetProductInfo(/*_productInfor*/);
@@ -147,7 +148,7 @@ namespace RootTools_Vision.Utility
 		}
 		public bool WaferStart(/*CRecipeData_CurrentWFInfor _waferInfor, CRecipeData_ProductSetting* _productInfor, */ RecipeType_WaferMap _mapdata, DateTime _waferStart)
 		{
-			klarfData.Clear();
+			//klarfData.Clear();
 			SetProductInfo(/*_productInfor*/);
 			SetWaferInfo(/*_waferInfor*/);
 
@@ -173,7 +174,7 @@ namespace RootTools_Vision.Utility
 
 			return true;
 		}
-		public bool AddSlot(RecipeType_WaferMap _mapdata)
+		public bool AddSlot(RecipeType_WaferMap _mapdata, List<Defect> _defectlist, OriginRecipe _origin)
 		{
 			UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
 
@@ -204,7 +205,8 @@ namespace RootTools_Vision.Utility
 			data.resX = this.resX;
 			data.resY = this.resY;
 
-		//	data.SetSampleTestPlan(pMapdata, pParam);
+			data.SetSampleTestPlan(_mapdata);
+			data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin);
 		//	data.m_nDefectDieCnt = pResultMap->GetBadDieNum();
 
 			data.SetMEMMAP(_mapdata);
@@ -212,6 +214,46 @@ namespace RootTools_Vision.Utility
 			klarfData.Add(data);
 			return true;
 		}
+
+		public bool AddSlot(RecipeType_WaferMap _mapdata, List<Measurement> _defectlist, OriginRecipe _origin)
+		{
+			UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
+
+			KlarfData data = new KlarfData();
+
+			data.SetKlarfType(klarfType);
+			data.tiffFileName = this.tiffFileName;
+
+			data.waferID_name = string.Format("{0:2d}", 0/*pMapdata->GetWaferID()*/);
+
+			//	data.m_nWaferID = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nWaferID);  
+			//	data.m_nSlot = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nSlot); 
+			data.partID = this.partID;
+
+			//	m_sLotID = data.m_sLotID = pRecipe->GetCurrentWFInfor()->m_strLotID;    
+
+			data.deviceID = this.deviceID;
+
+			data.sampleOrientationMarkType = this.sampleOrientationMarkType;
+			data.orientationMarkLocation = this.orientationMarkLocation;
+
+			data.diePitchX = this.diePitchX;
+			data.diePitchY = this.diePitchY;
+			data.dieOriginX = this.dieOriginX;
+			data.dieOriginY = this.dieOriginY;
+			data.sampleCenterLocationX = this.sampleCenterLocationX;
+			data.sampleCenterLocationY = this.sampleCenterLocationY;
+			data.resX = this.resX;
+			data.resY = this.resY;
+
+			//data.SetSampleTestPlan(_mapdata);
+			//data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin);
+			//data.SetMEMMAP(_mapdata);
+
+			klarfData.Add(data);
+			return true;
+		}
+
 		public bool AddSlotToServer(RecipeType_WaferMap _mapdata)
 		{
 			UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
@@ -241,7 +283,7 @@ namespace RootTools_Vision.Utility
 			data.resX = this.resX;
 			data.resY = this.resY;
 
-		//	data.SetSampleTestPlan(pMapdata, pParam);
+			data.SetSampleTestPlan(_mapdata);
 		//	data.m_nDefectDieCnt = pResultMap->GetBadDieNum();
 		//	data.SetDefectInfor_SRLine(pVSData, m_szChipSize, nMaxImgNum, pRecipe, pVRSMSG, pParam, pCS_DefectVerify);  // 170802 syyun SR Line 껄로 변경
 																											//data.SetDCollData_WPLine(pMDM);
@@ -251,12 +293,11 @@ namespace RootTools_Vision.Utility
 
 			return true;
 		}
-		public bool SaveKlarf(String strFilePath, bool bCollector)
+		public bool SaveKlarf(string strFilePath, bool bCollector)
 		{
 			timeFile = DateTime.Now;
 
-			FileStream fs = new FileStream(strFilePath, FileMode.Append, FileAccess.Write);
-			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
+
 
 			if (bCollector)
 			{
@@ -272,6 +313,9 @@ namespace RootTools_Vision.Utility
 			tempString += ".001";
 			tiffFileName = tempString;
 			tiffFileName.Replace(".001", ".tif");
+
+			FileStream fs = new FileStream(tiffFileName, FileMode.Create, FileAccess.Write);
+			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
 
 			if (sw != null)
 			{
@@ -293,7 +337,7 @@ namespace RootTools_Vision.Utility
 			return true;
 		}
 
-		public bool CreateLotEnd(String strFilePath)
+		public bool CreateLotEnd(string strFilePath)
 		{
 			timeFile = DateTime.Now;
 
@@ -325,7 +369,7 @@ namespace RootTools_Vision.Utility
 			return true;
 		}
 
-		public bool SaveKlarfToServer(String strFilePath, int nError)
+		public bool SaveKlarfToServer(string strFilePath, int nError)
 		{
 			timeFile = DateTime.Now;
 
@@ -434,19 +478,19 @@ namespace RootTools_Vision.Utility
 		bool SaveHeader(StreamWriter sw)
 		{
 			PutFileVersion(sw);
-			PutFileTimestamp(sw);
+			PutResultTimestamp(sw);
 			PutTiffSpec(sw);
 			PutInspectionStationID(sw);
 			PutSampleType(sw);
-			PutResultTimestamp(sw);
+			PutFileTimestamp(sw);
 			PutLotID(sw);
 			PutSampleSize(sw);
 			PutDeviceID(sw);
 			PutSetupID(sw);
 			PutStepID(sw);
 
-			sw.Flush();
-			sw.Close();
+			//sw.Flush();
+			//sw.Close();
 
 			return true;
 		}
@@ -462,7 +506,7 @@ namespace RootTools_Vision.Utility
 		private void PutFileTimestamp(StreamWriter sw)
 		{
 			this.timeFile = DateTime.Now;
-			tempString = string.Format(this.timeFile.ToString("yyyy-MM-dd HH:mm:ss"));
+			tempString = string.Format(this.timeFile.ToString("yyyy-MM-dd HH:mm:ss\n"));
 			tempString = "FileTimestamp " + tempString;
 			sw.Write(tempString);
 		}
@@ -506,7 +550,7 @@ namespace RootTools_Vision.Utility
 
 		private void PutResultTimestamp(StreamWriter sw)
 		{
-			tempString = string.Format(this.timeResultStamp.ToString("yyyy-MM-dd HH:mm:ss"));
+			tempString = string.Format(this.timeResultStamp.ToString("yyyy-MM-dd HH:mm:ss;\n"));;
 			tempString = "ResultTimestamp " + tempString;
 			sw.Write(tempString);
 			this.tempLotEndResultTimeStamp = tempString;
@@ -519,7 +563,7 @@ namespace RootTools_Vision.Utility
 
 		private void PutLotID(StreamWriter sw)
 		{
-			tempString = string.Format("LotID %c%s-%s%c;\n", 34, lotID, cassetteID, 34);
+			tempString = string.Format("LotID {0}{1}-{2}{3};\n", 34, lotID, cassetteID, 34);
 			sw.Write(tempString);
 		}
 

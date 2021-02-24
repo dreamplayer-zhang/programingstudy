@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="838" d:DesignWidth="1516" Background="{StaticResource PanelBackGround}">
     <UserControl.Resources>
@@ -51,9 +52,8 @@
         </Grid.ColumnDefinitions>
         <!--Defect View-->
         <Grid Grid.Column="0">
-            <GroupBox Grid.Row="1"
-                          Header="Defect View">
-                <Grid>
+            <GroupBox Grid.Row="1" Header="Defect View" Style="{StaticResource main_view_groupbox}">
+                <Grid Background="White" Margin="4">
                     <StackPanel VerticalAlignment="Top"
                                     Margin="10,10">
                         <Grid Margin="0,0,0,10" HorizontalAlignment="Left">
@@ -84,15 +84,15 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <TextBlock Text="Wafer ID" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="0" Margin="0,5,0,5"  VerticalAlignment="Center"/>
-                        <TextBlock Text="Recipe"   FontSize="15" FontWeight="Bold"  Grid.Row="1" Grid.Column="0" Margin="0,5,0,5" VerticalAlignment="Center"/>
-                        <TextBlock Text="Defect"   FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="0" Margin="0,5,0,5"  VerticalAlignment="Center"/>
-                        <TextBlock Text="   :    " FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
-                        <TextBlock Text="   :    " FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
-                        <TextBlock Text="   :    " FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
-                        <TextBlock Text="DummyWafer001" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                        <TextBlock Text="test200804.rcp"    FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                        <TextBlock Text="68423 (EA)"    FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                        <TextBlock Text="Wafer ID" Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="0" Margin="0,5,0,5"  VerticalAlignment="Center"/>
+                        <TextBlock Text="Recipe" Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="0" Margin="0,5,0,5" VerticalAlignment="Center"/>
+                        <TextBlock Text="Defect" Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="0" Margin="0,5,0,5"  VerticalAlignment="Center"/>
+                        <TextBlock Text="   :    " Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
+                        <TextBlock Text="   :    " Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
+                        <TextBlock Text="   :    " Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
+                        <TextBlock Text="DummyWafer001" Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                        <TextBlock Text="test200804.rcp" Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                        <TextBlock Text="68423 (EA)" Foreground="Black" FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
                     </Grid>
                     <Canvas VerticalAlignment="Stretch"
                                         HorizontalAlignment="Stretch"
@@ -112,7 +112,7 @@
         <!--End Defect View-->
 
         <Grid Grid.Column="1">
-            <GroupBox Header="Detail">
+            <GroupBox Header="Detail" Style="{StaticResource main_view_groupbox}">
                 <TabControl Background="{StaticResource PanelBackGround}"
                         BorderThickness="1">
                     <TabItem Header="Inspection">
@@ -134,81 +134,16 @@
                                 <CheckBox Content="EBR" FontSize="15" FontWeight="Bold"   Margin="0,0,15,0"/>
                             </StackPanel>
                             <Button Content="Tuning" Grid.Column="1"
-                                    Margin="3" FontWeight="Bold"/>
-                            <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="3">
+                                    Margin="3" FontWeight="Bold"
+                                    Style="{StaticResource groupbox_button}"/>
+                            <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="3" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Result"/>
                                 </GroupBox.Header>
-                                <DataGrid IsReadOnly="True" Grid.Row="1">
-                                    <DataGrid.Resources>
-                                        <Style TargetType="DataGridColumnHeader">
-                                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                        </Style>
-                                    </DataGrid.Resources>
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="No." Binding="{Binding Path=no}" Width="0.5*"/>
-                                        <DataGridTextColumn Header="Insp" Binding="{Binding Path=mode}" Width="0.7*"/>
-                                        <DataGridTextColumn Header="Chip" Binding="{Binding Path=chip}" Width="0.8*"/>
-                                        <DataGridTextColumn Header="Location" Binding="{Binding Path=xy}" Width="1.5*"/>
-                                        <DataGridTextColumn Header="Gv" Binding="{Binding Path=gv}" Width="0.5*"/>
-                                        <DataGridTextColumn Header="Size" Binding="{Binding Path=size}" Width="*"/>
-                                        <DataGridTextColumn Header="Code" Binding="{Binding Path=dc}" Width="*"/>
-                                    </DataGrid.Columns>
-
-                                    <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                </DataGrid>
+                                <tools:Database_DataView DataContext="{Binding p_DataViewer_VM}" Margin="4">
+                                </tools:Database_DataView>
                             </GroupBox>
-                            <GroupBox  Grid.Column="1" Grid.Row="1">
+                            <GroupBox  Grid.Column="1" Grid.Row="1" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Defect Image"/>
                                 </GroupBox.Header>
@@ -219,11 +154,13 @@
                                                    HorizontalAlignment="Center"/>
                                 </Grid>
                             </GroupBox>
-                            <GroupBox Grid.Column="1" Grid.Row="2">
+                            <GroupBox Grid.Column="1" Grid.Row="2" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Map"/>
                                 </GroupBox.Header>
-                                <Image Source="/Root_WIND2;component/Resources/WaferMap.PNG"/>
+                                <Grid Background="White" Margin="4">
+                                    <Image Source="/Root_WIND2;component/Resources/WaferMap.PNG"/>
+                                </Grid>
                             </GroupBox>
                         </Grid>
                     </TabItem>
@@ -240,81 +177,16 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Button Content="Tuning" Grid.Column="1"
-                                    Margin="3" FontWeight="Bold"/>
-                            <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
+                                    Margin="3" FontWeight="Bold"
+                                    Style="{StaticResource groupbox_button}"/>
+                            <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Result"/>
                                 </GroupBox.Header>
-                                <DataGrid IsReadOnly="True" Grid.Row="1">
-                                    <DataGrid.Resources>
-                                        <Style TargetType="DataGridColumnHeader">
-                                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                        </Style>
-                                    </DataGrid.Resources>
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="No." Binding="{Binding Path=no}" Width="0.5*"/>
-                                        <DataGridTextColumn Header="Insp" Binding="{Binding Path=mode}" Width="0.7*"/>
-                                        <DataGridTextColumn Header="Chip" Binding="{Binding Path=chip}" Width="0.8*"/>
-                                        <DataGridTextColumn Header="Location" Binding="{Binding Path=xy}" Width="1.5*"/>
-                                        <DataGridTextColumn Header="Gv" Binding="{Binding Path=gv}" Width="0.5*"/>
-                                        <DataGridTextColumn Header="Size" Binding="{Binding Path=size}" Width="*"/>
-                                        <DataGridTextColumn Header="Code" Binding="{Binding Path=dc}" Width="*"/>
-                                    </DataGrid.Columns>
-
-                                    <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                    <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
-                                </DataGrid>
+                                <tools:Database_DataView DataContext="{Binding p_DataViewer_VM}" Margin="4">
+                                </tools:Database_DataView>
                             </GroupBox>
-                            <GroupBox Grid.Column="1" Grid.Row="1">
+                            <GroupBox Grid.Column="1" Grid.Row="1" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Defect Image"/>
                                 </GroupBox.Header>
@@ -325,11 +197,11 @@
                                                    HorizontalAlignment="Center"/>
                                 </Grid>
                             </GroupBox>
-                            <GroupBox Grid.Column="1" Grid.Row="2">
+                            <GroupBox Grid.Column="1" Grid.Row="2" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Map"/>
                                 </GroupBox.Header>
-                                <Grid>
+                                <Grid Background="White" Margin="4">
                                     <Viewbox Margin="10">
                                         <Ellipse VerticalAlignment="Stretch"
                                              HorizontalAlignment="Stretch"
@@ -346,7 +218,7 @@
                                     </Viewbox>
                                 </Grid>
                             </GroupBox>
-                            <GroupBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2">
+                            <GroupBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource main_view_groupbox}">
                                 <GroupBox.Header>
                                     <TextBlock Text="Measurement Data"/>
                                 </GroupBox.Header>

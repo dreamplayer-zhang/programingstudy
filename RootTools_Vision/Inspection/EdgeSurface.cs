@@ -56,11 +56,6 @@ namespace RootTools_Vision
 			if (this.currentWorkplace.MapIndexY == -1)
 				return;
 
-			//byte[] arrSrc = this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY);
-			//Emgu.CV.Mat mat = new Emgu.CV.Mat((int)(parameterEdge.EdgeParamBaseTop.ROIHeight), (int)(parameterEdge.EdgeParamBaseTop.ROIWidth), Emgu.CV.CvEnum.DepthType.Cv8U, 1);
-			//Marshal.Copy(arrSrc, 0, mat.DataPointer, arrSrc.Length);
-			//mat.Save(@"D:/" + this.currentWorkplace.Index.ToString() + ".bmp");
-
 			EdgeSurfaceParameterBase param;
 			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
 				param = parameterEdge.EdgeParamBaseTop;
@@ -71,9 +66,10 @@ namespace RootTools_Vision
 			else
 				return;
 
+			// 연구소WIND R채널만 검사
 			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), param);
-			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), param);
-			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), param);
+			//DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), param);
+			//DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), param);
 
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 		}
@@ -85,7 +81,7 @@ namespace RootTools_Vision
 			int threshold = param.Threshold;
 			int defectSize = param.DefectSizeMin;
 			int searchLevel = param.EdgeSearchLevel;
-			double resolution = param.CamResolution;
+			//double resolution = param.Resolution;
 
 			if (this.currentWorkplace.Height < roiHeight)
 				roiHeight = this.currentWorkplace.Height;
@@ -137,8 +133,8 @@ namespace RootTools_Vision
 						label[i].value,
 						this.currentWorkplace.PositionX + label[i].boundLeft,
 						this.currentWorkplace.PositionY + label[i].boundTop,
-						(float)(Math.Abs(label[i].boundRight - label[i].boundLeft) * resolution),
-						(float)(Math.Abs(label[i].boundBottom - label[i].boundTop) * resolution),
+						Math.Abs(label[i].boundRight - label[i].boundLeft),// * resolution),
+						Math.Abs(label[i].boundBottom - label[i].boundTop),// * resolution),
 						this.currentWorkplace.MapIndexX,
 						this.currentWorkplace.MapIndexY
 						);

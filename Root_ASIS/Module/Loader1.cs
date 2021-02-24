@@ -93,6 +93,7 @@ namespace Root_ASIS.Module
                 if (Run(AxisMove(ePos.Boat0))) return p_sInfo;
                 m_turnover.p_infoStrip0 = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
+                if (EQ.p_eState == EQ.eState.Run) m_turnover.StartTurn(); 
                 return "OK";
             }
             finally { AxisMove(ePos.Boat0); }

@@ -79,6 +79,70 @@ namespace RootTools.Database
 				return false;
 		}
 
+		public bool ValidateDatabase()
+		{
+			try
+			{
+				DataSet data = new DataSet();
+				string sSelectQuery = "select distinct TABLE_NAME from INFORMATION_SCHEMA.columns where table_schema='wind2'"; // Temp
+				MySqlCommand cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+				MySqlDataReader rdr = cmd.ExecuteReader();
+				List<string> tableList = new List<string>();
+				while (rdr.Read())
+				{
+					object table = rdr["TABLE_NAME"];
+					tableList.Add(table.ToString());
+					//sSelectQuery = "select column_name from INFORMATION_SCHEMA.columns where table_schema='wind2' and table_name='"+a.ToString()+"'";
+					//cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+					//MySqlDataReader rdr2 = cmd.ExecuteReader();
+					//while (rdr2.Read())
+					//               {
+					//	object b = rdr["COLUMN_NAME"];
+					//}
+					////for ()
+
+				}
+				rdr.Close();
+				//bool isSame = true;
+				FieldInfo[] defectFieldInfos = null;
+				List<string> columnList = new List<string>();
+				for (int i = 0; i < tableList.Count; i++)
+				{
+					if (tableList[i].Equals("defect"))
+					{
+						Type defectType = typeof(Defect);
+						defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+					}
+					sSelectQuery = "select column_name from INFORMATION_SCHEMA.columns where table_schema='wind2' and table_name='" + tableList[i] + "'";
+					cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+
+					rdr = cmd.ExecuteReader();
+					//int a = 0;
+					while (rdr.Read())
+					{
+						object columnName = rdr["COLUMN_NAME"];
+						columnList.Add(columnName.ToString());
+					}
+
+					object[] tt = defectFieldInfos[i].GetCustomAttributes(true);
+					ObsoleteAttribute ob = (ObsoleteAttribute)tt[0];
+					string test = ob.Message;
+					if (defectFieldInfos.Length != columnList.Count)
+                    {
+						//isSame = false;
+						break;
+                    }
+				}
+				rdr.Close();
+				return true;
+			}
+			catch(Exception e)
+			{
+				TempLogger.Write("Database", e);
+				return false;
+			}
+		}
+
 
 		public bool SetDatabase(int _nThreadCount, string sServerName = "localhost", string sDBName = "wind2", string sUid = "root", string sPw = "root")
 		{
@@ -212,7 +276,7 @@ namespace RootTools.Database
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message);
+				TempLogger.Write("Database", ex);
 				table = data.Tables[0].Copy();
 				return table;
 			}
@@ -237,7 +301,7 @@ namespace RootTools.Database
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("SelectTablewithInspectionID : " + ex.Message);
+				TempLogger.Write("Database", ex);
 				table = data.Tables[0].Copy();
 				return table;
 			}
@@ -280,7 +344,7 @@ namespace RootTools.Database
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message);
+				TempLogger.Write("Database", ex);
 			}
 
 #endif
@@ -334,6 +398,64 @@ namespace RootTools.Database
 						sbQuery.Append(",");
 				}
 				 SendQuery(sbQuery.ToString());
+#if !DEBUG
+			}
+			catch (Exception ex)
+			{
+				TempLogger.Write("Database", ex);
+			}
+
+#endif
+		}
+
+		public void AddMeasurementDataList(List<Measurement> _measurelist)
+		{
+#if !DEBUG
+			try
+			{
+#endif
+			SendQuery("TRUNCATE measurement;");
+			StringBuilder temp = new StringBuilder();
+			StringBuilder sbQuery = new StringBuilder();
+			StringBuilder sbColumList = new StringBuilder();
+			StringBuilder sValueList = new StringBuilder();
+			List<string> sbValueList = new List<string>();
+			Type type = typeof(Measurement);
+			FieldInfo[] fld = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+			for (int measureListNum = 0; measureListNum < _measurelist.Count; measureListNum++)
+			{
+				temp.Clear();
+				sbColumList.Clear();
+				for (int i = 0; i < fld.Length; i++)
+				{
+					var f = fld[i];
+					object obj = f.GetValue(_measurelist[measureListNum]);
+					sbColumList.Append(f.Name);
+					if (i == 0)
+						temp.Append("(");
+
+					temp.AppendFormat("'{0}'", obj);
+
+					if (i != fld.Length - 1)
+					{
+						sbColumList.Append(",");
+						temp.Append(",");
+					}
+					else
+						temp.Append(")");
+				}
+				sbValueList.Add(temp.ToString());
+			}
+
+			sbQuery.AppendFormat("INSERT INTO measurement({0}) values", sbColumList.ToString());
+			for (int i = 0; i < sbValueList.Count; i++)
+			{
+				sbQuery.Append(sbValueList[i]);
+				if (i != sbValueList.Count - 1)
+					sbQuery.Append(",");
+			}
+			SendQuery(sbQuery.ToString());
 #if !DEBUG
 			}
 			catch (Exception ex)

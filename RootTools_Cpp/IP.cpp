@@ -3,6 +3,7 @@
 
 #include "IP.h"
 
+#pragma warning(disable: 4101)
 #pragma warning(disable: 4244)
 #pragma warning(disable: 4838)
 #pragma warning(disable: 6297)
@@ -361,7 +362,6 @@ void IP::SelectMinDiffinArea(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int 
     LPBYTE pCurChipLT;
 
     byte* pResult = pDst;
-    byte* pCurrent;
     byte* pHeader = NULL;
 
     pResult += nChipW * stride + stride;

@@ -52,6 +52,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>false</Optimize>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -189,6 +190,7 @@
     <Reference Include="System.Activities.Core.Presentation" />
     <Reference Include="System.Activities.Presentation" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -264,15 +266,6 @@
       <DependentUpon>BacksideInspection.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideInspection_ViewModel.cs" />
-    <Compile Include="Dialog\SettingDialog\ISettingData.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingData.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingData_Setup.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingData_SetupBackside.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingData_SetupFrontside.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingDialog.xaml.cs">
-      <DependentUpon>SettingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialog\SettingDialog\SettingDialog_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\4. EBR\ViewModel\EBRSetup_ViewModel.cs" />
     <Compile Include="UI\2. Review\Tuning.xaml.cs">
       <DependentUpon>Tuning.xaml</DependentUpon>
@@ -289,14 +282,19 @@
     <Compile Include="UI_User\BACK\ViewModels\BacksideInspect_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ViewModel.cs" />
+    <Compile Include="UI_User\CAMERA\CameraAlign.xaml.cs">
+      <DependentUpon>CameraAlign.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_User\CAMERA\CameraVRS.xaml.cs">
       <DependentUpon>CameraVRS.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\CAMERA\CameraVRS_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\CAMERA\CameraVRS_ViewModel.cs" />
-    <Compile Include="UI_User\CAMERA\MotionControlViewer.xaml.cs">
+    <Compile Include="UI_User\CAMERA\MotionViewer\MotionControlViewer.xaml.cs">
       <DependentUpon>MotionControlViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_User\CAMERA\ViewModels\CameraAlign_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\CAMERA\ViewModels\CameraAlign_ViewModel.cs" />
     <Compile Include="UI_User\EBR\EBRSetup.xaml.cs">
       <DependentUpon>EBRSetup.xaml</DependentUpon>
     </Compile>
@@ -699,10 +697,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialog\SettingDialog\SettingDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -715,11 +709,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI_User\CAMERA\CameraAlign.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI_User\CAMERA\CameraVRS.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_User\CAMERA\MotionControlViewer.xaml">
+    <Page Include="UI_User\CAMERA\MotionViewer\MotionControlViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -738,7 +736,6 @@
     <Page Include="UI_User\FRONT\FrontsideAlignment.xaml" />
     <Page Include="UI_User\FRONT\FrontsideInspect.xaml">
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\FRONT\FrontsideMask.xaml">
       <SubType>Designer</SubType>
@@ -746,23 +743,19 @@
     </Page>
     <Page Include="UI_User\FRONT\FrontsideSpec.xaml">
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Warning_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\FRONT\FrontsideOrigin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_User\FRONT\FrontsideProduct.xaml">
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\FRONT\FrontsideSummary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_User\RecipeWizardPanel.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -771,6 +764,10 @@
     <Page Include="UI_User\Setup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Warning_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

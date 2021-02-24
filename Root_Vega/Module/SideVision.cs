@@ -565,7 +565,7 @@ namespace Root_Vega.Module
             rcROI = new Rect(pt1, pt2);
 
             // Binarization
-            matSrc = new Mat((int)rcROI.Height, (int)rcROI.Width, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr((int)rcROI.Top, (int)rcROI.Left), (int)img.p_Stride);
+            matSrc = new Mat((int)rcROI.Height, (int)rcROI.Width, Emgu.CV.CvEnum.DepthType.Cv8U, img.GetBytePerPixel(), img.GetPtr((int)rcROI.Top, (int)rcROI.Left), (int)img.p_Stride);
             matBinary = new Mat();
             CvInvoke.Threshold(matSrc, matBinary, /*p_nThreshold*/180, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
 
@@ -1396,8 +1396,7 @@ namespace Root_Vega.Module
                         if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
                         else
                         {
-                            dLeftCurrentScore = af.GetImageVarianceScore
-                                (img, m_nVarianceSize);
+                            dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
                             bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                         }
 

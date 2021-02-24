@@ -19,6 +19,8 @@ namespace Root_CAMELLIA.Data
         public List<double> WaveLengthTransmittance { get; set; } = new List<double>();
         public int VISIntegrationTime { get; set; } = 20;
         public int NIRIntegrationTime { get; set; } = 150;
+        public bool UseThickness { get; set; } = true;
+        public bool UseTransmittance { get; set; } = true;
         //public List<string> MaterialList = new List<string>();
         public string ModelRecipePath = "";
         public void ClearPoint()
@@ -69,7 +71,8 @@ namespace Root_CAMELLIA.Data
             data.WaveLengthTransmittance = new List<double>(WaveLengthTransmittance.ToArray());
             data.VISIntegrationTime = VISIntegrationTime;
             data.NIRIntegrationTime = NIRIntegrationTime;
-            //data.MaterialList = new List<string>(MaterialList.ToArray());
+            data.UseThickness = UseThickness;
+            data.UseTransmittance = UseTransmittance;
             data.ModelRecipePath = ModelRecipePath;
         }
 

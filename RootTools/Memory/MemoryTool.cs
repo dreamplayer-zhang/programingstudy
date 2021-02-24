@@ -21,9 +21,183 @@ using System.Windows.Threading;
 using System.Xml.Serialization;
 using System.IO.Compression;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Net;
 
 namespace RootTools.Memory
 {
+    public class AsyncObject
+    {
+        public byte[] Buffer;
+        public Socket WorkingSocket;
+        public readonly int BufferSize;
+        public AsyncObject(int bufferSize)
+        {
+            BufferSize = bufferSize;
+            Buffer = new byte[BufferSize];
+        }
+
+        public void ClearBuffer()
+        {
+         //   Array.Clear(Buffer, 0, BufferSize);
+        }
+    }
+    public class MemServer
+    {
+        public delegate void OnReciveData(byte[] aBuf, int nSize);
+        public event OnReciveData EventReciveData;
+        const int nSize = 1920 * 1080 * 3;
+        //IPAddress thisAddress;
+        int port;
+        Socket mainSock;
+        public MemServer()
+        {
+            mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+        }
+        public void Start(int por)
+        {            
+            port = por;
+            IPEndPoint serverEP = new IPEndPoint(IPAddress.Any, port);
+            mainSock.Bind(serverEP);
+            mainSock.Listen(10);
+            mainSock.BeginAccept(AcceptCallback, null);            
+        }
+        List<Socket> connectedClients = new List<Socket>();
+        void AcceptCallback(IAsyncResult ar)
+        {
+            // 클라이언트의 연결 요청을 수락한다.
+            Socket client = mainSock.EndAccept(ar);
+
+            // 또 다른 클라이언트의 연결을 대기한다.
+            mainSock.BeginAccept(AcceptCallback, null);
+
+            AsyncObject obj = new AsyncObject(nSize);
+            obj.WorkingSocket = client;
+
+            // 연결된 클라이언트 리스트에 추가해준다.
+            connectedClients.Add(client);
+                        
+            // 클라이언트의 데이터를 받는다.
+            client.BeginReceive(obj.Buffer, 0, nSize, 0, DataReceived, obj);
+        }
+        void DataReceived(IAsyncResult ar)
+        {          
+            AsyncObject obj = (AsyncObject)ar.AsyncState;
+
+            int received = obj.WorkingSocket.EndReceive(ar);
+
+            if (received <= 0)
+            {
+                obj.WorkingSocket.Close();
+                return;
+            }
+
+            EventReciveData(obj.Buffer, received);
+                       
+            obj.ClearBuffer();
+
+            obj.WorkingSocket.BeginReceive(obj.Buffer, 0, nSize, 0, DataReceived, obj);
+        }
+        public void Send(byte[] p)
+        {
+            for (int i = connectedClients.Count - 1; i >= 0; i--)
+            {
+                Socket socket = connectedClients[i];
+                try
+                {
+                    socket.Send(p);
+                }
+                catch
+                {
+                    // 오류 발생하면 전송 취소하고 리스트에서 삭제한다.
+                    try
+                    {
+                        socket.Dispose();
+                    }
+                    catch { }
+                    connectedClients.RemoveAt(i);
+                }
+            }
+        }
+        public void Send(string p)
+        {
+            for (int i = connectedClients.Count - 1; i >= 0; i--)
+            {
+                Socket socket = connectedClients[i];
+                try
+                {
+                    byte[] b = Encoding.ASCII.GetBytes(p);
+                    socket.Send(b);
+                }
+                catch
+                {
+                    // 오류 발생하면 전송 취소하고 리스트에서 삭제한다.
+                    try
+                    {
+                        socket.Dispose();
+                    }
+                    catch { }
+                    connectedClients.RemoveAt(i);
+                }
+            }
+        }
+    }
+    public class MemClient
+    {
+        public delegate void OnReciveData(byte[] aBuf, int nSize);
+        public event OnReciveData EventReciveData;
+        Socket mainSock;
+        IPAddress thisAddress;
+        int port;
+      
+        public MemClient()
+        {
+           mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+        }
+        public void Connect(IPAddress adds, int por)
+        {
+            thisAddress = adds;
+            port = por;
+            try
+            {
+                mainSock.Connect(thisAddress, port);
+            }
+            catch (Exception)
+            {
+               return;
+            }
+
+            // 연결 완료, 서버에서 데이터가 올 수 있으므로 수신 대기한다.
+            AsyncObject obj = new AsyncObject(4096);
+            obj.WorkingSocket = mainSock;
+            mainSock.BeginReceive(obj.Buffer, 0, obj.BufferSize, 0, DataReceived, obj);
+        
+        }
+        void DataReceived(IAsyncResult ar)
+        {
+            // BeginReceive에서 추가적으로 넘어온 데이터를 AsyncObject 형식으로 변환한다.
+            AsyncObject obj = (AsyncObject)ar.AsyncState;
+
+            // 데이터 수신을 끝낸다.
+            int received = obj.WorkingSocket.EndReceive(ar);
+
+            // 받은 데이터가 없으면(연결끊어짐) 끝낸다.
+            if (received <= 0)
+            {
+                obj.WorkingSocket.Close();
+                return;
+            }
+
+            EventReciveData(obj.Buffer, received);
+       
+            obj.ClearBuffer();
+            // 수신 대기
+            obj.WorkingSocket.BeginReceive(obj.Buffer, 0, 4096, 0, DataReceived, obj);
+        }
+        public void Send(byte[] p)
+        {
+            mainSock.Send(p);
+        }
+    }
     public class MemoryTool : ObservableObject, IToolSet
     {
         const double c_fGB = 1024 * 1024 * 1024;
@@ -184,8 +358,9 @@ namespace RootTools.Memory
         #region MemoryProcess
         bool m_bThreadProcess = false;
         Thread m_threadProcess = null;
-        TCPIPServer m_Server;
-        TCPIPClient m_Client;
+        MemServer m_Server;
+        MemClient m_Client;
+
         bool bServer = true;
 
         public void InitThreadProcess()
@@ -232,10 +407,12 @@ namespace RootTools.Memory
             bServer = tree.Set(bServer, bServer, "MemServer", "Memory Tool Server");
             if (bServer && m_Server != null)
             {
-                m_Server.RunTree(tree);
+              //  m_ServerTree.RunTree(tree);
             }
             if (!bServer && m_Client != null)
-                m_Client.RunTree(tree);
+            {
+                //  m_ClientTree.RunTree(tree);
+            }
         }
 
         #endregion
@@ -332,15 +509,16 @@ namespace RootTools.Memory
 
             if (bServer)
             {
-                m_Server = new TCPIPServer(id, m_log);
+                m_Server = new MemServer();
                 RunTreeRun(Tree.eMode.RegRead);
-                m_Server.Init();
+                m_Server.Start(5000);
                 m_Server.EventReciveData += M_Server_EventReciveData;
             }
             else
             {
-                m_Client = new TCPIPClient(id, m_log);
+                m_Client = new MemClient();
                 RunTreeRun(Tree.eMode.RegRead);
+                m_Client.Connect(new IPAddress(new byte[] { 10,0,0,15 }),5000);
                 m_Client.EventReciveData += M_Client_EventReciveData;
             }
         }
@@ -359,31 +537,34 @@ namespace RootTools.Memory
         bool _bRecieve = false;
         byte[] m_abuf;
         public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem, int nByte)
-        {
-            string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
-            m_abuf = new byte[CanvasWidth * CanvasHeight * nByte];
-            _bRecieve = true;
-            m_Server.Send(str);
+        {  
             Stopwatch watch = new Stopwatch();
             watch.Start();
+            string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
+           
+            _bRecieve = true;
+            m_Server.Send(str);
+        
             while (_bRecieve)
             {
-                Thread.Sleep(10);
-                if (watch.ElapsedMilliseconds > 5000)
+                Thread.Sleep(5);
+                if (watch.ElapsedMilliseconds > 100)
                     return m_abuf;
             }
             _bRecieve = false;
+              m_log.Warn(watch.ElapsedMilliseconds.ToString());
             return m_abuf;
         }
-        private void M_Server_EventReciveData(byte[] aBuf, int nSize, System.Net.Sockets.Socket socket)
+        private void M_Server_EventReciveData(byte[] aBuf, int nSize)
         {
             //socket.Send(aBuf, nSize, SocketFlags.None);
-            string str = Encoding.ASCII.GetString(aBuf, 0, nSize);
+            //string str = Encoding.Default.GetString(aBuf, 0, nSize);
             //m_qLog.Enqueue(new Mars(0, Encoding.ASCII.GetString(aBuf, 0, nSize)));
             //string[] aStr = str.Split(Splitter);
             //string astr = str;
-            
-            m_abuf = Convert.FromBase64String(str);
+
+            m_abuf = aBuf;// Encoding.Default.GetBytes(str);//            Convert.FromBase64String(str);
+           // m_abuf = Decompress(m_abuf);
             _bRecieve = false;
             //switch (aStr)
             //{
@@ -396,7 +577,7 @@ namespace RootTools.Memory
             //}
         }
 
-        private void M_Client_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        private void M_Client_EventReciveData(byte[] aBuf, int nSize)
         {
             string str = Encoding.ASCII.GetString(aBuf, 0, nSize);
             string[] aStr = str.Split(Splitter);
@@ -405,15 +586,8 @@ namespace RootTools.Memory
                 case "GET":
                     System.Drawing.Rectangle rect = new System.Drawing.Rectangle();
                     byte[] res = GetImageView((System.Drawing.Rectangle)(GetSerializeObject(aStr[1], rect.GetType())), Convert.ToInt32(aStr[2]), Convert.ToInt32(aStr[3]), Convert.ToString(aStr[4]), Convert.ToString(aStr[5]), Convert.ToString(aStr[6]), Convert.ToInt32(aStr[7]));
-                    //string strResult = ImageSourceToString(res);
-                    //string strResult = GetSerializeString(res);
-                    //string strresult = Encoding.Default.GetString(res);
-                    //string strresult = bytestostring(res);
-                    byte[] rescom = Compress(res);                   
-                    string strresult = Convert.ToBase64String(rescom);
-                    //string stst = BitConverter.ToString(res);
-
-                    m_Client.Send(strresult);
+                   // res = Compress(res);
+                    m_Client.Send(res);
                     break;
             }
             //System.Drawing.Rectangle viewrect = GetSerializeObject(aStr[1],     );
@@ -506,31 +680,29 @@ namespace RootTools.Memory
 
             if (ptrMem == IntPtr.Zero)
                 return null;
-            int pix_x = 0;
-            int pix_y = 0;
+           
             int rectX, rectY, rectWidth, rectHeight, sizeX;
-            byte[] result = new byte[CanvasWidth * CanvasHeight];
+            byte[] result = new byte[CanvasWidth * CanvasHeight * nByte];
             rectX = View_Rect.X;
             rectY = View_Rect.Y;
             rectWidth = View_Rect.Width;
             rectHeight = View_Rect.Height;
             sizeX = Convert.ToInt32(memdata.W);
-            if(nByte == 3)
-                result = new byte[CanvasWidth * CanvasHeight * 3];
+
             //byte[,,] viewptr = view.Data;
             //byte* imageptr = (byte*)ptrMem.ToPointer();
             if (nByte == 1)
             {
-
+              
                 Parallel.For(0, CanvasHeight, (yy) =>
                 {
-                    lock (o)
+                    //   lock (o)
                     {
-                        pix_y = rectY + yy * rectHeight / CanvasHeight;
+                        int pix_y = rectY + yy * rectHeight / CanvasHeight;
 
                         for (int xx = 0; xx < CanvasWidth; xx++)
                         {
-                            pix_x = rectX + xx * rectWidth / CanvasWidth;
+                            int pix_x = rectX + xx * rectWidth / CanvasWidth;
                             result[yy * CanvasWidth + xx] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
                         }
                     }
@@ -539,15 +711,15 @@ namespace RootTools.Memory
             else if (nByte == 3)
             {
                 int nTerm = CanvasWidth * CanvasHeight;
-                Parallel.For(0, CanvasHeight, (yy) =>
+                Parallel.For(0, CanvasHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (yy) =>
                 {
-                    lock (o)
+                    //lock (o)
                     {
-                        pix_y = rectY + yy * rectHeight / CanvasHeight;
+                        int pix_y = rectY + yy * rectHeight / CanvasHeight;
 
                         for (int xx = 0; xx < CanvasWidth; xx++)
                         {
-                            pix_x = rectX + xx * rectWidth / CanvasWidth;
+                            int pix_x = rectX + xx * rectWidth / CanvasWidth;
                             result[yy * CanvasWidth + xx] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
                             result[yy * CanvasWidth + xx + nTerm] = ((byte*)ptrMem2)[pix_x + (long)pix_y * sizeX];
                             result[yy * CanvasWidth + xx + nTerm * 2] = ((byte*)ptrMem3)[pix_x + (long)pix_y * sizeX];
@@ -562,11 +734,11 @@ namespace RootTools.Memory
         {
             if (bServer)
             {
-                m_Server.Send("testserver");
+              //  m_Server.Send("testserver");
             }
             else
             {
-                m_Client.Send("testclient");
+               // m_Client.Send("testclient");
             }
         }
 

@@ -42,6 +42,13 @@
                             <Button Content="Open" Command="{Binding btnOpen}" Style="{StaticResource imageViewer_toolbar_button}"/>
                             <Button Content="Save" Command="{Binding btnSave}" Style="{StaticResource imageViewer_toolbar_button}"/>
                             <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource imageViewer_toolbar_button}"/>
+
+                            <TextBlock Text="Channel" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <CheckBox Content="Color" IsChecked="{Binding IsColorChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                            <CheckBox Content="R" IsChecked="{Binding IsRChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                            <CheckBox Content="G" IsChecked="{Binding IsGChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                            <CheckBox Content="B" IsChecked="{Binding IsBChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                            
                         </StackPanel>
                         <Grid Grid.Row="1" >
                             <tools:RootViewer/>
@@ -113,6 +120,10 @@
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
+                    <!--<CheckBox Content="Top" Grid.Column="0" IsChecked="{Binding IsTopChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Side" Grid.Column="1" IsChecked="{Binding IsSideChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Bottom" Grid.Column="2" IsChecked="{Binding IsBtmChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>-->
+
                     <ToggleButton Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type WrapPanel}}}"
                                     FontWeight="Bold" FontSize="12"
                                     Content="Top" Grid.Column="0"
@@ -161,13 +172,13 @@
                         </Grid>
 
                         <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}"
-                                  DataContext="{Binding Parameter}">
+                                  DataContext="{Binding Recipe}">
                             <Grid.ColumnDefinitions >
                                 <ColumnDefinition Width="120"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Resolution[um]" Style="{StaticResource group_box_item_name_text}"/>
-                            <TextBox Grid.Column="1" IsEnabled="False" Text="{Binding CamResolution}" HorizontalContentAlignment="Center"/>
+                            <TextBox Grid.Column="1" IsEnabled="False" Text="{Binding Resolution}" HorizontalContentAlignment="Center"/>
                         </Grid>
 
                         <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
@@ -180,14 +191,34 @@
                                 <ColumnDefinition Width="33"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Offset" Style="{StaticResource group_box_item_name_text}" Margin="6,1,0,1" Grid.ColumnSpan="2"/>
+                            <TextBlock Text="Image Offset[pxl]" Style="{StaticResource group_box_item_name_text}" Margin="6,1,0,1" Grid.ColumnSpan="2"/>
                             <TextBlock Text="Top" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,2"/>
-                            <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding TopOffset}" HorizontalContentAlignment="Center" VerticalAlignment="Top"/>
+                            <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding TopImageOffset}" HorizontalContentAlignment="Center" VerticalAlignment="Top"/>
                             <TextBlock Text="Side" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding SideOffset}" HorizontalContentAlignment="Center"/>
+                            <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding SideImageOffset}" HorizontalContentAlignment="Center"/>
                             <TextBlock Text="Btm" Grid.Column="5"  HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            <TextBox Grid.Column="6" IsEnabled="False" Text="{Binding BtmOffset}" HorizontalContentAlignment="Center"/>
+                            <TextBox Grid.Column="6" IsEnabled="False" Text="{Binding BtmImageOffset}" HorizontalContentAlignment="Center"/>
                         </Grid>
+                        
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions >
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="33"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="33"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="33"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Position Offset" Style="{StaticResource group_box_item_name_text}" Margin="6,1,0,1" Grid.ColumnSpan="2"/>
+                            <TextBlock Text="Top" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,2"/>
+                            <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding TopPositionOffset}" HorizontalContentAlignment="Center" VerticalAlignment="Top"/>
+                            <TextBlock Text="Side" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding SidePositionOffset}" HorizontalContentAlignment="Center"/>
+                            <TextBlock Text="Btm" Grid.Column="5"  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBox Grid.Column="6" IsEnabled="False" Text="{Binding BtmPositionOffset}" HorizontalContentAlignment="Center"/>
+                        </Grid>
+                        
                     </StackPanel>
                 </GroupBox>
 

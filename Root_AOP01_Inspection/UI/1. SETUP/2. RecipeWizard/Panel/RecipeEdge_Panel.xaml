@@ -56,25 +56,25 @@
                             </Grid.ColumnDefinitions>
                             <GroupBox Grid.Column="0" Header="Left">
 								<ScrollViewer>
-									<tools:RootViewer DataContext="{Binding p_ImageViewerLeft_VM}"
+									<tools:DrawableRootViewer DataContext="{Binding p_ImageViewerLeft_VM}"
 												  x:Name="canvas_left"/>
 								</ScrollViewer>
                             </GroupBox>
                             <GroupBox Grid.Column="1" Header="Top">
 								<ScrollViewer>
-									<tools:RootViewer DataContext="{Binding p_ImageViewerTop_VM}"
+									<tools:DrawableRootViewer DataContext="{Binding p_ImageViewerTop_VM}"
 												  x:Name="canvas_top"/>
 								</ScrollViewer>
                             </GroupBox>
                             <GroupBox Grid.Column="2" Header="Right">
 								<ScrollViewer>
-									<tools:RootViewer DataContext="{Binding p_ImageViewerRight_VM}"
+									<tools:DrawableRootViewer DataContext="{Binding p_ImageViewerRight_VM}"
 												  x:Name="canvas_right"/>
 								</ScrollViewer>
                             </GroupBox>
                             <GroupBox Grid.Column="3" Header="Bottom">
 								<ScrollViewer>
-									<tools:RootViewer DataContext="{Binding p_ImageViewerBot_VM}"
+									<tools:DrawableRootViewer DataContext="{Binding p_ImageViewerBot_VM}"
 												  x:Name="canvas_bot"/>
 								</ScrollViewer>
                             </GroupBox>

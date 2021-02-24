@@ -82,7 +82,7 @@ namespace Root_CAMELLIA.Module
             if (m_module.Run(axisZ.WaitReady()))
                 return p_sInfo;
 
-            Camera_Basler VRS = m_module.m_CamVRS;
+            Camera_Basler VRS = m_module.p_CamVRS;
             ImageData img = VRS.p_ImageViewer.p_ImageData;
             //string strVRSImageDir = "D:\\";
             //string strVRSImageFullPath = "";
@@ -209,8 +209,8 @@ namespace Root_CAMELLIA.Module
         void SaveRawData(object obj)
         {
             int i = (int)obj;
-            Met.DataManager.GetInstance().SaveRawData(@"C:\Users\ATI\Desktop\MeasureData\test" + i, i);
             App.m_nanoView.GetThickness(i);
+            Met.DataManager.GetInstance().SaveRawData(@"C:\Users\ATI\Desktop\MeasureData\test" + i, i);
             m_mwvm.p_RTGraph.DrawReflectanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
             m_mwvm.p_RTGraph.DrawTransmittanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
             isSaveDone = true;

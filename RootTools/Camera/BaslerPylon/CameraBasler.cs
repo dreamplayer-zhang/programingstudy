@@ -20,7 +20,11 @@ namespace RootTools.Camera.BaslerPylon
 
         #region Property
         public string p_id { get; set; }
-
+        public bool bStopThread
+        {
+            get;
+            set;
+        }
         string _sInfo = "OK";
         public string p_sInfo
         {
@@ -667,7 +671,7 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null) { }
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest =false) { }
         public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null) { }
         public CPoint GetRoiSize() { return null; }
 

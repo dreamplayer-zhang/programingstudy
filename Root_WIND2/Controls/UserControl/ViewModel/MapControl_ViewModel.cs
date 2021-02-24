@@ -25,7 +25,6 @@ namespace Root_WIND2
         CPoint MapSize;
         public MapControl_ViewModel()
         {
-            WorkEventManager.WorkplaceStateChanged += MapStateChanged_Callback;
         }
 
 

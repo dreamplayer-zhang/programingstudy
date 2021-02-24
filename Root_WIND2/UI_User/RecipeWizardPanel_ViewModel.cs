@@ -80,7 +80,8 @@ namespace Root_WIND2.UI_User
         public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
 
         // Camera
-        public readonly UI_User.Camera_VRS cameraVrs = new UI_User.Camera_VRS();
+        public readonly UI_User.CameraVRS cameraVrs = new UI_User.CameraVRS();
+        public readonly UI_User.CameraAlign cameraAlign = new UI_User.CameraAlign();
         #endregion
 
         #region [ViewModels]
@@ -129,8 +130,8 @@ namespace Root_WIND2.UI_User
         }
 
         #region [Camera ViewModes]
-        private UI_User.CameraVRS_ViewModel cameraVrsVM = new UI_User.CameraVRS_ViewModel();
-        public UI_User.CameraVRS_ViewModel CameraVrsVM
+        private UI_User.CameraVRS_ImageViewer_ViewModel cameraVrsVM = new UI_User.CameraVRS_ImageViewer_ViewModel();
+        public UI_User.CameraVRS_ImageViewer_ViewModel CameraVrsVM
         {
             get => cameraVrsVM;
         }
@@ -172,6 +173,14 @@ namespace Root_WIND2.UI_User
         public UI_User.EBRSetup_ViewModel EBRSetupVM
         {
             get => ebrSetupVM;
+        }
+        #endregion
+
+        #region [Camera ViewModels]
+        private UI_User.CameraAlign_ViewModel cameraAlignVM = new UI_User.CameraAlign_ViewModel();
+        public UI_User.CameraAlign_ViewModel CameraAlignVM
+        {
+            get => cameraAlignVM;
         }
         #endregion
 
@@ -323,7 +332,7 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                dlg.InitialDirectory = Constants.Path.RecipeFrontRootPath;
+                dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
                 dlg.Title = "Save Recipe";
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -364,7 +373,7 @@ namespace Root_WIND2.UI_User
                     else
                     {
                         System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                        dlg.InitialDirectory = Constants.Path.RecipeFrontRootPath;
+                        dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
                         dlg.Title = "Save Recipe";
                         dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                         if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -397,7 +406,7 @@ namespace Root_WIND2.UI_User
                 return new RelayCommand(() =>
                 {
                     System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
-                    dlg.InitialDirectory = Constants.Path.RecipeFrontRootPath;
+                    dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
                     dlg.Title = "Load Recipe";
                     dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                     if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -453,7 +462,7 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                dlg.InitialDirectory = Constants.Path.RecipeEdgeRootPath;
+                dlg.InitialDirectory = Constants.RootPath.RecipeEdgeRootPath;
                 dlg.Title = "Save Recipe";
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -494,7 +503,7 @@ namespace Root_WIND2.UI_User
                     else
                     {
                         System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                        dlg.InitialDirectory = Constants.Path.RecipeEdgeRootPath;
+                        dlg.InitialDirectory = Constants.RootPath.RecipeEdgeRootPath;
                         dlg.Title = "Save Recipe";
                         dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                         if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -527,7 +536,7 @@ namespace Root_WIND2.UI_User
                 return new RelayCommand(() =>
                 {
                     System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
-                    dlg.InitialDirectory = Constants.Path.RecipeEdgeRootPath;
+                    dlg.InitialDirectory = Constants.RootPath.RecipeEdgeRootPath;
                     dlg.Title = "Load Recipe";
                     dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                     if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -564,9 +573,111 @@ namespace Root_WIND2.UI_User
                 });
             }
         }
+
+        public ICommand btnNewRecipeEBR
+        {
+            get => new RelayCommand(() =>
+            {
+                System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+                dlg.InitialDirectory = Constants.RootPath.RecipeEBRRootPath;
+                dlg.Title = "Save Recipe";
+                dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                    string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                    string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                    string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+                    string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                    DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+                    if (!dir.Exists)
+                        dir.Create();
+
+                    RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+                    recipe.Clear();
+
+                    recipe.Name = sFileNameNoExt;
+                    recipe.RecipePath = sFullPath;
+                    recipe.RecipeFolderPath = sRecipeFolderPath;
+
+                    recipe.Save(sFullPath);
+                }
+            });
+        }
+
+        public ICommand btnSaveRecipeEBR
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+                    if (recipe.RecipePath != "")
+                    {
+                        recipe.Save(recipe.RecipePath);
+                    }
+                    else
+                    {
+                        System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+                        dlg.InitialDirectory = Constants.RootPath.RecipeEBRRootPath;
+                        dlg.Title = "Save Recipe";
+                        dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                        if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        {
+                            string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                            string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                            string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                            string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+                            string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                            DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+                            if (!dir.Exists)
+                                dir.Create();
+
+                            recipe.Name = sFileNameNoExt;
+                            recipe.RecipePath = sFullPath;
+                            recipe.RecipeFolderPath = sRecipeFolderPath;
+
+                            recipe.Save(sFullPath);
+                        }
+                    }
+                });
+            }
+        }
+
+        public ICommand btnLoadRecipeEBR
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+                    dlg.InitialDirectory = Constants.RootPath.RecipeEBRRootPath;
+                    dlg.Title = "Load Recipe";
+                    dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                        string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                        string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                        string sFullPath = Path.Combine(sFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                        DirectoryInfo dir = new DirectoryInfo(sFolderPath);
+                        if (!dir.Exists)
+                            dir.Create();
+
+                        RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+                        recipe.Read(sFullPath);
+
+                        ebrSetupVM.LoadParameter();
+                    }
+                });
+            }
+        }
         #endregion
 
-        #region [Command Back]
+            #region [Command Back]
         public ICommand btnBackSetup
         {
             get
@@ -596,7 +707,7 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                dlg.InitialDirectory = Constants.Path.RecipeBackRootPath;
+                dlg.InitialDirectory = Constants.RootPath.RecipeBackRootPath;
                 dlg.Title = "Save Recipe";
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -637,7 +748,7 @@ namespace Root_WIND2.UI_User
                     else
                     {
                         System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-                        dlg.InitialDirectory = Constants.Path.RecipeBackRootPath;
+                        dlg.InitialDirectory = Constants.RootPath.RecipeBackRootPath;
                         dlg.Title = "Save Recipe";
                         dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                         if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -670,7 +781,7 @@ namespace Root_WIND2.UI_User
                 return new RelayCommand(() =>
                 {
                     System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
-                    dlg.InitialDirectory = Constants.Path.RecipeBackRootPath;
+                    dlg.InitialDirectory = Constants.RootPath.RecipeBackRootPath;
                     dlg.Title = "Load Recipe";
                     dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                     if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -704,6 +815,18 @@ namespace Root_WIND2.UI_User
                 {
                     SetPage(cameraVrs);
                     cameraVrs.DataContext = CameraVrsVM;
+                });
+            }
+        }
+
+        public ICommand btnCameraAlign
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(cameraAlign);
+                    cameraAlign.DataContext = CameraAlignVM;
                 });
             }
         }

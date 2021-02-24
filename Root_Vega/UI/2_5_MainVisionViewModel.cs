@@ -38,6 +38,15 @@ namespace Root_Vega
 		bool refEnabled;
 		bool alignEnabled;
 
+		DispatcherTimer m_dispatcherTimer;
+		double m_dProgressTotal = 0.0;
+		double m_dProgressValue = 0.0;
+		public double p_dProgressValue
+        {
+            get { return m_dProgressValue; }
+            set { SetProperty(ref m_dProgressValue, value); }
+        }
+
 		//SqliteDataDB VSDBManager;
 		//int currentDefectIdx;
 		//System.Data.DataTable VSDataInfoDT;
@@ -71,9 +80,21 @@ namespace Root_Vega
 			m_Engineer = engineer;
 			Init(engineer, dialogService);
 
+			m_dispatcherTimer = new DispatcherTimer();
+			m_dispatcherTimer.Interval = TimeSpan.FromTicks(10000000);
+			m_dispatcherTimer.Tick += new EventHandler(timer_Tick);
+			m_dispatcherTimer.Start();
+
 			//m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
 			//bUsingInspection = false;
 		}
+
+		private void timer_Tick(object sender, EventArgs e)
+		{
+			if (m_dProgressTotal == 0) p_dProgressValue = 0.0;
+			else p_dProgressValue = (double)m_Engineer.m_InspManager.p_nPatternInspDoneNum / m_dProgressTotal * 100;
+		}
+
 		/// <summary>
 		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
 		/// </summary>
@@ -644,6 +665,7 @@ namespace Root_Vega
 			//_clearInspReslut();
 
 			ClearDrawList();
+			m_dProgressTotal = 0;
 
 			((Vega_Handler)m_Engineer.ClassHandler()).m_patternVision.p_nTotalBlockCount = 0;
 			App.m_engineer.m_InspManager.m_bFeatureSearchFail = false;
@@ -720,10 +742,10 @@ namespace Root_Vega
 
 					MemoryData memory = m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem);
 					IntPtr p = memory.GetPtr(0);
-					m_Engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
+					m_dProgressTotal = m_Engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
 							m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
 							m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.Y,
-							inspRect, 500, roiCurrent.Strip.ParameterList[j], nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p);
+							inspRect, 500, roiCurrent.Strip.ParameterList[j], nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p).Count;
 					//7. Strip검사를 시작한다
 				}
 			}

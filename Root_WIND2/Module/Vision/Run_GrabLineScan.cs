@@ -4,8 +4,10 @@ using RootTools.Control;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,6 +57,9 @@ namespace Root_WIND2.Module
         {
             if (m_grabMode == null) return "Grab Mode == null";
 
+            StopWatch snapTimeWatcher = new StopWatch();
+            snapTimeWatcher.Start();
+
             try
             {
                 m_grabMode.SetLens();
@@ -75,7 +80,7 @@ namespace Root_WIND2.Module
                 int nScanOffset_pulse = 40000;
 
                 int startOffsetX = cpMemoryOffset.X;
-                int startOffsetY = 0;
+                //int startOffsetY = 0;
                 const int nTimeOut_10s = 10000; //ms
                 const int nTimeOut_50s = 50000; //ms
                 const int nTimeOutInterval = 10; // ms
@@ -130,6 +135,7 @@ namespace Root_WIND2.Module
 
                     double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - nTotalTriggerCount / 2;
                     double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + nTotalTriggerCount / 2 ;
+
                     axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
                     string strPool = m_grabMode.m_memoryPool.p_id;
@@ -141,6 +147,7 @@ namespace Root_WIND2.Module
                     GrabData gd = m_grabMode.m_GD;
                     gd.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.BackWard;
                     gd.nScanOffsetY = (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_nYOffset;
+                    gd.ReverseOffsetY = m_grabMode.m_nReverseOffsetY;
                     //카메라 그랩 시작
                     m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_GD);
                     //Y축 트리거 발생
@@ -195,7 +202,7 @@ namespace Root_WIND2.Module
                     }
                     if (bNormal == true)
                     {
-                        WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
+                        //WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
 
                         nScanLine++;
                         cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
@@ -218,6 +225,12 @@ namespace Root_WIND2.Module
                     }
                 }
                 m_grabMode.m_camera.StopGrab();
+
+
+                snapTimeWatcher.Stop();
+                // Log
+                TempLogger.Write("Snap", string.Format("{0:F3}", (double)snapTimeWatcher.ElapsedMilliseconds / (double)1000));
+
                 return "OK";
             }
             catch(Exception e)

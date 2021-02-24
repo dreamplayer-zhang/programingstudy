@@ -75,8 +75,36 @@
 
             <GroupBox Header="Image Viewer" 
                   Margin="4"
-                  Style="{StaticResource main_view_groupbox}">
-                <tools:RootViewer DataContext="{Binding ImageViewerVM}"/>
+                  Style="{StaticResource main_view_groupbox}"
+                  DataContext="{Binding ImageViewerVM}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Column="1"  Orientation="Horizontal">
+                        <TextBlock Text="Image" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <Button Content="Open" Command="{Binding btnOpenCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                        <Button Content="Save" Command="{Binding btnSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                        <Button Content="Clear" Command="{Binding btnClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+
+                        <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <CheckBox Content="Box" IsChecked="{Binding IsBoxChecked, Mode=TwoWay}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                        <CheckBox Content="Rular" IsChecked="{Binding IsRularChecked, Mode=TwoWay}" IsEnabled="False" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                        <Button Content="Clear" Command="{Binding btnToolClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+
+
+                        <TextBlock Text="Channel" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <CheckBox Content="Color" IsChecked="{Binding IsColorChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                        <CheckBox Content="R" IsChecked="{Binding IsRChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                        <CheckBox Content="G" IsChecked="{Binding IsGChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                        <CheckBox Content="B" IsChecked="{Binding IsBChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    </StackPanel>
+                    <Grid Grid.Row="1" >
+                        <tools:RootViewer/>
+                    </Grid>
+                </Grid>
             </GroupBox>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>

@@ -71,6 +71,11 @@ namespace RootTools.Camera.Matrox
         Log m_log;
 
         public string p_id { get; set; }
+        public bool bStopThread
+        {
+            get;
+            set;
+        }
 
         int m_nGrabProgress = 0;
         public int p_nGrabProgress
@@ -123,8 +128,8 @@ namespace RootTools.Camera.Matrox
                 SetProperty(ref m_CamInfo, value);
             }
         }
-        const int c_nBuf = 300;
-        int _nBuf = 300;
+        const int c_nBuf = 400;
+        int _nBuf = 400;
         public int p_nBuf
         {
             get
@@ -416,7 +421,7 @@ namespace RootTools.Camera.Matrox
         private const int BUFFERING_SIZE_MAX = 20;
         MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(LineScanArchiveFunction);
         UserDataObject userObject = new UserDataObject();
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
         {
             m_nGrabCount = (int)Math.Truncate(1.0 * nLine / p_nHeight);
             m_nGrabTrigger = 0;
@@ -488,7 +493,7 @@ namespace RootTools.Camera.Matrox
                 if (iBlock < m_nGrabTrigger)
                 {   
                     MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarray);
-                    Parallel.For(0, p_nHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
+                    Parallel.For(0, p_nHeight, (y) =>
                     {
                         int yp = y + (iBlock) * p_nHeight;
                         fixed (byte* p = srcarray)
@@ -499,9 +504,9 @@ namespace RootTools.Camera.Matrox
                         }
                     });
                     iBlock++;
-                    GrabEvent();
-                    if (m_nGrabCount != 0)
-                        p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
+                    //GrabEvent();
+                    //if (m_nGrabCount != 0)
+                    //    p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
             }
             p_CamInfo.p_eState = eCamState.Ready;

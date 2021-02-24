@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Root_CAMELLIA.UI_Dialog;
 using Root_EFEM.Module;
 using RootTools;
 using RootTools.Memory;
@@ -198,6 +199,13 @@ namespace Root_CAMELLIA
         private void buttonBuzzerOff_Click(object sender, RoutedEventArgs e)
         {
             m_engineer.BuzzerOff();
+        }
+
+        Dlg_OHT dlgOHT = new Dlg_OHT();
+        private void buttonOHT_Click(object sender, RoutedEventArgs e)
+        {
+
+            dlgOHT.Show();
         }
     }
 }

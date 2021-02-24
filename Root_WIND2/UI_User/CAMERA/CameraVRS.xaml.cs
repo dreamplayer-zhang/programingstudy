@@ -18,9 +18,9 @@ namespace Root_WIND2.UI_User
     /// <summary>
     /// Camera_VRS.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Camera_VRS : UserControl
+    public partial class CameraVRS : UserControl
     {
-        public Camera_VRS()
+        public CameraVRS()
         {
             InitializeComponent();
         }

@@ -55,9 +55,9 @@ namespace RootTools_Vision
         }
     }
 
-    public class ProcessDefectWaferDoneEventArgs : EventArgs
+    public class IntegratedProcessDefectDoneEventArgs : EventArgs
     {
-        public ProcessDefectWaferDoneEventArgs()
+        public IntegratedProcessDefectDoneEventArgs()
         {
 
         }
@@ -116,6 +116,17 @@ namespace RootTools_Vision
     {
         public InspectionStartArgs()
         {
+        }
+    }
+
+    ///
+    public class MemoryIDArgs : EventArgs
+    {
+        public readonly MemoryID MemoryID;
+
+        public MemoryIDArgs(MemoryID memoryID)
+        {
+            this.MemoryID = memoryID;
         }
     }
 }

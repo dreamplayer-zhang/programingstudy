@@ -174,7 +174,7 @@ namespace Root_Vega
             foreach (IRobotChild child in m_robot.m_aChild) CalcRecoverChild(child);
             ReCalcSequence();
             RunTree(Tree.eMode.Init);
-            if (m_handler.m_nRnR > 0) m_handler.m_nRnR = 0;
+            if (EQ.p_nRnR > 0) EQ.p_nRnR = 0;
         }
 
         void CalcRecoverArm()

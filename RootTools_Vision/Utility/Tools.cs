@@ -14,11 +14,12 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 
 namespace RootTools_Vision
 {
-    public class Tools
+    public partial class Tools
     {
         public static byte[] CovertImageToArray(Image img)
         {
@@ -36,6 +37,177 @@ namespace RootTools_Vision
             return data;
         }
 
+        public static Bitmap ConvertArrayToBitmapRect(byte[] rawData, int _width, int _height, int _byteCount, CRect _rect)
+        {
+            try
+            {
+                System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                if (_byteCount == 1)
+                {
+                    format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                }
+                else if (_byteCount == 3)
+                {
+                    format = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("지원하지 않는 PixelFormat입니다.");
+                    return null;
+                }
+
+                int stride = (int)Math.Ceiling((double)_width / 4) * 4;
+                Bitmap bmp = new Bitmap(_width, _height, format);
+                ColorPalette palette = bmp.Palette;
+                if (_byteCount == 1)
+                {
+                    for (int i = 0; i < 256; i++)
+                        palette.Entries[i] = Color.FromArgb(i, i, i);
+
+                    bmp.Palette = palette;
+                }
+                else
+                {
+                    //Color Palette 만들줄 아는사람 넣어줘
+                }
+
+            }
+            catch
+            {
+
+            }
+            return null;
+        }
+
+        public static Bitmap ConvertArrayToColorBitmap(IntPtr rawDataR, IntPtr rawDataG, IntPtr rawDataB, int _memWidth, int _byteCount, Rect rect)
+        {
+            try
+            {
+                System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                if (_byteCount == 1)
+                {
+                    format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                }
+                else if (_byteCount == 3)
+                {
+                    format = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("지원하지 않는 PixelFormat입니다.");
+                    return null;
+                }
+
+                int stride = (int)Math.Ceiling((double)640 / 4) * 4;
+                Bitmap bmp = new Bitmap(640, 480, format);
+
+                ColorPalette palette = bmp.Palette;
+
+                if (_byteCount == 1)
+                {
+                    for (int i = 0; i < 256; i++)
+                        palette.Entries[i] = Color.FromArgb(i, i, i);
+
+                    bmp.Palette = palette;
+                }
+                else
+                {
+                    //Color Palette 만들줄 아는사람 넣어줘
+                }
+                //Marshal.Copy(,);
+
+
+                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, 640, 480), ImageLockMode.WriteOnly, format);
+
+                int centerX = (int)(rect.X + (rect.Width / 2));
+                int centerY = (int)(rect.Y + (rect.Height / 2));
+
+                Rect rt = new Rect();
+                int saveW = 640;
+                int saveH = 480;
+                if(rect.Width < saveW && rect.Height < saveH)
+                {
+                    rt.X = centerX - (saveW / 2);
+                    rt.Y = centerY - (saveH / 2);
+                    rt.Width = saveW;
+                    rt.Height = saveH;
+                }
+                else
+                {
+                    int nSaveW;
+                    int nSaveH;
+                    if (rect.Width > saveW)
+                        nSaveW = (int)rect.Width;
+                    else
+                        nSaveW = 640;
+
+                    if (rect.Height > saveH)
+                        nSaveH = (int)rect.Height;
+                    else
+                        nSaveH = 480;
+
+                    rt.X = (centerX - saveW / 2);
+                    rt.Y = (centerY - saveH / 2);
+                    rt.Width = nSaveW;
+                    rt.Height = nSaveH;
+                }
+                
+
+
+                IntPtr pointer = bmpData.Scan0;
+                {
+                    unsafe
+                    {
+                        byte* pPointer = (byte*)pointer.ToPointer();
+                        byte* pR = (byte*)rawDataR.ToPointer();
+                        byte* pG = (byte*)rawDataG.ToPointer();
+                        byte* pB = (byte*)rawDataB.ToPointer();
+
+                        for (int i = 0; i < rt.Y; i++)
+                        {
+                            pR += _memWidth;
+                            pG += _memWidth;
+                            pB += _memWidth;
+                        }
+
+                        pR += (int)rt.X;
+                        pG += (int)rt.X;
+                        pB += (int)rt.X;
+
+                        for (int i = 0; i < 480; i++)
+                        {
+                            for (int j = 0; j < 640; j++)
+                            {
+                                pPointer[i * (saveW * 3) + j * _byteCount + 0] = *(pB + j);
+                                pPointer[i * (saveW * 3) + j * _byteCount + 1] = *(pG + j);
+                                pPointer[i * (saveW * 3) + j * _byteCount + 2] = *(pR + j);
+                            }
+
+                            pR += _memWidth;
+                            pG += _memWidth;
+                            pB += _memWidth;
+                        }
+                    }
+                }
+                bmp.UnlockBits(bmpData);
+
+                if (rt.Width != 640 || rt.Height != 480)
+                {
+                    using (Graphics g = Graphics.FromImage(bmp))
+                    {
+                        g.DrawImage(bmp, 0, 0, saveW, saveH);
+                    }
+                }
+
+                return bmp;
+            }
+            catch (Exception)
+            {
+                //MessageBox.Show(ex.ToString());
+            }
+            return null;
+        }
+
         public static Bitmap CovertArrayToBitmap(byte[] rawdata, int _width, int _height, int _byteCount)
         {
             try
@@ -51,7 +223,7 @@ namespace RootTools_Vision
                 }
                 else
                 {
-                    MessageBox.Show("지원하지 않는 PixelFormat입니다.");
+                    System.Windows.MessageBox.Show("지원하지 않는 PixelFormat입니다.");
                     return null;
                 }
 
@@ -200,6 +372,13 @@ namespace RootTools_Vision
                 dstR[i] = srcColor[i * 3];
                 dstG[i] = srcColor[i * 3 + 1];
                 dstB[i] = srcColor[i * 3 + 2];
+            }
+        }
+        public static void ConvertRGB2Gray(byte[] srcColor, byte[] dstGray)
+        {
+            for (int i = 0; i < srcColor.Length / 3; i++)
+            {
+                dstGray[i] = (byte)(0.299 * srcColor[i * 3] + 0.587 * srcColor[i * 3 + 1] + 0.114 * srcColor[i * 3 + 2]);
             }
         }
         public static bool LoadBitmapToRawdata(string filepath, byte[] rawdata, int _width, int _height, int _byteCount)
@@ -404,7 +583,8 @@ namespace RootTools_Vision
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                //System.Windows.MessageBox.Show(ex.Message);
+                TempLogger.Write("Tools", ex);
             }
 
             return null;

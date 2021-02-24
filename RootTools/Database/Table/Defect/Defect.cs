@@ -9,8 +9,6 @@ namespace RootTools.Database
 {
     public class Defect
     {
-
-
         // 각 Inspection에서 올라오는 결과 데이터
         public int m_nDefectIndex;
         public string m_strInspectionID;
@@ -28,7 +26,7 @@ namespace RootTools.Database
         public int m_nChipIndexX; // Chip Index
         public int m_nCHipIndexY;
         //public string sImagePath;
-        
+                
         protected int m_nImgsizeX; 
         protected int m_nImgsizeY;
 
@@ -111,6 +109,11 @@ namespace RootTools.Database
         {
             m_fRelX = m_fAbsX - nRefX;
             m_fRelY = m_fAbsY - nRefY;
+        }
+
+        public Rect GetRect()
+        {
+            return p_rtDefectBox;
         }
 
         public void CalcDegree()

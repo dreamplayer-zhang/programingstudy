@@ -14,10 +14,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace Root_CAMELLIA
 {
-    public class Dlg_Engineer_ViewModel : RootViewer_ViewModel, IDialogRequestClose
+    public class Dlg_Engineer_ViewModel : ObservableObject, IDialogRequestClose
     {
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
 
@@ -64,16 +65,22 @@ namespace Root_CAMELLIA
                             CurrentAxisWorkPoints = GetWorkPoint(AxisLifter.m_aPos);
                             return;
                         }
-                    case TabAxis.StageZ:
-                        {
-                            return;
-                        }
                     case TabAxis.TiltX:
                         {
+                            SelectedAxis = TiltAxisX;
+                            CurrentAxisWorkPoints = GetWorkPoint(TiltAxisX.m_aPos);
                             return;
                         }
                     case TabAxis.TiltY:
                         {
+                            SelectedAxis = TiltAxisY;
+                            CurrentAxisWorkPoints = GetWorkPoint(TiltAxisY.m_aPos);
+                            return;
+                        }
+                    case TabAxis.TiltZ:
+                        {
+                            SelectedAxis = TiltAxisZ;
+                            CurrentAxisWorkPoints = GetWorkPoint(TiltAxisZ.m_aPos);
                             return;
                         }
                 }
@@ -211,62 +218,187 @@ namespace Root_CAMELLIA
         }
         private Axis _AxisLifter;
 
-        private Visibility _tttt = Visibility.Hidden;
-        public Visibility tttt
+        public Axis TiltAxisX
         {
             get
             {
-                return _tttt;
+                return _TiltAxisX;
             }
             set
             {
-                SetProperty(ref _tttt, value);
+                SetProperty(ref _TiltAxisX, value);
             }
         }
+        private Axis _TiltAxisX;
 
-        public int asdf = 0;
-        public ICommand CmdTest
+        public Axis TiltAxisY
+        {
+            get
+            {
+                return _TiltAxisY;
+            }
+            set
+            {
+                SetProperty(ref _TiltAxisY, value);
+            }
+        }
+        private Axis _TiltAxisY;
+
+        public Axis TiltAxisZ
+        {
+            get
+            {
+                return _TiltAxisZ;
+            }
+            set
+            {
+                SetProperty(ref _TiltAxisZ, value);
+            }
+        }
+        private Axis _TiltAxisZ;
+
+
+        //private Visibility _tttt = Visibility.Hidden;
+        //public Visibility tttt
+        //{
+        //    get
+        //    {
+        //        return _tttt;
+        //    }
+        //    set
+        //    {
+        //        SetProperty(ref _tttt, value);
+        //    }
+        //}
+
+        //public int asdf = 0;
+        //public ICommand CmdTest
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(() =>
+        //        {
+        //            asdf++;
+
+        //            if (asdf > 10 && asdf <= 20)
+        //            {
+        //                tttt = Visibility.Visible;
+        //            }
+        //            else if (asdf > 20)
+        //            {
+        //                tttt = Visibility.Hidden;
+        //                asdf = 0;
+        //            }
+
+        //        });
+        //    }
+        //}
+
+        public ICommand ConnectCommand
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-                    asdf++;
 
-                    if(asdf > 10 && asdf <= 20)
-                    {
-                        tttt = Visibility.Visible;
-                    }
-                    else if(asdf > 20)
-                    {
-                        tttt = Visibility.Hidden;
-                        asdf = 0;
-                    }
-                    
+                    ModuleCamellia.p_CamVRS.FunctionConnect();
+
                 });
             }
         }
 
+        public ICommand GrabCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+
+                    ModuleCamellia.p_CamVRS.GrabOneShot();
+
+                });
+            }
+        }
+
+        public ICommand ContinousGrabCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+
+                    ModuleCamellia.p_CamVRS.GrabContinuousShot();
+
+                });
+            }
+        }
+
+        public ICommand StopGrabCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+
+                    ModuleCamellia.p_CamVRS.GrabStop();
+
+                });
+            }
+        }
         #endregion
 
-        private Module_Camellia ModuleCamellia;    
+        private Module_Camellia moduleCamellia;
+        public Module_Camellia ModuleCamellia
+        {
+            get
+            {
+                return moduleCamellia;
+            }
+            set
+            {
+                SetProperty(ref moduleCamellia, value);
+            }
+        }
         private TabAxis eTabAxis = TabAxis.AxisX;
+
+        private RootViewer_ViewModel m_rootViewer = new RootViewer_ViewModel();
+        public RootViewer_ViewModel p_rootViewer
+        {
+            get => this.m_rootViewer;
+        }
+
+        Dispatcher dispatcher = null;
 
         public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
         {
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
-            //m_AxisXY = ModuleCamellia.m_axisXY;
-            //m_AxisZ = ModuleCamellia.m_axisZ;
+
             AxisX = ModuleCamellia.p_axisXY.p_axisX;
             AxisY = ModuleCamellia.p_axisXY.p_axisY;
             AxisZ = ModuleCamellia.p_axisZ;
             AxisLifter = ModuleCamellia.p_axisLifter;
 
-            p_VisibleMenu = Visibility.Hidden;
-            p_ImageData = ModuleCamellia.m_CamVRS.p_ImageViewer.p_ImageData;
-            SetImageSource();
+            TiltAxisX = ModuleCamellia.p_tiltAxisXY.p_axisX;
+            TiltAxisY = ModuleCamellia.p_tiltAxisXY.p_axisY;
+            TiltAxisZ = ModuleCamellia.p_tiltAxisZ;
+
+            ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
+
+            p_rootViewer.p_VisibleMenu = Visibility.Collapsed;
+
+            p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+
+            dispatcher = Application.Current.Dispatcher;
         }
 
+        private void OnGrabImageUpdate(object sender, EventArgs e)
+        {
+            dispatcher.Invoke(() =>
+            {
+                p_rootViewer.SetImageSource();
+            });
+
+        }
 
 
         #region Motion Command
@@ -404,7 +536,11 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     //select Axis jog
-                    SelectedAxis.Jog(-1);
+                    string str = SelectedAxis.Jog(-1);
+                    if (str != "OK")
+                    {
+                        MessageBox.Show(str);
+                    }
                 });
             }
         }
@@ -414,7 +550,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    SelectedAxis.Jog(-0.31);
+                    string str = SelectedAxis.Jog(-0.31);
+                    if (str != "OK")
+                    {
+                        MessageBox.Show(str);
+                    }
                 });
             }
         }
@@ -424,8 +564,12 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    
-                    SelectedAxis.StartMove(-PosValue);
+
+                    string str = SelectedAxis.StartMove(-PosValue);
+                    if(str != "OK")
+                    {
+                        MessageBox.Show(str);
+                    }
                     SelectedAxis.WaitReady();
                 });
             }
@@ -436,7 +580,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    SelectedAxis.StartMove(PosValue);
+                    string str = SelectedAxis.StartMove(PosValue);
+                    if (str != "OK")
+                    {
+                        MessageBox.Show(str);
+                    }
                     SelectedAxis.WaitReady();
                 });
             }
@@ -447,7 +595,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    SelectedAxis.Jog(0.31);
+                    string str = SelectedAxis.Jog(0.31);
+                    if (str != "OK")
+                    {
+                        MessageBox.Show(str);
+                    }
 
                 });
             }
@@ -458,7 +610,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    SelectedAxis.Jog(1);
+                    string str = SelectedAxis.Jog(1);
+                    if (str != "OK")
+                    {
+                        MessageBox.Show(str);
+                    }
                 });
             }
         }
@@ -532,13 +688,7 @@ namespace Root_CAMELLIA
         }
         #endregion
 
-        //public void OnMouseEnter(Object sender, System.Windows.Input.MouseEventArgs e)
-        //{
-        //    //if (MouseState == MouseButtonState.Pressed)
-        //    //    MouseState = MouseEvent.LeftButton;
-        //    var viewer = (Grid)sender;
-        //    viewer.Focus();
-        //}
+
         #region General Command
         public ICommand CmdClose
         {
@@ -681,9 +831,9 @@ namespace Root_CAMELLIA
             AxisY,
             AxisZ,
             Lifter,
-            StageZ,
             TiltX,
-            TiltY
+            TiltY,
+            TiltZ
         }
     }
 }
