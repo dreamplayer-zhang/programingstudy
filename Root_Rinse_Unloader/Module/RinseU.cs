@@ -325,8 +325,8 @@ namespace Root_Rinse_Unloader.Module
             {
                 switch (EQ.p_eState)
                 {
-                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Green); break;
-                    case EQ.eState.Run: m_doLamp.Write(eLamp.Yellow); break;
+                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Yellow); break;
+                    case EQ.eState.Run: m_doLamp.Write(eLamp.Green); break;
                     case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
                     default: m_doLamp.AllOff(); break;
                 }

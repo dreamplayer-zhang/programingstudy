@@ -130,8 +130,8 @@ namespace Root_Rinse_Loader
             borderUnloadState.Background = (rinse.p_eStateUnloader == EQ.eState.Ready || rinse.p_eStateUnloader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
 
             gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
-            gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Run)) ? Brushes.Gold : Brushes.YellowGreen;
-            gridGreen.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.SeaGreen : Brushes.DarkGreen; 
+            gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.Gold : Brushes.YellowGreen;
+            gridGreen.Background = (bBlink && (EQ.p_eState == EQ.eState.Run)) ? Brushes.SeaGreen : Brushes.DarkGreen; 
         }
         #endregion
 
