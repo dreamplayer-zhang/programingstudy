@@ -11,8 +11,8 @@ namespace Root.Module
     public class TestClient : ModuleBase
     {
         #region ToolBox
-        //TCPAsyncClient m_tcpip;
-        TCPSyncClient m_tcpip;
+        TCPAsyncClient m_tcpip;
+        //TCPSyncClient m_tcpip;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_tcpip, this, "Client", 2000000);

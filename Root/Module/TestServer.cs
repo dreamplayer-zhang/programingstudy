@@ -10,8 +10,8 @@ namespace Root.Module
     public class TestServer : ModuleBase
     {
         #region ToolBox
-        //TCPAsyncServer m_tcpip;
-        TCPSyncServer m_tcpip;
+        TCPAsyncServer m_tcpip;
+        //TCPSyncServer m_tcpip;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_tcpip, this, "Server", 2000000);
