@@ -35,6 +35,9 @@ namespace RootTools_Vision
                 foreach (Measurement measure in workplace.MeasureList)
                     measureList.Add(measure);
 
+            foreach (Measurement measure in measureList)
+                this.currentWorkplace.MeasureList.Add(measure);
+
             // TO DO 이거 측정마다 다를건데 어떻게 할거임
             int measureItem = Enum.GetValues(typeof(EBRMeasurement.EBRMeasureItem)).Length;
 

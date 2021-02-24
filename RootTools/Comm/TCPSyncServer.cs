@@ -1,23 +1,27 @@
 ﻿using RootTools.Trees;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace RootTools.Comm
 {
-    public class TCPAsyncServer : ITool, IComm
+    public class TCPSyncServer : ITool, IComm
     {
         public delegate void OnReciveData(byte[] aBuf, int nSize, Socket socket);
         public event OnReciveData EventReciveData;
-
+        
         #region ITool
         public UserControl p_ui
         {
             get
             {
-                TCPAsyncServer_UI ui = new TCPAsyncServer_UI();
+                TCPSyncServer_UI ui = new TCPSyncServer_UI();
                 ui.Init(this);
                 return ui;
             }
@@ -48,19 +52,6 @@ namespace RootTools.Comm
         }
         #endregion
 
-        #region Async
-        public class Async
-        {
-            public byte[] m_aBuf;
-            public Socket m_socket; 
-
-            public Async(int nL)
-            {
-                m_aBuf = new byte[nL]; 
-            }
-        }
-        #endregion
-
         #region Server Socket
         Socket m_socket = null;
         void InitServer()
@@ -68,64 +59,66 @@ namespace RootTools.Comm
             m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             m_socket.Bind(new IPEndPoint(IPAddress.Any, p_nPort));
             m_socket.Listen(5);
-            m_cbAccept = new AsyncCallback(CallBackAccept); 
+            m_cbAccept = new AsyncCallback(CallBackAccept);
             m_socket.BeginAccept(m_cbAccept, null);
-            m_cbSend = new AsyncCallback(CallBackSend);
-            m_commLog.Add(CommLog.eType.Info, "Init Server Socket"); 
+            m_commLog.Add(CommLog.eType.Info, "Init Server Socket");
         }
         #endregion
 
         #region Accept
         AsyncCallback m_cbAccept;
-        Socket m_socketComm = null; 
+        Socket m_socketComm = null;
         void CallBackAccept(IAsyncResult ar)
         {
             m_socketComm = m_socket.EndAccept(ar);
-            Async async = new Async(m_lMaxBuffer);
-            async.m_socket = m_socketComm;
-            m_cbReceive = new AsyncCallback(CallBackReceive);
-            m_socketComm.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
             m_commLog.Add(CommLog.eType.Info, "Accept Client Socket");
+            InitThread(); 
         }
         #endregion
 
-        #region Receive
-        AsyncCallback m_cbReceive;
-        void CallBackReceive(IAsyncResult ar)
+        #region Read Thread 
+        bool m_bThread = false;
+        Thread m_thread;
+        void InitThread()
         {
-            Async async = (Async)ar.AsyncState;
-            if (m_socket == null) return;
-            try
+            m_thread = new Thread(new ThreadStart(RunThread));
+            m_thread.Start();
+        }
+
+        byte[] m_aBufRead = null; 
+        void RunThread()
+        {
+            m_bThread = true; 
+            while (m_bThread)
             {
-                int lReceive = async.m_socket.EndReceive(ar);
-                if (lReceive > 0) EventReciveData(async.m_aBuf, lReceive, async.m_socket);
-                //m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.ASCII.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
-                async.m_socket.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
-            }
-            catch (Exception e)
-            {
-                if (m_socket != null) m_commLog.Add(CommLog.eType.Info, "CallBack Exception : " + e.Message);
+                Thread.Sleep(1); 
+                try
+                {
+                    int lReceive = m_socketComm.Receive(m_aBufRead);
+                    if (lReceive > 0) EventReciveData(m_aBufRead, lReceive, m_socketComm);
+                    //m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.ASCII.GetString(m_aBufRead, 0, lReceive) : "Large Data");
+                }
+                catch (Exception e) { m_commLog.Add(CommLog.eType.Info, "Receive Exception : " + e.Message); }
             }
         }
         #endregion
 
         #region Send
-        AsyncCallback m_cbSend;
         public string Send(string sMsg)
         {
-            if (m_socket == null) return "Not Connected"; 
-            Async async = new Async(1);
-            async.m_aBuf = Encoding.Default.GetBytes(sMsg);
-            async.m_socket = m_socketComm;
-            m_socketComm.BeginSend(async.m_aBuf, 0, async.m_aBuf.Length, SocketFlags.None, m_cbSend, async);
-            return "OK"; 
+            if (m_socketComm == null) return "Not Connected";
+            byte[] aBuf = Encoding.Default.GetBytes(sMsg);
+            m_socketComm.Send(aBuf);
+            //m_commLog.Add(CommLog.eType.Send, (sMsg.Length < 64) ? sMsg : "Large Data");
+            return "OK";
         }
 
-        void CallBackSend(IAsyncResult ar)
+        public string Send(byte[] aBuf)
         {
-            Async async = (Async)ar.AsyncState;
-            int lSend = async.m_socket.EndSend(ar);
-            //m_commLog.Add(CommLog.eType.Send, (lSend < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lSend) : "Large Data"); 
+            if (m_socketComm == null) return "Not Connected";
+            m_socketComm.Send(aBuf);
+            //m_commLog.Add(CommLog.eType.Send, (aBuf.Length < 64) ? Encoding.ASCII.GetString(aBuf, 0, aBuf.Length) : "Large Data");
+            return "OK";
         }
         #endregion
 
@@ -157,24 +150,33 @@ namespace RootTools.Comm
         #endregion
 
         public string p_id { get; set; }
-        int m_lMaxBuffer = 4096; 
         Log m_log;
-        public CommLog m_commLog; 
-        public TCPAsyncServer(string id, Log log, int lMaxBuffer = 4096)
+        public CommLog m_commLog;
+        public TCPSyncServer(string id, Log log, int lMaxBuffer = 4096)
         {
             p_id = id;
-            m_lMaxBuffer = lMaxBuffer; 
+            m_aBufRead = new byte[lMaxBuffer];
             m_log = log;
-            m_commLog = new CommLog(this, log); 
+            m_commLog = new CommLog(this, log);
 
-            InitTree(); 
+            InitTree();
         }
 
         public void ThreadStop()
         {
+            if (m_bThread)
+            {
+                m_bThread = false;
+                m_thread.Interrupt(); 
+                m_thread.Abort(); 
+            }
+            if (m_socketComm != null)
+            {
+                m_socketComm.Shutdown(SocketShutdown.Both);
+                m_socketComm.Close(); 
+            }
             if (m_socket != null) m_socket.Close();
-            m_socket = null; 
+            m_socket = null;
         }
-
     }
 }

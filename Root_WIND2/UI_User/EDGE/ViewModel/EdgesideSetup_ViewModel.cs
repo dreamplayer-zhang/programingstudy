@@ -161,8 +161,8 @@ namespace Root_WIND2.UI_User
 						Recipe.CameraHeight = inspect.BtmCameraHeight;
 				}
 
+				Recipe.Resolution = mode.m_dResX_um;
 				Recipe.TriggerRatio = mode.m_dCamTriggerRatio;
-				Parameter.CamResolution = mode.m_dResX_um;
 
 				SetProperty<int>(ref this.selectedGrabModeIndex, value);
 			}

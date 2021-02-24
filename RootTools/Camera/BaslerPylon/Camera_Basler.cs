@@ -161,7 +161,7 @@ namespace RootTools.Camera.BaslerPylon
             RunSetTree(treeRoot.GetTree("Connect Set"));
             RunAnalogControlTree(treeRoot.GetTree("Analog Control", false, p_CamInfo._OpenStatus));
             RunAOIControlsTree(treeRoot.GetTree("AOI Contorls", false, p_CamInfo._OpenStatus));
-            RunImageFormatControlsTree(treeRoot.GetTree("Image Format Controls", false,p_CamInfo._OpenStatus));
+            RunImageFormatControlsTree(treeRoot.GetTree("Image Format Controls", false, p_CamInfo._OpenStatus));
             RunAcquisitionControlsTree(treeRoot.GetTree("Acquisition Controls", false, p_CamInfo._OpenStatus));
             RunDeviceInfomationTree(treeRoot.GetTree("Device Infomation", false, p_CamInfo._OpenStatus));
             RunConfigurationSetTree(treeRoot.GetTree("Configuration Set", false, p_CamInfo._OpenStatus));
@@ -199,9 +199,9 @@ namespace RootTools.Camera.BaslerPylon
         }
         void RunImageFormatControlsTree(Tree tree)
         {
-            if(m_Caminfo._OpenStatus)
+            if (m_Caminfo._OpenStatus)
             {
-                p_CamParam.p_PixelFormat = tree.Set(p_CamParam.p_PixelFormat, "Mono 8",p_CamParam._PixelFormatEnum , "Pixel Format", "The Format of the pixel data transmitted for acquired images");
+                p_CamParam.p_PixelFormat = tree.Set(p_CamParam.p_PixelFormat, "Mono 8", p_CamParam._PixelFormatEnum, "Pixel Format", "The Format of the pixel data transmitted for acquired images");
                 p_CamParam._ReverseX = tree.Set(p_CamParam._ReverseX, false, "Reverse X", "The Horizontal flipping of the image");
             }
             else
@@ -226,10 +226,10 @@ namespace RootTools.Camera.BaslerPylon
         }
         void RunAcquisitionControlsTree(Tree tree)
         {
-            if(p_CamInfo._OpenStatus)
+            if (p_CamInfo._OpenStatus)
             {
-                p_CamParam._ExposureTimeRaw = tree.Set(p_CamParam._ExposureTimeRaw, 0, "Exposure Time (Raw)","The 'Raw' Exposure Time");
-                p_CamParam._ResultingFrameRateAbs = tree.Set(p_CamParam._ResultingFrameRateAbs, 0, "Resulting Frame Rate (Abs) [Hz]", "The Maximum Allowed Frame Acquisition Rate",true,true);
+                p_CamParam._ExposureTimeRaw = tree.Set(p_CamParam._ExposureTimeRaw, 0, "Exposure Time (Raw)", "The 'Raw' Exposure Time");
+                p_CamParam._ResultingFrameRateAbs = tree.Set(p_CamParam._ResultingFrameRateAbs, 0, "Resulting Frame Rate (Abs) [Hz]", "The Maximum Allowed Frame Acquisition Rate", true, true);
             }
             else
             {
@@ -322,8 +322,9 @@ namespace RootTools.Camera.BaslerPylon
                     p_CamParam = new BaslerParameterSet(m_cam, m_log);
                     p_CamParam._HeartbeatTimeout = 10000;
                     UpdateCamInfo(ConnectCamInfo, m_cam);
-                    m_ImageGrab.p_nByte = ((m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString()) ? 1 : 3);
                     m_ImageGrab.p_Size = new CPoint((int)m_CamParam._Width, (int)m_CamParam._Height);
+                    m_ImageGrab.p_nByte = 1;
+                    m_ImageGrab.p_nPlane = ((m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString()) ? 1 : 3);
                     //m_cam.Parameters[PLStream.TransmissionType].TrySetValue(PLStream.TransmissionType.Multicast);
                     //string strTemp = m_cam.Parameters[PLStream.TransmissionType].GetValue();
 
@@ -345,7 +346,7 @@ namespace RootTools.Camera.BaslerPylon
         public void Init()
         {
             Connect();
-            
+
         }
 
         public void Connect()
@@ -355,12 +356,12 @@ namespace RootTools.Camera.BaslerPylon
                 if (!bgw_Connect.IsBusy)
                     bgw_Connect.RunWorkerAsync();
             }
-            else if (m_cam.IsConnected ==false)
+            else if (m_cam.IsConnected == false)
             {
-                if(!bgw_Connect.IsBusy)
+                if (!bgw_Connect.IsBusy)
                     bgw_Connect.RunWorkerAsync();
             }
-            
+
         }
 
         void UpdateValue()
@@ -398,7 +399,7 @@ namespace RootTools.Camera.BaslerPylon
         }
 
         public string Grab()
-        {  
+        {
             if (!m_cam.IsOpen)
                 return p_id + " Camera not Connected";
             try
@@ -411,18 +412,20 @@ namespace RootTools.Camera.BaslerPylon
                     if (result.GrabSucceeded == false)
                         return p_id + " Grab Error : " + result.ErrorDescription;
 
+                    m_ImageGrab.p_nByte = 1;
                     if (m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString())
                     {
-                        m_ImageGrab.p_nByte = 1;
+                        m_ImageGrab.p_nPlane = 1;
                         m_ImageGrab.p_Size = new CPoint((int)m_CamParam._Width, (int)m_CamParam._Height);
                         byte[] aBuf = result.PixelData as byte[];
-                        Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.p_nByte);
+                        Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.GetBytePerPixel());
                     }
                     else
                     {
+                        m_ImageGrab.p_nPlane = 3;
                         PixelDataConverter converter = new PixelDataConverter();
                         converter.OutputPixelFormat = PixelType.BGR8packed;
-                        converter.Convert(m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.p_nByte, result);
+                        converter.Convert(m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.GetBytePerPixel(), result);
                     }
                     //p_ImageViewer.SetImageSource();
                     //Array.Copy(aBuf, m_ImageGrab.m_aBuf, m_ImageGrab.p_sz.X * m_ImageGrab.p_sz.Y);
@@ -580,7 +583,7 @@ namespace RootTools.Camera.BaslerPylon
                     p_CamInfo._IsGrabbing = true;
                 }
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 MessageBox.Show(e.Message.ToString());
             }
@@ -595,7 +598,7 @@ namespace RootTools.Camera.BaslerPylon
             p_CamInfo._IsCanGrab = true;
             p_CamInfo._IsGrabbing = false;
 
-            if(m_threadImgUpdate != null)
+            if (m_threadImgUpdate != null)
                 m_threadImgUpdate.Abort();
         }
 
@@ -710,46 +713,50 @@ namespace RootTools.Camera.BaslerPylon
                 // Check if the image can be displayed.
                 if (grabResult.IsValid)
                 {
-                    //if (!stopWatch.IsRunning)
+                    if (stopWatch.IsRunning)
                     {
                         if (m_bLive)
                         {
-                            m_ImageGrab.p_nByte = ((m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString()) ? 1 : 3);
+                            m_ImageGrab.p_nByte = 1;
+                            m_ImageGrab.p_nPlane = ((m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString()) ? 1 : 3);
                             m_ImageGrab.p_Size = new CPoint((int)m_CamParam._Width, (int)m_CamParam._Height);
 
-                            if (m_ImageGrab.p_nByte == 3)
+                            // Grabbed 이미지 m_ImageGrab에 복사
+                            if (m_ImageGrab.GetBytePerPixel() == 3)
                             {
                                 PixelDataConverter converter = new PixelDataConverter();
                                 converter.OutputPixelFormat = PixelType.BGR8packed;
-                                converter.Convert(m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.p_nByte, grabResult);
+                                converter.Convert(m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.GetBytePerPixel(), grabResult);
                             }
-                            else if (m_ImageGrab.p_nByte == 1)
+                            else if (m_ImageGrab.GetBytePerPixel() == 1)
                             {
                                 byte[] aBuf = grabResult.PixelData as byte[];
                                 Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
                             }
                             GrabEvent();
 
-                            // if(stopWatch.ElapsedMilliseconds > 33)
+                            // 최대 30프레임으로 화면 업데이트
+                            if (stopWatch.ElapsedMilliseconds > 33)
                             {
-                                // 샘플링 스레드에서 사용할 이미지 데이터 복사
+                                // 샘플링 스레드에서 사용할 이미지 버퍼 생성
                                 int imgSize = m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y;
-                                if (m_ImageGrab.p_nByte == 3)
-                                {
-                                    // 이미지 데이터 복사
-                                    m_threadBuf = new byte[imgSize * m_ImageGrab.p_nByte];
+                                m_threadBuf = new ImageData(m_ImageGrab.p_Size.X, m_ImageGrab.p_Size.Y, m_ImageGrab.GetBytePerPixel());
 
+                                // 샘플링 스레드에서 사용할 이미지 데이터 복사
+                                if (m_ImageGrab.GetBytePerPixel() == 3)
+                                {
                                     PixelDataConverter converter = new PixelDataConverter();
                                     converter.OutputPixelFormat = PixelType.BGR8packed;
-                                    converter.Convert(m_threadBuf, grabResult);
+
+                                    converter.Convert(m_threadBuf.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.GetBytePerPixel(), grabResult);
                                 }
-                                else if (m_ImageGrab.p_nByte == 1)
+                                else if (m_ImageGrab.GetBytePerPixel() == 1)
                                 {
-                                    // 이미지 데이터 복사
-                                    m_threadBuf = new byte[imgSize * m_ImageGrab.p_nByte];
-                                    Marshal.Copy(m_ImageGrab.GetPtr(), m_threadBuf, 0, imgSize * m_ImageGrab.p_nByte);
+                                    byte[] aBuf = grabResult.PixelData as byte[];
+                                    Marshal.Copy(aBuf, 0, m_threadBuf.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
                                 }
 
+                                // 스레드 동작 중이 아닐 때 화면 업데이트 위해 새 스레드 실행
                                 if (m_threadImgUpdate.ThreadState == System.Threading.ThreadState.Stopped ||
                                     m_threadImgUpdate.ThreadState == System.Threading.ThreadState.Aborted)
                                 {
@@ -885,7 +892,7 @@ namespace RootTools.Camera.BaslerPylon
 
                 }
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 string strError = e.Message.ToString();
                 Console.WriteLine(strError);
@@ -894,30 +901,27 @@ namespace RootTools.Camera.BaslerPylon
         public string StopGrab()
         {
             GrabStop();
-            return "OK"; 
+            return "OK";
         }
         public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, int nScanOffsetY = 0, bool bInvY = false, int ReserveOffsetY = 0) { }
 
         private Thread m_threadImgUpdate;
-        private byte[] m_threadBuf;
+        private ImageData m_threadBuf;
 
         public void StartImageUpdateThread()
         {
-            int nByte = m_ImageGrab.p_nByte;
-            int x = m_ImageViewer.p_View_Rect.X;
-            int y = m_ImageViewer.p_View_Rect.Y;
-            int rectWidth = m_ImageViewer.p_View_Rect.Width;
-            int rectHeight = m_ImageViewer.p_View_Rect.Height;
+            int nByte = m_ImageGrab.GetBytePerPixel();
+            Rect rect = new Rect(m_ImageViewer.p_View_Rect.X, m_ImageViewer.p_View_Rect.Y, m_ImageViewer.p_View_Rect.Width, m_ImageViewer.p_View_Rect.Height);
             int canvasWidth = m_ImageViewer.p_CanvasWidth;
             int canvasHeight = m_ImageViewer.p_CanvasHeight;
 
-            m_threadImgUpdate = new Thread(() => ImageUpdateThreadFunc(this, nByte, x, y, rectWidth, rectHeight, canvasWidth, canvasHeight));
+            m_threadImgUpdate = new Thread(() => ImageUpdateThreadFunc(this, nByte, rect, canvasWidth, canvasHeight));
             m_threadImgUpdate.Start();
         }
 
-        static unsafe void ImageUpdateThreadFunc(Camera_Basler cam, int nByte, int x, int y, int rectWidth, int rectHeight, int canvasWidth, int canvasHeight)
+        static unsafe void ImageUpdateThreadFunc(Camera_Basler cam, int nByte, Rect rect, int canvasWidth, int canvasHeight)
         {
-            if(cam != null)
+            if (cam != null)
             {
                 // Dispatcher 얻어오기
                 Dispatcher dispatcher = null;
@@ -926,68 +930,31 @@ namespace RootTools.Camera.BaslerPylon
                 else
                     dispatcher = cam._dispatcher;
 
-                if (nByte == 1)
+                ImageData imgData = cam.m_threadBuf;
+                if (imgData != null)
                 {
-                    // 이미지 샘플링
-                    Image<Gray, byte> image = cam.m_ImageViewer.GetSamplingGrayImage();
-
-                        // sampling 함수 추후 직접 구현 예정
-//                     IntPtr ptrMem = cam.m_ImageViewer.p_ImageData.GetPtr();
-//                     if (ptrMem == IntPtr.Zero)
-//                         return;
-// 
-//                     Image<Gray, byte> image = new Image<Gray, byte>(canvasWidth, canvasHeight);
-// 
-//                     Parallel.For(0, canvasHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (yy) =>
-//                     {
-//                         long pix_y = y + yy * rectHeight / canvasHeight;
-// 
-//                         for (int xx = 0; xx < canvasWidth; xx++)
-//                         {
-//                             long pix_x = x + xx * rectWidth / canvasWidth;
-//                             image.Data[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * x];
-//                         }
-//                     });
-
-
-                    // Dispatcher를 통해 메인스레드에서 화면표시
-                    dispatcher.Invoke(new Action(delegate ()
+                    if (nByte == 1)
                     {
-                        cam.m_ImageViewer.SetImageSource(image);
-                        //cam.m_ImageGrab.UpdateImage();
-                    }));
-                }
-                else if (nByte == 3)
-                {
-                    // 이미지 샘플링
-                    Image<Rgb, byte> image = cam.m_ImageViewer.GetSamplingRgbImage();
-                    
-                    // sampling 함수 추후 직접 구현 예정
-//                     IntPtr ptrMem = cam.m_ImageViewer.p_ImageData.GetPtr();
-//                     if (ptrMem == IntPtr.Zero)
-//                         return;
-// 
-//                     Image<Gray, byte> image = new Image<Gray, byte>(canvasWidth, canvasHeight);
-// 
-//                     Parallel.For(0, canvasHeight, (yy) =>
-//                     {
-//                         long pix_y = y + yy * rectHeight / canvasHeight;
-//                         for (int xx = 0; xx < canvasWidth; xx++)
-//                         {
-//                             long pix_x = x + xx * rectWidth / canvasWidth;
-// 
-//                             image.Data[yy, xx, 0] = ((byte*)ptrMem)[(pix_x * nByte + 0) + (long)pix_y * (x * 3)];
-//                             image.Data[yy, xx, 1] = ((byte*)ptrMem)[(pix_x * nByte + 1) + (long)pix_y * (x * 3)];
-//                             image.Data[yy, xx, 2] = ((byte*)ptrMem)[(pix_x * nByte + 2) + (long)pix_y * (x * 3)];
-//                         }
-//                     });
+                        // 이미지 샘플링
+                        Image<Gray, byte> image = cam.m_ImageViewer.GetSamplingGrayImage(cam.m_threadBuf, rect, canvasWidth, canvasHeight);
 
-                    // Dispatcher를 통해 메인스레드에서 화면표시
-                    dispatcher.Invoke(new Action(delegate ()
+                        // Dispatcher를 통해 메인스레드에서 화면표시
+                        dispatcher.Invoke(new Action(delegate ()
+                        {
+                            cam.m_ImageViewer.SetImageSource(image);
+                        }));
+                    }
+                    else if (nByte == 3)
                     {
-                        cam.m_ImageViewer.SetImageSource(image);
-                        //cam.m_ImageGrab.UpdateImage();
-                    }));
+                        // 이미지 샘플링
+                        Image<Rgb, byte> image = cam.m_ImageViewer.GetSamplingRgbImage(cam.m_threadBuf, rect, canvasWidth, canvasHeight, false);
+
+                        // Dispatcher를 통해 메인스레드에서 화면표시
+                        dispatcher.Invoke(new Action(delegate ()
+                        {
+                            cam.m_ImageViewer.SetImageSource(image);
+                        }));
+                    }
                 }
             }
         }
