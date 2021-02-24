@@ -19,7 +19,7 @@ namespace Root_CAMELLIA.Data
         public RecipeData MeasurementRD { get; set; }
         public ModelData ModelData { get; set; }
         public string TeachingRecipePath { get; set; }
-        public string TeachRecipeName { get; set; }
+        public string TeachRecipeName { get; set; } = "";
         public RecipeDataManager(DataManager DM)
         {
             dataManager = DM;
@@ -29,7 +29,7 @@ namespace Root_CAMELLIA.Data
             MeasurementRD = new RecipeData();
             ModelData = new ModelData();
         }
-        public void RecipeNew()
+        public bool RecipeNew()
         {
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.DefaultExt = "aco";
@@ -39,18 +39,18 @@ namespace Root_CAMELLIA.Data
             {
                 TeachingRecipePath = dialog.FileName;
                 string strTeachingRecipeName = Path.GetFileName(dialog.FileName);
-                strTeachingRecipeName = strTeachingRecipeName.Remove(strTeachingRecipeName.Length - 4);
+                TeachRecipeName = strTeachingRecipeName.Remove(strTeachingRecipeName.Length - 4);
                 dataManager.recipeDM.TeachingRD = null;
                 dataManager.recipeDM.TeachingRD = new RecipeData();
 
+                dataManager.recipeDM.TeachingRD.Clone(dataManager.recipeDM.MeasurementRD);
                 dialog.FileName = AddFolderPath(dialog.FileName);
                 GeneralFunction.Save(dataManager.recipeDM.TeachingRD, dialog.FileName);
+                return true;
             }
+            return false;
         }
-        public void ReadRecipe(string path)
-        {
 
-        }
         public bool RecipeOpen(string path = null)
         {
             OpenFileDialog dialog = new OpenFileDialog();

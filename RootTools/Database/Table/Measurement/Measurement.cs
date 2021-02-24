@@ -9,8 +9,7 @@ namespace RootTools.Database
 {
     public class Measurement
     {
-        // 각 Inspection에서 올라오는 결과 데이터
-        public int m_nMeasurementIndex; //
+        public int m_nMeasurementIndex;
         public string m_strInspectionID;
 
         public string m_strSide;
@@ -20,6 +19,7 @@ namespace RootTools.Database
         public float m_fData;
         public float m_fWidth;
         public float m_fHeight;
+        public float m_fAngle;
 
         public float m_fRelX; // 절대좌표 - CeterPoint
         public float m_fRelY;
@@ -29,7 +29,8 @@ namespace RootTools.Database
         public int m_nChipIndexX; // Chip Index
         public int m_nCHipIndexY;
 
-        public Rect m_rtDefectBox;
+        protected Rect m_rtDefectBox;
+        public Rect p_rtDefectBox { get => m_rtDefectBox; set => m_rtDefectBox = value; }
 
         public enum MeasureType
 		{
@@ -47,7 +48,7 @@ namespace RootTools.Database
 
         }
 
-        public Measurement(string strInspectionID, string strSide, string strType, string strMeasureName, float fData, float fDefectW, float fDefectH, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)
+        public Measurement(string strInspectionID, string strSide, string strType, string strMeasureName, float fData, float fDefectW, float fDefectH, float fAngle, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)
         {
             m_strInspectionID = strInspectionID;
             m_strSide = strSide;
@@ -57,6 +58,7 @@ namespace RootTools.Database
             m_fData = fData;
             m_fWidth = fDefectW;
             m_fHeight = fDefectH;
+            m_fAngle = fAngle;
 
             m_fAbsX = fDefectAbsLeft + fDefectW / 2;
             m_fAbsY = fDefectAbsTop + fDefectH / 2;
@@ -65,11 +67,16 @@ namespace RootTools.Database
             m_nCHipIndexY = nChipIdxY;
 
 			m_rtDefectBox = new Rect(fDefectAbsLeft, fDefectAbsTop, fDefectW, fDefectH);
-		}
+        }
 
         public void SetMeasureIndex(int nIndex)
         {
             m_nMeasurementIndex = nIndex;
+        }
+
+        public Rect GetRect()
+        {
+            return p_rtDefectBox;
         }
     }
 }

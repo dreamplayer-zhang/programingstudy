@@ -19,6 +19,11 @@ namespace RootTools.Camera.Dalsa
 
         #region Property
         public string p_id { get; set; }
+        public bool bStopThread
+        {
+            get;
+            set;
+        }
 
         string _sInfo = "OK";
         public string p_sInfo

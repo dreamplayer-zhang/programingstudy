@@ -677,11 +677,11 @@ namespace Root_EFEM.Module
 
         string CmdLoad()
         {
-            if (IsLock())
-            {
-                m_alidLoad.Run(true, p_id + " Lock by WTR");
-                return p_id + " Lock by WTR";
-            }
+            //if (IsLock())
+            //{
+            //    m_alidLoad.Run(true, p_id + " Lock by WTR");
+            //    return p_id + " Lock by WTR";
+            //}
             //0202 확인
             Protocol protocol = new Protocol(eCmd.Load, this);
             m_qProtocol.Enqueue(protocol);
@@ -690,11 +690,11 @@ namespace Root_EFEM.Module
 
         string CmdUnload()
         {
-            if (IsLock())
-            {
-                m_alidUnLoad.Run(true, p_id + " Lock by WTR");
-                return p_id + " Lock by WTR";
-            }
+            //if (IsLock())
+            //{
+            //    m_alidUnLoad.Run(true, p_id + " Lock by WTR");
+            //    return p_id + " Lock by WTR";
+            //}
             Protocol protocol = new Protocol(eCmd.Unload, this);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitDone(m_secLoad);
@@ -1019,7 +1019,7 @@ namespace Root_EFEM.Module
                             break;
                     }
                 }
-                infoCarrier.SetMapData(aSlot);
+                if (!EQ.p_bRecovery) infoCarrier.SetMapData(aSlot);
                 m_infoCarrier.SendSlotMap();
                 while (m_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
                 {

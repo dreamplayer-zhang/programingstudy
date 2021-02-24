@@ -1,5 +1,9 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,7 +12,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -19,7 +25,7 @@ namespace Root_CAMELLIA
     /// <summary>
     /// Explorer.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Explorer : UserControl
+    public partial class Explorer : System.Windows.Controls.UserControl
     {
         public Explorer()
         {
@@ -41,12 +47,13 @@ namespace Root_CAMELLIA
                 }
                 try
                 {
-                    TreeViewItem item = new TreeViewItem();
+                    ImageTreeViewItem item = new ImageTreeViewItem();
                     item.Header = str;
                     item.Tag = str;
                     item.IsExpanded = true;
                     item.Expanded += new RoutedEventHandler(item_Expanded);   // 노드 확장시 추가
-
+                    item.Collapsed += new RoutedEventHandler(item_Collapsed);
+                    item.ImageUrl = new Uri("pack://application:,,/Resource/326.ico");
                     ExplorerTree.Items.Add(item);
                     GetSubDirectories(item);
                 }
@@ -68,7 +75,7 @@ namespace Root_CAMELLIA
                 string strPath = itemParent.Tag as string;
                 try
                 {
-                    if (itemParent.Items.GetItemAt(0).ToString() == "")
+                    if (itemParent.Items.Count != 0 && itemParent.Items.GetItemAt(0).ToString() == "")
                         itemParent.Items.RemoveAt(0);
                 }
                 
@@ -83,12 +90,35 @@ namespace Root_CAMELLIA
                     ImageTreeViewItem item = new ImageTreeViewItem();
                     item.Header = dInfo.Name;
                     item.Tag = dInfo.FullName + "\\";
+                   
                     item.Expanded += new RoutedEventHandler(item_Expanded);
+                    item.Collapsed += new RoutedEventHandler(item_Collapsed);
                     itemParent.Items.Add(item);
 
-                    if(dInfo.GetDirectories().Length > 0)
+                    if(dInfo.GetDirectories().Length >= 0)
                     {
-                        item.Items.Add("");
+                        item.ImageUrl = new Uri("pack://application:,,/Resource/1437.ico");
+                        GetSubDirectories(item);
+                        //item.Items.Add(dInfo.Name);
+                    }
+                    if(dInfo.GetFiles().Length > 0)
+                    {
+                        foreach (FileInfo file in dInfo.GetFiles())
+                        {
+                            Icon iconForFile = SystemIcons.WinLogo;
+
+                            ImageList imageList = new ImageList();
+                            ImageTreeViewItem fileItem = new ImageTreeViewItem();
+                            fileItem.Header = file.Name;
+                            fileItem.Tag = file.FullName;
+                            if (!imageList.Images.ContainsKey(file.Extension))
+                            {
+                                iconForFile = System.Drawing.Icon.ExtractAssociatedIcon(file.FullName);
+                                fileItem.FileIcon = iconForFile;
+                            }
+                                
+                            item.Items.Add(fileItem);
+                        }
                     }
                 }
             }
@@ -99,12 +129,35 @@ namespace Root_CAMELLIA
             }
         }
 
+        void item_Collapsed(object sender, RoutedEventArgs e)
+        {
+            ImageTreeViewItem itemParent = sender as ImageTreeViewItem;
+            if (itemParent.IsExpanded)
+            {
+                return;
+            }
+            string path = itemParent.Header.ToString();
+            if (path.Contains(@"\"))
+            {
+                return;
+            }
+            itemParent.ImageUrl = new Uri("pack://application:,,/Resource/1437.ico");
+            string name = itemParent.Tag.ToString();
+        
+        }
         // 트리확장시 내용 추가
         void item_Expanded(object sender, RoutedEventArgs e)
         {
             ImageTreeViewItem itemParent = sender as ImageTreeViewItem;
             if (itemParent == null) return;
             if (itemParent.Items.Count == 0) return;
+            string path = itemParent.Header.ToString();
+            if (!path.Contains(@"\"))
+            {
+                itemParent.ImageUrl = new Uri("pack://application:,,/Resource/open2.png");
+            }
+            
+            
 
             if (itemParent.Items.Count == 1 && itemParent.Items.GetItemAt(0).ToString() == "")
             {
@@ -124,13 +177,47 @@ namespace Root_CAMELLIA
         }
     }
 
-    public class ImageTreeViewItem : TreeViewItem
+    public class HeaderToImageConverter : IValueConverter
+    {
+        public static HeaderToImageConverter Instance =
+            new HeaderToImageConverter();
+
+        public object Convert(object value, Type targetType,
+            object parameter, CultureInfo culture)
+        {
+            if ((value as string).Contains(@"\"))
+            {
+                Uri uri = new Uri
+                ("pack://application:,,,/Images/diskdrive.png");
+                BitmapImage source = new BitmapImage(uri);
+                return source;
+            }
+            else
+            {
+                Uri uri = new Uri("pack://application:,,,/Images/folder.png");
+                BitmapImage source = new BitmapImage(uri);
+                return source;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType,
+            object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException("Cannot convert back");
+        }
+    }
+
+    public class ImageTreeViewItem : TreeViewItem, INotifyPropertyChanged
     {
         #region Data Member
 
         Uri _imageUrl = null;
-        Image _image = null;
+        Icon _fileIcon = null;
+        System.Windows.Controls.Image _image = null;
+        ImageSource _imgSource = null;
         TextBlock _textBlock = null;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
 
@@ -142,7 +229,36 @@ namespace Root_CAMELLIA
             set
             {
                 _imageUrl = value;
-                _image.Source = new BitmapImage(value);
+                IconImage = new BitmapImage(value);
+                OnPropertyChanged("ImageUrl");
+            }
+        }
+
+        public ImageSource IconImage
+        {
+            get { return _imgSource; }
+            set
+            {
+                _imgSource = value;
+                OnPropertyChanged("IconImage");
+            }
+        }
+
+        public Icon FileIcon
+        {
+            get { return _fileIcon; }
+            set
+            {
+                _fileIcon = value;
+                Bitmap bitmap = value.ToBitmap();
+                IntPtr hBitmap = bitmap.GetHbitmap();
+                ImageSource wpfBitmap =
+     Imaging.CreateBitmapSourceFromHBitmap(
+          hBitmap, IntPtr.Zero, Int32Rect.Empty,
+          BitmapSizeOptions.FromEmptyOptions());
+                //bitmap.Save(@"D:\Root_Cameliia2\Root\Root_CAMELLIA\Resource\test.bmp");
+                IconImage = wpfBitmap;
+                OnPropertyChanged("ImageUrl");
             }
         }
 
@@ -168,9 +284,9 @@ namespace Root_CAMELLIA
         private void CreateTreeViewItemTemplate()
         {
             StackPanel stack = new StackPanel();
-            stack.Orientation = Orientation.Horizontal;
+            stack.Orientation = System.Windows.Controls.Orientation.Horizontal;
 
-            _image = new Image();
+            _image = new System.Windows.Controls.Image();
             _image.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             _image.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             _image.Width = 16;
@@ -187,7 +303,14 @@ namespace Root_CAMELLIA
 
             Header = stack;
         }
-
         #endregion
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if(handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
     }
 }

@@ -19,7 +19,7 @@ using System.Windows.Forms;
 
 namespace RootTools_Vision
 {
-    public class Tools
+    public partial class Tools
     {
         public static byte[] CovertImageToArray(Image img)
         {
@@ -162,13 +162,31 @@ namespace RootTools_Vision
                         byte* pR = (byte*)rawDataR.ToPointer();
                         byte* pG = (byte*)rawDataG.ToPointer();
                         byte* pB = (byte*)rawDataB.ToPointer();
+
+                        for (int i = 0; i < rt.Y; i++)
+                        {
+                            pR += _memWidth;
+                            pG += _memWidth;
+                            pB += _memWidth;
+                        }
+
+                        pR += (int)rt.X;
+                        pG += (int)rt.X;
+                        pB += (int)rt.X;
+
                         for (int i = 0; i < 480; i++)
+                        {
                             for (int j = 0; j < 640; j++)
                             {
-                                pPointer[i * (saveW * 3) + j * _byteCount + 0] = pB[(i + (int)(rt.Y)) * _memWidth + (j + (int)(rt.X))];
-                                pPointer[i * (saveW * 3) + j * _byteCount + 1] = pG[(i + (int)(rt.Y)) * _memWidth + (j + (int)(rt.X))];
-                                pPointer[i * (saveW * 3) + j * _byteCount + 2] = pR[(i + (int)(rt.Y)) * _memWidth + (j + (int)(rt.X))];
+                                pPointer[i * (saveW * 3) + j * _byteCount + 0] = *(pB + j);
+                                pPointer[i * (saveW * 3) + j * _byteCount + 1] = *(pG + j);
+                                pPointer[i * (saveW * 3) + j * _byteCount + 2] = *(pR + j);
                             }
+
+                            pR += _memWidth;
+                            pG += _memWidth;
+                            pB += _memWidth;
+                        }
                     }
                 }
                 bmp.UnlockBits(bmpData);
@@ -354,6 +372,13 @@ namespace RootTools_Vision
                 dstR[i] = srcColor[i * 3];
                 dstG[i] = srcColor[i * 3 + 1];
                 dstB[i] = srcColor[i * 3 + 2];
+            }
+        }
+        public static void ConvertRGB2Gray(byte[] srcColor, byte[] dstGray)
+        {
+            for (int i = 0; i < srcColor.Length / 3; i++)
+            {
+                dstGray[i] = (byte)(0.299 * srcColor[i * 3] + 0.587 * srcColor[i * 3 + 1] + 0.114 * srcColor[i * 3 + 2]);
             }
         }
         public static bool LoadBitmapToRawdata(string filepath, byte[] rawdata, int _width, int _height, int _byteCount)
@@ -558,7 +583,8 @@ namespace RootTools_Vision
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message);
+                //System.Windows.MessageBox.Show(ex.Message);
+                TempLogger.Write("Tools", ex);
             }
 
             return null;

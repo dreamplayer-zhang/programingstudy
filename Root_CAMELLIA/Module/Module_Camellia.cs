@@ -29,6 +29,7 @@ using System.Windows.Diagnostics;
 using Root_EFEM.Module;
 using Root_EFEM;
 using static RootTools.Control.Axis;
+using RootTools.GAFs;
 
 namespace Root_CAMELLIA.Module
 {
@@ -74,6 +75,32 @@ namespace Root_CAMELLIA.Module
             set
             {
                 m_axisLifter = value;
+            }
+        }
+
+        AxisXY m_tiltAxisXY;
+        public AxisXY p_tiltAxisXY
+        {
+            get
+            {
+                return m_tiltAxisXY;
+            }
+            set
+            {
+                m_tiltAxisXY = value;
+            }
+        }
+
+        Axis m_tiltAxisZ;
+        public Axis p_tiltAxisZ
+        {
+            get
+            {
+                return m_tiltAxisZ;
+            }
+            set
+            {
+                m_tiltAxisZ = value;
             }
         }
 
@@ -144,7 +171,26 @@ namespace Root_CAMELLIA.Module
         DIO_I m_axisYReady;
         DIO_I m_vacuum;
         DIO_O m_vacuumOnOff;
-        public Camera_Basler m_CamVRS;
+        DIO_Os m_doLamp;
+        DIO_Os m_doBuzzer;
+        DIO_I m_diEMS;
+        DIO_I m_diProtectionBar;
+        DIO_I m_diMCReset;
+
+
+        private Camera_Basler m_CamVRS;
+        public Camera_Basler p_CamVRS
+        {
+            get
+            {
+                return m_CamVRS;
+            }
+            set
+            {
+                m_CamVRS = value;
+            }
+        }
+        
 
         #region Light
         public LightSet m_lightSet;
@@ -188,19 +234,30 @@ namespace Root_CAMELLIA.Module
         }
         #endregion
 
+
+
         #endregion
+
+
+     
 
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_diEMS, this, "EMS");
+            p_sInfo = m_toolBox.Get(ref m_diProtectionBar, this, "ProtectionBar");
+            p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
             p_sInfo = m_toolBox.Get(ref m_axisLifter, this, "StageLifter");
+            p_sInfo = m_toolBox.Get(ref m_tiltAxisXY, this, "TiltXY");
+            p_sInfo = m_toolBox.Get(ref m_tiltAxisZ, this, "TiltZ");
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_axisXReady, this, "Stage X Ready");
             p_sInfo = m_toolBox.Get(ref m_axisYReady, this, "Stage Y Ready");
             p_sInfo = m_toolBox.Get(ref m_vacuum, this, "Vaccum On");
             p_sInfo = m_toolBox.Get(ref m_vacuumOnOff, this, "Vaccum OnOff");
+
         }
         public Module_Camellia(string id, IEngineer engineer)
         {
@@ -220,7 +277,7 @@ namespace Root_CAMELLIA.Module
         {
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_InitCalibration(this), true, "InitCalCentering");
-            AddModuleRunList(new Run_CalibrationWaferCentering(this), true, "Bacground Calibration_Centering");
+            AddModuleRunList(new Run_CalibrationWaferCentering(this), true, "Background Calibration_Centering");
             AddModuleRunList(new Run_Measure(this), true, "Measurement");
         }
 
@@ -229,6 +286,10 @@ namespace Root_CAMELLIA.Module
             p_sInfo = "OK";
             if (EQ.p_bSimulate)
                 return "OK";
+
+            m_tiltAxisXY.p_axisX.p_eState = Axis.eState.Ready;
+            m_tiltAxisXY.p_axisY.p_eState = Axis.eState.Ready;
+            m_tiltAxisZ.p_eState = Axis.eState.Ready;
 
             Thread.Sleep(200);
             if (m_listAxis.Count == 0) return "OK";
@@ -250,6 +311,7 @@ namespace Root_CAMELLIA.Module
             {
                 p_eState = eState.Error;
                 p_sInfo = "Vacuum is not turn off";
+                MessageBox.Show(p_sInfo);
                 return p_sInfo;
             }
             p_axisLifter.StartHome();
@@ -257,6 +319,7 @@ namespace Root_CAMELLIA.Module
             {
                 p_eState = eState.Error;
                 p_sInfo = "Lifter Home Error";
+                MessageBox.Show(p_sInfo);
                 return p_sInfo;
             }
 
@@ -445,6 +508,7 @@ namespace Root_CAMELLIA.Module
 
         public string BeforeGet(int nID)
         {
+            m_CamVRS.FunctionConnect();
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;

@@ -12,6 +12,7 @@ namespace RootTools_Vision
 		// Camera
 		private int cameraWidth;
 		private int cameraHeight;
+		private double cameraResolution;
 		private double cameraTriggerRatio;
 		private int imageOffset;
 
@@ -30,6 +31,11 @@ namespace RootTools_Vision
 		{
 			get => this.cameraHeight;
 			set => SetProperty<int>(ref this.cameraHeight, value);
+		}
+		public double Resolution
+		{
+			get => this.cameraResolution;
+			set => SetProperty<double>(ref this.cameraResolution, value);
 		}
 		public double TriggerRatio
 		{
