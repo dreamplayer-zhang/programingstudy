@@ -270,6 +270,9 @@
     <Compile Include="Module\Module_FFU.cs" />
     <Compile Include="Module\Interlock.cs" />
     <Compile Include="Module\TowerLamp.cs" />
+    <Compile Include="UI_Dialog\Dlg_OHT.xaml.cs">
+      <DependentUpon>Dlg_OHT.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_Dialog\test.xaml.cs">
       <DependentUpon>test.xaml</DependentUpon>
     </Compile>
@@ -372,6 +375,10 @@
     <Page Include="LibSR_Met\RTGraph.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_OHT.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_Dialog\test.xaml">
       <SubType>Designer</SubType>
