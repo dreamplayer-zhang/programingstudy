@@ -25,6 +25,11 @@ namespace Root_CAMELLIA.UI_Dialog
             InitializeComponent();
         }
 
+        public void Init(ILoadport loadport)
+        {
+
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
         }
