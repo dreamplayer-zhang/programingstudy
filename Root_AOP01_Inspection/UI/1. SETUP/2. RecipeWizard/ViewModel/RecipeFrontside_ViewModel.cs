@@ -607,7 +607,89 @@ namespace Root_AOP01_Inspection
                         surfaceInspection.UpdateTree();
 
                         mainVision.StartRun(surfaceInspection);
-					}
+
+
+                        MainVision.Run_SurfaceInspection pell = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.PellicleModuleName);
+
+                        pell.BrightGV = BrightGV;
+                        pell.SurfaceGV = SurfaceGV;
+                        pell.SurfaceSize = SurfaceSize;
+
+                        pell.InspectionOffsetX_Left = InspectionOffsetX_Left;
+                        pell.InspectionOffsetX_Right = InspectionOffsetX_Right;
+                        pell.InspectionOffsetY = InspectionOffsetY;
+                        pell.BlockSizeWidth = BlockSizeWidth;
+                        pell.BlockSizeHeight = BlockSizeHeight;
+                        pell.UpdateTree();
+
+                        mainVision.StartRun(pell);
+
+
+
+
+                        MainVision.Run_SurfaceInspection left = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideLeftModuleName);
+
+                        left.BrightGV = BrightGV;
+                        left.SurfaceGV = SurfaceGV;
+                        left.SurfaceSize = SurfaceSize;
+
+                        left.InspectionOffsetX_Left = InspectionOffsetX_Left;
+                        left.InspectionOffsetX_Right = InspectionOffsetX_Right;
+                        left.InspectionOffsetY = InspectionOffsetY;
+                        left.BlockSizeWidth = BlockSizeWidth;
+                        left.BlockSizeHeight = BlockSizeHeight;
+                        left.UpdateTree();
+
+                        mainVision.StartRun(left);
+
+
+                        MainVision.Run_SurfaceInspection right = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideRightModuleName);
+
+                        right.BrightGV = BrightGV;
+                        right.SurfaceGV = SurfaceGV;
+                        right.SurfaceSize = SurfaceSize;
+
+                        right.InspectionOffsetX_Left = InspectionOffsetX_Left;
+                        right.InspectionOffsetX_Right = InspectionOffsetX_Right;
+                        right.InspectionOffsetY = InspectionOffsetY;
+                        right.BlockSizeWidth = BlockSizeWidth;
+                        right.BlockSizeHeight = BlockSizeHeight;
+                        right.UpdateTree();
+
+                        mainVision.StartRun(right);
+
+
+                        MainVision.Run_SurfaceInspection bot = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideBotModuleName);
+
+                        bot.BrightGV = BrightGV;
+                        bot.SurfaceGV = SurfaceGV;
+                        bot.SurfaceSize = SurfaceSize;
+
+                        bot.InspectionOffsetX_Left = InspectionOffsetX_Left;
+                        bot.InspectionOffsetX_Right = InspectionOffsetX_Right;
+                        bot.InspectionOffsetY = InspectionOffsetY;
+                        bot.BlockSizeWidth = BlockSizeWidth;
+                        bot.BlockSizeHeight = BlockSizeHeight;
+                        bot.UpdateTree();
+
+                        mainVision.StartRun(bot);
+
+
+                        MainVision.Run_SurfaceInspection top = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideTopModuleName);
+
+                        top.BrightGV = BrightGV;
+                        top.SurfaceGV = SurfaceGV;
+                        top.SurfaceSize = SurfaceSize;
+
+                        top.InspectionOffsetX_Left = InspectionOffsetX_Left;
+                        top.InspectionOffsetX_Right = InspectionOffsetX_Right;
+                        top.InspectionOffsetY = InspectionOffsetY;
+                        top.BlockSizeWidth = BlockSizeWidth;
+                        top.BlockSizeHeight = BlockSizeHeight;
+                        top.UpdateTree();
+
+                        mainVision.StartRun(top);
+                    }
 				});
             }
         }

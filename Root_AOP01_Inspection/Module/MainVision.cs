@@ -1036,24 +1036,24 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(main, true, "Run "+ App.MainModuleName);
 
 
-            var pell = new Run_SurfaceInspection(this, App.PellRecipeRegName, App.PellInspMgRegName);
+            var pell = new Run_PellSideInspection (this, App.PellRecipeRegName, App.PellInspMgRegName);
             pell.m_sModuleRun = App.PellicleModuleName;
             AddModuleRunList(pell, true, "Run " + App.PellicleModuleName);
 
 
-            var left = new Run_SurfaceInspection(this, App.SideRecipeRegName, App.SideLeftInspMgRegName);
+            var left = new Run_LeftSideInspection(this, App.SideRecipeRegName, App.SideLeftInspMgRegName);
             left.m_sModuleRun = App.SideLeftModuleName;
             AddModuleRunList(left, true, "Run " + App.SideLeftModuleName);
 
-            var top = new Run_SurfaceInspection(this, App.SideRecipeRegName, App.SideTopInspMgRegName);
+            var top = new Run_TopSideInspection(this, App.SideRecipeRegName, App.SideTopInspMgRegName);
             top.m_sModuleRun = App.SideTopModuleName;
             AddModuleRunList(top, true, "Run " + App.SideTopModuleName);
 
-            var right = new Run_SurfaceInspection(this, App.SideRecipeRegName, App.SideRightInspMgRegName);
+            var right = new Run_RightSideInspection(this, App.SideRecipeRegName, App.SideRightInspMgRegName);
             right.m_sModuleRun = App.SideRightModuleName;
             AddModuleRunList(right, true, "Run " + App.SideRightModuleName);
 
-            var bottom = new Run_SurfaceInspection(this, App.SideRecipeRegName, App.SideBotInspMgRegName);
+            var bottom = new Run_BotSideInspection(this, App.SideRecipeRegName, App.SideBotInspMgRegName);
             bottom.m_sModuleRun = App.SideBotModuleName;
             AddModuleRunList(bottom, true, "Run " + App.SideBotModuleName);
 
@@ -1115,7 +1115,38 @@ namespace Root_AOP01_Inspection.Module
                 return "OK";
             }
         }
-		public class Run_SurfaceInspection : ModuleRunBase
+		public class Run_LeftSideInspection : Run_SurfaceInspection
+		{
+			public Run_LeftSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+			{
+			}
+        }
+        public class Run_TopSideInspection : Run_SurfaceInspection
+        {
+            public Run_TopSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+            {
+            }
+        }
+        public class Run_RightSideInspection : Run_SurfaceInspection
+        {
+            public Run_RightSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+            {
+            }
+        }
+        public class Run_BotSideInspection : Run_SurfaceInspection
+        {
+            public Run_BotSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+            {
+            }
+        }
+        public class Run_PellSideInspection : Run_SurfaceInspection
+        {
+            public Run_PellSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+            {
+            }
+        }
+
+        public class Run_SurfaceInspection : ModuleRunBase
 		{
 
 			MainVision m_module;
