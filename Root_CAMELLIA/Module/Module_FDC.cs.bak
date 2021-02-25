@@ -155,6 +155,7 @@ namespace Root_CAMELLIA.Module
                 p_fValue = nValue / m_fDiv;
             }
 
+            bool m_IsUpdate = false;
             public bool p_IsUpdate { get; set; }
             
             public void RunTree(Tree tree, int module_number)

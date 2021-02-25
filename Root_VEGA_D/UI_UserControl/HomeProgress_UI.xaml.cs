@@ -3,18 +3,8 @@ using Root_VEGA_D.Engineer;
 using RootTools;
 using RootTools.Module;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace Root_VEGA_D
@@ -68,7 +58,7 @@ namespace Root_VEGA_D
             if (bShow) this.Show();
             if (m_handler.m_wtr.p_eState == ModuleBase.eState.Home)
             {
-                progressWTR.Value = (int)(100 * Math.Min((m_swWTR.ElapsedMilliseconds / (((WTR_Cymechs)m_handler.m_wtr).m_secHome * 1000)), 1.0));
+                progressWTR.Value = (int)(100 * Math.Min((double)((double)m_swWTR.ElapsedMilliseconds / (((WTR_Cymechs)m_handler.m_wtr).m_secHome * 1000)), (double)1.0));
             }
             else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Ready) progressWTR.Value = 100;
             else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Error) progressWTR.Value = 0;    //working
@@ -76,7 +66,7 @@ namespace Root_VEGA_D
 
             if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Home)
             {
-                progressLP1.Value = (int)(100 * Math.Min((m_swLoadport[0].ElapsedMilliseconds / (m_handler.m_aLoadport[0].p_secHome * 1000)), 1.0));
+                progressLP1.Value = (int)(100 * Math.Min((double)((double)m_swLoadport[0].ElapsedMilliseconds / (m_handler.m_aLoadport[0].p_secHome * 1000)), (double)1.0));
             }
             else if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Ready) progressLP1.Value = 100;
             else if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Error) progressLP1.Value = 0;    //working
@@ -84,7 +74,7 @@ namespace Root_VEGA_D
 
             if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Home)
             {
-                progressLP2.Value = (int)(100 * Math.Min((m_swLoadport[1].ElapsedMilliseconds / (m_handler.m_aLoadport[1].p_secHome * 1000)), 1.0));
+                progressLP2.Value = (int)(100 * Math.Min((double)((double)m_swLoadport[1].ElapsedMilliseconds / (m_handler.m_aLoadport[1].p_secHome * 1000)), (double)1.0));
             }
             else if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Ready) progressLP2.Value = 100;
             else if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Error) progressLP2.Value = 0;    //working
