@@ -294,6 +294,7 @@
     <Compile Include="Database\Table\Defect\Defect.cs" />
     <Compile Include="Database\Table\Defect\DefectManager.cs" />
     <Compile Include="Database\Table\Lotinfo.cs" />
+    <Compile Include="Database\Table\Measurement\EBRMeasurement.cs" />
     <Compile Include="Database\Table\Measurement\Measurement.cs" />
     <Compile Include="Database\Table\Measurement\MeasurementManager.cs" />
     <Compile Include="Camera\Matrox\Camera_Matrox.cs" />
