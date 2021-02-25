@@ -129,7 +129,7 @@ namespace RootTools.Comm
 
         #region Send
         AsyncCallback m_cbSend;
-        static object g_lock = new object();
+        static readonly object g_lock = new object();
         public string Send(string sMsg)
         {
             if (m_socket == null) return "Not Connected";
