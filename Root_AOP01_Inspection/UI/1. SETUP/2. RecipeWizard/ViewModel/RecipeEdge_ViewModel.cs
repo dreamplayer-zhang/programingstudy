@@ -139,8 +139,8 @@ namespace Root_AOP01_Inspection
 				//tempList = new List<TRect>(viewer.TRectList);
 				MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideBotModuleName);
 				surfaceInspection.EdgeList = new List<TRect>(m_ImageViewerBot_VM.TRectList).ToArray();
-				surfaceInspection.UpdateTree();
-				surfaceInspection.RefreshTree();
+				//surfaceInspection.UpdateTree();
+				//surfaceInspection.RefreshTree();
 			}
 			//top
 			if (m_ImageViewerTop_VM.TRectList.Count == 6)
@@ -148,8 +148,8 @@ namespace Root_AOP01_Inspection
 				//tempList = new List<TRect>(viewer.TRectList);
 				MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideTopModuleName);
 				surfaceInspection.EdgeList = new List<TRect>(m_ImageViewerTop_VM.TRectList).ToArray();
-				surfaceInspection.UpdateTree();
-				surfaceInspection.RefreshTree();
+				//surfaceInspection.UpdateTree();
+				//surfaceInspection.RefreshTree();
 			}
 			//left
 			if (m_ImageViewerLeft_VM.TRectList.Count == 6)
@@ -157,8 +157,8 @@ namespace Root_AOP01_Inspection
 				//tempList = new List<TRect>(viewer.TRectList);
 				MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideLeftModuleName);
 				surfaceInspection.EdgeList = new List<TRect>(m_ImageViewerLeft_VM.TRectList).ToArray();
-				surfaceInspection.UpdateTree();
-				surfaceInspection.RefreshTree();
+				//surfaceInspection.UpdateTree();
+				//surfaceInspection.RefreshTree();
 			}
 			//right
 			if (m_ImageViewerBot_VM.TRectList.Count == 6)
@@ -166,8 +166,8 @@ namespace Root_AOP01_Inspection
 				//tempList = new List<TRect>(viewer.TRectList);
 				MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideBotModuleName);
 				surfaceInspection.EdgeList = new List<TRect>(m_ImageViewerBot_VM.TRectList).ToArray();
-				surfaceInspection.UpdateTree();
-				surfaceInspection.RefreshTree();
+				//surfaceInspection.UpdateTree();
+				//surfaceInspection.RefreshTree();
 			}
 
 

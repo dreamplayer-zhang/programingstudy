@@ -179,17 +179,17 @@ namespace RootTools.Database
 			}
 		}
 
-		public void SendQuery(string sQueryMessage) // Main
+		public int SendQuery(string sQueryMessage) // Main
 		{
 			if (m_MainConnectSession.IsConnected == false)
-				return;
+				return -1;
 #if !DEBUG
 			try
 			{
 
 #endif
 				MySqlCommand cmd = new MySqlCommand(sQueryMessage, m_MainConnectSession.GetConnection());
-				cmd.ExecuteNonQuery();
+				return cmd.ExecuteNonQuery();
 				//return cmd.ExecuteNonQuery();
 
 #if !DEBUG
@@ -197,6 +197,7 @@ namespace RootTools.Database
 			catch (Exception ex)
 			{
 				string sMessage = ex.Message;
+				return -1;
 			}
 
 #endif
@@ -349,14 +350,67 @@ namespace RootTools.Database
 
 #endif
 		}
+		public bool CheckExistTable(string tableName)
+		{
+			string query = string.Format("SELECT * FROM {0};", tableName);
+			var code = SendQuery(query);
+			if(code == (int)DB_ERROR.TABLE_IS_MISSING)
+			{
+				return false;
+			}
+			else
+			{
+				return true;//다른 에러일 수도 있으니 예외처리등이 필요? ㅁ?ㄹ
+			}
+		}
+		public void CreateTable(string tableName, Type type, string keyName)
+		{
+			StringBuilder stbr = new StringBuilder();
+			stbr.Append(string.Format("CREATE TABLE {0} (",tableName));
+			FieldInfo[] fld = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+			for (int i = 0; i < fld.Count(); i++)
+			{
+				stbr.Append(fld[i].Name);
+				string nullAble = " NULL";
+				if(keyName == fld[i].Name)
+				{
+					nullAble = " NOT NULL";
+					if(fld[i].FieldType == typeof(int))
+					{
+						nullAble += " AUTO_INCREMENT";
+					}
+				}
+				nullAble += ",";
 
-		public void AddDefectDataList(List<Defect> _defectlist)
+				if (fld[i].FieldType == typeof(int))
+				{
+					stbr.Append(" int(11) DEFAULT"+ nullAble);
+				}
+				else if (fld[i].FieldType == typeof(float))
+				{
+					stbr.Append(" double DEFAULT"+ nullAble);
+				}
+				else if (fld[i].FieldType == typeof(string) || fld[i].FieldType == typeof(String))
+				{
+					stbr.Append(" varchar(45) DEFAULT"+ nullAble);
+				}
+			}
+			stbr.Append(string.Format("PRIMARY KEY ({0})) ENGINE=InnoDB DEFAULT CHARSET=utf8;", keyName));
+			var result = SendQuery(stbr.ToString());
+		}
+
+		public void AddDefectDataList(List<Defect> _defectlist, string tableName)
 		{
 #if !DEBUG
 			try
 			{
 #endif
-				SendQuery("TRUNCATE defect;");
+				if(!CheckExistTable(tableName))
+				{
+					//var tableQuery = string.Format("CREATE TABLE '{0}' ('m_nDefectIndex' int(11) NOT NULL AUTO_INCREMENT,'m_strInspectionID' varchar(45) DEFAULT NULL,'m_nDefectCode' int(11) DEFAULT NULL,'m_fSize' double DEFAULT NULL,'m_fWidth' double DEFAULT NULL,'m_fHeight' double DEFAULT NULL,'m_fRelX' double DEFAULT NULL,'m_fRelY' double DEFAULT NULL,'m_fAbsX' double DEFAULT NULL,'m_fAbsY' double DEFAULT NULL,'m_fGV' double DEFAULT NULL,'m_nChipIndexX' int(11) DEFAULT NULL,'m_nCHipIndexY' int(11) DEFAULT NULL,PRIMARY KEY ('m_nDefectIndex')) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;", tableName);
+					CreateTable(tableName, typeof(Defect),nameof(Defect.m_nDefectIndex));
+				}
+				SendQuery(string.Format("TRUNCATE {0};", tableName));
 				StringBuilder temp = new StringBuilder();
 				StringBuilder sbQuery = new StringBuilder();
 				StringBuilder sbColumList = new StringBuilder();
@@ -390,7 +444,7 @@ namespace RootTools.Database
 					sbValueList.Add(temp.ToString());
 				}
 
-				sbQuery.AppendFormat("INSERT INTO defect({0}) values", sbColumList.ToString());
+				sbQuery.AppendFormat("INSERT INTO {0}({1}) values", tableName, sbColumList.ToString());
 				for (int i = 0; i < sbValueList.Count; i++)
 				{
 					sbQuery.Append(sbValueList[i]);

@@ -98,7 +98,7 @@ namespace Root_WIND2
             }
 
             ProcessDefect processDefect = new ProcessDefect();
-            ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
+            ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer("defect");
 
             bundle.Add(processDefect);
             bundle.Add(processDefect_Wafer);

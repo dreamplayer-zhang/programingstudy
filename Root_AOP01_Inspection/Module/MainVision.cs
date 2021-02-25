@@ -1200,33 +1200,9 @@ namespace Root_AOP01_Inspection.Module
 
                 return run;
             }
-
-            internal void UpdateTree()
-            {
-                var temp = localTree.p_treeRoot.p_eMode;
-                localTree.p_treeRoot.p_eMode = Tree.eMode.RegWrite;
-                RunTree(localTree, visible, isRecipe);
-                localTree.p_treeRoot.p_eMode = temp;
-            }
-            internal void RefreshTree()
-            {
-                var temp = localTree.p_treeRoot.p_eMode;
-                localTree.p_treeRoot.p_eMode = Tree.eMode.RegRead;
-                RunTree(localTree, visible, isRecipe);
-                localTree.p_treeRoot.p_eMode = temp;
-            }
-            static Tree localTree;
-            static bool visible;
-            static bool isRecipe;
             //string[] keywords = new string[] { "Main", "SideLeft", "SideTop", "SideBot", "SideRight", "Pellicle"};
 			public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
 			{
-                if(tree!=null)
-                {
-                    localTree = tree;
-                    visible = bVisible;
-                    isRecipe = bRecipe;
-                }
                 string defeaultName = currentMgmName + " EdgeBox #{0}";
 				for (int i = 0; i < 6; i++)
 				{

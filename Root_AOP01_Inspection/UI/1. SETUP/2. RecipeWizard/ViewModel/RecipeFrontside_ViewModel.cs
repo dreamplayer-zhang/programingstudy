@@ -477,8 +477,8 @@ namespace Root_AOP01_Inspection
                 //tempList = new List<TRect>(viewer.TRectList);
                 MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.MainModuleName);
                 surfaceInspection.EdgeList = new List<TRect>(m_ImageViewer_VM.TRectList).ToArray();
-                surfaceInspection.UpdateTree();
-                surfaceInspection.RefreshTree();
+                //surfaceInspection.UpdateTree();
+               // surfaceInspection.RefreshTree();
             }
 		}
         //List<TRect> tempList = new List<TRect>();
@@ -604,7 +604,7 @@ namespace Root_AOP01_Inspection
                         surfaceInspection.InspectionOffsetY = InspectionOffsetY;
                         surfaceInspection.BlockSizeWidth = BlockSizeWidth;
                         surfaceInspection.BlockSizeHeight = BlockSizeHeight;
-                        surfaceInspection.UpdateTree();
+                       // surfaceInspection.UpdateTree();
 
                         mainVision.StartRun(surfaceInspection);
 
@@ -620,7 +620,7 @@ namespace Root_AOP01_Inspection
                         pell.InspectionOffsetY = InspectionOffsetY;
                         pell.BlockSizeWidth = BlockSizeWidth;
                         pell.BlockSizeHeight = BlockSizeHeight;
-                        pell.UpdateTree();
+                       // pell.UpdateTree();
 
                         mainVision.StartRun(pell);
 
@@ -638,7 +638,7 @@ namespace Root_AOP01_Inspection
                         left.InspectionOffsetY = InspectionOffsetY;
                         left.BlockSizeWidth = BlockSizeWidth;
                         left.BlockSizeHeight = BlockSizeHeight;
-                        left.UpdateTree();
+                        //left.UpdateTree();
 
                         mainVision.StartRun(left);
 
@@ -654,7 +654,7 @@ namespace Root_AOP01_Inspection
                         right.InspectionOffsetY = InspectionOffsetY;
                         right.BlockSizeWidth = BlockSizeWidth;
                         right.BlockSizeHeight = BlockSizeHeight;
-                        right.UpdateTree();
+                       // right.UpdateTree();
 
                         mainVision.StartRun(right);
 
@@ -670,7 +670,7 @@ namespace Root_AOP01_Inspection
                         bot.InspectionOffsetY = InspectionOffsetY;
                         bot.BlockSizeWidth = BlockSizeWidth;
                         bot.BlockSizeHeight = BlockSizeHeight;
-                        bot.UpdateTree();
+                        //bot.UpdateTree();
 
                         mainVision.StartRun(bot);
 
@@ -686,7 +686,7 @@ namespace Root_AOP01_Inspection
                         top.InspectionOffsetY = InspectionOffsetY;
                         top.BlockSizeWidth = BlockSizeWidth;
                         top.BlockSizeHeight = BlockSizeHeight;
-                        top.UpdateTree();
+                      //  top.UpdateTree();
 
                         mainVision.StartRun(top);
                     }

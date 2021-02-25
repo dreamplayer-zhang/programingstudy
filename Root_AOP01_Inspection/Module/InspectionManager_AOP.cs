@@ -14,6 +14,7 @@ using RootTools_Vision;
 using MBrushes = System.Windows.Media.Brushes;
 using DPoint = System.Drawing.Point;
 using Root_AOP01_Inspection.Recipe;
+using RootTools.Inspects;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -144,18 +145,21 @@ namespace Root_AOP01_Inspection.Module
 
 			List<ParameterBase> paramList = recipe.ParameterItemList;
 			WorkBundle bundle = new WorkBundle();
+			string tableName = "defect";
 
 			foreach (ParameterBase param in paramList)
 			{
 				WorkBase work = (WorkBase)Tools.CreateInstance(param.InspectionType);
 				work.SetRecipe(recipe);
 				work.SetParameter(param); // 같은 class를 사용하는 parameter 객체가 존재할 수 있으므로 반드시 work를 생성할 때 parameter를 셋팅
+				ReticleSurfaceParameter reticleParam = param as ReticleSurfaceParameter;
+				tableName = InspectionManager.GetInspectionTarget(reticleParam.DefectCode).ToString();
 
 				bundle.Add(work);
 			}
 
 			ProcessDefect processDefect = new ProcessDefect();
-			ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
+			ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer(tableName);
 
 			bundle.Add(processDefect);
 			bundle.Add(processDefect_Wafer);
