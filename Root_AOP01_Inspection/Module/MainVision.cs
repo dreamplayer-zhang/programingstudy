@@ -4124,8 +4124,9 @@ namespace Root_AOP01_Inspection.Module
             public CPoint m_cptReticleCenter = new CPoint();
             public int m_nReticleSize_mm = 150;
             public int m_nReticleInnerOffset_mm = 10;
-            public int m_nPellicleWidth_mm = 100;
-            public int m_nPellicleHeight_mm = 100;
+            public int m_nFrameWidth_mm = 100;
+            public int m_nFrameHeight_mm = 100;
+            public int m_nFrameInnerOffset_mm = 10;
 
             public int m_nReticleEdgeThreshold = 20;
             public int m_nFrameEdgeThreshold = 40;
@@ -4146,6 +4147,8 @@ namespace Root_AOP01_Inspection.Module
                 run.m_cptReticleCenter = m_cptReticleCenter;
                 run.m_nSearchArea = m_nSearchArea;
                 run.m_nReticleEdgeThreshold = m_nReticleEdgeThreshold;
+                run.m_nFrameWidth_mm = m_nFrameWidth_mm;
+                run.m_nFrameHeight_mm = m_nFrameHeight_mm;
                 return run;
             }
 
@@ -4154,6 +4157,8 @@ namespace Root_AOP01_Inspection.Module
                 m_cptReticleCenter = tree.Set(m_cptReticleCenter, m_cptReticleCenter, "Reticle Center Position", "Reticle Center Position", bVisible);
                 m_nSearchArea = tree.Set(m_nSearchArea, m_nSearchArea, "Search Area", "Search Area", bVisible);
                 m_nReticleEdgeThreshold = tree.Set(m_nReticleEdgeThreshold, m_nReticleEdgeThreshold, "Reticle Edge Threshold", "Reticle Edge Threshold", bVisible);
+                m_nFrameWidth_mm = tree.Set(m_nFrameWidth_mm, m_nFrameWidth_mm, "Pellicle Width [mm]", "Pellicle Width [mm]", bVisible);
+                m_nFrameHeight_mm = tree.Set(m_nFrameHeight_mm, m_nFrameHeight_mm, "Pellicle Height [mm]", "Pellicle Height [mm]", bVisible);
             }
 
             public override string Run()
@@ -4164,6 +4169,7 @@ namespace Root_AOP01_Inspection.Module
                 double dResX_um = moduleRunGrab.m_dResX_um;
                 double dResY_um = moduleRunGrab.m_dResY_um;
                 int nMMPerUM = 1000;
+
                 int nInnerPointDistanceFromCenter_px = (int)((((m_nReticleSize_mm - (m_nReticleInnerOffset_mm * 2)) / 2) * nMMPerUM) / dResX_um);
                 int nOutterPointDistanceFromCenter_px = (int)(((m_nReticleSize_mm / 2) * nMMPerUM) / dResX_um);
                 eSearchDirection[] earrReticleEdgeSearchDirection = { eSearchDirection.TopToBottom, eSearchDirection.TopToBottom, eSearchDirection.RightToLeft, eSearchDirection.RightToLeft,
@@ -4174,8 +4180,10 @@ namespace Root_AOP01_Inspection.Module
                 CRect[] arrCRectFrameEdgeROI = new CRect[8];
                 System.Drawing.Point[] ptarrReticleEdgePoint = new System.Drawing.Point[8];
                 System.Drawing.Point[] ptarrFrameEdgePoint = new System.Drawing.Point[8];
-                VectorOfPoint contour = new VectorOfPoint();
+                VectorOfPoint contourReticle = new VectorOfPoint();
+                VectorOfPoint contourFrame = new VectorOfPoint();
                 double dReticleAngle = 0.0;
+                double dFrameAngle = 0.0;
 
                 // implement
                 // Reticle Edge 찾기  -> TL,TR,RT,RB,BR,BL,LB,LT
@@ -4201,12 +4209,12 @@ namespace Root_AOP01_Inspection.Module
                 {
                     if (earrReticleEdgeSearchDirection[i] == eSearchDirection.TopToBottom || earrReticleEdgeSearchDirection[i] == eSearchDirection.BottomToTop)
                     {
-                        if (i == 0 || i == 5)
+                        if (i == 0 || i == 5)   // TL or BL
                         {
                             nTemp = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
                             ptarrReticleEdgePoint[i] = new System.Drawing.Point(m_cptReticleCenter.X - nInnerPointDistanceFromCenter_px, arrCRectReticleEdgeROI[i].Top + nTemp);
                         }
-                        else
+                        else // TR or BR
                         {
                             nTemp = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
                             ptarrReticleEdgePoint[i] = new System.Drawing.Point(m_cptReticleCenter.X + nInnerPointDistanceFromCenter_px, arrCRectReticleEdgeROI[i].Top + nTemp);
@@ -4214,20 +4222,20 @@ namespace Root_AOP01_Inspection.Module
                     }
                     else
                     {
-                        if (i == 2 || i == 7)
+                        if (i == 2 || i == 7)   // RT or LT
                         {
                             nTemp = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
                             ptarrReticleEdgePoint[i] = new System.Drawing.Point(arrCRectReticleEdgeROI[i].Left + nTemp, m_cptReticleCenter.Y - nInnerPointDistanceFromCenter_px);
                         }
-                        else
+                        else // RB or LB
                         {
                             nTemp = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
                             ptarrReticleEdgePoint[i] = new System.Drawing.Point(arrCRectReticleEdgeROI[i].Left + nTemp, m_cptReticleCenter.Y + nInnerPointDistanceFromCenter_px);
                         }
                     }
                 }
-                contour.Push(ptarrReticleEdgePoint);
-                RotatedRect rtReticleEdge = CvInvoke.MinAreaRect(contour);
+                contourReticle.Push(ptarrReticleEdgePoint);
+                RotatedRect rtReticleEdge = CvInvoke.MinAreaRect(contourReticle);
                 dReticleAngle = rtReticleEdge.Angle;
                 int nBreakCount = 0;
                 while (true)
@@ -4251,6 +4259,15 @@ namespace Root_AOP01_Inspection.Module
                         if (nBreakCount > 4) break;
                     }
                 }
+
+                // Frame Edge 찾기  -> TL,TR,RT,RB,BR,BL,LB,LT
+                int nFrameHorizontalInnerPointDistanceFromCenter_px = (int)((((m_nFrameWidth_mm - (m_nFrameInnerOffset_mm * 2)) / 2) * nMMPerUM) / dResX_um);
+                int nFrameHorizontalOutterPointDistanceFromCenter_px = (int)(((m_nFrameWidth_mm / 2) * nMMPerUM) / dResX_um);
+                int nFrameVerticalInnerPointDistanceFromCenter_px = (int)((((m_nFrameHeight_mm - (m_nFrameInnerOffset_mm * 2)) / 2) * nMMPerUM) / dResX_um);
+                int nFrameVerticalOutterPointDistanceFromCenter_px = (int)(((m_nFrameHeight_mm / 2) * nMMPerUM) / dResX_um);
+                
+                //arrCRectFrameEdgeROI[0] = new CRect(new CPoint(m_cptReticleCenter.X - nFrameHorizontalInnerPointDistanceFromCenter_px - (m_nSearchArea / 2), ),
+                                                    //new CPoint());
 
                 return "OK";
             }
