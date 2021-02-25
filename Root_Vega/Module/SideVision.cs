@@ -1055,8 +1055,6 @@ namespace Root_Vega.Module
             public int m_nMaxFrame = 100;  // Camera max Frame 스펙
             public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
             
-            public eScanPos m_eScanPos = eScanPos.Bottom;
-
             public Run_BevelGrab(SideVision module)
             {
                 m_module = module;
@@ -1132,7 +1130,7 @@ namespace Root_Vega.Module
                         double dReticleRangePulse = m_grabMode.m_dTrigger * nReticleVerticalSize_px;
                         double dStartAxisPos = m_rpReticleCenterPos_pulse.Y + dReticleRangePulse / 2 + m_grabMode.m_intervalAcc; 
                         double dEndAxisPos = m_rpReticleCenterPos_pulse.Y - dReticleRangePulse / 2 - m_grabMode.m_intervalAcc;
-                        double dPosX = m_module.m_darrMaxScorePosX[(int)m_eScanPos] + m_grabMode.m_nXOffset;
+                        double dPosX = m_module.m_darrMaxScorePosX[(int)m_grabMode.m_eScanPos] + m_grabMode.m_nXOffset;
                         double dPosZ = m_nFocusPosZ;
                         double dPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4;
 
