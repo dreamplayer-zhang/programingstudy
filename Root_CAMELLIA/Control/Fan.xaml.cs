@@ -1,5 +1,4 @@
-﻿using RootTools.OHTNew;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,27 +10,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_CAMELLIA.UI_Dialog
+namespace Root_CAMELLIA.Control
 {
     /// <summary>
-    /// Dlg_OHT.xaml에 대한 상호 작용 논리
+    /// Fan.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Dlg_OHT : Window
+    public partial class Fan : UserControl
     {
-        public Dlg_OHT()
+        public Fan()
         {
             InitializeComponent();
-        }
-
-        public void Init(ILoadport loadport)
-        {
-
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
         }
     }
 }

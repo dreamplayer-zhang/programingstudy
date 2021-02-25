@@ -63,6 +63,7 @@ namespace Root_Rinse_Loader.Engineer
         {
             string sInfo = StateHome(p_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
+            m_rinse.m_doRinseEmg.Write(true);
             return sInfo;
         }
 

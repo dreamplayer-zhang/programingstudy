@@ -395,6 +395,12 @@
         <SolidColorBrush x:Key="GroupBoxBackground" Color="Transparent"/>
         <SolidColorBrush x:Key="Splitter" Color="DimGray"/>
         <SolidColorBrush x:Key="MainThema" Color="LightSteelBlue"/>
+        <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
+        </Style>
         <!--End Color-->
 
         <!--Control-->
@@ -444,12 +450,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
-            <Setter Property="FontFamily" Value="Arial"/>
-            <Setter Property="FontSize" Value="15"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
-        </Style>
+        
         <Style TargetType="{x:Type TextBlock}" x:Key="BasicTb">
             <Setter Property="FontFamily" Value="Arial"/>
             <Setter Property="TextBlock.VerticalAlignment"

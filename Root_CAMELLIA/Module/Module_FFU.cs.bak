@@ -227,15 +227,12 @@ namespace Root_CAMELLIA.Module
 				#endregion
 
 
-				public bool p_IsUpdate { get; set; } = false;
 
 				public void RunTree(Tree tree)
 				{
 					p_sFan = tree.Set(p_sFan, p_sFan, "Fan ID", "Fan ID");
 					m_nSet = tree.Set(m_nSet, m_nSet, "Set", "Fan Set Value (RPM) or Pressure (0.1pa)");
 					m_mmLimit = tree.Set(m_mmLimit, m_mmLimit, "Limit", "FFU Lower & Upper Limit");
-
-					p_IsUpdate = true;
 				}
 
 				public string m_id;

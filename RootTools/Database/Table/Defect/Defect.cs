@@ -9,8 +9,6 @@ namespace RootTools.Database
 {
     public class Defect
     {
-
-
         // 각 Inspection에서 올라오는 결과 데이터
         public int m_nDefectIndex;
         public string m_strInspectionID;
@@ -28,20 +26,7 @@ namespace RootTools.Database
         public int m_nChipIndexX; // Chip Index
         public int m_nCHipIndexY;
         //public string sImagePath;
-
-        //private Rect m_rtDefectRect;
-        public Rect p_rtDefectRect
-        {
-            get
-            {
-                return m_rtDefectBox;
-            }
-            private set
-            {
-                m_rtDefectBox = value;
-            }
-        }
-        
+                
         protected int m_nImgsizeX; 
         protected int m_nImgsizeY;
 
@@ -71,8 +56,6 @@ namespace RootTools.Database
 
             m_nChipIndexX = chipIdxX;
             m_nCHipIndexY = chipIdxY;
-
-            p_rtDefectRect = new Rect(m_rtDefectBox.Left, p_rtDefectBox.Top, m_fWidth, m_fHeight);
         }
         public Defect(string strInspectionID, int nDefectCode, float fDefectSz, float fDefectGV, float fDefectAbsLeft, float fDefectAbsTop, float fDefectW, float fDefectH, int nChipIdxX, int nChipIdxY)
         {
@@ -92,8 +75,6 @@ namespace RootTools.Database
 
             m_nChipIndexX = nChipIdxX;
             m_nCHipIndexY = nChipIdxY;
-
-            p_rtDefectRect = new Rect(m_rtDefectBox.Left, p_rtDefectBox.Top, m_fWidth, m_fHeight);
         }
 
         public void SetDefectIndex(int nIndex)
@@ -122,8 +103,6 @@ namespace RootTools.Database
 
             m_nChipIndexX = nChipIdxX;
             m_nCHipIndexY = nChipIdxY;
-
-            p_rtDefectRect = new Rect(m_rtDefectBox.Left, p_rtDefectBox.Top, m_fWidth, m_fHeight);
         }
 
         public void CalcAbsToRelPos(int nRefX, int nRefY)
@@ -134,7 +113,7 @@ namespace RootTools.Database
 
         public Rect GetRect()
         {
-            return p_rtDefectRect;
+            return p_rtDefectBox;
         }
 
         public void CalcDegree()

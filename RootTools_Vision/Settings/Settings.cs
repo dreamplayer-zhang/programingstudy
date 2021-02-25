@@ -22,6 +22,8 @@ namespace RootTools_Vision
         {
             SettingItems.Add(new SettingItem_SetupFrontside(new string[] { "Setup", "Frontside" }));
             SettingItems.Add(new SettingItem_SetupBackside(new string[] { "Setup", "Backside" }));
+            SettingItems.Add(new SettingItem_SetupEdgeside(new string[] { "Setup", "Edgeside" }));
+            SettingItems.Add(new SettingItem_SetupEBR(new string[] { "Setup", "EBR" }));
             SettingItems.Add(new SettingItem_Database(new string[] { "DataBase" }));
         }
 

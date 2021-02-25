@@ -185,6 +185,8 @@
     <Compile Include="Settings\SettingItem.cs" />
     <Compile Include="Settings\SettingItem_Database.cs" />
     <Compile Include="Settings\SettingItem_SetupBackside.cs" />
+    <Compile Include="Settings\SettingItem_SetupEBR.cs" />
+    <Compile Include="Settings\SettingItem_SetupEdgeside.cs" />
     <Compile Include="Settings\SettingItem_SetupFrontside.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Settings\WpfPropertyGrid.cs" />
@@ -202,6 +204,7 @@
     <Compile Include="Utility\KlarfData_Lot.cs" />
     <Compile Include="SingleObject.cs" />
     <Compile Include="Utility\TempLogger.cs" />
+    <Compile Include="Utility\Tools.Inspection.cs" />
     <Compile Include="WorkManager\CloneableWorkBase.cs" />
     <Compile Include="WorkManager\DebugOutput.cs" />
     <Compile Include="WorkManager\Interfaces\IWorkplaceBundle.cs" />

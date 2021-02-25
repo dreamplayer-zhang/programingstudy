@@ -398,7 +398,7 @@ namespace Root_EFEM
             {
                 sequence.m_moduleRun.StartRun();
                 Thread.Sleep(100);
-                foreach (ILoadport loadport in m_aLoadport)
+                foreach(ILoadport loadport in m_aLoadport)
                 {
                     if (loadport.p_id == sequence.m_infoWafer.m_sModule)
                     {
@@ -407,7 +407,7 @@ namespace Root_EFEM
                     }
                 }
             }
-            else if ((sequence.m_moduleRun.m_moduleBase == wtr))
+            else if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport) 
             {
                 sequence.m_moduleRun.StartRun();
                 Thread.Sleep(100);
@@ -507,16 +507,16 @@ namespace Root_EFEM
         public string m_id;
         IEngineer m_engineer;
         public IHandler m_handler;
-        IWTR m_wtr;
         List<ILoadport> m_aLoadport = new List<ILoadport>();
+        IWTR m_wtr;
         Log m_log;
         public EFEM_Process(string id, IEngineer engineer, IWTR wtr, List<ILoadport> loadports)
         {
             m_id = id;
             m_engineer = engineer;
             m_handler = engineer.ClassHandler();
-            m_wtr = wtr;
             m_aLoadport = loadports;
+            m_wtr = wtr;
             m_log = LogView.GetLog(id);
             InitTree(id); 
             InitLocate();

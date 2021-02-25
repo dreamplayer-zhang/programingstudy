@@ -58,7 +58,7 @@ namespace Root_VEGA_D.Engineer
             m_recipe = new VEGA_D_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
             m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
-            //CalcRecover();
+            CalcRecover();
         }
 
         void InitModule(ModuleBase module)
