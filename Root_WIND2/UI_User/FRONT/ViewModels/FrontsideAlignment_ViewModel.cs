@@ -377,7 +377,7 @@ namespace Root_WIND2.UI_User
         private void FeatureBoxDone_Callback(object obj)
         {
             TRect Box = obj as TRect;
-            int byteCnt = ImageViewerVM.p_ImageData.p_nByte;
+            int byteCnt = ImageViewerVM.p_ImageData.GetBytePerPixel();
 
             boxImage = new ImageData(Box.MemoryRect.Width, Box.MemoryRect.Height, byteCnt);
 
