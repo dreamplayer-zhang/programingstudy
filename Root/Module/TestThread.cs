@@ -1,13 +1,8 @@
 ﻿using RootTools;
 using RootTools.Module;
 using RootTools.Trees;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Root.Module
 {
