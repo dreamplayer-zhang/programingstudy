@@ -22,6 +22,7 @@ namespace RootTools_Vision
         {
             SettingItems.Add(new SettingItem_SetupFrontside(new string[] { "Setup", "Frontside" }));
             SettingItems.Add(new SettingItem_SetupBackside(new string[] { "Setup", "Backside" }));
+            SettingItems.Add(new SettingItem_Database(new string[] { "DataBase" }));
         }
 
         public T GetItem<T>()

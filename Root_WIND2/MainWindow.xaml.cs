@@ -142,7 +142,7 @@ namespace Root_WIND2
 
             UIManager.Instance.ChangeUIMode();
 
-            SettingItem_SetupFrontside frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
+            SettingItem_Database frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_Database>();
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
             //DatabaseManager.Instance.ValidateDatabase();
@@ -162,9 +162,6 @@ namespace Root_WIND2
         private string memoryFrontGroup = "Vision";
         private string memoryFront = "Main";
         private string memoryMask = "Layer";
-
-        private string memoryMaskPool = "pool";
-        private string memoryMaskGroup = "group";
 
         private string memoryBackPool = "BackSide Vision.BackSide Memory";
         private string memoryBackGroup = "BackSide Vision";
@@ -224,11 +221,11 @@ namespace Root_WIND2
                     frontImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nByte;
                     frontImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nCount;
                 }
-                if (maskLayer.m_MemData != null)
-                {
-                    maskLayer.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nByte;
-                    maskLayer.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nCount;
-                }
+                //if (maskLayer.m_MemData != null)
+                //{
+                //    maskLayer.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask).p_nByte;
+                //    maskLayer.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask).p_nCount;
+                //}
                 if (edgeTopImage.m_MemData != null)
                 {
                     edgeTopImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop).p_nByte;

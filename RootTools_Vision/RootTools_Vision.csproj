@@ -183,6 +183,7 @@
     </Compile>
     <Compile Include="Settings\SettingDialog_ViewModel.cs" />
     <Compile Include="Settings\SettingItem.cs" />
+    <Compile Include="Settings\SettingItem_Database.cs" />
     <Compile Include="Settings\SettingItem_SetupBackside.cs" />
     <Compile Include="Settings\SettingItem_SetupFrontside.cs" />
     <Compile Include="Settings\Settings.cs" />
