@@ -12,18 +12,19 @@ namespace Root
     {
         #region Module
         public ModuleList p_moduleList { get; set; }
-        public Test m_test;
+        //public Test m_test;
         //public BayerConvert m_bayer;
         //public ReadExcel m_readExcel;
         //public RemoteModule m_remote;
         //public RemoteModule m_server;
-        public TestServer m_tcpServer;
-        public TestClient m_tcpClient;
+        //public TestServer m_tcpServer;
+        //public TestClient m_tcpClient;
+        public TestThread m_testThread;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            m_test = new Test("Test", m_engineer);
-            InitModule(m_test);
+            //m_test = new Test("Test", m_engineer);
+            //InitModule(m_test);
             //m_bayer = new BayerConvert("BayerConvert", m_engineer);
             //InitModule(m_bayer);
             //m_readExcel = new ReadExcel("ReadExcel", m_engineer);
@@ -32,10 +33,12 @@ namespace Root
             //InitModule(m_server);
             //m_remote = new RemoteModule("Remote", m_engineer, ModuleBase.eRemote.Client);
             //InitModule(m_remote);
-            m_tcpServer = new TestServer("TestServer", m_engineer);
-            InitModule(m_tcpServer);
-            m_tcpClient = new TestClient("TestClient", m_engineer);
-            InitModule(m_tcpClient);
+            //m_tcpServer = new TestServer("TestServer", m_engineer);
+            //InitModule(m_tcpServer);
+            //m_tcpClient = new TestClient("TestClient", m_engineer);
+            //InitModule(m_tcpClient);
+            m_testThread = new TestThread("TestThread", m_engineer);
+            InitModule(m_testThread);
         }
 
         void InitModule(ModuleBase module)

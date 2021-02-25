@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.Data;
 
 namespace Root_WIND2.UI_User
 {
@@ -104,8 +105,20 @@ namespace Root_WIND2.UI_User
                 GlobalObjects.Instance.Get<InspectionManagerFrontside>().IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
             }
 
+            this.p_DataViewer_VM.SelectedCellsChanged += SelectedCellsChanged_Callback;
+
             // Initialize MapViewer
             this.mapViewerVM = new MapViewer_ViewModel();
+        }
+
+        private void SelectedCellsChanged_Callback(object obj)
+        {
+            DataRowView row = (DataRowView)obj;
+
+            System.Drawing.Rectangle m_View_Rect = new System.Drawing.Rectangle((int)(double)row["m_fAbsX"] - ImageViewerVM.p_View_Rect.Width / 2, (int)(double)row["m_fAbsY"] - this.imageViewerVM.p_View_Rect.Height / 2, this.imageViewerVM.p_View_Rect.Width, this.imageViewerVM.p_View_Rect.Height);
+            ImageViewerVM.p_View_Rect = m_View_Rect;
+            ImageViewerVM.SetImageSource();
+            //ImageViewerVM.RedrawShapes();
         }
 
         private string currentRecipe = "";

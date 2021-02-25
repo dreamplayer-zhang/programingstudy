@@ -733,7 +733,7 @@ namespace RootTools.Camera.BaslerPylon
                 // Check if the image can be displayed.
                 if (grabResult.IsValid)
                 {
-                    if (stopWatch.IsRunning)
+                    //if (stopWatch.IsRunning)
                     {
                         if (m_bLive)
                         {
@@ -756,7 +756,7 @@ namespace RootTools.Camera.BaslerPylon
                             GrabEvent();
 
                             // 최대 30프레임으로 화면 업데이트
-                            if (stopWatch.ElapsedMilliseconds > 33)
+                            //if (stopWatch.ElapsedMilliseconds > 33)
                             {
                                 // 샘플링 스레드에서 사용할 이미지 버퍼 생성
                                 int imgSize = m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y;
@@ -777,6 +777,12 @@ namespace RootTools.Camera.BaslerPylon
                                 }
 
                                 // 스레드 동작 중이 아닐 때 화면 업데이트 위해 새 스레드 실행
+
+                                if(m_threadImgUpdate == null)
+                                {
+                                    StartImageUpdateThread();
+                                }
+
                                 if (m_threadImgUpdate.ThreadState == System.Threading.ThreadState.Stopped ||
                                     m_threadImgUpdate.ThreadState == System.Threading.ThreadState.Aborted)
                                 {

@@ -119,12 +119,16 @@ namespace RootTools.Comm
         #endregion
 
         #region Send
-        public int m_lRead = 0; 
+        public int m_lRead = 0;
+        static readonly object g_lock = new object();
         public string Send(string sMsg)
         {
-            m_socket.Send(Encoding.ASCII.GetBytes(sMsg));
-            if (m_bCommLog) m_commLog.Add(CommLog.eType.Send, (sMsg.Length < 64) ? sMsg : "Large Data");
-            return "OK";
+            lock (g_lock)
+            {
+                m_socket.Send(Encoding.ASCII.GetBytes(sMsg));
+                if (m_bCommLog) m_commLog.Add(CommLog.eType.Send, (sMsg.Length < 64) ? sMsg : "Large Data");
+                return "OK";
+            }
         }
         #endregion
 
