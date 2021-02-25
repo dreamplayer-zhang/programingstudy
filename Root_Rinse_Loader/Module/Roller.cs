@@ -16,7 +16,7 @@ namespace Root_Rinse_Loader.Module
             p_sInfo = m_toolBox.Get(ref m_axisRotate[0], this, "Rotate0");
             p_sInfo = m_toolBox.Get(ref m_axisRotate[1], this, "Rotate1");
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
-            if (bInit) 
+            if (bInit)
             {
                 m_axisRotate[1].SetSpeed("Jog", m_axisRotate[0].GetSpeedValue("Jog")); 
             }
