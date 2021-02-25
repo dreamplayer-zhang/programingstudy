@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Module;
 using RootTools.Trees;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
@@ -40,6 +41,14 @@ namespace Root.Module
         #region RunRun
         string RunRun()
         {
+            StackTrace st = new StackTrace(true);
+            for (int n = 0; n < st.FrameCount; n++)
+            {
+                StackFrame sf = st.GetFrame(n);
+                System.Reflection.MethodBase mb = sf.GetMethod();
+                string sMethod = mb.Name;
+                string sClass = mb.DeclaringType.Name; 
+            }
             InitThread();
             int[] aBuf = new int[5]; 
             for (int n = 0; n < 10; n++)
@@ -59,13 +68,11 @@ namespace Root.Module
 
         public override void Reset()
         {
-            RunRun(); 
             base.Reset();
         }
 
         public override string StateHome()
         {
-            RunRun(); 
             return base.StateHome();
         }
         #endregion
