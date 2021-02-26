@@ -509,7 +509,6 @@ namespace Root_EFEM
         public IHandler m_handler;
         List<ILoadport> m_aLoadport = new List<ILoadport>();
         IWTR m_wtr;
-        List<ILoadport> m_aLoadport = new List<ILoadport>();
         Log m_log;
         public EFEM_Process(string id, IEngineer engineer, IWTR wtr, List<ILoadport> loadports)
         {
@@ -518,7 +517,6 @@ namespace Root_EFEM
             m_handler = engineer.ClassHandler();
             m_aLoadport = loadports;
             m_wtr = wtr;
-            m_aLoadport = loadports;
             m_log = LogView.GetLog(id);
             InitTree(id); 
             InitLocate();
