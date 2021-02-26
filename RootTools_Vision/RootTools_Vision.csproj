@@ -204,7 +204,6 @@
     <Compile Include="Utility\KlarfData_Lot.cs" />
     <Compile Include="SingleObject.cs" />
     <Compile Include="Utility\TempLogger.cs" />
-    <Compile Include="Utility\Tools.Inspection.cs" />
     <Compile Include="WorkManager\CloneableWorkBase.cs" />
     <Compile Include="WorkManager\DebugOutput.cs" />
     <Compile Include="WorkManager\Interfaces\IWorkplaceBundle.cs" />

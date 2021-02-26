@@ -532,19 +532,12 @@ namespace Root_WIND2.UI_User
 
                     p_Cursor = Cursors.Arrow;
 
-                    if( Math.Abs(memPt.X - originLeftBottom.X) > 30000 || Math.Abs(originLeftBottom.Y - memPt.Y) > 30000)
+                    if( (memPt.X - originLeftBottom.X) > 30000 || (originLeftBottom.Y - memPt.Y) > 30000)
                     {
                         MessageBox.Show("Origin(혹은 검사) 영역의 크기는 높이 30000(혹은 너비 30000)을 넘을 수 없습니다.");
                         return;
                     }
-
-                    if (memPt.X < originLeftBottom.X|| memPt.Y > originLeftBottom.Y)
-                    {
-                        MessageBox.Show("Origin Point보다 오른쪽(또는 위쪽)에 위치해야합니다.");
-                        return;
-                    }
-
-
+                    
                     originRightTop.X = memPt.X;
                     originRightTop.Y = memPt.Y;
 

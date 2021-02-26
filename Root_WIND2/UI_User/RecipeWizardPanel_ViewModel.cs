@@ -843,7 +843,8 @@ namespace Root_WIND2.UI_User
         {
             if (p_CurrentPanel == null) return;
 
-            ((IPage)p_CurrentPanel.DataContext).LoadRecipe();
+            if(p_CurrentPanel.DataContext is IPage)
+                ((IPage)p_CurrentPanel.DataContext).LoadRecipe();
         }
     }
 }
