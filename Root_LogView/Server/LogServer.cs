@@ -6,6 +6,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Media;
 
 namespace Root_LogView.Server
 {
@@ -23,18 +24,44 @@ namespace Root_LogView.Server
                 m_sLog = sLog;
             }
 
-            public string m_sGroup = null;
+            public string p_sTime { get; set; }
+            public string p_sLevel { get; set; }
+            public string p_sLogger { get; set; }
+            public string p_sMessage { get; set; }
+            public string p_sStackTrace { get; set; }
+            public Brush p_sColor { get; set; }
+
             public void CalcLog()
             {
                 string[] asLog = m_sLog.Split('\t');
-                if (asLog.Length < 3) asLog[0] = m_nServerID.ToString() + ". " + asLog[0];
-                else
+                if (asLog.Length > 0)
                 {
                     asLog[0] += " ~ " + m_dt.Second.ToString() + "." + m_dt.Millisecond.ToString();
-                    m_sGroup = m_nServerID.ToString() + "." + asLog[2];
-                    asLog[2] = m_sGroup; 
-
+                    p_sTime = asLog[0];
                 }
+                if (asLog.Length > 1) 
+                {
+                    p_sLevel = asLog[1];
+                    switch (asLog[1])
+                    {
+                        case "Fatal": p_sColor = Brushes.Yellow; break;
+                        case "Error": p_sColor = Brushes.Yellow; break;
+                        case "Warn": p_sColor = Brushes.GreenYellow; break;
+                        default: p_sColor = Brushes.White; break;
+                    }
+                }
+                else
+                {
+                    p_sLevel = "Error"; 
+                    p_sColor = Brushes.Red;
+                }
+                if (asLog.Length > 2) 
+                {
+                    p_sLogger = m_nServerID.ToString() + "." + asLog[2];
+                    asLog[2] = p_sLogger;
+                }
+                if (asLog.Length > 3) p_sMessage = asLog[3];
+                if (asLog.Length > 4) p_sStackTrace = asLog[4];
                 m_sLog = asLog[0];
                 for (int n = 1; n < asLog.Length; n++) m_sLog += '\t' + asLog[n]; 
             }
@@ -145,7 +172,7 @@ namespace Root_LogView.Server
         {
             logData.CalcLog();
             m_aGroup[0].AddLog(logData);
-            if (logData.m_sGroup != null) GetGroup(logData.m_sGroup).AddLog(logData); 
+            if (logData.p_sLogger != null) GetGroup(logData.p_sLogger).AddLog(logData); 
         }
 
         string m_sPath = "c:\\Log"; 
@@ -156,7 +183,7 @@ namespace Root_LogView.Server
         }
         #endregion
 
-        #region Thread Save
+        #region Thread Save ==> Timer & Display
         bool m_bThread = false;
         Thread m_thread;
         void InitThread()
