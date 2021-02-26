@@ -21,5 +21,8 @@ namespace Root_CAMELLIA.LibSR_Met
         //2020.12.23 Met.DS 
         public const int MULTI_THREAD_COUNT = 7;
         public const double DELTA = 0.0000000001;//미분 극소변화량
+        public const double SI_INIT_THICKNESS = 7750000;
+        public const int SI_AVG_OFFSET_RANGE = 80000;
+        public const int SI_AVG_OFFSET_STEP = 200;
     }
 }

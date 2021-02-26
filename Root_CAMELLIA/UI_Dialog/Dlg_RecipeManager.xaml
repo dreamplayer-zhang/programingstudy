@@ -10,7 +10,7 @@
         xmlns:stage ="clr-namespace:Camellia2Stage"
         xmlns:data="clr-namespace:Root_CAMELLIA.Data"
         WindowStyle="None"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
         WindowState="Normal"
         Width="1820" Height="980"
@@ -448,7 +448,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Thickness LM Iteration" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding ThicknessLMIteration, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding ThicknessLMIteration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"
                                          IsEnabled="{Binding p_UseThickness}"></TextBox>
                             </Grid>
                             <Grid Margin="5" Background="Gainsboro">
@@ -457,7 +457,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Damping Factor" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding DampingFactor, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N1}" TextAlignment="Center" VerticalContentAlignment="Center"
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding DampingFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, StringFormat=N1}" TextAlignment="Center" VerticalContentAlignment="Center"
                                          IsEnabled="{Binding p_UseThickness}"></TextBox>
                             </Grid>
                         </UniformGrid>
