@@ -129,14 +129,18 @@ namespace RootTools.Comm
 
         #region Send
         AsyncCallback m_cbSend;
+        static readonly object g_lock = new object();
         public string Send(string sMsg)
         {
             if (m_socket == null) return "Not Connected";
-            Async async = new Async(1);
-            async.m_aBuf = Encoding.Default.GetBytes(sMsg);
-            async.m_socket = m_socket;
-            m_socket.BeginSend(async.m_aBuf, 0, async.m_aBuf.Length, SocketFlags.None, m_cbSend, async);
-            return "OK";
+            lock (g_lock)
+            {
+                Async async = new Async(1);
+                async.m_aBuf = Encoding.Default.GetBytes(sMsg);
+                async.m_socket = m_socket;
+                m_socket.BeginSend(async.m_aBuf, 0, async.m_aBuf.Length, SocketFlags.None, m_cbSend, async);
+                return "OK";
+            }
         }
 
         void CallBackSend(IAsyncResult ar)

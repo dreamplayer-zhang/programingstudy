@@ -45,6 +45,18 @@ namespace Root_WIND2.Module
             }
         }
 
+        public Camera_Basler p_CamAlign
+        {
+            get
+            {
+                return m_CamAlign;
+            }
+            set
+            {
+                m_CamAlign = value;
+            }
+        }
+
         KlarfData_Lot m_KlarfData_Lot;
         LensLinearTurret m_LensLinearTurret;
         #region [Getter Setter]

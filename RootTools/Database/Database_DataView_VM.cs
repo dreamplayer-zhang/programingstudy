@@ -6,11 +6,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using RootTools.Database;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Input;
 
 namespace RootTools
 {
+    public delegate void SelectedCellsChangedHandler(object obj);
     public class Database_DataView_VM : ObservableObject
     {
+        public event SelectedCellsChangedHandler SelectedCellsChanged;
+
+        public ICommand SelectedCellsChangedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                if (SelectedCellsChanged != null)
+                    SelectedCellsChanged(selectedItem);
+            });
+        }
+
         DataTable _dataTable;
         public DataTable pDataTable 
         { 
@@ -45,7 +61,7 @@ namespace RootTools
 
         public Database_DataView_VM(DataTable _table)
         {
-            pDataTable = _table;          
+            pDataTable = _table;
         }
 
         public void DisplayDataTable(DataTable table)
