@@ -79,7 +79,9 @@
     <Reference Include="ColorPickerLib, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.ColorPickerLib.1.6.2\lib\net40\ColorPickerLib.dll</HintPath>
     </Reference>
-    <Reference Include="EasyModbus, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="EasyModbus">
+      <HintPath>..\Lib\EasyModbus.dll</HintPath>
+    </Reference>
     <Reference Include="Emgu.CV.UI, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
     </Reference>
@@ -202,7 +204,7 @@
     </Reference>
     <Reference Include="NanoView, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\ATI\Desktop\SW PG\Root_Edge테스트\Lib\MetLib\NanoView.dll</HintPath>
+      <HintPath>..\Lib\MetLib\NanoView.dll</HintPath>
     </Reference>
     <Reference Include="NumericUpDownLib, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.NumericUpDownLib.2.4.2\lib\net40\NumericUpDownLib.dll</HintPath>
@@ -257,6 +259,9 @@
     <Compile Include="Control\Explorer.xaml.cs">
       <DependentUpon>Explorer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Fan.xaml.cs">
+      <DependentUpon>Fan.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\FocusExtension.cs" />
     <Compile Include="Control\GaugeChart.xaml.cs">
       <DependentUpon>GaugeChart.xaml</DependentUpon>
@@ -266,6 +271,7 @@
     </Compile>
     <Compile Include="Converter\BoolConverter.cs" />
     <Compile Include="Converter\LampStateToColorConverter.cs" />
+    <Compile Include="Converter\ValueToColorConverter.cs" />
     <Compile Include="LibSR_Met\Calculation.cs" />
     <Compile Include="LibSR_Met\ConstValue.cs" />
     <Compile Include="LibSR_Met\DataManager.cs" />
@@ -377,6 +383,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Control\Explorer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Fan.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -570,6 +580,9 @@ copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectNam
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\msvcp140.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"
+copy /Y "$(SolutionDir)Lib\AXL\AXL.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\AXL.dll"
+copy /Y "$(SolutionDir)Lib\AXL\AXL.lib" $(SolutionDir)$(ProjectName)\$(OutDir)\AXL.lib"
+copy /Y "$(SolutionDir)Lib\AXL\EzBasicAxl.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\EzBasicAxl.dll"
 IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
 copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
 IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")

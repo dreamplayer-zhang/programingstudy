@@ -95,6 +95,8 @@ namespace RootTools_Vision
 
             if (settings.UseKlarf)
             {
+                Directory.CreateDirectory(settings.KlarfSavePath);
+
                 GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
                 GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
                 GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();

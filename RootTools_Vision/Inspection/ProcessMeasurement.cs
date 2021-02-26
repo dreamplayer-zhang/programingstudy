@@ -55,20 +55,20 @@ namespace RootTools_Vision
                                                                      currentWorkplace.SharedBufferG,
                                                                      currentWorkplace.SharedBufferB);
             
-            SettingItem_SetupEBR settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupEBR>();
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            Tools.SaveMeasurementImage(Path.Combine(settings.MeasureImagePath, sInspectionID), measureList, sharedBufferInfo);
+    //        SettingItem_SetupEBR settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupEBR>();
+    //        string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+    //        Tools.SaveMeasurementImage(Path.Combine(settings.MeasureImagePath, sInspectionID), measureList, sharedBufferInfo);
 
-            if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
-            {
-				//GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, measureList, this.recipe.GetItem<OriginRecipe>());
-				//GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
-				//GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
-				//GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
+    //        if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
+    //        {
+				////GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, measureList, this.recipe.GetItem<OriginRecipe>());
+				////GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
+				////GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+				////GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
 
-				string sTiffImagePath = @"D:\DefectImage";
-				Tools.SaveTiffImage(sTiffImagePath, measureList, sharedBufferInfo);
-            }
+				//string sTiffImagePath = @"D:\DefectImage";
+				//Tools.SaveTiffImage(sTiffImagePath, measureList, sharedBufferInfo);
+    //        }
 
             WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
         }
