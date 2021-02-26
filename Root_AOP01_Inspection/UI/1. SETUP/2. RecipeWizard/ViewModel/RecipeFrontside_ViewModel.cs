@@ -475,8 +475,10 @@ namespace Root_AOP01_Inspection
             {
                 MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
                 //tempList = new List<TRect>(viewer.TRectList);
-                MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.MainModuleName);
-                surfaceInspection.EdgeList = new List<TRect>(m_ImageViewer_VM.TRectList).ToArray();
+                //MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.MainModuleName);
+                //surfaceInspection.EdgeList = new List<TRect>(m_ImageViewer_VM.TRectList).ToArray();
+                mainVision.SetRectInfo(m_ImageViewer_VM.TRectList,App.MainModuleName);
+                mainVision.SaveModule();
                 //surfaceInspection.UpdateTree();
                // surfaceInspection.RefreshTree();
             }
