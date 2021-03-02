@@ -291,7 +291,7 @@ namespace Root_CAMELLIA.Module
                 while (m_aTemp.Count < m_lTemp) m_aTemp.Add(new Temp(m_FFU, m_id + ".Temp" + m_aTemp.Count.ToString("00")));
                 InitListTemp(m_aTempValue);
 
-                while (m_aHumidity.Count < m_lHumidity) m_aHumidity.Add(new Humidity(m_FFU, m_id + ".Temp" + m_aHumidity.Count.ToString("00")));
+                while (m_aHumidity.Count < m_lHumidity) m_aHumidity.Add(new Humidity(m_FFU, m_id + ".Humidity" + m_aHumidity.Count.ToString("00")));
                 InitListHumidity(m_aHumidityValue);
             }
 
