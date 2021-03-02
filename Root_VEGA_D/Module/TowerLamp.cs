@@ -2,18 +2,14 @@
 using RootTools.Control;
 using RootTools.Module;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace Root_CAMELLIA.Module
+namespace Root_VEGA_D.Module
 {
     public class TowerLamp : ModuleBase
     {
         #region ToolBox
-        public enum eLamp 
+        public enum eLamp
         {
             Red,
             Yellow,
@@ -72,7 +68,6 @@ namespace Root_CAMELLIA.Module
         protected override void RunThread()
         {
             base.RunThread();
-            //if(m_eState != EQ.p_eState)
             {
                 switch (EQ.p_eState)
                 {
@@ -104,10 +99,6 @@ namespace Root_CAMELLIA.Module
 
         public string BuzzerOff()
         {
-            //m_doBuzzer.Write(eBuzzer.Error, false);
-            //m_doBuzzer.Write(eBuzzer.Finish, false);
-            //m_doBuzzer.Write(eBuzzer.Home, false);
-            //m_doBuzzer.Write(eBuzzer.Warning, false);
             m_doBuzzer.AllOff();
             return "OK";
         }

@@ -11,6 +11,7 @@ using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
@@ -35,7 +36,11 @@ namespace Root_AOP01_Inspection.Module
     public class MainVision : ModuleBase, IWTRChild
     {
         public Dispatcher dispatcher;   // RecipeLADS_ViewModel 페이지에서 LADS Heatmap 바인딩을 하려면 Dispatcher 필요
-
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Vision Wafer Exist Error");
+        }
         #region ToolBox
         public Axis m_axisRotate;
         public Axis m_axisZ;

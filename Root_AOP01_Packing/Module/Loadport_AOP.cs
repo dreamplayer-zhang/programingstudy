@@ -26,7 +26,22 @@ namespace Root_AOP01_Packing.Module
         DIO_O m_doLoad;
         DIO_O m_doUnload;
         DIO_O m_doAlarm;
-        OHT m_OHT;
+        //OHT m_OHT;
+        OHT _OHT;
+        public OHT m_OHTNew
+        {
+            get { return _OHT; }
+            set
+            {
+                _OHT = value;
+                OnPropertyChanged();
+            }
+        }
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Wafer Exist Error");
+        }
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPodCheck[0], this, "POD Check0");
@@ -43,7 +58,8 @@ namespace Root_AOP01_Packing.Module
             p_sInfo = m_toolBox.Get(ref m_doLoad, this, "Load");
             p_sInfo = m_toolBox.Get(ref m_doUnload, this, "Unload");
             p_sInfo = m_toolBox.Get(ref m_doAlarm, this, "Alram");
-            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
+            //p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
+            p_sInfo = m_toolBox.Get(ref _OHT, this, p_infoCarrier, "OHT");
             if (bInit) 
             {
                 InitPos();
