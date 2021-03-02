@@ -145,10 +145,10 @@ namespace Root_CAMELLIA.Data
             eDir dir = ((CenteringParam)obj).dir;
             int nSearchRange = ((CenteringParam)obj).searchRange;
             int nSearchLevel = ((CenteringParam)obj).searchLevel;
-            Mat matSrc = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
-            Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
-            Mat matInsp = new Mat(ptROI.X, ptROI.Y, DepthType.Cv8U, 3);
-
+            Mat matSrc = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride * 3);
+            Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride * 3);
+            //Mat matInsp = new Mat(ptROI.X, ptROI.Y, DepthType.Cv8U, 3);
+            Mat matInsp = new Mat();
             StopWatch stopWatch = new StopWatch();
 
             try
