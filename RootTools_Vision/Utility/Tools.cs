@@ -207,7 +207,7 @@ namespace RootTools_Vision
             }
             return null;
         }
-
+                
         public static Bitmap CovertArrayToBitmap(byte[] rawdata, int _width, int _height, int _byteCount)
         {
             try

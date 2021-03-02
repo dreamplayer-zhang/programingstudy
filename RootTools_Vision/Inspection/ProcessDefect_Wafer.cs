@@ -52,7 +52,7 @@ namespace RootTools_Vision
 
             TempLogger.Write("Defect", string.Format("Total : {0}", DefectList.Count));
 
-            List<Defect> MergeDefectList = MergeDefect(DefectList, mergeDist);
+            List<Defect> MergeDefectList = Tools.MergeDefect(DefectList, mergeDist);
 
             TempLogger.Write("Defect", string.Format("Merge : {0}", MergeDefectList.Count));
 
@@ -62,14 +62,9 @@ namespace RootTools_Vision
                 defect.CalcAbsToRelPos(originRecipe.OriginX, originRecipe.OriginY); // Frontside
             }
 
-
             //Workplace displayDefect = new Workplace();
             foreach (Defect defect in MergeDefectList)
                 this.currentWorkplace.DefectList.Add(defect);
-
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-
-            
 
             //// Add Defect to DB
             if (MergeDefectList.Count > 0)
@@ -89,8 +84,31 @@ namespace RootTools_Vision
                 //}
             }
 
+            SharedBufferInfo sharedBufferInfo = new SharedBufferInfo(currentWorkplace.SharedBufferR_GRAY,
+                                                                     currentWorkplace.Width,
+                                                                     currentWorkplace.Height,
+                                                                     currentWorkplace.SharedBufferByteCnt,
+                                                                     currentWorkplace.SharedBufferG,
+                                                                     currentWorkplace.SharedBufferB);
+            
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
             SettingItem_SetupFrontside settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
+            
+            Tools.SaveDataImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList.Cast<Data>().ToList(), sharedBufferInfo);
+            
+            if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
+            {
+                List<string> dataStringList = GlobalObjects.Instance.Get<KlarfData_Lot>().DefectDataToStringList(MergeDefectList);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, dataStringList, null);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+                GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
+                Tools.SaveTiffImage(settings.KlarfSavePath, MergeDefectList.Cast<Data>().ToList(), sharedBufferInfo);
+            }
 
+            // 기존 210302
+            /*
+            SettingItem_SetupFrontside settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
             SaveDefectImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
 
             if (settings.UseKlarf)
@@ -105,10 +123,7 @@ namespace RootTools_Vision
 
                 SaveTiffImage(settings.KlarfSavePath, MergeDefectList, 3);
             }
-
-            //GlobalObjects.Instance.Get<Settings>
-            //string sTiffImagePath = ;
-            //SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
+            */
 
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
             WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
@@ -174,7 +189,8 @@ namespace RootTools_Vision
             DefectList.Clear();
             DefectList.AddRange(DefectList_Delete);
         }
-
+        
+        /*
         private List<Defect> MergeDefect(List<Defect> DefectList, int mergeDist)
         {
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();           
@@ -259,6 +275,7 @@ namespace RootTools_Vision
 
             return MergeDefectList;
         }
+        
         private void SaveDefectImage(String Path, List<Defect> DefectList, int nByteCnt)
         {
             Path += "\\";
@@ -381,6 +398,6 @@ namespace RootTools_Vision
             ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
             img.SaveAdd(ep);
         }
-
+        */
     }
 }
