@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace RootTools.Database
 {
-    public class Measurement
+    public class Measurement : Data
     {
         public int m_nMeasurementIndex;
         public string m_strInspectionID;
@@ -74,9 +74,19 @@ namespace RootTools.Database
             m_nMeasurementIndex = nIndex;
         }
 
-        public Rect GetRect()
+        public override Rect GetRect()
         {
             return p_rtDefectBox;
+        }
+
+        public override float GetWidth()
+        {
+            return m_fWidth;
+        }
+
+        public override float GetHeight()
+        {
+            return m_fHeight;
         }
     }
 }

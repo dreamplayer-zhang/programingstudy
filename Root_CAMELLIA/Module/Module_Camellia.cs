@@ -234,8 +234,12 @@ namespace Root_CAMELLIA.Module
 
         #endregion
 
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Vision Wafer Exist Error");
+        }
 
-     
 
         public override void GetTools(bool bInit)
         {
@@ -250,8 +254,7 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.Get(ref m_axisYReady, this, "Stage Y Ready");
             p_sInfo = m_toolBox.Get(ref m_vacuum, this, "Vaccum On");
             p_sInfo = m_toolBox.Get(ref m_vacuumOnOff, this, "Vaccum OnOff");
-
-            
+            m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
         }
         public Module_Camellia(string id, IEngineer engineer, List<ILoadport> loadports)
         {

@@ -13,6 +13,7 @@ namespace RootTools_Vision
 {
 	public partial class Tools
 	{
+        // 지울거야
         public static void SaveDefectImage(String Path, List<Defect> DefectList, SharedBufferInfo sharedBuffer, int nByteCnt)
         {
             Path += "\\";
@@ -63,29 +64,29 @@ namespace RootTools_Vision
             }
         }
 
-        public static void SaveMeasurementImage(String path, List<Measurement> measureList, SharedBufferInfo sharedBuffer)
+        public static void SaveDataImage(String path, List<Data> dataList, SharedBufferInfo sharedBuffer)
         {
             path += "\\";
             DirectoryInfo di = new DirectoryInfo(path);
             if (!di.Exists)
                 di.Create();
 
-            if (measureList.Count < 1)
+            if (dataList.Count < 1)
                 return;
 
             unsafe
             {
-                Cpp_Rect[] defectArray = new Cpp_Rect[measureList.Count];
+                Cpp_Rect[] defectArray = new Cpp_Rect[dataList.Count];
 
-                for (int i = 0; i < measureList.Count; i++)
+                for (int i = 0; i < dataList.Count; i++)
                 {
                     Cpp_Rect rect = new Cpp_Rect();
-                    rect.x = (int)measureList[i].p_rtDefectBox.Left;
-                    rect.y = (int)measureList[i].p_rtDefectBox.Top;
-                    rect.w = (int)measureList[i].m_fWidth;
-                    rect.h = (int)measureList[i].m_fHeight;
+					rect.x = (int)dataList[i].GetRect().Left;
+					rect.y = (int)dataList[i].GetRect().Top;
+                    rect.w = (int)dataList[i].GetWidth();
+					rect.h = (int)dataList[i].GetHeight();
 
-                    defectArray[i] = rect;
+					defectArray[i] = rect;
                 }
 
                 if (sharedBuffer.ByteCnt == 1)
@@ -113,6 +114,7 @@ namespace RootTools_Vision
             }
         }
 
+        // 지울거야
         public static void SaveTiffImage(string Path, List<Defect> defectList, SharedBufferInfo sharedBuffer)
         {
             Path += "\\";
@@ -186,7 +188,7 @@ namespace RootTools_Vision
             img.SaveAdd(ep);
         }
 
-        public static void SaveTiffImage(string Path, List<Measurement> meassureList, SharedBufferInfo sharedBuffer)
+        public static void SaveTiffImage(string Path, List<Data> dataList, SharedBufferInfo sharedBuffer)
         {
             Path += "\\";
             DirectoryInfo di = new DirectoryInfo(Path);
@@ -194,12 +196,12 @@ namespace RootTools_Vision
                 di.Create();
 
             ArrayList inputImage = new ArrayList();
-            for (int i = 0; i < meassureList.Count; i++)
+            for (int i = 0; i < dataList.Count; i++)
             {
                 MemoryStream image = new MemoryStream();
-                System.Drawing.Bitmap bitmap = Tools.ConvertArrayToColorBitmap(sharedBuffer.PtrR_GRAY, sharedBuffer.PtrG, sharedBuffer.PtrB, sharedBuffer.Width, sharedBuffer.ByteCnt, meassureList[i].GetRect());
-                //System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
-                bitmap.Save(image, ImageFormat.Tiff);
+				System.Drawing.Bitmap bitmap = Tools.ConvertArrayToColorBitmap(sharedBuffer.PtrR_GRAY, sharedBuffer.PtrG, sharedBuffer.PtrB, sharedBuffer.Width, sharedBuffer.ByteCnt, dataList[i].GetRect());
+				//System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
+				bitmap.Save(image, ImageFormat.Tiff);
                 inputImage.Add(image);
             }
 
@@ -258,5 +260,6 @@ namespace RootTools_Vision
             ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
             img.SaveAdd(ep);
         }
+
     }
 }

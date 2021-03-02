@@ -40,5 +40,7 @@ namespace Root_EFEM.Module
         void RunTreeTeach(Tree tree);
 
         void ReadInfoWafer_Registry();
+
+        void SetAlarm();
     }
 }
