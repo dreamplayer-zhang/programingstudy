@@ -71,7 +71,6 @@ namespace RootTools_Vision.Utility
 			//PutClassLookup(sw);
 			PutInspectionTest(sw);
 			PutSampleTestPlan(sw);
-			//PutTiffFileName(sw); // 170802 syyun 추가
 			PutDefectInfor(sw);
 			PutDCollData(sw);
 
@@ -318,6 +317,7 @@ namespace RootTools_Vision.Utility
 			areaPerTest = string.Format("AreaPerTest {0:e};\n", nAreaPerTest);
 		}
 
+		// 기존 210302
 		public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<Defect> _defectdata, OriginRecipe recipe)
         {
 			string defectList;
@@ -354,6 +354,31 @@ namespace RootTools_Vision.Utility
 			//m_sTemp.Format("%d %d %f %d %d;\n", 1, nDNum, fDensity, m_nSampleTestCnt, m_nDefectDieCnt);
 			//m_sDefectInfor += m_sTemp;
 
+		}
+
+		public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<string> _dataStringList, OriginRecipe recipe)
+		{
+			string defectList;
+			defectList = string.Format("DefectRecordSpec 17 DEFECTID XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER REVIEWSAMPLE IMAGECOUNT IMAGELIST;\n");
+			defectListInfor += defectList;
+			defectList = string.Format("DefectList\n");
+			defectListInfor += defectList;
+			double diePitchX = this.diePitchX;
+
+			for (int i = 0; i < _dataStringList.Count; i++)
+			{
+				defectListInfor += _dataStringList[i] + "\n";
+				defectListInfor += (i+1).ToString() + " 0\n";
+			}
+
+			defectList = string.Format("SummarySpec 5");
+			defectListInfor += defectList;
+			defectList = string.Format(" TESTNO NDEFECT DEFDENSITY NDIE NDEFDIE;\n");
+			defectListInfor += defectList;
+			defectList = string.Format("SummaryList\n");
+			defectListInfor += defectList;
+			//m_sTemp.Format("%d %d %f %d %d;\n", 1, nDNum, fDensity, m_nSampleTestCnt, m_nDefectDieCnt);
+			//m_sDefectInfor += m_sTemp;
 		}
 
 		public void SetMEMMAP(RecipeType_WaferMap _mapdata)

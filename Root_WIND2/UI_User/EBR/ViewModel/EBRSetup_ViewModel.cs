@@ -294,6 +294,12 @@ namespace Root_WIND2.UI_User
 			Parameter = recipe.GetItem<EBRParameter>();
 		}
 
+		public void CreateRecipeWaferMap()
+		{
+			//RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeEBR>().WaferMap;
+
+		}
+
 		private void UpdateProgress()
 		{
 			if (GlobalObjects.Instance.Get<InspectionManagerEBR>() != null)
