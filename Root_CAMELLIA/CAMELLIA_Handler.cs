@@ -76,7 +76,7 @@ namespace Root_CAMELLIA
             InitLoadport();
             InitRFID();
             InitAligner();
-            m_camellia = new Module_Camellia("Camellia", m_engineer);
+            m_camellia = new Module_Camellia("Camellia", m_engineer, m_aLoadport);
             InitModule(m_camellia);
             m_HomeProgress.Init(this);
             m_towerlamp = new TowerLamp("Towerlamp", m_engineer);

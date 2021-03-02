@@ -30,6 +30,7 @@ using Root_EFEM.Module;
 using Root_EFEM;
 using static RootTools.Control.Axis;
 using RootTools.GAFs;
+using RootTools.OHTNew;
 
 namespace Root_CAMELLIA.Module
 {
@@ -171,11 +172,6 @@ namespace Root_CAMELLIA.Module
         DIO_I m_axisYReady;
         DIO_I m_vacuum;
         DIO_O m_vacuumOnOff;
-        DIO_Os m_doLamp;
-        DIO_Os m_doBuzzer;
-        DIO_I m_diEMS;
-        DIO_I m_diProtectionBar;
-        DIO_I m_diMCReset;
 
 
         private Camera_Basler m_CamVRS;
@@ -247,9 +243,6 @@ namespace Root_CAMELLIA.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diEMS, this, "EMS");
-            p_sInfo = m_toolBox.Get(ref m_diProtectionBar, this, "ProtectionBar");
-            p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
             p_sInfo = m_toolBox.Get(ref m_axisLifter, this, "StageLifter");
@@ -263,13 +256,19 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.Get(ref m_vacuumOnOff, this, "Vaccum OnOff");
             m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
         }
-        public Module_Camellia(string id, IEngineer engineer)
+        public Module_Camellia(string id, IEngineer engineer, List<ILoadport> loadports)
         {
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             base.InitBase(id, engineer);
             InitWorkPoint();
             InitInfoWaferUI();
             m_DataManager = DataManager.Instance;
+            //InfoCarrier[] infoCarrier = new InfoCarrier[2];
+            //for(int i=0; i<loadports.Count; i++)
+            //{
+            //    infoCarrier[i] = loadports[i].p_infoCarrier;
+            //}
+            //infoCarrier[EQ.p_nRunLP].p_eState == InfoCarrier.eState.Dock
         }
 
         public override void ThreadStop()

@@ -1,0 +1,312 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Drawing;
+using System.IO;
+using NanoView;
+
+namespace Root_CAMELLIA.LibSR_Met
+{
+    /// <summary>
+    /// RTGraph.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class RTGraph : UserControl
+    {
+        DataManager m_DM = DataManager.GetInstance();
+        string m_strCurrentDir = string.Empty;
+        public bool m_bDataDetect = false;
+
+        bool m_bUseFile = false;
+
+        ScottPlot.PlottableScatterHighlight m_ReflectancePlotTable;
+        ScottPlot.PlottableScatterHighlight m_ReflectancePlotTable_Calc;
+        ScottPlot.PlottableScatterHighlight m_TransmittancePlotTable;
+
+        public RTGraph()
+        {
+            InitializeComponent();
+
+            if (m_bUseFile)
+            {
+                btnDrawMode.Content = FindResource("File");
+                btnOpenDatas.IsEnabled = true;
+            }
+            else
+            {
+                btnDrawMode.Content = FindResource("Measure");
+                btnOpenDatas.IsEnabled = false;
+            }
+        }
+
+        public void DrawReflectanceGraph(int nPointIndex, string xlabel, string ylabel, double[] xvalues = null, double[] yvalues = null, double[] yvalues2 = null)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                GraphR.Reset();
+                GraphR.plt.XLabel(xlabel);
+                GraphR.plt.YLabel(ylabel);
+                RawData data = m_DM.m_RawData[nPointIndex];
+                double[] VIS_Wavelength = new double[data.nCalcDataNum];
+                double[] VIS_Reflectance = new double[data.nCalcDataNum];
+                double[] CalcReflectance = new double[data.nCalcDataNum];
+
+                for (int n = 0; n < data.nCalcDataNum; n++)
+                {
+                    VIS_Wavelength[n] = data.VIS_Wavelength[n];
+                    VIS_Reflectance[n] = data.VIS_Reflectance[n];
+                    CalcReflectance[n] = data.CalcReflectance[n];
+                }
+
+                string sResult = "";
+                if (xvalues == null || yvalues == null)
+                {
+                    //display 옵션 조절해야함(
+                    m_ReflectancePlotTable = GraphR.plt.PlotScatterHighlight(VIS_Wavelength, VIS_Reflectance, markerSize: 2.5);
+                    m_ReflectancePlotTable_Calc = GraphR.plt.PlotScatterHighlight(VIS_Wavelength, CalcReflectance, markerSize: 2.5);
+
+                    sResult = string.Format("Point: {0}\nX Pos: {1}\nY Pos: {2}\nThickness:\n", nPointIndex, data.dX, data.dY);
+
+                    if (data.Thickness != null && data.Thickness.Count > 0)
+                    {
+                        for (int n = 0; n < m_DM.m_LayerData.Count; n++)
+                        {
+                            sResult += string.Concat(m_DM.m_LayerData[n].hostname) + " : " + data.Thickness[n].ToString("0.###") + "Å\n";
+                        }
+                    }
+
+                    // 추후 제거 GOF 출력 추가
+                    sResult += "GOF: " + data.dGoF.ToString() + "\n";
+
+                }
+                else
+                {
+                    m_ReflectancePlotTable = GraphR.plt.PlotScatterHighlight(xvalues, yvalues, markerSize: 2.5);
+
+                    if (yvalues2 != null)
+                        m_ReflectancePlotTable_Calc = GraphR.plt.PlotScatterHighlight(xvalues, yvalues2, markerSize: 2.5);
+                }
+                GraphR.plt.AxisAuto();
+                //ReflectancePlot.Show();
+                GraphR.Render();
+
+                m_bDataDetect = true;
+                FlowDocument flowDoc = new FlowDocument();
+                flowDoc.Blocks.Add(new Paragraph(new Run(sResult)));
+                textBoxResult.Document = flowDoc;
+            }));
+        }
+
+        public void DrawTransmittanceGraph(int nPointIndex, string xlabel, string ylabel, double[] xvalues = null, double[] yvalues = null)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                GraphT.plt.XLabel(xlabel);
+                GraphT.plt.YLabel(ylabel);
+
+                RawData data = m_DM.m_RawData[nPointIndex];
+                double[] VIS_Wavelength = new double[m_DM.m_RawData[nPointIndex].nCalcDataNum];
+                double[] VIS_Transmittance = new double[m_DM.m_RawData[nPointIndex].nCalcDataNum];
+
+                for (int n = 0; n < data.nCalcDataNum; n++)
+                {
+                    VIS_Wavelength[n] = data.VIS_Wavelength[n];
+                    VIS_Transmittance[n] = data.Transmittance[n];
+                }
+
+                if (xvalues == null || yvalues == null)
+                {
+                    m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(VIS_Wavelength, VIS_Transmittance, markerSize: 2.5);
+
+                }
+                else
+                {
+                    m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(xvalues, yvalues, markerSize: 2.5);
+                }
+                GraphT.plt.AxisAuto();
+                //TransmittancePlot.Show();
+                GraphT.Render();
+            }));
+        }
+
+        private void comboBoxDataIndex_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                if (m_bUseFile)
+                {
+                    if (comboBoxDataIndex.Items.Count <= 0)
+                        return;
+
+                    if (!string.IsNullOrEmpty(m_strCurrentDir))
+                    {
+                        GraphR.Reset();
+                        GraphT.Reset();
+
+                        m_bDataDetect = true;
+                        string path = m_strCurrentDir + "\\" + comboBoxDataIndex.SelectedItem + ".csv";
+                        StreamReader sr = new StreamReader(path);
+
+                        var column1 = new List<string>();
+                        var column2 = new List<string>();
+                        var column3 = new List<string>();
+
+                        while (sr.EndOfStream == false)
+                        {
+                            var splits = sr.ReadLine().Split(',');
+
+                            column1.Add(splits[0]);
+                            column2.Add(splits[1]);
+                            column3.Add(splits[2]);
+                        }
+
+                        //배열 선언
+                        double[] xvalues = new double[column1.Count - 1];
+                        double[] yvalues = new double[column1.Count - 1];
+                        double[] yvalues2 = new double[column1.Count - 1];
+
+                        //(x,y)에 넣을 배열 만들기
+                        for (int a = 0; a < column1.Count - 1; a++)
+                        {
+                            xvalues[a] = Convert.ToDouble(column1[a + 1]);
+                            yvalues[a] = Convert.ToDouble(column2[a + 1]);
+                            yvalues2[a] = Convert.ToDouble(column3[a + 1]);
+                        }
+
+                        DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength(nm)", "Reflectance(%)", xvalues, yvalues);
+                        DrawTransmittanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength(nm)", "Transmittance(%)", xvalues, yvalues2);
+                    }
+                    else
+                    {
+                        MessageBox.Show("[Warning] Open Files First!", "Warning", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                    }
+                }
+                else
+                {
+                    if ((int)comboBoxDataIndex.SelectedIndex != -1)
+                    {
+                        DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength(nm)", "Reflectance(%)");
+                        DrawTransmittanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength(nm)", "Transmittance(%)");
+                    }
+                }
+            }));
+        }
+
+        private void btnDrawMode_Click(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                m_bUseFile = !m_bUseFile;
+
+                if (m_bUseFile)
+                {
+                    btnDrawMode.Content = FindResource("File");
+                    btnOpenDatas.IsEnabled = true;
+                }
+                else
+                {
+                    btnDrawMode.Content = FindResource("Measure");
+                    btnOpenDatas.IsEnabled = false;
+                }
+            }));
+        }
+
+        private void btnOpenDatas_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.OpenFileDialog ofd = new System.Windows.Forms.OpenFileDialog();
+            ofd.Filter = "Reflectance Data (*.csv)|*.csv";
+            ofd.FilterIndex = 0;
+            ofd.RestoreDirectory = true;
+
+            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                comboBoxDataIndex.Items.Clear();
+
+                var fileinfos = ofd.FileNames.Select(x => new FileInfo(x)).ToArray();
+
+                foreach (FileInfo file in fileinfos)
+                {
+                    comboBoxDataIndex.Items.Add(System.IO.Path.GetFileNameWithoutExtension(file.Name));
+                    m_strCurrentDir = System.IO.Path.GetDirectoryName(file.FullName);
+                }
+
+                if(comboBoxDataIndex.Items.Count > 0)
+                    comboBoxDataIndex.SelectedIndex = 0;
+            }
+        }
+
+        private void GraphR_MouseMove(object sender, MouseEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                if (m_bDataDetect == true)
+                {
+                    var mousePos = e.MouseDevice.GetPosition(GraphR);
+                    double mouseX = GraphR.plt.CoordinateFromPixelX(mousePos.X);
+                    double mouseY = GraphR.plt.CoordinateFromPixelY(mousePos.Y);
+
+                    m_ReflectancePlotTable.HighlightClear();
+                    var (dX, dY, nIndex) = m_ReflectancePlotTable.HighlightPointNearest(mouseX, mouseY);
+                    
+                    double dX2 = 0.0, dY2 = 0.0;
+                    int nIndex2 = 0;
+                    if (m_ReflectancePlotTable_Calc != null)
+                    {
+                        m_ReflectancePlotTable_Calc.HighlightClear();
+                        (dX2, dY2, nIndex2) = m_ReflectancePlotTable_Calc.HighlightPointNearest(mouseX, mouseY);
+                    }
+                    GraphR.Render();
+
+                    labelR.Visibility = Visibility.Visible;
+                    labelR.Content = $"(Wavelength[nm], Reflectance[%]) = ({dX:N3}, {dY:N3})"+ Environment.NewLine + $"(Wavelength[nm], CalcReflectance[%]) = ({dX2:N3}, {dY2:N3})";
+                }
+            }));
+        }
+
+        private void GraphT_MouseMove(object sender, MouseEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                if (m_bDataDetect == true)
+                {
+                    var mousePos = e.MouseDevice.GetPosition(GraphT);
+                    double mouseX = GraphT.plt.CoordinateFromPixelX(mousePos.X);
+                    double mouseY = GraphT.plt.CoordinateFromPixelY(mousePos.Y);
+
+                    m_TransmittancePlotTable.HighlightClear();
+                    var (x, y, index) = m_TransmittancePlotTable.HighlightPointNearest(mouseX, mouseY);
+                    GraphT.Render();
+
+                    labelT.Visibility = Visibility.Visible;
+                    labelT.Content = $"(Wavelength[nm], Reflectance[%]) = ({x:N3}, {y:N3})";
+                }
+            }));
+        }
+
+        private void comboBoxDataIndex_DropDownOpened(object sender, EventArgs e)
+        {
+            if (!m_bUseFile)
+            {
+                comboBoxDataIndex.Items.Clear();
+
+                for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
+                {
+                    if (m_DM.m_RawData[n].bDataExist)
+                    {
+                        comboBoxDataIndex.Items.Add(n);
+                    }
+                }
+            }
+        }
+    }
+}

@@ -80,17 +80,17 @@ namespace Root_CAMELLIA.LibSR_Met
                 //다층 박막에서의 반사율
                 return cR.Real * 100.0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return -1.0;
             }
         }
 
-        private double CalcTransmittance(int nPointIndex, int[] arrNKDataIdx, double dWavelength, double[] Thickness) //계산된 T
+        public double CalcTransmittance(int nPointIndex, int[] arrNKDataIdx, double dWavelength, double[] Thickness) //계산된 T
         {
             try
             {
-                if (m_DM.m_LayerData.Count == 0)
+                if (m_DM.m_LayerData.Count-1 == 0)
                 {
                     MessageBox.Show("CalcTransmittance() - Please open a recipe first!");
                     return -1;
@@ -111,9 +111,10 @@ namespace Root_CAMELLIA.LibSR_Met
                 Complex cDelta; //d 두께 단위땜에 10 곱해줌 //여기수정
 
                 Complex[][] mMj = MatrixCreate(2, 2);
-                for (int n = 0; n < m_DM.m_LayerData.Count; n++)
+                int nCalLayer = m_DM.m_LayerData.Count - 2;
+                for (int n = 0; n < m_DM.m_LayerData.Count-1; n++)
                 {
-                    cN = new Complex(m_DM.m_LayerData[n].n[arrNKDataIdx[n]], -m_DM.m_LayerData[n].k[arrNKDataIdx[n]]);
+                    cN = new Complex(m_DM.m_LayerData[nCalLayer].n[arrNKDataIdx[nCalLayer]], -m_DM.m_LayerData[nCalLayer].k[arrNKDataIdx[nCalLayer]]);
                     cD = new Complex(Thickness[n], 0); //초기 두께
                     cDelta = (2 * Math.PI * cN * cD) / (dWavelength * 10.0); //d 두께 단위땜에 10 곱해줌 //여기수정
 
@@ -123,6 +124,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     mMj[1][1] = Complex.Cos(cDelta);
 
                     mM = MatrixProduct(mM, mMj);
+                    nCalLayer--;
                 }
                 //다층 박막에서의 admittance
                 Complex cY = 0.0, cB = 0.0, cC = 0.0;
@@ -140,17 +142,18 @@ namespace Root_CAMELLIA.LibSR_Met
 
                 return cT.Real * 100.0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return -1.0;
             }
         }
 
-        private void CalcTransmittance_OptimizingSi(int nPointIdx, int nSiAvgOffsetRange, int nSiAvgOffsetStep, int nDNum, double[] mPn)
+        public void CalcTransmittance_OptimizingSi(int nPointIdx, int nSiAvgOffsetRange, int nSiAvgOffsetStep, int nDNum, double[] mPn)
         {
             int nDataMin = 9999;
             int nDataMinLayerIdx = 0;
-            for (int n = 0; n < m_DM.m_LayerData.Count; n++)
+            int nLayerCount = m_DM.m_LayerData.Count - 1;
+            for (int n = 0; n < nLayerCount - 1; n++)
             {
                 if (m_DM.m_LayerData[n].wavelength.Count < nDataMin)
                 {
@@ -159,12 +162,12 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
             }
 
-            m_DM.m_RawData[nPointIdx].CalcTransmittance = new double[nDataMin];
+            m_DM.m_RawData[nPointIdx].Transmittance = new double[nDataMin];
 
             int[][] arrNKIndexes = new int[nDataMin][];
             for (int i = 0; i < nDataMin; i++)
             {
-                arrNKIndexes[i] = new int[m_DM.m_LayerData.Count];
+                arrNKIndexes[i] = new int[nLayerCount];
             }
 
             //투과율계산
@@ -181,13 +184,12 @@ namespace Root_CAMELLIA.LibSR_Met
                     {
                         double dWavelength = m_DM.m_LayerData[nDataMinLayerIdx].wavelength[i];
 
-                        for (int n = 0; n < m_DM.m_LayerData.Count; n++)
+                        for (int n = 0; n < nLayerCount; n++)
                         {
                             int nNKIdx = m_DM.m_LayerData[n].wavelength.FindIndex(wl => Math.Abs(dWavelength - wl) < 0.1);
                             if (nNKIdx == -1)
                             {
-                                //두께 계산 한다면 수정 작업 필요
-                                //m_Log.WriteLog("CalcThickness() - Please check nk data file and wavelength range. Wavelength : " + dWavelength.ToString());
+                                m_DM.m_Log.WriteLog(LogType.Datas,"CalcThickness() - Please check nk data file and wavelength range. Wavelength : " + dWavelength.ToString());
                                 return;
                             }
                             arrNKIndexes[i][n] = nNKIdx;
@@ -200,17 +202,10 @@ namespace Root_CAMELLIA.LibSR_Met
 
             var mPPTemp = new double[nDNum];//Matrix<double>.Build.Dense(nDNum, 1, 0.0);
             mPn.CopyTo(mPPTemp, 0);
-            var PP = new double[m_DM.m_LayerData.Count];
+            var PP = new double[nLayerCount];
             for (int n = 0; n < nDNum; n++)
             {
-                if (m_DM.m_LayerData[n].bUseTargetTHK == true)
-                {
-                    PP[n] = m_DM.m_LayerData[n].dTargetThickness;
-                }
-                else
-                {
                     PP[n] = mPPTemp[n];
-                }
             }
 
             Task task2 = new Task(() =>
@@ -229,16 +224,12 @@ namespace Root_CAMELLIA.LibSR_Met
                         int nNum = (int)Math.Abs((((double)nRange * 2.0) / (double)nStep));
 
                         double dWavelength = m_DM.m_LayerData[nDataMinLayerIdx].wavelength[i];
-                        var PPP = new double[m_DM.m_LayerData.Count];
-                        int nLastRowIndex = m_DM.m_LayerData.Count - 1;
+                        var PPP = new double[nLayerCount];
+                        int nLastRowIndex = nLayerCount-1;
 
                         PP.CopyTo(PPP, 0);
 
-                        double dSiThickness = m_DM.m_LayerData[nLastRowIndex].dInitThickness;
-                        if (m_DM.m_LayerData[nLastRowIndex].bUseTargetTHK == true)
-                        {
-                            dSiThickness = m_DM.m_LayerData[nLastRowIndex].dTargetThickness;
-                        }
+                        double dSiThickness = ConstValue.SI_INIT_THICKNESS;
 
                         for (int n = 0; n < nNum; n++)
                         {
@@ -257,7 +248,7 @@ namespace Root_CAMELLIA.LibSR_Met
                             dTAvg = 0.0;
                         }
 
-                        m_DM.m_RawData[nPointIdx].CalcTransmittance[i] = dTAvg;
+                        m_DM.m_RawData[nPointIdx].Transmittance[i] = dTAvg;
                     }
                 });
             });
@@ -395,7 +386,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 if (m_DM.m_bCalcTransmittance)
                 {
                     // 투과율 계산 안함
-                    //CalcTransmittance_OptimizingSi(nPointIndex, nSiAvgOffsetRange, nSiAvgOffsetStep, nDNum, mPn);
+                    CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, mPn);
                 }
                 else
                 {
@@ -576,7 +567,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
             if (m_DM.m_bCalcTransmittance)
             {
-                // CalcTransmittance_OptimizingSi(nPointIndex, nSiAvgOffsetRange, nSiAvgOffsetStep, nDNum, mPn);
+                CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, mPn);
             }
             else
             {
