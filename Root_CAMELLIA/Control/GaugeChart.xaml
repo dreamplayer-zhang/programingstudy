@@ -12,10 +12,10 @@
         <converter:ValueToColorConverter x:Key="ValueToColorconverter"/>
     </Control.Resources>
     <Grid>
-        <Grid Width="70" Height="100" Margin="3">
+        <Grid Width="auto" Height="100" Margin="3">
             <Grid.RowDefinitions>
                 <RowDefinition/>
-                <RowDefinition Height="0.3*"/>
+                <RowDefinition Height="0.6*"/>
             </Grid.RowDefinitions>
             <TextBlock Text="{Binding p_unit, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" HorizontalAlignment="Center" FontWeight="Heavy" VerticalAlignment="Center" Margin="0,0,0,20" Panel.ZIndex="1" FontSize="12" />
             <lvc:Gauge Grid.Row="0" Grid.Column="1"
