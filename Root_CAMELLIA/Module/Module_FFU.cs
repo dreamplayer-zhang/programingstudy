@@ -239,13 +239,24 @@ namespace Root_CAMELLIA.Module
 				}
 
 				public string m_id;
-				public string p_sFan { get; set; } = "";
+				string _sFan = "";
+				public string p_sFan 
+				{
+                    get { return _sFan; }
+                    set
+                    {
+						if (_sFan == value) return;
+						_sFan = value;
+						OnPropertyChanged();
+                    }
+				}
 				public Fan(Module_FFU FFU, string id)
 				{
 					m_id = id;
 					InitALID(FFU);
 				}
 			}
+			#endregion
 			public List<Fan> m_aFan = new List<Fan>();
 			public List<Fan> p_aFan
 			{
@@ -269,6 +280,16 @@ namespace Root_CAMELLIA.Module
 				}
 			}
 			public List<Humidity> m_aHumidity = new List<Humidity>();
+			public List<Humidity> p_aHumidity
+            {
+                get { return m_aHumidity; }
+                set
+                {
+					if (m_aHumidity == value) return;
+					m_aHumidity = value;
+					OnPropertyChanged();
+                }
+            }
 
 			List<int> m_aFanState = new List<int>();
 			List<int> m_aFanRPM = new List<int>();
@@ -302,14 +323,16 @@ namespace Root_CAMELLIA.Module
 			}
 			void InitListTemp(List<int> aList)
             {
-				while (aList.Count > m_lTemp) aList.RemoveAt(aList.Count - 1);
-				while (aList.Count < m_lTemp) aList.Add(0);
+				int nTotal = 32 * m_lTemp;
+				aList.Clear();
+				for (int i = 0; i < nTotal; i++) aList.Add(0);
             }
 
 			void InitListHumidity(List<int> aList)
             {
-				while (aList.Count > m_lHumidity) aList.RemoveAt(aList.Count - 1);
-				while (aList.Count < m_lHumidity) aList.Add(0);
+				int nTotal = 32 * m_lTemp;
+				aList.Clear();
+				for (int i = 0; i < nTotal; i++) aList.Add(0);
 			}
 
 			int m_lFan = 2;
@@ -327,7 +350,7 @@ namespace Root_CAMELLIA.Module
 				for (int n = 0; n < m_lTemp; n++) m_aTemp[n].RunTree(tree.GetTree(m_aTemp[n].m_id));
 				for (int n = 0; n < m_lHumidity; n++) m_aHumidity[n].RunTree(tree.GetTree(m_aHumidity[n].m_id));
 			}
-            #endregion
+            
 
             #region Temp
             public class Temp : NotifyProperty
@@ -356,7 +379,17 @@ namespace Root_CAMELLIA.Module
 					m_alidTempLow = GAF.GetALID(FFU, m_id + " : Temp Low", "Temp RPM too Low");
 				}
 				#endregion
-				public string p_sTemp { get; set; } = "";
+				string _sTemp = "";
+				public string p_sTemp 
+				{
+                    get { return _sTemp; }
+                    set
+                    {
+						if (_sTemp == value) return;
+						_sTemp = value;
+						OnPropertyChanged();
+                    }
+				}
 				public void RunTree(Tree tree)
 				{
 					p_sTemp = tree.Set(p_sTemp, p_sTemp, "Temp ID", "Temp ID");
@@ -399,12 +432,22 @@ namespace Root_CAMELLIA.Module
 					m_alidHumidityLow = GAF.GetALID(FFU, m_id + " : Humidity Low", "Humidity RPM too Low");
 				}
 				#endregion
-				public string p_sHumidity { get; set; } = "";
+				string _sHumidity = "";
+				public string p_sHumidity 
+				{
+                    get { return _sHumidity; }
+                    set
+                    {
+						if (_sHumidity == value) return;
+						_sHumidity = value;
+						OnPropertyChanged();
+                    }
+				}
 				public void RunTree(Tree tree)
 				{
 					p_sHumidity = tree.Set(p_sHumidity, p_sHumidity, "Humidity ID", "Temp ID");
 					m_mmLimit = tree.Set(m_mmLimit, m_mmLimit, "Limit", "Humidity Lower & Upper Limit");
-				}
+                }
 				public string m_id;
 				public Humidity(Module_FFU FFU, string id)
 				{
@@ -432,17 +475,30 @@ namespace Root_CAMELLIA.Module
 					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 128, m_aFanPressure);
 					for (int n = 0; n < m_lFan; n++) m_aFan[n].p_fPressure = m_aFan[n].p_bRun ? m_aFanPressure[n] / 10.0 : 0;
 
-					//Thread.Sleep(10);
-					//m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 192, m_aModuleData);
-
-					if (m_FFU.m_bResetFan)
-					{
+					for (int n = 0; n < m_lTemp; n++)
+                    {
 						Thread.Sleep(10);
-						for (int n = 0; n < m_lFan; n++) m_aFanReset[n] = 1;
-						m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 96, m_aFanReset);
+						int nTemp = 0;
+						m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 193 + (32 * n), ref nTemp);
+						m_aTemp[n].p_nTemp = nTemp;
 					}
 
-					if (IsRPMSet())
+                    for (int n = 0; n < m_lHumidity; n++)
+                    {
+                        Thread.Sleep(10);
+                        int nHumidity = 0;
+                        m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 194 + (32 * n), ref nHumidity);
+                        m_aHumidity[n].p_nHumidity = nHumidity;
+                    }
+
+                    if (m_FFU.m_bResetFan)
+                    {
+                        Thread.Sleep(10);
+                        for (int n = 0; n < m_lFan; n++) m_aFanReset[n] = 1;
+                        m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 96, m_aFanReset);
+                    }
+
+                    if (IsRPMSet())
 					{
 						Thread.Sleep(10);
 						for (int n = 0; n < m_lFan; n++) m_aFanRPMSet[n] = m_aFan[n].m_nSet;
