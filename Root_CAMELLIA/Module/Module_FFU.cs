@@ -475,17 +475,30 @@ namespace Root_CAMELLIA.Module
 					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 128, m_aFanPressure);
 					for (int n = 0; n < m_lFan; n++) m_aFan[n].p_fPressure = m_aFan[n].p_bRun ? m_aFanPressure[n] / 10.0 : 0;
 
-					//Thread.Sleep(10);
-					//m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 192, m_aModuleData);
-
-					if (m_FFU.m_bResetFan)
-					{
+					for (int n = 0; n < m_lTemp; n++)
+                    {
 						Thread.Sleep(10);
-						for (int n = 0; n < m_lFan; n++) m_aFanReset[n] = 1;
-						m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 96, m_aFanReset);
+						int nTemp = 0;
+						m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 193 + (32 * n), ref nTemp);
+						m_aTemp[n].p_nTemp = nTemp;
 					}
 
-					if (IsRPMSet())
+                    for (int n = 0; n < m_lHumidity; n++)
+                    {
+                        Thread.Sleep(10);
+                        int nHumidity = 0;
+                        m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 194 + (32 * n), ref nHumidity);
+                        m_aHumidity[n].p_nHumidity = nHumidity;
+                    }
+
+                    if (m_FFU.m_bResetFan)
+                    {
+                        Thread.Sleep(10);
+                        for (int n = 0; n < m_lFan; n++) m_aFanReset[n] = 1;
+                        m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 96, m_aFanReset);
+                    }
+
+                    if (IsRPMSet())
 					{
 						Thread.Sleep(10);
 						for (int n = 0; n < m_lFan; n++) m_aFanRPMSet[n] = m_aFan[n].m_nSet;
