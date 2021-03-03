@@ -487,8 +487,7 @@ namespace Root_AOP01_Inspection.Module
 			{
 				((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList[i] = new TRect(rectList[i]);
 			}
-
-			SaveModule();
+			((Run_SurfaceInspection)m_aModuleRun[targetidx]).UpdeteTree();
 		}
 
 		double m_dPatternShiftDistance = 0.0;
@@ -1086,13 +1085,6 @@ namespace Root_AOP01_Inspection.Module
 			AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
 		}
 		#endregion
-
-		public void SaveModule()
-		{
-			RunTree(Tree.eMode.RegWrite);
-			RunTree(Tree.eMode.Init);
-			RunTree(Tree.eMode.Update);
-		}
 
 		public MainVision(string id, IEngineer engineer)
 		{
