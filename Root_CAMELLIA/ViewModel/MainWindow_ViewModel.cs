@@ -662,8 +662,8 @@ namespace Root_CAMELLIA
             }
         }
 
-        ObservableCollection<FanListItem> _FanListItem = new ObservableCollection<FanListItem>();
-        public ObservableCollection<FanListItem> FanListItems
+        ObservableCollection<ObservableObject> _FanListItem = new ObservableCollection<ObservableObject>();
+        public ObservableCollection<ObservableObject> FanListItems
         {
             get
             {
@@ -774,10 +774,11 @@ namespace Root_CAMELLIA
                     }
                     for (int i = 0; i < FanListItems.Count; i++)
                     {
-                        if (FanListItems[i].Fan.p_bRun == false)
-                            FanListItems[i].Fan.p_bRun = true;
-                        else if (FanListItems[i].Fan.p_bRun)
-                            FanListItems[i].Fan.p_bRun = false;
+                        FanListItem fan = FanListItems[i] as FanListItem;
+                        if (fan.Fan.p_bRun == false)
+                            fan.Fan.p_bRun = true;
+                        else if (fan.Fan.p_bRun)
+                            fan.Fan.p_bRun = false;
                     }
                     //GaugeListItem gauge = new GaugeListItem();
                     //gauge.Gauge = new GaugeChart();
@@ -826,6 +827,7 @@ namespace Root_CAMELLIA
                     
                     m_MainWindow.Close();
                     App.m_engineer.ThreadStop();
+                    Application.Current.Shutdown();
                 });
             }
         }

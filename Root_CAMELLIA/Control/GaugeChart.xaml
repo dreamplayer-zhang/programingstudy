@@ -12,16 +12,16 @@
         <converter:ValueToColorConverter x:Key="ValueToColorconverter"/>
     </Control.Resources>
     <Grid>
-        <Grid Width="88" Height="100" Margin="3">
+        <Grid Width="70" Height="100" Margin="3">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition Height="0.3*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="{Binding p_unit, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,0,26" Panel.ZIndex="1" FontSize="14" />
+            <TextBlock Text="{Binding p_unit, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" HorizontalAlignment="Center" FontWeight="Heavy" VerticalAlignment="Center" Margin="0,0,0,20" Panel.ZIndex="1" FontSize="12" />
             <lvc:Gauge Grid.Row="0" Grid.Column="1"
                        From="{Binding p_from, UpdateSourceTrigger=PropertyChanged}" 
                        To="{Binding p_to, UpdateSourceTrigger=PropertyChanged}" 
-                       Value="{Binding p_value, UpdateSourceTrigger=PropertyChanged}"  HighFontSize="15" FontWeight="Bold" Margin ="0"
+                       Value="{Binding p_value, UpdateSourceTrigger=PropertyChanged}" HighFontSize="12" FontWeight="Heavy" Margin ="0"
                    LabelsVisibility="Collapsed">
                 <lvc:Gauge.GaugeActiveFill>
                     <LinearGradientBrush>

@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace RootTools.Database
 {
-    public class Defect
+    public class Defect : Data
     {
         // 각 Inspection에서 올라오는 결과 데이터
         public int m_nDefectIndex;
@@ -111,9 +111,19 @@ namespace RootTools.Database
             m_fRelY = m_fAbsY - nRefY;
         }
 
-        public Rect GetRect()
+        public override Rect GetRect()
         {
             return p_rtDefectBox;
+        }
+
+        public override float GetWidth()
+        {
+            return m_fWidth;
+        }
+
+        public override float GetHeight()
+        {
+            return m_fHeight;
         }
 
         public void CalcDegree()

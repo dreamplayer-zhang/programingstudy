@@ -289,6 +289,7 @@
       <DependentUpon>Database_DataView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Database\Database_DataView_VM.cs" />
+    <Compile Include="Database\Table\Data.cs" />
     <Compile Include="Database\Table\DatabaseManager.cs" />
     <Compile Include="Database\Table\Database_ConnectSession.cs" />
     <Compile Include="Database\Table\Defect\Defect.cs" />
