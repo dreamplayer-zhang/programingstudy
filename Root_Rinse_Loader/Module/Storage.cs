@@ -207,6 +207,7 @@ namespace Root_Rinse_Loader.Module
         {
             m_axis.AddPos(Enum.GetNames(typeof(eMagazine)));
             m_axis.AddPos("Stack");
+            m_axis.AddPos("Stack_Down");
         }
 
         int m_dZ = 6;
@@ -220,6 +221,12 @@ namespace Root_Rinse_Loader.Module
         public string MoveStack()
         {
             m_axis.StartMove("Stack");
+            return m_axis.WaitReady();
+        }
+
+        public string MoveStack_Down()
+        {
+            m_axis.StartMove("Stack_Down");
             return m_axis.WaitReady();
         }
 

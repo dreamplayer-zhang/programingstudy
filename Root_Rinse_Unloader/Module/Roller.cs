@@ -115,7 +115,7 @@ namespace Root_Rinse_Unloader.Module
         #region Line
         public class Line : NotifyProperty
         {
-            DIO_I[] m_diCheck = new DIO_I[3];
+            public DIO_I[] m_diCheck = new DIO_I[3];
             public DIO_I2O[] m_dioAlignUp = new DIO_I2O[2]; 
             public void GetTools(ToolBox toolBox)
             {

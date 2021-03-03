@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
@@ -10,6 +11,11 @@ namespace Root_EFEM.Module
 {
     public class Vision_AOP : ModuleBase, IWTRChild
     {
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
+        }
         #region ToolBox
         MemoryPool m_memoryPool;
 
@@ -44,6 +50,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.Get(ref m_axistheta, this, "Theta");
             //p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
+            m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
             if (bInit)
             {
                 InitMemory();

@@ -10,6 +10,7 @@
         xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
         xmlns:tools="clr-namespace:RootTools.Control.ACS;assembly=RootTools"
         xmlns:arrow="clr-namespace:Petzold.Media2D"
+        xmlns:ctrl="clr-namespace:Root_CAMELLIA.Control"
         mc:Ignorable="d"
         WindowStyle="None"
         AllowsTransparency="False"
@@ -25,6 +26,7 @@
         <local:AxisToStageUIConverter x:Key="AxisToStageConverter"/>
         <local:MeasurePointToStageUIConverter x:Key="PointToStageConverter"/>
         <local:DoubleToProgressConverter x:Key="ProgressConverter"/>
+        
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -53,7 +55,7 @@
                        VerticalAlignment="Center"
                        Margin="5,0,0,0"
                        Grid.Column="1" />
-            <TextBlock Text="Recipe Name.Rcp"
+            <TextBlock Text="{Binding RecipeViewModel.RecipePath}"
                        FontSize="12"
                        FontWeight="Bold"
                        Foreground="Black"
@@ -160,9 +162,15 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Grid Background="Crimson"/>
-                        <Grid Background="Gold" Grid.Row="1"/>
-                        <Grid Background="SeaGreen" Grid.Row="2"/>
+                        <Border BorderThickness="0,0,0,1" BorderBrush="#FF707070">
+                            <Grid Background="#FFDDDDDD"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0,1" BorderBrush="#FF707070" Grid.Row="1">
+                            <Grid Background="Gold"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0,0" BorderBrush="#FF707070" Grid.Row="2">
+                            <Grid Background="#FFDDDDDD" />
+                        </Border>
                     </Grid>
                 </Border>
             </StackPanel>
@@ -196,62 +204,102 @@
         <!--Main Panel-->
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.2*"/>
+                <ColumnDefinition Width="750"/>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="0.3*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="14*"/>
                 </Grid.RowDefinitions>
                 <GroupBox Header="Monitoring" Grid.Row="0">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width="1.5*"/>
+                            <ColumnDefinition Width="75*"/>
+                            <ColumnDefinition Width="25*"/>
                         </Grid.ColumnDefinitions>
-                        <UniformGrid Columns="2" Rows="2" Margin="2,0">
-                            <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBlock Text="Deuterium Lamp" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    <Ellipse Width="12" Height="12" Fill="Gray" Margin="3,0"/>
-                                </StackPanel>
-                            </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBlock Text="Halogen Lamp" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    <Ellipse Width="12" Height="12" Fill="Gray" Margin="3,0"/>
-                                </StackPanel>
+                        <GroupBox Header="FDC" BorderBrush="Black" BorderThickness="1">
+                            <ItemsControl ItemsSource="{Binding GaugeListItems, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                        </Grid>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style>
+                                        <Setter Property="Grid.Column"
+                    Value="{Binding p_columnIndex}" />
+                                        <Setter Property="Grid.Row"
+                    Value="{Binding p_rowIndex}" />
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ctrl:GaugeChart DataContext="{Binding Gauge}"></ctrl:GaugeChart>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </GroupBox>
+                        <GroupBox Grid.Column="1" BorderBrush="Black" BorderThickness="1" Header="FFU">
+                            <ItemsControl ItemsSource="{Binding FanListItems, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                        </Grid>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style>
+                                        <Setter Property="Grid.Column"
+                    Value="{Binding p_columnIndex}" />
+                                        <Setter Property="Grid.Row"
+                    Value="{Binding p_rowIndex}" />
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ctrl:Fan VerticalAlignment="Center" HorizontalAlignment="Center" DataContext="{Binding Fan, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </GroupBox>
+                        <!--<UniformGrid Columns="4" Rows="1" Margin="2,0" Grid.Column="1">
+                            <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
+                                <TextBlock Text="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <chart:GaugeChart DataContext="{Binding p_Test}"></chart:GaugeChart>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
-                                <TextBlock Text="Time : -1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
+                                <TextBlock Text="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,1,1,1">
-                                <TextBlock Text="Time : -1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
-                        </UniformGrid>
-                        <UniformGrid Columns="3" Rows="2" Margin="2,0" Grid.Column="1">
-                            <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                <TextBlock Text="Wafer Stage Offset X" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                                <TextBlock Text="Wafer Stage Offset Y" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
-                                <TextBlock Text="Theta Align" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
-                                <TextBlock Text="0um" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
-                                <TextBlock Text="0um" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1,1,1,1">
-                                <TextBlock Text="0 º" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </UniformGrid>
+                        </UniformGrid>-->
                     </Grid>
                 </GroupBox>
                 <Grid Grid.Row="2">
@@ -515,7 +563,7 @@
                                                     <RowDefinition Height="0.4*"/>
                                                 </Grid.RowDefinitions>
                                                 <DataGrid Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
-                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding RecipeViewModel.GridLayerData}" IsReadOnly="True">
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding RecipeViewModel.GridLayerData}" IsReadOnly="True" IsEnabled="{Binding RecipeViewModel.p_UseThickness}">
                                                     <DataGrid.Columns>
                                                         <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True" Foreground="Blue" FontWeight="ExtraBold"/>
                                                         <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedHost1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
@@ -719,7 +767,7 @@
                 <TabItem Header="Log" Width="80">
                 </TabItem>
                 <TabItem Header="RT Graph">
-                    <!--<met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>-->
+                    <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
                 </TabItem>
             </TabControl>
             <Grid Grid.Column="3">
@@ -744,6 +792,10 @@
                             Style="{StaticResource SetupPanelBtn}" 
                             Height="40"
                             Click="buttonBuzzerOff_Click"/>
+                    <Button Content="OHT" x:Name="buttonOHT" Margin="0,200,0,0"
+                            Style="{StaticResource SetupPanelBtn}"
+                            Height="40"
+                            Click="buttonOHT_Click"/>
                 </StackPanel>
             </Grid>
         </Grid>

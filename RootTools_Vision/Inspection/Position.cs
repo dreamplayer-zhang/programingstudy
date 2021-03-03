@@ -12,6 +12,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using RootTools;
 using System.Windows;
+using RootTools.Database;
 
 namespace RootTools_Vision
 {
@@ -204,6 +205,20 @@ namespace RootTools_Vision
                 }
                 else  // Position Fail
                 {
+                    string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+
+                    this.currentWorkplace.AddDefect(sInspectionID,
+                       90001,
+                       0,
+                       0,
+                       this.currentWorkplace.PositionX,
+                       this.currentWorkplace.PositionY,
+                       this.currentWorkplace.Width,
+                       this.currentWorkplace.Height,
+                       this.currentWorkplace.MapIndexX,
+                       this.currentWorkplace.MapIndexY
+                       );
+
                     WorkEventManager.OnPositionDone(this.currentWorkplace, new PositionDoneEventArgs(new CPoint(maxStartX, maxStartY), new CPoint(maxEndX, maxEndY),
                             new CPoint(maxStartX + transX, maxStartY + transY), new CPoint(maxEndX + transX, maxEndY + transY), false));
                 }     
@@ -339,13 +354,28 @@ namespace RootTools_Vision
                     this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS, false);
                     this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
 
+                    string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+
+                    this.currentWorkplace.AddDefect(sInspectionID,
+                       90001,
+                       0,
+                       0,
+                       this.currentWorkplace.PositionX,
+                       this.currentWorkplace.PositionY,
+                       this.currentWorkplace.Width,
+                       this.currentWorkplace.Height,
+                       this.currentWorkplace.MapIndexX,
+                       this.currentWorkplace.MapIndexY
+                       );
+
                     WorkEventManager.OnPositionDone(this.currentWorkplace, new PositionDoneEventArgs(new CPoint(tplStartX, tplStartY), new CPoint(tplStartX + tplW, tplStartY + tplH),
                             new CPoint(tplStartX + transX, tplStartY + transY), new CPoint(tplStartX + tplW + transX, tplStartY + tplH + transY), false));
                 }
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                TempLogger.Write("Position", ex);
+                //MessageBox.Show(ex.Message);
             }
 
             return true;
@@ -504,13 +534,28 @@ namespace RootTools_Vision
                     this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS, false);
                     this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
 
+                    string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+
+                    this.currentWorkplace.AddDefect(sInspectionID,
+                       90001,
+                       0,
+                       0,
+                       this.currentWorkplace.PositionX,
+                       this.currentWorkplace.PositionY,
+                       this.currentWorkplace.Width,
+                       this.currentWorkplace.Height,
+                       this.currentWorkplace.MapIndexX,
+                       this.currentWorkplace.MapIndexY
+                       );
+
                     WorkEventManager.OnPositionDone(this.currentWorkplace, new PositionDoneEventArgs(new CPoint(tplStartX, tplStartY), new CPoint(tplStartX + tplW, tplStartY + tplH),
                             new CPoint(tplStartX + transX, tplStartY + transY), new CPoint(tplStartX + tplW + transX, tplStartY + tplH + transY), false));
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                TempLogger.Write("Position", ex);
+                //MessageBox.Show(ex.Message);
             }
 
             return true;

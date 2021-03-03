@@ -32,6 +32,7 @@ namespace Root_WIND2.UI_User
 		private int maxProgress = 100;
 		private string percentage = "0";
 
+		private int sizeYMinVal = 0;
 		private int sizeYMaxVal = 1000; 
 		private double sizeFrom = 0;
 		private double sizeTo = 50;
@@ -42,6 +43,7 @@ namespace Root_WIND2.UI_User
 			get { return imageViewerVM; }
 			set { SetProperty(ref imageViewerVM, value); }
 		}
+
 		public EBRRecipe Recipe
 		{
 			get => recipe;
@@ -82,12 +84,14 @@ namespace Root_WIND2.UI_User
 				if (Recipe.CameraHeight == 0)
 					Recipe.CameraHeight = inspect.CameraHeight;
 
+				Recipe.Resolution = mode.m_dResX_um;
 				Recipe.TriggerRatio = mode.m_dCamTriggerRatio;
-				Parameter.CamResolution = mode.m_dResX_um;
-
+				Recipe.ImageOffset = inspect.ImageOffset;
+				
 				SetProperty<int>(ref this.selectedGrabModeIndex, value);
 			}
 		}
+
 		public int Progress
 		{
 			get => progress;
@@ -103,6 +107,7 @@ namespace Root_WIND2.UI_User
 			get => percentage;
 			set => SetProperty(ref percentage, value);
 		}
+
 		public DataTable MeasurementDataTable
 		{
 			get => measurementDataTable;
@@ -126,6 +131,16 @@ namespace Root_WIND2.UI_User
 			{
 				xLabels = value;
 				RaisePropertyChanged("XLabels");
+			}
+		}
+
+		public int SizeYMinVal
+		{
+			get => sizeYMinVal;
+			set
+			{
+				sizeYMinVal = value;
+				RaisePropertyChanged("sizeYMinVal");
 			}
 		}
 
@@ -229,11 +244,22 @@ namespace Root_WIND2.UI_User
 		private void WorkEventManager_ProcessMeasurementDone(object sender, ProcessMeasurementDoneEventArgs e)
 		{
 			Workplace workplace = sender as Workplace;
+			List<CRect> rectList = new List<CRect>();
+			List<string> textList = new List<string>();
+
+			foreach (RootTools.Database.Measurement measure in workplace.MeasureList)
+			{
+				String text = "";
+
+				rectList.Add(new CRect((int)measure.p_rtDefectBox.Left, (int)measure.p_rtDefectBox.Top, (int)measure.p_rtDefectBox.Right, (int)measure.p_rtDefectBox.Bottom));
+				textList.Add(text);
+			}
 
 			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
 			{
 				UpdateDataGrid();
 				DrawGraph();
+				DrawRectMeasurementROI(rectList, textList);
 			}));
 		}
 
@@ -268,6 +294,12 @@ namespace Root_WIND2.UI_User
 			Parameter = recipe.GetItem<EBRParameter>();
 		}
 
+		public void CreateRecipeWaferMap()
+		{
+			//RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeEBR>().WaferMap;
+
+		}
+
 		private void UpdateProgress()
 		{
 			if (GlobalObjects.Instance.Get<InspectionManagerEBR>() != null)
@@ -289,7 +321,7 @@ namespace Root_WIND2.UI_User
 			string sRecipeID = recipe.Name;
 			string sReicpeFileName = sRecipeID + ".rcp";
 
-			string sDefect = "defect";
+			string sDefect = "measurement";
 			MeasurementDataTable = DatabaseManager.Instance.SelectTablewithInspectionID(sDefect, sInspectionID);
 		}
 
@@ -327,20 +359,34 @@ namespace Root_WIND2.UI_User
 			ChartValues<float> bevels = new ChartValues<float>();
 			foreach (DataRow table in datas)
 			{
-				string data = table[5].ToString();
-				bevels.Add(float.Parse(data));
+				if (table[5].ToString() == Measurement.EBRMeasureItem.Bevel.ToString())
+				{
+					string data = table[6].ToString();
+					bevels.Add(float.Parse(data));
+				}
 			}
 			MeasurementGraph[0].Values = bevels;
 
 			ChartValues<float> ebrs = new ChartValues<float>();
 			foreach (DataRow table in datas)
 			{
-				string data = table[6].ToString();
-				ebrs.Add(float.Parse(data));
+				if (table[5].ToString() == Measurement.EBRMeasureItem.EBR.ToString())
+				{
+					string data = table[6].ToString();
+					ebrs.Add(float.Parse(data));
+				}
 			}
 			MeasurementGraph[1].Values = ebrs;
 
-			SizeYMaxVal = (int)ebrs.Max();
+			//if (bevels != null)
+			//	SizeYMinVal = (int)bevels.Min();
+			if (ebrs != null)
+				SizeYMaxVal = (int)ebrs.Max();
 		}
+		private void DrawRectMeasurementROI(List<CRect> rectList, List<String> textList, bool reDraw = false)
+		{
+			imageViewerVM.AddDrawRectList(rectList, System.Windows.Media.Brushes.Red);
+		}
+		
 	}
 }

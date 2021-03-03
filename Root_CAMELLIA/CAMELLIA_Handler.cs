@@ -63,6 +63,11 @@ namespace Root_CAMELLIA
         public EFEM_Process m_process;
         public Module_Camellia m_camellia;
         public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
+        public Module_FDC m_FDC;
+        public Module_FDC m_FDC_Vision;
+        public Module_FFU m_FFU;
+        public TowerLamp m_towerlamp;
+        public Interlock m_interlock;
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
@@ -71,21 +76,28 @@ namespace Root_CAMELLIA
             InitLoadport();
             InitRFID();
             InitAligner();
-            m_camellia = new Module_Camellia("Camellia", m_engineer);
+            m_camellia = new Module_Camellia("Camellia", m_engineer, m_aLoadport);
             InitModule(m_camellia);
             m_HomeProgress.Init(this);
-            //InitXGem();
+            m_towerlamp = new TowerLamp("Towerlamp", m_engineer);
+            InitModule(m_towerlamp);
+            m_interlock = new Interlock("Interlock", m_engineer);
+            InitModule(m_interlock);
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.AddChild(m_camellia);
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
             iWTR.ReadInfoReticle_Registry();
 
+            m_FDC = new Module_FDC("FDC", m_engineer);
+            InitModule(m_FDC);
+            m_FDC_Vision = new Module_FDC("FDC_Vision", m_engineer);
+            InitModule(m_FDC_Vision);
+            m_FFU = new Module_FFU("FFU", m_engineer);
+            InitModule(m_FFU);
             m_recipe = new CAMELLIA_Recipe("Recipe", m_engineer);
-            //m_recipe.AddModule(m_camellia);
             foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            //m_process = new CAMELLIA_Process("Process", m_engineer, this);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR);
+            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
         }
 
         void InitModule(ModuleBase module)
@@ -97,12 +109,26 @@ namespace Root_CAMELLIA
 
         public bool IsEnableRecovery()
         {
-            //            if (m_vision.p_infoWafer != null) return true;
-            //return false;
             IWTR iWTR = (IWTR)m_wtr;
-            foreach(IWTRChild child in iWTR.p_aChild)
+            foreach (IWTRChild child in iWTR.p_aChild)
             {
-                if (child.p_infoWafer != null) return true;
+                if (child.p_infoWafer != null)
+                {
+                    if (child.IsWaferExist(0) == false)
+                    {
+                        child.SetAlarm();
+                        return false;
+                    }
+                }
+                else if (child.p_infoWafer == null)
+                {
+                    if (child.IsWaferExist(0) == true)
+                    {
+                        child.SetAlarm();
+                        return false;
+                    }
+                }
+                return true;
             }
             return iWTR.IsEnableRecovery();
         }
@@ -379,7 +405,15 @@ namespace Root_CAMELLIA
         {
             foreach (EFEM_Process.Sequence sequence in aSequence)
             {
-                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
+                //if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) //return true;
+                {
+                    if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
+                    ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
+                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    m_process.m_qSequence.Enqueue(sequenceDock);
+                    return true;
+                }
             }
             return false;
         }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Root_CAMELLIA.Module
@@ -21,10 +22,10 @@ namespace Root_CAMELLIA.Module
 
         public enum eBuzzer
         {
-            Buzzer1,
-            Buzzer2,
-            Buzzer3,
-            Buzzer4
+            Error,
+            Warning,
+            Finish,
+            Home,
         }
 
         string[] m_asLamp = Enum.GetNames(typeof(eLamp));
@@ -36,6 +37,33 @@ namespace Root_CAMELLIA.Module
         {
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
             p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
+            if (bInit)
+            {
+                EQ.m_EQ.OnChanged += M_EQ_OnChanged;
+            }
+        }
+
+        private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
+        {
+            switch (eEQ)
+            {
+                case _EQ.eEQ.State:
+                    switch ((EQ.eState)value)
+                    {
+                        case EQ.eState.Error:
+                            RunBuzzer(eBuzzer.Error);
+                            break;
+                        case EQ.eState.Home:
+                            RunBuzzer(eBuzzer.Home);
+                            Thread.Sleep(200);
+                            BuzzerOff();
+                            break;
+                        case EQ.eState.Ready:
+                            BuzzerOff();
+                            break;
+                    }
+                    break;
+            }
         }
         #endregion
 
@@ -44,9 +72,9 @@ namespace Root_CAMELLIA.Module
         protected override void RunThread()
         {
             base.RunThread();
-            if(m_eState != EQ.p_eState)
+            //if(m_eState != EQ.p_eState)
             {
-                switch (EQ.p_eState) 
+                switch (EQ.p_eState)
                 {
                     case EQ.eState.Error:
                         m_doLamp.Write(eLamp.Red);
@@ -69,12 +97,18 @@ namespace Root_CAMELLIA.Module
         }
         #endregion
 
+        public void RunBuzzer(eBuzzer ebuzzer)
+        {
+            m_doBuzzer.Write(ebuzzer);
+        }
+
         public string BuzzerOff()
         {
-            m_doBuzzer.Write(eBuzzer.Buzzer1, false);
-            m_doBuzzer.Write(eBuzzer.Buzzer2, false);
-            m_doBuzzer.Write(eBuzzer.Buzzer3, false);
-            m_doBuzzer.Write(eBuzzer.Buzzer4, false);
+            //m_doBuzzer.Write(eBuzzer.Error, false);
+            //m_doBuzzer.Write(eBuzzer.Finish, false);
+            //m_doBuzzer.Write(eBuzzer.Home, false);
+            //m_doBuzzer.Write(eBuzzer.Warning, false);
+            m_doBuzzer.AllOff();
             return "OK";
         }
 

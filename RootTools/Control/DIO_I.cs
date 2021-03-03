@@ -10,7 +10,10 @@ namespace RootTools.Control
 
         public bool p_bIn
         {
-            get { return (m_bitDI.p_bOn != m_bReverse); }
+            get 
+            {
+                return (m_bitDI.p_bOn != m_bReverse); 
+            }
         }
 
         ListDIO m_listDI; 

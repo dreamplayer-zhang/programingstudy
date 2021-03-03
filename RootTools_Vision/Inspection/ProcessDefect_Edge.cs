@@ -46,27 +46,37 @@ namespace RootTools_Vision
 
             if (MergeDefectList.Count > 0)
                 DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
+            
+            SharedBufferInfo sharedBufferInfo = new SharedBufferInfo(currentWorkplace.SharedBufferR_GRAY,
+                                                                     currentWorkplace.Width,
+                                                                     currentWorkplace.Height,
+                                                                     currentWorkplace.SharedBufferByteCnt,
+                                                                     currentWorkplace.SharedBufferG,
+                                                                     currentWorkplace.SharedBufferB);
 
-            string sDefectimagePath = @"D:\DefectImage";
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            SaveDefectImage(Path.Combine(sDefectimagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
+            SettingItem_SetupEBR settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupEBR>();
 
-			//GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
-			//GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
-			//GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
-			//GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(sDefectimagePath, false);
+            Tools.SaveDataImage(Path.Combine(settings.MeasureImagePath, sInspectionID), MergeDefectList.Cast<Data>().ToList(), sharedBufferInfo);
 
-			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
-			WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
+            if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
+            {
+                List<string> dataStringList = GlobalObjects.Instance.Get<KlarfData_Lot>().DefectDataToStringList(MergeDefectList);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, dataStringList, null);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+                GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
+
+                Tools.SaveTiffImage(settings.KlarfSavePath, MergeDefectList.Cast<Data>().ToList(), sharedBufferInfo);
+            }
+
+            //WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
+            WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
         }
 
 		public List<Defect> CollectDefectData(int mapX)
 		{
 			List<Defect> DefectList = new List<Defect>();
-
-            //foreach (Workplace workplace in workplaceBundle)
-            //	foreach (Defect defect in workplace.DefectList)
-            //		DefectList.Add(defect);
 
             foreach (Workplace workplace in workplaceBundle)
             {
@@ -78,55 +88,5 @@ namespace RootTools_Vision
             }
             return DefectList;
 		}
-
-        private void SaveDefectImage(String Path, List<Defect> DefectList, int nByteCnt)
-        {
-            Path += "\\";
-            DirectoryInfo di = new DirectoryInfo(Path);
-            if (!di.Exists)
-                di.Create();
-
-            if (DefectList.Count < 1)
-                return;
-
-            unsafe
-            {
-                Cpp_Rect[] defectArray = new Cpp_Rect[DefectList.Count];
-
-                for (int i = 0; i < DefectList.Count; i++)
-                {
-                    Cpp_Rect rect = new Cpp_Rect();
-                    rect.x = (int)DefectList[i].p_rtDefectBox.Left;
-                    rect.y = (int)DefectList[i].p_rtDefectBox.Top;
-                    rect.w = (int)DefectList[i].m_fWidth;
-                    rect.h = (int)DefectList[i].m_fHeight;
-
-                    defectArray[i] = rect;
-                }
-
-                if (nByteCnt == 1)
-                {
-                    CLR_IP.Cpp_SaveDefectListBMP(
-                       Path,
-                       (byte*)currentWorkplace.SharedBufferR_GRAY.ToPointer(),
-                       currentWorkplace.SharedBufferWidth,
-                       currentWorkplace.SharedBufferHeight,
-                       defectArray
-                       );
-                }
-
-                else if (nByteCnt == 3)
-                {
-                    CLR_IP.Cpp_SaveDefectListBMP_Color(
-                        Path,
-                       (byte*)currentWorkplace.SharedBufferR_GRAY.ToPointer(),
-                       (byte*)currentWorkplace.SharedBufferG.ToPointer(),
-                       (byte*)currentWorkplace.SharedBufferB.ToPointer(),
-                       currentWorkplace.SharedBufferWidth,
-                       currentWorkplace.SharedBufferHeight,
-                       defectArray);
-                }
-            }
-        }
     }
 }

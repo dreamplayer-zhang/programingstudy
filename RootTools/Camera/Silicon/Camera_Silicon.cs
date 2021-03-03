@@ -88,6 +88,11 @@ namespace RootTools.Camera.Silicon
         {
             get; set;
         }
+        public bool bStopThread
+        {
+            get;
+            set;
+        }
         public int p_nGrabProgress
         {
             get

@@ -1,0 +1,799 @@
+﻿<Window x:Class="Root_CAMELLIA.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Root_CAMELLIA"
+        xmlns:lp="clr-namespace:Root_CAMELLIA.UI_UserControl"
+        xmlns:Icon ="clr-namespace:Root_CAMELLIA.Control.Icon"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
+        xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
+        xmlns:tools="clr-namespace:RootTools.Control.ACS;assembly=RootTools"
+        xmlns:arrow="clr-namespace:Petzold.Media2D"
+        xmlns:ctrl="clr-namespace:Root_CAMELLIA.Control"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        AllowsTransparency="False"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResizeWithGrip"
+        Height="1080"
+        Width="1920"
+        Title="CAMELLIA2"
+        Loaded="Window_Loaded"
+        Background="{StaticResource PanelBackGround}">
+    <Window.Resources>
+        <local:AxisToPositionConverter x:Key="AxisToPositionConverter"/>
+        <local:AxisToStageUIConverter x:Key="AxisToStageConverter"/>
+        <local:MeasurePointToStageUIConverter x:Key="PointToStageConverter"/>
+        <local:DoubleToProgressConverter x:Key="ProgressConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!--Title Bar-->
+        <Grid Grid.Row="0"
+              Name="TitleBar"
+              Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Icon:AtiLogo Width="30"
+                          Height="21"
+                          VerticalAlignment="Center"
+                          Margin="2"/>
+            <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
+                       FontSize="11"
+                       Foreground="Black"
+                       VerticalAlignment="Center"
+                       Margin="5,0,0,0"
+                       Grid.Column="1" />
+            <TextBlock Text="{Binding RecipeViewModel.RecipePath}"
+                       FontSize="12"
+                       FontWeight="Bold"
+                       Foreground="Black"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Grid.Column="1" />
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
+                        Orientation="Horizontal"
+                        Grid.Column="2">
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MinimizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="2,0"
+                        Click="MinimizeButton_Click">
+                    <Path Style="{StaticResource MinimizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MaximizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="2,0"
+                        Click="MaximizeButton_Click">
+                    <Path Style="{StaticResource MaximizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="NormalizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="2,0"
+                        Click="NormalizeButton_Click">
+                    <Path Style="{StaticResource NormalizeIconKey}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!--Tool Bar-->
+        <Grid Grid.Row="2">
+            <Grid.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="LightSteelBlue" Offset="0"/>
+                    <GradientStop Color="White" Offset="2"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.5*"/>
+                <ColumnDefinition Width="1.8*"/>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="1.8*"/>
+                <ColumnDefinition Width="1.2*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal" >
+                <Button Content="Load" VerticalAlignment="Center" Height="40" Width="60" Margin="5"     Command="{Binding CmdLoad}"/>
+                <Button Content="Recipe" VerticalAlignment="Center" Height="40" Width="60" Margin="5"   Command="{Binding CmdRecipe}"/>
+                <Button Content="Engineer" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdEngineer}"/>
+                <Button Content="Test" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdTest}"/>
+            </StackPanel>
+            <Grid Grid.Column="1">
+                <TextBlock x:Name="tbTime"
+                           Text="2020-10-10 15:39:47"
+                           FontSize="15"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"/>
+            </Grid>
+            <Border Grid.Column="2" 
+                    CornerRadius="0,0,50,50">
+                <Border.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="SteelBlue" Offset="0"/>
+                        <GradientStop Color="White" Offset="2"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <TextBlock Text="CAMELLIA Ⅱ" VerticalAlignment="Center" HorizontalAlignment="Center"
+                           FontSize="32" FontWeight="Bold"/>
+            </Border>
+            <Grid Grid.Column="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"  Text="State :  " 
+                           FontSize="15"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"/>
+                <TextBlock Grid.Column="1" Text=" " 
+                           x:Name="textState"
+                           FontSize="15"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"/>
+            </Grid>
+            <StackPanel Grid.Column="4"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <Button Content="Setting" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdSetting}"/>
+                <Button Content="Exit" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdExit}"/>
+                <Border Width="60" Margin="5" BorderBrush="#FF707070" BorderThickness="1">
+                    <Grid Opacity="0.8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Border BorderThickness="0,0,0,1" BorderBrush="#FF707070">
+                            <Grid Background="#FFDDDDDD"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0,1" BorderBrush="#FF707070" Grid.Row="1">
+                            <Grid Background="Gold"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0,0" BorderBrush="#FF707070" Grid.Row="2">
+                            <Grid Background="#FFDDDDDD" />
+                        </Border>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <!--Menu-->
+        <Menu Grid.Row="1" 
+              Background="{DynamicResource ControlBackGround}"
+              Height="25">
+            <MenuItem Header="File" Height="25">
+                <MenuItem Header="Load Recipe"/>
+                <MenuItem Header="Recipe Manager"/>
+            </MenuItem>
+            <MenuItem Header="Edit">
+                <MenuItem Header="Setting"/>
+            </MenuItem>
+            <MenuItem Header="User">
+                <MenuItem Header="Login"/>
+                <MenuItem Header="Logout"/>
+                <MenuItem Header="Authorization" IsEnabled="False"/>
+            </MenuItem>
+            <MenuItem Header="Test">
+                <MenuItem Header="Send Test"/>
+                <MenuItem Header="Filmetrics Test"/>
+            </MenuItem>
+            <MenuItem Header="PM">
+
+            </MenuItem>
+        </Menu>
+
+        <!--Main Panel-->
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="750"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="0.3*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="14*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Header="Monitoring" Grid.Row="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="75*"/>
+                            <ColumnDefinition Width="25*"/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="FDC" BorderBrush="Black" BorderThickness="1">
+                            <ItemsControl ItemsSource="{Binding GaugeListItems, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                        </Grid>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style>
+                                        <Setter Property="Grid.Column"
+                    Value="{Binding p_columnIndex}" />
+                                        <Setter Property="Grid.Row"
+                    Value="{Binding p_rowIndex}" />
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ctrl:GaugeChart DataContext="{Binding Gauge}"></ctrl:GaugeChart>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </GroupBox>
+                        <GroupBox Grid.Column="1" BorderBrush="Black" BorderThickness="1" Header="FFU">
+                            <ItemsControl ItemsSource="{Binding FanListItems, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                        </Grid>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style>
+                                        <Setter Property="Grid.Column"
+                    Value="{Binding p_columnIndex}" />
+                                        <Setter Property="Grid.Row"
+                    Value="{Binding p_rowIndex}" />
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ctrl:Fan DataContext="{Binding Fan, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </GroupBox>
+                        <!--<UniformGrid Columns="4" Rows="1" Margin="2,0" Grid.Column="1">
+                            <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
+                                --><!--<TextBlock Text="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>--><!--
+                                <chart:GaugeChart DataContext="{Binding p_Test}"></chart:GaugeChart>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
+                                <TextBlock Text="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
+                                <TextBlock Text="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,1,1,1">
+                                <TextBlock Text="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </UniformGrid>-->
+                    </Grid>
+                </GroupBox>
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <lp:Loadport_UI x:Name="loadportA"/>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <lp:Loadport_UI x:Name="loadportB"/>
+                    </Grid>
+                </Grid>
+
+            </Grid>
+            
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+
+                <GroupBox Header="Camera" Grid.Row="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="Captured Image">
+                            <Grid Background="Black"/>
+                        </GroupBox>
+                        <GroupBox Header="Captured Image" Grid.Column="1">
+                            <Grid Background="Black"/>
+                        </GroupBox>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Stage Map" Grid.Row="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="55"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <GroupBox Header="Current Position Information" Grid.Row="0" Margin="3">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <UniformGrid Grid.Column="0" Columns="3" Background="Gainsboro" Margin="2">
+                                    <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource AxisToPositionConverter}" ConverterParameter="AxisX">
+                                                <Binding Path="p_Module_Camellia.p_axisXY.p_axisX"/>
+                                                <Binding Path="p_Module_Camellia.p_axisXY.p_axisX.p_posActual"/>
+                                                <Binding Path="p_StageCenterPulse.X"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </UniformGrid>
+                                <UniformGrid Grid.Column="1" Columns="3" Background="Gainsboro" Margin="2">
+                                    <TextBlock Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource AxisToPositionConverter}" ConverterParameter="AxisY">
+                                                <Binding Path="p_Module_Camellia.p_axisXY.p_axisY"/>
+                                                <Binding Path="p_Module_Camellia.p_axisXY.p_axisY.p_posActual"/>
+                                                <Binding Path="p_StageCenterPulse.Y"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </UniformGrid>
+                            </Grid>
+                        </GroupBox>
+                        <Viewbox Margin="3"
+                                 Grid.Row="1">
+                            <ItemsControl ItemsSource="{Binding RecipeViewModel.p_DrawElement}"
+                                          Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                                          Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}"
+                                          BorderBrush="Black"
+                                          BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas ClipToBounds="True"
+                                                Width="{x:Static local:BaseDefine.CanvasWidth}"
+                                                Height="{x:Static local:BaseDefine.CanvasHeight}"
+                                                Background="#01FFFFFF"
+                                                Focusable="true">
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
+                        <Viewbox Margin="3"
+                                 Grid.Row="1">
+                            <ItemsControl ItemsSource="{Binding RecipeViewModel.p_DrawPointElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
+                        <Viewbox Margin="3" Grid.Row="1">
+                            <ItemsControl ItemsSource="{Binding p_DrawRouteElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
+                        <Viewbox Margin="3" Grid.Row="1">
+                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"
+                                    Background="#01FFFFFF" Focusable="true">
+                                <Border BorderBrush="Black" BorderThickness="1" Panel.ZIndex="99">
+                                    <Grid>
+                                        <Rectangle Width="5" Height="39" Fill="#990000FF" />
+                                        <!--<TextBlock Text="Test" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" />-->
+                                        <Rectangle Width="39" Height="5" Fill="#990000FF" />
+                                    </Grid>
+                                    <Canvas.Left>
+                                        <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="40">
+                                            <Binding Path="p_StageCenterPulse.X"/>
+                                            <Binding Path="p_Module_Camellia.p_axisXY.p_axisX.p_posActual"/>
+                                            <Binding Path="p_Module_Camellia.p_axisXY.p_axisX"/>
+                                        </MultiBinding>
+                                    </Canvas.Left>
+                                    <Canvas.Top>
+                                        <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="40">
+                                            <Binding Path="p_StageCenterPulse.Y"/>
+                                            <Binding Path="p_Module_Camellia.p_axisXY.p_axisY.p_posActual"/>
+                                            <Binding Path="p_Module_Camellia.p_axisXY.p_axisY"/>
+                                        </MultiBinding>
+                                    </Canvas.Top>
+                                </Border>
+                                <Border BorderBrush="Black" BorderThickness="1">
+                                    <Grid>
+                                        <arrow:ArrowLine x:Name="arrowPoint" X1="{Binding p_ArrowX1, Converter={StaticResource PointToStageConverter}, ConverterParameter=X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         Y1="{Binding p_ArrowY1, Converter={StaticResource PointToStageConverter}, ConverterParameter=Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         X2="{Binding p_ArrowX2, Converter={StaticResource PointToStageConverter}, ConverterParameter=X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         Y2="{Binding p_ArrowY2, Converter={StaticResource PointToStageConverter}, ConverterParameter=Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         Visibility="{Binding p_ArrowVisible, UpdateSourceTrigger=PropertyChanged}"  Width="1000" Height="1000" StrokeThickness="8" ArrowLength="30" ArrowAngle="80" >
+                                            <arrow:ArrowLine.Stroke>
+                                                <LinearGradientBrush StartPoint="{Binding p_GradientStartPoint, UpdateSourceTrigger=PropertyChanged}" EndPoint="{Binding p_GradientEndPoint, UpdateSourceTrigger=PropertyChanged}">
+                                                    <GradientStop x:Name="GradientStop1" Color="Yellow" Offset="0.0" />
+                                                    <GradientStop x:Name="GradientStop2" Color="Red" Offset="1.0" />
+                                                </LinearGradientBrush>
+                                            </arrow:ArrowLine.Stroke>
+                                            <arrow:ArrowLine.Triggers>
+                                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard  RepeatBehavior="Forever">
+                                                            <DoubleAnimation Storyboard.TargetName="GradientStop1"
+                                                                             Storyboard.TargetProperty="Offset"
+                                                                             From="0.0" To="1.0" Duration="0:0:1.5"
+                                                                             AutoReverse="False" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </arrow:ArrowLine.Triggers>
+                                        </arrow:ArrowLine>
+                                    </Grid>
+                                </Border>
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonDown" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Canvas>
+                        </Viewbox>
+                        <!--<Canvas Grid.Row="1" ClipToBounds="True"  Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                            <Rectangle Fill="Red" Width="30" Height="30" Canvas.Left="50" Canvas.Top="50"></Rectangle>
+                        </Canvas>-->
+                        <!--<Viewbox Margin="3" Grid.Row="1">
+                            <ItemsControl
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Rectangle Width="50" Height="50" Fill="Red"></Rectangle> 
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Viewbox>-->
+                    </Grid>
+                </GroupBox>
+            </Grid>
+            <TabControl Grid.Column="2" Background="Transparent">
+                <TabItem Header="Review" Width="100">
+                    <Grid Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="2.5*"/>
+                            <RowDefinition Height="0.2*"/>
+                        </Grid.RowDefinitions>
+                        <GroupBox Header="Contour Map">
+
+                        </GroupBox>
+                        <GroupBox Header="Measurement Data" Grid.Row="1">
+                            <TabControl Background="Transparent">
+                                <TabItem Header="Point List">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="5*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <UniformGrid Grid.Row="0" Margin="3" Background="Gainsboro" Columns="3" Grid.ColumnSpan="2">
+                                            <TextBlock Text="Count" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                            <TextBlock Text="{Binding RecipeViewModel.PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                        </UniformGrid>
+                                        <DataGrid Grid.Row="1" ItemsSource="{Binding RecipeViewModel.PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
+                                  EnableRowVirtualization="True" Grid.ColumnSpan="2" SelectionMode="Single" CanUserDeleteRows="False">
+                                            <DataGrid.Resources>
+                                                <Style TargetType="DataGridColumnHeader">
+                                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                    <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+                                                </Style>
+                                            </DataGrid.Resources>
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Index" Width="*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
+                                                <DataGridTextColumn Header="X (mm)" Width="*" Binding="{Binding ListX}" IsReadOnly="True"/>
+                                                <DataGridTextColumn Header="Y (mm)" Width="*" Binding="{Binding ListY}" IsReadOnly="True"/>
+                                                <DataGridTextColumn Header="Route" Width="*" Binding="{Binding ListRoute}" IsReadOnly="True"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Grid>
+                                </TabItem>
+                                <TabItem Header="Parameter">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="2.5*"/>
+                                            <RowDefinition Height="1.5*"/>
+                                            <RowDefinition Height="1*"/>
+                                        </Grid.RowDefinitions>
+                                        <GroupBox Header="Measurement Parameter">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="2*"/>
+                                                    <RowDefinition Height="0.4*"/>
+                                                </Grid.RowDefinitions>
+                                                <DataGrid Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding RecipeViewModel.GridLayerData}" IsReadOnly="True" IsEnabled="{Binding RecipeViewModel.p_UseThickness}">
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True" Foreground="Blue" FontWeight="ExtraBold"/>
+                                                        <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedHost1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
+                                                            <DataGridComboBoxColumn.Header>
+                                                                <TextBlock Text="Host" Style="{StaticResource GridHeaderStyle}"/>
+                                                            </DataGridComboBoxColumn.Header>
+                                                            <DataGridComboBoxColumn.ElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Host1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    <Setter Property="IsReadOnly" Value="True"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.ElementStyle>
+                                                            <DataGridComboBoxColumn.EditingElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Host1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.EditingElementStyle>
+                                                        </DataGridComboBoxColumn>
+                                                        <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
+                                                            <DataGridComboBoxColumn.Header>
+                                                                <TextBlock Text="Guest1" Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridComboBoxColumn.Header>
+                                                            <DataGridComboBoxColumn.ElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Guest1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    <Setter Property="IsReadOnly" Value="True"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.ElementStyle>
+                                                            <DataGridComboBoxColumn.EditingElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Guest1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.EditingElementStyle>
+                                                        </DataGridComboBoxColumn>
+                                                        <DataGridTextColumn Width="50" Binding="{Binding Fv1, StringFormat=N3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                            <DataGridTextColumn.Header>
+                                                                <TextBlock Text="fv1" Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridTextColumn.Header>
+                                                        </DataGridTextColumn>
+                                                        <DataGridCheckBoxColumn Width="25" Binding="{Binding Fv1Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                            <DataGridCheckBoxColumn.Header>
+                                                                <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridCheckBoxColumn.Header>
+                                                        </DataGridCheckBoxColumn>
+                                                        <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest2, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
+                                                            <DataGridComboBoxColumn.Header>
+                                                                <TextBlock Text="Guest2" Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridComboBoxColumn.Header>
+                                                            <DataGridComboBoxColumn.ElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    <Setter Property="IsReadOnly" Value="True"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.ElementStyle>
+                                                            <DataGridComboBoxColumn.EditingElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.EditingElementStyle>
+                                                        </DataGridComboBoxColumn>
+                                                        <DataGridTextColumn Width="50" Binding="{Binding Fv2, StringFormat=N3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                            <DataGridTextColumn.Header>
+                                                                <TextBlock Text="fv2" Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridTextColumn.Header>
+                                                        </DataGridTextColumn>
+                                                        <DataGridCheckBoxColumn Width="25" Binding="{Binding Fv2Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                            <DataGridCheckBoxColumn.Header>
+                                                                <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridCheckBoxColumn.Header>
+                                                        </DataGridCheckBoxColumn>
+                                                        <DataGridTextColumn Width="50" Binding="{Binding Thickness, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                            <DataGridTextColumn.Header>
+                                                                <TextBlock Text="Thick." Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridTextColumn.Header>
+                                                        </DataGridTextColumn>
+                                                        <DataGridCheckBoxColumn Width="25" Binding="{Binding ThicknessFit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                            <DataGridCheckBoxColumn.Header>
+                                                                <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridCheckBoxColumn.Header>
+                                                        </DataGridCheckBoxColumn>
+                                                        <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
+                                                            <DataGridComboBoxColumn.Header>
+                                                                <TextBlock Text="Emm" Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridComboBoxColumn.Header>
+                                                            <DataGridComboBoxColumn.ElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    <Setter Property="IsReadOnly" Value="True"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.ElementStyle>
+                                                            <DataGridComboBoxColumn.EditingElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.EditingElementStyle>
+                                                        </DataGridComboBoxColumn>
+                                                    </DataGrid.Columns>
+                                                </DataGrid>
+                                                <UniformGrid Columns="2" Grid.Row="1">
+                                                    <Grid Margin="5" Background="Gainsboro">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18*"/>
+                                                            <ColumnDefinition Width="12*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Integration Time (VIS)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.VISIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                                    </Grid>
+                                                    <Grid Margin="5" Background="Gainsboro">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18*"/>
+                                                            <ColumnDefinition Width="12*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Integration Time (NIR)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.NIRIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                                    </Grid>
+                                                </UniformGrid>
+                                            </Grid>
+                                        </GroupBox>
+                                        <GroupBox Header="WaveLength Data" Grid.Row="1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid Margin="5">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="0.2*"/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
+                                                            <TextBlock Grid.Row="0" Text="Reflectance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
+                                                        </Border>
+                                                        <ListBox Grid.Row="1" ItemsSource="{Binding RecipeViewModel.ReflectanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center"/>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid Grid.Column="1" Margin="5">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="0.2*"/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
+                                                            <TextBlock Grid.Row="0" Text="Transmittance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
+                                                        </Border>
+                                                        <ListBox Grid.Row="1" ItemsSource="{Binding RecipeViewModel.TransmittanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center" />
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                        </GroupBox>
+                                        <GroupBox Header="Thickness Parameter" Grid.Row="2">
+                                            <Grid>
+                                                <UniformGrid Columns="2" Rows="2">
+                                                    <Grid Margin="5" Background="Gainsboro">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18*"/>
+                                                            <ColumnDefinition Width="12*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Lower WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.LowerWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                    </Grid>
+                                                    <Grid Margin="5" Background="Gainsboro">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18*"/>
+                                                            <ColumnDefinition Width="12*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Upper WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.UpperWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                    </Grid>
+                                                    <Grid Margin="5" Background="Gainsboro">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18*"/>
+                                                            <ColumnDefinition Width="12*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Thickness LM Iteration" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.ThicknessLMIteration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                    </Grid>
+                                                    <Grid Margin="5" Background="Gainsboro">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18*"/>
+                                                            <ColumnDefinition Width="12*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Damping Factor" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.DampingFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                    </Grid>
+                                                </UniformGrid>
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
+                                </TabItem>
+                            </TabControl>
+                        </GroupBox>
+                        <GroupBox Header="Current Progress" Grid.Row="2">
+                            <Grid>
+                                <ProgressBar Minimum="0" Maximum="100" Margin="2" Value="{Binding p_Progress, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding p_ProgressColor}"/>
+                                <TextBlock Text="{Binding p_Progress, Converter={StaticResource ProgressConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" ></TextBlock>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Log" Width="80">
+                </TabItem>
+                <TabItem Header="RT Graph">
+                    <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
+                </TabItem>
+            </TabControl>
+            <Grid Grid.Column="3">
+                <StackPanel Margin="10,45,10,15">
+                    <Button Content="Resume" x:Name="buttonResume" Margin="0,0,0,15" 
+                            Style="{StaticResource SetupPanelBtn}" 
+                            Height="40"
+                            Click="buttonResume_Click"/>
+                    <Button Content="Pause" x:Name="buttonPause" Margin="0,0,0,15" 
+                            Style="{StaticResource SetupPanelBtn}" 
+                            Height="40"
+                            Click="buttonPause_Click"/>
+                    <Button Content="Initial" x:Name="buttonInit" Margin="0,0,0,15" 
+                            Style="{StaticResource SetupPanelBtn}" 
+                            Height="40"
+                            Click="buttonInit_Click"/>
+                    <Button Content="Recovery" x:Name="buttonRecovery" Margin="0,0,0,15" 
+                            Style="{StaticResource SetupPanelBtn}" 
+                            Height="40"
+                            Click="buttonRecovery_Click"/>
+                    <Button Content="Buzzer Off" x:Name="buttonBuzzerOff" Margin="0,0,0,15" 
+                            Style="{StaticResource SetupPanelBtn}" 
+                            Height="40"
+                            Click="buttonBuzzerOff_Click"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+    </Grid>
+</Window>

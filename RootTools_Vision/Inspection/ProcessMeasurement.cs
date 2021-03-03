@@ -1,5 +1,6 @@
 ﻿using RootTools.Database;
 using RootTools_CLR;
+using RootTools_Vision.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,78 +25,51 @@ namespace RootTools_Vision
 			return true;
 		}
 
-		public void DoProcessMeasurement()
-		{
-			if (this.currentWorkplace.Index != 0)
-				return;
+        public void DoProcessMeasurement()
+        {
+            if (this.currentWorkplace.Index != 0)
+                return;
 
-            List<Measurement> measureList = new List<Measurement>();
+			List<Measurement> measureList = new List<Measurement>();
 
-            foreach (Workplace workplace in workplaceBundle)
+			foreach (Workplace workplace in workplaceBundle)
                 foreach (Measurement measure in workplace.MeasureList)
                     measureList.Add(measure);
 
+            foreach (Measurement measure in measureList)
+                this.currentWorkplace.MeasureList.Add(measure);
+
             // TO DO 이거 측정마다 다를건데 어떻게 할거임
-            int measureItem = Enum.GetValues(typeof(EBRMeasurement.EBRMeasureItem)).Length;
-            for (int i = 0; i < measureList.Count; i += measureItem)
+            int measureItem = Enum.GetValues(typeof(Measurement.EBRMeasureItem)).Length;
+
+            for (int i = 0, index = 0; i < measureList.Count; i += measureItem, index++)
                 for (int j = 0; j < measureItem; j++)
-                    measureList[i+j].SetMeasureIndex(i);
+                    measureList[i + j].SetMeasureIndex(index);
 
-			string sMeasurementImagePath = @"D:\MeasurementImage";
-			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			SaveMeasurementImage(Path.Combine(sMeasurementImagePath, sInspectionID), measureList, this.currentWorkplace.SharedBufferByteCnt);
-			DatabaseManager.Instance.AddMeasurementDataList(measureList);
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+            DatabaseManager.Instance.AddMeasurementDataList(measureList);
 
-			WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
-		}
+            SettingItem_SetupEBR settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupEBR>();
+            SharedBufferInfo sharedBufferInfo = new SharedBufferInfo(currentWorkplace.SharedBufferR_GRAY,
+                                                                     currentWorkplace.Width,
+                                                                     currentWorkplace.Height,
+                                                                     currentWorkplace.SharedBufferByteCnt,
+                                                                     currentWorkplace.SharedBufferG,
+                                                                     currentWorkplace.SharedBufferB);
+            Tools.SaveDataImage(Path.Combine(settings.MeasureImagePath, sInspectionID), measureList.Cast<Data>().ToList(), sharedBufferInfo);
 
-		private void SaveMeasurementImage(String path, List<Measurement> measureList, int byteCnt)
-		{
-            path += "\\";
-            DirectoryInfo di = new DirectoryInfo(path);
-            if (!di.Exists)
-                di.Create();
-
-            if (measureList.Count < 1)
-                return;
-
-            unsafe
+            if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
             {
-                Cpp_Rect[] defectArray = new Cpp_Rect[measureList.Count];
+				List<string> dataStringList = GlobalObjects.Instance.Get<KlarfData_Lot>().EBRMeasureDataToStringList(measureList, Measurement.EBRMeasureItem.EBR.ToString());
+				GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, dataStringList, null);
+				GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
+				GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+				GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
 
-                for (int i = 0; i < measureList.Count; i++)
-                {
-                    Cpp_Rect rect = new Cpp_Rect();
-					rect.x = (int)measureList[i].m_rtDefectBox.Left;
-					rect.y = (int)measureList[i].m_rtDefectBox.Top;
-					rect.w = (int)measureList[i].m_fWidth;
-					rect.h = (int)measureList[i].m_fHeight;
+				//Tools.SaveTiffImage(settings.KlarfSavePath, measureList.Cast<Data>().ToList(), sharedBufferInfo);
+			}
 
-					defectArray[i] = rect;
-                }
-
-                if (byteCnt == 1)
-                {
-                    CLR_IP.Cpp_SaveDefectListBMP(
-                       path,
-                       (byte*)currentWorkplace.SharedBufferR_GRAY.ToPointer(),
-                       currentWorkplace.SharedBufferWidth,
-                       currentWorkplace.SharedBufferHeight,
-                       defectArray);
-                }
-
-                else if (byteCnt == 3)
-                {
-                    CLR_IP.Cpp_SaveDefectListBMP_Color(
-                        path,
-                       (byte*)currentWorkplace.SharedBufferR_GRAY.ToPointer(),
-                       (byte*)currentWorkplace.SharedBufferG.ToPointer(),
-                       (byte*)currentWorkplace.SharedBufferB.ToPointer(),
-                       currentWorkplace.SharedBufferWidth,
-                       currentWorkplace.SharedBufferHeight,
-                       defectArray);
-                }
-            }
+            WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
         }
 	}
 }

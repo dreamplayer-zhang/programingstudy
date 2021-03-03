@@ -174,7 +174,50 @@ namespace RootTools_Vision.Utility
 
 			return true;
 		}
-		public bool AddSlot(RecipeType_WaferMap _mapdata, List<Defect> _defectlist, OriginRecipe _origin)
+
+		// 기존 210302
+		//public bool AddSlot(RecipeType_WaferMap _mapdata, List<Defect> _defectlist, OriginRecipe _origin)
+		//{
+		//	UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
+
+		//	KlarfData data = new KlarfData();
+
+		//	data.SetKlarfType(klarfType);
+		//	data.tiffFileName = this.tiffFileName;
+
+		//	data.waferID_name = string.Format("{0:2d}", 0/*pMapdata->GetWaferID()*/);
+
+		//	//	data.m_nWaferID = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nWaferID);  
+		//	//	data.m_nSlot = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nSlot); 
+		//	data.partID = this.partID;
+
+		//	//	m_sLotID = data.m_sLotID = pRecipe->GetCurrentWFInfor()->m_strLotID;    
+
+		//	data.deviceID = this.deviceID;
+
+		//	data.sampleOrientationMarkType = this.sampleOrientationMarkType;
+		//	data.orientationMarkLocation = this.orientationMarkLocation;
+
+		//	data.diePitchX = this.diePitchX;
+		//	data.diePitchY = this.diePitchY;
+		//	data.dieOriginX = this.dieOriginX;
+		//	data.dieOriginY = this.dieOriginY;
+		//	data.sampleCenterLocationX = this.sampleCenterLocationX;
+		//	data.sampleCenterLocationY = this.sampleCenterLocationY;
+		//	data.resX = this.resX;
+		//	data.resY = this.resY;
+
+		//	data.SetSampleTestPlan(_mapdata);
+		//	data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin);
+		//	//	data.m_nDefectDieCnt = pResultMap->GetBadDieNum();
+
+		//	data.SetMEMMAP(_mapdata);
+
+		//	klarfData.Add(data);
+		//	return true;
+		//}
+
+		public bool AddSlot(RecipeType_WaferMap _mapdata, List<string> _dataStringList, OriginRecipe _origin)
 		{
 			UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
 
@@ -184,18 +227,13 @@ namespace RootTools_Vision.Utility
 			data.tiffFileName = this.tiffFileName;
 
 			data.waferID_name = string.Format("{0:2d}", 0/*pMapdata->GetWaferID()*/);
-
 			//	data.m_nWaferID = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nWaferID);  
 			//	data.m_nSlot = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nSlot); 
 			data.partID = this.partID;
-
 			//	m_sLotID = data.m_sLotID = pRecipe->GetCurrentWFInfor()->m_strLotID;    
-
 			data.deviceID = this.deviceID;
-
 			data.sampleOrientationMarkType = this.sampleOrientationMarkType;
 			data.orientationMarkLocation = this.orientationMarkLocation;
-
 			data.diePitchX = this.diePitchX;
 			data.diePitchY = this.diePitchY;
 			data.dieOriginX = this.dieOriginX;
@@ -205,15 +243,51 @@ namespace RootTools_Vision.Utility
 			data.resX = this.resX;
 			data.resY = this.resY;
 
-			data.SetSampleTestPlan(_mapdata);
-			data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin);
-		//	data.m_nDefectDieCnt = pResultMap->GetBadDieNum();
-
+			//data.SetSampleTestPlan(_mapdata); // map data 없는거 예외처리 필요
+			data.SetDefectInfor_SRLine(_mapdata, _dataStringList, _origin);
+			//	data.m_nDefectDieCnt = pResultMap->GetBadDieNum();
 			data.SetMEMMAP(_mapdata);
 
 			klarfData.Add(data);
 			return true;
 		}
+
+		public List<string> DefectDataToStringList(List<Defect> defectList)
+		{
+			List<string> stringList = new List<string>();
+			foreach (Defect defect in defectList)
+			{
+				//string str = string.Format("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13} {14} {15} {16}");
+				//stringList.Add(str);
+			}
+			return stringList;
+		}
+
+		public List<string> EBRMeasureDataToStringList(List<Measurement> measureList, string measureItem = null)
+		{
+			List<string> stringList = new List<string>();
+			for (int i = 0; i < measureList.Count; i++)
+			{
+				if (measureItem != null && measureList[i].m_strMeasureItem != measureItem)
+					continue;
+
+				string str = string.Format("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13} {14} {15} {16}",
+											(measureList[i].m_nMeasurementIndex + 1),
+											measureList[i].m_fRelX,
+											measureList[i].m_fRelY,
+											0, 0,
+											measureList[i].m_fData, 0,
+											measureList[i].m_fData,
+											measureList[i].m_fData,
+											0, 1, 0,
+											measureList[i].m_fData,
+											measureList[i].m_fAngle,
+											0, 1, 1);
+				stringList.Add(str);
+			}
+			return stringList;
+		}
+
 		public bool AddSlotToServer(RecipeType_WaferMap _mapdata)
 		{
 			UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
@@ -257,7 +331,8 @@ namespace RootTools_Vision.Utility
 		{
 			timeFile = DateTime.Now;
 
-
+			if (!Directory.Exists(strFilePath))
+				Directory.CreateDirectory(strFilePath);
 
 			if (bCollector)
 			{

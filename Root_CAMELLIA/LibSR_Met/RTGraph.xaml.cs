@@ -36,6 +36,28 @@ namespace Root_CAMELLIA.LibSR_Met
         public RTGraph()
         {
             InitializeComponent();
+            if (m_DM.bTransmittance)
+            {
+                GroupTransmittance.IsEnabled = true;
+
+            }
+            else
+            {
+                GroupTransmittance.IsEnabled = false;
+                GraphT.Visibility = Visibility.Hidden;
+            }
+
+            if (m_DM.bThickness)
+            {
+                GroupThicknessResult.IsEnabled = true;
+            }
+            else
+            {
+                GroupThicknessResult.IsEnabled = false;
+                GroupTransmittance.IsEnabled = false;
+                GraphT.Visibility = Visibility.Hidden;
+            }
+
 
             if (m_bUseFile)
             {
@@ -56,48 +78,65 @@ namespace Root_CAMELLIA.LibSR_Met
                 GraphR.Reset();
                 GraphR.plt.XLabel(xlabel);
                 GraphR.plt.YLabel(ylabel);
-                RawData data = m_DM.m_RawData[nPointIndex];
-                double[] VIS_Wavelength = new double[data.nCalcDataNum];
-                double[] VIS_Reflectance = new double[data.nCalcDataNum];
-                double[] CalcReflectance = new double[data.nCalcDataNum];
-
-                for (int n = 0; n < data.nCalcDataNum; n++)
-                {
-                    VIS_Wavelength[n] = data.VIS_Wavelength[n];
-                    VIS_Reflectance[n] = data.VIS_Reflectance[n];
-                    CalcReflectance[n] = data.CalcReflectance[n];
-                }
-
                 string sResult = "";
                 if (xvalues == null || yvalues == null)
                 {
-                    //display 옵션 조절해야함(
-                    m_ReflectancePlotTable = GraphR.plt.PlotScatterHighlight(VIS_Wavelength, VIS_Reflectance, markerSize: 2.5);
-                    m_ReflectancePlotTable_Calc = GraphR.plt.PlotScatterHighlight(VIS_Wavelength, CalcReflectance, markerSize: 2.5);
+                    RawData data = m_DM.m_RawData[nPointIndex];
 
-                    sResult = string.Format("Point: {0}\nX Pos: {1}\nY Pos: {2}\nThickness:\n", nPointIndex, data.dX, data.dY);
-
-                    if (data.Thickness != null && data.Thickness.Count > 0)
+                    double[] VIS_Wavelength = new double[data.nThicknessDataNum];
+                    double[] VIS_Reflectance = new double[data.nThicknessDataNum];
+                    double[] CalcReflectance = new double[data.nThicknessDataNum];
+                    double[] NIR_Wavelength = new double[data.nNIRDataNum];
+                    double[] NIR_Reflectance = new double[data.nNIRDataNum];
+                    for (int n = 0; n < data.nThicknessDataNum; n++)
                     {
-                        for (int n = 0; n < m_DM.m_LayerData.Count; n++)
-                        {
-                            sResult += string.Concat(m_DM.m_LayerData[n].hostname) + " : " + data.Thickness[n].ToString("0.###") + "Å\n";
-                        }
+                        VIS_Wavelength[n] = data.VIS_Wavelength[n];
+                        VIS_Reflectance[n] = data.VIS_Reflectance[n];
+                        CalcReflectance[n] = data.CalcReflectance[n];
+                    }
+                    for (int n = 0; n < data.nNIRDataNum; n++)
+                    {
+                        NIR_Wavelength[n] = data.Wavelength[n];
+                        NIR_Reflectance[n] = data.Reflectance[n];
+                    }
+                    if (m_DM.bExcept_NIR)
+                    {
+                        m_ReflectancePlotTable = GraphR.plt.PlotScatterHighlight(VIS_Wavelength, VIS_Reflectance, markerSize: 2.5);
+                        GraphR.plt.Axis(350, 950, -10, 100);
+                    }
+                    else
+                    {
+                        m_ReflectancePlotTable = GraphR.plt.PlotScatterHighlight(NIR_Wavelength, NIR_Reflectance, markerSize: 2.5);
+                        GraphR.plt.Axis(350,1500, -10, 100);
+                    }
+                    if (m_DM.bThickness && m_DM.bViewCalRGraph)
+                    {
+                        m_ReflectancePlotTable_Calc = GraphR.plt.PlotScatterHighlight(VIS_Wavelength, CalcReflectance, markerSize: 2.5);
                     }
 
-                    // 추후 제거 GOF 출력 추가
-                    sResult += "GOF: " + data.dGoF.ToString() + "\n";
+                    if (m_DM.bThickness)
+                    {
+                        sResult = string.Format("Point: {0}\nX Pos: {1}\nY Pos: {2}\nThickness:\n", nPointIndex, data.dX, data.dY);
 
+                        if (data.Thickness != null && data.Thickness.Count > 0)
+                        {
+                            for (int n = 0; n < m_DM.m_LayerData.Count; n++)
+                            {
+                                sResult += string.Concat(m_DM.m_LayerData[n].hostname) + " : " + data.Thickness[n].ToString("0.###") + "Å\n";
+                            }
+                        }
+
+                        if (data.dGoF < 0.0)
+                        {
+                            data.dGoF = 0.0;
+                        }
+                        sResult += "GOF: " + data.dGoF.ToString() + "\n";
+                    }
                 }
                 else
                 {
                     m_ReflectancePlotTable = GraphR.plt.PlotScatterHighlight(xvalues, yvalues, markerSize: 2.5);
-
-                    if (yvalues2 != null)
-                        m_ReflectancePlotTable_Calc = GraphR.plt.PlotScatterHighlight(xvalues, yvalues2, markerSize: 2.5);
                 }
-                GraphR.plt.AxisAuto();
-                //ReflectancePlot.Show();
                 GraphR.Render();
 
                 m_bDataDetect = true;
@@ -111,30 +150,42 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             Dispatcher.Invoke(new Action(() =>
             {
+                GraphT.Reset();
                 GraphT.plt.XLabel(xlabel);
                 GraphT.plt.YLabel(ylabel);
-
                 RawData data = m_DM.m_RawData[nPointIndex];
-                double[] VIS_Wavelength = new double[m_DM.m_RawData[nPointIndex].nCalcDataNum];
-                double[] VIS_Transmittance = new double[m_DM.m_RawData[nPointIndex].nCalcDataNum];
-
-                for (int n = 0; n < data.nCalcDataNum; n++)
-                {
-                    VIS_Wavelength[n] = data.VIS_Wavelength[n];
-                    VIS_Transmittance[n] = data.Transmittance[n];
-                }
-
                 if (xvalues == null || yvalues == null)
                 {
-                    m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(VIS_Wavelength, VIS_Transmittance, markerSize: 2.5);
-
+                    if(m_DM.bExcept_NIR)
+                    {
+                        double[] VIS_Wavelength = new double[data.nThicknessDataNum];
+                        double[] VIS_Transmittance = new double[data.nThicknessDataNum];
+                        for (int n = 0; n < data.nThicknessDataNum; n++)
+                        {
+                            VIS_Wavelength[n] = data.VIS_Wavelength[n];
+                            VIS_Transmittance[n] = data.Transmittance[n];
+                        }
+                        m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(VIS_Wavelength, VIS_Transmittance, markerSize: 2.5);
+                        GraphT.plt.Axis(350, 950, -10, 100);
+                    }
+                    else
+                    {
+                        double[] NIR_Wavelength = new double[data.nNIRDataNum];
+                        double[] NIR_Transmittance = new double[data.nNIRDataNum];
+                        for (int n = 0; n < data.nNIRDataNum; n++)
+                        {
+                            NIR_Wavelength[n] = data.Wavelength[n];
+                            NIR_Transmittance[n] = data.Transmittance[n];
+                        }
+                        Array.Reverse(NIR_Transmittance);
+                        m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(NIR_Wavelength, NIR_Transmittance, markerSize: 2.5);
+                        GraphT.plt.Axis(350, 1500, -10, 100);
+                    }
                 }
                 else
                 {
                     m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(xvalues, yvalues, markerSize: 2.5);
                 }
-                GraphT.plt.AxisAuto();
-                //TransmittancePlot.Show();
                 GraphT.Render();
             }));
         }
@@ -183,8 +234,11 @@ namespace Root_CAMELLIA.LibSR_Met
                             yvalues2[a] = Convert.ToDouble(column3[a + 1]);
                         }
 
-                        DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength(nm)", "Reflectance(%)", xvalues, yvalues);
-                        DrawTransmittanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength(nm)", "Transmittance(%)", xvalues, yvalues2);
+                        DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Reflectance [%]" ,xvalues, yvalues);
+                        if (m_DM.bTransmittance)
+                        {
+                            DrawTransmittanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Transmittance [%]", xvalues, yvalues2);
+                        }
                     }
                     else
                     {
@@ -193,8 +247,15 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 else
                 {
-                    DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength(nm)", "Reflectance(%)");
-                    DrawTransmittanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength(nm)", "Transmittance(%)");
+                    if ((int)comboBoxDataIndex.SelectedIndex == -1)
+                    {
+                        return;
+                    }
+                    DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Reflectance [%]");
+                    if (m_DM.bTransmittance)
+                    {
+                        DrawTransmittanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Transmittance [%]");
+                    }
                 }
             }));
         }
@@ -254,7 +315,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
                     m_ReflectancePlotTable.HighlightClear();
                     var (dX, dY, nIndex) = m_ReflectancePlotTable.HighlightPointNearest(mouseX, mouseY);
-                    
+
                     double dX2 = 0.0, dY2 = 0.0;
                     int nIndex2 = 0;
                     if (m_ReflectancePlotTable_Calc != null)
@@ -262,10 +323,11 @@ namespace Root_CAMELLIA.LibSR_Met
                         m_ReflectancePlotTable_Calc.HighlightClear();
                         (dX2, dY2, nIndex2) = m_ReflectancePlotTable_Calc.HighlightPointNearest(mouseX, mouseY);
                     }
+
                     GraphR.Render();
 
                     labelR.Visibility = Visibility.Visible;
-                    labelR.Content = $"(Wavelength[nm], Reflectance[%]) = ({dX:N3}, {dY:N3})"+ Environment.NewLine + $"(Wavelength[nm], CalcReflectance[%]) = ({dX2:N3}, {dY2:N3})";
+                    labelR.Content = $"(Wavelength[nm], Reflectance[%]) = ({dX:N3}, {dY:N3})" + Environment.NewLine + $"(Wavelength[nm], CalcReflectance[%]) = ({dX2:N3}, {dY2:N3})";
                 }
             }));
         }

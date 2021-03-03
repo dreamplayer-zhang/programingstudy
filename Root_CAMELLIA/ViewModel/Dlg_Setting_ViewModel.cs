@@ -133,6 +133,34 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_LightSourceLogPath, value);
             }
         }
+
+        private bool m_ExceptNIR = false;
+        public bool p_ExceptNIR
+        {
+            get
+            {
+                return m_ExceptNIR;
+            }
+            set
+            {
+                SetProperty(ref m_ExceptNIR, value);
+                m_reg.Write(BaseDefine.RegNanoViewExceptNIR, value);
+            }
+        }
+
+        private bool m_UseThickness = true;
+        public bool p_UseThickness
+        {
+            get
+            {
+                return m_UseThickness;
+            }
+            set
+            {
+                SetProperty(ref m_UseThickness, value);
+                m_reg.Write(BaseDefine.RegNanoViewUseThickness, value);
+            }
+        }
         #endregion
 
 
@@ -165,6 +193,13 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Parameter Load Error Check NanoView Initialize");
             }
             p_LightSourceLogPath = m_reg.Read(BaseDefine.RegLightSourcePath, m_LightSourceLogPath);
+           
+        }
+
+        public void LoadSettingData()
+        {
+            p_ExceptNIR = m_reg.Read(BaseDefine.RegNanoViewExceptNIR, m_ExceptNIR);
+            p_UseThickness = m_reg.Read(BaseDefine.RegNanoViewUseThickness, m_UseThickness);
         }
 
         public void LoadConfig()
@@ -189,6 +224,17 @@ namespace Root_CAMELLIA
                     }
                 });
 
+            }
+        }
+
+        public ICommand CmdToggle
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+
+                });
             }
         }
 
@@ -290,6 +336,12 @@ namespace Root_CAMELLIA
                 });
             }
         }
+
+        //private void OnClickToggleButton(object sender, RoutedEventArgs e)
+        //{
+
+        //}
+
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
     }
 }

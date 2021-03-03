@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="Root_CAMELLIA.Control.GaugeChart"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_CAMELLIA.Control"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf" 
+             xmlns:converter="clr-namespace:Root_CAMELLIA"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance local:GaugeChart}">
+    <Control.Resources>
+        <converter:ValueToColorConverter x:Key="ValueToColorconverter"/>
+    </Control.Resources>
+    <Grid>
+        <Grid Width="88" Height="100" Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="0.3*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="{Binding p_unit, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,0,26" Panel.ZIndex="1" FontSize="14" />
+            <lvc:Gauge Grid.Row="0" Grid.Column="1"
+                       From="{Binding p_from, UpdateSourceTrigger=PropertyChanged}" 
+                       To="{Binding p_to, UpdateSourceTrigger=PropertyChanged}" 
+                       Value="{Binding p_value, UpdateSourceTrigger=PropertyChanged}"  HighFontSize="15" FontWeight="Bold" Margin ="0"
+                   LabelsVisibility="Collapsed">
+                <lvc:Gauge.GaugeActiveFill>
+                    <LinearGradientBrush>
+                        <GradientStop Color="Yellow" Offset="0.0" />
+                        <GradientStop Color="Orange" Offset="0.5" />
+                        <GradientStop Color="Red" Offset="1.0" />
+                    </LinearGradientBrush>
+                </lvc:Gauge.GaugeActiveFill>
+                <lvc:Gauge.Foreground>
+                    <MultiBinding Converter="{StaticResource ValueToColorconverter}">
+                        <Binding Path="p_from"/>
+                        <Binding Path="p_to"/>
+                        <Binding Path="p_value"/>
+                    </MultiBinding>
+                </lvc:Gauge.Foreground>
+            </lvc:Gauge>
+            <TextBlock Grid.Row="1" TextWrapping="Wrap" Text="{Binding p_name, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+        </Grid>
+    </Grid>
+</UserControl>
