@@ -738,7 +738,7 @@ namespace Root_CAMELLIA
                     var viewModel = EngineerViewModel;
                     var dialog = dialogService.GetDialog(viewModel) as Dlg_Engineer;
                     dialog.HandlerUI.Init(App.m_engineer.m_handler);
-                    dialog.LogUI.Init(LogView.m_logView);
+                    dialog.LogUI.Init(LogView._logView);
                     dialog.ToolBoxUI.Init(App.m_engineer);
                     Nullable<bool> result = dialog.ShowDialog();
 

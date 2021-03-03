@@ -35,7 +35,7 @@ namespace Root_Inspect
         void Init()
         {
             m_engineer.Init();
-            logViewUI.Init(LogView.m_logView);
+            logViewUI.Init(LogView._logView);
             memoryToolUI.Init(m_engineer.m_memoryTool);
             InitInspect();
             namedPipeUI.Init(m_inspectTool.m_namedPipe);

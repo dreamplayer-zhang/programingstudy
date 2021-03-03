@@ -138,10 +138,10 @@ namespace Root_LogView.Server
                 m_qLogData.Enqueue(logData); 
             }
 
-            public void SaveLog(string sFile)
+            public void SaveLog(string sPath)
             {
                 if (m_qLogData.Count == 0) return; 
-                using (StreamWriter writer = new StreamWriter(sFile + m_id + ".txt"))
+                using (StreamWriter writer = new StreamWriter(sPath + m_id + ".txt"))
                 {
                     while (m_qLogData.Count > 0)
                     {
