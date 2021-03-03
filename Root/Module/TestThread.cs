@@ -41,21 +41,12 @@ namespace Root.Module
         #region RunRun
         string RunRun()
         {
-            StackTrace st = new StackTrace(true);
-            for (int n = 0; n < st.FrameCount; n++)
+            StopWatch sw = new StopWatch(); 
+            for (int n = 0; n < 100; n++)
             {
-                StackFrame sf = st.GetFrame(n);
-                System.Reflection.MethodBase mb = sf.GetMethod();
-                string sMethod = mb.Name;
-                string sClass = mb.DeclaringType.Name; 
+                m_log.Info("Test"); 
             }
-            InitThread();
-            int[] aBuf = new int[5]; 
-            for (int n = 0; n < 10; n++)
-            {
-                aBuf[n] = n;
-                int f = 100 / (3 - n); 
-            }
+            m_log.Info("Test : " + (sw.ElapsedMilliseconds / 100.0).ToString());
             return "OK"; 
         }
         #endregion

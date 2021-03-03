@@ -33,15 +33,15 @@ namespace RootTools
 
         void UpdateLogTab()
         {
-            foreach (ILogGroup log in m_logView.m_aGroup) UpdateLogTab(log);
+            foreach (LogGroup log in m_logView.m_aGroup) UpdateLogTab(log);
             m_asLog.Clear();
             comboLog.ItemsSource = null;
-            foreach (ILogGroup log in m_logView.m_aGroup) m_asLog.Add(log.p_id);
+            foreach (LogGroup log in m_logView.m_aGroup) m_asLog.Add(log.p_id);
             comboLog.ItemsSource = m_asLog;
             
         }
 
-        void UpdateLogTab(ILogGroup log)
+        void UpdateLogTab(LogGroup log)
         {
             foreach (TabItem tabItem in tabLog.Items)
             {

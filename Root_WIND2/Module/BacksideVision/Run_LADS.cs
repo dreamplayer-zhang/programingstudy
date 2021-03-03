@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
@@ -220,14 +221,15 @@ namespace Root_WIND2.Module
 
                 double M = double.MinValue;
                 double res = 0;
-                for (int i = 1; i < profile.Count - 1; i++)
+                Parallel.For (1, profile.Count - 1, (i) => 
                 {
                     if (M < profile[i] && profile[i] != 0)
                     {
                         M = profile[i];
                         res = (profile[i - 1] * (i + s - 1) + profile[i] * (i + s) + profile[i + 1] * (i + s + 1)) / (profile[i - 1] + profile[i] + profile[i + 1]);
                     }
-                }
+                }) ;
+
                 if (res != 0)
                     ladsinfo.Add((res - nCamHeight/2));
                 else

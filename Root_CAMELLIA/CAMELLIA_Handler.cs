@@ -128,7 +128,7 @@ namespace Root_CAMELLIA
                         return false;
                     }
                 }
-                return true;
+                return false;
             }
             return iWTR.IsEnableRecovery();
         }
