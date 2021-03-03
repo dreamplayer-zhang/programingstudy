@@ -474,22 +474,9 @@ namespace Root_AOP01_Inspection
 			if (m_ImageViewer_VM.TRectList.Count == 6)
             {
                 MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
-                //tempList = new List<TRect>(viewer.TRectList);
-                //MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.MainModuleName);
-                //surfaceInspection.EdgeList = new List<TRect>(m_ImageViewer_VM.TRectList).ToArray();
                 mainVision.SetRectInfo(m_ImageViewer_VM.TRectList,App.MainModuleName);
-                //surfaceInspection.UpdateTree();
-               // surfaceInspection.RefreshTree();
             }
 		}
-        //List<TRect> tempList = new List<TRect>();
-        //private void saveEdgeBox(RecipeFrontside_Viewer_ViewModel viewer)
-        //{
-        //	if (viewer.TRectList.Count == 6)
-        //	{
-        //		tempList = new List<TRect>(viewer.TRectList);
-        //	}
-        //}
         private void DrawDone_Callback(CPoint leftTop, CPoint rightBottom)
         {
             if (!EdgeDrawMode)
