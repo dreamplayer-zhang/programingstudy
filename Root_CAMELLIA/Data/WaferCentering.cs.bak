@@ -145,11 +145,10 @@ namespace Root_CAMELLIA.Data
             eDir dir = ((CenteringParam)obj).dir;
             int nSearchRange = ((CenteringParam)obj).searchRange;
             int nSearchLevel = ((CenteringParam)obj).searchLevel;
-
             Mat matSrc = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride * 3);
             Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride * 3);
+            //Mat matInsp = new Mat(ptROI.X, ptROI.Y, DepthType.Cv8U, 3);
             Mat matInsp = new Mat();
-            
             StopWatch stopWatch = new StopWatch();
 
             try
@@ -169,17 +168,17 @@ namespace Root_CAMELLIA.Data
                     case eDir.LT:
                         vector = new Point(0, 1);
                         tempList = m_ptLT;
-                        startPt = new PointF(ptROI.X / 2, 0);
+                        startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
                         break;
                     case eDir.RT:
                         vector = new Point(0, 1);
                         tempList = m_ptRT;
-                        startPt = new PointF(ptROI.X / 2, 0);
+                        startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), 0);
                         break;
                     case eDir.RB:
                         vector = new Point(0, -1);
                         tempList = m_ptRB;
-                        startPt = new PointF(ptROI.X / 2, ptROI.Y);
+                        startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y);
                         break;
                 }
                 tempList.Clear();

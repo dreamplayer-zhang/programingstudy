@@ -239,7 +239,7 @@ namespace Root_CAMELLIA.Module
 				}
 
 				public string m_id;
-				public string p_sFan { get; set; }
+				public string p_sFan { get; set; } = "";
 				public Fan(Module_FFU FFU, string id)
 				{
 					m_id = id;
@@ -356,7 +356,7 @@ namespace Root_CAMELLIA.Module
 					m_alidTempLow = GAF.GetALID(FFU, m_id + " : Temp Low", "Temp RPM too Low");
 				}
 				#endregion
-				public string p_sTemp { get; set; }
+				public string p_sTemp { get; set; } = "";
 				public void RunTree(Tree tree)
 				{
 					p_sTemp = tree.Set(p_sTemp, p_sTemp, "Temp ID", "Temp ID");
@@ -399,7 +399,7 @@ namespace Root_CAMELLIA.Module
 					m_alidHumidityLow = GAF.GetALID(FFU, m_id + " : Humidity Low", "Humidity RPM too Low");
 				}
 				#endregion
-				public string p_sHumidity { get; set; }
+				public string p_sHumidity { get; set; } = "";
 				public void RunTree(Tree tree)
 				{
 					p_sHumidity = tree.Set(p_sHumidity, p_sHumidity, "Humidity ID", "Temp ID");

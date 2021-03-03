@@ -266,6 +266,9 @@
     <Compile Include="Control\GaugeChart.xaml.cs">
       <DependentUpon>GaugeChart.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Humidity.xaml.cs">
+      <DependentUpon>Humidity.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\StageViewControl.xaml.cs">
       <DependentUpon>StageViewControl.xaml</DependentUpon>
     </Compile>
@@ -391,6 +394,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\GaugeChart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Humidity.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -662,7 +662,7 @@ namespace RootTools.Camera.BaslerPylon
                             }
                             GrabEvent();
 
-                            if(stopWatch.ElapsedMilliseconds > 33)
+                            //if(stopWatch.ElapsedMilliseconds > 33)
                             {
                                 int imgSize = m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y;
                                 m_threadBuf = new ImageData(m_ImageGrab.p_Size.X, m_ImageGrab.p_Size.Y, m_ImageGrab.GetBytePerPixel());
