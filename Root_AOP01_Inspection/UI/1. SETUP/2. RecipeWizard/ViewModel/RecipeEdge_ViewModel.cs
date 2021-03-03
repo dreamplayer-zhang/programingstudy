@@ -129,49 +129,28 @@ namespace Root_AOP01_Inspection
 
 		private void saveCurrentEdge()
 		{
-			//string[] keywords = new string[] { "Main", "SideLeft", "SideTop", "SideBot", "SideRight" };
-			//현재 ViewModel에 있는 edgebox를 저장한다.
 			MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
 
 			//bot
 			if (m_ImageViewerBot_VM.TRectList.Count == 6)
 			{
-				//tempList = new List<TRect>(viewer.TRectList);
-				MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideBotModuleName);
-				surfaceInspection.EdgeList = new List<TRect>(m_ImageViewerBot_VM.TRectList).ToArray();
-				//surfaceInspection.UpdateTree();
-				//surfaceInspection.RefreshTree();
+				mainVision.SetRectInfo(m_ImageViewerBot_VM.TRectList, App.SideBotModuleName);
 			}
 			//top
 			if (m_ImageViewerTop_VM.TRectList.Count == 6)
 			{
-				//tempList = new List<TRect>(viewer.TRectList);
-				MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideTopModuleName);
-				surfaceInspection.EdgeList = new List<TRect>(m_ImageViewerTop_VM.TRectList).ToArray();
-				//surfaceInspection.UpdateTree();
-				//surfaceInspection.RefreshTree();
+				mainVision.SetRectInfo(m_ImageViewerTop_VM.TRectList, App.SideTopModuleName);
 			}
 			//left
 			if (m_ImageViewerLeft_VM.TRectList.Count == 6)
 			{
-				//tempList = new List<TRect>(viewer.TRectList);
-				MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideLeftModuleName);
-				surfaceInspection.EdgeList = new List<TRect>(m_ImageViewerLeft_VM.TRectList).ToArray();
-				//surfaceInspection.UpdateTree();
-				//surfaceInspection.RefreshTree();
+				mainVision.SetRectInfo(m_ImageViewerLeft_VM.TRectList, App.SideLeftModuleName);
 			}
 			//right
-			if (m_ImageViewerBot_VM.TRectList.Count == 6)
+			if (m_ImageViewerRight_VM.TRectList.Count == 6)
 			{
-				//tempList = new List<TRect>(viewer.TRectList);
-				MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideBotModuleName);
-				surfaceInspection.EdgeList = new List<TRect>(m_ImageViewerBot_VM.TRectList).ToArray();
-				//surfaceInspection.UpdateTree();
-				//surfaceInspection.RefreshTree();
+				mainVision.SetRectInfo(m_ImageViewerRight_VM.TRectList, App.SideRightModuleName);
 			}
-
-
-			//surfaceInspection.UpdateTree();
 		}
 		public ICommand btnBack
 		{
