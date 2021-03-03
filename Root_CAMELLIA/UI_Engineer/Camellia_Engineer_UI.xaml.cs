@@ -17,7 +17,7 @@ namespace Root_CAMELLIA
         public void Init(CAMELLIA_Engineer engineer)
         {
             m_engineer = engineer;
-            logViewUI.Init(LogView.m_logView);
+            logViewUI.Init(LogView._logView);
             handlerUI.Init(engineer.m_handler);
             loginUI.Init(engineer.m_login);
             toolBoxUI.Init(engineer.ClassToolBox());

@@ -148,7 +148,7 @@ namespace Root_WIND2
             //DatabaseManager.Instance.ValidateDatabase();
             //////
 
-            logView.Init(LogView.m_logView);
+            logView.Init(LogView._logView);
             WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
             InitTimer();
         }
