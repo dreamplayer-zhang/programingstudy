@@ -316,7 +316,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         sLogPlus = "Init ";
 
                     m_DM.m_Log.WriteLog(LogType.Operating, sLogPlus + "Calibration Done");
-                    MessageBox.Show(sLogPlus + "Calibration Done");
+                    //MessageBox.Show(sLogPlus + "Calibration Done");
                 }
                 else
                 {
@@ -336,7 +336,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
                     {
                         m_DM.m_Log.WriteLog(LogType.Operating, "Init Calibration Measure Done");
-                        MessageBox.Show("Init Calibration Measure Done");
+                        //MessageBox.Show("Init Calibration Measure Done");
                     }
                     else
                     {
