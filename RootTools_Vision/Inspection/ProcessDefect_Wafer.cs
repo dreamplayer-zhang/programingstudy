@@ -85,17 +85,18 @@ namespace RootTools_Vision
             }
 
             SharedBufferInfo sharedBufferInfo = new SharedBufferInfo(currentWorkplace.SharedBufferR_GRAY,
-                                                                     currentWorkplace.Width,
-                                                                     currentWorkplace.Height,
+                                                                     currentWorkplace.SharedBufferWidth,
+                                                                     currentWorkplace.SharedBufferHeight,
                                                                      currentWorkplace.SharedBufferByteCnt,
                                                                      currentWorkplace.SharedBufferG,
                                                                      currentWorkplace.SharedBufferB);
             
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
             SettingItem_SetupFrontside settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
-            
-            Tools.SaveDataImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList.Cast<Data>().ToList(), sharedBufferInfo);
-            
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+
+            //Tools.SaveDataImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList.Cast<Data>().ToList(), sharedBufferInfo);
+            SaveDefectImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
+
             if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
             {
                 List<string> dataStringList = GlobalObjects.Instance.Get<KlarfData_Lot>().DefectDataToStringList(MergeDefectList);
@@ -124,7 +125,7 @@ namespace RootTools_Vision
                 SaveTiffImage(settings.KlarfSavePath, MergeDefectList, 3);
             }
             */
-
+            
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
             WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
         }
@@ -190,7 +191,7 @@ namespace RootTools_Vision
             DefectList.AddRange(DefectList_Delete);
         }
         
-        /*
+        
         private List<Defect> MergeDefect(List<Defect> DefectList, int mergeDist)
         {
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();           
@@ -398,6 +399,6 @@ namespace RootTools_Vision
             ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
             img.SaveAdd(ep);
         }
-        */
+        
     }
 }
