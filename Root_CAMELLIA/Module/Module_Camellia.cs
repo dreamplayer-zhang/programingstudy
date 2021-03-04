@@ -219,6 +219,7 @@ namespace Root_CAMELLIA.Module
         public enum eAxisPos
         {
             Ready,
+            InitCal
         }
         private void InitWorkPoint()
         {

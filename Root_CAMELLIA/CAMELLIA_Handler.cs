@@ -122,10 +122,13 @@ namespace Root_CAMELLIA
                 }
                 else if (child.p_infoWafer == null)
                 {
-                    if (child.IsWaferExist(0) == true)
+                    if (!child.p_id.Contains("Loadport"))
                     {
-                        child.SetAlarm();
-                        return false;
+                        if (child.IsWaferExist(0) == true)
+                        {
+                            child.SetAlarm();
+                            return false;
+                        }
                     }
                 }
             }
