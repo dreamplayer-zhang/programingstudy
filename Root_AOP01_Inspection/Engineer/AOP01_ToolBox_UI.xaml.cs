@@ -18,7 +18,7 @@ namespace Root_AOP01_Inspection
         public void Init(AOP01_Engineer engineer)
         {
             m_engineer = engineer;
-            logViewUI.Init(LogView.m_logView);
+            logViewUI.Init(LogView._logView);
             treeRootUI.Init(engineer.m_treeRoot);
             loginUI.Init(engineer.m_login);
             toolBoxUI.Init(engineer.ClassToolBox());
