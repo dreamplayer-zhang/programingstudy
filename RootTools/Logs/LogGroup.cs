@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Text;
 using System.Windows.Controls;
 
 namespace RootTools
@@ -41,14 +42,14 @@ namespace RootTools
             string sPath = LogView._logView.p_sPath; 
             string sDate = m_qLog.Peek().m_sDate;
             sPath += "\\" + sDate;
-            Directory.CreateDirectory(sPath); 
-            using (StreamWriter writer = new StreamWriter(sPath + "\\" + sDate + "_" + p_id + ".txt",true))
+            Directory.CreateDirectory(sPath);
+            using (StreamWriter writer = new StreamWriter(sPath + "\\" + sDate + "_" + p_id + ".txt", true, Encoding.Default))
             {
                 while (m_qLog.Count > 0)
                 {
                     Log.Data data = m_qLog.Peek();
                     if (data.m_sDate != sDate) return;
-                    m_qLog.Dequeue(); 
+                    m_qLog.Dequeue();
                     writer.WriteLine(data.p_sLog);
                     p_aLog.Add(data);
                     while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
