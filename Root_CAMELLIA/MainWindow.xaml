@@ -284,6 +284,12 @@
                                     <DataTemplate DataType="{x:Type local:FanListItem}">
                                         <ctrl:Fan VerticalAlignment="Center" HorizontalAlignment="Center" DataContext="{Binding Fan, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                                     </DataTemplate>
+                                    <DataTemplate DataType="{x:Type local:HumidityListItem}">
+                                        <ctrl:Humidity VerticalAlignment="Center" HorizontalAlignment="Center" DataContext="{Binding Humidity, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="{x:Type local:TemperatureListItem}">
+                                        <ctrl:Temp VerticalAlignment="Center" HorizontalAlignment="Center" DataContext="{Binding Temperature, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                    </DataTemplate>
                                 </ItemsControl.Resources>
                             </ItemsControl>
                         </GroupBox>

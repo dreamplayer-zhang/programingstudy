@@ -355,7 +355,7 @@ namespace Root_CAMELLIA.Module
             #region Temp
             public class Temp : NotifyProperty
             {
-				public RPoint m_mmLimit = new RPoint();
+				public RPoint m_mmLimit { get; set; } = new RPoint();
 				int _nTemp;
 				public int p_nTemp
 				{
@@ -408,7 +408,7 @@ namespace Root_CAMELLIA.Module
 			#region Humidity
 			public class Humidity : NotifyProperty
 			{
-				public RPoint m_mmLimit = new RPoint();
+				public RPoint m_mmLimit { get; set;} = new RPoint();
 				int _nHumidity;
 				public int p_nHumidity
 				{

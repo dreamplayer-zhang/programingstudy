@@ -501,7 +501,43 @@ namespace Root_CAMELLIA
 
                 FanListItems.Add(FanItem);
             }
-            
+
+            cols = 2;
+            for(int i = 0; i < p_Module_FFU.p_aUnit[0].m_aHumidity.Count; i++)
+            {
+                HumidityListItem HumidityItem = new HumidityListItem();
+                HumidityItem.Humidity = p_Module_FFU.p_aUnit[0].m_aHumidity[i];
+                if(i < 1)
+                {
+                    HumidityItem.p_rowIndex = 0;
+                }
+                else
+                {
+                    HumidityItem.p_rowIndex = 1;
+                }
+                HumidityItem.p_columnIndex = cols;
+
+                FanListItems.Add(HumidityItem);
+            }
+
+            cols = 3;
+            for (int i = 0; i < p_Module_FFU.p_aUnit[0].m_aTemp.Count; i++)
+            {
+                TemperatureListItem TemperatureItem = new TemperatureListItem();
+                TemperatureItem.Temperature = p_Module_FFU.p_aUnit[0].m_aTemp[i];
+                if (i < 1)
+                {
+                    TemperatureItem.p_rowIndex = 0;
+                }
+                else
+                {
+                    TemperatureItem.p_rowIndex = 1;
+                }
+                TemperatureItem.p_columnIndex = cols;
+
+                FanListItems.Add(TemperatureItem);
+            }
+
         }
 
         private void OnUpdateValue(object sender, EventArgs args)
@@ -775,10 +811,25 @@ namespace Root_CAMELLIA
                     for (int i = 0; i < FanListItems.Count; i++)
                     {
                         FanListItem fan = FanListItems[i] as FanListItem;
-                        if (fan.Fan.p_bRun == false)
-                            fan.Fan.p_bRun = true;
-                        else if (fan.Fan.p_bRun)
-                            fan.Fan.p_bRun = false;
+                        if(fan != null)
+                        {
+                            if (fan.Fan.p_bRun == false)
+                                fan.Fan.p_bRun = true;
+                            else if (fan.Fan.p_bRun)
+                                fan.Fan.p_bRun = false;
+                        }
+                        HumidityListItem humidity = FanListItems[i] as HumidityListItem;
+                        if(humidity != null)
+                        {
+                            humidity.Humidity.p_nHumidity = rand.Next(0, 40);
+                        }
+
+                        TemperatureListItem Temp = FanListItems[i] as TemperatureListItem;
+                        if (Temp != null)
+                        {
+                            Temp.Temperature.p_nTemp = rand.Next(0, 40);
+                        }
+
                     }
                     //GaugeListItem gauge = new GaugeListItem();
                     //gauge.Gauge = new GaugeChart();
@@ -883,6 +934,102 @@ namespace Root_CAMELLIA
             }
         }
 
+
+        int m_rowIndex = 0;
+        public int p_rowIndex
+        {
+            get
+            {
+                return m_rowIndex;
+            }
+            set
+            {
+                SetProperty(ref m_rowIndex, value);
+                RaisePropertyChanged("p_rowIndex");
+            }
+        }
+    }
+
+    public class HumidityListItem : ObservableObject
+    {
+        public HumidityListItem()
+        {
+
+        }
+        Module_FFU.Unit.Humidity _humidity;
+        public Module_FFU.Unit.Humidity Humidity
+        {
+            get
+            {
+                return _humidity;
+            }
+            set
+            {
+                SetProperty(ref _humidity, value);
+            }
+        }
+
+        int m_columnIndex = 0;
+        public int p_columnIndex
+        {
+            get
+            {
+                return m_columnIndex;
+            }
+            set
+            {
+                SetProperty(ref m_columnIndex, value);
+                RaisePropertyChanged("p_columnIndex");
+            }
+        }
+
+        int m_rowIndex = 0;
+        public int p_rowIndex
+        {
+            get
+            {
+                return m_rowIndex;
+            }
+            set
+            {
+                SetProperty(ref m_rowIndex, value);
+                RaisePropertyChanged("p_rowIndex");
+            }
+        }
+    }
+
+    public class TemperatureListItem : ObservableObject
+    {
+        public TemperatureListItem()
+        {
+
+        }
+        Module_FFU.Unit.Temp _temperature;
+        public Module_FFU.Unit.Temp Temperature
+        {
+            get
+            {
+                return _temperature;
+            }
+            set
+            {
+                SetProperty(ref _temperature, value);
+            }
+        }
+
+        int m_columnIndex = 0;
+        public int p_columnIndex
+        {
+            get
+            {
+                return m_columnIndex;
+            }
+            set
+            {
+                SetProperty(ref m_columnIndex, value);
+                RaisePropertyChanged("p_columnIndex");
+            }
+        }
 
         int m_rowIndex = 0;
         public int p_rowIndex
