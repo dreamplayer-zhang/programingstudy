@@ -33,7 +33,7 @@ namespace RootTools.Memory
         public AsyncObject(int bufferSize)
         {
             BufferSize = bufferSize;
-            Buffer = new byte[BufferSize];
+            Buffer = new byte[(long)BufferSize];
         }
 
         public void ClearBuffer()
@@ -716,7 +716,7 @@ namespace RootTools.Memory
                 return null;
            
             int rectX, rectY, rectWidth, rectHeight, sizeX;
-            byte[] result = new byte[CanvasWidth * CanvasHeight * nByte];
+            byte[] result = new byte[(long)CanvasWidth * CanvasHeight * nByte];
             rectX = View_Rect.X;
             rectY = View_Rect.Y;
             rectWidth = View_Rect.Width;
