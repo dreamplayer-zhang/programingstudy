@@ -549,22 +549,23 @@ namespace Root_CAMELLIA.Module
         
         public string BeforePut(int nID)
         {
-            if (CanInitCal[EQ.p_nRunLP])
-            {
-                if(m_DataManager.m_calibration.Run(true, false) != "OK")
-                {
-                    return "Init Calibration Error";
-                }
-                CanInitCal[EQ.p_nRunLP] = false;
-            }
+            //? InitCal 문제 보류
+            //if (CanInitCal[EQ.p_nRunLP])
+            //{
+            //    if(m_DataManager.m_calibration.Run(true, false) != "OK")
+            //    {
+            //        return "Init Calibration Error";
+            //    }
+            //    CanInitCal[EQ.p_nRunLP] = false;
+            //}
 
-            if (m_DataManager.m_calibration.InItCalDone)
-            {
-                if (m_DataManager.m_calibration.Run(false) != "OK")
-                {
-                    return "Calibration Error";
-                }
-            }
+            //if (m_DataManager.m_calibration.InItCalDone)
+            //{
+            //    if (m_DataManager.m_calibration.Run(false) != "OK")
+            //    {
+            //        return "Calibration Error";
+            //    }
+            //}
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;
