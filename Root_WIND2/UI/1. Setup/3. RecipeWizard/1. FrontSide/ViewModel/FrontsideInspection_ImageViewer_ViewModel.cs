@@ -266,7 +266,7 @@ namespace Root_WIND2
 
         //static long time = 0;
         static StopWatch watch = new StopWatch();
-        public void RedrawShapes()
+        private void RedrawShapes()
         {
             // 개선중..
             //watch.p_secTimeout = 1;
