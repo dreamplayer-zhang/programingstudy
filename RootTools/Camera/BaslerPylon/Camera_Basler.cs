@@ -529,6 +529,23 @@ namespace RootTools.Camera.BaslerPylon
                 }
                 // Starts the grabbing of one image.
                 m_cam.Parameters[PLCamera.AcquisitionMode].SetValue(PLCamera.AcquisitionMode.SingleFrame);
+                string s_curPixelFormat = m_cam.Parameters[PLCamera.PixelFormat].GetValue();
+                int width = (int)m_cam.Parameters[PLCamera.Width].GetValue();
+                int height = (int)m_cam.Parameters[PLCamera.Height].GetValue();
+                CPoint sz = new CPoint(width, height);
+
+                if (s_curPixelFormat.Equals(PLCamera.PixelFormat.Mono8.ToString()))
+                    m_ImageGrab.ReAllocate(sz, 1);
+                else if (s_curPixelFormat.Equals(PLCamera.PixelFormat.YUV422Packed.ToString()))
+                    m_ImageGrab.ReAllocate(sz, 3);
+
+                if (_dispatcher != null)
+                {
+                    _dispatcher.Invoke(new Action(delegate ()
+                    {
+                        p_ImageViewer.SetRoiRect();
+                    }));
+                }
                 m_cam.StreamGrabber.Start(1, GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
             }
             catch (Exception) { }
@@ -645,7 +662,7 @@ namespace RootTools.Camera.BaslerPylon
                             }
                             GrabEvent();
 
-                            if(stopWatch.ElapsedMilliseconds > 33)
+                            //if(stopWatch.ElapsedMilliseconds > 33)
                             {
                                 int imgSize = m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y;
                                 m_threadBuf = new ImageData(m_ImageGrab.p_Size.X, m_ImageGrab.p_Size.Y, m_ImageGrab.GetBytePerPixel());

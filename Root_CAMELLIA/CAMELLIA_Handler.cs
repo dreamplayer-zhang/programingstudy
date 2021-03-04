@@ -109,12 +109,25 @@ namespace Root_CAMELLIA
 
         public bool IsEnableRecovery()
         {
-            //            if (m_vision.p_infoWafer != null) return true;
-            //return false;
             IWTR iWTR = (IWTR)m_wtr;
-            foreach(IWTRChild child in iWTR.p_aChild)
+            foreach (IWTRChild child in iWTR.p_aChild)
             {
-                if (child.p_infoWafer != null) return true;
+                if (child.p_infoWafer != null)
+                {
+                    if (child.IsWaferExist(0) == false)
+                    {
+                        child.SetAlarm();
+                        return false;
+                    }
+                }
+                else if (child.p_infoWafer == null)
+                {
+                    if (child.IsWaferExist(0) == true)
+                    {
+                        child.SetAlarm();
+                        return false;
+                    }
+                }
             }
             return iWTR.IsEnableRecovery();
         }

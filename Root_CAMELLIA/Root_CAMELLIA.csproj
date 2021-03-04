@@ -266,10 +266,17 @@
     <Compile Include="Control\GaugeChart.xaml.cs">
       <DependentUpon>GaugeChart.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Humidity.xaml.cs">
+      <DependentUpon>Humidity.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\StageViewControl.xaml.cs">
       <DependentUpon>StageViewControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Temp.xaml.cs">
+      <DependentUpon>Temp.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converter\BoolConverter.cs" />
+    <Compile Include="Converter\HumidityToGradientOffsetConverter.cs" />
     <Compile Include="Converter\LampStateToColorConverter.cs" />
     <Compile Include="Converter\ValueToColorConverter.cs" />
     <Compile Include="LibSR_Met\Calculation.cs" />
@@ -394,7 +401,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\Humidity.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\StageViewControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Temp.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

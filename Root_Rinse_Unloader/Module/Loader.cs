@@ -88,11 +88,16 @@ namespace Root_Rinse_Unloader.Module
             for (int n = 0; n < 4; n++)
             {
                 m_aPicker[n].m_dioVacuum.Write(bOn);
-                //m_aPicker[n].m_dioVacuum.Write(bOn && m_roller.m_bExist[n]);
             }
             Thread.Sleep(200);
-            if (bOn) Thread.Sleep((int)(1000 * m_secVac));
-            else
+            //if (bOn) Thread.Sleep((int)(1000 * m_secVac));
+            //else
+            //{
+            //    foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
+            //    Thread.Sleep((int)(1000 * m_secBlow));
+            //    foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
+            //}
+            if (!bOn)
             {
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
                 Thread.Sleep((int)(1000 * m_secBlow));

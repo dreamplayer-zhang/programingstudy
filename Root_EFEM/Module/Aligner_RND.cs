@@ -21,10 +21,13 @@ namespace Root_EFEM.Module
         RS232 m_rs232;
         MemoryPool m_memoryPool;
         Camera_CognexOCR m_camOCR;
-        ALID m_alid_WaferExist;
         public ALID m_alid_AlignFail;
+        ALID m_alid_WaferExist;
 
-
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
+        }
 
         public override void GetTools(bool bInit)
         {

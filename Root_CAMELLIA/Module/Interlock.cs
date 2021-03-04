@@ -145,7 +145,6 @@ namespace Root_CAMELLIA.Module
         #endregion
 
         #region Thread
-        public EQ.eState m_eState = EQ.eState.Init;
         protected override void RunThread()
         {
             base.RunThread();
@@ -159,7 +158,7 @@ namespace Root_CAMELLIA.Module
             if (!m_diMCReset.p_bIn)
             {
                 Thread.Sleep(100);
-                if (!m_diEmergency.p_bIn) m_alidMCReset_EMO.Run(!m_diMCReset.p_bIn, "Please Check M/C Reset (EMO)");
+                if (!m_diCDALow.p_bIn) m_alidMCReset_EMO.Run(!m_diMCReset.p_bIn, "Please Check M/C Reset (EMO)");
                 else m_alidMCReset_EMS.Run(!m_diMCReset.p_bIn, "Please Check M/C Reset (EMS)");
             }
             if (m_bIonizer_Use)

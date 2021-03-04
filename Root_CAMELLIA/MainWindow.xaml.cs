@@ -80,6 +80,10 @@ namespace Root_CAMELLIA
             m_handler = m_engineer.m_handler;
             loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
+
+            int nLPNum = m_handler.m_aLoadport.Count;
+            for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTNew);
+
             InitTimer();
         }
 
@@ -204,7 +208,6 @@ namespace Root_CAMELLIA
         Dlg_OHT dlgOHT = new Dlg_OHT();
         private void buttonOHT_Click(object sender, RoutedEventArgs e)
         {
-
             dlgOHT.Show();
         }
     }

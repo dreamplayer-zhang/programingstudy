@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RootTools.Logs
+namespace Root_CAMELLIA.Control
 {
     /// <summary>
-    /// LogMars_Group_UI.xaml에 대한 상호 작용 논리
+    /// Humidity.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class LogMars_Group_UI : UserControl
+    public partial class Humidity : UserControl
     {
-        public LogMars_Group_UI()
+        public Humidity()
         {
             InitializeComponent();
         }
