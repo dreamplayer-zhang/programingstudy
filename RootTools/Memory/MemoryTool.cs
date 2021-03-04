@@ -49,9 +49,11 @@ namespace RootTools.Memory
         //IPAddress thisAddress;
         int port;
         Socket mainSock;
-        public MemServer()
+        Log log;
+        public MemServer(Log log)
         {
             mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+            this.log = log;
         }
         public void Start(int por)
         {            
@@ -83,6 +85,8 @@ namespace RootTools.Memory
         {          
             AsyncObject obj = (AsyncObject)ar.AsyncState;
 
+            try
+            {
             int received = obj.WorkingSocket.EndReceive(ar);
 
             if (received <= 0)
@@ -96,6 +100,17 @@ namespace RootTools.Memory
             obj.ClearBuffer();
 
             obj.WorkingSocket.BeginReceive(obj.Buffer, 0, nSize, 0, DataReceived, obj);
+        }
+            catch (Exception)
+            {
+                log.Warn("Server : Disconnected from the client");
+                obj.WorkingSocket.Close();
+
+                mainSock.Listen(10);
+                mainSock.BeginAccept(AcceptCallback, null);
+                return;
+            }
+
         }
         public void Send(byte[] p)
         {
@@ -148,50 +163,69 @@ namespace RootTools.Memory
         Socket mainSock;
         IPAddress thisAddress;
         int port;
-      
-        public MemClient()
+        Log log;
+
+        public MemClient(Log log)
         {
-           mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+            this.log = log;
+            mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
         }
         public void Connect(IPAddress adds, int por)
         {
             thisAddress = adds;
             port = por;
+
+            IPEndPoint clientEP = new IPEndPoint(adds, port);
+            mainSock.BeginConnect(clientEP, new AsyncCallback(ConnectCallback), mainSock);
+        }
+        void ConnectCallback(IAsyncResult ar)
+        {
             try
             {
-                mainSock.Connect(thisAddress, port);
-            }
-            catch (Exception)
-            {
-               return;
-            }
+                Socket client = (Socket)ar.AsyncState;
+                client.EndConnect(ar);
 
-            // 연결 완료, 서버에서 데이터가 올 수 있으므로 수신 대기한다.
-            AsyncObject obj = new AsyncObject(4096);
-            obj.WorkingSocket = mainSock;
-            mainSock.BeginReceive(obj.Buffer, 0, obj.BufferSize, 0, DataReceived, obj);
-        
+                AsyncObject obj = new AsyncObject(4096);
+                obj.WorkingSocket = mainSock;
+                mainSock.BeginReceive(obj.Buffer, 0, obj.BufferSize, 0, DataReceived, obj);
+            }
+            catch(Exception)
+            {
+                Connect(thisAddress, port);
+            }
         }
+
         void DataReceived(IAsyncResult ar)
         {
             // BeginReceive에서 추가적으로 넘어온 데이터를 AsyncObject 형식으로 변환한다.
             AsyncObject obj = (AsyncObject)ar.AsyncState;
-
-            // 데이터 수신을 끝낸다.
-            int received = obj.WorkingSocket.EndReceive(ar);
-
-            // 받은 데이터가 없으면(연결끊어짐) 끝낸다.
-            if (received <= 0)
+            try
             {
-                obj.WorkingSocket.Close();
+                // 데이터 수신을 끝낸다.
+                int received = obj.WorkingSocket.EndReceive(ar);
+
+                // 받은 데이터가 없으면(연결끊어짐) 끝낸다.
+                if (received <= 0)
+                {
+                    obj.WorkingSocket.Close();
+                    return;
+                }
+
+                EventReciveData(obj.Buffer, received);
+
+                obj.ClearBuffer();
+                // 수신 대기
+                obj.WorkingSocket.BeginReceive(obj.Buffer, 0, 4096, 0, DataReceived, obj);
+            }
+            catch(Exception)
+            {
+                log.Warn("Client : Disconnected from the server");
+                obj.WorkingSocket.Disconnect(true);
+
+                Connect(thisAddress, port);
                 return;
             }
-
-            EventReciveData(obj.Buffer, received);
-       
-            obj.ClearBuffer();
-            // 수신 대기
-            obj.WorkingSocket.BeginReceive(obj.Buffer, 0, 4096, 0, DataReceived, obj);
+            
         }
         public void Send(byte[] p)
         {
@@ -509,14 +543,14 @@ namespace RootTools.Memory
 
             if (bServer)
             {
-                m_Server = new MemServer();
+                m_Server = new MemServer(m_log);
                 RunTreeRun(Tree.eMode.RegRead);
                 m_Server.Start(5000);
                 m_Server.EventReciveData += M_Server_EventReciveData;
             }
             else
             {
-                m_Client = new MemClient();
+                m_Client = new MemClient(m_log);
                 RunTreeRun(Tree.eMode.RegRead);
                 m_Client.Connect(new IPAddress(new byte[] { 10,0,0,15 }),5000);
                 m_Client.EventReciveData += M_Client_EventReciveData;

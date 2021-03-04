@@ -17,6 +17,11 @@ namespace Root_AOP01_Inspection.Module
 {
     public class Loadport_AOP01 : ModuleBase, IWTRChild, ILoadport
     {
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
+        }
         #region ToolBox
         RS232 m_rs232;
         public DIO_I m_diPlaced;
@@ -25,6 +30,15 @@ namespace Root_AOP01_Inspection.Module
         public DIO_I m_diClose;
         public DIO_I m_diReady;
         public DIO_I m_diRun;
+        OHT _OHT;
+        public OHT m_OHTNew
+        {
+            get { return _OHT; }
+            set
+            {
+                _OHT = value;
+            }
+        }
         public OHT_Semi m_OHT;
         public bool m_bLoadCheck = false;
         public bool m_bUnLoadCheck = false;

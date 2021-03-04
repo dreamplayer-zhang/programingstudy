@@ -13,8 +13,6 @@ namespace Root_WIND2
         {
             // Regiseter Recipe Items
             RegisterRecipeItem<EBRRecipe>();
-
-            // Regiseter Parameter Items
             RegisterParameterItem<EBRParameter>();
         }
     }

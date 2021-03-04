@@ -71,6 +71,8 @@ namespace Root_CAMELLIA.Module
             run.m_WaferRB_pulse = m_WaferRB_pulse;
             run.m_EdgeSearchRange = m_EdgeSearchRange;
             run.m_EdgeSearchLevel = m_EdgeSearchLevel;
+            run.m_dResX_um = m_dResX_um;
+            run.m_dResY_um = m_dResY_um;
             run.m_useCal = m_useCal;
             run.m_useCentering = m_useCentering;
             run.m_dFocusZ = m_dFocusZ;

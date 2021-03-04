@@ -74,7 +74,7 @@ namespace Root_CAMELLIA.Module
             base.RunThread();
             //if(m_eState != EQ.p_eState)
             {
-                switch (EQ.p_eState) 
+                switch (EQ.p_eState)
                 {
                     case EQ.eState.Error:
                         m_doLamp.Write(eLamp.Red);

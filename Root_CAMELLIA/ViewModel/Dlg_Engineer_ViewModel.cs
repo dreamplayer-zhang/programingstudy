@@ -382,13 +382,13 @@ namespace Root_CAMELLIA
             TiltAxisY = ModuleCamellia.p_tiltAxisXY.p_axisY;
             TiltAxisZ = ModuleCamellia.p_tiltAxisZ;
 
-            //ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
+            ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
 
-            //p_rootViewer.p_VisibleMenu = Visibility.Collapsed;
+            p_rootViewer.p_VisibleMenu = Visibility.Collapsed;
 
-            //p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+            p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
 
-            //dispatcher = Application.Current.Dispatcher;
+            dispatcher = Application.Current.Dispatcher;
         }
 
         private void OnGrabImageUpdate(object sender, EventArgs e)

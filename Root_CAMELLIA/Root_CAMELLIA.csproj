@@ -266,10 +266,17 @@
     <Compile Include="Control\GaugeChart.xaml.cs">
       <DependentUpon>GaugeChart.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Humidity.xaml.cs">
+      <DependentUpon>Humidity.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\StageViewControl.xaml.cs">
       <DependentUpon>StageViewControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Temp.xaml.cs">
+      <DependentUpon>Temp.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converter\BoolConverter.cs" />
+    <Compile Include="Converter\HumidityToGradientOffsetConverter.cs" />
     <Compile Include="Converter\LampStateToColorConverter.cs" />
     <Compile Include="Converter\ValueToColorConverter.cs" />
     <Compile Include="LibSR_Met\Calculation.cs" />
@@ -394,7 +401,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\Humidity.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\StageViewControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Temp.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -580,6 +595,9 @@ copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectNam
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\msvcp140.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"
+copy /Y "$(SolutionDir)Lib\AXL\AXL.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\AXL.dll"
+copy /Y "$(SolutionDir)Lib\AXL\AXL.lib" $(SolutionDir)$(ProjectName)\$(OutDir)\AXL.lib"
+copy /Y "$(SolutionDir)Lib\AXL\EzBasicAxl.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\EzBasicAxl.dll"
 IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
 copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
 IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")

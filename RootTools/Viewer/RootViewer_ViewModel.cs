@@ -728,7 +728,7 @@ namespace RootTools
                 {
                     if (p_ImageData.m_eMode == ImageData.eMode.OtherPCMem)
                     {
-                        if (p_ImageData.p_nByte == 1)
+                        if (p_ImageData.GetBytePerPixel() == 1)
                         {
                             if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
                             {
@@ -746,7 +746,7 @@ namespace RootTools
                                 p_ImgSource = ImageHelper.ToBitmapSource(view);
                             }
                         }
-                        else if (p_ImageData.p_nByte == 3)
+                        else if (p_ImageData.GetBytePerPixel() == 3)
                         {
                             if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
                             {

@@ -14,6 +14,11 @@ namespace Root_AOP01_Packing.Module
 {
     public class VacuumPacker : ModuleBase, IWTRChild
     {
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Wafer Exist Error");
+        }
         #region ToolBox
         public override void GetTools(bool bInit)
         {
@@ -23,7 +28,7 @@ namespace Root_AOP01_Packing.Module
             m_holder.GetTools(m_toolBox, bInit);
             m_loader.GetTools(m_toolBox, bInit);
             m_heater.GetTools(m_toolBox, bInit);
-
+            m_alid_WaferExist = m_gaf.GetALID(this, "Wafer Exist", "Wafer Exist");
             if (bInit)
             {
                 InitALID();
