@@ -1515,7 +1515,7 @@ namespace Root_AOP01_Inspection.Module
                     GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).WaferMap.Clear();
 
                     RootViewer_ViewModel targetViewModel;
-
+                    
                     switch (currentMgmName)
                     {
                         case App.SideLeftInspMgRegName:
@@ -4205,6 +4205,9 @@ namespace Root_AOP01_Inspection.Module
                 double dReticleAngle = 0.0;
                 double dFrameAngle = 0.0;
 
+                RecipeFrontside_Viewer_ViewModel targetViewer = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
+                Dispatcher dispatcher = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.currentDispatcher;
+
                 // implement
                 m_module.p_bPellicleShiftPass = true;
 
@@ -4256,6 +4259,17 @@ namespace Root_AOP01_Inspection.Module
                         }
                     }
                 }
+
+                //
+                if (dispatcher != null)
+                {
+                    dispatcher.Invoke(new Action(delegate ()
+                    {
+                        targetViewer.DrawRect(arrCRectReticleEdgeROI.ToList(), RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                    }));
+                }
+                //
+
                 contourReticle.Push(ptarrReticleEdgePoint);
                 RotatedRect rtReticleEdge = CvInvoke.MinAreaRect(contourReticle);
                 dReticleAngle = rtReticleEdge.Angle;
