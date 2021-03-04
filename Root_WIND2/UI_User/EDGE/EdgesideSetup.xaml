@@ -311,6 +311,24 @@
                             <TextBlock Grid.Column="0" Text="Edge Search Level (%)" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                             <TextBox Grid.Column="1" Text="{Binding EdgeSearchLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
                         </Grid>
+
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Temp Start Notch" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                            <TextBox Grid.Column="1" Text="{Binding StartNotch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                        </Grid>
+
+                        <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Temp End Notch" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
+                            <TextBox Grid.Column="1" Text="{Binding EndNotch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
+                        </Grid>
                     </StackPanel>
                 </GroupBox>
             </Grid>

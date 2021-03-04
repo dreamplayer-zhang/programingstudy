@@ -355,7 +355,7 @@ namespace Root_CAMELLIA.Module
             #region Temp
             public class Temp : NotifyProperty
             {
-				public RPoint m_mmLimit = new RPoint();
+				public RPoint m_mmLimit { get; set; } = new RPoint();
 				int _nTemp;
 				public int p_nTemp
 				{
@@ -408,7 +408,7 @@ namespace Root_CAMELLIA.Module
 			#region Humidity
 			public class Humidity : NotifyProperty
 			{
-				public RPoint m_mmLimit = new RPoint();
+				public RPoint m_mmLimit { get; set;} = new RPoint();
 				int _nHumidity;
 				public int p_nHumidity
 				{
@@ -475,21 +475,21 @@ namespace Root_CAMELLIA.Module
 					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 128, m_aFanPressure);
 					for (int n = 0; n < m_lFan; n++) m_aFan[n].p_fPressure = m_aFan[n].p_bRun ? m_aFanPressure[n] / 10.0 : 0;
 
+					for (int n = 0; n < m_lHumidity; n++)
+					{
+						Thread.Sleep(10);
+						int nHumidity = 0;
+						m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 193 + (32 * n), ref nHumidity);
+						m_aHumidity[n].p_nHumidity = nHumidity;
+					}
+
 					for (int n = 0; n < m_lTemp; n++)
                     {
 						Thread.Sleep(10);
 						int nTemp = 0;
-						m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 193 + (32 * n), ref nTemp);
+						m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 194 + (32 * n), ref nTemp);
 						m_aTemp[n].p_nTemp = nTemp;
 					}
-
-                    for (int n = 0; n < m_lHumidity; n++)
-                    {
-                        Thread.Sleep(10);
-                        int nHumidity = 0;
-                        m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 194 + (32 * n), ref nHumidity);
-                        m_aHumidity[n].p_nHumidity = nHumidity;
-                    }
 
                     if (m_FFU.m_bResetFan)
                     {

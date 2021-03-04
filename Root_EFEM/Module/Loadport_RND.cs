@@ -36,7 +36,7 @@ namespace Root_EFEM.Module
         ALID m_alid_WaferExist;
         public void SetAlarm()
         {
-            m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
+           // m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
         }
         public override void GetTools(bool bInit)
         {

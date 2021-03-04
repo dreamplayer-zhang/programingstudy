@@ -27,6 +27,10 @@ namespace Root_CAMELLIA.Module
         double m_dResY_um = 1;
         double m_dFocusZ_pulse = 1; // Pulse
         bool isSaveDone = false;
+
+        bool m_bUseTestSequence = false;
+        RPoint m_ptTestMeasurePoint = new RPoint();
+
         public Run_Measure(Module_Camellia module)
         {
             m_module = module;
@@ -41,6 +45,8 @@ namespace Root_CAMELLIA.Module
             run.m_dResX_um = m_dResX_um;
             run.m_dResY_um = m_dResY_um;
             run.m_dFocusZ_pulse = m_dFocusZ_pulse;
+            run.m_bUseTestSequence = m_bUseTestSequence;
+            run.m_ptTestMeasurePoint = m_ptTestMeasurePoint;
             return run;
         }
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
@@ -49,6 +55,9 @@ namespace Root_CAMELLIA.Module
             m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)", bVisible);
             m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)", bVisible);
             m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)", bVisible);
+            m_bUseTestSequence = tree.Set(m_bUseTestSequence, m_bUseTestSequence, "Use Test Sequence", "Use Test Sequence", bVisible);
+            m_ptTestMeasurePoint = tree.Set(m_ptTestMeasurePoint, m_ptTestMeasurePoint, "Test Point Pulse", "Test Point Pulse", bVisible);
+
         }
         public override string Run()
         {
@@ -88,109 +97,130 @@ namespace Root_CAMELLIA.Module
             //string strVRSImageFullPath = "";
             RPoint MeasurePoint;
 
-            double centerX;
-            double centerY;
-            if (m_DataManager.m_waferCentering.m_ptCenter.X == 0 && m_DataManager.m_waferCentering.m_ptCenter.Y == 0)
-            {
-                centerX = m_StageCenterPos_pulse.X;
-                centerY = m_StageCenterPos_pulse.Y;
-            }
-            else
-            {
-                centerX = m_StageCenterPos_pulse.X + (m_DataManager.m_waferCentering.m_ptCenter.X - m_StageCenterPos_pulse.X);
-                centerY = m_StageCenterPos_pulse.Y + (m_DataManager.m_waferCentering.m_ptCenter.Y - m_StageCenterPos_pulse.Y);
-                //centerX = m_DataManager.m_waferCentering.m_ptCenter.X - (m_StageCenterPos_pulse.X - m_DataManager.m_waferCentering.m_ptCenter.X);
-                //centerY = m_DataManager.m_waferCentering.m_ptCenter.Y - (m_StageCenterPos_pulse.Y- m_DataManager.m_waferCentering.m_ptCenter.Y);
-            }
-
-            double RatioX = (int)(BaseDefine.CanvasWidth / BaseDefine.ViewSize);
-            double RatioY = (int)(BaseDefine.CanvasHeight / BaseDefine.ViewSize);
-
-            m_mwvm.p_Progress = 0;
-
             Met.DataManager dm = Met.DataManager.GetInstance();
 
             dm.ClearRawData();
-
-            double x = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[0]].x;
-            double y = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[0]].y;
-            double dX = centerX - x * 10000;
-            double dY = centerY - y * 10000;
-            object obj;
-            //StopWatch sw = new StopWatch();
-            for (int i = 0; i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count; i++)
+            if (m_bUseTestSequence)
             {
-
-                if (i == 0)
+                double centerX;
+                double centerY;
+                if (m_DataManager.m_waferCentering.m_ptCenter.X == 0 && m_DataManager.m_waferCentering.m_ptCenter.Y == 0)
                 {
-                    MeasurePoint = new RPoint(dX, dY);
-                    if (m_module.Run(axisXY.StartMove(MeasurePoint)))
-                        return p_sInfo;
-                    if (m_module.Run(axisXY.WaitReady()))
-                        return p_sInfo;
+                    centerX = m_StageCenterPos_pulse.X;
+                    centerY = m_StageCenterPos_pulse.Y;
+                }
+                else
+                {
+                    centerX = m_StageCenterPos_pulse.X + (m_DataManager.m_waferCentering.m_ptCenter.X - m_StageCenterPos_pulse.X);
+                    centerY = m_StageCenterPos_pulse.Y + (m_DataManager.m_waferCentering.m_ptCenter.Y - m_StageCenterPos_pulse.Y);
+                    //centerX = m_DataManager.m_waferCentering.m_ptCenter.X - (m_StageCenterPos_pulse.X - m_DataManager.m_waferCentering.m_ptCenter.X);
+                    //centerY = m_DataManager.m_waferCentering.m_ptCenter.Y - (m_StageCenterPos_pulse.Y- m_DataManager.m_waferCentering.m_ptCenter.Y);
+                }
 
-                    m_mwvm.p_ArrowX1 = x * RatioX;
-                    m_mwvm.p_ArrowY1 = -y * RatioY;
+                double RatioX = (int)(BaseDefine.CanvasWidth / BaseDefine.ViewSize);
+                double RatioY = (int)(BaseDefine.CanvasHeight / BaseDefine.ViewSize);
+
+                m_mwvm.p_Progress = 0;
+
+
+                double x = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[0]].x;
+                double y = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[0]].y;
+                double dX = centerX - x * 10000;
+                double dY = centerY - y * 10000;
+                object obj;
+                //StopWatch sw = new StopWatch();
+                for (int i = 0; i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count; i++)
+                {
+
+                    if (i == 0)
+                    {
+                        MeasurePoint = new RPoint(dX, dY);
+                        if (m_module.Run(axisXY.StartMove(MeasurePoint)))
+                            return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady()))
+                            return p_sInfo;
+
+                        m_mwvm.p_ArrowX1 = x * RatioX;
+                        m_mwvm.p_ArrowY1 = -y * RatioY;
+                        if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
+                        {
+                            double x2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].x;
+                            double y2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].y;
+                            m_mwvm.p_ArrowX2 = x2 * RatioX;
+                            m_mwvm.p_ArrowY2 = -y2 * RatioY;
+                            m_mwvm.p_ArrowVisible = Visibility.Visible;
+                        }
+                        isSaveDone = true;
+                    }
+                    //  sw.Start();
+                    while (!isSaveDone) ;
+                    isSaveDone = false;
+                    if (App.m_nanoView.SampleMeasure(i, x, y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, setting.nAverage_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, setting.nAverage_NIR,
+                        m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseTransmittance,
+                        m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                    {
+                        return "Layer Model Not Ready";
+                    }
+                    //   sw.Stop();
+                    //   System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
                     if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
                     {
-                        double x2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].x;
-                        double y2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].y;
-                        m_mwvm.p_ArrowX2 = x2 * RatioX;
-                        m_mwvm.p_ArrowY2 = -y2 * RatioY;
-                        m_mwvm.p_ArrowVisible = Visibility.Visible;
+                        x = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].x;
+                        y = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].y;
+                        dX = centerX - x * 10000;
+                        dY = centerY - y * 10000;
+
+                        MeasurePoint = new RPoint(dX, dY);
+
+                        if (m_module.Run(axisXY.StartMove(MeasurePoint)))
+                            return p_sInfo;
+
+
+                        m_mwvm.p_ArrowX1 = x * RatioX;
+                        m_mwvm.p_ArrowY1 = -y * RatioY;
+                        if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 2)
+                        {
+                            double x2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 2]].x;
+                            double y2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 2]].y;
+                            m_mwvm.p_ArrowX2 = x2 * RatioX;
+                            m_mwvm.p_ArrowY2 = -y2 * RatioY;
+                            m_mwvm.p_ArrowVisible = Visibility.Visible;
+                        }
                     }
-                    isSaveDone = true;
+                    obj = i;
+                    ThreadPool.QueueUserWorkItem(SaveRawData, obj);
+                    if (m_module.Run(axisXY.WaitReady()))
+                        return p_sInfo;
+                    //if (VRS.Grab() == "OK")
+                    //{
+                    //    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", i);
+                    //    img.SaveImageSync(strVRSImageFullPath);
+                    //    //Grab error
+                    //}
+                    ////Thread.Sleep(600);
+
+                    m_mwvm.p_Progress = (((double)(i + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
                 }
-                //  sw.Start();
-                while (!isSaveDone) ;
-                isSaveDone = false;
-                if (App.m_nanoView.SampleMeasure(i, x, y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, setting.nAverage_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, setting.nAverage_NIR,
-                    m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseTransmittance,
-                    m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                m_mwvm.p_ArrowVisible = Visibility.Hidden;
+
+            }
+            else
+            {
+                if (!m_module.Run(axisXY.StartMove(m_ptTestMeasurePoint)))
+                    return p_sInfo;
+                if (!m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+
+                if (App.m_nanoView.SampleMeasure(0, m_ptTestMeasurePoint.X, m_ptTestMeasurePoint.Y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, setting.nAverage_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, setting.nAverage_NIR,
+                       m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseTransmittance,
+                       m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     return "Layer Model Not Ready";
                 }
-                //   sw.Stop();
-                //   System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
-                if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
-                {
-                    x = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].x;
-                    y = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].y;
-                    dX = centerX - x * 10000;
-                    dY = centerY - y * 10000;
-
-                    MeasurePoint = new RPoint(dX, dY);
-
-                    if (m_module.Run(axisXY.StartMove(MeasurePoint)))
-                        return p_sInfo;
-
-
-                    m_mwvm.p_ArrowX1 = x * RatioX;
-                    m_mwvm.p_ArrowY1 = -y * RatioY;
-                    if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 2)
-                    {
-                        double x2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 2]].x;
-                        double y2 = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 2]].y;
-                        m_mwvm.p_ArrowX2 = x2 * RatioX;
-                        m_mwvm.p_ArrowY2 = -y2 * RatioY;
-                        m_mwvm.p_ArrowVisible = Visibility.Visible;
-                    }
-                }
-                    obj = i;
-                    ThreadPool.QueueUserWorkItem(SaveRawData, obj);
-                if (m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
-                //if (VRS.Grab() == "OK")
-                //{
-                //    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", i);
-                //    img.SaveImageSync(strVRSImageFullPath);
-                //    //Grab error
-                //}
-                ////Thread.Sleep(600);
-
-                m_mwvm.p_Progress = (((double)(i + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
+                object obj;
+                obj = 0;
+                ThreadPool.QueueUserWorkItem(SaveRawData, obj);
             }
-            m_mwvm.p_ArrowVisible = Visibility.Hidden;
 
             //? 세이브?
 

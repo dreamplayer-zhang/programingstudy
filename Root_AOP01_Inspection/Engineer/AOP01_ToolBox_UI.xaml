@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Root_AOP01_Inspection.AOP01_Engineer_UI"
+﻿<UserControl x:Class="Root_AOP01_Inspection.AOP01_ToolBox_UI"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -10,9 +10,19 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <local:AOP01_Handler_UI Grid.Column="0" x:Name="handlerUI"/>
+        <TabControl Grid.Column="2">
+            <TabItem Header="ToolBox" Background="DarkSalmon">
+                <toolBox:ToolBox_UI x:Name="toolBoxUI" Margin="2"/>
+            </TabItem>
+            <TabItem Header="Log" Background="DarkCyan">
+                <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
+            </TabItem>
+            <TabItem Header="Login" Background="DarkGreen">
+                <tools:Login_UI x:Name="loginUI"/>
+            </TabItem>
+            <TabItem Header="Setup" Background="DarkBlue">
+                <tree:TreeUI x:Name="treeRootUI"/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>
