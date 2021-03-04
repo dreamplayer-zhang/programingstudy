@@ -51,8 +51,8 @@ namespace RootTools_Vision
 
             SettingItem_SetupEBR settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupEBR>();
             SharedBufferInfo sharedBufferInfo = new SharedBufferInfo(currentWorkplace.SharedBufferR_GRAY,
-                                                                     currentWorkplace.Width,
-                                                                     currentWorkplace.Height,
+                                                                     currentWorkplace.SharedBufferWidth,
+                                                                     currentWorkplace.SharedBufferHeight,
                                                                      currentWorkplace.SharedBufferByteCnt,
                                                                      currentWorkplace.SharedBufferG,
                                                                      currentWorkplace.SharedBufferB);
