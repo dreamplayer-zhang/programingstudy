@@ -4357,6 +4357,11 @@ namespace Root_AOP01_Inspection.Module
 
                 // implement
                 m_module.p_bPellicleShiftPass = true;
+                m_module.p_nPellicleShiftProgressValue = 0;
+                m_module.p_nPellicleShiftProgressMin = 0;
+                m_module.p_nPellicleShiftProgressMax = 16;
+                if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                    m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
 
                 if (dispatcher != null)
                 {
@@ -4393,11 +4398,17 @@ namespace Root_AOP01_Inspection.Module
                         {
                             nTemp = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nReticleEdgeSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
                             ptarrReticleEdgePoint[i] = new System.Drawing.Point(m_cptReticleCenter.X - nInnerPointDistanceFromCenter_px, arrCRectReticleEdgeROI[i].Top + nTemp);
+                            m_module.p_nPellicleShiftProgressValue++;
+                            if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                                m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                         }
                         else // TR or BR
                         {
                             nTemp = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nReticleEdgeSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
                             ptarrReticleEdgePoint[i] = new System.Drawing.Point(m_cptReticleCenter.X + nInnerPointDistanceFromCenter_px, arrCRectReticleEdgeROI[i].Top + nTemp);
+                            m_module.p_nPellicleShiftProgressValue++;
+                            if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                                m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                         }
                     }
                     else
@@ -4406,11 +4417,17 @@ namespace Root_AOP01_Inspection.Module
                         {
                             nTemp = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nReticleEdgeSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
                             ptarrReticleEdgePoint[i] = new System.Drawing.Point(arrCRectReticleEdgeROI[i].Left + nTemp, m_cptReticleCenter.Y - nInnerPointDistanceFromCenter_px);
+                            m_module.p_nPellicleShiftProgressValue++;
+                            if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                                m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                         }
                         else // RB or LB
                         {
                             nTemp = m_module.GetEdge(mem, arrCRectReticleEdgeROI[i], m_nReticleEdgeSearchArea / 2, earrReticleEdgeSearchDirection[i], m_nReticleEdgeThreshold, true);
                             ptarrReticleEdgePoint[i] = new System.Drawing.Point(arrCRectReticleEdgeROI[i].Left + nTemp, m_cptReticleCenter.Y + nInnerPointDistanceFromCenter_px);
+                            m_module.p_nPellicleShiftProgressValue++;
+                            if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                                m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                         }
                     }
                 }
@@ -4483,11 +4500,17 @@ namespace Root_AOP01_Inspection.Module
                         {
                             nTemp = m_module.GetEdge(mem, arrCRectFrameEdgeROI[i], m_nFrameEdgeSearchArea / 2, earrFrameEdgeSearchDirection[i], m_nFrameEdgeThreshold, false);
                             ptarrFrameEdgePoint[i] = new System.Drawing.Point(m_cptReticleCenter.X - nFrameHorizontalInnerPointDistanceFromCenter_px, arrCRectFrameEdgeROI[i].Top + nTemp);
+                            m_module.p_nPellicleShiftProgressValue++;
+                            if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                                m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                         }
                         else // TR or BR
                         {
                             nTemp = m_module.GetEdge(mem, arrCRectFrameEdgeROI[i], m_nFrameEdgeSearchArea / 2, earrFrameEdgeSearchDirection[i], m_nFrameEdgeThreshold, false);
                             ptarrFrameEdgePoint[i] = new System.Drawing.Point(m_cptReticleCenter.X + nFrameHorizontalInnerPointDistanceFromCenter_px, arrCRectFrameEdgeROI[i].Top + nTemp);
+                            m_module.p_nPellicleShiftProgressValue++;
+                            if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                                m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                         }
                     }
                     else
@@ -4496,11 +4519,17 @@ namespace Root_AOP01_Inspection.Module
                         {
                             nTemp = m_module.GetEdge(mem, arrCRectFrameEdgeROI[i], m_nFrameEdgeSearchArea / 2, earrFrameEdgeSearchDirection[i], m_nFrameEdgeThreshold, false);
                             ptarrFrameEdgePoint[i] = new System.Drawing.Point(arrCRectFrameEdgeROI[i].Left + nTemp, m_cptReticleCenter.Y - nFrameVerticalInnerPointDistanceFromCenter_px);
+                            m_module.p_nPellicleShiftProgressValue++;
+                            if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                                m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                         }
                         else // RB or LB
                         {
                             nTemp = m_module.GetEdge(mem, arrCRectFrameEdgeROI[i], m_nFrameEdgeSearchArea / 2, earrFrameEdgeSearchDirection[i], m_nFrameEdgeThreshold, false);
                             ptarrFrameEdgePoint[i] = new System.Drawing.Point(arrCRectFrameEdgeROI[i].Left + nTemp, m_cptReticleCenter.Y + nFrameVerticalInnerPointDistanceFromCenter_px);
+                            m_module.p_nPellicleShiftProgressValue++;
+                            if (m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin > 0)
+                                m_module.p_nPellicleShiftProgressPercent = (int)((double)m_module.p_nPellicleShiftProgressValue / ((double)(m_module.p_nPellicleShiftProgressMax - m_module.p_nPellicleShiftProgressMin)) * 100);
                         }
                     }
                 }
