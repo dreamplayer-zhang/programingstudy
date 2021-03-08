@@ -33,5 +33,11 @@ namespace Root_AOP01_Packing
             //vm.p_LoadportA = vm.p_LoadportA;
 
         }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Dlg_RunStep dlg = new Dlg_RunStep();
+            dlg.ShowDialog();
+        }
     }
 }
