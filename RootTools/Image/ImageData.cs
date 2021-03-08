@@ -2265,6 +2265,8 @@ namespace RootTools
                 return bitmapSource;
             }
         }
+        public const int _dpi = 96;
+
         public static BitmapSource ToBitmapSource(Image<Gray, byte> image)
         {
             using (System.Drawing.Bitmap source = image.Bitmap)
@@ -2275,7 +2277,7 @@ namespace RootTools
 
                 BitmapSource bitmapSource = BitmapSource.Create(
                 source.Width, source.Height,
-                source.HorizontalResolution, source.VerticalResolution,
+                _dpi, _dpi,
                 PixelFormats.Gray8, null,
                 bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
 
@@ -2298,7 +2300,7 @@ namespace RootTools
 
                 BitmapSource bitmapSource = BitmapSource.Create(
                 source.Width, source.Height,
-                source.HorizontalResolution, source.VerticalResolution,
+                _dpi, _dpi,
                 PixelFormats.Bgr24, null,
                 bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
 
