@@ -136,6 +136,17 @@ namespace Root_CAMELLIA.Module
             }
 
             int m_nUnitID = 0;
+            public int p_nUnitID
+            {
+                get
+                {
+                    return m_nUnitID;
+                }
+                set
+                {
+                    m_nUnitID = value;
+                }
+            }
             //int m_nAddress = 0; 
             public void ReadInputRegister(Modbus modbus)
             {
@@ -144,6 +155,8 @@ namespace Root_CAMELLIA.Module
                 p_fValue = nValue / m_fDiv;
             }
 
+            public bool p_IsUpdate { get; set; }
+            
             public void RunTree(Tree tree, int module_number)
             {
                 p_id = tree.Set(p_id, p_id, "ID." + module_number.ToString("00"), "FDC Module Name");
@@ -162,6 +175,7 @@ namespace Root_CAMELLIA.Module
                 m_alid[1].p_id = "UpperLimit";
                 m_nUnitID = tree.Set(m_nUnitID, m_nUnitID, "Comm UnitID", "RS485 UnitID, 1보다 큰 숫자");
                 //m_nAddress = tree.Set(m_nAddress, m_nAddress, "Comm Address", "RS485 Address");
+                p_IsUpdate = true;
             }
 
             ModuleBase m_module;
@@ -217,8 +231,25 @@ namespace Root_CAMELLIA.Module
         }
         #endregion
 
+        #region Event
+        public event EventHandler ValueUpdate;
+
+        void UpdateEvent()
+        {
+            if (ValueUpdate != null)
+                OnUpdated(new EventArgs());
+        }
+        
+        protected virtual void OnUpdated(EventArgs e)
+        {
+            
+            if (ValueUpdate != null)
+                ValueUpdate.Invoke(this, e);
+        }
+        #endregion
+
         #region Check Thread
-        int m_iData = 0;
+        public int m_iData = 0;
         protected override void RunThread()
         {
             base.RunThread();
@@ -234,6 +265,7 @@ namespace Root_CAMELLIA.Module
                 {
                     m_aData[m_iData].ReadInputRegister(m_modbus);
                     m_iData = (m_iData + 1) % m_aData.Count;
+                    UpdateEvent();
                 }
             }
         }

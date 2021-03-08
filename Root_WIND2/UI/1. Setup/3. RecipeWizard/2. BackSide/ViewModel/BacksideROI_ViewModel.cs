@@ -133,7 +133,7 @@ namespace Root_WIND2
             float outRadius = Radius;
 
             IntPtr MainImage = new IntPtr();
-            if (p_ImageData.p_nByte == 3)
+            if (p_ImageData.GetBytePerPixel() == 3)
             {
                 if (p_eColorViewMode != eColorViewMode.All)
                     MainImage = p_ImageData.GetPtr((int)p_eColorViewMode - 1);
@@ -648,11 +648,11 @@ namespace Root_WIND2
                 if (p_eColorViewMode == eColorViewMode.All)
                 {
                     // SubSample
-                    byte[][] pImg = new byte[p_ImageData.p_nByte][];
+                    byte[][] pImg = new byte[p_ImageData.GetBytePerPixel()][];
                     // Wafer ROI 만큼만 잘라냄
-                    byte[][] pROIImg = new byte[p_ImageData.p_nByte][];
+                    byte[][] pROIImg = new byte[p_ImageData.GetBytePerPixel()][];
 
-                    for (int i = 0; i < p_ImageData.p_nByte; i++)
+                    for (int i = 0; i < p_ImageData.GetBytePerPixel(); i++)
                     {
                         pImg[i] = new byte[(long)nMemW * nMemH];
                         pROIImg[i] = new byte[(long)nMemW * nMemH];
@@ -678,7 +678,7 @@ namespace Root_WIND2
                 CLR_IP.Cpp_DrawContourMap(pRawImg, pContourMapImg, radius * 2, radius * 2);
 
                 string sImagePath = @"D:\ContourMap.bmp";
-                CLR_IP.Cpp_SaveBMP(sImagePath, pContourMapImg, radius * 2 * p_ImageData.p_nByte, radius * 2, p_ImageData.p_nByte);
+                CLR_IP.Cpp_SaveBMP(sImagePath, pContourMapImg, radius * 2 * p_ImageData.GetBytePerPixel(), radius * 2, p_ImageData.GetBytePerPixel());
             }
         }
     }

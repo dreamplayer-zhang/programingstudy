@@ -13,7 +13,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            <tools:RootViewer DataContext="{Binding p_Viewer}"/>
+			<tools:DrawableRootViewer DataContext="{Binding p_Viewer}"/>
         </Grid>
     </Grid>
 </UserControl>

@@ -14,7 +14,11 @@ namespace Root_AOP01_Packing.Module
 {
     public class TapePacker : ModuleBase, IWTRChild
     {
-
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Wafer Exist Error");
+        }
         public TapePacker(string id, IEngineer engineer)
         {
             InitChildSlot();

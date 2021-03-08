@@ -17,7 +17,7 @@ namespace Root_Siltron
         public void Init(Siltron_Engineer engineer)
         {
             m_engineer = engineer;
-            logViewUI.Init(LogView.m_logView);
+            logViewUI.Init(LogView._logView);
             toolBoxUI.Init(engineer.ClassToolBox());
             handlerUI.Init(engineer.m_handler);
         }

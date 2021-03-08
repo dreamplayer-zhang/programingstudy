@@ -5,6 +5,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.OHTNew;
 using RootTools_Vision;
+using RootTools.Database;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -127,6 +128,19 @@ namespace Root_WIND2
             }
         }
 
+        ObservableCollection<FFUModule> m_aFFU = new ObservableCollection<FFUModule>();
+        public ObservableCollection<FFUModule> p_aFFU
+        {
+            get
+            {
+                return m_aFFU;
+            }
+            set
+            {
+                SetProperty(ref m_aFFU, value);
+            }
+        }
+
 
         public RootViewer_ViewModel p_Viewer
         {
@@ -174,6 +188,7 @@ namespace Root_WIND2
                 p_Viewer.SetImageData(p_BackSideVision.GetMemoryData(BackSideVision.ScanMemory.BackSide));
                 p_ModuleList = engineer.ClassModuleList();
                 p_aTK4S = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_tk4s.p_aTK4S;
+                p_aFFU = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_FFUGourp.p_aFFU;
             }
         }
 
@@ -181,6 +196,9 @@ namespace Root_WIND2
         {
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Home;
+
+            DatabaseManager.Instance.SelectData();
+            m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
         }
 
         ModuleList m_ModuleList;
@@ -208,32 +226,37 @@ namespace Root_WIND2
         public void FuncBackSideImageView()
         {
             m_imagedata = p_BackSideVision.GetMemoryData(BackSideVision.ScanMemory.BackSide);
-            m_imagedata.p_nByte = 3;
+            m_imagedata.p_nByte = 1;
+            m_imagedata.p_nPlane = 3;
             p_Viewer.SetImageData(m_imagedata);
         }
 
         public void FuncEdgeTopImageView()
         {
             m_imagedata =  p_EdgeVision.GetMemoryData(EdgeSideVision.EDGE_TYPE.EdgeTop);
-            m_imagedata.p_nByte = 3;
+            m_imagedata.p_nByte = 1;
+            m_imagedata.p_nPlane = 3;
             p_Viewer.SetImageData(m_imagedata);
         }
         public void FuncEdgeSideImageView()
         {
             m_imagedata = p_EdgeVision.GetMemoryData(EdgeSideVision.EDGE_TYPE.EdgeSide);
-            m_imagedata.p_nByte = 3;
+            m_imagedata.p_nByte = 1;
+            m_imagedata.p_nPlane = 3;
             p_Viewer.SetImageData(m_imagedata);
         }
         public void FuncEdgeBtmImageView()
         {
             m_imagedata = p_EdgeVision.GetMemoryData(EdgeSideVision.EDGE_TYPE.EdgeBottom);
-            m_imagedata.p_nByte = 3;
+            m_imagedata.p_nByte = 1;
+            m_imagedata.p_nPlane = 3;
             p_Viewer.SetImageData(m_imagedata);
         }
         public void FuncEBRImageView()
         {
             m_imagedata = p_EdgeVision.GetMemoryData(EdgeSideVision.EDGE_TYPE.EBR);
-            m_imagedata.p_nByte = 3;
+            m_imagedata.p_nByte = 1;
+            m_imagedata.p_nPlane = 3;
             p_Viewer.SetImageData(m_imagedata);
         }
 
@@ -297,5 +320,11 @@ namespace Root_WIND2
             }
         }
 
+        private Database_DataView_VM m_DataViewer_VM = new Database_DataView_VM();
+        public Database_DataView_VM p_DataViewer_VM
+        {
+            get { return this.m_DataViewer_VM; }
+            set { SetProperty(ref m_DataViewer_VM, value); }
+        }
     }
 }

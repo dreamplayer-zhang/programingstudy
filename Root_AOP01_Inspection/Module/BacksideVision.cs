@@ -11,6 +11,7 @@ using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
 using RootTools.Control.Ajin;
+using RootTools.GAFs;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
@@ -54,6 +55,12 @@ namespace Root_AOP01_Inspection.Module
         Camera_Dalsa m_CamTDISide;
         Camera_Basler m_CamLADS;
 
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "BacksideVision Wafer Exist Error");
+        }
+
         public override void GetTools(bool bInit)
         {
             //p_sInfo = m_toolBox.Get(ref m_diExistVision, this, "Reticle Exist on Vision");
@@ -69,6 +76,7 @@ namespace Root_AOP01_Inspection.Module
             p_sInfo = m_toolBox.Get(ref m_CamTDI45, this, "TDI 45");
             p_sInfo = m_toolBox.Get(ref m_CamTDISide, this, "TDI Side");
             p_sInfo = m_toolBox.Get(ref m_CamLADS, this, "LADS");
+            m_alid_WaferExist = m_gaf.GetALID(this, "BacksideVision Wafer Exist", "BacksideVision Wafer Exist");
         }
         #endregion
 
@@ -417,7 +425,7 @@ namespace Root_AOP01_Inspection.Module
             ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
             IntPtr p = mem.GetPtr();
             img.SetData(p, crtROI, (int)mem.W);
-            Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
+            Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.GetBytePerPixel(), img.GetPtr(), (int)img.p_Stride);
 
             return matReturn;
         }

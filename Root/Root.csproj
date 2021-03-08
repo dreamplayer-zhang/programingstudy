@@ -199,6 +199,7 @@
     <Compile Include="Module\Test.cs" />
     <Compile Include="Module\TestClient.cs" />
     <Compile Include="Module\TestServer.cs" />
+    <Compile Include="Module\TestThread.cs" />
     <Compile Include="Root_Handler.cs" />
     <Compile Include="Root_Handler_UI.xaml.cs">
       <DependentUpon>Root_Handler_UI.xaml</DependentUpon>

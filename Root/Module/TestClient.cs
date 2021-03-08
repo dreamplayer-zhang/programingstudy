@@ -12,6 +12,7 @@ namespace Root.Module
     {
         #region ToolBox
         TCPAsyncClient m_tcpip;
+        //TCPSyncClient m_tcpip;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_tcpip, this, "Client", 2000000);
@@ -43,7 +44,7 @@ namespace Root.Module
             m_aTime.Clear(); 
             while (m_aTime.Count < 100)
             {
-                Thread.Sleep(10);
+                Thread.Sleep(1);
                 if (nSend == m_aTime.Count)
                 {
                     Send("Send");

@@ -80,9 +80,10 @@ namespace RootTools_Vision
 		private int defectSizeMin = 1;
 		private int mergeDist = 1;
 		private int edgeSearchLevel = 20;
-		
-		// 카메라 정보
-		private double camResolution = 0;
+
+		// temp 
+		private int startNotch;
+		private int endNotch;
 		#endregion
 
 		#region [Getter/Setter]
@@ -140,15 +141,27 @@ namespace RootTools_Vision
 				SetProperty<int>(ref this.edgeSearchLevel, value);
 			}
 		}
+
+		// temp
 		[Category("Parameter")]
-		public double CamResolution
+		public int StartNotch
 		{
-			get => this.camResolution;
+			get => this.startNotch;
 			set
 			{
-				SetProperty<double>(ref this.camResolution, value);
+				SetProperty<int>(ref this.startNotch, value);
 			}
 		}
+		[Category("Parameter")]
+		public int EndNotch
+		{
+			get => this.endNotch;
+			set
+			{
+				SetProperty<int>(ref this.endNotch, value);
+			}
+		}
+		//
 		#endregion
 	}
 }

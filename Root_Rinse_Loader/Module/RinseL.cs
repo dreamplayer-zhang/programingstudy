@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -178,7 +179,7 @@ namespace Root_Rinse_Loader.Module
 
         #region Rinse
         DIO_I m_diRinseRun;
-        DIO_O m_doRinseEmg; 
+        public DIO_O m_doRinseEmg; 
 
         public enum eRinseRun
         {
@@ -228,6 +229,14 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
+        #region GAF
+        ALID m_alidTCPConnect;
+        void InitALID()
+        {
+            m_alidTCPConnect = m_gaf.GetALID(this, "Unloader Disconnect", "Unloader Disconnect");
+        }
+        #endregion
+
         #region ToolBox
         public TCPIPClient m_tcpip; 
         public override void GetTools(bool bInit)
@@ -238,10 +247,16 @@ namespace Root_Rinse_Loader.Module
             p_sInfo = m_toolBox.Get(ref m_doRinseEmg, this, "Rinse Emg Stop");
             if (bInit)
             {
-                m_doRinseEmg.Write(false); 
+                InitALID();
+                m_doRinseEmg.Write(true); 
                 EQ.m_EQ.OnChanged += M_EQ_OnChanged;
                 m_tcpip.EventReciveData += M_tcpip_EventReciveData;
             }
+        }
+
+        public override string StateHome()
+        {
+            return p_sInfo;
         }
 
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
@@ -449,8 +464,9 @@ namespace Root_Rinse_Loader.Module
             {
                 Thread.Sleep(10);
                 p_eStateRinse = m_diRinseRun.p_bIn ? eRinseRun.Run : eRinseRun.Ready;
-                p_bRinseEmg = (p_eStateRinse == eRinseRun.Run) && (p_eStateUnloader != EQ.eState.Run); 
-                RunThreadDIO(); 
+                //p_bRinseEmg = (p_eStateRinse == eRinseRun.Run) && (p_eStateUnloader != EQ.eState.Run); 
+                p_bRinseEmg = p_eStateUnloader == EQ.eState.Error;
+                RunThreadDIO();
                 if (m_qProtocolReply.Count > 0)
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();

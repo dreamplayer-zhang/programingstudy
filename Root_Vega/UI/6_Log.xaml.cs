@@ -24,7 +24,7 @@ namespace Root_Vega
         public _6_Log()
         {
             InitializeComponent();
-            logView.Init(LogView.m_logView); 
+            logView.Init(LogView._logView); 
         }
         Vega_Engineer m_engineer;
         Vega_Handler m_handler;

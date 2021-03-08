@@ -47,8 +47,11 @@ namespace Root_WIND2
 
 		protected override WorkplaceBundle CreateWorkplaceBundle()
 		{
-			int firstNotch = 0;	// notch 찾기
-			int lastNotch = 270000;
+			// temp notch
+			int firstNotch = recipe.GetItem<EBRParameter>().StartNotch;
+			int lastNotch = recipe.GetItem<EBRParameter>().EndNotch;
+			//
+
 			int bufferHeight = lastNotch - firstNotch;
 			int bufferHeightPerDegree = bufferHeight / 360;
 
@@ -63,12 +66,6 @@ namespace Root_WIND2
 			for (int i = 1; i < workplaceCnt; i++)
 			{
 				int posY = (bufferHeightPerDegree * stepDegree * i) - (height / 2);
-
-				//if (posY < firstNotch)
-				//	posY = firstNotch;
-				//if (posY + height > lastNotch)
-				//	posY -= (posY + height) - lastNotch;
-
 				Workplace workplace = new Workplace(0, 0, 0, posY, width, height, workplaceBundle.Count);
 				workplaceBundle.Add(workplace);
 			}

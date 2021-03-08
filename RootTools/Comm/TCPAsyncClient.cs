@@ -1,10 +1,7 @@
 ﻿using RootTools.Trees;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace RootTools.Comm
@@ -119,8 +116,8 @@ namespace RootTools.Comm
             try
             {
                 int lReceive = async.m_socket.EndReceive(ar);
-                if (lReceive > 0) EventReciveData(async.m_aBuf, lReceive, async.m_socket);
-                m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
+                if ((lReceive > 0) && (EventReciveData != null)) EventReciveData(async.m_aBuf, lReceive, async.m_socket);
+                if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
                 async.m_socket.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
             }
             catch (Exception e)
@@ -132,21 +129,39 @@ namespace RootTools.Comm
 
         #region Send
         AsyncCallback m_cbSend;
+        static readonly object g_lock = new object();
         public string Send(string sMsg)
         {
             if (m_socket == null) return "Not Connected";
-            Async async = new Async(1);
-            async.m_aBuf = Encoding.Default.GetBytes(sMsg);
-            async.m_socket = m_socket;
-            m_socket.BeginSend(async.m_aBuf, 0, async.m_aBuf.Length, SocketFlags.None, m_cbSend, async);
-            return "OK";
+            lock (g_lock)
+            {
+                Async async = new Async(1);
+                async.m_aBuf = Encoding.Default.GetBytes(sMsg);
+                async.m_socket = m_socket;
+                m_socket.BeginSend(async.m_aBuf, 0, async.m_aBuf.Length, SocketFlags.None, m_cbSend, async);
+                return "OK";
+            }
         }
 
         void CallBackSend(IAsyncResult ar)
         {
             Async async = (Async)ar.AsyncState;
             int lSend = async.m_socket.EndSend(ar);
-            m_commLog.Add(CommLog.eType.Send, (lSend < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lSend) : "Large Data");
+            if (m_bCommLog) m_commLog.Add(CommLog.eType.Send, (lSend < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lSend) : "Large Data");
+        }
+        #endregion
+
+        #region CommLog
+        public CommLog m_commLog;
+        void InitCommLog()
+        {
+            m_commLog = new CommLog(this, m_log);
+        }
+
+        bool m_bCommLog = true;
+        void RunTreeCommLog(Tree tree)
+        {
+            m_bCommLog = tree.Set(m_bCommLog, m_bCommLog, "Enable", "CommLog Enable (false = Fast)");
         }
         #endregion
 
@@ -174,20 +189,19 @@ namespace RootTools.Comm
         public void RunTree(Tree treeRoot)
         {
             RunTreeSetting(treeRoot.GetTree("Setting"));
+            RunTreeCommLog(treeRoot.GetTree("CommLog"));
         }
         #endregion
 
         public string p_id { get; set; }
         int m_lMaxBuffer = 4096;
         Log m_log;
-        public CommLog m_commLog;
         public TCPAsyncClient(string id, Log log, int lMaxBuffer = 4096)
         {
             p_id = id;
             m_lMaxBuffer = lMaxBuffer;
             m_log = log;
-            m_commLog = new CommLog(this, log);
-
+            InitCommLog();
             InitTree();
         }
 

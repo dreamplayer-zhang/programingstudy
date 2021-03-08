@@ -551,7 +551,7 @@
                                                         </packicon:PackIconMaterial>
                                                         <TextBlock Text="EFEM 1"
                                                                 Style="{StaticResource tbFDCName}"></TextBlock>
-                                                        <TextBlock Text="600"
+                                                        <TextBlock Text="{Binding p_aFFU[0].p_nRPM}"
                                                                 Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="RPM"
                                                                 Style="{StaticResource tbFDCUnit}" />
@@ -569,7 +569,7 @@
                                                         </packicon:PackIconMaterial>
                                                         <TextBlock Text="EFEM 2"
                                                                 Style="{StaticResource tbFDCName}"></TextBlock>
-                                                        <TextBlock Text="600"
+                                                        <TextBlock Text="{Binding p_aFFU[1].p_nRPM}"
                                                                 Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="RPM"
                                                                 Style="{StaticResource tbFDCUnit}" />
@@ -587,7 +587,7 @@
                                                         </packicon:PackIconMaterial>
                                                         <TextBlock Text="Stage 1"
                                                                 Style="{StaticResource tbFDCName}"></TextBlock>
-                                                        <TextBlock Text="600"
+                                                        <TextBlock Text="{Binding p_aFFU[2].p_nRPM}"
                                                                 Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="RPM"
                                                                 Style="{StaticResource tbFDCUnit}" />
@@ -605,7 +605,7 @@
                                                         </packicon:PackIconMaterial>
                                                         <TextBlock Text="Stage 2"
                                                                 Style="{StaticResource tbFDCName}"></TextBlock>
-                                                        <TextBlock Text="600"
+                                                        <TextBlock Text="{Binding p_aFFU[3].p_nRPM}"
                                                                 Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="RPM"
                                                                 Style="{StaticResource tbFDCUnit}" />

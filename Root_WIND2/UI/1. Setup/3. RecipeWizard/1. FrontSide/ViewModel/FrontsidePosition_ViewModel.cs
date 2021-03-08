@@ -636,7 +636,7 @@ namespace Root_WIND2
         private void BoxDone(object e)
         {
             TRect Box = e as TRect;
-            int byteCnt = p_ImageData.p_nByte;
+            int byteCnt = p_ImageData.GetBytePerPixel();
 
             BoxImage = new ImageData(Box.MemoryRect.Width, Box.MemoryRect.Height, byteCnt);
             
@@ -693,7 +693,7 @@ namespace Root_WIND2
 
             PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
             //RecipeType_FeatureData rtf = new RecipeType_FeatureData(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.GetByteArray());
-            postionRecipe.AddMasterFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
+            postionRecipe.AddMasterFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.GetBytePerPixel(), BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
@@ -709,7 +709,7 @@ namespace Root_WIND2
                 return;
 
             PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
-            postionRecipe.AddShotFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
+            postionRecipe.AddShotFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.GetBytePerPixel(), BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
@@ -725,7 +725,7 @@ namespace Root_WIND2
                 return;
 
             PositionRecipe postionRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<PositionRecipe>();
-            postionRecipe.AddChipFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
+            postionRecipe.AddChipFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.GetBytePerPixel(), BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;

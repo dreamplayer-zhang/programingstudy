@@ -60,11 +60,11 @@ namespace Root_AOP01_Inspection
 		{
 			try
 			{
-				canvas.Dispatcher.Invoke(new Action(delegate ()
+				/*canvas.Dispatcher.Invoke(new Action(delegate ()
 				{
-					//canvas.ClearRect();
-					//canvas.RefreshDraw();
-				}));
+					canvas.ClearRect();
+					canvas.RefreshDraw();
+				}));*/
 			}
 			catch (Exception ex)
 			{

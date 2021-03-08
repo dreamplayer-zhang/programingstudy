@@ -190,6 +190,7 @@
     <Reference Include="System.Activities.Core.Presentation" />
     <Reference Include="System.Activities.Presentation" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -265,15 +266,6 @@
       <DependentUpon>BacksideInspection.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideInspection_ViewModel.cs" />
-    <Compile Include="Dialog\SettingDialog\ISettingData.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingData.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingData_Setup.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingData_SetupBackside.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingData_SetupFrontside.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingDialog.xaml.cs">
-      <DependentUpon>SettingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialog\SettingDialog\SettingDialog_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\4. EBR\ViewModel\EBRSetup_ViewModel.cs" />
     <Compile Include="UI\2. Review\Tuning.xaml.cs">
       <DependentUpon>Tuning.xaml</DependentUpon>
@@ -702,10 +694,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\4. Maintenance\ViewerTest.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialog\SettingDialog\SettingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

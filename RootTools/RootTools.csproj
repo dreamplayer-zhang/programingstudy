@@ -265,6 +265,14 @@
     <Compile Include="Comm\TCPAsyncServer_UI.xaml.cs">
       <DependentUpon>TCPAsyncServer_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Comm\TCPSyncClient.cs" />
+    <Compile Include="Comm\TCPSyncClient_UI.xaml.cs">
+      <DependentUpon>TCPSyncClient_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Comm\TCPSyncServer.cs" />
+    <Compile Include="Comm\TCPSyncServer_UI.xaml.cs">
+      <DependentUpon>TCPSyncServer_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\Xenax\Xenax.cs" />
     <Compile Include="Control\Xenax\XenaxAxis.cs" />
     <Compile Include="Control\Xenax\XenaxAxis_UI.xaml.cs">
@@ -281,12 +289,12 @@
       <DependentUpon>Database_DataView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Database\Database_DataView_VM.cs" />
+    <Compile Include="Database\Table\Data.cs" />
     <Compile Include="Database\Table\DatabaseManager.cs" />
     <Compile Include="Database\Table\Database_ConnectSession.cs" />
     <Compile Include="Database\Table\Defect\Defect.cs" />
     <Compile Include="Database\Table\Defect\DefectManager.cs" />
     <Compile Include="Database\Table\Lotinfo.cs" />
-    <Compile Include="Database\Table\Measurement\EBRMeasurement.cs" />
     <Compile Include="Database\Table\Measurement\Measurement.cs" />
     <Compile Include="Database\Table\Measurement\MeasurementManager.cs" />
     <Compile Include="Camera\Matrox\Camera_Matrox.cs" />
@@ -339,6 +347,7 @@
     <Compile Include="Comm\FFU_Group_UI.xaml.cs">
       <DependentUpon>FFU_Group_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Database\TempLogger.cs" />
     <Compile Include="GeneralFunction.cs" />
     <Compile Include="ImageProcess\AutoFocus.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
@@ -440,6 +449,9 @@
       <DependentUpon>FFUModuleUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
+    <Compile Include="Viewer\CustomViewer\DrawableRootViewer.xaml.cs">
+      <DependentUpon>DrawableRootViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Viewer\Root_Viewer.cs" />
     <Compile Include="Comm\TK4SGourpUI.xaml.cs">
       <DependentUpon>TK4SGourpUI.xaml</DependentUpon>
@@ -518,20 +530,14 @@
     <Compile Include="LogIn_MainUI.xaml.cs">
       <DependentUpon>LogIn_MainUI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Logs\ILogGroup.cs" />
     <Compile Include="Logs\Log.cs" />
-    <Compile Include="Logs\LogMars.cs" />
-    <Compile Include="Logs\LogMars_Group.cs" />
-    <Compile Include="Logs\LogMars_Group_UI.xaml.cs">
-      <DependentUpon>LogMars_Group_UI.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Logs\LogView.cs" />
     <Compile Include="Logs\LogView_UI.xaml.cs">
       <DependentUpon>LogView_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Logs\Log_Group.cs" />
-    <Compile Include="Logs\Log_Group_UI.xaml.cs">
-      <DependentUpon>Log_Group_UI.xaml</DependentUpon>
+    <Compile Include="Logs\LogGroup.cs" />
+    <Compile Include="Logs\LogGroup_UI.xaml.cs">
+      <DependentUpon>LogGroup_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Memory\MemoryDraw.cs" />
     <Compile Include="Memory\MemoryViewer.cs" />
@@ -838,6 +844,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Comm\TCPSyncClient_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\TCPSyncServer_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\ACS\ACSAxis_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -1002,15 +1016,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Logs\LogMars_Group_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Logs\LogView_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Logs\Log_Group_UI.xaml">
+    <Page Include="Logs\LogGroup_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -1091,6 +1101,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Comm\FFUModuleUI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Viewer\CustomViewer\DrawableRootViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

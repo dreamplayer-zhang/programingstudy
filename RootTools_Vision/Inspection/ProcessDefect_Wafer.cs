@@ -17,13 +17,6 @@ namespace RootTools_Vision
 {
     public class ProcessDefect_Wafer : WorkBase
     {
-        //BacksideRecipe recipeBackside;
-        string sDefectimagePath = @"D:\DefectImage";
-        /// <summary>
-        /// Defect Image가 저장될 Root Directory Path. 기본값 : D:\DefectImage
-        /// </summary>
-        public string DefectImagePath { get => sDefectimagePath; set => sDefectimagePath = value; }
-
         public ProcessDefect_Wafer()
         {
         }
@@ -59,7 +52,7 @@ namespace RootTools_Vision
 
             TempLogger.Write("Defect", string.Format("Total : {0}", DefectList.Count));
 
-            List<Defect> MergeDefectList = MergeDefect(DefectList, mergeDist);
+            List<Defect> MergeDefectList = Tools.MergeDefect(DefectList, mergeDist);
 
             TempLogger.Write("Defect", string.Format("Merge : {0}", MergeDefectList.Count));
 
@@ -69,13 +62,9 @@ namespace RootTools_Vision
                 defect.CalcAbsToRelPos(originRecipe.OriginX, originRecipe.OriginY); // Frontside
             }
 
-
             //Workplace displayDefect = new Workplace();
             foreach (Defect defect in MergeDefectList)
                 this.currentWorkplace.DefectList.Add(defect);
-
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            SaveDefectImage(Path.Combine(DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
 
             //// Add Defect to DB
             if (MergeDefectList.Count > 0)
@@ -95,17 +84,48 @@ namespace RootTools_Vision
                 //}
             }
 
-            GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
-            GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
-            GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+            SharedBufferInfo sharedBufferInfo = new SharedBufferInfo(currentWorkplace.SharedBufferR_GRAY,
+                                                                     currentWorkplace.SharedBufferWidth,
+                                                                     currentWorkplace.SharedBufferHeight,
+                                                                     currentWorkplace.SharedBufferByteCnt,
+                                                                     currentWorkplace.SharedBufferG,
+                                                                     currentWorkplace.SharedBufferB);
+            
+            SettingItem_SetupFrontside settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
+            //Tools.SaveDataImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList.Cast<Data>().ToList(), sharedBufferInfo);
+            SaveDefectImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
 
-            GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(sDefectimagePath, false);
+            if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
+            {
+                List<string> dataStringList = GlobalObjects.Instance.Get<KlarfData_Lot>().DefectDataToStringList(MergeDefectList);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, dataStringList, null);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+                GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
+                Tools.SaveTiffImage(settings.KlarfSavePath, MergeDefectList.Cast<Data>().ToList(), sharedBufferInfo);
+            }
 
+            // 기존 210302
+            /*
+            SettingItem_SetupFrontside settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
+            SaveDefectImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
 
+            if (settings.UseKlarf)
+            {
+                Directory.CreateDirectory(settings.KlarfSavePath);
 
-            string sTiffImagePath = @"D:\DefectImage";
-            SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
+                GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
+                GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+
+                GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
+
+                SaveTiffImage(settings.KlarfSavePath, MergeDefectList, 3);
+            }
+            */
+            
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
             WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
         }
@@ -170,7 +190,8 @@ namespace RootTools_Vision
             DefectList.Clear();
             DefectList.AddRange(DefectList_Delete);
         }
-
+        
+        
         private List<Defect> MergeDefect(List<Defect> DefectList, int mergeDist)
         {
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();           
@@ -255,6 +276,7 @@ namespace RootTools_Vision
 
             return MergeDefectList;
         }
+        
         private void SaveDefectImage(String Path, List<Defect> DefectList, int nByteCnt)
         {
             Path += "\\";
@@ -377,6 +399,6 @@ namespace RootTools_Vision
             ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
             img.SaveAdd(ep);
         }
-
+        
     }
 }

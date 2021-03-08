@@ -51,7 +51,8 @@ namespace Root_WIND2.UI
             m_ToolMemory = tool;
 
             m_imagedata = new ImageData(m_ToolMemory.GetMemory("Vision.Memory", "Vision", "Main"));
-            m_imagedata.p_nByte = 3;
+            m_imagedata.p_nByte = 1;
+            m_imagedata.p_nPlane = 3;
             p_Viewer.SetImageData(m_imagedata);
         }
 

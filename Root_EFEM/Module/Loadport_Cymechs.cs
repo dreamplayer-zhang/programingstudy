@@ -15,6 +15,11 @@ namespace Root_EFEM.Module
 {
     public class Loadport_Cymechs : ModuleBase, IWTRChild, ILoadport
     {
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
+        }
         #region ToolBox
 
         RS232 m_rs232;
@@ -84,18 +89,18 @@ namespace Root_EFEM.Module
                 m_diRun = value;
             }
         }
-        public OHT_Semi p_OHT
+        //public OHT_Semi p_OHT
 
-        {
-            get
-            {
-                return m_OHT;
-            }
-            set
-            {
-                m_OHT = value;
-            }
-        }
+        //{
+        //    get
+        //    {
+        //        return m_OHT;
+        //    }
+        //    set
+        //    {
+        //        m_OHT = value;
+        //    }
+        //}
 
         private DIO_I m_diPlaced;
         private DIO_I m_diPresent;
@@ -103,7 +108,17 @@ namespace Root_EFEM.Module
         private DIO_I m_diClose;
         private DIO_I m_diReady;
         private DIO_I m_diRun;
-        private OHT_Semi m_OHT;
+        //private OHT_Semi m_OHT;
+        OHT _OHT;
+        public OHT m_OHTNew
+        {
+            get { return _OHT; }
+            set
+            {
+                _OHT = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool m_bLoadCheck = false;
         public bool m_bUnLoadCheck = false;
@@ -116,7 +131,8 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.Get(ref m_diReady, this, "Ready");
             p_sInfo = m_toolBox.Get(ref m_diRun, this, "Run");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
+            //p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
+            p_sInfo = m_toolBox.Get(ref _OHT, this, p_infoCarrier, "OHT");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -677,11 +693,11 @@ namespace Root_EFEM.Module
 
         string CmdLoad()
         {
-            if (IsLock())
-            {
-                m_alidLoad.Run(true, p_id + " Lock by WTR");
-                return p_id + " Lock by WTR";
-            }
+            //if (IsLock())
+            //{
+            //    m_alidLoad.Run(true, p_id + " Lock by WTR");
+            //    return p_id + " Lock by WTR";
+            //}
             //0202 확인
             Protocol protocol = new Protocol(eCmd.Load, this);
             m_qProtocol.Enqueue(protocol);
@@ -690,11 +706,11 @@ namespace Root_EFEM.Module
 
         string CmdUnload()
         {
-            if (IsLock())
-            {
-                m_alidUnLoad.Run(true, p_id + " Lock by WTR");
-                return p_id + " Lock by WTR";
-            }
+            //if (IsLock())
+            //{
+            //    m_alidUnLoad.Run(true, p_id + " Lock by WTR");
+            //    return p_id + " Lock by WTR";
+            //}
             Protocol protocol = new Protocol(eCmd.Unload, this);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitDone(m_secLoad);
@@ -1019,7 +1035,7 @@ namespace Root_EFEM.Module
                             break;
                     }
                 }
-                infoCarrier.SetMapData(aSlot);
+                if (!EQ.p_bRecovery) infoCarrier.SetMapData(aSlot);
                 m_infoCarrier.SendSlotMap();
                 while (m_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
                 {
