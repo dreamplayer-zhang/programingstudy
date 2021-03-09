@@ -1693,6 +1693,79 @@ void IP::SaveBMP(String sFilePath, BYTE* pSrc, int nW, int nH, int nByteCnt)
         cv::imwrite(sFilePath, imgSrc);
     }
 }
+void IP::LoadBMP(String sFilePath, BYTE* pOut, int nW, int nH, int nByteCnt)
+{
+    if (nByteCnt == 1)
+    {
+        Mat imgSrc = imread(sFilePath, CV_LOAD_IMAGE_GRAYSCALE).clone();
+        memcpy(pOut, imgSrc.data, nW * nH);
+    }
+    else if (nByteCnt == 3)
+    {
+        Mat imgSrc = imread(sFilePath).clone();
+        cv::cvtColor(imgSrc, imgSrc, CV_BGR2RGB);
+        memcpy(pOut, imgSrc.data, (nW / 3) * nH);
+    }
+}
+
+void IP::SaveDefectListBMP(String sFilePath, BYTE* pSrc, int nW, int nH, Rect DefectRect)
+{
+	int saveSzW = 640;
+	int saveSzH = 480;
+
+	std::string Path = sFilePath;
+	int rectCenterX = DefectRect.x + DefectRect.width / 2;
+	int rectCenterY = DefectRect.y + DefectRect.height / 2;
+
+	if (DefectRect.x < saveSzW && DefectRect.y < saveSzH)
+	{
+		DefectRect.x = (rectCenterX - saveSzW / 2);
+		DefectRect.y = (rectCenterY - saveSzH / 2);
+		DefectRect.width = saveSzW;
+		DefectRect.height = saveSzH;
+	}
+	else
+	{
+		int saveW;
+		int saveH;
+		if (DefectRect.width > saveSzW)
+			saveW = DefectRect.width;
+		else
+			saveW = 640;
+
+		if (DefectRect.height > saveSzH)
+			saveH = DefectRect.height;
+		else
+			saveH = 480;
+
+		DefectRect.x = (rectCenterX - saveW / 2);
+		DefectRect.y = (rectCenterY - saveH / 2);
+		DefectRect.width = saveW;
+		DefectRect.height = saveH;
+	}
+
+	byte* pHeader = pSrc;
+	byte* defectROI = new byte[DefectRect.width * (long)DefectRect.height];
+
+	for (int r = 0; r < DefectRect.y; r++)
+		pHeader += nW;
+
+	int targetIdx = 0;
+	for (int r = DefectRect.y; r < DefectRect.y + DefectRect.height; r++)
+	{
+		memcpy(defectROI + ((long)DefectRect.width * targetIdx), pHeader + ((long)DefectRect.x), ((long)DefectRect.width));
+		pHeader += nW;
+		targetIdx++;
+	}
+
+	Mat saveROI;
+	saveROI = Mat(DefectRect.height, DefectRect.width, CV_8UC1, defectROI);
+
+	if (DefectRect.width != 640 || DefectRect.height != 480)
+		resize(saveROI, saveROI, Size(640, 480));
+
+	imwrite(Path, saveROI);
+}
 void IP::SaveDefectListBMP(String sFilePath, BYTE* pSrc, int nW, int nH, std::vector<Rect> DefectRect)
 {
     int saveSzW = 640;
@@ -1754,6 +1827,72 @@ void IP::SaveDefectListBMP(String sFilePath, BYTE* pSrc, int nW, int nH, std::ve
         Path += std::to_string(i + 1) + ".BMP";
         imwrite(Path, saveROI);
     }
+}
+void IP::SaveDefectListBMP_Color(String sFilePath, BYTE* pR, BYTE* pG, BYTE* pB, int nW, int nH, Rect DefectRect)
+{
+    byte* pRGB[3] = { pR, pG, pB };
+    Mat BGR[3];
+
+    int saveSzW = 640;
+    int saveSzH = 480;
+
+	std::string Path = sFilePath;
+	int rectCenterX = DefectRect.x + DefectRect.width / 2;
+	int rectCenterY = DefectRect.y + DefectRect.height / 2;
+
+	if (DefectRect.x < saveSzW && DefectRect.y < saveSzH)
+	{
+		DefectRect.x = (rectCenterX - saveSzW / 2);
+		DefectRect.y = (rectCenterY - saveSzH / 2);
+		DefectRect.width = saveSzW;
+		DefectRect.height = saveSzH;
+	}
+	else
+	{
+		int saveW;
+		int saveH;
+		if (DefectRect.width > saveSzW)
+			saveW = DefectRect.width;
+		else
+			saveW = 640;
+
+		if (DefectRect.height > saveSzH)
+			saveH = DefectRect.height;
+		else
+			saveH = 480;
+
+		DefectRect.x = (rectCenterX - saveW / 2);
+		DefectRect.y = (rectCenterY - saveH / 2);
+		DefectRect.width = saveW;
+		DefectRect.height = saveH;
+	}
+
+	for (int ch = 2; ch >= 0; ch--)
+	{
+		byte* pHeader = pRGB[ch];
+		byte* defectROI = new byte[DefectRect.width * (long)DefectRect.height];
+
+		for (int r = 0; r < DefectRect.y; r++)
+			pHeader += nW;
+
+		int targetIdx = 0;
+		for (int r = DefectRect.y; r < DefectRect.y + DefectRect.height; r++)
+		{
+			memcpy(defectROI + ((long)DefectRect.width * targetIdx), pHeader + ((long)DefectRect.x), (long)DefectRect.width);
+			pHeader += nW;
+			targetIdx++;
+		}
+		Mat saveROI;
+		saveROI = Mat(DefectRect.height, DefectRect.width, CV_8UC1, defectROI);
+
+		if (DefectRect.width != 640 || DefectRect.height != 480)
+			resize(saveROI, saveROI, Size(640, 480));
+
+		BGR[2 - ch] = saveROI;
+	}
+	Mat colorImg;
+	cv::merge(BGR, 3, colorImg);
+	imwrite(Path, colorImg);
 }
 void IP::SaveDefectListBMP_Color(String sFilePath, BYTE* pR, BYTE* pG, BYTE* pB, int nW, int nH, std::vector<Rect> DefectRect)
 {
@@ -1825,20 +1964,6 @@ void IP::SaveDefectListBMP_Color(String sFilePath, BYTE* pR, BYTE* pG, BYTE* pB,
 
         Path += std::to_string(i + 1) + ".BMP";
         imwrite(Path, colorImg);
-    }
-}
-void IP::LoadBMP(String sFilePath, BYTE* pOut, int nW, int nH, int nByteCnt)
-{
-    if (nByteCnt == 1)
-    {
-        Mat imgSrc = imread(sFilePath, CV_LOAD_IMAGE_GRAYSCALE).clone();
-        memcpy(pOut, imgSrc.data, nW * nH);
-    }
-    else if (nByteCnt == 3)
-    {
-        Mat imgSrc = imread(sFilePath).clone();
-        cv::cvtColor(imgSrc, imgSrc, CV_BGR2RGB);
-        memcpy(pOut, imgSrc.data, (nW / 3) * nH);
     }
 }
 
