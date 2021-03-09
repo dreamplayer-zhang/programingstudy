@@ -252,42 +252,6 @@ namespace RootTools_Vision.Utility
 			return true;
 		}
 
-		public List<string> DefectDataToStringList(List<Defect> defectList)
-		{
-			List<string> stringList = new List<string>();
-			foreach (Defect defect in defectList)
-			{
-				//string str = string.Format("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13} {14} {15} {16}");
-				//stringList.Add(str);
-			}
-			return stringList;
-		}
-
-		public List<string> EBRMeasureDataToStringList(List<Measurement> measureList, string measureItem = null)
-		{
-			List<string> stringList = new List<string>();
-			for (int i = 0; i < measureList.Count; i++)
-			{
-				if (measureItem != null && measureList[i].m_strMeasureItem != measureItem)
-					continue;
-
-				string str = string.Format("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13} {14} {15} {16}",
-											(measureList[i].m_nMeasurementIndex + 1),
-											measureList[i].m_fRelX,
-											measureList[i].m_fRelY,
-											0, 0,
-											measureList[i].m_fData, 0,
-											measureList[i].m_fData,
-											measureList[i].m_fData,
-											0, 1, 0,
-											measureList[i].m_fData,
-											measureList[i].m_fAngle,
-											0, 1, 1);
-				stringList.Add(str);
-			}
-			return stringList;
-		}
-
 		public bool AddSlotToServer(RecipeType_WaferMap _mapdata)
 		{
 			UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
