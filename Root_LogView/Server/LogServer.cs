@@ -2,16 +2,21 @@
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Root_LogView.Server
 {
     public class LogServer
     {
+        public delegate void dgOnChangeTab();
+        public event dgOnChangeTab OnChangeTab;
+
         #region LogData
         public class LogData
         {
@@ -22,6 +27,7 @@ namespace Root_LogView.Server
                 m_sLog = sLog;
             }
 
+            public string m_sDate;
             public string p_sTime { get; set; }
             public string p_sLevel { get; set; }
             public string p_sLogger { get; set; }
@@ -32,11 +38,9 @@ namespace Root_LogView.Server
             public void CalcLog()
             {
                 string[] asLog = m_sLog.Split('\t');
-                if (asLog.Length > 0)
-                {
-                    asLog[0] += " ~ " + m_dt.Second.ToString() + "." + m_dt.Millisecond.ToString();
-                    p_sTime = asLog[0];
-                }
+                DateTime dt = DateTime.Now;
+                m_sDate = dt.ToShortDateString();
+                p_sTime = dt.Hour.ToString("00") + '.' + dt.Minute.ToString("00") + '.' + dt.Second.ToString("00") + '.' + dt.Millisecond.ToString("000");
                 if (asLog.Length > 1) 
                 {
                     p_sLevel = asLog[1];
@@ -88,32 +92,51 @@ namespace Root_LogView.Server
         #region LogGroup
         public class LogGroup
         {
-            public string m_id;
+            public string p_id { get; set; }
             public LogGroup(string id)
             {
-                m_id = id;
+                p_aLog = new ObservableCollection<LogData>();
+                p_id = id;
             }
 
-            Queue<LogData> m_qLogData = new Queue<LogData>(); 
+            public UserControl p_ui
+            {
+                get
+                {
+                    LogGroup_UI ui = new LogGroup_UI();
+                    ui.Init(this);
+                    return ui;
+                }
+            }
+
+            public Queue<LogData> m_qLog = new Queue<LogData>(); 
             public void AddLog(LogData logData)
             {
-                m_qLogData.Enqueue(logData); 
+                m_qLog.Enqueue(logData); 
             }
 
-            public void SaveLog(string sPath)
+            const int c_lLog = 500;
+            public ObservableCollection<LogData> p_aLog { get; set; }
+            public void LogSave(string sPath)
             {
-                if (m_qLogData.Count == 0) return; 
-                using (StreamWriter writer = new StreamWriter(sPath + m_id + ".txt"))
+                string sDate = m_qLog.Peek().m_sDate;
+                sPath += "\\" + sDate;
+                Directory.CreateDirectory(sPath);
+                using (StreamWriter writer = new StreamWriter(sPath + "\\" + sDate + "_" + p_id + ".txt", true, Encoding.Default))
                 {
-                    while (m_qLogData.Count > 0)
+                    while (m_qLog.Count > 0)
                     {
-                        LogData logData = m_qLogData.Dequeue();
-                        writer.WriteLine(logData.m_sLog); 
+                        LogData data = m_qLog.Peek();
+                        if (data.m_sDate != sDate) return;
+                        m_qLog.Dequeue();
+                        writer.WriteLine(data.m_sLog);
+                        p_aLog.Add(data);
+                        while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
                     }
                 }
             }
         }
-        List<LogGroup> m_aGroup = new List<LogGroup>(); 
+        public List<LogGroup> m_aGroup = new List<LogGroup>(); 
         void InitGroup()
         {
             m_aGroup.Add(new LogGroup("Total")); 
@@ -123,10 +146,11 @@ namespace Root_LogView.Server
         {
             foreach (LogGroup group in m_aGroup)
             {
-                if (group.m_id == sGroup) return group; 
+                if (group.p_id == sGroup) return group; 
             }
             LogGroup logGroup = new LogGroup(sGroup);
             m_aGroup.Add(logGroup);
+            if (OnChangeTab != null) OnChangeTab();
             return logGroup; 
         }
 
@@ -156,30 +180,22 @@ namespace Root_LogView.Server
 
         void RunThread()
         {
-            DateTime dateTime = new DateTime(2000, 1, 1);
-            string sDate = "";
-            string sPath = ""; 
             m_bThread = true;
             Thread.Sleep(1000);
             while (m_bThread)
             {
                 Thread.Sleep(100);
                 while (m_qLogData.Count > 0) AddLogGroup(m_qLogData.Dequeue());
-                if (dateTime != DateTime.Today)
+                foreach (LogGroup group in m_aGroup)
                 {
-                    DateTime dt = DateTime.Now;
-                    sDate = dt.Year.ToString() + '-' + dt.Month.ToString("00") + '-' + dt.Day.ToString("00");
-                    sPath = m_sPath + "\\" + sDate;
-                    Directory.CreateDirectory(sPath);
-                    sPath += "\\" + sDate + '_'; 
+                    while (group.m_qLog.Count > 0) group.LogSave(m_sPath);
                 }
-                foreach (LogGroup group in m_aGroup) group.SaveLog(sPath); 
             }
         }
         #endregion
 
         #region Tree
-        TreeRoot m_treeRoot; 
+        public TreeRoot m_treeRoot; 
         void InitTree()
         {
             m_treeRoot = new TreeRoot(p_id, null);
@@ -209,6 +225,16 @@ namespace Root_LogView.Server
             InitServer(); 
             InitGroup(); 
             InitThread(); 
+        }
+
+        public void ThreadStop()
+        {
+            if (m_bThread)
+            {
+                m_bThread = false;
+                m_thread.Join(); 
+            }
+            m_server.ThreadStop(); 
         }
     }
 }
