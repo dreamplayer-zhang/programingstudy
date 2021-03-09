@@ -2,60 +2,58 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
-namespace RootTools
+namespace Root_LogView.Server
 {
     /// <summary>
-    /// LogView_UI.xaml에 대한 상호 작용 논리
+    /// LogServer_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class LogView_UI : UserControl
+    public partial class LogServer_UI : UserControl
     {
-        public LogView_UI()
+        public LogServer_UI()
         {
             InitializeComponent();
         }
 
-        _LogView m_logView; 
-        public void Init(_LogView logView)
+        LogServer m_logServer;
+        public void Init(LogServer logServer)
         {
-            
-            m_logView = logView;
-            DataContext = logView;
+            m_logServer = logServer;
+            DataContext = logServer;
             tabSetup.SelectedIndex = 0;
             comboLog.SelectedIndex = 0;
             UpdateLogTab();
-            logView.OnChangeTab += LogView_OnChangeTab;
-            treeRootUI.Init(logView.m_treeRoot);
-            logView.RunTree(Tree.eMode.Init); 
+            logServer.OnChangeTab += LogServer_OnChangeTab;
+            treeRootUI.Init(logServer.m_treeRoot);
+            logServer.RunTree(Tree.eMode.Init); 
         }
 
-        private void LogView_OnChangeTab()
+        private void LogServer_OnChangeTab()
         {
             UpdateLogTab();
+            tabSetup.SelectedIndex = 0;
             comboLog.SelectedIndex = 0;
-            comboLog.SelectedIndex = 0; 
         }
 
         void UpdateLogTab()
         {
-            foreach (LogGroup log in m_logView.m_aGroup) UpdateLogTab(log);
+            foreach (LogServer.LogGroup log in m_logServer.m_aGroup) UpdateLogTab(log);
             m_asLog.Clear();
             comboLog.ItemsSource = null;
-            foreach (LogGroup log in m_logView.m_aGroup) m_asLog.Add(log.p_id);
+            foreach (LogServer.LogGroup log in m_logServer.m_aGroup) m_asLog.Add(log.p_id);
             comboLog.ItemsSource = m_asLog;
-            
+
         }
 
-        void UpdateLogTab(LogGroup log)
+        void UpdateLogTab(LogServer.LogGroup log)
         {
             foreach (TabItem tabItem in tabLog.Items)
             {
-                if ((string)tabItem.Header == log.p_id) return; 
+                if ((string)tabItem.Header == log.p_id) return;
             }
             TabItem item = new TabItem();
             item.Header = log.p_id;
-            item.Height = 0; 
+            item.Height = 0;
             item.Content = log.p_ui;
             tabLog.Items.Add(item);
         }
@@ -65,8 +63,8 @@ namespace RootTools
         {
             if (comboLog.SelectedIndex < 0) return;
             tabSetup.SelectedIndex = 0;
-            checkSetup.IsChecked = false;
-            tabLog.SelectedIndex = comboLog.SelectedIndex; 
+            checkSetup.IsChecked = false; 
+            tabLog.SelectedIndex = comboLog.SelectedIndex;
         }
 
         private void checkSetup_Click(object sender, RoutedEventArgs e)
