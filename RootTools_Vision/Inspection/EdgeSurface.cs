@@ -53,19 +53,20 @@ namespace RootTools_Vision
 
 		public void DoInspection()
 		{
-			if (this.currentWorkplace.MapIndexY == -1)
+			//if (this.currentWorkplace.MapIndexY == -1)
+			//	return;
+
+			if (this.currentWorkplace.Index == 0)
 				return;
 
-			EdgeSurfaceParameterBase param;
+			EdgeSurfaceParameterBase param = parameterEdge.EdgeParamBaseTop;
 			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
 				param = parameterEdge.EdgeParamBaseTop;
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Side)
 				param = parameterEdge.EdgeParamBaseSide;
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
 				param = parameterEdge.EdgeParamBaseBtm;
-			else
-				return;
-
+			
 			// 연구소WIND R채널만 검사
 			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), param);
 			//DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), param);

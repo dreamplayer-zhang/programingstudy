@@ -267,7 +267,7 @@ namespace Root_TactTime
         public TactTime()
         {
             p_secRun = 0;
-            m_model = new Mold_Buffer(this); 
+            m_model = new Pine2_Picker(this); 
 
             InitColor(); 
             InitTree();
