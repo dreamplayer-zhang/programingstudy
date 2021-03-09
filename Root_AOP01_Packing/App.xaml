@@ -59,14 +59,55 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="{x:Type ToggleButton}" x:Key="SetupPanelToggleBtn">
+        <Style TargetType="{x:Type ToggleButton}"
+               x:Key="SetupPanelToggleBtn">
+            <Setter Property="FontFamily"
+                    Value="Arial" />
+            <Setter Property="FontSize"
+                    Value="15" />
+            <Setter Property="FontWeight"
+                    Value="Bold" />
+            <Setter Property="Margin"
+                    Value="10" />
+            <Setter Property="Height"
+                    Value="40" />
+            <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
+            <Setter Property="Background"
+                    Value="{StaticResource ControlBackGround}" />
+        </Style>
+        <Style TargetType="{x:Type ToggleButton}" x:Key="OperationToggleBtn">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="#FF767676"
+                                BorderThickness="1">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
             <Setter Property="FontFamily" Value="Arial"/>
             <Setter Property="FontSize" Value="15"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin" Value="10"/>
             <Setter Property="Height" Value="40"/>
             <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
-            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
+            <Setter Property="Background"
+                    Value="{StaticResource ControlBackGround}" />
+            <Style.Triggers>
+                <Trigger Property="IsChecked"
+                         Value="True">
+                    <Setter Property="Background"
+                            Value="SteelBlue" />
+                </Trigger>
+                <Trigger Property="IsChecked"
+                         Value="False">
+                    <Setter Property="Background"
+                            Value="Gray" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
         <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
             <Setter Property="FontFamily" Value="Arial"/>

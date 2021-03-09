@@ -20,6 +20,7 @@ namespace Root_EFEM.Module
         {
             m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
         }
+        
         #region ToolBox
 
         RS232 m_rs232;
@@ -895,6 +896,7 @@ namespace Root_EFEM.Module
             p_id = id;
             InitCmd();
             p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
+            
             //m_rfid = rfid;
             m_aTool.Add(p_infoCarrier);
             InitBase(id, engineer);
