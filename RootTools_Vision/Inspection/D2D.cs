@@ -54,7 +54,7 @@ namespace RootTools_Vision
                 return true;
             }
 
-            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterD2D.IndexChannel);
+            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterD2D.IndexChannel);
 
             if (this.currentWorkplace.GetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP) == true &&
                 this.workplaceBundle.CheckStateLine(this.currentWorkplace.MapIndexX, WORK_TYPE.ALIGNMENT) &&
@@ -164,23 +164,23 @@ namespace RootTools_Vision
                     {
                         case CreateRefImageMethod.Average:
                             CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count, 
-                                this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,  
+                                this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,  
                                 wpROIData, this.currentWorkplace.Width, this.currentWorkplace.Height);
                             break;
                         case CreateRefImageMethod.MedianAverage:
                             CLR_IP.Cpp_CreateGoldenImage_MedianAvg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                                this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
+                                this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
                                 wpROIData, this.currentWorkplace.Width, this.currentWorkplace.Height);
 
                             break;
                         case CreateRefImageMethod.Median:
                             CLR_IP.Cpp_CreateGoldenImage_Median((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                                this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
+                                this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
                                 wpROIData, this.currentWorkplace.Width, this.currentWorkplace.Height);
                             break;
                         default:
                             CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                                this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
+                                this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
                                 wpROIData, this.currentWorkplace.Width, this.currentWorkplace.Height);
                             break;
                     }
@@ -255,11 +255,11 @@ namespace RootTools_Vision
                 return;
             }
 
-            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterD2D.IndexChannel);
+            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterD2D.IndexChannel);
             this.inspectionWorkBuffer = this.GetWorkplaceBuffer(this.parameterD2D.IndexChannel);
 
-            int memH = this.currentWorkplace.SharedBufferHeight;
-            int memW = this.currentWorkplace.SharedBufferWidth;
+            int memH = this.currentWorkplace.SharedBufferInfo.Height;
+            int memW = this.currentWorkplace.SharedBufferInfo.Width;
 
             // Recipe
             int chipH = this.currentWorkplace.Height; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
@@ -274,7 +274,7 @@ namespace RootTools_Vision
                 {
                     List<Cpp_Point> wpROIData = TriggerDiffImage();
                     CLR_IP.Cpp_SelectMinDiffinArea((byte*)this.inspectionSharedBuffer.ToPointer(), diffImg, wpROIData.Count,
-                                        this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
+                                        this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
                                         wpROIData, new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY)
                                         , 1, this.currentWorkplace.Width, this.currentWorkplace.Height);
                 }
@@ -430,22 +430,22 @@ namespace RootTools_Vision
                 {
                     case CreateRefImageMethod.Average:
                         CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                            this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
+                            this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
                             wpROIData, this.currentWorkplace.Width, this.currentWorkplace.Height);
                         break;
                     case CreateRefImageMethod.MedianAverage:
                         CLR_IP.Cpp_CreateGoldenImage_MedianAvg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                            this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
+                            this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
                             wpROIData, this.currentWorkplace.Width, this.currentWorkplace.Height);
                         break;
                     case CreateRefImageMethod.Median:
                         CLR_IP.Cpp_CreateGoldenImage_Median((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                            this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
+                            this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
                             wpROIData, this.currentWorkplace.Width, this.currentWorkplace.Height);
                         break;
                     default:
                         CLR_IP.Cpp_CreateGoldenImage_Avg((byte*)this.inspectionSharedBuffer.ToPointer(), GoldenImage, wpROIData.Count,
-                            this.currentWorkplace.SharedBufferWidth, this.currentWorkplace.SharedBufferHeight,
+                            this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
                             wpROIData, this.currentWorkplace.Width, this.currentWorkplace.Height);
                         break;
                 }
