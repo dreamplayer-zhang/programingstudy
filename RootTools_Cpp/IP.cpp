@@ -1867,22 +1867,18 @@ void IP::SplitColorChannel(BYTE* pSrc, BYTE* pOutImg, int nW, int nH, Point ptLT
 }
 void IP::SubSampling(BYTE* pSrc, BYTE* pOutImg, int nW, int nH, Point ptLT, Point ptRB, int nDownSample)
 {
-    long nIdx = 0;
-    long nWidth = (ptRB.x - ptLT.x);
+    uint64_t nIdx = 0;
+    uint64_t nWidth = (ptRB.x - ptLT.x);
     nWidth -= nWidth % nDownSample;
 
     byte* pHeader = pSrc;
     byte* pDownSample = pOutImg;
-    for (int i = 0; i < ptLT.y; i++)
-        pHeader += (nW * nDownSample);
 
-    for (long j = ptLT.y; j < ptRB.y; j += nDownSample) {
-        for (long i = ptLT.x; i < ptLT.x + nWidth; i += nDownSample)
-            pOutImg[nIdx++] = *(pHeader + i);
-        pHeader += (nW * nDownSample);
-    }
+    for (uint64_t j = ptLT.y; j < ptRB.y; j += nDownSample)
+        for (uint64_t i = ptLT.x; i < ptLT.x + nWidth; i += nDownSample)
+            pOutImg[nIdx++] = pSrc[j * nWidth + i];
 
-    Mat imgSrc = Mat((ptRB.y - ptLT.y) / nDownSample, (ptRB.x - ptLT.x) / nDownSample, CV_8UC1, pOutImg); // Debug
+    //Mat imgSrc = Mat((ptRB.y - ptLT.y) / nDownSample, (ptRB.x - ptLT.x) / nDownSample, CV_8UC1, pOutImg); // Debug
 }
 void IP::ConvertRGB2H(BYTE* pR, BYTE* pG, BYTE* pB, BYTE* pOutH, int nW, int nH)
 {
