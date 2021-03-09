@@ -1,6 +1,7 @@
 ﻿using RootTools.Comm;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Windows.Threading;
 
 namespace RootTools
@@ -108,8 +109,17 @@ namespace RootTools
         #endregion
 
         #region TCP Client
-        public TCPAsyncClient m_client; 
+        public TCPAsyncClient m_client = null; 
+        void InitClient()
+        {
+            m_client = new TCPAsyncClient(EQ.m_sModel + ".Log", null);
+            m_client.p_nPort = 7065;
+            m_client.EventReciveData += M_client_EventReciveData;
+        }
 
+        private void M_client_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        {
+        }
         #endregion
 
         public _LogView()
