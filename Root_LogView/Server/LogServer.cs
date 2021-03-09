@@ -16,11 +16,9 @@ namespace Root_LogView.Server
         public class LogData
         {
             DateTime m_dt = DateTime.Now;
-            public int m_nServerID;
             public string m_sLog;
-            public LogData(int nServerID, string sLog)
+            public LogData(string sLog)
             {
-                m_nServerID = nServerID;
                 m_sLog = sLog;
             }
 
@@ -55,71 +53,35 @@ namespace Root_LogView.Server
                     p_sLevel = "Error"; 
                     p_sColor = Brushes.Red;
                 }
-                if (asLog.Length > 2) 
-                {
-                    p_sLogger = m_nServerID.ToString() + "." + asLog[2];
-                    asLog[2] = p_sLogger;
-                }
+                if (asLog.Length > 2) p_sLogger = asLog[2];
                 if (asLog.Length > 3) p_sMessage = asLog[3];
                 if (asLog.Length > 4) p_sStackTrace = asLog[4];
                 m_sLog = asLog[0];
                 for (int n = 1; n < asLog.Length; n++) m_sLog += '\t' + asLog[n]; 
             }
         }
-        Queue<LogData> m_qLogData = new Queue<LogData>(); 
+        Queue<LogData> m_qLogData = new Queue<LogData>();
         #endregion
 
         #region TCPServer
-        int _nServer = 0; 
-        public int p_nServer
+        public TCPIPServer m_server; 
+        void InitServer()
         {
-            get { return _nServer; }
-            set
-            {
-                if (_nServer == value) return;
-                _nServer = value;
-                InitTCPServer(); 
-            }
+            m_server = new TCPIPServer("TCPServer", null);
+            m_server.p_nPort = 7065;
+            m_server.EventReciveData += M_server_EventReciveData;
         }
 
-        public class TCPServer
+        private void M_server_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
-            LogServer m_logServer;
-            int m_nID; 
-            public TCPAsyncServer m_server;
-            public TCPServer(LogServer logServer, int nID)
-            {
-                m_logServer = logServer; 
-                m_nID = nID; 
-                m_server = new TCPAsyncServer("TCPServer" + nID.ToString(), null);
-                m_server.EventReciveData += M_server_EventReciveData;
-            }
-
-            private void M_server_EventReciveData(byte[] aBuf, int nSize, Socket socket)
-            {
-                socket.Send(aBuf);
-                LogData logData = new LogData(m_nID, Encoding.ASCII.GetString(aBuf, 0, nSize));
-                m_logServer.m_qLogData.Enqueue(logData); 
-            }
-        }
-
-        List<TCPAsyncServer> m_aServer = new List<TCPAsyncServer>(); 
-        void InitTCPServer()
-        {
-            while (m_aServer.Count > p_nServer) m_aServer.RemoveAt(m_aServer.Count - 1); 
-            while (m_aServer.Count < p_nServer)
-            {
-                int nID = m_aServer.Count; 
-                TCPAsyncServer server = new TCPAsyncServer("TCPServer" + nID.ToString(), null);
-                server.p_nPort = 7060 + nID; 
-                m_aServer.Add(server); 
-            }
+            socket.Send(aBuf);
+            LogData logData = new LogData(Encoding.ASCII.GetString(aBuf, 0, nSize));
+            m_qLogData.Enqueue(logData);
         }
 
         void RunTreeTCPIP(Tree tree)
         {
-            p_nServer = tree.Set(p_nServer, 1, "Count", "TCPIP Server Count"); 
-            foreach (TCPAsyncServer server in m_aServer) server.RunTree(tree.GetTree(server.p_id));
+            m_server.RunTree(tree.GetTree(m_server.p_id)); 
         }
         #endregion
 
@@ -244,6 +206,7 @@ namespace Root_LogView.Server
         {
             p_id = "LogServer";
             InitTree();
+            InitServer(); 
             InitGroup(); 
             InitThread(); 
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools.Comm;
+using System;
 using System.Collections.Generic;
 using System.Windows.Threading;
 
@@ -96,6 +97,19 @@ namespace RootTools
             if (p_bHold) return;
             foreach (LogGroup group in m_aGroup) group.TimerSave();
         }
+        #endregion
+
+        #region Log Type
+        public enum eLogType
+        {
+            File,
+            TCPIP,
+        }
+        #endregion
+
+        #region TCP Client
+        public TCPAsyncClient m_client; 
+
         #endregion
 
         public _LogView()
