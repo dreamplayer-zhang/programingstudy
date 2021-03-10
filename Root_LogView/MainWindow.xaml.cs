@@ -1,4 +1,5 @@
 ﻿using Root_LogView.Server;
+using System.ComponentModel;
 using System.Windows;
 
 namespace Root_LogView
@@ -21,7 +22,7 @@ namespace Root_LogView
             logViewerUI.Init(m_logViewer);
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             m_logServer.ThreadStop();
         }

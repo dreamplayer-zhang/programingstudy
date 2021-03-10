@@ -20,7 +20,7 @@
             </Grid.ColumnDefinitions>
             <ComboBox Grid.Column="0" x:Name="comboLog" SelectionChanged="comboLog_SelectionChanged"/>
             <CheckBox Grid.Column="1" Content="Hold" IsChecked="{Binding p_bHold}" VerticalAlignment="Center" Margin="4"/>
-            <CheckBox Grid.Column="2" x:Name="checkSetup" Content=" View Setup " VerticalAlignment="Center" Margin="4" Click="checkSetup_Click"/>
+            <CheckBox Grid.Column="2" x:Name="checkSetup" Content="View Setup " VerticalAlignment="Center" Margin="4" Click="checkSetup_Click"/>
         </Grid>
         <TabControl Grid.Row="1" x:Name="tabSetup">
             <TabItem Header="Log" Height="0">

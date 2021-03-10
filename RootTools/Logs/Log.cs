@@ -63,6 +63,7 @@ namespace RootTools
         void Add(eLevel eLevel, string sMessage)
         {
             Data data = new Data(p_id, eLevel, sMessage);
+            LogView.Send(data); 
             foreach (LogGroup group in m_aLogGroup) group.AddData(data); 
         }
 

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Root_LogView.Server
 {
@@ -78,14 +79,15 @@ namespace Root_LogView.Server
 
         private void M_server_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
-            socket.Send(aBuf);
+            //socket.Send(aBuf);
             LogData logData = new LogData(Encoding.ASCII.GetString(aBuf, 0, nSize));
             m_qLogData.Enqueue(logData);
         }
 
         void RunTreeTCPIP(Tree tree)
         {
-            m_server.RunTree(tree.GetTree(m_server.p_id)); 
+            m_server.RunTree(tree.GetTree(m_server.p_id));
+            m_server.p_bUse = true; 
         }
         #endregion
 
@@ -116,7 +118,7 @@ namespace Root_LogView.Server
             }
 
             const int c_lLog = 500;
-            public ObservableCollection<LogData> p_aLog { get; set; }
+            Queue<LogData> m_qLogView = new Queue<LogData>();
             public void LogSave(string sPath)
             {
                 string sDate = m_qLog.Peek().m_sDate;
@@ -130,10 +132,16 @@ namespace Root_LogView.Server
                         if (data.m_sDate != sDate) return;
                         m_qLog.Dequeue();
                         writer.WriteLine(data.m_sLog);
-                        p_aLog.Add(data);
-                        while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
+                        m_qLogView.Enqueue(data); 
                     }
                 }
+            }
+
+            public ObservableCollection<LogData> p_aLog { get; set; }
+            public void OnTimer()
+            {
+                while (m_qLogView.Count > 0) p_aLog.Add(m_qLogView.Dequeue());
+                while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
             }
         }
         public List<LogGroup> m_aGroup = new List<LogGroup>(); 
@@ -150,7 +158,7 @@ namespace Root_LogView.Server
             }
             LogGroup logGroup = new LogGroup(sGroup);
             m_aGroup.Add(logGroup);
-            if (OnChangeTab != null) OnChangeTab();
+            m_bChangeTab = true; 
             return logGroup; 
         }
 
@@ -161,11 +169,30 @@ namespace Root_LogView.Server
             if (logData.p_sLogger != null) GetGroup(logData.p_sLogger).AddLog(logData); 
         }
 
-        string m_sPath = "c:\\Log"; 
+        string m_sPath = "c:\\LogServer"; 
         void RunTreeFile(Tree tree)
         {
             m_sPath = tree.Set(m_sPath, m_sPath, "Path", "Log File Path");
             Directory.CreateDirectory(m_sPath); 
+        }
+        #endregion
+
+        #region Timer 
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromSeconds(0.1);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start(); 
+        }
+
+        bool m_bChangeTab = false;
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            foreach (LogGroup group in m_aGroup) group.OnTimer();
+            if (m_bChangeTab == false) return;
+            m_bChangeTab = false;
+            if (OnChangeTab != null) OnChangeTab();
         }
         #endregion
 
@@ -198,7 +225,7 @@ namespace Root_LogView.Server
         public TreeRoot m_treeRoot; 
         void InitTree()
         {
-            m_treeRoot = new TreeRoot(p_id, null);
+            m_treeRoot = new TreeRoot(p_id, null, false, "LogView");
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
         }
 
@@ -222,9 +249,12 @@ namespace Root_LogView.Server
         {
             p_id = "LogServer";
             InitTree();
-            InitServer(); 
+            InitServer();
+            RunTree(Tree.eMode.RegRead);
+            RunTree(Tree.eMode.Init);
             InitGroup(); 
-            InitThread(); 
+            InitThread();
+            InitTimer(); 
         }
 
         public void ThreadStop()

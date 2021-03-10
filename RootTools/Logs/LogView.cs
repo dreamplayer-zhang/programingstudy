@@ -33,6 +33,18 @@ namespace RootTools
         }
         #endregion
 
+        #region TCPIP
+        static object g_lock = new object();
+        public static void Send(Log.Data data)
+        {
+            lock (g_lock)
+            {
+                if (_logView.m_client.p_bConnect == false) return;
+                _logView.m_client.Send(data.p_sLog);
+            }
+        }
+        #endregion
+
         public static void Init()
         {
             _logView.Init(); 
@@ -101,14 +113,6 @@ namespace RootTools
         }
         #endregion
 
-        #region Log Type
-        public enum eLogType
-        {
-            File,
-            TCPIP,
-        }
-        #endregion
-
         #region TCP Client
         public TCPAsyncClient m_client = null; 
         void InitClient()
@@ -124,7 +128,7 @@ namespace RootTools
 
         void RunTreeTCPIP(Tree tree)
         {
-            if (m_client != null) m_client.RunTree(tree); 
+            m_client.RunTree(tree); 
         }
         #endregion
 
@@ -160,9 +164,11 @@ namespace RootTools
         {
             m_groupTotal = new LogGroup("Total", Log.eLevel.Info);
             m_aGroup.Add(m_groupTotal);
-            InitTree(); 
+            InitTree();
+            InitClient(); 
             StartTimer();
-            RunTree(Tree.eMode.RegRead); 
+            RunTree(Tree.eMode.RegRead);
+            RunTree(Tree.eMode.Init);
         }
 
         public void ThreadStop()
