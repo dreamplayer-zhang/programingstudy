@@ -416,6 +416,24 @@ namespace RootTools_Vision
             defectList.Add(defect);
         }
 
+        public void AddDefect(string sInspectionID, int defectCode, float defectSz, float defectVal, float defectRelX, float defectRelY, float defectAbsLeft, float defectAbsTop, float defectW, float defectH, int chipIdxX, int chipIdxY) // SurfaceDefectParam
+        {
+            Defect defect = new Defect(sInspectionID,
+                defectCode,
+                defectSz,
+                defectVal,
+                defectW,
+                defectH,
+                defectRelX,
+                defectRelY,
+                defectAbsLeft,
+                defectAbsTop,
+                chipIdxX,
+                chipIdxY);
+
+            defectList.Add(defect);
+        }
+
         public void AddMeasurement(string strInspectionID, string strSide, Measurement.MeasureType type, Measurement.EBRMeasureItem measureItem, float fData, float fDefectW, float fDefectH, float fAngle, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)
 		{
             Measurement measurement = new Measurement(strInspectionID,

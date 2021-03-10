@@ -132,6 +132,8 @@ namespace RootTools_Vision
 						10001,
 						label[i].area,
 						label[i].value,
+						0,
+						CalcDegree(0),
 						this.currentWorkplace.PositionX + label[i].boundLeft,
 						this.currentWorkplace.PositionY + label[i].boundTop,
 						Math.Abs(label[i].boundRight - label[i].boundLeft),// * resolution),
