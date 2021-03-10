@@ -48,11 +48,19 @@ namespace RootTools
                 while (m_qLog.Count > 0)
                 {
                     Log.Data data = m_qLog.Peek();
-                    if (data.m_sDate != sDate) return;
-                    m_qLog.Dequeue();
-                    writer.WriteLine(data.p_sLog);
-                    p_aLog.Add(data);
-                    while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
+                    if(data!= null)
+                    {
+                        if (data.m_sDate != sDate) return;
+                        m_qLog.Dequeue();
+                        writer.WriteLine(data.p_sLog);
+                        p_aLog.Add(data);
+                        while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
+                    }
+                    else
+                    {
+                        m_qLog.Dequeue();
+                    }
+                    
                 }
             }
         }

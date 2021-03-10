@@ -2493,6 +2493,12 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nThreshold = m_nThreshold;
                 run.m_nSubImageThreshold = m_nSubImageThreshold;
                 run.m_dNGSpecScratchLength_mm = m_dNGSpecScratchLength_mm;
+
+                if (EQ.p_bSimulate == false)
+                {
+                    run.m_dNGSpecScratchLength_mm = UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dBarcodeScratchSpec_mm;
+                }
+
                 return run;
             }
 
@@ -3305,6 +3311,13 @@ namespace Root_AOP01_Inspection.Module
                 run.m_dMatchScore = m_dMatchScore;
                 run.m_dNGSpecDistance_mm = m_dNGSpecDistance_mm;
                 run.m_dNGSpecDegree = m_dNGSpecDegree;
+
+                if (EQ.p_bSimulate == false)
+                {
+                    run.m_dNGSpecDistance_mm = UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dPatternArrayShiftSpec_mm;
+                    run.m_dNGSpecDegree = UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dPatternArrayRotationSpec_degree;
+                }
+
                 return run;
             }
 
@@ -3594,6 +3607,12 @@ namespace Root_AOP01_Inspection.Module
                 run.m_dMatchScore = m_dMatchScore;
                 run.m_nThreshold = m_nThreshold;
                 run.m_nNGSpec_um = m_nNGSpec_um;
+
+                if (EQ.p_bSimulate == false)
+                {
+                    run.m_nNGSpec_um = (int)UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dAlignKeyExistSpec_um;
+                }
+
                 return run;
             }
 
@@ -4277,6 +4296,13 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nFrameEdgeThreshold = m_nFrameEdgeThreshold;
                 run.m_dNGSpecDistance_mm = m_dNGSpecDistance_mm;
                 run.m_dNGSpecDegree = m_dNGSpecDegree;
+
+                if (EQ.p_bSimulate == false)
+                {
+                    run.m_dNGSpecDistance_mm = UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dPellicleShiftSpec_mm;
+                    run.m_dNGSpecDegree = UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dPellicleRotationSpec_degree;
+                }
+
                 return run;
             }
 
@@ -4596,6 +4622,12 @@ namespace Root_AOP01_Inspection.Module
                 Run_PellicleExpandingInspection run = new Run_PellicleExpandingInspection(m_module);
                 run.m_nLaserThreshold = m_nLaserThreshold;
                 run.m_nNGSpec_um = m_nNGSpec_um;
+
+                if (EQ.p_bSimulate == false)
+                {
+                    run.m_nNGSpec_um = (int)UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dPellicleExpandingSpec_um;
+                }
+
                 return run;
             }
 

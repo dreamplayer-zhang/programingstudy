@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using NanoView;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Root_CAMELLIA.LibSR_Met
 {
@@ -34,13 +35,15 @@ namespace Root_CAMELLIA.LibSR_Met
             NANOVIEW_ERROR = -9999
         }
 
-        ARCNIR m_SR = null;
+        public ARCNIR m_SR = null;
         Model m_Model = null;
         DataManager m_DM = DataManager.GetInstance();
         Calculation m_Calculation = new Calculation();
         public MaterialList m_MaterialList;
         public LayerList m_LayerList;
         string m_sConfigPath = string.Empty;
+
+        public bool isExceptNIR = false;
 
         //double[] m_Spectrum;
         private bool m_bSRInitialized = false;
@@ -53,7 +56,9 @@ namespace Root_CAMELLIA.LibSR_Met
             m_Model = new Model();
             m_MaterialList = m_Model.m_MaterialList;
             m_LayerList = m_Model.m_LayerList;
-
+            //Thickenss Alphafit
+            m_SR.bAlpha1Fit = true;
+            m_SR.Alpha1 = 1.0;
         }
 
         [DllImport("kernel32")]
@@ -293,6 +298,8 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
+       
+
         public ERRORCODE_NANOVIEW Calibration(int nBGIntTime_VIS, int nBGIntTime_NIR, int nAverage_VIS, int nAverage_NIR, bool bInitialCal)
         {
             //Init Calibration 아니고 Sample 측정 시 Measure Background
@@ -301,12 +308,17 @@ namespace Root_CAMELLIA.LibSR_Met
                 //if (bInitialCal == true)
                 //{
                 double[] spectrum = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
-
+                if (isExceptNIR)
+                {
+                    nBGIntTime_NIR = 15;
+                    nAverage_NIR = 0;
+                }
                 m_SR.BackIntTime_VIS = nBGIntTime_VIS;
                 m_SR.BackIntTime_NIR = nBGIntTime_NIR;
                 m_SR.Average_VIS = nAverage_VIS;
                 m_SR.Average_NIR = nAverage_NIR;
                 m_SR.bUpdateBeta = bInitialCal;
+              
 
                 ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.MeasureBackground(spectrum);
                 if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
@@ -373,17 +385,19 @@ namespace Root_CAMELLIA.LibSR_Met
                     //fitting할때 들어가야함
                     //_layer[] layers = m_DM.m_LayerData.To_layer();
                     //m_SR.Model(layers, layers.Length);
-
-                    m_SR.IntTime_VIS = nIntTime_VIS;
-                    m_SR.IntTime_NIR = nIntTime_NIR;
-                    m_SR.Average_VIS = nAverage_VIS;
-                    m_SR.Average_NIR = nAverage_NIR;
-
                     m_DM.bExcept_NIR = bExcept_NIR;
                     m_DM.bThickness = bThickness;
                     m_DM.bTransmittance = bTransmittance;
-
-                    //인자맞추기용 rs
+                    if (m_DM.bExcept_NIR)
+                    {
+                        nIntTime_NIR = 15;
+                        nAverage_NIR = 0;
+                    }
+                    m_SR.IntTime_VIS = nIntTime_VIS;
+                    m_SR.Average_VIS = nAverage_VIS;
+                    m_SR.IntTime_NIR = nIntTime_NIR;
+                    m_SR.Average_NIR = nAverage_NIR;
+                   
                     double[] rs = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
                     double[] reflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
                     double[] eV = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
@@ -396,8 +410,8 @@ namespace Root_CAMELLIA.LibSR_Met
                         RawData data = m_DM.m_RawData[nPointIndex];
                         data.bDataExist = true;
                         data.nCalcDataNum = nNumOfData;
-                        data.nStartWavelegth = nLowerWaveLength;
-                        data.nThicknessDataNum= (int)(nUpperWavelength - nLowerWaveLength)+1;
+                        m_DM.nStartWavelegth = nLowerWaveLength;
+                        m_DM.nThicknessDataNum= (int)(nUpperWavelength - nLowerWaveLength)+1;
                         data.nNIRDataNum = m_SR.m_ExpNum;
                         data.dX = dXPos;
                         data.dY = dYPos;
@@ -407,8 +421,8 @@ namespace Root_CAMELLIA.LibSR_Met
                         {
                             if( Math.Round(ConstValue.EV_TO_WAVELENGTH_VALUE/ eV[i])== nUpperWavelength)
                             {
-                                Array.Copy(reflectance,i, data.VIS_Reflectance, 0,data.nThicknessDataNum);
-                                Array.Copy(eV,i, data.eV,0, data.nThicknessDataNum);
+                                Array.Copy(reflectance,i, data.VIS_Reflectance, 0,m_DM.nThicknessDataNum);
+                                Array.Copy(eV,i, data.eV,0, m_DM.nThicknessDataNum);
                                 break;
                             }
 
@@ -474,106 +488,126 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
-                m_SR.m_iteration = nIteration;
-                m_SR.m_divratio = dDampingFactor;
-
-                if (m_Model.m_LayerList.Count == 0)
+                if (m_DM.bThickness)
                 {
-                    m_DM.m_Log.WriteLog(LogType.Operating, "Model recipe is not opened.");
-                    MessageBox.Show("Open Model First!"); //추후 제거
+                    m_SR.m_iteration = nIteration;
+                    m_SR.m_divratio = dDampingFactor;
 
-                    return ERRORCODE_NANOVIEW.ATI_PARAMETER_ERROR;
-                }
-                if (!m_DM.m_RawData[nPointIndex].bDataExist)
-                {
-                    m_DM.m_Log.WriteLog(LogType.Operating, "Point: " + nPointIndex.ToString() + " Sample data is not exist.");
-                    MessageBox.Show("Do Measure First!");
-
-                    return ERRORCODE_NANOVIEW.MEASURED_DATA_NOT_FOUND;
-                }
-                if (m_bSRInitialized == true)
-                {
-                    //fitting할때 들어가야함
-                    if (UpdateModel() == false)
+                    if (m_Model.m_LayerList.Count == 0)
                     {
-                        MessageBox.Show("Modeling Fail! Please check the log.");
-                        return ERRORCODE_NANOVIEW.SR_MODELING_FAIL;
+                        m_DM.m_Log.WriteLog(LogType.Operating, "Model recipe is not opened.");
+                        MessageBox.Show("Open Model First!"); //추후 제거
+
+                        return ERRORCODE_NANOVIEW.ATI_PARAMETER_ERROR;
                     }
-
-                    RawData data = m_DM.m_RawData[nPointIndex];
-                    int m_NKFitLayer = 0;
-                    m_SR.NKFitLayer = m_NKFitLayer;
-                    ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.Fit(data.VIS_Reflectance, data.VIS_Reflectance, data.eV, data.nThicknessDataNum);
-
-                    Array.Copy(m_SR.FitY, data.CalcReflectance, data.nThicknessDataNum);
-
-                    data.Thickness.Clear();
-                    for (int n = 0; n < m_SR.Thickness.Count(); n++)
+                    if (!m_DM.m_RawData[nPointIndex].bDataExist)
                     {
-                        data.Thickness.Add(m_SR.Thickness[n]);
+                        m_DM.m_Log.WriteLog(LogType.Operating, "Point: " + nPointIndex.ToString() + " Sample data is not exist.");
+                        MessageBox.Show("Do Measure First!");
+
+                        return ERRORCODE_NANOVIEW.MEASURED_DATA_NOT_FOUND;
                     }
- 
-                    double dAvgR = 0.0;
-                    int nWLCount = 0;
-                    double[] VIS_Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
-
-                    for (int i = 0; i < data.VIS_Reflectance.Length; i++)
+                    if (m_bSRInitialized == true)
                     {
-                        if (data.VIS_Reflectance[i] > 0)
+                        //fitting할때 들어가야함
+                        if (nPointIndex == 0)
                         {
-                            VIS_Wavelength[i] = ConstValue.EV_TO_WAVELENGTH_VALUE / data.eV[i];
-                            dAvgR += m_DM.m_RawData[0].VIS_Reflectance[i];
-                            nWLCount++;
+                            if (UpdateModel() == false)
+                            {
+                                MessageBox.Show("Modeling Fail! Please check the log.");
+                                return ERRORCODE_NANOVIEW.SR_MODELING_FAIL;
+                            }
                         }
-                    }
-                    VIS_Wavelength.CopyTo(data.VIS_Wavelength, 0);
-                    dAvgR = dAvgR / nWLCount;
+                        RawData data = m_DM.m_RawData[nPointIndex];
+                        //m_SR.bDispersionFit = false;
+                        //m_SR.WavelengthForNK = 633;
+                        int m_NKFitLayer = 0;
+                        m_SR.NKFitLayer = m_NKFitLayer;
+                        Stopwatch sw = new Stopwatch();
+                        sw.Start();
+                        ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.Fit(data.VIS_Reflectance, data.VIS_Reflectance, data.eV, m_DM.nThicknessDataNum);
 
-                    data.dGoF = m_Calculation.CalcGoF(data.VIS_Reflectance, data.CalcReflectance, 0, nWLCount, 0, nWLCount - 1, dAvgR);
-                    
+                        sw.Stop();
+                        Debug.WriteLine("Fit >> " + sw.ElapsedMilliseconds.ToString());
 
-                    if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
-                    {
+                     
+                        Array.Copy(m_SR.FitY, data.CalcReflectance, m_DM.nThicknessDataNum);
+
+                        data.Thickness.Clear();
                         for (int n = 0; n < m_SR.Thickness.Count(); n++)
                         {
-                            m_DM.m_Log.WriteLog(LogType.Datas, "Thickness - " + m_Model.m_LayerList[n].m_Host.m_Name + ": " + m_SR.Thickness[n].ToString() + "A");
+                            data.Thickness.Add(m_SR.Thickness[n]);
                         }
 
-                        m_DM.m_Log.WriteLog(LogType.Operating, "Nanoview Fit Done");
-                    }
-                    else
-                    {
-                        string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), rst);
-                        m_DM.m_Log.WriteLog(LogType.Error, sErr);
-                        MessageBox.Show(sErr); //추후 제거
-                    }
-                    if (m_DM.bTransmittance)
-                    {
-                        //투과율 함수 추가
-                        if (GetTransmittance(nPointIndex))
+                        double dAvgR = 0.0;
+                        int nWLCount = 0;
+                        double[] VIS_Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+
+                        for (int i = 0; i < data.VIS_Reflectance.Length; i++)
                         {
-                            m_DM.m_Log.WriteLog(LogType.Operating, "Transmittance Cal Done");
+                            if (data.VIS_Reflectance[i] > 0)
+                            {
+                                VIS_Wavelength[i] = ConstValue.EV_TO_WAVELENGTH_VALUE / data.eV[i];
+                                dAvgR += m_DM.m_RawData[0].VIS_Reflectance[i];
+                                nWLCount++;
+                            }
+                        }
+                        VIS_Wavelength.CopyTo(data.VIS_Wavelength, 0);
+                        dAvgR = dAvgR / nWLCount;
+
+                        data.dGoF = m_Calculation.CalcGoF(data.VIS_Reflectance, data.CalcReflectance, 0, nWLCount, 0, nWLCount - 1, dAvgR);
+
+
+                        if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                        {
+                            for (int n = 0; n < m_SR.Thickness.Count(); n++)
+                            {
+                                m_DM.m_Log.WriteLog(LogType.Datas, "Thickness - " + m_Model.m_LayerList[n].m_Host.m_Name + ": " + m_SR.Thickness[n].ToString() + "A");
+                            }
+
+                            m_DM.m_Log.WriteLog(LogType.Operating, "Nanoview Fit Done");
                         }
                         else
                         {
-                            m_DM.m_Log.WriteLog(LogType.Operating, "Cal Transmittance Fail!");
-                            MessageBox.Show("Cal Transmittance Fail!");
+                            string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), rst);
+                            m_DM.m_Log.WriteLog(LogType.Error, sErr);
+                            MessageBox.Show(sErr); //추후 제거
+                        }
+                       
+                        if (m_DM.bTransmittance)
+                        {
+                            if (GetTransmittance(nPointIndex))
+                            {
+                                m_DM.m_Log.WriteLog(LogType.Operating, "Transmittance Cal Done");
+                            }
+                            else
+                            {
+                                m_DM.m_Log.WriteLog(LogType.Operating, "Cal Transmittance Fail!");
+                                MessageBox.Show("Cal Transmittance Fail!");
 
-                            return ERRORCODE_NANOVIEW.MEASURED_DATA_NOT_FOUND;
+                                return ERRORCODE_NANOVIEW.MEASURED_DATA_NOT_FOUND;
+                            }
+
                         }
 
+
+                        return rst;
                     }
-
-
-                    return rst;
+                    else
+                    {
+                        string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), -1);
+                        m_DM.m_Log.WriteLog(LogType.Error, sErr);
+                        MessageBox.Show(sErr); //추후 제거
+                        return ERRORCODE_NANOVIEW.SR_DO_HW_INITIALIZE_FIRST;
+                    }
                 }
                 else
                 {
-                    string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), -1);
-                    m_DM.m_Log.WriteLog(LogType.Error, sErr);
-                    MessageBox.Show(sErr); //추후 제거
-                    return ERRORCODE_NANOVIEW.SR_DO_HW_INITIALIZE_FIRST;
+                    m_DM.m_Log.WriteLog(LogType.Others, "No Cal Thickenss");
+                    ERRORCODE_NANOVIEW rst = 0;
+                    return rst ;
                 }
+                
             }
             catch (Exception ex)
             {
@@ -695,15 +729,29 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public ERRORCODE_NANOVIEW GetSpectrum(ref double[] DataX, ref double[] DataY)
+        public ERRORCODE_NANOVIEW GetSpectrum(ref double[] DataX, ref double[] DataY, ref int nNumOfSpectrum)
         {
             try
             {
-                ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.GetSpectrum(DataY, DataX);
+                if (m_bSRInitialized == false)
+                {
+                    MessageBox.Show("Initialize first");
+                }
+
+
+                int NumOfSpectrum = 0;
+                double[] SpectrumData = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                double[] Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.GetSpectrum(SpectrumData, Wavelength, ref NumOfSpectrum);
+
 
                 if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     //m_DM.m_Log.WriteLog(LogType.Operating, "GetSpectrum");
+                    SpectrumData.CopyTo(DataX, 0);
+                    Wavelength.CopyTo(DataY, 0);
+                    nNumOfSpectrum = NumOfSpectrum;
+
                 }
                 else
                 {
@@ -725,12 +773,15 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
-                if (LoadNKDatas(nPointIndex) == false)
+                if (nPointIndex == 0)
                 {
-                    m_DM.m_Log.WriteLog(LogType.Operating, "NK Data is not find");
-                    MessageBox.Show("NK Data is not Found");
+                    if (LoadNKDatas() == false)
+                    {
+                        m_DM.m_Log.WriteLog(LogType.Operating, "NK Data is not find");
+                        MessageBox.Show("NK Data is not Found");
 
-                    return false;
+                        return false;
+                    }
                 }
                 int nDNum = m_DM.m_LayerData.Count - 2;
                 double[] dThickness = new double[m_DM.m_LayerData.Count - 2];
@@ -748,13 +799,13 @@ namespace Root_CAMELLIA.LibSR_Met
             catch (Exception ex)
             {
                 m_DM.m_Log.WriteLog(LogType.Operating, "Cal Transmittance Fail!");
-                MessageBox.Show("Cal Transmittance Fail!");
+                //MessageBox.Show("Cal Transmittance Fail!");
 
                 return false;
             }
         }
 
-        public bool LoadNKDatas(int nPointIndex)
+        public bool LoadNKDatas()
         {
             bool bLoadNKData = true;
 
@@ -768,17 +819,17 @@ namespace Root_CAMELLIA.LibSR_Met
             }
             string strTempPath = string.Empty;
             string strNKFilePath = string.Empty;
-            string strNKFileFormat = string.Empty;
-            int nWLStart = (int)m_DM.m_RawData[nPointIndex].nStartWavelegth;
+            string strNKFileFormat = string.Empty; 
+            int nWLStart = Convert .ToInt32(m_DM.nStartWavelegth);
             int nWLStop;
 
             if (m_DM.bExcept_NIR)
             {
-                nWLStop = nWLStart + m_DM.m_RawData[nPointIndex].nThicknessDataNum;
+                nWLStop = nWLStart + m_DM.nThicknessDataNum;
             }
             else
             {
-                nWLStop = nWLStart + m_DM.m_RawData[nPointIndex].nNIRDataNum;
+                nWLStop = nWLStart + m_DM.m_RawData[0].nNIRDataNum;
             }
 
             for (int n = 0; n < m_Model.m_LayerList.Count - 1; n++)
@@ -821,7 +872,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     string strTempNK = NKData.ReadLine();
                     string[] strSplitNK = strTempNK.Split(',');
                     // 이부분 수정 할것 NIR 사용할 것인지 아닌지에 따라서 nCalDataNUm 과 nDataNum_NIR 로 바꿔서 데이터 수집 할것
-                    if (Convert.ToInt32(strSplitNK[0]) >= WLStart && Convert.ToInt32(strSplitNK[0]) <= WLStop)
+                    if (Convert.ToInt32(strSplitNK[0]) >= WLStart && Convert.ToInt32(strSplitNK[0]) < WLStop)
                     {
                         m_DM.m_LayerData[nLayerIdx].wavelength.Add(Convert.ToDouble(strSplitNK[0]));
                         m_DM.m_LayerData[nLayerIdx].n.Add(Convert.ToDouble(strSplitNK[1]));

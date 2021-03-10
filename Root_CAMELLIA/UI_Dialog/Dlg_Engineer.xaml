@@ -8,6 +8,7 @@
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:viewConverter="clr-namespace:ViewConverter;assembly=RootTools"
+        xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
         WindowStyle="None"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
@@ -120,10 +121,7 @@
                                             <ColumnDefinition Width="1.5*" />
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
-                                        <GroupBox Header="Intensity Graph"
-                                                  Grid.Column="0">
-
-                                        </GroupBox>
+                                        <met:CountGraph Grid.Column="0" Width="auto" Height="auto"/>
                                         <GroupBox Header="SR Parameter"
                                                   Grid.Column="1">
                                             <Grid Margin="5,0">
@@ -336,7 +334,7 @@
                                                                 Margin="3"
                                                                 BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdServoOnOff}">
-                                                            <Grid Background="{Binding SelectedAxis.p_bSeroOn, Converter={StaticResource AxisBoolToBrush}}"
+                                                            <Grid Background="{Binding SelectedAxis.p_bServoOn, Converter={StaticResource AxisBoolToBrush}}"
                                                                   VerticalAlignment="Center"
                                                                   HorizontalAlignment="Center"
                                                                   Width="{Binding ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
@@ -763,7 +761,7 @@
                                                                 </DataGrid.Columns>
                                                             </DataGrid>
                                                         </TabItem>
-                                                        <TabItem Header="Tilt Z"
+                                                        <TabItem Header="Stage Z"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
                                                             <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"

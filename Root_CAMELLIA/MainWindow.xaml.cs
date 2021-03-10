@@ -81,10 +81,13 @@ namespace Root_CAMELLIA
             loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
 
+            LogUI.Init(LogView._logView);
+
             int nLPNum = m_handler.m_aLoadport.Count;
             for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTNew);
 
             InitTimer();
+
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();

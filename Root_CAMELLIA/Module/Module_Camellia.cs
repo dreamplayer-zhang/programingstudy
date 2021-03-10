@@ -93,16 +93,16 @@ namespace Root_CAMELLIA.Module
             }
         }
 
-        Axis m_tiltAxisZ;
-        public Axis p_tiltAxisZ
+        Axis m_stageAxisZ;
+        public Axis p_stageAxisZ
         {
             get
             {
-                return m_tiltAxisZ;
+                return m_stageAxisZ;
             }
             set
             {
-                m_tiltAxisZ = value;
+                m_stageAxisZ = value;
             }
         }
 
@@ -247,10 +247,10 @@ namespace Root_CAMELLIA.Module
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
+            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "NavigationZ");
             p_sInfo = m_toolBox.Get(ref m_axisLifter, this, "StageLifter");
             p_sInfo = m_toolBox.Get(ref m_tiltAxisXY, this, "TiltXY");
-            p_sInfo = m_toolBox.Get(ref m_tiltAxisZ, this, "TiltZ");
+            p_sInfo = m_toolBox.Get(ref m_stageAxisZ, this, "StageZ");
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_axisXReady, this, "Stage X Ready");
@@ -274,8 +274,9 @@ namespace Root_CAMELLIA.Module
                 infoCarrier[i] = loadports[i].p_infoCarrier;
                 CanInitCal[i] = false;
             }
-            m_log.Info("testtesttesttesttesttesttesttesttesttesttesttesttesttest");
-            m_log.Warn("asfdasfd");
+
+            if(!p_CamVRS.p_CamInfo._OpenStatus)
+                p_CamVRS.Connect();
         }
 
         public override void ThreadStop()
@@ -299,7 +300,7 @@ namespace Root_CAMELLIA.Module
 
             m_tiltAxisXY.p_axisX.p_eState = Axis.eState.Ready;
             m_tiltAxisXY.p_axisY.p_eState = Axis.eState.Ready;
-            m_tiltAxisZ.p_eState = Axis.eState.Ready;
+            m_stageAxisZ.p_eState = Axis.eState.Ready;
 
             Thread.Sleep(200);
             if (m_listAxis.Count == 0) return "OK";
@@ -540,7 +541,7 @@ namespace Root_CAMELLIA.Module
         public string BeforeGet(int nID)
         {
 
-            m_CamVRS.FunctionConnect();
+            //m_CamVRS.FunctionConnect();
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;

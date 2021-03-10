@@ -9,7 +9,7 @@
     <Grid>
         <Border ClipToBounds="True">
             <Viewbox>
-                <Canvas  Width="1000" Height="1000" Background="#01FFFFFF" Focusable="True" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseRightButtonDown="Canvas_MouseRightButtonDown">
+                <Canvas  Width="1000" Height="1000" Background="#01FFFFFF" Focusable="True" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseRightButtonDown="Canvas_MouseRightButtonDown" RenderTransformOrigin="0.5 0.5">
                     <Path StrokeThickness="1">
                             <Path.Data>
                                 <EllipseGeometry RadiusX="465" RadiusY="465" Center="500, 500"/>
@@ -1722,7 +1722,7 @@
                             </Path.Stroke>
                         </Path>
                         <Canvas.RenderTransform>
-                            <ScaleTransform x:Name="CanvasScaleTransform"/>
+                              <ScaleTransform x:Name="CanvasScaleTransform" ScaleX="{Binding ZoomScale}" ScaleY="{Binding ZoomScale}" CenterX="{Binding RenderCenterX}" CenterY="{Binding RenderCenterY}" />
                         </Canvas.RenderTransform>
                     </Canvas>
             </Viewbox>

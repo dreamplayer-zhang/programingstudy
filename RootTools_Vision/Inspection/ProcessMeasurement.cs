@@ -49,6 +49,8 @@ namespace RootTools_Vision
 			if (measureList.Count > 0)
 				DatabaseManager.Instance.AddMeasurementDataList(measureList);
 
+			// 수정 중
+			/*
             SettingItem_SetupEBR settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupEBR>();
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
@@ -64,6 +66,7 @@ namespace RootTools_Vision
 
 				//Tools.SaveTiffImage(settings.KlarfSavePath, measureList.Cast<Data>().ToList(), sharedBufferInfo);
 			}
+			*/
 
             WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
         }
