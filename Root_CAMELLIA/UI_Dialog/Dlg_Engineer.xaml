@@ -334,7 +334,7 @@
                                                                 Margin="3"
                                                                 BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdServoOnOff}">
-                                                            <Grid Background="{Binding SelectedAxis.p_bSeroOn, Converter={StaticResource AxisBoolToBrush}}"
+                                                            <Grid Background="{Binding SelectedAxis.p_bServoOn, Converter={StaticResource AxisBoolToBrush}}"
                                                                   VerticalAlignment="Center"
                                                                   HorizontalAlignment="Center"
                                                                   Width="{Binding ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
@@ -761,7 +761,7 @@
                                                                 </DataGrid.Columns>
                                                             </DataGrid>
                                                         </TabItem>
-                                                        <TabItem Header="Tilt Z"
+                                                        <TabItem Header="Stage Z"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
                                                             <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
