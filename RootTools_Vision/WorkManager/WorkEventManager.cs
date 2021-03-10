@@ -107,5 +107,14 @@ namespace RootTools_Vision
             ReceivedMemoryID?.Invoke(obj, args);
         }
         #endregion
+
+        #region [Log]
+        public static event EventHandler<LogArgs> AddLog;
+
+        public static void OnAddLog(object obj, LogArgs args)
+        {
+            AddLog?.Invoke(obj, args);
+        }
+        #endregion
     }
 }

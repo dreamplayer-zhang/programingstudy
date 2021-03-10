@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Media.Imaging;
 
 namespace RootTools_Vision
 {
@@ -599,6 +601,25 @@ namespace RootTools_Vision
             //return obj;
         }
 
+
+        public static string GetName<T>(Expression<Func<T>> expr)
+        {
+            var body = ((MemberExpression)expr.Body);
+            return body.Member.Name;
+        }
+
+        public static Bitmap BitmapFromSource(BitmapSource bitmapsource)
+        {
+            Bitmap bitmap;
+            using (var outStream = new MemoryStream())
+            {
+                BitmapEncoder enc = new BmpBitmapEncoder();
+                enc.Frames.Add(BitmapFrame.Create(bitmapsource));
+                enc.Save(outStream);
+                bitmap = new Bitmap(outStream);
+            }
+            return bitmap;
+        }
         public static T CreateInstance<T>()
         {
             return Activator.CreateInstance<T>();
@@ -640,13 +661,35 @@ namespace RootTools_Vision
         {
             var bitmapData = bitmap.LockBits(
                 new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
+                System.Drawing.Imaging.ImageLockMode.ReadWrite, bitmap.PixelFormat);
 
-            var bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
+
+            // Try creating a new image with a custom palette.
+
+
+            System.Windows.Media.Imaging.BitmapSource bitmapSource = null;
+            if (bitmap.PixelFormat == PixelFormat.Format8bppIndexed)
+            {
+                List<System.Windows.Media.Color> colors = new List<System.Windows.Media.Color>();
+                for(int i = 0; i < 256; i++)
+                    colors.Add(System.Windows.Media.Color.FromRgb((byte)i, (byte)i, (byte)i));
+                BitmapPalette palette = new BitmapPalette(colors);
+
+                bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
+                bitmapData.Width, bitmapData.Height,
+                bitmap.HorizontalResolution, bitmap.VerticalResolution,
+                System.Windows.Media.PixelFormats.Indexed8, palette,
+                bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+            }
+            else
+            {
+                bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
                 bitmapData.Width, bitmapData.Height,
                 bitmap.HorizontalResolution, bitmap.VerticalResolution,
                 System.Windows.Media.PixelFormats.Bgr24, null,
                 bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+            }
+            
 
             bitmap.UnlockBits(bitmapData);
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class SurfaceParameter : ParameterBase, IMaskInspection, IColorInspection
+    public class SurfaceParameter : ParameterBase, IMaskInspection, IColorInspection, IFrontsideInspection
     {
         public SurfaceParameter() : base(typeof(Surface))
         {

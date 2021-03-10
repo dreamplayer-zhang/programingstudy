@@ -35,15 +35,22 @@ namespace RootTools_Vision
         }
     }
 
+    [Serializable]
     public class InspectionDoneEventArgs : EventArgs
     {
+        public readonly Workplace workplace;
         public readonly List<CRect> listRect;
-        public readonly bool reDraw;
 
-        public InspectionDoneEventArgs(List<CRect> _rect, bool _reDraw = false)
+        public InspectionDoneEventArgs(List<CRect> _rect)
         {
+            this.workplace = new Workplace();
             this.listRect = _rect;
-            this.reDraw = _reDraw;
+        }
+
+        public InspectionDoneEventArgs(List<CRect> _rect, Workplace workplace)
+        {
+            this.workplace = workplace;
+            this.listRect = _rect;
         }
     }
 
@@ -127,6 +134,18 @@ namespace RootTools_Vision
         public MemoryIDArgs(MemoryID memoryID)
         {
             this.MemoryID = memoryID;
+        }
+    }
+
+    public class LogArgs : EventArgs
+    {
+        public readonly LOG_MESSAGE_TYPE type;
+        public readonly string msg;
+
+        public LogArgs(LOG_MESSAGE_TYPE type, string msg)
+        {
+            this.type = type;
+            this.msg = msg;
         }
     }
 }

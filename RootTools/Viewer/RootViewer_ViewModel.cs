@@ -1317,14 +1317,14 @@ namespace RootTools
         {
             if (offset == null) offset = new CPoint(0, 0);
 
-            rect.Left = rect.Left - offset.X;
-            rect.Right = rect.Right - offset.X;
-            rect.Top = rect.Top - offset.Y;
-            rect.Bottom = rect.Bottom - offset.Y;
+            rect.Left = rect.Left - offset.X - 1;
+            rect.Right = rect.Right - offset.X - 1;
+            rect.Top = rect.Top - offset.Y - 1;
+            rect.Bottom = rect.Bottom - offset.Y - 1;
 
-            Parallel.For(rect.Top, rect.Bottom , y =>
+            Parallel.For(rect.Top, rect.Bottom + 1 , y =>
             {
-                for (int x = rect.Left; x < rect.Right; x++)
+                for (int x = rect.Left; x <= rect.Right; x++)
                 {
                     CPoint pixelPt = new CPoint(x, y);
                     DrawPixelBitmap(pixelPt, r, g, b, a);

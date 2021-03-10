@@ -418,17 +418,6 @@ namespace Root_AOP01_Inspection.Module
         #endregion
 
         #region Vision Algorithm
-        Mat GetMatImage(MemoryData mem, CRect crtROI)
-        {
-            if (crtROI.Width < 1 || crtROI.Height < 1) return null;
-            if (crtROI.Left < 0 || crtROI.Top < 0) return null;
-            ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
-            IntPtr p = mem.GetPtr();
-            img.SetData(p, crtROI, (int)mem.W);
-            Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.GetBytePerPixel(), img.GetPtr(), (int)img.p_Stride);
-
-            return matReturn;
-        }
 
         bool TemplateMatching(MemoryData mem, CRect crtSearchArea, Image<Gray, byte> imgSrc, Image<Gray, byte> imgTemplate, out CPoint cptCenter, double dMatchScore)
         {

@@ -28,17 +28,17 @@ namespace Root_WIND2
             
             // Method
             m_cInspMethod = new ObservableCollection<ParameterBase>();
-            p_cInspMethod = ParameterBase.GetChildClass();
+            p_cInspMethod = ParameterBase.GetFrontSideClass();
 
             this.p_InspMethod = this.m_cInspMethod[1]; // Position
             this.p_InspChannel = IMAGE_CHANNEL.R_GRAY;
 
             // Mask
-            m_cInspROI = new ObservableCollection<InspectionROI>();
+            m_cInspROI = new ObservableCollection<ItemMask>();
             MaskRecipe maskRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<MaskRecipe>();
             for (int i = 0; i < maskRecipe.MaskList.Count; i++)
             {
-                InspectionROI roi = new InspectionROI();
+                ItemMask roi = new ItemMask();
                 roi.p_Index = i;
                 roi.p_Size = maskRecipe.MaskList[i].Area;
                 roi.p_Data = maskRecipe.MaskList[i].ToPointLineList();
@@ -64,8 +64,8 @@ namespace Root_WIND2
         }
         private int m_Index = 0;
 
-        private ObservableCollection<InspectionROI> m_cInspROI;
-        public ObservableCollection<InspectionROI> p_cInspROI
+        private ObservableCollection<ItemMask> m_cInspROI;
+        public ObservableCollection<ItemMask> p_cInspROI
         {
             get
             {
@@ -78,8 +78,8 @@ namespace Root_WIND2
         }
 
 
-        private InspectionROI m_InspROI;
-        public InspectionROI p_InspROI
+        private ItemMask m_InspROI;
+        public ItemMask p_InspROI
         {
             get
             {
