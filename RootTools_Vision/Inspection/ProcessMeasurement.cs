@@ -46,21 +46,17 @@ namespace RootTools_Vision
                 for (int j = 0; j < measureItem; j++)
                     measureList[i + j].SetMeasureIndex(index);
 
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            DatabaseManager.Instance.AddMeasurementDataList(measureList);
+			if (measureList.Count > 0)
+				DatabaseManager.Instance.AddMeasurementDataList(measureList);
 
             SettingItem_SetupEBR settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupEBR>();
-            SharedBufferInfo sharedBufferInfo = new SharedBufferInfo(currentWorkplace.SharedBufferR_GRAY,
-                                                                     currentWorkplace.SharedBufferWidth,
-                                                                     currentWorkplace.SharedBufferHeight,
-                                                                     currentWorkplace.SharedBufferByteCnt,
-                                                                     currentWorkplace.SharedBufferG,
-                                                                     currentWorkplace.SharedBufferB);
-            Tools.SaveDataImage(Path.Combine(settings.MeasureImagePath, sInspectionID), measureList.Cast<Data>().ToList(), sharedBufferInfo);
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+
+            Tools.SaveDefectImage(Path.Combine(settings.MeasureImagePath, sInspectionID), measureList.Cast<Data>().ToList(), currentWorkplace.SharedBufferInfo);
 
             if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
             {
-				List<string> dataStringList = GlobalObjects.Instance.Get<KlarfData_Lot>().EBRMeasureDataToStringList(measureList, Measurement.EBRMeasureItem.EBR.ToString());
+				List<string> dataStringList = ConvertDataListToStringList(measureList, Measurement.EBRMeasureItem.EBR.ToString());
 				GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, dataStringList, null);
 				GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
 				GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
@@ -71,5 +67,31 @@ namespace RootTools_Vision
 
             WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
         }
+
+		private List<string> ConvertDataListToStringList(List<Measurement> measureList, string measureItem = null)
+		{
+			List<string> stringList = new List<string>();
+			for (int i = 0; i < measureList.Count; i++)
+			{
+				if (measureItem != null && measureList[i].m_strMeasureItem != measureItem)
+					continue;
+
+				string str = string.Format("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13} {14} {15} {16}",
+											(measureList[i].m_nMeasurementIndex + 1),
+											measureList[i].m_fRelX,
+											measureList[i].m_fRelY,
+											0, 0,
+											measureList[i].m_fData, 0,
+											measureList[i].m_fData,
+											measureList[i].m_fData,
+											0, 1, 0,
+											measureList[i].m_fData,
+											measureList[i].m_fAngle,
+											0, 1, 1);
+				stringList.Add(str);
+			}
+			return stringList;
+		}
+
 	}
 }

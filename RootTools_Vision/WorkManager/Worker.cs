@@ -241,7 +241,7 @@ namespace RootTools_Vision
                     msg += ex.InnerException.Message + "\n" + ex.InnerException.StackTrace;
                 }
 
-                TempLogger.Write("Worker", msg);
+                TempLogger.Write("Worker", ex, msg);
             }
             finally
             {
@@ -318,9 +318,9 @@ namespace RootTools_Vision
             if (this.currentWorkplace.Width == 0 || this.currentWorkplace.Height == 0) return;
 
             Tools.ParallelImageCopy(
-                this.currentWorkplace.SharedBufferR_GRAY,
-                this.currentWorkplace.SharedBufferWidth,
-                this.currentWorkplace.SharedBufferHeight,
+                this.currentWorkplace.SharedBufferInfo.PtrR_GRAY,
+                this.currentWorkplace.SharedBufferInfo.Width,
+                this.currentWorkplace.SharedBufferInfo.Height,
                 new CRect
                 (
                     this.currentWorkplace.PositionX,
@@ -330,12 +330,12 @@ namespace RootTools_Vision
                 this.workplaceBufferR_GRAY);
 
 
-            if (this.currentWorkplace.SharedBufferByteCnt == 3)
+            if (this.currentWorkplace.SharedBufferInfo.ByteCnt == 3)
             {
                 Tools.ParallelImageCopy(
-                    this.currentWorkplace.SharedBufferG,
-                    this.currentWorkplace.SharedBufferWidth,
-                    this.currentWorkplace.SharedBufferHeight,
+                    this.currentWorkplace.SharedBufferInfo.PtrG,
+                    this.currentWorkplace.SharedBufferInfo.Width,
+                    this.currentWorkplace.SharedBufferInfo.Height,
                     new CRect
                     (
                         this.currentWorkplace.PositionX,
@@ -345,9 +345,9 @@ namespace RootTools_Vision
                     this.workplaceBufferG);
 
                 Tools.ParallelImageCopy(
-                    this.currentWorkplace.SharedBufferB,
-                    this.currentWorkplace.SharedBufferWidth,
-                    this.currentWorkplace.SharedBufferHeight,
+                    this.currentWorkplace.SharedBufferInfo.PtrB,
+                    this.currentWorkplace.SharedBufferInfo.Width,
+                    this.currentWorkplace.SharedBufferInfo.Height,
                     new CRect
                     (
                         this.currentWorkplace.PositionX,

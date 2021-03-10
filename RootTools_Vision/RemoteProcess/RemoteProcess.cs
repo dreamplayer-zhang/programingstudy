@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -18,6 +19,8 @@ namespace RootTools_Vision
     public class RemoteProcess
     {
         public event PipeCommMessageReceivedHandler MessageReceived;
+        public event PipeCommConnection Connected;
+        public event PipeCommConnection Disconnected;
 
         #region [Members]
 
@@ -38,53 +41,98 @@ namespace RootTools_Vision
             if (_mode == REMOTE_MODE.Master)
             {
                 pipeComm = new PipeComm(moduleName, PIPE_MODE.Server);
-                pipeComm.MessageReceived += PipeComm_MessageReceived;
+                pipeComm.Connected += Connected_Callback;
+                pipeComm.DisConnected += Disconnected_Callback;
             }
             else if(_mode == REMOTE_MODE.Slave)
             {
                 pipeComm = new PipeComm(moduleName, PIPE_MODE.Client);
-                pipeComm.MessageReceived += PipeComm_MessageReceived;
+                pipeComm.Connected += Connected_Callback;
+                pipeComm.DisConnected += Disconnected_Callback;
             }
         }
+
+        public void EventReset()
+        {
+            MessageReceived = null;
+        }
+
+        public void EventChange(PipeCommMessageReceivedHandler handler)
+        {
+            MessageReceived = null;
+            MessageReceived += handler;
+        }
+
+        private void Connected_Callback()
+        {
+            Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "Connected !");
+            pipeComm.MessageReceived += PipeComm_MessageReceived;
+
+            if (Connected != null)
+                Connected();
+
+        }
+        private void Disconnected_Callback()
+        {
+            Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "Disconnected !");
+            pipeComm.MessageReceived -= PipeComm_MessageReceived;
+
+            if (Disconnected != null)
+                Disconnected();
+        }
+
+        #region [Properties]
+        public bool IsConnected
+        {
+            get => this.pipeComm.IsConnected;
+        }
+
+        #endregion
 
 
         #region [Communiation]
         private void PipeComm_MessageReceived(PipeProtocol protocol)
         {
+            Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "Message Received: " + protocol.msgType.ToString() + "/" + protocol.msg);
+
             if (this.MessageReceived != null)
                 this.MessageReceived(protocol);
         }
 
-        public void StartProcess()
+
+        public void ListenStart()
         {
-            if (this.mode == REMOTE_MODE.None)
-            {
-                //MessageBox.Show("Remote Mode 가 아닙니다.");
-                return;
-            }
+            pipeComm.Listen();
+        }
 
-            if (this.mode == REMOTE_MODE.Master)
-            {
-                //foreach (Process prc in Process.GetProcesses())
-                //{
-                //    if (prc.ProcessName.StartsWith(processName))
-                //    {
-                //        prc.Kill();
-                //    }
-                //}
-
-                //process = Process.Start(processName + ".exe");
-
-                pipeComm.Listen();
-            }
-            else if(this.mode == REMOTE_MODE.Slave)
+        public void TryConnect()
+        {
+            if(!this.pipeComm.IsConnected)
             {
                 pipeComm.Connect();
             }
+
+            //int timeOutSecond = 10;
+            //int sec = 0;
+            //while(!this.pipeComm.IsConnected)
+            //{
+            //    if (sec > timeOutSecond)
+            //    {
+            //        Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "Try connect time-out, Check server state");
+            //        break;
+            //    }
+                    
+            //    pipeComm.Connect();
+
+            //    Thread.Sleep(1000);
+
+            //    sec++;
+            //}
         }
 
         public void Send(PipeProtocol protocol)
         {
+            
             if (this.mode == REMOTE_MODE.Master)
             {
                 this.pipeComm.Write(protocol);
@@ -93,6 +141,8 @@ namespace RootTools_Vision
             {
                 this.pipeComm.Write(protocol);
             }
+
+            Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "Message Sent: " + protocol.msgType.ToString() + "/" + protocol.msg);
         }
 
         public void Read(PipeProtocol protocol)
@@ -110,7 +160,14 @@ namespace RootTools_Vision
         #endregion
 
         #region [Process]
-        public void ExitProcess()
+
+        public void Exit()
+        {
+            ExitPipe();
+            ExitProcess();
+        }
+
+        private void ExitProcess()
         {
             foreach (Process prc in Process.GetProcesses())
             {
@@ -119,6 +176,11 @@ namespace RootTools_Vision
                     prc.Kill();
                 }
             }
+        }
+
+        private void ExitPipe()
+        {
+            this.pipeComm.Exit();
         }
         #endregion
     }

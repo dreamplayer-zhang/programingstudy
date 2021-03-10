@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 
 namespace RootTools
 {
+    [Serializable]
     public class CRect
     {
         int _x;

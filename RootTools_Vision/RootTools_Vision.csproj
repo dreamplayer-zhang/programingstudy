@@ -129,7 +129,6 @@
     <Compile Include="Inspection\ProcessDefect_Backside.cs" />
     <Compile Include="Inspection\ReticleSurface.cs" />
     <Compile Include="GlobalObjects.cs" />
-    <Compile Include="InspectionManager.cs" />
     <Compile Include="Inspection\D2D.cs" />
     <Compile Include="Inspection\EBR.cs" />
     <Compile Include="Inspection\EdgeSurface.cs" />
@@ -137,6 +136,7 @@
     <Compile Include="Inspection\ProcessDefect_Wafer.cs" />
     <Compile Include="Inspection\ProcessMeasurement.cs" />
     <Compile Include="Inspection\Snap.cs" />
+    <Compile Include="MainWindow_ViewModel.cs" />
     <Compile Include="MVVM\Converter.cs" />
     <Compile Include="Recipe\CloneableRecipe.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
@@ -185,6 +185,7 @@
     <Compile Include="Settings\SettingItem.cs" />
     <Compile Include="Settings\SettingItem_Database.cs" />
     <Compile Include="Settings\SettingItem_SetupBackside.cs" />
+    <Compile Include="Settings\SettingItem_SetupCamera.cs" />
     <Compile Include="Settings\SettingItem_SetupEBR.cs" />
     <Compile Include="Settings\SettingItem_SetupEdgeside.cs" />
     <Compile Include="Settings\SettingItem_SetupFrontside.cs" />
@@ -194,6 +195,11 @@
       <DependentUpon>CloneImageViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\CloneImageViewer_ViewModel.cs" />
+    <Compile Include="UI\Logger.cs" />
+    <Compile Include="UI\LogViewer.xaml.cs">
+      <DependentUpon>LogViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\LogViewer_ViewModel.cs" />
     <Compile Include="UserControls\MapViewer.xaml.cs">
       <DependentUpon>MapViewer.xaml</DependentUpon>
     </Compile>
@@ -240,6 +246,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\CloneImageViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\LogViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

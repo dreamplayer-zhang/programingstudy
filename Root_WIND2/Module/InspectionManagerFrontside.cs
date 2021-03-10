@@ -133,7 +133,7 @@ namespace Root_WIND2
             DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
 
             // 레시피를 사용안하는 곳도 있을 있으므로...
-            works.SetRecipe(recipe);
+            //works.SetRecipe(recipe);
 
             return true;
         }

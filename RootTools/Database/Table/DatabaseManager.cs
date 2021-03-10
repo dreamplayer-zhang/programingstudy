@@ -356,7 +356,7 @@ namespace RootTools.Database
 			try
 			{
 #endif
-				SendQuery("TRUNCATE defect;");
+				//SendQuery("TRUNCATE defect;");
 				StringBuilder temp = new StringBuilder();
 				StringBuilder sbQuery = new StringBuilder();
 				StringBuilder sbColumList = new StringBuilder();

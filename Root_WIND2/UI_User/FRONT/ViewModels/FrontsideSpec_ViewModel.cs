@@ -27,7 +27,7 @@ namespace Root_WIND2.UI_User
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
 
             m_cInspItem = new ObservableCollection<InspectionItem>();
-            p_MaskList = new ObservableCollection<InspectionROI>();
+            p_MaskList = new ObservableCollection<ItemMask>();
             p_selectedMethodItem = null;
         }
 
@@ -37,21 +37,23 @@ namespace Root_WIND2.UI_User
         {
             // Mask
             this.p_MaskList.Clear();
-            MaskRecipe maskRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<MaskRecipe>();
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+            MaskRecipe maskRecipe = recipe.GetItem<MaskRecipe>();
             for (int i = 0; i < maskRecipe.MaskList.Count; i++)
             {
-                InspectionROI roi = new InspectionROI();
-                roi.p_Index = i;
-                roi.p_Size = maskRecipe.MaskList[i].Area;
-                roi.p_Data = maskRecipe.MaskList[i].ToPointLineList();
-                roi.p_Color = maskRecipe.MaskList[i].ColorIndex;
-                this.p_MaskList.Add(roi);
-            }
+                ItemMask mask = new ItemMask();
+                mask.p_Index = i;
+                mask.p_FullSize = (long)originRecipe.OriginWidth * (long)originRecipe.OriginHeight;
+                mask.p_Size = maskRecipe.MaskList[i].Area;
+                mask.p_Data = maskRecipe.MaskList[i].ToPointLineList();
+                mask.p_Color = maskRecipe.MaskList[i].ColorIndex;
 
+                this.p_MaskList.Add(mask);
+            }
 
             // Inspectio Item
             p_cInspItem.Clear();
-            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
 
             foreach (ParameterBase parameterBase in recipe.ParameterItemList)
             {
@@ -115,23 +117,23 @@ namespace Root_WIND2.UI_User
 
 
 
-        private InspectionROI m_selectedMask;
-        public InspectionROI p_SelectedMask
+        private ItemMask m_selectedMask;
+        public ItemMask p_SelectedMask
         {
             get => this.m_selectedMask;
             set
             {
-                SetProperty<InspectionROI>(ref m_selectedMask, value);
+                SetProperty<ItemMask>(ref m_selectedMask, value);
             }
         }
 
-        private ObservableCollection<InspectionROI> m_MaskList;
-        public ObservableCollection<InspectionROI> p_MaskList
+        private ObservableCollection<ItemMask> m_MaskList;
+        public ObservableCollection<ItemMask> p_MaskList
         {
             get => m_MaskList;
             set
             {
-                SetProperty<ObservableCollection<InspectionROI>>(ref m_MaskList, value);
+                SetProperty<ObservableCollection<ItemMask>>(ref m_MaskList, value);
             }
         }
 
