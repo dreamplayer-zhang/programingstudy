@@ -291,6 +291,7 @@ namespace Root_Rinse_Unloader.Module
                 {
                     EQ.p_bStop = true;
                     EQ.p_eState = EQ.eState.Error;
+                    m_alidAirEmergency.p_bSet = true;
                 }
             }
         }
