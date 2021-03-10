@@ -94,7 +94,7 @@ namespace RootTools_Vision
             Settings settings = new Settings();
             SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
 
-            SaveDefectImage(Path.Combine(settings_frontside.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
+            Tools.SaveDefectImage(Path.Combine(settings_frontside.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
 
             if (settings_frontside.UseKlarf)
             {
@@ -107,14 +107,14 @@ namespace RootTools_Vision
 
                 klarfData.SaveKlarf(settings_frontside.KlarfSavePath, false);
 
-                SaveTiffImage(settings_frontside.KlarfSavePath, MergeDefectList, 3);
+                Tools.SaveTiffImage(settings_frontside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
             }
 
             //GlobalObjects.Instance.Get<Settings>
             //string sTiffImagePath = ;
             //SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
 
-            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>()));
+            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), this.currentWorkplace));
             WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
         }
 
