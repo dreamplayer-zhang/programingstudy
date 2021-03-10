@@ -48,7 +48,7 @@ namespace RootTools_Vision
                 return;
 			}
 
-            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBuffer(this.parameterBackside.IndexChannel);
+            this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterBackside.IndexChannel);
             byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameterBackside.IndexChannel);
 
             // Inspection Param

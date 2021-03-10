@@ -43,6 +43,8 @@ namespace RootTools_Vision
         private readonly int width;
         private readonly int height;
 
+        private SharedBufferInfo sharedBufferInfo;
+        
         private IntPtr sharedBufferR_GRAY;
         private IntPtr sharedBufferG;
         private IntPtr sharedBufferB;
@@ -50,7 +52,7 @@ namespace RootTools_Vision
         private int sharedBufferWidth;
         private int sharedBufferHeight;
         private int sharedBufferByteCnt;
-
+        
         private WORK_TYPE workState;
 
         [NonSerialized] private bool isOccupied = false;
@@ -177,7 +179,7 @@ namespace RootTools_Vision
                 WorkEventManager.OnWorkplaceStateChanged(this, new WorkplaceStateChangedEventArgs(this));
             }
         }
-
+        
         public int SharedBufferWidth
         {
             get => this.sharedBufferWidth;
@@ -207,6 +209,12 @@ namespace RootTools_Vision
         {
             get => sharedBufferB;
             private set => sharedBufferB = value;
+        }
+        
+        public SharedBufferInfo SharedBufferInfo
+        {
+            get => sharedBufferInfo;
+            private set => sharedBufferInfo = value;
         }
 
         public bool IsOccupied
@@ -258,6 +266,29 @@ namespace RootTools_Vision
         /// <param name="sharedBufferB">B채널 버퍼 포인터(없을 경우 IntPtr.Zero로 셋팅)</param>
         public void SetSharedBuffer(IntPtr sharedBufferR_GRAY, int sharedBufferWidth, int sharedBufferHeight, int sharedBufferByteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB)
         {
+            this.sharedBufferInfo.PtrR_GRAY = sharedBufferR_GRAY;
+            this.sharedBufferInfo.Width = sharedBufferWidth;
+            this.sharedBufferInfo.Height = sharedBufferHeight;
+            this.sharedBufferInfo.ByteCnt = sharedBufferByteCnt;
+
+            if (sharedBufferByteCnt != 1)
+            {
+                if (sharedBufferB == IntPtr.Zero)
+                    throw new ArgumentException("SharedBufferB가 설정되지 않았습니다(ByteCnt == 3).", nameof(sharedBufferB));
+
+                if (sharedBufferG == IntPtr.Zero)
+                    throw new ArgumentException("SharedBufferG가 설정되지 않았습니다(ByteCnt == 3).", nameof(sharedBufferG));
+
+                this.sharedBufferInfo.PtrG = sharedBufferG;
+                this.sharedBufferInfo.PtrB = sharedBufferB;
+            }
+            else
+            {
+                sharedBufferB = IntPtr.Zero;
+                sharedBufferG = IntPtr.Zero;
+            }
+
+            // 기존
             this.sharedBufferR_GRAY = sharedBufferR_GRAY;
             this.sharedBufferWidth = sharedBufferWidth;
             this.sharedBufferHeight = sharedBufferHeight;
@@ -283,6 +314,9 @@ namespace RootTools_Vision
 
         public void SetSharedBuffer(SharedBufferInfo info)
         {
+            this.sharedBufferInfo = info;
+
+            // 기존
             this.sharedBufferR_GRAY = info.PtrR_GRAY;
             this.SharedBufferG = info.PtrG;
             this.SharedBufferB = info.PtrB;
@@ -291,7 +325,7 @@ namespace RootTools_Vision
             this.sharedBufferHeight = info.Height;
             this.sharedBufferByteCnt = info.ByteCnt;
         }
-
+                
         public IntPtr GetSharedBuffer(IMAGE_CHANNEL channel)
         {
             switch (channel)
@@ -305,6 +339,22 @@ namespace RootTools_Vision
             }
 
             return sharedBufferR_GRAY;
+        }
+        
+
+        public IntPtr GetSharedBufferInfo(IMAGE_CHANNEL channel)
+        {
+            switch (channel)
+            {
+                case IMAGE_CHANNEL.R_GRAY:
+                    return sharedBufferInfo.PtrR_GRAY;
+                case IMAGE_CHANNEL.G:
+                    return sharedBufferInfo.PtrG;
+                case IMAGE_CHANNEL.B:
+                    return sharedBufferInfo.PtrB;
+            }
+
+            return sharedBufferInfo.PtrR_GRAY;
         }
 
         public void SetOffset(int _offsetX, int _offsetY)
@@ -413,11 +463,22 @@ namespace RootTools_Vision
         /// <summary>
         /// 초기 설정값과 SharedBuffer만 카피?
         /// </summary>
+        /*
         public Workplace Clone()
         {
             Workplace wp = new Workplace(mapIndexX, mapIndexY, positionX, positionY, Width, Height, Index);
 
             wp.SetSharedBuffer(this.sharedBufferR_GRAY, this.sharedBufferWidth, this.SharedBufferHeight, this.sharedBufferHeight, this.sharedBufferG, this.sharedBufferB);
+
+            return wp;
+        }
+        */
+
+        public Workplace Clone()
+        {
+            Workplace wp = new Workplace(mapIndexX, mapIndexY, positionX, positionY, Width, Height, Index);
+
+            wp.SetSharedBuffer(this.sharedBufferInfo);
 
             return wp;
         }
