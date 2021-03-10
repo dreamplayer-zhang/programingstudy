@@ -191,7 +191,7 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region ToolBox
-        TCPIPServer m_tcpip; 
+        public TCPIPServer m_tcpip; 
         public override void GetTools(bool bInit)
         {
             GetToolsDIO();

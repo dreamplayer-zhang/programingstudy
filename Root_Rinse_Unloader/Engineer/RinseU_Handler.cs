@@ -62,6 +62,7 @@ namespace Root_Rinse_Unloader.Engineer
         #region StateHome
         public string StateHome()
         {
+            m_loader.RunPickerDown(false);
             string sInfo = StateHome(p_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;

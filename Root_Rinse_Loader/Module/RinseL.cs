@@ -230,7 +230,7 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region GAF
-        ALID m_alidTCPConnect;
+        public ALID m_alidTCPConnect;
         void InitALID()
         {
             m_alidTCPConnect = m_gaf.GetALID(this, "Unloader Disconnect", "Unloader Disconnect");
