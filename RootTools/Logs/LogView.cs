@@ -124,7 +124,7 @@ namespace RootTools
 
         void RunTreeTCPIP(Tree tree)
         {
-            m_client.RunTree(tree); 
+            if (m_client != null) m_client.RunTree(tree); 
         }
         #endregion
 
