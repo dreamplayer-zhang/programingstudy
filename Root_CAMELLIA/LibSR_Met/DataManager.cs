@@ -21,8 +21,6 @@ namespace Root_CAMELLIA.LibSR_Met
         public bool bDataExist = false;
         public int nCalcDataNum = 0;
         public int nNIRDataNum = 0;
-        public int nThicknessDataNum = 0;
-        public float nStartWavelegth = 0;
         public double dX = 0.0;
         public double dY = 0.0;
         public double dGoF = 0.0;
@@ -77,6 +75,11 @@ namespace Root_CAMELLIA.LibSR_Met
             linearScale = new LinearScale();
         }
 
+        //Get Transmittance 
+        public List<double> n = new List<double>();
+        public List<double> k = new List<double>();
+        public List<double> wavelength = new List<double>();
+
         //추후 제거 20.12.23 Met.DS 추가 calcassistant
         public string sRefName;   //물질 이름   //레시피 저장 필요
         public bool bFix;    //두꼐 고정 유무
@@ -85,9 +88,7 @@ namespace Root_CAMELLIA.LibSR_Met
         public double dTargetThickness;   //투과율계산용 타겟 두께
         public bool bUseTargetTHK;  //투과율 계산시 타겟 두께를 쓸것인가 여부
         public LinearScale scales = new LinearScale();  //190627
-        public List<double> n = new List<double>();
-        public List<double> k = new List<double>();
-        public List<double> wavelength = new List<double>();
+        
         //
     }
 
@@ -143,6 +144,8 @@ namespace Root_CAMELLIA.LibSR_Met
         public bool bThickness = true;
         public bool bTransmittance = true;
         public bool bViewCalRGraph = true;
+        public int nThicknessDataNum = 0;
+        public float nStartWavelegth = 0;
 
 
         //추후 제거 DS 2021.01.05 추가
@@ -329,21 +332,27 @@ namespace Root_CAMELLIA.LibSR_Met
                 for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
                 {
                     m_RawData[n].bDataExist = false;
-                    m_RawData[n].Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
-                    m_RawData[n].Reflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
-                    m_RawData[n].VIS_Reflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
-                    m_RawData[n].VIS_Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
-                    m_RawData[n].Transmittance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
-                    m_RawData[n].CalcReflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
-                    m_RawData[n].eV = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    //m_RawData[n].Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].Wavelength = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
+                    //m_RawData[n].Reflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].Reflectance = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
+                    //m_RawData[n].VIS_Reflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].VIS_Reflectance = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
+                    //m_RawData[n].VIS_Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].VIS_Wavelength = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
+                    //m_RawData[n].Transmittance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].Transmittance = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
+                    //m_RawData[n].CalcReflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].CalcReflectance = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
+                    //m_RawData[n].eV = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].eV = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
                     m_RawData[n].Thickness.Clear();
                     m_RawData[n].dX = 0.0;
                     m_RawData[n].dY = 0.0;
                     m_RawData[n].dGoF = 0.0;
                     m_RawData[n].nCalcDataNum = 0;
                     m_RawData[n].nNIRDataNum = 0;
-                    m_RawData[n].nThicknessDataNum = 0;
-                    m_RawData[n].nStartWavelegth = 0;
+                    
     }
 
                 return true;
@@ -373,7 +382,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
                 Array.Reverse(data.Transmittance);
                 sw.WriteLine("Wavelength[nm],Reflectance[%],Transmittance[%]");
-                for (int n = 0; n < data.Wavelength.Length; n++)
+                for (int n = 0; n < data.Transmittance.Length ; n++)
                 {
                     sw.WriteLine("{0},{1},{2}", data.Wavelength[n], data.Reflectance[n], data.Transmittance[n]);
                 }

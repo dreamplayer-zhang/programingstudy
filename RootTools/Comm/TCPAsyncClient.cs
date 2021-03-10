@@ -54,7 +54,7 @@ namespace RootTools.Comm
         {
             bool bUse = tree.Set(p_bUse, false, "Use", "Use Server");
             p_sIP = tree.Set(_sIP, "127.0.0.1", "IP", "IP Address");
-            p_nPort = tree.Set(p_nPort, 5000, "Port", "Port Number");
+            p_nPort = tree.Set(p_nPort, p_nPort, "Port", "Port Number");
             p_bUse = bUse;
         }
         #endregion

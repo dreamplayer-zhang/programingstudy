@@ -282,6 +282,9 @@
     <Compile Include="Converter\ValueToUIValueConverter.cs" />
     <Compile Include="LibSR_Met\Calculation.cs" />
     <Compile Include="LibSR_Met\ConstValue.cs" />
+    <Compile Include="LibSR_Met\CountGraph.xaml.cs">
+      <DependentUpon>CountGraph.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LibSR_Met\DataManager.cs" />
     <Compile Include="LibSR_Met\ExtensionMethod.cs" />
     <Compile Include="LibSR_Met\LogManager.cs" />
@@ -411,6 +414,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\Temp.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibSR_Met\CountGraph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,15 +19,55 @@ namespace Camellia2Stage
     /// <summary>
     /// Interaction logic for UserControl1.xaml
     /// </summary>
-    public partial class CamelliaStage : UserControl
+    public partial class CamelliaStage : UserControl, INotifyPropertyChanged
     {
         public CamelliaStage()
         {
             InitializeComponent();
         }
 
-        Point offsetPt = new Point();
-        int nScale = 1;
+        double _zoomScale = 1;
+        public double ZoomScale
+        {
+            get
+            {
+                return _zoomScale;
+            }
+            set
+            {
+                _zoomScale = value;
+                OnPropertyChanged("ZoomScale");
+            }
+        }
+
+        double _renderCenterX = 0;
+        public double RenderCenterX
+        {
+            get
+            {
+                return _renderCenterX;
+            }
+            set
+            {
+                _renderCenterX = value;
+                OnPropertyChanged("RenderCenterX");
+            }
+        }
+
+        double _renderCenterY = 0;
+        public double RenderCenterY
+        {
+            get
+            {
+                return _renderCenterY;
+            }
+            set
+            {
+                _renderCenterY = value;
+                OnPropertyChanged("RenderCenterY");
+            }
+        }
+
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if(CanvasScaleTransform.ScaleX == 8)
@@ -88,6 +129,13 @@ namespace Camellia2Stage
 
             //matrix.ScaleAtPrepend(scale, scale, position.X, position.Y);
             //transform.Matrix = matrix;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName = null)
+        {
+            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

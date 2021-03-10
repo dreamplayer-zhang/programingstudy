@@ -756,9 +756,9 @@ namespace Root_CAMELLIA
                     {
                         isRecipeLoad = true;
                     }
-                    RecipeViewModel.UpdateListView(!isRecipeLoad);
+                    RecipeViewModel.UpdateListView(isRecipeLoad);
                     RecipeViewModel.UpdateLayerGridView();
-                    RecipeViewModel.UpdateView(!isRecipeLoad);
+                    RecipeViewModel.UpdateView(isRecipeLoad);
 
                     DrawMeasureRoute();
 

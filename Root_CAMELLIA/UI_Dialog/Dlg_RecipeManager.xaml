@@ -501,77 +501,130 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <Grid>
-                            <stage:CamelliaStage></stage:CamelliaStage>
+                            <!--<Viewbox Margin="10" Width="auto" Grid.Row="0">
+                                <stage:CamelliaStage DataContext="{Binding CamelliaStage}"/>
+                            </Viewbox>
+                            <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                                <ItemsControl ItemsSource="{Binding p_DrawPointElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Viewbox>
+                            <Viewbox Margin="10" Width="auto" Grid.Row="0" Panel.ZIndex="99">
+                                <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFfFFF" Focusable="True">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseMove">
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseMove" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseWheel" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseWheel" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseLeftButtonDown" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonDown" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseLeftButtonUp" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonUp" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseRightButtonDown" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseRightButtonDown" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseRightButtonUp" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseRightButtonUp" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseEnter" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseEnter" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseLeave" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeave" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="KeyDown" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnCanvasKeyDown" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="KeyUp" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnCanvasKeyUp" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Canvas>
+                            </Viewbox>-->
+                            <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                                <ItemsControl ItemsSource="{Binding p_DrawElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                            </Canvas>
+
+
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Viewbox>
+                            <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                                <ItemsControl ItemsSource="{Binding p_DrawPointElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                            </Canvas>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Viewbox>
+                            <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                                <ItemsControl ItemsSource="{Binding p_DrawSelectElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Viewbox>
+                            <Viewbox Margin="10" Width="auto" Grid.Row="0" Panel.ZIndex="99">
+                                <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFfFFF" Focusable="True">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseMove">
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseMove" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseWheel" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseWheel" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseLeftButtonDown" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonDown" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseLeftButtonUp" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonUp" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseRightButtonDown" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseRightButtonDown" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseRightButtonUp" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseRightButtonUp" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseEnter" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseEnter" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseLeave" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeave" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="KeyDown" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnCanvasKeyDown" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="KeyUp" >
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnCanvasKeyUp" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Canvas>
+                            </Viewbox>
                         </Grid>
-                        <!--<Viewbox Margin="10" Width="auto" Grid.Row="0">
-                            <ItemsControl ItemsSource="{Binding p_DrawElement}"
-                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
-                        </Viewbox>
-                        <Viewbox Margin="10" Width="auto" Grid.Row="0">
-                            <ItemsControl ItemsSource="{Binding p_DrawPointElement}"
-                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
-                        </Viewbox>
-                        <Viewbox Margin="10" Width="auto" Grid.Row="0">
-                            <ItemsControl ItemsSource="{Binding p_DrawSelectElement}"
-                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
-                        </Viewbox>
-                        <Viewbox Margin="10" Width="auto" Grid.Row="0" Panel.ZIndex="99">
-                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFfFFF" Focusable="True">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseMove">
-                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseMove" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseWheel" >
-                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseWheel" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseLeftButtonDown" >
-                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonDown" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseLeftButtonUp" >
-                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonUp" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseRightButtonDown" >
-                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseRightButtonDown" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseRightButtonUp" >
-                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseRightButtonUp" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseEnter" >
-                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseEnter" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseLeave" >
-                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeave" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="KeyDown" >
-                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnCanvasKeyDown" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="KeyUp" >
-                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnCanvasKeyUp" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </Canvas>
-                        </Viewbox>-->
                     </Grid>
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
@@ -750,15 +803,15 @@
 
                 <Grid Grid.Row="3">
                     <GroupBox Header="PreView">
-                        <stage:CamelliaStage></stage:CamelliaStage>
-                        <!--<Viewbox Margin="10">
+                        <!--<stage:CamelliaStage></stage:CamelliaStage>-->
+                        <Viewbox Margin="10">
                             <ItemsControl ItemsSource="{Binding p_PreviewDrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas x:Name="StagePreView" Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
-                                            --><!--<i:Interaction.Triggers>
+                                            <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseMove">
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
                                                 </i:EventTrigger>
@@ -768,12 +821,12 @@
                                                 <i:EventTrigger EventName="MouseLeftButtonDown" >
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
                                                 </i:EventTrigger>
-                                            </i:Interaction.Triggers>--><!--
+                                            </i:Interaction.Triggers>
                                         </Canvas>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
-                        </Viewbox>-->
+                        </Viewbox>
                     </GroupBox>
                 </Grid>
             </Grid>
