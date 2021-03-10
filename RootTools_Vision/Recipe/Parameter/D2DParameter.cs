@@ -32,7 +32,7 @@ namespace RootTools_Vision
         Line,
         BeforeInsp,
     }
-    public class D2DParameter : ParameterBase, IMaskInspection, IColorInspection, IDisplaySpecSummary
+    public class D2DParameter : ParameterBase, IMaskInspection, IColorInspection, IDisplaySpecSummary, IFrontsideInspection
     {
         public  D2DParameter() : base(typeof(D2D))
         {

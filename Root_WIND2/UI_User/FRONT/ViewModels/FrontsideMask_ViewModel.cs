@@ -72,11 +72,13 @@ namespace Root_WIND2.UI_User
             p_cInspROI.Clear();
 
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
             foreach (RecipeType_Mask mask in recipe.GetItem<MaskRecipe>().MaskList)
             {
-                InspectionROI roi = new InspectionROI();
+                ItemMask roi = new ItemMask();
                 roi.p_Color = mask.ColorIndex;
                 roi.p_Index = p_cInspROI.Count();
+                roi.p_FullSize = (long)(originRecipe.OriginWidth) * (long)(originRecipe.OriginHeight);
                 roi.p_Data = mask.ToPointLineList();
 
                 p_cInspROI.Add(roi);
@@ -92,7 +94,7 @@ namespace Root_WIND2.UI_User
         /// <summary>
         /// ROI List
         /// </summary>
-        public ObservableCollection<InspectionROI> p_cInspROI
+        public ObservableCollection<ItemMask> p_cInspROI
         {
             get
             {
@@ -103,11 +105,11 @@ namespace Root_WIND2.UI_User
                 m_cInspROI = value;
             }
         }
-        private ObservableCollection<InspectionROI> m_cInspROI = new ObservableCollection<InspectionROI>();
+        private ObservableCollection<ItemMask> m_cInspROI = new ObservableCollection<ItemMask>();
         /// <summary>
         /// Selected ROI
         /// </summary>
-        public InspectionROI p_SelectedROI
+        public ItemMask p_SelectedROI
         {
             get
             {
@@ -127,7 +129,7 @@ namespace Root_WIND2.UI_User
                     _ReadROI();
             }
         }
-        private InspectionROI m_SelectedROI;
+        private ItemMask m_SelectedROI;
         /// <summary>
         /// Enable Draw Tool
         /// </summary>
@@ -1623,7 +1625,7 @@ namespace Root_WIND2.UI_User
             byte* bitmapPtr = (byte*)ptrMem.ToPointer();
             UInt32* fPtr = (UInt32*)bitmapPtr;
 
-            foreach (InspectionROI roi in p_cInspROI)
+            foreach (ItemMask roi in p_cInspROI)
             {
                 UInt32 clr = roi.p_Color.A;
                 clr = ((UInt32)clr << 8);
@@ -1732,11 +1734,11 @@ namespace Root_WIND2.UI_User
             if (p_SelectedROI == null)
                 return;
             p_SelectedROI.p_Data.Clear();
-            PointLine DotLine = new PointLine();
+            List<PointLine> tempPointLines = new List<PointLine>();
             bool bStart = false;
             CPoint size = p_ImageData.p_Size;
             int selectIndex = p_cInspROI.IndexOf(p_SelectedROI);
-
+            PointLine pointLine = null;
             for (int j = 0; j < originHeight; j++)
             {
                 for (int i = 0; i < originWidth; i++)
@@ -1746,22 +1748,23 @@ namespace Root_WIND2.UI_User
                     {
                         if (!bStart)
                         {
-                            DotLine = new PointLine();
-                            DotLine.StartPt = new CPoint(i, j);
+                            pointLine = new PointLine();
+                            pointLine.StartPt = new CPoint(i, j);
                             bStart = true;
                         }
                     }
-                    if (a == 0)
+                    if (a == 0 || i == originWidth - 1)
                     {
                         if (bStart)
                         {
-                            DotLine.Width = i - DotLine.StartPt.X;
+                            pointLine.Width = i - pointLine.StartPt.X + 1;
                             bStart = false;
-                            p_SelectedROI.p_Data.Add(DotLine);
+                            tempPointLines.Add(pointLine);
                         }
                     }
-                }
+                }                    
             }
+            p_SelectedROI.p_Data = tempPointLines;
             SetRecipeData();
         }
 
@@ -1842,13 +1845,16 @@ namespace Root_WIND2.UI_User
 
         private void _CreateROI()
         {
-            InspectionROI roi = new InspectionROI();
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            OriginRecipe origin = recipe.GetItem<OriginRecipe>();
+
+            ItemMask roi = new ItemMask();
             roi.p_Color = Colors.AliceBlue;
             roi.p_Index = p_cInspROI.Count();
+            roi.p_FullSize = (long)(origin.OriginWidth) * (long)(origin.OriginHeight);
+
             p_cInspROI.Add(roi);
             p_SelectedROI = p_cInspROI.Last();
-
-            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
 
             recipe.GetItem<MaskRecipe>().MaskList.Add(new RecipeType_Mask());
         }
@@ -1926,11 +1932,13 @@ namespace Root_WIND2.UI_User
             p_cInspROI.Clear();
 
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
             foreach (RecipeType_Mask mask in recipe.GetItem<MaskRecipe>().MaskList)
             {
-                InspectionROI roi = new InspectionROI();
+                ItemMask roi = new ItemMask();
                 roi.p_Color = Colors.AliceBlue;
                 roi.p_Index = p_cInspROI.Count();
+                roi.p_FullSize = (long)(originRecipe.OriginWidth) * (long)(originRecipe.OriginHeight);
 
                 List<PointLine> pointLines = new List<PointLine>();
                 mask.CopyPointLinesTo(ref pointLines);

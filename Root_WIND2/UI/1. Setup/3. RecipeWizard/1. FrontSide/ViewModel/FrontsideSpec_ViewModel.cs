@@ -100,7 +100,7 @@ namespace Root_WIND2
 
         public void ComboBoxItemChanged_Mask_Callback(object obj, EventArgs args)
         {
-            InspectionROI mask = (InspectionROI)obj;
+            ItemMask mask = (ItemMask)obj;
         }
 
         public void ComboBoxItemChanged_Method_Callback(object obj, EventArgs args)

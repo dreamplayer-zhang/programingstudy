@@ -3,6 +3,7 @@ using RootTools.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace RootTools_Vision
         BAD_CHIP = 0b10000000,
     }
 
+    [Serializable]
     public enum PREWORKDATA_KEY // PreworkdataList의 index로 반드시 0부터 빈틈없이 추가
     {
         D2D_GOLDEN_IMAGE = 0,
@@ -28,7 +30,7 @@ namespace RootTools_Vision
     /// - Image Buffer를 직접할당하지 않습니다.
     /// - offset과 trans 이외의 값은 처음 생성할 떄 값을 할당받고 변경되지 않습니다.
     /// </summary>
-    public class Workplace : ObservableObject
+    public class Workplace : ObservableObject, ISerializable
     {
         #region [Members]
         private readonly int index;
@@ -53,15 +55,62 @@ namespace RootTools_Vision
 
         private WORK_TYPE workState;
 
-        [NonSerialized] private bool isOccupied = false;
-
-        [NonSerialized] private Dictionary<PREWORKDATA_KEY, object> preworkdataDicitonary = new Dictionary<PREWORKDATA_KEY, object>();
-
-        [NonSerialized] private int subState;
-
         [NonSerialized] private List<Defect> defectList = new List<Defect>();
         [NonSerialized] private List<Measurement> measureList = new List<Measurement>();
+        [NonSerialized] private Dictionary<PREWORKDATA_KEY, object> preworkdataDicitonary = new Dictionary<PREWORKDATA_KEY, object>();
 
+        [NonSerialized] private bool isOccupied = false;
+        [NonSerialized] private int subState;
+
+        public Workplace(SerializationInfo info, StreamingContext context)
+        {
+            this.index = (int)info.GetValue(nameof(index), typeof(int));
+            this.mapIndexX = (int)info.GetValue(nameof(mapIndexX), typeof(int));
+            this.mapIndexY = (int)info.GetValue(nameof(mapIndexY), typeof(int));
+            this.positionX = (int)info.GetValue(nameof(positionX), typeof(int));
+            this.positionY = (int)info.GetValue(nameof(positionY), typeof(int));
+            this.offsetX = (int)info.GetValue(nameof(offsetX), typeof(int));
+            this.offsetY = (int)info.GetValue(nameof(offsetY), typeof(int));
+            this.transX = (int)info.GetValue(nameof(transX), typeof(int));
+            this.transY = (int)info.GetValue(nameof(transY), typeof(int));
+            this.width = (int)info.GetValue(nameof(width), typeof(int));
+            this.height = (int)info.GetValue(nameof(height), typeof(int));
+            this.sharedBufferR_GRAY = (IntPtr)info.GetValue(nameof(sharedBufferR_GRAY), typeof(IntPtr));
+            this.sharedBufferG = (IntPtr)info.GetValue(nameof(sharedBufferG), typeof(IntPtr));
+            this.sharedBufferB = (IntPtr)info.GetValue(nameof(sharedBufferB), typeof(IntPtr));
+            this.sharedBufferWidth = (int)info.GetValue(nameof(sharedBufferWidth), typeof(int));
+            this.sharedBufferHeight = (int)info.GetValue(nameof(sharedBufferHeight), typeof(int));
+            this.sharedBufferByteCnt = (int)info.GetValue(nameof(sharedBufferByteCnt), typeof(int));
+            this.workState = (WORK_TYPE)info.GetValue(nameof(workState), typeof(WORK_TYPE));
+            this.defectList = (List<Defect>)info.GetValue(nameof(defectList), typeof(List<Defect>));
+            this.measureList = (List<Measurement>)info.GetValue(nameof(measureList), typeof(List<Measurement>));
+            this.preworkdataDicitonary = (Dictionary<PREWORKDATA_KEY, object>)info.GetValue(nameof(preworkdataDicitonary), typeof(Dictionary<PREWORKDATA_KEY, object>));
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(index), index);
+            info.AddValue(nameof(mapIndexX), mapIndexX);
+            info.AddValue(nameof(mapIndexY), mapIndexY);
+            info.AddValue(nameof(positionX), positionX);
+            info.AddValue(nameof(positionY), positionY);
+            info.AddValue(nameof(offsetX), offsetX);
+            info.AddValue(nameof(offsetY), offsetY);
+            info.AddValue(nameof(transX), transX);
+            info.AddValue(nameof(transY), transY);
+            info.AddValue(nameof(width), width);
+            info.AddValue(nameof(height), height);
+            info.AddValue(nameof(sharedBufferR_GRAY), sharedBufferR_GRAY);
+            info.AddValue(nameof(sharedBufferG), sharedBufferG);
+            info.AddValue(nameof(sharedBufferB), sharedBufferB);
+            info.AddValue(nameof(sharedBufferWidth), sharedBufferWidth);
+            info.AddValue(nameof(sharedBufferHeight), sharedBufferHeight);
+            info.AddValue(nameof(sharedBufferByteCnt), sharedBufferByteCnt);
+            info.AddValue(nameof(workState), workState);
+            info.AddValue(nameof(defectList), defectList, typeof(List<Defect>));
+            info.AddValue(nameof(measureList), measureList, typeof(List<Measurement>));
+            info.AddValue(nameof(preworkdataDicitonary), preworkdataDicitonary, typeof(Dictionary<PREWORKDATA_KEY, object>));
+        }
         #endregion
 
         #region [Getter Setter]
@@ -236,6 +285,16 @@ namespace RootTools_Vision
         #endregion
 
 
+        public Workplace()
+        {
+            this.mapIndexX = 0;
+            this.mapIndexY = 0;
+            this.positionX = 0;
+            this.positionY = 0;
+            this.width = 0;
+            this.height = 0;
+            this.index = 0;
+        }
         public Workplace(int mapX, int mapY, int posX, int posY, int width, int height, int index)
         {
             this.mapIndexX = mapX;
@@ -363,6 +422,8 @@ namespace RootTools_Vision
                 chipIdxX,
                 chipIdxY);
 
+            if (defectList == null) defectList = new List<Defect>();
+
             defectList.Add(defect);
         }
 
@@ -421,5 +482,7 @@ namespace RootTools_Vision
 
             return wp;
         }
+
+
     }
 }

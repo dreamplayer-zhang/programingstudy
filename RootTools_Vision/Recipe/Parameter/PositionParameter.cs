@@ -15,7 +15,7 @@ namespace RootTools_Vision
         Independent
     }
 
-    public class PositionParameter : ParameterBase, IMaskInspection, IColorInspection
+    public class PositionParameter : ParameterBase, IMaskInspection, IColorInspection, IFrontsideInspection
     {
         public PositionParameter() : base(typeof(Position))
         {

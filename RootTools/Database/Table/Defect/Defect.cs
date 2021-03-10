@@ -7,6 +7,7 @@ using System.Windows;
 
 namespace RootTools.Database
 {
+    [Serializable]
     public class Defect
     {
         // 각 Inspection에서 올라오는 결과 데이터

@@ -23,10 +23,15 @@ namespace RootTools_Vision
     }
 
     public delegate void PipeCommMessageReceivedHandler(PipeProtocol protocol);
+    public delegate void PipeCommConnection();
+    
 
     public class PipeComm
     {
         public event PipeCommMessageReceivedHandler MessageReceived;
+        public event PipeCommConnection Connected;
+        public event PipeCommConnection DisConnected;
+
 
         public PipeComm(string pipeName, PIPE_MODE mode)
         {
@@ -50,6 +55,11 @@ namespace RootTools_Vision
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern int ConnectNamedPipe(
+           SafeFileHandle hNamedPipe,
+           IntPtr lpOverlapped);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern int WaitNamedPipe(
            SafeFileHandle hNamedPipe,
            IntPtr lpOverlapped);
 
@@ -78,17 +88,18 @@ namespace RootTools_Vision
         private FileStream stream;
         private SafeFileHandle handle;
         Thread readThread;
-        bool connected;
+        bool isConnected;
 
         Thread listenThread;
         //bool running;
 
+        bool isConnecting;
         #endregion
 
         #region [Properties]
-        public bool Connected
+        public bool IsConnected
         {
-            get { return this.connected; }
+            get { return this.isConnected; }
         }
 
         public string PipeName
@@ -119,15 +130,20 @@ namespace RootTools_Vision
 
             //could not create handle - server probably not running
             if (this.handle.IsInvalid)
+            {
+                Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "Connection failed");
                 return;
-
-            this.connected = true;
+            }
 
             this.stream = new FileStream(this.handle, FileAccess.ReadWrite, BUFFER_SIZE, true);
 
             //start listening for messages
             this.readThread = new Thread(new ThreadStart(Read));
             this.readThread.Start();
+
+            this.isConnected = true;
+            if (this.Connected != null)
+                this.Connected();
         }
         #endregion
 
@@ -140,45 +156,69 @@ namespace RootTools_Vision
                 throw new ArgumentException("Client는 Listen Method를 사용할 수 없습니다");
             }
 
-            //start the listening thread
             this.listenThread = new Thread(new ThreadStart(ListenForClients));
             this.listenThread.Start();
 
             //this.running = true;
         }
 
+        public void Exit()
+        {
+            if (this.listenThread != null)
+                this.listenThread.Abort();
+        }
+
         private void ListenForClients()
         {
-            while (true)
+            if(this.isConnected == false && this.isConnecting == false)
             {
+                this.isConnecting = true;
+                Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "Try Listen...");
                 SafeFileHandle clientHandle =
                 CreateNamedPipe(
-                     @"\\.\pipe\" + this.pipeName,
-                     DUPLEX | FILE_FLAG_OVERLAPPED,
-                     0,
-                     255,
-                     BUFFER_SIZE,
-                     BUFFER_SIZE,
-                     0,
-                     IntPtr.Zero);
+                        @"\\.\pipe\" + this.pipeName,
+                        DUPLEX | FILE_FLAG_OVERLAPPED,
+                        0,
+                        255,
+                        BUFFER_SIZE,
+                        BUFFER_SIZE,
+                        5000,
+                        IntPtr.Zero);
 
                 //could not create named pipe
                 if (clientHandle.IsInvalid)
+                {
+                    Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "Listen Failed : Invalid Handle");
+                    this.isConnecting = false;
                     return;
-
+                }
+            
                 int success = ConnectNamedPipe(clientHandle, IntPtr.Zero);
 
                 //could not connect client
                 if (success == 0)
+                {
+                    Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "Listen Failed");
+                    this.isConnecting = false;
                     return;
+                }
+
+                Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "Connected");
 
                 handle = clientHandle;
                 stream = new FileStream(handle, FileAccess.ReadWrite, BUFFER_SIZE, true);
 
-                this.connected = true;
+                this.isConnected = true;
+                if (this.Connected != null)
+                    this.Connected();
+                this.isConnecting = false;
 
                 Thread readThread = new Thread(new ThreadStart(Read));
                 readThread.Start();
+            }
+            else
+            {
+                Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "이미 Client가 연결되었거나 연결 시도 중입니다.");
             }
         }
         #endregion
@@ -186,6 +226,7 @@ namespace RootTools_Vision
         #region [Read/Write]
         private void Read()
         {
+            Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "Message Read Start");
             byte[] bufferMsgType = new byte[sizeof(int)];
             byte[] bufferMsgSize = new byte[sizeof(int)];
             byte[] bufferDataTypeSize = new byte[sizeof(int)];
@@ -218,6 +259,8 @@ namespace RootTools_Vision
                         case PIPE_MESSAGE_TYPE.Message:
                             break;
                         case PIPE_MESSAGE_TYPE.Command:
+                            break;
+                        case PIPE_MESSAGE_TYPE.Process:
                             break;
                         case PIPE_MESSAGE_TYPE.Event:
                         case PIPE_MESSAGE_TYPE.Data:
@@ -258,14 +301,18 @@ namespace RootTools_Vision
                     stream.Flush();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show("Connection 종료\n"+ex.Message);
+                //MessageBox.Show("Connection 종료\n"+ex.Message);
+                Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "예외발생 Connection 종료 : " + ex.Message);
             }
             finally
             {
                 stream.Close();
                 handle.Close();
+                this.isConnected = false;
+                if (this.DisConnected != null)
+                    this.DisConnected();
             }
             if(handle.IsClosed == false)
             {
@@ -278,66 +325,74 @@ namespace RootTools_Vision
         private object lockObj = new object();
         public void Write(PipeProtocol protocol)
         {
-            lock(lockObj)
+            try
             {
-                if(stream == null)
+                lock (lockObj)
                 {
-                    MessageBox.Show("연결된 Client가 없습니다.");
-                    return;
-                }
-                byte[] bufferMsgType = BitConverter.GetBytes((int)protocol.msgType);
-                stream.Write(bufferMsgType, 0, bufferMsgType.Length);
+                    if (stream == null)
+                    {
+                        MessageBox.Show("연결된 Client가 없습니다.");
+                        return;
+                    }
+                    byte[] bufferMsgType = BitConverter.GetBytes((int)protocol.msgType);
+                    stream.Write(bufferMsgType, 0, bufferMsgType.Length);
 
-                byte[] bufferMsg = Tools.ObjectToByteArray<string>(protocol.msg);
-                byte[] bufferMsgSize = BitConverter.GetBytes(bufferMsg.Length);
+                    byte[] bufferMsg = Tools.ObjectToByteArray<string>(protocol.msg);
+                    byte[] bufferMsgSize = BitConverter.GetBytes(bufferMsg.Length);
 
-                stream.Write(bufferMsgSize, 0, bufferMsgSize.Length);
-                stream.Write(bufferMsg, 0, bufferMsg.Length);
+                    stream.Write(bufferMsgSize, 0, bufferMsgSize.Length);
+                    stream.Write(bufferMsg, 0, bufferMsg.Length);
 
-                switch (protocol.msgType)
-                {
-                    case PIPE_MESSAGE_TYPE.Message:
-                        break;
-                    case PIPE_MESSAGE_TYPE.Command:
-                        break;
-                    case PIPE_MESSAGE_TYPE.Event:
-                        {
-                            byte[] bufferDataType = Tools.ObejctToByteArray(protocol.dataType);
-                            byte[] bufferDataTypeSize = BitConverter.GetBytes(bufferDataType.Length);
-
-                            if(protocol.data == null)
+                    switch (protocol.msgType)
+                    {
+                        case PIPE_MESSAGE_TYPE.Message:
+                            break;
+                        case PIPE_MESSAGE_TYPE.Command:
+                            break;
+                        case PIPE_MESSAGE_TYPE.Process:
+                            break;
+                        case PIPE_MESSAGE_TYPE.Event:
                             {
-                                break;
+                                byte[] bufferDataType = Tools.ObejctToByteArray(protocol.dataType);
+                                byte[] bufferDataTypeSize = BitConverter.GetBytes(bufferDataType.Length);
+
+                                if (protocol.data == null)
+                                {
+                                    break;
+                                }
+                                byte[] bufferData = Tools.ObjectToByteArray(protocol.data);
+                                byte[] bufferDataSize = BitConverter.GetBytes(bufferData.Length);
+
+                                stream.Write(bufferDataTypeSize, 0, sizeof(int));
+                                stream.Write(bufferDataType, 0, bufferDataType.Length);
+                                stream.Write(bufferDataSize, 0, sizeof(int));
+                                stream.Write(bufferData, 0, bufferData.Length);
                             }
-                            byte[] bufferData = Tools.ObjectToByteArray(protocol.data);
-                            byte[] bufferDataSize = BitConverter.GetBytes(bufferData.Length);
+                            break;
+                        case PIPE_MESSAGE_TYPE.Data:
+                            {
+                                byte[] bufferDataType = Tools.ObejctToByteArray(protocol.dataType);
+                                byte[] bufferDataTypeSize = BitConverter.GetBytes(bufferDataType.Length);
 
-                            stream.Write(bufferDataTypeSize, 0, sizeof(int));
-                            stream.Write(bufferDataType, 0, bufferDataType.Length);
-                            stream.Write(bufferDataSize, 0, sizeof(int));
-                            stream.Write(bufferData, 0, bufferData.Length);
-                        }
-                        break;
-                    case PIPE_MESSAGE_TYPE.Data:
-                        {
-                            byte[] bufferDataType = Tools.ObejctToByteArray(protocol.dataType);
-                            byte[] bufferDataTypeSize = BitConverter.GetBytes(bufferDataType.Length);
+                                byte[] bufferData = Tools.ObjectToByteArray(protocol.data);
+                                byte[] bufferDataSize = BitConverter.GetBytes(bufferData.Length);
 
-                            byte[] bufferData = Tools.ObjectToByteArray(protocol.data);
-                            byte[] bufferDataSize = BitConverter.GetBytes(bufferData.Length);
+                                stream.Write(bufferDataTypeSize, 0, sizeof(int));
+                                stream.Write(bufferDataType, 0, bufferDataType.Length);
+                                stream.Write(bufferDataSize, 0, sizeof(int));
+                                stream.Write(bufferData, 0, bufferData.Length);
+                            }
+                            break;
+                    }
+                    stream.Flush();
 
-                            stream.Write(bufferDataTypeSize, 0, sizeof(int));
-                            stream.Write(bufferDataType, 0, bufferDataType.Length);
-                            stream.Write(bufferDataSize, 0, sizeof(int));
-                            stream.Write(bufferData, 0, bufferData.Length);
-                        }
-                        break;
                 }
-
-                stream.Flush();
+            }
+            catch(Exception ex)
+            {
+                Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "예외발생 Connection 종료 : " + ex.Message);
             }
         }
         #endregion
     }
-
 }

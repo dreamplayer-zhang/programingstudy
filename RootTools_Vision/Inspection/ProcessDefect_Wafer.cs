@@ -65,7 +65,11 @@ namespace RootTools_Vision
 
             //Workplace displayDefect = new Workplace();
             foreach (Defect defect in MergeDefectList)
+            {
+                if (this.currentWorkplace.DefectList == null) continue;
                 this.currentWorkplace.DefectList.Add(defect);
+            }
+                
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
@@ -89,28 +93,30 @@ namespace RootTools_Vision
                 //}
             }
 
-            SettingItem_SetupFrontside settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
+            Settings settings = new Settings();
+            SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
 
-            SaveDefectImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
+            SaveDefectImage(Path.Combine(settings_frontside.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
 
-            if (settings.UseKlarf)
+            if (settings_frontside.UseKlarf)
             {
-                Directory.CreateDirectory(settings.KlarfSavePath);
+                KlarfData_Lot klarfData = new KlarfData_Lot();
+                Directory.CreateDirectory(settings_frontside.KlarfSavePath);
 
-                GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
-                GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
-                GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+                klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
+                klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+                klarfData.SetResultTimeStamp();
 
-                GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
+                klarfData.SaveKlarf(settings_frontside.KlarfSavePath, false);
 
-                SaveTiffImage(settings.KlarfSavePath, MergeDefectList, 3);
+                SaveTiffImage(settings_frontside.KlarfSavePath, MergeDefectList, 3);
             }
 
             //GlobalObjects.Instance.Get<Settings>
             //string sTiffImagePath = ;
             //SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
 
-            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
+            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>()));
             WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
         }
 
@@ -124,8 +130,13 @@ namespace RootTools_Vision
             List<Defect> DefectList = new List<Defect>();
 
             foreach (Workplace workplace in workplaceBundle)
+            {
+                if (workplace.DefectList == null) continue;
+
                 foreach (Defect defect in workplace.DefectList)
                     DefectList.Add(defect);
+            }
+                
 
             return DefectList;
         }

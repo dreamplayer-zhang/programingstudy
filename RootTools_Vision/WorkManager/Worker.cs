@@ -241,7 +241,7 @@ namespace RootTools_Vision
                     msg += ex.InnerException.Message + "\n" + ex.InnerException.StackTrace;
                 }
 
-                TempLogger.Write("Worker", msg);
+                TempLogger.Write("Worker", ex, msg);
             }
             finally
             {
