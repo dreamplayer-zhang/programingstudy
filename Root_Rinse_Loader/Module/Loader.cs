@@ -276,6 +276,7 @@ namespace Root_Rinse_Loader.Module
         {
             if (m_storage.m_stack.p_bCheck == false)
             {
+                if (Run(m_roller.RunRotate(false))) return p_sInfo;
                 m_rinse.RunBuzzer(RinseL.eBuzzer.Finish);
                 EQ.p_eState = EQ.eState.Ready;
                 return "OK";
