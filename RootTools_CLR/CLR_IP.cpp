@@ -606,13 +606,13 @@ namespace RootTools_CLR
 		pOut = nullptr;
 	}
 
-	void CLR_IP::Cpp_SaveDefectListBMP(System::String^ strFilePath, byte* pSrcImg, int nMemW, int nMemH, Cpp_Rect DefectRect, int imageNum)
+	void CLR_IP::Cpp_SaveDefectListBMP(System::String^ strFilePath, byte* pSrcImg, int nMemW, int nMemH, Cpp_Rect^ DefectRect, int imageNum)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
 		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
 		sFilePath += std::to_string(imageNum) + ".BMP";
 
-		Rect defectRect = Rect(DefectRect.x, DefectRect.y, DefectRect.w, DefectRect.h);
+		Rect defectRect = Rect(DefectRect->x, DefectRect->y, DefectRect->w, DefectRect->h);
 		IP::SaveDefectListBMP(sFilePath, pSrc, nMemW, nMemH, defectRect);
 
 		pSrc = nullptr;
@@ -633,7 +633,7 @@ namespace RootTools_CLR
 
 		pSrc = nullptr;
 	}
-	void CLR_IP::Cpp_SaveDefectListBMP_Color(System::String^ strFilePath, BYTE* pRImg, BYTE* pGImg, BYTE* pBImg, int nMemW, int nMemH, Cpp_Rect DefectRect, int imageNum)
+	void CLR_IP::Cpp_SaveDefectListBMP_Color(System::String^ strFilePath, BYTE* pRImg, BYTE* pGImg, BYTE* pBImg, int nMemW, int nMemH, Cpp_Rect^ DefectRect, int imageNum)
 	{
 		pin_ptr<byte> pR = &pRImg[0];
 		pin_ptr<byte> pG = &pGImg[0];
@@ -641,14 +641,14 @@ namespace RootTools_CLR
 		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
 		sFilePath += std::to_string(imageNum) + ".BMP";
 
-		Rect defectRect = Rect(DefectRect.x, DefectRect.y, DefectRect.w, DefectRect.h);
+		Rect defectRect = Rect(DefectRect->x, DefectRect->y, DefectRect->w, DefectRect->h);
 		IP::SaveDefectListBMP_Color(sFilePath, pR, pG, pB, nMemW, nMemH, defectRect);
 
 		pR = nullptr;
 		pG = nullptr;
 		pB = nullptr;
 	}
-	void CLR_IP::Cpp_SaveDefectListBMP_Color(System::String^ strFilePath, BYTE* pRImg, BYTE* pGImg, BYTE* pBImg, int  nMemW, int  nMemH, array<Cpp_Rect^>^ DefectRect)
+	void CLR_IP::Cpp_SaveDefectListBMP_Color(System::String^ strFilePath, BYTE* pRImg, BYTE* pGImg, BYTE* pBImg, int nMemW, int nMemH, array<Cpp_Rect^>^ DefectRect)
 	{
 		if (DefectRect->Length == 0)
 			return;

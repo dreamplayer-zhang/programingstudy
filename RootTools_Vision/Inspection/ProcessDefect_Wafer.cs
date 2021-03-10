@@ -63,7 +63,15 @@ namespace RootTools_Vision
 
             //Workplace displayDefect = new Workplace();
             foreach (Defect defect in MergeDefectList)
+            {
+                if (this.currentWorkplace.DefectList == null) continue;
                 this.currentWorkplace.DefectList.Add(defect);
+            }
+                
+
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+
+            
 
             //// Add Defect to DB
             if (MergeDefectList.Count > 0)
@@ -83,41 +91,30 @@ namespace RootTools_Vision
                 //}
             }
 
-            SettingItem_SetupFrontside settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+            Settings settings = new Settings();
+            SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
 
-			Tools.SaveDefectImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList.Cast<Data>().ToList(), currentWorkplace.SharedBufferInfo);
+            Tools.SaveDefectImage(Path.Combine(settings_frontside.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
 
-            if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
+            if (settings_frontside.UseKlarf)
             {
-                List<string> dataStringList = ConvertDataListToStringList(MergeDefectList);
-                GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, dataStringList, null);
-                GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
-                GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
-                GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
-                Tools.SaveTiffImage(settings.KlarfSavePath, MergeDefectList.Cast<Data>().ToList(), currentWorkplace.SharedBufferInfo);
+                KlarfData_Lot klarfData = new KlarfData_Lot();
+                Directory.CreateDirectory(settings_frontside.KlarfSavePath);
+
+                klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
+                klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+                klarfData.SetResultTimeStamp();
+
+                klarfData.SaveKlarf(settings_frontside.KlarfSavePath, false);
+
+                Tools.SaveTiffImage(settings_frontside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
             }
 
-            // 기존 210302 지울거야
-            /*
-            SettingItem_SetupFrontside settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
-            SaveDefectImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
+            //GlobalObjects.Instance.Get<Settings>
+            //string sTiffImagePath = ;
+            //SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
 
-            if (settings.UseKlarf)
-            {
-                Directory.CreateDirectory(settings.KlarfSavePath);
-
-                GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
-                GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
-                GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
-
-                GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
-
-                SaveTiffImage(settings.KlarfSavePath, MergeDefectList, 3);
-            }
-            */
-            
-            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
+            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), this.currentWorkplace));
             WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
         }
 
@@ -131,8 +128,13 @@ namespace RootTools_Vision
             List<Defect> DefectList = new List<Defect>();
 
             foreach (Workplace workplace in workplaceBundle)
+            {
+                if (workplace.DefectList == null) continue;
+
                 foreach (Defect defect in workplace.DefectList)
                     DefectList.Add(defect);
+            }
+                
 
             return DefectList;
         }

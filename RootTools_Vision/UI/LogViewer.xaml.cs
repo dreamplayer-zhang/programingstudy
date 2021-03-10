@@ -1,8 +1,7 @@
 ﻿using RootTools;
-using RootTools.Memory;
 using System;
-using System.ComponentModel;
-using System.Data;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -16,31 +15,20 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Threading;
-using System.Drawing;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
-using RootTools.Database;
 
 namespace RootTools_Vision
 {
     /// <summary>
-    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// LogViewer.xaml에 대한 상호 작용 논리
     /// </summary>
-    /// 
-
-    public partial class MainWindow : Window
+    public partial class LogViewer : UserControl
     {
-
-
-        //ImageData imageData;
-        //InspectionManager inspectionManager;
-        public MainWindow()
+        public LogViewer()
         {
             InitializeComponent();
 
-            DataContext = new MainWindow_ViewModel();
         }
     }
+
+
 }

@@ -197,6 +197,10 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
+
+                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().ReadyWork();
+
+                //return;
                 //GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
                 this.ImageViewerVM.ClearObjects();
                 if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
@@ -210,13 +214,7 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().StartRemoteProcess();
-
-
-                //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
-                //{
-                //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
-                //}
+                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().TryConnect();
 
                 //return;
 
@@ -249,6 +247,8 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
+                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().StartWork();
+
                 if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
                 {
                     GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
@@ -303,7 +303,8 @@ namespace Root_WIND2.UI_User
 
         private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
         {
-            Workplace workplace = obj as Workplace;
+            Workplace workplace = args.workplace;
+            if (workplace == null || workplace.DefectList == null) return;
             List<String> textList = new List<String>();
             List<CRect> rectList = new List<CRect>();
 

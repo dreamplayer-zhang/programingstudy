@@ -219,27 +219,27 @@ namespace RootTools_Vision
 
                 if (sharedBuffer.ByteCnt == 1)
                 {
-                    //CLR_IP.Cpp_SaveDefectListBMP(
-                    //   path,
-                    //   (byte*)sharedBuffer.PtrR_GRAY.ToPointer(),
-                    //   sharedBuffer.Width,
-                    //   sharedBuffer.Height,
-                    //   rect,
-                    //   imageNum);
-                }
+					CLR_IP.Cpp_SaveDefectListBMP(
+					   path,
+					   (byte*)sharedBuffer.PtrR_GRAY.ToPointer(),
+					   sharedBuffer.Width,
+					   sharedBuffer.Height,
+					   rect,
+					   imageNum);
+				}
 
                 else if (sharedBuffer.ByteCnt == 3)
                 {
-                    //CLR_IP.Cpp_SaveDefectListBMP_Color(
-                    //   path,
-                    //   (byte*)sharedBuffer.PtrR_GRAY.ToPointer(),
-                    //   (byte*)sharedBuffer.PtrG.ToPointer(),
-                    //   (byte*)sharedBuffer.PtrB.ToPointer(),
-                    //   sharedBuffer.Width,
-                    //   sharedBuffer.Height,
-                    //   rect,
-                    //   imageNum);
-                }
+					CLR_IP.Cpp_SaveDefectListBMP_Color(
+					   path,
+					   (byte*)sharedBuffer.PtrR_GRAY.ToPointer(),
+					   (byte*)sharedBuffer.PtrG.ToPointer(),
+					   (byte*)sharedBuffer.PtrB.ToPointer(),
+					   sharedBuffer.Width,
+					   sharedBuffer.Height,
+					   rect,
+					   imageNum);
+				}
             }
         }
 

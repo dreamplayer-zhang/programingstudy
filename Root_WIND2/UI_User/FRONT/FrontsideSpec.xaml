@@ -85,8 +85,12 @@
                                                                 Binding="{Binding Converter={StaticResource IndexConverter},  
                                                                 ConverterParameter={StaticResource ResourceKey=items}}" />
 
+                                <DataGridTextColumn Header="Area Ratio[%]"
+                                                                Width="160"
+                                                                Binding="{Binding p_AreaRatio, StringFormat={}{0:F2}}"  
+                                                                ElementStyle="{StaticResource TextInCellCenter}" />
 
-                                <DataGridTemplateColumn Width="100"
+                                <DataGridTemplateColumn Width="*"
                                                                     Header="Color">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
@@ -95,10 +99,6 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTextColumn Header="Area[pxl]"
-                                                                Width="*"
-                                                                Binding="{Binding Path=p_Size, Converter={StaticResource IndexConverter},  
-                                                                ConverterParameter={StaticResource ResourceKey=items}}" />
                             </DataGrid.Columns>
                         </DataGrid>
                     </ScrollViewer>
