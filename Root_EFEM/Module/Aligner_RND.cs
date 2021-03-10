@@ -613,12 +613,17 @@ namespace Root_EFEM.Module
         public string BeforePut(int nID)
         {
             if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
+            SendCmd(eCmd.VacuumOn);
             return "OK";
         }
 
         public string AfterGet(int nID)
         {
-            //string sGet = SendCmd(eCmd.ResetPos);
+            string sGet = SendCmd(eCmd.ResetPos);
+            if(sGet != "OK")
+            {
+                return "Aligner Get Error";
+            }
             ////m_bgwWaferExist.RunWorkerAsync(true);
             //m_bgwWaferExist.RunWorkerAsync(false);
             return "OK"; 

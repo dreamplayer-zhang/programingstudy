@@ -8,6 +8,7 @@
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:viewConverter="clr-namespace:ViewConverter;assembly=RootTools"
+        xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
         WindowStyle="None"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
@@ -120,10 +121,7 @@
                                             <ColumnDefinition Width="1.5*" />
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
-                                        <GroupBox Header="Intensity Graph"
-                                                  Grid.Column="0">
-
-                                        </GroupBox>
+                                        <met:CountGraph Grid.Column="0" Width="auto" Height="auto"/>
                                         <GroupBox Header="SR Parameter"
                                                   Grid.Column="1">
                                             <Grid Margin="5,0">

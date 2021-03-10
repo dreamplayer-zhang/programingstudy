@@ -540,7 +540,7 @@ namespace Root_CAMELLIA.Module
         public string BeforeGet(int nID)
         {
 
-            m_CamVRS.FunctionConnect();
+            //m_CamVRS.FunctionConnect();
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;
