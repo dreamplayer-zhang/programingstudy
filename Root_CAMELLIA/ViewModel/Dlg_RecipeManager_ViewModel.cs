@@ -1,4 +1,5 @@
-﻿using ColorPickerLib.Controls;
+﻿using Camellia2Stage;
+using ColorPickerLib.Controls;
 using Root_CAMELLIA.Data;
 using Root_CAMELLIA.Draw;
 using Root_CAMELLIA.ShapeDraw;
@@ -308,7 +309,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-                if (0 < value && value < 64)
+                if (0 < value && value < 32)
                 {
                     if (ZoomScale < value)
                     {
@@ -316,8 +317,7 @@ namespace Root_CAMELLIA
                         //VerticalScroll.Maximum = HorizontalScroll.Maximum = 10 * nZoomScale;
                         //VerticalScroll.Visibility = Visibility.Visible;
                         //HorizontalScroll.Visibility = Visibility.Visible;
-
-
+                        CamelliaStage.ZoomScale = value;
                         if (OffsetX != 0)
                         {
                             OffsetX *= 2;
@@ -330,8 +330,8 @@ namespace Root_CAMELLIA
                     else
                     {
                         _nZoomScale = value;
+                        CamelliaStage.ZoomScale = value;
                         // VerticalScroll.Maximum = HorizontalScroll.Maximum = 10 * nZoomScale;
-
                         if (_nZoomScale == 1)
                         {
 
@@ -543,6 +543,19 @@ namespace Root_CAMELLIA
         private ObservableCollection<ModelData.LayerData> _GridLayerData = new ObservableCollection<ModelData.LayerData>();
 
 
+        CamelliaStage _camelliaStage = new CamelliaStage();
+        public CamelliaStage CamelliaStage
+        {
+            get
+            {
+                return _camelliaStage;
+            }
+            set
+            {
+                _camelliaStage = value;
+                SetProperty(ref _camelliaStage, value);
+            }
+        }
 
         public string PointAddMode
         {
@@ -1275,25 +1288,28 @@ namespace Root_CAMELLIA
 
             System.Windows.Point pt = e.GetPosition((UIElement)sender);
 
+            
 
             int nOffsetDiffX = (int)(CenterX - pt.X);
             int nOffsetDiffY = (int)(-CenterY + pt.Y);
 
             if (lines > 0 && !IsLockUI)
             {
-                if (ZoomScale < 32)
+                if (ZoomScale < 16)
                 {
                     if (Math.Abs(OffsetX + nOffsetDiffX) < 500 * ZoomScale)
                     {
                         OffsetX += (int)(CenterX - pt.X);
                         //CurrentMousePoint = new System.Windows.Point(MoveMousePoint.X, CurrentMousePoint.Y);
+                        CamelliaStage.RenderCenterX = (pt.X - CenterX);
                     }
                     if (Math.Abs(OffsetY + nOffsetDiffY) < 500 * ZoomScale)
                     {
                         OffsetY -= (int)(CenterY - pt.Y);
                         //CurrentMousePoint = new System.Windows.Point(CurrentMousePoint.X, MoveMousePoint.Y);
+                        CamelliaStage.RenderCenterY = pt.Y - CenterY;
                     }
-
+                    
                     //OffsetX += (CenterX - (int)pt.X);
                     //OffsetY += -(CenterY - (int)pt.Y);
                 }
@@ -1306,11 +1322,13 @@ namespace Root_CAMELLIA
                 {
                     OffsetX += (int)(CenterX - pt.X);
                     //CurrentMousePoint = new System.Windows.Point(MoveMousePoint.X, CurrentMousePoint.Y);
+                    CamelliaStage.RenderCenterX =  pt.X - CenterX;
                 }
                 if (Math.Abs(OffsetY + nOffsetDiffY) < 500 * ZoomScale)
                 {
                     OffsetY -= (int)(CenterY - pt.Y);
                     //CurrentMousePoint = new System.Windows.Point(CurrentMousePoint.X, MoveMousePoint.Y);
+                    CamelliaStage.RenderCenterY = pt.Y - CenterY;
                 }
                 //OffsetX += (CenterX - (int)pt.X);
                 //OffsetY += -(CenterY - (int)pt.Y);
@@ -1469,6 +1487,8 @@ namespace Root_CAMELLIA
 
                 OffsetX = -(int)((nPreviewX * ZoomScale));
                 OffsetY = (int)((nPreviewY * ZoomScale));
+
+                
 
                 RedrawStage();
             }

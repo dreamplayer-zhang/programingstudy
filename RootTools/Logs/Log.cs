@@ -25,7 +25,7 @@ namespace RootTools
             public string p_sLogger { get; set; }
             public string p_sMessage { get; set; }
             public string p_sStackTrace { get; set; }
-            public Brush p_sColor { get; set; }
+            public System.Windows.Media.Brush p_sColor { get; set; }
 
             public string p_sLog
             {
@@ -47,9 +47,9 @@ namespace RootTools
                 switch (eLevel)
                 {
                     case eLevel.Fatal:
-                    case eLevel.Error: p_sColor = Brushes.Yellow; break;
-                    case eLevel.Warn: p_sColor = Brushes.GreenYellow; break;
-                    default: p_sColor = Brushes.White; break;
+                    case eLevel.Error: p_sColor = System.Windows.Media.Brushes.Yellow; break;
+                    case eLevel.Warn: p_sColor = System.Windows.Media.Brushes.GreenYellow; break;
+                    default: p_sColor = System.Windows.Media.Brushes.White; break;
                 }
             }
 
