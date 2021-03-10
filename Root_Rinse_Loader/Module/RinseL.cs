@@ -230,14 +230,19 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region GAF
+        public ALID m_alidAirEmergency;
         public ALID m_alidTCPConnect;
+        public ALID m_alidUnloadError;
         void InitALID()
         {
+            m_alidAirEmergency = m_gaf.GetALID(this, "Air Emergency", "Air Emergency");
             m_alidTCPConnect = m_gaf.GetALID(this, "Unloader Disconnect", "Unloader Disconnect");
+            m_alidUnloadError = m_gaf.GetALID(this, "Unloader State is Error", "Unloader State is Error");
         }
         #endregion
 
         #region ToolBox
+        DIO_I m_diAirEmergency;
         public TCPIPClient m_tcpip; 
         public override void GetTools(bool bInit)
         {
@@ -344,6 +349,7 @@ namespace Root_Rinse_Loader.Module
                 {
                     EQ.p_bStop = true;
                     EQ.p_eState = EQ.eState.Error;
+                    m_alidAirEmergency.p_bSet = true;
                 }
             }
         }
@@ -512,6 +518,11 @@ namespace Root_Rinse_Loader.Module
                         case eCmd.EQUeState:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             p_eStateUnloader = GetEQeState(asRead[2]);
+                            if(p_eStateUnloader == EQ.eState.Error)
+                            {
+                                m_alidUnloadError.p_bSet = true;
+                                EQ.p_eState = EQ.eState.Error;
+                            }
                             break;
                         case eCmd.StripReceive:
                             AddProtocol(asRead[0], eCmd, asRead[2]);

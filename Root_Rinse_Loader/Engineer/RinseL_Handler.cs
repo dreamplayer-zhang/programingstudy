@@ -66,8 +66,11 @@ namespace Root_Rinse_Loader.Engineer
                 m_rinse.m_alidTCPConnect.p_bSet = true;
                 EQ.p_eState = EQ.eState.Error;
                 return "Unloader is disconnect";
-            } 
+            }
+            m_loader.RunVacuum(false);
+            Thread.Sleep(100);
             m_loader.RunPickerDown(false);
+            Thread.Sleep(100);
             string sInfo = StateHome(p_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             m_rinse.m_doRinseEmg.Write(true);
