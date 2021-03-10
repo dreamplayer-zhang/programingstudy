@@ -1,12 +1,17 @@
 ﻿using Root_WIND2.Module;
+using RootTools;
 using RootTools.Control;
+using RootTools.Module;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Root_WIND2.UI_User
@@ -29,13 +34,32 @@ namespace Root_WIND2.UI_User
         {
             get => this.visionModule;
         }
+
+        private ObservableCollection<Image> featureItemList = new ObservableCollection<Image>();
+        public ObservableCollection<Image> FeatureItemList
+        {
+            get => this.featureItemList;
+            set
+            {
+                SetProperty<ObservableCollection<Image>>(ref this.featureItemList, value);
+            }
+        }
+
+        private Image selectedFeatureItem = null;
+        public Image SelectedFeatureItem
+        {
+            get => this.selectedFeatureItem;
+            set
+            {
+                SetProperty<Image>(ref this.selectedFeatureItem, value);
+            }
+        }
         #endregion
 
 
         public CameraAlign_ViewModel()
         {
             this.imageViewerVM = new CameraAlign_ImageViewer_ViewModel();
-
 
 
             if (GlobalObjects.Instance.Get<WIND2_Engineer>().m_eMode == WIND2_Engineer.eMode.Vision)
@@ -50,6 +74,29 @@ namespace Root_WIND2.UI_User
                 this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
 
                 this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
+            }
+
+            EQ.p_bStop = false;
+            Vision vision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision;
+            if (vision.p_eState != ModuleBase.eState.Ready)
+            {
+                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                return;
+            }
+
+            Run_GrabLineScan Grab = (Run_GrabLineScan)vision.CloneModuleRun("GrabLineScan");
+            var viewModel = new Dialog_Scan_ViewModel(vision, Grab);
+            Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+            if (result.HasValue)
+            {
+                if (result.Value)
+                {
+                    vision.StartRun(Grab);
+                }
+                else
+                {
+
+                }
             }
         }
 
@@ -132,6 +179,8 @@ namespace Root_WIND2.UI_User
                         VisionModule.p_CamAlign.FunctionConnect();
                     }
                     VisionModule.p_CamAlign.GrabContinuousShot();
+
+                    RefreshFeatureItemList();
                 });
             }
         }
@@ -143,6 +192,40 @@ namespace Root_WIND2.UI_User
                 VisionModule.p_CamAlign.StopGrab();
             });
         }
+
+        public ICommand btnSetFirstAxisPositionCommond
+        {
+            get => new RelayCommand(() =>
+            {
+
+
+            });
+        }
+
+        public ICommand btnSetSecondAxisPositionCommond
+        {
+            get => new RelayCommand(() =>
+            {
+
+            });
+        }
+
+        public ICommand btnFeatureAddCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                string imagePath = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupCamera>().FeatureImagePath;
+                DirectoryInfo di = new DirectoryInfo(imagePath);
+                di.Create();
+
+                string fileName = "feature_" + di.GetFiles().Length + ".bmp";
+
+                this.ImageViewerVM.BoxImage.SaveImageSync(imagePath + "\\" + fileName);
+
+                RefreshFeatureItemList();
+            });
+        }
+
 
         public ICommand CmdAxisXMoveLeft
         {
@@ -284,7 +367,31 @@ namespace Root_WIND2.UI_User
                 });
             }
         }
+        #endregion
 
+        #region [Method]
+        private void RefreshFeatureItemList()
+        {
+            this.FeatureItemList.Clear();
+
+            string imagePath = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupCamera>().FeatureImagePath;
+
+            DirectoryInfo di = new DirectoryInfo(imagePath);
+            di.Create();
+
+            foreach (FileInfo file in di.GetFiles()) 
+            {
+                Image image = new Image();
+                string fullname = file.FullName;
+                image.Source = Tools.ConvertBitmapToSource(((System.Drawing.Bitmap)System.Drawing.Image.FromFile(fullname)));
+                image.Width = 200;
+                image.Height = 200;
+                Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    this.FeatureItemList.Add(image);
+                });
+            }
+        }
 
         #endregion
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -64,9 +65,18 @@ namespace RootTools_Vision
             return Tools.GetInheritedClasses(typeof(ParameterBase));
         }
 
-        public static ObservableCollection<ParameterBase> GetChildClass()
+        public static ObservableCollection<ParameterBase> GetFrontSideClass()
         {
-            return Tools.GetEnumerableOfType<ParameterBase>();
+            ObservableCollection<ParameterBase> objects = new ObservableCollection<ParameterBase>();
+            foreach (Type type in
+                Assembly.GetAssembly(typeof(ParameterBase)).GetTypes()
+                .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(ParameterBase))
+                && myType.GetInterface("IFrontsideInspection") != null))
+            {
+                objects.Add((ParameterBase)Activator.CreateInstance(type));
+            }
+
+            return objects;
         }
 
         public static ParameterBase CreateChildInstance(ParameterBase param)

@@ -118,29 +118,12 @@
                         </Image>
                     </Grid>
                 </GroupBox>
-                <GroupBox Grid.Row="1"  Margin="4"
-                                  Style="{StaticResource main_view_groupbox}"
-                                  Header="Insepction Data">
-                    <DataGrid Name="Defect_Viewer"
-                                              ItemsSource="{Binding DefectDataTable}"
-                                              SelectedItem="{Binding SelectedDefect, Mode=TwoWay}"
-                                              SelectionMode="Single"
-                                              EnableColumnVirtualization="True"
-                                              EnableRowVirtualization="True"
-                                              VirtualizingPanel.VirtualizationMode="Recycling"
-                                              ScrollViewer.CanContentScroll="True"
-                                              IsReadOnly="True"
-                                              AutoGenerateColumns="True"
-                                              Grid.Row="1">
-                        <DataGrid.Resources>
-                            <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="HorizontalAlignment"
-                                                        Value="Stretch" />
-                                <Setter Property="HorizontalContentAlignment"
-                                                        Value="Center" />
-                            </Style>
-                        </DataGrid.Resources>
-                    </DataGrid>
+                <GroupBox Grid.Row="1" 
+                      Header="Defect List"
+                      Margin="4,0,4,4"
+                      Style="{StaticResource main_view_groupbox}" >
+                    <tools:Database_DataView DataContext="{Binding DataViewerVM}" Margin="4">
+                    </tools:Database_DataView>
                 </GroupBox>
             </Grid>
 

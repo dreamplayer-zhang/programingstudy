@@ -251,9 +251,6 @@ namespace Root_WIND2
                 RecipeEdge recipeEdge = GlobalObjects.Instance.Register<RecipeEdge>();
                 RecipeEBR recipeEBR = GlobalObjects.Instance.Register<RecipeEBR>();
 
-                // Klarf
-                KlarfData_Lot klarfData_lot = GlobalObjects.Instance.Register<KlarfData_Lot>();
-
 
                 if(frontImage.GetPtr() == IntPtr.Zero)
                 {

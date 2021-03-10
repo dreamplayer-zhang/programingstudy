@@ -263,6 +263,25 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        public void UpdateImageViewer()
+        {
+            foreach (TRect rt in rectList)
+            {
+                if (p_DrawElement.Contains(rt.UIElement) == true)
+                {
+                    Rectangle rectangle = rt.UIElement as Rectangle;
+                    CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+                    CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+
+                    rectangle.Width = canvasRightBottom.X - canvasLeftTop.X;
+                    rectangle.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+                    Canvas.SetLeft(rectangle, canvasLeftTop.X);
+                    Canvas.SetTop(rectangle, canvasLeftTop.Y);
+                }
+            }
+        }
+
         private void MoveDefectPt(CPoint point)
 		{
             if (p_ImageData == null) return;
