@@ -1,5 +1,8 @@
-﻿using System;
+﻿using RootTools.Comm;
+using RootTools.Trees;
+using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Windows.Threading;
 
 namespace RootTools
@@ -27,6 +30,18 @@ namespace RootTools
         public static Log GetLog(string id, string sGroup)
         {
             return _logView.GetLog(id, sGroup); 
+        }
+        #endregion
+
+        #region TCPIP
+        static object g_lock = new object();
+        public static void Send(Log.Data data)
+        {
+            lock (g_lock)
+            {
+                if (_logView.m_client.p_bConnect == false) return;
+                _logView.m_client.Send(data.p_sLog);
+            }
         }
         #endregion
 
@@ -98,6 +113,47 @@ namespace RootTools
         }
         #endregion
 
+        #region TCP Client
+        public TCPAsyncClient m_client = null; 
+        void InitClient()
+        {
+            m_client = new TCPAsyncClient(EQ.m_sModel + ".Log", null);
+            m_client.p_nPort = 7065;
+            m_client.EventReciveData += M_client_EventReciveData;
+        }
+
+        private void M_client_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        {
+        }
+
+        void RunTreeTCPIP(Tree tree)
+        {
+            m_client.RunTree(tree); 
+        }
+        #endregion
+
+        #region Tree
+        public TreeRoot m_treeRoot;
+        void InitTree()
+        {
+            m_treeRoot = new TreeRoot("LogView", null);
+            m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
+        }
+
+        private void M_treeRoot_UpdateTree()
+        {
+            RunTree(Tree.eMode.Update);
+            RunTree(Tree.eMode.RegWrite);
+            RunTree(Tree.eMode.Init);
+        }
+
+        public void RunTree(Tree.eMode mode)
+        {
+            m_treeRoot.p_eMode = mode;
+            RunTreeTCPIP(m_treeRoot.GetTree("TCPIP"));
+        }
+        #endregion
+
         public _LogView()
         {
             p_sPath = "c:\\Log"; 
@@ -108,7 +164,11 @@ namespace RootTools
         {
             m_groupTotal = new LogGroup("Total", Log.eLevel.Info);
             m_aGroup.Add(m_groupTotal);
+            InitTree();
+            InitClient(); 
             StartTimer();
+            RunTree(Tree.eMode.RegRead);
+            RunTree(Tree.eMode.Init);
         }
 
         public void ThreadStop()

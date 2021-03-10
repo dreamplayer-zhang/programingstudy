@@ -7,9 +7,9 @@ using System.Windows.Media;
 
 namespace Root_WIND2
 {
-    public class InspectionROI : ObservableObject
+    public class ItemMask : ObservableObject
     {
-        public InspectionROI()
+        public ItemMask()
         {
         }
 
@@ -35,6 +35,17 @@ namespace Root_WIND2
             }
             set
             {
+                long sum = 0;
+                foreach(PointLine pl in value)
+                {
+                    sum += pl.Width;
+                }
+
+                p_Size = sum;
+
+                if (m_fullSize != 0)
+                    p_AreaRatio = (double)p_Size / (double)p_FullSize * 100;
+
                 SetProperty(ref m_Data, value);
             }
         }
@@ -52,6 +63,32 @@ namespace Root_WIND2
             }
         }
         private long m_Size = 0;
+
+        public long p_FullSize
+        {
+            get
+            {
+                return m_fullSize;
+            }
+            set
+            {
+                SetProperty(ref m_fullSize, value);
+            }
+        }
+        private long m_fullSize = 0;
+
+        public double p_AreaRatio
+        {
+            get
+            {
+                return m_areaRatio;
+            }
+            set
+            {
+                SetProperty(ref m_areaRatio, value);
+            }
+        }
+        private double m_areaRatio = 0;
 
         public Color p_Color
         {

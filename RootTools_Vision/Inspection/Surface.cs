@@ -49,7 +49,7 @@ namespace RootTools_Vision
             if (this.workplace.Index == 0)
                 return;
 
-            this.inspectionSharedBuffer = this.workplace.GetSharedBuffer(this.parameterSurface.IndexChannel);
+            this.inspectionSharedBuffer = this.workplace.GetSharedBufferInfo(this.parameterSurface.IndexChannel);
             byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameterSurface.IndexChannel);
 
             // Inspection Param

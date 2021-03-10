@@ -10,6 +10,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <main:HumidityToGradientOffsetConverter x:Key="humidityConverter"/>
+        <main:ValueToUIValueConverter x:Key="ValueConverter"/>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -47,7 +48,7 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
             <TextBlock HorizontalAlignment="Stretch" Grid.Row="0" Text="Humidity" Foreground="Black" TextAlignment="Center"/>
-            <TextBlock HorizontalAlignment="Center" Grid.Row="1" Text="{Binding p_nHumidity}" Foreground="Black"/>
+            <TextBlock HorizontalAlignment="Center" Grid.Row="1" Text="{Binding p_nHumidity, Converter={StaticResource ValueConverter},ConverterParameter = Humidity}" Foreground="Black"/>
         </Grid>
         <Grid></Grid>
     </Grid>

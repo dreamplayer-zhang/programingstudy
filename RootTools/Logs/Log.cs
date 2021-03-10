@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Reflection;
+using System.Windows.Media;
 
 namespace RootTools
 {
@@ -26,17 +26,13 @@ namespace RootTools
             public string p_sMessage { get; set; }
             public string p_sStackTrace { get; set; }
             public System.Windows.Media.Brush p_sColor { get; set; }
-
-            public string p_sLog
-            {
-                get { return p_sTime + "\t" + p_eLevel.ToString() + "\t" + p_sLogger + "\t" + p_sMessage + "\t" + p_sStackTrace; }
-            }
+            public string p_sLog { get; set; }
 
             public Data(string id, eLevel eLevel, string sMessage)
             {
                 DateTime dt = DateTime.Now;
                 m_sDate = dt.ToShortDateString();
-                p_sTime = dt.Hour.ToString("00") + '.' + dt.Minute.ToString("00") + '.' + dt.Second.ToString("00") + '.' + dt.Millisecond.ToString("000"); 
+                p_sTime = dt.Hour.ToString("00") + '.' + dt.Minute.ToString("00") + '.' + dt.Second.ToString("00") + '.' + dt.Millisecond.ToString("000");
                 p_eLevel = eLevel;
                 p_sLogger = id;
                 p_sMessage = sMessage.Replace("\n", "\\n").Replace("\r", "\\r").Replace("\t", "\\t");
@@ -44,6 +40,7 @@ namespace RootTools
                 int n = Math.Min(st.FrameCount, 6);
                 p_sStackTrace = GetStackString(st.GetFrame(n--));
                 while (n > 3) p_sStackTrace += " => " + GetStackString(st.GetFrame(n--));
+                p_sLog = p_sTime + "\t" + p_eLevel.ToString() + "\t" + p_sLogger + "\t" + p_sMessage + "\t" + p_sStackTrace;
                 switch (eLevel)
                 {
                     case eLevel.Fatal:
@@ -55,7 +52,7 @@ namespace RootTools
 
             string GetStackString(StackFrame stackFrame)
             {
-                MethodBase mb = stackFrame.GetMethod(); 
+                MethodBase mb = stackFrame.GetMethod();
                 return mb.DeclaringType.Name + "." + mb.Name;
             }
         }
@@ -66,6 +63,7 @@ namespace RootTools
         void Add(eLevel eLevel, string sMessage)
         {
             Data data = new Data(p_id, eLevel, sMessage);
+            LogView.Send(data); 
             foreach (LogGroup group in m_aLogGroup) group.AddData(data); 
         }
 

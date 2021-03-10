@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RootTools_Vision
 {
@@ -14,12 +16,14 @@ namespace RootTools_Vision
         public static object lockObj = new object();
         public static void Write(string filename, string log)
         {
-            Directory.CreateDirectory(tempLogRootPath);
-
+            string processName = Process.GetCurrentProcess().ProcessName;
+            string folderPath = tempLogRootPath + "\\" + processName;
+            Directory.CreateDirectory(folderPath);
+            
             lock(lockObj)
             {
                 string strTime = DateTime.Now.ToString("yyyyMMdd");
-                string filePath = tempLogRootPath + "\\" + filename + "_" + strTime + ".txt";
+                string filePath = folderPath + "\\" + filename + "_" + strTime + ".txt";
                 FileInfo file = new FileInfo(filePath);
                 StreamWriter sw;
                 if (!file.Exists)
@@ -42,12 +46,14 @@ namespace RootTools_Vision
 
         public static void Write(string filename, Exception e, string log = "")
         {
-            Directory.CreateDirectory(tempLogRootPath);
+            string processName = Process.GetCurrentProcess().ProcessName;
+            string folderPath = tempLogRootPath + "\\" + processName;
+            Directory.CreateDirectory(folderPath);
 
             lock (lockObj)
             {
                 string strTime = DateTime.Now.ToString("yyyyMMdd");
-                string filePath = tempLogRootPath + "\\" + filename + "_" + strTime + ".txt";
+                string filePath = folderPath + "\\" + filename + "_" + strTime + ".txt";
                 FileInfo file = new FileInfo(filePath);
                 StreamWriter sw;
                 if (!file.Exists)

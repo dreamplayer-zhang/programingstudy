@@ -1,7 +1,10 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,16 +16,19 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Roo_VegaP
+namespace RootTools_Vision
 {
     /// <summary>
-    /// MainWindow.xaml에 대한 상호 작용 논리
+    /// LogViewer.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class LogViewer : UserControl
     {
-        public MainWindow()
+        public LogViewer()
         {
             InitializeComponent();
+
         }
     }
+
+
 }

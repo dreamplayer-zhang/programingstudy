@@ -42,10 +42,10 @@
                            Grid.Column="1" />
             </StackPanel>
 
-            <TextBlock Text="Recipe Name.rcp"
+            <!--<TextBlock Text="Recipe Name.rcp"
                        Foreground="White"
                        VerticalAlignment="Center"
-                       HorizontalAlignment="Center"/>
+                       HorizontalAlignment="Center"/>-->
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
                         HorizontalAlignment="Right"
                         Orientation="Horizontal"
