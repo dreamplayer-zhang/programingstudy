@@ -49,7 +49,6 @@ namespace RootTools_Vision
 
             List<Defect> DefectList = CollectDefectData();
 
-
             TempLogger.Write("Defect", string.Format("Total : {0}", DefectList.Count));
 
             List<Defect> MergeDefectList = Tools.MergeDefect(DefectList, mergeDist);
@@ -87,11 +86,11 @@ namespace RootTools_Vision
             SettingItem_SetupFrontside settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
-			Tools.SaveDataImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList.Cast<Data>().ToList(), currentWorkplace.SharedBufferInfo);
+			Tools.SaveDefectImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList.Cast<Data>().ToList(), currentWorkplace.SharedBufferInfo);
 
             if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
             {
-                List<string> dataStringList = DefectDataToStringList(MergeDefectList);
+                List<string> dataStringList = ConvertDataListToStringList(MergeDefectList);
                 GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, dataStringList, null);
                 GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
                 GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
@@ -183,7 +182,7 @@ namespace RootTools_Vision
             DefectList.AddRange(DefectList_Delete);
         }
 
-        private List<string> DefectDataToStringList(List<Defect> defectList)
+        private List<string> ConvertDataListToStringList(List<Defect> defectList)
         {
             List<string> stringList = new List<string>();
             foreach (Defect defect in defectList)
@@ -194,6 +193,8 @@ namespace RootTools_Vision
             return stringList;
         }
 
+        // 지울거야
+        /*
         private List<Defect> MergeDefect(List<Defect> DefectList, int mergeDist)
         {
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();           
@@ -279,8 +280,6 @@ namespace RootTools_Vision
             return MergeDefectList;
         }
         
-        // 지울거야
-        /*
         private void SaveDefectImage(String Path, List<Defect> DefectList, int nByteCnt)
         {
             Path += "\\";
