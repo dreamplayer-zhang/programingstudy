@@ -80,7 +80,7 @@ namespace Root_LogView.Server
         private void M_server_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
             //socket.Send(aBuf);
-            LogData logData = new LogData(Encoding.ASCII.GetString(aBuf, 0, nSize));
+            LogData logData = new LogData(Encoding.Default.GetString(aBuf, 0, nSize));
             m_qLogData.Enqueue(logData);
         }
 
