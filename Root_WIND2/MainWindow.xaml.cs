@@ -148,7 +148,7 @@ namespace Root_WIND2
             //DatabaseManager.Instance.ValidateDatabase();
             //////
 
-            logView.Init(LogView.m_logView);
+            logView.Init(LogView._logView);
             WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
             InitTimer();
         }
@@ -187,20 +187,17 @@ namespace Root_WIND2
                 DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
                 WIND2_Warning warning = GlobalObjects.Instance.Register<WIND2_Warning>();
                 engineer.Init("WIND2");
-
-
                 
                 MemoryTool memoryTool = engineer.ClassMemoryTool();
-
                 ImageData frontImage;
                 ImageData maskLayer;
+
                 // ImageData
                 if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
                 {
-
-                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
-                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
-                    //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
+                    MemoryData memoryData = memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront);
+                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryFrontPool, memoryFrontGroup, memoryFront, memoryTool, memoryData.p_nCount, memoryData.p_nByte);
+                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
                 }
                 else
                 {

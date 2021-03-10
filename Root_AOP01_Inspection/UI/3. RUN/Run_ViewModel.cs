@@ -21,6 +21,8 @@ namespace Root_AOP01_Inspection
         {
             //m_Mainwindow = main;
             //m_mainVision = ((AOP01_Handler)main.m_engineer.ClassHandler()).m_mainVision;
+
+            p_mainVision = ((AOP01_Handler)((AOP01_Engineer)(GlobalObjects.Instance.Get<AOP01_Engineer>())).ClassHandler()).m_mainVision;
             
             // MiniViewer
             p_miniViewerMain = new MiniViewer_ViewModel(GlobalObjects.Instance.GetNamed<ImageData>(App.MainRegName));
@@ -44,12 +46,12 @@ namespace Root_AOP01_Inspection
             p_dSequencePercent = Math.Ceiling(temp.m_process.m_dSequencePercent);
         }
         #region Property
-        //MainVision m_mainVision;
-        //public MainVision p_mainVision
-        //{
-        //    get { return m_mainVision; }
-        //    set { SetProperty(ref m_mainVision, value); }
-        //}
+        MainVision m_mainVision;
+        public MainVision p_mainVision
+        {
+            get { return m_mainVision; }
+            set { SetProperty(ref m_mainVision, value); }
+        }
         #endregion
 
         #region MiniViewer

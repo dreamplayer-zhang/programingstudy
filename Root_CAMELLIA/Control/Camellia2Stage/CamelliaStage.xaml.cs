@@ -26,27 +26,68 @@ namespace Camellia2Stage
         }
 
         Point offsetPt = new Point();
+        int nScale = 1;
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if(CanvasScaleTransform.ScaleX == 8)
+            {
+                return;
+            }
             Point pt = e.GetPosition((UIElement)sender);
-            offsetPt.X += 500 - pt.X;
-            offsetPt.Y += 500 - pt.Y;
             CanvasScaleTransform.ScaleX *= 2;
             CanvasScaleTransform.ScaleY *= 2;
+            CanvasScaleTransform.CenterX = pt.X;
+            CanvasScaleTransform.CenterY = pt.Y;
+            //Point pt = e.GetPosition((UIElement)sender);
+            //offsetPt.X = 500 - pt.X;
+            //offsetPt.Y = 500 - pt.Y;
+            //CanvasScaleTransform.ScaleX *= 2;
+            //CanvasScaleTransform.ScaleY *= 2;
 
-            //offsetPt.X *= 2;
-            //offsetPt.Y *= 2;
-            CanvasScaleTransform.CenterX = (offsetPt.X);
-            CanvasScaleTransform.CenterY = (offsetPt.Y);
+            ////offsetPt.X *= CanvasScaleTransform.ScaleX;
+            //// offsetPt.Y *= CanvasScaleTransform.ScaleX;
+            ////CanvasScaleTransform.CenterX = 500 - (offsetPt.X);
+            ////CanvasScaleTransform.CenterY = 500 - (offsetPt.Y);
+            //CanvasScaleTransform.CenterX = pt.X;
+            //CanvasScaleTransform.CenterY = pt.Y;
+            //var element = sender as UIElement;
+            //var position = e.GetPosition(element);
+            //var transform = element.RenderTransform as MatrixTransform;
+            //var matrix = transform.Matrix;
+            //var scale = nScale * 2;
+            //var scale = e.Delta >= 0 ? 1.1 : (1.0 / 1.1); // choose appropriate scaling factor
+
+            //matrix.ScaleAtPrepend(scale, scale, position.X, position.Y);
+            //transform.Matrix = matrix;
         }
 
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Point pt = e.GetPosition((UIElement)sender);
+            if(CanvasScaleTransform.ScaleX == 1)
+            {
+                return;
+            }
             CanvasScaleTransform.ScaleX /= 2;
             CanvasScaleTransform.ScaleY /= 2;
-            //CanvasScaleTransform.CenterX = 500 +pt.X;
-            //CanvasScaleTransform.CenterY = 500 - pt.Y;
+            //Point pt = e.GetPosition((UIElement)sender);
+            //offsetPt.X += 500 - pt.X;
+            //offsetPt.Y += 500 - pt.Y;
+            //CanvasScaleTransform.ScaleX /= 2;
+            //CanvasScaleTransform.ScaleY /= 2;
+
+            //offsetPt.X /= 2;
+            //offsetPt.Y /= 2;
+            //CanvasScaleTransform.CenterX = 500 - (offsetPt.X);
+            //CanvasScaleTransform.CenterY = 500 - (offsetPt.Y);
+            //var element = sender as UIElement;
+            //var position = e.GetPosition(element);
+            //var transform = element.RenderTransform as MatrixTransform;
+            //var matrix = transform.Matrix;
+            //var scale = nScale / 2;
+            ////var scale = e.Delta >= 0 ? 1.1 : (1.0 / 1.1); // choose appropriate scaling factor
+
+            //matrix.ScaleAtPrepend(scale, scale, position.X, position.Y);
+            //transform.Matrix = matrix;
         }
     }
 }

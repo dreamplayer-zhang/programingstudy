@@ -20,6 +20,9 @@ namespace Root_CAMELLIA.LibSR_Met
     {
         public bool bDataExist = false;
         public int nCalcDataNum = 0;
+        public int nNIRDataNum = 0;
+        public int nThicknessDataNum = 0;
+        public float nStartWavelegth = 0;
         public double dX = 0.0;
         public double dY = 0.0;
         public double dGoF = 0.0;
@@ -31,7 +34,6 @@ namespace Root_CAMELLIA.LibSR_Met
         public double[] VIS_Wavelength;
         public double[] Transmittance;
         public double[] CalcReflectance;
-        public double[] CalcTransmittance;
 
         public RawData()
         {
@@ -43,7 +45,6 @@ namespace Root_CAMELLIA.LibSR_Met
             VIS_Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
             Transmittance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
             CalcReflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
-            CalcTransmittance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
         }
     }
 
@@ -79,8 +80,8 @@ namespace Root_CAMELLIA.LibSR_Met
         //추후 제거 20.12.23 Met.DS 추가 calcassistant
         public string sRefName;   //물질 이름   //레시피 저장 필요
         public bool bFix;    //두꼐 고정 유무
-        public double dInitThickness;   //레시피 저장 필요
-        public double dTHKRangeRate;    //두께 범위 (%)
+        public double dInitThickness = 0.0;   //레시피 저장 필요
+        public double dTHKRangeRate = 100;    //두께 범위 (%)-> CONSTVALUE 값으로 지정할 것
         public double dTargetThickness;   //투과율계산용 타겟 두께
         public bool bUseTargetTHK;  //투과율 계산시 타겟 두께를 쓸것인가 여부
         public LinearScale scales = new LinearScale();  //190627
@@ -96,6 +97,8 @@ namespace Root_CAMELLIA.LibSR_Met
         public int nAverage_VIS = 0;
         public int nBGIntTime_NIR = 0;
         public int nAverage_NIR = 0;
+        
+
         public SettingData()
         { 
         }
@@ -136,6 +139,10 @@ namespace Root_CAMELLIA.LibSR_Met
         public List<double> m_WL_List_R;  //관심 refelctance의 wavelength list
         public List<double> m_WL_List_T;  //관심 transmittance의 wavelength list
         public List<LayerData> m_LayerData;
+        public bool bExcept_NIR = false;
+        public bool bThickness = true;
+        public bool bTransmittance = true;
+        public bool bViewCalRGraph = true;
 
 
         //추후 제거 DS 2021.01.05 추가
@@ -302,7 +309,7 @@ namespace Root_CAMELLIA.LibSR_Met
             return true;
         }
 
-        //DS 2021.01.05 
+        //DS 2021.01.05 반사율 계싼에 필요한 InitThickness 
         public void AddLayerData(string sName, double dThickness, bool bFix, double dTHKRange = 0.0, bool bUseTargetTHK = false, double dTargetThickness = 0.0)
         {
             LayerData layerdata = new LayerData();
@@ -333,11 +340,15 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_RawData[n].dX = 0.0;
                     m_RawData[n].dY = 0.0;
                     m_RawData[n].dGoF = 0.0;
-                }
+                    m_RawData[n].nCalcDataNum = 0;
+                    m_RawData[n].nNIRDataNum = 0;
+                    m_RawData[n].nThicknessDataNum = 0;
+                    m_RawData[n].nStartWavelegth = 0;
+    }
 
                 return true;
             }
-            catch(Exception)
+            catch(Exception ex)
 
             {
                 m_Log.WriteLog(LogType.Error, "Failed to clear RawData.");
@@ -360,6 +371,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 StreamWriter sw = new StreamWriter(sPath);
                 RawData data = m_RawData[nPointIndex];
 
+                Array.Reverse(data.Transmittance);
                 sw.WriteLine("Wavelength[nm],Reflectance[%],Transmittance[%]");
                 for (int n = 0; n < data.Wavelength.Length; n++)
                 {
@@ -370,7 +382,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 m_Log.WriteLog(LogType.Datas, "Point: " + nPointIndex.ToString() + " Raw data saved.");
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 m_Log.WriteLog(LogType.Error, "Point: " + nPointIndex.ToString() + " Failed to save raw data.");
                 return false;
@@ -572,7 +584,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.Close();
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return false;
             }
@@ -804,7 +816,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 m_Log.WriteLog(LogType.Datas, " SaveResultFileLot()_Saved");
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 m_Log.WriteLog(LogType.Error, "SaveResultFileLot() - Error" );
                 return false;
@@ -1046,7 +1058,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 m_Log.WriteLog(LogType.Datas, " SaveResultFileLot()_Saved");
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 m_Log.WriteLog(LogType.Error, "SaveResultFileLot() - Error");
                 return false;

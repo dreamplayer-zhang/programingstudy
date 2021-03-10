@@ -49,10 +49,9 @@ namespace RootTools_Vision
 
             List<Defect> DefectList = CollectDefectData();
 
-
             TempLogger.Write("Defect", string.Format("Total : {0}", DefectList.Count));
 
-            List<Defect> MergeDefectList = MergeDefect(DefectList, mergeDist);
+            List<Defect> MergeDefectList = Tools.MergeDefect(DefectList, mergeDist);
 
             TempLogger.Write("Defect", string.Format("Merge : {0}", MergeDefectList.Count));
 
@@ -61,7 +60,6 @@ namespace RootTools_Vision
                 OriginRecipe originRecipe = this.recipe.GetItem<OriginRecipe>();
                 defect.CalcAbsToRelPos(originRecipe.OriginX, originRecipe.OriginY); // Frontside
             }
-
 
             //Workplace displayDefect = new Workplace();
             foreach (Defect defect in MergeDefectList)
@@ -186,6 +184,19 @@ namespace RootTools_Vision
             DefectList.AddRange(DefectList_Delete);
         }
 
+        private List<string> ConvertDataListToStringList(List<Defect> defectList)
+        {
+            List<string> stringList = new List<string>();
+            foreach (Defect defect in defectList)
+            {
+                //string str = string.Format("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13} {14} {15} {16}");
+                //stringList.Add(str);
+            }
+            return stringList;
+        }
+
+        // 지울거야
+        /*
         private List<Defect> MergeDefect(List<Defect> DefectList, int mergeDist)
         {
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();           
@@ -270,6 +281,7 @@ namespace RootTools_Vision
 
             return MergeDefectList;
         }
+        
         private void SaveDefectImage(String Path, List<Defect> DefectList, int nByteCnt)
         {
             Path += "\\";
@@ -392,6 +404,6 @@ namespace RootTools_Vision
             ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
             img.SaveAdd(ep);
         }
-
+        */
     }
 }

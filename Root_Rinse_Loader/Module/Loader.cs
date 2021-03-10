@@ -37,10 +37,10 @@ namespace Root_Rinse_Loader.Module
         void InitALID()
         {
             m_alidPickerDown = m_gaf.GetALID(this, "PickerDown", "Picker Up & Down Error");
-            m_alidPickerStripCheck0 = m_gaf.GetALID(this, "Picker Strip Check0", "Pucker0 Strip Check Error");
-            m_alidPickerStripCheck1 = m_gaf.GetALID(this, "Picker Strip Check1", "Pucker1 Strip Check Error");
-            m_alidPickerStripCheck2 = m_gaf.GetALID(this, "Picker Strip Check2", "Pucker2 Strip Check Error");
-            m_alidPickerStripCheck3 = m_gaf.GetALID(this, "Picker Strip Check3", "Pucker3 Strip Check Error");
+            m_alidPickerStripCheck0 = m_gaf.GetALID(this, "Picker Strip Check0", "Picker0 Strip Check Error");
+            m_alidPickerStripCheck1 = m_gaf.GetALID(this, "Picker Strip Check1", "Picker1 Strip Check Error");
+            m_alidPickerStripCheck2 = m_gaf.GetALID(this, "Picker Strip Check2", "Picker2 Strip Check Error");
+            m_alidPickerStripCheck3 = m_gaf.GetALID(this, "Picker Strip Check3", "Picker3 Strip Check Error");
         }
         #endregion
 
@@ -305,13 +305,13 @@ namespace Root_Rinse_Loader.Module
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack";
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
-            //if (Run(m_roller.RunRotate(false))) return p_sInfo;
+            if (Run(m_roller.RunRotate(false))) return p_sInfo;
             Thread.Sleep(100); 
             if (Run(RunPickerDown(true))) return p_sInfo;
             Thread.Sleep(200);
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(RunPickerDown(false))) return p_sInfo;
-            //if (Run(m_roller.RunRotate(true))) return p_sInfo;
+            if (Run(m_roller.RunRotate(true))) return p_sInfo;
             if (m_storage.m_stack.p_bCheck) return "OK"; 
             if (Run(MoveLoader(ePos.Rail))) return p_sInfo;
             return "OK";

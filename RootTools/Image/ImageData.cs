@@ -183,11 +183,24 @@ namespace RootTools
             m_eMode = eMode.OtherPCMem;
             m_ToolMemory = tool;
         }
-
+        string m_sPool;
+        string m_sGroup;
+        string m_sMem;
+        public ImageData(string sPool,string sGroup,string sMem,MemoryTool tool,int nPlane,int nByte)
+        {
+            m_sPool = sPool;
+            m_sGroup = sGroup;
+            m_sMem = sMem;
+            m_eMode = eMode.OtherPCMem;
+            p_nPlane = nPlane;
+            p_nByte = nByte;
+            p_Size = new CPoint(40000, 40000);
+            m_ToolMemory = tool;
+        }
         public byte[] GetData(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
         {
-            //m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight);
-            return new byte[5];  // 이게 머여??
+            return m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight, m_sPool, m_sGroup, m_sMem, p_nPlane);
+            //return new byte[5];  // 이게 머여??
         }
 
         public unsafe void SetData(IntPtr ptr, CRect rect, int stride, int nByte = 1)
@@ -239,7 +252,7 @@ namespace RootTools
         }
         public byte[] GetByteArray()
         {
-            byte[] aBuf = new byte[p_Size.X * p_nByte * p_Size.Y];
+            byte[] aBuf = new byte[(long)p_Size.X * p_nByte * p_Size.Y];
             int position = 0;
 
             for (int i = 0; i < p_Size.Y; i++)
@@ -324,7 +337,7 @@ namespace RootTools
                 rect.Right += 4 - rect.Width % 4;
             }
 
-            byte[] aBuf = new byte[rect.Width * p_nByte * rect.Height];
+            byte[] aBuf = new byte[(long)rect.Width * p_nByte * rect.Height];
             //나중에 거꾸로 나왔던것 확인해야 함. 일단 지금은 정순으로 바꿔둠
             for (int i = 0; i < rect.Height; i++)
             {
@@ -416,7 +429,7 @@ namespace RootTools
             {
                 rect.Right += 4 - rect.Width % 4;
             }
-            byte[] aBuf = new byte[rect.Width * rect.Height];
+            byte[] aBuf = new byte[(long)rect.Width * rect.Height];
             //나중에 거꾸로 나왔던것 확인해야 함. 일단 지금은 정순으로 바꿔둠
             for (int i = 0; i < rect.Height; i++)
             {
@@ -645,7 +658,7 @@ namespace RootTools
             {
                 rect.Right += 4 - rect.Width % 4;
             }
-            byte[] aBuf = new byte[p_nByte * rect.Width];
+            byte[] aBuf = new byte[(long)p_nByte * rect.Width];
             for (int i = rect.Height - 1; i >= 0; i--)
             {
                 Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * p_Size.X * p_nByte), aBuf, 0, rect.Width * p_nByte);
@@ -757,7 +770,7 @@ namespace RootTools
 
                 // Pixel data
                 int rowSize = (rect.Width * nByte + 3) & ~3;
-                byte[] aBuf = new byte[rowSize];
+                byte[] aBuf = new byte[(long)rowSize];
                 IntPtr ptr = IntPtr.Zero;
                 if (p_nPlane == 1)
                 {
@@ -786,7 +799,7 @@ namespace RootTools
                         {
                             Array.Clear(aBuf, 0, rowSize);
 
-                            Int64 idx = (j * p_Size.X + rect.Left) * p_nByte;
+                            long idx = ((long)j * p_Size.X + rect.Left) * p_nByte;
 
                             Parallel.For(0, rect.Width, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (i) =>
                             {
@@ -819,8 +832,9 @@ namespace RootTools
                         {
                             Array.Clear(aBuf, 0, rowSize);
 
-                            int idx = (j * p_Size.X + rect.Left) * p_nByte;
-                            Marshal.Copy(ptr + idx, aBuf, 0, rowSize);
+                            long idx = ((long)j * p_Size.X + rect.Left) * p_nByte;
+                            IntPtr srcPtr = new IntPtr(ptr.ToInt64() + idx);
+                            Marshal.Copy(srcPtr, aBuf, 0, rowSize);
 
                             bw.Write(aBuf);
                             p_nProgress = Convert.ToInt32(((double)(rect.Height - (j - rect.Top)) / rect.Height) * 100);
@@ -870,7 +884,7 @@ namespace RootTools
 
                 /// Pixel data
                 int rowSize = (rect.Width * 3 + 3) & ~3;
-                byte[] aBuf = new byte[rowSize];
+                byte[] aBuf = new byte[(long)rowSize];
                 IntPtr ptrR = IntPtr.Zero;
                 IntPtr ptrG = IntPtr.Zero;
                 IntPtr ptrB = IntPtr.Zero;
@@ -976,7 +990,7 @@ namespace RootTools
         {
             CPoint sz = p_Size;
             int np = sz.Y / 100;
-            byte[] pBuf = new byte[sz.X * p_nByte];
+            byte[] pBuf = new byte[(long)sz.X * p_nByte];
             int nProgress = 0;
 
             Parallel.For(0, sz.Y, new ParallelOptions { MaxDegreeOfParallelism = 20 }, (y) =>
@@ -1377,7 +1391,7 @@ namespace RootTools
                 // 파일로부터 픽셀 데이터 읽어오기
                 if (m_eMode == eMode.MemoryRead)
                 {
-                    byte[] aBuf = new byte[rect.Width * nByte];
+                    byte[] aBuf = new byte[(long)rect.Width * nByte];
                     int fileRowSize = (width * nByte + 3) & ~3; // 파일 내 하나의 열당 너비 사이즈 (4의 배수)
                     if (nByte == 1 || nByte == 2)
                     {
@@ -1400,7 +1414,8 @@ namespace RootTools
 
                             // 파일에서 필요한 만큼 데이터를 읽어 메모리에 복사
                             fs.Read(aBuf, 0, rect.Width * nByte);
-                            IntPtr destPtr = ptr + ((j + offset.Y) * p_Size.X) * p_nByte;
+                            //IntPtr destPtr = ptr + ((j + offset.Y) * p_Size.X) * p_nByte;
+                            IntPtr destPtr = new IntPtr(ptr.ToInt64() + (((long)j + offset.Y) * p_Size.X) * p_nByte);
                             if (offset.X >= 0)
                                 destPtr += offset.X * p_nByte;
 
@@ -1461,7 +1476,7 @@ namespace RootTools
                     p_Size = new CPoint(rect.Width + offset.X, rect.Height + offset.Y);
                     ReAllocate(p_Size, GetBytePerPixel());
  
-                    byte[] pBuf = new byte[(int)rect.Width * nByte];
+                    byte[] pBuf = new byte[(long)rect.Width * nByte];
  
                     for (int y = p_Size.Y - 1; y >= 0; y--)
                     {
@@ -1611,7 +1626,7 @@ namespace RootTools
                 {
                     int j = 0;
                     bool bFinish = false;
-                    byte[] aBuf = new byte[rect.Width * nByte];
+                    byte[] aBuf = new byte[(long)rect.Width * nByte];
                     int fileRowSize = (width * nByte + 3) & ~3; // 파일 내 하나의 열당 너비 사이즈 (4의 배수)
                     Int64 fileSize = (new System.IO.FileInfo(sFile)).Length;
                     if (nByte == 1 || nByte == 2)
@@ -1717,7 +1732,7 @@ namespace RootTools
                     p_Size = new CPoint(rect.Width + offset.X, rect.Height + offset.Y);
                     ReAllocate(p_Size, GetBytePerPixel());
 
-                    byte[] pBuf = new byte[(int)rect.Width * nByte];
+                    byte[] pBuf = new byte[(long)rect.Width * nByte];
 
                     for (int y = p_Size.Y - 1; y >= 0; y--)
                     {
@@ -1773,7 +1788,7 @@ namespace RootTools
                 {
                     unsafe
                     {
-                        fixed (byte* p = &m_aBuf[p_nByte * (y * p_Stride + x)])
+                        fixed (byte* p = &m_aBuf[(long)p_nByte * (y * p_Stride + x)])
                         {
                             ip = (IntPtr)(p);
                         }
@@ -2250,6 +2265,8 @@ namespace RootTools
                 return bitmapSource;
             }
         }
+        public const int _dpi = 96;
+
         public static BitmapSource ToBitmapSource(Image<Gray, byte> image)
         {
             using (System.Drawing.Bitmap source = image.Bitmap)
@@ -2260,7 +2277,7 @@ namespace RootTools
 
                 BitmapSource bitmapSource = BitmapSource.Create(
                 source.Width, source.Height,
-                source.HorizontalResolution, source.VerticalResolution,
+                _dpi, _dpi,
                 PixelFormats.Gray8, null,
                 bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
 
@@ -2283,7 +2300,7 @@ namespace RootTools
 
                 BitmapSource bitmapSource = BitmapSource.Create(
                 source.Width, source.Height,
-                source.HorizontalResolution, source.VerticalResolution,
+                _dpi, _dpi,
                 PixelFormats.Bgr24, null,
                 bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
 
@@ -2314,7 +2331,7 @@ namespace RootTools
 
         public static byte[] FileLoadBitmap(string sFilePath, int nW, int nH, int nByteCnt = 1)
         {
-            byte[] rawdata = new byte[nW * nH];
+            byte[] rawdata = new byte[(long)nW * nH];
             CLR_IP.Cpp_LoadBMP(sFilePath, rawdata, nW, nH, nByteCnt);
             return rawdata;
         }

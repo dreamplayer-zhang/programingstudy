@@ -4,9 +4,26 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_LogView"
+        xmlns:server="clr-namespace:Root_LogView.Server"
         mc:Ignorable="d"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing"
         Title="LogView" Height="1000" Width="1200" WindowState="Maximized">
-    <Grid>
-        <local:LogViewer_UI x:Name="logViewerUI"/>
-    </Grid>
+    <Window.Resources>
+        <DataTemplate x:Key="TabItemHeaderTemplate">
+            <ContentPresenter Content="{TemplateBinding Content}" RenderTransformOrigin="0.5,0.5">
+                <ContentPresenter.LayoutTransform>
+                    <RotateTransform Angle="-90"/>
+                </ContentPresenter.LayoutTransform>
+            </ContentPresenter>
+        </DataTemplate>
+    </Window.Resources>
+    <TabControl TabStripPlacement="Left">
+        <TabItem Header=" Log " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
+            <server:LogServer_UI x:Name="logServerUI"/>
+        </TabItem>
+        <TabItem Header=" File " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
+            <local:LogViewer_UI x:Name="logViewerUI"/>
+        </TabItem>
+    </TabControl>
 </Window>

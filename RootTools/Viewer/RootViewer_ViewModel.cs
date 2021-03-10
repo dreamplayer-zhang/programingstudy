@@ -490,7 +490,7 @@ namespace RootTools
                                         IntPtr ptrImg = m_ImageData.GetPtr();
                                         byte* arrByte = (byte*)ptrImg.ToPointer();
 
-                                        Int64 idx = (p_MouseMemY * m_ImageData.p_Size.X + p_MouseMemX) * m_ImageData.p_nByte;
+                                        long idx = ((long)p_MouseMemY * m_ImageData.p_Size.X + p_MouseMemX) * m_ImageData.p_nByte;
                                         byte b1 = arrByte[idx + 0];
                                         byte b2 = arrByte[idx + 1];
 
@@ -728,7 +728,7 @@ namespace RootTools
                 {
                     if (p_ImageData.m_eMode == ImageData.eMode.OtherPCMem)
                     {
-                        if (p_ImageData.p_nByte == 1)
+                        if (p_ImageData.GetBytePerPixel() == 1)
                         {
                             if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
                             {
@@ -746,7 +746,7 @@ namespace RootTools
                                 p_ImgSource = ImageHelper.ToBitmapSource(view);
                             }
                         }
-                        else if (p_ImageData.p_nByte == 3)
+                        else if (p_ImageData.GetBytePerPixel() == 3)
                         {
                             if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
                             {
@@ -806,7 +806,11 @@ namespace RootTools
                                     for (int xx = 0; xx < p_CanvasWidth; xx++)
                                     {
                                         long pix_x = rectX + xx * rectWidth / p_CanvasWidth;
-                                        viewptr[yy, xx, 0] = ApplyContrastAndBrightness(((byte*)ptrMem)[pix_x + (long)pix_y * sizeX]);
+                                        /*byte pixel = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];*/
+                                        byte* arrByte = (byte * )ptrMem.ToPointer();
+                                        long idx = pix_x + (long)pix_y * sizeX;
+                                        byte pixel = arrByte[idx];
+                                        viewptr[yy, xx, 0] = ApplyContrastAndBrightness(pixel);
                                     }
                                 }
                             });
@@ -908,9 +912,12 @@ namespace RootTools
                                             {
                                                 long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
-                                                viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[pix_x + (long)pix_y * sizeX]);
-                                                viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[pix_x + (long)pix_y * sizeX]);
-                                                viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[pix_x + (long)pix_y * sizeX]);
+                                                if (pix_x + (long)pix_y * sizeX >= 0)
+                                                {
+                                                    viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[pix_x + (long)pix_y * sizeX]);
+                                                    viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[pix_x + (long)pix_y * sizeX]);
+                                                    viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[pix_x + (long)pix_y * sizeX]);
+                                                }
                                             }
                                         }
                                     });
@@ -1094,7 +1101,7 @@ namespace RootTools
                             }
                         });
 
-                        byte[] pixels1d = new byte[CanvasHeight * CanvasWidth * 4];
+                        byte[] pixels1d = new byte[(long)CanvasHeight * CanvasWidth * 4];
                         WriteableBitmap wbitmap = new WriteableBitmap(CanvasWidth, CanvasHeight, 96, 96, PixelFormats.Bgra32, null);
 
                         Parallel.For(0, CanvasHeight, (row) =>

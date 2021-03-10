@@ -192,6 +192,9 @@
     <Compile Include="Control\UserControl\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\3. RUN\Dlg_RunStep.xaml.cs">
+      <DependentUpon>Dlg_RunStep.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dummy.cs" />
     <Compile Include="Converter\LoadportBrushConverter.cs" />
     <Compile Include="Converter\InfoCarrierBrushConverter.cs" />
@@ -238,6 +241,10 @@
       <DependentUpon>Setup_Panel.xaml</DependentUpon>
     </Compile>
     <Compile Include="Module\Vision_AOP.cs" />
+    <Page Include="UI\3. RUN\Dlg_RunStep.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Engineer\AOP01_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

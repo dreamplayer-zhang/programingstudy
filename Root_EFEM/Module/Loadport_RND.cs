@@ -23,7 +23,7 @@ namespace Root_EFEM.Module
         public DIO_I m_diDocked;
         RS232 m_rs232;
         OHT _OHT;
-        public OHT m_OHT
+        public OHT m_OHTNew
         {
             get { return _OHT; }
             set
@@ -33,6 +33,11 @@ namespace Root_EFEM.Module
             }
         }
         //OHT m_OHT;
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+           // m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
+        }
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");

@@ -1,5 +1,4 @@
 ﻿using RootTools;
-using RootTools.Trees;
 using System;
 
 namespace Root_TactTime
@@ -96,12 +95,14 @@ namespace Root_TactTime
             picker.m_loader.m_secReady = secNow; 
         }
 
+        public Module m_moduleSync = null;
         public double m_secReady = 0; 
         public void WaitDone(ref double secNow, Loader loader)
         {
             double secDone = m_secRun[1] - (secNow - m_secRun[0]);
             if (secDone > 0) loader.AddEvent(ref secNow, secDone, p_id + " Wait Done");
-            m_secReady = secNow; 
+            m_secReady = secNow;
+            if (m_moduleSync != null) m_moduleSync.m_secRun[0] = m_secReady; 
         }
 
         public enum eType
