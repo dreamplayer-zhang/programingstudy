@@ -395,7 +395,10 @@ namespace RootTools.Memory
         MemServer m_Server;
         MemClient m_Client;
 
+        bool bUseServer = false;
         bool bServer = true;
+        string serverIP = "";
+        int nPort = 5000;
 
         public void InitThreadProcess()
         {
@@ -438,7 +441,14 @@ namespace RootTools.Memory
 
         void RunTreeTCPSetup(Tree tree)
         {
+            bUseServer = tree.Set(bUseServer, bUseServer, "Use MemServer", "Use Mem Server");
             bServer = tree.Set(bServer, bServer, "MemServer", "Memory Tool Server");
+            if(!bServer)
+            {
+                serverIP = tree.Set(serverIP, serverIP, "Server IPAddress", "Server IPAddress");
+                nPort = tree.Set(nPort, nPort, "Server Port", "Server Port");
+            }               
+
             if (bServer && m_Server != null)
             {
               //  m_ServerTree.RunTree(tree);
@@ -541,18 +551,21 @@ namespace RootTools.Memory
             KillInspectProcess();
             if (bMaster == false) InitTimer();
 
+            if (!bUseServer) return;
+
             if (bServer)
             {
                 m_Server = new MemServer(m_log);
                 RunTreeRun(Tree.eMode.RegRead);
-                m_Server.Start(5000);
+                m_Server.Start(nPort);
                 m_Server.EventReciveData += M_Server_EventReciveData;
             }
             else
             {
                 m_Client = new MemClient(m_log);
                 RunTreeRun(Tree.eMode.RegRead);
-                m_Client.Connect(new IPAddress(new byte[] { 10,0,0,15 }),5000);
+                //m_Client.Connect(new IPAddress(new byte[] { 10,0,0,15 }),5000);
+                m_Client.Connect(IPAddress.Parse(serverIP), nPort);
                 m_Client.EventReciveData += M_Client_EventReciveData;
             }
         }
@@ -571,7 +584,9 @@ namespace RootTools.Memory
         bool _bRecieve = false;
         byte[] m_abuf;
         public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem, int nByte)
-        {  
+        {
+            if (!bUseServer) return null;
+
             Stopwatch watch = new Stopwatch();
             watch.Start();
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
