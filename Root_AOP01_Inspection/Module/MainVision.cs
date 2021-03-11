@@ -489,6 +489,27 @@ namespace Root_AOP01_Inspection.Module
 			}
 			((Run_SurfaceInspection)m_aModuleRun[targetidx]).UpdeteTree();
 		}
+		internal void SetSurfaceParam(bool isBright, int GV, int size, string mainModuleName)
+		{
+			var targetidx = -1;
+			for (int i = 0; i < m_asModuleRun.Count; i++)
+			{
+				if (m_asModuleRun[i] == mainModuleName)
+				{
+					targetidx = i;
+					break;
+				}
+			}
+			if (targetidx == -1)
+			{
+				return;
+			}
+			((Run_SurfaceInspection)m_aModuleRun[targetidx]).BrightGV = isBright;
+			((Run_SurfaceInspection)m_aModuleRun[targetidx]).SurfaceGV = GV;
+			((Run_SurfaceInspection)m_aModuleRun[targetidx]).SurfaceSize = size;
+
+			((Run_SurfaceInspection)m_aModuleRun[targetidx]).UpdeteTree();
+		}
 
 		double m_dPatternShiftDistance = 0.0;
 		public double p_dPatternShiftDistance
