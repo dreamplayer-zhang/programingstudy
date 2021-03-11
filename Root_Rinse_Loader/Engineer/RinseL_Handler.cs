@@ -61,6 +61,8 @@ namespace Root_Rinse_Loader.Engineer
         #region StateHome
         public string StateHome()
         {
+            m_loader.RunPickerDown(false);
+            Thread.Sleep(1000);
             string sInfo = StateHome(p_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             m_rinse.m_doRinseEmg.Write(true);
