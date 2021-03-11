@@ -230,11 +230,12 @@ namespace Root_Rinse_Unloader.Module
             //m_axis.StartMove(ePos.Roller); 
             if(p_sInfo == "OK")
             {
-                if (Run(m_axis.StartMove(ePos.Roller)))
-                {
-                    p_eState = eState.Error;
-                    return p_sInfo;
-                }
+                Thread.Sleep(200);
+                //if (Run(m_axis.StartMove(ePos.Roller)))
+                //{
+                //    p_eState = eState.Error;
+                //    return p_sInfo;
+                //}
                 p_eState = eState.Ready;
             }
             return p_sInfo;

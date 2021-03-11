@@ -39,7 +39,7 @@ namespace Root_Rinse_Unloader.Engineer
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            m_rinse = new RinseU("Rinse", m_engineer);
+            m_rinse = new RinseU("RinseUnloader", m_engineer);
             InitModule(m_rinse);
             m_storage = new Storage("Storage", m_engineer, m_rinse);
             InitModule(m_storage);
