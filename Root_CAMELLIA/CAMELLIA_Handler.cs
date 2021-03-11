@@ -275,6 +275,7 @@ namespace Root_CAMELLIA
             //if (sInfo == "OK")
             //    EQ.p_eState = EQ.eState.Ready;
             //return sInfo;
+            m_HomeProgress.Reset();
             IWTR iWTR = (IWTR)m_wtr;
             foreach (IWTRChild child in iWTR.p_aChild)
             {
