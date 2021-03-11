@@ -71,7 +71,7 @@ namespace RootTools.Memory
 
             // 또 다른 클라이언트의 연결을 대기한다.
             mainSock.BeginAccept(AcceptCallback, null);
-
+           
             AsyncObject obj = new AsyncObject(nSize);
             obj.WorkingSocket = client;
 
@@ -597,7 +597,7 @@ namespace RootTools.Memory
             while (_bRecieve)
             {
                 Thread.Sleep(5);
-                if (watch.ElapsedMilliseconds > 10000)
+                if (watch.ElapsedMilliseconds > 1000)
                     return m_abuf;
             }
             _bRecieve = false;
