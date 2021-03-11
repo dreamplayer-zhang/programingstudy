@@ -26,7 +26,7 @@ namespace Root_Memory
         void Init()
         {
             m_engineer.Init();
-            logViewUI.Init(LogView.m_logView);
+            logViewUI.Init(LogView._logView);
             memoryToolUI.Init(m_engineer.m_memoryTool);
         }
 

@@ -163,7 +163,8 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                LoadRecipe();
+                if (GlobalObjects.Instance.Get<InspectionManagerBackside>() == null) return;
+                LoadRecipe();                
 
                 GlobalObjects.Instance.Get<InspectionManagerBackside>().WorkplaceStateChanged += WorkplaceStateChanged_Callback;
             });
@@ -172,6 +173,8 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
+                if (GlobalObjects.Instance.Get<InspectionManagerBackside>() == null) return;
+
                 GlobalObjects.Instance.Get<InspectionManagerBackside>().WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
             });
         }

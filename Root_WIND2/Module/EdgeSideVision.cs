@@ -17,6 +17,10 @@ namespace Root_WIND2.Module
 {
 	public class EdgeSideVision : ModuleBase, IWTRChild
 	{
+		public void SetAlarm()
+		{
+			alid_WaferExist.Run(true, "EdgeSideVision Wafer Exist Error");
+		}
 		#region ToolBox
 		Axis axisRotate;
 		Axis axisEdgeX;
@@ -81,7 +85,6 @@ namespace Root_WIND2.Module
             p_sInfo = m_toolBox.Get(ref lightSet, this);
 			memoryGroup = memoryPool.GetGroup(p_id);
 			alid_WaferExist = m_gaf.GetALID(this, "Wafer Exist", "Wafer Exist");
-
 		}
 		#endregion
 

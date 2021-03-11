@@ -17,7 +17,7 @@ namespace Root_Vega
         public void Init(Vega_Engineer engineer)
         {
             m_engineer = engineer;
-            logViewUI.Init(LogView.m_logView);
+            logViewUI.Init(LogView._logView);
             loginUI.Init(engineer.m_login);
             toolBoxUI.Init(engineer.ClassToolBox());
             handlerUI.Init(engineer.m_handler);

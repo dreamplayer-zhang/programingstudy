@@ -136,6 +136,17 @@ namespace Root_CAMELLIA.Module
             }
 
             int m_nUnitID = 0;
+            public int p_nUnitID
+            {
+                get
+                {
+                    return m_nUnitID;
+                }
+                set
+                {
+                    m_nUnitID = value;
+                }
+            }
             //int m_nAddress = 0; 
             public void ReadInputRegister(Modbus modbus)
             {
@@ -144,7 +155,6 @@ namespace Root_CAMELLIA.Module
                 p_fValue = nValue / m_fDiv;
             }
 
-            bool m_IsUpdate = false;
             public bool p_IsUpdate { get; set; }
             
             public void RunTree(Tree tree, int module_number)
@@ -224,22 +234,22 @@ namespace Root_CAMELLIA.Module
         #region Event
         public event EventHandler ValueUpdate;
 
-        void UpdateEvent(int index)
+        void UpdateEvent()
         {
             if (ValueUpdate != null)
-                OnUpdated(index, new EventArgs());
+                OnUpdated(new EventArgs());
         }
         
-        protected virtual void OnUpdated(int index, EventArgs e)
+        protected virtual void OnUpdated(EventArgs e)
         {
             
             if (ValueUpdate != null)
-                ValueUpdate.Invoke(index, e);
+                ValueUpdate.Invoke(this, e);
         }
         #endregion
 
         #region Check Thread
-        int m_iData = 0;
+        public int m_iData = 0;
         protected override void RunThread()
         {
             base.RunThread();
@@ -255,10 +265,9 @@ namespace Root_CAMELLIA.Module
                 {
                     m_aData[m_iData].ReadInputRegister(m_modbus);
                     m_iData = (m_iData + 1) % m_aData.Count;
-                    UpdateEvent(m_iData);
+                    UpdateEvent();
                 }
             }
-            
         }
 
         int m_msInterval = 100; 

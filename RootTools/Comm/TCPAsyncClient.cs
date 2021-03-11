@@ -54,7 +54,7 @@ namespace RootTools.Comm
         {
             bool bUse = tree.Set(p_bUse, false, "Use", "Use Server");
             p_sIP = tree.Set(_sIP, "127.0.0.1", "IP", "IP Address");
-            p_nPort = tree.Set(p_nPort, 5000, "Port", "Port Number");
+            p_nPort = tree.Set(p_nPort, p_nPort, "Port", "Port Number");
             p_bUse = bUse;
         }
         #endregion
@@ -129,14 +129,18 @@ namespace RootTools.Comm
 
         #region Send
         AsyncCallback m_cbSend;
+        static readonly object g_lock = new object();
         public string Send(string sMsg)
         {
             if (m_socket == null) return "Not Connected";
-            Async async = new Async(1);
-            async.m_aBuf = Encoding.Default.GetBytes(sMsg);
-            async.m_socket = m_socket;
-            m_socket.BeginSend(async.m_aBuf, 0, async.m_aBuf.Length, SocketFlags.None, m_cbSend, async);
-            return "OK";
+            lock (g_lock)
+            {
+                Async async = new Async(1);
+                async.m_aBuf = Encoding.Default.GetBytes(sMsg);
+                async.m_socket = m_socket;
+                m_socket.BeginSend(async.m_aBuf, 0, async.m_aBuf.Length, SocketFlags.None, m_cbSend, async);
+                return "OK";
+            }
         }
 
         void CallBackSend(IAsyncResult ar)

@@ -52,7 +52,7 @@ namespace RootTools.Control.Ajin
         private void M_timer_Tick(object sender, EventArgs e)
         {
             Timer_Status();
-            Timer_Repeat(); 
+            Timer_Repeat();
         }
         #endregion
 

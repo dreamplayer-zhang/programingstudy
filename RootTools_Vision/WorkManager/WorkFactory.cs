@@ -71,10 +71,16 @@ namespace RootTools_Vision
 
         public WorkFactory(REMOTE_MODE mode = REMOTE_MODE.None)
         {
-            this.remote = new RemoteProcess(mode);
-            this.remoteMode = mode;
-                
             Initialize();
+
+            if (mode != REMOTE_MODE.None)
+            {
+                this.remote = new RemoteProcess(mode);
+                this.remoteMode = mode;
+                this.remote.MessageReceived += PipeCommMessageReceived_Callback;
+                this.remote.Connected += Connected_Callback;
+                this.remote.Disconnected += Disconnected_Callback;
+            }
 
             WorkEventManager.RequestStop += OnRequestStop_Callback;
 
@@ -106,6 +112,11 @@ namespace RootTools_Vision
 
         private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
         {
+            if(this.remoteMode != REMOTE_MODE.None && this.remote.IsConnected == true)
+            {
+                this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, REMOTE_MESSAGE_DATA.InspectionDone, typeof(InspectionDoneEventArgs).ToString(), (object)args));
+            }
+
             this.InspectionDone?.Invoke(obj, args);
         }
 
@@ -202,6 +213,7 @@ namespace RootTools_Vision
 
             WorkBundle works = CreateWorkBundle();
             works.SetWorkplacBundle(workplaces);
+            works.SetRecipe(this.recipe);
 
             if (Ready(workplaces, works) == false)
             {
@@ -226,6 +238,8 @@ namespace RootTools_Vision
                 wm.Start();
             }
         }
+
+        
 
         private bool WaitStop() // 구현해야함.
         {
@@ -443,186 +457,188 @@ namespace RootTools_Vision
 
         #region [Remote Process]
 
-        private void PipeCommMessageReceived_Callback(PipeProtocol protocol)
+        public bool IsConnected
         {
-            //MessageBox.Show(protocol.msgType.ToString());
-            //MessageBox.Show(protocol.msg);
-            //MessageBox.Show(protocol.data?.ToString());
-            //MessageBox.Show(protocol.dataType?.ToString());
-
-            RemoteMessage_CommandHandler(protocol);
-
-            //switch (protocol.msgType)
-            //{
-            //    case PIPE_MESSAGE_TYPE.Message:
-            //        RemoteMessage_MessageHandler(protocol);
-            //        break;
-            //    case PIPE_MESSAGE_TYPE.Command:
-            //        RemoteMessage_CommandHandler(protocol);
-            //        break;
-            //    case PIPE_MESSAGE_TYPE.Data:
-            //        break;
-            //    case PIPE_MESSAGE_TYPE.Event:
-                    
-            //        break;
-            //}
+            get => this.remote.IsConnected;
         }
 
 
-        public void StartRemoteProcess()
+        private void Connected_Callback()
         {
-            if (this.remoteMode != REMOTE_MODE.Master) return;
-
-            this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Command, REMOTE_MASTER_MESSAGES.StartRemote));
+            if(this.remoteMode == REMOTE_MODE.Master)
+                StartSync();
         }
 
-        private void RemoteMessage_MessageHandler(PipeProtocol protocol)
+        private void Disconnected_Callback()
+        {
+
+        }
+
+
+
+
+        #region [ProcessSync]
+        public void StartSync()
         {
             if(this.remoteMode == REMOTE_MODE.Master)
             {
+                this.remote.EventChange(ProcessSync);
+                this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Process, REMOTE_PROCESS_TYPE.StartSync));
+            }
+            else
+            {
+                MessageBox.Show("Master WorkFacotry에서만 StartSync 메서드를 실행할 수 있습니다");
+            }
+        }
+
+        private void ProcessSync(PipeProtocol protocol)
+        {
+            // Slave로부터 응답 메시지 전달 받고 시작
+            if(this.remoteMode == REMOTE_MODE.Master)
+            {
+                // Send Memory Data
+                foreach (SharedBufferInfo info in this.sharedBufferInfoList)
+                {
+                    this.remote.Send(new PipeProtocol(
+                    PIPE_MESSAGE_TYPE.Data,
+                    REMOTE_MESSAGE_DATA.MemoryID,
+                    typeof(MemoryID).ToString(),
+                    this.sharedBufferInfoList[0].MemoryID
+                    ));
+                }
+
+                // Send WorkManager
+                this.remote.Send(new PipeProtocol(
+                    PIPE_MESSAGE_TYPE.Data,
+                    REMOTE_MESSAGE_DATA.WorkManagerList,
+                    typeof(List<WorkManager>).ToString(),
+                    this.workManagers
+                    ));
+
+                this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Process, REMOTE_PROCESS_TYPE.EndSync));
+                this.remote.EventChange(PipeCommMessageReceived_Callback);
 
             }
             else
             {
-
-            }
-        }
-
-
-
-        // 정리 필요
-        private void RemoteMessage_CommandHandler(PipeProtocol protocol)
-        {
-            if (this.remoteMode == REMOTE_MODE.Master)  // Slave에서 보낸 메시지를 처리
-            {
-                REMOTE_SLAVE_MESSAGES msg = (REMOTE_SLAVE_MESSAGES)Enum.Parse(typeof(REMOTE_SLAVE_MESSAGES), protocol.msg, true);
-                switch (msg)
+                if(protocol.msg == REMOTE_PROCESS_TYPE.EndSync.ToString())
                 {
-                    case REMOTE_SLAVE_MESSAGES.StartRemoteAck:
+                    this.remote.EventChange(PipeCommMessageReceived_Callback);
+                    this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Process, REMOTE_PROCESS_TYPE.EndSync));
+                    return;
+                }
+
+                REMOTE_MESSAGE_DATA dataMsg = (REMOTE_MESSAGE_DATA)Enum.Parse(typeof(REMOTE_MESSAGE_DATA), protocol.msg);
+                switch (dataMsg)
+                {
+                    case REMOTE_MESSAGE_DATA.MemoryID:
+                        if (typeof(MemoryID).ToString() == protocol.dataType)
                         {
-                            this.remote.Send(new PipeProtocol(
-                                PIPE_MESSAGE_TYPE.Command,
-                                REMOTE_MASTER_MESSAGES.StartCreateCloneFactory));
+                            WorkEventManager.OnReceivedMemoryID(this, new MemoryIDArgs((MemoryID)protocol.data));
+
+                            MemoryID memoryID = (MemoryID)protocol.data;
+
+                            MemoryPool pool = new MemoryPool(memoryID.Pool);
+                            ImageData imageData = new ImageData(pool.GetMemory(memoryID.Group, memoryID.Data));
+                            this.sharedBufferInfoList.Add(new SharedBufferInfo(imageData.GetPtr(0), imageData.p_Size.X, imageData.p_Size.Y, imageData.GetBytePerPixel(), imageData.GetPtr(1), imageData.GetPtr(2)));
+                        }
+                        else
+                        {
+                            Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "데이터 타입이 다릅니다 : " + protocol.msg);
                         }
                         break;
-                    //
-                    // StartCreate CloneFactory
-                    //
-                    case REMOTE_SLAVE_MESSAGES.StartCreateCloneFactoryAck:
-                        {
-                            // Send Memory Data
-                            foreach(SharedBufferInfo info in this.sharedBufferInfoList)
+                    case REMOTE_MESSAGE_DATA.WorkManagerList:
+                        if (protocol.msg == REMOTE_MESSAGE_DATA.WorkManagerList.ToString())
+                        {                // Receive Workplace
+                            List<WorkManager> wms = (List<WorkManager>)protocol.data;
+                            this.workManagers.Clear();
+                            foreach (WorkManager wm in wms)
                             {
-                                this.remote.Send(new PipeProtocol(
-                                PIPE_MESSAGE_TYPE.Data,
-                                REMOTE_MASTER_MESSAGES.MemoryID,
-                                typeof(MemoryID).ToString(),
-                                this.sharedBufferInfoList[0].MemoryID
-                                ));
+                                this.workManagers.Add(wm.Clone());
                             }
-
-                            // Send WorkManager
-                            this.remote.Send(new PipeProtocol(
-                                PIPE_MESSAGE_TYPE.Data,
-                                REMOTE_MASTER_MESSAGES.WorkManagerList,
-                                typeof(List<WorkManager>).ToString(),
-                                this.workManagers
-                                ));
-
-                            this.remote.Send(new PipeProtocol(
-                                PIPE_MESSAGE_TYPE.Command,
-                                REMOTE_MASTER_MESSAGES.EndCreateCloneFactory));
+                        }
+                        else
+                        {
+                            Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "데이터 타입이 다릅니다 : " + protocol.msg);
                         }
                         break;
-
-                    case REMOTE_SLAVE_MESSAGES.EndCreateCloneFactoryAck:
+                    default:
                         {
-                            this.remote.Send(new PipeProtocol(
-                                PIPE_MESSAGE_TYPE.Command,
-                                REMOTE_MASTER_MESSAGES.StartCreateWork));
-                        }
-                        break;
-                    case REMOTE_SLAVE_MESSAGES.StartCreateWorkAck:
-                        {
-                            //Recipe Name
-                            this.remote.Send(new PipeProtocol(
-                                PIPE_MESSAGE_TYPE.Data,
-                                REMOTE_MASTER_MESSAGES.RecipeName,
-                                typeof(string).ToString(),
-                                this.recipe.RecipePath
-                                ));
-
-                            // WorkplaceBundle
-                            this.remote.Send(new PipeProtocol(
-                                PIPE_MESSAGE_TYPE.Data,
-                                REMOTE_MASTER_MESSAGES.WorkplaceBundle,
-                                typeof(WorkplaceBundle).ToString(),
-                                this.CreateWorkplaceBundle()
-                                ));
-
-                            // WorkBundle
-                            this.remote.Send(new PipeProtocol(
-                                PIPE_MESSAGE_TYPE.Data,
-                                REMOTE_MASTER_MESSAGES.WorkBundle,
-                                typeof(WorkBundle).ToString(),
-                                this.CreateWorkBundle().CloneForRemote()
-                                ));
-
-                            this.remote.Send(new PipeProtocol(
-                                PIPE_MESSAGE_TYPE.Command,
-                                REMOTE_MASTER_MESSAGES.EndCreateWork));
+                            this.remote.EventChange(PipeCommMessageReceived_Callback);
+                            Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "정의되지 않은 메시지 입니다. " + protocol.msg);
                         }
                         break;
                 }
             }
-            else  // 마스터에서 보낸 메시지를 처리
+        }
+        #endregion
+
+        #region [ProcessReadyWork]
+        public void ReadyWork()
+        {
+            if (this.remoteMode == REMOTE_MODE.Master)
             {
-                REMOTE_MASTER_MESSAGES msg = (REMOTE_MASTER_MESSAGES)Enum.Parse(typeof(REMOTE_MASTER_MESSAGES), protocol.msg, true);
-                switch (msg)
+                this.remote.EventChange(ProcessReadyWork);
+                this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Process, REMOTE_PROCESS_TYPE.StartReadyWork));
+            }
+            else
+            {
+                MessageBox.Show("Master WorkFacotry에서만 StartWork 메서드를 실행할 수 있습니다");
+            }
+        }
+
+        public void ProcessReadyWork(PipeProtocol protocol)
+        {
+            if (this.remoteMode == REMOTE_MODE.Master)
+            {
+                this.remote.Send(new PipeProtocol(
+                                PIPE_MESSAGE_TYPE.Data,
+                                REMOTE_MESSAGE_DATA.RecipeName,
+                                typeof(string).ToString(),
+                                this.recipe.RecipePath
+                                ));
+
+                // WorkplaceBundle
+                this.remote.Send(new PipeProtocol(
+                    PIPE_MESSAGE_TYPE.Data,
+                    REMOTE_MESSAGE_DATA.WorkplaceBundle,
+                    typeof(WorkplaceBundle).ToString(),
+                    this.CreateWorkplaceBundle()
+                    ));
+
+                // WorkBundle
+                this.remote.Send(new PipeProtocol(
+                    PIPE_MESSAGE_TYPE.Data,
+                    REMOTE_MESSAGE_DATA.WorkBundle,
+                    typeof(WorkBundle).ToString(),
+                    this.CreateWorkBundle().CloneForRemote()
+                    ));
+
+                this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Process, REMOTE_PROCESS_TYPE.EndReadyWork));
+                this.remote.EventChange(PipeCommMessageReceived_Callback);
+            }
+            else
+            {
+                if (protocol.msg == REMOTE_PROCESS_TYPE.EndReadyWork.ToString())
                 {
-                    case REMOTE_MASTER_MESSAGES.StartRemote:
-                        this.remote.Send(new PipeProtocol(
-                            PIPE_MESSAGE_TYPE.Command,
-                            REMOTE_SLAVE_MESSAGES.StartRemoteAck));
-                        break;
-                    case REMOTE_MASTER_MESSAGES.StartCreateCloneFactory:
-                        this.remote.Send(new PipeProtocol(
-                            PIPE_MESSAGE_TYPE.Command,
-                            REMOTE_SLAVE_MESSAGES.StartCreateCloneFactoryAck));
-                        break;
-                    case REMOTE_MASTER_MESSAGES.MemoryID:
-                        if (typeof(MemoryID).ToString() == protocol.dataType)
-                        {
-                            WorkEventManager.OnReceivedMemoryID(this, new MemoryIDArgs((MemoryID)protocol.data));
-                        }
-                        break;
-                    case REMOTE_MASTER_MESSAGES.WorkManagerList:
-                        List<WorkManager> workManagers = (List<WorkManager>)protocol.data;
-                        foreach (WorkManager wm in workManagers)
-                        {
-                            this.workManagers.Add(wm.Clone());
-                        }
-                        break;
-                    case REMOTE_MASTER_MESSAGES.EndCreateCloneFactory:
-                        this.remote.Send(new PipeProtocol(
-                            PIPE_MESSAGE_TYPE.Command,
-                            REMOTE_SLAVE_MESSAGES.EndCreateCloneFactoryAck));
-                        break;
-                    case REMOTE_MASTER_MESSAGES.StartCreateWork:
-                        this.remote.Send(new PipeProtocol(
-                            PIPE_MESSAGE_TYPE.Command,
-                            REMOTE_SLAVE_MESSAGES.StartCreateWorkAck));
-                        break;
-                    case REMOTE_MASTER_MESSAGES.RecipeName:
+                    this.remote.EventChange(PipeCommMessageReceived_Callback);
+                    this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Process, REMOTE_PROCESS_TYPE.EndReadyWork));
+                    return;
+                }
+
+                REMOTE_MESSAGE_DATA dataMsg = (REMOTE_MESSAGE_DATA)Enum.Parse(typeof(REMOTE_MESSAGE_DATA), protocol.msg);
+                switch (dataMsg)
+                {
+                    case REMOTE_MESSAGE_DATA.RecipeName:
                         string recipePath = (string)protocol.data;
                         this.recipe = new CloneableRecipe();
                         this.recipe.RecipePath = recipePath;
                         this.recipe.Read(recipePath);
                         break;
-                    case REMOTE_MASTER_MESSAGES.WorkplaceBundle:
+                    case REMOTE_MESSAGE_DATA.WorkplaceBundle:
                         this.workplaceBundle = (WorkplaceBundle)protocol.data;
                         break;
-                    case REMOTE_MASTER_MESSAGES.WorkBundle:
+                    case REMOTE_MESSAGE_DATA.WorkBundle:
                         WorkBundle wb = (WorkBundle)protocol.data;
                         this.workBundle = new WorkBundle();
                         int indexParam = 0;
@@ -640,247 +656,338 @@ namespace RootTools_Vision
                             }
                         }
                         break;
-                    case REMOTE_MASTER_MESSAGES.EndCreateWork:
+                    default:
+                        {
+                            this.remote.EventChange(PipeCommMessageReceived_Callback);
+                            Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "정의되지 않은 메시지 입니다. " + protocol.msg);
+                        }
                         break;
+                }
+            }
+        }
+        #endregion
+
+        #region [ProcessStartWork]
+        public void StartWork()
+        {
+            if (this.remoteMode == REMOTE_MODE.Master)
+            {
+                this.remote.EventChange(ProcessWork);
+                this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Process, REMOTE_PROCESS_TYPE.StartWork));
+            }
+            else
+            {
+                MessageBox.Show("Master WorkFacotry에서만 StartWork 메서드를 실행할 수 있습니다");
+            }
+        }
+
+        public void ProcessWork(PipeProtocol protocol)
+        {
+            if (this.remoteMode == REMOTE_MODE.Master)
+            {
+                if(protocol.msg == REMOTE_PROCESS_TYPE.StartWork.ToString())
+                {
+                    return;
+                }
+
+                REMOTE_MESSAGE_DATA dataMsg = (REMOTE_MESSAGE_DATA)Enum.Parse(typeof(REMOTE_MESSAGE_DATA), protocol.msg);
+                switch (dataMsg)
+                {
+                    case REMOTE_MESSAGE_DATA.InspectionDone:
+                        InspectionDoneEventArgs args = (InspectionDoneEventArgs)protocol.data;
+                        WorkEventManager.OnInspectionDone(args.workplace, args);
+                        break;
+                    default:
+                        {
+                            this.remote.EventChange(PipeCommMessageReceived_Callback);
+                            Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "정의되지 않은 메시지 입니다. " + protocol.msg);
+                        }
+                        break;
+                }
+            }
+            else
+            {
+
+
+            }
+        }
+        #endregion
+
+        private void PipeCommMessageReceived_Callback(PipeProtocol protocol)
+        {
+            if(this.remoteMode == REMOTE_MODE.Slave)
+            {
+                REMOTE_PROCESS_TYPE proc = (REMOTE_PROCESS_TYPE)Enum.Parse(typeof(REMOTE_PROCESS_TYPE), protocol.msg, true);
+                switch (proc)
+                {
+                    case REMOTE_PROCESS_TYPE.StartSync:
+                        this.remote.EventChange(ProcessSync);
+                        this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Process, REMOTE_PROCESS_TYPE.StartSync));
+                        break;
+                    case REMOTE_PROCESS_TYPE.StartReadyWork:
+                        this.remote.EventChange(ProcessReadyWork);
+                        this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Process, REMOTE_PROCESS_TYPE.StartReadyWork));
+                        break;
+                    case REMOTE_PROCESS_TYPE.StartWork:
+                        this.remote.EventChange(ProcessWork);
+                        this.remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Process, REMOTE_PROCESS_TYPE.StartWork));
+
+                        this.RemoteStartWork();
+                        break;
+                }
+            }
+
+
+
+
+            //RemoteMessage_CommandHandler(protocol);
+
+            //switch (protocol.msgType)
+            //{
+            //    case PIPE_MESSAGE_TYPE.Message:
+            //        RemoteMessage_MessageHandler(protocol);
+            //        break;
+            //    case PIPE_MESSAGE_TYPE.Command:
+            //        RemoteMessage_CommandHandler(protocol);
+            //        break;
+            //    case PIPE_MESSAGE_TYPE.Data:
+            //        break;
+            //    case PIPE_MESSAGE_TYPE.Event:
+
+            //        break;
+            //}
+        }
+
+
+        // 정리 필요
+        private void RemoteMessage_CommandHandler(PipeProtocol protocol)
+        {
+            if (this.remoteMode == REMOTE_MODE.Master)  // Slave에서 보낸 메시지를 처리
+            {
+                REMOTE_SLAVE_MESSAGES msg = (REMOTE_SLAVE_MESSAGES)Enum.Parse(typeof(REMOTE_SLAVE_MESSAGES), protocol.msg, true);
+                switch (msg)
+                {
+                    case REMOTE_SLAVE_MESSAGES.StartRemoteAck:
+                        {
+                            this.remote.Send(new PipeProtocol(
+                                PIPE_MESSAGE_TYPE.Command,
+                                REMOTE_MESSAGE_DATA.StartCreateCloneFactory));
+                        }
+                        break;
+                    //
+                    // StartCreate CloneFactory
+                    //
+                    case REMOTE_SLAVE_MESSAGES.StartCreateCloneFactoryAck:
+                        {
+                            // Send Memory Data
+                            foreach (SharedBufferInfo info in this.sharedBufferInfoList)
+                            {
+                                this.remote.Send(new PipeProtocol(
+                                PIPE_MESSAGE_TYPE.Data,
+                                REMOTE_MESSAGE_DATA.MemoryID,
+                                typeof(MemoryID).ToString(),
+                                this.sharedBufferInfoList[0].MemoryID
+                                ));
+                            }
+
+                            // Send WorkManager
+                            this.remote.Send(new PipeProtocol(
+                                PIPE_MESSAGE_TYPE.Data,
+                                REMOTE_MESSAGE_DATA.WorkManagerList,
+                                typeof(List<WorkManager>).ToString(),
+                                this.workManagers
+                                ));
+
+                            this.remote.Send(new PipeProtocol(
+                                PIPE_MESSAGE_TYPE.Command,
+                                REMOTE_MESSAGE_DATA.EndCreateCloneFactory));
+                        }
+                        break;
+
+                    case REMOTE_SLAVE_MESSAGES.EndCreateCloneFactoryAck:
+                        {
+                            this.remote.Send(new PipeProtocol(
+                                PIPE_MESSAGE_TYPE.Command,
+                                REMOTE_MESSAGE_DATA.StartCreateWork));
+                        }
+                        break;
+                    case REMOTE_SLAVE_MESSAGES.StartCreateWorkAck:
+                        {
+                            //Recipe Name
+                            this.remote.Send(new PipeProtocol(
+                                PIPE_MESSAGE_TYPE.Data,
+                                REMOTE_MESSAGE_DATA.RecipeName,
+                                typeof(string).ToString(),
+                                this.recipe.RecipePath
+                                ));
+
+                            // WorkplaceBundle
+                            this.remote.Send(new PipeProtocol(
+                                PIPE_MESSAGE_TYPE.Data,
+                                REMOTE_MESSAGE_DATA.WorkplaceBundle,
+                                typeof(WorkplaceBundle).ToString(),
+                                this.CreateWorkplaceBundle()
+                                ));
+
+                            // WorkBundle
+                            this.remote.Send(new PipeProtocol(
+                                PIPE_MESSAGE_TYPE.Data,
+                                REMOTE_MESSAGE_DATA.WorkBundle,
+                                typeof(WorkBundle).ToString(),
+                                this.CreateWorkBundle().CloneForRemote()
+                                ));
+
+                            this.remote.Send(new PipeProtocol(
+                                PIPE_MESSAGE_TYPE.Command,
+                                REMOTE_MESSAGE_DATA.EndCreateWork));
+                        }
+                        break;
+                    //case REMOTE_SLAVE_MESSAGES.EndCreateWorkAck:
+                    //    this.remote.Send(new PipeProtocol(
+                    //            PIPE_MESSAGE_TYPE.Command,
+                    //            REMOTE_MESSAGE_DATA.StartWork));
+                        break;
+                    case REMOTE_SLAVE_MESSAGES.StartWorkAck:
+                        break;
+                }
+            }
+            else  // 마스터에서 보낸 메시지를 처리
+            {
+                REMOTE_MESSAGE_DATA msg = (REMOTE_MESSAGE_DATA)Enum.Parse(typeof(REMOTE_MESSAGE_DATA), protocol.msg, true);
+                switch (msg)
+                {
+                    case REMOTE_MESSAGE_DATA.StartRemote:
+                        this.remote.Send(new PipeProtocol(
+                            PIPE_MESSAGE_TYPE.Command,
+                            REMOTE_SLAVE_MESSAGES.StartRemoteAck));
+                        break;
+                    case REMOTE_MESSAGE_DATA.StartCreateCloneFactory:
+                        this.remote.Send(new PipeProtocol(
+                            PIPE_MESSAGE_TYPE.Command,
+                            REMOTE_SLAVE_MESSAGES.StartCreateCloneFactoryAck));
+                        break;
+
+
+                    case REMOTE_MESSAGE_DATA.MemoryID:
+                        if (typeof(MemoryID).ToString() == protocol.dataType)
+                        {
+                            WorkEventManager.OnReceivedMemoryID(this, new MemoryIDArgs((MemoryID)protocol.data));
+
+                            MemoryID memoryID = (MemoryID)protocol.data;
+
+                            MemoryPool pool = new MemoryPool(memoryID.Pool);
+                            ImageData imageData = new ImageData(pool.GetMemory(memoryID.Group, memoryID.Data));
+                            this.sharedBufferInfoList.Add(new SharedBufferInfo(imageData.GetPtr(0), imageData.p_Size.X, imageData.p_Size.Y, imageData.GetBytePerPixel(), imageData.GetPtr(1), imageData.GetPtr(2)));
+                        }
+                        break;
+                    case REMOTE_MESSAGE_DATA.WorkManagerList:
+                        List<WorkManager> wms = (List<WorkManager>)protocol.data;
+                        this.workManagers.Clear();
+                        foreach (WorkManager wm in wms)
+                        {
+                            this.workManagers.Add(wm.Clone());
+                        }
+                        break;
+
+
+                    case REMOTE_MESSAGE_DATA.EndCreateCloneFactory:
+                        this.remote.Send(new PipeProtocol(
+                            PIPE_MESSAGE_TYPE.Command,
+                            REMOTE_SLAVE_MESSAGES.EndCreateCloneFactoryAck));
+                        break;
+                    case REMOTE_MESSAGE_DATA.StartCreateWork:
+                        this.remote.Send(new PipeProtocol(
+                            PIPE_MESSAGE_TYPE.Command,
+                            REMOTE_SLAVE_MESSAGES.StartCreateWorkAck));
+                        break;
+                    case REMOTE_MESSAGE_DATA.RecipeName:
+                        string recipePath = (string)protocol.data;
+                        this.recipe = new CloneableRecipe();
+                        this.recipe.RecipePath = recipePath;
+                        this.recipe.Read(recipePath);
+                        break;
+                    case REMOTE_MESSAGE_DATA.WorkplaceBundle:
+                        this.workplaceBundle = (WorkplaceBundle)protocol.data;
+                        break;
+                    case REMOTE_MESSAGE_DATA.WorkBundle:
+                        WorkBundle wb = (WorkBundle)protocol.data;
+                        this.workBundle = new WorkBundle();
+                        int indexParam = 0;
+                        foreach (CloneableWorkBase clone in wb)
+                        {
+                            WorkBase work = (WorkBase)Tools.CreateInstance(Type.GetType(clone.InspectionName));
+                            this.workBundle.Add(work);
+                            if (indexParam < this.recipe.ParameterItemList.Count)
+                            {
+                                if (this.recipe.ParameterItemList[indexParam].InspectionType.ToString() == clone.InspectionName)
+                                {
+                                    work.SetParameter(this.recipe.ParameterItemList[indexParam]);
+                                    indexParam++;
+                                }
+                            }
+                        }
+                        break;
+                    case REMOTE_MESSAGE_DATA.EndCreateWork:
+                        this.remote.Send(new PipeProtocol(
+                           PIPE_MESSAGE_TYPE.Command,
+                           REMOTE_SLAVE_MESSAGES.EndCreateWorkAck));
+                        break;
+                    //case REMOTE_MESSAGE_DATA.StartWork:
+
+                    //    RemoteStartWork();
+
+                    //    this.remote.Send(new PipeProtocol(
+                    //      PIPE_MESSAGE_TYPE.Command,
+                    //      REMOTE_SLAVE_MESSAGES.StartWorkAck));
+                    //    break;
                     default:
                         break;
                 }
             }
         }
 
-        private void RemoteMessage_EventHandler(PipeProtocol protocol)
+        private void RemoteStartWork()
+        {
+            this.workplaceBundle.SetWorkState(WORK_TYPE.SNAP);
+            this.workplaceBundle.SetSharedBuffer(this.sharedBufferInfoList[0]);
+
+
+#if DEBUG
+            Debug.WriteLine("[Start]");
+
+            DebugOutput.PrintWorkplaceBundle(workplaceBundle);
+#endif
+            WorkEventManager.OnInspectionStart(this, new InspectionStartArgs());
+
+            workBundle.SetRecipe(this.recipe);
+            workBundle.SetWorkplacBundle(this.workplaceBundle);
+            foreach (WorkManager wm in this.workManagers)
+            {
+                wm.SetWorkplaceBundle(workplaceBundle);
+                wm.SetWorkBundle(workBundle);
+                wm.Start();
+            }
+        }
+
+        /// <summary>
+        /// Server는 Listen Client는 Connect를 시도한다.
+        /// </summary>
+        public void TryConnect()
         {
             if (this.remoteMode == REMOTE_MODE.Master)
             {
-
+                this.remote.ListenStart();
             }
             else
             {
-
-            }
-        }
-
-        private void RemoteMessage_DataHandler(PipeProtocol protocol)
-        {
-            if (this.remoteMode == REMOTE_MODE.Master)
-            {
-
-            }
-            else
-            {
-
-            }
-        }
-
-
-
-
-        public void RemoteStart()
-        {
-            remote.StartProcess();
-            remote.MessageReceived += PipeCommMessageReceived_Callback;
-            //WorkplaceBundle wb = this.CreateWorkplaceBundle();
-            //if (wb == null) return;
-
-            //remote.Send<WorkplaceBundle>(wb);
-        }
-
-        public void WriteTest()
-        {
-            remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Message, "Start"));
-
-            WorkplaceBundle wb = new WorkplaceBundle();
-            wb.Add(new Workplace(0, 0, 0, 0, 0, 0, 0));
-            wb.Add(new Workplace(0, 1, 0, 0, 0, 0, 0));
-            wb.Add(new Workplace(0, 2, 0, 0, 0, 0, 0));
-            wb.Add(new Workplace(0, 3, 0, 0, 0, 0, 0));
-
-            remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, "WorkplaceBundle", typeof(WorkplaceBundle).ToString(), wb));
-
-            remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Command, "Command!!!!"));
-
-
-            remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Event, "Event!!", typeof(Workplace).ToString(), new Workplace(10, 10, 10, 10, 10, 10, 10)));
-
-            //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Message, typeof(string).ToString(), "AAAAAAAAAAA"));
-
-            //InitializeRemoteWorkFactory();
-        }
-
-        public void InitializeRemoteWorkFactory()
-        {
-            //const string InitializeStartMsg = "InitializeStart";
-            //const string InitializeDoneMsg = "InitializeDone";
-
-            if (remoteMode == REMOTE_MODE.Master)
-            {
-                //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Message, InitializeStartMsg));
-                //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, this.recipe.RecipePath));
-                //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, this.workManagers));
-                //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, this.CreateWorkplaceBundle()));
-                //remote.Send(new PipeProtocol(PIPE_MESSAGE_TYPE.Data, this.CreateWorkBundle().CloneForRemote()));
-
-                PipeProtocol protocol = new PipeProtocol();
-                remote.Read(protocol);
-
-
-                switch (protocol.msgType)
-                {
-                    case PIPE_MESSAGE_TYPE.Message:
-                        MessageBox.Show((string)protocol.data);
-                        break;
-                    case PIPE_MESSAGE_TYPE.Command:
-                        break;
-                    case PIPE_MESSAGE_TYPE.Data:
-                        break;
-                    case PIPE_MESSAGE_TYPE.Event:
-                        break;
-                }
-                //string message = "";
-                //remote.Send<string>(InitializeStartMsg);
-
-                //remote.Send<string>(this.recipe.RecipePath);
-                //remote.Send<List<WorkManager>>(this.workManagers);
-                //remote.Send<WorkplaceBundle>(this.CreateWorkplaceBundle());
-                //remote.Send<WorkBundle>(this.CreateWorkBundle().CloneForRemote());
-
-                //if (remote.Read<string>() == InitializeDoneMsg)
-                //{
-                //    Debug.WriteLine(message);
-                //    return;
-                //}
-                //Debug.WriteLine(message);
-            }
-            else // Slave
-            {
-                PipeProtocol protocol = new PipeProtocol();
-
-                remote.Read(protocol);
-
-
-                //string message = remote.Read<string>();
-                //if (message != InitializeStartMsg)
-                //{
-                //    Debug.WriteLine(message);
-                //    return;
-                //}
-                //Debug.WriteLine(message);
-
-                //string recipePath = remote.Read<string>();
-                //Debug.WriteLine(recipePath);
-
-                //this.recipe = new CloneableRecipe();
-                //this.recipe.RecipePath = recipePath;
-                //this.recipe.Read(recipePath);
-
-
-                //List<WorkManager> workManagers = remote.Read<List<WorkManager>>();
-                //foreach (WorkManager wm in workManagers)
-                //{
-                //    this.workManagers.Add(wm.Clone());
-                //}
-
-                //if (this.workManagers == null)
-                //{
-                //    Debug.WriteLine("workManagers == null");
-                //}
-
-                //this.workplaceBundle = remote.Read<WorkplaceBundle>();
-                //if (this.workplaceBundle == null)
-                //{
-                //    Debug.WriteLine("WorkplaceBundle == null");
-                //}
-
-                //WorkBundle wb = remote.Read<WorkBundle>();
-                //if (wb == null)
-                //{
-                //    Debug.WriteLine("workBundle == null");
-                //}
-                //this.workBundle = new WorkBundle();
-                //int indexParam = 0;
-                //foreach (CloneableWorkBase clone in wb)
-                //{
-                //    WorkBase work = (WorkBase)Tools.CreateInstance(Type.GetType(clone.InspectionName));
-                //    this.workBundle.Add(work);
-                //    if (indexParam < this.recipe.ParameterItemList.Count)
-                //    {
-                //        if (this.recipe.ParameterItemList[indexParam].InspectionType.ToString() == clone.InspectionName)
-                //        {
-                //            work.SetParameter(this.recipe.ParameterItemList[indexParam]);
-                //            indexParam++;
-                //        }
-                //    }
-                //}
-
-
-                //Debug.WriteLine(this.workplaceBundle.Count.ToString());
-
-                //remote.Send<string>(InitializeDoneMsg);
-                //string message = remote.Read<string>();
-                //if (message != InitializeStartMsg)
-                //{
-                //    Debug.WriteLine(message);
-                //    return;
-                //}
-                //Debug.WriteLine(message);
-
-                //string recipePath = remote.Read<string>();
-                //Debug.WriteLine(recipePath);
-
-                //this.recipe = new CloneableRecipe();
-                //this.recipe.RecipePath = recipePath;
-                //this.recipe.Read(recipePath);
-
-
-                //List<WorkManager> workManagers = remote.Read<List<WorkManager>>();
-                //foreach(WorkManager wm in workManagers)
-                //{
-                //    this.workManagers.Add(wm.Clone());
-                //}
-
-                //if (this.workManagers == null)
-                //{
-                //    Debug.WriteLine("workManagers == null");
-                //}
-
-                //this.workplaceBundle = remote.Read<WorkplaceBundle>();
-                //if(this.workplaceBundle == null)
-                //{
-                //    Debug.WriteLine("WorkplaceBundle == null");
-                //}
-
-                //WorkBundle wb= remote.Read<WorkBundle>();
-                //if (wb == null)
-                //{
-                //    Debug.WriteLine("workBundle == null");
-                //}
-                //this.workBundle = new WorkBundle();
-                //int indexParam = 0;
-                //foreach (CloneableWorkBase clone in wb)
-                //{
-                //    WorkBase work = (WorkBase)Tools.CreateInstance(Type.GetType(clone.InspectionName));
-                //    this.workBundle.Add(work);
-                //    if( indexParam < this.recipe.ParameterItemList.Count)
-                //    {
-                //        if (this.recipe.ParameterItemList[indexParam].InspectionType.ToString() == clone.InspectionName)
-                //        {
-                //            work.SetParameter(this.recipe.ParameterItemList[indexParam]);
-                //            indexParam++;
-                //        }
-                //    }  
-                //}
-
-
-                //Debug.WriteLine(this.workplaceBundle.Count.ToString());
-
-                //remote.Send<string>(InitializeDoneMsg);
+                this.remote.TryConnect();
             }
         }
 
 
         public void ExitRemoteProcess()
         {
-            remote.ExitProcess();
+            remote.Exit();
         }
 
         ~WorkFactory()

@@ -77,6 +77,11 @@ namespace Root_WIND2
 		private WorkplaceBundle CreateWorkplace_Edge()
 		{
 			workplaceBundle = new WorkplaceBundle();
+			
+			Workplace tempPlace = new Workplace(0, 0, 0, 0, 0, 0, workplaceBundle.Count);
+			tempPlace.SetSharedBuffer(this.SharedBufferInfoArray[0]);
+			workplaceBundle.Add(tempPlace);
+
 			CreateWorkplace_Edge(recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop, recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop, EdgeSurface.EdgeMapPositionX.Top, this.SharedBufferInfoArray[0], ref workplaceBundle);
 			CreateWorkplace_Edge(recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide, recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide, EdgeSurface.EdgeMapPositionX.Side, this.SharedBufferInfoArray[1], ref workplaceBundle);
 			CreateWorkplace_Edge(recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm, recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm, EdgeSurface.EdgeMapPositionX.Btm, this.SharedBufferInfoArray[2], ref workplaceBundle);
@@ -86,21 +91,36 @@ namespace Root_WIND2
 
 		private void CreateWorkplace_Edge(EdgeSurfaceRecipeBase recipe, EdgeSurfaceParameterBase param, EdgeSurface.EdgeMapPositionX mapX, SharedBufferInfo sharedBufferInfo, ref WorkplaceBundle workplaceBundle)
 		{
+			// temp notch
+			int firstNotch = param.StartNotch;
+			int lastNotch = param.EndNotch;
+			int bufferHeight = lastNotch - firstNotch;
+			//
+
+			// 나중에 원복
+			/*
 			// 360도 memory height
 			int bufferHeight = (int)(360000 / recipe.TriggerRatio) + recipe.ImageOffset;
 			// 검사 시작/끝 Y좌표 설정
 			int startY = recipe.PositionOffset * (bufferHeight / 360);
 			int endY = bufferHeight + startY;
+			*/
+			
 			// ROI
 			int roiWidth = param.ROIWidth;
 			int roiHeight = param.ROIHeight;
-
-			Workplace tempPlace = new Workplace((int)mapX, -1, 0, 0, 0, 0, workplaceBundle.Count);
-			tempPlace.SetSharedBuffer(sharedBufferInfo);
-			workplaceBundle.Add(tempPlace);
-
-			for (int i = 0; i < bufferHeight / roiHeight; i++)
+			for (int i = 0; i < 3/*bufferHeight / roiHeight*/; i++)
 			{
+				int calcStartY = (roiHeight * i) + firstNotch;
+				int calcHeight = roiHeight;
+
+				if (calcStartY + roiHeight > lastNotch)
+					calcHeight = lastNotch - calcStartY;
+
+				if (calcHeight <= 0) break;
+
+				// 나중에 원복
+				/*
 				int calcStartY = (roiHeight * i) + startY + recipe.ImageOffset;
 				int calcHeight = roiHeight;
 
@@ -108,6 +128,7 @@ namespace Root_WIND2
 					calcHeight = endY - calcStartY;
 
 				if (calcHeight <= 0) break;
+				*/
 
 				Workplace workplace = new Workplace((int)mapX, i, 0, calcStartY, roiWidth, calcHeight, workplaceBundle.Count);
 				workplace.SetSharedBuffer(sharedBufferInfo);

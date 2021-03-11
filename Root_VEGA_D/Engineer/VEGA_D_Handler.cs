@@ -38,6 +38,8 @@ namespace Root_VEGA_D.Engineer
         public Vision m_vision;
         public Vision_IPU m_visionIPU;
         public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
+        public Interlock m_interlock;
+        public TowerLamp m_towerlamp;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -51,6 +53,10 @@ namespace Root_VEGA_D.Engineer
             iWTR.AddChild(m_vision); 
             m_visionIPU = new Vision_IPU("Vision_IPU", m_engineer, ModuleBase.eRemote.Client);
             InitModule(m_visionIPU);
+            m_interlock = new Interlock("Interlock", m_engineer);
+            InitModule(m_interlock);
+            m_towerlamp = new TowerLamp("TowerLamp", m_engineer);
+            InitModule(m_towerlamp);
             m_HomeProgress.Init(this);
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
@@ -58,7 +64,7 @@ namespace Root_VEGA_D.Engineer
             m_recipe = new VEGA_D_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
             m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
-            //CalcRecover();
+            CalcRecover();
         }
 
         void InitModule(ModuleBase module)

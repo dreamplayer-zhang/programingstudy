@@ -598,7 +598,26 @@ namespace RootTools_CLR
 		IP::SaveBMP(sFilePath, pSrc, nMemW, nMemH, nByteCnt);
 		pSrc = nullptr;
 	}
-	void CLR_IP::Cpp_SaveDefectListBMP(System::String^ strFilePath, byte* pSrcImg, int  nMemW, int  nMemH, array<Cpp_Rect^>^ DefectRect)
+	void CLR_IP::Cpp_LoadBMP(System::String^ strFilePath, array<byte>^ pOutImg, int  nMemW, int  nMemH, int nByteCnt)
+	{
+		pin_ptr<byte> pOut = &pOutImg[0];
+		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
+		IP::LoadBMP(sFilePath, pOut, nMemW, nMemH, nByteCnt);
+		pOut = nullptr;
+	}
+
+	void CLR_IP::Cpp_SaveDefectListBMP(System::String^ strFilePath, byte* pSrcImg, int nMemW, int nMemH, Cpp_Rect^ DefectRect, int imageNum)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
+		sFilePath += std::to_string(imageNum) + ".BMP";
+
+		Rect defectRect = Rect(DefectRect->x, DefectRect->y, DefectRect->w, DefectRect->h);
+		IP::SaveDefectListBMP(sFilePath, pSrc, nMemW, nMemH, defectRect);
+
+		pSrc = nullptr;
+	}
+	void CLR_IP::Cpp_SaveDefectListBMP(System::String^ strFilePath, byte* pSrcImg, int nMemW, int nMemH, array<Cpp_Rect^>^ DefectRect)
 	{
 		if (DefectRect->Length == 0)
 			return;
@@ -614,7 +633,22 @@ namespace RootTools_CLR
 
 		pSrc = nullptr;
 	}
-	void CLR_IP::Cpp_SaveDefectListBMP_Color(System::String^ strFilePath, BYTE* pRImg, BYTE* pGImg, BYTE* pBImg, int  nMemW, int  nMemH, array<Cpp_Rect^>^ DefectRect)
+	void CLR_IP::Cpp_SaveDefectListBMP_Color(System::String^ strFilePath, BYTE* pRImg, BYTE* pGImg, BYTE* pBImg, int nMemW, int nMemH, Cpp_Rect^ DefectRect, int imageNum)
+	{
+		pin_ptr<byte> pR = &pRImg[0];
+		pin_ptr<byte> pG = &pGImg[0];
+		pin_ptr<byte> pB = &pBImg[0];
+		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
+		sFilePath += std::to_string(imageNum) + ".BMP";
+
+		Rect defectRect = Rect(DefectRect->x, DefectRect->y, DefectRect->w, DefectRect->h);
+		IP::SaveDefectListBMP_Color(sFilePath, pR, pG, pB, nMemW, nMemH, defectRect);
+
+		pR = nullptr;
+		pG = nullptr;
+		pB = nullptr;
+	}
+	void CLR_IP::Cpp_SaveDefectListBMP_Color(System::String^ strFilePath, BYTE* pRImg, BYTE* pGImg, BYTE* pBImg, int nMemW, int nMemH, array<Cpp_Rect^>^ DefectRect)
 	{
 		if (DefectRect->Length == 0)
 			return;
@@ -633,13 +667,6 @@ namespace RootTools_CLR
 		pR = nullptr;
 		pG = nullptr;
 		pB = nullptr;
-	}
-	void CLR_IP::Cpp_LoadBMP(System::String^ strFilePath, array<byte>^ pOutImg, int  nMemW, int  nMemH, int nByteCnt)
-	{
-		pin_ptr<byte> pOut = &pOutImg[0];
-		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
-		IP::LoadBMP(sFilePath, pOut, nMemW, nMemH, nByteCnt);
-		pOut = nullptr;
 	}
 
 	// ETC.

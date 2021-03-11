@@ -41,7 +41,7 @@ namespace RootTools_Vision
 			if (this.currentWorkplace.Index == 0)
 				return;
 
-			IntPtr ptrMem = this.currentWorkplace.SharedBufferR_GRAY;
+			IntPtr ptrMem = this.currentWorkplace.SharedBufferInfo.PtrR_GRAY;
 			int roiWidth = this.currentWorkplace.Width;
 			int roiHeight = this.currentWorkplace.Height;
 			int roiLeft = this.currentWorkplace.PositionX;
@@ -70,7 +70,7 @@ namespace RootTools_Vision
 			{
 				int ySum = 0;
 				for (int y = top; y < btm; y += 10)
-					ySum += ((byte*)memory)[(y * this.currentWorkplace.SharedBufferWidth) + x];
+					ySum += ((byte*)memory)[(y * this.currentWorkplace.SharedBufferInfo.Width) + x];
 				arrAvg[x - left] = ySum / ((btm - top) / 10);
 			}
 

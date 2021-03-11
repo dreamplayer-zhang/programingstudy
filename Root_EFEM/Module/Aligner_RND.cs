@@ -21,10 +21,13 @@ namespace Root_EFEM.Module
         RS232 m_rs232;
         MemoryPool m_memoryPool;
         Camera_CognexOCR m_camOCR;
-        ALID m_alid_WaferExist;
         public ALID m_alid_AlignFail;
+        ALID m_alid_WaferExist;
 
-
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
+        }
 
         public override void GetTools(bool bInit)
         {
@@ -610,15 +613,14 @@ namespace Root_EFEM.Module
         public string BeforePut(int nID)
         {
             if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
-            return "OK";
+            return SendCmd(eCmd.VacuumOn); ;
         }
 
         public string AfterGet(int nID)
         {
-            //string sGet = SendCmd(eCmd.ResetPos);
             ////m_bgwWaferExist.RunWorkerAsync(true);
             //m_bgwWaferExist.RunWorkerAsync(false);
-            return "OK"; 
+            return SendCmd(eCmd.ResetPos);
         }
 
         public string AfterPut(int nID)

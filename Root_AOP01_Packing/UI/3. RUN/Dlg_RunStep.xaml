@@ -1,0 +1,169 @@
+﻿<Window x:Class="Root_AOP01_Packing.Dlg_RunStep"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Root_AOP01_Packing"
+        xmlns:icon="clr-namespace:Root_AOP01_Packing.Icon"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="False"
+        ResizeMode="CanResizeWithGrip"
+        mc:Ignorable="d"
+        Title="Dlg_RunStep"
+        Height="450" Width="600" 
+        Background="{StaticResource PanelBackGround}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="4*" />
+            <RowDefinition Height="4*" />
+            <RowDefinition Height="2*" />
+        </Grid.RowDefinitions>
+        <!--Title Bar-->
+        <Grid Grid.Row="0"
+              Name="TitleBar"
+              Background="{DynamicResource MainThema}"
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <StackPanel Orientation="Horizontal">
+                <Viewbox Margin="3"
+                         VerticalAlignment="Center">
+                    <icon:AtiLogo />
+                </Viewbox>
+                <TextBlock Text="RUN STEP"
+                           Foreground="White"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           Margin="5,0,0,0"
+                           Grid.Column="1" />
+            </StackPanel>
+
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Grid.Column="2">
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MinimizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Foreground="White"
+                        Click="MinimizeButton_Click">
+                    <Path Style="{StaticResource MinimizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MaximizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Foreground="White"
+                        Click="MaximizeButton_Click">
+                    <Path Style="{StaticResource MaximizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="NormalizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Foreground="White"
+                        Click="NormalizeButton_Click">
+                    <Path Style="{StaticResource NormalizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="CloseButton"
+                        Width="30"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Foreground="White"
+                        Click="CloseButton_Click"
+                        VerticalAlignment="Bottom">
+                    <Path Style="{StaticResource CloseIconKey}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1" Margin="0">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <GroupBox Header="Module"
+                      Grid.Row="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ComboBox SelectedIndex="0"
+                              Margin="10"
+                              FontSize="18"
+                              FontFamily="Arial"
+                              FontWeight="Bold"
+                              HorizontalContentAlignment="Center"
+                              VerticalContentAlignment="Center">
+                        <ComboBoxItem Content="LOADPORT A" />
+                        <ComboBoxItem Content="LOADPORT B" />
+                        <ComboBoxItem Content="UNLOADPORT" />
+                        <ComboBoxItem Content="CASE ELEVATOR" />
+                        <ComboBoxItem Content="WTR A" />
+                        <ComboBoxItem Content="TAPING MODULE" />
+                        <ComboBoxItem Content="PACKING MODULE" />
+                        <ComboBoxItem Content="WTR B" />
+                    </ComboBox>
+                    <Border Margin="10"
+                            Grid.Column="1"
+                            Background="SeaGreen"
+                            BorderBrush="#FFACACAC"
+                            BorderThickness="1">
+                        <TextBlock Text="Ready"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   FontFamily="Arial" />
+                    </Border>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Step"
+                      Grid.Row="1">
+                <ComboBox SelectedIndex="0"
+                          Margin="10"
+                          FontSize="18"
+                          FontFamily="Arial"
+                          FontWeight="Bold"
+                          HorizontalContentAlignment="Center"
+                          VerticalContentAlignment="Center">
+                    <ComboBoxItem Content="Docking" />
+                    <ComboBoxItem Content="Undocking" />
+                </ComboBox>
+            </GroupBox>
+        </Grid>
+        <Grid Grid.Row="2">
+            <GroupBox Header="Description">
+                <TextBlock Text="Docking Loadport A" 
+                           FontSize="15" 
+                           FontFamily="Arail"
+                           Margin="10"/>
+                
+            </GroupBox>
+        </Grid>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Button Content="Cancel"
+                    Grid.Column="0"
+                    Height="50"
+                    FontSize="25"
+                    FontWeight="Bold"
+                    Click="CloseButton_Click"
+                    Style="{StaticResource SetupPanelBtn}" />
+            <Button Content="Start"
+                    Grid.Column="1"
+                    Height="50"
+                    FontSize="25"
+                    FontWeight="Bold"
+                    Style="{StaticResource SetupPanelBtn}" />
+        </Grid>
+    </Grid>
+</Window>

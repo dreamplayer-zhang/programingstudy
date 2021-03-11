@@ -48,7 +48,22 @@ namespace Root_Rinse_Unloader
             buttonStart.Foreground = (bRun && EQ.p_bPickerSet == false) ? Brushes.Red : Brushes.Black;
             buttonPickerSet.Foreground = (bRun && EQ.p_bPickerSet) ? Brushes.Red : Brushes.Black;
             borderState.Background = (EQ.p_eState == EQ.eState.Ready || EQ.p_eState == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
-            borderLoadState.Background = (rinse.p_eStateLoader == EQ.eState.Ready || rinse.p_eStateLoader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
+
+
+            if (rinse.m_tcpip.m_tcpSocket == null)
+            {
+                borderLoadState.Background = Brushes.Crimson;
+                textBlockLoadState.Text = "disconnect";
+            }
+            else if(rinse.m_tcpip.m_tcpSocket.m_socket.Connected)
+            {
+                borderLoadState.Background = (rinse.p_eStateLoader == EQ.eState.Ready || rinse.p_eStateLoader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
+            }
+            else
+            {
+                borderLoadState.Background = Brushes.Crimson;
+                textBlockLoadState.Text = "disconnect";
+            }
 
             gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
             gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.Gold : Brushes.YellowGreen;

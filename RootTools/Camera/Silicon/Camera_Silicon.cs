@@ -310,7 +310,7 @@ namespace RootTools.Camera.Silicon
                     m_hDev = null;
 
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     i++;
                 }

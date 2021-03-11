@@ -52,6 +52,7 @@ namespace Root_WIND2
         ALID alid_Ionizer;
         ALID alid_CDA;
         ALID alid_VAC1;
+        ALID alid_VAC2;
         ALID alid_MCRESET;
         public DIO_Os m_doLamp;
         string[] asLamp = Enum.GetNames(typeof(eLamp));
@@ -96,7 +97,8 @@ namespace Root_WIND2
             alid_EMS = m_gaf.GetALID(this, "EMS", "EMS ERROR");
             alid_Ionizer = m_gaf.GetALID(this, "Ionizer", "Ionizer ERROR");
             alid_CDA = m_gaf.GetALID(this, "CDA", "CDA ERROR");
-            alid_VAC1 = m_gaf.GetALID(this, "VAC1", "VAC Error");
+            alid_VAC1 = m_gaf.GetALID(this, "VAC 1", "VAC 1 Error");
+            alid_VAC2 = m_gaf.GetALID(this, "VAC 2", "VAC 2 Error");
             alid_MCRESET = m_gaf.GetALID(this, "MCReset", "MC Reset Error");
         }
 
@@ -260,12 +262,19 @@ namespace Root_WIND2
                 EQ.p_bStop = true;
                 alid_CDA.Run(!di_CDA.p_bIn, "Please Check CDA State");
             }
-            else if (!(di_VAC1.p_bIn && di_VAC2.p_bIn))
+            else if (!(di_VAC1.p_bIn))
             {
                 this.p_eState = eState.Error;
                 EQ.p_eState = EQ.eState.Error;
                 EQ.p_bStop = true;
-                alid_VAC1.Run(!(di_VAC1.p_bIn && di_VAC2.p_bIn), "Please Check VAC State");
+                alid_VAC1.Run(!(di_VAC1.p_bIn), "Please Check VAC State");
+            }
+            else if (!(di_VAC2.p_bIn))
+            {
+                this.p_eState = eState.Error;
+                EQ.p_eState = EQ.eState.Error;
+                EQ.p_bStop = true;
+                alid_VAC2.Run(!(di_VAC2.p_bIn), "Please Check VAC State");
             }
             else if (!(di_MCReset.p_bIn ))
             {
