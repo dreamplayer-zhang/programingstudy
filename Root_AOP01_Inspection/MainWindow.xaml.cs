@@ -168,18 +168,18 @@ namespace Root_AOP01_Inspection
 
 				//byte 업데이트
 				if (imageMain.m_MemData != null) 
-					imageMain.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.mMainMem).p_nCount;
+					imageMain.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.mMainMem).p_nByte;
 				if (image45D.m_MemData != null) 
 					image45D.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.m45DMem).p_nByte;
 
 				if (imageSideLeft.m_MemData != null) 
-					imageSideLeft.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.mSideLeftMem).p_nCount;
+					imageSideLeft.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.mSideLeftMem).p_nByte;
 				if (imageSideTop.m_MemData != null) 
-					imageSideTop.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.mSideTopMem).p_nCount;
+					imageSideTop.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.mSideTopMem).p_nByte;
 				if (imageSideRight.m_MemData != null) 
-					imageSideRight.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.mSideRightMem).p_nCount;
+					imageSideRight.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.mSideRightMem).p_nByte;
 				if (imageSideBottom.m_MemData != null) 
-					imageSideBottom.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.mSideBotMem).p_nCount;
+					imageSideBottom.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.mSideBotMem).p_nByte;
 
 
 				// Recipe 초기화 및 등록. 이름으로 찾도록 모두 수정해야함

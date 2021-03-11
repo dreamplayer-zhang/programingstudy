@@ -916,7 +916,7 @@ namespace RootTools.Module
                 m_qModuleRun.Clear();
                 m_bThread = false;
                 EQ.p_bStop = true;
-                m_thread.Join();
+                //m_thread.Join();
             }
         }
     }

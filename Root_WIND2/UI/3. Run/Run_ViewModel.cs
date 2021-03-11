@@ -128,6 +128,19 @@ namespace Root_WIND2
             }
         }
 
+        ObservableCollection<FFUModule> m_aFFU = new ObservableCollection<FFUModule>();
+        public ObservableCollection<FFUModule> p_aFFU
+        {
+            get
+            {
+                return m_aFFU;
+            }
+            set
+            {
+                SetProperty(ref m_aFFU, value);
+            }
+        }
+
 
         public RootViewer_ViewModel p_Viewer
         {
@@ -175,6 +188,7 @@ namespace Root_WIND2
                 p_Viewer.SetImageData(p_BackSideVision.GetMemoryData(BackSideVision.ScanMemory.BackSide));
                 p_ModuleList = engineer.ClassModuleList();
                 p_aTK4S = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_tk4s.p_aTK4S;
+                p_aFFU = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_FFUGourp.p_aFFU;
             }
         }
 

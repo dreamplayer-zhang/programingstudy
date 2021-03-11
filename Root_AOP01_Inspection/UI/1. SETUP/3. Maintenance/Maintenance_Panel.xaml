@@ -15,9 +15,10 @@
             <Grid>
                 <StackPanel Margin="0,10,0,0">
                     <Button Content="Engineer" x:Name="EngineerBtn"
-                             Command="{Binding btnEngineerTest}"
+                            Command="{Binding btnEngineerTest}"
                             Style="{StaticResource SetupPanelBtn}"/>
-                    <Button Content="Test"
+                    <Button Content="Tool Box"
+                            Command="{Binding btnToolBox}"
                             Style="{StaticResource SetupPanelBtn}"/>
                     <Button Content="ViewerTest"
                             Command="{Binding btnViewerTest}"

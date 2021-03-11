@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using RootTools.Trees;
+using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -20,28 +22,32 @@ namespace RootTools
             
             m_logView = logView;
             DataContext = logView;
+            tabSetup.SelectedIndex = 0;
             comboLog.SelectedIndex = 0;
             UpdateLogTab();
             logView.OnChangeTab += LogView_OnChangeTab;
+            treeRootUI.Init(logView.m_treeRoot);
+            logView.RunTree(Tree.eMode.Init); 
         }
 
         private void LogView_OnChangeTab()
         {
             UpdateLogTab();
+            comboLog.SelectedIndex = 0;
             comboLog.SelectedIndex = 0; 
         }
 
         void UpdateLogTab()
         {
-            foreach (ILogGroup log in m_logView.m_aGroup) UpdateLogTab(log);
+            foreach (LogGroup log in m_logView.m_aGroup) UpdateLogTab(log);
             m_asLog.Clear();
             comboLog.ItemsSource = null;
-            foreach (ILogGroup log in m_logView.m_aGroup) m_asLog.Add(log.p_id);
+            foreach (LogGroup log in m_logView.m_aGroup) m_asLog.Add(log.p_id);
             comboLog.ItemsSource = m_asLog;
             
         }
 
-        void UpdateLogTab(ILogGroup log)
+        void UpdateLogTab(LogGroup log)
         {
             foreach (TabItem tabItem in tabLog.Items)
             {
@@ -58,7 +64,14 @@ namespace RootTools
         private void comboLog_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (comboLog.SelectedIndex < 0) return;
+            tabSetup.SelectedIndex = 0;
+            checkSetup.IsChecked = false;
             tabLog.SelectedIndex = comboLog.SelectedIndex; 
+        }
+
+        private void checkSetup_Click(object sender, RoutedEventArgs e)
+        {
+            tabSetup.SelectedIndex = (checkSetup.IsChecked == true) ? 1 : 0;
         }
     }
 }

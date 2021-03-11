@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.GAFs;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
@@ -9,11 +10,17 @@ namespace Root_EFEM.Module
 {
     public class Vision_EBR : ModuleBase, IWTRChild
     {
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
+        }
         #region ToolBox
         MemoryPool m_memoryPool;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
+            m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
             if (bInit)
             {
                 InitMemory();

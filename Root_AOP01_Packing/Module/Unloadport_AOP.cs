@@ -1,6 +1,7 @@
 ﻿using Root_EFEM.Module;
 using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -11,6 +12,11 @@ namespace Root_AOP01_Packing.Module
 {
     public class Unloadport_AOP : ModuleBase, IWTRChild
     {
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Wafer Exist Error");
+        }
         #region ToolBox
         Axis m_axis;
         DIO_I[] m_diDoor = new DIO_I[2];

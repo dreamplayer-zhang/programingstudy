@@ -74,9 +74,11 @@ public:
 
 	// Bitmap Save / Load
 	static void SaveBMP(String sFilePath, BYTE* pSrc, int nW, int nH, int nByteCnt);
-	static void SaveDefectListBMP(String sFilePath, BYTE* pSrc, int nW, int nH, std::vector<Rect> DefectRect);
-	static void SaveDefectListBMP_Color(String sFilePath, BYTE* pR, BYTE* pG, BYTE* pB, int nW, int nH, std::vector<Rect> DefectRect);
 	static void LoadBMP(String sFilePath, BYTE* pOut, int nW, int nH, int nByteCnt);
+	static void SaveDefectListBMP(String sFilePath, BYTE* pSrc, int nW, int nH, Rect DefectRect);
+	static void SaveDefectListBMP(String sFilePath, BYTE* pSrc, int nW, int nH, std::vector<Rect> DefectRect);
+	static void SaveDefectListBMP_Color(String sFilePath, BYTE* pR, BYTE* pG, BYTE* pB, int nW, int nH, Rect DefectRect);
+	static void SaveDefectListBMP_Color(String sFilePath, BYTE* pR, BYTE* pG, BYTE* pB, int nW, int nH, std::vector<Rect> DefectRect);
 
 	// ETC.
 	static void SplitColorChannel(BYTE* pSrc, BYTE* pOutImg, int nW, int nH, Point ptLT, Point ptRB, int nChIndex, int nDownSample);

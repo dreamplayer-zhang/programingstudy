@@ -17,32 +17,31 @@ namespace Root_WIND2.UI_User
 {
 	public class EdgesideInspect_ViewModel : ObservableObject
 	{
-		private Edgeside_ImageViewer_ViewModel imgeViewerTopVM;
-		private Edgeside_ImageViewer_ViewModel imgeViewerSideVM;
-		private Edgeside_ImageViewer_ViewModel imgeViewerBtmVM;
+		private Edgeside_ImageViewer_ViewModel imageViewerTopVM;
+		private Edgeside_ImageViewer_ViewModel imageViewerSideVM;
+		private Edgeside_ImageViewer_ViewModel imageViewerBtmVM;
+		private Database_DataView_VM dataViewerVM;
+		private BitmapSource defectImage;
 
 		private int progress = 0;
 		private int maxProgress = 100;
 		private string percentage = "0";
-		private DataTable defectDataTable;
-		private object selectedDefect;
-		private BitmapSource defectImage;
 
 		#region [Getter / Setter]
 		public Edgeside_ImageViewer_ViewModel ImageViewerTopVM
 		{
-			get => imgeViewerTopVM;
-			set => SetProperty(ref imgeViewerTopVM, value);
+			get => imageViewerTopVM;
+			set => SetProperty(ref imageViewerTopVM, value);
 		}
 		public Edgeside_ImageViewer_ViewModel ImageViewerSideVM
 		{
-			get => imgeViewerSideVM;
-			set => SetProperty(ref imgeViewerSideVM, value);
+			get => imageViewerSideVM;
+			set => SetProperty(ref imageViewerSideVM, value);
 		}
 		public Edgeside_ImageViewer_ViewModel ImageViewerBtmVM
 		{
-			get => imgeViewerBtmVM;
-			set => SetProperty(ref imgeViewerBtmVM, value);
+			get => imageViewerBtmVM;
+			set => SetProperty(ref imageViewerBtmVM, value);
 		}
 		public int Progress
 		{
@@ -59,44 +58,11 @@ namespace Root_WIND2.UI_User
 			get => percentage;
 			set => SetProperty(ref percentage, value);
 		}
-		public DataTable DefectDataTable
+		public Database_DataView_VM DataViewerVM
 		{
-			get => defectDataTable;
-			set => SetProperty(ref defectDataTable, value);
+			get { return this.dataViewerVM; }
+			set { SetProperty(ref dataViewerVM, value); }
 		}
-
-		public object SelectedDefect
-		{
-			get => selectedDefect;
-			set
-			{
-				SetProperty(ref selectedDefect, value);
-
-				DataRowView selectedRow = (DataRowView)SelectedDefect;
-				if (selectedRow != null)
-				{
-					int nIndex = (int)GetDataGridItem(DefectDataTable, selectedRow, "m_nDefectIndex");
-					string sInspectionID = (string)GetDataGridItem(DefectDataTable, selectedRow, "m_strInspectionID");
-					string sFileName = nIndex.ToString() + ".bmp";
-					DisplayDefectImage(sInspectionID, sFileName);
-
-					int mapIndexX = (int)GetDataGridItem(DefectDataTable, selectedRow, "m_nChipIndexX");
-					double x = (double)GetDataGridItem(DefectDataTable, selectedRow, "m_fAbsX");
-					double y = (double)GetDataGridItem(DefectDataTable, selectedRow, "m_fAbsY");
-
-					Edgeside_ImageViewer_ViewModel imageViewerVM = new Edgeside_ImageViewer_ViewModel();
-					if (mapIndexX == (int)EdgeSurface.EdgeMapPositionX.Top)
-						imageViewerVM = ImageViewerTopVM;
-					else if (mapIndexX == (int)EdgeSurface.EdgeMapPositionX.Side)
-						imageViewerVM = ImageViewerSideVM;
-					else if (mapIndexX == (int)EdgeSurface.EdgeMapPositionX.Btm)
-						imageViewerVM = ImageViewerBtmVM;
-
-					MoveDefect(imageViewerVM, (int)x, (int)y);
-				}
-			}
-		}
-
 		public BitmapSource DefectImage
 		{
 			get => defectImage;
@@ -158,6 +124,9 @@ namespace Root_WIND2.UI_User
 			ImageViewerBtmVM = new Edgeside_ImageViewer_ViewModel();
 			ImageViewerBtmVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeBottomImage"), GlobalObjects.Instance.Get<DialogService>());
 
+			dataViewerVM = new Database_DataView_VM();
+			this.DataViewerVM.SelectedCellsChanged += SelectedCellsChanged_Callback;
+
 			if (GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
             {
 				GlobalObjects.Instance.Get<InspectionManagerEdge>().InspectionDone += WorkEventManager_InspectionDone;
@@ -188,91 +157,100 @@ namespace Root_WIND2.UI_User
 		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
 		{
 			Workplace workplace = sender as Workplace;
-			//List<String> textList = new List<String>();
-			//List<CRect> rectList = new List<CRect>();
-
-			//foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
-			//{
-			//	String text = "";
-
-			//	rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
-			//	textList.Add(text);
-			//}
 			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
 			{
-				//DrawRectDefect(rectList, textList, e.reDraw);
 				UpdateProgress();
 			}));
-		}
-
-		private void WorkEventManager_IntegratedProcessDefectDone(object sender, IntegratedProcessDefectDoneEventArgs e)
-		{
-			Workplace workplace = sender as Workplace;
-			List<CRect> rectList = new List<CRect>();
-			List<string> textList = new List<string>();
-
-			Edgeside_ImageViewer_ViewModel imageViewerVM = new Edgeside_ImageViewer_ViewModel();
-			if (workplace.MapIndexX == (int)EdgeSurface.EdgeMapPositionX.Top)
-				imageViewerVM = ImageViewerTopVM;
-			else if (workplace.MapIndexX == (int)EdgeSurface.EdgeMapPositionX.Side)
-				imageViewerVM = ImageViewerSideVM;
-			else if (workplace.MapIndexX == (int)EdgeSurface.EdgeMapPositionX.Btm)
-				imageViewerVM = ImageViewerBtmVM;
-
-			foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
-			{
-				String text = "";
-
-				rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
-				textList.Add(text);
-			}
-
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				DrawRectDefect(imageViewerVM, rectList, textList);
-				UpdateDefectData();
-			}));
-		}
-
-		private void DrawRectDefect(Edgeside_ImageViewer_ViewModel imageViewerVM, List<CRect> rectList, List<String> textList, bool reDraw = false)
-		{
-			imageViewerVM.AddDrawRectList(rectList, System.Windows.Media.Brushes.Red);
 		}
 
 		private void UpdateProgress()
 		{
 			if (GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
-            {
+			{
 				int workplaceCount = GlobalObjects.Instance.Get<InspectionManagerEdge>().GetWorkplaceCount();
 				MaxProgress = workplaceCount - 1;
 				Progress++;
 
 				int proc = (int)(((double)Progress / MaxProgress) * 100);
-				//if (proc == 100)
-				//	Percentage = "Processing";
+				if (proc == 100)
+					Percentage = "Processing";
 				Percentage = proc.ToString();
 			}
 		}
 
-		private void UpdateDefectData()
+		private void WorkEventManager_IntegratedProcessDefectDone(object sender, IntegratedProcessDefectDoneEventArgs e)
 		{
-			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			string sDefect = "defect";
-			DefectDataTable = DatabaseManager.Instance.SelectTablewithInspectionID(sDefect, sInspectionID);
-		}
+			Workplace workplace = sender as Workplace;
+			List<CRect> rectListTop = new List<CRect>();
+			List<CRect> rectListSide = new List<CRect>();
+			List<CRect> rectListBtm = new List<CRect>();
 
-		private object GetDataGridItem(DataTable table, DataRowView selectedRow, string sColumnName)
-		{
-			object result;
-			for (int i = 0; i < table.Columns.Count; i++)
+			List<string> textListTop = new List<string>();
+			List<string> textListSide = new List<string>();
+			List<string> textListBtm = new List<string>();
+
+			foreach (RootTools.Database.Defect defect in workplace.DefectList)
 			{
-				if (table.Columns[i].ColumnName == sColumnName)
+				String text = "";
+
+				if (defect.m_nChipIndexX == (int)EdgeSurface.EdgeMapPositionX.Top)
 				{
-					result = selectedRow.Row.ItemArray[i];
-					return result;
+					rectListTop.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+					textListTop.Add(text);
+				}
+				else if (defect.m_nChipIndexX == (int)EdgeSurface.EdgeMapPositionX.Side)
+				{
+					rectListSide.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+					textListSide.Add(text);
+				}
+				else if (defect.m_nChipIndexX == (int)EdgeSurface.EdgeMapPositionX.Btm)
+				{
+					rectListBtm.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+					textListBtm.Add(text);
 				}
 			}
-			return null;
+
+			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+			{
+				DatabaseManager.Instance.SelectData();
+				dataViewerVM.pDataTable = DatabaseManager.Instance.pDefectTable;
+
+				DrawRectDefect(ImageViewerTopVM, rectListTop, textListTop);
+				DrawRectDefect(imageViewerSideVM, rectListSide, textListSide);
+				DrawRectDefect(ImageViewerBtmVM, rectListBtm, textListBtm);
+				Percentage = "Done";
+			}));
+		}
+
+		private void SelectedCellsChanged_Callback(object obj)
+		{
+			DataRowView row = (DataRowView)obj;
+			if (row == null)
+				return;
+			
+			int nIndex = (int)row["m_nDefectIndex"];
+			string sInspectionID = (string)row["m_strInspectionID"];
+			string sFileName = nIndex.ToString() + ".bmp";
+			DisplayDefectImage(sInspectionID, sFileName);
+			
+			Edgeside_ImageViewer_ViewModel imageViewerVM = new Edgeside_ImageViewer_ViewModel();
+			int mapX = (int)row["m_nChipIndexX"];
+			if (mapX == (int)EdgeSurface.EdgeMapPositionX.Top)
+				imageViewerVM = ImageViewerTopVM;
+			else if (mapX == (int)EdgeSurface.EdgeMapPositionX.Side)
+				imageViewerVM = ImageViewerSideVM;
+			else if (mapX == (int)EdgeSurface.EdgeMapPositionX.Btm)
+				imageViewerVM = ImageViewerBtmVM;
+
+			System.Drawing.Rectangle m_View_Rect = new System.Drawing.Rectangle((int)(double)row["m_fAbsX"] - imageViewerVM.p_View_Rect.Width / 2, (int)(double)row["m_fAbsY"] - imageViewerVM.p_View_Rect.Height / 2, imageViewerVM.p_View_Rect.Width, imageViewerVM.p_View_Rect.Height);
+			imageViewerVM.p_View_Rect = m_View_Rect;
+			imageViewerVM.SetImageSource();
+			imageViewerVM.UpdateImageViewer();
+		}
+
+		private void DrawRectDefect(Edgeside_ImageViewer_ViewModel imageViewerVM, List<CRect> rectList, List<String> textList, bool reDraw = false)
+		{
+			imageViewerVM.AddDrawRectList(rectList, System.Windows.Media.Brushes.Red);
 		}
 
 		private void DisplayDefectImage(string sInspectionID, string sDefectImageName)
@@ -288,9 +266,5 @@ namespace Root_WIND2.UI_User
 				DefectImage = null;
 		}
 
-		private void MoveDefect(Edgeside_ImageViewer_ViewModel imageViewerVM, int x, int y)
-		{
-			imageViewerVM.CanvasMovePoint_Ref(new CPoint(x, y), 1, 1);
-		}
 	}
 }

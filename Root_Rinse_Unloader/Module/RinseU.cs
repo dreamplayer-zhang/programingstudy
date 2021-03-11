@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -190,8 +191,16 @@ namespace Root_Rinse_Unloader.Module
 
         #endregion
 
+        #region GAF
+        ALID m_alidAirEmergency;
+        void InitALID()
+        {
+            m_alidAirEmergency = m_gaf.GetALID(this, "Air Emergency", "Air Emergency");
+        }
+        #endregion
+
         #region ToolBox
-        TCPIPServer m_tcpip; 
+        public TCPIPServer m_tcpip; 
         public override void GetTools(bool bInit)
         {
             GetToolsDIO();
@@ -264,6 +273,7 @@ namespace Root_Rinse_Unloader.Module
                 {
                     EQ.p_bStop = true;
                     EQ.p_eState = EQ.eState.Error;
+                    m_alidAirEmergency.p_bSet = true;
                 }
             }
         }
@@ -281,6 +291,7 @@ namespace Root_Rinse_Unloader.Module
                 {
                     EQ.p_bStop = true;
                     EQ.p_eState = EQ.eState.Error;
+                    m_alidAirEmergency.p_bSet = true;
                 }
             }
         }

@@ -199,6 +199,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Engineer\AOP01_ToolBox_UI.xaml.cs">
+      <DependentUpon>AOP01_ToolBox_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\InspectionManager_AOP.cs" />
     <Compile Include="Recipe\AOP_RecipeSurface.cs" />
     <Compile Include="UIManager.cs" />
@@ -307,6 +310,10 @@
     <Page Include="Engineer\AOP01_Process_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Engineer\AOP01_ToolBox_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Module\FFU_Fan_UI.xaml">
       <Generator>MSBuild:Compile</Generator>

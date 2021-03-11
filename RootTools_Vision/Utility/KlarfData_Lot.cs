@@ -174,85 +174,47 @@ namespace RootTools_Vision.Utility
 
 			return true;
 		}
-		public bool AddSlot(RecipeType_WaferMap _mapdata, List<Defect> _defectlist, OriginRecipe _origin)
-		{
-			UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
 
-			KlarfData data = new KlarfData();
+        public bool AddSlot(RecipeType_WaferMap _mapdata, List<Defect> _defectlist, OriginRecipe _origin)
+        {
+            UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
 
-			data.SetKlarfType(klarfType);
-			data.tiffFileName = this.tiffFileName;
+            KlarfData data = new KlarfData();
 
-			data.waferID_name = string.Format("{0:2d}", 0/*pMapdata->GetWaferID()*/);
+            data.SetKlarfType(klarfType);
+            data.tiffFileName = this.tiffFileName;
 
-			//	data.m_nWaferID = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nWaferID);  
-			//	data.m_nSlot = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nSlot); 
-			data.partID = this.partID;
+            data.waferID_name = string.Format("{0:2d}", 0/*pMapdata->GetWaferID()*/);
 
-			//	m_sLotID = data.m_sLotID = pRecipe->GetCurrentWFInfor()->m_strLotID;    
+            //	data.m_nWaferID = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nWaferID);  
+            //	data.m_nSlot = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nSlot); 
+            data.partID = this.partID;
 
-			data.deviceID = this.deviceID;
+            //	m_sLotID = data.m_sLotID = pRecipe->GetCurrentWFInfor()->m_strLotID;    
 
-			data.sampleOrientationMarkType = this.sampleOrientationMarkType;
-			data.orientationMarkLocation = this.orientationMarkLocation;
+            data.deviceID = this.deviceID;
 
-			data.diePitchX = this.diePitchX;
-			data.diePitchY = this.diePitchY;
-			data.dieOriginX = this.dieOriginX;
-			data.dieOriginY = this.dieOriginY;
-			data.sampleCenterLocationX = this.sampleCenterLocationX;
-			data.sampleCenterLocationY = this.sampleCenterLocationY;
-			data.resX = this.resX;
-			data.resY = this.resY;
+            data.sampleOrientationMarkType = this.sampleOrientationMarkType;
+            data.orientationMarkLocation = this.orientationMarkLocation;
 
-			data.SetSampleTestPlan(_mapdata);
-			data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin);
-		//	data.m_nDefectDieCnt = pResultMap->GetBadDieNum();
+            data.diePitchX = this.diePitchX;
+            data.diePitchY = this.diePitchY;
+            data.dieOriginX = this.dieOriginX;
+            data.dieOriginY = this.dieOriginY;
+            data.sampleCenterLocationX = this.sampleCenterLocationX;
+            data.sampleCenterLocationY = this.sampleCenterLocationY;
+            data.resX = this.resX;
+            data.resY = this.resY;
 
-			data.SetMEMMAP(_mapdata);
+            data.SetSampleTestPlan(_mapdata);
+            data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin);
+            //	data.m_nDefectDieCnt = pResultMap->GetBadDieNum();
 
-			klarfData.Add(data);
-			return true;
-		}
+            data.SetMEMMAP(_mapdata);
 
-		public bool AddSlot(RecipeType_WaferMap _mapdata, List<Measurement> _defectlist, OriginRecipe _origin)
-		{
-			UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
-
-			KlarfData data = new KlarfData();
-
-			data.SetKlarfType(klarfType);
-			data.tiffFileName = this.tiffFileName;
-
-			data.waferID_name = string.Format("{0:2d}", 0/*pMapdata->GetWaferID()*/);
-
-			//	data.m_nWaferID = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nWaferID);  
-			//	data.m_nSlot = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nSlot); 
-			data.partID = this.partID;
-
-			//	m_sLotID = data.m_sLotID = pRecipe->GetCurrentWFInfor()->m_strLotID;    
-
-			data.deviceID = this.deviceID;
-
-			data.sampleOrientationMarkType = this.sampleOrientationMarkType;
-			data.orientationMarkLocation = this.orientationMarkLocation;
-
-			data.diePitchX = this.diePitchX;
-			data.diePitchY = this.diePitchY;
-			data.dieOriginX = this.dieOriginX;
-			data.dieOriginY = this.dieOriginY;
-			data.sampleCenterLocationX = this.sampleCenterLocationX;
-			data.sampleCenterLocationY = this.sampleCenterLocationY;
-			data.resX = this.resX;
-			data.resY = this.resY;
-
-			//data.SetSampleTestPlan(_mapdata);
-			//data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin);
-			//data.SetMEMMAP(_mapdata);
-
-			klarfData.Add(data);
-			return true;
-		}
+            klarfData.Add(data);
+            return true;
+        }
 
 		public bool AddSlotToServer(RecipeType_WaferMap _mapdata)
 		{
@@ -297,7 +259,8 @@ namespace RootTools_Vision.Utility
 		{
 			timeFile = DateTime.Now;
 
-
+			if (!Directory.Exists(strFilePath))
+				Directory.CreateDirectory(strFilePath);
 
 			if (bCollector)
 			{

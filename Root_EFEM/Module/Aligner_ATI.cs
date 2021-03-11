@@ -2,6 +2,7 @@
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.CognexOCR;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
@@ -27,6 +28,13 @@ namespace Root_EFEM.Module
         CameraBasler m_camAlign;
         Camera_CognexOCR m_camOCR;
 
+        ALID m_alid_WaferExist;
+
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
+        }
+
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "AxisRotate");
@@ -41,6 +49,8 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_camAlign, this, "Align");
             p_sInfo = m_toolBox.Get(ref m_camOCR, this, "OCR");
+
+            m_alid_WaferExist = m_gaf.GetALID(this, "Aligner Wafer Exist", "Aligner Wafer Exist");
             if (bInit) InitTools();
         }
 
