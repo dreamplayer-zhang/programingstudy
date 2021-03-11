@@ -306,6 +306,20 @@ namespace Root_CAMELLIA
         }
         private ObservableCollection<UIElement> m_DrawRouteElement = new ObservableCollection<UIElement>();
 
+        public ObservableCollection<UIElement> p_DrawPointElement
+        {
+            get
+            {
+                return m_DrawPointElement;
+            }
+            set
+            {
+                //m_DrawPointElement = value;
+                SetProperty(ref m_DrawPointElement, value);
+            }
+        }
+        private ObservableCollection<UIElement> m_DrawPointElement = new ObservableCollection<UIElement>();
+
         public double p_Progress
         {
             get
@@ -727,6 +741,7 @@ namespace Root_CAMELLIA
                         RecipeViewModel.UpdateListView(true);
                         RecipeViewModel.UpdateLayerGridView();
                         RecipeViewModel.UpdateView(true);
+                        p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                         DrawMeasureRoute();
                         p_Progress = 0;
                     }
@@ -740,17 +755,17 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    var viewModel = new Dlg_RecipeManager_ViewModel(this);
-                    //viewModel.dataManager = RecipeViewModel.dataManager;
+                    //var viewModel = new Dlg_RecipeManager_ViewModel(this);
+                    ////viewModel.dataManager = RecipeViewModel.dataManager;
                     bool isRecipeLoad = false;
-                    if(DataManager.Instance.recipeDM.TeachRecipeName != "")
+                    if (DataManager.Instance.recipeDM.TeachRecipeName != "")
                     {
                         isRecipeLoad = true;
                     }
-                    viewModel.UpdateListView(isRecipeLoad);
-                    viewModel.UpdateView(isRecipeLoad);
-                    Nullable<bool> result = dialogService.ShowDialog(viewModel);
-
+                    RecipeViewModel.UpdateListView(isRecipeLoad);
+                    RecipeViewModel.UpdateView(isRecipeLoad, true);
+                    Nullable<bool> result = dialogService.ShowDialog(RecipeViewModel);
+                   
                     isRecipeLoad = false;
                     if (DataManager.Instance.recipeDM.TeachRecipeName != "")
                     {
@@ -758,8 +773,9 @@ namespace Root_CAMELLIA
                     }
                     RecipeViewModel.UpdateListView(isRecipeLoad);
                     RecipeViewModel.UpdateLayerGridView();
-                    RecipeViewModel.UpdateView(isRecipeLoad);
+                    RecipeViewModel.UpdateView(isRecipeLoad, true);
 
+                    p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                     DrawMeasureRoute();
 
                 });

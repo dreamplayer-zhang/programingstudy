@@ -34,7 +34,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="690" />
+            <RowDefinition Height="800" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -86,780 +86,777 @@
                      Margin="-1,0,0,0"
                      Width="100">
                 <Grid>
-                    <ScrollViewer Grid.Row="2"
-                                  VerticalAlignment="Top">
-                        <StackPanel>
-                            <Grid Height="40">
-                                <StackPanel Orientation="Horizontal">
-                                    <Button FontWeight="Bold"
+                    <StackPanel>
+                        <Grid Height="40">
+                            <StackPanel Orientation="Horizontal">
+                                <Button FontWeight="Bold"
                                             Content="PM"
                                             Width="100"
                                             Margin="5,5" />
-                                    <Button FontWeight="Bold"
+                                <Button FontWeight="Bold"
                                             Content="VRS Viewer"
                                             Width="100"
                                             Margin="5,5" />
-                                    <Button FontWeight="Bold"
+                                <Button FontWeight="Bold"
                                             Content="Test"
                                             Width="100"
                                             Margin="5,5" Command="{Binding CmdTest}" />
-                                </StackPanel>
-                            </Grid>
-                            <Grid Height="610">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="4*" />
-                                    <ColumnDefinition Width="4.8*" />
-                                    <ColumnDefinition Width="1.2*" />
-                                </Grid.ColumnDefinitions>
-                                <Grid Grid.Column="0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="1.5*" />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <met:CountGraph Grid.Column="0" Width="auto" Height="auto"/>
-                                        <GroupBox Header="SR Parameter"
+                            </StackPanel>
+                        </Grid>
+                        <Grid Height="740">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4*" />
+                                <ColumnDefinition Width="4.8*" />
+                                <ColumnDefinition Width="1.2*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1.5*" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <met:CountGraph Grid.Column="0" Width="auto" Height="auto"/>
+                                    <GroupBox Header="SR Parameter"
                                                   Grid.Column="1">
-                                            <Grid Margin="5,0">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition />
-                                                    <RowDefinition />
-                                                    <RowDefinition />
-                                                    <RowDefinition />
-                                                    <RowDefinition />
-                                                    <RowDefinition />
-                                                </Grid.RowDefinitions>
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Center"
-                                                            Grid.Row="0">
-                                                    <TextBlock Text="Alpha1 :"
-                                                               Margin="3,0" />
-                                                    <TextBox Width="60"
-                                                             Margin="10,0" />
-                                                    <CheckBox VerticalAlignment="Center"
-                                                              Margin="3,0" />
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Center"
-                                                            Grid.Row="1">
-                                                    <TextBlock Text="Intergration Time :"
-                                                               Margin="3,0" />
-                                                    <ToggleButton Content="Vis"
-                                                                  Width="40"
-                                                                  Margin="67,0,3,0" />
-                                                    <ToggleButton Content="NIR"
-                                                                  Width="40"
-                                                                  Margin="3,0" />
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Center"
-                                                            Grid.Row="2">
-                                                    <TextBlock Text="Background Intergration Time:"
-                                                               Margin="3,0" />
-                                                    <ToggleButton Content="Vis"
-                                                                  Width="40"
-                                                                  Margin="3,0" />
-                                                    <ToggleButton Content="NIR"
-                                                                  Width="40"
-                                                                  Margin="3,0" />
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Center"
-                                                            Grid.Row="3">
-                                                    <TextBlock Text="Boxcar :"
-                                                               Margin="3,0" />
-                                                    <TextBox Width="60"
-                                                             Margin="10,0" />
-                                                </StackPanel>
-                                                <UniformGrid Columns="2"
-                                                             Grid.Row="4">
-                                                    <StackPanel Orientation="Horizontal"
-                                                                VerticalAlignment="Center">
-                                                        <TextBlock Text="Repeat :"
-                                                                   Margin="3,0" />
-                                                        <TextBox Width="60"
-                                                                 Margin="9,0" />
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Horizontal"
-                                                                VerticalAlignment="Center">
-                                                        <TextBlock Text="Start No. :"
-                                                                   Margin="3,0" />
-                                                        <TextBox Width="60"
-                                                                 Margin="3,0" />
-                                                    </StackPanel>
-                                                </UniformGrid>
-                                                <UniformGrid Columns="2"
-                                                             Grid.Row="5">
-                                                    <StackPanel Orientation="Horizontal"
-                                                                VerticalAlignment="Center">
-                                                        <TextBlock Text="Average :"
-                                                                   Margin="3,0" />
-                                                        <TextBox Width="60"
-                                                                 Margin="3,0" />
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Horizontal"
-                                                                VerticalAlignment="Center">
-                                                        <TextBlock Text="Delay :"
-                                                                   Margin="3,0" />
-                                                        <TextBox Width="60"
-                                                                 Margin="20,0" />
-                                                    </StackPanel>
-                                                </UniformGrid>
-                                            </Grid>
-                                        </GroupBox>
-                                    </Grid>
-                                    <Grid Grid.Row="1">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="1.5*" />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <GroupBox Header="Reflectance Graph">
-                                        </GroupBox>
-                                        <Grid Grid.Column="1">
+                                        <Grid Margin="5,0">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition />
                                                 <RowDefinition />
                                                 <RowDefinition />
                                                 <RowDefinition />
                                                 <RowDefinition />
+                                                <RowDefinition />
                                             </Grid.RowDefinitions>
-                                            <Button Content="Wafer Centering"
+                                            <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center"
+                                                            Grid.Row="0">
+                                                <TextBlock Text="Alpha1 :"
+                                                               Margin="3,0" />
+                                                <TextBox Width="60"
+                                                             Margin="10,0" />
+                                                <CheckBox VerticalAlignment="Center"
+                                                              Margin="3,0" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center"
+                                                            Grid.Row="1">
+                                                <TextBlock Text="Intergration Time :"
+                                                               Margin="3,0" />
+                                                <ToggleButton Content="Vis"
+                                                                  Width="40"
+                                                                  Margin="67,0,3,0" />
+                                                <ToggleButton Content="NIR"
+                                                                  Width="40"
+                                                                  Margin="3,0" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center"
+                                                            Grid.Row="2">
+                                                <TextBlock Text="Background Intergration Time:"
+                                                               Margin="3,0" />
+                                                <ToggleButton Content="Vis"
+                                                                  Width="40"
+                                                                  Margin="3,0" />
+                                                <ToggleButton Content="NIR"
+                                                                  Width="40"
+                                                                  Margin="3,0" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center"
+                                                            Grid.Row="3">
+                                                <TextBlock Text="Boxcar :"
+                                                               Margin="3,0" />
+                                                <TextBox Width="60"
+                                                             Margin="10,0" />
+                                            </StackPanel>
+                                            <UniformGrid Columns="2"
+                                                             Grid.Row="4">
+                                                <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Center">
+                                                    <TextBlock Text="Repeat :"
+                                                                   Margin="3,0" />
+                                                    <TextBox Width="60"
+                                                                 Margin="9,0" />
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Center">
+                                                    <TextBlock Text="Start No. :"
+                                                                   Margin="3,0" />
+                                                    <TextBox Width="60"
+                                                                 Margin="3,0" />
+                                                </StackPanel>
+                                            </UniformGrid>
+                                            <UniformGrid Columns="2"
+                                                             Grid.Row="5">
+                                                <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Center">
+                                                    <TextBlock Text="Average :"
+                                                                   Margin="3,0" />
+                                                    <TextBox Width="60"
+                                                                 Margin="3,0" />
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Center">
+                                                    <TextBlock Text="Delay :"
+                                                                   Margin="3,0" />
+                                                    <TextBox Width="60"
+                                                                 Margin="20,0" />
+                                                </StackPanel>
+                                            </UniformGrid>
+                                        </Grid>
+                                    </GroupBox>
+                                </Grid>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1.5*" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <GroupBox Header="Reflectance Graph">
+                                    </GroupBox>
+                                    <Grid Grid.Column="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <Button Content="Wafer Centering"
                                                     Margin="5"
                                                     Grid.Row="0"
                                                     Command="{Binding CmdCentering}" />
-                                            <Button Content="Init Calibration : Calibration(initcal:true)"
+                                        <Button Content="Init Calibration : Calibration(initcal:true)"
                                                     Margin="5"
                                                     Grid.Row="1"
                                                     Command="{Binding CmdInitCal}" />
-                                            <Button Content="Measure Background : Calibration(initcal:False)"
+                                        <Button Content="Measure Background : Calibration(initcal:False)"
                                                     Margin="5"
                                                     Grid.Row="2"
                                                     Command="{Binding CmdMeasureBack}" />
-                                            <Button Content="Measure Sample"
+                                        <Button Content="Measure Sample"
                                                     Margin="5"
                                                     Grid.Row="3"
                                                     Command="{Binding CmdMeasureSample}" />
-                                            <Button Content="Repeat Measurement"
+                                        <Button Content="Repeat Measurement"
                                                     Margin="5"
                                                     Grid.Row="4"
                                                     Command="{Binding CmdRepeatMeasure}" />
-                                        </Grid>
                                     </Grid>
                                 </Grid>
-                                <Grid Grid.Column="1">
-                                    <GroupBox Header="Motion Controller">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*" />
-                                                <RowDefinition Height="*" />
-                                            </Grid.RowDefinitions>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <GroupBox Header="Motion Controller">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
 
-                                            <Grid Grid.Row="0"
+                                        <Grid Grid.Row="0"
                                                   Margin="5">
-                                                <!--IsEnabled="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToEnableConverter}}"
+                                            <!--IsEnabled="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToEnableConverter}}"
                                                   Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToOpacityConverter}}">-->
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="4*" />
-                                                    <ColumnDefinition Width="6*" />
-                                                </Grid.ColumnDefinitions>
-                                                <Grid Grid.Column="0"
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="4*" />
+                                                <ColumnDefinition Width="6*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid Grid.Column="0"
                                                       Margin="0,5,0,0">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="0.8*" />
-                                                        <RowDefinition Height="2.5*" />
-                                                        <RowDefinition Height="2*" />
-                                                        <RowDefinition Height="1.5*" />
-                                                        <RowDefinition Height="1*" />
-                                                    </Grid.RowDefinitions>
-                                                    <Grid Grid.Row="0"
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="0.8*" />
+                                                    <RowDefinition Height="2.5*" />
+                                                    <RowDefinition Height="2*" />
+                                                    <RowDefinition Height="1.5*" />
+                                                    <RowDefinition Height="1*" />
+                                                </Grid.RowDefinitions>
+                                                <Grid Grid.Row="0"
                                                           Margin="5,0,0,5">
-                                                        <TextBlock Text="{Binding SelectedAxis.p_id}"
+                                                    <TextBlock Text="{Binding SelectedAxis.p_id}"
                                                                    FontSize="15"
                                                                    VerticalAlignment="Bottom" />
-                                                        <TextBlock Text="{Binding SelectedAxis.p_eState}"
+                                                    <TextBlock Text="{Binding SelectedAxis.p_eState}"
                                                                    FontSize="12"
                                                                    Margin="15,0"
                                                                    VerticalAlignment="Bottom"
                                                                    HorizontalAlignment="Right" />
-                                                    </Grid>
-                                                    <UniformGrid Grid.Row="1"
+                                                </Grid>
+                                                <UniformGrid Grid.Row="1"
                                                                  Columns="4"
                                                                  Rows="2"
                                                                  Margin="0">
-                                                        <Button Content="All Home"
+                                                    <Button Content="All Home"
                                                                 Margin="3"
                                                                 BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdAllHome}" />
-                                                        <Button Content="Move Pos"
+                                                    <Button Content="Move Pos"
                                                                 Margin="3"
                                                                 BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdMovePos}" />
-                                                        <Button Content="Stop"
+                                                    <Button Content="Stop"
                                                                 Margin="3"
                                                                 BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdStop}" />
-                                                        <Button Content="Save"
+                                                    <Button Content="Save"
                                                                 Margin="3"
                                                                 BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdSave}" />
-                                                        <Button Content="Axis Home"
+                                                    <Button Content="Axis Home"
                                                                 Margin="3"
                                                                 BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdAxisHome}" />
-                                                        <Button Content="Set Pos"
+                                                    <Button Content="Set Pos"
                                                                 Margin="3"
                                                                 BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdSetPos}" />
-                                                        <Button Content="Repeat"
+                                                    <Button Content="Repeat"
                                                                 Margin="3"
                                                                 BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdRepeat}" />
-                                                        <Button Content="Load"
+                                                    <Button Content="Load"
                                                                 Margin="3"
                                                                 BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdLoad}" />
-                                                    </UniformGrid>
-                                                    <Grid Grid.Row="2"
+                                                </UniformGrid>
+                                                <Grid Grid.Row="2"
                                                           Margin="0,10,0,0">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition />
-                                                            <ColumnDefinition />
-                                                            <ColumnDefinition Width="2*" />
-                                                        </Grid.ColumnDefinitions>
-                                                        <Button Grid.Column="0"
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="2*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Button Grid.Column="0"
                                                                 Margin="3"
                                                                 BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdServoOnOff}">
-                                                            <Grid Background="{Binding SelectedAxis.p_bSeroOn, Converter={StaticResource AxisBoolToBrush}}"
+                                                        <Grid Background="{Binding SelectedAxis.p_bServoOn, Converter={StaticResource AxisBoolToBrush}}"
                                                                   VerticalAlignment="Center"
                                                                   HorizontalAlignment="Center"
                                                                   Width="{Binding ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
                                                                   Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}">
-                                                                <TextBlock Text="Servo"
+                                                            <TextBlock Text="Servo"
                                                                            VerticalAlignment="Center"
                                                                            HorizontalAlignment="Center" />
-                                                            </Grid>
-                                                        </Button>
-                                                        <Grid Margin="3"
+                                                        </Grid>
+                                                    </Button>
+                                                    <Grid Margin="3"
                                                               Background="#FFDDDDDD"
                                                               Grid.Column="1">
-                                                            <Grid Background="{Binding SelectedAxis.p_sensorMinusLimit, Converter={StaticResource AxisBoolToBrush}}">
-                                                                <TextBlock Text="Fault"
+                                                        <Grid Background="{Binding SelectedAxis.p_sensorMinusLimit, Converter={StaticResource AxisBoolToBrush}}">
+                                                            <TextBlock Text="Fault"
                                                                            HorizontalAlignment="Center"
                                                                            VerticalAlignment="Center" />
-                                                            </Grid>
-                                                        </Grid>
-                                                        <Grid Grid.Column="2"
-                                                              Margin="1.5">
-                                                            <Grid.RowDefinitions>
-                                                                <RowDefinition />
-                                                                <RowDefinition />
-                                                            </Grid.RowDefinitions>
-                                                            <UniformGrid Columns="4"
-                                                                         Margin="1">
-                                                                <Grid Margin="2,1"
-                                                                      Background="#FFDDDDDD">
-                                                                    <Grid Background="{Binding SelectedAxis.p_sensorMinusLimit, Converter={StaticResource AxisBoolToBrush}}">
-                                                                        <TextBlock Text="-"
-                                                                                   HorizontalAlignment="Center"
-                                                                                   VerticalAlignment="Center" />
-                                                                    </Grid>
-                                                                </Grid>
-                                                                <Grid Margin="2,1"
-                                                                      Background="#FFDDDDDD">
-                                                                    <Grid Background="{Binding SelectedAxis.p_sensorHome, Converter={StaticResource AxisBoolToBrush}}">
-                                                                        <TextBlock Text="H"
-                                                                                   HorizontalAlignment="Center"
-                                                                                   VerticalAlignment="Center" />
-                                                                    </Grid>
-                                                                </Grid>
-                                                                <Grid Margin="2,1"
-                                                                      Background="#FFDDDDDD">
-                                                                    <Grid Background="{Binding SelectedAxis.p_sensorInPos, Converter={StaticResource AxisBoolToBrush}}">
-                                                                        <TextBlock Text="P"
-                                                                                   HorizontalAlignment="Center"
-                                                                                   VerticalAlignment="Center" />
-                                                                    </Grid>
-                                                                </Grid>
-                                                                <Grid Margin="2,1"
-                                                                      Background="#FFDDDDDD">
-                                                                    <Grid Background="{Binding SelectedAxis.p_sensorPlusLimit, Converter={StaticResource AxisBoolToBrush}}">
-                                                                        <TextBlock Text="+"
-                                                                                   HorizontalAlignment="Center"
-                                                                                   VerticalAlignment="Center" />
-                                                                    </Grid>
-                                                                </Grid>
-                                                            </UniformGrid>
-                                                            <Grid Margin="3"
-                                                                  Background="#FFDDDDDD"
-                                                                  Grid.Row="1">
-                                                                <TextBlock Text="Interlock"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center" />
-                                                            </Grid>
-
                                                         </Grid>
                                                     </Grid>
-                                                    <Grid Grid.Row="3"
+                                                    <Grid Grid.Column="2"
+                                                              Margin="1.5">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+                                                        <UniformGrid Columns="4"
+                                                                         Margin="1">
+                                                            <Grid Margin="2,1"
+                                                                      Background="#FFDDDDDD">
+                                                                <Grid Background="{Binding SelectedAxis.p_sensorMinusLimit, Converter={StaticResource AxisBoolToBrush}}">
+                                                                    <TextBlock Text="-"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   VerticalAlignment="Center" />
+                                                                </Grid>
+                                                            </Grid>
+                                                            <Grid Margin="2,1"
+                                                                      Background="#FFDDDDDD">
+                                                                <Grid Background="{Binding SelectedAxis.p_sensorHome, Converter={StaticResource AxisBoolToBrush}}">
+                                                                    <TextBlock Text="H"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   VerticalAlignment="Center" />
+                                                                </Grid>
+                                                            </Grid>
+                                                            <Grid Margin="2,1"
+                                                                      Background="#FFDDDDDD">
+                                                                <Grid Background="{Binding SelectedAxis.p_sensorInPos, Converter={StaticResource AxisBoolToBrush}}">
+                                                                    <TextBlock Text="P"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   VerticalAlignment="Center" />
+                                                                </Grid>
+                                                            </Grid>
+                                                            <Grid Margin="2,1"
+                                                                      Background="#FFDDDDDD">
+                                                                <Grid Background="{Binding SelectedAxis.p_sensorPlusLimit, Converter={StaticResource AxisBoolToBrush}}">
+                                                                    <TextBlock Text="+"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   VerticalAlignment="Center" />
+                                                                </Grid>
+                                                            </Grid>
+                                                        </UniformGrid>
+                                                        <Grid Margin="3"
+                                                                  Background="#FFDDDDDD"
+                                                                  Grid.Row="1">
+                                                            <TextBlock Text="Interlock"
+                                                                           HorizontalAlignment="Center"
+                                                                           VerticalAlignment="Center" />
+                                                        </Grid>
+
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid Grid.Row="3"
                                                           Margin="0,0"
                                                           VerticalAlignment="Stretch">
-                                                        <ContentControl>
-                                                            <TextBlock Text="{Binding SelectedAxis.p_posActual}"
+                                                    <ContentControl>
+                                                        <TextBlock Text="{Binding SelectedAxis.p_posActual}"
                                                                    FontSize="35"
                                                                    FontWeight="Bold"
                                                                    Margin="10,5"
                                                                    VerticalAlignment="Bottom" />
-                                                            <i:Interaction.Triggers>
-                                                                <i:EventTrigger EventName="MouseDoubleClick">
-                                                                    <i:InvokeCommandAction Command="{Binding CmdCopyCurrentPos}" />
-                                                                </i:EventTrigger>
-                                                            </i:Interaction.Triggers>
-                                                        </ContentControl>
-                                                    </Grid>
-                                                    <Grid Grid.Row="4"
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="MouseDoubleClick">
+                                                                <i:InvokeCommandAction Command="{Binding CmdCopyCurrentPos}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </ContentControl>
+                                                </Grid>
+                                                <Grid Grid.Row="4"
                                                           Margin="0">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="2*" />
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="*" />
-                                                        </Grid.ColumnDefinitions>
-                                                        <Button Content="＜＜"
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="2*" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Button Content="＜＜"
                                                                 Margin="3"
                                                                 Grid.Column="0"
                                                                 BorderBrush="{x:Null}">
-                                                            <i:Interaction.Triggers>
-                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                                                    <i:InvokeCommandAction Command="{Binding CmdJogMinusFast}" />
-                                                                </i:EventTrigger>
-                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                                                    <i:InvokeCommandAction Command="{Binding CmdStop}" />
-                                                                </i:EventTrigger>
-                                                            </i:Interaction.Triggers>
-                                                        </Button>
-                                                        <Button Content="＜"
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                                <i:InvokeCommandAction Command="{Binding CmdJogMinusFast}" />
+                                                            </i:EventTrigger>
+                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                                <i:InvokeCommandAction Command="{Binding CmdStop}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </Button>
+                                                    <Button Content="＜"
                                                                 Margin="3"
                                                                 Grid.Column="1"
                                                                 BorderBrush="{x:Null}">
-                                                            <i:Interaction.Triggers>
-                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                                                    <i:InvokeCommandAction Command="{Binding CmdJogMinusNormal}" />
-                                                                </i:EventTrigger>
-                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                                                    <i:InvokeCommandAction Command="{Binding CmdStop}" />
-                                                                </i:EventTrigger>
-                                                            </i:Interaction.Triggers>
-                                                        </Button>
-                                                        <Button Content="|＜"
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                                <i:InvokeCommandAction Command="{Binding CmdJogMinusNormal}" />
+                                                            </i:EventTrigger>
+                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                                <i:InvokeCommandAction Command="{Binding CmdStop}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </Button>
+                                                    <Button Content="|＜"
                                                                 Margin="3"
                                                                 Grid.Column="2"
                                                                 BorderBrush="{x:Null}">
-                                                            <i:Interaction.Triggers>
-                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                                                    <i:InvokeCommandAction Command="{Binding cmdRelMoveMinus}" />
-                                                                </i:EventTrigger>
-                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                                                    <i:InvokeCommandAction Command="{Binding CmdStop}" />
-                                                                </i:EventTrigger>
-                                                            </i:Interaction.Triggers>
-                                                        </Button>
-                                                        <TextBox Text="{Binding PosValue, Converter={StaticResource TextBoxToInt}}"
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                                <i:InvokeCommandAction Command="{Binding cmdRelMoveMinus}" />
+                                                            </i:EventTrigger>
+                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                                <i:InvokeCommandAction Command="{Binding CmdStop}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </Button>
+                                                    <TextBox Text="{Binding PosValue, Converter={StaticResource TextBoxToInt}}"
                                                                  TextAlignment="Center"
                                                                  VerticalContentAlignment="Center"
                                                                  Margin="3"
                                                                  Grid.Column="3" />
 
-                                                        <Button Content="＞|"
+                                                    <Button Content="＞|"
                                                                 Margin="3"
                                                                 Grid.Column="4"
                                                                 BorderBrush="{x:Null}">
-                                                            <i:Interaction.Triggers>
-                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                                                    <i:InvokeCommandAction Command="{Binding CmdRelMovePlus}" />
-                                                                </i:EventTrigger>
-                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                                                    <i:InvokeCommandAction Command="{Binding CmdStop}" />
-                                                                </i:EventTrigger>
-                                                            </i:Interaction.Triggers>
-                                                        </Button>
-                                                        <Button Content="＞"
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                                <i:InvokeCommandAction Command="{Binding CmdRelMovePlus}" />
+                                                            </i:EventTrigger>
+                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                                <i:InvokeCommandAction Command="{Binding CmdStop}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </Button>
+                                                    <Button Content="＞"
                                                                 Margin="3"
                                                                 Grid.Column="5"
                                                                 BorderBrush="{x:Null}">
-                                                            <i:Interaction.Triggers>
-                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                                                    <i:InvokeCommandAction Command="{Binding CmdJogPlusNormal}" />
-                                                                </i:EventTrigger>
-                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                                                    <i:InvokeCommandAction Command="{Binding CmdStop}" />
-                                                                </i:EventTrigger>
-                                                            </i:Interaction.Triggers>
-                                                        </Button>
-                                                        <Button Content="＞＞"
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                                <i:InvokeCommandAction Command="{Binding CmdJogPlusNormal}" />
+                                                            </i:EventTrigger>
+                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                                <i:InvokeCommandAction Command="{Binding CmdStop}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </Button>
+                                                    <Button Content="＞＞"
                                                                 Margin="3"
                                                                 Grid.Column="6"
                                                                 BorderBrush="{x:Null}">
-                                                            <i:Interaction.Triggers>
-                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                                                    <i:InvokeCommandAction Command="{Binding CmdJogPlusFast}" />
-                                                                </i:EventTrigger>
-                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                                                    <i:InvokeCommandAction Command="{Binding CmdStop}" />
-                                                                </i:EventTrigger>
-                                                            </i:Interaction.Triggers>
-                                                        </Button>
-                                                    </Grid>
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                                <i:InvokeCommandAction Command="{Binding CmdJogPlusFast}" />
+                                                            </i:EventTrigger>
+                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                                <i:InvokeCommandAction Command="{Binding CmdStop}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </Button>
                                                 </Grid>
-                                                <Grid Grid.Column="1">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="4*" />
-                                                        <ColumnDefinition Width="1*" />
-                                                        <ColumnDefinition Width="1*" />
-                                                        <ColumnDefinition Width="1*" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <GroupBox Header="XY"
+                                            </Grid>
+                                            <Grid Grid.Column="1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="4*" />
+                                                    <ColumnDefinition Width="1*" />
+                                                    <ColumnDefinition Width="1*" />
+                                                    <ColumnDefinition Width="1*" />
+                                                </Grid.ColumnDefinitions>
+                                                <GroupBox Header="XY"
                                                               Grid.Column="0">
-                                                        <Viewbox>
-                                                            <Canvas Background="{StaticResource ControlBackGround}"
+                                                    <Viewbox>
+                                                        <Canvas Background="{StaticResource ControlBackGround}"
                                                                     Width="10000" Height="10000">
-                                                                <Border Width="3000"
+                                                            <Border Width="3000"
                                                                         Height="3000"
                                                                         Canvas.Left="{Binding AxisX.p_posActual, Converter={StaticResource AxisXToMotionUI}}"
                                                                         Canvas.Top="{Binding AxisY.p_posActual, Converter={StaticResource AxisYToMotionUI}}"
                                                                         Background="Gray"
                                                                         Margin="5">
-                                                                    
-                                                                    <Grid>
-                                                                        <Ellipse Width="2800"
+
+                                                                <Grid>
+                                                                    <Ellipse Width="2800"
                                                                                  Height="2800"
                                                                                  Fill="LightGray" />
-                                                                        <TextBlock Text="Stage"
+                                                                    <TextBlock Text="Stage"
                                                                                    FontSize="300"
                                                                                    VerticalAlignment="Center"
                                                                                    HorizontalAlignment="Center" />
-                                                                    </Grid>
-                                                                </Border>
-                                                            </Canvas>
-                                                        </Viewbox>
-                                                    </GroupBox>
-                                                    <GroupBox Header="Z"
+                                                                </Grid>
+                                                            </Border>
+                                                        </Canvas>
+                                                    </Viewbox>
+                                                </GroupBox>
+                                                <GroupBox Header="Z"
                                                               Grid.Column="1">
-                                                        <Viewbox>
-                                                            <Canvas Background="LightGray"
+                                                    <Viewbox>
+                                                        <Canvas Background="LightGray"
                                                                     Width="2000" Height="10000">
-                                                                <Border Width="2000"
+                                                            <Border Width="2000"
                                                                         Height="500"
                                                                         Canvas.Top="{Binding AxisZ.p_posActual, Converter={StaticResource AxisZToMotionUI}}"
                                                                         Background="Gray"
                                                                         Margin="5" />
-                                                            </Canvas>
-                                                        </Viewbox>
-                                                    </GroupBox>
-                                                    <GroupBox Header="Lifter"
+                                                        </Canvas>
+                                                    </Viewbox>
+                                                </GroupBox>
+                                                <GroupBox Header="Lifter"
                                                               Grid.Column="2">
-                                                        <Viewbox>
-                                                            <Canvas Background="LightGray"
+                                                    <Viewbox>
+                                                        <Canvas Background="LightGray"
                                                                     Width="2000"
                                                                     Height="10000">
-                                                                <Border Width="2000"
+                                                            <Border Width="2000"
                                                                         Height="500"
                                                                         Canvas.Top="{Binding AxisLifter.p_posActual, Converter={StaticResource AxisLifterToMotionUI}}"
                                                                         Background="Gray"
                                                                         Margin="5" />
-                                                            </Canvas>
-                                                        </Viewbox>
-                                                    </GroupBox>
-                                                    <GroupBox Header="Stage Z"
+                                                        </Canvas>
+                                                    </Viewbox>
+                                                </GroupBox>
+                                                <GroupBox Header="Stage Z"
                                                               Grid.Column="3">
-                                                        <Viewbox>
-                                                            <Canvas Background="LightGray"
+                                                    <Viewbox>
+                                                        <Canvas Background="LightGray"
                                                                     Width="2000"
                                                                     Height="10000">
-                                                                <Border Width="2000"
+                                                            <Border Width="2000"
                                                                         Height="500"
                                                                         Background="Gray"
                                                                         Margin="5" />
-                                                            </Canvas>
-                                                        </Viewbox>
-                                                    </GroupBox>
+                                                        </Canvas>
+                                                    </Viewbox>
+                                                </GroupBox>
 
-                                                </Grid>
-                                                <Grid Grid.Column="1">
-                                                    <!--<local:LoadingControl Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToLoadingOpacityConverter}}" />-->
-                                                    <local:LoadingControl Opacity="{Binding SelectedAxis, Converter={StaticResource AxisStateToLoadingOpacity}}" />
-                                                </Grid>
                                             </Grid>
-                                            <Grid Grid.Row="1"
+                                            <Grid Grid.Column="1">
+                                                <!--<local:LoadingControl Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToLoadingOpacityConverter}}" />-->
+                                                <local:LoadingControl Opacity="{Binding SelectedAxis, Converter={StaticResource AxisStateToLoadingOpacity}}" />
+                                            </Grid>
+                                        </Grid>
+                                        <Grid Grid.Row="1"
                                                   Margin="5">
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="1*"/>
-                                                        <ColumnDefinition/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TabControl SelectedIndex="{Binding MotionTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                                        <TabItem Width="0"/>
-                                                        <TabItem Header="X"
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1*"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TabControl SelectedIndex="{Binding MotionTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <TabItem Width="0"/>
+                                                    <TabItem Header="X"
                                                              Width="30"
                                                              Margin="-3,0,0,0">
-                                                            <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
+                                                        <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
                                                                   SelectedIndex="{Binding SelectedWorkPointIndex}"
                                                                   SelectionMode="Single"
                                                                   CanUserSortColumns="False"
                                                                   AutoGenerateColumns="False"
                                                                   CanUserAddRows="False">
-                                                                <i:Interaction.Triggers>
-                                                                    <i:EventTrigger EventName="CellEditEnding">
-                                                                        <i:CallMethodAction TargetObject="{Binding}"
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="CellEditEnding">
+                                                                    <i:CallMethodAction TargetObject="{Binding}"
                                                                                         MethodName="DataGrid_CellEditEnding" />
-                                                                    </i:EventTrigger>
-                                                                </i:Interaction.Triggers>
-                                                                <DataGrid.Columns>
-                                                                    <DataGridTextColumn Header="  Name"
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="  Name"
                                                                                     Width="*"
                                                                                     IsReadOnly="True"
                                                                                     Binding="{Binding Name}" />
-                                                                    <DataGridTextColumn Header="  Value"
+                                                                <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
-                                                                </DataGrid.Columns>
-                                                            </DataGrid>
-                                                        </TabItem>
-                                                        <TabItem Header="Y"
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
+                                                    </TabItem>
+                                                    <TabItem Header="Y"
                                                               Width="30"
                                                              Margin="-3,0,0,0">
-                                                            <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
+                                                        <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
                                                                   SelectedIndex="{Binding SelectedWorkPointIndex}"
                                                                   SelectionMode="Single"
                                                                   CanUserSortColumns="False"
                                                                   AutoGenerateColumns="False"
                                                                   CanUserAddRows="False">
-                                                                <i:Interaction.Triggers>
-                                                                    <i:EventTrigger EventName="CellEditEnding">
-                                                                        <i:CallMethodAction TargetObject="{Binding}"
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="CellEditEnding">
+                                                                    <i:CallMethodAction TargetObject="{Binding}"
                                                                                         MethodName="DataGrid_CellEditEnding" />
-                                                                    </i:EventTrigger>
-                                                                </i:Interaction.Triggers>
-                                                                <DataGrid.Columns>
-                                                                    <DataGridTextColumn Header="  Name"
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="  Name"
                                                                                     Width="*"
                                                                                     IsReadOnly="True"
                                                                                     Binding="{Binding Name}" />
-                                                                    <DataGridTextColumn Header="  Value"
+                                                                <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
-                                                                </DataGrid.Columns>
-                                                            </DataGrid>
-                                                        </TabItem>
-                                                        <TabItem Header="Z"
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
+                                                    </TabItem>
+                                                    <TabItem Header="Z"
                                                               Width="30"
                                                              Margin="-3,0,0,0">
-                                                            <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
+                                                        <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
                                                                   SelectedIndex="{Binding SelectedWorkPointIndex}"
                                                                   SelectionMode="Single"
                                                                   CanUserSortColumns="False"
                                                                   AutoGenerateColumns="False"
                                                                   CanUserAddRows="False">
-                                                                <i:Interaction.Triggers>
-                                                                    <i:EventTrigger EventName="CellEditEnding">
-                                                                        <i:CallMethodAction TargetObject="{Binding}"
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="CellEditEnding">
+                                                                    <i:CallMethodAction TargetObject="{Binding}"
                                                                                         MethodName="DataGrid_CellEditEnding" />
-                                                                    </i:EventTrigger>
-                                                                </i:Interaction.Triggers>
-                                                                <DataGrid.Columns>
-                                                                    <DataGridTextColumn Header="  Name"
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="  Name"
                                                                                     Width="*"
                                                                                     IsReadOnly="True"
                                                                                     Binding="{Binding Name}" />
-                                                                    <DataGridTextColumn Header="  Value"
+                                                                <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
-                                                                </DataGrid.Columns>
-                                                            </DataGrid>
-                                                        </TabItem>
-                                                        <TabItem Header="Lifter"
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
+                                                    </TabItem>
+                                                    <TabItem Header="Lifter"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
-                                                            <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
+                                                        <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
                                                                   SelectedIndex="{Binding SelectedWorkPointIndex}"
                                                                   SelectionMode="Single"
                                                                   CanUserSortColumns="False"
                                                                   AutoGenerateColumns="False"
                                                                   CanUserAddRows="False">
-                                                                <i:Interaction.Triggers>
-                                                                    <i:EventTrigger EventName="CellEditEnding">
-                                                                        <i:CallMethodAction TargetObject="{Binding}"
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="CellEditEnding">
+                                                                    <i:CallMethodAction TargetObject="{Binding}"
                                                                                         MethodName="DataGrid_CellEditEnding" />
-                                                                    </i:EventTrigger>
-                                                                </i:Interaction.Triggers>
-                                                                <DataGrid.Columns>
-                                                                    <DataGridTextColumn Header="  Name"
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="  Name"
                                                                                     Width="*"
                                                                                     IsReadOnly="True"
                                                                                     Binding="{Binding Name}" />
-                                                                    <DataGridTextColumn Header="  Value"
+                                                                <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
-                                                                </DataGrid.Columns>
-                                                            </DataGrid>
-                                                        </TabItem>
-                                                        <TabItem Header="Tilt X"
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
+                                                    </TabItem>
+                                                    <TabItem Header="Tilt X"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
-                                                            <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
+                                                        <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
                                                                   SelectedIndex="{Binding SelectedWorkPointIndex}"
                                                                   SelectionMode="Single"
                                                                   CanUserSortColumns="False"
                                                                   AutoGenerateColumns="False"
                                                                   CanUserAddRows="False">
-                                                                <i:Interaction.Triggers>
-                                                                    <i:EventTrigger EventName="CellEditEnding">
-                                                                        <i:CallMethodAction TargetObject="{Binding}"
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="CellEditEnding">
+                                                                    <i:CallMethodAction TargetObject="{Binding}"
                                                                                         MethodName="DataGrid_CellEditEnding" />
-                                                                    </i:EventTrigger>
-                                                                </i:Interaction.Triggers>
-                                                                <DataGrid.Columns>
-                                                                    <DataGridTextColumn Header="  Name"
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="  Name"
                                                                                     Width="*"
                                                                                     IsReadOnly="True"
                                                                                     Binding="{Binding Name}" />
-                                                                    <DataGridTextColumn Header="  Value"
+                                                                <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
-                                                                </DataGrid.Columns>
-                                                            </DataGrid>
-                                                        </TabItem>
-                                                        <TabItem Header="Tilt Y"
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
+                                                    </TabItem>
+                                                    <TabItem Header="Tilt Y"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
-                                                            <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
+                                                        <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
                                                                   SelectedIndex="{Binding SelectedWorkPointIndex}"
                                                                   SelectionMode="Single"
                                                                   CanUserSortColumns="False"
                                                                   AutoGenerateColumns="False"
                                                                   CanUserAddRows="False">
-                                                                <i:Interaction.Triggers>
-                                                                    <i:EventTrigger EventName="CellEditEnding">
-                                                                        <i:CallMethodAction TargetObject="{Binding}"
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="CellEditEnding">
+                                                                    <i:CallMethodAction TargetObject="{Binding}"
                                                                                         MethodName="DataGrid_CellEditEnding" />
-                                                                    </i:EventTrigger>
-                                                                </i:Interaction.Triggers>
-                                                                <DataGrid.Columns>
-                                                                    <DataGridTextColumn Header="  Name"
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="  Name"
                                                                                     Width="*"
                                                                                     IsReadOnly="True"
                                                                                     Binding="{Binding Name}" />
-                                                                    <DataGridTextColumn Header="  Value"
+                                                                <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
-                                                                </DataGrid.Columns>
-                                                            </DataGrid>
-                                                        </TabItem>
-                                                        <TabItem Header="Tilt Z"
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
+                                                    </TabItem>
+                                                    <TabItem Header="Stage Z"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
-                                                            <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
+                                                        <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
                                                                   SelectedIndex="{Binding SelectedWorkPointIndex}"
                                                                   SelectionMode="Single"
                                                                   CanUserSortColumns="False"
                                                                   AutoGenerateColumns="False"
                                                                   CanUserAddRows="False">
-                                                                <i:Interaction.Triggers>
-                                                                    <i:EventTrigger EventName="CellEditEnding">
-                                                                        <i:CallMethodAction TargetObject="{Binding}"
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="CellEditEnding">
+                                                                    <i:CallMethodAction TargetObject="{Binding}"
                                                                                         MethodName="DataGrid_CellEditEnding" />
-                                                                    </i:EventTrigger>
-                                                                </i:Interaction.Triggers>
-                                                                <DataGrid.Columns>
-                                                                    <DataGridTextColumn Header="  Name"
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="  Name"
                                                                                     Width="*"
                                                                                     IsReadOnly="True"
                                                                                     Binding="{Binding Name}" />
-                                                                    <DataGridTextColumn Header="  Value"
+                                                                <DataGridTextColumn Header="  Value"
                                                                                     Width="5*"
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
-                                                                </DataGrid.Columns>
-                                                            </DataGrid>
-                                                        </TabItem>
-                                                    </TabControl>
-                                                    <Grid Grid.Column="1">
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="0.079*"/>
-                                                            <RowDefinition/>
-                                                        </Grid.RowDefinitions>
-                                                        <UniformGrid Columns="4">
-                                                            <Button Command="{Binding ConnectCommand}"
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
+                                                    </TabItem>
+                                                </TabControl>
+                                                <Grid Grid.Column="1">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="0.079*"/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <UniformGrid Columns="4">
+                                                        <Button Command="{Binding ConnectCommand}"
                                                                 Content="{Binding ModuleCamellia.p_CamVRS.p_CamInfo._OpenStatus, Converter= {StaticResource ConnectStringToBoolConverters}}">
-                                                            </Button>
-                                                            <Button Content="Grab" Command="{Binding GrabCommand}"
+                                                        </Button>
+                                                        <Button Content="Grab" Command="{Binding GrabCommand}"
                                                                     IsEnabled="{Binding ModuleCamellia.p_CamVRS.p_CamInfo._IsCanGrab}">
-                                                            </Button>
-                                                            <Button Content="Live" Command="{Binding ContinousGrabCommand}"
+                                                        </Button>
+                                                        <Button Content="Live" Command="{Binding ContinousGrabCommand}"
                                                                     IsEnabled="{Binding ModuleCamellia.p_CamVRS.p_CamInfo._IsCanGrab}">
-                                                            </Button>
-                                                            <Button Content="Stop" Command="{Binding StopGrabCommand}">
+                                                        </Button>
+                                                        <Button Content="Stop" Command="{Binding StopGrabCommand}">
 
-                                                            </Button>
-                                                        </UniformGrid>
-                                                        <Border Grid.Row="1">
-                                                            <tools:RootViewer DataContext="{Binding p_rootViewer}"></tools:RootViewer>
-                                                        </Border>
-                                                    </Grid>
+                                                        </Button>
+                                                    </UniformGrid>
+                                                    <Border Grid.Row="1">
+                                                        <tools:RootViewer DataContext="{Binding p_rootViewer}"></tools:RootViewer>
+                                                    </Border>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
-                                    </GroupBox>
-                                </Grid>
-                                <Grid Grid.Column="2">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="0.2*" />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Text="Sequence Function"
+                                    </Grid>
+                                </GroupBox>
+                            </Grid>
+                            <Grid Grid.Column="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="0.2*" />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Sequence Function"
                                                Grid.Row="0"
                                                VerticalAlignment="Bottom"
                                                HorizontalAlignment="Center"
                                                FontSize="14"
                                                FontWeight="Bold" />
-                                    <Button Style="{StaticResource SetupPanelBtn}"
+                                <Button Style="{StaticResource SetupPanelBtn}"
                                             Grid.Row="1"
                                             Margin="15,20"
                                             Content="Vision Pause"
                                             Command="{Binding CmdVisionPause}" />
-                                    <Button Style="{StaticResource SetupPanelBtn}"
+                                <Button Style="{StaticResource SetupPanelBtn}"
                                             Grid.Row="2"
                                             Margin="15,20"
                                             Content="Stop"
                                             Command="{Binding CmdSeqStop}" />
-                                    <Button Style="{StaticResource SetupPanelBtn}"
+                                <Button Style="{StaticResource SetupPanelBtn}"
                                             Grid.Row="3"
                                             Margin="15,20"
                                             Content="Run"
                                             Command="{Binding CmdRun}" />
-                                    <Button Style="{StaticResource SetupPanelBtn}"
+                                <Button Style="{StaticResource SetupPanelBtn}"
                                             Grid.Row="4"
                                             Margin="15,20"
                                             Content="Loading"
                                             Command="{Binding CmdLoading}" />
-                                    <Button Style="{StaticResource SetupPanelBtn}"
+                                <Button Style="{StaticResource SetupPanelBtn}"
                                             Grid.Row="5"
                                             Margin="15,20"
                                             Content="Unloading"
                                             Command="{Binding CmdUnloading}" />
-                                </Grid>
                             </Grid>
-                        </StackPanel>
-                    </ScrollViewer>
+                        </Grid>
+                    </StackPanel>
                 </Grid>
             </TabItem>
             <TabItem Header="Handler"

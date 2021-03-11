@@ -116,7 +116,7 @@ namespace Root_CAMELLIA
                 {
                     if (child.IsWaferExist(0) == false)
                     {
-                        child.SetAlarm();
+                        //child.SetAlarm();
                         return false;
                     }
                 }
@@ -126,7 +126,7 @@ namespace Root_CAMELLIA
                     {
                         if (child.IsWaferExist(0) == true)
                         {
-                            child.SetAlarm();
+                            //child.SetAlarm();
                             return false;
                         }
                     }
@@ -275,6 +275,34 @@ namespace Root_CAMELLIA
             //if (sInfo == "OK")
             //    EQ.p_eState = EQ.eState.Ready;
             //return sInfo;
+            m_HomeProgress.Reset();
+            IWTR iWTR = (IWTR)m_wtr;
+            foreach (IWTRChild child in iWTR.p_aChild)
+            {
+                if (child.p_infoWafer != null)
+                {
+                    if (!child.p_id.Contains("Loadport"))
+                    {
+                        if (child.IsWaferExist(0) == false)
+                        {
+                            child.SetAlarm();
+                            return "Wafer Check Error";
+                        }
+                    }
+                }
+                else if (child.p_infoWafer == null)
+                {
+                    if (!child.p_id.Contains("Loadport"))
+                    {
+                        if (child.IsWaferExist(0) == true)
+                        {
+                            child.SetAlarm();
+                            return "Wafer Check Error";
+                        }
+                    }
+                }
+            }
+
             m_HomeProgress.HomeProgressShow();
             string sInfo = StateHome(m_wtr);
             if(sInfo != "OK")
