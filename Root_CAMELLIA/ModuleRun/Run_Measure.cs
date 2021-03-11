@@ -44,31 +44,6 @@ namespace Root_CAMELLIA.Module
             InitModuleRun(module);
         }
 
-        public void RunThread()
-        {
-            m_bStart = true;
-            m_IsCalcThicknessDone = false;
-            while (m_bStart)
-            {
-                int index;
-                if (EQ.IsStop())
-                {
-                    while (ThicknessQueue.TryDequeue(out index)) ;
-                }
-               
-                if (ThicknessQueue.TryDequeue(out index))
-                {
-                    App.m_nanoView.GetThickness(index, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor);
-                    SaveRawData(index);
-                }
-
-                if (ThicknessQueue.Count() < 0)
-                {
-                    m_IsCalcThicknessDone = true;
-                }
-            }
-        }
-
         public override ModuleRunBase Clone()
         {
             Run_Measure run = new Run_Measure(m_module);
@@ -370,7 +345,6 @@ namespace Root_CAMELLIA.Module
             if (m_module.Run(axisZ.WaitReady()))
                 return p_sInfo;
 
-            while(!m_IsCalcThicknessDone) ;
             m_bStart = false;
 
             return "OK";
@@ -412,12 +386,6 @@ namespace Root_CAMELLIA.Module
             
             //isSaveDone = true;
         }
-        void SaveRawData(int index)
-        {
-            Met.DataManager.GetInstance().SaveRawData(@"C:\Users\ATI\Desktop\MeasureData\test" + index, index);
-            m_mwvm.p_RTGraph.DrawReflectanceGraph(index, "Wavelength(nm)", "Reflectance(%)");
-            m_mwvm.p_RTGraph.DrawTransmittanceGraph(index, "Wavelength(nm)", "Reflectance(%)");
-            isSaveDone = true;
-        }
+   
     }
 }
