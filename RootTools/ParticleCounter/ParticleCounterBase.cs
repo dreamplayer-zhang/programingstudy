@@ -2,6 +2,7 @@
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 using System.Windows.Controls;
 
@@ -115,17 +116,22 @@ namespace RootTools.ParticleCounter
             }
             catch (Exception e) { return "ReadParticleCount Exception : " + e.Message; }
         }
+
+        void ClearCount()
+        {
+            foreach (ParticleCount pc in m_aParticleCount) pc.m_aCount.Clear(); 
+        }
         #endregion
 
         #region Start Ready
         StopWatch m_swRun = new StopWatch(); 
-        bool _bStart = false; 
-        bool p_bStart
+        bool _bRun = false; 
+        bool p_bRun
         {
             get
             {
-                m_modbus.ReadCoils(m_nUnit, 0, ref _bStart);
-                return _bStart;
+                m_modbus.ReadCoils(m_nUnit, 0, ref _bRun);
+                return _bRun;
             }
             set 
             { 
@@ -134,13 +140,13 @@ namespace RootTools.ParticleCounter
             }
         }
 
-        bool _bReady = false; 
-        bool p_bReady
+        bool _bDone = false; 
+        bool p_bDone
         {
             get
             {
-                m_modbus.ReadCoils(m_nUnit, 1, ref _bReady);
-                return _bReady;
+                m_modbus.ReadCoils(m_nUnit, 1, ref _bDone);
+                return _bDone;
             }
             set 
             { 
@@ -148,19 +154,64 @@ namespace RootTools.ParticleCounter
             }
         }
 
-        string WaitReady(int msTimeout)
+        string WaitDone(Sample sample)
         {
+            int msTimeout = 1000 * (sample.m_secSample + 2); 
             while (m_swRun.ElapsedMilliseconds < msTimeout)
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop";
-                if (p_bReady) return "OK";
+                if (p_bDone) return "OK";
             }
             return "Read Data Timeout";
         }
         #endregion
 
+        #region Run
+        Sample m_sampleRun; 
+        public string StartRun(Sample sample)
+        {
+            m_sampleRun = sample;
+            if (IsBusy()) return "Busy"; 
+            ClearCount();
+            if (Run(ConnectModbus())) return m_sRun; 
+            return "OK";
+        }
 
+        BackgroundWorker m_bgw = new BackgroundWorker();
+        void InitBackgroundWorker()
+        {
+            m_bgw.DoWork += M_bgw_DoWork;
+            m_bgw.RunWorkerCompleted += M_bgw_RunWorkerCompleted;
+        }
+
+        private void M_bgw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            p_bRun = false;
+            p_bDone = false;
+            if (Run(SetSample(m_sampleRun))) return;
+            Thread.Sleep(10);
+            p_bRun = true;
+            Thread.Sleep(1000 * m_sampleRun.m_secHold);
+            for (int n = 0; n < m_sampleRun.m_nRepeat; n++)
+            {
+                if (Run(WaitDone(m_sampleRun))) return;
+                if (Run(ReadParticleCount())) return;
+                p_bDone = false; 
+            }
+            p_bRun = false; 
+        }
+
+        private void M_bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            //forget
+        }
+
+        public bool IsBusy()
+        {
+            return m_bgw.IsBusy; 
+        }
+        #endregion
 
         #region Tree
         public TreeRoot m_treeRoot;
@@ -199,7 +250,8 @@ namespace RootTools.ParticleCounter
                 m_aRead.Add(0);
             }
             InitModbus();
-            InitTree(); 
+            InitTree();
+            InitBackgroundWorker(); 
         }
 
         public void ThreadStop()
