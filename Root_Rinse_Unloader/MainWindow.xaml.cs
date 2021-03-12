@@ -58,6 +58,7 @@ namespace Root_Rinse_Unloader
             else if(rinse.m_tcpip.m_tcpSocket.m_socket.Connected)
             {
                 borderLoadState.Background = (rinse.p_eStateLoader == EQ.eState.Ready || rinse.p_eStateLoader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
+                textBlockLoadState.Text = rinse.p_eStateLoader.ToString();
             }
             else
             {

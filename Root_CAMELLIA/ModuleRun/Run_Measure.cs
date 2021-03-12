@@ -328,7 +328,6 @@ namespace Root_CAMELLIA.Module
             if (m_module.Run(axisZ.WaitReady()))
                 return p_sInfo;
 
-            //while(!m_IsCalcThicknessDone) ;
             m_bStart = false;
 
             return "OK";

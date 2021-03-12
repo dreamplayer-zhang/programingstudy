@@ -103,6 +103,12 @@ namespace Root_CAMELLIA.Module
             string strVRSImageDir = "D:\\";
             string strVRSImageFullPath = "";
 
+
+            if (m_module.LifterDown() != "OK")
+            {
+                return p_sInfo;
+            }
+
             if (m_useCal)
             {
                 m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
@@ -145,12 +151,8 @@ namespace Root_CAMELLIA.Module
             }
             sw.Stop();
 
-            if (m_module.LifterDown() != "OK")
-            {
-                return p_sInfo;
-            }
 
-            m_module.VaccumOnOff(true);
+            //m_module.VaccumOnOff(true);
 
 
 

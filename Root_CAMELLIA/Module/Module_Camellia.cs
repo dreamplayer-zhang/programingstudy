@@ -172,7 +172,8 @@ namespace Root_CAMELLIA.Module
         DIO_I m_axisXReady;
         DIO_I m_axisYReady;
         DIO_I m_vacuum;
-        DIO_I m_existWafer;
+        DIO_I m_homeExistWafer;
+        DIO_I m_readyExistWafer;
         DIO_O m_vacuumOnOff;
 
 
@@ -257,7 +258,8 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.Get(ref m_axisYReady, this, "Stage Y Ready");
             p_sInfo = m_toolBox.Get(ref m_vacuum, this, "Vaccum On");
             p_sInfo = m_toolBox.Get(ref m_vacuumOnOff, this, "Vaccum OnOff");
-            p_sInfo = m_toolBox.Get(ref m_existWafer, this, "Wafer Exist");
+            p_sInfo = m_toolBox.Get(ref m_homeExistWafer, this, "Home Wafer Exist");
+            p_sInfo = m_toolBox.Get(ref m_readyExistWafer, this, "Read Wafer Exist");
             m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
         }
         public Module_Camellia(string id, IEngineer engineer, List<ILoadport> loadports)
@@ -552,14 +554,14 @@ namespace Root_CAMELLIA.Module
         public string BeforePut(int nID)
         {
             //? InitCal 문제 보류
-            //if (CanInitCal[EQ.p_nRunLP])
-            //{
-            //    if(m_DataManager.m_calibration.Run(true, false) != "OK")
-            //    {
-            //        return "Init Calibration Error";
-            //    }
-            //    CanInitCal[EQ.p_nRunLP] = false;
-            //}
+            if (CanInitCal[EQ.p_nRunLP])
+            {
+                if (m_DataManager.m_calibration.Run(true, false) != "OK")
+                {
+                    return "Init Calibration Error";
+                }
+                CanInitCal[EQ.p_nRunLP] = false;
+            }
 
             //if (m_DataManager.m_calibration.InItCalDone)
             //{
@@ -594,7 +596,10 @@ namespace Root_CAMELLIA.Module
         {
             switch (m_eCheckWafer)
             {
-                case eCheckWafer.Sensor: return false; //m_diWaferExist.p_bIn;
+                case eCheckWafer.Sensor:
+                    if (m_homeExistWafer.p_bIn || m_readyExistWafer.p_bIn)
+                        return true;
+                    return false;
                 default: return (p_infoWafer != null);
             }
         }

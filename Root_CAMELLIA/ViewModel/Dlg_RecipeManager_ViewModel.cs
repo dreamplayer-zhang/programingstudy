@@ -48,9 +48,8 @@ namespace Root_CAMELLIA
             RecipePath = dataManager.recipeDM.TeachingRecipePath;
             Init();
             InitStage();
-            SetStage(false);
+            SetStage();
             SetSelectRect();
-            SetStage(true);
             SetViewRect();
             InitLayer();
             UpdateLayerGridView();
@@ -164,7 +163,6 @@ namespace Root_CAMELLIA
         public List<ShapeManager> Shapes = new List<ShapeManager>();
         public List<ShapeManager> PreviewShapes = new List<ShapeManager>();
         public List<GeometryManager> Geometry = new List<GeometryManager>();
-        public List<GeometryManager> PreviewGeometry = new List<GeometryManager>();
         public List<GeometryManager> ViewRectGeometry = new List<GeometryManager>();
         public List<GeometryManager> SelectGeometry = new List<GeometryManager>();
         public List<TextManager> TextBlocks = new List<TextManager>();
@@ -866,7 +864,7 @@ namespace Root_CAMELLIA
             {
                 if (!p_UseThickness && value)
                 {
-                    MessageBox.Show("Need Using Thickness Measurement");
+                    MessageBox.Show("Need Using Thickness Measurement", "Check Thickness", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                     return;
                 }
                 if (IsTransmittanceCheck)
@@ -1921,12 +1919,9 @@ namespace Root_CAMELLIA
                 OffsetY = 0;
                 m_DrawElement.Clear();
                 Geometry.Clear();
-                SetStage(false);
+                SetStage();
                 dataManager.recipeDM.TeachingRD = new RecipeData();
-                if (!p_SettingViewModel.p_UseThickness)
-                {
-                    p_UseThickness = false;
-                }
+                p_UseThickness = p_SettingViewModel.p_UseThickness;
             }
             RecipeData data = dataManager.recipeDM.TeachingRD;
             if (MeasurementLoad)
@@ -1947,8 +1942,7 @@ namespace Root_CAMELLIA
 
             p_PreviewDrawElement.Clear();
             previewTemp.Clear();
-            PreviewGeometry.Clear();
-            SetStage(true);
+            //SetStage(true);
             SetPoint(true, data);
 
             ViewRectGeometry.Clear();
@@ -2279,7 +2273,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        public void SetStage(bool preview)
+        public void SetStage()
         {
             ObservableCollection<UIElement> temp = new ObservableCollection<UIElement>();
             GeneralTools.GbHole.GradientOrigin = new System.Windows.Point(0.3, 0.3);
@@ -2290,44 +2284,28 @@ namespace Root_CAMELLIA
 
             viewStageField.Set(GeneralTools.DataStageField);
             viewStageField.Transform(RatioX, RatioY);
-            if (!preview)
-            {
-                viewStageField.ScaleOffset(ZoomScale, OffsetX, OffsetY);
-            }
+            viewStageField.ScaleOffset(ZoomScale, OffsetX, OffsetY);
             stageField.SetData(viewStageField, CenterX, CenterY);
-            if (!preview)
-            {
-                Geometry.Add(stageField);
-                temp.Add(stageField.path);
-            }
-            else
-            {
-                PreviewGeometry.Add(stageField);
-                previewTemp.Add(stageField.path);
-            }
-        
+
+            Geometry.Add(stageField);
+            temp.Add(stageField.path);
+
+
 
             // Stage 중간 흰색 라인
             stage = new CustomRectangleGeometry(GeneralTools.ActiveBrush, GeneralTools.ActiveBrush);
             CustomRectangleGeometry rectLine = stage as CustomRectangleGeometry;
             viewStageLineHole.Set(GeneralTools.DataStageLineHole);
             viewStageLineHole.Transform(RatioX, RatioY);
-            if (!preview)
-            {
-                viewStageLineHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
-            }
+
+            viewStageLineHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+
             rectLine.SetData(drawGeometryManager.GetRect(viewStageLineHole, CenterX, CenterY));
-            if (!preview)
-            {
-                Geometry.Add(rectLine);
-                temp.Add(rectLine.path);
-            }
-            else
-            {
-                PreviewGeometry.Add(rectLine);
-                previewTemp.Add(rectLine.path);
-            }
-           
+
+            Geometry.Add(rectLine);
+            temp.Add(rectLine.path);
+
+
             // Stage 점선 가이드라인
             for (int i = 0; i < GeneralTools.GuideLineNum; i++)
             {
@@ -2338,19 +2316,12 @@ namespace Root_CAMELLIA
                 ViewStageGuideLine[i] = new Circle();
                 ViewStageGuideLine[i].Set(GeneralTools.DataStageGuideLine[i]);
                 ViewStageGuideLine[i].Transform(RatioX, RatioY);
-                if (!preview)
-                {
-                    ViewStageGuideLine[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
-                    guideLine.SetData(ViewStageGuideLine[i], CenterX, CenterY, 5 * ZoomScale);
-                    Geometry.Add(guideLine);
-                    temp.Add(guideLine.path);
-                }
-                else
-                {
-                    guideLine.SetData(ViewStageGuideLine[i], CenterX, CenterY, 5);
-                    previewTemp.Add(guideLine.path);
-                }
-               
+
+                ViewStageGuideLine[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                guideLine.SetData(ViewStageGuideLine[i], CenterX, CenterY, 5 * ZoomScale);
+                Geometry.Add(guideLine);
+                temp.Add(guideLine.path);
+
             }
 
             // 엣지부분 흰색 영역
@@ -2359,10 +2330,7 @@ namespace Root_CAMELLIA
                 viewStageEdgeHoleArc[i] = new Arc();
                 viewStageEdgeHoleArc[i].Set(GeneralTools.DataStageEdgeHoleArc[i]);
                 viewStageEdgeHoleArc[i].Transform(RatioX, RatioY);
-                if (!preview)
-                {
-                    viewStageEdgeHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
-                }
+                viewStageEdgeHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
             }
 
             for (int n = 0; n < GeneralTools.EdgeNum; n++)
@@ -2373,17 +2341,8 @@ namespace Root_CAMELLIA
                 PathFigure path = drawGeometryManager.AddDoubleHole(viewStageEdgeHoleArc[2 * n + 0], viewStageEdgeHoleArc[2 * n + 1], CenterX, CenterY);
 
                 edgePath.SetData(path);
-                if (!preview)
-                {
-                    Geometry.Add(edgePath);
-                    temp.Add(edgePath.path);
-                }
-                else
-                {
-                    PreviewGeometry.Add(edgePath);
-                    previewTemp.Add(edgePath.path);
-                }
-              
+                Geometry.Add(edgePath);
+                temp.Add(edgePath.path);
                 drawGeometryManager.ClearSegments();
             }
 
@@ -2395,11 +2354,7 @@ namespace Root_CAMELLIA
                 viewStageDoubleHoleArc[i] = new Arc();
                 viewStageDoubleHoleArc[i].Set(GeneralTools.DataStageDoubleHoleArc[i]);
                 viewStageDoubleHoleArc[i].Transform(RatioX, RatioY);
-                if (!preview)
-                {
-                    viewStageDoubleHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
-                }
-
+                viewStageDoubleHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
             }
 
             for (int i = 0; i < GeneralTools.DoubleHoleNum; i++)
@@ -2410,17 +2365,8 @@ namespace Root_CAMELLIA
                 PathFigure path = drawGeometryManager.AddDoubleHole(viewStageDoubleHoleArc[2 * i + 0], viewStageDoubleHoleArc[2 * i + 1], CenterX, CenterY);
 
                 doubleHole.SetData(path);
-                if (!preview)
-                {
-                    Geometry.Add(doubleHole);
-                    temp.Add(doubleHole.path);
-                }
-                else
-                {
-                    PreviewGeometry.Add(doubleHole);
-                    previewTemp.Add(doubleHole.path);
-                }
-              
+                Geometry.Add(doubleHole);
+                temp.Add(doubleHole.path);
                 drawGeometryManager.ClearSegments();
             }
 
@@ -2430,17 +2376,11 @@ namespace Root_CAMELLIA
                 viewStageTopHoleArc[i] = new Arc();
                 viewStageTopHoleArc[i].Set(GeneralTools.DataStageTopHoleArc[i]);
                 viewStageTopHoleArc[i].Transform(RatioX, RatioY);
-                if (!preview)
-                {
-                    viewStageTopHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
-                }
+                viewStageTopHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
                 viewStageBotHoleArc[i] = new Arc();
                 viewStageBotHoleArc[i].Set(GeneralTools.DataStageBotHoleArc[i]);
                 viewStageBotHoleArc[i].Transform(RatioX, RatioY);
-                if (!preview)
-                {
-                    viewStageBotHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
-                }
+                viewStageBotHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
             }
 
             Arc[] arc;
@@ -2460,17 +2400,8 @@ namespace Root_CAMELLIA
                 PathFigure path = drawGeometryManager.AddDoubleHole(arc[0], arc[1], CenterX, CenterY);
 
                 topBotDoubleHole.SetData(path);
-                if (!preview)
-                {
-                    Geometry.Add(topBotDoubleHole);
-                    temp.Add(topBotDoubleHole.path);
-                }
-                else
-                {
-                    PreviewGeometry.Add(topBotDoubleHole);
-                    previewTemp.Add(topBotDoubleHole.path);
-                }
-               
+                Geometry.Add(topBotDoubleHole);
+                temp.Add(topBotDoubleHole.path);
                 drawGeometryManager.ClearSegments();
             }
 
@@ -2482,24 +2413,12 @@ namespace Root_CAMELLIA
                 CustomEllipseGeometry circleHole = stage as CustomEllipseGeometry;
                 viewStageCircleHole.Set(circle);
                 viewStageCircleHole.Transform(RatioX, RatioY);
-                if (!preview)
-                {
-                    viewStageCircleHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
-                }
+                viewStageCircleHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
                 drawGeometryManager.GetRect(ref viewStageCircleHole, CenterX, CenterY);
                 circleHole.SetData(viewStageCircleHole, (int)(viewStageCircleHole.Width / 2),
                     (int)(viewStageCircleHole.Y + (viewStageCircleHole.Height / 2) + viewStageCircleHole.Y));
-                if (!preview)
-                {
-                    Geometry.Add(circleHole);
-                    temp.Add(circleHole.path);
-                }
-                else
-                {
-                    PreviewGeometry.Add(circleHole);
-                    previewTemp.Add(circleHole.path);
-                }
-               
+                Geometry.Add(circleHole);
+                temp.Add(circleHole.path);
             }
 
 
@@ -2512,45 +2431,29 @@ namespace Root_CAMELLIA
 
             viewStageField.Set(GeneralTools.DataStageField);
             viewStageField.Transform(RatioX, RatioY);
-            if (!preview)
-            {
-                viewStageField.ScaleOffset(ZoomScale, OffsetX, OffsetY);
-            }
+            viewStageField.ScaleOffset(ZoomScale, OffsetX, OffsetY);
 
-            if (!preview)
-            {
-                stageEdge.SetData(viewStageField, CenterX, CenterY, 3 * ZoomScale);
-                Geometry.Add(stageEdge);
-                temp.Add(stageEdge.path);
-            }
-            else
-            {
-                stageEdge.SetData(viewStageField, CenterX, CenterY, 3);
-                PreviewGeometry.Add(stageEdge);
-                previewTemp.Add(stageEdge.path);
-            }
-          
+            stageEdge.SetData(viewStageField, CenterX, CenterY, 3 * ZoomScale);
+            Geometry.Add(stageEdge);
+            temp.Add(stageEdge.path);
 
-            if (!preview)
-            {
-                stage = new CustomRectangleGeometry(GeneralTools.StageShadeBrush, GeneralTools.StageShadeBrush);
-                CustomRectangleGeometry lockRect = stage as CustomRectangleGeometry;
-                Rect shadeRect = new Rect(0, 0, 0, 0);
-                lockRect.SetData(shadeRect, 100);
-                Geometry.Add(lockRect);
-                //p_DrawElement.Add(lockRect.path);
-                temp.Add(lockRect.path);
+            stage = new CustomRectangleGeometry(GeneralTools.StageShadeBrush, GeneralTools.StageShadeBrush);
+            CustomRectangleGeometry lockRect = stage as CustomRectangleGeometry;
+            Rect shadeRect = new Rect(0, 0, 0, 0);
+            lockRect.SetData(shadeRect, 100);
+            Geometry.Add(lockRect);
+            //p_DrawElement.Add(lockRect.path);
+            temp.Add(lockRect.path);
 
-                LockImage.Source = new BitmapImage(new Uri(BaseDefine.Dir_LockImg, UriKind.RelativeOrAbsolute));
-                LockImage.Width = 100;
-                LockImage.Visibility = Visibility.Hidden;
-                Canvas.SetLeft(LockImage, 850);
-                Canvas.SetTop(LockImage, 50);
-                //m_DrawElement.Add(LockImage);
-                temp.Add(LockImage);
+            LockImage.Source = new BitmapImage(new Uri(BaseDefine.Dir_LockImg, UriKind.RelativeOrAbsolute));
+            LockImage.Width = 100;
+            LockImage.Visibility = Visibility.Hidden;
+            Canvas.SetLeft(LockImage, 850);
+            Canvas.SetTop(LockImage, 50);
+            //m_DrawElement.Add(LockImage);
+            temp.Add(LockImage);
 
-                p_DrawElement = temp;
-            }
+            p_DrawElement = temp;
         }
 
         public void RouteOptimizaionFunc()
