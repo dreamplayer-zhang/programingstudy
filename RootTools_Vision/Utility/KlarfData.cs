@@ -71,7 +71,6 @@ namespace RootTools_Vision.Utility
 			//PutClassLookup(sw);
 			PutInspectionTest(sw);
 			PutSampleTestPlan(sw);
-			//PutTiffFileName(sw); // 170802 syyun 추가
 			PutDefectInfor(sw);
 			PutDCollData(sw);
 
@@ -341,6 +340,8 @@ namespace RootTools_Vision.Utility
             {
 				//defectList = string.Format("{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0}",
 				//	i + 1, );
+
+				defectList += (i + 1).ToString() + " 0\n";
 
 			}
 

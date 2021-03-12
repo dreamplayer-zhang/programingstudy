@@ -118,7 +118,7 @@ namespace Root_WIND2
 
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                DrawRectDefect(rectList, textList, args.reDraw);
+                DrawRectDefect(rectList, textList, false);
             }));
         }
 

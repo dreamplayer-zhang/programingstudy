@@ -18,10 +18,6 @@ namespace Root_AOP01_Inspection
         public void Init(AOP01_Engineer engineer)
         {
             m_engineer = engineer;
-            logViewUI.Init(LogView.m_logView);
-            treeRootUI.Init(engineer.m_treeRoot);
-            loginUI.Init(engineer.m_login);
-            toolBoxUI.Init(engineer.ClassToolBox());
             handlerUI.Init(engineer.m_handler); // 2020-11-13 
             engineer.RunTree(Tree.eMode.Init);
         }

@@ -88,11 +88,17 @@ namespace Root_Rinse_Unloader.Module
             for (int n = 0; n < 4; n++)
             {
                 m_aPicker[n].m_dioVacuum.Write(bOn);
-                //m_aPicker[n].m_dioVacuum.Write(bOn && m_roller.m_bExist[n]);
             }
+            //if (!bOn) Thread.Sleep((int)(1000 * m_secBlow));
             Thread.Sleep(200);
-            if (bOn) Thread.Sleep((int)(1000 * m_secVac));
-            else
+            //if (bOn) Thread.Sleep((int)(1000 * m_secVac));
+            //else
+            //{
+            //    foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
+            //    Thread.Sleep((int)(1000 * m_secBlow));
+            //    foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
+            //}
+            if (!bOn)
             {
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
                 Thread.Sleep((int)(1000 * m_secBlow));
@@ -152,8 +158,10 @@ namespace Root_Rinse_Unloader.Module
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop"; 
             }
-            if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
+
+            if (Run(RunPickerDown(true))) return p_sInfo;
+            Thread.Sleep((int)(1000 * m_secVac));
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(RunCheckStrip())) return p_sInfo;
             m_roller.p_eStep = Roller.eStep.Empty;
@@ -218,8 +226,18 @@ namespace Root_Rinse_Unloader.Module
             RunPickerDown(false);
             RunVacuum(false); 
             p_sInfo = base.StateHome();
-            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
-            m_axis.StartMove(ePos.Roller); 
+            //p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            //m_axis.StartMove(ePos.Roller); 
+            if(p_sInfo == "OK")
+            {
+                Thread.Sleep(200);
+                //if (Run(m_axis.StartMove(ePos.Roller)))
+                //{
+                //    p_eState = eState.Error;
+                //    return p_sInfo;
+                //}
+                p_eState = eState.Ready;
+            }
             return p_sInfo;
         }
 

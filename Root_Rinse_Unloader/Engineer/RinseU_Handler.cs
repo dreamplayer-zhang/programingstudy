@@ -39,7 +39,7 @@ namespace Root_Rinse_Unloader.Engineer
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            m_rinse = new RinseU("Rinse", m_engineer);
+            m_rinse = new RinseU("RinseUnloader", m_engineer);
             InitModule(m_rinse);
             m_storage = new Storage("Storage", m_engineer, m_rinse);
             InitModule(m_storage);
@@ -62,6 +62,10 @@ namespace Root_Rinse_Unloader.Engineer
         #region StateHome
         public string StateHome()
         {
+            m_loader.RunVacuum(false);
+            Thread.Sleep(100);
+            m_loader.RunPickerDown(false);
+            Thread.Sleep(100);
             string sInfo = StateHome(p_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;

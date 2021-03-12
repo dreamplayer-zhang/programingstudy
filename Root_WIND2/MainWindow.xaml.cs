@@ -142,13 +142,13 @@ namespace Root_WIND2
 
             UIManager.Instance.ChangeUIMode();
 
-            SettingItem_SetupFrontside frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupFrontside>();
+            SettingItem_Database frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_Database>();
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
             //DatabaseManager.Instance.ValidateDatabase();
             //////
 
-            logView.Init(LogView.m_logView);
+            logView.Init(LogView._logView);
             WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
             InitTimer();
         }
@@ -162,9 +162,6 @@ namespace Root_WIND2
         private string memoryFrontGroup = "Vision";
         private string memoryFront = "Main";
         private string memoryMask = "Layer";
-
-        private string memoryMaskPool = "pool";
-        private string memoryMaskGroup = "group";
 
         private string memoryBackPool = "BackSide Vision.BackSide Memory";
         private string memoryBackGroup = "BackSide Vision";
@@ -190,20 +187,17 @@ namespace Root_WIND2
                 DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
                 WIND2_Warning warning = GlobalObjects.Instance.Register<WIND2_Warning>();
                 engineer.Init("WIND2");
-
-
                 
                 MemoryTool memoryTool = engineer.ClassMemoryTool();
-
                 ImageData frontImage;
                 ImageData maskLayer;
+
                 // ImageData
                 if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
                 {
-
-                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryFrontPool, memoryFrontGroup, memoryFront, engineer.ClassMemoryTool(),3);
-                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage",memoryFrontPool, memoryFrontGroup, memoryMask , engineer.ClassMemoryTool(),3);
-                    //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
+                    MemoryData memoryData = memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront);
+                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryFrontPool, memoryFrontGroup, memoryFront, memoryTool, memoryData.p_nCount, memoryData.p_nByte);
+                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
                 }
                 else
                 {
@@ -224,11 +218,11 @@ namespace Root_WIND2
                     frontImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nByte;
                     frontImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront).p_nCount;
                 }
-                if (maskLayer.m_MemData != null)
-                {
-                    maskLayer.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nByte;
-                    maskLayer.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryMaskPool, memoryMaskGroup, memoryMask).p_nCount;
-                }
+                //if (maskLayer.m_MemData != null)
+                //{
+                //    maskLayer.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask).p_nByte;
+                //    maskLayer.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask).p_nCount;
+                //}
                 if (edgeTopImage.m_MemData != null)
                 {
                     edgeTopImage.p_nByte = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop).p_nByte;
@@ -256,9 +250,6 @@ namespace Root_WIND2
                 RecipeBack recipeBack = GlobalObjects.Instance.Register<RecipeBack>();
                 RecipeEdge recipeEdge = GlobalObjects.Instance.Register<RecipeEdge>();
                 RecipeEBR recipeEBR = GlobalObjects.Instance.Register<RecipeEBR>();
-
-                // Klarf
-                KlarfData_Lot klarfData_lot = GlobalObjects.Instance.Register<KlarfData_Lot>();
 
 
                 if(frontImage.GetPtr() == IntPtr.Zero)

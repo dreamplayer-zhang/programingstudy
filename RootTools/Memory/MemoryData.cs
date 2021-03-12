@@ -413,7 +413,7 @@ namespace RootTools.Memory
                 bw.Write(i);
                 bw.Write((byte)255);
             }
-            byte[] aBuf = new byte[p_nByte * p_sz.X];
+            byte[] aBuf = new byte[(long)p_nByte * p_sz.X];
             for (int y = 0; y < p_sz.Y; y++)
             {
                 Marshal.Copy(GetPtr(nIndex, 0, p_sz.Y - y - 1), aBuf, 0, p_nByte * p_sz.X);
@@ -444,7 +444,7 @@ namespace RootTools.Memory
             p_sz.X = Math.Min(p_sz.X, szJPG.X) / 4 * 4;
             p_sz.Y = Math.Min(p_sz.Y, szJPG.Y);
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
-            byte[] aBuf = new byte[p_nByte * szJPG.X * szJPG.Y];
+            byte[] aBuf = new byte[(long)p_nByte * szJPG.X * szJPG.Y];
             Marshal.Copy(bitmapData.Scan0, aBuf, 0, p_nByte * szJPG.X * szJPG.Y);
             int wJpg = p_nByte * szJPG.X;
             int wMemory = p_nByte * p_sz.X; 

@@ -546,7 +546,7 @@ namespace RootTools.OHTNew
                     CheckDI(m_diTrReq, false);
                     CheckDI(m_diBusy, false);
                     CheckDI(m_diComplete, false);
-                    p_eState = eState.Error;
+                    //p_eState = eState.Error;
                 }
                 if (_eAccessLP == value) return;
                 _eAccessLP = value;

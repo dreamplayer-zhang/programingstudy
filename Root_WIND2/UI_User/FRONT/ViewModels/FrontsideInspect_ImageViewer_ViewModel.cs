@@ -227,46 +227,6 @@ namespace Root_WIND2.UI_User
                 {
                     this.isBoxDrawing = false;
 
-                    //TRect tRect = boxList[boxList.Count - 1];
-                    //tRect.MemoryRect.Right = p_MouseMemX;
-                    //tRect.MemoryRect.Bottom = p_MouseMemY;
-
-                    //CPoint canvasLeftTop = GetCanvasPoint(new CPoint(tRect.MemoryRect.Left, tRect.MemoryRect.Top));
-                    //CPoint canvasRightBottom = GetCanvasPoint(new CPoint(tRect.MemoryRect.Right, tRect.MemoryRect.Bottom));
-
-                    //Rectangle rt = tRect.UIElement as Rectangle;
-                    //rt.Width = Math.Abs(canvasRightBottom.X - canvasLeftTop.X);
-                    //rt.Height = Math.Abs(canvasRightBottom.Y - canvasLeftTop.Y);
-
-                    //Canvas.SetLeft(rt, canvasLeftTop.X < canvasRightBottom.X ? canvasLeftTop.X : canvasRightBottom.X);
-                    //Canvas.SetTop(rt, canvasLeftTop.Y < canvasRightBottom.Y ? canvasLeftTop.Y : canvasRightBottom.Y);
-
-                    //if (tRect.MemoryRect.Right < tRect.MemoryRect.Left)
-                    //{
-                    //    int temp = tRect.MemoryRect.Right;
-                    //    tRect.MemoryRect.Right = tRect.MemoryRect.Left;
-                    //    tRect.MemoryRect.Left = temp;
-                    //}
-
-                    //if (tRect.MemoryRect.Bottom < tRect.MemoryRect.Top)
-                    //{
-                    //    int temp = tRect.MemoryRect.Bottom;
-                    //    tRect.MemoryRect.Bottom = tRect.MemoryRect.Top;
-                    //    tRect.MemoryRect.Top = temp;
-                    //}
-
-                    //TRect tRect = boxList[boxList.Count - 1];
-                    //if (this.boxFirstPoint.X > p_MouseMemX)
-                    //{
-                    //    tRect.MemoryRect.Left = p_MouseMemX;
-                    //    tRect.MemoryRect.Right = this.boxFirstPoint.X;
-                    //}
-                    //else
-                    //{
-                    //    tRect.MemoryRect.Right = p_MouseMemX;
-                    //    tRect.MemoryRect.Left = this.boxFirstPoint.X;
-                    //}
-
                     TRect tRect = boxList[boxList.Count - 1];
                     if (this.boxFirstPoint.Y > p_MouseMemY)
                     {
@@ -481,6 +441,40 @@ namespace Root_WIND2.UI_User
             foreach(TRect rt in rectList)
             {
                 if(p_DrawElement.Contains(rt.UIElement) == true)
+                {
+                    Rectangle rectangle = rt.UIElement as Rectangle;
+                    CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+                    CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+
+                    rectangle.Width = canvasRightBottom.X - canvasLeftTop.X;
+                    rectangle.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+                    Canvas.SetLeft(rectangle, canvasLeftTop.X);
+                    Canvas.SetTop(rectangle, canvasLeftTop.Y);
+                }
+            }
+
+            foreach (TRect rt in boxList)
+            {
+                if (p_UIElement.Contains(rt.UIElement) == true)
+                {
+                    Rectangle rectangle = rt.UIElement as Rectangle;
+                    CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+                    CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+
+                    rectangle.Width = Math.Abs(canvasRightBottom.X - canvasLeftTop.X);
+                    rectangle.Height = Math.Abs(canvasRightBottom.Y - canvasLeftTop.Y);
+
+                    Canvas.SetLeft(rectangle, canvasLeftTop.X);
+                    Canvas.SetTop(rectangle, canvasLeftTop.Y);
+                }
+            }
+        }
+        public void UpdateImageViewer()
+        {
+            foreach (TRect rt in rectList)
+            {
+                if (p_DrawElement.Contains(rt.UIElement) == true)
                 {
                     Rectangle rectangle = rt.UIElement as Rectangle;
                     CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));

@@ -39,6 +39,7 @@ namespace Root_CAMELLIA.Module
         DIO_I m_diLPIonizerAlarm;
         DIO_I m_diALIonizerAlarm;
         DIO_I m_diVSIonizerAlarm;
+        DIO_I m_diProtectionbar;
 
         DIO_O m_doDoorLock;
         DIO_O m_doIonizer;
@@ -70,6 +71,7 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.Get(ref m_diLPIonizerAlarm, this, "Loadport Ionizer Alarm");
             p_sInfo = m_toolBox.Get(ref m_diALIonizerAlarm, this, "Aligner Ionizer Alarm");
             p_sInfo = m_toolBox.Get(ref m_diVSIonizerAlarm, this, "Vision Ionizer Alarm");
+            p_sInfo = m_toolBox.Get(ref m_diProtectionbar, this, "Protection bar");
 
             p_sInfo = m_toolBox.Get(ref m_doDoorLock, this, "Door Lock On/Off");
             p_sInfo = m_toolBox.Get(ref m_doIonizer, this, "Ionizer On/Off");
@@ -108,6 +110,7 @@ namespace Root_CAMELLIA.Module
         ALID m_alidVisionPC_FanAlarm;
         ALID m_alidVisionTop_FanAlarm;
         ALID m_alidVisionBtm_FanAlarm;
+        ALID m_alidProtectionbar;
         void InitALID()
         {
             m_alidEmergency = m_gaf.GetALID(this, "Emergency", "Emergency Error");
@@ -135,12 +138,13 @@ namespace Root_CAMELLIA.Module
             m_alidVisionPC_FanAlarm = m_gaf.GetALID(this, "Vision PC Fan", "Vision PC Fan Alarm");
             m_alidVisionTop_FanAlarm = m_gaf.GetALID(this, "Vision Top Fan", "Vision Top Fan Alarm");
             m_alidVisionBtm_FanAlarm = m_gaf.GetALID(this, "Vision Btm Fan", "Vision Bottom Fan Alarm");
+
+            m_alidProtectionbar = m_gaf.GetALID(this, "Protectionbar", "Protection Bar");
         }
 
         #endregion
 
         #region Thread
-        public EQ.eState m_eState = EQ.eState.Init;
         protected override void RunThread()
         {
             base.RunThread();
@@ -154,7 +158,7 @@ namespace Root_CAMELLIA.Module
             if (!m_diMCReset.p_bIn)
             {
                 Thread.Sleep(100);
-                if (!m_diEmergency.p_bIn) m_alidMCReset_EMO.Run(!m_diMCReset.p_bIn, "Please Check M/C Reset (EMO)");
+                if (!m_diCDALow.p_bIn) m_alidMCReset_EMO.Run(!m_diMCReset.p_bIn, "Please Check M/C Reset (EMO)");
                 else m_alidMCReset_EMS.Run(!m_diMCReset.p_bIn, "Please Check M/C Reset (EMS)");
             }
             if (m_bIonizer_Use)
@@ -162,6 +166,10 @@ namespace Root_CAMELLIA.Module
                 m_alidLPIonizerAlarm.Run(!m_diLPIonizerAlarm.p_bIn, "Please Check Loadport Ionizer");
                 m_alidALIonizerAlarm.Run(!m_diALIonizerAlarm.p_bIn, "Please Check Aligner Ionizer");
                 m_alidVSIonizerAlarm.Run(!m_diVSIonizerAlarm.p_bIn, "Please Check Vision Ionizer");
+            }
+            if (m_bProtectionbar_Use)
+            {
+                m_alidProtectionbar.Run(!m_diProtectionbar.p_bIn, "Protectionbar Check");
             }
 
             //Door
@@ -185,6 +193,7 @@ namespace Root_CAMELLIA.Module
 
         #region Tree
         bool m_bIonizer_Use = false;
+        bool m_bProtectionbar_Use = false;
         public override void RunTree(Tree tree)
         {
             RunTreeInterLock(tree.GetTree("Option", false));
@@ -193,6 +202,7 @@ namespace Root_CAMELLIA.Module
         void RunTreeInterLock(Tree tree)
         {
             m_bIonizer_Use = tree.Set(m_bIonizer_Use, m_bIonizer_Use, "Ionizer Use", "Ionizer Use");
+            m_bProtectionbar_Use = tree.Set(m_bProtectionbar_Use, m_bProtectionbar_Use, "Protectionbar Use", "Protectionbar Use");
         }
         #endregion
 

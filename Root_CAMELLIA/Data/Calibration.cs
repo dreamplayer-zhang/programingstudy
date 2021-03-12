@@ -21,7 +21,7 @@ namespace Root_CAMELLIA
            
         }
 
-        public string Run(bool bInitialCal)
+        public string Run(bool bInitialCal, bool bUseThread = true)
         {
             if (bInitialCal)
             {
@@ -35,10 +35,17 @@ namespace Root_CAMELLIA
             (Met.SettingData, Met.Nanoview.ERRORCODE_NANOVIEW) m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
             if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
             {
-                ThreadPool.QueueUserWorkItem(o => RunThreadPool(m_SettingDataWithErrorCode.Item1.nBGIntTime_VIS,
-                    m_SettingDataWithErrorCode.Item1.nBGIntTime_NIR, m_SettingDataWithErrorCode.Item1.nAverage_VIS,
-                     m_SettingDataWithErrorCode.Item1.nAverage_NIR,
-                     bInitialCal));
+                if (bUseThread)
+                {
+                    ThreadPool.QueueUserWorkItem(o => RunThreadPool(m_SettingDataWithErrorCode.Item1.nBGIntTime_VIS, m_SettingDataWithErrorCode.Item1.nBGIntTime_NIR, m_SettingDataWithErrorCode.Item1.nAverage_VIS, 
+                        m_SettingDataWithErrorCode.Item1.nAverage_NIR, bInitialCal));
+                }
+                else
+                {
+                    App.m_nanoView.Calibration(m_SettingDataWithErrorCode.Item1.nBGIntTime_VIS, m_SettingDataWithErrorCode.Item1.nBGIntTime_NIR, m_SettingDataWithErrorCode.Item1.nAverage_VIS,
+                        m_SettingDataWithErrorCode.Item1.nAverage_NIR, bInitialCal);
+                }
+
             }
             else
             {

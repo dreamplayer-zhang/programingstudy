@@ -33,7 +33,7 @@ namespace RootTools.Memory
         public AsyncObject(int bufferSize)
         {
             BufferSize = bufferSize;
-            Buffer = new byte[BufferSize];
+            Buffer = new byte[(long)BufferSize];
         }
 
         public void ClearBuffer()
@@ -49,9 +49,11 @@ namespace RootTools.Memory
         //IPAddress thisAddress;
         int port;
         Socket mainSock;
-        public MemServer()
+        Log log;
+        public MemServer(Log log)
         {
             mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+            this.log = log;
         }
         public void Start(int por)
         {            
@@ -69,7 +71,7 @@ namespace RootTools.Memory
 
             // 또 다른 클라이언트의 연결을 대기한다.
             mainSock.BeginAccept(AcceptCallback, null);
-
+           
             AsyncObject obj = new AsyncObject(nSize);
             obj.WorkingSocket = client;
 
@@ -83,6 +85,8 @@ namespace RootTools.Memory
         {          
             AsyncObject obj = (AsyncObject)ar.AsyncState;
 
+            try
+            {
             int received = obj.WorkingSocket.EndReceive(ar);
 
             if (received <= 0)
@@ -96,6 +100,17 @@ namespace RootTools.Memory
             obj.ClearBuffer();
 
             obj.WorkingSocket.BeginReceive(obj.Buffer, 0, nSize, 0, DataReceived, obj);
+        }
+            catch (Exception)
+            {
+                log.Warn("Server : Disconnected from the client");
+                obj.WorkingSocket.Close();
+
+                mainSock.Listen(10);
+                mainSock.BeginAccept(AcceptCallback, null);
+                return;
+            }
+
         }
         public void Send(byte[] p)
         {
@@ -148,50 +163,69 @@ namespace RootTools.Memory
         Socket mainSock;
         IPAddress thisAddress;
         int port;
-      
-        public MemClient()
+        Log log;
+
+        public MemClient(Log log)
         {
-           mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+            this.log = log;
+            mainSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
         }
         public void Connect(IPAddress adds, int por)
         {
             thisAddress = adds;
             port = por;
+
+            IPEndPoint clientEP = new IPEndPoint(adds, port);
+            mainSock.BeginConnect(clientEP, new AsyncCallback(ConnectCallback), mainSock);
+        }
+        void ConnectCallback(IAsyncResult ar)
+        {
             try
             {
-                mainSock.Connect(thisAddress, port);
-            }
-            catch (Exception)
-            {
-               return;
-            }
+                Socket client = (Socket)ar.AsyncState;
+                client.EndConnect(ar);
 
-            // 연결 완료, 서버에서 데이터가 올 수 있으므로 수신 대기한다.
-            AsyncObject obj = new AsyncObject(4096);
-            obj.WorkingSocket = mainSock;
-            mainSock.BeginReceive(obj.Buffer, 0, obj.BufferSize, 0, DataReceived, obj);
-        
+                AsyncObject obj = new AsyncObject(4096);
+                obj.WorkingSocket = mainSock;
+                mainSock.BeginReceive(obj.Buffer, 0, obj.BufferSize, 0, DataReceived, obj);
+            }
+            catch(Exception)
+            {
+                Connect(thisAddress, port);
+            }
         }
+
         void DataReceived(IAsyncResult ar)
         {
             // BeginReceive에서 추가적으로 넘어온 데이터를 AsyncObject 형식으로 변환한다.
             AsyncObject obj = (AsyncObject)ar.AsyncState;
-
-            // 데이터 수신을 끝낸다.
-            int received = obj.WorkingSocket.EndReceive(ar);
-
-            // 받은 데이터가 없으면(연결끊어짐) 끝낸다.
-            if (received <= 0)
+            try
             {
-                obj.WorkingSocket.Close();
+                // 데이터 수신을 끝낸다.
+                int received = obj.WorkingSocket.EndReceive(ar);
+
+                // 받은 데이터가 없으면(연결끊어짐) 끝낸다.
+                if (received <= 0)
+                {
+                    obj.WorkingSocket.Close();
+                    return;
+                }
+
+                EventReciveData(obj.Buffer, received);
+
+                obj.ClearBuffer();
+                // 수신 대기
+                obj.WorkingSocket.BeginReceive(obj.Buffer, 0, 4096, 0, DataReceived, obj);
+            }
+            catch(Exception)
+            {
+                log.Warn("Client : Disconnected from the server");
+                obj.WorkingSocket.Disconnect(true);
+
+                Connect(thisAddress, port);
                 return;
             }
-
-            EventReciveData(obj.Buffer, received);
-       
-            obj.ClearBuffer();
-            // 수신 대기
-            obj.WorkingSocket.BeginReceive(obj.Buffer, 0, 4096, 0, DataReceived, obj);
+            
         }
         public void Send(byte[] p)
         {
@@ -361,7 +395,10 @@ namespace RootTools.Memory
         MemServer m_Server;
         MemClient m_Client;
 
+        bool bUseServer = false;
         bool bServer = true;
+        string serverIP = "";
+        int nPort = 5000;
 
         public void InitThreadProcess()
         {
@@ -404,7 +441,14 @@ namespace RootTools.Memory
 
         void RunTreeTCPSetup(Tree tree)
         {
+            bUseServer = tree.Set(bUseServer, bUseServer, "Use MemServer", "Use Mem Server");
             bServer = tree.Set(bServer, bServer, "MemServer", "Memory Tool Server");
+            if(!bServer)
+            {
+                serverIP = tree.Set(serverIP, serverIP, "Server IPAddress", "Server IPAddress");
+                nPort = tree.Set(nPort, nPort, "Server Port", "Server Port");
+            }               
+
             if (bServer && m_Server != null)
             {
               //  m_ServerTree.RunTree(tree);
@@ -507,18 +551,21 @@ namespace RootTools.Memory
             KillInspectProcess();
             if (bMaster == false) InitTimer();
 
+            if (!bUseServer) return;
+
             if (bServer)
             {
-                m_Server = new MemServer();
+                m_Server = new MemServer(m_log);
                 RunTreeRun(Tree.eMode.RegRead);
-                m_Server.Start(5000);
+                m_Server.Start(nPort);
                 m_Server.EventReciveData += M_Server_EventReciveData;
             }
             else
             {
-                m_Client = new MemClient();
+                m_Client = new MemClient(m_log);
                 RunTreeRun(Tree.eMode.RegRead);
-                m_Client.Connect(new IPAddress(new byte[] { 10,0,0,15 }),5000);
+                //m_Client.Connect(new IPAddress(new byte[] { 10,0,0,15 }),5000);
+                m_Client.Connect(IPAddress.Parse(serverIP), nPort);
                 m_Client.EventReciveData += M_Client_EventReciveData;
             }
         }
@@ -537,7 +584,9 @@ namespace RootTools.Memory
         bool _bRecieve = false;
         byte[] m_abuf;
         public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem, int nByte)
-        {  
+        {
+            if (!bUseServer) return null;
+
             Stopwatch watch = new Stopwatch();
             watch.Start();
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
@@ -548,7 +597,7 @@ namespace RootTools.Memory
             while (_bRecieve)
             {
                 Thread.Sleep(5);
-                if (watch.ElapsedMilliseconds > 100)
+                if (watch.ElapsedMilliseconds > 1000)
                     return m_abuf;
             }
             _bRecieve = false;
@@ -682,7 +731,7 @@ namespace RootTools.Memory
                 return null;
            
             int rectX, rectY, rectWidth, rectHeight, sizeX;
-            byte[] result = new byte[CanvasWidth * CanvasHeight * nByte];
+            byte[] result = new byte[(long)CanvasWidth * CanvasHeight * nByte];
             rectX = View_Rect.X;
             rectY = View_Rect.Y;
             rectWidth = View_Rect.Width;

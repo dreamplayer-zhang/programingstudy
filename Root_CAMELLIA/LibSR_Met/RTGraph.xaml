@@ -58,20 +58,40 @@
                     </WpfPlot>
                 </Grid>
             </GroupBox>
-        <GroupBox Header="Transmittance" Grid.Row="2">
+        <GroupBox x:Name="GroupTransmittance" Header="Transmittance" Grid.Row="2" IsEnabled="False">
+            <GroupBox.Style >
+                <Style>
+                    <Style.Triggers>
+                        <Trigger Property="ItemsControl.IsEnabled" Value="False">
+                            <Setter Property="ItemsControl.Foreground" Value="LightGray">
+
+                            </Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </GroupBox.Style>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1.5*"/>
                     <RowDefinition Height="10*"/>
                 </Grid.RowDefinitions>
-                <Label Name="labelT" Grid.Row="0" VerticalContentAlignment="Center" FontStretch="SemiExpanded" FontFamily="Consolas"></Label>
-                <WpfPlot Name="GraphT" MouseMove="GraphT_MouseMove" Grid.Row="1">
-                </WpfPlot>
+                <Label Name="labelT" Grid.Row="0" VerticalContentAlignment="Center" FontStretch="SemiExpanded" FontFamily="Consolas"/>
+                <WpfPlot Name="GraphT" MouseMove="GraphT_MouseMove" Grid.Row="1"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Result" Grid.Row="3">
-            <RichTextBox Name="textBoxResult" IsReadOnly="True">
-            </RichTextBox>
+        <GroupBox x:Name="GroupThicknessResult" Header="Result" Grid.Row="3" IsEnabled="False">
+            <GroupBox.Style >
+                <Style>
+                    <Style.Triggers>
+                        <Trigger Property="ItemsControl.IsEnabled" Value="False">
+                            <Setter Property="ItemsControl.Foreground" Value="LightGray">
+
+                            </Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </GroupBox.Style>
+            <RichTextBox Name="textBoxResult"/>
         </GroupBox>
     </Grid>
 </UserControl>

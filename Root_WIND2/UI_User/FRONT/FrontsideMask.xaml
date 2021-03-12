@@ -95,7 +95,7 @@
                                                         Binding="{Binding p_Index}" 
                                                         ElementStyle="{StaticResource TextInCellCenter}"/>
 
-                                    <DataGridTextColumn Header="Size(byte)" Width="*" Binding="{Binding p_Size}"
+                                    <DataGridTextColumn Header="Area Ratio(%)" Width="*" Binding="{Binding p_AreaRatio, StringFormat={}{0:F2}}"
                                                                 ElementStyle="{StaticResource TextInCellCenter}"/>
 
                                     <DataGridTemplateColumn Width="*" Header="Color">

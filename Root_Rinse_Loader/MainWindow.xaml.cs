@@ -128,13 +128,23 @@ namespace Root_Rinse_Loader
             buttonPickerSet.Foreground = (bRun && EQ.p_bPickerSet) ? Brushes.Red : Brushes.Black;
 
             borderState.Background = (EQ.p_eState == EQ.eState.Ready || EQ.p_eState == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
-            borderUnloadState.Background = (rinse.p_eStateUnloader == EQ.eState.Ready || rinse.p_eStateUnloader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
+
+            if (rinse.m_tcpip.p_bConnect)
+            {    
+                borderUnloadState.Background = (rinse.p_eStateUnloader == EQ.eState.Ready || rinse.p_eStateUnloader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
+                textBolckUnloadState.Text = rinse.p_eStateUnloader.ToString();
+            }
+            else
+            {
+                borderUnloadState.Background = Brushes.Crimson;
+                textBolckUnloadState.Text = "disconnect";
+            }
 
             gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
             gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.Gold : Brushes.YellowGreen;
             gridGreen.Background = (bBlink && (EQ.p_eState == EQ.eState.Run)) ? Brushes.SeaGreen : Brushes.DarkGreen;
 
-            textBolckUnloadState.Foreground = rinse.m_tcpip.p_bConnect ? Brushes.Black : Brushes.Gray; 
+            //textBolckUnloadState.Foreground = rinse.m_tcpip.p_bConnect ? Brushes.Black : Brushes.Gray; 
         }
         #endregion
 

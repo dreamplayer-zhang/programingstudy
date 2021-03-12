@@ -267,7 +267,7 @@ namespace Root_WIND2.Module
             for(int i=0;i<darrZAxisPos.Count;i++)
             {
                 darrPosition[iIdxScan] = darrScanAxisPos[i];
-                darrPosition[iIdxZ] = m_MaingrabMode.m_nFocusPosZ - (darrZAxisPos[i] * Math.Sqrt(2) * 90);/*pixel per pulse*/;
+                darrPosition[iIdxZ] = m_MaingrabMode.m_nFocusPosZ - (darrZAxisPos[i] * Math.Sqrt(2) * 90);/*pixel per pulse = 90*/;
                 CAXM.AxmLineMove(contiNum, darrPosition, dMaxVelocity, dMaxAccel, dMaxDecel);
             }
 

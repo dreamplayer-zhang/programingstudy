@@ -11,25 +11,8 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="7*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <local:AOP01_Handler_UI Grid.Column="0" x:Name="handlerUI"/>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <TabControl Grid.Column="2">
-            <TabItem Header="ToolBox" Background="DarkSalmon">
-                <toolBox:ToolBox_UI x:Name="toolBoxUI" Margin="2"/>
-            </TabItem>
-            <TabItem Header="Log" Background="DarkCyan">
-                <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
-            </TabItem>
-            <TabItem Header="Login" Background="DarkGreen">
-                <tools:Login_UI x:Name="loginUI"/>
-            </TabItem>
-            <TabItem Header="Setup" Background="DarkBlue">
-                <tree:TreeUI x:Name="treeRootUI"/>
-            </TabItem>
-        </TabControl>
     </Grid>
 </UserControl>
