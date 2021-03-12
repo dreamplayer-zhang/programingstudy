@@ -72,13 +72,31 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
     </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.Material.4.8.0\lib\net47\MahApps.Metro.IconPacks.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Material, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.Material.4.8.0\lib\net47\MahApps.Metro.IconPacks.Material.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Activities.Extensions, Version=2.0.6.9, Culture=neutral, PublicKeyToken=23b0c89d0d5ad43f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Activities.Extensions.2.0.6.9\lib\Net45\Microsoft.Activities.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.31\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Core.Presentation" />
+    <Reference Include="System.Activities.Presentation" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -111,7 +129,6 @@
     <Compile Include="Inspection\ProcessDefect_Backside.cs" />
     <Compile Include="Inspection\ReticleSurface.cs" />
     <Compile Include="GlobalObjects.cs" />
-    <Compile Include="InspectionManager.cs" />
     <Compile Include="Inspection\D2D.cs" />
     <Compile Include="Inspection\EBR.cs" />
     <Compile Include="Inspection\EdgeSurface.cs" />
@@ -119,6 +136,8 @@
     <Compile Include="Inspection\ProcessDefect_Wafer.cs" />
     <Compile Include="Inspection\ProcessMeasurement.cs" />
     <Compile Include="Inspection\Snap.cs" />
+    <Compile Include="MainWindow_ViewModel.cs" />
+    <Compile Include="MVVM\Converter.cs" />
     <Compile Include="Recipe\CloneableRecipe.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
     <Compile Include="Recipe\Parameter\BacksideSurfaceParameter.cs" />
@@ -157,10 +176,30 @@
     <Compile Include="RemoteProcess\RemoteProcess.cs" />
     <Compile Include="RemoteProcess\StreamDataWriter.cs" />
     <Compile Include="ServerWorkFactory.cs" />
+    <Compile Include="Settings\Constants.cs" />
+    <Compile Include="Settings\ISettingItem.cs" />
+    <Compile Include="Settings\SettingDialog.xaml.cs">
+      <DependentUpon>SettingDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\SettingDialog_ViewModel.cs" />
+    <Compile Include="Settings\SettingItem.cs" />
+    <Compile Include="Settings\SettingItem_Database.cs" />
+    <Compile Include="Settings\SettingItem_SetupBackside.cs" />
+    <Compile Include="Settings\SettingItem_SetupCamera.cs" />
+    <Compile Include="Settings\SettingItem_SetupEBR.cs" />
+    <Compile Include="Settings\SettingItem_SetupEdgeside.cs" />
+    <Compile Include="Settings\SettingItem_SetupFrontside.cs" />
+    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Settings\WpfPropertyGrid.cs" />
     <Compile Include="UI\CloneImageViewer.xaml.cs">
       <DependentUpon>CloneImageViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\CloneImageViewer_ViewModel.cs" />
+    <Compile Include="UI\Logger.cs" />
+    <Compile Include="UI\LogViewer.xaml.cs">
+      <DependentUpon>LogViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\LogViewer_ViewModel.cs" />
     <Compile Include="UserControls\MapViewer.xaml.cs">
       <DependentUpon>MapViewer.xaml</DependentUpon>
     </Compile>
@@ -171,6 +210,7 @@
     <Compile Include="Utility\KlarfData_Lot.cs" />
     <Compile Include="SingleObject.cs" />
     <Compile Include="Utility\TempLogger.cs" />
+    <Compile Include="Utility\Tools.Inspection.cs" />
     <Compile Include="WorkManager\CloneableWorkBase.cs" />
     <Compile Include="WorkManager\DebugOutput.cs" />
     <Compile Include="WorkManager\Interfaces\IWorkplaceBundle.cs" />
@@ -201,7 +241,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Settings\SettingDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\CloneImageViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\LogViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

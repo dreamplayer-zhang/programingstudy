@@ -5,6 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_TactTime"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="1200">
+        Title="MainWindow" Height="900" Width="1400">
     <local:TactTime_UI x:Name="tactTimeUI"/>
 </Window>

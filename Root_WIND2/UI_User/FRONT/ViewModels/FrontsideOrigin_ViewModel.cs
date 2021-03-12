@@ -81,7 +81,7 @@ namespace Root_WIND2.UI_User
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
 
             this.OriginX = originRecipe.OriginX;
-            this.OriginY = originRecipe.OriginX;
+            this.OriginY = originRecipe.OriginY;
 
             this.OriginWidth = originRecipe.OriginWidth;
             this.OriginHeight = originRecipe.OriginHeight;

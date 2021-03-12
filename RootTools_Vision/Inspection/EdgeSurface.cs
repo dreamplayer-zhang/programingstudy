@@ -53,19 +53,20 @@ namespace RootTools_Vision
 
 		public void DoInspection()
 		{
-			if (this.currentWorkplace.MapIndexY == -1)
+			//if (this.currentWorkplace.MapIndexY == -1)
+			//	return;
+
+			if (this.currentWorkplace.Index == 0)
 				return;
 
-			EdgeSurfaceParameterBase param;
+			EdgeSurfaceParameterBase param = parameterEdge.EdgeParamBaseTop;
 			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
 				param = parameterEdge.EdgeParamBaseTop;
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Side)
 				param = parameterEdge.EdgeParamBaseSide;
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
 				param = parameterEdge.EdgeParamBaseBtm;
-			else
-				return;
-
+			
 			// 연구소WIND R채널만 검사
 			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), param);
 			//DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), param);
@@ -81,7 +82,7 @@ namespace RootTools_Vision
 			int threshold = param.Threshold;
 			int defectSize = param.DefectSizeMin;
 			int searchLevel = param.EdgeSearchLevel;
-			double resolution = param.CamResolution;
+			//double resolution = param.Resolution;
 
 			if (this.currentWorkplace.Height < roiHeight)
 				roiHeight = this.currentWorkplace.Height;
@@ -131,10 +132,12 @@ namespace RootTools_Vision
 						10001,
 						label[i].area,
 						label[i].value,
+						0,
+						CalcDegree(0),
 						this.currentWorkplace.PositionX + label[i].boundLeft,
 						this.currentWorkplace.PositionY + label[i].boundTop,
-						(float)(Math.Abs(label[i].boundRight - label[i].boundLeft) * resolution),
-						(float)(Math.Abs(label[i].boundBottom - label[i].boundTop) * resolution),
+						Math.Abs(label[i].boundRight - label[i].boundLeft),// * resolution),
+						Math.Abs(label[i].boundBottom - label[i].boundTop),// * resolution),
 						this.currentWorkplace.MapIndexX,
 						this.currentWorkplace.MapIndexY
 						);

@@ -71,6 +71,8 @@ namespace Root_CAMELLIA.Module
             run.m_WaferRB_pulse = m_WaferRB_pulse;
             run.m_EdgeSearchRange = m_EdgeSearchRange;
             run.m_EdgeSearchLevel = m_EdgeSearchLevel;
+            run.m_dResX_um = m_dResX_um;
+            run.m_dResY_um = m_dResY_um;
             run.m_useCal = m_useCal;
             run.m_useCentering = m_useCentering;
             run.m_dFocusZ = m_dFocusZ;
@@ -100,8 +102,13 @@ namespace Root_CAMELLIA.Module
             Axis axisZ = m_module.p_axisZ;
             string strVRSImageDir = "D:\\";
             string strVRSImageFullPath = "";
-            StopWatch sw = new StopWatch();
-            sw.Start();
+
+
+            if (m_module.LifterDown() != "OK")
+            {
+                return p_sInfo;
+            }
+
             if (m_useCal)
             {
                 m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
@@ -132,13 +139,20 @@ namespace Root_CAMELLIA.Module
             Camera_Basler VRS = m_module.p_CamVRS;
             ImageData img = VRS.p_ImageViewer.p_ImageData;
 
-
-            if (m_module.LifterDown() != "OK")
+            StopWatch sw = new StopWatch();
+            if (VRS.p_CamInfo._OpenStatus == false) VRS.Connect();
+            while (VRS.p_CamInfo._OpenStatus == false)
             {
-                return p_sInfo;
+                if (sw.ElapsedMilliseconds > 15000)
+                {
+                    sw.Stop();
+                    return "Navigation Camera Not Connected";
+                }
             }
+            sw.Stop();
 
-            m_module.VaccumOnOff(true);
+
+            //m_module.VaccumOnOff(true);
 
 
 

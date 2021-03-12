@@ -30,9 +30,17 @@ namespace Root_Rinse_Loader.Module
 
         #region GAF
         ALID m_alidPickerDown;
+        ALID m_alidPickerStripCheck0;
+        ALID m_alidPickerStripCheck1;
+        ALID m_alidPickerStripCheck2;
+        ALID m_alidPickerStripCheck3;
         void InitALID()
         {
             m_alidPickerDown = m_gaf.GetALID(this, "PickerDown", "Picker Up & Down Error");
+            m_alidPickerStripCheck0 = m_gaf.GetALID(this, "Picker Strip Check0", "Picker0 Strip Check Error");
+            m_alidPickerStripCheck1 = m_gaf.GetALID(this, "Picker Strip Check1", "Picker1 Strip Check Error");
+            m_alidPickerStripCheck2 = m_gaf.GetALID(this, "Picker Strip Check2", "Picker2 Strip Check Error");
+            m_alidPickerStripCheck3 = m_gaf.GetALID(this, "Picker Strip Check3", "Picker3 Strip Check Error");
         }
         #endregion
 
@@ -76,6 +84,7 @@ namespace Root_Rinse_Loader.Module
 
         double m_secVac = 2;
         double m_secBlow = 0.5;
+        double m_secRollerStop = 1;
         public string RunVacuum(bool bOn)
         {
             p_bVacuum = bOn;
@@ -133,11 +142,43 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
+        public string RunCheckStrip()
+        {
+            string sResult = "OK";
+            List<Picker> picker = m_aPicker;
+            if (m_storage.m_stack.m_diCheck[0].p_bIn)
+                if (picker[0].m_dioVacuum.p_bIn == false)
+                {
+                    m_alidPickerStripCheck0.p_bSet = true;
+                    return "Picker0 Strip Check Error";
+                }
+            if (m_storage.m_stack.m_diCheck[1].p_bIn)
+                if (picker[1].m_dioVacuum.p_bIn == false)
+                {
+                    m_alidPickerStripCheck1.p_bSet = true;
+                    return "Picker1 Strip Check Error";
+                }
+            if (m_storage.m_stack.m_diCheck[2].p_bIn)
+                if (picker[2].m_dioVacuum.p_bIn == false)
+                {
+                    m_alidPickerStripCheck2.p_bSet = true;
+                    return "Picker2 Strip Check Error";
+                }
+            if (m_storage.m_stack.m_diCheck[3].p_bIn)
+                if (picker[3].m_dioVacuum.p_bIn == false)
+                {
+                    m_alidPickerStripCheck3.p_bSet = true;
+                    return "Picker3 Strip Check Error";
+                }
+            return sResult;
+        }
+
         void RunTreePicker(Tree tree)
         {
             m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum Sensor Wait (sec)");
             m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
             m_nShake = tree.Set(m_nShake, m_nShake, "Shake", "Shake Up Count");
+            m_secRollerStop = tree.Set(m_secRollerStop, m_secRollerStop, "Roller Stop", "Roller Stop Wait (sec)");
             RunTreePickerShake(tree.GetTree("Shake Delay", true, m_nShake > 0), m_nShake > 0); 
         }
 
@@ -239,6 +280,8 @@ namespace Root_Rinse_Loader.Module
             {
                 m_rinse.RunBuzzer(RinseL.eBuzzer.Finish);
                 EQ.p_eState = EQ.eState.Ready;
+                Thread.Sleep((int)(1000 * m_secRollerStop));
+                if (Run(m_roller.RunRotate(false))) return p_sInfo;
                 return "OK";
             }
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack"; 
@@ -252,7 +295,10 @@ namespace Root_Rinse_Loader.Module
             Thread.Sleep(200);
             if (Run(RunVacuum(true))) return p_sInfo;
             Thread.Sleep(200);
-            m_storage.StartStackDown();
+            //m_storage.StartStackDown();
+            if (Run(m_storage.MoveStack_Down())) return p_sInfo;
+            if (Run(RunCheckStrip())) return p_sInfo;
+            Thread.Sleep(100);
             if (Run(RunShakeUp())) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             return "OK";
@@ -263,13 +309,13 @@ namespace Root_Rinse_Loader.Module
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack";
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
-            //if (Run(m_roller.RunRotate(false))) return p_sInfo;
+            if (Run(m_roller.RunRotate(false))) return p_sInfo;
             Thread.Sleep(100); 
             if (Run(RunPickerDown(true))) return p_sInfo;
             Thread.Sleep(200);
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(RunPickerDown(false))) return p_sInfo;
-            //if (Run(m_roller.RunRotate(true))) return p_sInfo;
+            if (Run(m_roller.RunRotate(true))) return p_sInfo;
             if (m_storage.m_stack.p_bCheck) return "OK"; 
             if (Run(MoveLoader(ePos.Rail))) return p_sInfo;
             return "OK";

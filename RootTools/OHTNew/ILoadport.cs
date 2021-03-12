@@ -24,5 +24,7 @@ namespace RootTools.OHTNew
         int p_secHome { get; set; }
 
         IRFID m_rfid { get; set; }
+
+        OHT m_OHTNew { get; set; }
     }
 }

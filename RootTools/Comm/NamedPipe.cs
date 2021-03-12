@@ -143,7 +143,7 @@ namespace RootTools.Comm
                 try { pipe.Connect(300); }
                 catch (Exception) { return p_id + " Client Connect Error"; }
                 if (pipe.CanWrite == false) return p_id + "Can't Write Pipe : " + send.p_sMsg;
-                m_commLog.Add(CommLog.eType.Send, send.p_sMsg); 
+                if (m_bCommLog) m_commLog.Add(CommLog.eType.Send, send.p_sMsg); 
                 send.Write(pipe);
                 return "OK";
             }
@@ -274,7 +274,7 @@ namespace RootTools.Comm
                         try
                         {
                             string sMsg = encoder.GetString(bufRead, 0, nRead - 1);
-                            m_commLog.Add(CommLog.eType.Receive, sMsg);
+                            if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, sMsg);
                             string[] sMsgs = sMsg.Split(c_cSeparate);
                             if (sMsgs[0] == p_id)
                             {
@@ -315,6 +315,16 @@ namespace RootTools.Comm
         }
         #endregion
 
+        #region CommLog
+        public bool m_bCommLog = true; 
+        public CommLog m_commLog = null;
+
+        void RunTreeCommLog(Tree tree)
+        {
+            m_bCommLog = tree.Set(m_bCommLog, m_bCommLog, "Display", "Display Send & Receive Log"); 
+        }
+        #endregion
+
         #region Tree
         private void M_treeRoot_UpdateTree()
         {
@@ -334,11 +344,11 @@ namespace RootTools.Comm
             RunNameTree(treeRoot.GetTree("Name"));
             RunSendTree(treeRoot.GetTree("Send"));
             RunReceiveTree(treeRoot.GetTree("Receive"));
+            RunTreeCommLog(treeRoot.GetTree("CommLog"));
         }
         #endregion
 
         Log m_log;
-        public CommLog m_commLog = null;
         public TreeRoot m_treeRoot; 
         public NamedPipe(string id, Log log)
         {

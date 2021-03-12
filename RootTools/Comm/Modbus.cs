@@ -68,7 +68,7 @@ namespace RootTools.Comm
             set
             {
                 _eComm = value;
-                m_reg.Write("p_eComm", (int)p_eComm);
+                m_reg.Write("p_eComm", (int)value);
             }
         }
         Registry m_reg;
@@ -93,6 +93,7 @@ namespace RootTools.Comm
         void RunTreeRS232(Tree tree)
         {
             if (p_eComm != eComm.RS232) return;
+            if (m_client.SerialPort == null) m_client.SerialPort = "COM50";
             lock (m_csLock)
             {
                 try
@@ -121,6 +122,7 @@ namespace RootTools.Comm
         void RunTreeTCPIP(Tree tree)
         {
             if (p_eComm != eComm.TCPIP) return;
+            if (m_client.IPAddress == null) m_client.IPAddress = "192.0.0.1";
             m_client.IPAddress = tree.Set(m_client.IPAddress, m_client.IPAddress, "IP", "IP Address");
             m_client.Port = tree.Set(m_client.Port, m_client.Port, "Port", "Port numver");
             if (tree.m_bUpdated && m_client.Connected) m_client.Disconnect();
@@ -131,7 +133,15 @@ namespace RootTools.Comm
         public string Connect()
         {
             if (m_client.Connected) return "OK";
-            try { m_client.Connect(); }
+            try 
+            { 
+                switch (p_eComm)
+                {
+                    case eComm.RS232: m_client.IPAddress = null; break;
+                    case eComm.TCPIP: m_client.SerialPort = null; break; 
+                }
+                m_client.Connect(); 
+            }
             catch (Exception) { return "Connection Error"; }
             if (m_client.Connected == false) return "Connection False";
             m_client.SendDataChanged += M_client_SendDataChanged;
@@ -151,7 +161,7 @@ namespace RootTools.Comm
         private void M_client_ReceiveDataChanged(object sender)
         {
            if (m_bLogReceive) m_commLog.Add(CommLog.eType.Receive, BitConverter.ToString(m_client.receiveData)); 
-        }
+          }
 
         void RunTreeLog(Tree tree)
 		{
@@ -255,10 +265,11 @@ namespace RootTools.Comm
             m_client.UnitIdentifier = nUnit;
             try
             {
+
                 int[] anRead = m_client.ReadHoldingRegisters(nAddress, 1);
                 if (anRead.Length > 0) nValue = anRead[0];
             }
-            catch { }
+            catch(Exception ex) { p_sInfo = ex.ToString(); }
             return "OK";
         }
 
@@ -272,7 +283,10 @@ namespace RootTools.Comm
 				int[] anRead = m_client.ReadHoldingRegisters(nAddress, anValue.Count);
 				for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
 			}
-			catch { }
+			catch (Exception ex) 
+            {
+                string sTemp = string.Format("{0}", ex.ToString());
+            }
 			return "OK";
         }
 
@@ -308,7 +322,7 @@ namespace RootTools.Comm
                     if (anRead.Length > 0) nValue = anRead[0];
                 }
             }
-            catch { }
+            catch (Exception e) { m_log.Error("ReadInputRegister Error : " + e.Message); }
             return "OK";
         }
 

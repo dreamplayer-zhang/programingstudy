@@ -10,6 +10,7 @@ namespace Root_AOP01_Inspection
 
         Setup_ViewModel m_Setup;
         AOP01_Engineer_UI Engineer_UI;
+        AOP01_ToolBox_UI ToolBox_UI;
         ViewerTest ToolViewerTest;
         ViewerTest_ViewModel ToolViewerTest_VM;
 
@@ -18,6 +19,8 @@ namespace Root_AOP01_Inspection
             m_Setup = setup;
             Engineer_UI = new AOP01_Engineer_UI();
             Engineer_UI.Init(GlobalObjects.Instance.Get<AOP01_Engineer>());
+            ToolBox_UI = new AOP01_ToolBox_UI();
+            ToolBox_UI.Init(GlobalObjects.Instance.Get<AOP01_Engineer>());
             ToolViewerTest_VM = new ViewerTest_ViewModel();
             ToolViewerTest_VM.Init(GlobalObjects.Instance.Get<AOP01_Engineer>().ClassMemoryTool());
             ToolViewerTest = new ViewerTest();
@@ -71,6 +74,17 @@ namespace Root_AOP01_Inspection
                     SetPage(Engineer_UI);
                 });
 
+            }
+        }
+
+        public ICommand btnToolBox
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(ToolBox_UI);
+                });
             }
         }
         #endregion

@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using Root_LogView.Server;
+using System.ComponentModel;
+using System.Windows;
 
 namespace Root_LogView
 {
@@ -7,11 +9,22 @@ namespace Root_LogView
     /// </summary>
     public partial class MainWindow : Window
     {
-        LogViewer m_logViewer = new LogViewer(); 
         public MainWindow()
         {
             InitializeComponent();
-            logViewerUI.Init(m_logViewer); 
+        }
+
+        LogServer m_logServer = new LogServer();
+        LogViewer m_logViewer = new LogViewer();
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            logServerUI.Init(m_logServer);
+            logViewerUI.Init(m_logViewer);
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            m_logServer.ThreadStop();
         }
     }
 }

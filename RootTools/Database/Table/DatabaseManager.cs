@@ -429,7 +429,6 @@ namespace RootTools.Database
 					//var tableQuery = string.Format("CREATE TABLE '{0}' ('m_nDefectIndex' int(11) NOT NULL AUTO_INCREMENT,'m_strInspectionID' varchar(45) DEFAULT NULL,'m_nDefectCode' int(11) DEFAULT NULL,'m_fSize' double DEFAULT NULL,'m_fWidth' double DEFAULT NULL,'m_fHeight' double DEFAULT NULL,'m_fRelX' double DEFAULT NULL,'m_fRelY' double DEFAULT NULL,'m_fAbsX' double DEFAULT NULL,'m_fAbsY' double DEFAULT NULL,'m_fGV' double DEFAULT NULL,'m_nChipIndexX' int(11) DEFAULT NULL,'m_nCHipIndexY' int(11) DEFAULT NULL,PRIMARY KEY ('m_nDefectIndex')) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;", tableName);
 					CreateTable(tableName, typeof(Defect),nameof(Defect.m_nDefectIndex));
 				}
-				//SendQuery(string.Format("TRUNCATE {0};", tableName));
 				StringBuilder temp = new StringBuilder();
 				StringBuilder sbQuery = new StringBuilder();
 				StringBuilder sbColumList = new StringBuilder();

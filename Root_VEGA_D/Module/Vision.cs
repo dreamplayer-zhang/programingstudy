@@ -3,6 +3,7 @@ using RootTools;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Lens.LinearTurret;
 using RootTools.Light;
 using RootTools.Memory;
@@ -17,6 +18,11 @@ namespace Root_VEGA_D.Module
 {
     public class Vision : ModuleBase, IWTRChild
     {
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Vision Wafer Exist Error");
+        }
         #region ToolBox
         Axis m_axisRotate;
         Axis m_axisZ;
@@ -66,6 +72,7 @@ namespace Root_VEGA_D.Module
             p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
 
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
+            m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
             //m_remote.GetTools(bInit);
         }
         #endregion

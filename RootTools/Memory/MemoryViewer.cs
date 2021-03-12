@@ -399,7 +399,7 @@ namespace RootTools.Memory
 
             int nByte = p_memoryData.p_nByte;
             CPoint sz = m_szBitmapSource = new CPoint(Math.Min(p_szWindow.X, m_szImage.X), Math.Min(p_szWindow.Y, m_szImage.Y));
-            byte[] aBuf = m_aBufDisplay = new byte[nByte * sz.Y * sz.X];
+            byte[] aBuf = m_aBufDisplay = new byte[(long)nByte * sz.Y * sz.X];
             FixOffset();
 
             int[] aX = new int[sz.X];

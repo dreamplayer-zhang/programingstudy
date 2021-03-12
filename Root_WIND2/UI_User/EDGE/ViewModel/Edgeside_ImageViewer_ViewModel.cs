@@ -179,7 +179,7 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        public void AddDrawRect(CRect rect, SolidColorBrush color = null)
+        private void AddDrawRect(CRect rect, SolidColorBrush color = null)
         {
             if (color == null)
             {
@@ -245,6 +245,25 @@ namespace Root_WIND2.UI_User
         }
 
         private void RedrawShapes()
+        {
+            foreach (TRect rt in rectList)
+            {
+                if (p_DrawElement.Contains(rt.UIElement) == true)
+                {
+                    Rectangle rectangle = rt.UIElement as Rectangle;
+                    CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+                    CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+
+                    rectangle.Width = canvasRightBottom.X - canvasLeftTop.X;
+                    rectangle.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+                    Canvas.SetLeft(rectangle, canvasLeftTop.X);
+                    Canvas.SetTop(rectangle, canvasLeftTop.Y);
+                }
+            }
+        }
+
+        public void UpdateImageViewer()
         {
             foreach (TRect rt in rectList)
             {

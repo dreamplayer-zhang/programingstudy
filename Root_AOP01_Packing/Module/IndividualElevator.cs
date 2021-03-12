@@ -12,6 +12,11 @@ namespace Root_AOP01_Packing.Module
 {
     public class IndividualElevator : ModuleBase, IWTRChild
     {
+        ALID m_alid_WaferExist;
+        public void SetAlarm()
+        {
+            m_alid_WaferExist.Run(true, "Vision Wafer Exist Error");
+        }
         public IndividualElevator(string id, IEngineer engineer)
         {
             m_waferSize = new InfoWafer.WaferSize(id, false, false);

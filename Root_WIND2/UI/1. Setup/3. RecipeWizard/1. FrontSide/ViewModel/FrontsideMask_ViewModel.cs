@@ -78,7 +78,7 @@ namespace Root_WIND2
         /// <summary>
         /// ROI List
         /// </summary>
-        public ObservableCollection<InspectionROI> p_cInspROI
+        public ObservableCollection<ItemMask> p_cInspROI
         {
             get
             {
@@ -89,11 +89,11 @@ namespace Root_WIND2
                 m_cInspROI = value;
             }
         }
-        private ObservableCollection<InspectionROI> m_cInspROI = new ObservableCollection<InspectionROI>();
+        private ObservableCollection<ItemMask> m_cInspROI = new ObservableCollection<ItemMask>();
         /// <summary>
         /// Selected ROI
         /// </summary>
-        public InspectionROI p_SelectedROI
+        public ItemMask p_SelectedROI
         {
             get
             {
@@ -113,7 +113,7 @@ namespace Root_WIND2
                     _ReadROI();
             }
         }
-        private InspectionROI m_SelectedROI;
+        private ItemMask m_SelectedROI;
         /// <summary>
         /// Enable Draw Tool
         /// </summary>
@@ -1444,10 +1444,10 @@ namespace Root_WIND2
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
+            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel()];
             for (int y = 0; y < p_ROILayer.p_Size.Y; y++)
             {
-                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * y), buf.Length);
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel() * y), buf.Length);
             }
 
 
@@ -1462,7 +1462,7 @@ namespace Root_WIND2
             byte* bitmapPtr = (byte*)ptrMem.ToPointer();
             UInt32* fPtr = (UInt32*)bitmapPtr;
 
-            foreach (InspectionROI roi in p_cInspROI)
+            foreach (ItemMask roi in p_cInspROI)
             {
                 UInt32 clr = roi.p_Color.A;
                 clr = ((UInt32)clr << 8);
@@ -1487,10 +1487,10 @@ namespace Root_WIND2
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
+            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel()];
             for (int y = 0; y < p_ROILayer.p_Size.Y; y++)
             {
-                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * y), buf.Length);
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel() * y), buf.Length);
             }
 
 
@@ -1527,10 +1527,10 @@ namespace Root_WIND2
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
+            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel()];
             for (int i = 0; i < p_ROILayer.p_Size.Y; i++)
             {
-                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * i), buf.Length);
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel() * i), buf.Length);
             }
         }
         private void Worker_ClearROI_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -1608,7 +1608,7 @@ namespace Root_WIND2
         #region ICommand
         private void _CreateROI()
         {
-            InspectionROI roi = new InspectionROI();
+            ItemMask roi = new ItemMask();
             roi.p_Color = Colors.AliceBlue;
             roi.p_Index = p_cInspROI.Count();
             p_cInspROI.Add(roi);
@@ -1695,7 +1695,7 @@ namespace Root_WIND2
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
             foreach (RecipeType_Mask mask in recipe.GetItem<MaskRecipe>().MaskList)
             {
-                InspectionROI roi = new InspectionROI();
+                ItemMask roi = new ItemMask();
                 roi.p_Color = Colors.AliceBlue;
                 roi.p_Index = p_cInspROI.Count();
 

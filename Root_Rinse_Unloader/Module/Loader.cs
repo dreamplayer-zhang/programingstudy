@@ -29,9 +29,11 @@ namespace Root_Rinse_Unloader.Module
 
         #region GAF
         ALID m_alidPickerDown;
+        ALID m_alidRollerStripCheck;
         void InitALID()
         {
             m_alidPickerDown = m_gaf.GetALID(this, "PickerDown", "Picker Up & Down Error");
+            m_alidRollerStripCheck = m_gaf.GetALID(this, "Roller Strip Check", "Roller Strip Check Error");
         }
         #endregion
 
@@ -86,11 +88,17 @@ namespace Root_Rinse_Unloader.Module
             for (int n = 0; n < 4; n++)
             {
                 m_aPicker[n].m_dioVacuum.Write(bOn);
-                //m_aPicker[n].m_dioVacuum.Write(bOn && m_roller.m_bExist[n]);
             }
+            //if (!bOn) Thread.Sleep((int)(1000 * m_secBlow));
             Thread.Sleep(200);
-            if (bOn) Thread.Sleep((int)(1000 * m_secVac));
-            else
+            //if (bOn) Thread.Sleep((int)(1000 * m_secVac));
+            //else
+            //{
+            //    foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
+            //    Thread.Sleep((int)(1000 * m_secBlow));
+            //    foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
+            //}
+            if (!bOn)
             {
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
                 Thread.Sleep((int)(1000 * m_secBlow));
@@ -150,9 +158,12 @@ namespace Root_Rinse_Unloader.Module
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop"; 
             }
-            if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
+
+            if (Run(RunPickerDown(true))) return p_sInfo;
+            Thread.Sleep((int)(1000 * m_secVac));
             if (Run(RunPickerDown(false))) return p_sInfo;
+            if (Run(RunCheckStrip())) return p_sInfo;
             m_roller.p_eStep = Roller.eStep.Empty;
             if (Run(m_roller.RunRotate(true))) return p_sInfo;
             return "OK";
@@ -188,6 +199,20 @@ namespace Root_Rinse_Unloader.Module
             if (EQ.p_bPickerSet) return "OK";
             return p_bVacuum ? RunUnload() : RunLoad();
         }
+
+        public string RunCheckStrip()
+        {
+            string sResult = "OK";
+            foreach(Roller.Line line in m_roller.m_aLine)
+            {
+                if(line.m_diCheck[2].p_bIn)
+                {
+                    m_alidRollerStripCheck.p_bSet = true;
+                    return "Roller Check Strip";
+                }
+            }
+            return sResult;
+        }
         #endregion
 
         #region State Home
@@ -201,8 +226,18 @@ namespace Root_Rinse_Unloader.Module
             RunPickerDown(false);
             RunVacuum(false); 
             p_sInfo = base.StateHome();
-            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
-            m_axis.StartMove(ePos.Roller); 
+            //p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            //m_axis.StartMove(ePos.Roller); 
+            if(p_sInfo == "OK")
+            {
+                Thread.Sleep(200);
+                //if (Run(m_axis.StartMove(ePos.Roller)))
+                //{
+                //    p_eState = eState.Error;
+                //    return p_sInfo;
+                //}
+                p_eState = eState.Ready;
+            }
             return p_sInfo;
         }
 

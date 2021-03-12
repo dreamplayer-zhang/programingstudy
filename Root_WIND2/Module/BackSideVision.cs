@@ -21,7 +21,10 @@ namespace Root_WIND2.Module
         {
             BackSide, LADS
         }
-
+        public void SetAlarm()
+        {
+            alid_WaferExist.Run(true, "BackSideVision Wafer Exist Error");
+        }
         #region ToolBox
         Axis axisZ;
         AxisXY axisXY;

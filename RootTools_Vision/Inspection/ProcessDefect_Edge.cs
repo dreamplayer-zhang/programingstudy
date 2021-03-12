@@ -2,7 +2,9 @@
 using RootTools_CLR;
 using RootTools_Vision.Utility;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,101 +35,192 @@ namespace RootTools_Vision
 
 		public void DoProcessDefect_Edge()
 		{
-            if (this.currentWorkplace.MapIndexY != -1)
-                return;
+			if (this.currentWorkplace.Index != 0)
+				return;
 
-            int mapX = this.currentWorkplace.MapIndexX;
-            int mergeDist = 1;  // RECIPE에서 가져와야함
+			List<Defect> topMergeDefectList = Tools.MergeDefect(CollectDefectData((int)EdgeSurface.EdgeMapPositionX.Top), this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.MergeDist);
+			List<Defect> sideMergeDefectList = Tools.MergeDefect(CollectDefectData((int)EdgeSurface.EdgeMapPositionX.Side), this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide.MergeDist);
+			List<Defect> btmMergeDefectList = Tools.MergeDefect(CollectDefectData((int)EdgeSurface.EdgeMapPositionX.Btm), this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.MergeDist);
 
-			List<Defect> DefectList = CollectDefectData(mapX);
-			List<Defect> MergeDefectList = Tools.MergeDefect(DefectList, mergeDist);
+			List<Defect> MergeDefectList = new List<Defect>();
+			foreach (Defect defect in topMergeDefectList)
+				MergeDefectList.Add(defect);
+			foreach (Defect defect in sideMergeDefectList)
+				MergeDefectList.Add(defect);
+			foreach (Defect defect in btmMergeDefectList)
+				MergeDefectList.Add(defect);
+
+			// Top/Side/Btm 별 Defect Merge 후 Index 재정렬
+			MergeDefectList = RearrangeDefectIndex(MergeDefectList);
 
 			foreach (Defect defect in MergeDefectList)
 				this.currentWorkplace.DefectList.Add(defect);
 
-            if (MergeDefectList.Count > 0)
-                DatabaseManager.Instance.AddDefectDataList(MergeDefectList, TableName);
+			if (MergeDefectList.Count > 0)
+				DatabaseManager.Instance.AddDefectDataList(MergeDefectList, TableName);
 
-            string sDefectimagePath = @"D:\DefectImage";
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            SaveDefectImage(Path.Combine(sDefectimagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferByteCnt);
 
-			//GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
-			//GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
-			//GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
-			//GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(sDefectimagePath, false);
+			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			Settings settings = new Settings();
+			SettingItem_SetupEdgeside settings_edgeside = settings.GetItem<SettingItem_SetupEdgeside>();
 
+			for (int i = 0; i < MergeDefectList.Count; i++)
+			{
+				SharedBufferInfo sharedBufferInfo = GetSharedBufferInfoByChipX(MergeDefectList[i].m_nChipIndexX);
+				Tools.SaveDefectImage(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID), MergeDefectList[i], sharedBufferInfo, i + 1);
+			}
+
+			if (settings_edgeside.UseKlarf)
+			{
+				KlarfData_Lot klarfData = new KlarfData_Lot();
+				Directory.CreateDirectory(settings_edgeside.KlarfSavePath);
+
+				klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
+				klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+				klarfData.SetResultTimeStamp();
+
+				klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
+
+				//Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
+			}
 			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
 			WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
-        }
+		}
 
-		public List<Defect> CollectDefectData(int mapX)
+		public void TEST(string Path/*, List<Data> dataList, SharedBufferInfo sharedBuffer*/)
+		{
+			Path += "\\";
+			DirectoryInfo di = new DirectoryInfo(Path);
+			if (!di.Exists)
+				di.Create();
+
+			Defect defect = new Defect();
+			SharedBufferInfo sharedBufferInfo_Top = GetSharedBufferInfoByChipX((int)EdgeSurface.EdgeMapPositionX.Top);
+			SharedBufferInfo sharedBufferInfo_Side = GetSharedBufferInfoByChipX((int)EdgeSurface.EdgeMapPositionX.Side);
+			SharedBufferInfo sharedBufferInfo_Btm = GetSharedBufferInfoByChipX((int)EdgeSurface.EdgeMapPositionX.Btm);
+
+			int posOffset_Top = this.recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop.PositionOffset;
+			int posOffset_Side = this.recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide.PositionOffset;
+			int posOffset_Btm = this.recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm.PositionOffset;
+
+			//첫 notch + (각도 * 1도당 image height)
+			//defect.m_fRelY * 
+
+			System.Windows.Rect defectRect = defect.GetRect();
+			System.Windows.Rect calcDefectRect = new System.Windows.Rect(defectRect.X, defectRect.Y, defectRect.Width, defectRect.Height);
+
+
+			System.Drawing.Bitmap bitmap_Top = Tools.ConvertArrayToColorBitmap(sharedBufferInfo_Top.PtrR_GRAY, sharedBufferInfo_Top.PtrG, sharedBufferInfo_Top.PtrB, sharedBufferInfo_Top.Width, sharedBufferInfo_Top.ByteCnt, defect.GetRect());
+			System.Drawing.Bitmap bitmap_Side = Tools.ConvertArrayToColorBitmap(sharedBufferInfo_Side.PtrR_GRAY, sharedBufferInfo_Side.PtrG, sharedBufferInfo_Side.PtrB, sharedBufferInfo_Side.Width, sharedBufferInfo_Side.ByteCnt, defect.GetRect());
+			System.Drawing.Bitmap bitmap_Btm = Tools.ConvertArrayToColorBitmap(sharedBufferInfo_Btm.PtrR_GRAY, sharedBufferInfo_Btm.PtrG, sharedBufferInfo_Btm.PtrB, sharedBufferInfo_Btm.Width, sharedBufferInfo_Btm.ByteCnt, defect.GetRect());
+
+
+			/////
+			/*
+			ArrayList inputImage = new ArrayList();
+			for (int i = 0; i < dataList.Count; i++)
+			{
+				MemoryStream image = new MemoryStream();
+				System.Drawing.Bitmap bitmap = Tools.ConvertArrayToColorBitmap(sharedBuffer.PtrR_GRAY, sharedBuffer.PtrG, sharedBuffer.PtrB, sharedBuffer.Width, sharedBuffer.ByteCnt, dataList[i].GetRect());
+				//System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
+				bitmap.Save(image, ImageFormat.Tiff);
+				inputImage.Add(image);
+			}
+
+			ImageCodecInfo info = null;
+			foreach (ImageCodecInfo ice in ImageCodecInfo.GetImageEncoders())
+			{
+				if (ice.MimeType == "image/tiff")
+				{
+					info = ice;
+					break;
+				}
+			}
+
+			string test = "test";
+			Path += test + ".tiff";
+
+			EncoderParameters ep = new EncoderParameters(2);
+
+			bool firstPage = true;
+
+			System.Drawing.Image img = null;
+
+			for (int i = 0; i < inputImage.Count; i++)
+			{
+				System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
+				Guid guid = img_src.FrameDimensionsList[0];
+				System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
+
+				for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+				{
+					img_src.SelectActiveFrame(dimension, nLoopFrame);
+
+					ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
+
+					if (firstPage)
+					{
+						img = img_src;
+
+						ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+						img.Save(Path, info, ep);
+
+						firstPage = false;
+						continue;
+					}
+
+					ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+					img.SaveAdd(img_src, ep);
+				}
+			}
+			if (inputImage.Count == 0)
+			{
+				File.Create(Path);
+				return;
+			}
+
+			ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+			img.SaveAdd(ep);
+			*/
+		}
+
+		public List<Defect> CollectDefectData(int chipX)
 		{
 			List<Defect> DefectList = new List<Defect>();
 
-            //foreach (Workplace workplace in workplaceBundle)
-            //	foreach (Defect defect in workplace.DefectList)
-            //		DefectList.Add(defect);
-
-            foreach (Workplace workplace in workplaceBundle)
-            {
-                if (workplace.MapIndexX == mapX)
-                {
-                    foreach (Defect defect in workplace.DefectList)
-                        DefectList.Add(defect);
-                }
-            }
-            return DefectList;
+			foreach (Workplace workplace in workplaceBundle)
+			{
+				if (workplace.MapIndexX == chipX)
+				{
+					foreach (Defect defect in workplace.DefectList)
+						DefectList.Add(defect);
+				}
+			}
+			return DefectList;
 		}
 
-        private void SaveDefectImage(String Path, List<Defect> DefectList, int nByteCnt)
-        {
-            Path += "\\";
-            DirectoryInfo di = new DirectoryInfo(Path);
-            if (!di.Exists)
-                di.Create();
+		private SharedBufferInfo GetSharedBufferInfoByChipX(int chipX)
+		{
+			foreach (Workplace workplace in workplaceBundle)
+			{
+				if (workplace.MapIndexX == chipX)
+					return workplace.SharedBufferInfo;
+			}
 
-            if (DefectList.Count < 1)
-                return;
+			return currentWorkplace.SharedBufferInfo;
+		}
 
-            unsafe
-            {
-                Cpp_Rect[] defectArray = new Cpp_Rect[DefectList.Count];
+		private List<Defect> RearrangeDefectIndex(List<Defect> defectList)
+		{
+			List<Defect> MergeDefectList = new List<Defect>();
+			int nDefectIndex = 1;
 
-                for (int i = 0; i < DefectList.Count; i++)
-                {
-                    Cpp_Rect rect = new Cpp_Rect();
-                    rect.x = (int)DefectList[i].p_rtDefectBox.Left;
-                    rect.y = (int)DefectList[i].p_rtDefectBox.Top;
-                    rect.w = (int)DefectList[i].m_fWidth;
-                    rect.h = (int)DefectList[i].m_fHeight;
-
-                    defectArray[i] = rect;
-                }
-
-                if (nByteCnt == 1)
-                {
-                    CLR_IP.Cpp_SaveDefectListBMP(
-                       Path,
-                       (byte*)currentWorkplace.SharedBufferR_GRAY.ToPointer(),
-                       currentWorkplace.SharedBufferWidth,
-                       currentWorkplace.SharedBufferHeight,
-                       defectArray
-                       );
-                }
-
-                else if (nByteCnt == 3)
-                {
-                    CLR_IP.Cpp_SaveDefectListBMP_Color(
-                        Path,
-                       (byte*)currentWorkplace.SharedBufferR_GRAY.ToPointer(),
-                       (byte*)currentWorkplace.SharedBufferG.ToPointer(),
-                       (byte*)currentWorkplace.SharedBufferB.ToPointer(),
-                       currentWorkplace.SharedBufferWidth,
-                       currentWorkplace.SharedBufferHeight,
-                       defectArray);
-                }
-            }
-        }
-    }
+			for (int i = 0; i < defectList.Count; i++)
+			{
+				MergeDefectList.Add(defectList[i]);
+				MergeDefectList[nDefectIndex - 1].SetDefectIndex(nDefectIndex++);
+			}
+			return MergeDefectList;
+		}
+	}
 }

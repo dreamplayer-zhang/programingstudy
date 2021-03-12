@@ -238,7 +238,6 @@
     <Compile Include="Controls\UserControl\LoadingBlock.xaml.cs">
       <DependentUpon>LoadingBlock.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialog\SettingDialog\Settings.cs" />
     <Compile Include="EdgeResult.cs" />
     <Compile Include="ManualJob\ManualJobSchedule.cs" />
     <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
@@ -267,15 +266,6 @@
       <DependentUpon>BacksideInspection.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\ViewModel\BacksideInspection_ViewModel.cs" />
-    <Compile Include="Dialog\SettingDialog\ISettingItem.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingItem.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingItem_Setup.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingItem_SetupBackside.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingItem_SetupFrontside.cs" />
-    <Compile Include="Dialog\SettingDialog\SettingDialog.xaml.cs">
-      <DependentUpon>SettingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialog\SettingDialog\SettingDialog_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\4. EBR\ViewModel\EBRSetup_ViewModel.cs" />
     <Compile Include="UI\2. Review\Tuning.xaml.cs">
       <DependentUpon>Tuning.xaml</DependentUpon>
@@ -370,14 +360,14 @@
     <Compile Include="Module\Vision\Run_Inspect.cs" />
     <Compile Include="Module\Common\Run_Rotate.cs" />
     <Compile Include="UIManager.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\InspectionROI.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\Items\ItemMask.cs" />
     <Compile Include="Module\EdgeSideVision.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideMap_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideSpecTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideSummary_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideSpec_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\InspectionItem.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\Mask.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\Items\InspectionItem.cs" />
+    <Compile Include="UI_User\FRONT\ViewModels\Items\Mask.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideMask_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideOriginBox_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideOriginTool_ViewModel.cs" />
@@ -704,10 +694,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\4. Maintenance\ViewerTest.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialog\SettingDialog\SettingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

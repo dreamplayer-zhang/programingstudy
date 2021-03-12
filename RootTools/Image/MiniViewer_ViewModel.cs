@@ -206,7 +206,7 @@ namespace RootTools
             {
                 if (p_ImageData != null)
                 {
-                    if (p_ImageData.p_nByte == 1)
+                    if (p_ImageData.GetBytePerPixel() == 1)
                     {
                         Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
                         IntPtr ptrMem = m_ImageData.GetPtr();
@@ -359,10 +359,12 @@ namespace RootTools
                         }
                         p_ImgSource = ImageHelper.ToBitmapSource(view);
                     }
-                    else if (p_ImageData.p_nByte == 3)
+                    else if (p_ImageData.GetBytePerPixel() == 3)
                     {
                         Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
                         IntPtr ptrMem = m_ImageData.GetPtr();
+                        IntPtr ptrMem1 = m_ImageData.GetPtr(1);
+                        IntPtr ptrMem2 = m_ImageData.GetPtr(2);
                         if (ptrMem == IntPtr.Zero)
                             return;
                         int pix_x = 0;
@@ -377,9 +379,9 @@ namespace RootTools
                             {
                                 pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
 
-                                view.Data[yy, xx, 0] = ((byte*)ptrMem)[0 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
-                                view.Data[yy, xx, 1] = ((byte*)ptrMem)[1 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
-                                view.Data[yy, xx, 2] = ((byte*)ptrMem)[2 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
+                                view.Data[yy, xx, 0] = ((byte*)ptrMem)[ ((long)pix_x + pix_rect)];
+                                view.Data[yy, xx, 1] = ((byte*)ptrMem1)[((long)pix_x + pix_rect)];
+                                view.Data[yy, xx, 2] = ((byte*)ptrMem2)[((long)pix_x + pix_rect)];
 
                             }
                         }
