@@ -1022,6 +1022,7 @@ namespace Root_AOP01_Inspection.Module
             main.m_sModuleRun = App.MainModuleName;// "MainSurfaceInspection";
             AddModuleRunList(main, true, "Run MainSurfaceInspection");
             AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
+            AddModuleRunList(new Run_Test(this), true, "Run Test");
         }
         #endregion
 
@@ -1647,6 +1648,9 @@ namespace Root_AOP01_Inspection.Module
 
                 try
                 {
+                    RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
+                    if (recipeWizard.p_bUseEdgeBroken == false) return "OK";
+
                     m_grabMode.SetLight(true);
 
                     AxisXY axisXY = m_module.m_axisXY;
@@ -1781,6 +1785,9 @@ namespace Root_AOP01_Inspection.Module
 
                 try
                 {
+                    RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
+                    if (recipeWizard.p_bUseAlignKeyExist == false && recipeWizard.p_bUseBarcodeScratch == false && recipeWizard.p_bUsePatternArrayShiftAndRotation == false && recipeWizard.p_bUsePatternDiscolor == false && recipeWizard.p_bUsePellicleShiftAndRotation == false) return "OK";
+
                     m_grabMode.SetLight(true);
 
                     //((Camera_Dalsa)m_grabMode.m_camera).p_CamParam.p_eDir = DalsaParameterSet.eDir.Reverse;
@@ -2121,6 +2128,9 @@ namespace Root_AOP01_Inspection.Module
 
                 try
                 {
+                    RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
+                    if (recipeWizard.p_bUsePellicleFrontside == false && recipeWizard.p_bUsePellicleHaze == false) return "OK";
+
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
                     Axis axisRotate = m_module.m_axisRotate;
@@ -2358,6 +2368,9 @@ namespace Root_AOP01_Inspection.Module
 
                 try
                 {
+                    RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
+                    if (recipeWizard.p_bUsePellicleExpanding == false) return "OK";
+
                     m_grabMode.SetLight(true);
                     ladsinfos.Clear();
 
@@ -2524,6 +2537,9 @@ namespace Root_AOP01_Inspection.Module
                         
             public override string Run()
             {
+                RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
+                if (recipeWizard.p_bUseBarcodeScratch == false) return "OK";
+
                 // variable
                 CPoint[] cptarrBarcodLTPoint = new CPoint[3];
                 int[] narrBarcodeWidth = new int[3];
@@ -3289,6 +3305,98 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
+        #region Test
+        public class Run_Test : ModuleRunBase
+        {
+            MainVision m_module;
+            public CPoint m_cptReticleCenterPos = new CPoint();
+            public int m_nReticleSize_mm = 150;
+            public int m_nSearchArea_mm = 10;
+            public int m_nOffset_mm = 1;
+
+            public Run_Test(MainVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Test run = new Run_Test(m_module);
+                run.m_cptReticleCenterPos = new CPoint(m_cptReticleCenterPos);
+                run.m_nReticleSize_mm = m_nReticleSize_mm;
+                run.m_nSearchArea_mm = m_nSearchArea_mm;
+                run.m_nOffset_mm = m_nOffset_mm;
+
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_cptReticleCenterPos = tree.Set(m_cptReticleCenterPos, m_cptReticleCenterPos, "Reticle Center Memory Position", "Reticle Center Memory Position", bVisible);
+                m_nReticleSize_mm = tree.Set(m_nReticleSize_mm, m_nReticleSize_mm, "Reticle Size [mm]", "Reticle Size [mm]", bVisible);
+                m_nSearchArea_mm = tree.Set(m_nSearchArea_mm, m_nSearchArea_mm, "Search Area [mm]", "Search Area [mm]", bVisible);
+                m_nOffset_mm = tree.Set(m_nOffset_mm, m_nOffset_mm, "Inner Offset [mm]", "Inner Offset [mm]", bVisible);
+            }
+
+            public override string Run()
+            {
+                string strPool = "MainVision.Vision Memory";
+                string strGroup = "MainVision";
+                string strMemory = "Main";
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                int nMMPerUM = 1000;
+                int nOutPos = (((m_nReticleSize_mm - (m_nOffset_mm * 2)) / 2) * nMMPerUM) / 5;
+                int nInPos = (((m_nReticleSize_mm - (m_nSearchArea_mm * 2) - (m_nOffset_mm * 2)) / 2) * nMMPerUM) / 5;
+
+                RecipeFrontside_Viewer_ViewModel targetViewer = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
+                Dispatcher dispatcher = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.currentDispatcher;
+
+                CRect crtLTROI = new CRect(new CPoint(m_cptReticleCenterPos.X - nOutPos, m_cptReticleCenterPos.Y - nOutPos), new CPoint(m_cptReticleCenterPos.X - nInPos, m_cptReticleCenterPos.Y - nInPos));
+                CRect crtRTROI = new CRect(new CPoint(m_cptReticleCenterPos.X + nInPos, m_cptReticleCenterPos.Y - nOutPos), new CPoint(m_cptReticleCenterPos.X + nOutPos, m_cptReticleCenterPos.Y - nInPos));
+                CRect crtRBROI = new CRect(new CPoint(m_cptReticleCenterPos.X + nInPos, m_cptReticleCenterPos.Y + nInPos), new CPoint(m_cptReticleCenterPos.X + nOutPos, m_cptReticleCenterPos.Y + nOutPos));
+                CRect crtLBROI = new CRect(new CPoint(m_cptReticleCenterPos.X - nOutPos, m_cptReticleCenterPos.Y + nInPos), new CPoint(m_cptReticleCenterPos.X - nInPos, m_cptReticleCenterPos.Y + nOutPos));
+
+                if (dispatcher != null)
+                {
+                    dispatcher.Invoke(new Action(delegate ()
+                    {
+                        targetViewer.Clear();
+                        targetViewer.DrawRect(crtLTROI, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                        targetViewer.DrawRect(crtRTROI, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                        targetViewer.DrawRect(crtLBROI, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                        targetViewer.DrawRect(crtRBROI, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                    }));
+                }
+
+                // LT Blob
+                CvBlobs blobs = new CvBlobs();
+                CvBlobDetector blobDetector = new CvBlobDetector();
+                Image<Gray, byte> imgOriginal = m_module.GetGrayByteImageFromMemory(mem, crtLTROI);
+                imgOriginal.Save("D:\\ORIGINAL.BMP");
+                Image<Gray, byte> imgBinary = imgOriginal.ThresholdBinaryInv(new Gray(128.0), new Gray(255.0));
+                imgBinary.Save("D:\\BINARY.BMP");
+                blobDetector.Detect(imgBinary, blobs);
+
+                foreach (CvBlob blob in blobs.Values)
+                {
+                    if (blob.Area < 100) continue;
+                    CRect crtBlob = new CRect(crtLTROI.Left + blob.BoundingBox.Left, crtLTROI.Top + blob.BoundingBox.Top, crtLTROI.Left + blob.BoundingBox.Right, crtLTROI.Top + blob.BoundingBox.Bottom);
+
+                    if (dispatcher != null)
+                    {
+                        dispatcher.Invoke(new Action(delegate ()
+                        {
+                            targetViewer.DrawRect(crtBlob, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                        }));
+                    }
+                }
+
+                return "OK";
+            }
+        }
+        #endregion
+
         #region PatternArrayShift & Rotation 검사
         public class Run_PatternShiftAndRotation : ModuleRunBase
         {
@@ -3339,6 +3447,9 @@ namespace Root_AOP01_Inspection.Module
             }
             public override string Run()
             {
+                RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
+                if (recipeWizard.p_bUsePatternArrayShiftAndRotation == false) return "OK";
+
                 // variable
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
@@ -3626,6 +3737,9 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+                RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
+                if (recipeWizard.p_bUsePatternArrayShiftAndRotation == false) return "OK";
+
                 // variable
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
@@ -4323,6 +4437,9 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+                RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
+                if (recipeWizard.p_bUsePellicleShiftAndRotation == false) return "OK";
+
                 // variable
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
@@ -4639,6 +4756,9 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+                RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
+                if (recipeWizard.p_bUsePellicleExpanding == false) return "OK";
+
                 // variable
                 Run_LADS moduleRunLADS = (Run_LADS)m_module.CloneModuleRun("LADS");
                 GrabMode grabMode = m_module.GetGrabMode("LADS");
