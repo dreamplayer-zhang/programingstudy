@@ -570,12 +570,15 @@ namespace Root_AOP01_Inspection
 					if (p_bEnablePatternDiscolor)
 					{
                         //startTestInsp();
-                        RootTools.Database.DatabaseManager.Instance.ClearTableData("defect");
+                        //RootTools.Database.DatabaseManager.Instance.ClearTableData("defect");
 
 						ResultDataTable = null;
 						ResultDataTable = new DataTable();
 						SelectedDataTable = null;
                         MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.MainModuleName);
+
+                        GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.MainInspMgRegName).InitInspectionInfo();
+
                         //현재 ViewModel에 있는 edgebox를 저장한다.
                         if (m_ImageViewer_VM.TRectList.Count == 6)
                         {
@@ -599,87 +602,57 @@ namespace Root_AOP01_Inspection
                         mainVision.StartRun(surfaceInspection);
 
 
-                      //  MainVision.Run_SurfaceInspection pell = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.PellicleModuleName);
+						MainVision.Run_SurfaceInspection pell = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.PellicleModuleName);
 
-                      //  pell.BrightGV = BrightGV;
-                      //  pell.SurfaceGV = SurfaceGV;
-                      //  pell.SurfaceSize = SurfaceSize;
+						pell.BrightGV = BrightGV;
+						pell.SurfaceGV = SurfaceGV;
+						pell.SurfaceSize = SurfaceSize;
+                        mainVision.SetSurfaceParam(BrightGV, SurfaceGV, SurfaceSize, App.PellicleModuleName);
 
-                      //  pell.InspectionOffsetX_Left = InspectionOffsetX_Left;
-                      //  pell.InspectionOffsetX_Right = InspectionOffsetX_Right;
-                      //  pell.InspectionOffsetY = InspectionOffsetY;
-                      //  pell.BlockSizeWidth = BlockSizeWidth;
-                      //  pell.BlockSizeHeight = BlockSizeHeight;
-                      // // pell.UpdateTree();
-
-                      //  mainVision.StartRun(pell);
+                        mainVision.StartRun(pell);
 
 
 
 
-                      //  MainVision.Run_SurfaceInspection left = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideLeftModuleName);
+						MainVision.Run_SurfaceInspection left = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideLeftModuleName);
 
-                      //  left.BrightGV = BrightGV;
-                      //  left.SurfaceGV = SurfaceGV;
-                      //  left.SurfaceSize = SurfaceSize;
+						left.BrightGV = BrightGV;
+						left.SurfaceGV = SurfaceGV;
+						left.SurfaceSize = SurfaceSize;
+                        mainVision.SetSurfaceParam(BrightGV, SurfaceGV, SurfaceSize, App.SideLeftModuleName);
 
-                      //  left.InspectionOffsetX_Left = InspectionOffsetX_Left;
-                      //  left.InspectionOffsetX_Right = InspectionOffsetX_Right;
-                      //  left.InspectionOffsetY = InspectionOffsetY;
-                      //  left.BlockSizeWidth = BlockSizeWidth;
-                      //  left.BlockSizeHeight = BlockSizeHeight;
-                      //  //left.UpdateTree();
-
-                      //  mainVision.StartRun(left);
+                        mainVision.StartRun(left);
 
 
-                      //  MainVision.Run_SurfaceInspection right = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideRightModuleName);
+						MainVision.Run_SurfaceInspection right = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideRightModuleName);
 
-                      //  right.BrightGV = BrightGV;
-                      //  right.SurfaceGV = SurfaceGV;
-                      //  right.SurfaceSize = SurfaceSize;
+						right.BrightGV = BrightGV;
+						right.SurfaceGV = SurfaceGV;
+						right.SurfaceSize = SurfaceSize;
+                        mainVision.SetSurfaceParam(BrightGV, SurfaceGV, SurfaceSize, App.SideRightModuleName);
 
-                      //  right.InspectionOffsetX_Left = InspectionOffsetX_Left;
-                      //  right.InspectionOffsetX_Right = InspectionOffsetX_Right;
-                      //  right.InspectionOffsetY = InspectionOffsetY;
-                      //  right.BlockSizeWidth = BlockSizeWidth;
-                      //  right.BlockSizeHeight = BlockSizeHeight;
-                      // // right.UpdateTree();
-
-                      //  mainVision.StartRun(right);
+                        mainVision.StartRun(right);
 
 
-                      //  MainVision.Run_SurfaceInspection bot = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideBotModuleName);
+						MainVision.Run_SurfaceInspection bot = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideBotModuleName);
 
-                      //  bot.BrightGV = BrightGV;
-                      //  bot.SurfaceGV = SurfaceGV;
-                      //  bot.SurfaceSize = SurfaceSize;
+						bot.BrightGV = BrightGV;
+						bot.SurfaceGV = SurfaceGV;
+						bot.SurfaceSize = SurfaceSize;
+                        mainVision.SetSurfaceParam(BrightGV, SurfaceGV, SurfaceSize, App.SideBotModuleName);
 
-                      //  bot.InspectionOffsetX_Left = InspectionOffsetX_Left;
-                      //  bot.InspectionOffsetX_Right = InspectionOffsetX_Right;
-                      //  bot.InspectionOffsetY = InspectionOffsetY;
-                      //  bot.BlockSizeWidth = BlockSizeWidth;
-                      //  bot.BlockSizeHeight = BlockSizeHeight;
-                      //  //bot.UpdateTree();
-
-                      //  mainVision.StartRun(bot);
+                        mainVision.StartRun(bot);
 
 
-                      //  MainVision.Run_SurfaceInspection top = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideTopModuleName);
+						MainVision.Run_SurfaceInspection top = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.SideTopModuleName);
 
-                      //  top.BrightGV = BrightGV;
-                      //  top.SurfaceGV = SurfaceGV;
-                      //  top.SurfaceSize = SurfaceSize;
+						top.BrightGV = BrightGV;
+						top.SurfaceGV = SurfaceGV;
+						top.SurfaceSize = SurfaceSize;
+                        mainVision.SetSurfaceParam(BrightGV, SurfaceGV, SurfaceSize, App.SideTopModuleName);
 
-                      //  top.InspectionOffsetX_Left = InspectionOffsetX_Left;
-                      //  top.InspectionOffsetX_Right = InspectionOffsetX_Right;
-                      //  top.InspectionOffsetY = InspectionOffsetY;
-                      //  top.BlockSizeWidth = BlockSizeWidth;
-                      //  top.BlockSizeHeight = BlockSizeHeight;
-                      ////  top.UpdateTree();
-
-                      //  mainVision.StartRun(top);
-                    }
+                        mainVision.StartRun(top);
+					}
 				});
             }
         }

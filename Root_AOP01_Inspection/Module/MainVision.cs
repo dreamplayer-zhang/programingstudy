@@ -1589,7 +1589,7 @@ namespace Root_AOP01_Inspection.Module
 				{
 					GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(currentMgmName).ClearDefect();
 					//m_Setup.PatternInspectionManager.ResetWorkManager();
-					GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(currentMgmName).InitInspectionInfo();
+					//GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(currentMgmName).InitInspectionInfo();
 					GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).WaferMap.Clear();
 
 					RootViewer_ViewModel targetViewModel;

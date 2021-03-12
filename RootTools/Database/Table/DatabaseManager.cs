@@ -60,7 +60,17 @@ namespace RootTools.Database
 
 		protected Lotinfo m_Loftinfo = new Lotinfo(); // 현재 Lot정보
 		protected string m_sInspectionID; // INSPECTION ID(DB PRIMARY KEY)
-		public string InspectionID { get { return m_sInspectionID; } }
+		public string InspectionID 
+		{ 
+			get 
+			{ 
+				return m_sInspectionID; 
+			}
+			set
+			{
+				m_sInspectionID = value;
+			}
+		}
 
 		public DataSet m_DataSet = new DataSet();
 		public DataTable m_DefectTable = new DataTable();
@@ -359,7 +369,7 @@ namespace RootTools.Database
 			try
 			{
 				var code = SendQuery(query);
-				if (code == 0)
+				if (code == -1)
 					return true;//다른 에러일 수도 있으니 예외처리등이 필요? ㅁ?ㄹ
 				else
 					return false;//추가 예외처리 필요
@@ -426,7 +436,7 @@ namespace RootTools.Database
 				StringBuilder sValueList = new StringBuilder();
 				List<string> sbValueList = new List<string>();
 				Type type = typeof(Defect);
-				FieldInfo[] fld = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+				FieldInfo[] fld = type.GetFields(BindingFlags.Instance | BindingFlags.Public).Where(x => x.Name != nameof(Defect.m_nDefectIndex).ToString()).ToArray();
 
 				for (int defectListNum = 0; defectListNum < _defectlist.Count; defectListNum++)
 				{
