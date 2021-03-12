@@ -92,9 +92,8 @@ namespace RootTools.Memory
             this.p_id = id;
             InitTree();
         }
-        public void Start(int por)
+        public void Start()
         {            
-            port = por;
             IPEndPoint serverEP = new IPEndPoint(IPAddress.Any, port);
             mainSock.Bind(serverEP);
             mainSock.Listen(10);
@@ -201,14 +200,16 @@ namespace RootTools.Memory
         #region Setting
         Socket mainSock;
         IPAddress serverAddr;
+        string strAddr= "127.0.0.1";
         int port;
         Log log;
         public TreeRoot m_treeRoot;
 
         void RunTreeSetting(Tree tree)
         {
-            serverAddr = tree.Set(serverAddr.ToString(), "127.0.0.1", "IP", "IP Address");
-            port = tree.Set(port, 0, "Port", "Port Number");
+            strAddr = tree.Set(strAddr, "10.0.0.10", "IP", "IP Address");
+            serverAddr = IPAddress.Parse(strAddr);
+            port = tree.Set(port, 5000, "Port", "Port Number");
         }
         #endregion
 
@@ -238,12 +239,9 @@ namespace RootTools.Memory
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);
         }
-        public void Connect(IPAddress adds, int por)
+        public void Connect()
         {
-            serverAddr = adds;
-            port = por;
-
-            IPEndPoint clientEP = new IPEndPoint(adds, port);
+            IPEndPoint clientEP = new IPEndPoint(serverAddr, port);
             mainSock.BeginConnect(clientEP, new AsyncCallback(ConnectCallback), mainSock);
         }
         void ConnectCallback(IAsyncResult ar)
@@ -259,7 +257,7 @@ namespace RootTools.Memory
             }
             catch(Exception)
             {
-                Connect(serverAddr, port);
+                Connect();
             }
         }
 
@@ -290,7 +288,7 @@ namespace RootTools.Memory
                 log.Warn("Client : Disconnected from the server");
                 obj.WorkingSocket.Disconnect(true);
 
-                Connect(serverAddr, port);
+                Connect();
                 return;
             }
             
@@ -465,7 +463,6 @@ namespace RootTools.Memory
 
         bool bUseServer = false;
         bool bServer = true;
-        string serverIP = "";
         int nPort = 5000;
 
         public void InitThreadProcess()
@@ -510,6 +507,9 @@ namespace RootTools.Memory
         void RunTreeTCPSetup(Tree tree)
         {
             bUseServer = tree.Set(bUseServer, bUseServer, "Use Memory Server", "Use Mem Server");
+
+            if (!bUseServer) return;
+
             bServer = tree.Set(bServer, bServer, "MemServer", "Memory Tool Server");
             if(bServer)
             {
@@ -626,20 +626,21 @@ namespace RootTools.Memory
 
             if (!bUseServer) return;
 
+            m_Server = new MemServer(m_log,id);
+            m_Client = new MemClient(m_log,id);
+
             if (bServer)
             {
-                m_Server = new MemServer(m_log,id);
                 RunTreeRun(Tree.eMode.RegRead);
                 m_Server.RunTree(Tree.eMode.RegRead);
-                m_Server.Start(nPort);
+                m_Server.Start();
                 m_Server.EventReciveData += M_Server_EventReciveData;
             }
             else
             {
-                m_Client = new MemClient(m_log,id);
                 RunTreeRun(Tree.eMode.RegRead);
                 m_Client.RunTree(Tree.eMode.RegRead);
-                m_Client.Connect(IPAddress.Parse(serverIP), nPort);
+                m_Client.Connect();
                 m_Client.EventReciveData += M_Client_EventReciveData;
             }
         }
