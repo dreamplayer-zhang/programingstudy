@@ -392,11 +392,11 @@ namespace RootTools.Memory
         #region MemoryProcess
         bool m_bThreadProcess = false;
         Thread m_threadProcess = null;
-        //MemServer m_Server;
-        //MemClient m_Client;
+        MemServer m_Server;
+        MemClient m_Client;
 
-        TCPAsyncClient m_Client;
-        TCPAsyncServer m_Server;
+        //TCPAsyncClient m_Client;
+        //TCPAsyncServer m_Server;
 
         bool bServer = true;
 
@@ -679,9 +679,9 @@ namespace RootTools.Memory
                 case "GET":
                     System.Drawing.Rectangle rect = new System.Drawing.Rectangle();
                     byte[] res = GetImageView((System.Drawing.Rectangle)(GetSerializeObject(aStr[1], rect.GetType())), Convert.ToInt32(aStr[2]), Convert.ToInt32(aStr[3]), Convert.ToString(aStr[4]), Convert.ToString(aStr[5]), Convert.ToString(aStr[6]), Convert.ToInt32(aStr[7]));
-                     res = Compress(res);
-                    //m_Client.Send(res);
-                    m_Client.Send(Encoding.Default.GetString(res));
+                     //res = Compress(res);
+                    m_Client.Send(res);
+                    //m_Client.Send(Encoding.Default.GetString(res));
                     break;
             }
             //System.Drawing.Rectangle viewrect = GetSerializeObject(aStr[1],     );
