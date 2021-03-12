@@ -987,7 +987,10 @@ namespace RootTools_Vision
 
         public void ExitRemoteProcess()
         {
-            remote.Exit();
+            if(remote != null)
+            {
+                remote.Exit();
+            }
         }
 
         ~WorkFactory()
