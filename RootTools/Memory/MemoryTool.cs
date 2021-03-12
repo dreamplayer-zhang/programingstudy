@@ -445,21 +445,37 @@ namespace RootTools.Memory
         void RunTreeTCPSetup(Tree tree)
         {
             bUseServer = tree.Set(bUseServer, bUseServer, "Use MemServer", "Use Mem Server");
-            bServer = tree.Set(bServer, bServer, "MemServer", "Memory Tool Server");
-            if(!bServer)
+            if(bUseServer)
             {
-                serverIP = tree.Set(serverIP, serverIP, "Server IPAddress", "Server IPAddress");
-                nPort = tree.Set(nPort, nPort, "Server Port", "Server Port");
-            }               
+                bServer = tree.Set(bServer, bServer, "MemServer", "Memory Tool Server");
+                if (bServer)
+                {
+                    //serverIP = tree.Set(serverIP, serverIP, "Server IPAddress", "Server IPAddress");
+                    //nPort = tree.Set(nPort, nPort, "Server Port", "Server Port");
+                    if(m_Server == null)
+                        m_Server = new TCPAsyncServer(p_id, m_log);
 
-            if (bServer && m_Server != null)
-            {
-              //  m_ServerTree.RunTree(tree);
+                    m_Server.RunTree(tree);
+                }
+                else
+                {
+                    if (m_Client == null)
+                        m_Client = new TCPAsyncClient(p_id, m_log);
+                    m_Client.RunTree(tree);
+                }
+
             }
-            if (!bServer && m_Client != null)
-            {
-                //  m_ClientTree.RunTree(tree);
-            }
+
+            //if (bServer && m_Server != null)
+            //{
+            //    m_Server.RunTree(tree);
+            //    //m_ServerTree.RunTree(tree);
+            //}
+            //if (!bServer && m_Client != null)
+            //{
+            //    m_Client.RunTree(tree);
+            //    //m_ClientTree.RunTree(tree);
+            //}
         }
 
         #endregion
@@ -550,7 +566,6 @@ namespace RootTools.Memory
             if (bMaster) NotifyMemoryChange(); 
             m_treeRootRun = new TreeRoot(id, m_log);
             m_treeRootRun.UpdateTree += M_treeRootRun_UpdateTree;
-            RunTreeRun(Tree.eMode.RegRead);
             KillInspectProcess();
             if (bMaster == false) InitTimer();
 
@@ -575,6 +590,9 @@ namespace RootTools.Memory
                 //m_Client.Connect(IPAddress.Parse(serverIP), nPort);
                 //m_Client.EventReciveData += M_Client_EventReciveData;
             }
+            RunTreeRun(Tree.eMode.RegRead);
+
+
         }
 
         public void ThreadStop()
@@ -599,7 +617,8 @@ namespace RootTools.Memory
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
            
             _bRecieve = true;
-            m_Server.Send(str);
+            if(m_Server!=null)
+                m_Server.Send(str);
         
             while (_bRecieve)
             {
