@@ -318,7 +318,7 @@ namespace RootTools.Comm
                     if (anRead.Length > 0) nValue = anRead[0];
                 }
             }
-            catch { }
+            catch (Exception e) { m_log.Error("ReadInputRegister Error : " + e.Message); }
             return "OK";
         }
 
