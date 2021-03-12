@@ -132,7 +132,6 @@ namespace Root_Rinse_Loader
             if (rinse.m_tcpip.p_bConnect)
             {    
                 borderUnloadState.Background = (rinse.p_eStateUnloader == EQ.eState.Ready || rinse.p_eStateUnloader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
-                textBolckUnloadState.Text = rinse.p_eStateUnloader.ToString();
             }
             else
             {

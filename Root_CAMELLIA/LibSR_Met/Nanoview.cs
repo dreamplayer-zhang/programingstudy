@@ -491,7 +491,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 if (m_DM.bThickness)
                 {
                     m_SR.m_iteration = nIteration;
-                    //m_SR.m_divratio = dDampingFactor;
+                    m_SR.m_divratio = dDampingFactor;
 
                     if (m_Model.m_LayerList.Count == 0)
                     {

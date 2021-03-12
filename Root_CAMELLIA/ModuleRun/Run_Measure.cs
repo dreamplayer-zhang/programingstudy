@@ -44,6 +44,31 @@ namespace Root_CAMELLIA.Module
             InitModuleRun(module);
         }
 
+        public void RunThread()
+        {
+            m_bStart = true;
+            m_IsCalcThicknessDone = false;
+            while (m_bStart)
+            {
+                int index;
+                if (EQ.IsStop())
+                {
+                    while (ThicknessQueue.TryDequeue(out index)) ;
+                }
+               
+                if (ThicknessQueue.TryDequeue(out index))
+                {
+                    App.m_nanoView.GetThickness(index, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor);
+                    SaveRawData(index);
+                }
+
+                if (ThicknessQueue.Count() < 0)
+                {
+                    m_IsCalcThicknessDone = true;
+                }
+            }
+        }
+
         public override ModuleRunBase Clone()
         {
             Run_Measure run = new Run_Measure(m_module);
@@ -110,7 +135,6 @@ namespace Root_CAMELLIA.Module
                         //m_mwvm.p_RTGraph.DrawTransmittanceGraph(index, "Wavelength(nm)", "Reflectance(%)");
                        
                     }
-                    m_mwvm.p_Progress = (((double)(index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
                     SaveRawData(index);
                     sw.Stop();
                     System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
@@ -242,8 +266,26 @@ namespace Root_CAMELLIA.Module
                     StopWatch sw = new StopWatch();
                     sw.Start();
 
+                    //App.m_nanoView.m_SR.m_iteration = 30;
+                    //App.m_nanoView.m_SR.m_divratio = 0.01;
+                    ////App.m_nanoView.GetThickness(i, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor);
+                    //LibSR_Met.RawData data = LibSR_Met.DataManager.GetInstance().m_RawData[i];
+                    ////App.m_nanoView.m_SR.bDispersionFit = false;
+                    ////App.m_nanoView.m_SR.WavelengthForNK = 633;
+                    //int m_NKFitLayer = 0;
+                    //App.m_nanoView.m_SR.NKFitLayer = m_NKFitLayer;
+                    //App.m_nanoView.m_SR.Fit(data.VIS_Reflectance, data.VIS_Reflectance, data.eV, LibSR_Met.DataManager.GetInstance().nThicknessDataNum);
+                    //sw.Stop();
+                    //double thickness = App.m_nanoView.m_SR.Thickness[1];
+                    //System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds.ToString());
+                    //System.Diagnostics.Debug.WriteLine("Thick : " + thickness.ToString());
                     thicknessQueue.Enqueue(i);
-
+                    //if (m_DataManager.recipeDM.MeasurementRD.UseThickness)
+                    //{
+                    //    App.m_nanoView.GetThickness(i, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor);
+                    //}
+                    //   sw.Stop();
+                    //   System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
                     if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
                     {
                         x = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]].x;
@@ -280,7 +322,7 @@ namespace Root_CAMELLIA.Module
                     //}
                     ////Thread.Sleep(600);
 
-                    //m_mwvm.p_Progress = (((double)(i + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
+                    m_mwvm.p_Progress = (((double)(i + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
                 }
                 m_mwvm.p_ArrowVisible = Visibility.Hidden;
 
@@ -328,6 +370,7 @@ namespace Root_CAMELLIA.Module
             if (m_module.Run(axisZ.WaitReady()))
                 return p_sInfo;
 
+            while(!m_IsCalcThicknessDone) ;
             m_bStart = false;
 
             return "OK";
@@ -352,10 +395,9 @@ namespace Root_CAMELLIA.Module
             //m_mwvm.p_RTGraph.DrawTransmittanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
             //isSaveDone = true;
         }
-
         void SaveRawData(int index)
         {
-
+          
             if (m_module.p_infoWafer != null)
             {
                 Met.DataManager.GetInstance().SaveRawData(@"C:\Users\ATI\Desktop\MeasureData\" + m_module.p_infoWafer.p_id + "_" + DateTime.Now.ToString("HH-mm-ss") + "_" + index, index);
@@ -367,8 +409,15 @@ namespace Root_CAMELLIA.Module
                 //Thread.Sleep(3000);
             }
 
-
+            
             //isSaveDone = true;
+        }
+        void SaveRawData(int index)
+        {
+            Met.DataManager.GetInstance().SaveRawData(@"C:\Users\ATI\Desktop\MeasureData\test" + index, index);
+            m_mwvm.p_RTGraph.DrawReflectanceGraph(index, "Wavelength(nm)", "Reflectance(%)");
+            m_mwvm.p_RTGraph.DrawTransmittanceGraph(index, "Wavelength(nm)", "Reflectance(%)");
+            isSaveDone = true;
         }
     }
 }

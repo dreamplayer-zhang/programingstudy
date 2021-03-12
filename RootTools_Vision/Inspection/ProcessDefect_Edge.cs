@@ -58,29 +58,23 @@ namespace RootTools_Vision
 			if (MergeDefectList.Count > 0)
 				DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
 
-
+			SettingItem_SetupEdgeside settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupEdgeside>();
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			Settings settings = new Settings();
-			SettingItem_SetupEdgeside settings_edgeside = settings.GetItem<SettingItem_SetupEdgeside>();
-
 			for (int i = 0; i < MergeDefectList.Count; i++)
 			{
 				SharedBufferInfo sharedBufferInfo = GetSharedBufferInfoByChipX(MergeDefectList[i].m_nChipIndexX);
-				Tools.SaveDefectImage(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID), MergeDefectList[i], sharedBufferInfo, i + 1);
+				Tools.SaveDefectImage(Path.Combine(settings.DefectImagePath, sInspectionID), MergeDefectList[i], sharedBufferInfo, i + 1);
 			}
 
-			if (settings_edgeside.UseKlarf)
+			if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
 			{
-				KlarfData_Lot klarfData = new KlarfData_Lot();
-				Directory.CreateDirectory(settings_edgeside.KlarfSavePath);
+				List<string> dataStringList = ConvertDataListToStringList(MergeDefectList);
+				GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, dataStringList, null);
+				GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
+				GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
+				GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
 
-				klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
-				klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
-				klarfData.SetResultTimeStamp();
-
-				klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
-
-				//Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
+				//Tools.SaveTiffImage(settings.KlarfSavePath, MergeDefectList.Cast<Data>().ToList(), sharedBufferInfo);
 			}
 			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
 			WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
@@ -102,16 +96,8 @@ namespace RootTools_Vision
 			int posOffset_Side = this.recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide.PositionOffset;
 			int posOffset_Btm = this.recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm.PositionOffset;
 
-			//첫 notch + (각도 * 1도당 image height)
-			//defect.m_fRelY * 
-
-			System.Windows.Rect defectRect = defect.GetRect();
-			System.Windows.Rect calcDefectRect = new System.Windows.Rect(defectRect.X, defectRect.Y, defectRect.Width, defectRect.Height);
-
-
 			System.Drawing.Bitmap bitmap_Top = Tools.ConvertArrayToColorBitmap(sharedBufferInfo_Top.PtrR_GRAY, sharedBufferInfo_Top.PtrG, sharedBufferInfo_Top.PtrB, sharedBufferInfo_Top.Width, sharedBufferInfo_Top.ByteCnt, defect.GetRect());
-			System.Drawing.Bitmap bitmap_Side = Tools.ConvertArrayToColorBitmap(sharedBufferInfo_Side.PtrR_GRAY, sharedBufferInfo_Side.PtrG, sharedBufferInfo_Side.PtrB, sharedBufferInfo_Side.Width, sharedBufferInfo_Side.ByteCnt, defect.GetRect());
-			System.Drawing.Bitmap bitmap_Btm = Tools.ConvertArrayToColorBitmap(sharedBufferInfo_Btm.PtrR_GRAY, sharedBufferInfo_Btm.PtrG, sharedBufferInfo_Btm.PtrB, sharedBufferInfo_Btm.Width, sharedBufferInfo_Btm.ByteCnt, defect.GetRect());
+
 
 
 			/////
@@ -207,6 +193,17 @@ namespace RootTools_Vision
 			}
 
 			return currentWorkplace.SharedBufferInfo;
+		}
+
+		private List<string> ConvertDataListToStringList(List<Defect> defectList)
+		{
+			List<string> stringList = new List<string>();
+			foreach (Defect defect in defectList)
+			{
+				//string str = string.Format("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13} {14} {15} {16}");
+				//stringList.Add(str);
+			}
+			return stringList;
 		}
 
 		private List<Defect> RearrangeDefectIndex(List<Defect> defectList)

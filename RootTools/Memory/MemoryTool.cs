@@ -1,4 +1,4 @@
-﻿using Emgu.CV;
+using Emgu.CV;
 using Emgu.CV.Structure;
 using Microsoft.Win32;
 using RootTools.Comm;
@@ -71,7 +71,7 @@ namespace RootTools.Memory
 
             // 또 다른 클라이언트의 연결을 대기한다.
             mainSock.BeginAccept(AcceptCallback, null);
-           
+
             AsyncObject obj = new AsyncObject(nSize);
             obj.WorkingSocket = client;
 
@@ -398,10 +398,7 @@ namespace RootTools.Memory
         TCPAsyncClient m_Client;
         TCPAsyncServer m_Server;
 
-        bool bUseServer = false;
         bool bServer = true;
-        string serverIP = "";
-        int nPort = 5000;
 
         public void InitThreadProcess()
         {
@@ -444,26 +441,14 @@ namespace RootTools.Memory
 
         void RunTreeTCPSetup(Tree tree)
         {
-            bUseServer = tree.Set(bUseServer, bUseServer, "Use MemServer", "Use Mem Server");
-            if(bUseServer)
+            bServer = tree.Set(bServer, bServer, "MemServer", "Memory Tool Server");
+            if (bServer && m_Server != null)
             {
-                bServer = tree.Set(bServer, bServer, "MemServer", "Memory Tool Server");
-                if (bServer)
-                {
-                    //serverIP = tree.Set(serverIP, serverIP, "Server IPAddress", "Server IPAddress");
-                    //nPort = tree.Set(nPort, nPort, "Server Port", "Server Port");
-                    if(m_Server == null)
-                        m_Server = new TCPAsyncServer(p_id, m_log);
-
-                    m_Server.RunTree(tree);
-                }
-                else
-                {
-                    if (m_Client == null)
-                        m_Client = new TCPAsyncClient(p_id, m_log);
-                    m_Client.RunTree(tree);
-                }
-
+              //  m_ServerTree.RunTree(tree);
+            }
+            if (!bServer && m_Client != null)
+            {
+                //  m_ClientTree.RunTree(tree);
             }
 
             //if (bServer && m_Server != null)
@@ -569,11 +554,11 @@ namespace RootTools.Memory
             KillInspectProcess();
             if (bMaster == false) InitTimer();
 
-            if (!bUseServer) return;
-
             if (bServer)
             {
-                m_Server = new TCPAsyncServer(p_id, m_log);
+                m_Server = new MemServer(m_log);
+                RunTreeRun(Tree.eMode.RegRead);
+                m_Server.Start(5000);
                 m_Server.EventReciveData += M_Server_EventReciveData;
                 //m_Server = new MemServer(m_log);
                 //RunTreeRun(Tree.eMode.RegRead);
@@ -582,13 +567,10 @@ namespace RootTools.Memory
             }
             else
             {
-                m_Client = new TCPAsyncClient(p_id, m_log);
-                m_Server.EventReciveData += M_Client_EventReciveData;
-                //m_Client = new MemClient(m_log);
-                //RunTreeRun(Tree.eMode.RegRead);
-                ////m_Client.Connect(new IPAddress(new byte[] { 10,0,0,15 }),5000);
-                //m_Client.Connect(IPAddress.Parse(serverIP), nPort);
-                //m_Client.EventReciveData += M_Client_EventReciveData;
+                m_Client = new MemClient(m_log);
+                RunTreeRun(Tree.eMode.RegRead);
+                m_Client.Connect(new IPAddress(new byte[] { 10,0,0,15 }),5000);
+                m_Client.EventReciveData += M_Client_EventReciveData;
             }
             RunTreeRun(Tree.eMode.RegRead);
 
@@ -609,9 +591,7 @@ namespace RootTools.Memory
         bool _bRecieve = false;
         byte[] m_abuf;
         public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem, int nByte)
-        {
-            if (!bUseServer) return null;
-
+        {  
             Stopwatch watch = new Stopwatch();
             watch.Start();
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
@@ -623,7 +603,7 @@ namespace RootTools.Memory
             while (_bRecieve)
             {
                 Thread.Sleep(5);
-                if (watch.ElapsedMilliseconds > 1000)
+                if (watch.ElapsedMilliseconds > 10000)
                     return m_abuf;
             }
             _bRecieve = false;

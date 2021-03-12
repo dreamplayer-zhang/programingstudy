@@ -416,13 +416,13 @@ namespace Root_Rinse_Unloader.Module
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();
                     m_tcpip.Send(protocol.p_sCmd);
-                    Thread.Sleep(100); 
+                    Thread.Sleep(10); 
                 }
                 else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
                 {
                     m_protocolSend = m_qProtocolSend.Dequeue();
                     m_tcpip.Send(m_protocolSend.p_sCmd);
-                    Thread.Sleep(100);
+                    Thread.Sleep(10);
                 }
             }
         }
@@ -430,7 +430,6 @@ namespace Root_Rinse_Unloader.Module
         public Protocol AddProtocol(string id, eCmd eCmd, dynamic value)
         {
             Protocol protocol = new Protocol(id, eCmd, value);
-            if (!m_tcpip.m_tcpSocket.m_socket.Connected) return protocol;
             if (id == p_id) m_qProtocolSend.Enqueue(protocol);
             else m_qProtocolReply.Enqueue(protocol);
             return protocol;
@@ -471,9 +470,8 @@ namespace Root_Rinse_Unloader.Module
                             //switch (GetEQeState(asRead[2]))
                             switch(p_eStateLoader)
                             {
-                                case EQ.eState.Home:
-                                    //if (EQ.p_eState != EQ.eState.Run) EQ.p_eState = EQ.eState.Home; //forget
-                                    EQ.p_eState = EQ.eState.Home;
+                                case EQ.eState.Home: 
+                                    if (EQ.p_eState != EQ.eState.Run) EQ.p_eState = EQ.eState.Home; //forget
                                     break;
                                 case EQ.eState.Run: 
                                     EQ.p_eState = EQ.eState.Run; 

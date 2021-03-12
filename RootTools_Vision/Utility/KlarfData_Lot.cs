@@ -175,6 +175,7 @@ namespace RootTools_Vision.Utility
 			return true;
 		}
 
+        // 기존 210302
         public bool AddSlot(RecipeType_WaferMap _mapdata, List<Defect> _defectlist, OriginRecipe _origin)
         {
             UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
@@ -215,6 +216,41 @@ namespace RootTools_Vision.Utility
             klarfData.Add(data);
             return true;
         }
+
+        public bool AddSlot(RecipeType_WaferMap _mapdata, List<string> _dataStringList, OriginRecipe _origin)
+		{
+			UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
+
+			KlarfData data = new KlarfData();
+
+			data.SetKlarfType(klarfType);
+			data.tiffFileName = this.tiffFileName;
+
+			data.waferID_name = string.Format("{0:2d}", 0/*pMapdata->GetWaferID()*/);
+			//	data.m_nWaferID = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nWaferID);  
+			//	data.m_nSlot = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nSlot); 
+			data.partID = this.partID;
+			//	m_sLotID = data.m_sLotID = pRecipe->GetCurrentWFInfor()->m_strLotID;    
+			data.deviceID = this.deviceID;
+			data.sampleOrientationMarkType = this.sampleOrientationMarkType;
+			data.orientationMarkLocation = this.orientationMarkLocation;
+			data.diePitchX = this.diePitchX;
+			data.diePitchY = this.diePitchY;
+			data.dieOriginX = this.dieOriginX;
+			data.dieOriginY = this.dieOriginY;
+			data.sampleCenterLocationX = this.sampleCenterLocationX;
+			data.sampleCenterLocationY = this.sampleCenterLocationY;
+			data.resX = this.resX;
+			data.resY = this.resY;
+
+			//data.SetSampleTestPlan(_mapdata); // map data 없는거 예외처리 필요
+			data.SetDefectInfor_SRLine(_mapdata, _dataStringList, _origin);
+			//	data.m_nDefectDieCnt = pResultMap->GetBadDieNum();
+			data.SetMEMMAP(_mapdata);
+
+			klarfData.Add(data);
+			return true;
+		}
 
 		public bool AddSlotToServer(RecipeType_WaferMap _mapdata)
 		{

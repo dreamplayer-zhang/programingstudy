@@ -242,6 +242,7 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region ToolBox
+        DIO_I m_diAirEmergency;
         public TCPIPClient m_tcpip; 
         public override void GetTools(bool bInit)
         {
@@ -260,8 +261,6 @@ namespace Root_Rinse_Loader.Module
 
         public override string StateHome()
         {
-            //m_qProtocolSend.Clear();
-            //m_protocolSend = null;      //??
             return p_sInfo;
         }
 
@@ -478,13 +477,13 @@ namespace Root_Rinse_Loader.Module
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();
                     m_tcpip.Send(protocol.p_sCmd);
-                    Thread.Sleep(100);
+                    Thread.Sleep(10);
                 }
                 else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
                 {
                     m_protocolSend = m_qProtocolSend.Dequeue();
                     m_tcpip.Send(m_protocolSend.p_sCmd);
-                    Thread.Sleep(100);
+                    Thread.Sleep(10);
                 }
             }
         }
@@ -492,7 +491,6 @@ namespace Root_Rinse_Loader.Module
         public Protocol AddProtocol(string id, eCmd eCmd, dynamic value)
         {
             Protocol protocol = new Protocol(id, eCmd, value);
-            if (!m_tcpip.p_bConnect) return protocol;
             if (id == p_id) m_qProtocolSend.Enqueue(protocol);
             else m_qProtocolReply.Enqueue(protocol); 
             return protocol;
