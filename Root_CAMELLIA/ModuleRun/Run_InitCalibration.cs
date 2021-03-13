@@ -21,7 +21,7 @@ namespace Root_CAMELLIA.Module
         bool m_useCalWafer = true;
         bool m_useRefWafer = true;
         bool m_InitialCal = true;
-
+        
 
         (Met.SettingData, Met.Nanoview.ERRORCODE_NANOVIEW) m_SettingDataWithErrorCode;
         public Run_InitCalibration(Module_Camellia module)
@@ -76,7 +76,7 @@ namespace Root_CAMELLIA.Module
                 if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     Met.SettingData setting = m_SettingDataWithErrorCode.Item1;
-                    App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal);
+                    App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal, m_dataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_dataManager.recipeDM.MeasurementRD.NIRIntegrationTime);
                 }
             }
 
@@ -92,7 +92,7 @@ namespace Root_CAMELLIA.Module
                 if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     Met.SettingData setting = m_SettingDataWithErrorCode.Item1;
-                    App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal);
+                    App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal, m_dataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_dataManager.recipeDM.MeasurementRD.NIRIntegrationTime);
                 }
             }
 
