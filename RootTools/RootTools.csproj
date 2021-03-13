@@ -438,6 +438,11 @@
     <Compile Include="OHTNew\OHT_UI.xaml.cs">
       <DependentUpon>OHT_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ParticleCounter\LasairIII.cs" />
+    <Compile Include="ParticleCounter\ParticleCounterBase.cs" />
+    <Compile Include="ParticleCounter\ParticleCounterBase_UI.xaml.cs">
+      <DependentUpon>ParticleCounterBase_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Printer\SRP350.cs" />
     <Compile Include="Printer\SRP350_UI.xaml.cs">
       <DependentUpon>SRP350_UI.xaml</DependentUpon>
@@ -1081,6 +1086,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="OHT\SSEM\OHT_SSEM_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ParticleCounter\ParticleCounterBase_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
