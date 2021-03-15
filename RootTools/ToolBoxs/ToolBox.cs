@@ -17,6 +17,7 @@ using RootTools.Module;
 using RootTools.OHT.Semi;
 using RootTools.OHT.SSEM;
 using RootTools.OHTNew;
+using RootTools.ParticleCounter;
 using RootTools.Printer;
 using RootTools.RADS;
 using RootTools.RTC5s.LaserBright;
@@ -576,6 +577,33 @@ namespace RootTools.ToolBoxs
         }
         #endregion
 
+        #region ITool ParticleCounter
+        ToolSet m_toolSetParticleCounter = null;
+        public string Get(ref LasairIII value, ModuleBase module, string id)
+        {
+            if (m_toolSetPrinter == null) m_toolSetParticleCounter = InitToolSet("ParticleCounter");
+            if (value == null)
+            {
+                value = new LasairIII(module.p_id + "." + id, module.m_log);
+                m_toolSetParticleCounter.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            return "OK";
+        }
+
+        public string Get(ref AirnetII_310 value, ModuleBase module, string id)
+        {
+            if (m_toolSetPrinter == null) m_toolSetParticleCounter = InitToolSet("ParticleCounter");
+            if (value == null)
+            {
+                value = new AirnetII_310(module.p_id + "." + id, module.m_log);
+                m_toolSetParticleCounter.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            return "OK";
+        }
+        #endregion
+
         #region ITool RADS
         ToolSet m_toolSetRADS = null;
         public string Get(ref RADSControl value, ModuleBase module, string id, bool bUseRADS)
@@ -590,6 +618,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
         #endregion
+
         #region ITool TK4S
         ToolSet m_toolTK4S = null;
         public string Get(ref TK4SGroup value, ModuleBase module, string id , IDialogService dialogService = null)

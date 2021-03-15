@@ -86,7 +86,7 @@ namespace RootTools.ParticleCounter
         #endregion
 
         #region Read Count
-        public List<string> m_asParticleSize = null; 
+        public string[] m_asParticleSize = null; 
         public class ParticleCount
         {
             public string m_sParticleSize; 
@@ -105,7 +105,7 @@ namespace RootTools.ParticleCounter
             try
             {
                 if (Run(m_modbus.ReadInputRegister(m_nUnit, 228, m_aRead))) return m_sRun;
-                for (int n = 0; n < m_asParticleSize.Count; n++)
+                for (int n = 0; n < m_asParticleSize.Length; n++)
                 {
                     m_aRead[2 * n] &= 0xffff;
                     m_aRead[2 * n + 1] &= 0xffff;
@@ -237,7 +237,7 @@ namespace RootTools.ParticleCounter
 
         public string p_id { get; set; }
         Log m_log; 
-        public ParticleCounterBase(string id, Log log, List<string> asParticleSize)
+        protected void Init(string id, Log log, string[] asParticleSize)
         {
             p_id = id;
             m_log = log;
@@ -245,13 +245,13 @@ namespace RootTools.ParticleCounter
             foreach (string sParticleSize in asParticleSize)
             {
                 ParticleCount particleCount = new ParticleCount(sParticleSize);
-                m_aParticleCount.Add(particleCount); 
+                m_aParticleCount.Add(particleCount);
                 m_aRead.Add(0);
                 m_aRead.Add(0);
             }
             InitModbus();
             InitTree();
-            InitBackgroundWorker(); 
+            InitBackgroundWorker();
         }
 
         public void ThreadStop()
