@@ -19,6 +19,14 @@
         BorderThickness="1"
         Background="{StaticResource PanelBackGround}"
         mc:Ignorable="d">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding UnloadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Window.Resources>
         <local:TextBoxToIntConverter x:Key="TextBoxToInt" />
         <local:AxisBoolToBrushConverter x:Key="AxisBoolToBrush" />

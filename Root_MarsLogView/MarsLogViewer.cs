@@ -1,5 +1,4 @@
-﻿using NLog.Targets;
-using RootTools.Comm;
+﻿using RootTools.Comm;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;

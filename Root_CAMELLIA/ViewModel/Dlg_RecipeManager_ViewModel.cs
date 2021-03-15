@@ -317,7 +317,6 @@ namespace Root_CAMELLIA
                         //VerticalScroll.Maximum = HorizontalScroll.Maximum = 10 * nZoomScale;
                         //VerticalScroll.Visibility = Visibility.Visible;
                         //HorizontalScroll.Visibility = Visibility.Visible;
-                        CamelliaStage.ZoomScale = value;
                         if (OffsetX != 0)
                         {
                             OffsetX *= 2;
@@ -330,7 +329,6 @@ namespace Root_CAMELLIA
                     else
                     {
                         _nZoomScale = value;
-                        CamelliaStage.ZoomScale = value;
                         // VerticalScroll.Maximum = HorizontalScroll.Maximum = 10 * nZoomScale;
                         if (_nZoomScale == 1)
                         {
@@ -362,8 +360,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-                strPercentage = value;
-                RaisePropertyChanged("Percentage");
+                SetProperty(ref strPercentage, value);
             }
         }
         private string strPercentage;
@@ -376,9 +373,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-
-                _XPosition = value;
-                RaisePropertyChanged("XPosition");
+                SetProperty(ref _XPosition, value);
             }
         }
         private string _XPosition;
@@ -391,8 +386,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _YPosition = value;
-                RaisePropertyChanged("YPosition");
+                SetProperty(ref _YPosition, value);
             }
         }
         private string _YPosition;
@@ -405,8 +399,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-                routeThickness = value;
-                RaisePropertyChanged("RouteThickness");
+                SetProperty(ref routeThickness, value);
             }
         }
         private string routeThickness;
@@ -419,8 +412,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _CurrentTheta = value;
-                RaisePropertyChanged("CurrentTheta");
+                SetProperty(ref _CurrentTheta, value);
             }
         }
         private string _CurrentTheta;
@@ -433,8 +425,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _CurrentRadius = value;
-                RaisePropertyChanged("CurrentRadius");
+                SetProperty(ref _CurrentRadius, value);
             }
         }
         private string _CurrentRadius;
@@ -447,8 +438,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _PointCount = value;
-                RaisePropertyChanged("PointCount");
+                SetProperty(ref _PointCount, value);
             }
         }
         private string _PointCount;
@@ -461,8 +451,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-                _PointListItem = value;
-                RaisePropertyChanged("PointListItem");
+                SetProperty(ref _PointListItem, value);
             }
         }
         private DataTable _PointListItem = new DataTable();
@@ -1300,14 +1289,10 @@ namespace Root_CAMELLIA
                     if (Math.Abs(OffsetX + nOffsetDiffX) < 500 * ZoomScale)
                     {
                         OffsetX += (int)(CenterX - pt.X);
-                        //CurrentMousePoint = new System.Windows.Point(MoveMousePoint.X, CurrentMousePoint.Y);
-                        CamelliaStage.RenderCenterX = (pt.X - CenterX);
                     }
                     if (Math.Abs(OffsetY + nOffsetDiffY) < 500 * ZoomScale)
                     {
                         OffsetY -= (int)(CenterY - pt.Y);
-                        //CurrentMousePoint = new System.Windows.Point(CurrentMousePoint.X, MoveMousePoint.Y);
-                        CamelliaStage.RenderCenterY = pt.Y - CenterY;
                     }
                     
                     //OffsetX += (CenterX - (int)pt.X);
@@ -1321,14 +1306,10 @@ namespace Root_CAMELLIA
                 if (Math.Abs(OffsetX + nOffsetDiffX) < 500 * ZoomScale)
                 {
                     OffsetX += (int)(CenterX - pt.X);
-                    //CurrentMousePoint = new System.Windows.Point(MoveMousePoint.X, CurrentMousePoint.Y);
-                    CamelliaStage.RenderCenterX =  pt.X - CenterX;
                 }
                 if (Math.Abs(OffsetY + nOffsetDiffY) < 500 * ZoomScale)
                 {
                     OffsetY -= (int)(CenterY - pt.Y);
-                    //CurrentMousePoint = new System.Windows.Point(CurrentMousePoint.X, MoveMousePoint.Y);
-                    CamelliaStage.RenderCenterY = pt.Y - CenterY;
                 }
                 //OffsetX += (CenterX - (int)pt.X);
                 //OffsetY += -(CenterY - (int)pt.Y);

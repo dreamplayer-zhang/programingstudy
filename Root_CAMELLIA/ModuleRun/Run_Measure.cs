@@ -110,8 +110,7 @@ namespace Root_CAMELLIA.Module
                 //    m_CalcThicknessDone = true;
                 //    break;
                 //}
-           
-                if (isEQStop)
+                if (EQ.IsStop())
                 {
                     while (thicknessQueue.TryDequeue(out index)) ;
                     m_CalcThicknessDone = true;
@@ -183,11 +182,14 @@ namespace Root_CAMELLIA.Module
             if (m_module.Run(axisZ.WaitReady()))
                 return p_sInfo;
 
+            //return "OK";
+
             Camera_Basler VRS = m_module.p_CamVRS;
             ImageData img = VRS.p_ImageViewer.p_ImageData;
             //string strVRSImageDir = "D:\\";
             //string strVRSImageFullPath = "";
             RPoint MeasurePoint;
+
 
             Met.DataManager dm = Met.DataManager.GetInstance();
             //App.m_nanoView.UpdateModel();
@@ -223,10 +225,6 @@ namespace Root_CAMELLIA.Module
                 //StopWatch sw = new StopWatch();
                 for (int i = 0; i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count; i++)
                 {
-                    if (isEQStop)
-                    {
-                        return "Get Tickness Error";
-                    }
                     if (EQ.IsStop())
                     {
                         isEQStop = false;

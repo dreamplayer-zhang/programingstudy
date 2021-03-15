@@ -364,7 +364,14 @@ namespace Root_CAMELLIA
         private RootViewer_ViewModel m_rootViewer = new RootViewer_ViewModel();
         public RootViewer_ViewModel p_rootViewer
         {
-            get => this.m_rootViewer;
+            get
+            {
+                return m_rootViewer;
+            }
+            set
+            {
+                SetProperty(ref m_rootViewer, value);
+            }
         }
 
         Dispatcher dispatcher = null;
@@ -385,8 +392,6 @@ namespace Root_CAMELLIA
             ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
 
             p_rootViewer.p_VisibleMenu = Visibility.Collapsed;
-
-            p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
 
             dispatcher = Application.Current.Dispatcher;
         }
@@ -691,6 +696,23 @@ namespace Root_CAMELLIA
 
 
         #region General Command
+
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (!ModuleCamellia.p_CamVRS.p_CamInfo.OpenStatus)
+                    {
+                        ModuleCamellia.p_CamVRS.Connect();
+                    }
+                    while (!ModuleCamellia.p_CamVRS.m_ConnectDone) ;
+                    p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+                });
+            }
+        }
+
         public ICommand CmdClose
         {
             get
