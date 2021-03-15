@@ -167,7 +167,7 @@ namespace Root_EFEM.Module
             SlowStop,       // 감속정지
             EmgStop,        // 비상정지
             ReadError,      // 에러상태 문의
-            CrearError,     // 에러 해제
+            ClearError,     // 에러 해제
             WriteValue,     // 내부변수 쓰기
             ReadValue,      // 내부변수 읽기
             GetControlState,   // 제어기 상태 읽기
@@ -204,7 +204,7 @@ namespace Root_EFEM.Module
             m_aCmd.Add(new Command(eCmd.SlowStop, "ASS"));
             m_aCmd.Add(new Command(eCmd.EmgStop, "AES"));
             m_aCmd.Add(new Command(eCmd.ReadError, "ERR"));
-            m_aCmd.Add(new Command(eCmd.CrearError, "DRT"));
+            m_aCmd.Add(new Command(eCmd.ClearError, "DRT"));
             m_aCmd.Add(new Command(eCmd.WriteValue, "DWL"));
             m_aCmd.Add(new Command(eCmd.ReadValue, "UWL"));
             m_aCmd.Add(new Command(eCmd.GetControlState, "IDO 1"));
@@ -396,7 +396,7 @@ namespace Root_EFEM.Module
                 if (sReads.Length < 1) return "OnReceive String too Short : " + sRead;
                 eCmd eCmdReceive = m_aligner.GetCommand(sReads[0]).m_eCmd;
                 if (m_eCmd != eCmdReceive) return "OnReceive Protocol MissMatch !!"; 
-                if ((sReads.Length > 2) && (sReads[1] == "E12")) m_aligner.m_qSend.Enqueue(new Protocol(m_aligner, eCmd.CrearError));
+                if ((sReads.Length > 2) && (sReads[1] == "E12")) m_aligner.m_qSend.Enqueue(new Protocol(m_aligner, eCmd.ClearError));
                 try
                 {
                     switch (eCmdReceive)
@@ -420,7 +420,11 @@ namespace Root_EFEM.Module
                             break;
                         case eCmd.GetControlState:
                             m_aligner.p_sAlignerControl = m_aligner.GetControlState(Convert.ToInt32(sReads[1]));
-                            break; 
+                            break;
+                        case eCmd.EmgStop:
+                            //? 20210313 임시 추가
+                            m_aligner.p_sInfo = m_aligner.GetError(sReads[1]);
+                            break;
                         default:
                             if (sReads.Length > 1)
                             {
@@ -442,7 +446,7 @@ namespace Root_EFEM.Module
                 {
                     Thread.Sleep(10);
                     if (m_bDone) return "OK";
-                    if (m_bSend && (m_swWait.ElapsedMilliseconds > msWait)) 
+                    if (!m_bSend && (m_swWait.ElapsedMilliseconds > msWait)) 
                         return "Wait Receive Timeout : " + m_eCmd.ToString();
                     if (EQ.IsStop()) return "EQ Stop"; 
                 }
@@ -715,7 +719,7 @@ namespace Root_EFEM.Module
         public override void Reset()
         {
             SendCmd(eCmd.EmgStop);
-            SendCmd(eCmd.CrearError);
+            SendCmd(eCmd.ClearError);
             SendCmd(eCmd.ResetPos);
             base.Reset();
         }
@@ -736,9 +740,9 @@ namespace Root_EFEM.Module
 
         string RunCmdHome()
         {
-            if (Run(SendCmd(eCmd.CrearError)))
+            if (Run(SendCmd(eCmd.ClearError)))
             {
-                if (Run(SendCmd(eCmd.CrearError))) return p_sInfo;
+                if (Run(SendCmd(eCmd.ClearError))) return p_sInfo;
             }
             if (Run(SendCmd(eCmd.CheckWaferCCD))) return p_sInfo;
             if (Run(SendCmd(eCmd.VacuumOn))) return p_sInfo;
@@ -810,7 +814,7 @@ namespace Root_EFEM.Module
                 InitModuleRun(module);
             }
 
-            eCmd m_eCmd = eCmd.CrearError; 
+            eCmd m_eCmd = eCmd.ClearError; 
             public override ModuleRunBase Clone()
             {
                 Run_Command run = new Run_Command(m_module);

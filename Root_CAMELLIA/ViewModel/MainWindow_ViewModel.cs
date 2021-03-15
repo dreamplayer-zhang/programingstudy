@@ -385,9 +385,10 @@ namespace Root_CAMELLIA
             config = SettingViewModel.m_reg.Read(BaseDefine.RegNanoViewConfig, config);
             int port = -1;
             port = SettingViewModel.m_reg.Read(BaseDefine.RegNanoViewPort, port);
+
             if (config != "" && port != -1)
             {
-                if(App.m_nanoView.InitializeSR(config, port) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                if (App.m_nanoView.InitializeSR(config, port) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     p_InitNanoview = true;
                     SettingViewModel.LoadParameter();

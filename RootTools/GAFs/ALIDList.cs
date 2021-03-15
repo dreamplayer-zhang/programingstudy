@@ -118,13 +118,19 @@ namespace RootTools.GAFs
             {
                 if (p_aSetALID[n].p_bSet == false) p_aSetALID.RemoveAt(n);
             }
+
+            bool isShow = false;
             foreach (ALID alid in p_aALID)
-            {
+            {   
                 if (alid.p_bSet && (IsExistSetALID(alid) == false))
                 {
-                    ShowPopup();
                     p_aSetALID.Add(alid);
+                    isShow = true;
                 }
+            }
+            if (isShow)
+            {
+                ShowPopup();
             }
             p_brushAlarm = (p_aSetALID.Count > 0) ? Brushes.Red : Brushes.White;
             p_alarmListBlink = (p_aSetALID.Count > 0) ? true : false;

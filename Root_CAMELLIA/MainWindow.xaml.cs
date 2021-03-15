@@ -187,7 +187,7 @@ namespace Root_CAMELLIA
             if (IsEnable_Recovery() == false) return;
             m_handler.CalcRecover();
             EQ.p_bStop = false;
-            EQ.p_eState = EQ.eState.Run;
+            EQ.p_eState = EQ.eState.Run; //? Run으로 되어있었음.
             EQ.p_bRecovery = true;
         }
 
