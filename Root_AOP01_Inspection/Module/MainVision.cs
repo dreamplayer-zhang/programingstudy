@@ -850,6 +850,275 @@ namespace Root_AOP01_Inspection.Module
             return bFoundTemplate;
         }
 
+        bool TemplateMatching(Image<Gray, byte> imgSrc, Image<Gray, byte> imgTemplate, out CPoint cptCenter, double dMatchScore)
+        {
+            // variable
+            int nWidthDiff = 0;
+            int nHeightDiff = 0;
+            Point ptMaxRelative = new Point();
+            float fMaxScore = float.MinValue;
+            bool bFoundTemplate = false;
+
+            // implement
+            Image<Gray, float> imgResult = imgSrc.MatchTemplate(imgTemplate, TemplateMatchingType.CcorrNormed);
+            nWidthDiff = imgSrc.Width - imgResult.Width;
+            nHeightDiff = imgSrc.Height - imgResult.Height;
+            float[,,] matches = imgResult.Data;
+
+            for (int x = 0; x<matches.GetLength(1); x++)
+            {
+                for (int y = 0; y<matches.GetLength(0); y++)
+                {
+                    if (fMaxScore < matches[y, x, 0] && dMatchScore <= matches[y, x, 0])
+                    {
+                        fMaxScore = matches[y, x, 0];
+                        ptMaxRelative.X = x;
+                        ptMaxRelative.Y = y;
+                        bFoundTemplate = true;
+                    }
+                }
+            }
+            cptCenter = new CPoint();
+            cptCenter.X = (int)(ptMaxRelative.X) + (int)(nWidthDiff / 2);
+            cptCenter.Y = (int)(ptMaxRelative.Y) + (int)(nHeightDiff / 2);
+
+            return true;
+        }
+
+        Image<Gray, byte> FloodFill(Image<Gray, byte> imgSrc, System.Drawing.Point ptSeed, int nPaintValue, out CRect crtBoundingBox, Connectivity connect)
+        {
+            // variable
+            Queue<System.Drawing.Point> q = new Queue<System.Drawing.Point>();
+            bool[,] barrVisited = new bool[imgSrc.Height, imgSrc.Width];
+            int nL = imgSrc.Width - 1;
+            int nT = imgSrc.Height - 1;
+            int nR = 0;
+            int nB = 0;
+
+            // implement
+            byte[,,] imgarr = imgSrc.Data;
+            for (int y = 0; y < imgSrc.Height; y++)
+            {
+                for (int x = 0; x < imgSrc.Width; x++)
+                {
+                    barrVisited[y, x] = false;
+                }
+            }
+
+            // BFS 시작
+            q.Enqueue(ptSeed);
+            barrVisited[ptSeed.Y, ptSeed.X] = true;
+            imgarr[ptSeed.Y, ptSeed.X, 0] = (byte)nPaintValue;
+            if (connect == Connectivity.FourConnected)
+            {
+                while (q.Count != 0)
+                {
+                    System.Drawing.Point ptTemp = q.Dequeue();
+                    // 상,우,하,좌
+                    if (ptTemp.Y - 1 >= 0)
+                    {
+                        if (barrVisited[ptTemp.Y - 1, ptTemp.X] == false && imgarr[ptTemp.Y - 1, ptTemp.X, 0] != 0)
+                        {
+                            barrVisited[ptTemp.Y - 1, ptTemp.X] = true;
+                            imgarr[ptTemp.Y - 1, ptTemp.X, 0] = (byte)nPaintValue;
+                            q.Enqueue(new System.Drawing.Point(ptTemp.X, ptTemp.Y - 1));
+                            if (nL > ptTemp.X) nL = ptTemp.X;
+                            if (nT > ptTemp.Y) nT = ptTemp.Y;
+                            if (nR < ptTemp.X) nR = ptTemp.X;
+                            if (nB < ptTemp.Y) nB = ptTemp.Y;
+                        }
+                    }
+                    if (ptTemp.X + 1 < imgSrc.Width)
+                    {
+                        if (barrVisited[ptTemp.Y, ptTemp.X + 1] == false && imgarr[ptTemp.Y, ptTemp.X + 1, 0] != 0)
+                        {
+                            barrVisited[ptTemp.Y, ptTemp.X + 1] = true;
+                            imgarr[ptTemp.Y, ptTemp.X + 1, 0] = (byte)nPaintValue;
+                            q.Enqueue(new System.Drawing.Point(ptTemp.X + 1, ptTemp.Y));
+                            if (nL > ptTemp.X) nL = ptTemp.X;
+                            if (nT > ptTemp.Y) nT = ptTemp.Y;
+                            if (nR < ptTemp.X) nR = ptTemp.X;
+                            if (nB < ptTemp.Y) nB = ptTemp.Y;
+                        }
+                    }
+                    if (ptTemp.Y + 1 < imgSrc.Height)
+                    {
+                        if (barrVisited[ptTemp.Y + 1, ptTemp.X] == false && imgarr[ptTemp.Y + 1, ptTemp.X, 0] != 0)
+                        {
+                            barrVisited[ptTemp.Y + 1, ptTemp.X] = true;
+                            imgarr[ptTemp.Y + 1, ptTemp.X, 0] = (byte)nPaintValue;
+                            q.Enqueue(new System.Drawing.Point(ptTemp.X, ptTemp.Y + 1));
+                            if (nL > ptTemp.X) nL = ptTemp.X;
+                            if (nT > ptTemp.Y) nT = ptTemp.Y;
+                            if (nR < ptTemp.X) nR = ptTemp.X;
+                            if (nB < ptTemp.Y) nB = ptTemp.Y;
+                        }
+                    }
+                    if (ptTemp.X - 1 >= 0)
+                    {
+                        if (barrVisited[ptTemp.Y, ptTemp.X - 1] == false && imgarr[ptTemp.Y, ptTemp.X - 1, 0] != 0)
+                        {
+                            barrVisited[ptTemp.Y, ptTemp.X - 1] = true;
+                            imgarr[ptTemp.Y, ptTemp.X - 1, 0] = (byte)nPaintValue;
+                            q.Enqueue(new System.Drawing.Point(ptTemp.X - 1, ptTemp.Y));
+                            if (nL > ptTemp.X) nL = ptTemp.X;
+                            if (nT > ptTemp.Y) nT = ptTemp.Y;
+                            if (nR < ptTemp.X) nR = ptTemp.X;
+                            if (nB < ptTemp.Y) nB = ptTemp.Y;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                while (q.Count != 0)
+                {
+                    System.Drawing.Point ptTemp = q.Dequeue();
+                    // 좌상,상,우상,우,우하,하,좌하,좌
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        for (int x = -1; x <= 1; x++)
+                        {
+                            if (ptTemp.X + x >= 0 && ptTemp.X + x < imgSrc.Width && ptTemp.Y + y >= 0 && ptTemp.Y + y < imgSrc.Height)
+                            {
+                                if (barrVisited[ptTemp.Y + y, ptTemp.X + x] == false && imgarr[ptTemp.Y + y, ptTemp.X + x, 0] != 0)
+                                {
+                                    barrVisited[ptTemp.Y + y, ptTemp.X + x] = true;
+                                    imgarr[ptTemp.Y + y, ptTemp.X + x, 0] = (byte)nPaintValue;
+                                    q.Enqueue(new System.Drawing.Point(ptTemp.X + x, ptTemp.Y + y));
+                                    if (nL > ptTemp.X) nL = ptTemp.X;
+                                    if (nT > ptTemp.Y) nT = ptTemp.Y;
+                                    if (nR < ptTemp.X) nR = ptTemp.X;
+                                    if (nB < ptTemp.Y) nB = ptTemp.Y;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            crtBoundingBox = new CRect(nL, nT, nR, nB);
+            Image<Gray, byte> imgResult = new Image<Gray, byte>(imgarr);
+            return imgResult;
+        }
+
+        Mat FloodFill(Mat matSrc, System.Drawing.Point ptSeed, int nPaintValue, out CRect crtBoundingBox, Connectivity connect)
+        {
+            // variable
+            Queue<System.Drawing.Point> q = new Queue<System.Drawing.Point>();
+            bool[,] barrVisited = new bool[matSrc.Height, matSrc.Width];
+            int nL = matSrc.Width - 1;
+            int nT = matSrc.Height - 1;
+            int nR = 0;
+            int nB = 0;
+
+            // implement
+            Image<Gray, byte> img = matSrc.ToImage<Gray, byte>();
+            byte[,,] imgarr = img.Data;
+            for (int y = 0; y < matSrc.Height; y++)
+            {
+                for (int x = 0; x < matSrc.Width; x++)
+                {
+                    barrVisited[y, x] = false;
+                }
+            }
+
+            // BFS 시작
+            q.Enqueue(ptSeed);
+            barrVisited[ptSeed.Y, ptSeed.X] = true;
+            imgarr[ptSeed.Y, ptSeed.X, 0] = (byte)nPaintValue;
+            if (connect == Connectivity.FourConnected)
+            {
+                while (q.Count != 0)
+                {
+                    System.Drawing.Point ptTemp = q.Dequeue();
+                    // 상,우,하,좌
+                    if (ptTemp.Y - 1 >= 0)
+                    {
+                        if (barrVisited[ptTemp.Y - 1, ptTemp.X] == false && imgarr[ptTemp.Y - 1, ptTemp.X, 0] != 0)
+                        {
+                            barrVisited[ptTemp.Y - 1, ptTemp.X] = true;
+                            imgarr[ptTemp.Y - 1, ptTemp.X, 0] = (byte)nPaintValue;
+                            q.Enqueue(new System.Drawing.Point(ptTemp.X, ptTemp.Y - 1));
+                            if (nL > ptTemp.X) nL = ptTemp.X;
+                            if (nT > ptTemp.Y) nT = ptTemp.Y;
+                            if (nR < ptTemp.X) nR = ptTemp.X;
+                            if (nB < ptTemp.Y) nB = ptTemp.Y;
+                        }
+                    }
+                    if (ptTemp.X + 1 < matSrc.Width)
+                    {
+                        if (barrVisited[ptTemp.Y, ptTemp.X + 1] == false && imgarr[ptTemp.Y, ptTemp.X + 1, 0] != 0)
+                        {
+                            barrVisited[ptTemp.Y, ptTemp.X + 1] = true;
+                            imgarr[ptTemp.Y, ptTemp.X + 1, 0] = (byte)nPaintValue;
+                            q.Enqueue(new System.Drawing.Point(ptTemp.X + 1, ptTemp.Y));
+                            if (nL > ptTemp.X) nL = ptTemp.X;
+                            if (nT > ptTemp.Y) nT = ptTemp.Y;
+                            if (nR < ptTemp.X) nR = ptTemp.X;
+                            if (nB < ptTemp.Y) nB = ptTemp.Y;
+                        }
+                    }
+                    if (ptTemp.Y + 1 < matSrc.Height)
+                    {
+                        if (barrVisited[ptTemp.Y + 1, ptTemp.X] == false && imgarr[ptTemp.Y + 1, ptTemp.X, 0] != 0)
+                        {
+                            barrVisited[ptTemp.Y + 1, ptTemp.X] = true;
+                            imgarr[ptTemp.Y + 1, ptTemp.X, 0] = (byte)nPaintValue;
+                            q.Enqueue(new System.Drawing.Point(ptTemp.X, ptTemp.Y + 1));
+                            if (nL > ptTemp.X) nL = ptTemp.X;
+                            if (nT > ptTemp.Y) nT = ptTemp.Y;
+                            if (nR < ptTemp.X) nR = ptTemp.X;
+                            if (nB < ptTemp.Y) nB = ptTemp.Y;
+                        }
+                    }
+                    if (ptTemp.X - 1 >= 0)
+                    {
+                        if (barrVisited[ptTemp.Y, ptTemp.X - 1] == false && imgarr[ptTemp.Y, ptTemp.X - 1, 0] != 0)
+                        {
+                            barrVisited[ptTemp.Y, ptTemp.X - 1] = true;
+                            imgarr[ptTemp.Y, ptTemp.X - 1, 0] = (byte)nPaintValue;
+                            q.Enqueue(new System.Drawing.Point(ptTemp.X - 1, ptTemp.Y));
+                            if (nL > ptTemp.X) nL = ptTemp.X;
+                            if (nT > ptTemp.Y) nT = ptTemp.Y;
+                            if (nR < ptTemp.X) nR = ptTemp.X;
+                            if (nB < ptTemp.Y) nB = ptTemp.Y;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                while (q.Count != 0)
+                {
+                    System.Drawing.Point ptTemp = q.Dequeue();
+                    // 좌상,상,우상,우,우하,하,좌하,좌
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        for (int x = -1; x <= 1; x++)
+                        {
+                            if (ptTemp.X + x >= 0 && ptTemp.X + x < matSrc.Width && ptTemp.Y + y >= 0 && ptTemp.Y + y < matSrc.Height)
+                            {
+                                if (barrVisited[ptTemp.Y + y, ptTemp.X + x] == false && imgarr[ptTemp.Y + y, ptTemp.X + x, 0] != 0)
+                                {
+                                    barrVisited[ptTemp.Y + y, ptTemp.X + x] = true;
+                                    imgarr[ptTemp.Y + y, ptTemp.X + x, 0] = (byte)nPaintValue;
+                                    q.Enqueue(new System.Drawing.Point(ptTemp.X + x, ptTemp.Y + y));
+                                    if (nL > ptTemp.X) nL = ptTemp.X;
+                                    if (nT > ptTemp.Y) nT = ptTemp.Y;
+                                    if (nR < ptTemp.X) nR = ptTemp.X;
+                                    if (nB < ptTemp.Y) nB = ptTemp.Y;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            crtBoundingBox = new CRect(nL, nT, nR, nB);
+            Image<Gray, byte> imgResult = new Image<Gray, byte>(imgarr);
+            Mat matResult = imgResult.Mat;
+            return matResult;
+        }
+
         public enum eSearchDirection
         {
             TopToBottom = 0,
@@ -3339,6 +3608,13 @@ namespace Root_AOP01_Inspection.Module
                 m_nOffset_mm = tree.Set(m_nOffset_mm, m_nOffset_mm, "Inner Offset [mm]", "Inner Offset [mm]", bVisible);
             }
 
+            struct structTemplate
+            {
+                public Image<Gray, byte> img;
+                public int nMemoryX;
+                public int nMemoryY;
+            }
+
             public override string Run()
             {
                 string strPool = "MainVision.Vision Memory";
@@ -3348,6 +3624,7 @@ namespace Root_AOP01_Inspection.Module
                 int nMMPerUM = 1000;
                 int nOutPos = (((m_nReticleSize_mm - (m_nOffset_mm * 2)) / 2) * nMMPerUM) / 5;
                 int nInPos = (((m_nReticleSize_mm - (m_nSearchArea_mm * 2) - (m_nOffset_mm * 2)) / 2) * nMMPerUM) / 5;
+                List<structTemplate> templateInfos = new List<structTemplate>();
 
                 RecipeFrontside_Viewer_ViewModel targetViewer = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
                 Dispatcher dispatcher = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.currentDispatcher;
@@ -3373,23 +3650,39 @@ namespace Root_AOP01_Inspection.Module
                 CvBlobs blobs = new CvBlobs();
                 CvBlobDetector blobDetector = new CvBlobDetector();
                 Image<Gray, byte> imgOriginal = m_module.GetGrayByteImageFromMemory(mem, crtLTROI);
-                imgOriginal.Save("D:\\ORIGINAL.BMP");
-                Image<Gray, byte> imgBinary = imgOriginal.ThresholdBinaryInv(new Gray(128.0), new Gray(255.0));
-                imgBinary.Save("D:\\BINARY.BMP");
+                Image<Gray, byte> imgBinary = imgOriginal.ThresholdBinaryInv(new Gray(50.0), new Gray(128.0));
                 blobDetector.Detect(imgBinary, blobs);
 
                 foreach (CvBlob blob in blobs.Values)
                 {
+                    // 작은거 필터링
                     if (blob.Area < 100) continue;
-                    CRect crtBlob = new CRect(crtLTROI.Left + blob.BoundingBox.Left, crtLTROI.Top + blob.BoundingBox.Top, crtLTROI.Left + blob.BoundingBox.Right, crtLTROI.Top + blob.BoundingBox.Bottom);
-
-                    if (dispatcher != null)
+                    // Template 이미지 찾기
+                    DPoint[] ptsContour = blob.GetContour();
+                    CRect crtBoundingBox;
+                    Image<Gray, byte> imgBinaryClone = imgBinary.Clone();
+                    Image<Gray, byte> imgAfterFloodFill = m_module.FloodFill(imgBinaryClone, ptsContour[0], 255, out crtBoundingBox, Connectivity.FourConnected);
+                    Image<Gray, byte> imgResult = imgAfterFloodFill - imgBinary;
+                    CvBlobs templates = new CvBlobs();
+                    CvBlobDetector templateDetector = new CvBlobDetector();
+                    templateDetector.Detect(imgResult, templates);
+                    foreach (CvBlob template in templates.Values)
                     {
-                        dispatcher.Invoke(new Action(delegate ()
-                        {
-                            targetViewer.DrawRect(crtBlob, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
-                        }));
+                        structTemplate templateInfo = new structTemplate();
+                        templateInfo.img = imgResult.Copy(template.BoundingBox);
+                        templateInfo.nMemoryX = crtLTROI.Left + template.BoundingBox.X;
+                        templateInfo.nMemoryY = crtLTROI.Top + template.BoundingBox.Y;
+                        templateInfos.Add(templateInfo);
                     }
+                }
+
+                // RT, RB, LB ROI 안에서 LT에서 찾은 Blob들 각각 Template Matching
+                Image<Gray, byte> imgRTROI = m_module.GetGrayByteImageFromMemory(mem, crtRTROI);
+                Image<Gray, byte> imgBinaryRT = imgRTROI.ThresholdBinaryInv(new Gray(50.0), new Gray(128.0));
+                foreach(structTemplate templateInfo in templateInfos)
+                {
+                    CPoint cptCenter = new CPoint();
+                    bool bRet = m_module.TemplateMatching(imgBinaryRT, templateInfo.img, out cptCenter, 0.9);
                 }
 
                 return "OK";
@@ -3827,7 +4120,7 @@ namespace Root_AOP01_Inspection.Module
                             }
                         }
                         CRect crtBoundingBox;
-                        Mat matResult = FloodFill(matBinary, ptsContour[0], 255, out crtBoundingBox, Connectivity.EightConnected);
+                        Mat matResult = m_module.FloodFill(matBinary, ptsContour[0], 255, out crtBoundingBox, Connectivity.EightConnected);
                         //
                         string strText = "Width=" + crtBoundingBox.Width + ", Height=" + crtBoundingBox.Height;
                         if (dispatcher != null)
@@ -3951,124 +4244,6 @@ namespace Root_AOP01_Inspection.Module
                 }
 
                 return true;
-            }
-
-            Mat FloodFill(Mat matSrc, System.Drawing.Point ptSeed, int nPaintValue, out CRect crtBoundingBox, Connectivity connect)
-            {
-                // variable
-                Queue<System.Drawing.Point> q = new Queue<System.Drawing.Point>();
-                bool[,] barrVisited = new bool[matSrc.Height, matSrc.Width];
-                int nL = matSrc.Width - 1;
-                int nT = matSrc.Height - 1;
-                int nR = 0;
-                int nB = 0;
-
-                // implement
-                Image<Gray, byte> img = matSrc.ToImage<Gray, byte>();
-                byte[,,] imgarr = img.Data;
-                for (int y = 0; y < matSrc.Height; y++)
-                {
-                    for (int x = 0; x < matSrc.Width; x++)
-                    {
-                        barrVisited[y, x] = false;
-                    }
-                }
-
-                // BFS 시작
-                q.Enqueue(ptSeed);
-                barrVisited[ptSeed.Y, ptSeed.X] = true;
-                imgarr[ptSeed.Y, ptSeed.X, 0] = (byte)nPaintValue;
-                if (connect == Connectivity.FourConnected)
-                {
-                    while (q.Count != 0)
-                    {
-                        System.Drawing.Point ptTemp = q.Dequeue();
-                        // 상,우,하,좌
-                        if (ptTemp.Y - 1 >= 0)
-                        {
-                            if (barrVisited[ptTemp.Y - 1, ptTemp.X] == false && imgarr[ptTemp.Y - 1, ptTemp.X, 0] != 0)
-                            {
-                                barrVisited[ptTemp.Y - 1, ptTemp.X] = true;
-                                imgarr[ptTemp.Y - 1, ptTemp.X, 0] = (byte)nPaintValue;
-                                q.Enqueue(new System.Drawing.Point(ptTemp.X, ptTemp.Y - 1));
-                                if (nL > ptTemp.X) nL = ptTemp.X;
-                                if (nT > ptTemp.Y) nT = ptTemp.Y;
-                                if (nR < ptTemp.X) nR = ptTemp.X;
-                                if (nB < ptTemp.Y) nB = ptTemp.Y;
-                            }
-                        }
-                        if (ptTemp.X + 1 < matSrc.Width)
-                        {
-                            if (barrVisited[ptTemp.Y, ptTemp.X + 1] == false && imgarr[ptTemp.Y, ptTemp.X + 1, 0] != 0)
-                            {
-                                barrVisited[ptTemp.Y, ptTemp.X + 1] = true;
-                                imgarr[ptTemp.Y, ptTemp.X + 1, 0] = (byte)nPaintValue;
-                                q.Enqueue(new System.Drawing.Point(ptTemp.X + 1, ptTemp.Y));
-                                if (nL > ptTemp.X) nL = ptTemp.X;
-                                if (nT > ptTemp.Y) nT = ptTemp.Y;
-                                if (nR < ptTemp.X) nR = ptTemp.X;
-                                if (nB < ptTemp.Y) nB = ptTemp.Y;
-                            }
-                        }
-                        if (ptTemp.Y + 1 < matSrc.Height)
-                        {
-                            if (barrVisited[ptTemp.Y + 1, ptTemp.X] == false && imgarr[ptTemp.Y + 1, ptTemp.X, 0] != 0)
-                            {
-                                barrVisited[ptTemp.Y + 1, ptTemp.X] = true;
-                                imgarr[ptTemp.Y + 1, ptTemp.X, 0] = (byte)nPaintValue;
-                                q.Enqueue(new System.Drawing.Point(ptTemp.X, ptTemp.Y + 1));
-                                if (nL > ptTemp.X) nL = ptTemp.X;
-                                if (nT > ptTemp.Y) nT = ptTemp.Y;
-                                if (nR < ptTemp.X) nR = ptTemp.X;
-                                if (nB < ptTemp.Y) nB = ptTemp.Y;
-                            }
-                        }
-                        if (ptTemp.X - 1 >= 0)
-                        {
-                            if (barrVisited[ptTemp.Y, ptTemp.X - 1] == false && imgarr[ptTemp.Y, ptTemp.X - 1, 0] != 0)
-                            {
-                                barrVisited[ptTemp.Y, ptTemp.X - 1] = true;
-                                imgarr[ptTemp.Y, ptTemp.X - 1, 0] = (byte)nPaintValue;
-                                q.Enqueue(new System.Drawing.Point(ptTemp.X - 1, ptTemp.Y));
-                                if (nL > ptTemp.X) nL = ptTemp.X;
-                                if (nT > ptTemp.Y) nT = ptTemp.Y;
-                                if (nR < ptTemp.X) nR = ptTemp.X;
-                                if (nB < ptTemp.Y) nB = ptTemp.Y;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    while (q.Count != 0)
-                    {
-                        System.Drawing.Point ptTemp = q.Dequeue();
-                        // 좌상,상,우상,우,우하,하,좌하,좌
-                        for (int y = -1; y <= 1; y++)
-                        {
-                            for (int x = -1; x <= 1; x++)
-                            {
-                                if (ptTemp.X + x >= 0 && ptTemp.X + x < matSrc.Width && ptTemp.Y + y >= 0 && ptTemp.Y + y < matSrc.Height)
-                                {
-                                    if (barrVisited[ptTemp.Y + y, ptTemp.X + x] == false && imgarr[ptTemp.Y + y, ptTemp.X + x, 0] != 0)
-                                    {
-                                        barrVisited[ptTemp.Y + y, ptTemp.X + x] = true;
-                                        imgarr[ptTemp.Y + y, ptTemp.X + x, 0] = (byte)nPaintValue;
-                                        q.Enqueue(new System.Drawing.Point(ptTemp.X + x, ptTemp.Y + y));
-                                        if (nL > ptTemp.X) nL = ptTemp.X;
-                                        if (nT > ptTemp.Y) nT = ptTemp.Y;
-                                        if (nR < ptTemp.X) nR = ptTemp.X;
-                                        if (nB < ptTemp.Y) nB = ptTemp.Y;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                crtBoundingBox = new CRect(nL, nT, nR, nB);
-                Image<Gray, byte> imgResult = new Image<Gray, byte>(imgarr);
-                Mat matResult = imgResult.Mat;
-                return matResult;
             }
         }
         #endregion
