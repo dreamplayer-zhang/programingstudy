@@ -44,37 +44,37 @@
                                 <TextBlock Text="Value" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="1">
-                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbEdge"/>
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding p_bUseEdgeBroken}"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="2">
-                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbPatternShift"/>
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding p_bUsePatternArrayShiftAndRotation}"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="3">
-                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbDiscolor"/>
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding p_bUsePatternDiscolor}"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="4">
-                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbBarcode"/>
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding p_bUseBarcodeScratch}"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="5">
-                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbAlignKey"/>
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding p_bUseAlignKeyExist}"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="6">
-                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbPellicleShift"/>
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding p_bUsePellicleShiftAndRotation}"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="7">
-                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbHaze"/>
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding p_bUsePellicleHaze}"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="8">
-                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbExpanding"/>
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding p_bUsePellicleExpanding}"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="9">
-                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbFront"/>
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding p_bUsePellicleFrontside}"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="1">
                                 <TextBlock Style="{StaticResource BasicTb}" Text="Edge Broken"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="2">
-                                <TextBlock Style="{StaticResource BasicTb}" Text="Pattern Array Shift"/>
+                                <TextBlock Style="{StaticResource BasicTb}" Text="Pattern Array Shift &amp; Rotation"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="3">
                                 <TextBlock Style="{StaticResource BasicTb}" Text="Pateern Discolor"/>
@@ -86,7 +86,7 @@
                                 <TextBlock Style="{StaticResource BasicTb}" Text="Align Key Exist"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="6">
-                                <TextBlock Style="{StaticResource BasicTb}" Text="Pellicle Shift"/>
+                                <TextBlock Style="{StaticResource BasicTb}" Text="Pellicle Shift &amp; Rotation"/>
                             </Border>
                             <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="7">
                                 <TextBlock Style="{StaticResource BasicTb}" Text="Pellicle Haze"/>
@@ -101,23 +101,35 @@
                                     BorderBrush="Gray" BorderThickness="0,0,1,1">
                                 <Grid>
                                     <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
-                                    <TextBox Style="{StaticResource BasicTbox}" Text="3" Margin="100,24"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dEdgeBrokenSpec_mm}" Margin="100,24"/>
                                     <TextBlock Style="{StaticResource BasicTb}" Text="mm" Margin="40,0" HorizontalAlignment="Right"/>
                                 </Grid>
                             </Border>
                             <Border Grid.Column="2" Grid.Row="2" IsEnabled="{Binding ElementName=cbPatternShift, Path=IsChecked}"
                                     BorderBrush="Gray" BorderThickness="0,0,1,1">
                                 <Grid>
-                                    <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
-                                    <TextBox Style="{StaticResource BasicTbox}" Text="0.5" Margin="100,24"/>
-                                    <TextBlock Style="{StaticResource BasicTb}" Text="mm" Margin="40,0" HorizontalAlignment="Right"/>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Center"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource BasicTbox}" Text="{Binding p_dPatternArrayShiftSpec_mm}" VerticalAlignment="Center" Margin="5,0,5,0" />
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource BasicTb}" Text="mm" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Center"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource BasicTbox}" Text="{Binding p_dPatternArrayRotationSpec_degree}" VerticalAlignment="Center" Margin="5,0,5,0" />
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource BasicTb}" Text="º" HorizontalAlignment="Center"/>
                                 </Grid>
                             </Border>
                             <Border Grid.Column="2" Grid.Row="3" IsEnabled="{Binding ElementName=cbDiscolor, Path=IsChecked}"
                                     BorderBrush="Gray" BorderThickness="0,0,1,1">
                                 <Grid>
                                     <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
-                                    <TextBox Style="{StaticResource BasicTbox}" Text="1" Margin="100,24"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dPatternDiscolorSpec_mm}" Margin="100,24"/>
                                     <TextBlock Style="{StaticResource BasicTb}" Text="mm" Margin="40,0" HorizontalAlignment="Right"/>
                                 </Grid>
                             </Border>
@@ -125,7 +137,7 @@
                                     BorderBrush="Gray" BorderThickness="0,0,1,1">
                                 <Grid>
                                     <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
-                                    <TextBox Style="{StaticResource BasicTbox}" Text="1" Margin="100,24"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dBarcodeScratchSpec_mm}" Margin="100,24"/>
                                     <TextBlock Style="{StaticResource BasicTb}" Text="mm" Margin="40,0" HorizontalAlignment="Right"/>
                                 </Grid>
                             </Border>
@@ -133,23 +145,35 @@
                                     BorderBrush="Gray" BorderThickness="0,0,1,1">
                                 <Grid>
                                     <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
-                                    <TextBox Style="{StaticResource BasicTbox}" Text="30" Margin="100,24"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dAlignKeyExistSpec_um}" Margin="100,24"/>
                                     <TextBlock Style="{StaticResource BasicTb}" Text="um" Margin="40,0" HorizontalAlignment="Right"/>
                                 </Grid>
                             </Border>
                             <Border Grid.Column="2" Grid.Row="6" IsEnabled="{Binding ElementName=cbPellicleShift, Path=IsChecked}"
                                     BorderBrush="Gray" BorderThickness="0,0,1,1">
                                 <Grid>
-                                    <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
-                                    <TextBox Style="{StaticResource BasicTbox}" Text="0.3" Margin="100,24"/>
-                                    <TextBlock Style="{StaticResource BasicTb}" Text="mm" Margin="40,0" HorizontalAlignment="Right"/>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Center"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource BasicTbox}" Text="{Binding p_dPellicleShiftSpec_mm}" VerticalAlignment="Center" Margin="5,0,5,0"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource BasicTb}" Text="mm" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Center"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource BasicTbox}" Text="{Binding p_dPellicleRotationSpec_degree}" VerticalAlignment="Center" Margin="5,0,5,0"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource BasicTb}" Text="º" HorizontalAlignment="Center"/>
                                 </Grid>
                             </Border>
                             <Border Grid.Column="2" Grid.Row="7" IsEnabled="{Binding ElementName=cbHaze, Path=IsChecked}"
                                     BorderBrush="Gray" BorderThickness="0,0,1,1">
                                 <Grid>
                                     <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
-                                    <TextBox Style="{StaticResource BasicTbox}" Text="1" Margin="100,24"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dPellicleHazeSpec_mm}" Margin="100,24"/>
                                     <TextBlock Style="{StaticResource BasicTb}" Text="mm" Margin="40,0" HorizontalAlignment="Right"/>
                                 </Grid>
                             </Border>
@@ -157,7 +181,7 @@
                                     BorderBrush="Gray" BorderThickness="0,0,1,1">
                                 <Grid>
                                     <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
-                                    <TextBox Style="{StaticResource BasicTbox}" Text="100" Margin="100,24"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dPellicleExpandingSpec_um}" Margin="100,24"/>
                                     <TextBlock Style="{StaticResource BasicTb}" Text="um" Margin="40,0" HorizontalAlignment="Right"/>
                                 </Grid>
                             </Border>
@@ -165,7 +189,7 @@
                                     BorderBrush="Gray" BorderThickness="0,0,1,1">
                                 <Grid>
                                     <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
-                                    <TextBox Style="{StaticResource BasicTbox}" Text="10" Margin="100,24"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dPellicleFrontsideSpec_um}" Margin="100,24"/>
                                     <TextBlock Style="{StaticResource BasicTb}" Text="um" Margin="40,0" HorizontalAlignment="Right"/>
                                 </Grid>
                             </Border>

@@ -197,9 +197,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\MySQL Connector Net 8.0.20\Assemblies\v4.5.2\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.6.7\lib\net45\NLog.dll</HintPath>
-    </Reference>
     <Reference Include="PylonC.NET, Version=4.2.0.0, Culture=neutral, PublicKeyToken=a77e8471c5919d5a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Camera\Silicon\DLL\PylonC.NET.dll</HintPath>
@@ -437,6 +434,12 @@
     </Compile>
     <Compile Include="OHTNew\OHT_UI.xaml.cs">
       <DependentUpon>OHT_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ParticleCounter\AirnetII_310.cs" />
+    <Compile Include="ParticleCounter\LasairIII.cs" />
+    <Compile Include="ParticleCounter\ParticleCounterBase.cs" />
+    <Compile Include="ParticleCounter\ParticleCounterBase_UI.xaml.cs">
+      <DependentUpon>ParticleCounterBase_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Printer\SRP350.cs" />
     <Compile Include="Printer\SRP350_UI.xaml.cs">
@@ -1081,6 +1084,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="OHT\SSEM\OHT_SSEM_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ParticleCounter\ParticleCounterBase_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

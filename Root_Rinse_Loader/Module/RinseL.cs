@@ -230,10 +230,14 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region GAF
-        ALID m_alidTCPConnect;
+        public ALID m_alidAirEmergency;
+        public ALID m_alidTCPConnect;
+        public ALID m_alidUnloadError;
         void InitALID()
         {
+            m_alidAirEmergency = m_gaf.GetALID(this, "Air Emergency", "Air Emergency");
             m_alidTCPConnect = m_gaf.GetALID(this, "Unloader Disconnect", "Unloader Disconnect");
+            m_alidUnloadError = m_gaf.GetALID(this, "Unloader State is Error", "Unloader State is Error");
         }
         #endregion
 
@@ -256,6 +260,8 @@ namespace Root_Rinse_Loader.Module
 
         public override string StateHome()
         {
+            //m_qProtocolSend.Clear();
+            //m_protocolSend = null;      //??
             return p_sInfo;
         }
 
@@ -344,6 +350,7 @@ namespace Root_Rinse_Loader.Module
                 {
                     EQ.p_bStop = true;
                     EQ.p_eState = EQ.eState.Error;
+                    m_alidAirEmergency.p_bSet = true;
                 }
             }
         }
@@ -471,13 +478,13 @@ namespace Root_Rinse_Loader.Module
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();
                     m_tcpip.Send(protocol.p_sCmd);
-                    Thread.Sleep(10);
+                    Thread.Sleep(100);
                 }
                 else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
                 {
                     m_protocolSend = m_qProtocolSend.Dequeue();
                     m_tcpip.Send(m_protocolSend.p_sCmd);
-                    Thread.Sleep(10);
+                    Thread.Sleep(100);
                 }
             }
         }
@@ -485,6 +492,7 @@ namespace Root_Rinse_Loader.Module
         public Protocol AddProtocol(string id, eCmd eCmd, dynamic value)
         {
             Protocol protocol = new Protocol(id, eCmd, value);
+            if (!m_tcpip.p_bConnect) return protocol;
             if (id == p_id) m_qProtocolSend.Enqueue(protocol);
             else m_qProtocolReply.Enqueue(protocol); 
             return protocol;
@@ -512,6 +520,11 @@ namespace Root_Rinse_Loader.Module
                         case eCmd.EQUeState:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             p_eStateUnloader = GetEQeState(asRead[2]);
+                            if(p_eStateUnloader == EQ.eState.Error)
+                            {
+                                m_alidUnloadError.p_bSet = true;
+                                EQ.p_eState = EQ.eState.Error;
+                            }
                             break;
                         case eCmd.StripReceive:
                             AddProtocol(asRead[0], eCmd, asRead[2]);

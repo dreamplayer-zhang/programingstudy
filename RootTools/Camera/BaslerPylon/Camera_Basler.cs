@@ -302,6 +302,7 @@ namespace RootTools.Camera.BaslerPylon
         {
             try
             {
+                m_ConnectDone = false;
                 if (p_CamInfo._DeviceUserID == "") return;
                 List<ICameraInfo> allCameras = CameraFinder.Enumerate();    //SEHException 에러 나는경우 Lib/BaslerRuntime 내 파일들을 실행위치로 복사 요망
                 ICameraInfo ConnectCamInfo = null;
@@ -404,6 +405,24 @@ namespace RootTools.Camera.BaslerPylon
                 return p_id + " Camera not Connected";
             try
             {
+                m_cam.Parameters[PLCamera.AcquisitionMode].SetValue(PLCamera.AcquisitionMode.SingleFrame);
+                string s_curPixelFormat = m_cam.Parameters[PLCamera.PixelFormat].GetValue();
+                int width = (int)m_cam.Parameters[PLCamera.Width].GetValue();
+                int height = (int)m_cam.Parameters[PLCamera.Height].GetValue();
+                CPoint sz = new CPoint(width, height);
+
+                if (s_curPixelFormat.Equals(PLCamera.PixelFormat.Mono8.ToString()))
+                    m_ImageGrab.ReAllocate(sz, 1);
+                else if (s_curPixelFormat.Equals(PLCamera.PixelFormat.YUV422Packed.ToString()))
+                    m_ImageGrab.ReAllocate(sz, 3);
+
+                if (_dispatcher != null)
+                {
+                    _dispatcher.Invoke(new Action(delegate ()
+                    {
+                        p_ImageViewer.SetRoiRect();
+                    }));
+                }
 
                 m_cam.StreamGrabber.Start();
                 IGrabResult result = m_cam.StreamGrabber.RetrieveResult(m_nGrabTimeout, TimeoutHandling.ThrowException);

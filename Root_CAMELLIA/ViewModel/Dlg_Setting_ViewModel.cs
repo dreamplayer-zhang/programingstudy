@@ -145,6 +145,7 @@ namespace Root_CAMELLIA
             {
                 SetProperty(ref m_ExceptNIR, value);
                 m_reg.Write(BaseDefine.RegNanoViewExceptNIR, value);
+                App.m_nanoView.isExceptNIR = value;
             }
         }
 

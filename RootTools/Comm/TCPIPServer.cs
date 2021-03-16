@@ -202,7 +202,7 @@ namespace RootTools.Comm
         void RunSetTree(Tree tree)
         {
             bool bUse = tree.Set(p_bUse, false, "Use", "Use Server");
-            p_nPort = tree.Set(p_nPort, 5000, "Port", "Port Number"); 
+            p_nPort = tree.Set(p_nPort, p_nPort, "Port", "Port Number"); 
             p_bUse = bUse; 
         }
         #endregion
@@ -216,6 +216,7 @@ namespace RootTools.Comm
 
         public TCPIPServer(string id, Log log, int nBufReceive = -1)
         {
+            p_nPort = 5000; 
             p_id = id;
             m_log = log;
             m_commLog = new CommLog(this, log); 

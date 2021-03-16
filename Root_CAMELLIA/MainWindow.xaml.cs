@@ -81,10 +81,13 @@ namespace Root_CAMELLIA
             loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
 
+            LogUI.Init(LogView._logView);
+
             int nLPNum = m_handler.m_aLoadport.Count;
             for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTNew);
 
             InitTimer();
+
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -184,7 +187,7 @@ namespace Root_CAMELLIA
             if (IsEnable_Recovery() == false) return;
             m_handler.CalcRecover();
             EQ.p_bStop = false;
-            EQ.p_eState = EQ.eState.Run;
+            EQ.p_eState = EQ.eState.Run; //? Run으로 되어있었음.
             EQ.p_bRecovery = true;
         }
 

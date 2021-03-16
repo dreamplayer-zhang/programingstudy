@@ -377,22 +377,25 @@ namespace Root_WIND2.UI_User
         private void FeatureBoxDone_Callback(object obj)
         {
             TRect Box = obj as TRect;
+            CRect memRect = Box.MemoryRect;
+            ImageData viewerData = imageViewerVM.p_ImageData;
+
             int byteCnt = ImageViewerVM.p_ImageData.GetBytePerPixel();
 
-            boxImage = new ImageData(Box.MemoryRect.Width, Box.MemoryRect.Height, byteCnt);
-
+            boxImage = new ImageData(memRect.Width, memRect.Height, byteCnt);
             boxImage.m_eMode = ImageData.eMode.ImageBuffer;
-            boxImage.SetData(ImageViewerVM.p_ImageData
-                , new CRect(Box.MemoryRect.Left, Box.MemoryRect.Top, Box.MemoryRect.Right, Box.MemoryRect.Bottom)
-                , (int)ImageViewerVM.p_ImageData.p_Stride, byteCnt);
 
-            Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
-            {
+            if (viewerData.m_eMode == ImageData.eMode.OtherPCMem)
+                viewerData.GetRectData(Box, boxImage);
+            else
+                boxImage.SetData(viewerData, new CRect(memRect.Left, memRect.Top, memRect.Right, memRect.Bottom) , (int)viewerData.p_Stride, byteCnt);
+
+            Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>{
                 p_BoxImgSource = boxImage.GetBitMapSource(byteCnt);
             }));
 
-            p_PointXY = new CPoint(Box.MemoryRect.Left, Box.MemoryRect.Top);
-            p_SizeWH = new CPoint(Box.MemoryRect.Width, Box.MemoryRect.Height);
+            p_PointXY = new CPoint(memRect.Left, memRect.Top);
+            p_SizeWH = new CPoint(memRect.Width, memRect.Height);
 
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
             CPoint origin = new CPoint(originRecipe.OriginX, originRecipe.OriginY);

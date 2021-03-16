@@ -155,12 +155,12 @@ namespace RootTools.Module
             set { SetProperty(ref m_treeRoot, value); }
         }
         
-        public ModuleRunList(string id, IEngineer engineer, string sLogGroup = "")
+        public ModuleRunList(string id, IEngineer engineer)
         {
             m_id = id;
             m_engineer = engineer;
             m_moduleList = engineer.ClassModuleList();
-            m_log = LogView.GetLog(m_id, sLogGroup);
+            m_log = LogView.GetLog(m_id, "ModuleRunList");
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);

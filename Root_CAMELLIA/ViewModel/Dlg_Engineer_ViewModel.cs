@@ -77,10 +77,10 @@ namespace Root_CAMELLIA
                             CurrentAxisWorkPoints = GetWorkPoint(TiltAxisY.m_aPos);
                             return;
                         }
-                    case TabAxis.TiltZ:
+                    case TabAxis.StageZ:
                         {
-                            SelectedAxis = TiltAxisZ;
-                            CurrentAxisWorkPoints = GetWorkPoint(TiltAxisZ.m_aPos);
+                            SelectedAxis = StageAxisZ;
+                            CurrentAxisWorkPoints = GetWorkPoint(StageAxisZ.m_aPos);
                             return;
                         }
                 }
@@ -244,18 +244,18 @@ namespace Root_CAMELLIA
         }
         private Axis _TiltAxisY;
 
-        public Axis TiltAxisZ
+        public Axis StageAxisZ
         {
             get
             {
-                return _TiltAxisZ;
+                return _StageAxisZ;
             }
             set
             {
-                SetProperty(ref _TiltAxisZ, value);
+                SetProperty(ref _StageAxisZ, value);
             }
         }
-        private Axis _TiltAxisZ;
+        private Axis _StageAxisZ;
 
 
         //private Visibility _tttt = Visibility.Hidden;
@@ -364,7 +364,14 @@ namespace Root_CAMELLIA
         private RootViewer_ViewModel m_rootViewer = new RootViewer_ViewModel();
         public RootViewer_ViewModel p_rootViewer
         {
-            get => this.m_rootViewer;
+            get
+            {
+                return m_rootViewer;
+            }
+            set
+            {
+                SetProperty(ref m_rootViewer, value);
+            }
         }
 
         Dispatcher dispatcher = null;
@@ -380,13 +387,11 @@ namespace Root_CAMELLIA
 
             TiltAxisX = ModuleCamellia.p_tiltAxisXY.p_axisX;
             TiltAxisY = ModuleCamellia.p_tiltAxisXY.p_axisY;
-            TiltAxisZ = ModuleCamellia.p_tiltAxisZ;
+            StageAxisZ = ModuleCamellia.p_stageAxisZ;
 
             ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
 
             p_rootViewer.p_VisibleMenu = Visibility.Collapsed;
-
-            p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
 
             dispatcher = Application.Current.Dispatcher;
         }
@@ -691,6 +696,23 @@ namespace Root_CAMELLIA
 
 
         #region General Command
+
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (!ModuleCamellia.p_CamVRS.p_CamInfo.OpenStatus)
+                    {
+                        ModuleCamellia.p_CamVRS.Connect();
+                    }
+                    while (!ModuleCamellia.p_CamVRS.m_ConnectDone) ;
+                    p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+                });
+            }
+        }
+
         public ICommand CmdClose
         {
             get
@@ -834,7 +856,7 @@ namespace Root_CAMELLIA
             Lifter,
             TiltX,
             TiltY,
-            TiltZ
+            StageZ
         }
     }
 }

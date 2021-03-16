@@ -477,6 +477,24 @@ namespace RootTools_Vision
             defectList.Add(defect);
         }
 
+        public void AddDefect(string sInspectionID, int defectCode, float defectSz, float defectVal, float defectRelX, float defectRelY, float defectAbsLeft, float defectAbsTop, float defectW, float defectH, int chipIdxX, int chipIdxY) // SurfaceDefectParam
+        {
+            Defect defect = new Defect(sInspectionID,
+                defectCode,
+                defectSz,
+                defectVal,
+                defectW,
+                defectH,
+                defectRelX,
+                defectRelY,
+                defectAbsLeft,
+                defectAbsTop,
+                chipIdxX,
+                chipIdxY);
+
+            defectList.Add(defect);
+        }
+
         public void AddMeasurement(string strInspectionID, string strSide, Measurement.MeasureType type, Measurement.EBRMeasureItem measureItem, float fData, float fDefectW, float fDefectH, float fAngle, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)
 		{
             Measurement measurement = new Measurement(strInspectionID,
@@ -524,21 +542,11 @@ namespace RootTools_Vision
         /// <summary>
         /// 초기 설정값과 SharedBuffer만 카피?
         /// </summary>
-        /*
         public Workplace Clone()
         {
             Workplace wp = new Workplace(mapIndexX, mapIndexY, positionX, positionY, Width, Height, Index);
 
-            wp.SetSharedBuffer(this.sharedBufferR_GRAY, this.sharedBufferWidth, this.SharedBufferHeight, this.sharedBufferHeight, this.sharedBufferG, this.sharedBufferB);
-
-            return wp;
-        }
-        */
-
-        public Workplace Clone()
-        {
-            Workplace wp = new Workplace(mapIndexX, mapIndexY, positionX, positionY, Width, Height, Index);
-
+            //wp.SetSharedBuffer(this.sharedBufferR_GRAY, this.sharedBufferWidth, this.SharedBufferHeight, this.sharedBufferHeight, this.sharedBufferG, this.sharedBufferB);
             wp.SetSharedBuffer(this.sharedBufferInfo);
 
             return wp;

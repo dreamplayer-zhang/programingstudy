@@ -161,7 +161,7 @@ namespace RootTools.Comm
         private void M_client_ReceiveDataChanged(object sender)
         {
            if (m_bLogReceive) m_commLog.Add(CommLog.eType.Receive, BitConverter.ToString(m_client.receiveData)); 
-        }
+          }
 
         void RunTreeLog(Tree tree)
 		{
@@ -265,10 +265,11 @@ namespace RootTools.Comm
             m_client.UnitIdentifier = nUnit;
             try
             {
+
                 int[] anRead = m_client.ReadHoldingRegisters(nAddress, 1);
                 if (anRead.Length > 0) nValue = anRead[0];
             }
-            catch { }
+            catch(Exception ex) { p_sInfo = ex.ToString(); }
             return "OK";
         }
 
@@ -282,7 +283,10 @@ namespace RootTools.Comm
 				int[] anRead = m_client.ReadHoldingRegisters(nAddress, anValue.Count);
 				for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
 			}
-			catch { }
+			catch (Exception ex) 
+            {
+                string sTemp = string.Format("{0}", ex.ToString());
+            }
 			return "OK";
         }
 
@@ -318,7 +322,7 @@ namespace RootTools.Comm
                     if (anRead.Length > 0) nValue = anRead[0];
                 }
             }
-            catch { }
+            catch (Exception e) { m_log.Error("ReadInputRegister Error : " + e.Message); }
             return "OK";
         }
 

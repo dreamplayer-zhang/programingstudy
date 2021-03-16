@@ -282,6 +282,9 @@
     <Compile Include="Converter\ValueToUIValueConverter.cs" />
     <Compile Include="LibSR_Met\Calculation.cs" />
     <Compile Include="LibSR_Met\ConstValue.cs" />
+    <Compile Include="LibSR_Met\CountGraph.xaml.cs">
+      <DependentUpon>CountGraph.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LibSR_Met\DataManager.cs" />
     <Compile Include="LibSR_Met\ExtensionMethod.cs" />
     <Compile Include="LibSR_Met\LogManager.cs" />
@@ -298,6 +301,9 @@
     <Compile Include="Module\TowerLamp.cs" />
     <Compile Include="UI_Dialog\Dlg_OHT.xaml.cs">
       <DependentUpon>Dlg_OHT.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Dialog\Dlg_Review.xaml.cs">
+      <DependentUpon>Dlg_Review.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_Dialog\test.xaml.cs">
       <DependentUpon>test.xaml</DependentUpon>
@@ -414,11 +420,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="LibSR_Met\CountGraph.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LibSR_Met\RTGraph.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_Dialog\Dlg_OHT.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_Review.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -7,8 +7,10 @@ namespace RootTools.GAFs
     /// <summary>
     /// ALIDList_PopupUI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class ALIDList_PopupUI : Window
+    public partial class ALIDList_PopupUI : Window, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         static public bool m_bShow = false; 
         public ALIDList_PopupUI()
         {
@@ -23,14 +25,18 @@ namespace RootTools.GAFs
 		}
 
 		ALIDList m_listALID;
-        IEngineer m_engineer; 
-
+        IEngineer m_engineer;
         public void Init(ALIDList listALID, IEngineer engineer)
         {
             m_listALID = listALID;
             m_engineer = engineer; 
             DataContext = listALID;
-            listViewALID.ItemsSource = listALID.p_aSetALID; 
+            listViewALID.ItemsSource = listALID.p_aSetALID;
+            if(m_listALID.p_aSetALID.Count != 0)
+            {
+                ALID alid = (ALID)listViewALID.Items[m_listALID.p_aSetALID.Count - 1];
+                SetLableBinding(alid);
+            }
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -41,7 +47,9 @@ namespace RootTools.GAFs
         private void buttonClearALID_Click(object sender, RoutedEventArgs e)
         {
             m_listALID.ClearALID();
-            SetLableBinding(null); 
+            SetLableBinding(null);
+            ALID alid = (ALID)listViewALID.Items[m_listALID.p_aSetALID.Count - 1];
+            SetLableBinding(alid);
         }
 
         private void TextBlock_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -109,6 +117,11 @@ namespace RootTools.GAFs
         private void buttonRecovery_Click(object sender, RoutedEventArgs e)
         {
             m_engineer.Recovery(); 
+        }
+
+        public void OnPropertyChanged(string propertyName = null)
+        {
+            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

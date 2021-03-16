@@ -9,7 +9,7 @@
     <Grid>
         <Border ClipToBounds="True">
             <Viewbox>
-                <Canvas  Width="1000" Height="1000" Background="#01FFFFFF" Focusable="True" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseRightButtonDown="Canvas_MouseRightButtonDown">
+                <Canvas  Width="1000" Height="1000" Background="#01FFFFFF" Focusable="True" RenderTransformOrigin="0.5 0.5">
                     <Path StrokeThickness="1">
                             <Path.Data>
                                 <EllipseGeometry RadiusX="465" RadiusY="465" Center="500, 500"/>
@@ -1713,18 +1713,15 @@
                                 </GeometryGroup>
                             </Path.Data>
                         </Path>
-                        <Path StrokeThickness="3" Panel.ZIndex="2">
-                            <Path.Data>
-                                <EllipseGeometry RadiusX="465" RadiusY="465" Center="500, 500"/>
-                            </Path.Data>
-                            <Path.Stroke>
-                                <SolidColorBrush Color="#FFF0F0F0"></SolidColorBrush>
-                            </Path.Stroke>
-                        </Path>
-                        <Canvas.RenderTransform>
-                            <ScaleTransform x:Name="CanvasScaleTransform"/>
-                        </Canvas.RenderTransform>
-                    </Canvas>
+                    <Path StrokeThickness="3" Panel.ZIndex="2">
+                        <Path.Data>
+                            <EllipseGeometry RadiusX="465" RadiusY="465" Center="500, 500"/>
+                        </Path.Data>
+                        <Path.Stroke>
+                            <SolidColorBrush Color="#FFF0F0F0"></SolidColorBrush>
+                        </Path.Stroke>
+                    </Path>
+                </Canvas>
             </Viewbox>
         </Border>
     </Grid>
