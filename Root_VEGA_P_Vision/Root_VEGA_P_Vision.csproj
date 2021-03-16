@@ -86,6 +86,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\Buffer.cs" />
+    <Compile Include="Module\InfoPod.cs" />
     <Compile Include="Module\IRTRChild.cs" />
     <Compile Include="Module\Vision.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
