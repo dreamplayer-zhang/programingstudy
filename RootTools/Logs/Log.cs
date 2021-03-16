@@ -53,7 +53,11 @@ namespace RootTools
             string GetStackString(StackFrame stackFrame)
             {
                 MethodBase mb = stackFrame.GetMethod();
-                return mb.DeclaringType.Name + "." + mb.Name;
+                if(mb.DeclaringType != null)
+                {
+                    return mb.DeclaringType.Name + "." + mb.Name;
+                }
+                return mb.Name;
             }
         }
 

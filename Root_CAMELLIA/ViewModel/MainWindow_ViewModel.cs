@@ -385,9 +385,10 @@ namespace Root_CAMELLIA
             config = SettingViewModel.m_reg.Read(BaseDefine.RegNanoViewConfig, config);
             int port = -1;
             port = SettingViewModel.m_reg.Read(BaseDefine.RegNanoViewPort, port);
+
             if (config != "" && port != -1)
             {
-                if(App.m_nanoView.InitializeSR(config, port) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                if (App.m_nanoView.InitializeSR(config, port) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     p_InitNanoview = true;
                     SettingViewModel.LoadParameter();
@@ -816,37 +817,39 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    ////test tes = new test();
-                    //// tes.ShowDialog();
-                    Random rand = new Random();
-                    for (int i = 0; i < GaugeListItems.Count; i++)
-                    {
-                        GaugeListItems[i].Gauge.p_value = double.Parse(rand.Next(0, 100).ToString("#.##"));
-                        //GaugeListItems[i].p_name = "strasgding" + i;
-                    }
-                    for (int i = 0; i < FanListItems.Count; i++)
-                    {
-                        FanListItem fan = FanListItems[i] as FanListItem;
-                        if(fan != null)
-                        {
-                            if (fan.Fan.p_bRun == false)
-                                fan.Fan.p_bRun = true;
-                            else if (fan.Fan.p_bRun)
-                                fan.Fan.p_bRun = false;
-                        }
-                        HumidityListItem humidity = FanListItems[i] as HumidityListItem;
-                        if(humidity != null)
-                        {
-                            humidity.Humidity.p_nHumidity = rand.Next(0, 40);
-                        }
+                    //////test tes = new test();
+                    ////// tes.ShowDialog();
+                    //Random rand = new Random();
+                    //for (int i = 0; i < GaugeListItems.Count; i++)
+                    //{
+                    //    GaugeListItems[i].Gauge.p_value = double.Parse(rand.Next(0, 100).ToString("#.##"));
+                    //    //GaugeListItems[i].p_name = "strasgding" + i;
+                    //}
+                    //for (int i = 0; i < FanListItems.Count; i++)
+                    //{
+                    //    FanListItem fan = FanListItems[i] as FanListItem;
+                    //    if(fan != null)
+                    //    {
+                    //        if (fan.Fan.p_bRun == false)
+                    //            fan.Fan.p_bRun = true;
+                    //        else if (fan.Fan.p_bRun)
+                    //            fan.Fan.p_bRun = false;
+                    //    }
+                    //    HumidityListItem humidity = FanListItems[i] as HumidityListItem;
+                    //    if(humidity != null)
+                    //    {
+                    //        humidity.Humidity.p_nHumidity = rand.Next(0, 40);
+                    //    }
 
-                        TemperatureListItem Temp = FanListItems[i] as TemperatureListItem;
-                        if (Temp != null)
-                        {
-                            Temp.Temperature.p_nTemp = rand.Next(0, 40);
-                        }
+                    //    TemperatureListItem Temp = FanListItems[i] as TemperatureListItem;
+                    //    if (Temp != null)
+                    //    {
+                    //        Temp.Temperature.p_nTemp = rand.Next(0, 40);
+                    //    }
 
-                    }
+                    //}
+                    Dlg_Review review = new Dlg_Review();
+                    review.ShowDialog();
                     //GaugeListItem gauge = new GaugeListItem();
                     //gauge.Gauge = new GaugeChart();
                     //gauge.p_columnIndex = 0;

@@ -173,7 +173,7 @@ namespace Root_CAMELLIA.Module
         DIO_I m_axisYReady;
         DIO_I m_vacuum;
         DIO_I m_homeExistWafer;
-        DIO_I m_readyExistWafer;
+        DIO_I m_loadExistWafer;
         DIO_O m_vacuumOnOff;
 
 
@@ -214,6 +214,14 @@ namespace Root_CAMELLIA.Module
                 }
             }
         }
+
+        public void SetLight(bool bOn)
+        {
+            for (int n = 0; n < m_lightSet.m_aLight.Count; n++)
+            {
+                m_lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
+            }
+        }
         #endregion
 
         #region Axis WorkPoint
@@ -241,7 +249,12 @@ namespace Root_CAMELLIA.Module
         ALID m_alid_WaferExist;
         public void SetAlarm()
         {
-            m_alid_WaferExist.Run(true, "Vision Wafer Exist Error");
+            if(m_loadExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Load Position Wafer Exist Error");
+            else if(m_homeExistWafer.p_bIn)
+            {
+                m_alid_WaferExist.Run(true, "Vision Home Position Wafer Exist Error");
+            }
         }
 
 
@@ -255,12 +268,13 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_axisXReady, this, "Stage X Ready");
-            p_sInfo = m_toolBox.Get(ref m_axisYReady, this, "Stage Y Ready");
+            p_sInfo = m_toolBox.Get(ref m_axisYReady, this, "Stage Y Ready");   
             p_sInfo = m_toolBox.Get(ref m_vacuum, this, "Vaccum On");
             p_sInfo = m_toolBox.Get(ref m_vacuumOnOff, this, "Vaccum OnOff");
             p_sInfo = m_toolBox.Get(ref m_homeExistWafer, this, "Home Wafer Exist");
-            p_sInfo = m_toolBox.Get(ref m_readyExistWafer, this, "Read Wafer Exist");
+            p_sInfo = m_toolBox.Get(ref m_loadExistWafer, this, "Load Wafer Exist");
             m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
+
         }
         public Module_Camellia(string id, IEngineer engineer, List<ILoadport> loadports)
         {
@@ -274,11 +288,13 @@ namespace Root_CAMELLIA.Module
             for (int i = 0; i < loadports.Count; i++)
             {
                 infoCarrier[i] = loadports[i].p_infoCarrier;
-                CanInitCal[i] = false;
+                CanInitCal[i] = false;  
             }
 
-            if(!p_CamVRS.p_CamInfo._OpenStatus)
+            if (!p_CamVRS.p_CamInfo._OpenStatus)
                 p_CamVRS.Connect();
+
+            while (!p_CamVRS.m_ConnectDone) ;
         }
 
         public override void ThreadStop()
@@ -296,6 +312,8 @@ namespace Root_CAMELLIA.Module
 
         public override string StateHome()
         {
+
+
             p_sInfo = "OK";
             if (EQ.p_bSimulate)
                 return "OK";
@@ -370,16 +388,35 @@ namespace Root_CAMELLIA.Module
 
 
         bool[] CanInitCal = new bool[2];
+        bool m_InitCalDone = false;
         protected override void RunThread()
         {
             base.RunThread();
-            if (!CanInitCal[EQ.p_nRunLP] && infoCarrier[EQ.p_nRunLP].p_eState == InfoCarrier.eState.Dock)
+            if (m_bUseInitCal)
             {
-                CanInitCal[EQ.p_nRunLP] = true;
-            }
-            else if (infoCarrier[EQ.p_nRunLP].p_eState != InfoCarrier.eState.Dock)
-            {
-                CanInitCal[EQ.p_nRunLP] = false;
+                if (EQ.p_eState == EQ.eState.Run)
+                {
+                    if (!CanInitCal[EQ.p_nRunLP] && infoCarrier[EQ.p_nRunLP].p_eState == InfoCarrier.eState.Dock)
+                    {
+                        CanInitCal[EQ.p_nRunLP] = true;
+                        if (((Run_InitCalibration)CloneModuleRun("InitCalibration")).Run() != "OK")
+                        {
+                            p_sInfo = "Init Cal Error";
+                            m_InitCalDone = false;
+                            CanInitCal[EQ.p_nRunLP] = false;
+                        }
+                        else
+                        {
+                            MoveReadyPos();
+                            m_InitCalDone = true;
+                        }
+                    }
+                    else if (CanInitCal[EQ.p_nRunLP] && infoCarrier[EQ.p_nRunLP].p_eState != InfoCarrier.eState.Dock)
+                    {
+                        CanInitCal[EQ.p_nRunLP] = false;
+                        m_InitCalDone = false;
+                    }
+                }
             }
         }
 
@@ -542,7 +579,6 @@ namespace Root_CAMELLIA.Module
 
         public string BeforeGet(int nID)
         {
-
             //m_CamVRS.FunctionConnect();
             string info = MoveReadyPos();
             if (info != "OK")
@@ -553,23 +589,23 @@ namespace Root_CAMELLIA.Module
         
         public string BeforePut(int nID)
         {
-            //? InitCal 문제 보류
-            if (CanInitCal[EQ.p_nRunLP])
+
+            //if (CanInitCal[EQ.p_nRunLP])
+            //{
+
+            //    //CanInitCal[EQ.p_nRunLP] = false;
+            //}
+            if (m_bUseInitCal)
             {
-                if (m_DataManager.m_calibration.Run(true, false) != "OK")
+                while (!m_InitCalDone)
                 {
-                    return "Init Calibration Error";
+                    if (EQ.IsStop())
+                    {
+                        return "Cal Error";
+                    }
                 }
-                CanInitCal[EQ.p_nRunLP] = false;
             }
 
-            //if (m_DataManager.m_calibration.InItCalDone)
-            //{
-            //    if (m_DataManager.m_calibration.Run(false) != "OK")
-            //    {
-            //        return "Calibration Error";
-            //    }
-            //}
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;
@@ -597,7 +633,7 @@ namespace Root_CAMELLIA.Module
             switch (m_eCheckWafer)
             {
                 case eCheckWafer.Sensor:
-                    if (m_homeExistWafer.p_bIn || m_readyExistWafer.p_bIn)
+                    if (m_homeExistWafer.p_bIn || m_loadExistWafer.p_bIn)
                         return true;
                     return false;
                 default: return (p_infoWafer != null);
@@ -613,12 +649,32 @@ namespace Root_CAMELLIA.Module
         {
             base.RunTree(tree);
             RunTreeSetup(tree.GetTree("Setup", false));
+            RunTreeLight(tree.GetTree("LightPower", false));
+            RunTreeInitCal(tree.GetTree("Calibration", false));
         }
 
+        bool m_bUseInitCal = false;
+        void RunTreeInitCal(Tree tree)
+        {
+            m_bUseInitCal = tree.Set(m_bUseInitCal, m_bUseInitCal,"Use Init Cal", "Use Init Cal");
+        }
         void RunTreeSetup(Tree tree)
         {
             m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer");
             m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
+        }
+
+        List<double> m_aLightPower = new List<double>();
+        void RunTreeLight(Tree tree)
+        {
+            if (m_lightSet == null) return;
+
+            while (m_aLightPower.Count < m_lightSet.m_aLight.Count)
+                m_aLightPower.Add(0);
+            for (int n = 0; n < m_aLightPower.Count; n++)
+            {
+                m_aLightPower[n] = tree.Set(m_aLightPower[n], m_aLightPower[n], m_lightSet.m_aLight[n].m_sName, "Light Power (0 ~ 100 %%)");
+            }
         }
 
     }

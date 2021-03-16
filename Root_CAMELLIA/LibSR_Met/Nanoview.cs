@@ -300,7 +300,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
        
 
-        public ERRORCODE_NANOVIEW Calibration(int nBGIntTime_VIS, int nBGIntTime_NIR, int nAverage_VIS, int nAverage_NIR, bool bInitialCal)
+        public ERRORCODE_NANOVIEW Calibration(int nBGIntTime_VIS, int nBGIntTime_NIR, int nAverage_VIS, int nAverage_NIR, bool bInitialCal, int nIntegrationTime_VIS, int nIntegrationTime_NIR)
         {
             //Init Calibration 아니고 Sample 측정 시 Measure Background
             try
@@ -313,6 +313,8 @@ namespace Root_CAMELLIA.LibSR_Met
                     nBGIntTime_NIR = 15;
                     nAverage_NIR = 0;
                 }
+                m_SR.IntTime_VIS = nIntegrationTime_VIS;
+                m_SR.IntTime_NIR = nIntegrationTime_NIR;
                 m_SR.BackIntTime_VIS = nBGIntTime_VIS;
                 m_SR.BackIntTime_NIR = nBGIntTime_NIR;
                 m_SR.Average_VIS = nAverage_VIS;
@@ -491,7 +493,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 if (m_DM.bThickness)
                 {
                     m_SR.m_iteration = nIteration;
-                    //m_SR.m_divratio = dDampingFactor;
+                    m_SR.m_divratio = Math.Round(dDampingFactor,3);
 
                     if (m_Model.m_LayerList.Count == 0)
                     {
@@ -538,7 +540,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         {
                             data.Thickness.Add(m_SR.Thickness[n]);
                         }
-
+                        
                         double dAvgR = 0.0;
                         int nWLCount = 0;
                         double[] VIS_Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
@@ -736,6 +738,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 if (m_bSRInitialized == false)
                 {
                     MessageBox.Show("Initialize first");
+                    return ERRORCODE_NANOVIEW.SR_DO_HW_INITIALIZE_FIRST;
                 }
 
 
