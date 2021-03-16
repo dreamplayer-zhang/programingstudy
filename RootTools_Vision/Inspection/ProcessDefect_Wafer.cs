@@ -77,18 +77,6 @@ namespace RootTools_Vision
             if (MergeDefectList.Count > 0)
             {
                 DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
-
-                //if (MergeDefectList.Count == 1)
-                //{
-                //    foreach (Defect defect in MergeDefectList)
-                //    {
-                //        DatabaseManager.Instance.AddDefectData(defect);
-                //    }
-                //}
-                //else 
-                //{
-                //    DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
-                //}
             }
 
             Settings settings = new Settings();
