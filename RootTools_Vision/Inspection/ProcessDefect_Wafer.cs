@@ -17,8 +17,17 @@ namespace RootTools_Vision
 {
     public class ProcessDefect_Wafer : WorkBase
     {
-        public ProcessDefect_Wafer()
+        //BacksideRecipe recipeBackside;
+        string sDefectimagePath = @"D:\DefectImage";
+        /// <summary>
+        /// Defect Image가 저장될 Root Directory Path. 기본값 : D:\DefectImage
+        /// </summary>
+        public string DefectImagePath { get => sDefectimagePath; set => sDefectimagePath = value; }
+        string TableName;
+
+        public ProcessDefect_Wafer(string tableName)
         {
+            TableName = tableName;
         }
 
         public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_ALL;
@@ -76,19 +85,7 @@ namespace RootTools_Vision
             //// Add Defect to DB
             if (MergeDefectList.Count > 0)
             {
-                DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
-
-                //if (MergeDefectList.Count == 1)
-                //{
-                //    foreach (Defect defect in MergeDefectList)
-                //    {
-                //        DatabaseManager.Instance.AddDefectData(defect);
-                //    }
-                //}
-                //else 
-                //{
-                //    DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
-                //}
+                DatabaseManager.Instance.AddDefectDataList(MergeDefectList, TableName);
             }
 
             Settings settings = new Settings();

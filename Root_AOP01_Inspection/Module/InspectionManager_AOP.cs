@@ -14,6 +14,9 @@ using RootTools_Vision;
 using MBrushes = System.Windows.Media.Brushes;
 using DPoint = System.Drawing.Point;
 using Root_AOP01_Inspection.Recipe;
+using RootTools.Inspects;
+using MySql.Data.MySqlClient;
+using System.Diagnostics;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -85,7 +88,7 @@ namespace Root_AOP01_Inspection.Module
 			//string sRecipe = "RecipeID";
 			string recipeName = recipe.Name;
 
-			DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
+			//DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
 
 			base.Start();
 		}
@@ -144,18 +147,21 @@ namespace Root_AOP01_Inspection.Module
 
 			List<ParameterBase> paramList = recipe.ParameterItemList;
 			WorkBundle bundle = new WorkBundle();
+			string tableName = "defect";
 
 			foreach (ParameterBase param in paramList)
 			{
 				WorkBase work = (WorkBase)Tools.CreateInstance(param.InspectionType);
 				work.SetRecipe(recipe);
 				work.SetParameter(param); // 같은 class를 사용하는 parameter 객체가 존재할 수 있으므로 반드시 work를 생성할 때 parameter를 셋팅
+				ReticleSurfaceParameter reticleParam = param as ReticleSurfaceParameter;
+				//tableName = InspectionManager.GetInspectionTarget(reticleParam.DefectCode).ToString();
 
 				bundle.Add(work);
 			}
 
 			ProcessDefect processDefect = new ProcessDefect();
-			ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
+			ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer(tableName);
 
 			bundle.Add(processDefect);
 			bundle.Add(processDefect_Wafer);
@@ -342,8 +348,21 @@ namespace Root_AOP01_Inspection.Module
 			string waferId = "WaferID";
 			//string sRecipe = "RecipeID";
 			string recipeName = recipe.Name;
-			var temp = DatabaseManager.Instance.GetConnectionStatus();
-			DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
+			if(DatabaseManager.Instance.GetConnectionStatus())
+			{
+				try
+				{
+					DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
+				}
+				catch (MySqlException ex)
+				{
+					Debug.WriteLine("InitInspectionInfo() - " + ex.Message);
+				}
+			}
+			else
+			{
+				Debug.WriteLine("InitInspectionInfo() - Connection Fail");
+			}
 		}
 		public static unsafe DPoint GetEdge(ImageData img, System.Windows.Rect rcROI, RootTools.Inspects.eEdgeFindDirection eDirection, bool bUseAutoThreshold, bool bUseB2D, int nThreshold)
 		{

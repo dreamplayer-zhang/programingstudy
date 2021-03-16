@@ -129,28 +129,28 @@ namespace Root_AOP01_Inspection
 
 		private void saveCurrentEdge()
 		{
-			//string[] keywords = new string[] { "Main", "SideLeft", "SideTop", "SideBot", "SideRight" };
-			//현재 ViewModel에 있는 edgebox를 저장한다.
-			throw new System.Exception();
-			//MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
-			//MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun("MainSurfaceInspection");
-			//if (m_ImageViewerLeft_VM.TRectList.Count == 6)
-			//{
-			//	surfaceInspection.mainEdgeList[1] = new List<TRect>(m_ImageViewerLeft_VM.TRectList).ToArray();
-			//}
-			//if (m_ImageViewerTop_VM.TRectList.Count == 6)
-			//{
-			//	surfaceInspection.mainEdgeList[2] = new List<TRect>(m_ImageViewerTop_VM.TRectList).ToArray();
-			//}
-			//if (m_ImageViewerBot_VM.TRectList.Count == 6)
-			//{
-			//	surfaceInspection.mainEdgeList[3] = new List<TRect>(m_ImageViewerBot_VM.TRectList).ToArray();
-			//}
-			//if (m_ImageViewerRight_VM.TRectList.Count == 6)
-			//{
-			//	surfaceInspection.mainEdgeList[4] = new List<TRect>(m_ImageViewerRight_VM.TRectList).ToArray();
-			//}
-			//surfaceInspection.UpdateTree();
+			MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
+
+			//bot
+			if (m_ImageViewerBot_VM.TRectList.Count == 6)
+			{
+				mainVision.SetRectInfo(m_ImageViewerBot_VM.TRectList, App.SideBotModuleName);
+			}
+			//top
+			if (m_ImageViewerTop_VM.TRectList.Count == 6)
+			{
+				mainVision.SetRectInfo(m_ImageViewerTop_VM.TRectList, App.SideTopModuleName);
+			}
+			//left
+			if (m_ImageViewerLeft_VM.TRectList.Count == 6)
+			{
+				mainVision.SetRectInfo(m_ImageViewerLeft_VM.TRectList, App.SideLeftModuleName);
+			}
+			//right
+			if (m_ImageViewerRight_VM.TRectList.Count == 6)
+			{
+				mainVision.SetRectInfo(m_ImageViewerRight_VM.TRectList, App.SideRightModuleName);
+			}
 		}
 		public ICommand btnBack
 		{
