@@ -1,11 +1,10 @@
-﻿<UserControl x:Class="Root_VEGA_P.Engineer.VEGA_P_Handler_UI"
+﻿<UserControl x:Class="Root_VEGA_P_Vision.Engineer.VEGA_P_Vision_Handler_UI"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Root_VEGA_P.Engineer"
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision.Engineer"
              xmlns:module="clr-namespace:RootTools.Module;assembly=RootTools"
-             xmlns:EFEM="clr-namespace:Root_EFEM;assembly=Root_EFEM"
              xmlns:gaf="clr-namespace:RootTools.GAFs;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -14,12 +13,6 @@
             <TabControl>
                 <TabItem Header="ModuleList" Background="{Binding p_brushHandler}">
                     <module:ModuleList_UI x:Name="moduleListUI"/>
-                </TabItem>
-                <TabItem Header="Recipe" Background="{Binding p_brushHandler}">
-                    <local:VEGA_P_Recipe_UI x:Name="recipeUI"/>
-                </TabItem>
-                <TabItem Header="Process" Background="{Binding p_brushHandler}">
-                    <EFEM:EFEM_Process_UI x:Name="processUI"/>
                 </TabItem>
                 <TabItem Header="GAF" Background="{Binding p_brushHandler}">
                     <gaf:GAF_UI x:Name="gafUI"/>

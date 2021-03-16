@@ -10,9 +10,9 @@ using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 
-namespace Root_VEGA_P.Engineer
+namespace Root_VEGA_P_Vision.Engineer
 {
-    public class VEGA_P_Engineer : NotifyProperty, IEngineer
+    public class VEGA_P_Vision_Engineer : NotifyProperty, IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
@@ -23,6 +23,7 @@ namespace Root_VEGA_P.Engineer
             switch (m_eControl)
             {
                 case eControl.Ajin: return m_ajin;
+                case eControl.ACS: return m_acs; 
             }
             return m_ajin;
         }
@@ -60,7 +61,7 @@ namespace Root_VEGA_P.Engineer
             switch (m_eControl)
             {
                 case eControl.Ajin: InitAjin(); break;
-                case eControl.ACS: InitACS(); break; 
+                case eControl.ACS: InitACS(); break;
             }
         }
 
@@ -160,7 +161,7 @@ namespace Root_VEGA_P.Engineer
         }
         #endregion
 
-        public VEGA_P_Handler m_handler = new VEGA_P_Handler();
+        public VEGA_P_Vision_Handler m_handler = new VEGA_P_Vision_Handler();
         public void Init(string id)
         {
             EQ.m_sModel = id;
