@@ -85,6 +85,20 @@ namespace RootTools.Module
 
         public virtual void RunTree(Tree tree, bool bVisible, bool bRecipe = false) { }
 
+        public void RunTree(Tree.eMode mode)
+        {
+            m_moduleBase.m_treeRootRun.p_eMode = mode;
+            RunTree(m_moduleBase.m_treeRootRun, true);
+        }
+        /// <summary>
+        /// 입력된 Tree 데이터를 Registry에 쓰고 업데이트합니다
+        /// </summary>
+        public void UpdeteTree()
+        {
+            RunTree(Tree.eMode.RegWrite);
+            RunTree(Tree.eMode.Init);
+            RunTree(Tree.eMode.Update);
+        }
         public virtual string IsRunOK()
         {
             if (m_moduleBase.p_eState != ModuleBase.eState.Ready) return "Module State not Ready : " + m_moduleBase.p_eState.ToString();

@@ -15,14 +15,14 @@ using System.Windows.Shapes;
 
 namespace RootTools
 {
-    /// <summary>
-    /// RootViewer.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class DrawableRootViewer : UserControl
-    {
-        public DrawableRootViewer()
-        {
-            InitializeComponent();
+	/// <summary>
+	/// RootViewer.xaml에 대한 상호 작용 논리
+	/// </summary>
+	public partial class DrawableRootViewer : UserControl
+	{
+		public DrawableRootViewer()
+		{
+			InitializeComponent();
 			SetVisual(this);
 		}
 		public void SetVisual(Visual visual)
@@ -48,10 +48,13 @@ namespace RootTools
 		public void RefreshDraw()
 		{
 			var temp_vm = (RootViewer_ViewModel)this.DataContext;
-			canvas.StartPoint = temp_vm.p_View_Rect;//여기에 왼쪽위 메모리 주소같은게 필요함
-			canvas.ImageSize = temp_vm.p_ImageData.p_Size;
-			canvas.Zoom = temp_vm.p_Zoom;
-			canvas.InvalidateVisual();
+			if (temp_vm != null)
+			{
+				canvas.StartPoint = temp_vm.p_View_Rect;//여기에 왼쪽위 메모리 주소같은게 필요함
+				canvas.ImageSize = temp_vm.p_ImageData.p_Size;
+				canvas.Zoom = temp_vm.p_Zoom;
+				canvas.InvalidateVisual();
+			}
 		}
 	}
 }

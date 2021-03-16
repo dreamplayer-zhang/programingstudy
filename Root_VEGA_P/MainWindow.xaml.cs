@@ -23,7 +23,7 @@ namespace Root_VEGA_P
             engineerUI.Init(m_engineer);
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             m_engineer.ThreadStop();
         }

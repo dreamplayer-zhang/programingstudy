@@ -11,25 +11,31 @@ using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
-using RootTools.GAFs;
+using RootTools.Control.Ajin;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
-using RootTools_CLR;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using static RootTools.Control.Axis;
+using MBrushes = System.Windows.Media.Brushes;
 using DPoint = System.Drawing.Point;
+using RootTools_CLR;
+using System.Linq;
+using RootTools.Inspects;
+using RootTools.GAFs;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -465,6 +471,51 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
+		internal void SetRectInfo(ObservableCollection<TRect> rectList, string mainModuleName)
+		{
+			//TODO 여기서 직접 가져와서 수정하자!
+			var targetidx = -1;
+			for (int i = 0; i < m_asModuleRun.Count; i++)
+			{
+				if (m_asModuleRun[i] == mainModuleName)
+				{
+					targetidx = i;
+					break;
+				}
+			}
+			if(targetidx == -1)
+			{
+				return;
+			}
+
+			for (int i = 0; i < ((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList.Length; i++)
+			{
+				((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList[i] = new TRect(rectList[i]);
+			}
+			((Run_SurfaceInspection)m_aModuleRun[targetidx]).UpdeteTree();
+		}
+		internal void SetSurfaceParam(bool isBright, int GV, int size, string mainModuleName)
+		{
+			var targetidx = -1;
+			for (int i = 0; i < m_asModuleRun.Count; i++)
+			{
+				if (m_asModuleRun[i] == mainModuleName)
+				{
+					targetidx = i;
+					break;
+				}
+			}
+			if (targetidx == -1)
+			{
+				return;
+			}
+			((Run_SurfaceInspection)m_aModuleRun[targetidx]).BrightGV = isBright;
+			((Run_SurfaceInspection)m_aModuleRun[targetidx]).SurfaceGV = GV;
+			((Run_SurfaceInspection)m_aModuleRun[targetidx]).SurfaceSize = size;
+
+			((Run_SurfaceInspection)m_aModuleRun[targetidx]).UpdeteTree();
+		}
+
         double m_dPatternShiftDistance = 0.0;
         public double p_dPatternShiftDistance
         {
@@ -793,6 +844,17 @@ namespace Root_AOP01_Inspection.Module
         #endregion
 
         #region Vision Algorithm
+	Mat GetMatImage(MemoryData mem, CRect crtROI)
+	{
+		if (crtROI.Width < 1 || crtROI.Height < 1) return null;
+		if (crtROI.Left < 0 || crtROI.Top < 0) return null;
+		ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+		IntPtr p = mem.GetPtr();
+		img.SetData(p, crtROI, (int)mem.W);
+		Mat matReturn = new Mat((int)img.p_Size.Y, (int)img.p_Size.X, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
+
+		return matReturn;
+	}
 
         Image<Gray, byte> GetGrayByteImageFromMemory(MemoryData mem, CRect crtROI)
         {
@@ -1018,9 +1080,34 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(new Run_AlignKeyInspection(this), true, "Run AlignKeyInspection");
             AddModuleRunList(new Run_PellicleShiftAndRotation(this), true, "Run PellicleShiftAndRotation");
             AddModuleRunList(new Run_PellicleExpandingInspection(this), true, "Run PellicleExpanding");
+
             var main = new Run_SurfaceInspection(this, App.MainRecipeRegName, App.MainInspMgRegName);
-            main.m_sModuleRun = App.MainModuleName;// "MainSurfaceInspection";
-            AddModuleRunList(main, true, "Run MainSurfaceInspection");
+            main.m_sModuleRun = App.MainModuleName;
+            AddModuleRunList(main, true, "Run " + App.MainModuleName);
+
+
+			var pell = new Run_PellSideInspection(this, App.PellRecipeRegName, App.PellInspMgRegName);
+			pell.m_sModuleRun = App.PellicleModuleName;
+			AddModuleRunList(pell, true, "Run " + App.PellicleModuleName);
+
+
+			var left = new Run_LeftSideInspection(this, App.SideRecipeRegName, App.SideLeftInspMgRegName);
+			left.m_sModuleRun = App.SideLeftModuleName;
+			AddModuleRunList(left, true, "Run " + App.SideLeftModuleName);
+
+			var top = new Run_TopSideInspection(this, App.SideRecipeRegName, App.SideTopInspMgRegName);
+			top.m_sModuleRun = App.SideTopModuleName;
+			AddModuleRunList(top, true, "Run " + App.SideTopModuleName);
+
+			var right = new Run_RightSideInspection(this, App.SideRecipeRegName, App.SideRightInspMgRegName);
+			right.m_sModuleRun = App.SideRightModuleName;
+			AddModuleRunList(right, true, "Run " + App.SideRightModuleName);
+
+			var bottom = new Run_BotSideInspection(this, App.SideRecipeRegName, App.SideBotInspMgRegName);
+			bottom.m_sModuleRun = App.SideBotModuleName;
+			AddModuleRunList(bottom, true, "Run " + App.SideBotModuleName);
+
+
             AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
         }
         #endregion
@@ -1078,6 +1165,37 @@ namespace Root_AOP01_Inspection.Module
                 return "OK";
             }
         }
+		public class Run_LeftSideInspection : Run_SurfaceInspection
+		{
+			public Run_LeftSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+			{
+			}
+		}
+		public class Run_TopSideInspection : Run_SurfaceInspection
+		{
+			public Run_TopSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+			{
+			}
+		}
+		public class Run_RightSideInspection : Run_SurfaceInspection
+		{
+			public Run_RightSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+			{
+			}
+		}
+		public class Run_BotSideInspection : Run_SurfaceInspection
+		{
+			public Run_BotSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+			{
+			}
+		}
+		public class Run_PellSideInspection : Run_SurfaceInspection
+		{
+			public Run_PellSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+			{
+			}
+		}
+
 		public class Run_SurfaceInspection : ModuleRunBase
 		{
 
@@ -1132,33 +1250,9 @@ namespace Root_AOP01_Inspection.Module
 
                 return run;
             }
-
-            internal void UpdateTree()
-            {
-                var temp = localTree.p_treeRoot.p_eMode;
-                localTree.p_treeRoot.p_eMode = Tree.eMode.RegWrite;
-                RunTree(localTree, visible, isRecipe);
-                localTree.p_treeRoot.p_eMode = temp;
-            }
-            internal void RefreshTree()
-            {
-                var temp = localTree.p_treeRoot.p_eMode;
-                localTree.p_treeRoot.p_eMode = Tree.eMode.RegRead;
-                RunTree(localTree, visible, isRecipe);
-                localTree.p_treeRoot.p_eMode = temp;
-            }
-            static Tree localTree;
-            static bool visible;
-            static bool isRecipe;
             //string[] keywords = new string[] { "Main", "SideLeft", "SideTop", "SideBot", "SideRight", "Pellicle"};
 			public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
 			{
-                if(tree!=null)
-                {
-                    localTree = tree;
-                    visible = bVisible;
-                    isRecipe = bRecipe;
-                }
                 string defeaultName = currentMgmName + " EdgeBox #{0}";
 				for (int i = 0; i < 6; i++)
 				{
@@ -1500,27 +1594,34 @@ namespace Root_AOP01_Inspection.Module
 				{
                     GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(currentMgmName).ClearDefect();
                     //m_Setup.PatternInspectionManager.ResetWorkManager();
-                    GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(currentMgmName).InitInspectionInfo();
+                    //GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(currentMgmName).InitInspectionInfo();
                     GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).WaferMap.Clear();
 
                     RootViewer_ViewModel targetViewModel;
                     
+					int defectCode = 10000;
+
                     switch (currentMgmName)
                     {
                         case App.SideLeftInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerLeft_VM;
+							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionLeft, InspectionType.AbsoluteSurface, 0);
                             break;
                         case App.SideTopInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerTop_VM;
+							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionTop, InspectionType.AbsoluteSurface, 0);
                             break;
                         case App.SideBotInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerBot_VM;
+							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionBottom, InspectionType.AbsoluteSurface, 0);
                             break;
                         case App.SideRightInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerRight_VM;
+							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionRight, InspectionType.AbsoluteSurface, 0);
                             break;
                         case App.PellInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_Recipe45D.p_ImageViewer_VM;
+							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.Pellcile45, InspectionType.AbsoluteSurface, 0);
                             break;
                         //case App.BackInspMgRegName:
                         //	targetList = new List<TRect>(mainEdgeList[6]);
@@ -1529,6 +1630,7 @@ namespace Root_AOP01_Inspection.Module
                         case App.MainInspMgRegName:
                         default:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
+							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.AbsoluteSurface, 0);
                             break;
                     }
 
@@ -1537,6 +1639,7 @@ namespace Root_AOP01_Inspection.Module
                     ReticleSurfaceParameter surParam = GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).GetItem<ReticleSurfaceParameter>();
                     surParam.IsBright = BrightGV;
                     surParam.Intensity = SurfaceGV;
+					surParam.DefectCode = defectCode;
                     //surParam.DiffFilter = DiffFilterMethod.Gaussian;
                     surParam.Size = SurfaceSize;
 
@@ -4850,4 +4953,3 @@ namespace Root_AOP01_Inspection.Module
         }
     }
 }
-

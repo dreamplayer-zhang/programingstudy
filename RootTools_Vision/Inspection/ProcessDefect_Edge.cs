@@ -14,10 +14,11 @@ namespace RootTools_Vision
 {
 	public class ProcessDefect_Edge : WorkBase
 	{
-		public ProcessDefect_Edge()
+        string TableName;
+		public ProcessDefect_Edge(string tableName)
 		{
-
-		}
+            TableName = tableName;
+        }
 
 		public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_ALL;
 
@@ -56,7 +57,7 @@ namespace RootTools_Vision
 				this.currentWorkplace.DefectList.Add(defect);
 
 			if (MergeDefectList.Count > 0)
-				DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
+				DatabaseManager.Instance.AddDefectDataList(MergeDefectList, TableName);
 
 			SettingItem_SetupEdgeside settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupEdgeside>();
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();

@@ -435,6 +435,7 @@
     <Compile Include="OHTNew\OHT_UI.xaml.cs">
       <DependentUpon>OHT_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ParticleCounter\AirnetII_310.cs" />
     <Compile Include="ParticleCounter\LasairIII.cs" />
     <Compile Include="ParticleCounter\ParticleCounterBase.cs" />
     <Compile Include="ParticleCounter\ParticleCounterBase_UI.xaml.cs">

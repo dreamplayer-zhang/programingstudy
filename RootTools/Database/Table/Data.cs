@@ -7,6 +7,7 @@ using System.Windows;
 
 namespace RootTools.Database
 {
+	[Serializable]
 	public class Data
 	{
 		public virtual Rect GetRect()
