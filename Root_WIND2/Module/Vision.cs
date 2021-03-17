@@ -379,10 +379,7 @@ namespace Root_WIND2.Module
         InfoWafer _infoWafer = null;
         public InfoWafer p_infoWafer
         {
-            get
-            {
-                return _infoWafer;
-            }
+            get { return _infoWafer; }
             set
             {
                 m_sInfoWafer = (value == null) ? "" : value.p_id;
