@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Root_VEGA_P_Vision.Module
@@ -122,9 +123,51 @@ namespace Root_VEGA_P_Vision.Module
         }
         #endregion
 
-        public Buffer()
+        public Buffer(string id, IEngineer engineer, eRemote eRemote)
         {
-            m_teach = new TeachRTR(); 
+            m_teach = new TeachRTR();
+            InitBase(id, engineer, eRemote);
         }
+
+        public override void ThreadStop()
+        {
+            base.ThreadStop();
+        }
+
+        #region ModuleRun
+        protected override void InitModuleRuns()
+        {
+            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+        }
+
+        public class Run_Delay : ModuleRunBase
+        {
+            Buffer m_module;
+            public Run_Delay(Buffer module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            double m_secDelay = 2;
+            public override ModuleRunBase Clone()
+            {
+                Run_Delay run = new Run_Delay(m_module);
+                run.m_secDelay = m_secDelay;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
+            }
+
+            public override string Run()
+            {
+                Thread.Sleep((int)(1000 * m_secDelay / 2));
+                return "OK";
+            }
+        }
+        #endregion
     }
 }

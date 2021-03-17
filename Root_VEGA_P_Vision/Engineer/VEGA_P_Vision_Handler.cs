@@ -36,8 +36,8 @@ namespace Root_VEGA_P_Vision.Engineer
             p_moduleList = new ModuleList(m_engineer);
             m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_vision);
-            //m_buffer = new Buffer();
-            //InitModule(m_buffer); 
+            m_buffer = new Buffer("Buffer", m_engineer, ModuleBase.eRemote.Server);
+            InitModule(m_buffer); 
         }
 
         void InitModule(ModuleBase module)

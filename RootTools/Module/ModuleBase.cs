@@ -660,10 +660,8 @@ namespace RootTools.Module
 
             void InitialModule(Protocol protocol)
             {
-                
                 m_module.p_eState = eState.Home;
-                while (m_module.IsBusy())
-                    Thread.Sleep(10);
+                while (m_module.IsBusy()) Thread.Sleep(10);
                 EQ.p_eState = EQ.eState.Ready;
                 protocol.p_sRun = m_module.p_sInfo;
                 Send(protocol);

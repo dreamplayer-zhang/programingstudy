@@ -323,8 +323,8 @@ namespace Root_VEGA_P_Vision.Module
 
         public class Run_Delay : ModuleRunBase
         {
-            ModuleBase m_module;
-            public Run_Delay(ModuleBase module)
+            Vision m_module;
+            public Run_Delay(Vision module)
             {
                 m_module = module;
                 InitModuleRun(module);
