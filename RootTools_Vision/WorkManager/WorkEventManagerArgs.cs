@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
+    [Serializable]
     public class WorkDoneAllEventArgs : EventArgs
     {
         public WorkDoneAllEventArgs()
@@ -14,7 +15,7 @@ namespace RootTools_Vision
             
         }
     }
-
+    [Serializable]
     public class PositionDoneEventArgs : EventArgs
     {
         public readonly CPoint ptOldStart;
@@ -35,18 +36,25 @@ namespace RootTools_Vision
         }
     }
 
+    [Serializable]
     public class InspectionDoneEventArgs : EventArgs
     {
+        public readonly Workplace workplace;
         public readonly List<CRect> listRect;
-        public readonly bool reDraw;
 
-        public InspectionDoneEventArgs(List<CRect> _rect, bool _reDraw = false)
+        public InspectionDoneEventArgs(List<CRect> _rect)
         {
+            this.workplace = new Workplace();
             this.listRect = _rect;
-            this.reDraw = _reDraw;
+        }
+
+        public InspectionDoneEventArgs(List<CRect> _rect, Workplace workplace)
+        {
+            this.workplace = workplace;
+            this.listRect = _rect;
         }
     }
-
+    [Serializable]
     public class ProcessDefectDoneEventArgs : EventArgs
     {
         public ProcessDefectDoneEventArgs()
@@ -54,7 +62,7 @@ namespace RootTools_Vision
 
         }
     }
-
+    [Serializable]
     public class IntegratedProcessDefectDoneEventArgs : EventArgs
     {
         public IntegratedProcessDefectDoneEventArgs()
@@ -62,7 +70,7 @@ namespace RootTools_Vision
 
         }
     }
-
+    [Serializable]
     public class ProcessDefectWaferStartEventArgs : EventArgs
     {
         public ProcessDefectWaferStartEventArgs()
@@ -70,7 +78,7 @@ namespace RootTools_Vision
 
         }
     }
-
+    [Serializable]
     public class ProcessDefectEdgeDoneEventArgs : EventArgs
     {
         public ProcessDefectEdgeDoneEventArgs()
@@ -78,7 +86,7 @@ namespace RootTools_Vision
 
         }
     }
-
+    [Serializable]
     public class ProcessMeasurementDoneEventArgs : EventArgs
     {
         public ProcessMeasurementDoneEventArgs()
@@ -86,7 +94,7 @@ namespace RootTools_Vision
 
         }
     }
-
+    [Serializable]
     public class UIRedrawEventArgs : EventArgs
     {
         public UIRedrawEventArgs()
@@ -95,6 +103,7 @@ namespace RootTools_Vision
         }
     }
 
+    [Serializable]
     public class WorkplaceStateChangedEventArgs : EventArgs
     {
         public readonly Workplace workplace;
@@ -104,14 +113,14 @@ namespace RootTools_Vision
             this.workplace = _workplace;
         }
     }
-
+    [Serializable]
     public class RequestStopEventArgs : EventArgs
     {
         public RequestStopEventArgs()
         {
         }
     }
-
+    [Serializable]
     public class InspectionStartArgs : EventArgs
     {
         public InspectionStartArgs()
@@ -119,7 +128,7 @@ namespace RootTools_Vision
         }
     }
 
-    ///
+    [Serializable]
     public class MemoryIDArgs : EventArgs
     {
         public readonly MemoryID MemoryID;
@@ -127,6 +136,19 @@ namespace RootTools_Vision
         public MemoryIDArgs(MemoryID memoryID)
         {
             this.MemoryID = memoryID;
+        }
+    }
+
+    [Serializable]
+    public class LogArgs : EventArgs
+    {
+        public readonly LOG_MESSAGE_TYPE type;
+        public readonly string msg;
+
+        public LogArgs(LOG_MESSAGE_TYPE type, string msg)
+        {
+            this.type = type;
+            this.msg = msg;
         }
     }
 }

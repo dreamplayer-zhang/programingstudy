@@ -98,7 +98,7 @@ namespace Root_WIND2
             }
 
             ProcessDefect processDefect = new ProcessDefect();
-            ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
+            ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer("defect");
 
             bundle.Add(processDefect);
             bundle.Add(processDefect_Wafer);
@@ -133,7 +133,7 @@ namespace Root_WIND2
             DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
 
             // 레시피를 사용안하는 곳도 있을 있으므로...
-            works.SetRecipe(recipe);
+            //works.SetRecipe(recipe);
 
             return true;
         }

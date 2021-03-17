@@ -148,7 +148,7 @@ namespace Root_VEGA_D.Module
 
             if (m_bLightCurtain_Use)
             {
-                m_alidLightCurtain.Run(!m_diLightCurtain.p_bIn, "Light Curtain Detect Error");
+                m_alidLightCurtain.Run(!m_diLightCurtain.p_bIn, "Light Curtain Detect Error"); 
             }
             if (m_bProtectionbar_Use)
             {

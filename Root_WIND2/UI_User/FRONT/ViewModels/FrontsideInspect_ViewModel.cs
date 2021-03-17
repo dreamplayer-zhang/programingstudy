@@ -210,16 +210,6 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().StartRemoteProcess();
-
-
-                //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
-                //{
-                //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
-                //}
-
-                //return;
-
                 EQ.p_bStop = false;
                 Vision vision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision;
                 if (vision.p_eState != ModuleBase.eState.Ready)
@@ -264,11 +254,11 @@ namespace Root_WIND2.UI_User
             });
         }
 
-        public RelayCommand btnRemote
+        public RelayCommand btnRemoteStart
         {
             get => new RelayCommand(() =>
             {
-                
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
             });
         }
         #endregion
@@ -303,7 +293,8 @@ namespace Root_WIND2.UI_User
 
         private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
         {
-            Workplace workplace = obj as Workplace;
+            Workplace workplace = args.workplace;
+            if (workplace == null || workplace.DefectList == null) return;
             List<String> textList = new List<String>();
             List<CRect> rectList = new List<CRect>();
 

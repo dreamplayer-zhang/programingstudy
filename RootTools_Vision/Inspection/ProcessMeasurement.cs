@@ -46,15 +46,19 @@ namespace RootTools_Vision
                 for (int j = 0; j < measureItem; j++)
                     measureList[i + j].SetMeasureIndex(index);
 
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-            DatabaseManager.Instance.AddMeasurementDataList(measureList);
+			if (measureList.Count > 0)
+				DatabaseManager.Instance.AddMeasurementDataList(measureList);
 
+			// 수정 중
+			/*
             SettingItem_SetupEBR settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupEBR>();
-            Tools.SaveDataImage(Path.Combine(settings.MeasureImagePath, sInspectionID), measureList.Cast<Data>().ToList(), currentWorkplace.SharedBufferInfo);
+            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+
+            Tools.SaveDefectImage(Path.Combine(settings.MeasureImagePath, sInspectionID), measureList.Cast<Data>().ToList(), currentWorkplace.SharedBufferInfo);
 
             if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
             {
-				List<string> dataStringList = EBRMeasureDataToStringList(measureList, Measurement.EBRMeasureItem.EBR.ToString());
+				List<string> dataStringList = ConvertDataListToStringList(measureList, Measurement.EBRMeasureItem.EBR.ToString());
 				GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, dataStringList, null);
 				GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
 				GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
@@ -62,11 +66,12 @@ namespace RootTools_Vision
 
 				//Tools.SaveTiffImage(settings.KlarfSavePath, measureList.Cast<Data>().ToList(), sharedBufferInfo);
 			}
+			*/
 
             WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
         }
 
-		public List<string> EBRMeasureDataToStringList(List<Measurement> measureList, string measureItem = null)
+		private List<string> ConvertDataListToStringList(List<Measurement> measureList, string measureItem = null)
 		{
 			List<string> stringList = new List<string>();
 			for (int i = 0; i < measureList.Count; i++)

@@ -2,28 +2,33 @@
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Root_LogView.Server
 {
     public class LogServer
     {
+        public delegate void dgOnChangeTab();
+        public event dgOnChangeTab OnChangeTab;
+
         #region LogData
         public class LogData
         {
             DateTime m_dt = DateTime.Now;
-            public int m_nServerID;
             public string m_sLog;
-            public LogData(int nServerID, string sLog)
+            public LogData(string sLog)
             {
-                m_nServerID = nServerID;
                 m_sLog = sLog;
             }
 
+            public string m_sDate;
             public string p_sTime { get; set; }
             public string p_sLevel { get; set; }
             public string p_sLogger { get; set; }
@@ -34,11 +39,9 @@ namespace Root_LogView.Server
             public void CalcLog()
             {
                 string[] asLog = m_sLog.Split('\t');
-                if (asLog.Length > 0)
-                {
-                    asLog[0] += " ~ " + m_dt.Second.ToString() + "." + m_dt.Millisecond.ToString();
-                    p_sTime = asLog[0];
-                }
+                DateTime dt = DateTime.Now;
+                m_sDate = dt.ToShortDateString();
+                p_sTime = dt.Hour.ToString("00") + '.' + dt.Minute.ToString("00") + '.' + dt.Second.ToString("00") + '.' + dt.Millisecond.ToString("000");
                 if (asLog.Length > 1) 
                 {
                     p_sLevel = asLog[1];
@@ -55,103 +58,93 @@ namespace Root_LogView.Server
                     p_sLevel = "Error"; 
                     p_sColor = Brushes.Red;
                 }
-                if (asLog.Length > 2) 
-                {
-                    p_sLogger = m_nServerID.ToString() + "." + asLog[2];
-                    asLog[2] = p_sLogger;
-                }
+                if (asLog.Length > 2) p_sLogger = asLog[2];
                 if (asLog.Length > 3) p_sMessage = asLog[3];
                 if (asLog.Length > 4) p_sStackTrace = asLog[4];
                 m_sLog = asLog[0];
                 for (int n = 1; n < asLog.Length; n++) m_sLog += '\t' + asLog[n]; 
             }
         }
-        Queue<LogData> m_qLogData = new Queue<LogData>(); 
+        Queue<LogData> m_qLogData = new Queue<LogData>();
         #endregion
 
         #region TCPServer
-        int _nServer = 0; 
-        public int p_nServer
+        public TCPIPServer m_server; 
+        void InitServer()
         {
-            get { return _nServer; }
-            set
-            {
-                if (_nServer == value) return;
-                _nServer = value;
-                InitTCPServer(); 
-            }
+            m_server = new TCPIPServer("TCPServer", null);
+            m_server.p_nPort = 7065;
+            m_server.EventReciveData += M_server_EventReciveData;
         }
 
-        public class TCPServer
+        private void M_server_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
-            LogServer m_logServer;
-            int m_nID; 
-            public TCPAsyncServer m_server;
-            public TCPServer(LogServer logServer, int nID)
-            {
-                m_logServer = logServer; 
-                m_nID = nID; 
-                m_server = new TCPAsyncServer("TCPServer" + nID.ToString(), null);
-                m_server.EventReciveData += M_server_EventReciveData;
-            }
-
-            private void M_server_EventReciveData(byte[] aBuf, int nSize, Socket socket)
-            {
-                socket.Send(aBuf);
-                LogData logData = new LogData(m_nID, Encoding.ASCII.GetString(aBuf, 0, nSize));
-                m_logServer.m_qLogData.Enqueue(logData); 
-            }
-        }
-
-        List<TCPAsyncServer> m_aServer = new List<TCPAsyncServer>(); 
-        void InitTCPServer()
-        {
-            while (m_aServer.Count > p_nServer) m_aServer.RemoveAt(m_aServer.Count - 1); 
-            while (m_aServer.Count < p_nServer)
-            {
-                int nID = m_aServer.Count; 
-                TCPAsyncServer server = new TCPAsyncServer("TCPServer" + nID.ToString(), null);
-                server.p_nPort = 7060 + nID; 
-                m_aServer.Add(server); 
-            }
+            //socket.Send(aBuf);
+            LogData logData = new LogData(Encoding.Default.GetString(aBuf, 0, nSize));
+            m_qLogData.Enqueue(logData);
         }
 
         void RunTreeTCPIP(Tree tree)
         {
-            p_nServer = tree.Set(p_nServer, 1, "Count", "TCPIP Server Count"); 
-            foreach (TCPAsyncServer server in m_aServer) server.RunTree(tree.GetTree(server.p_id));
+            m_server.RunTree(tree.GetTree(m_server.p_id));
+            m_server.p_bUse = true; 
         }
         #endregion
 
         #region LogGroup
         public class LogGroup
         {
-            public string m_id;
+            public string p_id { get; set; }
             public LogGroup(string id)
             {
-                m_id = id;
+                p_aLog = new ObservableCollection<LogData>();
+                p_id = id;
             }
 
-            Queue<LogData> m_qLogData = new Queue<LogData>(); 
+            public UserControl p_ui
+            {
+                get
+                {
+                    LogGroup_UI ui = new LogGroup_UI();
+                    ui.Init(this);
+                    return ui;
+                }
+            }
+
+            public Queue<LogData> m_qLog = new Queue<LogData>(); 
             public void AddLog(LogData logData)
             {
-                m_qLogData.Enqueue(logData); 
+                m_qLog.Enqueue(logData); 
             }
 
-            public void SaveLog(string sPath)
+            const int c_lLog = 500;
+            Queue<LogData> m_qLogView = new Queue<LogData>();
+            public void LogSave(string sPath)
             {
-                if (m_qLogData.Count == 0) return; 
-                using (StreamWriter writer = new StreamWriter(sPath + m_id + ".txt"))
+                string sDate = m_qLog.Peek().m_sDate;
+                sPath += "\\" + sDate;
+                Directory.CreateDirectory(sPath);
+                using (StreamWriter writer = new StreamWriter(sPath + "\\" + sDate + "_" + p_id + ".txt", true, Encoding.Default))
                 {
-                    while (m_qLogData.Count > 0)
+                    while (m_qLog.Count > 0)
                     {
-                        LogData logData = m_qLogData.Dequeue();
-                        writer.WriteLine(logData.m_sLog); 
+                        LogData data = m_qLog.Peek();
+                        if (data.m_sDate != sDate) return;
+                        m_qLog.Dequeue();
+                        writer.WriteLine(data.m_sLog);
+                        m_qLogView.Enqueue(data); 
                     }
                 }
             }
+
+            public ObservableCollection<LogData> p_aLog { get; set; }
+            public void OnTimer()
+            {
+                while (m_qLogView.Count > 0) p_aLog.Add(m_qLogView.Dequeue());
+                while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
+            }
         }
-        List<LogGroup> m_aGroup = new List<LogGroup>(); 
+        public List<LogGroup> m_aGroup = new List<LogGroup>(); 
         void InitGroup()
         {
             m_aGroup.Add(new LogGroup("Total")); 
@@ -161,10 +154,11 @@ namespace Root_LogView.Server
         {
             foreach (LogGroup group in m_aGroup)
             {
-                if (group.m_id == sGroup) return group; 
+                if (group.p_id == sGroup) return group; 
             }
             LogGroup logGroup = new LogGroup(sGroup);
             m_aGroup.Add(logGroup);
+            m_bChangeTab = true; 
             return logGroup; 
         }
 
@@ -175,11 +169,30 @@ namespace Root_LogView.Server
             if (logData.p_sLogger != null) GetGroup(logData.p_sLogger).AddLog(logData); 
         }
 
-        string m_sPath = "c:\\Log"; 
+        string m_sPath = "c:\\LogServer"; 
         void RunTreeFile(Tree tree)
         {
             m_sPath = tree.Set(m_sPath, m_sPath, "Path", "Log File Path");
             Directory.CreateDirectory(m_sPath); 
+        }
+        #endregion
+
+        #region Timer 
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromSeconds(0.1);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start(); 
+        }
+
+        bool m_bChangeTab = false;
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            foreach (LogGroup group in m_aGroup) group.OnTimer();
+            if (m_bChangeTab == false) return;
+            m_bChangeTab = false;
+            if (OnChangeTab != null) OnChangeTab();
         }
         #endregion
 
@@ -194,33 +207,25 @@ namespace Root_LogView.Server
 
         void RunThread()
         {
-            DateTime dateTime = new DateTime(2000, 1, 1);
-            string sDate = "";
-            string sPath = ""; 
             m_bThread = true;
             Thread.Sleep(1000);
             while (m_bThread)
             {
                 Thread.Sleep(100);
                 while (m_qLogData.Count > 0) AddLogGroup(m_qLogData.Dequeue());
-                if (dateTime != DateTime.Today)
+                foreach (LogGroup group in m_aGroup)
                 {
-                    DateTime dt = DateTime.Now;
-                    sDate = dt.Year.ToString() + '-' + dt.Month.ToString("00") + '-' + dt.Day.ToString("00");
-                    sPath = m_sPath + "\\" + sDate;
-                    Directory.CreateDirectory(sPath);
-                    sPath += "\\" + sDate + '_'; 
+                    while (group.m_qLog.Count > 0) group.LogSave(m_sPath);
                 }
-                foreach (LogGroup group in m_aGroup) group.SaveLog(sPath); 
             }
         }
         #endregion
 
         #region Tree
-        TreeRoot m_treeRoot; 
+        public TreeRoot m_treeRoot; 
         void InitTree()
         {
-            m_treeRoot = new TreeRoot(p_id, null);
+            m_treeRoot = new TreeRoot(p_id, null, false, "LogView");
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
         }
 
@@ -244,8 +249,22 @@ namespace Root_LogView.Server
         {
             p_id = "LogServer";
             InitTree();
+            InitServer();
+            RunTree(Tree.eMode.RegRead);
+            RunTree(Tree.eMode.Init);
             InitGroup(); 
-            InitThread(); 
+            InitThread();
+            InitTimer(); 
+        }
+
+        public void ThreadStop()
+        {
+            if (m_bThread)
+            {
+                m_bThread = false;
+                m_thread.Join(); 
+            }
+            m_server.ThreadStop(); 
         }
     }
 }

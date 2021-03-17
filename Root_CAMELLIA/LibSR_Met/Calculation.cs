@@ -90,7 +90,7 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
-                if (m_DM.m_LayerData.Count-1 == 0)
+                if (m_DM.m_LayerData.Count - 1 == 0)
                 {
                     MessageBox.Show("CalcTransmittance() - Please open a recipe first!");
                     return -1;
@@ -112,7 +112,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
                 Complex[][] mMj = MatrixCreate(2, 2);
                 int nCalLayer = m_DM.m_LayerData.Count - 2;
-                for (int n = 0; n < m_DM.m_LayerData.Count-1; n++)
+                for (int n = 0; n < m_DM.m_LayerData.Count - 1; n++)
                 {
                     cN = new Complex(m_DM.m_LayerData[nCalLayer].n[arrNKDataIdx[nCalLayer]], -m_DM.m_LayerData[nCalLayer].k[arrNKDataIdx[nCalLayer]]);
                     cD = new Complex(Thickness[n], 0); //초기 두께
@@ -171,89 +171,103 @@ namespace Root_CAMELLIA.LibSR_Met
             }
 
             //투과율계산
-            Task task1 = new Task(() =>
+            //Task task1 = new Task(() =>
+            //{
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            var MaxWorkingCount = nDataMin;
+            int nWorkingRangeSize = MaxWorkingCount / ConstValue.MULTI_THREAD_COUNT;
+
+            //var part = System.Collections.Concurrent.Partitioner.Create(0, MaxWorkingCount, nWorkingRangeSize);
+            var part = System.Collections.Concurrent.Partitioner.Create(0, MaxWorkingCount);
+
+            Parallel.ForEach(part, (num, state) =>
             {
-                var MaxWorkingCount = nDataMin;
-                int nWorkingRangeSize = MaxWorkingCount / ConstValue.MULTI_THREAD_COUNT;
-
-                var part = System.Collections.Concurrent.Partitioner.Create(0, MaxWorkingCount, nWorkingRangeSize);
-
-                Parallel.ForEach(part, (num, state) =>
+                for (int i = num.Item1; i < num.Item2; i++)
                 {
-                    for (int i = num.Item1; i < num.Item2; i++)
-                    {
-                        double dWavelength = m_DM.m_LayerData[nDataMinLayerIdx].wavelength[i];
+                    double dWavelength = m_DM.m_LayerData[nDataMinLayerIdx].wavelength[i];
 
-                        for (int n = 0; n < nLayerCount; n++)
+                    for (int n = 0; n < nLayerCount; n++)
+                    {
+                        int nNKIdx = m_DM.m_LayerData[n].wavelength.FindIndex(wl => Math.Abs(dWavelength - wl) < 0.1);
+                        if (nNKIdx == -1)
                         {
-                            int nNKIdx = m_DM.m_LayerData[n].wavelength.FindIndex(wl => Math.Abs(dWavelength - wl) < 0.1);
-                            if (nNKIdx == -1)
-                            {
-                                m_DM.m_Log.WriteLog(LogType.Datas,"CalcThickness() - Please check nk data file and wavelength range. Wavelength : " + dWavelength.ToString());
-                                return;
-                            }
-                            arrNKIndexes[i][n] = nNKIdx;
+                            m_DM.m_Log.WriteLog(LogType.Datas, "CalcThickness() - Please check nk data file and wavelength range. Wavelength : " + dWavelength.ToString());
+                            return;
                         }
+                        arrNKIndexes[i][n] = nNKIdx;
                     }
-                });
+                }
             });
-            task1.Start();
-            task1.Wait();
+
+            sw.Stop();
+            Debug.WriteLine("task1 >> " + sw.ElapsedMilliseconds.ToString());
+            //});
+            //task1.Start();
+            //task1.Wait();
 
             var mPPTemp = new double[nDNum];//Matrix<double>.Build.Dense(nDNum, 1, 0.0);
             mPn.CopyTo(mPPTemp, 0);
             var PP = new double[nLayerCount];
             for (int n = 0; n < nDNum; n++)
             {
-                    PP[n] = mPPTemp[n];
+                PP[n] = mPPTemp[n];
             }
 
-            Task task2 = new Task(() =>
+            //Task task2 = new Task(() =>
+            //{
+            //var MaxWorkingCount = nDataMin;
+            //int nWorkingRangeSize = MaxWorkingCount / ConstValue.MULTI_THREAD_COUNT;
+
+            //var part = System.Collections.Concurrent.Partitioner.Create(0, MaxWorkingCount, nWorkingRangeSize);
+            sw.Start();
+            Parallel.ForEach(part, (numm, state) =>
             {
-                var MaxWorkingCount = nDataMin;
-                int nWorkingRangeSize = MaxWorkingCount / ConstValue.MULTI_THREAD_COUNT;
-
-                var part = System.Collections.Concurrent.Partitioner.Create(0, MaxWorkingCount, nWorkingRangeSize);
-                Parallel.ForEach(part, (numm, state) =>
+                for (int i = numm.Item1; i < numm.Item2; i++)
                 {
-                    for (int i = numm.Item1; i < numm.Item2; i++)
+                    //for (int i = 0; i < MaxWorkingCount; i++)
+                    //{
+                    double dTSum = 0;
+                    int nRange = -nSiAvgOffsetRange;
+                    int nStep = nSiAvgOffsetStep;
+                    int nNum = (int)Math.Abs((((double)nRange * 2.0) / (double)nStep));
+
+                    double dWavelength = m_DM.m_LayerData[nDataMinLayerIdx].wavelength[i];
+                    var PPP = new double[nLayerCount];
+                    int nLastRowIndex = nLayerCount - 1;
+
+                    PP.CopyTo(PPP, 0);
+
+                    double dSiThickness = ConstValue.SI_INIT_THICKNESS;
+                    var parts = System.Collections.Concurrent.Partitioner.Create(0, nNum);
+                    //Parallel.ForEach(parts, (num, state) =>
+                    for (int n = 0; n < nNum; n++)
                     {
-                        double dTSum = 0;
-                        int nRange = -nSiAvgOffsetRange;
-                        int nStep = nSiAvgOffsetStep;
-                        int nNum = (int)Math.Abs((((double)nRange * 2.0) / (double)nStep));
+                        double dCalcT = 0.0;
+                        PPP[nLastRowIndex] = dSiThickness + (double)nRange;
 
-                        double dWavelength = m_DM.m_LayerData[nDataMinLayerIdx].wavelength[i];
-                        var PPP = new double[nLayerCount];
-                        int nLastRowIndex = nLayerCount-1;
+                        dCalcT = CalcTransmittance(nPointIdx, arrNKIndexes[i], dWavelength, PPP);
+                        dTSum += dCalcT;
 
-                        PP.CopyTo(PPP, 0);
+                        nRange += nStep;
+                    }//);
+                    double dTAvg = dTSum / (double)nNum;
 
-                        double dSiThickness = ConstValue.SI_INIT_THICKNESS;
-
-                        for (int n = 0; n < nNum; n++)
-                        {
-                            double dCalcT = 0.0;
-                            PPP[nLastRowIndex] = dSiThickness + (double)nRange;
-
-                            dCalcT = CalcTransmittance(nPointIdx, arrNKIndexes[i], dWavelength, PPP);
-                            dTSum += dCalcT;
-
-                            nRange += nStep;
-                        }
-                        double dTAvg = dTSum / (double)nNum;
-
-                        if (dTAvg < 0.0 || double.IsNaN(dTAvg))
-                        {
-                            dTAvg = 0.0;
-                        }
-
-                        m_DM.m_RawData[nPointIdx].Transmittance[i] = dTAvg;
+                    if (dTAvg < 0.0 || double.IsNaN(dTAvg))
+                    {
+                        dTAvg = 0.0;
                     }
-                });
+
+                    m_DM.m_RawData[nPointIdx].Transmittance[i] = dTAvg;
+                }
             });
-            task2.Start();
-            task2.Wait();
+
+            // });
+            sw.Stop();
+            Debug.WriteLine("task2 >> " + sw.ElapsedMilliseconds.ToString());
+            //});
+            //task2.Start();
+            //task2.Wait();
         }
         // CalcThickness -> 투과율 출력 포함 -> 투과울 계산 지원을 안하는 것이 확정 된다면 부분 삭제 
         public bool CalcThickness(int nPointIndex, double dWLStart, double dWLEnd, int nNum_Iteration, double dEigenValue, ref List<double> GoFs, ref List<double> Thickness, ref long lCalcTime, ref int nMaxGoFInit)

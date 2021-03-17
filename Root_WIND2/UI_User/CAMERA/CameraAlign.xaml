@@ -7,7 +7,7 @@
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
-             d:DesignHeight="800" d:DesignWidth="1300">
+             d:DesignHeight="1000" d:DesignWidth="1600">
     <UserControl.Resources>
         <Style x:Key="button_selectmode" TargetType="Button">
             <Setter Property="Background" Value="#333366"/>
@@ -53,21 +53,86 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <StackPanel Background="{StaticResource main_view_background}" Orientation="Horizontal">
+    <Grid  
+        Background="{StaticResource main_view_background}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="400"/>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
         <GroupBox Header="Align Camera Viewer" 
                   Margin="4"
+                  DataContext="{Binding ImageViewerVM}"
                   Width="{Binding ActualHeight, RelativeSource={RelativeSource self}}"
                   Style="{StaticResource main_view_groupbox}">
-            <tools:RootViewer DataContext="{Binding ImageViewerVM}" Margin="4"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="1"  Orientation="Horizontal">
+                    <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <CheckBox Content="Box" IsChecked="{Binding IsBoxChecked, Mode=TwoWay}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Rular" IsChecked="{Binding IsRularChecked, Mode=TwoWay}" IsEnabled="False" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <Button Content="Clear" Command="{Binding btnToolClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                </StackPanel>
+                <Grid Grid.Row="1" >
+                    <tools:RootViewer  Margin="4"/>
+                </Grid>
+            </Grid>
         </GroupBox>
-        <Grid Width="300">
+        <Grid Grid.Column="2"
+              Width="400"
+              HorizontalAlignment="Left">
             <Grid.RowDefinitions>
-                <RowDefinition  Height="200"/>
-                <RowDefinition />
+                <RowDefinition  Height="160"/>
+                <RowDefinition  Height="240"/>
+                <RowDefinition  Height="*"/>
             </Grid.RowDefinitions>
-            
-            <GroupBox Header="Motion Controller"
-                        Style="{StaticResource main_view_groupbox}" Margin="4">
+            <GroupBox Grid.Row="0"
+                      Header="Align Information"
+                      Style="{StaticResource main_view_groupbox}" Margin="4">
+                <StackPanel Grid.Row="1"
+                                Margin="0, 15, 0, 0"
+                                Orientation="Vertical">
+                    <Grid Height="30">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="90"/>
+                            <ColumnDefinition Width="90"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Current Axis Pos" IsEnabled="False" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        <TextBox Grid.Column="1" Margin="4"/>
+                        <TextBox Grid.Column="2" Margin="4"/>
+
+                    </Grid>
+                    <Grid Height="30">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="1st Axis Position" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        <TextBox Grid.Column="1" Margin="4"/>
+                        <Button Grid.Column="2" Content="SET" Command="{Binding btnSetFirstAxisPositionCommond}" Style="{StaticResource groupbox_griditem_button}"/>
+                    </Grid>
+                    <Grid Height="30">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="2nd Axis Position" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        <TextBox Grid.Column="1" Margin="4"/>
+                        <Button Grid.Column="2" Content="SET" Command="{Binding btnSetSecondAxisPositionCommond}" Style="{StaticResource groupbox_griditem_button}"/>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Row="1"
+                      Header="Motion Controller"
+                      Style="{StaticResource main_view_groupbox}" Margin="4">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -148,7 +213,28 @@
                 </Grid>
             </GroupBox>
         </Grid>
-    </StackPanel>
-
-        
+        <GroupBox Header="Feature Item List"  Grid.Column="1" Style="{StaticResource main_view_groupbox}" Margin="4">
+            <Grid >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="80"/>
+                </Grid.RowDefinitions>
+                <ListBox Grid.Row="0" 
+                         ItemsSource="{Binding FeatureItemList}"
+                         SelectedIndex="{Binding SelectedFeatureItem}"
+                         Background="Transparent">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Vertical" HorizontalAlignment="Center"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
+                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                    <Button Content="Add" Command="{Binding btnFeatureAddCommand}" Width="120" Style="{StaticResource groupbox_button}"/>
+                    <Button Content="Set" Width="120" Style="{StaticResource groupbox_button}"/>
+                    <Button Content="Clear" Width="120" Style="{StaticResource groupbox_button}"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+    </Grid>
 </UserControl>

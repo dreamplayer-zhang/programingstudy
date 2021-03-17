@@ -203,7 +203,7 @@ namespace Root_AOP01_Inspection
 					rectInfo = new TRect(Brushes.Red, 4, 1);
 					break;
 				case ColorType.MapData:
-					rectInfo = new TRect(Brushes.LimeGreen, 1, 1);
+					rectInfo = new TRect(Brushes.LimeGreen, 4, 1);
 					break;
 				case ColorType.Teaching:
 					rectInfo = new TRect(Brushes.Blue, 1, 1);

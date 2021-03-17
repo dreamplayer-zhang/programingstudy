@@ -382,7 +382,7 @@ namespace RootTools_Vision
                         );
                 }
             }
-            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), this.currentWorkplace)); // 나중에 ProcessDefect쪽 EVENT로...
         }
 
         public void CreateGoldenImage()

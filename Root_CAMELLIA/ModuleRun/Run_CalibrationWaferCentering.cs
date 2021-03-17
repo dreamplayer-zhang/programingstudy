@@ -33,27 +33,6 @@ namespace Root_CAMELLIA.Module
         public bool m_useCal = true;
         public bool m_useCentering = true;
 
-        List<double> m_aLightPower = new List<double>();
-        LightSet m_lightSet = null;
-
-        void RunTreeLight(Tree tree, bool bVisible, bool bReadOnly)
-        {
-            while (m_aLightPower.Count < m_lightSet.m_aLight.Count)
-                m_aLightPower.Add(0);
-            for (int n = 0; n < m_aLightPower.Count; n++)
-            {
-                m_aLightPower[n] = tree.Set(m_aLightPower[n], m_aLightPower[n], m_lightSet.m_aLight[n].m_sName, "Light Power (0 ~ 100 %%)", bVisible, bReadOnly);
-            }
-        }
-
-        public void SetLight(bool bOn)
-        {
-            for (int n = 0; n < m_aLightPower.Count; n++)
-            {
-                m_lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
-            }
-        }
-
         public Run_CalibrationWaferCentering(Module_Camellia module)
         {
             m_module = module;
@@ -102,8 +81,13 @@ namespace Root_CAMELLIA.Module
             Axis axisZ = m_module.p_axisZ;
             string strVRSImageDir = "D:\\";
             string strVRSImageFullPath = "";
-            StopWatch sw = new StopWatch();
-            sw.Start();
+
+
+            if (m_module.LifterDown() != "OK")
+            {
+                return p_sInfo;
+            }
+
             if (m_useCal)
             {
                 m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
@@ -112,14 +96,14 @@ namespace Root_CAMELLIA.Module
                     Met.SettingData setting = m_SettingDataWithErrorCode.Item1;
                     if (m_useCentering)
                     {
-                        if (m_DataManager.m_calibration.Run(m_InitialCal) != "OK")
+                        if (m_DataManager.m_calibration.Run(m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, m_InitialCal) != "OK")
                         {
                             return "Calibration Error";
                         }
                     }
                     else
                     {
-                        App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal);
+                        App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime);
                     }
 
                 }
@@ -129,18 +113,26 @@ namespace Root_CAMELLIA.Module
                 return "OK";
 
             m_DataManager.m_waferCentering.FindEdgeInit();
-            SetLight(true);
+
+            m_module.SetLight(true);
 
             Camera_Basler VRS = m_module.p_CamVRS;
             ImageData img = VRS.p_ImageViewer.p_ImageData;
 
-
-            if (m_module.LifterDown() != "OK")
+            StopWatch sw = new StopWatch();
+            if (VRS.p_CamInfo._OpenStatus == false) VRS.Connect();
+            while (VRS.p_CamInfo._OpenStatus == false)
             {
-                return p_sInfo;
+                if (sw.ElapsedMilliseconds > 15000)
+                {
+                    sw.Stop();
+                    return "Navigation Camera Not Connected";
+                }
             }
+            sw.Stop();
 
-            m_module.VaccumOnOff(true);
+
+            //m_module.VaccumOnOff(true);
 
 
 
@@ -241,7 +233,7 @@ namespace Root_CAMELLIA.Module
                 }
             }
 
-            SetLight(false);
+            m_module.SetLight(false);
             sw.Stop();
             System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
 

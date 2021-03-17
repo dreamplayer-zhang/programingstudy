@@ -95,7 +95,6 @@ namespace Root_VEGA_P.Engineer
         #endregion
 
         #region XGem
-        //bool m_bUseXGem = false;
         bool _bUseXGem = false;
         public bool p_bUseXGem
         {

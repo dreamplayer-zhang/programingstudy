@@ -74,12 +74,12 @@
                             <Grid Grid.Column="0">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="3.5*"/>
-                                    <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="3*"/>
-                                    <RowDefinition Height="1.4*"/>
-                                    <RowDefinition Height="1.4*"/>
-                                    <RowDefinition Height="1.4*"/>
-                                    <RowDefinition Height="5*"/>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="6*"/>
                                 </Grid.RowDefinitions>
                                 <GroupBox Grid.Row="0" Header="Option">
                                     <Grid Margin="5">
@@ -151,19 +151,19 @@
 												<RowDefinition/>
 												<RowDefinition/>
 											<RowDefinition/>
+											<!--<RowDefinition/>
 											<RowDefinition/>
 											<RowDefinition/>
-											<RowDefinition/>
-											<RowDefinition/>
+											<RowDefinition/>-->
 										</Grid.RowDefinitions>
 											<TextBlock FontSize="9" Text="Birght Inspection" Style="{StaticResource BasicTb}" Grid.Row="0"/>
 											<!--<TextBlock FontSize="12" Text="Pit Level" Style="{StaticResource BasicTb}" Grid.Row="3"/>-->
 											<TextBlock FontSize="9" Text="GV" Style="{StaticResource BasicTb}" Grid.Row="1"/>
 										<TextBlock FontSize="9" Text="Size" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-										<TextBlock FontSize="9" Text="Inspection Offset X Left" Style="{StaticResource BasicTb}" Grid.Row="3"/>
+										<!--<TextBlock FontSize="9" Text="Inspection Offset X Left" Style="{StaticResource BasicTb}" Grid.Row="3"/>
 										<TextBlock FontSize="9" Text="Inspection Offset X Right" Style="{StaticResource BasicTb}" Grid.Row="4"/>
 										<TextBlock FontSize="9" Text="Inspection Offset Y" Style="{StaticResource BasicTb}" Grid.Row="5"/>
-										<TextBlock FontSize="9" Text="Outmap" Style="{StaticResource BasicTb}" Grid.Row="6"/>
+										<TextBlock FontSize="9" Text="Outmap" Style="{StaticResource BasicTb}" Grid.Row="6"/>-->
 										<ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
                                                       FontSize="9" Width="85"
 															  IsChecked="{Binding AbsoluteGV}"/>
@@ -171,7 +171,7 @@
 														 Text="{Binding SurfaceGV}"/>
 										<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="2" 
 														 Text="{Binding SurfaceSize}"/>
-										<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="3" 
+										<!--<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="3" 
 														 Text="{Binding InspectionOffsetX_Left}"/>
 										<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="4" 
 														 Text="{Binding InspectionOffsetX_Right}"/>
@@ -182,7 +182,7 @@
 														 Text="{Binding BlockSizeWidth}"/>
 											<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="5" 
 														 Text="{Binding BlockSizeHeight}"/>
-										</StackPanel>
+										</StackPanel>-->
 										<!--<TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="3" 
 														 Text="{Binding PitLevel}"/>-->
 										<!--<TextBlock FontSize="12" Text="Discolor Spe(mm)" Style="{StaticResource BasicTb}" Grid.Row="0"/>
@@ -413,14 +413,14 @@
                                             <RowDefinition/>
                                         </Grid.RowDefinitions>
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0" Grid.ColumnSpan="2" Margin="10,5,10,4"/>
-                                        <TextBlock FontSize="12" Text="Center" Style="{StaticResource BasicTb}" Grid.Row="1" Grid.ColumnSpan="2" Margin="10,5,10,4"/>
+                                        <TextBlock FontSize="12" Text="Shift" Style="{StaticResource BasicTb}" Grid.Row="1" Grid.ColumnSpan="2" Margin="10,5,10,4"/>
                                         <TextBlock FontSize="12" Text="Angle" Style="{StaticResource BasicTb}" Grid.Row="2" Grid.ColumnSpan="2" Margin="10,5,10,4"/>
                                         <TextBlock FontWeight="Bold" FontSize="12" 
                                                    Text="{Binding p_mainVision.p_bPellicleShiftPass, Converter={StaticResource BooleanToPassFailString}}" 
                                                    Foreground="{Binding p_mainVision.p_bPellicleShiftPass, Converter={StaticResource BooleanToPassFailColor}}" 
                                                    Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="0" Margin="10,5,10,4" />
-                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPellicleShiftDistance}" Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="1" Margin="10,5,10,4" />
-                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPellicleShiftAngle}" Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="2" Margin="10,5,10,4" />
+                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPellicleShiftDistance, StringFormat={}\{0:n4\} mm}" Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="1" Margin="10,5,10,4" />
+                                        <TextBlock FontSize="12" Text="{Binding p_mainVision.p_dPellicleShiftAngle, StringFormat={}\{0:n4\} º}" Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="2" Margin="10,5,10,4" />
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Header="Barcode Scratch" Grid.Row="4">

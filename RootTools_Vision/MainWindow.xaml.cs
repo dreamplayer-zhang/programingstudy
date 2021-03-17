@@ -21,8 +21,9 @@ using System.Drawing;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using RootTools.Database;
 
-namespace RootTools_Vision
+namespace RootTools_Vision  
 {
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리
@@ -31,51 +32,15 @@ namespace RootTools_Vision
 
     public partial class MainWindow : Window
     {
-        CloneImageViewer_ViewModel imageViewerVM = new CloneImageViewer_ViewModel();
-        public CloneImageViewer_ViewModel ImageViewerVM
-        {
-            get => this.imageViewerVM;
-            set => this.imageViewerVM = value;
-        }
+
 
         //ImageData imageData;
         //InspectionManager inspectionManager;
         public MainWindow()
         {
             InitializeComponent();
-            viewer.DataContext = ImageViewerVM;
+
+            DataContext = new MainWindow_ViewModel();
         }
-
-        bool isServer = false;
-
-        private ClonableWorkFactory client = new ClonableWorkFactory();
-        private ServerWorkFactory server = new ServerWorkFactory();
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.isServer)
-                server.RemoteStart();
-            else
-                client.RemoteStart();
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            if (this.isServer)
-                server.WriteTest();
-            else
-                client.WriteTest();
-        }
-
-        private void Button_Server(object sender, RoutedEventArgs e)
-        {
-            this.isServer = true;
-        }
-
-        private void Button_Client(object sender, RoutedEventArgs e)
-        {
-            this.isServer = false;
-        }
-
     }
 }

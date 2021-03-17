@@ -1,4 +1,5 @@
-﻿using Met = Root_CAMELLIA.LibSR_Met;
+﻿
+using Met = Root_CAMELLIA.LibSR_Met;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,6 +14,7 @@ namespace Root_CAMELLIA
 {
     public class Calibration
     {
+
         public bool CalDone { get; set; } = false;
         public bool InItCalDone { get; set; } = false;
         public string ErrorString { get; set; } = "OK";
@@ -21,7 +23,7 @@ namespace Root_CAMELLIA
            
         }
 
-        public string Run(bool bInitialCal, bool bUseThread = true)
+        public string Run(int VISIntegrationTime, int NIRIntegrationTime, bool bInitialCal, bool bUseThread = true)
         {
             if (bInitialCal)
             {
@@ -38,12 +40,13 @@ namespace Root_CAMELLIA
                 if (bUseThread)
                 {
                     ThreadPool.QueueUserWorkItem(o => RunThreadPool(m_SettingDataWithErrorCode.Item1.nBGIntTime_VIS, m_SettingDataWithErrorCode.Item1.nBGIntTime_NIR, m_SettingDataWithErrorCode.Item1.nAverage_VIS, 
-                        m_SettingDataWithErrorCode.Item1.nAverage_NIR, bInitialCal));
+                        m_SettingDataWithErrorCode.Item1.nAverage_NIR, VISIntegrationTime, NIRIntegrationTime, bInitialCal));
                 }
                 else
                 {
+                      
                     App.m_nanoView.Calibration(m_SettingDataWithErrorCode.Item1.nBGIntTime_VIS, m_SettingDataWithErrorCode.Item1.nBGIntTime_NIR, m_SettingDataWithErrorCode.Item1.nAverage_VIS,
-                        m_SettingDataWithErrorCode.Item1.nAverage_NIR, bInitialCal);
+                        m_SettingDataWithErrorCode.Item1.nAverage_NIR, bInitialCal, VISIntegrationTime, NIRIntegrationTime);
                 }
 
             }
@@ -54,9 +57,9 @@ namespace Root_CAMELLIA
             return "OK";
         }
 
-        public void RunThreadPool(int nBGIntTime_VIS, int nBGIntTime_NIR, int nAverage_VIS, int nAverage_NIR, bool bInitialCal)
+        public void RunThreadPool(int nBGIntTime_VIS, int nBGIntTime_NIR, int nAverage_VIS, int nAverage_NIR, int VISIntegrationTime, int NIRIntegrationTime, bool bInitialCal)
         {
-            if(App.m_nanoView.Calibration(nBGIntTime_VIS, nBGIntTime_NIR, nAverage_VIS, nAverage_NIR, bInitialCal) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+            if(App.m_nanoView.Calibration(nBGIntTime_VIS, nBGIntTime_NIR, nAverage_VIS, nAverage_NIR, bInitialCal, VISIntegrationTime, NIRIntegrationTime) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
             {
                 if (bInitialCal)
                 {

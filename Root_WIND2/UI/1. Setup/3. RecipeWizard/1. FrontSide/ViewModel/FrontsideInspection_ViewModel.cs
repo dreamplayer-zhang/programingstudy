@@ -78,9 +78,9 @@ namespace Root_WIND2
 
             if(GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
             {
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().PositionDone += PositionDone_Callback;
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionDone += InspectionDone_Callback;
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().ProcessDefectDone += ProcessDefectDone_Callback;
+                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().PositionDone += PositionDone_Callback;
+                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionDone += InspectionDone_Callback;
+                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().ProcessDefectDone += ProcessDefectDone_Callback;
             }
         }
 
@@ -120,7 +120,7 @@ namespace Root_WIND2
 
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                DrawRectDefect(rectList, textList, args.reDraw);
+                DrawRectDefect(rectList, textList, false);
             }));
         }
 

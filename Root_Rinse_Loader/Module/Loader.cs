@@ -84,6 +84,7 @@ namespace Root_Rinse_Loader.Module
 
         double m_secVac = 2;
         double m_secBlow = 0.5;
+        double m_secRollerStop = 1;
         public string RunVacuum(bool bOn)
         {
             p_bVacuum = bOn;
@@ -177,6 +178,7 @@ namespace Root_Rinse_Loader.Module
             m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum Sensor Wait (sec)");
             m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
             m_nShake = tree.Set(m_nShake, m_nShake, "Shake", "Shake Up Count");
+            m_secRollerStop = tree.Set(m_secRollerStop, m_secRollerStop, "Roller Stop", "Roller Stop Wait (sec)");
             RunTreePickerShake(tree.GetTree("Shake Delay", true, m_nShake > 0), m_nShake > 0); 
         }
 
@@ -278,6 +280,8 @@ namespace Root_Rinse_Loader.Module
             {
                 m_rinse.RunBuzzer(RinseL.eBuzzer.Finish);
                 EQ.p_eState = EQ.eState.Ready;
+                Thread.Sleep((int)(1000 * m_secRollerStop));
+                if (Run(m_roller.RunRotate(false))) return p_sInfo;
                 return "OK";
             }
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack"; 

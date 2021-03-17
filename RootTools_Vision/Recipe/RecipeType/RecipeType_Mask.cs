@@ -34,7 +34,7 @@ namespace RootTools_Vision
             get => pointLines;
             set
             {
-                area = 0;
+                Area = 0;
                 pointLines = new List<RecipeType_PointLine>();
                 boundingBox = new CRect();
 
@@ -42,6 +42,7 @@ namespace RootTools_Vision
                 int minY = int.MaxValue;
                 int maxX = int.MinValue;
                 int maxY = int.MinValue;
+
                 foreach (RecipeType_PointLine pl in value)
                 {
                     pointLines.Add(new RecipeType_PointLine(pl.StartPoint, pl.Length));
@@ -51,7 +52,7 @@ namespace RootTools_Vision
                     maxX = maxX < pl.StartPoint.X + pl.Length ? pl.StartPoint.X + pl.Length : maxX;
                     maxY = maxY < pl.StartPoint.Y ? pl.StartPoint.Y : maxY;
 
-                    area += pl.Length;
+                    Area += pl.Length;
                 }
 
                 boundingBox.Left = minX;
@@ -93,7 +94,7 @@ namespace RootTools_Vision
 
         public RecipeType_Mask(List<RecipeType_PointLine> _pointLines)
         {
-            area = 0;
+            Area = 0;
             pointLines = new List<RecipeType_PointLine>();
             boundingBox = new CRect();
 
@@ -110,7 +111,7 @@ namespace RootTools_Vision
                 maxX = maxX < pl.StartPoint.X + pl.Length ? pl.StartPoint.X + pl.Length : maxX;
                 maxY = maxY < pl.StartPoint.Y ? pl.StartPoint.Y : maxY;
 
-                area += pl.Length;
+                Area += pl.Length;
             }
 
             boundingBox.Left = minX;
@@ -123,7 +124,7 @@ namespace RootTools_Vision
         {
             this.colorIndex = _colorIndex;
 
-            area = 0;
+            Area = 0;
             pointLines = new List<RecipeType_PointLine>();
             boundingBox = new CRect();
 
@@ -140,7 +141,7 @@ namespace RootTools_Vision
                 maxX = maxX < pl.StartPt.X + pl.Width ? pl.StartPt.X + pl.Width : maxX;
                 maxY = maxY < pl.StartPt.Y ? pl.StartPt.Y : maxY;
 
-                area += pl.Width;
+                Area += pl.Width;
             }
 
             boundingBox.Left = minX;

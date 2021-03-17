@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,6 +34,24 @@ namespace RootTools_Vision
             get => this.sizeY;
             set => this.sizeY = value;
         }
+
+        //public WorkplaceBundle() { }        
+
+        //public WorkplaceBundle(SerializationInfo info, StreamingContext context)
+        //{
+        //    WorkplaceBundle wb = (WorkplaceBundle)info.GetValue("workplaceList", typeof(WorkplaceBundle));
+        //    this.sizeX = wb.sizeX;
+        //    this.sizeY = wb.sizeY;
+        //    foreach(Workplace wp in wb)
+        //    {
+        //        this.Add(wp);
+        //    }
+        //}
+
+        //public void GetObjectData(SerializationInfo info, StreamingContext context)
+        //{
+        //    info.AddValue("workplaceList", this);
+        //}
         #endregion
 
         /// <summary>
@@ -167,6 +186,7 @@ namespace RootTools_Vision
 
             return bundle;
         }
+
 
     }
 }

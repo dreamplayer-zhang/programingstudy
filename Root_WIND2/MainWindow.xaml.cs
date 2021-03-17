@@ -47,12 +47,14 @@ namespace Root_WIND2
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+
             ThreadStop();
 
             //GlobalObjects.Instance.Get<InspectionManagerFrontside>().Exit();
             //GlobalObjects.Instance.Get<InspectionManagerBackside>().Exit();
 
             GlobalObjects.Instance.Clear();
+            Application.Current.Shutdown();
             //GlobalObjects.Instance.Get<InspectionManagerEdge>().Exit();
             //GlobalObjects.Instance.Get<InspectionManagerEBR>().Exit();
 
@@ -250,9 +252,6 @@ namespace Root_WIND2
                 RecipeBack recipeBack = GlobalObjects.Instance.Register<RecipeBack>();
                 RecipeEdge recipeEdge = GlobalObjects.Instance.Register<RecipeEdge>();
                 RecipeEBR recipeEBR = GlobalObjects.Instance.Register<RecipeEBR>();
-
-                // Klarf
-                KlarfData_Lot klarfData_lot = GlobalObjects.Instance.Register<KlarfData_Lot>();
 
 
                 if(frontImage.GetPtr() == IntPtr.Zero)

@@ -199,7 +199,6 @@ namespace Root_WIND2.Module
             m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
             m_memoryMain = m_memoryGroup.CreateMemory("Layer", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
         }
-
         #endregion
 
         #region Axis
@@ -380,10 +379,7 @@ namespace Root_WIND2.Module
         InfoWafer _infoWafer = null;
         public InfoWafer p_infoWafer
         {
-            get
-            {
-                return _infoWafer;
-            }
+            get { return _infoWafer; }
             set
             {
                 m_sInfoWafer = (value == null) ? "" : value.p_id;

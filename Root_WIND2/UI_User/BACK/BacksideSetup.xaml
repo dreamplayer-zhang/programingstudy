@@ -163,7 +163,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="DownSampling [1/n]"  Style="{StaticResource group_box_item_name_text}"/>
-                        <TextBox Grid.Column="1" Text="{Binding DownSamplingRatio}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="1" Text="{Binding DownSamplingRatio}" HorizontalContentAlignment="Center"/>
                     </Grid>
                     <Grid Margin="0, 16, 0, 10">
                         <Grid.ColumnDefinitions>
