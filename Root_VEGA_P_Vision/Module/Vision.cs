@@ -1,8 +1,11 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.Memory;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 
 namespace Root_VEGA_P_Vision.Module
@@ -12,10 +15,10 @@ namespace Root_VEGA_P_Vision.Module
         #region ToolBox
         public override void GetTools(bool bInit)
         {
-            m_stage.GetTools(m_toolBox, bInit);
-            m_mainOptic.GetTools(m_toolBox, bInit);
-            m_sideOptic.GetTools(m_toolBox, bInit); 
-            m_remote.GetTools(bInit); 
+            m_stage.GetTools(m_toolBox, bInit); 
+            m_mainOptic.GetTools(m_toolBox, bInit); //TDI
+            m_sideOptic.GetTools(m_toolBox, bInit);  //
+            m_remote.GetTools(bInit);
         }
         #endregion
 
@@ -90,10 +93,13 @@ namespace Root_VEGA_P_Vision.Module
         public class MainOptic : NotifyProperty
         {
             public Axis m_axisZ;
+            MemoryPool memoryPool;
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
                 m_vision.p_sInfo = toolBox.Get(ref m_axisZ, m_vision, "Main Optic AxisZ");
+                m_vision.p_sInfo = toolBox.Get(ref memoryPool, m_vision, "Main Optic Memory", 1);
+
                 if (bInit)
                 {
 
@@ -132,11 +138,17 @@ namespace Root_VEGA_P_Vision.Module
         #region SideOptic
         public class SideOptic : NotifyProperty
         {
+            public enum eSide
+            {
+                Top,Left,Right,Bottom
+            }
             public Axis m_axisZ;
+
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
                 m_vision.p_sInfo = toolBox.Get(ref m_axisZ, m_vision, "Side Optic AxisZ");
+
                 if (bInit)
                 {
 
@@ -145,9 +157,11 @@ namespace Root_VEGA_P_Vision.Module
 
             public void InitMemorys()
             {
-                //m_memoryGroup = m_memoryPool.GetGroup(p_id);
-                //m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
-                //m_memoryMain = m_memoryGroup.CreateMemory("Layer", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+                //memoryGroup = memoryPool.GetGroup(m_vision.p_id);
+                //memoryTop = memoryGroup.CreateMemory(eSide.Top.ToString(), 1, 1, 1000, 1000);
+                //memoryLeft = memoryGroup.CreateMemory(eSide.Left.ToString(), 1, 1, 1000, 1000);
+                //memoryRight = memoryGroup.CreateMemory(eSide.Right.ToString(), 1, 1, 1000, 1000);
+                //memoryBottom = memoryGroup.CreateMemory(eSide.Bottom.ToString(), 1, 1, 1000, 1000);
             }
 
             double m_pulsePermm = 10000;
@@ -298,6 +312,45 @@ namespace Root_VEGA_P_Vision.Module
             base.RunTree(tree);
             m_stage.RunTree(tree.GetTree("Stage")); 
         }
+        #endregion
+
+        #region Grab Mode
+        int m_lGrabMode = 0;
+        public ObservableCollection<GrabMode> m_aGrabMode = new ObservableCollection<GrabMode>();
+        public List<string> p_asGrabMode
+        {
+            get
+            {
+                List<string> asGrabMode = new List<string>();
+                foreach (GrabMode grabMode in m_aGrabMode) 
+                    asGrabMode.Add(grabMode.p_sName);
+                return asGrabMode;
+            }
+        }
+
+        public GrabMode GetGrabMode(string sGrabMode)
+        {
+            foreach (GrabMode grabMode in m_aGrabMode)
+                if (sGrabMode == grabMode.p_sName) return grabMode;
+          
+            return null;
+        }
+
+        void RunTreeGrabMode(Tree tree)
+        {
+            m_lGrabMode = tree.Set(m_lGrabMode, m_lGrabMode, "Count", "Grab Mode Count");
+            while (m_aGrabMode.Count < m_lGrabMode)
+            {
+                string id = "Mode." + m_aGrabMode.Count.ToString("00");
+                //GrabMode grabMode = new GrabMode(id, lightSet, memoryPool);
+                //m_aGrabMode.Add(grabMode);
+            }
+            while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
+            foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTreeName(tree.GetTree("Name", false));
+            foreach (GrabMode grabMode in m_aGrabMode)
+                grabMode.RunTree(tree.GetTree(grabMode.p_sName, false), true, false);
+        }
+
         #endregion
 
         public Vision(string id, IEngineer engineer, eRemote eRemote)
