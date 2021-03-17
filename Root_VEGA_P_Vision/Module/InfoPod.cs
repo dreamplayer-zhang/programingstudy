@@ -1,14 +1,10 @@
 ﻿using RootTools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Root_VEGA_P_Vision.Module
 {
     public class InfoPod : NotifyProperty
     {
+        #region Property
         public enum ePod
         {
             EOP_Door,
@@ -28,10 +24,29 @@ namespace Root_VEGA_P_Vision.Module
                 OnPropertyChanged();
             }
         }
+        #endregion
 
+        #region Registry
+        Registry m_reg; 
+        public void WriteReg()
+        {
+            m_reg.Write("p_ePod", (int)p_ePod);
+            m_reg.Write("p_bTurn", p_bTurn); 
+        }
+
+        public void ReadReg()
+        {
+            p_ePod = (ePod)m_reg.Read("p_ePod", (int)p_ePod);
+            p_bTurn = m_reg.Read("p_bTurn", p_bTurn); 
+        }
+        #endregion
+
+        public string p_id { get; set; }
         public InfoPod(ePod ePod)
         {
-            p_ePod = ePod; 
+            p_ePod = ePod;
+            p_id = ePod.ToString();
+            m_reg = new Registry("InfoPod." + p_id); 
         }
     }
 }

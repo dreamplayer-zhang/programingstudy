@@ -136,7 +136,7 @@ namespace Root_VEGA_P_Vision.Module
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
-                m_vision.p_sInfo = toolBox.Get(ref m_axisZ, m_vision, "Main Optic AxisZ");
+                m_vision.p_sInfo = toolBox.Get(ref m_axisZ, m_vision, "Side Optic AxisZ");
                 if (bInit)
                 {
 
@@ -170,6 +170,94 @@ namespace Root_VEGA_P_Vision.Module
             }
         }
         SideOptic m_sideOptic;
+        #endregion
+
+        #region InfoPod
+        InfoPod _infoPod = null;
+        public InfoPod p_infoPod
+        {
+            get { return _infoPod; }
+            set
+            {
+                int nPod = (value != null) ? (int)value.p_ePod : -1; 
+                _infoPod = value;
+                m_reg.Write("InfoPod", nPod);
+                value.WriteReg(); 
+                OnPropertyChanged();
+            }
+        }
+
+        Registry m_reg = null;
+        public void ReadPod_Registry()
+        {
+            int nPod = m_reg.Read("InfoPod", -1);
+            p_infoPod = new InfoPod((InfoPod.ePod)nPod);
+            p_infoPod.ReadReg();
+        }
+        #endregion
+
+        #region IRTRChild
+        public string IsGetOK()
+        {
+            if (p_eState != eState.Ready) return p_id + " eState not Ready"; 
+            return (p_infoPod != null) ? "OK" : p_id + " IsGetOK - Pod not Exist";
+        }
+
+        public string IsPutOK(InfoPod infoPod)
+        {
+            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            switch (infoPod.p_ePod)
+            {
+                case InfoPod.ePod.EOP_Dome:
+                case InfoPod.ePod.EOP_Door:
+                    return p_id + " Invalid Pod Type"; 
+            }
+            return (p_infoPod == null) ? "OK" : p_id + " IsPutOK - Pod Exist";
+        }
+
+        public string BeforeGet()
+        {
+            // Move to Ready Pos ?
+            // Vacuum Off ?
+            return "OK";
+        }
+
+        public string BeforePut(InfoPod infoPod)
+        {
+            // Move to Ready Pos ?
+            // Vacuum Off ?
+            return "OK";
+        }
+
+        public string AfterGet()
+        {
+            // ??
+            return "OK";
+        }
+
+        public string AfterPut()
+        {
+            // ??
+            return "OK";
+        }
+
+        public bool IsPodExist()
+        {
+            return (p_infoPod != null);
+        }
+        #endregion
+
+        #region Teach RTR
+        Buffer.TeachRTR m_teach; 
+        public int GetTeachRTR(InfoPod infoPod)
+        {
+            return m_teach.GetTeach(infoPod);
+        }
+
+        public void RunTreeTeach(Tree tree)
+        {
+            m_teach.RunTree(tree.GetTree(p_id));
+        }
         #endregion
 
         #region override
@@ -214,6 +302,8 @@ namespace Root_VEGA_P_Vision.Module
 
         public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
+            m_reg = new Registry(p_id + "_InfoPod");
+            m_teach = new Buffer.TeachRTR(); 
             m_stage = new Stage(this);
             m_mainOptic = new MainOptic(this);
             m_sideOptic = new SideOptic(this); 

@@ -1,9 +1,5 @@
 ﻿using RootTools.Module;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using RootTools.Trees;
 
 namespace Root_VEGA_P_Vision.Module
 {
@@ -13,12 +9,26 @@ namespace Root_VEGA_P_Vision.Module
 
         ModuleBase.eState p_eState { get; }
 
-        InfoPod GetInfoPod(InfoPod.ePod ePod);
+        InfoPod p_infoPod { get; set; }
+        
+        string IsGetOK();
 
-        void SetInfoPod(InfoPod.ePod ePod, InfoPod infoPod);
+        string IsPutOK(InfoPod infoPod);
+
+        string BeforeGet();
+
+        string BeforePut(InfoPod infoPod);
+
+        string AfterGet();
+
+        string AfterPut();
+
+        bool IsPodExist();
 
         int GetTeachRTR(InfoPod infoPod);
 
-        string IsGetOK(InfoPod.ePod ePod); 
+        void RunTreeTeach(Tree tree);
+
+        void ReadPod_Registry(); 
     }
 }
