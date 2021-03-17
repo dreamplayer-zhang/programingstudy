@@ -45,7 +45,7 @@
                                     CornerRadius="3"
                                     Margin="5"
                                     Background="Gainsboro">
-                                <TextBlock Text="READY" 
+                                <TextBlock Text="{Binding p_ModuleList.p_sNowProgress}" 
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center"
                                            FontWeight="Bold"
@@ -459,16 +459,23 @@
                     </GroupBox>
                 </Grid>
                 <Grid Grid.Column="2">
-                    <StackPanel VerticalAlignment="Top" Margin="0,20">
-                        <!--<Button Content="{Binding p_sNameStartBtn}" Style="{StaticResource SetupPanelBtn}" Command="{Binding cmdStart}" />-->
+                    <StackPanel VerticalAlignment="Top"
+                                Margin="0,20">
                         <Button Content="POD START"
-                                Style="{StaticResource SetupPanelBtn}"/>
+                                Style="{StaticResource SetupPanelBtn}"
+                                Command="{Binding cmdPodStart}" />
                         <Button Content="CASE START"
                                 Style="{StaticResource SetupPanelBtn}"
+                                Command="{Binding cmdCaseStart}" />
+                        <Button Content="RUN STEP"
+                                Style="{StaticResource SetupPanelBtn}"
                                 Click="Button_Click_1" />
-                        <Button Content="RUN STEP" Style="{StaticResource SetupPanelBtn}" Click="Button_Click_1" />
-                        <Button Content="INITIALIZE" Style="{StaticResource SetupPanelBtn}" Command="{Binding cmdInit}"/>
-                        <Button Content="RECOVERY" Style="{StaticResource SetupPanelBtn}" Command="{Binding cmdHome}"/>
+                        <Button Content="INITIALIZE"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Command="{Binding cmdInit}" />
+                        <!--<Button Content="RECOVERY"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Command="{Binding cmdHome}" />-->
                     </StackPanel>
                     <StackPanel VerticalAlignment="Bottom" Margin="0,0">
                         <Button Content="OHT" Style="{StaticResource SetupPanelBtn}" />

@@ -99,6 +99,7 @@ namespace Root_AOP01_Packing
         private Setup_ViewModel m_Setup;
         private Run_ViewModel m_Run;
         #endregion
+
         public IDialogService dialogService;
         AOP01_Engineer m_engineer = new AOP01_Engineer();
 
@@ -117,6 +118,8 @@ namespace Root_AOP01_Packing
             m_engineer.Init("AOP01",dialogService);
             Init_ViewModel();
             Init_UI();
+
+            logViewUI.Init(LogView._logView);
             m_Setup.m_Home.Engineer.Engineer_UI.Init(m_engineer);
 
         }
