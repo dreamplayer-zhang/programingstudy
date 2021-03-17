@@ -182,6 +182,13 @@ namespace Root_VEGA_P_Vision.Module
             {
                 m_vision = vision;
             }
+
+            #region ModuleRun
+            public class Run_SideGrab:ModuleRunBase
+            {
+                
+            }
+            #endregion
         }
         SideOptic m_sideOptic;
         #endregion

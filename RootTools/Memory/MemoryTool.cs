@@ -505,7 +505,6 @@ namespace RootTools.Memory
             m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "Memory Process ID", bVisible && m_bStartProcess);
             m_sProcessFile = tree.SetFile(m_sProcessFile, m_sProcessFile, "exe", "File", "Process File Name", bVisible && m_bStartProcess);
         }
-
         bool bUseServer = false;
         void RunTreeTCPSetup(Tree tree)
         {
