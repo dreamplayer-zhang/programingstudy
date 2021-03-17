@@ -1,12 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RootTools.Module;
+using RootTools.Trees;
 
 namespace Root_VEGA_P_Vision.Module
 {
-    interface IRTRChild
+    public interface IRTRChild
     {
+        string p_id { get; set; }
+
+        ModuleBase.eState p_eState { get; }
+
+        InfoPod p_infoPod { get; set; }
+        
+        string IsGetOK();
+
+        string IsPutOK(InfoPod infoPod);
+
+        string BeforeGet();
+
+        string BeforePut(InfoPod infoPod);
+
+        string AfterGet();
+
+        string AfterPut();
+
+        bool IsPodExist();
+
+        int GetTeachRTR(InfoPod infoPod);
+
+        void RunTreeTeach(Tree tree);
+
+        void ReadPod_Registry(); 
     }
 }
