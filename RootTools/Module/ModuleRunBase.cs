@@ -47,19 +47,14 @@ namespace RootTools.Module
         }
         #endregion
 
-        
-
         private int _nProgress = 0;
         public int p_nProgress
         {
-            get
-            {
-                return _nProgress;
-            }
-            set
-            {
-            SetProperty(ref _nProgress, value);}
+            get { return _nProgress; }
+            set { SetProperty(ref _nProgress, value); }
         }
+
+        public bool m_bRemoteRun = false; 
         public string p_id { get; set; }
         public string m_sModuleRun;
         protected Log m_log;

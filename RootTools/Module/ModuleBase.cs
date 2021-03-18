@@ -18,6 +18,9 @@ namespace RootTools.Module
     public class ModuleBase : NotifyProperty
     {
         #region eState
+        public delegate void dgOnChangeState(eState eState);
+        public event dgOnChangeState OnChangeState;
+
         public enum eState
         {
             Init,
@@ -37,13 +40,8 @@ namespace RootTools.Module
                 _eState = value;
                 EQ.p_bPause = false;
                 OnPropertyChanged();
-                m_remote?.RemoteSend(Remote.eProtocol.State, "State", value.ToString());
+                if (OnChangeState != null) OnChangeState(value); 
             }
-        }
-        public void RemoteChangeState(Remote.Protocol protocol)
-        {
-            if (p_eRemote == protocol.m_eRemote) return;
-            p_eState = GetState(protocol.p_sRun);
         }
 
         string[] m_asState = Enum.GetNames(typeof(eState));
@@ -59,12 +57,9 @@ namespace RootTools.Module
         protected int _nProgress = 0;
         public int p_nProgress
         {
-            get
-            {
-                return _nProgress;
-            }
-            set
-            {
+            get { return _nProgress; }
+            set 
+            { 
                 //if (_nProgress == value) return;
                 _nProgress = value;
                 OnPropertyChanged();
@@ -221,6 +216,7 @@ namespace RootTools.Module
 
         protected virtual void RunThread()
         {
+            if (StateRemote()) return;
             switch (p_eState)
             {
                 case eState.Init:
@@ -230,12 +226,9 @@ namespace RootTools.Module
                 case eState.Home:
                     p_bEnableHome = false;
                     p_sRun = "Stop";
-                    //if (p_eRemote != eRemote.Client)
-                    //{
-                        string sStateHome = StateHome();
-                        if (sStateHome == "OK") p_eState = eState.Ready;
-                        else StopHome();
-                    //}
+                    string sStateHome = StateHome();
+                    if (sStateHome == "OK") p_eState = eState.Ready;
+                    else StopHome();
                     break;
                 case eState.Ready:
                     p_bEnableHome = true;
@@ -266,7 +259,7 @@ namespace RootTools.Module
                     break;
                 case eState.Error:
                     p_bEnableHome = false;
-                    p_sRun = "Reset"; 
+                    p_sRun = "Reset";
                     break;
             }
         }
@@ -419,6 +412,27 @@ namespace RootTools.Module
             }
             return p_sInfo;
         }
+
+        bool StateRemote()
+        {
+            if (m_qModuleRun.Count == 0) return false;
+            ModuleRunBase moduleRun = m_qModuleRun.Peek();
+            if (moduleRun.m_bRemoteRun == false) return false;
+            m_swRun.Restart();
+            m_log.Info("RemoteRun : " + moduleRun.p_id + " Start");
+            try
+            {
+                switch (p_eRemote)
+                {
+                    case eRemote.Client: p_sInfo = m_remote.RemoteSend(moduleRun); break;
+                    default: p_sInfo = moduleRun.Run(); break;
+                }
+            }
+            catch (Exception e) { p_sInfo = "StateRun Exception = " + e.Message; }
+            m_log.Info("RemoteRun : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
+            if (m_qModuleRun.Count > 0) m_qModuleRun.Dequeue();
+            return true; 
+        }
         #endregion
 
         #region RemoteRun
@@ -449,7 +463,6 @@ namespace RootTools.Module
             public enum eProtocol
             {
                 ModuleRun,
-                State,
                 RemoteRun,
 
                 Initial,
@@ -619,7 +632,6 @@ namespace RootTools.Module
                 {
                     switch (protocol.m_eProtocol)
                     {
-                        case eProtocol.State: m_module.RemoteChangeState(protocol); break;
                     }
                 }
             }
@@ -643,7 +655,6 @@ namespace RootTools.Module
                 {
                     switch (protocol.m_eProtocol)
                     {
-                        case eProtocol.State: m_module.RemoteChangeState(protocol); break;
                         case eProtocol.ModuleRun: ServerModuleRun(protocol); break;
 
                         case eProtocol.Initial: InitialModule(protocol); break;
@@ -685,7 +696,7 @@ namespace RootTools.Module
                 }
                 m_memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(protocol.p_sRun));
                 m_treeRoot.m_job = new Job(m_memoryStream, false, m_log);
-                m_treeRoot.p_eMode = Tree.eMode.RegRead;
+                m_treeRoot.p_eMode = Tree.eMode.JobOpen;
                 run.RunTree(m_treeRoot, true);
                 m_treeRoot.m_job.Close();
                 m_module.StartRun(run);
@@ -838,8 +849,6 @@ namespace RootTools.Module
             }
         }
         #endregion
-
-
 
         public string p_id { get; set; }
 
