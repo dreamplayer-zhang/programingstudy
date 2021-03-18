@@ -135,13 +135,14 @@
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="0.4*"/>
-                                            <RowDefinition Height="0.4*"/>
+                                            <RowDefinition Height="0.3*"/>
                                             <RowDefinition/>
                                         </Grid.RowDefinitions>
                                         <GroupBox Header="SR Parameter"
                                                   Grid.Column="1">
                                             <Grid Margin="5,0">
                                                 <Grid.RowDefinitions>
+                                                    <RowDefinition />
                                                     <RowDefinition />
                                                     <RowDefinition />
                                                     <RowDefinition />
@@ -155,7 +156,7 @@
                                                     <TextBlock Text="Alpha1 :"
                                                                Margin="3,0" TextAlignment="Center" VerticalAlignment="Center" />
                                                     <TextBox Width="60" VerticalAlignment="Center"
-                                                             Margin="10,0" Text="{Binding p_pmParameter.p_alpha1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" TextAlignment="Center" />
+                                                             Margin="10,0" Text="{Binding p_pmParameter.p_alpha1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" />
                                                     <CheckBox VerticalAlignment="Center"
                                                               Margin="3,0" HorizontalAlignment="Center" IsChecked="{Binding p_pmParameter.p_isAlpha1, Mode=TwoWay}"/>
                                                     <TextBlock Text="Show Stage Measure Point"
@@ -176,6 +177,16 @@
                                                 <StackPanel Orientation="Horizontal"
                                                             VerticalAlignment="Center"
                                                             Grid.Row="2">
+                                                    <TextBlock Text="Init Intergration Time:"
+                                                               Margin="3,0" TextAlignment="Center" VerticalAlignment="Center" />
+                                                    <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                                    <TextBox Width="40" Margin="3,0,13,0" Text="{Binding p_pmParameter.p_InitVISIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"  VerticalAlignment="Center" TextAlignment="Center"/>
+                                                    <TextBlock Text="NIR"  TextAlignment="Center" VerticalAlignment="Center"/>
+                                                    <TextBox Width="40" Margin="3,0" Text="{Binding p_pmParameter.p_InitNIRIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center"
+                                                            Grid.Row="3">
                                                     <TextBlock Text="BG Intergration Time:"
                                                                Margin="3,0" TextAlignment="Center" VerticalAlignment="Center" />
                                                     <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" />
@@ -185,7 +196,7 @@
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal"
                                                             VerticalAlignment="Center"
-                                                            Grid.Row="3">
+                                                            Grid.Row="4">
                                                     <TextBlock Text="Boxcar :"
                                                                Margin="3,0" VerticalAlignment="Center" TextAlignment="Center" />
                                                     <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" />
@@ -196,7 +207,7 @@
                                                              Margin="10,0" Text="{Binding p_pmParameter.p_NIRBoxcar, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
                                                 </StackPanel>
                                                 <UniformGrid Columns="1"
-                                                             Grid.Row="4">
+                                                             Grid.Row="5">
                                                     <StackPanel Orientation="Horizontal"
                                                                 VerticalAlignment="Center">
                                                         <TextBlock Text="Average :"
@@ -210,7 +221,7 @@
                                                     </StackPanel>
                                                 </UniformGrid>
                                                 <UniformGrid Columns="2"
-                                                             Grid.Row="5">
+                                                             Grid.Row="6">
                                                     <StackPanel Orientation="Horizontal"
                                                                 VerticalAlignment="Center">
                                                         <TextBlock Text="Repeat :"
@@ -295,9 +306,9 @@
                                     Background="#01FFFFFF" Focusable="true">
                                                     <Border BorderBrush="Black" BorderThickness="1" Panel.ZIndex="99">
                                                         <Grid>
-                                                            <Rectangle Width="5" Height="39" Fill="#990000FF" />
+                                                            <Rectangle Width="5" Height="40" Fill="#990000FF" />
                                                             <!--<TextBlock Text="Test" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" />-->
-                                                            <Rectangle Width="39" Height="5" Fill="#990000FF" />
+                                                            <Rectangle Width="40" Height="5" Fill="#990000FF" />
                                                         </Grid>
                                                         <Canvas.Left>
                                                             <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="40">

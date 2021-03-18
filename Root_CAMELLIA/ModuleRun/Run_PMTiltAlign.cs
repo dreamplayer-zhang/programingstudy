@@ -90,7 +90,9 @@ namespace Root_CAMELLIA.Module
             if (VRS.Grab() == "OK")
             {
                 strVRSImageFullPath = string.Format(strVRSImageDir + "PMCameraImageTest.bmp", 0);
-                img.SaveImageSync(strVRSImageFullPath);
+                //img.SaveImageSync(strVRSImageFullPath);
+                Emgu.CV.Mat mat = new Emgu.CV.Mat(new System.Drawing.Size(VRS.GetRoiSize().X, VRS.GetRoiSize().Y), Emgu.CV.CvEnum.DepthType.Cv8U, 3, img.GetPtr(), (int)img.p_Stride * 3);
+                mat.Save(strVRSImageFullPath);
                 //Grab error
             }
             else

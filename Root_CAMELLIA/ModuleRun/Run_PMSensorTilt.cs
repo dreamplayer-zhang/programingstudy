@@ -85,28 +85,28 @@ namespace Root_CAMELLIA.Module
             {
                 setting = m_SettingDataWithErrorCode.Item1;
 
-                //Init Cal
-                if (App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
-                {
-                    m_InitialCal = false;
-                    m_log.Info("[CheckSensorTilt] Init Calbration OK");
+                ////Init Cal
+                //if (App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                //{
+                //    m_InitialCal = false;
+                //    m_log.Info("[CheckSensorTilt] Init Calbration OK");
 
-                }
-                else
-                {
-                    m_log.Info("[CheckSensorTilt] Init Calbration fail");
-                    return "[CheckSensorTilt] Init Calbration fail";
-                }
-                //Sample Cal
-                if (App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
-                {
-                    m_log.Info("[CheckSensorTilt] Sample Calbration OK");
-                }
-                else
-                {
-                    m_log.Info("[CheckSensorTilt] Init Calbration fail");
-                    return "[CheckSensorTilt] Init Calbration fail";
-                }
+                //}
+                //else
+                //{
+                //    m_log.Info("[CheckSensorTilt] Init Calbration fail");
+                //    return "[CheckSensorTilt] Init Calbration fail";
+                //}
+                ////Sample Cal
+                //if (App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                //{
+                //    m_log.Info("[CheckSensorTilt] Sample Calbration OK");
+                //}
+                //else
+                //{
+                //    m_log.Info("[CheckSensorTilt] Init Calbration fail");
+                //    return "[CheckSensorTilt] Init Calbration fail";
+                //}
             }
             else
             {
@@ -117,7 +117,7 @@ namespace Root_CAMELLIA.Module
             object obj;
             for (int n = 0; n < PMDatas.SensorTiltRepeatNum; n++)
             {
-                if (App.m_nanoView.SampleMeasure(0, 0, 0, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, setting.nAverage_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, setting.nAverage_NIR,
+                if (App.m_nanoView.SampleMeasure(0, 0, 0, 
                        m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
                        m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {

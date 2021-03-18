@@ -420,7 +420,7 @@ namespace Root_CAMELLIA
             temp = new ObservableCollection<UIElement>();
             for (int i = 0; i < rd.DataSelectedPoint.Count; i++)
             {
-                ShapeManager dataPoint = new ShapeEllipse(GeneralTools.StageHoleBrush);
+                ShapeManager dataPoint = new ShapeEllipse(GeneralTools.GbHole);
                 ShapeEllipse dataSelectedPoint = dataPoint as ShapeEllipse;
 
                 CCircle circle = new CCircle(rd.DataSelectedPoint[i].x, rd.DataSelectedPoint[i].y, rd.DataSelectedPoint[i].width + 4,
@@ -528,8 +528,18 @@ namespace Root_CAMELLIA
             double y = listRealPos[nMinIndex].y;
             double dX = centerX - x * 10000;
             double dY = centerY - y * 10000;
-            ModuleCamellia.p_axisXY.StartMove(new RPoint(dX, dY));
-            ModuleCamellia.p_axisXY.WaitReady();
+            Thread thread = new Thread(() =>
+            {
+                string str;
+                str = ModuleCamellia.p_axisXY.StartMove(new RPoint(dX, dY));
+                if (str != "OK")
+                {
+                    MessageBox.Show(str);
+                    return;
+                }
+                ModuleCamellia.p_axisXY.WaitReady();
+            });
+            thread.Start();
             //MessageBox.Show(listRealPos[nMinIndex].x.ToString() + " " + listRealPos[nMinIndex].y.ToString());
         }
 
@@ -973,6 +983,21 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Function
+        public void UpdateParameter()
+        {
+            LibSR_Met.DataManager dataManager = LibSR_Met.DataManager.GetInstance();
+            dataManager.m_SettngData.nAverage_NIR = p_pmParameter.p_NIRAverage;
+            dataManager.m_SettngData.nAverage_VIS = p_pmParameter.p_VISAverage;
+            dataManager.m_SettngData.nInitCalIntTime_NIR = p_pmParameter.p_InitNIRIntegrationTime;
+            dataManager.m_SettngData.nInitCalIntTime_VIS = p_pmParameter.p_InitVISIntegrationTime;
+            dataManager.m_SettngData.nBoxcar_NIR = p_pmParameter.p_NIRBoxcar;
+            dataManager.m_SettngData.nBoxcar_VIS = p_pmParameter.p_VISBoxcar;
+            dataManager.m_SettngData.nBGIntTime_NIR = p_pmParameter.p_BGNIRIntegrationTime;
+            dataManager.m_SettngData.nBGIntTime_VIS = p_pmParameter.p_BGVISIntegrationTime;
+            dataManager.m_SettngData.nMeasureIntTime_NIR = p_pmParameter.p_NIRIntegrationTime;
+            dataManager.m_SettngData.nMeasureIntTime_VIS = p_pmParameter.p_VISIntegrationTime;
+            dataManager.m_SettngData.dAlphaFit = p_pmParameter.p_alpha1;
+        }
         private void OnGrabImageUpdate(object sender, EventArgs e)
         {
             dispatcher.Invoke(() =>
@@ -992,6 +1017,9 @@ namespace Root_CAMELLIA
             Thread thread = new Thread(() =>
             {
                 Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+                UpdateParameter();
+                measure.m_isPM = true;
+                measure.m_isAlphaFit = p_pmParameter.p_isAlpha1;
                 measure.Run();
             });
             thread.Start();
@@ -1007,6 +1035,8 @@ namespace Root_CAMELLIA
             Thread thread = new Thread(() =>
             {
                 Run_CalibrationWaferCentering calibration = (Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("CalibrationWaferCentering");
+                UpdateParameter();
+                calibration.m_isPM = true;
                 calibration.m_useCal = true;
                 calibration.m_useCentering = false;
                 calibration.Run();
@@ -1023,7 +1053,9 @@ namespace Root_CAMELLIA
             }
             Thread thread = new Thread(() =>
             {
-                Run_InitCalibration initCalibration = (Run_InitCalibration)ModuleCamellia.CloneModuleRun("InitCalWaferCentering");
+                Run_InitCalibration initCalibration = (Run_InitCalibration)ModuleCamellia.CloneModuleRun("InitCalibration");
+                initCalibration.m_isPM = true;
+                UpdateParameter();
                 initCalibration.Run();
             });
             thread.Start();
@@ -1076,10 +1108,24 @@ namespace Root_CAMELLIA
         public class PM_SR_Parameter : ObservableObject
         {
             #region Property
-            public double p_alpha1 { get; set; } = 1.0;
+
+            double m_alpha1 = 1.0;
+            public double p_alpha1
+            {
+                get
+                {
+                    return m_alpha1;
+                }
+                set
+                {
+                    SetProperty(ref m_alpha1, value);
+                }
+            }
             public bool p_isAlpha1 { get; set; } = false;
             public int p_VISIntegrationTime { get; set; } = 25;
             public int p_NIRIntegrationTime { get; set; } = 150;
+            public int p_InitVISIntegrationTime { get; set; } = 25;
+            public int p_InitNIRIntegrationTime { get; set; } = 150;
             public int p_BGVISIntegrationTime { get; set; } = 50;
             public int p_BGNIRIntegrationTime { get; set; } = 150;
             public int p_VISBoxcar { get; set; } = 2;
@@ -1097,9 +1143,12 @@ namespace Root_CAMELLIA
                 {
                     p_NIRAverage = m_SettingDataWithErrorCode.Item1.nAverage_NIR;
                     p_VISAverage = m_SettingDataWithErrorCode.Item1.nAverage_VIS;
+                    p_InitVISIntegrationTime = m_SettingDataWithErrorCode.Item1.nInitCalIntTime_VIS;
+                    p_InitNIRIntegrationTime = m_SettingDataWithErrorCode.Item1.nInitCalIntTime_NIR;
                     p_BGNIRIntegrationTime = m_SettingDataWithErrorCode.Item1.nBGIntTime_NIR;
                     p_BGVISIntegrationTime = m_SettingDataWithErrorCode.Item1.nBGIntTime_VIS;
-                    //m_NIRBoxcar = m_SettingDataWithErrorCode.Item1.
+                    p_VISBoxcar = m_SettingDataWithErrorCode.Item1.nBoxcar_VIS;
+                    p_NIRBoxcar = m_SettingDataWithErrorCode.Item1.nBoxcar_NIR;
 
                 }
             }

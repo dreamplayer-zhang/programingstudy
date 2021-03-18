@@ -36,6 +36,9 @@ namespace Root_CAMELLIA.Module
         bool m_bStart = false;
         bool m_CalcThicknessDone = false;
 
+        public Dlg_Engineer_ViewModel.PM_SR_Parameter SR_Parameter = new Dlg_Engineer_ViewModel.PM_SR_Parameter();
+        public bool m_isPM = false;
+        public bool m_isAlphaFit = false;
         public Run_Measure(Module_Camellia module)
         {
             m_module = module;
@@ -79,6 +82,16 @@ namespace Root_CAMELLIA.Module
             while (m_bStart)
             {
                 int index;
+                bool useAlphafit = true;
+                if (m_isPM)
+                {
+                    useAlphafit = m_isAlphaFit;
+                }
+                else
+                {
+                    LibSR_Met.DataManager.GetInstance().m_SettngData.dAlphaFit = 1.0;
+                }
+                   
                 //if (EQ.p_eState == EQ.eState.Error)
                 //{
                 //    while (thicknessQueue.TryDequeue(out index)) ;
@@ -97,12 +110,17 @@ namespace Root_CAMELLIA.Module
                     sw.Start();
                     if (m_DataManager.recipeDM.MeasurementRD.UseThickness)
                     {
-                        if (App.m_nanoView.GetThickness(index, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+
+                        if (App.m_nanoView.GetThickness(index, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor, useAlphafit) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                         {
                             isEQStop = false;
+                            
                             // "Get Thickness Error";
                         }
-
+                        if (m_isPM)
+                        {
+                            m_mwvm.EngineerViewModel.p_pmParameter.p_alpha1 = App.m_nanoView.GetAlphaFit();
+                        }
                     }
                     else
                     {
@@ -140,15 +158,21 @@ namespace Root_CAMELLIA.Module
             m_thread = new Task(RunThread);
             m_thread.Start();
 
-            m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
-            Met.SettingData setting = null;
-            if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+            //m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
+            //Met.SettingData setting = null;
+            //if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+            //{
+            //    setting = m_SettingDataWithErrorCode.Item1;
+            //}
+            //else
+            //{
+            //    return "SettingDataLoad Error";
+            //}
+
+            if (!m_isPM)
             {
-                setting = m_SettingDataWithErrorCode.Item1;
-            }
-            else
-            {
-                return "SettingDataLoad Error";
+                Met.DataManager.GetInstance().m_SettngData.nMeasureIntTime_NIR = m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime;
+                Met.DataManager.GetInstance().m_SettngData.nMeasureIntTime_VIS = m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime;
             }
 
             //m_module.p_eState = (eState)5;
@@ -230,18 +254,15 @@ namespace Root_CAMELLIA.Module
                             m_mwvm.p_ArrowY2 = -y2 * RatioY;
                             m_mwvm.p_ArrowVisible = Visibility.Visible;
                         }
-                        isSaveDone = true;
                     }
-                    //  sw.Start();
-                   // while (!isSaveDone) ;
-                    isSaveDone = false;
-                    if (App.m_nanoView.SampleMeasure(i, x, y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, setting.nAverage_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, setting.nAverage_NIR,
-                        m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
-                        m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
-                    {
-                        isEQStop = false;
-                        return "Layer Model Not Ready";
-                    }
+                        if (App.m_nanoView.SampleMeasure(i, x, y,
+    m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
+    m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                        {
+                            isEQStop = false;
+                            return "Layer Model Not Ready";
+                        }
+
                     //pp.m_nanoView.
                     StopWatch sw = new StopWatch();
                     sw.Start();
@@ -296,7 +317,7 @@ namespace Root_CAMELLIA.Module
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
 
-                if (App.m_nanoView.SampleMeasure(0, m_ptTestMeasurePoint.X, m_ptTestMeasurePoint.Y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, setting.nAverage_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, setting.nAverage_NIR,
+                if (App.m_nanoView.SampleMeasure(0, m_ptTestMeasurePoint.X, m_ptTestMeasurePoint.Y,
                        m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
                        m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {

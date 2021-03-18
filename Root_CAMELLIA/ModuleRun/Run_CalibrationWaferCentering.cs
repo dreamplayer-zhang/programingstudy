@@ -33,6 +33,7 @@ namespace Root_CAMELLIA.Module
         public bool m_useCal = true;
         public bool m_useCentering = true;
 
+        public bool m_isPM = false;
         public Run_CalibrationWaferCentering(Module_Camellia module)
         {
             m_module = module;
@@ -92,22 +93,19 @@ namespace Root_CAMELLIA.Module
 
             if (m_useCal)
             {
-                m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
-                if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                if (m_useCentering)
                 {
-                    Met.SettingData setting = m_SettingDataWithErrorCode.Item1;
-                    if (m_useCentering)
+                    if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM) != "OK")
                     {
-                        if (m_DataManager.m_calibration.Run(m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, m_InitialCal) != "OK")
-                        {
-                            return "Calibration Error";
-                        }
+                        return "Calibration fail";
                     }
-                    else
+                }
+                else
+                {
+                    if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM, false) != "OK")
                     {
-                        App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime);
+                        return "Calibration fail";
                     }
-
                 }
             }
 

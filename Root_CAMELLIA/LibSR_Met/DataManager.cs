@@ -92,6 +92,11 @@ namespace Root_CAMELLIA.LibSR_Met
         //
     }
 
+    public class PM_SR_Parameter
+    {
+
+    }
+
     public class SettingData
     {
         public int nBGIntTime_VIS = 0;
@@ -100,7 +105,11 @@ namespace Root_CAMELLIA.LibSR_Met
         public int nAverage_NIR = 0;
         public int nBoxcar_NIR = 0;
         public int nBoxcar_VIS = 0;
-        public double nAlphaFit = 1.0;
+        public double dAlphaFit = 1.0;
+        public int nInitCalIntTime_VIS = 0;
+        public int nInitCalIntTime_NIR = 0;
+        public int nMeasureIntTime_VIS = 0;
+        public int nMeasureIntTime_NIR = 0;
 
         public SettingData()
         { 
@@ -148,6 +157,7 @@ namespace Root_CAMELLIA.LibSR_Met
         public bool bViewCalRGraph = true;
         public int nThicknessDataNum = 0;
         public float nStartWavelegth = 0;
+        public SettingData m_SettngData;
 
 
         //추후 제거 DS 2021.01.05 추가
@@ -184,8 +194,8 @@ namespace Root_CAMELLIA.LibSR_Met
             m_WL_List_R = new List<double>();// 특정 반사율 파장 리스트 
             m_WL_List_T = new List<double>();// 특정 투과율 파장 리스트 
             m_LayerData = new List<LayerData>();
-           
-            
+
+            m_SettngData = new SettingData();
 
             for (int i = 0; i < ConstValue.RAWDATA_POINT_MAX_SIZE; i++)
             {
