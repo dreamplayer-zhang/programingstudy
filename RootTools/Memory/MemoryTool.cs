@@ -631,14 +631,12 @@ namespace RootTools.Memory
 
             if (bServer)
             {
-                RunTreeRun(Tree.eMode.RegRead);
                 m_Server.RunTree(Tree.eMode.RegRead);
                 m_Server.Start();
                 m_Server.EventReciveData += M_Server_EventReciveData;
             }
             else
             {
-                RunTreeRun(Tree.eMode.RegRead);
                 m_Client.RunTree(Tree.eMode.RegRead);
                 m_Client.Connect();
                 m_Client.EventReciveData += M_Client_EventReciveData;

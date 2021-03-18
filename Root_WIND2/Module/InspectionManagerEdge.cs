@@ -56,7 +56,7 @@ namespace Root_WIND2
 			List<ParameterBase> paramList = recipe.ParameterItemList;
 			WorkBundle workBundle = new WorkBundle();
 			EdgeSurface edgeSurface = new EdgeSurface();
-			ProcessDefect_Edge processDefect_Edge = new ProcessDefect_Edge();
+			ProcessDefect_Edge processDefect_Edge = new ProcessDefect_Edge("defect");
 
 			foreach (ParameterBase param in paramList)
 				edgeSurface.SetParameter(param);

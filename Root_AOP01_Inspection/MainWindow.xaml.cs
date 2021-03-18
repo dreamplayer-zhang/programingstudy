@@ -120,7 +120,16 @@ namespace Root_AOP01_Inspection
 
 		private void Window_Closing(object sender, CancelEventArgs e)
 		{
-			ThreadStop();
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.BackInspMgRegName).Clear();
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.MainInspMgRegName).Clear();
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.PellInspMgRegName).Clear();
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.SideBotInspMgRegName).Clear();
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.SideLeftInspMgRegName).Clear();
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.SideRightInspMgRegName).Clear();
+			GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.SideTopInspMgRegName).Clear();
+			GlobalObjects.Instance.Get<AOP01_Engineer>().ThreadStop();
+
+			Application.Current.Shutdown();
 		}
 		#endregion
 
@@ -149,6 +158,8 @@ namespace Root_AOP01_Inspection
 			try
 			{
 #endif
+			// Settings
+			Settings settings = GlobalObjects.Instance.Register<Settings>();
 			// Engineer
 			AOP01_Engineer engineer = GlobalObjects.Instance.Register<AOP01_Engineer>();
 				DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
@@ -282,6 +293,7 @@ namespace Root_AOP01_Inspection
 				dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
 				//dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
 				//dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
+				dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
 				dialogService.Register<TK4S, TK4SModuleUI>();
 #if !DEBUG
 			}
@@ -358,7 +370,10 @@ namespace Root_AOP01_Inspection
 		}
 		void ThreadStop()
 		{
-			m_engineer.ThreadStop();
+			//if(m_engineer != null)
+			//{
+			//	m_engineer.ThreadStop();
+			//}
 		}
 
 
@@ -466,6 +481,23 @@ namespace Root_AOP01_Inspection
 				ViewArea.Height = new GridLength(200);
 			}
 
+		}
+
+		private void btnPopUpSetting(object sender, RoutedEventArgs e)
+		{
+			var viewModel = UIManager.Instance.SettingDialogViewModel;
+			Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+			if (result.HasValue)
+			{
+				if (result.Value)
+				{
+
+				}
+				else
+				{
+
+				}
+			}
 		}
 	}
 }

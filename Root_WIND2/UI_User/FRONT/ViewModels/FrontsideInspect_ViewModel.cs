@@ -197,10 +197,6 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-
-                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().ReadyWork();
-
-                //return;
                 //GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
                 this.ImageViewerVM.ClearObjects();
                 if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
@@ -214,10 +210,6 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().TryConnect();
-
-                //return;
-
                 EQ.p_bStop = false;
                 Vision vision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision;
                 if (vision.p_eState != ModuleBase.eState.Ready)
@@ -247,8 +239,6 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().StartWork();
-
                 if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
                 {
                     GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
@@ -264,11 +254,11 @@ namespace Root_WIND2.UI_User
             });
         }
 
-        public RelayCommand btnRemote
+        public RelayCommand btnRemoteStart
         {
             get => new RelayCommand(() =>
             {
-                
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
             });
         }
         #endregion

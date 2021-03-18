@@ -248,8 +248,20 @@
                                                HorizontalAlignment="Center"/>
                                 </Grid>
                             </MenuItem.Header>
-                        </MenuItem>
-                    </Menu>
+						</MenuItem>
+						<MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="110"
+								  Click="btnPopUpSetting">
+							<MenuItem.Header>
+								<TextBlock Text="Setting" 
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+							</MenuItem.Header>
+						</MenuItem>
+					</Menu>
                 </StackPanel>
                 <Menu Background="{StaticResource ControlBackGround}" HorizontalAlignment="Right">
                     <MenuItem Background="{StaticResource ControlBackGround}"

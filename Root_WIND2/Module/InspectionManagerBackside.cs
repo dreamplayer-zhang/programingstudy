@@ -99,7 +99,7 @@ namespace Root_WIND2
             surface.SetParameter(param);
 
             ProcessDefect processDefect = new ProcessDefect();
-            ProcessDefect_Backside processDefect_Backside = new ProcessDefect_Backside();
+            ProcessDefect_Backside processDefect_Backside = new ProcessDefect_Backside("defect");
 
 
             workBundle.Add(alignment);

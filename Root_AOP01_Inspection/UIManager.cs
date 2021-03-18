@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools_Vision;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,8 +33,8 @@ namespace Root_AOP01_Inspection
 		public Setup_ViewModel SetupViewModel { get => setupViewModel; set => setupViewModel = value; }
 		//internal Review_ViewModel ReviewViewModel { get => reviewViewModel; set => reviewViewModel = value; }
 		internal Run_ViewModel RunViewModel { get => runViewModel; set => runViewModel = value; }
-		//public SettingDialog SettingDialog { get => settingDialog; set => settingDialog = value; }
-		//public SettingDialog_ViewModel SettingDialogViewModel { get => settingDialogViewModel; set => settingDialogViewModel = value; }
+		public SettingDialog SettingDialog { get => settingDialog; set => settingDialog = value; }
+		public SettingDialog_ViewModel SettingDialogViewModel { get => settingDialogViewModel; set => settingDialogViewModel = value; }
 
 
 
@@ -49,7 +50,7 @@ namespace Root_AOP01_Inspection
 		private Review_Panel reviewWindow;
 		private Run_Panel runWindow;
 
-		//private SettingDialog settingDialog;
+		private SettingDialog settingDialog;
 		#endregion
 
 		#region ViewModel
@@ -57,7 +58,7 @@ namespace Root_AOP01_Inspection
 		//private Review_ViewModel reviewViewModel;
 		private Run_ViewModel runViewModel;
 
-		//private SettingDialog_ViewModel settingDialogViewModel;
+		private SettingDialog_ViewModel settingDialogViewModel;
 		#endregion
 
 		public bool Initialize()
@@ -69,7 +70,7 @@ namespace Root_AOP01_Inspection
 			InitRunMode();
 
 			// 기타 UI
-			//InitSettingDialog();
+			InitSettingDialog();
 
 			return true;
 		}
@@ -103,12 +104,12 @@ namespace Root_AOP01_Inspection
 			runWindow.DataContext = runViewModel;
 		}
 
-		//void InitSettingDialog()
-		//{
-		//	settingDialog = new SettingDialog();
-		//	settingDialogViewModel = new SettingDialog_ViewModel();
-		//	settingDialog.DataContext = settingDialogViewModel;
-		//}
+		void InitSettingDialog()
+		{
+			settingDialog = new SettingDialog();
+			settingDialogViewModel = new SettingDialog_ViewModel(GlobalObjects.Instance.Get<Settings>());
+			settingDialog.DataContext = settingDialogViewModel;
+		}
 
 		public void ChangeMainUI(UIElement window)
 		{

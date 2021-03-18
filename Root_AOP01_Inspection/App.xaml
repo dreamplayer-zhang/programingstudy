@@ -16,7 +16,42 @@
         <SolidColorBrush x:Key="GroupBoxBackground" Color="Transparent"/>
         <SolidColorBrush x:Key="Splitter" Color="DimGray"/>
         <SolidColorBrush x:Key="MainThema" Color="#FF2D2D50"/>
-        <!--End Color-->
+
+		<!--#region [Color Definition] -->
+		<SolidColorBrush x:Key="main_background" Color="#080820"/>
+		<SolidColorBrush x:Key="sidetap_parent_background" Color="#080820"/>
+		<SolidColorBrush x:Key="sidetap_child_background" Color="#151540"/>
+		<SolidColorBrush x:Key="main_view_background" Color="#505050"/>
+
+		<!-- sidetap -->
+		<SolidColorBrush x:Key="sidetap_parent_menu_normal" Color="#505060"/>
+		<SolidColorBrush x:Key="sidetap_parent_menu_mouseover" Color="#404070"/>
+		<!--<SolidColorBrush x:Key="sidetap_parent_menu_selected" Color="DarkSlateBlue"/>-->
+
+		<SolidColorBrush x:Key="sidetap_child_menu_normal" Color="#151540"/>
+		<SolidColorBrush x:Key="sidetap_child_menu_mouseover" Color="#404080"/>
+		<SolidColorBrush x:Key="sidetap_child_menu_selected" Color="#5070DD"/>
+		<SolidColorBrush x:Key="sidetap_child_menu_disable" Color="#333333"/>
+
+		<SolidColorBrush x:Key="sidetap_parent_menu_text" Color="White"/>
+		<SolidColorBrush x:Key="sidetap_child_menu_text" Color="White"/>
+		<SolidColorBrush x:Key="sidetap_child_menu_text_disable" Color="#888888"/>
+
+
+		<SolidColorBrush x:Key="main_view_groupbox_background" Color="#202035"/>
+
+		<SolidColorBrush x:Key="sidetap_child_button_normal" Color="#5050A0"/>
+		<SolidColorBrush x:Key="sidetap_child_button_mouseover" Color="#7070B0"/>
+		<SolidColorBrush x:Key="sidetap_child_button_press" Color="#3030A0"/>
+		<SolidColorBrush x:Key="sidetap_child_button_text" Color="White"/>
+		<SolidColorBrush x:Key="sidetap_child_button_press_text" Color="#888888"/>
+
+		<SolidColorBrush x:Key="groupbox_button_normal" Color="#5050A0"/>
+		<SolidColorBrush x:Key="groupbox_button_mouseover" Color="#7070B0"/>
+		<SolidColorBrush x:Key="groupbox_button_press" Color="#333356"/>
+		<SolidColorBrush x:Key="groupbox_button_text" Color="White"/>
+		<SolidColorBrush x:Key="groupbox_button_press_text" Color="#888888"/>
+		<!--End Color-->
         
         
         <!-- 베가 붙여옴-->
@@ -71,7 +106,41 @@
         <SolidColorBrush x:Key="LightGray"
                          Color="#FFEAEAEA" />
         <!--#endregion-->
-        <Style TargetType="{x:Type TabControl}"
+
+		<Style x:Key="main_view_groupbox" TargetType="GroupBox">
+			<Setter Property="BorderBrush" Value="Gray"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type GroupBox}" >
+
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="24"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<Border x:Name="Header"
+                                    Grid.Row="0"
+                                    Padding="10,0,0,0"
+                                    CornerRadius="2,2,0,0"
+                                    VerticalAlignment="Stretch"
+                                    Background="{StaticResource main_view_groupbox_background}">
+								<ContentPresenter VerticalAlignment="Center" ContentSource="Header" RecognizesAccessKey="True" />
+							</Border>
+							<Border Grid.Row="1" 
+                                    CornerRadius="0,0,2,2"
+                                    Background="{StaticResource main_view_groupbox_background}">
+								<ContentPresenter />
+							</Border>
+							<Grid.Effect>
+								<DropShadowEffect ShadowDepth="1" Color="Gray"/>
+							</Grid.Effect>
+						</Grid>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+		<Style TargetType="{x:Type TabControl}"
                x:Key="StackPanelTabControl">
             <Setter Property="Template">
                 <Setter.Value>

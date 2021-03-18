@@ -305,6 +305,9 @@
     <Compile Include="UI_Dialog\Dlg_OHT.xaml.cs">
       <DependentUpon>Dlg_OHT.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_Dialog\Dlg_Review.xaml.cs">
+      <DependentUpon>Dlg_Review.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_Dialog\test.xaml.cs">
       <DependentUpon>test.xaml</DependentUpon>
     </Compile>
@@ -429,6 +432,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_Dialog\Dlg_OHT.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_Review.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
