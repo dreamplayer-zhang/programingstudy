@@ -521,13 +521,13 @@ namespace Root_EFEM.Module
         {
             try
             {
-                if (EQ.IsStop()) return "EQ Stop";
+                //if (EQ.IsStop()) return "EQ Stop";
                 int msDelay = 1000 * secTimeout;
                 int ms10 = 0;
                 if (m_rs232.p_bConnect == false) return m_eSendCmd.ToString() + " RS232 not Connect !!";
                 while (m_eSendCmd != eCmd.None)
                 {
-                    if (EQ.IsStop()) return "EQ Stop";
+                    //if (EQ.IsStop()) return "EQ Stop";
                     Thread.Sleep(10);
                     ms10 += 10;
                     if (ms10 > msDelay) return m_eSendCmd.ToString() + " Has no Answer !!";
