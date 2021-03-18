@@ -99,15 +99,18 @@ namespace Root_CAMELLIA.Module
                     {
                         if (App.m_nanoView.GetThickness(index, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                         {
-                            isEQStop = true;
+                            isEQStop = false;
+                            // "Get Thickness Error";
                         }
+
                     }
                     else
                     {
+                        isEQStop = false;
                         //20210308
                         //m_mwvm.p_RTGraph.DrawReflectanceGraph(index, "Wavelength(nm)", "Reflectance(%)");
                         //m_mwvm.p_RTGraph.DrawTransmittanceGraph(index, "Wavelength(nm)", "Reflectance(%)");
-                       
+
                     }
                     m_mwvm.p_Progress = (((double)(index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
                     SaveRawData(index);
@@ -124,7 +127,9 @@ namespace Root_CAMELLIA.Module
         }
         public override string Run()
         {
-          
+            StopWatch test = new StopWatch();
+            test.Start();
+            m_log.Warn("Measure Start >> ");
 
             Axis axisLifter = m_module.p_axisLifter;
             if (m_module.LifterDown() != "OK")
@@ -181,8 +186,8 @@ namespace Root_CAMELLIA.Module
                 }
                 else
                 {
-                    centerX = m_StageCenterPos_pulse.X + (m_DataManager.m_waferCentering.m_ptCenter.X - m_StageCenterPos_pulse.X);
-                    centerY = m_StageCenterPos_pulse.Y + (m_DataManager.m_waferCentering.m_ptCenter.Y - m_StageCenterPos_pulse.Y);
+                    centerX = m_StageCenterPos_pulse.X - (m_DataManager.m_waferCentering.m_ptCenter.X - m_StageCenterPos_pulse.X);
+                    centerY = m_StageCenterPos_pulse.Y - (m_DataManager.m_waferCentering.m_ptCenter.Y - m_StageCenterPos_pulse.Y);
                     //centerX = m_DataManager.m_waferCentering.m_ptCenter.X - (m_StageCenterPos_pulse.X - m_DataManager.m_waferCentering.m_ptCenter.X);
                     //centerY = m_DataManager.m_waferCentering.m_ptCenter.Y - (m_StageCenterPos_pulse.Y- m_DataManager.m_waferCentering.m_ptCenter.Y);
                 }
@@ -213,6 +218,7 @@ namespace Root_CAMELLIA.Module
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
+
 
                         m_mwvm.p_ArrowX1 = x * RatioX;
                         m_mwvm.p_ArrowY1 = -y * RatioY;
@@ -327,7 +333,8 @@ namespace Root_CAMELLIA.Module
                 return p_sInfo;
 
             m_bStart = false;
-
+            test.Stop();
+            m_log.Warn("Measure End >> " + test.ElapsedMilliseconds);
             return "OK";
         }
 

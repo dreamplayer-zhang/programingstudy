@@ -98,7 +98,9 @@ namespace Root_CAMELLIA.LibSR_Met
         public int nAverage_VIS = 0;
         public int nBGIntTime_NIR = 0;
         public int nAverage_NIR = 0;
-        
+        public int nBoxcar_NIR = 0;
+        public int nBoxcar_VIS = 0;
+        public double nAlphaFit = 1.0;
 
         public SettingData()
         { 
@@ -385,6 +387,48 @@ namespace Root_CAMELLIA.LibSR_Met
                 for (int n = 0; n < data.Transmittance.Length ; n++)
                 {
                     sw.WriteLine("{0},{1},{2}", data.Wavelength[n], data.Reflectance[n], data.Transmittance[n]);
+                }
+                sw.Close();
+
+                m_Log.WriteLog(LogType.Datas, "Point: " + nPointIndex.ToString() + " Raw data saved.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                m_Log.WriteLog(LogType.Error, "Point: " + nPointIndex.ToString() + " Failed to save raw data.");
+                return false;
+            }
+        }
+        public bool SaveCheckSensorData(string sPath, int nPointIndex)
+        {
+            try
+            {
+                if (!m_RawData[nPointIndex].bDataExist)
+                {
+                    throw new Exception("Point: " + nPointIndex.ToString() + " Data is not exist.");
+                }
+                bool bFirst = true;
+                if (File.Exists(sPath))
+                {
+                    bFirst = false;
+                }
+                else
+                {
+                    string FileSpace = sPath.Replace(".csv", "");
+                    File.Create(FileSpace);
+                }
+
+                if (Path.GetExtension(sPath) != ".csv")
+                {
+                    sPath += ".csv";
+                }
+                StreamWriter sw = new StreamWriter(new FileStream(sPath, FileMode.Create));
+                RawData data = m_RawData[nPointIndex];
+
+                sw.WriteLine("Wavelength[nm],Reflectance[%]");
+                for (int n = 0; n < data.Wavelength.Length; n++)
+                {
+                    sw.WriteLine("{0},{1}", data.Wavelength[n], data.Reflectance[n]);
                 }
                 sw.Close();
 

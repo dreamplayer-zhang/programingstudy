@@ -76,7 +76,9 @@ namespace Root_CAMELLIA.Module
 
         public override string Run()
         {
-
+            StopWatch test = new StopWatch();
+            test.Start();
+            m_log.Warn("Measure Start");
             AxisXY axisXY = m_module.p_axisXY;
             Axis axisZ = m_module.p_axisZ;
             string strVRSImageDir = "D:\\";
@@ -149,11 +151,13 @@ namespace Root_CAMELLIA.Module
             if (m_module.Run(axisXY.WaitReady()))
                 return p_sInfo;
 
-            // Thread.Sleep(1000);
+             //Thread.Sleep(1000);
 
-
+            ImageData asdv = new ImageData(VRS.p_ImageViewer.p_ImageData.m_MemData);
+            
             if (VRS.Grab() == "OK")
             {
+                //asdv.SetData(VRS.p_ImageViewer.p_ImageData.GetPtr(), new CRect(0,0, 2044, 2044), (int)VRS.p_ImageViewer.p_ImageData.p_Stride, 3);
                 strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 0);
                 img.SaveImageSync(strVRSImageFullPath);
                 //Grab error
@@ -163,16 +167,22 @@ namespace Root_CAMELLIA.Module
                 return "Grab Error";
             }
 
+            
+
             CenteringParam param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.LT);
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
-            //m_DataManager.m_waferCentering.FindEdge(param);
 
             if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
                 return p_sInfo;
             if (m_module.Run(axisXY.WaitReady()))
                 return p_sInfo;
-
+           // return "OK";
+            //m_DataManager.m_waferCentering.FindEdge(param);
             //Thread.Sleep(1000);
+
+
+
+            
 
             if (VRS.Grab() == "OK")
             {
@@ -189,11 +199,13 @@ namespace Root_CAMELLIA.Module
             param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.RT);
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
             //m_DataManager.m_waferCentering.FindEdge(param);
+
+           // Thread.Sleep(1000);
             if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
                 return p_sInfo;
             if (m_module.Run(axisXY.WaitReady()))
                 return p_sInfo;
-            //Thread.Sleep(1000);
+            
             if (VRS.Grab() == "OK")
             {
                 strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);
@@ -234,8 +246,9 @@ namespace Root_CAMELLIA.Module
             }
 
             m_module.SetLight(false);
-            sw.Stop();
-            System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
+
+            test.Stop();
+            m_log.Warn("Calibration End >> " + test.ElapsedMilliseconds);
 
             return "OK";
         }

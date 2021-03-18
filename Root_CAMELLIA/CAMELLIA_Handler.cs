@@ -126,7 +126,7 @@ namespace Root_CAMELLIA
                     {
                         if (child.IsWaferExist(0) == true)
                         {
-                            //child.SetAlarm();
+                            child.SetAlarm();
                             return false;
                         }
                     }
@@ -275,10 +275,22 @@ namespace Root_CAMELLIA
         public bool m_bIsPossible_Recovery = false;
         public string StateHome()
         {
-            //string sInfo = StateHome(m_moduleList.m_aModule);
-            //if (sInfo == "OK")
-            //    EQ.p_eState = EQ.eState.Ready;
-            //return sInfo;
+            m_HomeProgress.Reset();
+            m_HomeProgress.HomeProgressShow();
+            string sInfo = StateHome(m_wtr);
+            if(sInfo != "OK")
+            {
+                EQ.p_eState = EQ.eState.Init;
+                return sInfo;
+            }
+            sInfo = StateHome((Loadport_RND)m_aLoadport[0], (Loadport_RND)m_aLoadport[1], m_Aligner, m_camellia, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1]);
+            if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
+
+            if (m_gem != null)
+            {
+                m_gem.DeleteAllJobInfo();
+            }
+
             IWTR iWTR = (IWTR)m_wtr;
             foreach (IWTRChild child in iWTR.p_aChild)
             {
@@ -306,21 +318,6 @@ namespace Root_CAMELLIA
                 }
             }
 
-            m_HomeProgress.Reset();
-            m_HomeProgress.HomeProgressShow();
-            string sInfo = StateHome(m_wtr);
-            if(sInfo != "OK")
-            {
-                EQ.p_eState = EQ.eState.Init;
-                return sInfo;
-            }
-            sInfo = StateHome((Loadport_RND)m_aLoadport[0], (Loadport_RND)m_aLoadport[1], m_Aligner, m_camellia, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1]);
-            if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
-
-            if (m_gem != null)
-            {
-                m_gem.DeleteAllJobInfo();
-            }
             return sInfo;
         }
 
