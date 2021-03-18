@@ -500,16 +500,17 @@ namespace Root_CAMELLIA
 
         public void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            if (listRealPos.Count <= 0)
+            {
+                return;
+            }
+
             if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
             {
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
 
-            if (listRealPos.Count <= 0)
-            {
-                return;
-            }
             double centerX;
             double centerY;
             if (DataManager.Instance.m_waferCentering.m_ptCenter.X == 0 && DataManager.Instance.m_waferCentering.m_ptCenter.Y == 0)
