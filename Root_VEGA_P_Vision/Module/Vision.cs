@@ -182,13 +182,6 @@ namespace Root_VEGA_P_Vision.Module
             {
                 m_vision = vision;
             }
-
-            #region ModuleRun
-            public class Run_SideGrab:ModuleRunBase
-            {
-                
-            }
-            #endregion
         }
         SideOptic m_sideOptic;
         #endregion
@@ -406,6 +399,46 @@ namespace Root_VEGA_P_Vision.Module
             public override string Run()
             {
                 Thread.Sleep((int)(1000 * m_secDelay / 2));
+                return "OK";
+            }
+        }
+
+        public class Run_SideGrab : ModuleRunBase
+        {
+            Vision m_module;
+            GrabMode SidegrabMode = null;
+            string sSideGrabMode = "";
+            public Run_SideGrab(Vision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+            #region Property
+            string p_sSideGrabMode
+            {
+                get { return sSideGrabMode; }
+                set
+                {
+                    sSideGrabMode = value;
+                    SidegrabMode = m_module.GetGrabMode(value);
+                }
+            }
+            #endregion
+            public override ModuleRunBase Clone()
+            {
+                Run_SideGrab run = new Run_SideGrab(m_module);
+                run.p_sSideGrabMode = p_sSideGrabMode;
+
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                p_sSideGrabMode = tree.Set(p_sSideGrabMode, p_sSideGrabMode, m_module.p_asGrabMode, "Grab Mode : Side Grab", "Select GrabMode", bVisible);
+            }
+
+            public override string Run()
+            {
                 return "OK";
             }
         }
