@@ -617,7 +617,7 @@ namespace Root_EFEM.Module
         public string BeforePut(int nID)
         {
             if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
-            return SendCmd(eCmd.VacuumOn); ;
+            return SendCmd(eCmd.VacuumOn); 
         }
 
         public string AfterGet(int nID)

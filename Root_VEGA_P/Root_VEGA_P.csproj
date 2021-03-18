@@ -246,6 +246,10 @@
       <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
       <Name>Root_EFEM</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Root_VEGA_P_Vision\Root_VEGA_P_Vision.csproj">
+      <Project>{919e1fd8-72d3-430d-ad34-9aadda3e1996}</Project>
+      <Name>Root_VEGA_P_Vision</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -7,6 +7,7 @@ using System.Windows;
 
 namespace RootTools.Database
 {
+    [Serializable]
     public class Measurement : Data
     {
         public int m_nMeasurementIndex;

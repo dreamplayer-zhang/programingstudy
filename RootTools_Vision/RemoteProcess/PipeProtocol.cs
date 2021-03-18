@@ -64,7 +64,7 @@ namespace RootTools_Vision
             }
         }
 
-        public PipeProtocol(PIPE_MESSAGE_TYPE msgType, REMOTE_PROCESS_TYPE msg, string dataType = "", object data = null)
+        public PipeProtocol(PIPE_MESSAGE_TYPE msgType, REMOTE_PROCESS_MESSAGE_TYPE msg, string dataType = "", object data = null)
         {
             this.msgType = msgType;
             this.msg = msg.ToString();
