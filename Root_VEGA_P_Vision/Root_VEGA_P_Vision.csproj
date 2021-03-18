@@ -184,6 +184,14 @@
     <Compile Include="Module\InfoPod.cs" />
     <Compile Include="Module\IRTRChild.cs" />
     <Compile Include="Module\Vision.cs" />
+    <Compile Include="Module\Vision\Run_SideGrab.cs" />
+    <Compile Include="Module\Vision\Run_StainGrab.cs" />
+    <Compile Include="MVVM\Converter.cs" />
+    <Compile Include="MVVM\Helper.cs" />
+    <Compile Include="MVVM\ObservableObject.cs" />
+    <Compile Include="MVVM\PropertySupport.cs" />
+    <Compile Include="MVVM\RelayCommand.cs" />
+    <Compile Include="MVVM\SizeObserver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -1,5 +1,9 @@
 ﻿using RootTools;
+using RootTools.Camera.BaslerPylon;
+using RootTools.Camera.Dalsa;
+using RootTools.Camera.Matrox;
 using RootTools.Control;
+using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.ToolBoxs;
@@ -13,11 +17,18 @@ namespace Root_VEGA_P_Vision.Module
     public class Vision : ModuleBase, IRTRChild
     {
         #region ToolBox
+        LightSet lightSet;
+        MemoryPool memoryPool;
+        MemoryGroup memoryGroup;
+        public AxisXY axisXY;
+
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
+            p_sInfo = m_toolBox.Get(ref lightSet, this);
             m_stage.GetTools(m_toolBox, bInit); 
-            m_mainOptic.GetTools(m_toolBox, bInit); //TDI
-            m_sideOptic.GetTools(m_toolBox, bInit);  //
+            m_mainOptic.GetTools(m_toolBox, bInit); //TDI, Stain, ZStack
+            m_sideOptic.GetTools(m_toolBox, bInit);  //Side
             m_remote.GetTools(bInit);
         }
         #endregion
@@ -93,12 +104,22 @@ namespace Root_VEGA_P_Vision.Module
         public class MainOptic : NotifyProperty
         {
             public Axis m_axisZ;
-            MemoryPool memoryPool;
+            public Camera_Dalsa camTDI;
+            public Camera_Basler camStain;
+            public Camera_Matrox camZStack;
+            MemoryData memoryStain, memoryTDI, memoryZStack;
+            public enum eMainScan
+            {
+                MemoryStain,MemoryTDI,MemoryZStack
+            }
+
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
                 m_vision.p_sInfo = toolBox.Get(ref m_axisZ, m_vision, "Main Optic AxisZ");
-                m_vision.p_sInfo = toolBox.Get(ref memoryPool, m_vision, "Main Optic Memory", 1);
+                m_vision.p_sInfo = toolBox.Get(ref camTDI, m_vision, "TDI Cam");
+                m_vision.p_sInfo = toolBox.Get(ref camStain, m_vision, "Stain Cam");
+                m_vision.p_sInfo = toolBox.Get(ref camZStack, m_vision, "Z-Stacking Cam");
 
                 if (bInit)
                 {
@@ -108,17 +129,25 @@ namespace Root_VEGA_P_Vision.Module
 
             public void InitMemorys()
             {
-                //m_memoryGroup = m_memoryPool.GetGroup(p_id);
-                //m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
-                //m_memoryMain = m_memoryGroup.CreateMemory("Layer", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+                memoryStain = m_vision.memoryGroup.CreateMemory(eMainScan.MemoryStain.ToString(), 1, 1, 1000, 1000);
+                memoryTDI = m_vision.memoryGroup.CreateMemory(eMainScan.MemoryTDI.ToString(), 1, 1, 1000, 1000);
+                memoryZStack = m_vision.memoryGroup.CreateMemory(eMainScan.MemoryZStack.ToString(), 1, 1, 1000, 1000);
             }
 
-            double m_pulsePermm = 10000;
-            public string Move(double mmZ, bool bWait = true)
+            public double m_pulsePermm = 10000;
+
+            public string Move(Axis axis, double pos, bool bWait = true)
             {
-                string sRun = m_axisZ.StartMove(mmZ * m_pulsePermm);
-                if (sRun != "OK") return sRun;
-                return bWait ? m_axisZ.WaitReady() : "OK";
+                string sRun = axis.StartMove(pos);
+                if (sRun.Equals("OK")) return sRun;
+                return bWait ? axis.WaitReady() : "OK";
+            }
+
+            public string MoveXY(CPoint posmm,bool bWait = true)
+            {
+                string sRun = m_vision.axisXY.StartMove(new RPoint(posmm));
+                if (sRun.Equals("OK")) return sRun;
+                return bWait ? m_vision.axisXY.WaitReady() : "OK";
             }
 
             public void RunTree(Tree tree)
@@ -132,23 +161,25 @@ namespace Root_VEGA_P_Vision.Module
                 m_vision = vision;
             }
         }
-        MainOptic m_mainOptic;
+        public MainOptic m_mainOptic;
         #endregion
 
         #region SideOptic
         public class SideOptic : NotifyProperty
         {
+            Camera_Basler camSide;
+            MemoryData memoryTop, memoryLeft, memoryRight, memoryBottom;
             public enum eSide
             {
                 Top,Left,Right,Bottom
             }
-            public Axis m_axisZ;
+            public Axis axisZ;
 
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
-                m_vision.p_sInfo = toolBox.Get(ref m_axisZ, m_vision, "Side Optic AxisZ");
-
+                m_vision.p_sInfo = toolBox.Get(ref axisZ, m_vision, "Side Optic AxisZ");
+                m_vision.p_sInfo = toolBox.Get(ref camSide, m_vision, "Side Cam");
                 if (bInit)
                 {
 
@@ -157,19 +188,18 @@ namespace Root_VEGA_P_Vision.Module
 
             public void InitMemorys()
             {
-                //memoryGroup = memoryPool.GetGroup(m_vision.p_id);
-                //memoryTop = memoryGroup.CreateMemory(eSide.Top.ToString(), 1, 1, 1000, 1000);
-                //memoryLeft = memoryGroup.CreateMemory(eSide.Left.ToString(), 1, 1, 1000, 1000);
-                //memoryRight = memoryGroup.CreateMemory(eSide.Right.ToString(), 1, 1, 1000, 1000);
-                //memoryBottom = memoryGroup.CreateMemory(eSide.Bottom.ToString(), 1, 1, 1000, 1000);
+                memoryTop = m_vision.memoryGroup.CreateMemory(eSide.Top.ToString(), 1, 1, 1000, 1000);
+                memoryLeft = m_vision.memoryGroup.CreateMemory(eSide.Left.ToString(), 1, 1, 1000, 1000);
+                memoryRight = m_vision.memoryGroup.CreateMemory(eSide.Right.ToString(), 1, 1, 1000, 1000);
+                memoryBottom = m_vision.memoryGroup.CreateMemory(eSide.Bottom.ToString(), 1, 1, 1000, 1000);
             }
 
             double m_pulsePermm = 10000;
             public string Move(double mmZ, bool bWait = true)
             {
-                string sRun = m_axisZ.StartMove(mmZ * m_pulsePermm);
+                string sRun = axisZ.StartMove(mmZ * m_pulsePermm);
                 if (sRun != "OK") return sRun;
-                return bWait ? m_axisZ.WaitReady() : "OK";
+                return bWait ? axisZ.WaitReady() : "OK";
             }
 
             public void RunTree(Tree tree)
@@ -183,7 +213,7 @@ namespace Root_VEGA_P_Vision.Module
                 m_vision = vision;
             }
         }
-        SideOptic m_sideOptic;
+        public SideOptic m_sideOptic;
         #endregion
 
         #region InfoPod
@@ -260,7 +290,7 @@ namespace Root_VEGA_P_Vision.Module
         {
             return (p_infoPod != null);
         }
-        #endregion
+        #endregion 
 
         #region Teach RTR
         Buffer.TeachRTR m_teach; 
@@ -283,6 +313,7 @@ namespace Root_VEGA_P_Vision.Module
 
         public override void InitMemorys()
         {
+            memoryGroup = memoryPool.GetGroup(p_id);
             m_mainOptic.InitMemorys();
             m_sideOptic.InitMemorys(); 
         }
@@ -314,6 +345,7 @@ namespace Root_VEGA_P_Vision.Module
             m_stage.RunTree(tree.GetTree("Stage"));
             m_mainOptic.RunTree(tree.GetTree("Main Optic"));
             m_sideOptic.RunTree(tree.GetTree("Side Optic"));
+            RunTreeGrabMode(tree.GetTree("Grab Mode"));
         }
         #endregion
 
@@ -345,8 +377,8 @@ namespace Root_VEGA_P_Vision.Module
             while (m_aGrabMode.Count < m_lGrabMode)
             {
                 string id = "Mode." + m_aGrabMode.Count.ToString("00");
-                //GrabMode grabMode = new GrabMode(id, lightSet, memoryPool);
-                //m_aGrabMode.Add(grabMode);
+                GrabMode grabMode = new GrabMode(id, m_cameraSet, lightSet, memoryPool);
+                m_aGrabMode.Add(grabMode);
             }
             while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
             foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTreeName(tree.GetTree("Name", false));
@@ -374,76 +406,8 @@ namespace Root_VEGA_P_Vision.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
-        }
-
-        public class Run_Delay : ModuleRunBase
-        {
-            Vision m_module;
-            public Run_Delay(Vision module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            double m_secDelay = 2;
-            public override ModuleRunBase Clone()
-            {
-                Run_Delay run = new Run_Delay(m_module);
-                run.m_secDelay = m_secDelay;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
-            }
-
-            public override string Run()
-            {
-                Thread.Sleep((int)(1000 * m_secDelay / 2));
-                return "OK";
-            }
-        }
-
-        public class Run_SideGrab : ModuleRunBase
-        {
-            Vision m_module;
-            GrabMode SidegrabMode = null;
-            string sSideGrabMode = "";
-            public Run_SideGrab(Vision module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-            #region Property
-            string p_sSideGrabMode
-            {
-                get { return sSideGrabMode; }
-                set
-                {
-                    sSideGrabMode = value;
-                    SidegrabMode = m_module.GetGrabMode(value);
-                }
-            }
-            #endregion
-            public override ModuleRunBase Clone()
-            {
-                Run_SideGrab run = new Run_SideGrab(m_module);
-                run.p_sSideGrabMode = p_sSideGrabMode;
-
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                p_sSideGrabMode = tree.Set(p_sSideGrabMode, p_sSideGrabMode, m_module.p_asGrabMode, "Grab Mode : Side Grab", "Select GrabMode", bVisible);
-            }
-
-            public override string Run()
-            {
-                return "OK";
-            }
+            //AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
+            AddModuleRunList(new Run_StainGrab(this), true, "Stain Grab");
         }
         #endregion
     }

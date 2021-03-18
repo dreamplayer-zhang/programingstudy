@@ -16,6 +16,8 @@ namespace Root_VEGA_P_Vision.Module
         public eGrabDirection m_eDefaultCamDirection = eGrabDirection.Forward;
         public eGrabDirection m_eGrabDirection = eGrabDirection.Forward;
         public ICamera m_camera = null;
+        CameraSet m_cameraSet;
+        string m_sCamera = "";
         public double m_dTDIToVRSOffsetX = 0;
         public double m_dTDIToVRSOffsetY = 0;
         public double m_dVRSFocusPos = 0;
@@ -42,7 +44,7 @@ namespace Root_VEGA_P_Vision.Module
             m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Cam Y Resolution", "Y Resolution (um)", bVisible);
             m_nYOffset = tree.Set(m_nYOffset, m_nYOffset, "Cam Y Offset", "Y Tilt(pxl)", bVisible);
             m_nFocusPosZ = tree.Set(m_nFocusPosZ, m_nFocusPosZ, "Focus Z Position", "Focus Z Position", bVisible);
-            m_nPodSize_mm = tree.Set(m_nPodSize_mm, m_nPodSize_mm, "Wafer Size Y", "Wafer Size Y", bVisible);
+            m_nPodSize_mm = tree.Set(m_nPodSize_mm, m_nPodSize_mm, "Pod Size Y", "Pod Size Y", bVisible);
             m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
             m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
         }
@@ -51,6 +53,11 @@ namespace Root_VEGA_P_Vision.Module
         {
             m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
             m_nReverseOffsetY = tree.Set(m_nReverseOffsetY, 800, "ReverseOffsetY", "Reverse Scan 동작시 Y 이미지 Offset 설정");
+            if (m_cameraSet != null)
+            {
+                m_sCamera = tree.Set(m_sCamera, m_sCamera, m_cameraSet.p_asCamera, "Camera", "Select Camera", bVisible, false);
+                m_camera = m_cameraSet.Get(m_sCamera);
+            }
             m_ScanLineNum = tree.Set(m_ScanLineNum, m_ScanLineNum, "Scan Line Number", "Scan Line Number");
             m_ScanStartLine = tree.Set(m_ScanStartLine, m_ScanStartLine, "Scan Start Line", "Scan Start Line");
             m_dTDIToVRSOffsetX = tree.Set(m_dTDIToVRSOffsetX, m_dTDIToVRSOffsetX, "TDI To VRS Offset X", "TDI To VRS Offset X");
@@ -160,10 +167,11 @@ namespace Root_VEGA_P_Vision.Module
 
         public string p_sName { get; set; }
 
-        public GrabMode(string id, LightSet lightSet, MemoryPool memoryPool)
+        public GrabMode(string id, CameraSet camSet,LightSet lightSet, MemoryPool memoryPool)
         {
             p_id = id;
             p_sName = id;
+            m_cameraSet = camSet;
             m_lightSet = lightSet;
             m_memoryPool = memoryPool;
         }
