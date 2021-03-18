@@ -58,11 +58,6 @@ namespace Root_VEGA_P_Vision.Module
             return (p_infoPod == null) ? "OK" : p_id + " IsPutOK - Pod Exist";
         }
 
-        public override void ButtonHome()
-        {
-            BeforeGet(); 
-        }
-
         public string BeforeGet()
         {
             if (p_eRemote == eRemote.Client) return StartRemoteRun(eRemoteRun.BeforeGet, null);
