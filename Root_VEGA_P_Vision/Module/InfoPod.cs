@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using System;
 
 namespace Root_VEGA_P_Vision.Module
 {
@@ -30,14 +31,40 @@ namespace Root_VEGA_P_Vision.Module
         Registry m_reg; 
         public void WriteReg()
         {
-            m_reg.Write("p_ePod", (int)p_ePod);
-            m_reg.Write("p_bTurn", p_bTurn); 
+            m_reg?.Write("p_ePod", (int)p_ePod);
+            m_reg?.Write("p_bTurn", p_bTurn); 
         }
 
         public void ReadReg()
         {
+            if (m_reg == null) return; 
             p_ePod = (ePod)m_reg.Read("p_ePod", (int)p_ePod);
             p_bTurn = m_reg.Read("p_bTurn", p_bTurn); 
+        }
+        #endregion
+
+        #region ToString
+        public override string ToString()
+        {
+            return ((int)p_ePod).ToString() + ',' + p_bTurn.ToString(); 
+        }
+
+        public void FromString(string sInfoPod)
+        {
+            //forget
+        }
+
+        public InfoPod(string sInfoPod)
+        {
+            try
+            {
+                string[] asInfoPod = sInfoPod.Split(',');
+                p_ePod = (ePod)Convert.ToInt32(asInfoPod[0]); 
+                p_bTurn = (asInfoPod[1] == true.ToString());
+                p_id = p_ePod.ToString();
+                m_reg = new Registry("InfoPod." + p_id);
+            }
+            catch (Exception) { }
         }
         #endregion
 
