@@ -46,8 +46,12 @@ namespace Root_VEGA_P_Vision.Module
         #region ToString
         public override string ToString()
         {
-            int nTurn = p_bTurn ? 1 : 0; 
-            return ((int)p_ePod).ToString() + ',' + nTurn.ToString(); 
+            return ((int)p_ePod).ToString() + ',' + p_bTurn.ToString(); 
+        }
+
+        public void FromString(string sInfoPod)
+        {
+            //forget
         }
 
         public InfoPod(string sInfoPod)
@@ -56,7 +60,9 @@ namespace Root_VEGA_P_Vision.Module
             {
                 string[] asInfoPod = sInfoPod.Split(',');
                 p_ePod = (ePod)Convert.ToInt32(asInfoPod[0]); 
-                p_bTurn = (asInfoPod[1] == "1");
+                p_bTurn = (asInfoPod[1] == true.ToString());
+                p_id = p_ePod.ToString();
+                m_reg = new Registry("InfoPod." + p_id);
             }
             catch (Exception) { }
         }

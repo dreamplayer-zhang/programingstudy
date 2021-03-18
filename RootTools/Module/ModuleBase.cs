@@ -451,6 +451,7 @@ namespace RootTools.Module
                 ModuleRun,
                 State,
                 RemoteRun,
+
                 Initial,
                 BeforeGet,
                 BeforePut,
@@ -552,8 +553,8 @@ namespace RootTools.Module
                 m_aProtocol.Add(protocol); 
                 switch (m_module.p_eRemote)
                 {
-                    case eRemote.Client: m_client.Send(protocol.p_sSend); break;
-                    case eRemote.Server: m_server.Send(protocol.p_sSend); break; 
+                    case eRemote.Client: m_client?.Send(protocol.p_sSend); break;
+                    case eRemote.Server: m_server?.Send(protocol.p_sSend); break; 
                 }
             }
 

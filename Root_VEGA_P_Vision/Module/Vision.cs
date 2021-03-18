@@ -191,6 +191,7 @@ namespace Root_VEGA_P_Vision.Module
         public void ReadPod_Registry()
         {
             int nPod = m_reg.Read("InfoPod", -1);
+            if (nPod < 0) return;  
             p_infoPod = new InfoPod((InfoPod.ePod)nPod);
             p_infoPod.ReadReg();
         }
@@ -296,7 +297,9 @@ namespace Root_VEGA_P_Vision.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            m_stage.RunTree(tree.GetTree("Stage")); 
+            m_stage.RunTree(tree.GetTree("Stage"));
+            m_mainOptic.RunTree(tree.GetTree("Main Optic"));
+            m_sideOptic.RunTree(tree.GetTree("Side Optic"));
         }
         #endregion
 
